@@ -1,19 +1,22 @@
-//! PCM sample buffers: decoding, procedural generation, DSP operations.
-//! SoundData: interleaved f32 samples clamped to [-1, 1]; supports in-memory and file-based loading.
+﻿//! In-memory PCM sample container and waveform synthesis/edit utilities.
+//! Owns sample buffers, metadata (rate/channels/bit depth), WAV encoding, procedural
+//! generators, waveform rasterisation, and simple one-pole filtering helpers.
 
 use rodio::Source;
-
-/// f32 PCM buffer: interleaved samples, clamped to [-1, 1].
 #[derive(Debug, Clone)]
+/// In-memory interleaved f32 PCM data with metadata and utility transforms.
 pub struct SoundData {
+    /// Interleaved audio samples in the range [-1.0, 1.0].
     samples: Vec<f32>,
+    /// Sample rate in Hz.
     sample_rate: u32,
+    /// Channel count (1=mono, 2=stereo).
     channels: u16,
+    /// Logical bit depth used by import/export paths.
     bit_depth: u16,
 }
-
 impl SoundData {
-    /// Create silent zero-filled buffer.
+    /// Allocate silent audio buffer with `sample_count` frames and `channels` interleaved channels.
     pub fn new(sample_count: usize, sample_rate: u32, channels: u16) -> Self {
         Self {
             samples: vec![0.0; sample_count * channels as usize],
@@ -22,8 +25,7 @@ impl SoundData {
             bit_depth: 32,
         }
     }
-
-    /// Create from existing f32 sample buffer.
+    /// Construct from an existing interleaved sample vector.
     pub fn from_samples(samples: Vec<f32>, sample_rate: u32, channels: u16) -> Self {
         Self {
             samples,
@@ -32,8 +34,7 @@ impl SoundData {
             bit_depth: 16,
         }
     }
-
-    /// Create from path (if Some) or silent buffer.
+    /// Build `SoundData` from Lua arguments: load file when `path` is set, otherwise allocate silent buffer.
     pub fn from_lua_args(
         path: Option<&str>,
         count: usize,
@@ -45,8 +46,7 @@ impl SoundData {
             None => Ok(Self::new(count, sample_rate, channels)),
         }
     }
-
-    /// Decode audio file to SoundData; return error on open/decode failure.
+    /// Decode audio file at `path` into f32 interleaved samples.
     pub fn from_file(path: &str) -> Result<Self, String> {
         use std::io::BufReader;
         let file = std::fs::File::open(path)
@@ -54,13 +54,9 @@ impl SoundData {
         let reader = BufReader::new(file);
         let source = rodio::Decoder::new(reader)
             .map_err(|e| format!("Failed to decode audio file '{}': {}", path, e))?;
-
         let channels = source.channels();
         let sample_rate = source.sample_rate();
-
-        // Collect all samples as f32
         let samples: Vec<f32> = source.convert_samples::<f32>().collect();
-
         Ok(Self {
             samples,
             sample_rate,
@@ -68,18 +64,15 @@ impl SoundData {
             bit_depth: 32,
         })
     }
-
-    /// Returns a sample at the given index.
+    /// Return sample value at `index`, or `None` when out of bounds.
     pub fn get_sample(&self, index: usize) -> Option<f32> {
         self.samples.get(index).copied()
     }
-
-    /// Returns the full sample buffer as a slice.
+    /// Return all interleaved samples as a shared slice.
     pub fn samples(&self) -> &[f32] {
         &self.samples
     }
-
-    /// Sets a sample at index, clamped to [-1, 1].
+    /// Set sample at `index` to `value` (clamped to [-1,1]); returns `false` if index is invalid.
     pub fn set_sample(&mut self, index: usize, value: f32) -> bool {
         if index < self.samples.len() {
             self.samples[index] = value.clamp(-1.0, 1.0);
@@ -88,70 +81,56 @@ impl SoundData {
             false
         }
     }
-
-    /// Returns sample count per channel.
+    /// Return number of frames (samples per channel), not raw interleaved element count.
     pub fn sample_count(&self) -> usize {
         if self.channels == 0 {
             return 0;
         }
         self.samples.len() / self.channels as usize
     }
-
-    /// Returns sample rate in Hz.
+    /// Return sample rate in Hz.
     pub fn sample_rate(&self) -> u32 {
         self.sample_rate
     }
-
-    /// Returns channel count.
+    /// Return channel count.
     pub fn channel_count(&self) -> u16 {
         self.channels
     }
-
-    /// Returns bit depth.
+    /// Return logical bit depth metadata.
     pub fn bit_depth(&self) -> u16 {
         self.bit_depth
     }
-
-    /// Returns duration in seconds.
+    /// Return duration in seconds.
     pub fn duration(&self) -> f64 {
         if self.sample_rate == 0 {
             return 0.0;
         }
         self.sample_count() as f64 / self.sample_rate as f64
     }
-
-    /// Returns reference to raw samples.
+    /// Return interleaved sample slice.
     pub fn as_samples(&self) -> &[f32] {
         &self.samples
     }
-
-    /// Encodes as WAV (16-bit PCM + RIFF header).
+    /// Encode current samples as an in-memory 16-bit PCM WAV byte vector.
     pub fn encode_wav(&self) -> Vec<u8> {
         let num_samples = self.samples.len();
-        let bytes_per_sample: u16 = 2; // 16-bit PCM
+        let bytes_per_sample: u16 = 2;
         let block_align = self.channels * bytes_per_sample;
         let byte_rate = self.sample_rate * block_align as u32;
         let data_size = (num_samples * bytes_per_sample as usize) as u32;
-        let file_size = 36 + data_size; // RIFF header = 44 bytes total, minus 8 for RIFF+size
-
+        let file_size = 36 + data_size;
         let mut buf = Vec::with_capacity(44 + data_size as usize);
-
-        // RIFF header
         buf.extend_from_slice(b"RIFF");
         buf.extend_from_slice(&file_size.to_le_bytes());
         buf.extend_from_slice(b"WAVE");
-
-        // fmt chunk
         buf.extend_from_slice(b"fmt ");
-        buf.extend_from_slice(&16u32.to_le_bytes()); // chunk size
-        buf.extend_from_slice(&1u16.to_le_bytes()); // PCM format
+        buf.extend_from_slice(&16u32.to_le_bytes());
+        buf.extend_from_slice(&1u16.to_le_bytes());
         buf.extend_from_slice(&self.channels.to_le_bytes());
         buf.extend_from_slice(&self.sample_rate.to_le_bytes());
         buf.extend_from_slice(&byte_rate.to_le_bytes());
         buf.extend_from_slice(&block_align.to_le_bytes());
-        buf.extend_from_slice(&(bytes_per_sample * 8).to_le_bytes()); // bits per sample
-
-        // data chunk
+        buf.extend_from_slice(&(bytes_per_sample * 8).to_le_bytes());
         buf.extend_from_slice(b"data");
         buf.extend_from_slice(&data_size.to_le_bytes());
         for &sample in &self.samples {
@@ -159,11 +138,9 @@ impl SoundData {
             let val = (clamped * 32767.0) as i16;
             buf.extend_from_slice(&val.to_le_bytes());
         }
-
         buf
     }
-
-    /// Generates sine wave: freq, duration, sample_rate, amplitude.
+    /// Generate mono sine-wave `SoundData` at `freq` Hz for `duration` seconds.
     pub fn sine_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
         let n = (sample_rate as f32 * duration) as usize;
         let samples = (0..n)
@@ -174,8 +151,7 @@ impl SoundData {
             .collect();
         Self::from_samples(samples, sample_rate, 1)
     }
-
-    /// Generates square wave.
+    /// Generate mono square-wave `SoundData` at `freq` Hz for `duration` seconds.
     pub fn square_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
         let n = (sample_rate as f32 * duration) as usize;
         let amp = amplitude.clamp(0.0, 1.0);
@@ -191,8 +167,7 @@ impl SoundData {
             .collect();
         Self::from_samples(samples, sample_rate, 1)
     }
-
-    /// Generates sawtooth wave.
+    /// Generate mono sawtooth-wave `SoundData` at `freq` Hz for `duration` seconds.
     pub fn sawtooth_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
         let n = (sample_rate as f32 * duration) as usize;
         let amp = amplitude.clamp(0.0, 1.0);
@@ -204,8 +179,7 @@ impl SoundData {
             .collect();
         Self::from_samples(samples, sample_rate, 1)
     }
-
-    /// Generates triangle wave.
+    /// Generate mono triangle-wave `SoundData` at `freq` Hz for `duration` seconds.
     pub fn triangle_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
         let n = (sample_rate as f32 * duration) as usize;
         let amp = amplitude.clamp(0.0, 1.0);
@@ -217,8 +191,7 @@ impl SoundData {
             .collect();
         Self::from_samples(samples, sample_rate, 1)
     }
-
-    /// Generates white noise (seeded LCG PRNG).
+    /// Generate mono white-noise `SoundData` using deterministic LCG seeded by `seed`.
     pub fn white_noise(duration: f32, sample_rate: u32, amplitude: f32, seed: u32) -> Self {
         let n = (sample_rate as f32 * duration) as usize;
         let amp = amplitude.clamp(0.0, 1.0);
@@ -231,9 +204,8 @@ impl SoundData {
             .collect();
         Self::from_samples(samples, sample_rate, 1)
     }
-
-    /// Draws waveform visualization to ImageData.
     #[allow(clippy::too_many_arguments)]
+    /// Draw waveform envelope into `img` as vertical min/max bars in RGBA colour `(r,g,b,a)`.
     pub fn draw_waveform(
         &self,
         img: &mut crate::image::ImageData,
@@ -249,25 +221,19 @@ impl SoundData {
         if w == 0 || h == 0 || self.samples.is_empty() {
             return;
         }
-
         let num_frames = self.sample_count();
         if num_frames == 0 {
             return;
         }
-
         let channels = self.channels as usize;
         let img_w = img.width() as i32;
         let img_h = img.height() as i32;
-
         let half_h = h as f32 / 2.0;
-
         for px in 0..w {
             let start_frame = (px as usize * num_frames) / w as usize;
             let end_frame = ((px + 1) as usize * num_frames) / w as usize;
-
             let mut min_val = 0.0f32;
             let mut max_val = 0.0f32;
-
             if start_frame < end_frame {
                 for frame in start_frame..end_frame {
                     let mut sum = 0.0;
@@ -297,14 +263,11 @@ impl SoundData {
                 min_val = avg;
                 max_val = avg;
             }
-
             let mut y1 = ((y as f32 + half_h) - max_val * half_h).round() as i32;
             let mut y2 = ((y as f32 + half_h) - min_val * half_h).round() as i32;
-
             if y1 > y2 {
                 std::mem::swap(&mut y1, &mut y2);
             }
-
             let draw_x = x + px as i32;
             if draw_x >= 0 && draw_x < img_w {
                 for draw_y in y1..=y2 {
@@ -315,8 +278,7 @@ impl SoundData {
             }
         }
     }
-
-    /// Applies first-order IIR lowpass filter in-place.
+    /// Apply one-pole low-pass filter in place with cutoff `cutoff_hz`.
     pub fn apply_lowpass(&mut self, cutoff_hz: f32) {
         if self.samples.is_empty() || cutoff_hz <= 0.0 {
             return;
@@ -330,8 +292,7 @@ impl SoundData {
             *s = prev_output;
         }
     }
-
-    /// Applies first-order IIR highpass filter in-place.
+    /// Apply one-pole high-pass filter in place with cutoff `cutoff_hz`.
     pub fn apply_highpass(&mut self, cutoff_hz: f32) {
         if self.samples.is_empty() || cutoff_hz <= 0.0 {
             return;
@@ -348,21 +309,18 @@ impl SoundData {
             *s = prev_output;
         }
     }
-
-    /// Applies bandpass filter (lowpass cascaded with highpass).
+    /// Apply simple band-pass by chaining `apply_highpass(low_hz)` then `apply_lowpass(high_hz)`.
     pub fn apply_bandpass(&mut self, low_hz: f32, high_hz: f32) {
         self.apply_highpass(low_hz);
         self.apply_lowpass(high_hz);
     }
-
-    /// Applies gain (amplitude scaling) in-place, clamping to [-1, 1].
+    /// Multiply all samples by `gain` and clamp to [-1.0, 1.0].
     pub fn apply_gain(&mut self, gain: f32) {
         for s in self.samples.iter_mut() {
             *s = (*s * gain).clamp(-1.0, 1.0);
         }
     }
-
-    /// Mixes another SoundData in-place (additive, clamped to [-1, 1]).
+    /// Mix `other` into `self` sample-by-sample, extending length if needed and clamping output to [-1,1].
     pub fn mix_into(&mut self, other: &SoundData) {
         let len = self.samples.len().max(other.samples.len());
         self.samples.resize(len, 0.0);
@@ -372,4 +330,3 @@ impl SoundData {
         }
     }
 }
-

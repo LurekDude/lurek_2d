@@ -1,47 +1,28 @@
-//! Fallback error screen display for unhandled failures.
-//! ErrorScreen: formats error and traceback into render commands for blue error display.
+﻿//! Fatal error presentation model and text-formatting helpers.
+//! Builds display-ready message and traceback lines from Lua/engine failures and
+//! emits `RenderCommand` sets for full-screen error view rendering.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::error::EngineError;
 use crate::runtime::resource_keys::FontKey;
-
-// ---- Type: ErrorScreen ----
-
-/// Blue error screen background color.
 const ERROR_BG: [f32; 4] = [0.11, 0.22, 0.53, 1.0];
-/// Highlight color for the "Error" heading.
 const ERROR_TITLE_COLOR: [f32; 4] = [0.9, 0.6, 0.6, 1.0];
-/// White color for the error message body.
 const ERROR_TEXT_COLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-/// Subdued color for the help footer.
 const ERROR_FOOTER_COLOR: [f32; 4] = [0.7, 0.7, 0.8, 1.0];
-
-/// Maximum characters per line before wrapping.
 const WRAP_WIDTH: usize = 80;
-/// Approximate glyph width at scale 1.0 for the built-in bitmap font.
 const GLYPH_W: f32 = 8.0;
-/// Line height at scale 1.0 for the built-in bitmap font.
 const LINE_H: f32 = 14.0;
-
-/// Error screen with wrapped message and traceback display.
-/// Generates render commands for a blue error fallback screen.
-/// # Fields
-/// - `title` — Error heading.
-/// - `message_lines` — Wrapped message body.
-/// - `traceback_lines` — Stack trace lines (empty if none).
+/// Render-ready error payload shown when Lua or engine execution fails fatally.
 pub struct ErrorScreen {
-    /// Bold heading (first line of the error).
+    /// Title line shown near the top of the screen.
     title: String,
-    /// Wrapped message body lines.
+    /// Wrapped primary error message lines.
     message_lines: Vec<String>,
-    /// Cleaned-up traceback lines (empty if no traceback).
+    /// Optional cleaned traceback lines.
     traceback_lines: Vec<String>,
 }
-
 impl ErrorScreen {
-    // ---- Implementation: ErrorScreen ----
-
-    /// Create error screen from plain error message; first line is title, rest is body.
+    /// Build error screen model from plain text where first line is title and remainder is body.
     pub fn from_error(msg: &str) -> Self {
         let lines: Vec<&str> = msg.lines().collect();
         let title = lines.first().unwrap_or(&"Error").to_string();
@@ -57,25 +38,21 @@ impl ErrorScreen {
             traceback_lines: Vec::new(),
         }
     }
-
-    /// Create error screen from mlua error; extract message and traceback.
+    /// Build error screen model from `mlua::Error`, splitting message and traceback sections.
     pub fn from_lua_error(err: &mlua::Error) -> Self {
         let full = format_lua_error(err);
         let (msg_part, tb_part) = split_traceback(&full);
         let cleaned_msg = replace_string_markers(&msg_part);
-
-        // Try to extract "file:line: actual error" into a more readable format.
         let (title, body) = if let Some(colon2) = find_second_colon(&cleaned_msg) {
             let location = cleaned_msg[..colon2].trim();
             let description = cleaned_msg[colon2 + 1..].trim();
             (
-                format!("Lua Error  —  {}", location),
+                format!("Lua Error  â€”  {}", location),
                 description.to_string(),
             )
         } else {
             ("Lua Error".to_string(), cleaned_msg.clone())
         };
-
         let message_lines = wrap_text(&body, WRAP_WIDTH);
         let traceback_lines = format_traceback(&tb_part);
         Self {
@@ -84,31 +61,11 @@ impl ErrorScreen {
             traceback_lines,
         }
     }
-
-    /// Creates an `ErrorScreen` from an `EngineError`.
-    ///
-    /// # Parameters
-    /// - `err` — `&EngineError`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Build error screen model from `EngineError` display text.
     pub fn from_engine_error(err: &EngineError) -> Self {
         Self::from_error(&err.to_string())
     }
-
-    /// Generates a sequence of `RenderCommand` values that render the error screen.
-    ///
-    /// # Parameters
-    /// - `screen_w` — `u32`.
-    /// - `screen_h` — `u32`.
-    /// - `heading_font` — `Option<FontKey>`.
-    /// - `body_font` — `Option<FontKey>`.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
-    ///
-    /// When `heading_font` and `body_font` are `Some`, uses `Print` commands
-    /// for crisp text. Falls back to the built-in bitmap `Print` when `None`.
+    /// Build draw commands that render full-screen error background, text body, traceback, and footer hints.
     pub fn build_render_commands(
         &self,
         screen_w: u32,
@@ -119,8 +76,6 @@ impl ErrorScreen {
         let mut cmds = Vec::new();
         let margin_x = 40.0_f32;
         let mut y = 40.0_f32;
-
-        // Blue background fill
         cmds.push(RenderCommand::SetColor(
             ERROR_BG[0],
             ERROR_BG[1],
@@ -134,8 +89,6 @@ impl ErrorScreen {
             w: screen_w as f32,
             h: screen_h as f32,
         });
-
-        // "Error" heading
         cmds.push(RenderCommand::SetColor(
             ERROR_TITLE_COLOR[0],
             ERROR_TITLE_COLOR[1],
@@ -152,11 +105,8 @@ impl ErrorScreen {
             });
             y += 50.0;
         } else {
-            // No font available — skip heading
             y += 50.0;
         }
-
-        // Error title (first line)
         cmds.push(RenderCommand::SetColor(
             ERROR_TEXT_COLOR[0],
             ERROR_TEXT_COLOR[1],
@@ -170,16 +120,12 @@ impl ErrorScreen {
         };
         self.push_text(&mut cmds, &self.title, margin_x, y, body_font);
         y += body_line_h + 4.0;
-
-        // Message body
         for line in &self.message_lines {
             if !line.is_empty() {
                 self.push_text(&mut cmds, line, margin_x, y, body_font);
             }
             y += body_line_h;
         }
-
-        // Traceback
         if !self.traceback_lines.is_empty() {
             y += body_line_h * 0.5;
             cmds.push(RenderCommand::SetColor(0.8, 0.8, 0.9, 1.0));
@@ -195,8 +141,6 @@ impl ErrorScreen {
                 y += body_line_h;
             }
         }
-
-        // Footer instructions
         let footer = "Press Escape to quit  |  R to restart  |  Ctrl+C to copy error";
         let footer_y = screen_h as f32 - 50.0;
         cmds.push(RenderCommand::SetColor(
@@ -206,14 +150,9 @@ impl ErrorScreen {
             ERROR_FOOTER_COLOR[3],
         ));
         self.push_text(&mut cmds, footer, margin_x, footer_y, body_font);
-
         cmds
     }
-
-    /// Returns the full error text as a plain string suitable for clipboard copy.
-    ///
-    /// # Returns
-    /// `String` containing the title, message, and traceback joined with newlines.
+    /// Return formatted text representation used for clipboard export and logs.
     pub fn as_text(&self) -> String {
         let mut parts = vec![self.title.clone()];
         parts.extend(self.message_lines.iter().cloned());
@@ -226,8 +165,7 @@ impl ErrorScreen {
         }
         parts.join("\n")
     }
-
-    /// Pushes a text draw command using the loaded font.
+    /// Push one text draw command when `font_key` is available.
     fn push_text(
         &self,
         cmds: &mut Vec<RenderCommand>,
@@ -247,19 +185,7 @@ impl ErrorScreen {
         }
     }
 }
-
-// ---- Helper Functions: Text Formatting ----
-
-/// Wraps a text string at word boundaries to fit within `max_chars` columns.
-///
-/// # Parameters
-/// - `text` — `&str`.
-/// - `max_chars` — `usize`.
-///
-/// # Returns
-/// `Vec<String>`.
-///
-/// Returns one `String` per output line. Empty input produces an empty `Vec`.
+/// Wrap `text` into lines not exceeding `max_chars`, preserving existing line breaks.
 pub fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
     let mut result = Vec::new();
     for line in text.lines() {
@@ -271,7 +197,6 @@ pub fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
         for word in line.split_whitespace() {
             if current.is_empty() {
                 if word.len() > max_chars {
-                    // Force-break very long words.
                     let mut remaining = word;
                     while remaining.len() > max_chars {
                         result.push(remaining[..max_chars].to_string());
@@ -298,18 +223,7 @@ pub fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
     }
     result
 }
-
-/// Cleans up a Lua traceback string for display.
-///
-/// # Parameters
-/// - `traceback` — `&str`.
-///
-/// # Returns
-/// `Vec<String>`.
-///
-/// - Removes `[string "..."]` wrappers, showing just `filename:line`.
-/// - Strips the "stack traceback:" header line.
-/// - Prefixes each line with two spaces of indentation.
+/// Normalize traceback block by removing boilerplate lines and replacing string markers.
 pub fn format_traceback(traceback: &str) -> Vec<String> {
     traceback
         .lines()
@@ -319,14 +233,12 @@ pub fn format_traceback(traceback: &str) -> Vec<String> {
         })
         .map(|l| {
             let cleaned = l.trim();
-            // Remove [string "..."] markers → just "filename:line"
             let cleaned = replace_string_markers(cleaned);
             format!("  {}", cleaned)
         })
         .collect()
 }
-
-/// Formats an `mlua::Error` into a user-friendly string.
+/// Convert `mlua::Error` variants into user-facing text, preserving nested callback tracebacks.
 fn format_lua_error(err: &mlua::Error) -> String {
     match err {
         mlua::Error::RuntimeError(msg) => msg.clone(),
@@ -341,8 +253,7 @@ fn format_lua_error(err: &mlua::Error) -> String {
         other => format!("{}", other),
     }
 }
-
-/// Splits a formatted error string into (message, traceback) parts.
+/// Split combined Lua error text into message part and traceback part.
 fn split_traceback(full: &str) -> (String, String) {
     if let Some(idx) = full.find("stack traceback:") {
         let msg = full[..idx].trim_end().to_string();
@@ -352,22 +263,19 @@ fn split_traceback(full: &str) -> (String, String) {
         (full.to_string(), String::new())
     }
 }
-
-/// Finds the byte offset of the second `:` in a string like `"file.lua:40: msg"`.
-/// Returns `None` if fewer than two colons exist.
+/// Return byte index of the second colon in `s`, if present.
 fn find_second_colon(s: &str) -> Option<usize> {
     let first = s.find(':')?;
     s[first + 1..].find(':').map(|i| first + 1 + i)
 }
-
-/// Replaces `[string "X"]:line` patterns with `X:line`.
+/// Replace Lua `[string "..."]` markers with bare script names for cleaner display.
 fn replace_string_markers(s: &str) -> String {
     let mut result = s.to_string();
     while let Some(start) = result.find("[string \"") {
-        let after = start + 9; // length of `[string "`
+        let after = start + 9;
         if let Some(end_quote) = result[after..].find("\"]") {
             let name = result[after..after + end_quote].to_string();
-            let end = after + end_quote + 2; // skip `"]`
+            let end = after + end_quote + 2;
             result = format!("{}{}{}", &result[..start], name, &result[end..]);
         } else {
             break;
@@ -375,5 +283,3 @@ fn replace_string_markers(s: &str) -> String {
     }
     result
 }
-
-// Remaining tests migrated to tests/rust/unit/app_tests.rs

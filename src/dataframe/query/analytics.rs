@@ -1,8 +1,11 @@
-//! Statistical helpers: percentile, normalization, outliers.
+//! Own statistical analytics extension for `DataFrame` used in the query pipeline.
+//! Provides z-score normalisation, min-max rescaling to a target range, outlier detection
+//! by threshold, most-frequent-value lookup, and Shannon entropy over rendered cell strings.
+//! Also exposes a free `percentile` function for sorted f64 slices. All operations are nil-safe:
+//! nil cells are excluded from numeric computations. Does not mutate the source frame.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
-
-/// Linear-interpolation percentile on a **sorted** slice.
+/// Compute percentile by linear interpolation over sorted values.
 pub fn percentile(sorted: &[f64], pct: f64) -> f64 {
     if sorted.is_empty() {
         return 0.0;
@@ -16,13 +19,8 @@ pub fn percentile(sorted: &[f64], pct: f64) -> f64 {
     let frac = rank - lo as f64;
     sorted[lo] * (1.0 - frac) + sorted[hi] * frac
 }
-
 impl DataFrame {
-    // -----------------------------------------------------------------------
-    // Normalisation
-    // -----------------------------------------------------------------------
-
-    /// Add a z-score column.
+    /// Compute z-score for numeric column and write result column.
     pub fn zscore_col(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -50,8 +48,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add a min-max normalised column, scaled to `[out_min, out_max]`.
+    /// Normalize numeric column to output range and write result column.
     pub fn normalize_col(
         &mut self,
         col: ColRef,
@@ -91,12 +88,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    // -----------------------------------------------------------------------
-    // Outlier detection
-    // -----------------------------------------------------------------------
-
-    /// Return rows where `col` deviates more than `threshold` std devs from the mean.
+    /// Return rows where absolute z-score exceeds threshold.
     pub fn outliers(&self, col: ColRef, threshold: f64) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -119,12 +111,7 @@ impl DataFrame {
             .collect();
         Ok(self.extract_rows(&indices))
     }
-
-    // -----------------------------------------------------------------------
-    // Mode and entropy
-    // -----------------------------------------------------------------------
-
-    /// Return the most frequent non-nil value in a column.
+    /// Return most frequent non-nil value in selected column.
     pub fn mode_val(&self, col: ColRef) -> Result<CellValue, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -145,8 +132,7 @@ impl DataFrame {
         let best = order.iter().max_by_key(|k| counts[*k].1);
         Ok(best.map(|k| counts[k].0.clone()).unwrap_or(CellValue::Nil))
     }
-
-    /// Shannon entropy (bits) of the value distribution in a column.
+    /// Compute Shannon entropy over rendered cell values.
     pub fn entropy(&self, col: ColRef) -> Result<f64, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();

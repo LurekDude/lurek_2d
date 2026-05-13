@@ -1,14 +1,5 @@
-﻿//! Spatial owns 2D neighborhood operations for NdArray grids.
-//! It implements convolution, morphology, flood fill, region copy,
-//! matrix multiplication, and vector dot products on row-major buffers.
-
-use std::collections::VecDeque;
-
 use crate::compute::array::{DataType, NdArray};
-
-// Convolution.
-
-/// Convolve a 2D input with zero padding and return an output with identical shape.
+use std::collections::VecDeque;
 pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if input.ndim() != 2 {
         return Err(format!(
@@ -22,16 +13,13 @@ pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> 
             kernel.ndim()
         ));
     }
-
     let in_rows = input.shape()[0];
     let in_cols = input.shape()[1];
     let k_rows = kernel.shape()[0];
     let k_cols = kernel.shape()[1];
     let kr_half = k_rows / 2;
     let kc_half = k_cols / 2;
-
     let mut out = NdArray::zeros(&[in_rows, in_cols], input.dtype())?;
-
     for r in 0..in_rows {
         for c in 0..in_cols {
             let mut acc = 0.0f64;
@@ -54,13 +42,8 @@ pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> 
             out.set_f64(out.flat_index(&[r, c]).expect("index in bounds"), acc);
         }
     }
-
     Ok(out)
 }
-
-// Morphological operations.
-
-/// Dilate nonzero cells with a Manhattan-radius neighborhood and return a 0/1 field.
 pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("dilate: input must be 2D, got {}D", a.ndim()));
@@ -68,7 +51,6 @@ pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     let rows = a.shape()[0];
     let cols = a.shape()[1];
     let mut out = NdArray::zeros(&[rows, cols], a.dtype())?;
-
     for r in 0..rows {
         for c in 0..cols {
             let mut found = false;
@@ -93,11 +75,8 @@ pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
             }
         }
     }
-
     Ok(out)
 }
-
-/// Erode nonzero cells with a Manhattan-radius neighborhood and return a 0/1 field.
 pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("erode: input must be 2D, got {}D", a.ndim()));
@@ -105,7 +84,6 @@ pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     let rows = a.shape()[0];
     let cols = a.shape()[1];
     let mut out = NdArray::zeros(&[rows, cols], a.dtype())?;
-
     for r in 0..rows {
         for c in 0..cols {
             let mut all_nonzero = true;
@@ -136,11 +114,8 @@ pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
             }
         }
     }
-
     Ok(out)
 }
-
-/// Flood-fill 4-connected cells from a seed and return the modified copy.
 pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("flood_fill: input must be 2D, got {}D", a.ndim()));
@@ -152,19 +127,14 @@ pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArr
             "flood_fill: ({row}, {col}) out of bounds for shape ({rows}, {cols})"
         ));
     }
-
     let mut out = a.clone();
     let target = out.get_f64(out.flat_index(&[row, col]).expect("index in bounds"));
-
-    // Exit early when target and fill values are equal.
     if (target - val).abs() < f64::EPSILON {
         return Ok(out);
     }
-
     let mut queue = VecDeque::new();
     queue.push_back((row, col));
     out.set_f64(out.flat_index(&[row, col]).expect("index in bounds"), val);
-
     while let Some((r, c)) = queue.pop_front() {
         let neighbors: [(isize, isize); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
         for (dr, dc) in neighbors {
@@ -181,11 +151,8 @@ pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArr
             }
         }
     }
-
     Ok(out)
 }
-
-/// Copy a rectangular region into a new 2D array.
 pub fn get_region(
     a: &NdArray,
     row: usize,
@@ -206,7 +173,6 @@ pub fn get_region(
     if sub_rows == 0 || sub_cols == 0 {
         return Err("get_region: sub-region must have positive dimensions".to_string());
     }
-
     let mut out = NdArray::zeros(&[sub_rows, sub_cols], a.dtype())?;
     for r in 0..sub_rows {
         for c in 0..sub_cols {
@@ -217,8 +183,6 @@ pub fn get_region(
     }
     Ok(out)
 }
-
-/// Write a source 2D block into a target 2D array at the requested offset.
 pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Result<(), String> {
     if a.ndim() != 2 {
         return Err(format!("set_region: target must be 2D, got {}D", a.ndim()));
@@ -238,7 +202,6 @@ pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Res
             "set_region: region ({row},{col})+({sr},{sc}) exceeds bounds ({rows},{cols})"
         ));
     }
-
     for r in 0..sr {
         for c in 0..sc {
             let s_idx = src.flat_index(&[r, c]).expect("index in bounds");
@@ -248,8 +211,6 @@ pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Res
     }
     Ok(())
 }
-
-/// Multiply two 2D matrices with compatible inner dimensions and return the product.
 pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!(
@@ -272,13 +233,11 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
             "matmul: inner dimensions mismatch: ({m},{k_a}) x ({k_b},{n})"
         ));
     }
-
     let out_dtype = if a.dtype() == DataType::Float64 || b.dtype() == DataType::Float64 {
         DataType::Float64
     } else {
         a.dtype()
     };
-
     let mut out = NdArray::zeros(&[m, n], out_dtype)?;
     for i in 0..m {
         for j in 0..n {
@@ -292,8 +251,6 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-/// Compute dot product of two equal-length 1D arrays and return the scalar result.
 pub fn dot(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     if a.ndim() != 1 {
         return Err(format!("dot: first operand must be 1D, got {}D", a.ndim()));
@@ -308,7 +265,6 @@ pub fn dot(a: &NdArray, b: &NdArray) -> Result<f64, String> {
             b.shape()[0]
         ));
     }
-
     let mut acc = 0.0f64;
     for i in 0..a.shape()[0] {
         acc += a.get_f64(i) * b.get_f64(i);

@@ -1,21 +1,22 @@
-//! Audio source metadata and 3D spatial state.
-//! SpatialState: position, velocity, orientation for spatial audio; AudioSource: legacy handle.
+﻿//! Lightweight audio source descriptors used by the audio API.
+//! `SpatialState` carries listener-relative 3D attributes, and `AudioSource` stores
+//! source identity/path/default playback flags before registration in `Mixer`.
 
 use crate::log_msg;
 use crate::runtime::log_messages::AS01;
-
-/// 3D spatial audio state: position, velocity, orientation.
 #[derive(Debug, Clone, Copy)]
+/// 3D spatial attributes used for panning/attenuation and doppler calculations.
 pub struct SpatialState {
-    /// World-space position `[x, y, z]`.
+    /// Source position as `[x, y, z]`.
     pub position: [f32; 3],
-    /// World-space velocity (Doppler effect).
+    /// Source velocity as `[vx, vy, vz]`.
     pub velocity: [f32; 3],
-    /// Forward + up direction vectors `[fx, fy, fz, ux, uy, uz]`.
+    /// Forward/up orientation vectors packed as `[fx, fy, fz, ux, uy, uz]`.
     pub orientation: [f32; 6],
 }
-
+/// `Default` impl: zero position/velocity, forward -Z, up +Y.
 impl Default for SpatialState {
+    /// Create default spatial state suitable for non-spatialised playback.
     fn default() -> Self {
         SpatialState {
             position: [0.0, 0.0, 0.0],
@@ -24,21 +25,19 @@ impl Default for SpatialState {
         }
     }
 }
-
-/// Legacy audio source handle (superseded by Mixer SlotMap).
+/// Basic audio source metadata exposed to scripting and tools.
 pub struct AudioSource {
-    /// Numeric ID (legacy, unused).
+    /// Stable source identifier assigned by the caller.
     pub id: usize,
-    /// File path relative to game directory.
+    /// Asset path to the source audio file.
     pub file_path: String,
-    /// Playback volume (default 1.0).
+    /// Per-source gain multiplier.
     pub volume: f32,
-    /// Loop on completion.
+    /// Whether playback should loop when used directly.
     pub looping: bool,
 }
-
 impl AudioSource {
-    /// Create new source with default volume (1.0) and no looping.
+    /// Create a new source descriptor with volume=1.0 and looping disabled.
     pub fn new(id: usize, file_path: &str) -> Self {
         log_msg!(debug, AS01, "{}", file_path);
         AudioSource {
@@ -49,4 +48,3 @@ impl AudioSource {
         }
     }
 }
-

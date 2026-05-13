@@ -1,35 +1,20 @@
-//! Province map import and preprocessing helpers.
-//!
-//! This module centralizes expensive, reusable province-map prep work that was
-//! previously re-implemented in Lua scripts (marker sanitization + metadata import).
-
-use std::collections::{HashMap, HashSet};
-use std::path::Path;
-
 use crate::image::ImageData;
 use crate::province::registry::ProvinceRegistry;
-
+use std::collections::{HashMap, HashSet};
+use std::path::Path;
 #[derive(Debug, Clone)]
 struct ProvinceInfo {
     name: Option<String>,
     terrain: Option<String>,
 }
-
-/// Marker-detection thresholds used by [`sanitize_marked_png`].
 #[derive(Debug, Clone)]
 pub struct MarkerSanitizeOptions {
-    /// White-ish marker threshold used for capital markers.
     pub capital_min: u8,
-    /// Magenta-ish marker threshold used for label markers (red minimum).
     pub label_r_min: u8,
-    /// Magenta-ish marker threshold used for label markers (green maximum).
     pub label_g_max: u8,
-    /// Magenta-ish marker threshold used for label markers (blue minimum).
     pub label_b_min: u8,
-    /// Maximum ring radius used to find replacement owner color around a marker.
     pub search_radius: u32,
 }
-
 impl Default for MarkerSanitizeOptions {
     fn default() -> Self {
         Self {
@@ -41,45 +26,26 @@ impl Default for MarkerSanitizeOptions {
         }
     }
 }
-
-/// Summary returned by [`sanitize_marked_png`].
 #[derive(Debug, Clone, Copy)]
 pub struct MarkerSanitizeSummary {
-    /// Number of marker pixels replaced by nearby owner colors.
     pub replaced_pixels: u32,
-    /// Number of marker pixels where no non-marker owner color was found.
     pub unresolved_pixels: u32,
 }
-
-/// Options used by [`import_metadata_from_files`].
 #[derive(Debug, Clone)]
 pub struct ProvinceMetadataImportOptions {
-    /// Sanitized map PNG used for RGB->game-id mapping.
     pub color_map_png_path: String,
-    /// Marker PNG used for capital/label markers; defaults to `color_map_png_path`.
     pub marker_png_path: Option<String>,
-    /// CSV path with `id,r,g,b` rows.
     pub color_csv_path: String,
-    /// Optional TOML path with per-id metadata (`name`, `terrain`).
     pub province_toml_path: Option<String>,
-    /// Terrain labels treated as water.
     pub water_terrain_tokens: Vec<String>,
-    /// Terrain type value used for water provinces.
     pub water_terrain_type: u32,
-    /// Terrain type value used for non-water provinces.
     pub land_terrain_type: u32,
-    /// Whether to set deterministic political colors from game ids.
     pub set_political_colors: bool,
-    /// Whether to set label text from TOML metadata or fallback id.
     pub set_label_text: bool,
-    /// Whether to read and apply capital markers.
     pub set_capitals: bool,
-    /// Whether to read and apply label-line markers.
     pub set_label_lines: bool,
-    /// Marker thresholds used on `marker_png_path`.
     pub marker_options: MarkerSanitizeOptions,
 }
-
 impl Default for ProvinceMetadataImportOptions {
     fn default() -> Self {
         Self {
@@ -98,36 +64,25 @@ impl Default for ProvinceMetadataImportOptions {
         }
     }
 }
-
-/// Summary returned by [`import_metadata_from_files`].
 #[derive(Debug, Clone, Copy)]
 pub struct ProvinceMetadataImportSummary {
-    /// Number of unique registry province ids mapped to external game ids.
     pub mapped_provinces: u32,
-    /// Number of capitals written from marker pixels.
     pub capitals_set: u32,
-    /// Number of label lines inferred from marker clusters.
     pub label_lines_set: u32,
-    /// Number of label texts written.
     pub labels_set: u32,
 }
-
 fn pack_rgb(r: u8, g: u8, b: u8) -> u32 {
     ((r as u32) << 16) | ((g as u32) << 8) | (b as u32)
 }
-
 fn is_capital_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     r >= opts.capital_min && g >= opts.capital_min && b >= opts.capital_min
 }
-
 fn is_label_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     r >= opts.label_r_min && g <= opts.label_g_max && b >= opts.label_b_min
 }
-
 fn is_special_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     is_capital_marker(r, g, b, opts) || is_label_marker(r, g, b, opts)
 }
-
 fn find_owner_rgb(
     img: &ImageData,
     x: u32,
@@ -138,7 +93,6 @@ fn find_owner_rgb(
     let h = img.height() as i32;
     let x = x as i32;
     let y = y as i32;
-
     for radius in 1..=opts.search_radius as i32 {
         for dy in -radius..=radius {
             for dx in -radius..=radius {
@@ -160,13 +114,6 @@ fn find_owner_rgb(
     }
     None
 }
-
-/// Replaces special marker pixels in a map PNG with nearby owner colors.
-///
-/// This is useful for producing a sanitized map that can be consumed by
-/// color->province-id mappings while still keeping a marker-rich source PNG.
-///
-/// Marker rules are controlled by [`MarkerSanitizeOptions`].
 pub fn sanitize_marked_png(
     input_png_path: &str,
     output_png_path: &str,
@@ -177,7 +124,6 @@ pub fn sanitize_marked_png(
     let mut out = ImageData::new(w, h);
     let mut replaced_pixels = 0u32;
     let mut unresolved_pixels = 0u32;
-
     for y in 0..h {
         for x in 0..w {
             let (r, g, b, _) = src
@@ -196,7 +142,6 @@ pub fn sanitize_marked_png(
             }
         }
     }
-
     if let Some(parent) = Path::new(output_png_path).parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent).map_err(|e| {
@@ -208,7 +153,6 @@ pub fn sanitize_marked_png(
             })?;
         }
     }
-
     let encoded = out.encode_png()?;
     std::fs::write(output_png_path, encoded).map_err(|e| {
         format!(
@@ -216,22 +160,18 @@ pub fn sanitize_marked_png(
             output_png_path, e
         )
     })?;
-
     Ok(MarkerSanitizeSummary {
         replaced_pixels,
         unresolved_pixels,
     })
 }
-
 fn parse_rgb_id_map(csv_path: &str) -> Result<HashMap<u32, u32>, String> {
     let raw = std::fs::read_to_string(csv_path)
         .map_err(|e| format!("province metadata: failed to read '{}': {}", csv_path, e))?;
-
     let mut out = HashMap::new();
     let mut rdr = csv::ReaderBuilder::new()
         .has_headers(true)
         .from_reader(raw.as_bytes());
-
     for row in rdr.records() {
         let rec = row.map_err(|e| {
             format!(
@@ -290,13 +230,10 @@ fn parse_rgb_id_map(csv_path: &str) -> Result<HashMap<u32, u32>, String> {
                     e
                 )
             })?;
-
         out.insert(pack_rgb(r, g, b), game_id);
     }
-
     Ok(out)
 }
-
 fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String> {
     let raw = std::fs::read_to_string(path)
         .map_err(|e| format!("province metadata: failed to read '{}': {}", path, e))?;
@@ -305,7 +242,6 @@ fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String>
     let Some(root) = value.as_table() else {
         return Ok(HashMap::new());
     };
-
     let mut out = HashMap::new();
     for (key, entry) in root {
         let Ok(id) = key.parse::<u32>() else {
@@ -314,7 +250,6 @@ fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String>
         let Some(table) = entry.as_table() else {
             continue;
         };
-
         let name = table
             .get("name")
             .and_then(toml::Value::as_str)
@@ -323,13 +258,10 @@ fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String>
             .get("terrain")
             .and_then(toml::Value::as_str)
             .map(str::to_string);
-
         out.insert(id, ProvinceInfo { name, terrain });
     }
-
     Ok(out)
 }
-
 fn color_for_gameid(game_id: u32, water: bool) -> [f32; 4] {
     if water {
         return [45.0 / 255.0, 120.0 / 255.0, 215.0 / 255.0, 1.0];
@@ -340,12 +272,6 @@ fn color_for_gameid(game_id: u32, water: bool) -> [f32; 4] {
     let b = 70 + ((h * 7) % 90);
     [r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0]
 }
-
-/// Imports external province metadata into an existing registry from CSV/TOML/image sources.
-///
-/// The method is intentionally registry-centric: it maps external game ids into
-/// existing registry province ids (derived from PNG geometry), then applies
-/// standardized terrain/style/label/capital metadata in one pass.
 pub fn import_metadata_from_files(
     registry: &mut ProvinceRegistry,
     opts: &ProvinceMetadataImportOptions,
@@ -356,14 +282,12 @@ pub fn import_metadata_from_files(
     if opts.color_csv_path.trim().is_empty() {
         return Err("province metadata: color_csv_path is required".to_string());
     }
-
     let color_img = ImageData::from_file(&opts.color_map_png_path)?;
     let marker_img = if let Some(path) = &opts.marker_png_path {
         ImageData::from_file(path)?
     } else {
         color_img.clone()
     };
-
     let (reg_w, reg_h) = (registry.width(), registry.height());
     if color_img.width() != reg_w || color_img.height() != reg_h {
         return Err(format!(
@@ -383,34 +307,28 @@ pub fn import_metadata_from_files(
             marker_img.height()
         ));
     }
-
     let rgb_to_game_id = parse_rgb_id_map(&opts.color_csv_path)?;
     let province_info = if let Some(path) = &opts.province_toml_path {
         parse_province_toml(path)?
     } else {
         HashMap::new()
     };
-
     let water_tokens: HashSet<String> = opts
         .water_terrain_tokens
         .iter()
         .map(|s| s.to_ascii_lowercase())
         .collect();
-
     let mut gid_to_game_id: HashMap<u32, u32> = HashMap::new();
     let mut label_points: HashMap<u32, Vec<(f32, f32)>> = HashMap::new();
-
     let mut mapped_provinces = 0u32;
     let mut capitals_set = 0u32;
     let mut labels_set = 0u32;
-
     for y in 0..reg_h {
         for x in 0..reg_w {
             let gid = registry.get_at(x, y);
             if gid == 0 {
                 continue;
             }
-
             if let std::collections::hash_map::Entry::Vacant(entry) = gid_to_game_id.entry(gid) {
                 let (r, g, b, _) = color_img.get_pixel(x, y).ok_or_else(|| {
                     "province metadata: color map pixel out of bounds".to_string()
@@ -418,7 +336,6 @@ pub fn import_metadata_from_files(
                 if let Some(game_id) = rgb_to_game_id.get(&pack_rgb(r, g, b)).copied() {
                     entry.insert(game_id);
                     mapped_provinces = mapped_provinces.saturating_add(1);
-
                     let info = province_info.get(&game_id);
                     let terrain = info
                         .and_then(|p| p.terrain.as_ref())
@@ -427,23 +344,19 @@ pub fn import_metadata_from_files(
                         .as_ref()
                         .map(|t| water_tokens.contains(t))
                         .unwrap_or(false);
-
                     let terrain_type = if is_water {
                         opts.water_terrain_type
                     } else {
                         opts.land_terrain_type
                     };
                     registry.set_terrain_type(gid, terrain_type);
-
                     if opts.set_political_colors {
                         registry.set_political_color(gid, color_for_gameid(game_id, is_water));
                     }
-
                     registry.set_attr(gid, "game_id".to_string(), game_id.to_string());
                     if let Some(t) = terrain {
                         registry.set_attr(gid, "terrain".to_string(), t.clone());
                     }
-
                     if opts.set_label_text {
                         let label = info
                             .and_then(|p| p.name.as_ref())
@@ -456,7 +369,6 @@ pub fn import_metadata_from_files(
                     }
                 }
             }
-
             let (mr, mg, mb, _) = marker_img
                 .get_pixel(x, y)
                 .ok_or_else(|| "province metadata: marker map pixel out of bounds".to_string())?;
@@ -472,7 +384,6 @@ pub fn import_metadata_from_files(
             }
         }
     }
-
     let mut label_lines_set = 0u32;
     if opts.set_label_lines {
         for (gid, points) in label_points {
@@ -499,7 +410,6 @@ pub fn import_metadata_from_files(
             }
         }
     }
-
     Ok(ProvinceMetadataImportSummary {
         mapped_provinces,
         capitals_set,

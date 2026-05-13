@@ -1,49 +1,44 @@
-//! finite-state machine runtime for named state transitions.
-use std::collections::HashMap;
-
+//! Finite-state machine for AI agents: states, transitions, and Lua callbacks.
+//! Owns `StateCallbacks`, `Transition`, and `StateMachine`.
+//! Does not execute enter/update/exit callbacks; tick logic lives in `lua_api/ai_api.rs`.
+//! Depends on `mlua::RegistryKey` for Lua callbacks and log codes for tracing.
 use crate::log_msg;
 use crate::runtime::log_messages::{FN01, FN02};
 use mlua::RegistryKey;
-
-/// Lua lifecycle hooks for a single FSM state.
+use std::collections::HashMap;
 pub struct StateCallbacks {
-    /// Called once when the FSM transitions into this state. Signature: `fn(agent)`.
+    /// Registry key of the Lua callback invoked when entering this state.
     pub on_enter: Option<RegistryKey>,
-    /// Called every frame while this state is active. Signature: `fn(agent, dt)`.
+    /// Registry key of the Lua callback invoked each tick while in this state.
     pub on_update: Option<RegistryKey>,
-    /// Called once when the FSM transitions out of this state. Signature: `fn(agent)`.
+    /// Registry key of the Lua callback invoked when leaving this state.
     pub on_exit: Option<RegistryKey>,
 }
-
-/// A directed edge in the FSM state graph with an optional guard predicate.
 pub struct Transition {
-    /// Name of the source state this transition leaves from.
+    /// Source state name; `"*"` matches any state.
     pub from: String,
-    /// Name of the destination state this transition goes to.
+    /// Destination state name activated when the guard passes.
     pub to: String,
-    /// Optional guard predicate: `fn(agent, dt) -> bool`.
+    /// Optional Lua guard predicate; `None` means the transition is unconditional.
     pub guard: Option<RegistryKey>,
-    /// Priority for evaluation ordering. Higher values are checked first.
+    /// Evaluation order; higher priority transitions are tested first.
     pub priority: i32,
 }
-
-/// A finite state machine that manages named states with lifecycle callbacks (enter/update/exit) and guarded transitions.
 #[allow(dead_code)]
 pub struct StateMachine {
-    /// Named states with their lifecycle callbacks (enter/update/exit).
+    /// Map from state name to its enter/update/exit callbacks.
     pub(crate) states: HashMap<String, StateCallbacks>,
-    /// All transitions, maintained sorted by descending priority so the first match is the highest-priority eligible transition.
+    /// All registered transitions, sorted descending by priority.
     pub(crate) transitions: Vec<Transition>,
-    /// The currently active state name, or `None` if the machine hasn't started yet.
+    /// Name of the currently active state; `None` before first tick.
     pub(crate) current_state: Option<String>,
-    /// The initial state assigned via `setInitialState`. The machine transitions here on its first update call.
+    /// State name to activate on the first tick if none is active.
     pub(crate) initial_state: Option<String>,
-    /// Accumulated time (in seconds) spent in the current state. Resets to `0.0` on every state transition.
+    /// Elapsed time in seconds since the current state was entered.
     pub(crate) time_in_state: f32,
 }
-
 impl StateMachine {
-    /// Create a new empty state machine.
+    /// Create an empty state machine with no states or transitions.
     pub fn new() -> Self {
         log_msg!(debug, FN01);
         Self {
@@ -54,25 +49,21 @@ impl StateMachine {
             time_in_state: 0.0,
         }
     }
-
-    /// Add a transition and re-sorts by descending priority.
+    /// Register a transition and re-sort the transition list by descending priority.
     pub fn add_transition(&mut self, transition: Transition) {
         log_msg!(debug, FN02);
         self.transitions.push(transition);
         self.transitions.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
-
-    /// Return the current state name, if any.
+    /// Return the name of the currently active state, or `None` before the first tick.
     pub fn current_state(&self) -> Option<&str> {
         self.current_state.as_deref()
     }
-
-    /// Return the time spent in the current state in seconds.
+    /// Return elapsed seconds since the current state was entered.
     pub fn time_in_state(&self) -> f32 {
         self.time_in_state
     }
-
-    /// Add a named state with optional lifecycle callbacks. Used by the Lua API.
+    /// Register a state by name with optional enter, update, and exit registry keys.
     pub fn add_state_raw(
         &mut self,
         name: String,
@@ -89,8 +80,7 @@ impl StateMachine {
             },
         );
     }
-
-    /// Add a transition with optional guard callback. Used by the Lua API.
+    /// Build a `Transition` from raw parts and add it via `add_transition`.
     pub fn add_transition_raw(
         &mut self,
         from: String,
@@ -105,14 +95,14 @@ impl StateMachine {
             priority,
         });
     }
-
-    /// Set the initial state name. The machine transitions here on its first update.
+    /// Set the state name that will be activated on the first tick.
     pub fn set_initial_state(&mut self, name: String) {
         self.initial_state = Some(name);
     }
 }
-
+/// `Default` delegates to `StateMachine::new`.
 impl Default for StateMachine {
+    /// `Default` delegates to `StateMachine::new`.
     fn default() -> Self {
         Self::new()
     }

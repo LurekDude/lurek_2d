@@ -1,61 +1,14 @@
-//! Post-processing effect stack.
-//!
-//! [`PostFxStack`] manages an ordered chain of effects that captures and
-//! processes the rendered scene each frame.
-
 use crate::log_msg;
 use crate::runtime::log_messages::{FX01, FX02};
-/// An ordered chain of effects that captures and processes the rendered scene.
-///
-/// The full lifecycle every draw frame is:
-/// 1. Call `beginCapture()` (Lua) — the GPU redirects draw calls to an
-///    internal canvas.
-/// 2. Draw the scene normally.
-/// 3. Call `endCapture()` (Lua) — stops capture.
-/// 4. Call `apply()` (Lua) — runs each enabled effect in insertion order
-///    through ping-pong canvases and blits the final result to the screen.
-///
-/// Effects are referenced by numeric index into the local `effects` vector
-/// in `LuaPostFxStack`. The `PostFxStack` itself is agnostic to the
-/// concrete effect objects and only tracks indices, enabled states, and
-/// canvas dimensions.
-///
-/// # Fields
-/// - `effects` — Ordered list of effect indices (referencing external storage).
-/// - `enabled` — Per-effect enable flag, parallel to `effects`.
-/// - `width` — Internal canvas width in pixels.
-/// - `height` — Internal canvas height in pixels.
-///
-/// The stack manages ping-pong canvases internally for multi-pass rendering.
-/// During `lurek.draw`, the user calls `beginCapture()` → draws scene →
-/// `endCapture()` → `apply()` to render the post-processed result.
 #[derive(Debug, Clone)]
 pub struct PostFxStack {
-    /// Ordered effect indices referencing external effect storage.
     pub effects: Vec<usize>,
-    /// Per-effect enabled state (same length as `effects`).
     pub enabled: Vec<bool>,
-    /// Width of the internal canvases in pixels.
     pub width: u32,
-    /// Height of the internal canvases in pixels.
     pub height: u32,
-    /// Whether the stack is currently capturing.
     pub capturing: bool,
 }
-
 impl PostFxStack {
-    /// Creates a new post-processing stack with the given canvas dimensions.
-    ///
-    /// Starts empty with no effects, `capturing = false`, and the internal
-    /// canvas dimensions set to `width` × `height`. Call `add` to append
-    /// effects before the first `apply`.
-    ///
-    /// # Parameters
-    /// - `width` — `u32` — Width of the internal capture canvas in pixels.
-    /// - `height` — `u32` — Height of the internal capture canvas in pixels.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(width: u32, height: u32) -> Self {
         log_msg!(debug, FX01);
         Self {
@@ -66,33 +19,11 @@ impl PostFxStack {
             capturing: false,
         }
     }
-
-    /// Appends an effect index to the end of the chain.
-    ///
-    /// Effects are applied in insertion order during `apply()` — the first
-    /// effect added is the first shader pass executed. The new effect is
-    /// enabled by default.
-    ///
-    /// # Parameters
-    /// - `effect_idx` — `usize` — Index into the caller's effect storage.
     pub fn add(&mut self, effect_idx: usize) {
         log_msg!(debug, FX02);
         self.effects.push(effect_idx);
         self.enabled.push(true);
     }
-
-    /// Removes an effect index from the chain.
-    ///
-    /// After removal all subsequent effects shift down by one position.
-    /// The `enabled` parallel array is updated accordingly. If the same
-    /// effect is in the chain multiple times, only the first occurrence is
-    /// removed.
-    ///
-    /// # Parameters
-    /// - `effect_idx` — `usize` — Index to remove.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the effect was present and removed.
     pub fn remove(&mut self, effect_idx: usize) -> bool {
         if let Some(pos) = self.effects.iter().position(|&e| e == effect_idx) {
             self.effects.remove(pos);
@@ -102,41 +33,16 @@ impl PostFxStack {
             false
         }
     }
-
-    /// Inserts an effect at a specific 1-based position.
-    ///
-    /// A `position` of 1 places the effect at the front of the chain
-    /// (first to be applied). Values beyond the current chain length are
-    /// clamped to the end — equivalent to `add`. The new effect is
-    /// enabled by default.
-    ///
-    /// # Parameters
-    /// - `position` — `usize` — 1-based insertion index; clamped to `[1, len+1]`.
-    /// - `effect_idx` — `usize` — Index into the caller's effect storage.
     pub fn insert(&mut self, position: usize, effect_idx: usize) {
         let idx = (position.saturating_sub(1)).min(self.effects.len());
         self.effects.insert(idx, effect_idx);
         self.enabled.insert(idx, true);
     }
-
-    /// Sets the enabled state for an effect in the chain.
-    ///
-    /// # Parameters
-    /// - `effect_idx` — `usize`.
-    /// - `is_enabled` — `bool`.
     pub fn set_enabled(&mut self, effect_idx: usize, is_enabled: bool) {
         if let Some(pos) = self.effects.iter().position(|&e| e == effect_idx) {
             self.enabled[pos] = is_enabled;
         }
     }
-
-    /// Gets the enabled state for an effect in the chain.
-    ///
-    /// # Parameters
-    /// - `effect_idx` — `usize`.
-    ///
-    /// # Returns
-    /// `bool` — `false` if the effect is not in the chain.
     pub fn is_enabled(&self, effect_idx: usize) -> bool {
         self.effects
             .iter()
@@ -144,22 +50,9 @@ impl PostFxStack {
             .map(|pos| self.enabled[pos])
             .unwrap_or(false)
     }
-
-    /// Returns the number of effects in the chain.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn get_effect_count(&self) -> usize {
         self.effects.len()
     }
-
-    /// Returns the effect index at a 1-based position.
-    ///
-    /// # Parameters
-    /// - `index` — `usize` — 1-based.
-    ///
-    /// # Returns
-    /// `Option<usize>`.
     pub fn get_effect(&self, index: usize) -> Option<usize> {
         if index >= 1 && index <= self.effects.len() {
             Some(self.effects[index - 1])
@@ -167,16 +60,6 @@ impl PostFxStack {
             None
         }
     }
-
-    /// Returns the indices of all enabled effects in order.
-    ///
-    /// Called by the `lua_api` GPU layer during `apply()` to determine
-    /// which shader passes to execute. Only effects with their per-position
-    /// `enabled` flag set to `true` are included; disabled effects are
-    /// skipped entirely without affecting their position in the chain.
-    ///
-    /// # Returns
-    /// `Vec<usize>` — Effect indices in application order.
     pub fn enabled_effects(&self) -> Vec<usize> {
         self.effects
             .iter()
@@ -185,81 +68,29 @@ impl PostFxStack {
             .map(|(&idx, _)| idx)
             .collect()
     }
-
-    /// Resizes the internal canvas dimensions.
-    ///
-    /// Call this when the window or render target is resized so that the
-    /// ping-pong canvases can be recreated at the correct resolution by the
-    /// GPU layer. Does not affect any effects in the chain.
-    ///
-    /// # Parameters
-    /// - `width` — `u32` — New canvas width in pixels.
-    /// - `height` — `u32` — New canvas height in pixels.
     pub fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
     }
-
-    /// Returns the canvas width.
-    ///
-    /// Reflects the last value set via `new` or `resize`.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn get_width(&self) -> u32 {
         self.width
     }
-
-    /// Returns the canvas height.
-    ///
-    /// Reflects the last value set via `new` or `resize`.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn get_height(&self) -> u32 {
         self.height
     }
-
-    /// Returns both canvas dimensions as `(width, height)`.
-    ///
-    /// Convenience accessor combining `get_width()` and `get_height()`.
-    ///
-    /// # Returns
-    /// `(u32, u32)`.
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
-
-    /// Returns the number of effects currently in the chain.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn len(&self) -> usize {
         self.effects.len()
     }
-
-    /// Returns `true` if the chain contains no effects.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.effects.is_empty()
     }
-
-    /// Removes all effects from the chain.
     pub fn clear(&mut self) {
         self.effects.clear();
         self.enabled.clear();
     }
-
-    /// Removes duplicate effect indices from the chain, keeping the first occurrence
-    /// of each index and discarding subsequent duplicates.
-    ///
-    /// This is useful for reducing redundant wgpu shader passes when the same effect
-    /// has been added more than once.
-    ///
-    /// # Returns
-    /// `usize` — the number of duplicate entries removed.
     pub fn dedup_indices(&mut self) -> usize {
         let mut seen = std::collections::HashSet::new();
         let before = self.effects.len();
@@ -276,30 +107,14 @@ impl PostFxStack {
         self.enabled = new_enabled;
         removed
     }
-
-    // ── CPU rendering ──
-
-    /// Renders a diagnostic image showing the effect stack layout.
-    ///
-    /// Each effect slot is drawn as a labelled box: green when enabled,
-    /// red with an X when disabled. Useful for evidence tests.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_info_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
-
         let count = self.effects.len();
         if count == 0 {
             img.draw_label("EMPTY STACK", 10, 10, 180, 180, 190);
             return img;
         }
-
         let box_gap = 10u32;
         let total_gap = box_gap * (count as u32 + 1);
         let box_w = if count > 0 {
@@ -309,18 +124,14 @@ impl PostFxStack {
         };
         let box_h = height.saturating_sub(60).min(100);
         let box_y = (height - box_h) / 2;
-
         for (i, &_effect_idx) in self.effects.iter().enumerate() {
             let bx = box_gap + i as u32 * (box_w + box_gap);
             let enabled = self.enabled.get(i).copied().unwrap_or(false);
-
             let (r, g, b) = if enabled {
                 (80u8, 200u8, 80u8)
             } else {
                 (200u8, 60u8, 60u8)
             };
-
-            // Box background
             img.draw_rect(
                 bx as i32,
                 box_y as i32,
@@ -331,7 +142,6 @@ impl PostFxStack {
                 b / 3,
                 200,
             );
-            // Top/bottom borders
             img.draw_rect(bx as i32, box_y as i32, box_w, 2, r, g, b, 255);
             img.draw_rect(
                 bx as i32,
@@ -343,8 +153,6 @@ impl PostFxStack {
                 b,
                 255,
             );
-
-            // X on disabled
             if !enabled {
                 img.draw_line(
                     bx as i32 + 10,
@@ -367,28 +175,11 @@ impl PostFxStack {
                     255,
                 );
             }
-
-            // Index label
             let label = format!("FX{}", i);
             img.draw_label(&label, bx as i32 + 4, box_y as i32 + 4, r, g, b);
         }
-
         img
     }
-
-    /// Render the stack state as two side-by-side column layouts.
-    ///
-    /// Shows the initial effect list on the left and the current
-    /// (possibly modified) list on the right, with enabled/disabled
-    /// indicators.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    /// - `labels` — `&[&str]`. Display name per effect slot.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_stack_management_to_image(
         &self,
         width: u32,
@@ -398,7 +189,6 @@ impl PostFxStack {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 18, 28, 255);
         img.draw_label("STACK OPS", (width / 2 - 30) as i32, 4, 200, 180, 255);
-
         for i in 0..self.effects.len() {
             let y = 24 + i as i32 * 22;
             let enabled = self.enabled.get(i).copied().unwrap_or(false);
@@ -423,19 +213,6 @@ impl PostFxStack {
         }
         img
     }
-
-    /// Render a catalog grid of effect types with representative visual patterns.
-    ///
-    /// Creates a 4-column grid of panels, one per effect type entry in `entries`.
-    /// Each entry gets a label and a filled pattern block.
-    ///
-    /// # Parameters
-    /// - `entries` — `&[(&str, (u8, u8, u8))]`. Effect name and color per slot.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_effect_catalog_to_image(
         entries: &[(&str, (u8, u8, u8))],
         width: u32,
@@ -444,7 +221,6 @@ impl PostFxStack {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 18, 28, 255);
         img.draw_label("POSTFX CATALOG", (width / 2 - 40) as i32, 4, 220, 180, 255);
-
         let cols = 4u32;
         let cell_w = width / cols;
         let rows = (entries.len() as u32).div_ceil(cols);
@@ -453,7 +229,6 @@ impl PostFxStack {
         } else {
             height
         };
-
         for (i, &(label, (cr, cg, cb))) in entries.iter().enumerate() {
             let col = (i as u32) % cols;
             let row = (i as u32) / cols;
@@ -473,19 +248,6 @@ impl PostFxStack {
         }
         img
     }
-
-    /// Render a parameter showcase grid for PostFx effects.
-    ///
-    /// Each entry produces a row showing the effect label and its
-    /// `(name, value)` parameter pairs.
-    ///
-    /// # Parameters
-    /// - `entries` — `&[(&str, &[(&str, f32)])]`. Effect name and param list.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `crate::image::ImageData`.
     pub fn draw_effect_parameters_to_image(
         entries: &[(&str, &[(&str, f32)])],
         width: u32,
@@ -495,7 +257,6 @@ impl PostFxStack {
         img.fill(20, 18, 28, 255);
         let title_x = width.saturating_sub(76) / 2;
         img.draw_label("POSTFX PARAMETERS", title_x as i32, 4, 200, 180, 255);
-
         let mut y = 24i32;
         for &(label, params) in entries {
             if y + 52 > height as i32 {
@@ -503,7 +264,6 @@ impl PostFxStack {
             }
             img.draw_rect(10, y, width - 20, 50, 30, 28, 42, 255);
             img.draw_label(label, 14, y + 4, 220, 180, 100);
-
             let mut px = 14i32;
             for &(name, val) in params {
                 let text = format!("{}:{:.1}", name.to_uppercase(), val);
@@ -514,20 +274,6 @@ impl PostFxStack {
         }
         img
     }
-
-    /// Render a bar preview for a small set of PostFx effect types.
-    ///
-    /// Draws one coloured row per entry with dot markers for parameter count.
-    /// Suitable for showing 4–8 built-in effect types side-by-side in evidence
-    /// tests.
-    ///
-    /// # Parameters
-    /// - `entries` — `&[(&str, (u8, u8, u8), usize)]`. (label, colour, param_count).
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `crate::image::ImageData`.
     pub fn draw_effect_type_bars_to_image(
         entries: &[(&str, (u8, u8, u8), usize)],
         width: u32,
@@ -543,13 +289,11 @@ impl PostFxStack {
             180,
             255,
         );
-
         let row_h = if entries.is_empty() {
             height
         } else {
             (height - 20) / entries.len() as u32
         };
-
         for (i, &(label, (cr, cg, cb), param_count)) in entries.iter().enumerate() {
             let y_base = (20 + i as u32 * row_h) as i32;
             let row_h_i = row_h.saturating_sub(4);
@@ -564,20 +308,6 @@ impl PostFxStack {
         }
         img
     }
-
-    /// Render a bar preview for a list of PostFx effect types,
-    /// auto-assigning colours and counting parameters.
-    ///
-    /// Each type is instantiated to query its parameter names, then
-    /// drawn as a coloured row with dot indicators for parameter count.
-    ///
-    /// # Parameters
-    /// - `types` — `&[PostFxEffectType]`. Effect types to visualise.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `crate::image::ImageData`.
     pub fn draw_effect_types_to_image(
         types: &[super::PostFxEffectType],
         width: u32,
@@ -607,11 +337,9 @@ impl PostFxStack {
         Self::draw_effect_type_bars_to_image(&entries, width, height)
     }
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn new_stack_is_empty() {
         let s = PostFxStack::new(800, 600);
@@ -619,7 +347,6 @@ mod tests {
         assert_eq!(s.len(), 0);
         assert!(!s.capturing);
     }
-
     #[test]
     fn add_and_len() {
         let mut s = PostFxStack::new(800, 600);
@@ -628,7 +355,6 @@ mod tests {
         assert_eq!(s.len(), 2);
         assert!(!s.is_empty());
     }
-
     #[test]
     fn remove_returns_true_when_present() {
         let mut s = PostFxStack::new(800, 600);
@@ -636,22 +362,19 @@ mod tests {
         assert!(s.remove(5));
         assert!(s.is_empty());
     }
-
     #[test]
     fn remove_returns_false_when_absent() {
         let mut s = PostFxStack::new(800, 600);
         assert!(!s.remove(99));
     }
-
     #[test]
     fn insert_at_front() {
         let mut s = PostFxStack::new(800, 600);
         s.add(10);
-        s.insert(1, 20); // position 1 = front
+        s.insert(1, 20);
         assert_eq!(s.get_effect(1), Some(20));
         assert_eq!(s.get_effect(2), Some(10));
     }
-
     #[test]
     fn set_enabled_toggles() {
         let mut s = PostFxStack::new(800, 600);
@@ -660,7 +383,6 @@ mod tests {
         s.set_enabled(0, false);
         assert!(!s.is_enabled(0));
     }
-
     #[test]
     fn enabled_effects_filters_disabled() {
         let mut s = PostFxStack::new(800, 600);
@@ -670,14 +392,12 @@ mod tests {
         let enabled = s.enabled_effects();
         assert_eq!(enabled, vec![1]);
     }
-
     #[test]
     fn resize_updates_dimensions() {
         let mut s = PostFxStack::new(800, 600);
         s.resize(1920, 1080);
         assert_eq!(s.get_dimensions(), (1920, 1080));
     }
-
     #[test]
     fn clear_empties_chain() {
         let mut s = PostFxStack::new(800, 600);
@@ -686,7 +406,6 @@ mod tests {
         s.clear();
         assert!(s.is_empty());
     }
-
     #[test]
     fn dedup_indices_removes_duplicates() {
         let mut s = PostFxStack::new(800, 600);
@@ -697,7 +416,6 @@ mod tests {
         assert_eq!(removed, 1);
         assert_eq!(s.len(), 2);
     }
-
     #[test]
     fn get_effect_is_one_based() {
         let mut s = PostFxStack::new(800, 600);

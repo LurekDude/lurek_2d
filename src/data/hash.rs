@@ -1,29 +1,24 @@
-//! Hashing: MD5, SHA-1, SHA-256, SHA-512, CRC-32.
+//! Own hashing and checksum helpers for byte buffers used by the data module.
+//! Supports MD5, SHA-1, SHA-256, SHA-512, and CRC32. Digests are returned as lowercase hex
+//! strings; CRC32 returns a raw u64 for Lua numeric compatibility. Algorithm is caller-selected
+//! via a parsed enum. No streaming. Primary consumer is `src/lua_api/data_api.rs`.
 
 use md5::Digest;
 use sha1;
-
-/// Hash algorithm selector.
-///
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select hash algorithm used for digest computation.
 pub enum HashAlgorithm {
-    /// MD5 (128-bit, not recommended for security).
+    /// Compute MD5 digest.
     Md5,
-    /// SHA-1 (160-bit, not recommended for security).
+    /// Compute SHA-1 digest.
     Sha1,
-    /// SHA-256 (256-bit).
+    /// Compute SHA-256 digest.
     Sha256,
-    /// SHA-512 (512-bit).
+    /// Compute SHA-512 digest.
     Sha512,
 }
-
 impl HashAlgorithm {
-    /// Parse an algorithm name string (case-insensitive).
-    /// Accepts `"md5"`, `"sha1"` / `"sha-1"`, `"sha256"` / `"sha-256"`,
-    /// `"sha512"` / `"sha-512"`.
-    ///
-    ///
-    /// `Result<Self, String>`.
+    /// Parse algorithm label and return hash variant or error.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
             "md5" => Ok(HashAlgorithm::Md5),
@@ -37,11 +32,7 @@ impl HashAlgorithm {
         }
     }
 }
-
-/// Compute the hash of data using the specified algorithm, returned as a hex string.
-///
-///
-/// `String`.
+/// Hash bytes with selected algorithm and return hex digest.
 pub fn hash(algorithm: HashAlgorithm, data: &[u8]) -> String {
     match algorithm {
         HashAlgorithm::Md5 => {
@@ -62,15 +53,7 @@ pub fn hash(algorithm: HashAlgorithm, data: &[u8]) -> String {
         }
     }
 }
-
-/// Compute the CRC-32 checksum of `data` using the IEEE polynomial.
-///
-/// Suitable for non-security integrity checks and binary format validation.
-/// The result is a `u32` returned as `u64` for ergonomic use in Lua (integers
-/// are 64-bit in LuaJIT and Lua 5.4).
-///
-///
-/// `u64` — CRC-32 value in `[0, 2³²)`.
+/// Compute CRC32 checksum and return value as u64.
 pub fn crc32(data: &[u8]) -> u64 {
     crc32fast::hash(data) as u64
 }

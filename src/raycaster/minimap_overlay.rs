@@ -1,29 +1,15 @@
-//! Top-down minimap extraction from a raycaster grid.
-//!
-//! Provides functions to extract a pixel-based minimap from a [`super::Raycaster2D`]
-//! grid, including player position and directional arrow rendering.
-
 use super::dda::Raycaster2D;
 use super::lighting::{compute_lighting, PointLight};
 use std::collections::HashSet;
-
-/// One minimap tile sample produced by [`build_minimap_tile_window`].
 #[derive(Debug, Clone)]
 pub struct MinimapTileSample {
-    /// Grid X coordinate.
     pub x: u32,
-    /// Grid Y coordinate.
     pub y: u32,
-    /// Whether this tile is blocked by a wall.
     pub blocked: bool,
-    /// Whether the tile has line-of-sight from the center tile.
     pub visible: bool,
-    /// Lit RGB values in range [0, 1].
     pub light: [f32; 3],
-    /// Convenience luma value from the light vector.
     pub luma: f32,
 }
-
 fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
     let mut x = x0;
     let mut y = y0;
@@ -32,7 +18,6 @@ fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i3
     let sx = if x0 < x1 { 1 } else { -1 };
     let sy = if y0 < y1 { 1 } else { -1 };
     let mut err = dx - dy;
-
     while !(x == x1 && y == y1) {
         let e2 = 2 * err;
         if e2 > -dy {
@@ -43,19 +28,12 @@ fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i3
             err += dx;
             y += sy;
         }
-
         if (x != x1 || y != y1) && (x < 0 || y < 0 || raycaster.get_cell(x as u32, y as u32) > 0) {
             return false;
         }
     }
-
     true
 }
-
-/// Computes tile lighting for one grid cell using the raycaster wall map.
-///
-/// The light sample position is taken at tile center `(x+0.5, y+0.5)`.
-/// Out-of-bounds tiles return `[ambient, ambient, ambient]`.
 pub fn compute_tile_light(
     raycaster: &Raycaster2D,
     x: u32,
@@ -67,7 +45,6 @@ pub fn compute_tile_light(
         let a = ambient.clamp(0.0, 1.0);
         return [a, a, a];
     }
-
     let wx = x as f32 + 0.5;
     let wy = y as f32 + 0.5;
     let wall_at = |cx: i32, cy: i32| -> bool {
@@ -75,11 +52,6 @@ pub fn compute_tile_light(
     };
     compute_lighting(wx, wy, ambient, lights, &wall_at)
 }
-
-/// Builds minimap tile samples around a world-space center.
-///
-/// Returns one sample per in-bounds tile inside the square window
-/// `[(cx-radius)..(cx+radius)] x [(cy-radius)..(cy+radius)]`.
 pub fn build_minimap_tile_window(
     raycaster: &Raycaster2D,
     center_x: f32,
@@ -92,24 +64,20 @@ pub fn build_minimap_tile_window(
     let cy = center_y.floor() as i32;
     let r = radius as i32;
     let mut out = Vec::new();
-
     for gy in (cy - r)..=(cy + r) {
         for gx in (cx - r)..=(cx + r) {
             if gx < 0 || gy < 0 {
                 continue;
             }
-
             let ux = gx as u32;
             let uy = gy as u32;
             if ux >= raycaster.width() || uy >= raycaster.height() {
                 continue;
             }
-
             let blocked = raycaster.get_cell(ux, uy) > 0;
             let visible = tile_line_of_sight(raycaster, cx, cy, gx, gy);
             let light = compute_tile_light(raycaster, ux, uy, ambient, lights);
             let luma = ((light[0] + light[1] + light[2]) / 3.0).clamp(0.0, 1.0);
-
             out.push(MinimapTileSample {
                 x: ux,
                 y: uy,
@@ -120,13 +88,8 @@ pub fn build_minimap_tile_window(
             });
         }
     }
-
     out
 }
-
-/// Traces multiple rays and returns unique grid cells crossed by those rays.
-///
-/// The output can drive fog-of-war reveal logic without Lua-side per-ray loops.
 #[allow(clippy::too_many_arguments)]
 pub fn reveal_cells_from_rays(
     raycaster: &Raycaster2D,
@@ -141,7 +104,6 @@ pub fn reveal_cells_from_rays(
     let step = step.max(0.05);
     let mut visited: HashSet<(u32, u32)> = HashSet::new();
     let mut cells = Vec::new();
-
     let add_cell =
         |visited: &mut HashSet<(u32, u32)>, cells: &mut Vec<(u32, u32)>, x: f32, y: f32| {
             if x.is_finite() && y.is_finite() && x >= 0.0 && y >= 0.0 {
@@ -152,10 +114,8 @@ pub fn reveal_cells_from_rays(
                 }
             }
         };
-
     add_cell(&mut visited, &mut cells, ox, oy);
     let hits = raycaster.cast_rays(ox, oy, angle, fov, count, max_dist);
-
     for hit in hits {
         let hx = if hit.hit {
             hit.hit_x
@@ -171,36 +131,13 @@ pub fn reveal_cells_from_rays(
         let dy = hy - oy;
         let dist = (dx * dx + dy * dy).sqrt();
         let steps = (dist / step).max(1.0).floor() as u32;
-
         for i in 0..=steps {
             let t = i as f32 / steps as f32;
             add_cell(&mut visited, &mut cells, ox + dx * t, oy + dy * t);
         }
     }
-
     cells
 }
-
-/// Extracts a top-down minimap from a Raycaster2D grid.
-///
-/// Returns flat RGBA pixel data (4 bytes per pixel, row-major) centered on
-/// the player position, with a configurable view radius and cell size.
-///
-/// # Parameters
-/// - `raycaster` — `&Raycaster2D`.
-/// - `player_x` — `f32`.
-/// - `player_y` — `f32`.
-/// - `player_angle` — `f32`.
-/// - `view_radius` — `u32`.
-/// - `cell_size` — `u32`.
-/// - `wall_color` — `[u8; 4]`.
-/// - `floor_color` — `[u8; 4]`.
-/// - `player_color` — `[u8; 4]`.
-///
-/// # Returns
-/// `(Vec<u8>, u32, u32)`.
-///
-/// Returns `(pixels, pixel_width, pixel_height)`.
 #[allow(clippy::too_many_arguments)]
 pub fn extract_minimap(
     raycaster: &Raycaster2D,
@@ -217,24 +154,18 @@ pub fn extract_minimap(
     let pixel_w = diameter * cell_size;
     let pixel_h = diameter * cell_size;
     let mut pixels = vec![0u8; (pixel_w * pixel_h * 4) as usize];
-
     let player_cell_x = player_x.floor() as i32;
     let player_cell_y = player_y.floor() as i32;
-
     for vy in 0..diameter {
         for vx in 0..diameter {
             let cell_x = player_cell_x - view_radius as i32 + vx as i32;
             let cell_y = player_cell_y - view_radius as i32 + vy as i32;
-
             let is_wall = if cell_x >= 0 && cell_y >= 0 {
                 raycaster.get_cell(cell_x as u32, cell_y as u32) > 0
             } else {
                 false
             };
-
             let color = if is_wall { wall_color } else { floor_color };
-
-            // Fill the cell_size x cell_size block
             for py in 0..cell_size {
                 for px in 0..cell_size {
                     let img_x = vx * cell_size + px;
@@ -250,8 +181,6 @@ pub fn extract_minimap(
             }
         }
     }
-
-    // Draw player dot at center
     let center_px = view_radius * cell_size + cell_size / 2;
     let center_py = view_radius * cell_size + cell_size / 2;
     draw_player_arrow(
@@ -263,23 +192,8 @@ pub fn extract_minimap(
         cell_size.max(3),
         player_color,
     );
-
     (pixels, pixel_w, pixel_h)
 }
-
-/// Renders a simple directional arrow for the player on the minimap.
-///
-/// Draws a small triangle pointing in the player's facing direction,
-/// centered at `(center_x, center_y)` in the pixel buffer.
-///
-/// # Parameters
-/// - `pixels` — `&mut [u8]`.
-/// - `img_width` — `u32`.
-/// - `center_x` — `u32`.
-/// - `center_y` — `u32`.
-/// - `angle` — `f32`.
-/// - `size` — `u32`.
-/// - `color` — `[u8; 4]`.
 #[allow(clippy::too_many_arguments)]
 pub fn draw_player_arrow(
     pixels: &mut [u8],
@@ -291,11 +205,8 @@ pub fn draw_player_arrow(
     color: [u8; 4],
 ) {
     let half = size as f32 / 2.0;
-
-    // Draw a simple filled circle/dot for the player
     let radius = (half * 0.6).max(1.0);
     let r2 = radius * radius;
-
     for dy in -(radius as i32)..=(radius as i32) {
         for dx in -(radius as i32)..=(radius as i32) {
             if (dx * dx + dy * dy) as f32 <= r2 {
@@ -313,12 +224,9 @@ pub fn draw_player_arrow(
             }
         }
     }
-
-    // Draw direction indicator line
     let line_len = half;
     let tip_x = center_x as f32 + angle.cos() * line_len;
     let tip_y = center_y as f32 + angle.sin() * line_len;
-
     let steps = (line_len * 2.0) as i32;
     for i in 0..=steps {
         let t = i as f32 / steps.max(1) as f32;

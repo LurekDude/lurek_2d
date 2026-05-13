@@ -1,28 +1,20 @@
-//! Represent one animation frame and compatibility aliases.
-
+//! Animation frame geometry and optional per-frame duration.
+//! Owns `AnimFrame` and the `AnimationFrame` alias.
+//! Does not own texture data; it only stores quad coordinates.
 use crate::math::Rect;
-
-// ---- Type: AnimFrame ----
-
-/// A single animation frame with a source rectangle and optional duration.
+/// Frame rectangle and duration.
 #[derive(Debug, Clone)]
 pub struct AnimFrame {
-    /// Source rectangle (quad) within the sprite-sheet texture.
+    /// Source rectangle for the frame.
     pub quad: Rect,
-    /// Per-frame duration override in seconds. When `> 0.0` this value
-    /// takes priority over the clip's FPS.
+    /// Duration in seconds; 0 uses clip FPS.
     pub duration: f32,
 }
-
 impl AnimFrame {
-    // ---- Implementation: AnimFrame ----
-    /// Create a new frame from source quad and duration.
+    /// Create a new animation frame.
     pub fn new(quad: Rect, duration: f32) -> Self {
         Self { quad, duration }
     }
 }
-
-// ---- Type: AnimationFrame Alias ----
-
-/// Deprecated name for `AnimFrame`; retained for compatibility.
+/// Backward-compatible alias for `AnimFrame`.
 pub type AnimationFrame = AnimFrame;

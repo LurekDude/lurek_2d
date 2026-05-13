@@ -1,31 +1,27 @@
-//! Define animation clip metadata and playback modes.
-
-// ---- Type: ClipPlaybackMode ----
-
-/// Playback mode for an [`AnimClip`].
+//! Animation clip metadata and playback mode.
+//! Owns `ClipPlaybackMode` and `AnimClip`.
+//! Does not own runtime playback state; that lives in `controller.rs`.
+/// Supported clip playback modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClipPlaybackMode {
-    /// Progresses from first frame to last frame.
+    /// Play frames forward.
     Forward,
-    /// Progresses from last frame to first frame.
+    /// Play frames backward.
     Reverse,
-    /// Bounces between first and last frame.
+    /// Bounce between ends.
     PingPong,
 }
-
-// ---- Type: AnimClip ----
-
-/// A named animation clip that references frame indices in the parent animation.
+/// Named animation clip referencing frame indices.
 #[derive(Debug, Clone)]
 pub struct AnimClip {
-    /// Human-readable clip name.
+    /// Clip name.
     pub name: String,
-    /// Indices into [`Animation::frames`](crate::animation::Animation) (0-based).
+    /// Indices into the frame list.
     pub frame_indices: Vec<usize>,
-    /// Playback speed in frames per second.
+    /// Frames per second used when frame durations are absent.
     pub fps: f32,
-    /// Whether the clip wraps around after the last frame.
+    /// Whether the clip loops.
     pub looping: bool,
-    /// Playback mode for frame traversal.
+    /// Playback mode.
     pub mode: ClipPlaybackMode,
 }

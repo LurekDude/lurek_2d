@@ -1,57 +1,32 @@
-//! Audio waveform visualization helpers.
-//!
-//! Renders mono, stereo, and zoomed waveform plots as CPU-side [`ImageData`].
-
 use crate::image::ImageData;
-
-/// Render audio samples as a waveform visualization.
-///
-/// Draws a waveform with a dark background, grid lines, center-zero line,
-/// auto-scaled amplitude, and a blue waveform trace. Handles both oversampled
-/// (min/max per pixel column) and undersampled (single sample) cases.
-///
-/// # Parameters
-/// - `samples` — `&[f32]`. Audio samples, range typically –1.0..=1.0.
-/// - `_sample_rate` — `u32`. Not currently used; reserved for future time-axis labels.
-/// - `width` — `u32`. Output image width in pixels.
-/// - `height` — `u32`. Output image height in pixels.
-///
-/// # Returns
-/// `ImageData`.
 pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height: u32) -> ImageData {
     let margin = 40u32;
     let plot_w = width - margin * 2;
     let plot_h = height - margin * 2;
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
-    // Grid lines (horizontal)
     for i in 0..=4 {
         let y = margin as i32 + (plot_h as i32 * i / 4);
         for x in margin..width - margin {
             img.set_pixel(x, y as u32, 35, 35, 50, 255);
         }
     }
-    // Grid lines (vertical, time markers)
     for i in 0..=8 {
         let x = margin as i32 + (plot_w as i32 * i / 8);
         for y in margin..height - margin {
             img.set_pixel(x as u32, y, 35, 35, 50, 255);
         }
     }
-    // Center line (zero crossing)
     let center_y = margin + plot_h / 2;
     for x in margin..width - margin {
         img.set_pixel(x, center_y, 60, 60, 80, 255);
     }
-
     let peak = samples
         .iter()
         .map(|s| s.abs())
         .fold(0.0f32, f32::max)
         .max(0.01);
     let scale = 0.9 / peak;
-
     let samples_per_pixel = samples.len().max(1) / plot_w as usize;
     if samples_per_pixel > 0 {
         for x in 0..plot_w {
@@ -79,8 +54,6 @@ pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height:
             );
         }
     }
-
-    // Border
     for x in margin..width - margin {
         img.set_pixel(x, margin, 60, 60, 80, 255);
         img.set_pixel(x, height - margin - 1, 60, 60, 80, 255);
@@ -91,21 +64,6 @@ pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height:
     }
     img
 }
-
-/// Render interleaved stereo audio samples as a two-channel waveform.
-///
-/// Splits interleaved L/R samples into two panels stacked vertically.
-/// Left channel is cyan, right channel is orange. Both channels are
-/// auto-scaled together based on the global peak amplitude.
-///
-/// # Parameters
-/// - `samples` — `&[f32]`. Interleaved stereo samples (L, R, L, R …).
-/// - `_sample_rate` — `u32`. Reserved for future time-axis labels.
-/// - `width` — `u32`. Output image width in pixels.
-/// - `height` — `u32`. Output image height in pixels.
-///
-/// # Returns
-/// `ImageData`.
 pub fn waveform_stereo_to_image(
     samples: &[f32],
     _sample_rate: u32,
@@ -117,22 +75,18 @@ pub fn waveform_stereo_to_image(
     let ch_height = (height - margin * 2) / 2;
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
     let left: Vec<f32> = samples.iter().step_by(2).copied().collect();
     let right: Vec<f32> = samples.iter().skip(1).step_by(2).copied().collect();
-
     let peak = samples
         .iter()
         .map(|s| s.abs())
         .fold(0.0f32, f32::max)
         .max(0.01);
     let scale = 0.85 / peak;
-
     let sep_y = margin + ch_height;
     for x in margin..width - margin {
         img.set_pixel(x, sep_y, 80, 80, 100, 255);
     }
-
     for ch in 0..2 {
         let base_y = margin + ch * ch_height;
         let center_y = base_y + ch_height / 2;
@@ -140,7 +94,6 @@ pub fn waveform_stereo_to_image(
             img.set_pixel(x, center_y, 40, 40, 55, 255);
         }
     }
-
     for (ch_idx, ch_samples) in [&left, &right].iter().enumerate() {
         let base_y = margin as f32 + ch_idx as f32 * ch_height as f32;
         let spp = ch_samples.len().max(1) / plot_w as usize;
@@ -172,22 +125,6 @@ pub fn waveform_stereo_to_image(
     }
     img
 }
-
-/// Render a zoomed-in waveform showing individual sample cycles.
-///
-/// Only the first `max_samples` samples are rendered, enabling close
-/// inspection of individual wave cycles. Uses linear interpolation
-/// between adjacent samples and draws lines from the center to each
-/// sample value.
-///
-/// # Parameters
-/// - `samples` — `&[f32]`. Audio samples to visualize.
-/// - `max_samples` — `usize`. Maximum number of samples to show (leading window).
-/// - `width` — `u32`. Output image width in pixels.
-/// - `height` — `u32`. Output image height in pixels.
-///
-/// # Returns
-/// `ImageData`.
 pub fn waveform_zoomed_to_image(
     samples: &[f32],
     max_samples: usize,
@@ -200,7 +137,6 @@ pub fn waveform_zoomed_to_image(
     let plot_h = height - margin * 2;
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
     for i in 0..=4 {
         let y = margin as i32 + (plot_h as i32 * i / 4);
         for x in margin..width - margin {
@@ -217,14 +153,12 @@ pub fn waveform_zoomed_to_image(
     for x in margin..width - margin {
         img.set_pixel(x, center_y, 60, 60, 80, 255);
     }
-
     let peak = zoomed
         .iter()
         .map(|s| s.abs())
         .fold(0.0f32, f32::max)
         .max(0.01);
     let scale = 0.9 / peak;
-
     let n = zoomed.len();
     if n > 1 {
         for x in 0..plot_w {
@@ -256,7 +190,6 @@ pub fn waveform_zoomed_to_image(
             }
         }
     }
-
     for x in margin..width - margin {
         img.set_pixel(x, margin, 60, 60, 80, 255);
         img.set_pixel(x, height - margin - 1, 60, 60, 80, 255);
@@ -267,18 +200,6 @@ pub fn waveform_zoomed_to_image(
     }
     img
 }
-
-/// Draw a single waveform as a colored plot on a dark background.
-///
-/// # Parameters
-/// - `samples` — `&[f32]`. Audio sample data.
-/// - `label` — `&str`. Title text drawn at bottom.
-/// - `width` — `u32`. Image width.
-/// - `height` — `u32`. Image height.
-/// - `color` — `(u8, u8, u8)`. Line colour.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_sound_waveform_to_image(
     samples: &[f32],
     label: &str,
@@ -288,12 +209,9 @@ pub fn draw_sound_waveform_to_image(
 ) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);
-
     let margin = 10u32;
     let plot_w = width.saturating_sub(margin * 2);
     let mid_y = (height / 2) as i32;
-
-    // Center line
     img.draw_line(
         margin as i32,
         mid_y,
@@ -304,7 +222,6 @@ pub fn draw_sound_waveform_to_image(
         80,
         150,
     );
-
     let step = if plot_w == 0 {
         1
     } else {
@@ -312,7 +229,6 @@ pub fn draw_sound_waveform_to_image(
     };
     let step = step.max(1);
     let h_half = (height / 2) as f32 * 0.8;
-
     for x in 0..plot_w {
         let idx = x as usize * step;
         if idx < samples.len() {
@@ -326,7 +242,6 @@ pub fn draw_sound_waveform_to_image(
             img.draw_circle((x + margin) as i32, y, 1, r, g, b, 255);
         }
     }
-
     img.draw_label(label, margin as i32, (height - 15) as i32, 100, 255, 100);
     img
 }

@@ -1,15 +1,8 @@
-//! Province centroid/label anchor helpers.
-
 use std::collections::HashMap;
-
-/// Computes centroid candidates from fill spans.
-///
-/// Returns `province_id -> (x, y)` in map pixel coordinates.
 pub fn centroids_from_spans(spans: &[(u32, u32, u32, u32)]) -> HashMap<u32, (f32, f32)> {
     let mut sum_x: HashMap<u32, f64> = HashMap::new();
     let mut sum_y: HashMap<u32, f64> = HashMap::new();
     let mut sum_n: HashMap<u32, f64> = HashMap::new();
-
     for &(id, y, x0, x1) in spans {
         if id == 0 || x1 <= x0 {
             continue;
@@ -20,7 +13,6 @@ pub fn centroids_from_spans(spans: &[(u32, u32, u32, u32)]) -> HashMap<u32, (f32
         *sum_y.entry(id).or_insert(0.0) += (y as f64) * n;
         *sum_n.entry(id).or_insert(0.0) += n;
     }
-
     let mut out = HashMap::new();
     for (id, n) in sum_n {
         if n > 0.0 {

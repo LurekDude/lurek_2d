@@ -1,44 +1,14 @@
-//! 3×3 column-major matrix for 2D affine transforms.
-//!
-//! [`Mat3`] supports translation, rotation, scale, shear, and point
-//! transformation. Used by [`super::Transform`] and `Camera::view_matrix`
-//! to compose world-to-screen mappings.
-//!
-//! Construction helpers: `identity`, `from_translation`, `from_rotation`,
-//! `from_scale`, `from_shear`, `from_row_major`.
-//!
 use super::vec2::Vec2;
-
-/// A 3×3 column-major matrix used for 2D affine transforms (translation, rotation, scale).
-///
-/// Used by `Camera::view_matrix` to combine position, rotation, and zoom into a single
-/// transform that maps world coordinates to screen coordinates.
-///
-/// # Fields
-/// - `m` — 3×3 array of `f32` in row-major layout (`m[row][col]`).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Mat3 {
     pub m: [[f32; 3]; 3],
 }
-
 impl Mat3 {
-    /// Returns the 3×3 identity matrix. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `Mat3` — Identity: no translation, no rotation, scale 1.
     pub fn identity() -> Self {
         Mat3 {
             m: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         }
     }
-
-    /// Creates a `Mat3` from a flat 9-element array in row-major order.
-    ///
-    /// # Parameters
-    /// - `data` — `&[f32; 9]`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn from_row_major(data: &[f32; 9]) -> Self {
         Mat3 {
             m: [
@@ -48,27 +18,11 @@ impl Mat3 {
             ],
         }
     }
-
-    /// Creates a translation matrix that moves points by `(t.x, t.y)`.
-    ///
-    /// # Parameters
-    /// - `t` — Translation vector.
-    ///
-    /// # Returns
-    /// `Mat3` — A pure translation matrix.
     pub fn from_translation(t: Vec2) -> Self {
         Mat3 {
             m: [[1.0, 0.0, t.x], [0.0, 1.0, t.y], [0.0, 0.0, 1.0]],
         }
     }
-
-    /// Creates a rotation matrix for a counter-clockwise rotation of `angle` radians.
-    ///
-    /// # Parameters
-    /// - `angle` — Rotation in radians.
-    ///
-    /// # Returns
-    /// `Mat3` — A pure rotation matrix.
     pub fn from_rotation(angle: f32) -> Self {
         let c = angle.cos();
         let s = angle.sin();
@@ -76,48 +30,24 @@ impl Mat3 {
             m: [[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]],
         }
     }
-
-    /// Creates a shear (skew) matrix. Returns a fully initialised instance with all fields set to their initial values.
-    ///
-    /// # Parameters
-    /// - `kx` — Shear factor along the X axis.
-    /// - `ky` — Shear factor along the Y axis.
-    ///
-    /// # Returns
-    /// `Mat3` — A pure shear matrix.
     pub fn from_shear(kx: f32, ky: f32) -> Self {
         Mat3 {
             m: [[1.0, ky, 0.0], [kx, 1.0, 0.0], [0.0, 0.0, 1.0]],
         }
     }
-
-    /// Creates a non-uniform scale matrix with the given per-axis factors.
-    ///
-    /// # Parameters
-    /// - `scale` — `Vec2` where `x` scales the X axis and `y` scales the Y axis.
-    ///
-    /// # Returns
-    /// `Mat3` — A pure scale matrix.
     pub fn from_scale(scale: Vec2) -> Self {
         Mat3 {
             m: [[scale.x, 0.0, 0.0], [0.0, scale.y, 0.0], [0.0, 0.0, 1.0]],
         }
     }
-
-    /// Compute the inverse of this 3×3 matrix. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// The inverse matrix, or the identity matrix if the determinant is ≈ 0.
     pub fn inverse(&self) -> Self {
         let m = &self.m;
         let det = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
             - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
             + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-
         if det.abs() < 1e-10 {
             return Self::identity();
         }
-
         let inv_det = 1.0 / det;
         Self {
             m: [
@@ -139,14 +69,6 @@ impl Mat3 {
             ],
         }
     }
-
-    /// Applies the matrix transform to a 2D point using homogeneous coordinates.
-    ///
-    /// # Parameters
-    /// - `p` — Input point in 2D space.
-    ///
-    /// # Returns
-    /// `Vec2` — The transformed point.
     pub fn transform_point(&self, p: Vec2) -> Vec2 {
         Vec2 {
             x: self.m[0][0] * p.x + self.m[0][1] * p.y + self.m[0][2],
@@ -154,7 +76,6 @@ impl Mat3 {
         }
     }
 }
-
 impl std::ops::Mul for Mat3 {
     type Output = Mat3;
     fn mul(self, rhs: Mat3) -> Mat3 {

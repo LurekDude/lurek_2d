@@ -1,37 +1,5 @@
-//! Engine configuration loaded from `conf.toml`.
-//!
-//! When the engine starts it looks for `conf.toml`; if absent it uses built-in
-//! defaults.  Missing fields also fall back to built-in defaults so authors only
-//! need to specify the settings they actually want to change.
-//!
-//! # Structure
-//!
-//! [`Config`] is the top-level container and contains five nested structs:
-//! - [`WindowConfig`] — window geometry, title, display placement, and decoration options.
-//! - [`RenderConfig`] — GPU backend selection and power preference, resolved at startup.
-//! - [`ModulesConfig`] — boolean feature-flags for optional engine subsystems (audio,
-//!   physics, render, etc.).  Disabling a module avoids the startup cost and prevents
-//!   the matching `lurek.*` API calls from being registered.
-//! - [`PerformanceConfig`] — target frame-rate cap (`fps_cap`).
-//!
-//! The `identity` field sets the name of the per-user save directory returned by
-//! `lurek.filesystem.getSaveDirectory()`.  If unset, the engine uses the game directory
-//! name as a fallback.
-//!
-//! # Example `conf.toml`
-//!
-//! ```toml
-//! [window]
-//! title  = "My Game"
-//! width  = 1280
-//! height = 720
-//! vsync  = true
-//!
-//! # GPU backend: "auto" | "dx12" | "vulkan" | "metal"
-//! [render]
-//! backend = "auto"
-//! power_preference = "high"
-//! ```
+//! Runtime configuration schema loaded from `conf.toml`.
+//! Owns defaults, dependency normalization, and merge logic for user overrides.
 
 #[allow(unused_imports)]
 use crate::log_msg;
@@ -40,213 +8,150 @@ use crate::runtime::log_messages::{
 };
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-
-/// Top-level engine configuration.
-///
-/// Loaded from `conf.toml` or constructed with defaults.
-///
-/// # Fields
-/// - `window` — Window dimensions, title, vsync, fullscreen, and resize settings.
-/// - `render` — GPU backend selection and power preference (resolved at engine startup).
-/// - `modules` — Flags enabling optional subsystems (audio, physics, render, etc.).
-/// - `performance` — Frame rate cap.
-/// - `identity` — Save directory name (used for persistent game data).
-/// - `version` — Target engine version string.
-/// - `log_file` — Path to the log file, relative to the game directory.
-/// - `log_append` — If `true`, appends to an existing log file instead of truncating it.
-/// - `log_level` — Minimum log level written to both stderr and the log file (`"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`). Overrides the build-mode default when set.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Top-level runtime configuration consumed during engine startup.
 pub struct Config {
+    /// Window and presentation settings.
     pub window: WindowConfig,
+    /// Renderer backend selection and adapter preferences.
     pub render: RenderConfig,
+    /// Per-module enable flags.
     pub modules: ModulesConfig,
+    /// Frame pacing and callback timing settings.
     pub performance: PerformanceConfig,
+    /// Optional filesystem identity string used by save/runtime systems.
     pub identity: Option<String>,
+    /// Optional game or package version tag.
     pub version: Option<String>,
-    /// Path to the log file, relative to the game directory. Defaults to `"lurek2d.log"` in the current working directory.
+    /// Optional custom path for runtime log file output.
     pub log_file: Option<String>,
-    /// If `true`, appends to an existing log file instead of truncating it on startup.
+    /// Append mode flag for log file writes.
     pub log_append: bool,
-    /// Minimum log level for both stderr and the log file.
-    /// Valid values: `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
-    /// When `None`, falls back to the build-mode default (debug builds: `debug`, release builds: `error`).
+    /// Optional log level override.
     pub log_level: Option<String>,
 }
-
-/// GPU backend and power-preference settings resolved once at engine startup.
-///
-/// These values are read from `[render]` in `conf.toml` and translate directly into
-/// [`wgpu::Backends`] and [`wgpu::PowerPreference`] passed to [`wgpu::Instance::new`] and
-/// [`wgpu::Instance::request_adapter`] respectively.
-///
-/// Changing these fields after the GPU has been initialised has no effect.
-///
-/// # Fields
-/// - `backend` — Which graphics API to use. `"auto"` lets wgpu choose the best available
-///   backend for the current platform (DX12 on Windows, Metal on macOS, Vulkan on Linux).
-///   Valid values: `"auto"`, `"dx12"`, `"vulkan"`, `"metal"`.
-/// - `power_preference` — Hint for which physical adapter to prefer when multiple GPUs are
-///   present. `"high"` requests the discrete GPU, `"low"` requests the integrated GPU,
-///   `"none"` expresses no preference and lets the driver decide.
-///   Valid values: `"high"`, `"low"`, `"none"`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Renderer backend configuration.
 pub struct RenderConfig {
+    /// Requested backend name.
     pub backend: String,
+    /// Requested adapter power preference.
     pub power_preference: String,
 }
-
-/// Window dimensions, title, vsync, fullscreen, and resize settings.
-///
-/// # Fields
-/// - `width` — Window width in pixels.
-/// - `height` — Window height in pixels.
-/// - `title` — Title bar string.
-/// - `vsync` — Enable vertical sync.
-/// - `fullscreen` — Launch in fullscreen mode.
-/// - `resizable` — Allow the user to resize the window.
-/// - `min_width` — Minimum window width (optional).
-/// - `min_height` — Minimum window height (optional).
-/// - `borderless` — Remove window decorations (title bar, borders).
-/// - `icon` — Path to a window icon image, resolved relative to the game directory and applied during startup.
-/// - `display_index` — Monitor index for window placement (0 = primary).
-/// - `scale_mode` — Viewport scaling mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`. Default: `"none"`.
-/// - `game_width` — Logical game resolution width in virtual pixels. `None` means match window width.
-/// - `game_height` — Logical game resolution height in virtual pixels. `None` means match window height.
-/// - `maximized` — Start the window maximized. Default: `false`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Window and viewport configuration.
 pub struct WindowConfig {
+    /// Initial window width in pixels.
     pub width: u32,
+    /// Initial window height in pixels.
     pub height: u32,
+    /// Initial window title.
     pub title: String,
+    /// Startup vsync flag.
     pub vsync: bool,
+    /// Startup fullscreen flag.
     pub fullscreen: bool,
+    /// Window resizable flag.
     pub resizable: bool,
+    /// Optional minimum window width in pixels.
     pub min_width: Option<u32>,
+    /// Optional minimum window height in pixels.
     pub min_height: Option<u32>,
+    /// Borderless-window flag.
     pub borderless: bool,
+    /// Optional window icon path.
     pub icon: Option<String>,
+    /// Preferred display index for startup placement.
     pub display_index: u32,
-    /// Viewport scaling mode: `"none"`, `"letterbox"`, `"stretch"`, or `"pixel"`.
+    /// Game-space scaling mode.
     pub scale_mode: String,
-    /// Logical game resolution width in virtual pixels. `None` means match window width.
+    /// Optional logical game width used by viewport scaling.
     pub game_width: Option<u32>,
-    /// Logical game resolution height in virtual pixels. `None` means match window height.
+    /// Optional logical game height used by viewport scaling.
     pub game_height: Option<u32>,
-    /// Whether to start the window maximized.
+    /// Startup maximized flag.
     pub maximized: bool,
 }
-
-/// Flags to enable or disable optional engine subsystems.
-///
-/// All flags default to `true` (all systems on) except `debug`, which defaults to
-/// `true` only in debug builds.  Set a flag to `false` in `conf.toml` to skip
-/// registering the matching `lurek.*` namespace entirely.
-///
-/// # Fields
-/// - `audio` — rodio audio subsystem (`lurek.audio`).
-/// - `physics` — rapier2d physics world (`lurek.physics`).
-/// - `render` — GPU render pipeline (`lurek.render`, `lurek.font`, `lurek.sprite`).
-/// - `input` — keyboard / mouse / gamepad input (`lurek.input`).
-/// - `timer` — frame timer and scheduled callbacks (`lurek.timer`).
-/// - `filesystem` — sandboxed game filesystem (`lurek.filesystem`).
-/// - `window` — window state queries (`lurek.window`).
-/// - `particle` — 2D particle emitters (`lurek.particle`).
-/// - `image` — CPU-side image manipulation (`lurek.image`).
-/// - `ui` — retained-mode GUI widgets (`lurek.ui`).
-/// - `effect` — fullscreen overlay and post-processing effects (`lurek.effect`).
-/// - `tilemap` — tile maps, tile sets, and map generation (`lurek.tilemap`).
-/// - `scene` — scene stack and transition management (`lurek.scene`).
-/// - `save` — save/load orchestration and schema versioning (`lurek.save`).
-/// - `ecs` — lightweight ECS primitives (`lurek.ecs`).
-/// - `ai` — FSMs, behaviour trees, and steering (`lurek.ai`, `lurek.steering`).
-/// - `pathfind` — A★ and flow-field navigation grids (`lurek.pathfind`).
-/// - `thread` — background Rust threads and `Channel` objects (`lurek.thread`).
-/// - `graph` — directed graphs and flow simulation (`lurek.graph`).
-/// - `data` — binary data helpers, encoding/compression, and serial (`lurek.data`, `lurek.serial`).
-/// - `compute` — dense numerical arrays and `DataFrame` (`lurek.compute`, `lurek.dataframe`).
-/// - `minimap` — minimap extraction and FOV masking (`lurek.minimap`).
-/// - `mods` — mod discovery and load ordering (`lurek.mods`).
-/// - `pipeline` — data transformation pipelines and pattern helpers (`lurek.pipeline`, `lurek.patterns`).
-/// - `runtime` — system information queries (`lurek.runtime`).
-/// - `i18n` — string localisation tables (`lurek.i18n`).
-/// - `debug` — debug bridge, doc server, and automation helpers (`lurek.debug`, `lurek.debugbridge`, `lurek.docs`, `lurek.automation`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
-/// # Fields
-/// - `render` — See field documentation.
-/// - `physics` — See field documentation.
-/// - `audio` — See field documentation.
-/// - `input` — See field documentation.
-/// - `timer` — See field documentation.
-/// - `filesystem` — See field documentation.
-/// - `ui` — See field documentation.
-/// - `scene` — See field documentation.
+/// Feature-toggle table for engine modules.
 pub struct ModulesConfig {
+    /// Enable audio module.
     pub audio: bool,
+    /// Enable physics module.
     pub physics: bool,
+    /// Enable render module.
     pub render: bool,
+    /// Enable input module.
     pub input: bool,
+    /// Enable timer module.
     pub timer: bool,
+    /// Enable filesystem module.
     pub filesystem: bool,
+    /// Enable window module.
     pub window: bool,
+    /// Enable particle module.
     pub particle: bool,
+    /// Enable image module.
     pub image: bool,
+    /// Enable UI module.
     pub ui: bool,
+    /// Enable effect module.
     pub effect: bool,
+    /// Enable tilemap module.
     pub tilemap: bool,
+    /// Enable scene module.
     pub scene: bool,
+    /// Enable save module.
     pub save: bool,
+    /// Enable ECS module.
     pub ecs: bool,
+    /// Enable AI module.
     pub ai: bool,
+    /// Enable pathfinding module.
     pub pathfind: bool,
+    /// Enable threading module.
     pub thread: bool,
+    /// Enable graph module.
     pub graph: bool,
+    /// Enable data module.
     pub data: bool,
+    /// Enable compute module.
     pub compute: bool,
+    /// Enable minimap module.
     pub minimap: bool,
+    /// Enable mods module.
     pub mods: bool,
+    /// Enable pipeline module.
     pub pipeline: bool,
+    /// Enable runtime module.
     pub runtime: bool,
+    /// Enable i18n module.
     pub i18n: bool,
+    /// Enable debug module.
     pub debug: bool,
-    /// Enable lurek.animation sprite animation API (frame clips, named animations).
+    /// Enable animation module.
     pub animation: bool,
-    /// Enable lurek.tween property tweening API (animate any Lua table field).
+    /// Enable tween module.
     pub tween: bool,
-    /// Enable lurek.camera Camera2D API.
+    /// Enable camera module.
     pub camera: bool,
-    /// Enable lurek.network UDP networking API.
+    /// Enable network module.
     pub network: bool,
-    /// Enable lurek.procgen procedural generation API.
+    /// Enable procedural-generation module.
     pub procgen: bool,
-    /// Enable lurek.raycaster DDA raycaster API.
+    /// Enable raycaster module.
     pub raycaster: bool,
-    /// Enable lurek.spine skeletal animation API.
+    /// Enable spine module.
     pub spine: bool,
-    /// Enable lurek.terminal text-mode terminal emulator API.
+    /// Enable terminal module.
     pub terminal: bool,
-    /// Enable lurek.parallax multi-layer scrolling background API.
+    /// Enable parallax module.
     pub parallax: bool,
-    /// Enable lurek.globe Geoscape-style province sphere API.
+    /// Enable globe module.
     pub globe: bool,
 }
-
 impl ModulesConfig {
-    /// Enforces dependency constraints so that a partially-disabled config is never
-    /// internally inconsistent.  Call this after loading `conf.toml`.
-    ///
-    /// Current rules:
-    /// - `minimap` requires `render` (the minimap samples the render output).
-    /// - `particle` requires `render` (particles are draw calls).
-    /// - `ui` requires `render` (widgets render to the GPU surface).
-    /// - `effect` requires `render` (overlay and postfx are render passes).
-    /// - `parallax` requires `render` (layer scrolling renders to the GPU surface).
-    /// - `terminal` requires `render` (text-mode terminal renders via the GPU surface).
-    /// - `animation` requires `render` (frame clips are GPU draw calls).
-    /// - `tilemap` requires `render` (tile layers are batched GPU draw calls).
-    /// - `raycaster` requires `render` (DDA output is rendered to a GPU texture).
-    /// - `camera` requires `render` (Camera2D transforms are applied at the GPU level).
-    /// - `globe` requires `render` (province sphere renders to the GPU surface).
-    /// - `spine` requires `animation` (skeletal animation builds on the animation subsystem).
+    /// Disable modules whose dependencies are not enabled and emit warnings.
     pub fn validate_and_fix(&mut self) {
         if !self.render {
             if self.minimap {
@@ -298,42 +203,32 @@ impl ModulesConfig {
                 self.spine = false;
             }
         }
-        // spine also requires animation (checked after the render block so that
-        // the render-disabled path above already cleared both animation and spine).
         if !self.animation && self.spine {
             log_msg!(warn, L050_MODULE_DEP_DISABLED, "spine requires animation");
             self.spine = false;
         }
     }
 }
-
-/// Frame rate cap and other performance tuning options.
-///
-/// # Fields
-/// - `target_fps` — Desired frames per second for the game loop.
-/// - `physics_tick_rate` — Fixed tick rate for `process_physics` callback (Hz, default 60).
-/// - `fixed_update_tick_rate` — Optional fixed tick rate for the `fixedUpdate` Lua callback (Hz).  `None` disables fixed update.
-/// - `frame_budget_warn_ms` — If set, emit a `warn!` log when a frame exceeds this many milliseconds.
-/// - `lua_callback_timeout_ms` — Optional hard timeout (milliseconds) for any single Lua callback. `None` disables timeout protection.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Performance-related runtime configuration.
 pub struct PerformanceConfig {
+    /// Target frame rate for main loop pacing.
     pub target_fps: u32,
-    /// Fixed tick rate in Hz for the `process_physics` callback (default 60).
+    /// Fixed physics tick rate.
     pub physics_tick_rate: u32,
-    /// Optional fixed tick rate in Hz for the `fixedUpdate` Lua callback.  `None` = disabled.
     #[serde(default)]
+    /// Optional fixed-update callback rate.
     pub fixed_update_tick_rate: Option<u32>,
-    /// Frame time threshold in milliseconds before a `warn!` is emitted.  `None` = no warning.
     #[serde(default)]
+    /// Optional frame-time warning threshold in milliseconds.
     pub frame_budget_warn_ms: Option<f32>,
-    /// Optional timeout in milliseconds for one Lua callback invocation.
-    ///
-    /// When set, callbacks that exceed this budget are aborted and surfaced as runtime errors.
     #[serde(default)]
+    /// Optional Lua callback timeout in milliseconds.
     pub lua_callback_timeout_ms: Option<f32>,
 }
-
+/// Provides default runtime configuration values when no config file is present.
 impl Default for Config {
+    /// Build default runtime configuration.
     fn default() -> Self {
         Config {
             window: WindowConfig {
@@ -415,18 +310,8 @@ impl Default for Config {
         }
     }
 }
-
 impl Config {
-    /// Loads engine configuration from the game directory.
-    ///
-    /// Tries `conf.toml`; if absent returns `Config::default()`.
-    ///
-    /// # Parameters
-    /// - `game_dir` — Absolute path to the directory containing the game files.
-    ///
-    /// # Returns
-    /// A tuple of `(Config, Option<String>)`. The second element is `Some(msg)` if
-    /// loading had errors; the returned `Config` still holds usable defaults.
+    /// Load configuration, preferring `conf.toml` when it exists in `game_dir`.
     pub fn load(game_dir: &Path) -> (Self, Option<String>) {
         let toml_path = game_dir.join("conf.toml");
         if toml_path.exists() {
@@ -434,28 +319,13 @@ impl Config {
         }
         (Config::default(), None)
     }
-
-    /// Loads engine configuration from `conf.toml` in the game directory.
-    ///
-    /// The file must be valid TOML whose top-level keys match the [`Config`] struct.
-    /// Missing keys fall back to defaults from [`Config::default`].  Nested tables are
-    /// merged field-by-field so a `[window]` block with only `title` still keeps the
-    /// default `width` and `height`.
-    ///
-    /// # Parameters
-    /// - `game_dir` — Absolute path to the directory containing `conf.toml`.
-    ///
-    /// # Returns
-    /// A tuple of `(Config, Option<String>)`. The second element is `Some(msg)` if
-    /// `conf.toml` had errors; the returned `Config` still holds usable defaults.
+    /// Parse `conf.toml`, merge it over defaults, and return config with optional parse error.
     pub fn load_from_conf_toml(game_dir: &Path) -> (Self, Option<String>) {
         let conf_path = game_dir.join("conf.toml");
         let default = Config::default();
-
         if !conf_path.exists() {
             return (default, None);
         }
-
         let text = match std::fs::read_to_string(&conf_path) {
             Ok(c) => c,
             Err(e) => {
@@ -463,7 +333,6 @@ impl Config {
                 return (default, Some(format!("Failed to read conf.toml: {}", e)));
             }
         };
-
         let override_val = match toml::from_str::<toml::Value>(&text) {
             Ok(v) => v,
             Err(e) => {
@@ -471,19 +340,14 @@ impl Config {
                 return (default, Some(format!("Error in conf.toml: {}", e)));
             }
         };
-
-        // Merge override on top of serialised defaults so omitted keys keep
-        // their default values rather than triggering a serde error.
         let default_text = match toml::to_string(&default) {
             Ok(s) => s,
             Err(_) => return (default, None),
         };
         let mut merged: toml::Value =
             toml::from_str(&default_text).unwrap_or(toml::Value::Table(toml::Table::new()));
-
         if let (toml::Value::Table(base), toml::Value::Table(over_)) = (&mut merged, override_val) {
             for (k, v) in over_ {
-                // Merge nested tables to preserve unspecified defaults within sections.
                 if let (Some(toml::Value::Table(base_tbl)), toml::Value::Table(over_tbl)) =
                     (base.get_mut(&k), v.clone())
                 {
@@ -495,7 +359,6 @@ impl Config {
                 }
             }
         }
-
         match merged.try_into::<Config>() {
             Ok(cfg) => (cfg, None),
             Err(e) => {
@@ -505,5 +368,3 @@ impl Config {
         }
     }
 }
-
-// Tests migrated to tests/rust/unit/runtime_tests.rs

@@ -1,68 +1,80 @@
-//! Binary pack format using tokens: u8, i16, f32, str, cstr, pad.
+//! Own whitespace-token binary reader/writer for structured binary data exchange.
+//! A format string is a space-separated list of type tokens. Serialises typed value slices
+//! to bytes and deserialises bytes back to typed values. Static byte-length estimation
+//! is available for fixed-width formats. Primary consumer is `src/lua_api/data_api.rs`.
 
 use crate::data::byte_data::ByteData;
-
-/// Packable value: enum of all types.
 #[derive(Debug, Clone)]
+/// Hold typed values used by token-based binary packing.
 pub enum BinValue {
-    /// Unsigned 8-bit integer.
+    /// Store u8 value.
     U8(u8),
-    /// Unsigned 16-bit integer.
+    /// Store u16 value.
     U16(u16),
-    /// Unsigned 32-bit integer.
+    /// Store u32 value.
     U32(u32),
-    /// Unsigned 64-bit integer.
+    /// Store u64 value.
     U64(u64),
-    /// Signed 8-bit integer.
+    /// Store i8 value.
     I8(i8),
-    /// Signed 16-bit integer.
+    /// Store i16 value.
     I16(i16),
-    /// Signed 32-bit integer.
+    /// Store i32 value.
     I32(i32),
-    /// Signed 64-bit integer.
+    /// Store i64 value.
     I64(i64),
-    /// 32-bit float.
+    /// Store f32 value.
     F32(f32),
-    /// 64-bit float.
+    /// Store f64 value.
     F64(f64),
-    /// Boolean value.
+    /// Store boolean value.
     Bool(bool),
-    /// UTF-8 string.
+    /// Store UTF-8 string value.
     Str(String),
-    /// Raw byte vector.
+    /// Store raw bytes value.
     Bytes(Vec<u8>),
 }
-
-/// Format token parsed from a Lurek2D binary format string.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Represent one format token parsed from a whitespace-separated format string.
 enum Token {
+    /// Read or write one u8 byte.
     U8,
+    /// Read or write two-byte unsigned integer.
     U16,
+    /// Read or write four-byte unsigned integer.
     U32,
+    /// Read or write eight-byte unsigned integer.
     U64,
+    /// Read or write one signed byte.
     I8,
+    /// Read or write two-byte signed integer.
     I16,
+    /// Read or write four-byte signed integer.
     I32,
+    /// Read or write eight-byte signed integer.
     I64,
+    /// Read or write four-byte float.
     F32,
+    /// Read or write eight-byte float.
     F64,
+    /// Read or write one-byte boolean.
     Bool,
+    /// Read or write length-prefixed UTF-8 string.
     Str,
+    /// Read or write null-terminated UTF-8 string.
     CStr,
+    /// Write one zero padding byte; skip on read.
     Pad,
 }
-
-/// Byte order for write/read operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Select byte order for multi-byte scalar reads and writes.
 enum Endian {
+    /// Use little-endian byte order.
     Little,
+    /// Use big-endian byte order.
     Big,
 }
-
-/// Parse a Lurek2D binary format string into an endianness and a token list.
-///
-///
-/// `Result<(Endian, Vec<Token>), String>`.
+/// Parse whitespace-separated format string into endian selector and token list.
 fn parse_format(fmt: &str) -> Result<(Endian, Vec<Token>), String> {
     let mut endian = Endian::Little;
     let mut tokens = Vec::new();
@@ -89,16 +101,11 @@ fn parse_format(fmt: &str) -> Result<(Endian, Vec<Token>), String> {
     }
     Ok((endian, tokens))
 }
-
-/// Write values into a binary buffer according to a Lurek2D format string.
-///
-///
-/// `Result<ByteData, String>`.
+/// Write values by token format and return ByteData or error.
 pub fn write(format: &str, values: &[BinValue]) -> Result<ByteData, String> {
     let (endian, tokens) = parse_format(format)?;
     let mut buf = Vec::new();
     let mut val_idx = 0usize;
-
     for token in &tokens {
         match token {
             Token::Pad => buf.push(0u8),
@@ -217,19 +224,13 @@ pub fn write(format: &str, values: &[BinValue]) -> Result<ByteData, String> {
             }
         }
     }
-
     Ok(ByteData::from_bytes(buf))
 }
-
-/// Read values from a binary buffer according to a Lurek2D format string.
-///
-///
-/// `Result<(Vec<BinValue>, usize), String>` — decoded values and next byte position.
+/// Read values by token format and return values with next offset.
 pub fn read(format: &str, data: &[u8], offset: usize) -> Result<(Vec<BinValue>, usize), String> {
     let (endian, tokens) = parse_format(format)?;
     let mut values = Vec::new();
     let mut pos = offset;
-
     for token in &tokens {
         match token {
             Token::Pad => {
@@ -369,21 +370,12 @@ pub fn read(format: &str, data: &[u8], offset: usize) -> Result<(Vec<BinValue>, 
             }
         }
     }
-
     Ok((values, pos))
 }
-
-/// Compute the total byte size that `write` would produce for the given format string.
-///
-/// Return an error if the format contains `str` or `cstr` tokens since their
-/// encoded size depends on the string content.
-///
-///
-/// `Result<usize, String>`.
+/// Measure static size for token format without variable-width tokens.
 pub fn measure_size(format: &str) -> Result<usize, String> {
     let (_endian, tokens) = parse_format(format)?;
     let mut size = 0usize;
-
     for token in &tokens {
         match token {
             Token::Pad | Token::U8 | Token::I8 | Token::Bool => size += 1,
@@ -404,13 +396,9 @@ pub fn measure_size(format: &str) -> Result<usize, String> {
             }
         }
     }
-
     Ok(size)
 }
-
-// ── Internal helpers ─────────────────────────────────────────────────────────
-
-/// Assert `data[pos..pos+count]` is in bounds.
+/// Check that slice has enough bytes at pos for count; return error on underflow.
 fn check_bounds(data: &[u8], pos: usize, count: usize, token: &str) -> Result<(), String> {
     if pos + count > data.len() {
         Err(format!(
@@ -421,8 +409,7 @@ fn check_bounds(data: &[u8], pos: usize, count: usize, token: &str) -> Result<()
         Ok(())
     }
 }
-
-/// Read 8 bytes from `data` at `pos` (caller must call `check_bounds` first).
+/// Read eight bytes at pos without bounds check; caller must call check_bounds first.
 fn read8(data: &[u8], pos: usize) -> [u8; 8] {
     [
         data[pos],
@@ -435,8 +422,7 @@ fn read8(data: &[u8], pos: usize) -> [u8; 8] {
         data[pos + 7],
     ]
 }
-
-/// Coerce a `BinValue` to `u64`, accepting any numeric variant.
+/// Coerce value at index to u64; return error when missing or incompatible.
 fn coerce_u64(values: &[BinValue], idx: usize, token: &str) -> Result<u64, String> {
     match values.get(idx) {
         Some(BinValue::U8(v)) => Ok(*v as u64),
@@ -458,8 +444,7 @@ fn coerce_u64(values: &[BinValue], idx: usize, token: &str) -> Result<u64, Strin
         )),
     }
 }
-
-/// Coerce a `BinValue` to `i64`, accepting any numeric variant.
+/// Coerce value at index to i64; return error when missing or incompatible.
 fn coerce_i64(values: &[BinValue], idx: usize, token: &str) -> Result<i64, String> {
     match values.get(idx) {
         Some(BinValue::U8(v)) => Ok(*v as i64),
@@ -481,8 +466,7 @@ fn coerce_i64(values: &[BinValue], idx: usize, token: &str) -> Result<i64, Strin
         )),
     }
 }
-
-/// Coerce a `BinValue` to `f64`, accepting any numeric variant.
+/// Coerce value at index to f64; return error when missing or incompatible.
 fn coerce_f64(values: &[BinValue], idx: usize, token: &str) -> Result<f64, String> {
     match values.get(idx) {
         Some(BinValue::U8(v)) => Ok(*v as f64),
@@ -504,8 +488,6 @@ fn coerce_f64(values: &[BinValue], idx: usize, token: &str) -> Result<f64, Strin
         )),
     }
 }
-
-/// Coerce a `BinValue` to `bool`.
 fn coerce_bool(values: &[BinValue], idx: usize, token: &str) -> Result<bool, String> {
     match values.get(idx) {
         Some(BinValue::Bool(b)) => Ok(*b),
@@ -519,8 +501,6 @@ fn coerce_bool(values: &[BinValue], idx: usize, token: &str) -> Result<bool, Str
         )),
     }
 }
-
-/// Coerce a `BinValue` to a `String` reference for writing.
 fn coerce_str(values: &[BinValue], idx: usize, token: &str) -> Result<String, String> {
     match values.get(idx) {
         Some(BinValue::Str(s)) => Ok(s.clone()),

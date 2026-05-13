@@ -1,63 +1,24 @@
-//! Vfs implementation for the `filesystem` subsystem.
-//!
-//! This module is part of Lurek2D's `filesystem` subsystem and provides the implementation
-//! details for vfs-related operations and data management.
-//! Key types exported from this module: `FileInfo`, `FileType`, `GameFS`.
-//! Primary functions: `new()`, `base_dir()`, `read_string()`, `read_bytes()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-//!
 use crate::filesystem::file_handle::{FileHandle, FileMode};
 use crate::log_msg;
 use crate::runtime::error::{EngineError, EngineResult};
 use crate::runtime::log_messages::{FS01_GAMEFS_INIT, FS04_PATH_TRAVERSAL, FS05_VFS_MOUNT};
 use serde_json::Value as JsonValue;
 use std::path::{Path, PathBuf};
-
-/// File metadata returned by `get_info()`.
-///
-/// # Fields
-/// - `file_type` — whether the entry is a file, directory, symlink, or other
-/// - `size` — size in bytes
-/// - `modified_time` — last modification time as a UNIX timestamp, if available
-/// - `readonly` — whether the entry is marked read-only
 #[derive(Debug, Clone)]
 pub struct FileInfo {
-    /// The type of file system entry.
     pub file_type: FileType,
-    /// Size in bytes.
     pub size: u64,
-    /// Last modification time as a UNIX timestamp, if available.
     pub modified_time: Option<u64>,
-    /// Whether the entry is read-only.
     pub readonly: bool,
 }
-
-/// File type classification for `FileInfo`.
-///
-/// # Variants
-/// - `File` — regular file
-/// - `Directory` — directory
-/// - `Symlink` — symbolic link
-/// - `Other` — unknown or special entry
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FileType {
-    /// Regular file.
     File,
-    /// Directory.
     Directory,
-    /// Symbolic link.
     Symlink,
-    /// Unknown or special entry.
     Other,
 }
-
 impl FileType {
-    /// Returns the string name of this file type.
-    ///
-    /// # Returns
-    /// `&'static str` — one of `"file"`, `"directory"`, `"symlink"`, or `"other"`.
     pub fn as_str(&self) -> &'static str {
         match self {
             FileType::File => "file",
@@ -67,40 +28,17 @@ impl FileType {
         }
     }
 }
-
-/// A virtual filesystem mount layer overlaid on top of the game directory.
-///
-/// # Fields
-/// - `source` — `PathBuf`. The host-OS directory being mounted.
-/// - `mountpoint` — `String`. The virtual path prefix this layer serves.
 #[derive(Debug, Clone)]
 pub struct MountLayer {
-    /// The host-OS directory being mounted.
     pub source: PathBuf,
-    /// The virtual path prefix this layer serves.
     pub mountpoint: String,
 }
-
-/// Sandboxed filesystem rooted at the game directory; prevents path-traversal attacks.
-///
-/// # Fields
-/// - `base_dir` — `PathBuf`.
-/// - `identity` — `String`.
-/// - `mounts` — `Vec<MountLayer>`.
 pub struct GameFS {
     base_dir: PathBuf,
     identity: String,
     mounts: Vec<MountLayer>,
 }
-
 impl GameFS {
-    /// Creates a new `GameFS` rooted at `base_dir`.
-    ///
-    /// # Parameters
-    /// - `base_dir` — The game's root directory; all paths are resolved relative to this.
-    ///
-    /// # Returns
-    /// A new `GameFS` instance ready for sandboxed I/O.
     pub fn new(base_dir: impl Into<PathBuf>) -> Self {
         log_msg!(debug, FS01_GAMEFS_INIT);
         GameFS {
@@ -109,18 +47,9 @@ impl GameFS {
             mounts: Vec::new(),
         }
     }
-
-    /// Returns a reference to the base directory path.
-    ///
-    /// # Returns
-    /// `&Path` — The absolute base directory set at construction.
     pub fn base_dir(&self) -> &Path {
         &self.base_dir
     }
-
-    /// Rejects paths containing `..` (parent-directory) components.
-    ///
-    /// Prevents path-traversal attacks by scanning path components.
     fn reject_traversal(path: &str) -> EngineResult<()> {
         for component in std::path::Path::new(path).components() {
             if let std::path::Component::ParentDir = component {
@@ -131,49 +60,16 @@ impl GameFS {
         }
         Ok(())
     }
-
-    /// Reads the file at `path` (relative to base dir) and returns its contents as a `String`.
-    ///
-    /// Canonicalises the path and rejects any path that escapes the base directory,
-    /// preventing path-traversal attacks.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the file within the game directory.
-    ///
-    /// # Returns
-    /// `Ok(String)` — The UTF-8 file contents. `Err(EngineError)` — I/O or traversal error.
     pub fn read_string(&self, path: &str) -> EngineResult<String> {
         let resolved = self.resolve_read_path(path)?;
         std::fs::read_to_string(&resolved)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to read '{}': {}", path, e)))
     }
-
-    /// Reads the file at `path` as raw bytes.
-    ///
-    /// Applies the same path-traversal check as `read_string`.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the file within the game directory.
-    ///
-    /// # Returns
-    /// `Ok(Vec<u8>)` — The raw file bytes. `Err(EngineError)` — I/O or traversal error.
     pub fn read_bytes(&self, path: &str) -> EngineResult<Vec<u8>> {
         let resolved = self.resolve_read_path(path)?;
         std::fs::read(&resolved)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to read '{}': {}", path, e)))
     }
-
-    /// Writes `content` to `path`, which must be inside the `save/` subdirectory.
-    ///
-    /// Creates parent directories automatically. Rejects any path outside `save/`
-    /// to prevent scripts from writing arbitrary files to the system.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path under `save/`, e.g. `"save/progress.json"`.
-    /// - `content` — String content to write.
-    ///
-    /// # Returns
-    /// `Ok(())` on success. `Err(EngineError)` if the path is outside `save/` or an I/O error occurs.
     pub fn write_string(&self, path: &str, content: &str) -> EngineResult<()> {
         let resolved = self.resolve_save_path(path)?;
         if let Some(parent) = resolved.parent() {
@@ -184,18 +80,6 @@ impl GameFS {
         std::fs::write(&resolved, content)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to write '{}': {}", path, e)))
     }
-
-    /// Writes raw bytes to `path`, which must stay inside the `save/` subdirectory.
-    ///
-    /// Creates parent directories automatically. Rejects any path outside `save/`
-    /// to prevent scripts from writing arbitrary files to the host filesystem.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path under `save/`, e.g. `"save/frame.png"`.
-    /// - `bytes` — Raw bytes to write.
-    ///
-    /// # Returns
-    /// `Ok(())` on success. `Err(EngineError)` if the path is outside `save/` or an I/O error occurs.
     pub fn write_bytes(&self, path: &str, bytes: &[u8]) -> EngineResult<()> {
         let resolved = self.resolve_save_path(path)?;
         if let Some(parent) = resolved.parent() {
@@ -206,15 +90,6 @@ impl GameFS {
         std::fs::write(&resolved, bytes)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to write '{}': {}", path, e)))
     }
-
-    /// Reads a JSON file and validates that it contains valid JSON text.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the JSON file.
-    ///
-    /// # Returns
-    /// `Ok(String)` — Raw JSON text when valid.
-    /// `Err(EngineError)` — On I/O errors or invalid JSON.
     pub fn read_json(&self, path: &str) -> EngineResult<String> {
         let content = self.read_string(path)?;
         serde_json::from_str::<JsonValue>(&content).map_err(|e| {
@@ -222,32 +97,12 @@ impl GameFS {
         })?;
         Ok(content)
     }
-
-    /// Writes JSON text to a file in the save sandbox after validating it.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path under `save/`.
-    /// - `json` — JSON text payload.
-    ///
-    /// # Returns
-    /// `Ok(())` on success.
     pub fn write_json(&self, path: &str, json: &str) -> EngineResult<()> {
         serde_json::from_str::<JsonValue>(json).map_err(|e| {
             EngineError::FileSystemError(format!("Invalid JSON for '{}': {}", path, e))
         })?;
         self.write_string(path, json)
     }
-
-    /// Reads JSON from `path`, or writes and returns `default_json` if missing.
-    ///
-    /// Both existing and default content are validated as JSON.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path under `save/`.
-    /// - `default_json` — JSON text written when the file does not exist.
-    ///
-    /// # Returns
-    /// `Ok(String)` — Existing JSON text or the default text after write.
     pub fn read_or_write_json(&self, path: &str, default_json: &str) -> EngineResult<String> {
         if self.exists(path) {
             return self.read_json(path);
@@ -255,25 +110,9 @@ impl GameFS {
         self.write_json(path, default_json)?;
         Ok(default_json.to_string())
     }
-
-    /// Returns `true` if the file or directory at `path` exists within the game directory.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to check.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the path exists on disk.
     pub fn exists(&self, path: &str) -> bool {
         self.base_dir.join(path).exists()
     }
-
-    /// Lists all entries in the directory at `path` relative to the game directory.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the directory to list.
-    ///
-    /// # Returns
-    /// `Ok(Vec<String>)` — Entry names (files and subdirectories). `Err(EngineError)` on I/O failure.
     pub fn list(&self, path: &str) -> EngineResult<Vec<String>> {
         let full = self.base_dir.join(path);
         let mut entries = Vec::new();
@@ -289,16 +128,6 @@ impl GameFS {
         }
         Ok(entries)
     }
-
-    /// Lists all entries recursively under `path`, returning paths relative to `path`.
-    ///
-    /// Traverses subdirectories depth-first. Applies the same sandbox check as `resolve_read_path`.
-    ///
-    /// # Parameters
-    /// - `path` — Relative directory path within the game root.
-    ///
-    /// # Returns
-    /// `Ok(Vec<String>)` — Relative paths (using `/` separator) of all files and directories found.
     pub fn list_recursive(&self, path: &str) -> EngineResult<Vec<String>> {
         let resolved = self.resolve_read_path(path)?;
         let mut results = Vec::new();
@@ -306,8 +135,6 @@ impl GameFS {
         results.sort();
         Ok(results)
     }
-
-    /// Internal recursive directory walker.
     fn collect_recursive(
         base: &std::path::Path,
         dir: &std::path::Path,
@@ -335,16 +162,6 @@ impl GameFS {
         }
         Ok(())
     }
-
-    // ── Directory Operations ──────────────────────────────────────────
-
-    /// Get sorted directory items relative to `base_dir`.
-    ///
-    /// # Parameters
-    /// - `path` — directory path relative to the game root
-    ///
-    /// # Returns
-    /// Sorted list of entry names (filenames only, not full paths), or an `EngineError`.
     pub fn get_directory_items(&self, path: &str) -> EngineResult<Vec<String>> {
         let resolved = self.resolve_read_path(path)?;
         let rd = std::fs::read_dir(&resolved).map_err(|e| {
@@ -357,54 +174,22 @@ impl GameFS {
         items.sort();
         Ok(items)
     }
-
-    /// Check if the given path refers to a regular file.
-    ///
-    /// # Parameters
-    /// - `path` — path relative to the game root
-    ///
-    /// # Returns
-    /// `true` if the path exists and is a regular file; `false` otherwise.
     pub fn is_file(&self, path: &str) -> bool {
         self.resolve_read_path(path)
             .map(|p| p.is_file())
             .unwrap_or(false)
     }
-
-    /// Check if the given path refers to a directory.
-    ///
-    /// # Parameters
-    /// - `path` — path relative to the game root
-    ///
-    /// # Returns
-    /// `true` if the path exists and is a directory; `false` otherwise.
     pub fn is_directory(&self, path: &str) -> bool {
         self.resolve_read_path(path)
             .map(|p| p.is_dir())
             .unwrap_or(false)
     }
-
-    /// Create a directory (and all parent directories) inside the save area.
-    ///
-    /// # Parameters
-    /// - `path` — target directory path; must be inside `save/`
-    ///
-    /// # Returns
-    /// `Ok(())` on success, or an `EngineError` if creation fails or the path is outside `save/`.
     pub fn create_directory(&self, path: &str) -> EngineResult<()> {
         let resolved = self.resolve_save_path(path)?;
         std::fs::create_dir_all(&resolved).map_err(|e| {
             EngineError::FileSystemError(format!("Cannot create directory '{}': {}", path, e))
         })
     }
-
-    /// Remove a file or empty directory from the save area.
-    ///
-    /// # Parameters
-    /// - `path` — path to remove; must be inside `save/`
-    ///
-    /// # Returns
-    /// `Ok(())` on success, or an `EngineError` if removal fails or path is outside `save/`.
     pub fn remove(&self, path: &str) -> EngineResult<()> {
         let resolved = self.resolve_save_path(path)?;
         if resolved.is_dir() {
@@ -417,15 +202,6 @@ impl GameFS {
             })
         }
     }
-
-    /// Get file or directory metadata. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Parameters
-    /// - `path` — path relative to the game root
-    ///
-    /// # Returns
-    /// A `FileInfo` struct with type, size, modification time, and read-only flag;
-    /// returns an `EngineError` if the path does not exist or is inaccessible.
     pub fn get_info(&self, path: &str) -> EngineResult<FileInfo> {
         let resolved = self.resolve_read_path(path)?;
         let metadata = std::fs::metadata(&resolved).map_err(|e| {
@@ -449,17 +225,6 @@ impl GameFS {
             readonly: metadata.permissions().readonly(),
         })
     }
-
-    /// Append UTF-8 string content to a file in the save area.
-    ///
-    /// Creates the file and any parent directories if they do not exist.
-    ///
-    /// # Parameters
-    /// - `path` — target file path; must be inside `save/`
-    /// - `content` — string to append
-    ///
-    /// # Returns
-    /// `Ok(())` on success, or an `EngineError` on I/O failure or path violation.
     pub fn append_string(&self, path: &str, content: &str) -> EngineResult<()> {
         let resolved = self.resolve_save_path(path)?;
         if let Some(parent) = resolved.parent() {
@@ -479,29 +244,12 @@ impl GameFS {
             EngineError::FileSystemError(format!("Failed to append to '{}': {}", path, e))
         })
     }
-
-    // ── Path Utilities ────────────────────────────────────────────────
-
-    /// Get the game source directory (where `main.lua` lives).
-    ///
-    /// # Returns
-    /// Absolute path of the game root directory as a `String`.
     pub fn get_source(&self) -> String {
         self.base_dir.to_string_lossy().to_string()
     }
-
-    /// Get the save directory path. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// Path to the `save/` subdirectory inside the game root.
     pub fn get_save_directory(&self) -> PathBuf {
         self.base_dir.join("save")
     }
-
-    /// Get the current working directory of the process.
-    ///
-    /// # Returns
-    /// The working directory as a `String`, or an `EngineError` if it cannot be determined.
     pub fn get_working_directory() -> EngineResult<String> {
         std::env::current_dir()
             .map(|p| p.to_string_lossy().to_string())
@@ -509,12 +257,6 @@ impl GameFS {
                 EngineError::FileSystemError(format!("Cannot get working directory: {}", e))
             })
     }
-
-    /// Get the current user's home directory. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// Home directory path as a `String` (`USERPROFILE` on Windows, `HOME` on Unix).
-    /// Falls back to the current directory if the environment variable is not set.
     pub fn get_user_directory() -> String {
         #[cfg(target_os = "windows")]
         {
@@ -533,38 +275,13 @@ impl GameFS {
             })
         }
     }
-
-    /// Get the game identity string used for save directory naming.
-    ///
-    /// # Returns
-    /// The identity string, or an empty string if not set.
     pub fn get_identity(&self) -> &str {
         &self.identity
     }
-
-    /// Set the game identity string. Replaces the current identity value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `identity` — short name used to identify the game (e.g. `"my_awesome_game"`)
     pub fn set_identity(&mut self, identity: &str) {
         self.identity = identity.to_string();
     }
-
-    // ── Mount Layer Management ────────────────────────────────────────
-
-    /// Mounts a host directory (relative to the game dir) at a virtual mountpoint.
-    ///
-    /// The source path must not contain `.` components and must resolve to a
-    /// directory inside the game directory, preventing arbitrary filesystem access.
-    ///
-    /// # Parameters
-    /// - `source_path` — `&str`. Relative path (within game dir) to mount.
-    /// - `mountpoint` — `&str`. Virtual prefix to serve (e.g., `"/mods/hello"`).
-    ///
-    /// # Returns
-    /// `Result<(), EngineError>`.
     pub fn mount(&mut self, source_path: &str, mountpoint: &str) -> EngineResult<()> {
-        // Security: reject path traversal in source
         for component in std::path::Path::new(source_path).components() {
             if let std::path::Component::ParentDir = component {
                 log_msg!(warn, FS04_PATH_TRAVERSAL, "{}", source_path);
@@ -602,17 +319,6 @@ impl GameFS {
         });
         Ok(())
     }
-
-    /// Mounts an absolute host-OS path at a virtual mountpoint.
-    ///
-    /// The caller is responsible for ensuring the path is safe to expose.
-    ///
-    /// # Parameters
-    /// - `source_path` — `&Path`. Absolute host-OS path to a directory.
-    /// - `mountpoint` — `&str`. Virtual path prefix.
-    ///
-    /// # Returns
-    /// `Result<(), EngineError>`.
     pub fn mount_full(&mut self, source_path: &Path, mountpoint: &str) -> EngineResult<()> {
         if !source_path.is_dir() {
             return Err(EngineError::FileSystemError(format!(
@@ -629,14 +335,6 @@ impl GameFS {
         });
         Ok(())
     }
-
-    /// Removes the first mount layer matching `mountpoint`.
-    ///
-    /// # Parameters
-    /// - `mountpoint` — `&str`. Virtual path prefix to remove.
-    ///
-    /// # Returns
-    /// `bool` — `true` if a layer was found and removed; `false` otherwise.
     pub fn unmount(&mut self, mountpoint: &str) -> bool {
         if let Some(idx) = self.mounts.iter().position(|m| m.mountpoint == mountpoint) {
             self.mounts.remove(idx);
@@ -645,19 +343,7 @@ impl GameFS {
             false
         }
     }
-
-    /// Reads file bytes from the VFS, searching mount layers newest-first before
-    /// falling back to the base game directory.
-    ///
-    /// Useful for `lurek.filesystem.load()` — returns raw bytes for Lua compilation.
-    ///
-    /// # Parameters
-    /// - `path` — `&str`. Virtual path to the file.
-    ///
-    /// # Returns
-    /// `Result<Vec<u8>, EngineError>`.
     pub fn load_chunk(&self, path: &str) -> EngineResult<Vec<u8>> {
-        // Search mount layers newest-first so that later mounts override earlier ones.
         for layer in self.mounts.iter().rev() {
             if let Some(rel) = path.strip_prefix(&layer.mountpoint) {
                 let candidate = layer.source.join(rel.trim_start_matches('/'));
@@ -668,17 +354,8 @@ impl GameFS {
                 }
             }
         }
-        // Fall through to base directory
         self.read_bytes(path)
     }
-
-    /// Lists entries visible under a virtual path, merging all mount layers.
-    ///
-    /// # Parameters
-    /// - `path` — `&str`. Virtual path to the directory.
-    ///
-    /// # Returns
-    /// `Result<Vec<String>, EngineError>`.
     pub fn get_directory_items_merged(&self, path: &str) -> EngineResult<Vec<String>> {
         let mut items: std::collections::HashSet<String> = std::collections::HashSet::new();
         if let Ok(base_items) = self.get_directory_items(path) {
@@ -703,18 +380,6 @@ impl GameFS {
         result.sort();
         Ok(result)
     }
-
-    // ── Internal Path Resolution ──────────────────────────────────────
-
-    /// Resolve a logical path to an absolute path for reading.
-    ///
-    /// Rejects path-traversal sequences (`.`) via `canonicalize()`.
-    ///
-    /// # Parameters
-    /// - `path` — logical path relative to the game root
-    ///
-    /// # Returns
-    /// Canonical absolute path, or an `EngineError` if the path escapes the sandbox.
     pub fn resolve_read_path(&self, path: &str) -> EngineResult<PathBuf> {
         let full = self.base_dir.join(path);
         let canonical = full.canonicalize().map_err(|e| {
@@ -731,20 +396,9 @@ impl GameFS {
         }
         Ok(canonical)
     }
-
-    /// Resolve a logical path to an absolute path for writing.
-    ///
-    /// Enforces that the target is inside the `save/` subdirectory.
-    ///
-    /// # Parameters
-    /// - `path` — logical path; must begin with `save/`
-    ///
-    /// # Returns
-    /// Absolute path inside `save/`, or an `EngineError` if the path is outside the write sandbox.
     pub fn resolve_save_path(&self, path: &str) -> EngineResult<PathBuf> {
         let full = self.base_dir.join(path);
         let save_dir = self.base_dir.join("save");
-        // For files that don't exist yet, check the logical path prefix
         if !full.starts_with(&save_dir) {
             return Err(EngineError::FileSystemError(
                 "Write access restricted to save/ directory".into(),
@@ -753,43 +407,14 @@ impl GameFS {
         Self::reject_traversal(path)?;
         Ok(full)
     }
-
-    /// Reads a text file and returns its contents split into lines.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the file within the game directory.
-    ///
-    /// # Returns
-    /// `Ok(Vec<String>)` — The lines of the file. `Err(EngineError)` on I/O failure.
     pub fn read_lines(&self, path: &str) -> EngineResult<Vec<String>> {
         let content = self.read_string(path)?;
         Ok(content.lines().map(|l| l.to_string()).collect())
     }
-
-    /// Opens a file handle by parsing the mode string and delegating to `FileHandle::open`.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the file.
-    /// - `mode_str` — Mode string: `"r"` for read, `"w"` for write, `"a"` for append.
-    ///
-    /// # Returns
-    /// An open `FileHandle`, or an `EngineError` on failure.
     pub fn open_file(&self, path: &str, mode_str: &str) -> EngineResult<FileHandle> {
         let mode = FileMode::parse_mode(mode_str)?;
         FileHandle::open(self, path, mode)
     }
-
-    /// Copies a file within the sandbox.
-    ///
-    /// Both source and destination must resolve inside the game root.
-    /// The destination must be inside the `save/` directory.
-    ///
-    /// # Parameters
-    /// - `src` — Relative source path (readable).
-    /// - `dst` — Relative destination path (must be inside `save/`).
-    ///
-    /// # Returns
-    /// `EngineResult<()>` — Number of bytes copied on success (discarded), or an error.
     pub fn copy_file(&self, src: &str, dst: &str) -> EngineResult<()> {
         let src_path = self.resolve_read_path(src)?;
         let dst_path = self.resolve_save_path(dst)?;
@@ -803,17 +428,6 @@ impl GameFS {
         })?;
         Ok(())
     }
-
-    /// Moves (renames) a file within the `save/` directory.
-    ///
-    /// Both source and destination must be inside `save/`.
-    ///
-    /// # Parameters
-    /// - `src` — Relative source path (inside `save/`).
-    /// - `dst` — Relative destination path (inside `save/`).
-    ///
-    /// # Returns
-    /// `EngineResult<()>`.
     pub fn move_file(&self, src: &str, dst: &str) -> EngineResult<()> {
         let src_path = self.resolve_save_path(src)?;
         let dst_path = self.resolve_save_path(dst)?;
@@ -826,16 +440,6 @@ impl GameFS {
             EngineError::FileSystemError(format!("move_file '{}' → '{}': {}", src, dst, e))
         })
     }
-
-    /// Recursively removes a directory and all its contents within the `save/` directory.
-    ///
-    /// This is a destructive operation. The target must be inside `save/`.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path to the directory (inside `save/`).
-    ///
-    /// # Returns
-    /// `EngineResult<()>`.
     pub fn remove_dir(&self, path: &str) -> EngineResult<()> {
         let dir_path = self.resolve_save_path(path)?;
         if !dir_path.is_dir() {
@@ -847,26 +451,7 @@ impl GameFS {
         std::fs::remove_dir_all(&dir_path)
             .map_err(|e| EngineError::FileSystemError(format!("remove_dir '{}': {}", path, e)))
     }
-
-    /// Returns a list of paths inside the game root that match a simple glob pattern.
-    ///
-    /// Supported wildcards:
-    /// - `*` — any sequence of characters within a single path component.
-    /// - `?` — any single character within a path component.
-    ///
-    /// The pattern is relative to the game root (same namespace as all other paths).
-    /// Returned paths are relative to the game root and use forward slashes.
-    ///
-    /// **Note**: does not recurse into subdirectories — only the depth implied by the
-    /// pattern's `/`-separated segments is searched.
-    ///
-    /// # Parameters
-    /// - `pattern` — Relative path pattern, e.g. `"save/*.json"` or `"maps/level_?.tmx"`.
-    ///
-    /// # Returns
-    /// `EngineResult<Vec<String>>` — Sorted list of matching relative paths.
     pub fn glob(&self, pattern: &str) -> EngineResult<Vec<String>> {
-        // Split into directory part and filename part
         let (dir_part, file_pattern) = match pattern.rfind('/') {
             Some(idx) => (&pattern[..idx], &pattern[idx + 1..]),
             None => (".", pattern),
@@ -897,20 +482,6 @@ impl GameFS {
         matches.sort();
         Ok(matches)
     }
-
-    /// Returns lightweight file-size statistics for a path without loading file
-    /// contents.
-    ///
-    /// Unlike [`get_info`], this method returns only the data needed for
-    /// `lurek.filesystem.stat`: file size, and booleans indicating whether the path is
-    /// a regular file or a directory.
-    ///
-    /// # Parameters
-    /// - `path` — Relative path inside the game directory.
-    ///
-    /// # Returns
-    /// `Ok((size, is_file, is_dir))` on success, `Err(EngineError)` if the
-    /// path is inaccessible or outside the sandbox.
     pub fn stat(&self, path: &str) -> EngineResult<(u64, bool, bool)> {
         let resolved = self.resolve_read_path(path)?;
         let meta = std::fs::metadata(&resolved).map_err(|e| {
@@ -918,21 +489,6 @@ impl GameFS {
         })?;
         Ok((meta.len(), meta.is_file(), meta.is_dir()))
     }
-
-    /// Creates a temporary file inside the `save/` sandbox and returns its
-    /// relative path.
-    ///
-    /// The path follows the pattern `save/<prefix><timestamp>_<counter>.tmp`.
-    /// The file is created empty and ready for writing. The caller is
-    /// responsible for deleting it when done.
-    ///
-    /// # Parameters
-    /// - `prefix` — Optional name prefix for the temp file. Defaults to `"tmp"`.
-    ///
-    /// # Returns
-    /// `Ok(String)` — Relative path of the created temp file.
-    /// `Err(EngineError)` — If the save directory cannot be created or the file
-    ///   cannot be opened.
     pub fn create_temp_file(&self, prefix: &str) -> EngineResult<String> {
         let save_dir = self.base_dir.join("save");
         std::fs::create_dir_all(&save_dir).map_err(|e| {
@@ -942,7 +498,6 @@ impl GameFS {
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_micros())
             .unwrap_or(0);
-        // Use a simple counter to reduce collisions when called in tight loops.
         static COUNTER: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
         let n = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
         let safe_prefix = prefix
@@ -964,24 +519,15 @@ impl GameFS {
         Ok(format!("save/{}", filename))
     }
 }
-
-/// Minimal glob matching: `*` matches any run of non-separator characters,
-/// `?` matches exactly one non-separator character.
 fn glob_match(pattern: &str, name: &str) -> bool {
     let pat: Vec<char> = pattern.chars().collect();
     let txt: Vec<char> = name.chars().collect();
     glob_match_inner(&pat, &txt)
 }
-
-/// Recursive backtracking matcher for [`glob_match`].
-///
-/// For `*`: tries matching zero characters first (skip `*` in pattern), then
-/// consumes one text character and retries — classic NFA-style backtracking.
 fn glob_match_inner(pat: &[char], txt: &[char]) -> bool {
     match (pat.first(), txt.first()) {
         (None, None) => true,
         (Some('*'), _) => {
-            // '*' can match zero characters or advance one txt character
             glob_match_inner(&pat[1..], txt)
                 || (!txt.is_empty() && glob_match_inner(pat, &txt[1..]))
         }

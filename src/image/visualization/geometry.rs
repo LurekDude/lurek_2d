@@ -1,25 +1,9 @@
-//! Geometry shape and intersection visualization helpers.
-//!
-//! Renders polygon galleries, spirals, filled primitives, convex hulls,
-//! Bresenham lines, and intersection tests as CPU-side [`ImageData`].
-
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
-
-/// Render a gallery of regular polygons (triangle→dodecagon), a five-pointed
-/// star, and an arrow shape using `draw_line`.
-///
-/// # Parameters
-/// - `width` — `u32`. Image width.
-/// - `height` — `u32`. Image height.
-///
-/// # Returns
-/// `ImageData`.
 #[allow(clippy::type_complexity)]
 pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
     let shapes: &[(i32, i32, i32, usize, (u8, u8, u8))] = &[
         (85, 85, 60, 3, (255, 100, 100)),
         (255, 85, 60, 4, (100, 255, 100)),
@@ -40,8 +24,6 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
             img.draw_line(x0, y0, x1, y1, r, g, b, 255);
         }
     }
-
-    // Five-pointed star
     let (sx, sy, sr) = (170i32, 425i32, 70i32);
     let star_pts: Vec<(i32, i32)> = (0..10)
         .map(|i| {
@@ -62,8 +44,6 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
         let (x1, y1) = star_pts[(i + 1) % 10];
         img.draw_line(x0, y0, x1, y1, 255, 220, 50, 255);
     }
-
-    // Arrow shape
     let (ax, ay) = (340i32, 425i32);
     let arrow: [(i32, i32); 7] = [
         (0, -50),
@@ -79,22 +59,11 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
         let (x1, y1) = arrow[(i + 1) % arrow.len()];
         img.draw_line(ax + x0, ay + y0, ax + x1, ay + y1, 255, 150, 50, 255);
     }
-
     img
 }
-
-/// Render concentric colored circles to demonstrate angular segment drawing.
-///
-/// # Parameters
-/// - `width` — `u32`. Image width.
-/// - `height` — `u32`. Image height.
-///
-/// # Returns
-/// `ImageData`.
 pub fn spiral_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
     let (cx, cy) = (width as i32 / 2, height as i32 / 2);
     for ring in 1u32..=10 {
         let r = ring * 18;
@@ -110,23 +79,11 @@ pub fn spiral_to_image(width: u32, height: u32) -> ImageData {
             img.draw_line(x0, y0, x1, y1, cr, cg, cb, 255);
         }
     }
-
     img
 }
-
-/// Render filled rectangle and circle primitives with HSV-coloured fills.
-///
-/// # Parameters
-/// - `width` — `u32`. Image width.
-/// - `height` — `u32`. Image height.
-///
-/// # Returns
-/// `ImageData`.
 pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
-
-    // Filled rectangles of increasing size
     for i in 0u32..5 {
         let x = 20 + i * 35;
         let size = 15 + i * 8;
@@ -134,16 +91,12 @@ pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
         let (r, g, b) = hsv_to_rgb_viz(hue, 0.8, 0.9);
         img.draw_rect(x as i32, 20, size, size, r, g, b, 200);
     }
-
-    // Filled circles of increasing size
     for i in 0u32..5 {
         let cx = (50 + i * 70) as i32;
         let radius = (10 + i * 5) as i32;
         let (r, g, b) = hsv_to_rgb_viz((i * 72) as u16, 0.8, 0.9);
         img.draw_circle(cx, 150, radius as u32, r, g, b, 200);
     }
-
-    // Grid of small brightness dots
     for row in 0u32..16 {
         for col in 0u32..16 {
             let x = 20 + col * 22;
@@ -155,29 +108,13 @@ pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
             img.set_pixel(x + 1, y + 1, brightness, brightness, brightness, 255);
         }
     }
-
     img
 }
-
-/// Draw a comprehensive geometry shapes & queries visualization.
-///
-/// Renders convex hull, polygon area/centroid, point-in-polygon test,
-/// Bresenham line, angle measurement, circle containment, and circle-circle
-/// intersection — all in a single composite image.
-///
-/// # Parameters
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);
     let w = width as i32;
     let h = height as i32;
-
-    // 1. Convex hull
     let points: Vec<f32> = vec![
         50.0, 50.0, 100.0, 30.0, 150.0, 60.0, 130.0, 120.0, 80.0, 130.0, 40.0, 100.0, 90.0, 80.0,
         110.0, 70.0,
@@ -203,8 +140,6 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
         );
     }
     img.draw_label("CONVEX HULL", 50, 140, 200, 200, 80);
-
-    // 2. Polygon area and centroid
     let square: Vec<f32> = vec![200.0, 20.0, 280.0, 20.0, 280.0, 100.0, 200.0, 100.0];
     let area = crate::math::polygon_area(&square);
     let (cx, cy) = crate::math::polygon_centroid(&square);
@@ -215,18 +150,13 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     img.draw_circle(cx as i32, cy as i32, 4, 255, 100, 100, 255);
     let area_str = format!("AREA {:.0}", area.abs());
     img.draw_label(&area_str, 200, 108, 80, 200, 80);
-
-    // 3. Point-in-polygon
     let _triangle: Vec<f32> = vec![350.0, 30.0, 450.0, 100.0, 340.0, 100.0];
     img.draw_line(350, 30, 450, 100, 200, 120, 80, 255);
     img.draw_line(450, 100, 340, 100, 200, 120, 80, 255);
     img.draw_line(340, 100, 350, 30, 200, 120, 80, 255);
-    // inside = green, outside = red
     img.draw_circle(380, 70, 4, 0, 255, 0, 255);
     img.draw_circle(320, 30, 4, 255, 0, 0, 255);
     img.draw_label("POINT IN POLY", 340, 108, 200, 120, 80);
-
-    // 4. Bresenham line
     let line_pts = crate::math::bresenham(20, 180, 180, 220);
     for &(px, py) in &line_pts {
         if px >= 0 && py >= 0 && px < w && py < h {
@@ -234,14 +164,10 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
         }
     }
     img.draw_label("BRESENHAM", 20, 230, 255, 180, 80);
-
-    // 5. Angle between
     let angle = crate::math::angle_between(250.0, 200.0, 350.0, 250.0);
     img.draw_line(250, 200, 350, 250, 200, 80, 200, 255);
     let angle_str = format!("{:.2} RAD", angle);
     img.draw_label(&angle_str, 270, 255, 200, 80, 200);
-
-    // 6. Circle containment
     for a in 0..360 {
         let rad = a as f32 * std::f32::consts::PI / 180.0;
         let px = (100.0 + 40.0 * rad.cos()) as i32;
@@ -253,8 +179,6 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     img.draw_circle(110, 310, 3, 0, 255, 0, 255);
     img.draw_circle(200, 300, 3, 255, 0, 0, 255);
     img.draw_label("CIRCLE CONTAIN", 60, 350, 80, 200, 200);
-
-    // 7. Circle-circle intersection
     for a in 0..360 {
         let rad = a as f32 * std::f32::consts::PI / 180.0;
         let px1 = (300.0 + 30.0 * rad.cos()) as i32;
@@ -269,29 +193,14 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
         }
     }
     img.draw_label("CC INTERSECT", 290, 340, 200, 200, 100);
-
     img.draw_label("GEOMETRY SHAPES OK", 170, (h - 15).max(0), 100, 255, 100);
     img
 }
-
-/// Draw geometry intersection tests visualization.
-///
-/// Renders segment-segment, closest-point, circle-line, circle-segment,
-/// and line-line intersections in a single composite image.
-///
-/// # Parameters
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);
     let w = width as i32;
     let h = height as i32;
-
-    // 1. Segment-segment intersection
     let (_hit, point) =
         crate::math::segment_intersects_segment(20.0, 20.0, 150.0, 120.0, 20.0, 120.0, 150.0, 20.0);
     img.draw_line(20, 20, 150, 120, 200, 80, 80, 255);
@@ -300,24 +209,18 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
         img.draw_circle(ix as i32, iy as i32, 5, 255, 255, 80, 255);
     }
     img.draw_label("SEG-SEG", 60, 130, 200, 200, 80);
-
-    // 2. No intersection
     let (_no_hit, _) = crate::math::segment_intersects_segment(
         20.0, 160.0, 100.0, 160.0, 20.0, 200.0, 100.0, 200.0,
     );
     img.draw_line(20, 160, 100, 160, 200, 80, 80, 255);
     img.draw_line(20, 200, 100, 200, 80, 200, 80, 255);
     img.draw_label("NO HIT", 30, 210, 200, 80, 80);
-
-    // 3. Closest point on segment
     let (cpx, cpy) = crate::math::closest_point_on_segment(250.0, 30.0, 200.0, 80.0, 350.0, 80.0);
     img.draw_line(200, 80, 350, 80, 80, 180, 200, 255);
     img.draw_circle(250, 30, 4, 255, 100, 100, 255);
     img.draw_circle(cpx as i32, cpy as i32, 4, 100, 255, 100, 255);
     img.draw_line(250, 30, cpx as i32, cpy as i32, 150, 150, 150, 150);
     img.draw_label("CLOSEST PT", 230, 90, 80, 180, 200);
-
-    // 4. Circle-line intersection
     let (_cl_hit, p1, p2) =
         crate::math::circle_intersects_line(300.0, 200.0, 50.0, 200.0, 200.0, 400.0, 200.0);
     for a in 0..360 {
@@ -336,8 +239,6 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
         img.draw_circle(ix as i32, iy as i32, 4, 80, 255, 80, 255);
     }
     img.draw_label("CIRCLE-LINE", 273, 260, 100, 100, 200);
-
-    // 5. Circle-segment intersection
     let (cs_hit, sp1, sp2) =
         crate::math::circle_intersects_segment(100.0, 300.0, 30.0, 60.0, 280.0, 140.0, 320.0);
     for a in 0..360 {
@@ -358,8 +259,6 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
         }
     }
     img.draw_label("CIRCLE-SEG", 60, 335, 200, 150, 80);
-
-    // 6. Line intersection (infinite lines)
     let result =
         crate::math::line_intersect(200.0, 260.0, 400.0, 340.0, 200.0, 340.0, 400.0, 260.0);
     img.draw_line(200, 260, 400, 340, 200, 80, 200, 200);
@@ -368,7 +267,6 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
         img.draw_circle(ix as i32, iy as i32, 5, 255, 255, 100, 255);
     }
     img.draw_label("LINE INTERSECT", 260, 345, 200, 200, 200);
-
     img.draw_label("GEOMETRY INTERSECTIONS OK", 120, 3, 100, 255, 100);
     img
 }

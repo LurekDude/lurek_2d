@@ -1,28 +1,23 @@
-//! debug-render command builders for AI inspection overlays.
+//! Debug render helpers for AI state machines and behavior trees.
+//! Extends `StateMachine` and `BehaviorTree` with render-command generation.
+//! Does not own any rendering backend; it only emits `RenderCommand` data.
 use crate::ai::behavior_tree::{BTNode, BTStatus, BehaviorTree};
 use crate::ai::fsm::StateMachine;
 use crate::image::ImageData;
 use crate::render::renderer::{DrawMode, RenderCommand};
-
-// ---- Extension: StateMachine render helpers ----
-
 impl StateMachine {
-    /// Generate debug render commands representing the finite state machine.
+    /// Build line and box commands for the FSM debug view.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let mut state_names: Vec<&str> = self.states.keys().map(|s| s.as_str()).collect();
         state_names.sort_unstable();
-
         if state_names.is_empty() {
             return Vec::new();
         }
-
         let box_w = 80.0f32;
         let box_h = 30.0f32;
         let gap = 10.0f32;
         let y = 20.0f32;
-
         let mut cmds = Vec::with_capacity(state_names.len() * 4 + 2);
-
         for (i, name) in state_names.iter().enumerate() {
             let x = (box_w + gap) * i as f32 + 10.0;
             let is_active = self
@@ -30,8 +25,6 @@ impl StateMachine {
                 .as_deref()
                 .map(|c| c == *name)
                 .unwrap_or(false);
-
-            // Box colour: bright white for active, dim blue for inactive
             if is_active {
                 cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 0.9));
             } else {
@@ -45,8 +38,6 @@ impl StateMachine {
                 h: box_h,
             });
         }
-
-        // Draw transition arrows as short diagonal lines
         cmds.push(RenderCommand::SetColor(0.6, 0.6, 0.6, 0.5));
         for t in &self.transitions {
             let from_idx = state_names.iter().position(|&s| s == t.from);
@@ -66,21 +57,17 @@ impl StateMachine {
                 }
             }
         }
-
         cmds
     }
-
-    /// Render the FSM to a CPU image.
+    /// Draw the FSM debug view into an `ImageData` buffer.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
-
         let mut state_names: Vec<&str> = self.states.keys().map(|s| s.as_str()).collect();
         state_names.sort_unstable();
         if state_names.is_empty() {
             return img;
         }
-
         let row_h = (height / state_names.len() as u32).max(1);
         for (i, name) in state_names.iter().enumerate() {
             let is_active = self
@@ -105,14 +92,10 @@ impl StateMachine {
                 200,
             );
         }
-
         img
     }
 }
-
-// ---- Extension: BehaviorTree render helpers ----
-
-/// Count the total number of nodes in a behavior tree recursively.
+/// Count all BT nodes in a subtree.
 fn bt_node_count(node: &BTNode) -> usize {
     match node {
         BTNode::Selector { children, .. }
@@ -127,8 +110,7 @@ fn bt_node_count(node: &BTNode) -> usize {
         BTNode::Action { .. } | BTNode::Condition { .. } => 1,
     }
 }
-
-/// Return the display name for a BTNode variant.
+/// Return a short label for a BT node.
 fn bt_node_label(node: &BTNode) -> &'static str {
     match node {
         BTNode::Selector { .. } => "SEL",
@@ -142,8 +124,7 @@ fn bt_node_label(node: &BTNode) -> &'static str {
         BTNode::Condition { .. } => "CND",
     }
 }
-
-/// Compute the maximum depth of a behavior tree.
+/// Return the maximum depth of a BT subtree.
 fn bt_depth(node: &BTNode) -> usize {
     match node {
         BTNode::Selector { children, .. }
@@ -156,8 +137,7 @@ fn bt_depth(node: &BTNode) -> usize {
         BTNode::Action { .. } | BTNode::Condition { .. } => 1,
     }
 }
-
-/// Emit render commands for a subtree, laying out nodes in a depth-column grid.
+/// Emit BT debug render commands for one subtree.
 fn emit_bt_commands(
     node: &BTNode,
     depth: usize,
@@ -167,10 +147,9 @@ fn emit_bt_commands(
     node_h: f32,
     gap: f32,
 ) {
-    let _ = bt_node_label(node); // ensure label is derived (lint guard)
+    let _ = bt_node_label(node);
     let x = gap + depth as f32 * (node_w + gap);
     let y = gap + slot as f32 * (node_h + gap);
-
     cmds.push(RenderCommand::SetColor(0.3, 0.6, 0.9, 0.8));
     cmds.push(RenderCommand::Rectangle {
         mode: DrawMode::Line,
@@ -179,8 +158,6 @@ fn emit_bt_commands(
         w: node_w,
         h: node_h,
     });
-
-    // Recurse to children
     let children: Vec<&BTNode> = match node {
         BTNode::Selector { children, .. }
         | BTNode::Sequence { children, .. }
@@ -191,12 +168,10 @@ fn emit_bt_commands(
         | BTNode::Guard { child, .. } => vec![child.as_ref()],
         _ => vec![],
     };
-
     let mut child_slot = slot;
     for child in children {
         let cx = gap + (depth + 1) as f32 * (node_w + gap);
         let cy = gap + child_slot as f32 * (node_h + gap);
-        // Line from this nod's right edge to chil's left edge
         cmds.push(RenderCommand::SetColor(0.5, 0.5, 0.5, 0.5));
         cmds.push(RenderCommand::Line {
             x1: x + node_w,
@@ -209,20 +184,16 @@ fn emit_bt_commands(
         child_slot += sub_size;
     }
 }
-
 impl BehaviorTree {
-    /// Generate debug render commands that outline the behavior tree structure.
+    /// Build render commands for the BT debug view.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let root = match &self.root {
             Some(r) => r,
             None => return Vec::new(),
         };
-
         let node_count = bt_node_count(root);
         let mut cmds = Vec::with_capacity(node_count * 4);
         let (node_w, node_h, gap) = (50.0f32, 20.0f32, 8.0f32);
-
-        // Status colour indicator
         let (sr, sg, sb) = match self.last_status {
             BTStatus::Success => (0.2, 0.9, 0.2),
             BTStatus::Failure => (0.9, 0.2, 0.2),
@@ -235,21 +206,17 @@ impl BehaviorTree {
             y: 8.0,
             r: 5.0,
         });
-
         emit_bt_commands(root, 0, 0, &mut cmds, node_w, node_h, gap);
         cmds
     }
-
-    /// Render the behavior tree structure to a CPU image.
+    /// Draw the BT debug view into an `ImageData` buffer.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
-
         let root = match &self.root {
             Some(r) => r,
             None => return img,
         };
-
         let depth = bt_depth(root);
         if depth == 0 {
             return img;
@@ -257,13 +224,11 @@ impl BehaviorTree {
         let node_count = bt_node_count(root);
         let node_w = (width / (depth as u32 + 1)).max(4);
         let node_h = (height / (node_count as u32 + 1)).max(4);
-
         draw_bt_image(&mut img, root, 0, 0, node_w, node_h);
         img
     }
 }
-
-/// Recursively paint a behavior tree onto an `ImageData` in a depth-column layout.
+/// Draw one BT subtree into an image buffer.
 fn draw_bt_image(
     img: &mut ImageData,
     node: &BTNode,
@@ -275,7 +240,6 @@ fn draw_bt_image(
     let gap = 2u32;
     let x = (depth * (node_w + gap)) as i32;
     let y = (slot * (node_h + gap)) as i32;
-
     let (r, g, b) = match node {
         BTNode::Selector { .. } | BTNode::Sequence { .. } | BTNode::Parallel { .. } => {
             (80u8, 120, 200)
@@ -296,7 +260,6 @@ fn draw_bt_image(
         b,
         220,
     );
-
     let children: Vec<&BTNode> = match node {
         BTNode::Selector { children, .. }
         | BTNode::Sequence { children, .. }
@@ -307,7 +270,6 @@ fn draw_bt_image(
         | BTNode::Guard { child, .. } => vec![child.as_ref()],
         _ => vec![],
     };
-
     let mut child_slot = slot;
     for child in children {
         draw_bt_image(img, child, depth + 1, child_slot, node_w, node_h);

@@ -1,32 +1,8 @@
-//! API documentation catalog, quality reporting, and schema validation for Lurek2D.
-//!
-//! This module provides a structured way to describe, store, and validate
-//! documentation for the `lurek.*` Lua API surface.  Tools and tests can
-//! populate a [`Catalog`] at runtime and use [`QualityReport`] to surface
-//! incomplete or missing entries.
-//!
-//! The [`schema`] sub-module provides a lightweight runtime data-validation
-//! system for game config, save-data, and mod manifest validation.
-//!
-//! # Sub-modules
-//! | Module | Purpose |
-//! |---|---|
-//! | [`entry`] | [`DocEntry`], [`ParamInfo`], [`ReturnInfo`] data types |
-//! | [`catalog`] | In-memory [`Catalog`] with search and filter helpers |
-//! | [`report`] | [`quality_score`], [`quality_grade`], [`ValidationReport`], [`QualityReport`] |
-//! | [`schema`] | [`Schema`], [`FieldRule`], [`SchemaResult`] for game-data validation |
-
-/// In-memory catalog of `DocEntry` items with search and filter helpers.
 pub mod catalog;
-/// Core documentation entry types: `DocEntry`, `ParamInfo`, and `ReturnInfo`.
 pub mod entry;
-/// Export helpers for completions, hover, and signature documentation.
 pub mod export;
-/// Quality scoring and validation report generation.
 pub mod report;
-/// Runtime data-validation schema for game config and save-data.
 pub mod schema;
-
 pub use catalog::Catalog;
 pub use entry::{DocEntry, ParamInfo, ReturnInfo};
 pub use export::{export_all, export_completions, export_hover, export_signatures};

@@ -1,64 +1,44 @@
-//! Audio subsystem: loading, mixing, playback, buses, and effects.
-//! Mixer manages sounds and buses; DSP provides lock-free effect parameters.
+//! Audio subsystem: mixing, bus routing, decoding, DSP effects, MIDI, and spatial audio.
+//! Owns `Mixer` (slot-map of sources and buses), `Bus` (per-channel routing), `Decoder`
+//! (WAV/OGG/MP3/FLAC), DSP effect chain, `MidiPlayer`, `SoundPool`, and `SoundData`.
+//! Does not own event dispatch or rendering. Depends on rodio 0.17 and GameFS for file I/O.
 
-/// Named audio bus: shared volume/pitch/pause/effects.
+/// `Bus` struct: named per-channel volume/pitch routing with effect chain and duck target.
 pub mod bus;
-/// Decoder: streaming audio reading via rodio.
+/// `Decoder` struct: seeks and decodes audio files (WAV/OGG/MP3/FLAC) into PCM samples.
 pub mod decoder;
-/// MIDI player: sine-additive synthesis (currently disabled - midly removed).
+/// `MidiPlayer`: loads and plays MIDI files with SoundFont synthesis, per-channel controls.
 pub mod midi_player;
-/// Mixer: sound loading, playback, volume, bus routing.
+/// `Mixer`: rodio-backed slot-map of sources and buses; owns playback, spatial, and peak state.
 pub mod mixer;
-/// AudioSource: handle with path, volume, looping state.
+/// `AudioSource` and `SpatialState`: per-source identity and spatial position/velocity/orientation.
 pub mod source;
-
-/// Re-export from bus.
 pub use bus::Bus;
-/// Re-export from decoder.
 pub use decoder::Decoder;
-/// Re-export from midi_player.
 pub use midi_player::MidiPlayer;
-/// Re-export from mixer.
 pub use mixer::Mixer;
-/// Re-export from mixer.
 pub use mixer::PlayState;
-/// Re-export from mixer.
 pub use mixer::QueueableSource;
-/// Re-export from mixer.
 pub use mixer::SourceType;
-/// Re-export from source.
 pub use source::AudioSource;
-/// Re-export from source.
 pub use source::SpatialState;
-/// SoundData: f32 PCM buffer, procedural waveforms, DSP operations.
+/// `SoundData`: in-memory PCM sample buffer with WAV encode, sine-wave generation, and Lua interop.
 pub mod sound_data;
-/// Re-export from sound_data.
 pub use sound_data::SoundData;
-
-/// MidiState: loaded SoundFont data and path.
+/// `MidiState`: SoundFont loading and path/data storage for MIDI synthesis.
 pub mod midi;
-/// Re-export from midi.
 pub use midi::MidiState;
-
-/// DSP effects: biquads, reverb, modulation, dynamics, lock-free parameters.
+/// DSP effect chain: `EffectType`, `EffectParams`, `AtomicParam`, `ActiveEffect`, `DynamicEffectSource`.
 pub mod dsp;
-/// Re-exports from dsp.
 pub use dsp::{AtomicParam, DynamicEffectSource, EffectParams, EffectType};
-
-/// SoundPool: round-robin voice cycling for polyphony.
+/// `SoundPool`: polyphonic round-robin voice pool for one-shot sound playback.
 pub mod pool;
-/// Re-export from pool.
 pub use pool::SoundPool;
-
-/// Offline: decode, apply effects, normalize, write WAV.
+/// Offline audio processing: `OfflineEffect`, normalisation, WAV read/write helpers.
 pub mod offline;
-/// Re-export from offline.
 pub use offline::OfflineEffect;
-
-/// Visualizer: waveform and spectrogram PNG rendering.
-pub mod visualizer;
-
-/// Facade: playback device enumeration (stub).
+/// Device enumeration and selection stubs: `get_playback_devices`, `get_playback_device`, `set_playback_device`.
 pub mod facade;
-/// Re-exports from facade.
+/// Audio visualisation: waveform-to-PNG and spectrogram-to-PNG rendering.
+pub mod visualizer;
 pub use facade::{get_playback_device, get_playback_devices, set_playback_device};

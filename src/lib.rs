@@ -1,206 +1,64 @@
-//! Lurek2D â€” a 2D game engine written in Rust that loads and executes Lua game scripts.
-//!
-//! This crate is the engine library. It re-exports every subsystem through public submodules so
-//! that the `lurek2d` binary, integration tests, and tooling can all share the same code paths.
-//! Game developers do not interact with this crate directly; they write Lua scripts that call
-//! the `lurek.*` API, which is registered by the Lua API layer on top of the types defined here.
-//!
-//! # Architecture overview
-//!
-//! The engine is split into domain modules with a strict dependency direction:
-//! `engine` may depend on all modules; domain modules (`graphics`, `physics`, `audio`, `input`,
-//! `timer`, `filesystem`, `math`, `window`) must not depend on each other except through `math`.
-//!
-//! The main entry point is [`lurek_run`], which is called by both the `lurek` (console) and
-//! `lurekc` (no-console) binaries. It installs the panic hook, parses CLI arguments, loads
-//! `conf.lua`, and enters the main engine loop via [`engine::App::run`].
-//!
-//! # Submodule map
-//!
-//! | Module | Purpose |
-//! |---|---|
-//! | [`ai`] | FSM, behaviour trees, GOAP, Q-learning, influence maps, steering, squads |
-//! | [`audio`] | Sound playback via rodio, bus routing, MIDI synthesis |
-//! | [`battle`] | Turn-based battle engine: combatants, actions, statuses, turn order |
-//! | [`cardgame`] | Card game backend: cards, decks (stacks), zones, card pools, history |
-//! | [`combat`] | Vehicle combat: chassis, turrets, weapons, projectiles |
-//! | [`compute`] | N-dimensional numerical arrays (lurek.compute) |
-//! | [`crafting`] | Recipe-based crafting queues and upgrade trees |
-//! | [`data`] | LĂ–VE2D-compatible binary data: ByteData, compress, hash, encode, LĂ–VE2D pack format |
-//! | [`dataframe`] | In-memory column-major tabular data |
-//! | [`dialog`] | Dialogue sequencer for branching narrative with typewriter effect |
-//! | [`economy`] | Named resource economy: capacity, flow rates, decay, and reservations |
-//! | [`engine`] | App lifecycle, Config, EngineError, SharedState, debug overlay |
-//! | [`ecs`] | Lightweight ECS with ID recycling, bitmap tags, blueprints, systems |
-//! | [`event`] | Event queue for polling and custom events |
-//! | [`filesystem`] | Sandboxed game filesystem (GameFS) |
-//! | [`graph`] | Directed graph with item-flow simulation and Dijkstra |
-//! | [`graphics`] | GPU rendering pipeline via wgpu, draw commands, fonts |
-//! | [`image`] | CPU-side RGBA8 pixel buffer for image manipulation |
-//! | [`input`] | Keyboard, mouse, gamepad, and touch input state |
-//! | [`inventory`] | Inventory slots, stacking, weight limits, equip slots |
-//! | [`item`] | Item definitions, attributes, and loot-table rarity |
-//! | [`math`] | Vec2, Mat3, Rect, polygon utilities, easing, noise |
-//! | [`minimap`] | Minimap content extraction and FOV mask rendering |
-//! | [`mods`] | Mod metadata, dependency resolution, and hook dispatch |
-//! | [`particle`] | Emitter-based 2D particle effects |
-//! | [`pathfind`] | Grid pathfinding: Aâ…, HPAâ…, flow fields, NavGrid |
-//! | [`physics`] | Rigid bodies, AABB/circle collision, sensors, layer filtering |
-//! | [`postfx`] | Post-processing effects data model: bloom, blur, color grading |
-//! | [`province_map`] | Province/territory spatial data from colour-coded PNG images |
-//! | [`quest`] | Quest tracking, objectives, branching completion states |
-//! | [`raycaster`] | DDA grid raycaster for FPS/dungeon-crawler: walls, sprites, lighting, minimap |
-//! | [`save`] | Slot-based save/load with schema versioning and auto-save |
-//! | [`scene`] | Scene stack, depth-sorted rendering, visual transitions |
-//! | [`stats`] | Character attributes, derived stats, and buff modifiers |
-//! | [`tilemap`] | TileSet, TileMap, autotile, coordinate utilities, map generation |
-//! | [`timer`] | Frame delta-time clock, `Clock::tick()`, and scheduled callbacks |
-//! | [`thread`] | Background Rust worker threads and `Channel` inter-thread communication |
-//! | [`window`] | winit event-loop wrapper and window state |
-
-// Lua API files use `///` doc comments inside function bodies to document Lua-exposed
-// bindings at their call site; these are intentional inline docs, not misplaced rustdoc.
 #![allow(unused_doc_comments)]
-// The same inline `///` blocks do not produce well-formed markdown list continuations;
-// suppress that secondary lint across the whole crate.
 #![allow(clippy::doc_lazy_continuation)]
-
-/// Game AI toolkit: FSM, Behavior Trees, Steering, Pathfinding, Q-Learning, and more.
 pub mod ai;
-/// Sprite animation system: named clips, frame pools, speed control, and frame-level events.
 pub mod animation;
-/// Audio playback system backed by rodio.
+pub mod app;
 pub mod audio;
-/// Automated input simulation via timed step scripts for testing and replay.
 #[cfg(feature = "automation-plugin")]
 pub mod automation;
-/// Property tween system: animate any Lua table field with easing, sequences, and parallels.
-pub mod tween;
-// migration-state: pub mod battle; â€” now library/battle/init.lua
-// migration-state: pub mod cardgame; â€” now library/cardgame/init.lua
-// migration-state: pub mod combat; â€” now library/combat/init.lua
-/// Dense N-dimensional numerical arrays (lurek.compute).
+pub mod camera;
 pub mod compute;
-// migration-state: pub mod crafting; â€” now library/crafting/init.lua
-/// LĂ–VE2D-compatible binary data API: ByteData, compress, hash, encode, and LĂ–VE2D pack format.
 pub mod data;
-/// In-memory column-major tabular data (lurek.dataframe).
 pub mod dataframe;
-/// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
+pub mod debugbridge;
 #[cfg(feature = "devtools-plugin")]
 pub mod devtools;
-/// Format-agnostic serialization: JSON, TOML, CSV, MessagePack, XML, and schema tools via shared SerialValue.
-pub mod serial;
-// migration-state: pub mod dialog; â€” now library/dialog/init.lua
-// migration-state: pub mod economy; â€” now library/economy/init.lua
-/// App module â€” engine lifecycle, main loop, and application state.
-pub mod app;
-/// 2D camera system: viewport, scaling, zoom, smooth follow, dead-zone, and shake.
-pub mod camera;
-/// TCP debug bridge for connecting external tools to a running Lurek2D game.
-pub mod debugbridge;
-/// API documentation catalog and quality reporting for the lurek.* API surface.
 pub mod docs;
-/// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
 pub mod ecs;
-/// Visual effects pipeline: post-processing, overlays, weather, and atmosphere.
 pub mod effect;
-/// Event queue for polling system and custom events.
 pub mod event;
-/// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
-/// XCOM-style Geoscape globe â€” province topology, orbit camera, fog-of-war, markers.
 pub mod globe;
-/// Directed graph with item flow simulation, pathfinding, and supply/demand.
 #[cfg(feature = "graph")]
 pub mod graph;
-/// Lightweight pure-Rust HTML/CSS layout engine for `lurek.html`.
 pub mod html;
-/// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod i18n;
-/// CPU-side pixel-level image manipulation.
 pub mod image;
-/// Keyboard, mouse, and gamepad input state.
 pub mod input;
-/// 2D lighting system: lights, shadows, occluders, and blend modes.
 pub mod light;
-/// Script log-level management â€” delegates to the `log` crate via `engine::log_messages`.
 pub mod log;
-/// 2D GPU rendering pipeline, draw commands, and graphics types.
-pub mod render;
-/// Core engine lifecycle, configuration, and error types.
-pub mod runtime;
-/// Sprite handling: individual sprites, sprite batches, sheets, nine-slice.
-pub mod sprite;
-/// Retained-mode widget UI system: buttons, panels, text fields, layouts.
-pub mod ui;
-// migration-state: pub mod inventory; â€” now library/inventory/init.lua
-// migration-state: pub mod item; â€” now library/item/init.lua
-/// Foundational math types: Vec2, Mat3, Rect.
-pub mod math;
-/// Minimap content extraction, FOV mask, and tile sampling.
-pub mod minimap;
-/// Mod management framework: metadata, dependencies, load ordering, hooks.
-pub mod mods;
-/// UDP networking via ENet â€” reliable packet transport for multiplayer games.
-pub mod network;
-/// Multi-layer parallax background system with camera-relative scroll factors, autoscroll, tiling, blend modes, and scene grouping.
-pub mod parallax;
-/// (Deprecated â€” use `fx::screen` instead.) Composable per-frame screen-effect overlay.
-// pub mod overlay; â€” superseded by fx::screen
-/// Emitter-based 2D particle effects.
-pub mod particle;
-/// Grid pathfinding: Aâ…, HPAâ…, flow fields, and NavGrid unit-size navigation.
-pub mod pathfind;
-/// Game programming patterns: EventBus, ObjectPool, CommandStack, ServiceLocator, Factory, and StateMachine.
-pub mod patterns;
-/// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
-pub mod physics;
-/// DAG-based pipeline orchestrator for composing multi-step workflows.
-pub mod pipeline;
-/// (Deprecated â€” use `fx::post` instead.) Post-processing effects data model.
-// pub mod postfx; â€” superseded by fx::post
-/// Procedural world generation: cellular automata, Voronoi, flood fill, Poisson disk, periodic noise.
-pub mod procgen;
-/// Province runtime engine: map-state snapshots, topology, border classes, and GPU bridge data.
-pub mod province;
-/// Grid-based DDA raycaster for retro FPS and dungeon-crawler games: wall rendering, sprite projection, lighting, doors, heightmaps, minimap.
-pub mod raycaster;
-// migration-state: pub mod province_map; â€” now library/province_map/init.lua
-// migration-state: pub mod quest; â€” now library/quest/init.lua
-/// Slot-based save/load system with collectors, schema versioning, and auto-save.
-pub mod save;
-/// Scene stack for managing game scene lifecycle, transitions, and depth-sorted rendering.
-pub mod scene;
-/// Skeletal animation: bone hierarchies, slots, and world-transform propagation.
-pub mod spine;
-// migration-state: pub mod stats; â€” now library/stats/init.lua
-/// Lua API registration layer: LuaJIT VM creation and `lurek.*` module binding.
 pub mod lua_api;
-/// Grid-based character-cell terminal emulator and widget toolkit.
+pub mod math;
+pub mod minimap;
+pub mod mods;
+pub mod network;
+pub mod parallax;
+pub mod particle;
+pub mod pathfind;
+pub mod patterns;
+pub mod physics;
+pub mod pipeline;
+pub mod procgen;
+pub mod province;
+pub mod raycaster;
+pub mod render;
+pub mod runtime;
+pub mod save;
+pub mod scene;
+pub mod serial;
+pub mod spine;
+pub mod sprite;
 pub mod terminal;
-/// Background Rust worker threads and `Channel` inter-thread communication.
 pub mod thread;
-/// Tilemap engine: TileSet, TileMap, autotile, coords, and procedural generation.
 pub mod tilemap;
-/// Frame delta-time clock, `Clock::tick()`, and scheduled callbacks.
 pub mod timer;
-/// Window event loop placeholder.
+pub mod tween;
+pub mod ui;
 pub mod window;
-
-/// Entry-point shared by both `lurek` (console) and `lurekc` (no-console) binaries.
-///
-/// Installs the panic hook, reads CLI arguments, loads the game config,
-/// and runs the main engine loop. Both binary crates call this function.
-///
-/// When the first argument is a `.lurek` file (a zip archive containing a game),
-/// the archive is extracted to a temporary directory and the engine runs from there.
-/// The temporary directory is cleaned up automatically when the engine exits.
 pub fn lurek_run() {
     use app::App;
     use runtime::Config;
     use std::env;
-
     std::panic::set_hook(Box::new(|info| {
         let payload = if let Some(s) = info.payload().downcast_ref::<&str>() {
             s.to_string()
@@ -209,12 +67,10 @@ pub fn lurek_run() {
         } else {
             "Unknown panic".to_string()
         };
-
         let location = info
             .location()
             .map(|l| format!(" at {}:{}:{}", l.file(), l.line(), l.column()))
             .unwrap_or_default();
-
         let msg = format!("Lurek2D panicked: {}{}", payload, location);
         log_msg!(
             error,
@@ -222,32 +78,16 @@ pub fn lurek_run() {
             "{}",
             msg
         );
-
         #[cfg(target_os = "windows")]
         {
-            // Skip the blocking dialog in non-interactive (screenshot) mode.
             let is_screenshot_mode = std::env::args().any(|a| a.starts_with("--screenshot"));
             if !is_screenshot_mode {
                 show_windows_error_box(&msg);
             }
         }
-
         eprintln!("{}", msg);
-        // Exit immediately to avoid WER (Windows Error Reporting) holding the
-        // process alive after abort() is called.  std::process::exit bypasses
-        // destructors but that is acceptable in a crash scenario.
         std::process::exit(1);
     }));
-
-    // Parse CLI arguments. Supported flags:
-    //   --screenshot=<path>        Absolute output path for the auto-screenshot PNG.
-    //   --screenshot-frames=<n>    Rendered game frames to wait before capturing (default 3).
-    //   --screenshot-time=<s>      Wall-clock seconds after game start before capturing.
-    //                              Takes priority over --screenshot-frames when both are set.
-    //   --window-x=<n>             Initial window X position in physical pixels.
-    //   --window-y=<n>             Initial window Y position in physical pixels.
-    //   --window-width=<n>         Initial window width in physical pixels.
-    //   --window-height=<n>        Initial window height in physical pixels.
     let mut screenshot_path: Option<std::path::PathBuf> = None;
     let mut screenshot_frames: u32 = 3;
     let mut screenshot_time: Option<f32> = None;
@@ -256,7 +96,6 @@ pub fn lurek_run() {
     let mut window_width: Option<u32> = None;
     let mut window_height: Option<u32> = None;
     let mut game_arg: Option<String> = None;
-
     for arg in env::args().skip(1) {
         if let Some(val) = arg.strip_prefix("--screenshot=") {
             screenshot_path = Some(std::path::PathBuf::from(val));
@@ -288,13 +127,8 @@ pub fn lurek_run() {
             game_arg = Some(arg);
         }
     }
-
     let explicit_game_dir = game_arg.is_some();
-
-    // Keep the temp dir alive for the entire engine session; it is dropped (and deleted)
-    // after app.run() returns.
     let mut _lurek_temp_dir: Option<tempfile::TempDir> = None;
-
     let game_dir = if let Some(ref arg) = game_arg {
         let path = std::path::PathBuf::from(arg);
         if path
@@ -328,7 +162,6 @@ pub fn lurek_run() {
     } else {
         env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."))
     };
-
     let (mut config, conf_error) = Config::load(&game_dir);
     config.modules.validate_and_fix();
     if let Some(width) = window_width {
@@ -347,23 +180,16 @@ pub fn lurek_run() {
         window_x.zip(window_y),
     );
 }
-
-/// Shows a Windows message box with an error message.
 #[cfg(target_os = "windows")]
 fn show_windows_error_box(msg: &str) {
     use std::ffi::OsStr;
     use std::iter::once;
     use std::os::windows::ffi::OsStrExt;
-
     fn to_wide(s: &str) -> Vec<u16> {
         OsStr::new(s).encode_wide().chain(once(0)).collect()
     }
-
     let text = to_wide(msg);
     let caption = to_wide("Lurek2D Crash");
-
-    // SAFETY: Calling Win32 MessageBoxW with valid null-terminated wide strings.
-    // MB_OK | MB_ICONERROR = 0x10
     unsafe {
         windows_sys::Win32::UI::WindowsAndMessaging::MessageBoxW(
             std::ptr::null_mut(),
@@ -373,34 +199,17 @@ fn show_windows_error_box(msg: &str) {
         );
     }
 }
-
-/// Extracts a `.lurek` zip archive into a fresh temporary directory and returns
-/// a handle to that directory.
-///
-/// The caller must keep the returned [`tempfile::TempDir`] alive for as long as
-/// the extracted files are needed; dropping it deletes the directory.
-///
-/// # Parameters
-/// - `archive_path` â€” `&std::path::Path`. Path to the `.lurek` file on disk.
-///
-/// # Returns
-/// `Result<tempfile::TempDir, Box<dyn std::error::Error>>`.
 fn extract_lurek_archive(
     archive_path: &std::path::Path,
 ) -> Result<tempfile::TempDir, Box<dyn std::error::Error>> {
     use std::fs;
     use std::io;
-
     let file = fs::File::open(archive_path)?;
     let mut archive = zip::ZipArchive::new(file)?;
     let temp_dir = tempfile::tempdir()?;
-
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i)?;
         let entry_name = entry.name().to_owned();
-
-        // Sanitise path: reject absolute paths and any `..` components to
-        // prevent zip-slip directory traversal.
         let relative = std::path::Path::new(&entry_name);
         for component in relative.components() {
             match component {
@@ -410,9 +219,7 @@ fn extract_lurek_archive(
                 }
             }
         }
-
         let dest = temp_dir.path().join(relative);
-
         if entry.is_dir() {
             fs::create_dir_all(&dest)?;
         } else {
@@ -423,6 +230,5 @@ fn extract_lurek_archive(
             io::copy(&mut entry, &mut out)?;
         }
     }
-
     Ok(temp_dir)
 }

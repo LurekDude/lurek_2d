@@ -1,61 +1,16 @@
-//! Active tween pool and frame-tick orchestration.
-//!
-//! # Purpose
-//!
-//! `TweenEngine` owns registry references to all live `LuaTween`, `LuaTweenSequence`,
-//! and `LuaTweenParallel` objects. It drives the entire tween system by iterating over
-//! those references each frame, delegating to each object's `tick_with()` method, and
-//! releasing registry entries when objects complete or are cancelled.
-//!
-//! # Architecture note
-//!
-//! `TweenEngine` is instantiated once per Lua VM inside `lurek.tween`'s `register()`
-//! call and held in an `Rc<RefCell<TweenEngine>>` shared among all closures in the
-//! `lurek.tween.*` namespace. Domain types (`LuaTween`, `LuaTweenSequence`,
-//! `LuaTweenParallel`) and the thin Lua wrapper live in sibling modules.
-//!
-//! # Relationship to mlua
-//!
-//! This module intentionally depends on `mlua` because it manages `LuaRegistryKey`
-//! lifetimes for Lua UserData objects. This is domain logic, not Lua API glue.
-
+use crate::tween::handle::{LuaTween, LuaTweenParallel, LuaTweenSequence};
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-
-use crate::tween::handle::{LuaTween, LuaTweenParallel, LuaTweenSequence};
-
-/// Active-object pool and frame-tick driver for the `lurek.tween` system.
-///
-/// Tracks all live `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, and `LuaSpring`
-/// objects via `LuaRegistryKey` handles, preventing premature garbage collection.
-/// Each frame, `update()` drives every tween object and the Lua API layer ticks springs.
-///
-/// # Fields
-/// - `active_tweens` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTween`.
-/// - `active_seqs` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTweenSequence`.
-/// - `active_pars` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTweenParallel`.
-/// - `active_springs` — `Vec<LuaRegistryKey>`. Registry references to live `LuaSpring`.
-/// - `custom_easings` — `HashMap<String, LuaRegistryKey>`. Name → Lua easing function.
 pub struct TweenEngine {
-    /// Registry references to all currently tracked `LuaTween` objects.
     pub active_tweens: Vec<LuaRegistryKey>,
-    /// Registry references to all currently tracked `LuaTweenSequence` objects.
     pub active_seqs: Vec<LuaRegistryKey>,
-    /// Registry references to all currently tracked `LuaTweenParallel` objects.
     pub active_pars: Vec<LuaRegistryKey>,
-    /// Registry references to all currently tracked `LuaSpring` objects.
     pub active_springs: Vec<LuaRegistryKey>,
-    /// User-registered easing functions: name → registry key for the Lua function.
     pub custom_easings: HashMap<String, LuaRegistryKey>,
 }
-
 impl TweenEngine {
-    /// Creates an empty `TweenEngine` with no active objects.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self {
             active_tweens: Vec::new(),
@@ -65,24 +20,7 @@ impl TweenEngine {
             custom_easings: HashMap::new(),
         }
     }
-
-    /// Advances all active tweens, sequences, and parallels by `dt` seconds.
-    ///
-    /// Objects that complete or have been externally cancelled are removed from the
-    /// tracking lists and their registry entries are freed. The `on_cancel` callback
-    /// fires for tweens that were cancelled externally before this call.
-    ///
-    /// # Parameters
-    /// - `this_rc` — `&Rc<RefCell<TweenEngine>>`. Shared reference to self.
-    /// - `lua` — `&Lua`. Active Lua VM.
-    /// - `dt` — `f64`. Delta-time in seconds.
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
     pub fn update(this_rc: &Rc<RefCell<Self>>, lua: &Lua, dt: f64) -> LuaResult<()> {
-        // ── standalone tweens ─────────────────────────────────────────────
-        // Take-and-replace: move the key list out of the RefCell so we don't
-        // hold a borrow_mut while calling Lua callbacks (which may re-enter).
         let tween_keys = std::mem::take(&mut this_rc.borrow_mut().active_tweens);
         let mut still_active_tweens = Vec::with_capacity(tween_keys.len());
         for key in tween_keys {
@@ -109,8 +47,6 @@ impl TweenEngine {
             }
         }
         this_rc.borrow_mut().active_tweens = still_active_tweens;
-
-        // ── sequences ─────────────────────────────────────────────────────
         let seq_keys = std::mem::take(&mut this_rc.borrow_mut().active_seqs);
         let mut still_active_seqs = Vec::with_capacity(seq_keys.len());
         for key in seq_keys {
@@ -130,8 +66,6 @@ impl TweenEngine {
             }
         }
         this_rc.borrow_mut().active_seqs = still_active_seqs;
-
-        // ── parallels ─────────────────────────────────────────────────────
         let par_keys = std::mem::take(&mut this_rc.borrow_mut().active_pars);
         let mut still_active_pars = Vec::with_capacity(par_keys.len());
         for key in par_keys {
@@ -151,21 +85,8 @@ impl TweenEngine {
             }
         }
         this_rc.borrow_mut().active_pars = still_active_pars;
-
         Ok(())
     }
-
-    /// Cancels and removes all active tweens, sequences, and parallels.
-    ///
-    /// The `on_cancel` callback fires for each tween that has one set. After this
-    /// call, `update()` has nothing to tick until new objects are registered.
-    ///
-    /// # Parameters
-    /// - `this_rc` — `&Rc<RefCell<TweenEngine>>`.
-    /// - `lua` — `&Lua`.
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
     pub fn cancel_all(this_rc: &Rc<RefCell<Self>>, lua: &Lua) -> LuaResult<()> {
         let (tweens, seqs, pars) = {
             let mut s = this_rc.borrow_mut();
@@ -204,11 +125,6 @@ impl TweenEngine {
         }
         Ok(())
     }
-
-    /// Returns the total number of currently tracked objects (tweens + seqs + pars + springs).
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn active_count(&self) -> usize {
         self.active_tweens.len()
             + self.active_seqs.len()
@@ -216,9 +132,7 @@ impl TweenEngine {
             + self.active_springs.len()
     }
 }
-
 impl Default for TweenEngine {
-    /// Creates an empty `TweenEngine`. Delegates to `TweenEngine::new()`.
     fn default() -> Self {
         Self::new()
     }

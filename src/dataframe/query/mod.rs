@@ -1,8 +1,11 @@
-//! Query submodules: filter, grouping, analytics, window.
+//! Own query-time transformation sub-modules that extend `DataFrame` with filtering, grouping,
+//! analytics, and window operations. Each sub-module adds methods via a separate `impl DataFrame`
+//! block so they can be read and tested in isolation. No SQL parsing lives here; that is in
+//! `../sql.rs`. No serialization lives here; that is in `../serial.rs`.
+//! Business logic stays inside these files; bindings live in `src/lua_api/dataframe_api.rs`.
 
 pub mod analytics;
 pub mod filter;
 pub mod grouping;
 pub mod window;
-
 pub use analytics::percentile;

@@ -1,54 +1,42 @@
-//! Blend-layer system for compositing multiple animation clips on one sprite.
-//! Defines `BlendMask`, `BlendLayer`, and `BlendLayerSet`; enforces name uniqueness
-//! and clamps weights to `[0.0, 1.0]`. Does not own frame timing or clip state.
-
-// ---- Type: BlendMask ----
-
-/// Bone restriction mask for a `BlendLayer`; empty `bone_names` means all bones.
+//! Animation blend layers and optional bone masks.
+//! Owns `BlendMask`, `BlendLayer`, and `BlendLayerSet`.
+//! Does not own animation playback; it only stores blend configuration.
+/// Bone mask for restricting a blend layer to selected bones.
 #[derive(Debug, Clone, Default)]
 pub struct BlendMask {
-    /// Bone names this layer affects; empty = no masking (all bones).
+    /// Bones included by the mask; empty means all bones.
     pub bone_names: Vec<String>,
 }
-
 impl BlendMask {
-    // ---- Implementation: BlendMask ----
-    /// Create a mask that affects all bones (no filtering).
+    /// Create a mask that includes all bones.
     pub fn all() -> Self {
         Self {
             bone_names: Vec::new(),
         }
     }
-
-    /// Create a mask restricted to the given bone names.
+    /// Create a mask from an explicit bone list.
     pub fn from_bones(bones: Vec<String>) -> Self {
         Self { bone_names: bones }
     }
-
-    /// Return `true` if this mask applies to the given bone name.
+    /// Return `true` when the mask includes `bone`.
     pub fn includes(&self, bone: &str) -> bool {
         self.bone_names.is_empty() || self.bone_names.iter().any(|b| b == bone)
     }
 }
-
-// ---- Type: BlendLayer ----
-
-/// One layer in a [`BlendLayerSet`]: a named clip at a given blend weight.
 #[derive(Debug, Clone)]
+/// One named blend layer referencing a clip and mask.
 pub struct BlendLayer {
-    /// Unique name for this layer (used as a stable key for lookups).
+    /// Layer name.
     pub name: String,
-    /// Name of the [`AnimClip`] this layer plays.
+    /// Clip name assigned to this layer.
     pub clip_name: String,
-    /// Blend weight in `[0.0, 1.0]`.  Weight 0 = invisible; weight 1 = full.
+    /// Blend weight clamped to `[0, 1]`.
     pub weight: f32,
-    /// Bone mask restricting which joints this layer influences.
+    /// Bone mask applied to this layer.
     pub mask: BlendMask,
 }
-
 impl BlendLayer {
-    // ---- Implementation: BlendLayer ----
-    /// Create a new blend layer.
+    /// Create a blend layer with clamped weight.
     pub fn new(name: &str, clip_name: &str, weight: f32, mask: BlendMask) -> Self {
         Self {
             name: name.to_string(),
@@ -58,33 +46,26 @@ impl BlendLayer {
         }
     }
 }
-
-// ---- Type: BlendLayerSet ----
-
-/// Ordered set of blend layers for a single sprite's animation.
+/// Ordered set of blend layers addressed by name.
 #[derive(Debug, Clone, Default)]
 pub struct BlendLayerSet {
+    /// Stored layers.
     layers: Vec<BlendLayer>,
 }
-
 impl BlendLayerSet {
-    // ---- Implementation: BlendLayerSet ----
-    /// Create an empty blend layer set.
+    /// Create an empty layer set.
     pub fn new() -> Self {
         Self { layers: Vec::new() }
     }
-
-    /// Return the number of layers currently in the set.
+    /// Return the number of layers.
     pub fn len(&self) -> usize {
         self.layers.len()
     }
-
-    /// Return `true` if the set contains no layers.
+    /// Return `true` when no layers are stored.
     pub fn is_empty(&self) -> bool {
         self.layers.is_empty()
     }
-
-    /// Append a new layer.  Returns `Err` if a layer with the same name already exists.
+    /// Add a layer; returns an error when the name already exists.
     pub fn add_layer(&mut self, layer: BlendLayer) -> Result<(), String> {
         if self.layers.iter().any(|l| l.name == layer.name) {
             return Err(format!("blend: layer '{}' already exists", layer.name));
@@ -96,8 +77,7 @@ impl BlendLayerSet {
         );
         Ok(())
     }
-
-    /// Remove a layer by name.  Returns `Err` if not found.
+    /// Remove a layer by name.
     pub fn remove_layer(&mut self, name: &str) -> Result<(), String> {
         let pos = self
             .layers
@@ -108,8 +88,7 @@ impl BlendLayerSet {
         log::debug!("animation: blend layer '{name}' removed");
         Ok(())
     }
-
-    /// Set the blend weight of a layer.  Returns `Err` if the layer is not found.
+    /// Set a layer's weight and clamp it to `[0, 1]`.
     pub fn set_weight(&mut self, name: &str, weight: f32) -> Result<(), String> {
         let layer = self
             .layers
@@ -119,16 +98,14 @@ impl BlendLayerSet {
         layer.weight = weight.clamp(0.0, 1.0);
         Ok(())
     }
-
-    /// Return the current weight of a layer, or `None` if not found.
+    /// Return a layer's weight, or `None` when missing.
     pub fn get_weight(&self, name: &str) -> Option<f32> {
         self.layers
             .iter()
             .find(|l| l.name == name)
             .map(|l| l.weight)
     }
-
-    /// Replace the bone mask of a layer.  Returns `Err` if not found.
+    /// Replace a layer's mask.
     pub fn set_mask(&mut self, name: &str, mask: BlendMask) -> Result<(), String> {
         let layer = self
             .layers
@@ -138,13 +115,11 @@ impl BlendLayerSet {
         layer.mask = mask;
         Ok(())
     }
-
-    /// Return a reference to the ordered layer list.
+    /// Return the stored layers.
     pub fn layers(&self) -> &[BlendLayer] {
         &self.layers
     }
-
-    /// Return an immutable reference to a named layer, or `None`.
+    /// Return a layer by name.
     pub fn get_layer(&self, name: &str) -> Option<&BlendLayer> {
         self.layers.iter().find(|l| l.name == name)
     }

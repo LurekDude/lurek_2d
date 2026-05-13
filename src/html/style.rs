@@ -1,32 +1,16 @@
-//! CSS parser and cascade engine — parses stylesheet text into [`CssRule`]s and
-//! resolves the computed style for each DOM element in specificity + source order.
-//!
-//! Only a subset of CSS 2.1 property names are handled by the layout engine;
-//! unknown properties are stored but silently ignored during layout computation.
-
-use std::collections::BTreeMap;
-
 use crate::html::element::normalise_name;
-
-/// A parsed CSS rule with a selector string and a property → value map.
+use std::collections::BTreeMap;
 #[derive(Clone, Debug)]
 pub(crate) struct CssRule {
-    /// Raw selector text (e.g. `".btn:hover"`).
     pub(crate) selector: String,
-    /// Property-value pairs after parsing the declaration block.
     pub(crate) declarations: BTreeMap<String, String>,
-    /// Source-order index used for specificity tie-breaking.
     pub(crate) order: usize,
 }
-
-/// Output of [`parse_declarations`] — a property map and any parse warnings.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct CssParseResult {
     pub(crate) declarations: BTreeMap<String, String>,
     pub(crate) warnings: Vec<String>,
 }
-
-/// Parses multiple stylesheet source strings into a flat list of [`CssRule`]s and any warnings.
 pub(crate) fn parse_stylesheets(sources: &[String]) -> (Vec<CssRule>, Vec<String>) {
     let mut rules = Vec::new();
     let mut warnings = Vec::new();
@@ -52,8 +36,6 @@ pub(crate) fn parse_stylesheets(sources: &[String]) -> (Vec<CssRule>, Vec<String
     }
     (rules, warnings)
 }
-
-/// Parses a single CSS declaration block (e.g. `"color: red; margin: 0"`) into a [`CssParseResult`].
 pub(crate) fn parse_declarations(source: &str) -> CssParseResult {
     let mut result = CssParseResult::default();
     for declaration in source.split(';') {
@@ -75,8 +57,6 @@ pub(crate) fn parse_declarations(source: &str) -> CssParseResult {
     }
     result
 }
-
-/// Parses a CSS length value (`px`, `%` relative to `basis`, or bare `f32`). Returns `None` for unparseable values.
 pub(crate) fn parse_length(value: Option<&str>, basis: f32) -> Option<f32> {
     let value = value?.trim();
     if value == "0" {
@@ -94,7 +74,6 @@ pub(crate) fn parse_length(value: Option<&str>, basis: f32) -> Option<f32> {
     }
     value.parse::<f32>().ok()
 }
-
 fn is_supported_property(property: &str) -> bool {
     matches!(
         property,

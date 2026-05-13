@@ -1,18 +1,18 @@
-//! Monte Carlo Tree Search runtime and configuration primitives.
-// ---- Type: MCTSConfig ----
-
-/// Configuration for the MCTS engine.
+//! Monte Carlo tree search engine for discrete action spaces.
+//! Owns `MCTSConfig`, the internal `MCTSNode`, and `MCTSEngine`.
+//! Does not own the game state; callers supply actions, transitions, and evaluation.
+/// Configuration for one MCTS search run.
 pub struct MCTSConfig {
-    /// Number of MCTS iterations per `search` call.
+    /// Number of iterations to execute.
     pub iterations: u32,
-    /// UCT exploration constant (2 1.414 is the standard default).
+    /// Exploration constant used by UCT.
     pub uct_c: f32,
-    /// Maximum depth for random rollout simulation.
+    /// Maximum rollout depth.
     pub rollout_depth: usize,
-    /// Seed for the internal PRNG.
+    /// RNG seed.
     pub seed: u64,
 }
-
+/// `Default` provides the standard search parameters.
 impl Default for MCTSConfig {
     fn default() -> Self {
         Self {
@@ -23,21 +23,23 @@ impl Default for MCTSConfig {
         }
     }
 }
-
-// ---- Type: MCTSNode ----
-
-/// Arena-allocated MCTS tree node.
+/// Internal tree node used by `MCTSEngine`.
 struct MCTSNode {
+    /// Parent node index.
     parent: Option<usize>,
+    /// Child node indices.
     children: Vec<usize>,
-    /// Action that led from the parent to this node. `None` for root.
+    /// Action that produced this node.
     action: Option<i32>,
+    /// Visit count.
     visits: u32,
+    /// Accumulated rollout score.
     total_score: f64,
+    /// Actions not yet expanded from this node.
     untried_actions: Vec<i32>,
 }
-
 impl MCTSNode {
+    /// Create a new node with the supplied untried actions.
     fn new(parent: Option<usize>, action: Option<i32>, actions: Vec<i32>) -> Self {
         Self {
             parent,
@@ -48,8 +50,7 @@ impl MCTSNode {
             untried_actions: actions,
         }
     }
-
-    /// UCT score for this node.
+    /// Return the UCT score for this node.
     fn uct(&self, parent_visits: u32, c: f32) -> f64 {
         if self.visits == 0 {
             return f64::INFINITY;
@@ -58,25 +59,22 @@ impl MCTSNode {
         let u = c as f64 * ((parent_visits as f64).ln() / self.visits as f64).sqrt();
         q + u
     }
-
-    /// Return `true` if all child actions have been tried.
+    /// Return `true` when no untried actions remain.
     fn is_fully_expanded(&self) -> bool {
         self.untried_actions.is_empty()
     }
 }
-
-// ---- Type: MCTSEngine ----
-
-/// MCTS engine with arena-allocated node tree.
+/// MCTS search engine with an internal arena-backed tree.
 pub struct MCTSEngine {
     /// Search configuration.
     pub config: MCTSConfig,
+    /// Arena of nodes for the current search.
     arena: Vec<MCTSNode>,
+    /// Internal RNG state.
     rng: u64,
 }
-
 impl MCTSEngine {
-    /// Create a new MCTS engine with the given configuration.
+    /// Create a search engine with the provided config.
     pub fn new(config: MCTSConfig) -> Self {
         let rng = config.seed;
         Self {
@@ -85,13 +83,11 @@ impl MCTSEngine {
             rng,
         }
     }
-
-    /// Return a reference to the current configuration.
+    /// Return the active config.
     pub fn config(&self) -> &MCTSConfig {
         &self.config
     }
-
-    /// Runs MCTS from `root_state` and returns the best action index, or `None`
+    /// Search for the best action and return its id, or `None` when no actions exist.
     pub fn search<S, FA, FB, FC>(
         &mut self,
         root_state: S,
@@ -111,30 +107,19 @@ impl MCTSEngine {
             return None;
         }
         self.arena.push(MCTSNode::new(None, None, root_actions));
-
         for _ in 0..self.config.iterations {
-            // 1. Selection
             let (node_idx, state) = self.select(0, root_state.clone(), apply_action);
-
-            // 2. Expansion
             let (node_idx, state) = self.expand(node_idx, state, get_actions, apply_action);
-
-            // 3. Simulation (rollout)
             let score = self.rollout(&state, get_actions, apply_action, evaluate);
-
-            // 4. Backpropagation
             self.backpropagate(node_idx, score as f64);
         }
-
-        // Choose child of root with highest visit count
         let root = &self.arena[0];
         root.children
             .iter()
             .max_by_key(|&&c| self.arena[c].visits)
             .and_then(|&c| self.arena[c].action)
     }
-
-    /// Traverses to the most promising node using UCT selection.
+    /// Follow UCT until an expandable node is reached.
     fn select<S, FB>(&self, mut idx: usize, mut state: S, apply_action: &mut FB) -> (usize, S)
     where
         S: Clone,
@@ -162,8 +147,7 @@ impl MCTSEngine {
             idx = best_child;
         }
     }
-
-    /// Expands an untried action from `node_idx`. Returns `(new_node_idx, new_state)`.
+    /// Expand one untried action from `node_idx`.
     fn expand<S, FA, FB>(
         &mut self,
         node_idx: usize,
@@ -189,8 +173,7 @@ impl MCTSEngine {
         self.arena[node_idx].children.push(child_idx);
         (child_idx, new_state)
     }
-
-    /// Simulates a random rollout from `state` up to `rollout_depth` steps.
+    /// Run a random rollout from `state` and return the evaluated score.
     fn rollout<S, FA, FB, FC>(
         &mut self,
         state: &S,
@@ -215,8 +198,7 @@ impl MCTSEngine {
         }
         evaluate(&cur)
     }
-
-    /// Propagates `score` up to the root node.
+    /// Propagate a rollout score back to the root.
     fn backpropagate(&mut self, mut idx: usize, score: f64) {
         loop {
             self.arena[idx].visits += 1;
@@ -227,8 +209,7 @@ impl MCTSEngine {
             }
         }
     }
-
-    /// Xorshift64 PRNG returning a `usize` in `[0, n)`.
+    /// Sample a random index in `[0, n)`.
     fn rand_usize(&mut self, n: usize) -> usize {
         self.rng ^= self.rng << 13;
         self.rng ^= self.rng >> 7;
@@ -236,4 +217,3 @@ impl MCTSEngine {
         (self.rng as usize) % n
     }
 }
-

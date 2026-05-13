@@ -1,26 +1,23 @@
-//! Compression wrappers: deflate, gzip, lz4, zlib codecs.
+//! Own compression and decompression helpers wrapping flate2 (deflate/gzip/zlib) and lz4_flex.
+//! Supports full-buffer, chunk-list, and generic streaming paths. Codec and level are caller-selected.
+//! A private `ChunkReader` adapter implements `Read` over a slice list for the chunk path.
+//! Does not own file I/O; callers pre-read bytes. Primary consumer is `src/lua_api/data_api.rs`.
 
 use std::io::{Cursor, Read, Write};
-
-/// Compression codec selector.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select compression codec.
 pub enum CompressFormat {
-    /// Raw deflate.
+    /// Use raw DEFLATE stream.
     Deflate,
-    /// Gzip container.
+    /// Use gzip container and DEFLATE payload.
     Gzip,
-    /// LZ4 block compression.
+    /// Use lz4 frame with prepended size helper.
     Lz4,
-    /// Zlib container.
+    /// Use zlib container and DEFLATE payload.
     Zlib,
 }
-
 impl CompressFormat {
-    /// Parse a format name string (case-insensitive).
-    /// Accepts `"deflate"`, `"gzip"` / `"gz"`, `"lz4"`, `"zlib"`.
-    ///
-    ///
-    /// `Result<Self, String>`.
+    /// Parse codec label and return variant or error.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
             "deflate" => Ok(CompressFormat::Deflate),
@@ -34,31 +31,19 @@ impl CompressFormat {
         }
     }
 }
-
-/// Compress data using the specified format and compression level (0-9).
-///
-///
-/// `Result<Vec<u8>, String>`.
+/// Compress full byte slice and return compressed bytes.
 pub fn compress(data: &[u8], format: CompressFormat, level: u32) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
     compress_stream(Cursor::new(data), &mut out, format, level)?;
     Ok(out)
 }
-
-/// Decompress data using the specified format.
-///
-///
-/// `Result<Vec<u8>, String>`.
+/// Decompress full byte slice and return decoded bytes.
 pub fn decompress(data: &[u8], format: CompressFormat) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
     decompress_stream(Cursor::new(data), &mut out, format)?;
     Ok(out)
 }
-
-/// Compresss a sequence of byte chunks without requiring callers to pre-concatenate input.
-///
-///
-/// `Result<Vec<u8>, String>`.
+/// Compress concatenated chunks and return compressed bytes.
 pub fn compress_chunks(
     chunks: &[&[u8]],
     format: CompressFormat,
@@ -66,7 +51,6 @@ pub fn compress_chunks(
 ) -> Result<Vec<u8>, String> {
     let level = level.min(9);
     let compression = flate2::Compression::new(level);
-
     match format {
         CompressFormat::Deflate => {
             let mut encoder = flate2::write::DeflateEncoder::new(Vec::new(), compression);
@@ -111,25 +95,24 @@ pub fn compress_chunks(
         }
     }
 }
-
-/// Decompress a sequence of compressed byte chunks.
-///
-///
-/// `Result<Vec<u8>, String>`.
+/// Decompress concatenated chunks and return decoded bytes.
 pub fn decompress_chunks(chunks: &[&[u8]], format: CompressFormat) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
     let mut reader = ChunkReader::new(chunks);
     decompress_stream(&mut reader, &mut out, format)?;
     Ok(out)
 }
-
+/// Hold state for reading over a borrowed slice list as a single `Read` stream.
 struct ChunkReader<'a> {
+    /// Hold borrowed slice list being read.
     chunks: &'a [&'a [u8]],
+    /// Track current chunk index.
     chunk_idx: usize,
+    /// Track byte offset within current chunk.
     offset: usize,
 }
-
 impl<'a> ChunkReader<'a> {
+    /// Create reader over slice list starting at first byte.
     fn new(chunks: &'a [&'a [u8]]) -> Self {
         Self {
             chunks,
@@ -138,48 +121,35 @@ impl<'a> ChunkReader<'a> {
         }
     }
 }
-
+/// Implement `Read` over a flattened view of borrowed byte slices for chunk compression.
 impl Read for ChunkReader<'_> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         if buf.is_empty() {
             return Ok(0);
         }
-
         let mut written = 0;
-
         while written < buf.len() {
             if self.chunk_idx >= self.chunks.len() {
                 break;
             }
-
             let chunk = self.chunks[self.chunk_idx];
             if self.offset >= chunk.len() {
                 self.chunk_idx += 1;
                 self.offset = 0;
                 continue;
             }
-
             let remaining_in_chunk = chunk.len() - self.offset;
             let remaining_out = buf.len() - written;
             let to_copy = remaining_in_chunk.min(remaining_out);
-
             buf[written..written + to_copy]
                 .copy_from_slice(&chunk[self.offset..self.offset + to_copy]);
             self.offset += to_copy;
             written += to_copy;
         }
-
         Ok(written)
     }
 }
-
-/// Compress data from `reader` to `writer` using the specified format.
-///
-/// This path avoids requiring a full pre-concatenated input buffer and enables
-/// chunked pipelines for large payloads.
-///
-///
-/// `Result<(), String>`.
+/// Compress bytes from reader into writer using selected codec.
 pub fn compress_stream<R: Read, W: Write>(
     mut reader: R,
     mut writer: W,
@@ -188,7 +158,6 @@ pub fn compress_stream<R: Read, W: Write>(
 ) -> Result<(), String> {
     let level = level.min(9);
     let compression = flate2::Compression::new(level);
-
     match format {
         CompressFormat::Deflate => {
             let mut encoder = flate2::write::DeflateEncoder::new(writer, compression);
@@ -217,7 +186,6 @@ pub fn compress_stream<R: Read, W: Write>(
                 .map_err(|e| format!("Zlib finish error: {}", e))?;
             Ok(())
         }
-        // LZ4 uses size-prepended block mode in this module.
         CompressFormat::Lz4 => {
             let mut input = Vec::new();
             reader
@@ -230,11 +198,7 @@ pub fn compress_stream<R: Read, W: Write>(
         }
     }
 }
-
-/// Decompress data from `reader` to `writer` using the specified format.
-///
-///
-/// `Result<(), String>`.
+/// Decompress bytes from reader into writer using selected codec.
 pub fn decompress_stream<R: Read, W: Write>(
     mut reader: R,
     mut writer: W,

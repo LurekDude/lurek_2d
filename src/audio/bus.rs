@@ -1,26 +1,30 @@
-//! Named audio buses for volume/pitch/pause/effects grouping.
-//! Bus: shared DSP state applied to assigned sources; supports effects chain.
+﻿//! `Bus` — a named audio routing channel used by `Mixer` to group sources.
+//! Holds per-bus volume, pitch, pause state, a shared DSP effect chain, and an optional
+//! duck-target for automatic volume reduction on another bus. Does not own playback state.
+//! Used by `Mixer` and exposed to Lua via `audio_api.rs`.
 
 use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::log_msg;
 use crate::runtime::log_messages::{BU01, BU02, BU03};
-
-/// Named audio bus applying shared volume, pitch, pause, and effects to sources.
 #[derive(Debug, Clone)]
+/// Named audio routing channel that applies volume, pitch, effects, and ducking to its sources.
 pub struct Bus {
+    /// Human-readable identifier used as the registry key in `Mixer`.
     name: String,
+    /// Volume multiplier applied to all sources on this bus; clamped to >= 0.0.
     volume: f32,
+    /// Pitch multiplier applied to all sources on this bus; clamped to >= 0.0.
     pitch: f32,
+    /// When true, all sources assigned to this bus are suspended from playback.
     paused: bool,
-    /// DSP effects chain.
+    /// Shared DSP effect chain applied by `DynamicEffectSource` on every source in this bus.
     pub effects:
         std::sync::Arc<std::sync::RwLock<Vec<std::sync::Arc<crate::audio::dsp::EffectParams>>>>,
-    /// Ducking target: `(target_bus_name, volume)`.
+    /// Optional duck target: `(bus_name, duck_volume)` to suppress when this bus is active.
     pub duck_target: Option<(String, f32)>,
 }
-
 impl Bus {
-    /// Create new bus with name; default volume/pitch 1.0.
+    /// Create a new bus with the given name, volume=1.0, pitch=1.0, unpaused, and no effects.
     pub fn new(name: impl Into<String>) -> Self {
         let name = name.into();
         log_msg!(debug, BU01, "{}", name);
@@ -33,50 +37,41 @@ impl Bus {
             duck_target: None,
         }
     }
-
-    /// Return the bus name.
+    /// Return the name of this bus.
     pub fn name(&self) -> &str {
         &self.name
     }
-
-    /// Return bus volume (clamped >= 0.0).
+    /// Return the current volume multiplier for this bus.
     pub fn volume(&self) -> f32 {
         self.volume
     }
-
-    /// Set bus volume (clamped >= 0.0).
+    /// Set the volume multiplier; values below 0.0 are clamped to 0.0.
     pub fn set_volume(&mut self, volume: f32) {
         self.volume = volume.max(0.0);
     }
-
-    /// Return bus pitch multiplier (clamped >= 0.0).
+    /// Return the current pitch multiplier for this bus.
     pub fn pitch(&self) -> f32 {
         self.pitch
     }
-
-    /// Set bus pitch multiplier (clamped >= 0.0).
+    /// Set the pitch multiplier; values below 0.0 are clamped to 0.0.
     pub fn set_pitch(&mut self, pitch: f32) {
         self.pitch = pitch.max(0.0);
     }
-
-    /// Pause all sources assigned to this bus.
+    /// Pause all sources on this bus; no-op if already paused.
     pub fn pause(&mut self) {
         log_msg!(debug, BU02, "{}", self.name);
         self.paused = true;
     }
-
-    /// Resume playback of this bus.
+    /// Resume all sources on this bus; no-op if already playing.
     pub fn resume(&mut self) {
         log_msg!(debug, BU03, "{}", self.name);
         self.paused = false;
     }
-
-    /// Return true if the bus is paused.
+    /// Return `true` when this bus is paused.
     pub fn is_paused(&self) -> bool {
         self.paused
     }
-
-    /// Add DSP effect to this bus and return its ID; supported types: lowpass, highpass, bandpass, reverb, chorus, etc.
+    /// Append a DSP effect of `effect_type_str` with initial parameter `p1_val` to the chain; returns the new effect ID.
     pub fn add_effect(&self, effect_type_str: &str, p1_val: f32) -> Result<u32, String> {
         let effect_type = match effect_type_str {
             "lowpass" => EffectType::Lowpass,
@@ -107,8 +102,7 @@ impl Bus {
         }));
         Ok(eid)
     }
-
-    /// Removes a DSP effect by ID. Returns an error if not found.
+    /// Remove the DSP effect with `effect_id` from the chain; error if not found.
     pub fn remove_effect(&self, effect_id: u32) -> Result<(), String> {
         let mut fx_list = self.effects.write().unwrap();
         let len_before = fx_list.len();
@@ -119,17 +113,14 @@ impl Bus {
             Ok(())
         }
     }
-
-    /// Sets ducking target: reduces a named bus's volume when this bus plays.
+    /// Set the duck target bus name and duck volume; volume is clamped to 0.0..=1.0.
     pub fn set_duck_target(&mut self, target_bus_name: impl Into<String>, duck_volume: f32) {
         log_msg!(debug, BU02, "{}", duck_volume);
         self.duck_target = Some((target_bus_name.into(), duck_volume.clamp(0.0, 1.0)));
     }
-
-    /// Clears the ducking target.
+    /// Remove configured duck target from this bus.
     pub fn clear_duck_target(&mut self) {
         log_msg!(debug, BU03, "duck target cleared");
         self.duck_target = None;
     }
 }
-

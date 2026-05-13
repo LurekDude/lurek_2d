@@ -1,24 +1,8 @@
-//! Render command generation for the GUI widget tree.
-//!
-//! Converts a [`GuiContext`] widget tree into a flat list of
-//! [`RenderCommand`]s that the GPU renderer can execute.  Walks the tree
-//! depth-first from the root panel, emitting background rectangles, borders,
-//! and text labels for each visible widget according to the active
-//! [`Theme`](super::Theme).
-
 use crate::render::renderer::{DrawMode, GradientDirection, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
 use crate::ui::context::{GuiContext, WidgetKind};
 use crate::ui::theme::WidgetStyle;
 use crate::ui::widget::WidgetBase;
-
-/// Return the display text for widgets that have a text field.
-///
-/// # Parameters
-/// - `widget` — `&WidgetKind`.
-///
-/// # Returns
-/// `Option<&str>`.
 fn display_text(widget: &WidgetKind) -> Option<&str> {
     let text = match widget {
         WidgetKind::Button(w) => &w.text,
@@ -34,8 +18,6 @@ fn display_text(widget: &WidgetKind) -> Option<&str> {
         Some(text)
     }
 }
-
-/// Convert HSV colour to RGB bytes. `h` in `[0.0, 1.0]`.
 fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
     let h6 = (h * 6.0).rem_euclid(6.0);
     let i = h6 as u32;
@@ -53,8 +35,6 @@ fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
     };
     ((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
 }
-
-/// Recursive CPU-side tree node row renderer. Returns the next `ry`.
 #[allow(clippy::too_many_arguments)]
 fn draw_tree_nodes_cpu(
     nodes: &[crate::ui::extras::TreeNode],
@@ -76,15 +56,11 @@ fn draw_tree_nodes_cpu(
         None => return ry,
     };
     let indent = x + depth * 14 + 4;
-
     if selected == Some(idx) {
         img.draw_rect(x, ry, 9999, row_h as u32, 50, 85, 150, 180);
     }
-
-    // Expand/collapse arrow
     if !node.children.is_empty() {
         if node.expanded {
-            // ▼ down
             img.draw_line(indent, ry + 4, indent + 6, ry + 4, fg[0], fg[1], fg[2], 200);
             img.draw_line(indent, ry + 4, indent + 3, ry + 8, fg[0], fg[1], fg[2], 200);
             img.draw_line(
@@ -98,7 +74,6 @@ fn draw_tree_nodes_cpu(
                 200,
             );
         } else {
-            // ▶ right
             img.draw_line(
                 indent,
                 ry + 3,
@@ -131,7 +106,6 @@ fn draw_tree_nodes_cpu(
             );
         }
     }
-
     img.draw_label(
         &node.text,
         indent + 10,
@@ -141,7 +115,6 @@ fn draw_tree_nodes_cpu(
         fg[2],
     );
     let mut next_y = ry + row_h;
-
     if node.expanded {
         let children: Vec<usize> = node.children.clone();
         for child_idx in children {
@@ -161,19 +134,8 @@ fn draw_tree_nodes_cpu(
     }
     next_y
 }
-
-/// Emit render commands for a single widget's background and border.
-///
-/// Uses rounded rectangles when `corner_radius > 0`, plain rectangles
-/// otherwise.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let [br, bg, bb, ba] = style.bg_color;
-
     if let Some(color2) = style.gradient_end {
         if style.corner_radius <= 0.0 {
             cmds.push(RenderCommand::DrawGradientRect {
@@ -218,12 +180,10 @@ fn emit_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand
             h: base.height,
         });
     }
-
     if style.border_width > 0.0 {
         let [cr, cg, cb, ca] = style.border_color;
         cmds.push(RenderCommand::SetColor(cr, cg, cb, ca));
         cmds.push(RenderCommand::SetLineWidth(style.border_width));
-
         if style.corner_radius > 0.0 {
             cmds.push(RenderCommand::RoundedRectangle {
                 mode: DrawMode::Line,
@@ -245,15 +205,6 @@ fn emit_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand
         }
     }
 }
-
-/// Emit a `Print` command for the widget's text, centred inside padding.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `text` — `&str`.
-/// - `style` — `&WidgetStyle`.
-/// - `font_key` — `FontKey`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_text(
     base: &WidgetBase,
     text: &str,
@@ -263,16 +214,14 @@ fn emit_text(
 ) {
     let [fr, fg, fb, fa] = style.fg_color;
     cmds.push(RenderCommand::SetColor(fr, fg, fb, fa));
-
-    let scale = style.font_size / 14.0; // normalise against 14 px baseline
+    let scale = style.font_size / 14.0;
     let approx_w = text.chars().count() as f32 * 6.0 * scale;
     let tx = match style.text_align.as_str() {
         "left" => base.x + base.padding[3] + 4.0,
         "right" => base.x + (base.width - approx_w - 6.0).max(0.0),
         _ => base.x + ((base.width - approx_w) * 0.5).max(2.0),
     };
-    let ty = base.y + base.padding[0]; // top padding
-
+    let ty = base.y + base.padding[0];
     cmds.push(RenderCommand::Print {
         font_key,
         text: text.to_string(),
@@ -281,13 +230,6 @@ fn emit_text(
         scale,
     });
 }
-
-/// Emit a drop-shadow rectangle offset from the widget bounds.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_shadow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let [sr, sg, sb, sa] = style.shadow_color;
     if sa <= 0.0 {
@@ -315,15 +257,6 @@ fn emit_shadow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderComm
         });
     }
 }
-
-/// Emit a thin translucent highlight strip along the top edge of a widget.
-///
-/// The strip height is `shadow_offset[1].max(2.0)` pixels.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_highlight(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     if style.highlight_alpha <= 0.0 {
         return;
@@ -339,18 +272,6 @@ fn emit_highlight(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderC
         h: strip_h,
     });
 }
-
-/// Emit the filled fill-portion of a range widget (slider track fill).
-///
-/// The fill uses `style.gradient_end` colour if set, otherwise `style.fg_color`.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `value` — `f64`. Current value.
-/// - `min` — `f64`. Range minimum.
-/// - `max` — `f64`. Range maximum.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_slider(
     base: &WidgetBase,
     value: f64,
@@ -374,7 +295,6 @@ fn emit_slider(
             h: base.height,
         });
     }
-    // Thumb circle at fill end-point.
     let thumb_cx = base.x + fill_w;
     let thumb_cy = base.y + base.height * 0.5;
     let thumb_r = (base.height * 0.5 - 1.0).max(2.0);
@@ -386,16 +306,6 @@ fn emit_slider(
         r: thumb_r,
     });
 }
-
-/// Emit the fill portion of a progress bar.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `value` — `f64`. Current value.
-/// - `min` — `f64`. Range minimum.
-/// - `max` — `f64`. Range maximum.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_progress_bar(
     base: &WidgetBase,
     value: f64,
@@ -421,15 +331,6 @@ fn emit_progress_bar(
         h: base.height,
     });
 }
-
-/// Emit a check-mark glyph inside the checkbox bounds.
-///
-/// Draws two `Line` segments forming a ✓ shape.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_checkbox(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let box_size = base.height.min(base.height);
     let cx = base.x + box_size * 0.5;
@@ -438,14 +339,12 @@ fn emit_checkbox(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
     let [fr, fg, fb, fa] = style.fg_color;
     cmds.push(RenderCommand::SetColor(fr, fg, fb, fa));
     cmds.push(RenderCommand::SetLineWidth(2.0));
-    // Down-right leg of check
     cmds.push(RenderCommand::Line {
         x1: cx - s,
         y1: cy,
         x2: cx - s * 0.2,
         y2: cy + s,
     });
-    // Up-right leg of check
     cmds.push(RenderCommand::Line {
         x1: cx - s * 0.2,
         y1: cy + s,
@@ -453,13 +352,6 @@ fn emit_checkbox(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
         y2: cy - s,
     });
 }
-
-/// Emit a filled dot inside the radio-button circle.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_radio_button(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let r = (base.height * 0.5 - 3.0).max(2.0);
     let cx = base.x + base.height * 0.5;
@@ -473,13 +365,6 @@ fn emit_radio_button(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<Rend
         r,
     });
 }
-
-/// Emit a down-arrow indicator on the right side of a ComboBox.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_combo_box_arrow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let btn_w = base.height;
     let ax = base.x + base.width - btn_w * 0.5;
@@ -497,17 +382,6 @@ fn emit_combo_box_arrow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<R
         y3: ay + s * 0.5,
     });
 }
-
-/// Emit a scroll-bar thumb rectangle.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `position` — `f32`. Scroll position.
-/// - `content_size` — `f32`. Total scrollable content size.
-/// - `view_size` — `f32`. Visible viewport size.
-/// - `vertical` — `bool`. Axis.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_scroll_bar(
     base: &WidgetBase,
     position: f32,
@@ -550,20 +424,12 @@ fn emit_scroll_bar(
         });
     }
 }
-
-/// Emit the increment/decrement arrow buttons on a SpinBox.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_spin_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let btn_w = base.height;
     let mid_y = base.y + base.height * 0.5;
     let s = 4.0_f32;
     let [fr, fg, fb, fa] = style.fg_color;
     cmds.push(RenderCommand::SetColor(fr, fg, fb, fa));
-    // Decrement arrow (left button)
     cmds.push(RenderCommand::Triangle {
         mode: DrawMode::Fill,
         x1: base.x + btn_w * 0.5 - s,
@@ -573,7 +439,6 @@ fn emit_spin_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
         x3: base.x + btn_w * 0.5,
         y3: mid_y + s * 0.5,
     });
-    // Increment arrow (right button)
     let rx = base.x + base.width - btn_w * 0.5;
     cmds.push(RenderCommand::Triangle {
         mode: DrawMode::Fill,
@@ -585,18 +450,6 @@ fn emit_spin_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
         y3: mid_y - s * 0.5,
     });
 }
-
-/// Emit the sliding thumb pill of a Switch widget.
-///
-/// When `on` is true the thumb slides to the right side.
-/// `thumb_t` in `[0.0, 1.0]` drives the animated position.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `on` — `bool`. Logical state.
-/// - `thumb_t` — `f32`. Animation progress.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_switch(
     base: &WidgetBase,
     on: bool,
@@ -604,7 +457,6 @@ fn emit_switch(
     style: &WidgetStyle,
     cmds: &mut Vec<RenderCommand>,
 ) {
-    // Tint the track when on.
     let [tr, tg, tb, ta] = if on {
         style.gradient_end.unwrap_or([0.20, 0.55, 0.30, 1.0])
     } else {
@@ -620,8 +472,6 @@ fn emit_switch(
         rx: base.height * 0.5,
         ry: base.height * 0.5,
     });
-
-    // Thumb
     let t = thumb_t.clamp(0.0, 1.0);
     let thumb_r = (base.height * 0.5 - 2.0).max(2.0);
     let thumb_cx = base.x + thumb_r + 2.0 + (base.width - (thumb_r + 2.0) * 2.0).max(0.0) * t;
@@ -634,17 +484,6 @@ fn emit_switch(
         r: thumb_r,
     });
 }
-
-/// Emit a badge rendered as a rounded pill with count text.
-///
-/// The background is drawn by `emit_box`; this function only adds the `Print`.
-///
-/// # Parameters
-/// - `base` — `&WidgetBase`.
-/// - `text` — `&str`. Display text (from [`Badge::display_text`]).
-/// - `font_key` — `FontKey`.
-/// - `style` — `&WidgetStyle`.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn emit_badge(
     base: &WidgetBase,
     text: &str,
@@ -665,7 +504,6 @@ fn emit_badge(
         scale,
     });
 }
-
 fn emit_text_at(
     text: &str,
     x: f32,
@@ -684,7 +522,6 @@ fn emit_text_at(
         scale: style.font_size / 14.0,
     });
 }
-
 struct TreeCtx<'a> {
     nodes: &'a [crate::ui::extras::TreeNode],
     selected: Option<usize>,
@@ -692,7 +529,6 @@ struct TreeCtx<'a> {
     style: &'a WidgetStyle,
     cmds: &'a mut Vec<RenderCommand>,
 }
-
 fn emit_tree_nodes(
     ctx: &mut TreeCtx<'_>,
     idx: usize,
@@ -776,7 +612,6 @@ fn emit_tree_nodes(
     }
     y
 }
-
 fn widget_render_children(widget: &WidgetKind) -> Vec<usize> {
     let mut children = widget.children().cloned().unwrap_or_default();
     match widget {
@@ -811,8 +646,6 @@ fn widget_render_children(widget: &WidgetKind) -> Vec<usize> {
     children.dedup();
     children
 }
-
-/// Resolve widget style from theme/default and apply widget alpha to visual channels.
 fn resolve_style_with_alpha(
     ctx: &GuiContext,
     base: &WidgetBase,
@@ -832,15 +665,12 @@ fn resolve_style_with_alpha(
     style_with_alpha.highlight_alpha *= alpha;
     style_with_alpha
 }
-
-/// Thin render-pipeline coordinator for root traversal and recursive widget emission.
 struct WidgetRenderer<'a> {
     ctx: &'a GuiContext,
     font_key: FontKey,
     default_style: &'a WidgetStyle,
     cmds: &'a mut Vec<RenderCommand>,
 }
-
 impl<'a> WidgetRenderer<'a> {
     fn new(
         ctx: &'a GuiContext,
@@ -855,11 +685,9 @@ impl<'a> WidgetRenderer<'a> {
             cmds,
         }
     }
-
     fn render_widget(&mut self, idx: usize) {
         render_widget(self.ctx, idx, self.font_key, self.default_style, self.cmds);
     }
-
     fn render_root_children(&mut self) {
         if let Some(children) = self.ctx.widgets.first().and_then(|w| w.children()) {
             for &child_idx in children {
@@ -870,15 +698,6 @@ impl<'a> WidgetRenderer<'a> {
         }
     }
 }
-
-/// Recursively walk a widget and its children, emitting render commands.
-///
-/// # Parameters
-/// - `ctx` — `&GuiContext`.
-/// - `idx` — `usize`. Widget index in the pool.
-/// - `font_key` — `FontKey`.
-/// - `default_style` — `&WidgetStyle`. Fallback when no theme is set.
-/// - `cmds` — `&mut Vec<RenderCommand>`.
 fn render_widget(
     ctx: &GuiContext,
     idx: usize,
@@ -888,26 +707,16 @@ fn render_widget(
 ) {
     let widget = &ctx.widgets[idx];
     let base = widget.base();
-
     if !base.visible {
         return;
     }
-
     let style_with_alpha = resolve_style_with_alpha(ctx, base, default_style);
     let style = &style_with_alpha;
-
-    // Drop shadow (drawn before background)
     emit_shadow(base, style, cmds);
-
-    // Background + border
     emit_box(base, style, cmds);
-
-    // Top-edge highlight strip
     if style.highlight_alpha > 0.0 {
         emit_highlight(base, style, cmds);
     }
-
-    // Per-type specialized rendering
     match widget {
         WidgetKind::Slider(w) => {
             emit_slider(base, w.value, w.min, w.max, style, cmds);
@@ -1549,8 +1358,6 @@ fn render_widget(
         }
         _ => {}
     }
-
-    // Text label for widgets that carry text (skip types already rendered manually)
     let skip_text = matches!(
         widget,
         WidgetKind::Badge(_)
@@ -1566,72 +1373,32 @@ fn render_widget(
             emit_text(base, text, style, font_key, cmds);
         }
     }
-
-    // Recurse into all widget-owned children (not only generic container children).
     for child_idx in widget_render_children(widget) {
         if child_idx < ctx.widgets.len() {
             render_widget(ctx, child_idx, font_key, default_style, cmds);
         }
     }
 }
-
 impl GuiContext {
-    /// Generate a flat list of [`RenderCommand`]s for the entire widget tree.
-    ///
-    /// Walks the root panel's children depth-first, emitting styled
-    /// rectangles and text for every visible widget.
-    ///
-    /// # Parameters
-    /// - `font_key` — `FontKey`. Font used for all widget text.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn build_render_commands(&mut self, font_key: FontKey) -> Vec<RenderCommand> {
         self.run_layout_pass();
         let default_style = WidgetStyle::default();
         let mut cmds = Vec::new();
-
         WidgetRenderer::new(self, font_key, &default_style, &mut cmds).render_root_children();
-
         cmds
     }
-
-    /// Generate render commands using the default font key.
-    ///
-    /// Convenience alias for [`build_render_commands`](Self::build_render_commands)
-    /// that passes [`FontKey::default()`], satisfying the standard
-    /// `generate_render_commands()` contract used across engine modules.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn generate_render_commands(&mut self) -> Vec<RenderCommand> {
         self.build_render_commands(FontKey::default())
     }
-
-    /// Render the widget tree to a CPU image for headless layout testing.
-    ///
-    /// Uses the active theme styles (or default style fallback), including
-    /// shadow, gradient body, border, highlight strip and basic control
-    /// glyphs. Text labels are rasterised with `ImageData::draw_label`.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `crate::image::ImageData`.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(24, 26, 34, 255);
-
         let mut layout_ctx = self.clone();
         layout_ctx.run_layout_pass();
-
         let default_style = WidgetStyle::default();
         let Some(children) = layout_ctx.widgets.first().and_then(|w| w.children()) else {
             return img;
         };
-
         let mut stack: Vec<usize> = children.to_vec();
         while let Some(idx) = stack.pop() {
             let Some(widget) = layout_ctx.widgets.get(idx) else {
@@ -1641,16 +1408,13 @@ impl GuiContext {
             if !base.visible {
                 continue;
             }
-
             let rect = base.computed_rect;
             let x = rect.x as i32;
             let y = rect.y as i32;
             let w = rect.width.max(1.0) as u32;
             let h = rect.height.max(1.0) as u32;
-
             let style_with_alpha = resolve_style_with_alpha(&layout_ctx, base, &default_style);
             let style = &style_with_alpha;
-
             let [sr, sg, sb, sa] = style.shadow_color;
             if sa > 0.0 {
                 let sx = x + style.shadow_offset[0] as i32;
@@ -1666,7 +1430,6 @@ impl GuiContext {
                     (sa * 255.0) as u8,
                 );
             }
-
             let [r0, g0, b0, a0] = style.bg_color;
             if let Some([r1, g1, b1, _a1]) = style.gradient_end {
                 for py in 0..h {
@@ -1701,7 +1464,6 @@ impl GuiContext {
                     (a0 * 255.0) as u8,
                 );
             }
-
             if style.highlight_alpha > 0.0 {
                 let hi = (style.highlight_alpha.clamp(0.0, 1.0) * 140.0) as u8;
                 let strip_h = (style.border_width.max(2.0)) as u32;
@@ -1716,7 +1478,6 @@ impl GuiContext {
                     hi,
                 );
             }
-
             if style.border_width > 0.0 {
                 let [br, bg, bb, ba] = style.border_color;
                 let br = (br * 255.0) as u8;
@@ -1728,16 +1489,12 @@ impl GuiContext {
                 img.draw_rect(x, y, 1, h, br, bg, bb, ba);
                 img.draw_rect(x + w as i32 - 1, y, 1, h, br, bg, bb, ba);
             }
-
-            // ── Widget-specific rendering ──────────────────────────────────
             let [frc, fgc, fbc, _fa] = style.fg_color;
             let fr = (frc * 255.0) as u8;
             let fg = (fgc * 255.0) as u8;
             let fb = (fbc * 255.0) as u8;
             let mut skip_text = false;
-
             match widget {
-                // ── Value controls ─────────────────────────────────────────
                 WidgetKind::Slider(slider) => {
                     let range = (slider.max - slider.min).max(1e-6);
                     let t = ((slider.value - slider.min) / range).clamp(0.0, 1.0) as f32;
@@ -1875,7 +1632,6 @@ impl GuiContext {
                     );
                     skip_text = true;
                 }
-                // ── Toggle controls ─────────────────────────────────────────
                 WidgetKind::CheckBox(cb) => {
                     let box_sz = (h as i32).clamp(10, 14);
                     let bx = x + 3;
@@ -1946,7 +1702,6 @@ impl GuiContext {
                     }
                     skip_text = true;
                 }
-                // ── Text input ──────────────────────────────────────────────
                 WidgetKind::TextInput(ti) => {
                     if ti.text.is_empty() && !ti.placeholder.is_empty() {
                         img.draw_label(
@@ -1976,7 +1731,6 @@ impl GuiContext {
                     }
                     skip_text = true;
                 }
-                // ── Selection controls ──────────────────────────────────────
                 WidgetKind::ComboBox(cb) => {
                     if let Some(text) = cb.selected_item() {
                         img.draw_label(
@@ -2018,7 +1772,6 @@ impl GuiContext {
                     }
                     skip_text = true;
                 }
-                // ── Tab bar ─────────────────────────────────────────────────
                 WidgetKind::TabBar(tb) => {
                     if !tb.tabs.is_empty() {
                         let tab_w = (w as i32 / tb.tabs.len() as i32).max(30);
@@ -2047,7 +1800,6 @@ impl GuiContext {
                     }
                     skip_text = true;
                 }
-                // ── Notifications ───────────────────────────────────────────
                 WidgetKind::Toast(t) => {
                     img.draw_rect(x, y, 4, h, 100, 190, 255, 255);
                     let fade_a = ((1.0 - t.progress()) * 200.0) as u8;
@@ -2089,7 +1841,6 @@ impl GuiContext {
                     }
                     skip_text = true;
                 }
-                // ── Layout primitives ───────────────────────────────────────
                 WidgetKind::Separator(sep) => {
                     if sep.vertical {
                         let cx = x + w as i32 / 2;
@@ -2103,7 +1854,6 @@ impl GuiContext {
                 WidgetKind::Spacer(_) => {
                     skip_text = true;
                 }
-                // ── Window chrome ───────────────────────────────────────────
                 WidgetKind::GUIWindow(win) => {
                     let bar_h = 24u32;
                     img.draw_rect(x, y, w, bar_h, 38, 42, 60, 255);
@@ -2403,7 +2153,6 @@ impl GuiContext {
                         img.draw_rect(sx - 1, y, 3, h, 55, 60, 80, 255);
                     }
                 }
-                // Containers and Button/Label handled via display_text + children push
                 WidgetKind::Panel(_)
                 | WidgetKind::Layout(_)
                 | WidgetKind::ScrollPanel(_)
@@ -2413,8 +2162,6 @@ impl GuiContext {
                 | WidgetKind::Label(_)
                 | WidgetKind::Custom(_) => {}
             }
-
-            // ── Text fallback for Button/Label ─────────────────────────────
             if !skip_text {
                 if let Some(text) = display_text(widget) {
                     let approx_w = (text.chars().count() as i32) * 6;
@@ -2427,7 +2174,6 @@ impl GuiContext {
                     img.draw_label(text, tx, ty, fr, fg, fb);
                 }
             }
-
             if let Some(ch) = widget.children() {
                 stack.extend_from_slice(ch);
             }

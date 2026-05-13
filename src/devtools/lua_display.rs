@@ -1,8 +1,3 @@
-//! Scope: Lua runtime value-to-text conversion helpers.
-//! This file defines value_to_string and format helpers for Lua types.
-//! It owns compact display formatting for REPL and log output.
-
-/// Converts an [`mlua::Value`] into a compact display string.
 pub fn value_to_string(v: &mlua::Value) -> String {
     match v {
         mlua::Value::Nil => "nil".to_string(),

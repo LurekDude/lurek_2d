@@ -1,16 +1,3 @@
-//! Fixed-point time accumulation helpers shared by runtime subsystems.
-
-/// Accumulate scaled seconds into a deterministic microsecond counter.
-///
-/// This avoids long-run drift from repeatedly adding `f32` deltas directly
-/// into elapsed time fields. Fractional microseconds are preserved in
-/// `carry_micros` and rolled into later updates.
-///
-/// # Parameters
-/// - `elapsed_micros`: monotonic elapsed counter in microseconds.
-/// - `carry_micros`: fractional microseconds carried between updates.
-/// - `dt_seconds`: frame delta in seconds.
-/// - `scale`: playback/time-scale multiplier.
 pub(crate) fn accumulate_scaled_micros(
     elapsed_micros: &mut u64,
     carry_micros: &mut f64,

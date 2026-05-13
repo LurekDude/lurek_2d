@@ -31,7 +31,7 @@ description: "Load this skill when working on wgpu setup, RenderCommand flow, re
 - Sprite batching happens automatically in `render_frame()` when consecutive `RenderCommand::DrawSprite` commands share the same texture, blend mode, and shader. Break the batch only when necessary; sorting draw commands by texture before pushing them to `pending_commands` is the simplest way to maximize batch sizes and reduce bind-group switches.
 - `src/render/shader.rs` exposes user WGSL shaders with a uniform variable table. Auto-uniform convention: declare a uniform name in Lua, the engine binds the value each frame before the draw call. When adding a new auto-uniform, add it to both the WGSL binding slot and the Rust `UniformTable` in `shader.rs`, then update the binding index in the pipeline layout.
 - Draw layer ordering is controlled by `src/render/draw_layer.rs`. Layers determine which RenderPass phase a command lands in. If a new draw type needs to render in a specific phase (e.g., always on top of everything), assign it the correct layer enum variant — do not rely on push order.
-- After render changes, run `cargo test --test graphics_tests` and check `tests/evidence_out/` for screenshot regressions. Cargo test pass alone does not confirm visual correctness.
+- After render changes, run `cargo test --test graphics_tests` and check `tests/output/` for screenshot regressions. Cargo test pass alone does not confirm visual correctness.
 - Engine is 2D-only (binding constraint A-03). Any proposal involving perspective projection, depth buffer, or 3D scene graph is out of scope. Raycasting and isometric effects still use 2D draw calls.
 ## Companion File Index
 - None.

@@ -1,24 +1,22 @@
-//! Build render commands from current animation frame data.
+//! Render helpers for turning animation frames into draw commands.
 
 use crate::animation::controller::Animation;
 use crate::math::Rect;
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::TextureKey;
 
-// ---- Type: AnimRenderParams ----
-
-/// Parameters for rendering an animated sprite.
+/// Rendering inputs shared by animation frame draw helpers.
 #[derive(Debug, Clone)]
 pub struct AnimRenderParams {
-    /// Handle to the sprite-sheet texture.
+    /// Texture atlas that contains the frame quad.
     pub texture_key: TextureKey,
-    /// Full texture width in pixels (for UV normalisation).
+    /// Full atlas width in pixels.
     pub tex_w: f32,
-    /// Full texture height in pixels (for UV normalisation).
+    /// Full atlas height in pixels.
     pub tex_h: f32,
-    /// World X position.
+    /// World-space or screen-space X position for the draw call.
     pub x: f32,
-    /// World Y position.
+    /// World-space or screen-space Y position for the draw call.
     pub y: f32,
     /// Rotation in radians.
     pub rotation: f32,
@@ -26,24 +24,21 @@ pub struct AnimRenderParams {
     pub sx: f32,
     /// Vertical scale.
     pub sy: f32,
-    /// Origin X offset.
+    /// Origin X used as the rotation and scale pivot.
     pub ox: f32,
-    /// Origin Y offset.
+    /// Origin Y used as the rotation and scale pivot.
     pub oy: f32,
 }
 
 impl Animation {
-    // ---- Implementation: Animation Render Helpers ----
-    /// Produces a single `DrawQuad` render command for the current frame.
+    /// Builds a draw command for the current frame when the animation has an active quad.
     pub fn generate_render_command(&self, params: &AnimRenderParams) -> Option<RenderCommand> {
         let quad = self.current_quad()?;
         Some(quad_to_draw_command(&quad, params))
     }
 }
 
-// ---- Helper Functions: Render Command Conversion ----
-
-/// Converts a source quad and render parameters into a `DrawQuad` command.
+/// Converts a texture quad plus render parameters into a renderer draw command.
 pub fn quad_to_draw_command(quad: &Rect, params: &AnimRenderParams) -> RenderCommand {
     RenderCommand::DrawQuad {
         texture_key: params.texture_key,

@@ -1,56 +1,34 @@
-//! SQL parsing and execution over in-memory tables.
+//! Own SQL-like SELECT query parser and executor over `DataFrame` and `Database` tables.
+//! Tokenises a SQL string, parses the statement into a structured plan, then dispatches to
+//! existing `DataFrame` query methods rather than reimplementing row logic. Supports column
+//! aliases, wildcard select, literals, and basic WHERE expressions. No DDL, INSERT, or UPDATE.
+//! Primary consumer is `src/lua_api/dataframe_api.rs`. All mutation goes through query methods.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
-
-// ---------------------------------------------------------------------------
-// Token types
-// ---------------------------------------------------------------------------
-
-/// SQL token.
 #[derive(Debug, Clone, PartialEq)]
 enum Token {
-    /// Keyword or identifier.
     Ident(String),
-    /// String literal (single-quoted).
     StringLit(String),
-    /// Numeric literal.
     NumberLit(f64),
-    /// Star / asterisk.
     Star,
-    /// Comma.
     Comma,
-    /// Dot.
     Dot,
-    /// Opening parenthesis.
     LParen,
-    /// Closing parenthesis.
     RParen,
-    /// Operator: =, !=, <, <=, >, >=.
     Op(String),
-    /// End of input.
     Eof,
 }
-
-// ---------------------------------------------------------------------------
-// Tokenizer
-// ---------------------------------------------------------------------------
-
-/// Tokenize a SQL string.
 fn tokenize(sql: &str) -> Result<Vec<Token>, String> {
     let chars: Vec<char> = sql.chars().collect();
     let len = chars.len();
     let mut tokens = Vec::new();
     let mut i = 0;
-
     while i < len {
         let c = chars[i];
-
-        // Skip whitespace
         if c.is_ascii_whitespace() {
             i += 1;
             continue;
         }
-
         match c {
             '*' => {
                 tokens.push(Token::Star);
@@ -106,7 +84,6 @@ fn tokenize(sql: &str) -> Result<Vec<Token>, String> {
                 }
             }
             '\'' => {
-                // String literal
                 i += 1;
                 let mut s = String::new();
                 while i < len {
@@ -125,11 +102,10 @@ fn tokenize(sql: &str) -> Result<Vec<Token>, String> {
                 if i >= len {
                     return Err("unterminated string literal".to_string());
                 }
-                i += 1; // skip closing quote
+                i += 1;
                 tokens.push(Token::StringLit(s));
             }
             '"' => {
-                // Double-quoted identifier
                 i += 1;
                 let mut s = String::new();
                 while i < len && chars[i] != '"' {
@@ -152,7 +128,6 @@ fn tokenize(sql: &str) -> Result<Vec<Token>, String> {
                 while i < len && (chars[i].is_ascii_digit() || chars[i] == '.') {
                     i += 1;
                 }
-                // Handle scientific notation
                 if i < len && (chars[i] == 'e' || chars[i] == 'E') {
                     i += 1;
                     if i < len && (chars[i] == '+' || chars[i] == '-') {
@@ -181,16 +156,9 @@ fn tokenize(sql: &str) -> Result<Vec<Token>, String> {
             }
         }
     }
-
     tokens.push(Token::Eof);
     Ok(tokens)
 }
-
-// ---------------------------------------------------------------------------
-// Parser state
-// ---------------------------------------------------------------------------
-
-/// Parsed SQL statement.
 #[derive(Debug)]
 struct SqlSelect {
     columns: Vec<SelectExpr>,
@@ -199,23 +167,16 @@ struct SqlSelect {
     where_clause: Option<Expr>,
     group_by: Option<String>,
     having: Option<Expr>,
-    order_by: Option<(String, bool)>, // (col, ascending)
+    order_by: Option<(String, bool)>,
     limit: Option<usize>,
     offset: Option<usize>,
 }
-
-/// A column expression in SELECT.
 #[derive(Debug)]
 enum SelectExpr {
-    /// All columns.
     Star,
-    /// A single column reference.
     Column(String),
-    /// Aggregate function: COUNT, SUM, AVG, MIN, MAX.
     Aggregate(AggFunc, AggArg),
 }
-
-/// Aggregate function type.
 #[derive(Debug, Clone)]
 enum AggFunc {
     Count,
@@ -224,60 +185,37 @@ enum AggFunc {
     Min,
     Max,
 }
-
-/// Aggregate argument.
 #[derive(Debug, Clone)]
 enum AggArg {
-    /// COUNT(*)
     Star,
-    /// SUM(col), etc.
     Column(String),
 }
-
-/// JOIN clause.
 #[derive(Debug)]
 struct JoinClause {
     table: String,
     left_col: String,
     right_col: String,
 }
-
-/// WHERE / HAVING expression tree.
 #[derive(Debug)]
 enum Expr {
-    /// Comparison: col op value.
     Compare(String, String, CellValue),
-    /// LIKE: col LIKE pattern.
     Like(String, String),
-    /// IN: col IN (val1, val2, ...).
     In(String, Vec<CellValue>),
-    /// NOT expr.
     Not(Box<Expr>),
-    /// AND.
     And(Box<Expr>, Box<Expr>),
-    /// OR.
     Or(Box<Expr>, Box<Expr>),
 }
-
-// ---------------------------------------------------------------------------
-// Parser
-// ---------------------------------------------------------------------------
-
-/// Recursive-descent SQL parser.
 struct Parser {
     tokens: Vec<Token>,
     pos: usize,
 }
-
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
         Self { tokens, pos: 0 }
     }
-
     fn peek(&self) -> &Token {
         &self.tokens[self.pos]
     }
-
     fn advance(&mut self) -> Token {
         let t = self.tokens[self.pos].clone();
         if self.pos < self.tokens.len() - 1 {
@@ -285,18 +223,15 @@ impl Parser {
         }
         t
     }
-
     fn expect_ident(&mut self) -> Result<String, String> {
         match self.advance() {
             Token::Ident(s) => Ok(s),
             other => Err(format!("expected identifier, got {other:?}")),
         }
     }
-
     fn is_keyword(&self, kw: &str) -> bool {
         matches!(self.peek(), Token::Ident(s) if s.eq_ignore_ascii_case(kw))
     }
-
     fn consume_keyword(&mut self, kw: &str) -> bool {
         if self.is_keyword(kw) {
             self.advance();
@@ -305,7 +240,6 @@ impl Parser {
             false
         }
     }
-
     fn expect_keyword(&mut self, kw: &str) -> Result<(), String> {
         if self.consume_keyword(kw) {
             Ok(())
@@ -313,30 +247,21 @@ impl Parser {
             Err(format!("expected keyword '{kw}', got {:?}", self.peek()))
         }
     }
-
-    /// Parse a full SELECT statement.
     fn parse_select(&mut self) -> Result<SqlSelect, String> {
         self.expect_keyword("SELECT")?;
-
-        // Parse select list
         let columns = self.parse_select_list()?;
-
-        // Optional FROM
         let from = if self.consume_keyword("FROM") {
             Some(self.expect_ident()?)
         } else {
             None
         };
-
-        // Optional JOINs
         let mut joins = Vec::new();
         while self.consume_keyword("JOIN") {
             let table = self.expect_ident()?;
             self.expect_keyword("ON")?;
-            // Expect: t1.col = t2.col
             let left_table_or_col = self.expect_ident()?;
             let left_col = if matches!(self.peek(), Token::Dot) {
-                self.advance(); // .
+                self.advance();
                 self.expect_ident()?
             } else {
                 left_table_or_col
@@ -347,7 +272,7 @@ impl Parser {
             }
             let right_table_or_col = self.expect_ident()?;
             let right_col = if matches!(self.peek(), Token::Dot) {
-                self.advance(); // .
+                self.advance();
                 self.expect_ident()?
             } else {
                 right_table_or_col
@@ -358,30 +283,22 @@ impl Parser {
                 right_col,
             });
         }
-
-        // Optional WHERE
         let where_clause = if self.consume_keyword("WHERE") {
             Some(self.parse_expr()?)
         } else {
             None
         };
-
-        // Optional GROUP BY
         let group_by = if self.consume_keyword("GROUP") {
             self.expect_keyword("BY")?;
             Some(self.expect_ident()?)
         } else {
             None
         };
-
-        // Optional HAVING
         let having = if self.consume_keyword("HAVING") {
             Some(self.parse_expr()?)
         } else {
             None
         };
-
-        // Optional ORDER BY
         let order_by = if self.consume_keyword("ORDER") {
             self.expect_keyword("BY")?;
             let col = self.expect_ident()?;
@@ -395,8 +312,6 @@ impl Parser {
         } else {
             None
         };
-
-        // Optional LIMIT
         let limit = if self.consume_keyword("LIMIT") {
             match self.advance() {
                 Token::NumberLit(n) => Some(n as usize),
@@ -405,8 +320,6 @@ impl Parser {
         } else {
             None
         };
-
-        // Optional OFFSET
         let offset = if self.consume_keyword("OFFSET") {
             match self.advance() {
                 Token::NumberLit(n) => Some(n as usize),
@@ -415,7 +328,6 @@ impl Parser {
         } else {
             None
         };
-
         Ok(SqlSelect {
             columns,
             from,
@@ -428,11 +340,8 @@ impl Parser {
             offset,
         })
     }
-
-    /// Parse the SELECT column list.
     fn parse_select_list(&mut self) -> Result<Vec<SelectExpr>, String> {
         let mut list = Vec::new();
-
         loop {
             if matches!(self.peek(), Token::Star) {
                 self.advance();
@@ -441,35 +350,28 @@ impl Parser {
                 list.push(self.parse_agg_expr()?);
             } else {
                 let name = self.expect_ident()?;
-                // Handle optional table.column qualifier — use only the column part.
                 let col_name = if matches!(self.peek(), Token::Dot) {
-                    self.advance(); // consume '.'
+                    self.advance();
                     self.expect_ident()?
                 } else {
                     name
                 };
                 list.push(SelectExpr::Column(col_name));
             }
-
             if matches!(self.peek(), Token::Comma) {
                 self.advance();
             } else {
                 break;
             }
         }
-
         Ok(list)
     }
-
-    /// Check if current token is an aggregate function name.
     fn is_agg_func(&self) -> bool {
         matches!(self.peek(), Token::Ident(s) if {
             let u = s.to_uppercase();
             u == "COUNT" || u == "SUM" || u == "AVG" || u == "MIN" || u == "MAX"
         })
     }
-
-    /// Parse an aggregate expression like COUNT(*) or SUM(col).
     fn parse_agg_expr(&mut self) -> Result<SelectExpr, String> {
         let func_name = self.expect_ident()?;
         let func = match func_name.to_uppercase().as_str() {
@@ -480,12 +382,10 @@ impl Parser {
             "MAX" => AggFunc::Max,
             _ => return Err(format!("unknown aggregate function: {func_name}")),
         };
-
         match self.advance() {
             Token::LParen => {}
             other => return Err(format!("expected '(' after {func_name}, got {other:?}")),
         }
-
         let arg = if matches!(self.peek(), Token::Star) {
             self.advance();
             AggArg::Star
@@ -493,16 +393,12 @@ impl Parser {
             let col = self.expect_ident()?;
             AggArg::Column(col)
         };
-
         match self.advance() {
             Token::RParen => {}
             other => return Err(format!("expected ')' after aggregate, got {other:?}")),
         }
-
         Ok(SelectExpr::Aggregate(func, arg))
     }
-
-    /// Parse an expression (OR level).
     fn parse_expr(&mut self) -> Result<Expr, String> {
         let mut left = self.parse_and_expr()?;
         while self.consume_keyword("OR") {
@@ -511,8 +407,6 @@ impl Parser {
         }
         Ok(left)
     }
-
-    /// Parse AND expression.
     fn parse_and_expr(&mut self) -> Result<Expr, String> {
         let mut left = self.parse_not_expr()?;
         while self.consume_keyword("AND") {
@@ -521,8 +415,6 @@ impl Parser {
         }
         Ok(left)
     }
-
-    /// Parse NOT expression.
     fn parse_not_expr(&mut self) -> Result<Expr, String> {
         if self.consume_keyword("NOT") {
             let inner = self.parse_primary_expr()?;
@@ -531,10 +423,7 @@ impl Parser {
             self.parse_primary_expr()
         }
     }
-
-    /// Parse primary expression (comparison, LIKE, IN, parenthesized).
     fn parse_primary_expr(&mut self) -> Result<Expr, String> {
-        // Parenthesized expression
         if matches!(self.peek(), Token::LParen) {
             self.advance();
             let expr = self.parse_expr()?;
@@ -544,19 +433,13 @@ impl Parser {
             }
             return Ok(expr);
         }
-
-        // Column name
         let col = self.expect_ident()?;
-
-        // Handle table.column notation — just take the column part
         let col = if matches!(self.peek(), Token::Dot) {
             self.advance();
             self.expect_ident()?
         } else {
             col
         };
-
-        // NOT LIKE / NOT IN / LIKE / IN / comparison
         if self.consume_keyword("NOT") {
             if self.consume_keyword("LIKE") {
                 let pattern = self.parse_string_value()?;
@@ -574,7 +457,6 @@ impl Parser {
             let vals = self.parse_in_list()?;
             Ok(Expr::In(col, vals))
         } else {
-            // Comparison operator
             let op = match self.advance() {
                 Token::Op(s) => s,
                 other => {
@@ -584,21 +466,16 @@ impl Parser {
                 }
             };
             let val = self.parse_cell_value()?;
-            // Map = to ==
             let op = if op == "=" { "==".to_string() } else { op };
             Ok(Expr::Compare(col, op, val))
         }
     }
-
-    /// Parse a string value (single-quoted).
     fn parse_string_value(&mut self) -> Result<String, String> {
         match self.advance() {
             Token::StringLit(s) => Ok(s),
             other => Err(format!("expected string literal, got {other:?}")),
         }
     }
-
-    /// Parse an IN (...) value list.
     fn parse_in_list(&mut self) -> Result<Vec<CellValue>, String> {
         match self.advance() {
             Token::LParen => {}
@@ -620,8 +497,6 @@ impl Parser {
         }
         Ok(vals)
     }
-
-    /// Parse a literal value (number, string, NULL, TRUE, FALSE).
     fn parse_cell_value(&mut self) -> Result<CellValue, String> {
         match self.peek().clone() {
             Token::NumberLit(n) => {
@@ -648,26 +523,18 @@ impl Parser {
         }
     }
 }
-
-// ---------------------------------------------------------------------------
-// SQL execution
-// ---------------------------------------------------------------------------
-
-/// Execute a SQL query on a single DataFrame.
+/// Execute SQL-like query over one DataFrame and return result frame.
 pub fn query_sql(df: &DataFrame, sql: &str) -> Result<DataFrame, String> {
     let tokens = tokenize(sql)?;
     let mut parser = Parser::new(tokens);
     let stmt = parser.parse_select()?;
     execute_select(df, &stmt)
 }
-
-/// Execute a SQL query on a Database (supports FROM and JOIN).
+/// Execute SQL-like query against Database table references.
 pub fn query_sql_database(db: &Database, sql: &str) -> Result<DataFrame, String> {
     let tokens = tokenize(sql)?;
     let mut parser = Parser::new(tokens);
     let stmt = parser.parse_select()?;
-
-    // Resolve the FROM table
     let base_table_name = stmt
         .from
         .as_ref()
@@ -675,8 +542,6 @@ pub fn query_sql_database(db: &Database, sql: &str) -> Result<DataFrame, String>
     let base = db
         .get_table(base_table_name)
         .ok_or_else(|| format!("table not found: {base_table_name}"))?;
-
-    // Apply JOINs
     let mut working = base.clone_df();
     for join in &stmt.joins {
         let right = db
@@ -689,38 +554,26 @@ pub fn query_sql_database(db: &Database, sql: &str) -> Result<DataFrame, String>
             "inner",
         )?;
     }
-
     execute_select(&working, &stmt)
 }
-
-/// Execute a parsed SELECT statement against a DataFrame.
 fn execute_select(df: &DataFrame, stmt: &SqlSelect) -> Result<DataFrame, String> {
-    // 1. Apply WHERE filter
     let filtered = if let Some(ref where_expr) = stmt.where_clause {
         apply_filter(df, where_expr)?
     } else {
         df.clone_df()
     };
-
-    // 2. GROUP BY + aggregates
     let result = if let Some(ref group_col) = stmt.group_by {
         execute_group_by(&filtered, group_col, &stmt.columns, stmt.having.as_ref())?
     } else if has_aggregates(&stmt.columns) {
-        // Aggregate without GROUP BY — whole table is one group
         execute_aggregate_no_group(&filtered, &stmt.columns)?
     } else {
-        // Plain SELECT (column projection)
         execute_column_select(&filtered, &stmt.columns)?
     };
-
-    // 3. ORDER BY
     let result = if let Some((ref col, ascending)) = stmt.order_by {
         result.sort(ColRef::Name(col.clone()), ascending)?
     } else {
         result
     };
-
-    // 4. OFFSET
     let result = if let Some(offset) = stmt.offset {
         if offset >= result.nrows() {
             DataFrame::from_raw(result.columns().to_vec(), vec![Vec::new(); result.ncols()])
@@ -730,44 +583,33 @@ fn execute_select(df: &DataFrame, stmt: &SqlSelect) -> Result<DataFrame, String>
     } else {
         result
     };
-
-    // 5. LIMIT
     let result = if let Some(limit) = stmt.limit {
         result.head(limit)
     } else {
         result
     };
-
     Ok(result)
 }
-
-/// Check whether any SelectExpr is an aggregate.
 fn has_aggregates(columns: &[SelectExpr]) -> bool {
     columns
         .iter()
         .any(|c| matches!(c, SelectExpr::Aggregate(_, _)))
 }
-
-/// Apply a WHERE filter expression, returning matching rows.
 fn apply_filter(df: &DataFrame, expr: &Expr) -> Result<DataFrame, String> {
     let nrows = df.nrows();
     let data = df.raw_data();
     let cols = df.columns();
-
     let mut keep = Vec::new();
     for row in 0..nrows {
         if eval_expr(expr, cols, data, row)? {
             keep.push(row);
         }
     }
-
     let new_data: Vec<Vec<CellValue>> = (0..df.ncols())
         .map(|ci| keep.iter().map(|&row| data[ci][row].clone()).collect())
         .collect();
     Ok(DataFrame::from_raw(cols.to_vec(), new_data))
 }
-
-/// Evaluate an expression for a given row.
 fn eval_expr(
     expr: &Expr,
     cols: &[String],
@@ -814,30 +656,21 @@ fn eval_expr(
         Expr::Or(a, b) => Ok(eval_expr(a, cols, data, row)? || eval_expr(b, cols, data, row)?),
     }
 }
-
-/// Find column index by name.
 fn find_col(cols: &[String], name: &str) -> Result<usize, String> {
     cols.iter()
         .position(|n| n == name)
         .ok_or_else(|| format!("column not found: {name}"))
 }
-
-/// SQL LIKE pattern matching. `%` = any sequence, `_` = any single char.
 fn sql_like_match(s: &str, pattern: &str) -> bool {
     let s_chars: Vec<char> = s.chars().collect();
     let p_chars: Vec<char> = pattern.chars().collect();
     like_match_dp(&s_chars, &p_chars)
 }
-
-/// Dynamic programming LIKE match.
 fn like_match_dp(s: &[char], p: &[char]) -> bool {
     let sn = s.len();
     let pn = p.len();
-    // dp[i][j] = true if s[0..i] matches p[0..j]
     let mut dp = vec![vec![false; pn + 1]; sn + 1];
     dp[0][0] = true;
-
-    // Handle leading % in pattern
     for j in 1..=pn {
         if p[j - 1] == '%' {
             dp[0][j] = dp[0][j - 1];
@@ -845,7 +678,6 @@ fn like_match_dp(s: &[char], p: &[char]) -> bool {
             break;
         }
     }
-
     for i in 1..=sn {
         for j in 1..=pn {
             let pc = p[j - 1];
@@ -856,11 +688,8 @@ fn like_match_dp(s: &[char], p: &[char]) -> bool {
             }
         }
     }
-
     dp[sn][pn]
 }
-
-/// Execute column projection (no aggregates).
 fn execute_column_select(df: &DataFrame, columns: &[SelectExpr]) -> Result<DataFrame, String> {
     let mut col_refs: Vec<ColRef> = Vec::new();
     for expr in columns {
@@ -880,8 +709,6 @@ fn execute_column_select(df: &DataFrame, columns: &[SelectExpr]) -> Result<DataF
     }
     df.select_columns(&col_refs)
 }
-
-/// Execute GROUP BY with optional HAVING and aggregates.
 fn execute_group_by(
     df: &DataFrame,
     group_col: &str,
@@ -889,8 +716,6 @@ fn execute_group_by(
     having: Option<&Expr>,
 ) -> Result<DataFrame, String> {
     let groups = df.group_by(ColRef::Name(group_col.to_string()))?;
-
-    // Build result columns
     let mut result_col_names: Vec<String> = Vec::new();
     for expr in select_exprs {
         match expr {
@@ -904,12 +729,9 @@ fn execute_group_by(
             }
         }
     }
-
     let ncols = result_col_names.len();
     let mut result_data: Vec<Vec<CellValue>> = vec![Vec::new(); ncols];
-
     for (key, sub_df) in &groups {
-        // Compute values for this group
         let mut row_vals: Vec<CellValue> = Vec::with_capacity(ncols);
         for expr in select_exprs {
             match expr {
@@ -917,7 +739,6 @@ fn execute_group_by(
                     if name == group_col {
                         row_vals.push(key.clone());
                     } else {
-                        // Take first value from the group
                         let val = sub_df
                             .get_value(0, ColRef::Name(name.clone()))
                             .unwrap_or(CellValue::Nil);
@@ -933,10 +754,7 @@ fn execute_group_by(
                 }
             }
         }
-
-        // Apply HAVING filter
         if let Some(having_expr) = having {
-            // Build a temporary single-row dataframe for evaluation
             let temp = DataFrame::from_raw(
                 result_col_names.clone(),
                 row_vals.iter().map(|v| vec![v.clone()]).collect(),
@@ -945,23 +763,18 @@ fn execute_group_by(
                 continue;
             }
         }
-
         for (ci, val) in row_vals.into_iter().enumerate() {
             result_data[ci].push(val);
         }
     }
-
     Ok(DataFrame::from_raw(result_col_names, result_data))
 }
-
-/// Execute aggregate SELECT without GROUP BY (whole table is one group).
 fn execute_aggregate_no_group(
     df: &DataFrame,
     select_exprs: &[SelectExpr],
 ) -> Result<DataFrame, String> {
     let mut col_names = Vec::new();
     let mut values = Vec::new();
-
     for expr in select_exprs {
         match expr {
             SelectExpr::Aggregate(func, arg) => {
@@ -983,14 +796,11 @@ fn execute_aggregate_no_group(
             }
         }
     }
-
     Ok(DataFrame::from_raw(
         col_names,
         values.into_iter().map(|v| vec![v]).collect(),
     ))
 }
-
-/// Compute an aggregate function value for a DataFrame.
 fn compute_aggregate(df: &DataFrame, func: &AggFunc, arg: &AggArg) -> Result<CellValue, String> {
     match func {
         AggFunc::Count => match arg {
@@ -1031,16 +841,12 @@ fn compute_aggregate(df: &DataFrame, func: &AggFunc, arg: &AggArg) -> Result<Cel
         }
     }
 }
-
-/// Get the column name from an aggregate argument.
 fn agg_col_ref(arg: &AggArg) -> Result<String, String> {
     match arg {
         AggArg::Column(col) => Ok(col.clone()),
         AggArg::Star => Err("aggregate function requires a column name, not *".to_string()),
     }
 }
-
-/// Generate a display name for an aggregate column.
 fn agg_col_name(func: &AggFunc, arg: &AggArg) -> String {
     let func_name = match func {
         AggFunc::Count => "COUNT",

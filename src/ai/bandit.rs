@@ -1,24 +1,22 @@
-//! online multi-armed bandit exploration and exploitation runtime.
-
-// ---- Type: BanditArm ----
-
-/// One arm in a multi-armed bandit.
+//! Multi-armed bandit strategies: epsilon-greedy, UCB1, and Thompson sampling.
+//! Owns `BanditArm`, `BanditStrategy`, and `Bandit` only.
+//! Does not own reward collection; callers feed outcomes into `update`.
+/// A single bandit arm with accumulated reward statistics.
 #[derive(Clone)]
 pub struct BanditArm {
-    /// Number of times this arm has been pulled.
+    /// Number of times this arm has been selected.
     pub pulls: u32,
-    /// Cumulative reward received from this arm.
+    /// Sum of all observed rewards.
     pub total_reward: f64,
-    /// Beta distribution alpha parameter (successes + 1 for Thompson sampling).
+    /// Beta-distribution alpha parameter used by Thompson sampling.
     pub alpha: f64,
-    /// Beta distribution beta parameter (failures + 1 for Thompson sampling).
+    /// Beta-distribution beta parameter used by Thompson sampling.
     pub beta: f64,
-    /// Optional human-readable label for the action this arm represents.
+    /// Optional label for debug or UI display.
     pub label: Option<String>,
 }
-
 impl BanditArm {
-    /// Return the mean estimated reward (0.5 when unpulled).
+    /// Return the empirical mean reward; returns 0.5 before the first pull.
     pub fn mean_reward(&self) -> f64 {
         if self.pulls == 0 {
             0.5
@@ -27,38 +25,32 @@ impl BanditArm {
         }
     }
 }
-
-// ---- Type: BanditStrategy ----
-
-/// Arm selection algorithm for a [`Bandit`].
+/// Selection strategy used by `Bandit`.
 #[derive(Clone, Copy, Debug)]
 pub enum BanditStrategy {
-    /// Exploit best arm with probability `1-`, explore randomly with probability ``.
+    /// Random exploration with probability `epsilon`, otherwise greedy selection.
     EpsilonGreedy {
-        /// Explore probability (0.0 = always exploit; 1.0 = always random).
+        /// Exploration rate in `[0, 1]`.
         epsilon: f32,
     },
-    /// Upper Confidence Bound 1: chooses arm with highest ` + (2 ln N / n)`.
+    /// Upper Confidence Bound strategy.
     UCB1,
-    /// Thompson Sampling: draws from each ar's Beta distribution, picks argmax.
+    /// Thompson sampling over Beta-distributed arm posteriors.
     ThompsonSampling,
 }
-
-// ---- Type: Bandit ----
-
-/// Multi-armed bandit with configurable exploration strategy.
+/// Complete bandit agent with one strategy and a mutable set of arms.
 pub struct Bandit {
-    /// All arms in this bandit.
+    /// All arms available to the bandit.
     pub arms: Vec<BanditArm>,
-    /// Active selection strategy.
+    /// Current selection strategy.
     pub strategy: BanditStrategy,
-    /// Total number of `select` + `update` pairs completed.
+    /// Total number of pulls across all arms.
     pub total_pulls: u64,
+    /// Internal RNG state.
     rng: u64,
 }
-// ---- Implementation: BanditArm ----
 impl Bandit {
-    /// Create a new bandit with `arm_count` arms and the given strategy.
+    /// Create a bandit with `arm_count` arms and a fixed RNG seed.
     pub fn new(arm_count: usize, strategy: BanditStrategy, seed: u64) -> Self {
         let arms = (0..arm_count)
             .map(|_| BanditArm {
@@ -76,13 +68,11 @@ impl Bandit {
             rng: seed,
         }
     }
-
-    /// Return the number of arms.
+    /// Return the number of available arms.
     pub fn arm_count(&self) -> usize {
         self.arms.len()
     }
-
-    /// Selects an arm index using the configured strategy.
+    /// Select an arm index according to the current strategy.
     pub fn select(&mut self) -> usize {
         let n = self.arms.len();
         match self.strategy {
@@ -94,7 +84,6 @@ impl Bandit {
                 }
             }
             BanditStrategy::UCB1 => {
-                // Force any unpulled arm first
                 if let Some(i) = self.arms.iter().position(|a| a.pulls == 0) {
                     return i;
                 }
@@ -109,7 +98,6 @@ impl Bandit {
                     .unwrap_or(0)
             }
             BanditStrategy::ThompsonSampling => {
-                // Sample from each ar's Beta distribution and pick argmax
                 let arm_data: Vec<(f64, f64)> =
                     self.arms.iter().map(|a| (a.alpha, a.beta)).collect();
                 let samples: Vec<f64> = arm_data
@@ -125,8 +113,7 @@ impl Bandit {
             }
         }
     }
-
-    /// Records the observed `reward` for arm `index` and updates arm statistics.
+    /// Update the chosen arm with an observed reward in the range `[0, 1]`.
     pub fn update(&mut self, index: usize, reward: f64) {
         if index >= self.arms.len() {
             return;
@@ -138,8 +125,7 @@ impl Bandit {
         arm.beta += 1.0 - reward;
         self.total_pulls += 1;
     }
-
-    /// Return the index of the arm with the highest mean reward.
+    /// Return the greedy best arm by empirical mean reward.
     pub fn best_arm(&self) -> usize {
         (0..self.arms.len())
             .max_by(|&a, &b| {
@@ -150,8 +136,7 @@ impl Bandit {
             })
             .unwrap_or(0)
     }
-
-    /// Resets all arm statistics while keeping arm count and strategy.
+    /// Reset all arm statistics and the total pull counter.
     pub fn reset(&mut self) {
         for arm in &mut self.arms {
             arm.pulls = 0;
@@ -161,22 +146,18 @@ impl Bandit {
         }
         self.total_pulls = 0;
     }
-
-    // ---- Helper Functions: PRNG ----
-
+    /// Sample a random index in `[0, n)` using the internal RNG.
     fn rand_usize(&mut self, n: usize) -> usize {
         self.rng = xorshift64(self.rng);
         (self.rng as usize) % n
     }
-
+    /// Sample a uniform float in `[0, 1)` using the internal RNG.
     fn rand_f32(&mut self) -> f32 {
         self.rng = xorshift64(self.rng);
         (self.rng >> 11) as f32 * (1.0 / (1u64 << 53) as f32)
     }
-
-    /// Approximate Beta(, ) sample via ratio-of-uniforms method.
+    /// Sample from a Beta distribution using gamma sampling.
     fn beta_sample(&mut self, alpha: f64, beta: f64) -> f64 {
-        // Use Gamma approximation: Beta(a,b) = G(a) / (G(a)+G(b))
         let ga = self.gamma_sample(alpha);
         let gb = self.gamma_sample(beta);
         if ga + gb < 1e-15 {
@@ -185,8 +166,7 @@ impl Bandit {
             ga / (ga + gb)
         }
     }
-
-    /// Marsaglia & Tsang Gamma(shape) sampler. Shape must be >= 1.
+    /// Sample from a Gamma distribution with the given shape parameter.
     fn gamma_sample(&mut self, shape: f64) -> f64 {
         if shape < 1.0 {
             return self.gamma_sample(1.0 + shape) * self.rand_f64().powf(1.0 / shape);
@@ -209,24 +189,22 @@ impl Bandit {
             }
         }
     }
-
+    /// Sample a uniform float in `[0, 1)` using the internal RNG.
     fn rand_f64(&mut self) -> f64 {
         self.rng = xorshift64(self.rng);
         (self.rng >> 11) as f64 * (1.0 / (1u64 << 53) as f64)
     }
-
+    /// Sample a standard normal value using Box-Muller.
     fn normal_f64(&mut self) -> f64 {
         let u1 = self.rand_f64().max(1e-15);
         let u2 = self.rand_f64();
         (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos()
     }
 }
-
-/// Xorshift64 PRNG step.
+/// Xorshift64 RNG step used by the bandit sampler.
 fn xorshift64(mut x: u64) -> u64 {
     x ^= x << 13;
     x ^= x >> 7;
     x ^= x << 17;
     x
 }
-

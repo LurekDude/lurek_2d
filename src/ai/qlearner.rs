@@ -1,26 +1,27 @@
-//! tabular Q-learning runtime for discrete-state action policies.
-/// Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
+//! Q-learning reinforcement model: Q-table, epsilon-greedy selection, and Bellman updates.
+//! Owns `QLearner` only. Does not own reward signals or state encoding.
+//! Used by `lua_api/ai_api.rs` to expose `lurek.ai.qlearner.*` to Lua.
+/// Q-learning agent with a flat `state × action` value table.
 pub struct QLearner {
-    /// Number of discrete states.
+    /// Total number of discrete states.
     pub(crate) state_count: usize,
-    /// Number of discrete actions.
+    /// Total number of discrete actions per state.
     pub(crate) action_count: usize,
-    /// Flat Q-table laid out as `state_count × action_count` rows. `Q[s][a] = qtable[s * action_count + a]`.
+    /// Flat Q-table of size `state_count × action_count`, row-major.
     pub(crate) qtable: Vec<f64>,
-    /// Learning rate in `(0, 1]`. Controls how much each Bellman update shifts Q-values toward the new target.
+    /// Learning rate α in `[0, 1]`; default 0.1.
     pub(crate) alpha: f64,
-    /// Discount factor in `[0, 1]`. Values close to `1` weight future rewards heavily; `0` makes the agent purely myopic.
+    /// Discount factor γ in `[0, 1]`; default 0.9.
     pub(crate) gamma: f64,
-    /// Exploration rate [0,1].
+    /// Exploration probability; action chosen randomly when `rand < epsilon`.
     pub epsilon: f64,
-    /// Decay multiplier applied to epsilon after each episode.
+    /// Multiplicative decay applied to `epsilon` at the end of each episode.
     pub(crate) epsilon_decay: f64,
-    /// Number of completed episodes.
+    /// Number of episodes completed since creation.
     pub episode_count: u64,
 }
-
 impl QLearner {
-    /// Create a new Q-learner with zero-initialized Q-values.
+    /// Create a zeroed Q-table for `state_count` states and `action_count` actions.
     pub fn new(state_count: usize, action_count: usize) -> Self {
         Self {
             state_count,
@@ -33,8 +34,7 @@ impl QLearner {
             episode_count: 0,
         }
     }
-
-    /// Selects an action using the epsilon-greedy policy.
+    /// Return a randomly chosen action (explore) or the greedy best action (exploit).
     pub fn choose_action(&self, state: usize) -> usize {
         if state >= self.state_count {
             return 0;
@@ -45,8 +45,7 @@ impl QLearner {
             self.best_action(state)
         }
     }
-
-    /// Return the greedy-best action (highest Q-value) for the given state.
+    /// Return the action with the highest Q-value for `state`; ties broken by index.
     pub fn best_action(&self, state: usize) -> usize {
         if state >= self.state_count {
             return 0;
@@ -63,8 +62,7 @@ impl QLearner {
         }
         best_idx
     }
-
-    /// Performs one Bellman Q-learning update.
+    /// Apply a Bellman update: Q[s,a] ← Q[s,a] + α(r + γ·max Q[s'] − Q[s,a]).
     pub fn learn(&mut self, state: usize, action: usize, reward: f64, next_state: usize) {
         if state >= self.state_count
             || action >= self.action_count
@@ -77,29 +75,26 @@ impl QLearner {
         let old = self.qtable[idx];
         self.qtable[idx] = old + self.alpha * (reward + self.gamma * max_next - old);
     }
-
-    /// Ends the current episode: applies epsilon decay and increments episode count.
+    /// Decay epsilon and increment `episode_count`; call once at the end of each episode.
     pub fn end_episode(&mut self) {
         self.epsilon *= self.epsilon_decay;
         self.episode_count += 1;
     }
-
-    /// Return the Q-value for a (state, action) pair, or 0.0 if out of range.
+    /// Return Q[state, action]; returns 0.0 if indices are out of bounds.
     pub fn get_q(&self, state: usize, action: usize) -> f64 {
         if state >= self.state_count || action >= self.action_count {
             return 0.0;
         }
         self.qtable[state * self.action_count + action]
     }
-
-    /// Overwrites the Q-value for a (state, action) pair. No-ops if out of range.
+    /// Set Q[state, action] to `value`; no-op if indices are out of bounds.
     pub fn set_q(&mut self, state: usize, action: usize, value: f64) {
         if state >= self.state_count || action >= self.action_count {
             return;
         }
         self.qtable[state * self.action_count + action] = value;
     }
-
+    /// Return the maximum Q-value over all actions for `state`.
     fn max_q(&self, state: usize) -> f64 {
         let base = state * self.action_count;
         let mut max_val = f64::NEG_INFINITY;
@@ -111,8 +106,7 @@ impl QLearner {
         }
         max_val
     }
-
-    /// Serializes the Q-table to a JSON string (2D array of state rows).
+    /// Serialize the Q-table to a compact JSON string `[[row0], [row1], ...]`.
     pub fn serialize(&self) -> String {
         let mut out = String::from("[");
         for s in 0..self.state_count {
@@ -132,8 +126,7 @@ impl QLearner {
         out.push(']');
         out
     }
-
-    /// Restores the Q-table from a JSON string produced by [`serialize`](Self::serialize).
+    /// Parse a JSON Q-table string and overwrite the current table; returns error on shape mismatch.
     pub fn deserialize(&mut self, json: &str) -> Result<(), String> {
         let trimmed = json.trim();
         if !trimmed.starts_with('[') || !trimmed.ends_with(']') {

@@ -1,47 +1,39 @@
-//! Group animation keys that should advance in lock-step.
-
+//! Synchronization group for animation handles that should advance together.
+//! Owns `AnimSyncGroup` only.
+//! Does not own animation playback; it only stores slotmap keys.
 use slotmap::DefaultKey;
-
-// ---- Type: AnimSyncGroup ----
-
-/// A named set of animation keys that advance in lock-step.
+/// Set of animation keys that should stay in sync.
 #[derive(Debug, Clone, Default)]
 pub struct AnimSyncGroup {
+    /// Registered members.
     members: Vec<DefaultKey>,
 }
-
 impl AnimSyncGroup {
-    // ---- Implementation: AnimSyncGroup ----
-    /// Create an empty `AnimSyncGroup`.
+    /// Create an empty sync group.
     pub fn new() -> Self {
         Self {
             members: Vec::new(),
         }
     }
-
-    /// Add an animation key to the group.
+    /// Add `key` when it is not already present.
     pub fn add(&mut self, key: DefaultKey) {
         if !self.members.contains(&key) {
             self.members.push(key);
         }
     }
-
-    /// Remove an animation key from the group.
+    /// Remove `key` from the group.
     pub fn remove(&mut self, key: DefaultKey) {
         self.members.retain(|k| *k != key);
     }
-
-    /// Remove all members from the group.
+    /// Remove all members.
     pub fn clear(&mut self) {
         self.members.clear();
     }
-
-    /// Return the number of animation keys currently in the group.
+    /// Return the number of members.
     pub fn member_count(&self) -> usize {
         self.members.len()
     }
-
-    /// Return a reference to the member key slice.
+    /// Return the member slice.
     pub fn members(&self) -> &[DefaultKey] {
         &self.members
     }

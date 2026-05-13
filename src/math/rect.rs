@@ -1,22 +1,4 @@
-//! Axis-aligned rectangle for containment, overlap, and intersection queries.
-//!
-//! [`Rect`] defines a rectangle by its top-left corner and dimensions. Used for
-//! AABB collision detection, UI layout bounds, camera viewport clipping, and
-//! sprite source regions.
-//!
-//! Key methods: `contains`, `intersects`, `intersect` (computed overlap region).
-//!
 use super::vec2::Vec2;
-
-/// An axis-aligned rectangle defined by its top-left corner and dimensions.
-///
-/// Used for AABB collision detection, UI layout, and camera viewport clipping.
-///
-/// # Fields
-/// - `x` — X coordinate of the top-left corner.
-/// - `y` — Y coordinate of the top-left corner.
-/// - `width` — Width in pixels or world units.
-/// - `height` — Height in pixels or world units.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Rect {
     pub x: f32,
@@ -24,18 +6,7 @@ pub struct Rect {
     pub width: f32,
     pub height: f32,
 }
-
 impl Rect {
-    /// Creates a new `Rect` at `(x, y)` with the given `width` and `height`.
-    ///
-    /// # Parameters
-    /// - `x` — Left edge X coordinate.
-    /// - `y` — Top edge Y coordinate.
-    /// - `width` — Rectangle width.
-    /// - `height` — Rectangle height.
-    ///
-    /// # Returns
-    /// A new `Rect`.
     pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
         Rect {
             x,
@@ -44,63 +15,24 @@ impl Rect {
             height,
         }
     }
-
-    /// Returns the center point of the rectangle.
-    ///
-    /// # Returns
-    /// `Vec2` — The midpoint `(x + width/2, y + height/2)`.
     pub fn center(&self) -> Vec2 {
         Vec2::new(self.x + self.width / 2.0, self.y + self.height / 2.0)
     }
-
-    /// Returns the area of the rectangle. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `f32` — `width × height`.
     pub fn area(&self) -> f32 {
         self.width * self.height
     }
-
-    /// Returns `true` if the given point lies within or on the boundary of the rectangle.
-    ///
-    /// # Parameters
-    /// - `point_x` — X coordinate of the point to test.
-    /// - `point_y` — Y coordinate of the point to test.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the point is inside or on the edge.
     pub fn contains(&self, point_x: f32, point_y: f32) -> bool {
         point_x >= self.x
             && point_x <= self.x + self.width
             && point_y >= self.y
             && point_y <= self.y + self.height
     }
-
-    /// Returns `true` if this rectangle overlaps with `other`.
-    ///
-    /// Touch (shared edge) is not considered an intersection; the overlap must be positive.
-    ///
-    /// # Parameters
-    /// - `other` — The rectangle to test against.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the two rectangles have positive-area overlap.
     pub fn intersects(&self, other: &Rect) -> bool {
         self.x < other.x + other.width
             && self.x + self.width > other.x
             && self.y < other.y + other.height
             && self.y + self.height > other.y
     }
-
-    /// Computes the rectangle intersection of `self` and `other`.
-    ///
-    /// Returns a zero-area rectangle at the origin if the two rectangles do not overlap.
-    ///
-    /// # Parameters
-    /// - `other` — `&Rect`.
-    ///
-    /// # Returns
-    /// `Rect`.
     pub fn intersect(&self, other: &Rect) -> Rect {
         let left = self.x.max(other.x);
         let top = self.y.max(other.y);
@@ -112,14 +44,6 @@ impl Rect {
             Rect::new(0.0, 0.0, 0.0, 0.0)
         }
     }
-
-    /// Returns the smallest rectangle that contains both `self` and `other`.
-    ///
-    /// # Parameters
-    /// - `other` — `&Rect`.
-    ///
-    /// # Returns
-    /// `Rect` — Bounding rectangle.
     pub fn union(&self, other: &Rect) -> Rect {
         let left = self.x.min(other.x);
         let top = self.y.min(other.y);
@@ -127,30 +51,9 @@ impl Rect {
         let bottom = (self.y + self.height).max(other.y + other.height);
         Rect::new(left, top, right - left, bottom - top)
     }
-
-    /// Creates a rectangle centered at `(cx, cy)` with the given width and height.
-    ///
-    /// # Parameters
-    /// - `cx` — Center X.
-    /// - `cy` — Center Y.
-    /// - `w` — Width.
-    /// - `h` — Height.
-    ///
-    /// # Returns
-    /// `Rect`.
     pub fn from_center(cx: f32, cy: f32, w: f32, h: f32) -> Rect {
         Rect::new(cx - w / 2.0, cy - h / 2.0, w, h)
     }
-
-    /// Creates the smallest axis-aligned bounding rectangle that contains all given points.
-    ///
-    /// Returns a zero-area rectangle at the origin if the slice is empty.
-    ///
-    /// # Parameters
-    /// - `points` — A slice of `(f32, f32)` positions.
-    ///
-    /// # Returns
-    /// `Rect` — Bounding rectangle.
     pub fn from_points(points: &[(f32, f32)]) -> Rect {
         if points.is_empty() {
             return Rect::new(0.0, 0.0, 0.0, 0.0);

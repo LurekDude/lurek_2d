@@ -1,25 +1,17 @@
-//! Lua callback invocation with optional timeout enforcement.
-//! Helpers for calling lurek.* callbacks with missing-callback safety and timeout control.
-
-use std::time::{Duration, Instant};
+//! Lua callback invocation wrappers with optional timeout safety guard.
+//! Centralizes lookup of `lurek.*` callbacks and applies an instruction-count hook
+//! to abort runaway callbacks when timeout is configured.
 
 use mlua::prelude::*;
 use mlua::HookTriggers;
-
-// ---- Helper Functions: Lua Callback Invocation ----
-
-/// Call named lurek.* callback and log any Lua error.
-pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(
-    lua: &'a Lua,
-    name: &str,
-    args: A,
-) {
+use std::time::{Duration, Instant};
+/// Call `lurek.<name>(...)` and log failures to `error!` without returning them.
+pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A) {
     if let Err(e) = call_lua_callback_checked(lua, name, args) {
         log::error!("lurek.{}(): {}", name, e);
     }
 }
-
-/// Call named lurek.* callback; return any error or Ok if missing.
+/// Call `lurek.<name>(...)` and return any Lua error to the caller.
 pub fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -27,8 +19,7 @@ pub fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
 ) -> Result<(), mlua::Error> {
     call_lua_callback_checked_with_timeout(lua, name, args, None)
 }
-
-/// Call lurek.* callback with optional timeout; log any error.
+/// Call `lurek.<name>(...)` with optional timeout and log failures.
 pub fn call_lua_callback_with_timeout<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -39,8 +30,7 @@ pub fn call_lua_callback_with_timeout<'a, A: IntoLuaMulti<'a>>(
         log::error!("lurek.{}(): {}", name, e);
     }
 }
-
-/// Call lurek.* callback with optional timeout; return any error.
+/// Call `lurek.<name>(...)` and optionally abort execution when callback exceeds `timeout_ms`.
 pub fn call_lua_callback_checked_with_timeout<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -57,7 +47,7 @@ pub fn call_lua_callback_checked_with_timeout<'a, A: IntoLuaMulti<'a>>(
     }
     Ok(())
 }
-
+/// Execute one Lua callback with instruction-hook timeout guard.
 fn call_with_timeout<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -68,7 +58,6 @@ fn call_with_timeout<'a, A: IntoLuaMulti<'a>>(
     let timeout = Duration::from_secs_f64((timeout_ms as f64 / 1000.0).max(0.000_001));
     let deadline = Instant::now() + timeout;
     let callback_name = name.to_string();
-
     lua.set_hook(
         HookTriggers {
             on_calls: false,
@@ -86,7 +75,6 @@ fn call_with_timeout<'a, A: IntoLuaMulti<'a>>(
             Ok(())
         },
     );
-
     let result = func.call::<_, ()>(args);
     lua.remove_hook();
     result

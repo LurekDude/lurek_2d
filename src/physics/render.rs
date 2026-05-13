@@ -1,40 +1,19 @@
-//! Debug render-command generation for the physics world.
-//!
-//! Pure CPU — no wgpu, winit, or mlua imports.  Intended to be called
-//! from the debug-overlay collect phase in `src/app/`.
-
 use crate::image::ImageData;
 use crate::physics::body::{BodyShape, BodyType};
 use crate::physics::world::World;
 use crate::render::renderer::{DrawMode, RenderCommand};
-
 impl World {
-    /// Generate debug render commands for all physics bodies.
-    ///
-    /// Draws collider outlines coloured by body type:
-    /// - green — `Dynamic`
-    /// - blue — `Static`
-    /// - cyan — `Kinematic`
-    /// - yellow — `Sensor`
-    ///
-    /// Dynamic bodies also get a short velocity arrow (red line).
-    /// Returns an empty `Vec` when there are no bodies.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let ids = self.get_body_ids();
         if ids.is_empty() {
             return Vec::new();
         }
         let mut cmds = Vec::with_capacity(ids.len() * 3);
-
         for id in ids {
             let body = match self.get_body(id) {
                 Some(b) => b,
                 None => continue,
             };
-
             let (r, g, b) = match body.body_type {
                 BodyType::Dynamic => (0.1f32, 0.9, 0.2),
                 BodyType::Static => (0.3, 0.6, 1.0),
@@ -42,7 +21,6 @@ impl World {
                 BodyType::Sensor => (1.0, 1.0, 0.0),
             };
             cmds.push(RenderCommand::SetColor(r, g, b, 0.85));
-
             let px = body.position.x;
             let py = body.position.y;
             match body.shape {
@@ -64,8 +42,6 @@ impl World {
                     });
                 }
             }
-
-            // Velocity arrow for dynamic bodies
             if matches!(body.body_type, BodyType::Dynamic) {
                 let vx = body.velocity.x;
                 let vy = body.velocity.y;
@@ -80,30 +56,14 @@ impl World {
                 }
             }
         }
-
         cmds
     }
-
-    /// Render the physics world to a CPU image for headless testing or export.
-    ///
-    /// Bodies are drawn on a dark background, colour-coded by type.
-    /// The coordinate origin is centred in the image; one pixel equals
-    /// `200.0 / width` world units.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`. Output image width in pixels.
-    /// - `height` — `u32`. Output image height in pixels.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
-
         let scale = width as f32 / 200.0;
         let cx = width as i32 / 2;
         let cy = height as i32 / 2;
-
         for id in self.get_body_ids() {
             let body = match self.get_body(id) {
                 Some(b) => b,
@@ -132,9 +92,6 @@ impl World {
                 }
             }
         }
-
         img
     }
 }
-
-// ── Tests ──────────────────────────────────────────────────────────────────────

@@ -1,42 +1,12 @@
-//! Tile-based first-person movement controller with cardinal directions.
-//!
-//! This module is part of Lurek2D's `tilemap` subsystem and provides the implementation
-//! details for tile walker-related operations and data management.
-//! Key types exported from this module: `Facing`, `TileWalker`.
-//! Primary functions: `parse()`, `to_str()`, `angle()`, `dx()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
 use std::f32::consts::PI;
-
-/// Cardinal facing direction. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Variants
-/// - `North` — North variant.
-/// - `East` — East variant.
-/// - `South` — South variant.
-/// - `West` — West variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Facing {
-    /// Facing north (up, towards -Y).
     North = 0,
-    /// Facing east (right, towards +X).
     East = 1,
-    /// Facing south (down, towards +Y).
     South = 2,
-    /// Facing west (left, towards -X).
     West = 3,
 }
-
 impl Facing {
-    /// Parses a facing direction from a string (case-insensitive).
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<Self>`.
     pub fn parse(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "north" | "n" => Some(Facing::North),
@@ -46,11 +16,6 @@ impl Facing {
             _ => None,
         }
     }
-
-    /// Returns the direction as a lowercase string.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn to_str(self) -> &'static str {
         match self {
             Facing::North => "north",
@@ -59,14 +24,6 @@ impl Facing {
             Facing::West => "west",
         }
     }
-
-    /// Returns the angle in radians. North=3PI/2, East=0, South=PI/2, West=PI.
-    ///
-    /// # Returns
-    /// `f32`.
-    ///
-    /// This uses standard math angles where east=0 and angles increase counter-clockwise,
-    /// but in screen space (Y-down) east=0 and south=PI/2.
     pub fn angle(self) -> f32 {
         match self {
             Facing::North => 3.0 * PI / 2.0,
@@ -75,11 +32,6 @@ impl Facing {
             Facing::West => PI,
         }
     }
-
-    /// Returns the X delta for one step in this direction.
-    ///
-    /// # Returns
-    /// `i32`.
     pub fn dx(self) -> i32 {
         match self {
             Facing::East => 1,
@@ -87,11 +39,6 @@ impl Facing {
             _ => 0,
         }
     }
-
-    /// Returns the Y delta for one step in this direction.
-    ///
-    /// # Returns
-    /// `i32`.
     pub fn dy(self) -> i32 {
         match self {
             Facing::North => -1,
@@ -99,8 +46,6 @@ impl Facing {
             _ => 0,
         }
     }
-
-    /// Returns the direction after turning left (counter-clockwise).
     fn turn_left(self) -> Facing {
         match self {
             Facing::North => Facing::West,
@@ -109,8 +54,6 @@ impl Facing {
             Facing::East => Facing::North,
         }
     }
-
-    /// Returns the direction after turning right (clockwise).
     fn turn_right(self) -> Facing {
         match self {
             Facing::North => Facing::East,
@@ -119,8 +62,6 @@ impl Facing {
             Facing::West => Facing::North,
         }
     }
-
-    /// Returns the opposite direction.
     fn opposite(self) -> Facing {
         match self {
             Facing::North => Facing::South,
@@ -130,18 +71,6 @@ impl Facing {
         }
     }
 }
-
-/// Tile-based movement controller for first-person grid navigation.
-///
-/// Operates on integer grid coordinates with cardinal facing directions.
-///
-/// # Fields
-/// - `x` — `i32`.
-/// - `y` — `i32`.
-/// - `facing` — `Facing`.
-/// - `prev_x` — `i32`.
-/// - `prev_y` — `i32`.
-/// - `prev_facing` — `Facing`.
 pub struct TileWalker {
     x: i32,
     y: i32,
@@ -150,17 +79,7 @@ pub struct TileWalker {
     prev_y: i32,
     prev_facing: Facing,
 }
-
 impl TileWalker {
-    /// Creates a new tile walker at (x, y) facing the given direction. 0-based coordinates.
-    ///
-    /// # Parameters
-    /// - `x` — `i32`.
-    /// - `y` — `i32`.
-    /// - `facing` — `Facing`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(x: i32, y: i32, facing: Facing) -> Self {
         Self {
             x,
@@ -171,94 +90,40 @@ impl TileWalker {
             prev_facing: facing,
         }
     }
-
-    /// Returns the current X coordinate. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `i32`.
     pub fn x(&self) -> i32 {
         self.x
     }
-
-    /// Returns the current Y coordinate. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `i32`.
     pub fn y(&self) -> i32 {
         self.y
     }
-
-    /// Returns the current facing direction. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `Facing`.
     pub fn facing(&self) -> Facing {
         self.facing
     }
-
-    /// Sets the position. Replaces the current position value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `x` — `i32`.
-    /// - `y` — `i32`.
     pub fn set_position(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;
     }
-
-    /// Sets the facing direction. Replaces the current facing value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `facing` — `Facing`.
     pub fn set_facing(&mut self, facing: Facing) {
         self.facing = facing;
     }
-
-    /// Checks if a target cell is passable. Always returns `true`;
-    /// collision checking is handled by the Lua layer.
     fn can_move_to(&self, _tx: i32, _ty: i32) -> bool {
         true
     }
-
-    /// Returns true if the walker can move forward without actually moving.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn can_move_forward(&self) -> bool {
         self.can_move_to(self.x + self.facing.dx(), self.y + self.facing.dy())
     }
-
-    /// Returns true if the walker can move backward without actually moving.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn can_move_backward(&self) -> bool {
         let back = self.facing.opposite();
         self.can_move_to(self.x + back.dx(), self.y + back.dy())
     }
-
-    /// Returns true if the walker can strafe left without actually moving.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn can_strafe_left(&self) -> bool {
         let left = self.facing.turn_left();
         self.can_move_to(self.x + left.dx(), self.y + left.dy())
     }
-
-    /// Returns true if the walker can strafe right without actually moving.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn can_strafe_right(&self) -> bool {
         let right = self.facing.turn_right();
         self.can_move_to(self.x + right.dx(), self.y + right.dy())
     }
-
-    /// Moves forward one tile. Returns true if the move succeeded.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn move_forward(&mut self) -> bool {
         let tx = self.x + self.facing.dx();
         let ty = self.y + self.facing.dy();
@@ -270,11 +135,6 @@ impl TileWalker {
             false
         }
     }
-
-    /// Moves backward one tile. Returns true if the move succeeded.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn move_backward(&mut self) -> bool {
         let back = self.facing.opposite();
         let tx = self.x + back.dx();
@@ -287,11 +147,6 @@ impl TileWalker {
             false
         }
     }
-
-    /// Strafes left one tile. Returns true if the move succeeded.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn strafe_left(&mut self) -> bool {
         let left = self.facing.turn_left();
         let tx = self.x + left.dx();
@@ -304,11 +159,6 @@ impl TileWalker {
             false
         }
     }
-
-    /// Strafes right one tile. Returns true if the move succeeded.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn strafe_right(&mut self) -> bool {
         let right = self.facing.turn_right();
         let tx = self.x + right.dx();
@@ -321,107 +171,58 @@ impl TileWalker {
             false
         }
     }
-
-    /// Turns left (counter-clockwise). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_left(&mut self) {
         self.facing = self.facing.turn_left();
     }
-
-    /// Turns right (clockwise). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_right(&mut self) {
         self.facing = self.facing.turn_right();
     }
-
-    /// Turns around (180 degrees). Consult the module-level documentation for the broader usage context and preconditions.
     pub fn turn_around(&mut self) {
         self.facing = self.facing.opposite();
     }
-
-    /// Snapshots the current state as the previous state for interpolation.
     pub fn begin_move(&mut self) {
         self.prev_x = self.x;
         self.prev_y = self.y;
         self.prev_facing = self.facing;
     }
-
-    /// Returns the interpolated position between previous and current at time `t` in [0, 1].
-    ///
-    /// # Parameters
-    /// - `t` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
     pub fn get_interpolated_position(&self, t: f32) -> (f32, f32) {
         let t = t.clamp(0.0, 1.0);
         let ix = self.prev_x as f32 + (self.x - self.prev_x) as f32 * t;
         let iy = self.prev_y as f32 + (self.y - self.prev_y) as f32 * t;
         (ix, iy)
     }
-
-    /// Returns the interpolated angle between previous and current facing at time `t` in [0, 1].
-    ///
-    /// # Parameters
-    /// - `t` — `f32`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_interpolated_angle(&self, t: f32) -> f32 {
         let t = t.clamp(0.0, 1.0);
         let a1 = self.prev_facing.angle();
         let a2 = self.facing.angle();
-
-        // Shortest-path angle interpolation
         let mut diff = a2 - a1;
         if diff > PI {
             diff -= 2.0 * PI;
         } else if diff < -PI {
             diff += 2.0 * PI;
         }
-
         a1 + diff * t
     }
-
-    /// Returns the relative direction from the walker to a target tile.
-    ///
-    /// # Parameters
-    /// - `tx` — `i32`.
-    /// - `ty` — `i32`.
-    ///
-    /// # Returns
-    /// `&'static str`.
-    ///
-    /// Returns "front", "back", "left", or "right".
     pub fn get_relative_facing(&self, tx: i32, ty: i32) -> &'static str {
         let dx = tx - self.x;
         let dy = ty - self.y;
-
         let fwd_x = self.facing.dx();
         let fwd_y = self.facing.dy();
-
-        // Check forward
         if dx == fwd_x && dy == fwd_y {
             return "front";
         }
-
-        // Check backward
         let back = self.facing.opposite();
         if dx == back.dx() && dy == back.dy() {
             return "back";
         }
-
-        // Check left
         let left = self.facing.turn_left();
         if dx == left.dx() && dy == left.dy() {
             return "left";
         }
-
-        // Check right
         let right = self.facing.turn_right();
         if dx == right.dx() && dy == right.dy() {
             return "right";
         }
-
-        // Default for non-adjacent tiles based on dominant direction
         let dot_fwd = dx * fwd_x + dy * fwd_y;
         if dot_fwd > 0 {
             "front"

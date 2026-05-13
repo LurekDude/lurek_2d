@@ -1,52 +1,51 @@
-//! dialogue decision helpers connected to AI runtime state.
+//! Dialogue topic and branch scoring for AI conversations.
+//! Owns `DialogueBranch`, `DialogueTopic`, and `DialogueAI`.
+//! Does not own rendering or UI; it only selects topic and branch identifiers.
+//! Depends on `HashMap` for utility score lookup.
 use std::collections::HashMap;
-
-/// One branch candidate under a dialogue topic.
 #[derive(Debug, Clone)]
+/// Single branch inside a topic.
 pub struct DialogueBranch {
-    /// Branch identifier returned to Lua/game logic.
+    /// Branch identifier.
     pub id: String,
-    /// Baseline branch weight.
+    /// Base branch weight.
     pub weight: f32,
-    /// Optional FSM-state gate.
+    /// Required FSM state, if any.
     pub required_fsm_state: Option<String>,
-    /// Optional BT-status gate.
+    /// Required behavior-tree status, if any.
     pub required_bt_status: Option<String>,
-    /// Optional utility score key that contributes to branch ranking.
+    /// Optional utility score lookup key.
     pub utility_key: Option<String>,
 }
-
-/// One dialogue topic with weighted branch options.
 #[derive(Debug, Clone)]
+/// Top-level dialogue topic with an ordered set of branches.
 pub struct DialogueTopic {
-    /// Topic identifier returned to Lua/game logic.
+    /// Topic identifier.
     pub id: String,
-    /// Baseline topic weight.
+    /// Base topic weight.
     pub weight: f32,
-    /// Optional FSM-state gate.
+    /// Required FSM state, if any.
     pub required_fsm_state: Option<String>,
-    /// Optional BT-status gate.
+    /// Required behavior-tree status, if any.
     pub required_bt_status: Option<String>,
-    /// Optional utility score key that contributes to topic ranking.
+    /// Optional utility score lookup key.
     pub utility_key: Option<String>,
-    /// Branch candidates under this topic.
+    /// Candidate branches under this topic.
     pub branches: Vec<DialogueBranch>,
 }
-
-/// Dialogue planner state and scoring context.
+/// Topic and branch selector with gate checks and utility scoring.
 pub struct DialogueAI {
-    /// Registered dialogue topics.
+    /// All registered topics.
     pub topics: Vec<DialogueTopic>,
-    /// Current FSM state fed from gameplay logic.
+    /// Current FSM state gate.
     pub fsm_state: Option<String>,
-    /// Current BT status fed from gameplay logic.
+    /// Current behavior-tree status gate.
     pub bt_status: Option<String>,
-    /// Utility scores keyed by action/topic labels.
+    /// Utility scores keyed by topic or branch name.
     pub utility_scores: HashMap<String, f32>,
 }
-
 impl DialogueAI {
-    /// Create a new empty dialogue planner.
+    /// Create an empty dialogue selector.
     pub fn new() -> Self {
         Self {
             topics: Vec::new(),
@@ -55,28 +54,23 @@ impl DialogueAI {
             utility_scores: HashMap::new(),
         }
     }
-
-    /// Set the current FSM state used by topic/branch gate checks.
+    /// Set the FSM state gate used by topic and branch selection.
     pub fn set_fsm_state(&mut self, state: Option<String>) {
         self.fsm_state = state;
     }
-
-    /// Set the current BT status used by topic/branch gate checks.
+    /// Set the behavior-tree status gate used by topic and branch selection.
     pub fn set_bt_status(&mut self, status: Option<String>) {
         self.bt_status = status;
     }
-
-    /// Set one utility score used when ranking topics/branches.
+    /// Store a utility score under `key`.
     pub fn set_utility_score(&mut self, key: String, score: f32) {
         self.utility_scores.insert(key, score);
     }
-
-    /// Clears all utility scores.
+    /// Remove all cached utility scores.
     pub fn clear_utility_scores(&mut self) {
         self.utility_scores.clear();
     }
-
-    /// Add a dialogue topic.
+    /// Add a topic with optional gate requirements and utility key.
     pub fn add_topic(
         &mut self,
         id: String,
@@ -94,8 +88,7 @@ impl DialogueAI {
             branches: Vec::new(),
         });
     }
-
-    /// Add a branch under an existing topic.
+    /// Add a branch to the named topic; returns `false` if the topic is missing.
     pub fn add_branch(
         &mut self,
         topic_id: &str,
@@ -117,8 +110,7 @@ impl DialogueAI {
         }
         false
     }
-
-    /// Selects the best topic for the current context.
+    /// Return the best matching topic id, or `None` when no topic matches.
     pub fn select_topic(&self) -> Option<String> {
         let mut best: Option<(&DialogueTopic, f32)> = None;
         for topic in &self.topics {
@@ -131,8 +123,7 @@ impl DialogueAI {
         }
         best.map(|(topic, _)| topic.id.clone())
     }
-
-    /// Selects the best branch for a given topic id and current context.
+    /// Return the best matching branch id for `topic_id`, or `None` when none matches.
     pub fn select_branch(&self, topic_id: &str) -> Option<String> {
         let topic = self.topics.iter().find(|t| t.id == topic_id)?;
         let mut best: Option<(&DialogueBranch, f32)> = None;
@@ -146,12 +137,11 @@ impl DialogueAI {
         }
         best.map(|(branch, _)| branch.id.clone())
     }
-
     /// Return the number of registered topics.
     pub fn topic_count(&self) -> usize {
         self.topics.len()
     }
-
+    /// Return topic score when gates pass; `None` when gates fail.
     fn topic_score(&self, topic: &DialogueTopic) -> Option<f32> {
         if !self.matches_gate(
             topic.required_fsm_state.as_deref(),
@@ -166,7 +156,7 @@ impl DialogueAI {
             .unwrap_or(0.0);
         Some(topic.weight + utility)
     }
-
+    /// Return branch score when gates pass; `None` when gates fail.
     fn branch_score(&self, branch: &DialogueBranch) -> Option<f32> {
         if !self.matches_gate(
             branch.required_fsm_state.as_deref(),
@@ -181,7 +171,7 @@ impl DialogueAI {
             .unwrap_or(0.0);
         Some(branch.weight + utility)
     }
-
+    /// Return `true` when the required FSM and BT gates both match the current state.
     fn matches_gate(&self, required_fsm: Option<&str>, required_bt: Option<&str>) -> bool {
         if let Some(req) = required_fsm {
             if self.fsm_state.as_deref() != Some(req) {
@@ -196,7 +186,6 @@ impl DialogueAI {
         true
     }
 }
-
 impl Default for DialogueAI {
     fn default() -> Self {
         Self::new()

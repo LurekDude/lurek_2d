@@ -1,13 +1,24 @@
-//! Binary data: packing, compression, hashing, encoding.
+//! Own binary data utilities module: byte buffers, sequential writers, typed views, ring buffers,
+//! hash digests, text encoding, compression, and pack/unpack format helpers. Lua bindings live
+//! in `src/lua_api/data_api.rs`. No graphics, audio, or physics logic belongs here.
 
+/// Token-based binary reader and writer for structured byte payloads.
 pub mod bin_pack;
+/// Mutable owned byte buffer with indexed access and conversion helpers.
 pub mod byte_data;
+/// Compression and decompression helpers for deflate, gzip, zlib, and lz4.
 pub mod compress;
+/// Sequential binary writer with a movable cursor over an owned buffer.
 pub mod data_writer;
+/// Read-only typed accessor over a shared Arc byte buffer.
 pub mod dataview;
+/// Base64 and hex encode/decode helpers for opaque byte payloads.
 pub mod encode;
+/// Hash and checksum helpers returning hex-encoded digests.
 pub mod hash;
+/// Format-string pack and unpack helpers modelled on Python struct.
 pub mod pack;
+/// Fixed-capacity ring buffer with overwrite-on-full FIFO semantics.
 pub mod ring_buffer;
 pub use bin_pack::{
     measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue,

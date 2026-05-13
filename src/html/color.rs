@@ -1,27 +1,12 @@
-//! CSS color parsing helpers for HTML draw command translation.
-
 use crate::math::Color;
-
-/// Parses a CSS color string into normalized RGBA components.
-///
-/// Supported formats:
-/// - Hex via [`Color::from_hex`] (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa` depending on implementation)
-/// - `rgb(r, g, b)` with byte or percent components
-/// - `rgba(r, g, b, a)` with byte or percent RGB and float/percent alpha
-/// - `hsl(h, s%, l%)`
-/// - `hsla(h, s%, l%, a)`
-/// - A practical set of named colors (`white`, `black`, `red`, ...)
 pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
     let value = raw.trim().to_ascii_lowercase();
-
     if value.is_empty() {
         return None;
     }
-
     if let Some(color) = Color::from_hex(&value) {
         return Some([color.r, color.g, color.b, color.a]);
     }
-
     if let Some(inner) = value
         .strip_prefix("rgba(")
         .and_then(|s| s.strip_suffix(')'))
@@ -35,7 +20,6 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
             return Some([r, g, b, a]);
         }
     }
-
     if let Some(inner) = value.strip_prefix("rgb(").and_then(|s| s.strip_suffix(')')) {
         let parts = split_color_args(inner);
         if parts.len() == 3 {
@@ -45,7 +29,6 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
             return Some([r, g, b, 1.0]);
         }
     }
-
     if let Some(inner) = value
         .strip_prefix("hsla(")
         .and_then(|s| s.strip_suffix(')'))
@@ -60,7 +43,6 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
             return Some([r, g, b, a]);
         }
     }
-
     if let Some(inner) = value.strip_prefix("hsl(").and_then(|s| s.strip_suffix(')')) {
         let parts = split_color_args(inner);
         if parts.len() == 3 {
@@ -71,7 +53,6 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
             return Some([r, g, b, 1.0]);
         }
     }
-
     match value.as_str() {
         "transparent" => Some([0.0, 0.0, 0.0, 0.0]),
         "white" => Some([1.0, 1.0, 1.0, 1.0]),
@@ -102,11 +83,9 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
         _ => None,
     }
 }
-
 fn split_color_args(inner: &str) -> Vec<&str> {
     inner.split(',').map(str::trim).collect()
 }
-
 fn parse_rgb_component(raw: &str) -> Option<f32> {
     if let Some(percent) = raw.strip_suffix('%') {
         let value = percent.trim().parse::<f32>().ok()?;
@@ -115,7 +94,6 @@ fn parse_rgb_component(raw: &str) -> Option<f32> {
     let value = raw.trim().parse::<f32>().ok()?;
     Some((value / 255.0).clamp(0.0, 1.0))
 }
-
 fn parse_alpha_component(raw: &str) -> Option<f32> {
     if let Some(percent) = raw.strip_suffix('%') {
         let value = percent.trim().parse::<f32>().ok()?;
@@ -124,12 +102,10 @@ fn parse_alpha_component(raw: &str) -> Option<f32> {
     let value = raw.trim().parse::<f32>().ok()?;
     Some(value.clamp(0.0, 1.0))
 }
-
 fn parse_percent_component(raw: &str) -> Option<f32> {
     let value = raw.trim().strip_suffix('%')?.trim().parse::<f32>().ok()?;
     Some((value / 100.0).clamp(0.0, 1.0))
 }
-
 fn parse_hue_component(raw: &str) -> Option<f32> {
     let input = raw.trim();
     let hue_degrees = if let Some(value) = input.strip_suffix("deg") {
@@ -141,23 +117,19 @@ fn parse_hue_component(raw: &str) -> Option<f32> {
     } else {
         input.parse::<f32>().ok()?
     };
-
     let mut normalized = hue_degrees % 360.0;
     if normalized < 0.0 {
         normalized += 360.0;
     }
     Some(normalized)
 }
-
 fn hsl_to_rgb(h: f32, s: f32, l: f32) -> (f32, f32, f32) {
     if s <= f32::EPSILON {
         return (l, l, l);
     }
-
     let c = (1.0 - (2.0 * l - 1.0).abs()) * s;
     let h_prime = h / 60.0;
     let x = c * (1.0 - ((h_prime % 2.0) - 1.0).abs());
-
     let (r1, g1, b1) = if (0.0..1.0).contains(&h_prime) {
         (c, x, 0.0)
     } else if (1.0..2.0).contains(&h_prime) {
@@ -171,7 +143,6 @@ fn hsl_to_rgb(h: f32, s: f32, l: f32) -> (f32, f32, f32) {
     } else {
         (c, 0.0, x)
     };
-
     let m = l - c * 0.5;
     (
         (r1 + m).clamp(0.0, 1.0),

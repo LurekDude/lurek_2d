@@ -1,32 +1,17 @@
-//! Unified codec dispatch for `SerialValue` formats.
-//!
-//! This module centralizes format parsing/encoding and format detection so
-//! callers can switch codecs at runtime without branching on per-format APIs.
-
 use super::{
     from_csv, from_ini, from_json, from_toml, from_xml, to_csv, to_json, to_toml, CsvOptions,
 };
 use super::{from_msgpack, to_msgpack, SerialValue};
-
-/// Supported serial codec formats.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SerialFormat {
-    /// JavaScript Object Notation.
     Json,
-    /// TOML text format.
     Toml,
-    /// Comma-separated values.
     Csv,
-    /// MessagePack binary format.
     MsgPack,
-    /// XML text format (decode-only).
     Xml,
-    /// INI text format (decode-only).
     Ini,
 }
-
 impl SerialFormat {
-    /// Parse a format string (`json`, `toml`, `csv`, `msgpack`, `xml`).
     pub fn parse(s: &str) -> Option<Self> {
         match s.trim().to_ascii_lowercase().as_str() {
             "json" => Some(Self::Json),
@@ -38,9 +23,6 @@ impl SerialFormat {
             _ => None,
         }
     }
-
-    /// Detect format by file extension (e.g., `.json`, `.toml`, `.csv`).
-    /// Returns `None` if the extension cannot be mapped to a format.
     pub fn from_extension(path: &str) -> Option<Self> {
         let path_lower = path.to_ascii_lowercase();
         let ext = if let Some(dot_idx) = path_lower.rfind('.') {
@@ -48,7 +30,6 @@ impl SerialFormat {
         } else {
             return None;
         };
-
         match ext {
             "json" => Some(Self::Json),
             "toml" => Some(Self::Toml),
@@ -59,8 +40,6 @@ impl SerialFormat {
             _ => None,
         }
     }
-
-    /// Canonical lowercase name for the format.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Json => "json",
@@ -72,38 +51,24 @@ impl SerialFormat {
         }
     }
 }
-
-/// Text codec decode options.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct DecodeOptions {
-    /// CSV-specific decode options.
     pub csv: CsvOptions,
 }
-
-/// Encoding options used by the format-dispatch codec entry points.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct EncodeOptions {
-    /// Pretty-print JSON output when true.
     pub json_pretty: bool,
-    /// CSV-specific encode options.
     pub csv: CsvOptions,
 }
-
-/// Encoded payload returned by `encode`, either UTF-8 text or binary bytes.
 pub enum EncodedValue {
-    /// UTF-8 text payload.
     Text(String),
-    /// Binary payload.
     Binary(Vec<u8>),
 }
-
-/// Detect text format using lightweight syntax checks and parser probes.
 pub fn detect_format(input: &str) -> Option<SerialFormat> {
     let s = input.trim_start();
     if s.is_empty() {
         return None;
     }
-
     if (s.starts_with('{') || s.starts_with('[')) && from_json(input).is_ok() {
         return Some(SerialFormat::Json);
     }
@@ -113,21 +78,16 @@ pub fn detect_format(input: &str) -> Option<SerialFormat> {
     if (s.starts_with('[') || s.contains('=')) && from_toml(input).is_ok() {
         return Some(SerialFormat::Toml);
     }
-
     let looks_like_csv =
         s.contains('\n') && (s.contains(',') || s.contains(';') || s.contains('\t'));
     if looks_like_csv && from_csv(input, CsvOptions::default()).is_ok() {
         return Some(SerialFormat::Csv);
     }
-
     if s.contains('=') && from_ini(input).is_ok() {
         return Some(SerialFormat::Ini);
     }
-
     None
 }
-
-/// Decode UTF-8 text using explicit or auto-detected format.
 pub fn decode_text(
     input: &str,
     format: Option<SerialFormat>,
@@ -136,7 +96,6 @@ pub fn decode_text(
     let detected = format.or_else(|| detect_format(input)).ok_or_else(|| {
         "decode_text: could not detect format (expected json/toml/csv/xml/ini)".to_string()
     })?;
-
     match detected {
         SerialFormat::Json => from_json(input),
         SerialFormat::Toml => from_toml(input),
@@ -148,8 +107,6 @@ pub fn decode_text(
         }
     }
 }
-
-/// Decode binary bytes for the selected binary-capable format.
 pub fn decode_bytes(input: &[u8], format: SerialFormat) -> Result<SerialValue, String> {
     match format {
         SerialFormat::MsgPack => from_msgpack(input),
@@ -159,8 +116,6 @@ pub fn decode_bytes(input: &[u8], format: SerialFormat) -> Result<SerialValue, S
         )),
     }
 }
-
-/// Encode a `SerialValue` using the selected format.
 pub fn encode(
     value: &SerialValue,
     format: SerialFormat,

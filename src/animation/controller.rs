@@ -1,46 +1,44 @@
-//! Control animation playback, clip switching, events, and crossfades.
-
-use std::collections::HashMap;
-
-use crate::math::Rect;
-
+//! Animation playback controller for clip selection, timing, and debug previews.
+//! Owns `Animation` only.
+//! Does not own asset loading or rendering; it exposes frame/clip state to callers.
+//! Depends on `Rect`, `AnimClip`, `AnimEvent`, `AnimFrame`, and log message codes.
 use super::clip::{AnimClip, ClipPlaybackMode};
 use super::event::AnimEvent;
 use super::frame::AnimFrame;
 use crate::log_msg;
+use crate::math::Rect;
 use crate::runtime::log_messages::{AN01_ANIM_CTRL_INIT, AN02_CLIP_ADDED, AN03_CLIP_NOT_FOUND};
-
-/// Sprite animation with named clips, speed control, and playback events.
+use std::collections::HashMap;
+/// Runtime animation controller that tracks clips, frames, and playback state.
 #[derive(Clone)]
 pub struct Animation {
-    /// All frames available to this animation.
+    /// All loaded frames.
     frames: Vec<AnimFrame>,
-    /// Named clips mapping name to clip data.
+    /// Named clips mapped to frame indices.
     clips: HashMap<String, AnimClip>,
-    /// Currently active clip name.
+    /// Current clip name.
     current_clip: Option<String>,
-    /// Current position within the active clip's `frame_indices` (0-based).
+    /// Frame index inside the current clip.
     current_frame_pos: usize,
-    /// Time accumulator for frame advancement.
+    /// Accumulated playback timer.
     timer: f32,
-    /// Whether the animation is currently playing.
+    /// Whether playback is active.
     playing: bool,
-    /// Playback speed multiplier (default `1.0`).
+    /// Playback speed multiplier.
     speed: f32,
-    /// Events generated during the last [`update`](Self::update) call.
+    /// Events emitted since the last drain.
     pending_events: Vec<AnimEvent>,
-    /// Source quad saved at the start of a crossfade (from-clip frame).
+    /// Starting quad for an active crossfade.
     crossfade_from_quad: Option<Rect>,
-    /// Elapsed time since the crossfade started (seconds).
+    /// Crossfade timer.
     crossfade_timer: f32,
-    /// Total crossfade duration in seconds; 0.0 means no crossfade active.
+    /// Crossfade duration.
     crossfade_duration: f32,
-    /// Direction flag used by ping-pong clips (`true` => forward, `false` => backward).
+    /// Direction flag for ping-pong clips.
     pingpong_forward: bool,
 }
-
 impl Animation {
-    /// Create a new, empty animation with no frames or clips.
+    /// Create an empty animation controller.
     pub fn new() -> Self {
         log_msg!(debug, AN01_ANIM_CTRL_INIT);
         Self {
@@ -58,17 +56,13 @@ impl Animation {
             pingpong_forward: true,
         }
     }
-
-    // ---- Helper Functions: Frame Management ----
-
-    /// Add a single frame and returns its 0-based index.
+    /// Append a frame and return its index.
     pub fn add_frame(&mut self, quad: Rect) -> usize {
         let idx = self.frames.len();
         self.frames.push(AnimFrame::new(quad, 0.0));
         idx
     }
-
-    /// Slices a sprite-sheet grid into frames and appends them.
+    /// Append frames from a texture grid and return the number added.
     pub fn add_frames_from_grid(
         &mut self,
         tex_w: u32,
@@ -104,25 +98,18 @@ impl Animation {
         }
         added
     }
-
-    // add_frames_from_rects ---------------------------------------------------
-
-    /// Add frames from a pre-sliced list of source rectangles.
+    /// Append a list of frame rectangles and return the number added.
     pub fn add_frames_from_rects(&mut self, quads: &[Rect]) -> usize {
         for &quad in quads {
             self.frames.push(AnimFrame::new(quad, 0.0));
         }
         quads.len()
     }
-
-    // ---- Helper Functions: Clip Management ----
-
-    /// Registers a named clip.
+    /// Add a forward-playing clip.
     pub fn add_clip(&mut self, name: &str, frame_indices: Vec<usize>, fps: f32, looping: bool) {
         self.add_clip_with_mode(name, frame_indices, fps, looping, ClipPlaybackMode::Forward);
     }
-
-    /// Registers a named clip with an explicit playback mode.
+    /// Add a clip with an explicit playback mode.
     pub fn add_clip_with_mode(
         &mut self,
         name: &str,
@@ -143,9 +130,8 @@ impl Animation {
             },
         );
     }
-
-    /// Convenience method: adds grid-sliced frames then creates a clip referencing them.
     #[allow(clippy::too_many_arguments)]
+    /// Create frames from a grid and register a clip that references them.
     pub fn add_clip_from_grid(
         &mut self,
         name: &str,
@@ -163,10 +149,7 @@ impl Animation {
         let indices: Vec<usize> = (base..base + added).collect();
         self.add_clip(name, indices, fps, looping);
     }
-
-    // ---- Helper Functions: Playback Control ----
-
-    /// Starts playing a clip by name.
+    /// Start playing a named clip; returns `false` when the clip is missing.
     pub fn play(&mut self, name: &str) -> bool {
         if !self.clips.contains_key(name) {
             log_msg!(warn, AN03_CLIP_NOT_FOUND, "{}", name);
@@ -180,44 +163,33 @@ impl Animation {
         self.pending_events.clear();
         true
     }
-
-    /// Stops playback and resets to frame 0.
+    /// Stop playback and reset the frame position.
     pub fn stop(&mut self) {
         self.playing = false;
         self.current_frame_pos = 0;
         self.timer = 0.0;
     }
-
-    /// Pauses playback at the current frame.
+    /// Pause playback without resetting the frame position.
     pub fn pause(&mut self) {
         self.playing = false;
     }
-
-    /// Resumes playback from the current frame.
+    /// Resume playback.
     pub fn resume(&mut self) {
         self.playing = true;
     }
-
-    // ---- Helper Functions: Update ----
-
-    /// Advances the animation by `dt` seconds (scaled by [`speed`](Self::get_speed)).
+    /// Advance playback timers and emit frame events.
     pub fn update(&mut self, dt: f32) {
         self.pending_events.clear();
-
-        // Advance crossfade timer; clamp at duration so blend weight saturates at 1.0.
         if self.crossfade_duration > 0.0 {
             self.crossfade_timer = (self.crossfade_timer + dt).min(self.crossfade_duration);
         }
-
         if !self.playing || dt <= 0.0 {
             return;
         }
-
         let clip_name = match self.current_clip.clone() {
             Some(name) => name,
             None => return,
         };
-
         let clip_len = match self.clip_len(&clip_name) {
             Some(len) => len,
             None => return,
@@ -225,22 +197,17 @@ impl Animation {
         if clip_len == 0 {
             return;
         }
-
         let mut frame_duration = self.frame_duration_for_name(&clip_name, self.current_frame_pos);
         if frame_duration <= 0.0 {
             return;
         }
-
         self.timer += dt * self.speed;
-
-        // Drain accumulated time in a loop: a large dt can skip multiple frames.
         while self.timer >= frame_duration {
             self.timer -= frame_duration;
             let clip_mode = self
                 .clip_mode(&clip_name)
                 .unwrap_or(ClipPlaybackMode::Forward);
             let clip_looping = self.clip_looping(&clip_name).unwrap_or(false);
-
             let advanced = match clip_mode {
                 ClipPlaybackMode::Forward => {
                     let next = self.current_frame_pos + 1;
@@ -305,7 +272,6 @@ impl Animation {
                     }
                 }
             };
-
             if advanced {
                 self.pending_events.push(AnimEvent::FrameChanged {
                     frame_index: self.current_frame_pos,
@@ -316,28 +282,25 @@ impl Animation {
                 self.pending_events.push(AnimEvent::Finished);
                 return;
             }
-
-            // Recompute duration for the new frame (it may differ).
             frame_duration = self.frame_duration_for_name(&clip_name, self.current_frame_pos);
             if frame_duration <= 0.0 {
                 return;
             }
         }
     }
-
+    /// Return the length of a named clip.
     fn clip_len(&self, clip_name: &str) -> Option<usize> {
         Some(self.clips.get(clip_name)?.frame_indices.len())
     }
-
+    /// Return whether a named clip loops.
     fn clip_looping(&self, clip_name: &str) -> Option<bool> {
         Some(self.clips.get(clip_name)?.looping)
     }
-
+    /// Return the playback mode of a named clip.
     fn clip_mode(&self, clip_name: &str) -> Option<ClipPlaybackMode> {
         Some(self.clips.get(clip_name)?.mode)
     }
-
-    /// Return the effective duration for the frame at `pos` within `clip`.
+    /// Return the duration for one frame in a clip, falling back to clip FPS.
     fn frame_duration_for(&self, clip: &AnimClip, pos: usize) -> f32 {
         if let Some(&idx) = clip.frame_indices.get(pos) {
             if let Some(frame) = self.frames.get(idx) {
@@ -348,89 +311,72 @@ impl Animation {
         }
         1.0 / clip.fps
     }
-
+    /// Return the duration for a named clip at position `pos`.
     fn frame_duration_for_name(&self, clip_name: &str, pos: usize) -> f32 {
         match self.clips.get(clip_name) {
             Some(clip) => self.frame_duration_for(clip, pos),
             None => 0.0,
         }
     }
-
-    // ---- Helper Functions: Queries ----
-
-    /// Return the source rectangle of the current frame, or `None` if no
-    /// clip is active or the frame pool is empty.
+    /// Return the current frame quad, or `None` when playback is unset.
     pub fn current_quad(&self) -> Option<Rect> {
         let clip_name = self.current_clip.as_ref()?;
         let clip = self.clips.get(clip_name)?;
         let &frame_idx = clip.frame_indices.get(self.current_frame_pos)?;
         Some(self.frames.get(frame_idx)?.quad)
     }
-
-    /// Return the current position within the active clip's frame list (0-based).
+    /// Return the current frame index inside the clip.
     pub fn current_frame(&self) -> usize {
         self.current_frame_pos
     }
-
-    /// Return the name of the currently active clip, if any.
+    /// Return the current clip name.
     pub fn get_current_clip(&self) -> Option<&str> {
         self.current_clip.as_deref()
     }
-
-    /// Return `true` if the animation is currently playing.
+    /// Return `true` when playback is active.
     pub fn is_playing(&self) -> bool {
         self.playing
     }
-
-    /// Return `true` if the current clip is set to loop.
+    /// Return `true` when the active clip loops.
     pub fn is_looping(&self) -> bool {
         self.current_clip
             .as_ref()
             .and_then(|name| self.clips.get(name))
             .is_some_and(|clip| clip.looping)
     }
-
     /// Return the playback speed multiplier.
     pub fn get_speed(&self) -> f32 {
         self.speed
     }
-
     /// Set the playback speed multiplier.
     pub fn set_speed(&mut self, speed: f32) {
         self.speed = speed.max(0.0);
     }
-
-    /// Return the total number of frames in the animation's frame pool.
+    /// Return the number of loaded frames.
     pub fn get_frame_count(&self) -> usize {
         self.frames.len()
     }
-
-    /// Return the source quad for a frame by pool index, or `None` if out of range.
+    /// Return the quad for frame `index`.
     pub fn get_frame_quad(&self, index: usize) -> Option<Rect> {
         self.frames.get(index).map(|f| f.quad)
     }
-
     /// Return the number of registered clips.
     pub fn get_clip_count(&self) -> usize {
         self.clips.len()
     }
-
-    /// Return an immutable reference to a clip by name.
+    /// Return a clip by name.
     pub fn get_clip(&self, name: &str) -> Option<&AnimClip> {
         self.clips.get(name)
     }
-
-    /// Return a mutable reference to a clip by name.
+    /// Return a clip by name mutably.
     pub fn get_clip_mut(&mut self, name: &str) -> Option<&mut AnimClip> {
         self.clips.get_mut(name)
     }
-
-    /// Return and clears all pending animation events.
+    /// Drain and return the pending playback events.
     pub fn drain_events(&mut self) -> Vec<AnimEvent> {
         std::mem::take(&mut self.pending_events)
     }
-
-    /// Set the playback position within the current clip.
+    /// Force the current clip frame index.
     pub fn set_frame(&mut self, index: usize) {
         if let Some(clip_name) = &self.current_clip {
             if let Some(clip) = self.clips.get(clip_name) {
@@ -441,10 +387,7 @@ impl Animation {
             }
         }
     }
-
-    // ---- Helper Functions: Crossfade ----
-
-    /// Starts a crossfade to another clip over the given duration in seconds.
+    /// Start a crossfade to another clip; returns `false` if the clip is missing.
     pub fn crossfade(&mut self, clip_name: &str, duration: f32) -> bool {
         if !self.clips.contains_key(clip_name) {
             return false;
@@ -454,8 +397,7 @@ impl Animation {
         self.crossfade_duration = duration.max(0.0);
         self.play(clip_name)
     }
-
-    /// Return the current crossfade state as `(from_quad, to_quad, blend_weight)`.
+    /// Return the active crossfade state as `(from, to, blend)` when a blend is running.
     pub fn get_blend_state(&self) -> Option<(Rect, Rect, f32)> {
         if self.crossfade_duration <= 0.0 || self.crossfade_timer >= self.crossfade_duration {
             return None;
@@ -465,15 +407,11 @@ impl Animation {
         let blend = self.crossfade_timer / self.crossfade_duration;
         Some((q1, q2, blend))
     }
-
-    // ---- Helper Functions: Debug Rendering ----
-
-    /// Renders the current animation frame as a debug image.
+    /// Draw a simple preview image for the current frame.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(255, 255, 255, 255);
         if let Some(q) = self.current_quad() {
-            // Draw the frame rect in blue
             img.draw_rect(
                 q.x as i32,
                 q.y as i32,
@@ -484,7 +422,6 @@ impl Animation {
                 220,
                 200,
             );
-            // Draw outline
             img.draw_line(
                 q.x as i32,
                 q.y as i32,
@@ -528,8 +465,7 @@ impl Animation {
         }
         img
     }
-
-    /// Renders all frame quads into a debug preview grid.
+    /// Draw a grid preview of all loaded frames.
     pub fn draw_preview_grid(&self, columns: u32, cell_size: u32) -> crate::image::ImageData {
         let columns = columns.max(1);
         let cell_size = cell_size.max(4);
@@ -539,19 +475,16 @@ impl Animation {
         } else {
             count.div_ceil(columns)
         };
-
         let width = columns * cell_size;
         let height = rows * cell_size;
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(24, 28, 36, 255);
-
         for (idx, frame) in self.frames.iter().enumerate() {
             let idx = idx as u32;
             let col = idx % columns;
             let row = idx / columns;
             let x = (col * cell_size) as i32;
             let y = (row * cell_size) as i32;
-
             let inset = 2i32;
             let inner_w = cell_size.saturating_sub((inset * 2) as u32);
             let inner_h = cell_size.saturating_sub((inset * 2) as u32);
@@ -580,45 +513,32 @@ impl Animation {
                 255,
             );
         }
-
         img
     }
-
-    // ---- Helper Functions: Aseprite Import ----
-
-    /// Create an [`Animation`] from an [`AsepriteParsed`] result.
+    /// Build an `Animation` from parsed Aseprite metadata.
     pub fn load_from_aseprite(parsed: &crate::animation::aseprite::AsepriteParsed) -> Animation {
         use crate::animation::aseprite::AsepriteDirection;
-
         let mut anim = Animation::new();
-
-        // Add one frame per parsed frame entry.
         for f in &parsed.frames {
             let quad = Rect::new(f.x as f32, f.y as f32, f.w as f32, f.h as f32);
             let duration = f.duration_ms as f32 / 1000.0;
             anim.frames.push(AnimFrame::new(quad, duration));
         }
-
-        // Create clips from frame tags.
         for tag in &parsed.tags {
             if tag.from > tag.to || tag.to >= anim.frames.len() {
                 continue;
             }
-
             let indices: Vec<usize> = match tag.direction {
                 AsepriteDirection::Forward | AsepriteDirection::PingPong => {
                     (tag.from..=tag.to).collect()
                 }
                 AsepriteDirection::Reverse => (tag.from..=tag.to).rev().collect(),
             };
-
             let mode = match tag.direction {
                 AsepriteDirection::Forward => ClipPlaybackMode::Forward,
                 AsepriteDirection::Reverse => ClipPlaybackMode::Reverse,
                 AsepriteDirection::PingPong => ClipPlaybackMode::PingPong,
             };
-
-            // Calculate FPS from the first frame's duration.
             let fps = {
                 let dur_ms = parsed.frames[tag.from].duration_ms;
                 if dur_ms > 0 {
@@ -627,21 +547,15 @@ impl Animation {
                     10.0
                 }
             };
-
             anim.add_clip_with_mode(&tag.name, indices, fps, true, mode);
         }
-
         anim
     }
 }
-
+/// `Default` delegates to `Animation::new`.
+/// `Default` delegates to `Animation::new`.
 impl Default for Animation {
     fn default() -> Self {
         Self::new()
     }
 }
-
-// ├óÔÇŁÔéČ├óÔÇŁÔéČ Unit tests ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ├óÔÇŁÔéČ
-
-
-

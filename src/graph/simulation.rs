@@ -1,126 +1,58 @@
-//! Simulation engine — update(dt) and step() for item flow, decay, transit, and conversions.
-//!
-//! This module is part of Lurek2D's `graph` subsystem and provides the implementation
-//! details for simulation-related operations and data management.
-//! Key types exported from this module: `GraphEvent`.
-//! Primary functions: `update()`, `step()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::node::FlowMode;
 use crate::log_msg;
 use crate::runtime::log_messages::{GR01, GR02};
-
-/// Events generated during simulation for the Lua callback layer to dispatch.
-///
-/// # Variants
-/// - `ItemEnter` — ItemEnter variant.
-/// - `ItemLeave` — ItemLeave variant.
-/// - `ItemDecay` — ItemDecay variant.
-/// - `ItemConvert` — ItemConvert variant.
-/// - `ItemLost` — ItemLost variant.
-/// - `EdgeEnter` — EdgeEnter variant.
-/// - `EdgeLeave` — EdgeLeave variant.
-/// - `DemandFulfilled` — DemandFulfilled variant.
-/// - `SupplyDepleted` — SupplyDepleted variant.
-/// - `ItemQueued` — ItemQueued variant.
-/// - `ItemDequeued` — ItemDequeued variant.
 #[derive(Debug, Clone)]
 pub enum GraphEvent {
-    /// An item arrived at a node.
     ItemEnter {
-        /// Item that entered.
         item_id: u64,
-        /// Node it entered.
         node_id: u64,
     },
-    /// An item left a node (onto an edge).
     ItemLeave {
-        /// Item that left.
         item_id: u64,
-        /// Node it left.
         node_id: u64,
     },
-    /// An item decayed (remaining_life reached zero).
     ItemDecay {
-        /// Item that decayed.
         item_id: u64,
     },
-    /// Items were consumed and new items produced by a conversion rule.
     ItemConvert {
-        /// Node where conversion happened.
         node_id: u64,
-        /// Items consumed.
         consumed: Vec<u64>,
-        /// Items produced.
         produced: Vec<u64>,
     },
-    /// An item was lost (destroyed by overflow policy).
     ItemLost {
-        /// Item that was destroyed.
         item_id: u64,
-        /// Node that rejected it.
         node_id: u64,
     },
-    /// An item entered an edge (started transit).
     EdgeEnter {
-        /// Item that entered transit.
         item_id: u64,
-        /// Edge it entered.
         edge_id: u64,
     },
-    /// An item left an edge (arrived at destination).
     EdgeLeave {
-        /// Item that left the edge.
         item_id: u64,
-        /// Edge it left.
         edge_id: u64,
     },
-    /// A demand was fulfilled by a supply.
     DemandFulfilled {
-        /// Node that had the demand.
         demand_node: u64,
-        /// Node that supplied.
         supply_node: u64,
-        /// Item type transferred.
         item_type: String,
-        /// Number of items.
         count: u32,
     },
-    /// A supply was depleted.
     SupplyDepleted {
-        /// Node whose supply was exhausted.
         node_id: u64,
-        /// Item type that ran out.
         item_type: String,
     },
-    /// An item was placed in a queue.
     ItemQueued {
-        /// Item that was queued.
         item_id: u64,
-        /// Node where it was queued.
         node_id: u64,
     },
-    /// An item was dequeued from a queue.
     ItemDequeued {
-        /// Item that was dequeued.
         item_id: u64,
-        /// Node where it was dequeued.
         node_id: u64,
     },
 }
-
 impl Graph {
-    /// Advance the simulation by `dt` seconds. Returns events for callback dispatch.
-    ///
-    /// # Parameters
-    /// - `dt` — `f64`.
-    ///
-    /// # Returns
-    /// `Vec<GraphEvent>`.
     pub fn update(&mut self, dt: f64) -> Vec<GraphEvent> {
         log_msg!(debug, GR01);
         let mut events = Vec::new();
@@ -134,42 +66,19 @@ impl Graph {
         log_msg!(debug, GR02, "{}", events.len());
         events
     }
-
-    /// One discrete simulation step (equivalent to `update(1.0)`).
-    ///
-    /// # Returns
-    /// `Vec<GraphEvent>`.
     pub fn step(&mut self) -> Vec<GraphEvent> {
         self.update(1.0)
     }
-
-    /// Advance the simulation by `dt` seconds with a parallelised decay phase.
-    ///
-    /// Identical to [`update`] but the decay life-decrement step runs across
-    /// all items in parallel using rayon, reducing per-frame CPU time when
-    /// the graph contains a large number of live items.  The remaining phases
-    /// (transit, push/pull flow, conversions, queues) run sequentially as
-    /// normal.
-    ///
-    /// # Parameters
-    /// - `dt` — `f64` — elapsed time in seconds.
-    ///
-    /// # Returns
-    /// `Vec<GraphEvent>`.
     #[cfg(feature = "graph-parallel")]
     pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
         use rayon::prelude::*;
         log_msg!(debug, GR01);
         let mut events = Vec::new();
-
-        // Phase 1a: parallel decay decrement — each item is independent.
         self.items.par_iter_mut().for_each(|(_, item)| {
             if item.alive && item.decay_time >= 0.0 {
                 item.remaining_life -= dt;
             }
         });
-
-        // Phase 1b: sequential collect + remove dead items.
         let dead_ids: Vec<u64> = self
             .items
             .iter()
@@ -194,8 +103,6 @@ impl Graph {
                 edge.items_in_transit.retain(|&iid| iid != id);
             }
         }
-
-        // Remaining phases: sequential (mutably aliased structures).
         self.process_transit(dt, &mut events);
         self.process_cooldowns(dt);
         self.process_push_flow(dt, &mut events);
@@ -205,13 +112,10 @@ impl Graph {
         log_msg!(debug, GR02, "{}", events.len());
         events
     }
-
     #[cfg(not(feature = "graph-parallel"))]
     pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
         self.update(dt)
     }
-
-    /// Phase 1: Decay — decrement remaining_life, kill expired items.
     fn process_decay(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let mut dead_ids = Vec::new();
         for item in self.items.values_mut() {
@@ -226,7 +130,6 @@ impl Graph {
         }
         for id in dead_ids {
             events.push(GraphEvent::ItemDecay { item_id: id });
-            // Remove from containers
             for node in self.nodes.values_mut() {
                 node.items.retain(|&iid| iid != id);
                 node.queue.retain(|&iid| iid != id);
@@ -236,13 +139,8 @@ impl Graph {
             }
         }
     }
-
-    /// Phase 2: Transit — advance items along edges, deliver arrived items.
     fn process_transit(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
-        // Collect arrivals: (item_id, edge_id, dest_node_id)
         let mut arrivals: Vec<(u64, u64, u64)> = Vec::new();
-
-        // Collect edge transit info for processing
         let edge_info: Vec<(u64, u64, f64, f64, Vec<u64>)> = self
             .edges
             .values()
@@ -263,7 +161,6 @@ impl Graph {
                 )
             })
             .collect();
-
         for (edge_id, dest_node, progress_delta, _travel_time, transit_items) in &edge_info {
             for &iid in transit_items {
                 if let Some(item) = self.items.get_mut(&iid) {
@@ -282,17 +179,11 @@ impl Graph {
                 }
             }
         }
-
-        // Process arrivals
         for (item_id, edge_id, dest_node) in arrivals {
             events.push(GraphEvent::EdgeLeave { item_id, edge_id });
-
-            // Remove from edge transit
             if let Some(edge) = self.edges.get_mut(&edge_id) {
                 edge.items_in_transit.retain(|&id| id != item_id);
             }
-
-            // Try placing at dest node
             if let Some(node) = self.nodes.get(&dest_node) {
                 if node.is_full() {
                     match node.overflow_policy {
@@ -329,7 +220,6 @@ impl Graph {
                         }
                     }
                 } else {
-                    // Place normally
                     if let Some(node) = self.nodes.get_mut(&dest_node) {
                         node.items.push(item_id);
                     }
@@ -344,8 +234,6 @@ impl Graph {
             }
         }
     }
-
-    /// Phase 3: Cooldowns — decrement edge cooldown timers.
     fn process_cooldowns(&mut self, dt: f64) {
         for edge in self.edges.values_mut() {
             if edge.cooldown_timer > 0.0 {
@@ -353,8 +241,6 @@ impl Graph {
             }
         }
     }
-
-    /// Phase 4: Push flow — active Push/Both nodes send items along outgoing edges.
     fn process_push_flow(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let push_nodes: Vec<u64> = self
             .nodes
@@ -364,7 +250,6 @@ impl Graph {
             })
             .map(|n| n.id)
             .collect();
-
         for nid in push_nodes {
             let (push_rate, push_filter, items_snapshot) = {
                 let node = match self.nodes.get_mut(&nid) {
@@ -379,10 +264,8 @@ impl Graph {
                 node.push_timer -= slots as f64 / node.push_rate;
                 (slots, node.push_filter.clone(), node.items.clone())
             };
-
             let outgoing: Vec<u64> = self.get_outgoing_edges(nid);
             let mut sent = 0;
-
             for &iid in &items_snapshot {
                 if sent >= push_rate {
                     break;
@@ -391,15 +274,11 @@ impl Graph {
                     Some(item) if item.alive => item.item_type.clone(),
                     _ => continue,
                 };
-
-                // Check push filter
                 if let Some(ref filter) = push_filter {
                     if &item_type != filter {
                         continue;
                     }
                 }
-
-                // Find a suitable outgoing edge
                 for &eid in &outgoing {
                     let can_send = {
                         let edge = match self.edges.get(&eid) {
@@ -420,11 +299,9 @@ impl Graph {
                             item_id: iid,
                             edge_id: eid,
                         });
-                        // Remove from node
                         if let Some(node) = self.nodes.get_mut(&nid) {
                             node.items.retain(|&id| id != iid);
                         }
-                        // Place on edge
                         if let Some(edge) = self.edges.get_mut(&eid) {
                             edge.items_in_transit.push(iid);
                             edge.cooldown_timer = edge.cooldown;
@@ -442,8 +319,6 @@ impl Graph {
             }
         }
     }
-
-    /// Phase 5: Pull flow — active Pull/Both nodes pull items from source nodes.
     fn process_pull_flow(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let pull_nodes: Vec<u64> = self
             .nodes
@@ -453,7 +328,6 @@ impl Graph {
             })
             .map(|n| n.id)
             .collect();
-
         for nid in pull_nodes {
             let (pull_slots, pull_filter) = {
                 let node = match self.nodes.get_mut(&nid) {
@@ -468,10 +342,8 @@ impl Graph {
                 node.pull_timer -= slots as f64 / node.pull_rate;
                 (slots, node.pull_filter.clone())
             };
-
             let incoming: Vec<u64> = self.get_incoming_edges(nid);
             let mut pulled = 0;
-
             for &eid in &incoming {
                 if pulled >= pull_slots {
                     break;
@@ -480,24 +352,18 @@ impl Graph {
                     Some(e) => (e.from_node, e.active),
                     None => continue,
                 };
-
                 if !edge_active {
                     continue;
                 }
-
-                // Check if dest node is full
                 if let Some(node) = self.nodes.get(&nid) {
                     if node.is_full() {
                         break;
                     }
                 }
-
-                // Find an item at the source node
                 let source_items: Vec<u64> = match self.nodes.get(&source_node_id) {
                     Some(n) => n.items.clone(),
                     None => continue,
                 };
-
                 for &iid in &source_items {
                     if pulled >= pull_slots {
                         break;
@@ -506,15 +372,11 @@ impl Graph {
                         Some(item) if item.alive => item.item_type.clone(),
                         _ => continue,
                     };
-
-                    // Check pull filter
                     if let Some(ref filter) = pull_filter {
                         if &item_type != filter {
                             continue;
                         }
                     }
-
-                    // Check edge allows this type
                     let allowed = match self.edges.get(&eid) {
                         Some(e) => e.is_item_type_allowed(&item_type) && !e.is_transit_full(),
                         None => false,
@@ -522,8 +384,6 @@ impl Graph {
                     if !allowed {
                         continue;
                     }
-
-                    // Transfer: remove from source, place on edge
                     events.push(GraphEvent::ItemLeave {
                         item_id: iid,
                         node_id: source_node_id,
@@ -532,7 +392,6 @@ impl Graph {
                         item_id: iid,
                         edge_id: eid,
                     });
-
                     if let Some(src) = self.nodes.get_mut(&source_node_id) {
                         src.items.retain(|&id| id != iid);
                     }
@@ -547,16 +406,13 @@ impl Graph {
                         };
                     }
                     pulled += 1;
-                    break; // one item per edge per cycle
+                    break;
                 }
             }
         }
     }
-
-    /// Phase 6: Conversions — consume input items and produce output items.
     fn process_conversions(&mut self, events: &mut Vec<GraphEvent>) {
         let node_ids: Vec<u64> = self.nodes.keys().copied().collect();
-
         for nid in node_ids {
             let conversions: Vec<(String, String, u32, u32)> = match self.nodes.get(&nid) {
                 Some(node) if node.active && !node.conversions.is_empty() => node
@@ -573,10 +429,8 @@ impl Graph {
                     .collect(),
                 _ => continue,
             };
-
             for (in_type, out_type, in_count, out_count) in conversions {
                 loop {
-                    // Find matching items at this node
                     let matching: Vec<u64> = {
                         let node = match self.nodes.get(&nid) {
                             Some(n) => n,
@@ -594,12 +448,9 @@ impl Graph {
                             .take(in_count as usize)
                             .collect()
                     };
-
                     if matching.len() < in_count as usize {
                         break;
                     }
-
-                    // Consume input items
                     let consumed = matching;
                     for &iid in &consumed {
                         if let Some(item) = self.items.get_mut(&iid) {
@@ -609,8 +460,6 @@ impl Graph {
                             node.items.retain(|&id| id != iid);
                         }
                     }
-
-                    // Produce output items
                     let mut produced = Vec::new();
                     for _ in 0..out_count {
                         let new_id = self.create_item(&out_type, -1.0);
@@ -622,7 +471,6 @@ impl Graph {
                         }
                         produced.push(new_id);
                     }
-
                     events.push(GraphEvent::ItemConvert {
                         node_id: nid,
                         consumed: consumed.clone(),
@@ -632,11 +480,8 @@ impl Graph {
             }
         }
     }
-
-    /// Phase 7: Queue processing — dequeue items when capacity and process_time allow.
     fn process_queues(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let node_ids: Vec<u64> = self.nodes.keys().copied().collect();
-
         for nid in node_ids {
             let should_dequeue = {
                 let node = match self.nodes.get_mut(&nid) {
@@ -656,7 +501,6 @@ impl Graph {
                 node.process_accumulator = 0.0;
                 true
             };
-
             if should_dequeue {
                 let item_id = {
                     let node = self.nodes.get_mut(&nid).unwrap();
@@ -665,8 +509,6 @@ impl Graph {
                         None => continue,
                     }
                 };
-
-                // Place into node items
                 if let Some(node) = self.nodes.get_mut(&nid) {
                     node.items.push(item_id);
                 }

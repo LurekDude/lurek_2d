@@ -1,75 +1,17 @@
-//! 2D geometry utility functions.
-//!
-//! Free functions for common geometric computations: angle measurement, circle/line/
-//! rectangle intersection tests, point-in-polygon, convex hull (Andrew's monotone
-//! chain), polygon centroid and area, Bresenham line rasterisation, point-to-segment
-//! projection, and polygon offsetting.
-
-/// Returns the angle in radians from (x1, y1) to (x2, y2).
-///
-/// # Parameters
-/// - `x1` — `f32`.
-/// - `y1` — `f32`.
-/// - `x2` — `f32`.
-/// - `y2` — `f32`.
-///
-/// # Returns
-/// `f32`.
 pub fn angle_between(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
     (y2 - y1).atan2(x2 - x1)
 }
-
-/// Returns true if the point (px, py) is inside the circle centered at (cx, cy) with radius r.
-///
-/// # Parameters
-/// - `cx` — `f32`.
-/// - `cy` — `f32`.
-/// - `r` — `f32`.
-/// - `px` — `f32`.
-/// - `py` — `f32`.
-///
-/// # Returns
-/// `bool`.
 pub fn circle_contains_point(cx: f32, cy: f32, r: f32, px: f32, py: f32) -> bool {
     let dx = px - cx;
     let dy = py - cy;
     dx * dx + dy * dy <= r * r
 }
-
-/// Returns true if two circles overlap. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `x1` — `f32`.
-/// - `y1` — `f32`.
-/// - `r1` — `f32`.
-/// - `x2` — `f32`.
-/// - `y2` — `f32`.
-/// - `r2` — `f32`.
-///
-/// # Returns
-/// `bool`.
 pub fn circle_intersects_circle(x1: f32, y1: f32, r1: f32, x2: f32, y2: f32, r2: f32) -> bool {
     let dx = x2 - x1;
     let dy = y2 - y1;
     let sum_r = r1 + r2;
     dx * dx + dy * dy <= sum_r * sum_r
 }
-
-/// Line-circle intersection. Returns (intersects, hit1, hit2).
-///
-/// # Parameters
-/// - `cx` — `f32`.
-/// - `cy` — `f32`.
-/// - `r` — `f32`.
-/// - `lx1` — `f32`.
-/// - `ly1` — `f32`.
-/// - `lx2` — `f32`.
-/// - `ly2` — `f32`.
-///
-/// # Returns
-/// `(bool, Option<(f32, f32)>, Option<(f32, f32)>)`.
-///
-/// Points are along the infinite line through (lx1,ly1)-(lx2,ly2).
 #[allow(clippy::type_complexity)]
 pub fn circle_intersects_line(
     cx: f32,
@@ -84,7 +26,6 @@ pub fn circle_intersects_line(
     let dy = ly2 - ly1;
     let fx = lx1 - cx;
     let fy = ly1 - cy;
-
     let a = dx * dx + dy * dy;
     if a < 1e-10 {
         return (false, None, None);
@@ -92,38 +33,20 @@ pub fn circle_intersects_line(
     let b = 2.0 * (fx * dx + fy * dy);
     let c = fx * fx + fy * fy - r * r;
     let discriminant = b * b - 4.0 * a * c;
-
     if discriminant < 0.0 {
         return (false, None, None);
     }
-
     let sqrt_d = discriminant.sqrt();
     let t1 = (-b - sqrt_d) / (2.0 * a);
     let t2 = (-b + sqrt_d) / (2.0 * a);
-
     let p1 = Some((lx1 + t1 * dx, ly1 + t1 * dy));
     let p2 = if discriminant > 1e-10 {
         Some((lx1 + t2 * dx, ly1 + t2 * dy))
     } else {
         None
     };
-
     (true, p1, p2)
 }
-
-/// Segment-circle intersection. Same as line-circle but clamped to the segment.
-///
-/// # Parameters
-/// - `cx` — `f32`.
-/// - `cy` — `f32`.
-/// - `r` — `f32`.
-/// - `sx1` — `f32`.
-/// - `sy1` — `f32`.
-/// - `sx2` — `f32`.
-/// - `sy2` — `f32`.
-///
-/// # Returns
-/// `(bool, Option<(f32, f32)>, Option<(f32, f32)>)`.
 #[allow(clippy::type_complexity)]
 pub fn circle_intersects_segment(
     cx: f32,
@@ -138,7 +61,6 @@ pub fn circle_intersects_segment(
     let dy = sy2 - sy1;
     let fx = sx1 - cx;
     let fy = sy1 - cy;
-
     let a = dx * dx + dy * dy;
     if a < 1e-10 {
         return (false, None, None);
@@ -146,15 +68,12 @@ pub fn circle_intersects_segment(
     let b = 2.0 * (fx * dx + fy * dy);
     let c = fx * fx + fy * fy - r * r;
     let discriminant = b * b - 4.0 * a * c;
-
     if discriminant < 0.0 {
         return (false, None, None);
     }
-
     let sqrt_d = discriminant.sqrt();
     let t1 = (-b - sqrt_d) / (2.0 * a);
     let t2 = (-b + sqrt_d) / (2.0 * a);
-
     let p1 = if (0.0..=1.0).contains(&t1) {
         Some((sx1 + t1 * dx, sy1 + t1 * dy))
     } else {
@@ -165,20 +84,9 @@ pub fn circle_intersects_segment(
     } else {
         None
     };
-
     let any_hit = p1.is_some() || p2.is_some();
     (any_hit, p1, p2)
 }
-
-/// Computes the signed area of a polygon using the Shoelace formula.
-///
-/// # Parameters
-/// - `vertices` — `&[f32]`.
-///
-/// # Returns
-/// `f32`.
-///
-/// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn polygon_area(vertices: &[f32]) -> f32 {
     let n = vertices.len() / 2;
     if n < 3 {
@@ -195,16 +103,6 @@ pub fn polygon_area(vertices: &[f32]) -> f32 {
     }
     area * 0.5
 }
-
-/// Computes the centroid of a polygon. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `vertices` — `&[f32]`.
-///
-/// # Returns
-/// `(f32, f32)`.
-///
-/// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
     let n = vertices.len() / 2;
     if n == 0 {
@@ -226,7 +124,6 @@ pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
     }
     signed_area *= 0.5;
     if signed_area.abs() < 1e-10 {
-        // Degenerate polygon, use simple average
         let mut sx = 0.0;
         let mut sy = 0.0;
         for i in 0..n {
@@ -238,21 +135,6 @@ pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
     let factor = 1.0 / (6.0 * signed_area);
     (cx * factor, cy * factor)
 }
-
-/// Tests if two line segments intersect. Returns (intersects, intersection_point).
-///
-/// # Parameters
-/// - `x1` — `f32`.
-/// - `y1` — `f32`.
-/// - `x2` — `f32`.
-/// - `y2` — `f32`.
-/// - `x3` — `f32`.
-/// - `y3` — `f32`.
-/// - `x4` — `f32`.
-/// - `y4` — `f32`.
-///
-/// # Returns
-/// `(bool, Option<(f32, f32)>)`.
 #[allow(clippy::too_many_arguments)]
 pub fn segment_intersects_segment(
     x1: f32,
@@ -270,7 +152,6 @@ pub fn segment_intersects_segment(
     }
     let t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d;
     let u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / d;
-
     if (0.0..=1.0).contains(&t) && (0.0..=1.0).contains(&u) {
         let ix = x1 + t * (x2 - x1);
         let iy = y1 + t * (y2 - y1);
@@ -279,19 +160,6 @@ pub fn segment_intersects_segment(
         (false, None)
     }
 }
-
-/// Returns the closest point on a line segment to a given point.
-///
-/// # Parameters
-/// - `px` — `f32`.
-/// - `py` — `f32`.
-/// - `x1` — `f32`.
-/// - `y1` — `f32`.
-/// - `x2` — `f32`.
-/// - `y2` — `f32`.
-///
-/// # Returns
-/// `(f32, f32)`.
 pub fn closest_point_on_segment(
     px: f32,
     py: f32,
@@ -310,18 +178,6 @@ pub fn closest_point_on_segment(
     let t = t.clamp(0.0, 1.0);
     (x1 + t * dx, y1 + t * dy)
 }
-
-/// Tests if a point is inside a polygon using the ray casting algorithm.
-///
-/// # Parameters
-/// - `vertices` — `&[f32]`.
-/// - `px` — `f32`.
-/// - `py` — `f32`.
-///
-/// # Returns
-/// `bool`.
-///
-/// `vertices` is a flat array `[x0, y0, x1, y1, ...]`.
 pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
     let n = vertices.len() / 2;
     if n < 3 {
@@ -334,7 +190,6 @@ pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
         let yi = vertices[i * 2 + 1];
         let xj = vertices[j * 2];
         let yj = vertices[j * 2 + 1];
-
         if ((yi > py) != (yj > py)) && (px < (xj - xi) * (py - yi) / (yj - yi) + xi) {
             inside = !inside;
         }
@@ -342,21 +197,6 @@ pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
     }
     inside
 }
-
-/// Infinite line intersection. Returns the intersection point if lines are not parallel.
-///
-/// # Parameters
-/// - `x1` — `f32`.
-/// - `y1` — `f32`.
-/// - `x2` — `f32`.
-/// - `y2` — `f32`.
-/// - `x3` — `f32`.
-/// - `y3` — `f32`.
-/// - `x4` — `f32`.
-/// - `y4` — `f32`.
-///
-/// # Returns
-/// `Option<(f32, f32)>`.
 #[allow(clippy::too_many_arguments)]
 pub fn line_intersect(
     x1: f32,
@@ -375,19 +215,6 @@ pub fn line_intersect(
     let t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d;
     Some((x1 + t * (x2 - x1), y1 + t * (y2 - y1)))
 }
-
-/// Bresenham line rasterization from (x1, y1) to (x2, y2).
-///
-/// # Parameters
-/// - `x1` — `i32`.
-/// - `y1` — `i32`.
-/// - `x2` — `i32`.
-/// - `y2` — `i32`.
-///
-/// # Returns
-/// `Vec<(i32, i32)>`.
-///
-/// Returns all integer grid cells the line passes through.
 pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
     let mut points = Vec::new();
     let mut x = x1;
@@ -397,7 +224,6 @@ pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
     let sx = if x1 < x2 { 1 } else { -1 };
     let sy = if y1 < y2 { 1 } else { -1 };
     let mut err = dx + dy;
-
     loop {
         points.push((x, y));
         if x == x2 && y == y2 {
@@ -415,38 +241,20 @@ pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
     }
     points
 }
-
-/// Computes the convex hull of a set of 2D points using Andrew's monotone chain algorithm.
-///
-/// Sorts points lexicographically, then builds the lower and upper hulls
-/// by maintaining a stack of points with consistent left-turn cross products.
-///
-/// # Parameters
-/// - `points` — `&[f32]`.
-///
-/// # Returns
-/// `Vec<f32>`.
-///
-/// `points` is a flat array `[x0, y0, x1, y1, ...]`. Returns flat `[x0, y0, ...]`.
 pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     let n = points.len() / 2;
     if n < 3 {
         return points.to_vec();
     }
-
-    // Extract and sort points by x, then y
     let mut pts: Vec<(f32, f32)> = (0..n).map(|i| (points[i * 2], points[i * 2 + 1])).collect();
     pts.sort_by(|a, b| {
         a.0.partial_cmp(&b.0)
             .expect("partial_cmp on finite f32")
             .then(a.1.partial_cmp(&b.1).expect("partial_cmp on finite f32"))
     });
-
     let cross = |o: (f32, f32), a: (f32, f32), b: (f32, f32)| -> f32 {
         (a.0 - o.0) * (b.1 - o.1) - (a.1 - o.1) * (b.0 - o.0)
     };
-
-    // Build lower hull
     let mut lower: Vec<(f32, f32)> = Vec::new();
     for &p in &pts {
         while lower.len() >= 2 && cross(lower[lower.len() - 2], lower[lower.len() - 1], p) <= 0.0 {
@@ -454,8 +262,6 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
         }
         lower.push(p);
     }
-
-    // Build upper hull
     let mut upper: Vec<(f32, f32)> = Vec::new();
     for &p in pts.iter().rev() {
         while upper.len() >= 2 && cross(upper[upper.len() - 2], upper[upper.len() - 1], p) <= 0.0 {
@@ -463,11 +269,8 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
         }
         upper.push(p);
     }
-
-    // Remove last point of each half because it's repeated
     lower.pop();
     upper.pop();
-
     lower.extend(upper);
     let mut result = Vec::with_capacity(lower.len() * 2);
     for (x, y) in lower {
@@ -476,22 +279,10 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     }
     result
 }
-
-/// Delaunay triangulation using the Bowyer-Watson algorithm.
-///
-/// # Parameters
-/// - `points` — `&[(f64, f64)]`.
-///
-/// # Returns
-/// `Vec<[f64; 6]>`.
-///
-/// Returns a list of triangles, each as `[x1, y1, x2, y2, x3, y3]`.
 pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
     if points.len() < 3 {
         return Vec::new();
     }
-
-    // Find bounding box
     let mut min_x = f64::MAX;
     let mut min_y = f64::MAX;
     let mut max_x = f64::MIN;
@@ -510,29 +301,20 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
             max_y = y;
         }
     }
-
     let dx = max_x - min_x;
     let dy = max_y - min_y;
     let delta = dx.max(dy);
     let mid_x = (min_x + max_x) / 2.0;
     let mid_y = (min_y + max_y) / 2.0;
-
-    // Super-triangle vertices
     let st0 = (mid_x - 20.0 * delta, mid_y - delta);
     let st1 = (mid_x, mid_y + 20.0 * delta);
     let st2 = (mid_x + 20.0 * delta, mid_y - delta);
-
-    // Triangle: (i0, i1, i2) indices into all_points
     let mut all_points: Vec<(f64, f64)> = vec![st0, st1, st2];
     all_points.extend_from_slice(points);
-
-    // Each triangle stores 3 indices
     let mut triangles: Vec<[usize; 3]> = vec![[0, 1, 2]];
-
     for pi in 3..all_points.len() {
         let p = all_points[pi];
         let mut bad_triangles = Vec::new();
-
         for (ti, tri) in triangles.iter().enumerate() {
             if in_circumcircle(
                 p,
@@ -543,8 +325,6 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
                 bad_triangles.push(ti);
             }
         }
-
-        // Find boundary polygon (edges not shared by two bad triangles)
         let mut polygon: Vec<[usize; 2]> = Vec::new();
         for &bi in &bad_triangles {
             let tri = triangles[bi];
@@ -565,22 +345,15 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
                 }
             }
         }
-
-        // Remove bad triangles (reverse order to preserve indices)
         bad_triangles.sort_unstable();
         for &bi in bad_triangles.iter().rev() {
             triangles.swap_remove(bi);
         }
-
-        // Create new triangles
         for edge in &polygon {
             triangles.push([edge[0], edge[1], pi]);
         }
     }
-
-    // Remove triangles that share vertices with super-triangle
     triangles.retain(|tri| tri[0] >= 3 && tri[1] >= 3 && tri[2] >= 3);
-
     triangles
         .iter()
         .map(|tri| {
@@ -591,8 +364,6 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
         })
         .collect()
 }
-
-/// Tests if point p is inside the circumcircle of triangle (a, b, c).
 fn in_circumcircle(p: (f64, f64), a: (f64, f64), b: (f64, f64), c: (f64, f64)) -> bool {
     let ax = a.0 - p.0;
     let ay = a.1 - p.1;
@@ -600,10 +371,8 @@ fn in_circumcircle(p: (f64, f64), a: (f64, f64), b: (f64, f64), c: (f64, f64)) -
     let by = b.1 - p.1;
     let cx = c.0 - p.0;
     let cy = c.1 - p.1;
-
     let det = ax * (by * (cx * cx + cy * cy) - cy * (bx * bx + by * by))
         - ay * (bx * (cx * cx + cy * cy) - cx * (bx * bx + by * by))
         + (ax * ax + ay * ay) * (bx * cy - by * cx);
-
     det > 0.0
 }

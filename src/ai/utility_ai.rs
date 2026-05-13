@@ -1,29 +1,29 @@
-//! utility-AI scoring with response curves and action ranking.
+//! Utility AI: consideration scoring, response curves, and best-action selection.
+//! Owns `ResponseCurve`, `Consideration`, `UAAction`, and `UtilityAI`.
+//! Does not own the Lua environment; `evaluate` borrows `&Lua` to call scorers.
+//! Depends on `mlua::RegistryKey` for scorer and consideration callbacks.
 use mlua::prelude::*;
 use mlua::RegistryKey;
-
-/// Mathematical function shapes for transforming raw consideration inputs into normalized scores in `[0.0, 1.0]`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ResponseCurve {
-    /// Linear: output = p1 * input + p2.
+    /// Output = p1 * input + p2.
     Linear,
-    /// Quadratic: output = p1 * input^2 + p2 * input + p3.
+    /// Output = p1 * input² + p2 * input + p3.
     Quadratic,
-    /// Logistic: output = 1 / (1 + e^(-p1 * (input - p2))).
+    /// Sigmoid: 1 / (1 + exp(−p1 * (input − p2))).
     Logistic,
-    /// Logit: output = ln(input / (1 - input)) * p1 + p2.
+    /// Log-odds transform, clamped to avoid infinities.
     Logit,
-    /// Step: output = p2 if input >= p1, else p3.
+    /// Returns p2 when input ≥ p1, otherwise p3.
     Step,
-    /// A user-defined Lua function maps `f64 -> f64` for this axis.
+    /// Delegates to a Lua callback identified by `callback_id`.
     Custom {
-        /// Opaque ID referencing the Lua curve callback in the API-layer registry.
+        /// Registry index of the Lua curve callback.
         callback_id: u32,
     },
 }
-
 impl ResponseCurve {
-    /// Parse from Lua string. Returns an error if the source data is malformed or missing.
+    /// Parse a string tag into a `ResponseCurve`; unknown strings map to `Linear`.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "quadratic" => Self::Quadratic,
@@ -33,8 +33,7 @@ impl ResponseCurve {
             _ => Self::Linear,
         }
     }
-
-    /// Transforms a raw input value through this response curve using the provided parameters `p1`, `p2`, `p3`.
+    /// Evaluate the curve at `input` using shape parameters p1, p2, p3.
     pub fn apply(&self, input: f64, p1: f64, p2: f64, p3: f64) -> f64 {
         match self {
             Self::Linear => p1 * input + p2,
@@ -51,54 +50,46 @@ impl ResponseCurve {
                     p3
                 }
             }
-            // Invoked by LuaUtilityAI; domain code returns identity for Custom.
             Self::Custom { .. } => input,
         }
     }
 }
-
-/// A single evaluation axis within a utility action's scoring function.
 pub struct Consideration {
-    /// Human-readable label for this consideration axis. Used in debug output and score inspection.
+    /// Unique name for this consideration, used for debug display.
     pub name: String,
-    /// Lua callback that returns a raw f64 score.
+    /// Lua callback that returns a raw input score in `[0, 1]`.
     pub callback: RegistryKey,
-    /// Response curve to apply to the raw score.
+    /// Response curve that maps the raw input to a utility value.
     pub curve: ResponseCurve,
-    /// Curve parameter 1.
+    /// First shape parameter for the response curve.
     pub p1: f64,
-    /// Curve parameter 2.
+    /// Second shape parameter for the response curve.
     pub p2: f64,
-    /// Curve parameter 3.
+    /// Third shape parameter for the response curve.
     pub p3: f64,
-    /// Weight multiplier applied to this consideration's score before the axis product is computed.
+    /// Multiplicative weight applied to the curve output before product scoring.
     pub weight: f64,
 }
-
-/// A candidate action in the utility AI decision space.
 pub struct UAAction {
-    /// Unique action name returned by `evaluate()` when this action wins.
+    /// Unique name identifying this action.
     pub name: String,
-    /// Lua scorer callback (optional, for simple single-score actions).
+    /// Lua scorer callback returning the overall action utility.
     pub scorer: RegistryKey,
-    /// Multi-axis considerations.
+    /// Ordered list of considerations whose outputs are multiplied together.
     pub considerations: Vec<Consideration>,
-    /// Bonus added when this action was chosen last (inertia/momentum).
+    /// Bonus multiplier added to the score when this action was selected last tick.
     pub momentum_bonus: f64,
 }
-
-/// Multi-axis utility scorer that evaluates candidate actions and chooses the highest-scoring one each frame.
 pub struct UtilityAI {
-    /// Available actions to evaluate.
+    /// All registered actions evaluated each tick.
     pub actions: Vec<UAAction>,
-    /// Index of the action chosen by the last `evaluate()`.
+    /// Index of the action selected on the last `evaluate` call.
     pub last_action: Option<usize>,
-    /// Score array from the last `evaluate()`, one per action.
+    /// Per-action weighted scores from the last `evaluate` call.
     pub last_scores: Vec<f64>,
 }
-
 impl UtilityAI {
-    /// Create a new empty UtilityAI scorer.
+    /// Create a `UtilityAI` with no actions.
     pub fn new() -> Self {
         Self {
             actions: Vec::new(),
@@ -106,8 +97,7 @@ impl UtilityAI {
             last_scores: Vec::new(),
         }
     }
-
-    /// Add an action with the given scorer callback and momentum bonus. Used by the Lua API.
+    /// Register a new action with an empty consideration list.
     pub fn add_action(&mut self, name: String, scorer: RegistryKey, momentum_bonus: f64) {
         self.actions.push(UAAction {
             name,
@@ -116,9 +106,8 @@ impl UtilityAI {
             momentum_bonus,
         });
     }
-
-    /// Add a consideration to the named action. No-op if action not found. Used by the Lua API.
     #[allow(clippy::too_many_arguments)]
+    /// Append a consideration to the named action; no-op if the action is not found.
     pub fn add_consideration(
         &mut self,
         action_name: &str,
@@ -142,14 +131,13 @@ impl UtilityAI {
             });
         }
     }
-
-    /// Return the name of the last chosen action, or `None` if no evaluation has occurred.
+    /// Return the name of the action selected on the last `evaluate` call, or `None`.
     pub fn last_action_name(&self) -> Option<&str> {
         self.last_action
             .and_then(|i| self.actions.get(i))
             .map(|a| a.name.as_str())
     }
-    /// Evaluates all actions using Lua scorer callbacks and returns the best action name.
+    /// Call all action scorers, apply momentum, and return the best action name.
     pub fn evaluate(&mut self, lua: &Lua) -> LuaResult<Option<String>> {
         if self.actions.is_empty() {
             return Ok(None);
@@ -172,10 +160,10 @@ impl UtilityAI {
         Ok(Some(self.actions[best_idx].name.clone()))
     }
 }
-
+/// `Default` delegates to `UtilityAI::new`.
 impl Default for UtilityAI {
+    /// `Default` delegates to `UtilityAI::new`.
     fn default() -> Self {
         Self::new()
     }
 }
-

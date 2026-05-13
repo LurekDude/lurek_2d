@@ -1,6 +1,3 @@
-//! Shared color conversion helpers for the `visualization` module.
-
-/// Convert HSV colour to RGB bytes.
 pub(crate) fn hsv_to_rgb_viz(h: u16, s: f32, v: f32) -> (u8, u8, u8) {
     let h = (h % 360) as f32;
     let c = v * s;

@@ -1,35 +1,7 @@
-//! Province data loaders for the globe module.
-//!
-//! Supported formats:
-//! - **TOML province list** (`*.toml`): a `[[province]]` array. Human-authored.
-//! - **PNG color-index** (`*.png`): each unique non-white/non-black color = one province.
-//!   Boundaries are derived from connected-component analysis. (Stub for MVP.)
-//!
-//! Both loaders produce a `Vec<Province>` that can be inserted into a `ProvinceGraph`.
-
 use crate::globe::types::{Province, ProvinceId};
 use crate::image::province_grid::ProvinceGrid;
 use crate::math::voronoi::voronoi_from_points;
 use std::collections::HashMap;
-
-// ── TOML province list ──────────────────────────────────────────────────────
-
-/// Province definition as read from a TOML `[[province]]` entry.
-///
-/// ```toml
-/// [[province]]
-/// id = 1
-/// name = "England"
-/// centroid = [51.5, -0.1]
-/// vertices = [[50.0, -5.0], [55.0, -2.0], [51.0, 1.0]]
-/// neighbors = [2, 3]
-/// base_color = [0.2, 0.5, 0.8, 1.0]
-/// texture = "england_terrain"   # optional
-///
-/// [province.attrs]
-/// owner = "player"
-/// terrain = "plains"
-/// ```
 #[derive(Debug, Clone)]
 struct TomlProvince {
     id: ProvinceId,
@@ -40,31 +12,15 @@ struct TomlProvince {
     texture: Option<String>,
     attrs: HashMap<String, String>,
 }
-
-/// Parse a TOML province file from a string.
-///
-/// Expected structure:
-/// ```toml
-/// [[province]]
-/// id = 1
-/// centroid = [lat, lon]
-/// vertices = [[lat, lon], ...]
-/// neighbors = [id, ...]
-/// ```
 pub fn load_from_toml_str(src: &str) -> Result<Vec<Province>, String> {
-    // Minimal hand-rolled TOML parser for the [[province]] array.
-    // Full TOML parsing would use the `toml` crate; this covers the required subset.
     let doc = parse_toml_province_list(src)?;
     Ok(doc.into_iter().map(toml_province_to_province).collect())
 }
-
-/// Load province data from the filesystem (synchronous).
 pub fn load_from_toml_file(path: &str) -> Result<Vec<Province>, String> {
     let src =
         std::fs::read_to_string(path).map_err(|e| format!("cannot read '{}': {}", path, e))?;
     load_from_toml_str(&src)
 }
-
 fn toml_province_to_province(tp: TomlProvince) -> Province {
     let verts: Vec<(f32, f32)> = tp.vertices.iter().map(|v| (v[0], v[1])).collect();
     let mut p = Province::new(tp.id, verts);
@@ -75,14 +31,10 @@ fn toml_province_to_province(tp: TomlProvince) -> Province {
     p.attrs = tp.attrs;
     p
 }
-
-// ── Minimal TOML parser ──────────────────────────────────────────────────────
-
 fn parse_toml_province_list(src: &str) -> Result<Vec<TomlProvince>, String> {
     let mut provinces: Vec<TomlProvince> = Vec::new();
     let mut current: Option<TomlProvinceBuilder> = None;
     let mut in_attrs = false;
-
     for (line_no, raw_line) in src.lines().enumerate() {
         let line = raw_line.trim();
         if line.starts_with('#') || line.is_empty() {
@@ -101,7 +53,6 @@ fn parse_toml_province_list(src: &str) -> Result<Vec<TomlProvince>, String> {
             continue;
         }
         if line.starts_with('[') {
-            // Other table header — skip.
             in_attrs = false;
             continue;
         }
@@ -120,7 +71,6 @@ fn parse_toml_province_list(src: &str) -> Result<Vec<TomlProvince>, String> {
     }
     Ok(provinces)
 }
-
 #[derive(Default)]
 struct TomlProvinceBuilder {
     id: Option<ProvinceId>,
@@ -131,7 +81,6 @@ struct TomlProvinceBuilder {
     texture: Option<String>,
     attrs: HashMap<String, String>,
 }
-
 impl TomlProvinceBuilder {
     fn build(self) -> Result<TomlProvince, String> {
         Ok(TomlProvince {
@@ -145,7 +94,6 @@ impl TomlProvinceBuilder {
         })
     }
 }
-
 fn parse_field(line: &str, b: &mut TomlProvinceBuilder) -> Result<(), String> {
     let eq = line
         .find('=')
@@ -171,11 +119,10 @@ fn parse_field(line: &str, b: &mut TomlProvinceBuilder) -> Result<(), String> {
         "texture" => {
             b.texture = Some(strip_quotes(val).to_string());
         }
-        _ => {} // Unknown keys are silently ignored.
+        _ => {}
     }
     Ok(())
 }
-
 fn parse_kv_string(line: &str, mut f: impl FnMut(String, String)) {
     if let Some(eq) = line.find('=') {
         let k = line[..eq].trim().to_string();
@@ -183,11 +130,9 @@ fn parse_kv_string(line: &str, mut f: impl FnMut(String, String)) {
         f(k, v);
     }
 }
-
 fn parse_u32(s: &str) -> Result<u32, String> {
     s.trim().parse().map_err(|_| format!("not a u32: '{}'", s))
 }
-
 fn parse_f32_pair(s: &str) -> Result<[f32; 2], String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     let parts: Vec<&str> = inner.split(',').collect();
@@ -205,7 +150,6 @@ fn parse_f32_pair(s: &str) -> Result<[f32; 2], String> {
             .map_err(|_| format!("bad f32 '{}'", parts[1]))?,
     ])
 }
-
 fn parse_f32_4(s: &str) -> Result<[f32; 4], String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     let parts: Vec<&str> = inner.split(',').collect();
@@ -218,9 +162,7 @@ fn parse_f32_4(s: &str) -> Result<[f32; 4], String> {
     }
     Ok(out)
 }
-
 fn parse_f32_pair_array(s: &str) -> Result<Vec<[f32; 2]>, String> {
-    // e.g. [[50.0, -5.0], [55.0, -2.0], [51.0, 1.0]]
     let s = s.trim().trim_start_matches('[').trim_end_matches(']');
     let mut out = Vec::new();
     let mut depth = 0i32;
@@ -244,7 +186,6 @@ fn parse_f32_pair_array(s: &str) -> Result<Vec<[f32; 2]>, String> {
     }
     Ok(out)
 }
-
 fn parse_u32_array(s: &str) -> Result<Vec<u32>, String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     if inner.trim().is_empty() {
@@ -255,7 +196,6 @@ fn parse_u32_array(s: &str) -> Result<Vec<u32>, String> {
         .map(|p| p.trim().parse().map_err(|_| format!("bad u32 '{}'", p)))
         .collect()
 }
-
 fn strip_quotes(s: &str) -> &str {
     let s = s.trim();
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
@@ -264,23 +204,10 @@ fn strip_quotes(s: &str) -> &str {
         s
     }
 }
-
-// ── PNG color-index loader (stub) ─────────────────────────────────────────────
-
-/// Load provinces from a color-indexed PNG.
-///
-/// Each unique color in the image corresponds to one province. The province ID is
-/// derived from the color value. Boundaries are the convex hull of the pixels with
-/// that color (converted from pixel space to lat/lon via a configurable projection).
-///
-/// **This is a stub implementation.** It returns an empty list and logs a warning.
-/// Full implementation requires a flood-fill connected-component analysis and a
-/// pixel → lat/lon coordinate transform (provided by the caller as a closure).
 pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
     let grid = ProvinceGrid::from_file(_path)?;
     let width = grid.width().max(1);
     let height = grid.height().max(1);
-
     let mut bounds: HashMap<ProvinceId, (u32, u32, u32, u32)> = HashMap::new();
     for y in 0..height {
         for x in 0..width {
@@ -295,18 +222,15 @@ pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
             e.3 = e.3.max(y);
         }
     }
-
     let mut neighbors: HashMap<ProvinceId, Vec<ProvinceId>> = HashMap::new();
     for (a, b, _) in grid.adjacencies() {
         neighbors.entry(*a).or_default().push(*b);
         neighbors.entry(*b).or_default().push(*a);
     }
-
     let mut out = Vec::with_capacity(bounds.len());
     for (id, (min_x, min_y, max_x, max_y)) in bounds {
         let to_lon = |x: u32| (x as f32 / width as f32) * 360.0 - 180.0;
         let to_lat = |y: u32| 90.0 - (y as f32 / height as f32) * 180.0;
-
         let lat0 = to_lat(min_y);
         let lat1 = to_lat(max_y);
         let lon0 = to_lon(min_x);
@@ -324,11 +248,6 @@ pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
     }
     Ok(out)
 }
-
-/// Generate procedural provinces with a Voronoi tessellation.
-///
-/// Input points are `(lat_deg, lon_deg)` seed positions. The function returns one
-/// province per generated Voronoi cell with neighbor links inferred from edge sharing.
 pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
     if points.is_empty() {
         return Vec::new();
@@ -336,7 +255,6 @@ pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
     let pts_xy: Vec<(f32, f32)> = points.iter().map(|(lat, lon)| (*lon, *lat)).collect();
     let cells = voronoi_from_points(&pts_xy);
     let mut out = Vec::with_capacity(cells.len());
-
     for (i, cell) in cells.iter().enumerate() {
         let id = (i + 1) as u32;
         let mut vertices = Vec::with_capacity(cell.vertices.len().max(3));
@@ -361,8 +279,6 @@ pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
             [0.45, 0.45, 0.5, 1.0],
         ));
     }
-
-    // Lightweight neighbor inference by centroid proximity.
     for i in 0..out.len() {
         let (ilat, ilon) = out[i].centroid;
         let mut nearest: Vec<(f32, u32)> = out
@@ -377,6 +293,5 @@ pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
         nearest.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
         out[i].neighbors = nearest.into_iter().take(4).map(|(_, id)| id).collect();
     }
-
     out
 }

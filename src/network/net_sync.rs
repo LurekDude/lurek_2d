@@ -1,26 +1,14 @@
-//! Common helpers for entity state sync and lightweight client prediction.
-
 use crate::network::message::NetValue;
-
-/// Basic network snapshot for one entity.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EntitySnapshot {
-    /// Stable entity identifier.
     pub id: u32,
-    /// Simulation tick used by reconciliation.
     pub tick: u32,
-    /// Position X.
     pub x: f32,
-    /// Position Y.
     pub y: f32,
-    /// Velocity X.
     pub vx: f32,
-    /// Velocity Y.
     pub vy: f32,
 }
-
 impl EntitySnapshot {
-    /// Encodes this snapshot to NetValue map.
     pub fn to_netvalue(&self) -> NetValue {
         NetValue::Map(vec![
             ("id".to_string(), NetValue::Integer(self.id as i64)),
@@ -31,8 +19,6 @@ impl EntitySnapshot {
             ("vy".to_string(), NetValue::Float(self.vy as f64)),
         ])
     }
-
-    /// Decodes snapshot from NetValue map.
     pub fn from_netvalue(value: &NetValue) -> Option<Self> {
         let NetValue::Map(fields) = value else {
             return None;
@@ -60,7 +46,6 @@ impl EntitySnapshot {
                 }
             })
         };
-
         Some(Self {
             id: get_i("id")? as u32,
             tick: get_i("tick")? as u32,
@@ -71,8 +56,6 @@ impl EntitySnapshot {
         })
     }
 }
-
-/// Linear client-side prediction for one fixed step.
 pub fn predict_linear(snapshot: &EntitySnapshot, dt: f32) -> EntitySnapshot {
     let mut out = snapshot.clone();
     out.tick = out.tick.saturating_add(1);
@@ -80,8 +63,6 @@ pub fn predict_linear(snapshot: &EntitySnapshot, dt: f32) -> EntitySnapshot {
     out.y += out.vy * dt;
     out
 }
-
-/// Reconciles a predicted state towards server-authoritative snapshot.
 pub fn reconcile(
     predicted: &EntitySnapshot,
     authoritative: &EntitySnapshot,

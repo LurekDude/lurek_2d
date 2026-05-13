@@ -1,56 +1,58 @@
-//! GOAP planning over symbolic world-state facts and action effects.
-use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
-
+//! Goal-Oriented Action Planning (GOAP): actions, goals, A* planner, and plan search.
+//! Owns `GOAPAction`, `GOAPGoal`, `PlanNode` (internal A* node), and `GOAPPlanner`.
+//! Does not execute actions; callback invocation lives in `lua_api/ai_api.rs`.
+//! Depends on `mlua::RegistryKey` for action callbacks and log codes GP01–GP03.
 use crate::log_msg;
 use crate::runtime::log_messages::{GP01, GP02, GP03};
 use mlua::RegistryKey;
-
-/// A single GOAP action with boolean preconditions and effects.
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap};
 pub struct GOAPAction {
-    /// Human-readable action name, returned in plan results (e.g., `"chop_tree"`, `"craft_axe"`).
+    /// Unique name identifying this action.
     pub name: String,
-    /// Numeric cost used by A* to prefer cheaper action sequences.
+    /// Path cost used by the A* planner; lower cost preferred.
     pub cost: f64,
-    /// Optional Lua callback invoked when this action is executed during plan playback.
+    /// Optional Lua callback invoked when this action is executed.
     pub callback: Option<RegistryKey>,
-    /// Boolean conditions that must all be true in the world state for this action to be applicable during planning.
+    /// World-state conditions that must be true before this action can run.
     pub preconditions: HashMap<String, bool>,
-    /// Boolean effects applied to the world state after this action executes.
+    /// World-state changes applied after this action completes successfully.
     pub effects: HashMap<String, bool>,
 }
-
-/// A planning goal expressed as a desired boolean world state.
 pub struct GOAPGoal {
-    /// Human-readable goal name (e.g., `"survive"`, `"build_shelter"`).
+    /// Unique name identifying this goal.
     pub name: String,
-    /// Priority for goal selection. The planner picks the goal with the highest priority when `plan()` is called without a specific goal index.
+    /// Selection weight; the highest-priority unsatisfied goal is planned for.
     pub priority: f64,
-    /// Target boolean world state. All entries must match for the goal to be considered satisfied and the plan complete.
+    /// Desired world state this goal requires to be satisfied.
     pub state: HashMap<String, bool>,
 }
-
-/// Node in the GOAP A* search.
 #[derive(Clone)]
 struct PlanNode {
+    /// World state at this search node.
     state: HashMap<String, bool>,
+    /// Sequence of action indices selected to reach this node.
     actions: Vec<usize>,
+    /// Accumulated action cost from the start.
     cost: f64,
+    /// Estimated remaining cost to goal; counts unsatisfied goal conditions.
     heuristic: f64,
 }
-
 impl PartialEq for PlanNode {
+    /// Equal when `total()` values are equal (used for heap ordering only).
     fn eq(&self, other: &Self) -> bool {
         self.total() == other.total()
     }
 }
 impl Eq for PlanNode {}
 impl PartialOrd for PlanNode {
+    /// Delegate to `Ord::cmp`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 impl Ord for PlanNode {
+    /// Min-heap ordering: lower `total()` wins, ties resolved as `Equal`.
     fn cmp(&self, other: &Self) -> Ordering {
         other
             .total()
@@ -58,25 +60,22 @@ impl Ord for PlanNode {
             .unwrap_or(Ordering::Equal)
     }
 }
-
 impl PlanNode {
+    /// Return the combined f-score `cost + heuristic`.
     fn total(&self) -> f64 {
         self.cost + self.heuristic
     }
 }
-
-/// A* planner that finds optimal action sequences to satisfy goals over boolean world state.
 pub struct GOAPPlanner {
-    /// Available actions the planner can compose into sequences.
+    /// All registered actions available to the planner.
     pub actions: Vec<GOAPAction>,
-    /// Goals the planner can target, selected by highest priority.
+    /// All registered goals; the highest-priority goal is selected at plan time.
     pub goals: Vec<GOAPGoal>,
-    /// Maximum A* iterations per planning call. Default 10 000. Zero is treated as unlimited.
+    /// Hard cap on A* iterations to prevent runaway planning; default 10 000.
     pub max_iterations: usize,
 }
-
 impl GOAPPlanner {
-    /// Create a new empty GOAP planner.
+    /// Create a planner with an empty action and goal lists and `max_iterations = 10 000`.
     pub fn new() -> Self {
         log_msg!(debug, GP01);
         Self {
@@ -85,10 +84,8 @@ impl GOAPPlanner {
             max_iterations: 10_000,
         }
     }
-
-    /// Plans a sequence of actions to satisfy the highest-priority goal.
+    /// Plan for the highest-priority goal; return ordered action name list or empty on failure.
     pub fn plan(&self, world_state: &HashMap<String, bool>, max_depth: usize) -> Vec<String> {
-        // Find highest-priority goal
         let best_goal = self.goals.iter().max_by(|a, b| {
             a.priority
                 .partial_cmp(&b.priority)
@@ -100,8 +97,7 @@ impl GOAPPlanner {
         };
         self.plan_for_goal(&goal.state, world_state, max_depth)
     }
-
-    /// Plans an action sequence to satisfy the goal at `goal_idx`, using the provided `world_state` as the starting point. Returns an empty vec if the index is out of range.
+    /// Plan for the goal at `goal_idx`; return ordered action name list or empty on failure.
     pub fn plan_for_goal_idx(
         &self,
         goal_idx: usize,
@@ -113,7 +109,7 @@ impl GOAPPlanner {
         }
         self.plan_for_goal(&self.goals[goal_idx].state, world_state, max_depth)
     }
-
+    /// A* search from `world_state` toward `goal_state` up to `max_depth` actions.
     fn plan_for_goal(
         &self,
         goal_state: &HashMap<String, bool>,
@@ -121,9 +117,8 @@ impl GOAPPlanner {
         max_depth: usize,
     ) -> Vec<String> {
         if self.goal_satisfied(goal_state, world_state) {
-            return Vec::new(); // Already satisfied
+            return Vec::new();
         }
-
         let mut open = BinaryHeap::new();
         open.push(PlanNode {
             state: world_state.clone(),
@@ -131,10 +126,8 @@ impl GOAPPlanner {
             cost: 0.0,
             heuristic: self.heuristic(goal_state, world_state),
         });
-
         let mut iterations = 0;
         let max_iterations = self.max_iterations;
-
         while let Some(current) = open.pop() {
             iterations += 1;
             if iterations > max_iterations {
@@ -143,7 +136,6 @@ impl GOAPPlanner {
             if current.actions.len() >= max_depth {
                 continue;
             }
-
             for (i, action) in self.actions.iter().enumerate() {
                 if !self.preconditions_met(&action.preconditions, &current.state) {
                     continue;
@@ -154,7 +146,6 @@ impl GOAPPlanner {
                 }
                 let mut new_actions = current.actions.clone();
                 new_actions.push(i);
-
                 if self.goal_satisfied(goal_state, &new_state) {
                     log_msg!(debug, GP03);
                     return new_actions
@@ -162,7 +153,6 @@ impl GOAPPlanner {
                         .map(|&idx| self.actions[idx].name.clone())
                         .collect();
                 }
-
                 open.push(PlanNode {
                     heuristic: self.heuristic(goal_state, &new_state),
                     cost: current.cost + action.cost,
@@ -171,15 +161,14 @@ impl GOAPPlanner {
                 });
             }
         }
-
         log_msg!(warn, GP02);
-        Vec::new() // No plan found
+        Vec::new()
     }
-
+    /// Return `true` when every goal condition is met in `state`.
     fn goal_satisfied(&self, goal: &HashMap<String, bool>, state: &HashMap<String, bool>) -> bool {
         goal.iter().all(|(k, v)| state.get(k) == Some(v))
     }
-
+    /// Return `true` when every precondition is satisfied by `state`.
     fn preconditions_met(
         &self,
         preconds: &HashMap<String, bool>,
@@ -187,14 +176,13 @@ impl GOAPPlanner {
     ) -> bool {
         preconds.iter().all(|(k, v)| state.get(k) == Some(v))
     }
-
+    /// Count unsatisfied goal conditions as a distance-to-goal estimate.
     fn heuristic(&self, goal: &HashMap<String, bool>, state: &HashMap<String, bool>) -> f64 {
         goal.iter()
             .filter(|(k, v)| state.get(*k) != Some(*v))
             .count() as f64
     }
-
-    /// Add an action with the given cost and optional Lua callback. Used by the Lua API.
+    /// Register a new action with an empty precondition and effect set.
     pub fn add_action(&mut self, name: String, cost: f64, callback: Option<RegistryKey>) {
         self.actions.push(GOAPAction {
             name,
@@ -204,22 +192,19 @@ impl GOAPPlanner {
             effects: HashMap::new(),
         });
     }
-
-    /// Add a boolean precondition to the named action. No-op if action not found.
+    /// Add a precondition entry to the named action; no-op if the action is not found.
     pub fn add_precondition(&mut self, action_name: &str, key: String, value: bool) {
         if let Some(a) = self.actions.iter_mut().find(|a| a.name == action_name) {
             a.preconditions.insert(key, value);
         }
     }
-
-    /// Add a boolean effect to the named action. No-op if action not found.
+    /// Add an effect entry to the named action; no-op if the action is not found.
     pub fn add_effect(&mut self, action_name: &str, key: String, value: bool) {
         if let Some(a) = self.actions.iter_mut().find(|a| a.name == action_name) {
             a.effects.insert(key, value);
         }
     }
-
-    /// Add a goal with the given name and priority. Used by the Lua API.
+    /// Register a new goal with an empty desired state map.
     pub fn add_goal(&mut self, name: String, priority: f64) {
         self.goals.push(GOAPGoal {
             name,
@@ -227,28 +212,25 @@ impl GOAPPlanner {
             state: HashMap::new(),
         });
     }
-
-    /// Set a boolean condition on the named goal. No-op if goal not found.
+    /// Add a desired world-state entry to the named goal; no-op if goal is not found.
     pub fn set_goal_state(&mut self, goal_name: &str, key: String, value: bool) {
         if let Some(g) = self.goals.iter_mut().find(|g| g.name == goal_name) {
             g.state.insert(key, value);
         }
     }
-
-    /// Return the maximum A* planning iterations.
+    /// Return the current A* iteration cap.
     pub fn get_max_iterations(&self) -> usize {
         self.max_iterations
     }
-
-    /// Set the maximum A* planning iterations. A value of `0` means unlimited.
+    /// Set the A* iteration cap to `n`.
     pub fn set_max_iterations(&mut self, n: usize) {
         self.max_iterations = n;
     }
 }
-
+/// `Default` delegates to `GOAPPlanner::new`.
 impl Default for GOAPPlanner {
+    /// `Default` delegates to `GOAPPlanner::new`.
     fn default() -> Self {
         Self::new()
     }
 }
-

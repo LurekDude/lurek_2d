@@ -1,24 +1,20 @@
-//! AI level-of-detail tier assignment and update throttling.
-
-// ---- Type: LodTier ----
-
-/// One distance band in the AI LOD system.
+//! AI level-of-detail tiers for update throttling and thinking distance.
+//! Owns `LodTier` and `AILod`.
+//! Does not own scheduling; callers decide how to use the chosen tier.
+/// One LOD bucket for AI work.
 #[derive(Clone)]
 pub struct LodTier {
-    /// Human-readable tier name (e.g. `"near"`, `"mid"`, `"far"`, `"sleep"`).
+    /// Tier name used for debug and display.
     pub name: String,
-    /// Maximum distance from the reference point for this tier.
+    /// Maximum distance covered by this tier.
     pub max_distance: f32,
-    /// Run the full AI update every `update_every` frames. `1` = every frame.
+    /// Update cadence in frames; 0 means never.
     pub update_every: u32,
-    /// Agents beyond this distance are considered out of "think range". Used by callers to skip expensive planning entirely for distant agents.
+    /// Distance at which the AI should still think.
     pub think_distance: f32,
 }
-
-// ---- Implementation: LodTier ----
-
 impl LodTier {
-    /// Create a new LOD tier.
+    /// Create a tier with the given parameters.
     pub fn new(name: &str, max_distance: f32, update_every: u32, think_distance: f32) -> Self {
         Self {
             name: name.to_string(),
@@ -28,35 +24,26 @@ impl LodTier {
         }
     }
 }
-
-// ---- Type: AILod ----
-
-/// LOD distance tiers and per-frame assignment engine.
+/// Ordered LOD tier set.
 pub struct AILod {
-    /// Ordered tier definitions (sorted ascending by `max_distance`).
+    /// Sorted tiers from near to far.
     pub tiers: Vec<LodTier>,
 }
-
-// ---- Implementation: AILod ----
-
 impl AILod {
-    /// Create a LOD system from a custom tier list.
+    /// Sort tiers by distance and build an `AILod`.
     pub fn new(mut tiers: Vec<LodTier>) -> Self {
         tiers.sort_by(|a, b| a.max_distance.partial_cmp(&b.max_distance).unwrap());
         Self { tiers }
     }
-
-    /// Return a reference to the tier at index `i`.
+    /// Return tier `i` if it exists.
     pub fn tier(&self, i: usize) -> Option<&LodTier> {
         self.tiers.get(i)
     }
-
     /// Return the number of tiers.
     pub fn tier_count(&self) -> usize {
         self.tiers.len()
     }
-
-    /// Determines the LOD tier index for an agent at `agent_pos` from `ref_pos`.
+    /// Return the tier index for `agent_pos` relative to `ref_pos`.
     pub fn tier_for(&self, agent_pos: (f32, f32), ref_pos: (f32, f32)) -> usize {
         let dx = agent_pos.0 - ref_pos.0;
         let dy = agent_pos.1 - ref_pos.1;
@@ -68,16 +55,14 @@ impl AILod {
         }
         self.tiers.len().saturating_sub(1)
     }
-
-    /// Computes tier indices for a batch of agent positions. Returns a `Vec<usize>` with one entry per input position, each equal to `tier_for(pos, ref_pos)`.
+    /// Return one tier index per agent position.
     pub fn assign_tiers(&self, agent_positions: &[(f32, f32)], ref_pos: (f32, f32)) -> Vec<usize> {
         agent_positions
             .iter()
             .map(|&p| self.tier_for(p, ref_pos))
             .collect()
     }
-
-    /// Return `true` if an agent in `tier` should be updated on `frame_number`.
+    /// Return `true` when tier `tier` should update on `frame_number`.
     pub fn should_update(&self, tier: usize, frame_number: u64) -> bool {
         match self.tiers.get(tier) {
             Some(t) => {
@@ -91,11 +76,9 @@ impl AILod {
         }
     }
 }
-
-// ---- Default Implementation ----
-
+/// `Default` creates near, mid, and far tiers.
+/// `Default` builds the near, mid, and far tier set.
 impl Default for AILod {
-    /// Create a three-tier default configuration:
     fn default() -> Self {
         Self::new(vec![
             LodTier::new("near", 400.0, 1, 400.0),

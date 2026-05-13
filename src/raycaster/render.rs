@@ -1,34 +1,10 @@
-//! Render-command generation for raycaster scenes.
-//!
-//! Converts a [`RaycasterScene`] into [`RenderCommand`] sequences.
-//! Each surface (wall, floor, ceiling, sprite) emits a single
-//! [`RenderCommand::DrawTexturedQuad`] with perspective-correct UV corners
-//! and a per-polygon RGBA light tint. Untextured quads fall back to a
-//! coloured [`RenderCommand::Rectangle`]. Pure CPU — no wgpu, winit, or mlua.
-
 use crate::raycaster::scene::RaycasterScene;
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::render::BlendMode;
-
 impl RaycasterScene {
-    /// Converts the entire scene into render commands.
-    ///
-    /// Draw order: ceilings → floors → walls (column order) → sprites (back-to-front).
-    /// Textured quads emit [`RenderCommand::DrawTexturedQuad`] with perspective-correct
-    /// UV corners and the pre-computed per-polygon RGBA light tint as the colour
-    /// multiplier. Quads without a texture fall back to a coloured
-    /// [`RenderCommand::Rectangle`].
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
-        // One command per quad (DrawTexturedQuad or Rectangle).
-        // Untextured quads need an extra SetColor, so capacity is a slight over-estimate.
         let mut cmds = Vec::with_capacity(self.quad_count() + 2);
-
         cmds.push(RenderCommand::SetBlendMode(BlendMode::Alpha));
-
-        // ── Ceilings ──
         for ceil in &self.ceilings {
             match ceil.texture_key {
                 Some(tex) => {
@@ -53,8 +29,6 @@ impl RaycasterScene {
                 }
             }
         }
-
-        // ── Floors ──
         for floor in &self.floors {
             match floor.texture_key {
                 Some(tex) => {
@@ -79,8 +53,6 @@ impl RaycasterScene {
                 }
             }
         }
-
-        // ── Walls (column order; depth sorting handled by scene builder) ──
         for wall in &self.walls {
             match wall.texture_key {
                 Some(tex) => {
@@ -105,8 +77,6 @@ impl RaycasterScene {
                 }
             }
         }
-
-        // ── Sprites (already sorted back-to-front by build_scene) ──
         for sprite in &self.sprites {
             cmds.push(RenderCommand::DrawTexturedQuad {
                 corners: sprite.corners,
@@ -116,7 +86,6 @@ impl RaycasterScene {
                 color: sprite.light,
             });
         }
-
         cmds
     }
 }

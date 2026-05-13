@@ -1,25 +1,9 @@
-//! Scope: TCP server accept loop and message dispatch for debug bridge.
-//! This file defines server_thread and handle_client_message functions.
-//! It owns non-blocking I/O, JSON parsing, and background-safe method handling.
-
+use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-
-use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
-
-/// Accept loop: runs on a background thread and handles all TCP I/O.
-///
-/// Accepts new connections, reads newline-delimited JSON messages from each
-/// client, and writes pending responses back.  Stops when `running` is set to
-/// `false`.
-///
-/// # Parameters
-/// - `listener` — `TcpListener`.
-/// - `shared` — `Arc<Mutex<BridgeShared>>`.
-/// - `running` — `Arc<AtomicBool>`.
 pub fn server_thread(
     listener: TcpListener,
     shared: Arc<Mutex<BridgeShared>>,
@@ -28,14 +12,10 @@ pub fn server_thread(
     listener
         .set_nonblocking(true)
         .expect("Cannot set non-blocking");
-
     let mut clients: Vec<Option<(std::net::TcpStream, BufReader<std::net::TcpStream>)>> =
         Vec::new();
-
     while running.load(Ordering::Relaxed) {
         let mut had_activity = false;
-
-        // Accept new connections
         match listener.accept() {
             Ok((stream, _addr)) => {
                 stream.set_nonblocking(true).ok();
@@ -49,8 +29,6 @@ pub fn server_thread(
             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {}
             Err(_) => {}
         }
-
-        // Read from clients
         let mut to_remove = Vec::new();
         for (idx, client) in clients.iter_mut().enumerate() {
             if let Some((_stream, reader)) = client {
@@ -75,13 +53,9 @@ pub fn server_thread(
                 }
             }
         }
-
-        // Remove disconnected clients
         for idx in to_remove.into_iter().rev() {
             clients[idx] = None;
         }
-
-        // Write pending responses and broadcasts to clients
         if let Ok(mut sh) = shared.lock() {
             for resp in sh.drain_responses() {
                 if let Some(Some((stream, _))) = clients.get_mut(resp.client_idx) {
@@ -96,7 +70,6 @@ pub fn server_thread(
                     had_activity = true;
                 }
             }
-
             let mut sent_events = 0usize;
             let max_events_per_tick = 64usize;
             while sent_events < max_events_per_tick {
@@ -114,11 +87,8 @@ pub fn server_thread(
                 sent_events += 1;
                 had_activity = true;
             }
-
             sh.client_count = clients.iter().filter(|c| c.is_some()).count();
         }
-
-        // Adaptive sleep avoids fixed busy looping while keeping responsiveness.
         std::thread::sleep(if had_activity {
             Duration::from_millis(1)
         } else {
@@ -126,21 +96,11 @@ pub fn server_thread(
         });
     }
 }
-
-/// Parses a newline-terminated JSON message from a client and either responds
-/// immediately (background-safe methods) or queues a [`PendingRequest`] for the
-/// main thread.
-///
-/// # Parameters
-/// - `line` — `&str`.
-/// - `client_idx` — `usize`.
-/// - `shared` — `&Arc<Mutex<BridgeShared>>`.
 pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<BridgeShared>>) {
     let parsed: serde_json::Value = match serde_json::from_str(line) {
         Ok(v) => v,
         Err(_) => return,
     };
-
     let id = parsed.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
     let method = parsed
         .get("method")
@@ -151,23 +111,19 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
         .get("params")
         .cloned()
         .unwrap_or(serde_json::Value::Null);
-
     let mut sh = match shared.lock() {
         Ok(s) => s,
         Err(_) => return,
     };
-
     let client_version = parsed
         .get("version")
         .and_then(|v| v.as_u64())
         .unwrap_or(sh.protocol_version as u64) as u32;
-
     let nonce_ok = params
         .get("nonce")
         .and_then(|v| v.as_str())
         .map(|v| v == sh.handshake_nonce)
         .unwrap_or(false);
-
     match method.as_str() {
         "ping" => {
             let time = sh.elapsed();
@@ -195,7 +151,6 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
                 });
                 return;
             }
-
             if client_version != sh.protocol_version {
                 let protocol_version = sh.protocol_version;
                 sh.pending_responses.push_back(PendingResponse {
@@ -209,7 +164,6 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
                 });
                 return;
             }
-
             let protocol_version = sh.protocol_version;
             let capabilities = sh.capabilities.clone();
             sh.pending_responses.push_back(PendingResponse {

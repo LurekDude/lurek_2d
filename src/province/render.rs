@@ -1,16 +1,9 @@
-//! Province render command generation.
-//!
-//! Builds `RenderCommand` batches from `ProvinceRegistry` data so Lua can keep
-//! gameplay logic while heavy map rendering stays in Rust.
-
 use crate::province::borders::classify_border;
 use crate::province::map_modes::{resolve_color, ProvinceMapMode};
 use crate::province::registry::ProvinceRegistry;
 use crate::province::types::{BorderClass, ProvinceId};
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
-
-/// Render options for one province map pass.
 #[derive(Debug, Clone)]
 pub struct ProvinceRenderOptions {
     pub x: f32,
@@ -28,7 +21,6 @@ pub struct ProvinceRenderOptions {
     pub hovered_id: Option<ProvinceId>,
     pub selected_id: Option<ProvinceId>,
 }
-
 impl Default for ProvinceRenderOptions {
     fn default() -> Self {
         Self {
@@ -49,7 +41,6 @@ impl Default for ProvinceRenderOptions {
         }
     }
 }
-
 fn border_color(class: BorderClass) -> [f32; 4] {
     match class {
         BorderClass::LandLand => [120.0 / 255.0, 120.0 / 255.0, 120.0 / 255.0, 1.0],
@@ -58,7 +49,6 @@ fn border_color(class: BorderClass) -> [f32; 4] {
         BorderClass::Special => [1.0, 0.2, 1.0, 1.0],
     }
 }
-
 fn viewport_bounds(opts: &ProvinceRenderOptions) -> (f32, f32, f32, f32) {
     let zoom_ps = (opts.zoom * opts.pixel_size).max(0.0001);
     let left = -opts.x / zoom_ps;
@@ -67,8 +57,6 @@ fn viewport_bounds(opts: &ProvinceRenderOptions) -> (f32, f32, f32, f32) {
     let bottom = (opts.screen_h - opts.y) / zoom_ps;
     (left, top, right, bottom)
 }
-
-/// Generates render commands for one province map frame.
 pub fn generate_render_commands(
     registry: &ProvinceRegistry,
     opts: &ProvinceRenderOptions,
@@ -76,7 +64,6 @@ pub fn generate_render_commands(
 ) -> Vec<RenderCommand> {
     let mut cmds: Vec<RenderCommand> = Vec::new();
     let (left, top, right, bottom) = viewport_bounds(opts);
-
     cmds.push(RenderCommand::PushTransform);
     cmds.push(RenderCommand::Translate {
         x: opts.x,
@@ -86,7 +73,6 @@ pub fn generate_render_commands(
         sx: opts.zoom,
         sy: opts.zoom,
     });
-
     if opts.draw_fills {
         for id in registry.province_ids() {
             let Some(bb) = registry.bbox_for(id) else {
@@ -104,13 +90,11 @@ pub fn generate_render_commands(
             if (bb.1 as f32) > bottom {
                 continue;
             }
-
             let Some(style) = registry.style_for(id) else {
                 continue;
             };
             let c = resolve_color(opts.map_mode, style);
             cmds.push(RenderCommand::SetColor(c[0], c[1], c[2], c[3]));
-
             if let Some(spans) = registry.spans_for(id) {
                 for &(y, x0, x1) in spans {
                     if (y as f32) < top {
@@ -136,7 +120,6 @@ pub fn generate_render_commands(
             }
         }
     }
-
     if opts.draw_borders {
         cmds.push(RenderCommand::SetLineWidth(opts.border_width.max(1.0)));
         for &(a, b, x0, y0, x1, y1) in registry.border_segments() {
@@ -147,7 +130,6 @@ pub fn generate_render_commands(
             if max_x < left || min_x > right || max_y < top || min_y > bottom {
                 continue;
             }
-
             let class = if let Some(c) = registry.get_border_class(a, b) {
                 c
             } else {
@@ -168,7 +150,6 @@ pub fn generate_render_commands(
             });
         }
     }
-
     if opts.draw_capitals {
         for id in registry.province_ids() {
             let Some(bb) = registry.bbox_for(id) else {
@@ -186,14 +167,12 @@ pub fn generate_render_commands(
             if (bb.1 as f32) > bottom {
                 continue;
             }
-
             let marker = registry
                 .capital_for(id)
                 .or_else(|| registry.get_province(id).and_then(|p| p.centroid));
             let Some((cx, cy)) = marker else {
                 continue;
             };
-
             cmds.push(RenderCommand::SetColor(
                 1.0,
                 220.0 / 255.0,
@@ -220,7 +199,6 @@ pub fn generate_render_commands(
             });
         }
     }
-
     if opts.draw_labels {
         if let Some(font) = font_key {
             for id in registry.province_ids() {
@@ -239,7 +217,6 @@ pub fn generate_render_commands(
                 if (bb.1 as f32) > bottom {
                     continue;
                 }
-
                 let text = registry
                     .label_text_for(id)
                     .map(|s| s.to_string())
@@ -268,7 +245,6 @@ pub fn generate_render_commands(
             }
         }
     }
-
     if let Some(id) = opts.hovered_id {
         if let Some((min_x, min_y, max_x, max_y)) = registry.bbox_for(id) {
             cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 0.35));
@@ -282,7 +258,6 @@ pub fn generate_render_commands(
             });
         }
     }
-
     if let Some(id) = opts.selected_id {
         if let Some((min_x, min_y, max_x, max_y)) = registry.bbox_for(id) {
             cmds.push(RenderCommand::SetColor(1.0, 0.9, 0.1, 0.9));
@@ -296,7 +271,6 @@ pub fn generate_render_commands(
             });
         }
     }
-
     cmds.push(RenderCommand::PopTransform);
     cmds
 }

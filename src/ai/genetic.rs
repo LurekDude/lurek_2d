@@ -1,22 +1,18 @@
-//! genetic algorithm utilities for parameter and policy optimization.
-
-// ---- Type: Chromosome ----
-
-/// A candidate solution in a genetic algorithm population.
+//! Genetic algorithm for evolving fixed-length float chromosomes.
+//! Owns `Chromosome` and `GeneticAlgorithm` only.
+//! Does not own fitness evaluation; callers assign fitness externally.
+/// Evolving genome with fitness and stable id.
 #[derive(Clone)]
 pub struct Chromosome {
-    /// The flat gene vector (e.g. neural network weights).
+    /// Gene vector used by the genome.
     pub genes: Vec<f32>,
-    /// Fitness score computed by the calle's evaluation function.
+    /// Fitness assigned by the caller.
     pub fitness: f32,
-    /// Per-population unique ID assigned at construction.
+    /// Stable identifier across generations.
     pub id: u64,
 }
-
-// ---- Implementation: Chromosome ----
-
 impl Chromosome {
-    /// Create a zeroed chromosome.
+    /// Create a zeroed chromosome with `gene_count` genes.
     pub fn new(gene_count: usize, id: u64) -> Self {
         Self {
             genes: vec![0.0; gene_count],
@@ -25,33 +21,29 @@ impl Chromosome {
         }
     }
 }
-
-// ---- Type: GeneticAlgorithm ----
-
-/// Simple generational genetic algorithm.
+/// Population-based genetic optimizer.
 pub struct GeneticAlgorithm {
-    /// Current population ordered by arbitrary index.
+    /// Current population.
     pub population: Vec<Chromosome>,
-    /// Number of genes per chromosome.
+    /// Gene count per chromosome.
     pub gene_count: usize,
-    /// Probability of mutating any single gene.
+    /// Per-gene mutation probability.
     pub mutation_rate: f32,
-    /// Standard deviation of Gaussian mutation noise.
+    /// Standard deviation used by Gaussian mutation.
     pub mutation_std: f32,
-    /// Number of candidates in each tournament selection round.
+    /// Tournament size used for parent selection.
     pub tournament_size: usize,
-    /// Number of best chromosomes copied unchanged to the next generation.
+    /// Number of elite chromosomes preserved each generation.
     pub elitism: usize,
-    /// Count of completed generations.
+    /// Current generation number.
     pub generation: usize,
+    /// Next chromosome id.
     next_id: u64,
+    /// Internal RNG state.
     rng: u64,
 }
-
-// ---- Implementation: GeneticAlgorithm ----
-
 impl GeneticAlgorithm {
-    /// Create a new GA with a random initial population.
+    /// Create a population with random initial genes.
     pub fn new(pop_size: usize, gene_count: usize, seed: u64) -> Self {
         let mut ga = Self {
             population: Vec::with_capacity(pop_size),
@@ -75,25 +67,20 @@ impl GeneticAlgorithm {
         }
         ga
     }
-
-    /// Return the population size.
+    /// Return the current population size.
     pub fn pop_size(&self) -> usize {
         self.population.len()
     }
-
-    /// Return a reference to the chromosome with highest fitness.
+    /// Return the chromosome with the highest fitness, or `None` if empty.
     pub fn best(&self) -> Option<&Chromosome> {
         self.population
             .iter()
             .max_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap())
     }
-
-    /// Runs one generation: tournament selection, crossover, mutation, elitism.
+    /// Build the next generation using elitism, tournament selection, crossover, and mutation.
     pub fn evolve(&mut self) {
         let pop_size = self.population.len();
         let mut next_gen: Vec<Chromosome> = Vec::with_capacity(pop_size);
-
-        // Elitism: carry over best unchanged
         let mut sorted: Vec<usize> = (0..pop_size).collect();
         sorted.sort_by(|&a, &b| {
             self.population[b]
@@ -104,8 +91,6 @@ impl GeneticAlgorithm {
         for &i in sorted.iter().take(self.elitism) {
             next_gen.push(self.population[i].clone());
         }
-
-        // Fill rest with crossover + mutation offspring
         while next_gen.len() < pop_size {
             let p1 = self.tournament_select(pop_size);
             let p2 = self.tournament_select(pop_size);
@@ -117,14 +102,10 @@ impl GeneticAlgorithm {
             child.fitness = 0.0;
             next_gen.push(child);
         }
-
         self.population = next_gen;
         self.generation += 1;
     }
-
-    // ---- Helper Functions: Tournament, Crossover, Mutation ----
-
-    /// Return index of winning chromosome in a tournament of `tournament_size`.
+    /// Return one selected parent index using tournament selection.
     fn tournament_select(&mut self, pop_size: usize) -> usize {
         let mut best_idx = self.rand_usize(pop_size);
         for _ in 1..self.tournament_size {
@@ -135,8 +116,7 @@ impl GeneticAlgorithm {
         }
         best_idx
     }
-
-    /// Uniform crossover: each gene drawn randomly from one of the two parents.
+    /// Create a child chromosome by choosing each gene from one parent.
     fn crossover(&mut self, p1: &Chromosome, p2: &Chromosome) -> Chromosome {
         let mut child = Chromosome::new(self.gene_count, 0);
         for i in 0..self.gene_count {
@@ -148,8 +128,7 @@ impl GeneticAlgorithm {
         }
         child
     }
-
-    /// Gaussian mutation: each gene mutated independently with `mutation_rate` probability.
+    /// Mutate a chromosome in place.
     fn mutate(&mut self, c: &mut Chromosome) {
         for g in &mut c.genes {
             if self.rand_f01() < self.mutation_rate {
@@ -157,38 +136,32 @@ impl GeneticAlgorithm {
             }
         }
     }
-
-    /// Xorshift64 -> `[0, n)`
+    /// Sample a random index in `[0, n)`.
     fn rand_usize(&mut self, n: usize) -> usize {
         self.rng = xorshift64(self.rng);
         (self.rng as usize) % n
     }
-
-    /// Xorshift64 -> `[0, 1)`
+    /// Sample a uniform float in `[0, 1)`.
     fn rand_f01(&mut self) -> f32 {
         self.rng = xorshift64(self.rng);
         (self.rng >> 11) as f32 * (1.0 / (1u64 << 53) as f32)
     }
-
-    /// Box-Muller transform for Gaussian noise (mean=0, std=1).
+    /// Sample a standard normal float with Box-Muller.
     fn randn(&mut self) -> f32 {
         let u1 = self.rand_f01().max(1e-7);
         let u2 = self.rand_f01();
         (-2.0 * u1.ln()).sqrt() * (2.0 * std::f32::consts::PI * u2).cos()
     }
-
-    /// Return `true` ~50% of the time.
+    /// Sample a random boolean.
     fn rand_bool(&mut self) -> bool {
         self.rng = xorshift64(self.rng);
         self.rng & 1 == 0
     }
 }
-
-/// Xorshift64 PRNG step.
+/// Xorshift64 RNG step used by the algorithm.
 fn xorshift64(mut x: u64) -> u64 {
     x ^= x << 13;
     x ^= x >> 7;
     x ^= x << 17;
     x
 }
-

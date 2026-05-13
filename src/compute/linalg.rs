@@ -1,11 +1,5 @@
-﻿//! Vector, matrix, and geometry helpers on NdArray.
-
 use crate::compute::array::{DataType, NdArray};
 use crate::compute::spatial;
-
-// ---- Helper Functions: Vector Utilities ----
-
-/// Compute L2-normalization of 1D vector; return error if vector has zero length.
 pub fn normalize_vec(v: &NdArray) -> Result<NdArray, String> {
     if v.ndim() != 1 {
         return Err(format!(
@@ -24,8 +18,6 @@ pub fn normalize_vec(v: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-/// Compute 2D cross product as signed scalar area of parallelogram: `ax*by - ay*bx`.
 pub fn cross2d(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     if a.size() != 2 || b.size() != 2 {
         return Err(format!(
@@ -36,8 +28,6 @@ pub fn cross2d(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     }
     Ok(a.get_f64(0) * b.get_f64(1) - a.get_f64(1) * b.get_f64(0))
 }
-
-/// Compute outer product of two 1D vectors; result shape is [m, n].
 pub fn outer(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 1 || b.ndim() != 1 {
         return Err("outer: both inputs must be 1D".to_string());
@@ -53,24 +43,16 @@ pub fn outer(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-// ---- Helper Functions: 2D Transform Matrices ----
-
-/// Build a 2x2 rotation matrix for angle_rad as [[cos, -sin], [sin, cos]].
 pub fn rotate2d_matrix(angle_rad: f64) -> Result<NdArray, String> {
     let (s, c) = angle_rad.sin_cos();
     let vals = [c, -s, s, c];
     NdArray::from_slice(&vals, &[2, 2], DataType::Float64)
 }
-
-/// Build 3x3 homogeneous affine matrix for translation (tx, ty), rotation (angle_rad), and scale (sx, sy).
 pub fn affine2d(tx: f64, ty: f64, angle_rad: f64, sx: f64, sy: f64) -> Result<NdArray, String> {
     let (s, c) = angle_rad.sin_cos();
     let vals = [sx * c, -sy * s, tx, sx * s, sy * c, ty, 0.0, 0.0, 1.0];
     NdArray::from_slice(&vals, &[3, 3], DataType::Float64)
 }
-
-/// Apply 2x2 or 3x3 (homogeneous) matrix to list of 2D points; `points` shape [N, 2], return shape [N, 2].
 pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, String> {
     if points.ndim() != 2 || points.shape()[1] != 2 {
         return Err(format!(
@@ -88,13 +70,10 @@ pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, S
             ms
         ));
     }
-
     let mut out = NdArray::zeros(&[n, 2], points.dtype())?;
-
     for i in 0..n {
         let px = points.get_f64(points.flat_index(&[i, 0]).unwrap());
         let py = points.get_f64(points.flat_index(&[i, 1]).unwrap());
-
         let (ox, oy) = if is2x2 {
             let m00 = matrix.get_f64(matrix.flat_index(&[0, 0]).unwrap());
             let m01 = matrix.get_f64(matrix.flat_index(&[0, 1]).unwrap());
@@ -102,7 +81,6 @@ pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, S
             let m11 = matrix.get_f64(matrix.flat_index(&[1, 1]).unwrap());
             (m00 * px + m01 * py, m10 * px + m11 * py)
         } else {
-            // 3x3 homogeneous transform; normalize by w.
             let m00 = matrix.get_f64(matrix.flat_index(&[0, 0]).unwrap());
             let m01 = matrix.get_f64(matrix.flat_index(&[0, 1]).unwrap());
             let m02 = matrix.get_f64(matrix.flat_index(&[0, 2]).unwrap());
@@ -119,16 +97,11 @@ pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, S
                 (m10 * px + m11 * py + m12) / w,
             )
         };
-
         out.set_f64(out.flat_index(&[i, 0]).unwrap(), ox);
         out.set_f64(out.flat_index(&[i, 1]).unwrap(), oy);
     }
     Ok(out)
 }
-
-// ---- Helper Functions: Kernel Generators ----
-
-/// Generate `size x size` Gaussian kernel with standard deviation `sigma` (normalized to sum 1.0).
 pub fn gaussian_kernel(size: usize, sigma: f64) -> Result<NdArray, String> {
     if size == 0 {
         return Err("gaussian_kernel: size must be >= 1".to_string());
@@ -151,22 +124,16 @@ pub fn gaussian_kernel(size: usize, sigma: f64) -> Result<NdArray, String> {
             vals[r * size + c] = (-(dr * dr + dc * dc) / two_sig2).exp();
         }
     }
-    // Normalise
     let sum: f64 = vals.iter().sum();
     for v in &mut vals {
         *v /= sum;
     }
     NdArray::from_slice(&vals, &[size, size], DataType::Float64)
 }
-
-// Sobel edge detection
-
-/// Apply Sobel edge detection to 2D array; return (Gx, Gy) gradient arrays with same shape as input.
 pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
     if input.ndim() != 2 {
         return Err(format!("sobel: expected 2D array, got {}D", input.ndim()));
     }
-
     let gx_kernel = NdArray::from_slice(
         &[-1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0],
         &[3, 3],
@@ -177,15 +144,10 @@ pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
         &[3, 3],
         DataType::Float64,
     )?;
-
     let gx = spatial::convolve2d(input, &gx_kernel)?;
     let gy = spatial::convolve2d(input, &gy_kernel)?;
     Ok((gx, gy))
 }
-
-// Linear solver
-
-/// Solve linear system A*x = b with partial pivoting and return error for singular matrices.
 #[allow(clippy::needless_range_loop)]
 pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 || a.shape()[0] != a.shape()[1] {
@@ -201,8 +163,6 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
             b.shape()
         ));
     }
-
-    // Build augmented matrix [A|b] as a flat Vec
     let mut mat: Vec<Vec<f64>> = (0..n)
         .map(|r| {
             let mut row: Vec<f64> = (0..n)
@@ -212,10 +172,7 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
             row
         })
         .collect();
-
-    // Forward elimination with partial pivoting
     for col in 0..n {
-        // Find pivot
         let pivot_row = (col..n)
             .max_by(|&i, &j| {
                 mat[i][col]
@@ -225,12 +182,10 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
             })
             .unwrap();
         mat.swap(col, pivot_row);
-
         let pivot = mat[col][col];
         if pivot.abs() < 1e-12 {
             return Err("linsolve: matrix is singular or near-singular".to_string());
         }
-
         for row in (col + 1)..n {
             let factor = mat[row][col] / pivot;
             for k in col..=n {
@@ -239,8 +194,6 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
             }
         }
     }
-
-    // Back substitution
     let mut x = vec![0.0_f64; n];
     for i in (0..n).rev() {
         let mut rhs = mat[i][n];
@@ -249,30 +202,19 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
         }
         x[i] = rhs / mat[i][i];
     }
-
     let mut out = NdArray::zeros(&[n], b.dtype())?;
     for (i, v) in x.into_iter().enumerate() {
         out.set_f64(i, v);
     }
     Ok(out)
 }
-
-// LU Decomposition
-
-/// Hold LU decomposition output: combined L/U buffer, row permutation, size, and det sign.
 #[derive(Debug, Clone)]
 pub struct LuDecomp {
-    /// Store combined L/U coefficients in row-major n x n order.
     pub lu_data: Vec<f64>,
-    /// Row permutation from partial pivoting.
     pub perm: Vec<usize>,
-    /// Matrix dimension (n).
     pub n: usize,
-    /// Store determinant sign induced by row swaps (+1 or -1).
     pub det_sign: i32,
 }
-
-/// Decompose square matrix into P*A = L*U with partial pivoting.
 pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
     let shape = a.shape();
     if shape.len() != 2 || shape[0] != shape[1] {
@@ -290,14 +232,10 @@ pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
             det_sign: 1,
         });
     }
-
-    // Copy A into a mutable flat row-major buffer.
     let mut buf: Vec<f64> = (0..n * n).map(|i| a.get_f64(i)).collect();
     let mut perm: Vec<usize> = (0..n).collect();
     let mut det_sign = 1i32;
-
     for col in 0..n {
-        // Find pivot (max absolute value in this column, rows col..n).
         let pivot_row = (col..n)
             .max_by(|&r1, &r2| {
                 buf[r1 * n + col]
@@ -306,32 +244,25 @@ pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
                     .unwrap_or(std::cmp::Ordering::Equal)
             })
             .unwrap();
-
         if pivot_row != col {
-            // Swap rows.
             for k in 0..n {
                 buf.swap(pivot_row * n + k, col * n + k);
             }
             perm.swap(pivot_row, col);
             det_sign = -det_sign;
         }
-
         let pivot = buf[col * n + col];
         if pivot.abs() < 1e-14 {
-            // Singular pivot; continue so determinant trends to zero.
             continue;
         }
-
-        // Eliminate below pivot.
         for row in (col + 1)..n {
             let factor = buf[row * n + col] / pivot;
-            buf[row * n + col] = factor; // Store L multiplier in lower triangle.
+            buf[row * n + col] = factor;
             for k in (col + 1)..n {
                 buf[row * n + k] -= factor * buf[col * n + k];
             }
         }
     }
-
     Ok(LuDecomp {
         lu_data: buf,
         perm,
@@ -339,10 +270,6 @@ pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
         det_sign,
     })
 }
-
-// Power-Iteration Eigenvalue
-
-/// Estimate dominant eigenvalue and normalized eigenvector by power iteration.
 #[allow(clippy::needless_range_loop)]
 pub fn eigenvalue_power(a: &NdArray, max_iter: u32, tol: f64) -> Result<(f64, Vec<f64>), String> {
     let shape = a.shape();
@@ -356,43 +283,31 @@ pub fn eigenvalue_power(a: &NdArray, max_iter: u32, tol: f64) -> Result<(f64, Ve
     if n == 0 {
         return Err("eigenvalue_power: matrix is empty".to_string());
     }
-
     let iters = if max_iter == 0 { 1000 } else { max_iter };
     let epsilon = if tol <= 0.0 { 1e-10 } else { tol };
-
-    // Start with unit vector v = [1, 0, 0, ...].
     let mut v: Vec<f64> = (0..n).map(|i| if i == 0 { 1.0 } else { 0.0 }).collect();
     let mut eigenvalue = 0.0_f64;
-
     for _ in 0..iters {
-        // Compute w = A * v.
         let mut w = vec![0.0_f64; n];
         for row in 0..n {
             for col in 0..n {
                 w[row] += a.get_f64(row * n + col) * v[col];
             }
         }
-
-        // Rayleigh quotient lambda = v^T * w.
         let new_lambda: f64 = v.iter().zip(w.iter()).map(|(vi, wi)| vi * wi).sum();
-
-        // Normalise w.
         let norm: f64 = w.iter().map(|x| x * x).sum::<f64>().sqrt();
         if norm < 1e-14 {
-            break; // Zero vector: eigenvalues are approximately zero.
+            break;
         }
         for x in w.iter_mut() {
             *x /= norm;
         }
-
         let delta = (new_lambda - eigenvalue).abs();
         eigenvalue = new_lambda;
         v = w;
-
         if delta < epsilon {
             break;
         }
     }
-
     Ok((eigenvalue, v))
 }

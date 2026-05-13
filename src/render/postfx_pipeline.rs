@@ -1,55 +1,11 @@
-//! GPU post-processing pipeline for Lurek2D.
-//!
-//! Provides full-screen shader passes that can be chained together to apply
-//! visual effects (bloom, blur, vignette, CRT, etc.) to a captured frame
-//! using ping-pong rendering. Each pass reads from an off-screen texture and
-//! writes to the other one; the final result is composited onto the main
-//! surface.
-//!
-//! # Architecture
-//!
-//! | Phase | Description |
-//! |---|---|
-//! | `BeginPostFx` | The Lua side has already pushed a `BeginPostFx` command; the GPU allocates/reuses a capture texture for the stack. |
-//! | Draw loop | All normal draw commands write into the capture texture instead of the surface. |
-//! | `ApplyPostFx` | For each enabled `PostFxPass`, the pipeline dispatches a WGSL fragment shader via ping-pong. The last pass is composited onto the surface. |
-//!
-//! # WGSL shader conventions
-//!
-//! All built-in shaders share the same vertex stage (a full-screen clip-space
-//! triangle, no VBO) and the same parameter binding layout:
-//!
-//! ```wgsl
-//! @group(0) @binding(0) var t_src:   texture_2d<f32>;
-//! @group(0) @binding(1) var s_src:   sampler;
-//! @group(0) @binding(2) var<uniform> params: PostFxParams;
-//! ```
-//!
-//! `PostFxParams` is 16 packed `f32` values:
-//!
-//! ```wgsl
-//! struct PostFxParams { p: array<vec4<f32>, 4>, }
-//! ```
-//!
-//! # Per-effect parameter layout
-//!
-//! See [`EFFECT_PARAM_MAP`] documentation for which slot carries which value.
-
 use std::collections::HashMap;
-
-// ── WGSL source constants ─────────────────────────────────────────────────────
-
-/// Common vertex shader shared by every post-FX pass. Emits a full-screen
-/// triangle from the built-in vertex index — no vertex buffer needed.
 const POSTFX_VERTEX: &str = r#"
 struct VertexOutput {
     @builtin(position) clip_pos: vec4<f32>,
     @location(0)       uv:       vec2<f32>,
 }
-
 @vertex
 fn vs_main(@builtin(vertex_index) vi: u32) -> VertexOutput {
-    // Full-screen triangle: indices 0-1-2
     let u = f32((vi & 1u) << 1u);
     let v = f32(vi & 2u);
     var out: VertexOutput;
@@ -58,14 +14,11 @@ fn vs_main(@builtin(vertex_index) vi: u32) -> VertexOutput {
     return out;
 }
 "#;
-
-/// Bloom: additive blur + glow.  `params.p[0].x` = threshold, `.y` = intensity, `.z` = radius.
 const SHADER_BLOOM: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let base  = textureSample(t_src, s_src, uv);
@@ -86,14 +39,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(base.rgb + bloom * intensity, base.a);
 }
 "#;
-
-/// Horizontal Gaussian blur.  `params.p[0].x` = radius in pixels.
 const SHADER_BLUR_H: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let radius = max(params.p[0].x, 1.0);
@@ -107,14 +57,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return col;
 }
 "#;
-
-/// Vertical Gaussian blur.  `params.p[0].x` = radius in pixels.
 const SHADER_BLUR_V: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let radius = max(params.p[0].x, 1.0);
@@ -128,14 +75,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return col;
 }
 "#;
-
-/// Vignette: darken edges.  `params.p[0].x` = strength (0–1), `.y` = smoothness.
 const SHADER_VIGNETTE: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -147,18 +91,14 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(col.rgb * vig, col.a);
 }
 "#;
-
-/// Animated noise / film grain.  `params.p[0].x` = strength, `.y` = time seed.
 const SHADER_NOISE: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 fn hash(p: vec2<f32>) -> f32 {
     return fract(sin(dot(p, vec2<f32>(127.1, 311.7))) * 43758.5453);
 }
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -168,14 +108,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(col.rgb + vec3<f32>(n * str), col.a);
 }
 "#;
-
-/// Grayscale.  `params.p[0].x` = mix weight (0 = no effect, 1 = full grey).
 const SHADER_GRAYSCALE: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -184,14 +121,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(mix(col.rgb, vec3<f32>(lum), mix), col.a);
 }
 "#;
-
-/// Sepia tone.  `params.p[0].x` = intensity (0–1).
 const SHADER_SEPIA: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -202,35 +136,27 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(mix(col.rgb, vec3<f32>(r, g, b), str), col.a);
 }
 "#;
-
-/// Color inversion.  No parameters.
 const SHADER_INVERT: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
     return vec4<f32>(1.0 - col.rgb, col.a);
 }
 "#;
-
-/// CRT scan-warp: barrel distortion + RGB separation.
-/// `params.p[0].x` = warp (0–0.3), `.y` = rgb_split (0–0.01).
 const SHADER_CRT: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 fn barrel(uv: vec2<f32>, warp: f32) -> vec2<f32> {
     let d = uv - 0.5;
     let r2 = dot(d, d);
     return uv + d * r2 * warp;
 }
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let warp = params.p[0].x;
@@ -242,14 +168,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(r, g, b, 1.0);
 }
 "#;
-
-/// Chromatic aberration.  `params.p[0].x` = strength (0–0.02).
 const SHADER_CHROMATIC: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let str = params.p[0].x;
@@ -260,14 +183,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(r, g, b, 1.0);
 }
 "#;
-
-/// Scanlines.  `params.p[0].x` = density (e.g. 2.0), `.y` = darkness (0–1).
 const SHADER_SCANLINES: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -279,14 +199,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(col.rgb * factor, col.a);
 }
 "#;
-
-/// Pixel art pixelation.  `params.p[0].x` = pixel size.
 const SHADER_PIXELATE: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let px = max(params.p[0].x, 1.0);
@@ -295,14 +212,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return textureSample(t_src, s_src, snapped);
 }
 "#;
-
-/// Hue shift.  `params.p[0].x` = hue rotation in radians.
 const SHADER_HUESHIFT: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 fn rgb2hsv(c: vec3<f32>) -> vec3<f32> {
     let K = vec4<f32>(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
     let p = mix(vec4<f32>(c.bg, K.wz), vec4<f32>(c.gb, K.xy), step(c.b, c.g));
@@ -311,13 +225,11 @@ fn rgb2hsv(c: vec3<f32>) -> vec3<f32> {
     let e = 1.0e-10;
     return vec3<f32>(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
-
 fn hsv2rgb(c: vec3<f32>) -> vec3<f32> {
     let K = vec4<f32>(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     let p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, vec3<f32>(0.0), vec3<f32>(1.0)), c.y);
 }
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -327,14 +239,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(hsv2rgb(hsv), col.a);
 }
 "#;
-
-/// Edge detection (Sobel).  `params.p[0].x` = edge strength (1–5).
 const SHADER_EDGEDETECT: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let str = params.p[0].x;
@@ -354,15 +263,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(vec3<f32>(edge), 1.0);
 }
 "#;
-
-/// God rays / light rays. `params.p[0].xy` = light pos (UV), `.z` = decay, `.w` = weight.
-/// `params.p[1].x` = density, `.y` = exposure.
 const SHADER_GODRAYS: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let light_pos = params.p[0].xy;
@@ -384,15 +289,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return illumination * exposure + textureSample(t_src, s_src, uv);
 }
 "#;
-
-/// Water surface UV distortion.
-/// `params.p[0].x` = amplitude, `.y` = frequency, `.z` = time.
 const SHADER_WATERDISTORT: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let amp  = params.p[0].x;
@@ -403,14 +304,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return textureSample(t_src, s_src, uv + vec2<f32>(dx, dy));
 }
 "#;
-
-/// Sharpen.  `params.p[0].x` = strength (1–5).
 const SHADER_SHARPEN: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let str = params.p[0].x;
@@ -426,19 +324,15 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(clamp(sharpened, vec3<f32>(0.0), vec3<f32>(1.0)), col_full.a);
 }
 "#;
-
-/// Ordered dithering.  `params.p[0].x` = palette_size (2–16), `.y` = matrix_size (2 or 4).
 const SHADER_DITHER: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 fn bayer2(x: i32, y: i32) -> f32 {
     let b = array<f32,4>(0.0, 2.0, 3.0, 1.0);
     return b[(y % 2) * 2 + (x % 2)] / 4.0 - 0.5;
 }
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -450,15 +344,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(clamp(dithered, vec3<f32>(0.0), vec3<f32>(1.0)), col.a);
 }
 "#;
-
-/// Outline / edge highlight.
-/// `params.p[0].xyz` = outline colour (RGB), `.w` = thickness (1–3 pixels).
 const SHADER_OUTLINE: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let col = textureSample(t_src, s_src, uv);
@@ -475,15 +365,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return mix(col, vec4<f32>(outline_col, 1.0), edge * (1.0 - a));
 }
 "#;
-
-/// Depth of field (circle-of-confusion blur).
-/// `params.p[0].xy` = focus point (UV), `.z` = strength, `.w` = radius.
 const SHADER_DEPTHOFFIELD: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let focus  = params.p[0].xy;
@@ -504,15 +390,11 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return col;
 }
 "#;
-
-/// Radial motion blur.
-/// `params.p[0].xy` = screen centre (UV), `.z` = strength, `.w` = samples.
 const SHADER_MOTIONBLUR: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     let center  = params.p[0].xy;
@@ -526,43 +408,16 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return col / f32(samples);
 }
 "#;
-
-/// Copy / passthrough (used for composite final pass to surface).
 const SHADER_COPY: &str = r#"
 struct PostFxParams { p: array<vec4<f32>, 4>, }
 @group(0) @binding(0) var t_src: texture_2d<f32>;
 @group(0) @binding(1) var s_src: sampler;
 @group(0) @binding(2) var<uniform> params: PostFxParams;
-
 @fragment
 fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
     return textureSample(t_src, s_src, uv);
 }
 "#;
-
-// ── Params layout map ─────────────────────────────────────────────────────────
-
-/// Maps a `PostFxEffect` parameter dictionary to the 16-float packed buffer
-///
-/// # Parameters
-/// - `params` — `&HashMap<String, f32>`.
-///
-/// # Returns
-/// `[f32; 16]`.
-/// consumed by every WGSL shader's `PostFxParams` uniform.
-///
-/// Layout (slot indices into the flat `[f32; 16]` array):
-///
-/// | Index | Common name  | Used by                                |
-/// |-------|--------------|----------------------------------------|
-/// | 0     | strength/p0x | bloom:threshold, blur:radius, vignette, noise, grayscale, sepia, sharpen, dither:palette_size, motionblur:strength |
-/// | 1     | p0y          | bloom:intensity, crt:rgb_split, scanlines:darkness, dither:matrix_size, motionblur:samples |
-/// | 2     | p0z          | bloom:radius, godrays:decay, waterdistort:time, depthoffield:strength |
-/// | 3     | p0w          | godrays:weight, outline:thickness, depthoffield:radius |
-/// | 4,5   | p1xy         | godrays: light_pos / motionblur: center / depthoffield: focus_xy |
-/// | 6     | p1z          | godrays:density |
-/// | 7     | p1w          | godrays:exposure |
-/// | 8,9,10| p2xyz        | outline: colour RGB |
 #[allow(dead_code)]
 pub fn params_to_uniform(params: &HashMap<String, f32>) -> [f32; 16] {
     let get = |key: &str| params.get(key).copied().unwrap_or(0.0);
@@ -585,33 +440,11 @@ pub fn params_to_uniform(params: &HashMap<String, f32>) -> [f32; 16] {
         get("palette_size"),
     ]
 }
-
-// ── Data types ────────────────────────────────────────────────────────────────
-
-/// Stores a wgpu texture and its default view together for convenience.
-///
-/// # Fields
-/// - `texture` — `wgpu::Texture`.
-/// - `view` — `wgpu::TextureView`.
 pub struct PostFxTexture {
-    /// GPU texture object.
     pub texture: wgpu::Texture,
-    /// Default view into `texture`.
     pub view: wgpu::TextureView,
 }
-
 impl PostFxTexture {
-    /// Create a new `Rgba8UnormSrgb` render-target texture of the requested size.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// # Parameters
-    /// - `device` — wgpu logical device.
-    /// - `width` — Width in pixels.
-    /// - `height` — Height in pixels.
-    /// - `label` — Debug label.
-    /// - `format` — Texture format (should match the surface format).
     pub fn new(
         device: &wgpu::Device,
         width: u32,
@@ -639,53 +472,18 @@ impl PostFxTexture {
         Self { texture, view }
     }
 }
-
-// ── PostFxPipeline ────────────────────────────────────────────────────────────
-
-/// GPU post-processing pipeline.
-///
-/// # Fields
-/// - `pipelines` — `HashMap<String, wgpu::RenderPipeline>`.
-/// - `sampler` — `wgpu::Sampler`.
-/// - `params_buf` — `wgpu::Buffer`.
-/// - `bind_group_layout` — `wgpu::BindGroupLayout`.
-///
-/// Holds one [`wgpu::RenderPipeline`] per named effect, a shared linear-clamp
-/// sampler, a `params` uniform buffer, and a bind-group layout.
-///
-/// Create with [`PostFxPipeline::new`] then call [`PostFxPipeline::apply`] to
-/// run a list of passes onto the given surface view.
 pub struct PostFxPipeline {
-    /// Named pipelines — one per built-in and custom effect.
     pub(crate) pipelines: HashMap<String, wgpu::RenderPipeline>,
-    /// Shared linear-clamp sampler.
     pub(crate) sampler: wgpu::Sampler,
-    /// Uniform buffer holding 16 packed f32 params for the current pass.
     pub(crate) params_buf: wgpu::Buffer,
-    /// Bind group layout: texture + sampler + uniform.
     pub(crate) bind_group_layout: wgpu::BindGroupLayout,
-    /// Surface format used when creating pipelines.
     surface_format: wgpu::TextureFormat,
 }
-
 impl PostFxPipeline {
-    /// Instantiate the post-FX pipeline for `surface_format`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// All built-in WGSL shaders are compiled during this call. Custom-effect
-    /// pipelines can be added at runtime via [`PostFxPipeline::register_custom`].
-    ///
-    /// # Parameters
-    /// - `device` — wgpu logical device.
-    /// - `surface_format` — `wgpu::TextureFormat` that matches the swap-chain surface.
     pub fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat) -> Self {
-        // ── Bind group layout ─────────────────────────────────────────────────
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("postfx_bgl"),
             entries: &[
-                // binding 0: source texture
                 wgpu::BindGroupLayoutEntry {
                     binding: 0,
                     visibility: wgpu::ShaderStages::FRAGMENT,
@@ -696,14 +494,12 @@ impl PostFxPipeline {
                     },
                     count: None,
                 },
-                // binding 1: sampler
                 wgpu::BindGroupLayoutEntry {
                     binding: 1,
                     visibility: wgpu::ShaderStages::FRAGMENT,
                     ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
                     count: None,
                 },
-                // binding 2: params uniform
                 wgpu::BindGroupLayoutEntry {
                     binding: 2,
                     visibility: wgpu::ShaderStages::FRAGMENT,
@@ -716,14 +512,11 @@ impl PostFxPipeline {
                 },
             ],
         });
-
         let layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("postfx_layout"),
             bind_group_layouts: &[&bind_group_layout],
             push_constant_ranges: &[],
         });
-
-        // ── Shared sampler ────────────────────────────────────────────────────
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             label: Some("postfx_sampler"),
             address_mode_u: wgpu::AddressMode::ClampToEdge,
@@ -732,23 +525,17 @@ impl PostFxPipeline {
             min_filter: wgpu::FilterMode::Linear,
             ..Default::default()
         });
-
-        // ── Params uniform buffer (64 bytes = 16 × f32) ───────────────────────
         let params_buf = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("postfx_params"),
             size: 64,
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
-
-        // ── Vertex shader module (shared by all effects) ──────────────────────
         let vs_src = POSTFX_VERTEX;
         let vs_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("postfx_vs"),
             source: wgpu::ShaderSource::Wgsl(vs_src.into()),
         });
-
-        // ── Helper: compile one effect pipeline ───────────────────────────────
         let build = |name: &str, fs_src: &str| -> wgpu::RenderPipeline {
             let full_src = format!("{vs_src}\n{fs_src}");
             let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -784,10 +571,7 @@ impl PostFxPipeline {
                 cache: None,
             })
         };
-
-        // Suppress unused variable warning for vs_module — we inline `vs_src` in build()
         let _ = vs_module;
-
         let mut pipelines = HashMap::new();
         pipelines.insert("bloom".into(), build("postfx_bloom", SHADER_BLOOM));
         pipelines.insert("blur_h".into(), build("postfx_blur_h", SHADER_BLUR_H));
@@ -832,7 +616,6 @@ impl PostFxPipeline {
             build("postfx_motionblur", SHADER_MOTIONBLUR),
         );
         pipelines.insert("__copy".into(), build("postfx_copy", SHADER_COPY));
-
         Self {
             pipelines,
             sampler,
@@ -841,16 +624,6 @@ impl PostFxPipeline {
             surface_format,
         }
     }
-
-    /// Register a custom WGSL fragment shader under `name`.
-    ///
-    /// The fragment source must follow the same binding convention as built-ins
-    /// (`@group(0) @binding(0/1/2)` for texture / sampler / params).
-    ///
-    /// # Parameters
-    /// - `device` — wgpu logical device.
-    /// - `name` — Effect name to register (replaces any existing entry).
-    /// - `fs_src` — WGSL fragment shader source.
     pub fn register_custom(&mut self, device: &wgpu::Device, name: &str, fs_src: &str) {
         let full_src = format!("{POSTFX_VERTEX}\n{fs_src}");
         let label = format!("postfx_custom_{name}");
@@ -893,24 +666,6 @@ impl PostFxPipeline {
         });
         self.pipelines.insert(name.to_string(), pipeline);
     }
-
-    /// Execute a sequence of post-FX passes then composite the result onto `target_view`.
-    ///
-    /// The function allocates (or reuses) two ping-pong textures, dispatches each
-    /// pass, then does a final copy pass to `target_view`. If `passes` is empty the
-    /// function is a no-op. An unknown effect name is silently skipped with a
-    /// `log::warn!`.
-    ///
-    /// # Parameters
-    /// - `device` — wgpu logical device.
-    /// - `queue` — wgpu command queue.
-    /// - `encoder` — Active command encoder (shared with the frame).
-    /// - `capture_view` — The view that holds the rendered scene to apply effects to.
-    /// - `target_view` — Output surface or canvas texture view.
-    /// - `passes` — [`PostFxPass`] list built by the Lua PostFxStack.
-    /// - `width` / `height` — Frame dimensions in pixels.
-    /// - `total_time` — Elapsed seconds since engine start (for auto-uniform p[3].x).
-    /// - `frame_count` — Monotonic frame counter (for auto-uniform p[3].y).
     #[allow(clippy::too_many_arguments)]
     pub fn apply(
         &self,
@@ -926,22 +681,14 @@ impl PostFxPipeline {
         frame_count: u64,
     ) {
         if passes.is_empty() {
-            // Nothing to do — just copy capture to target.
             self.run_copy_pass(device, encoder, queue, capture_view, target_view);
             return;
         }
-
-        // Allocate ping-pong textures.
         let ping = PostFxTexture::new(device, width, height, "postfx_ping", self.surface_format);
         let pong = PostFxTexture::new(device, width, height, "postfx_pong", self.surface_format);
-
-        // Textures indexed by ping-pong flip.
         let textures = [&ping, &pong];
-
-        // First pass reads from capture.
         let mut src_view: &wgpu::TextureView = capture_view;
-        let mut dst_idx = 0usize; // write to ping first
-
+        let mut dst_idx = 0usize;
         let n = passes.len();
         for (i, pass) in passes.iter().enumerate() {
             let is_last = i == n - 1;
@@ -950,22 +697,17 @@ impl PostFxPipeline {
             } else {
                 &textures[dst_idx].view
             };
-
-            // Update params UBO.
             let mut raw = params_to_uniform(&pass.params);
             if pass.auto_uniforms {
-                raw[12] = total_time; // p[3].x — elapsed time (s)
-                raw[13] = frame_count as f32; // p[3].y — frame counter
-                raw[14] = width as f32; // p[3].z — render target width
-                raw[15] = height as f32; // p[3].w — render target height
+                raw[12] = total_time;
+                raw[13] = frame_count as f32;
+                raw[14] = width as f32;
+                raw[15] = height as f32;
             }
             queue.write_buffer(&self.params_buf, 0, bytemuck::cast_slice(&raw));
-
-            // Look up pipeline.
             let effect_key = pass.effect_name.as_str();
             let Some(pipeline) = self.pipelines.get(effect_key) else {
                 log::warn!("PostFxPipeline: unknown effect '{}' — skipped", effect_key);
-                // Passthrough: copy src to dst so the chain isn't broken.
                 self.run_copy_pass(device, encoder, queue, src_view, dst_view);
                 if !is_last {
                     src_view = &textures[dst_idx].view;
@@ -973,8 +715,6 @@ impl PostFxPipeline {
                 }
                 continue;
             };
-
-            // Create transient bind group.
             let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
                 label: Some("postfx_bg"),
                 layout: &self.bind_group_layout,
@@ -993,7 +733,6 @@ impl PostFxPipeline {
                     },
                 ],
             });
-
             {
                 let mut rp = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: Some("postfx_pass"),
@@ -1010,18 +749,14 @@ impl PostFxPipeline {
                 });
                 rp.set_pipeline(pipeline);
                 rp.set_bind_group(0, &bind_group, &[]);
-                rp.draw(0..3, 0..1); // full-screen triangle
+                rp.draw(0..3, 0..1);
             }
-
-            // Advance ping-pong (only relevant for intermediate passes).
             if !is_last {
                 src_view = &textures[dst_idx].view;
                 dst_idx = 1 - dst_idx;
             }
         }
     }
-
-    /// Run a passthrough (copy) pass from `src_view` to `dst_view`.
     fn run_copy_pass(
         &self,
         device: &wgpu::Device,

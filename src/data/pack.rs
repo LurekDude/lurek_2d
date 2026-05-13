@@ -1,43 +1,38 @@
-//! Pack/unpack using LOVE2D format strings.
+//! Own format-string pack/unpack helpers modelled on Python’s `struct` module.
+//! A format string is a sequence of type tokens with optional endianness prefix.
+//! Serialises typed value slices to bytes and deserialises bytes back to typed values.
+//! Primary consumer is `src/lua_api/data_api.rs`. Does not own file I/O.
 
 use crate::data::byte_data::ByteData;
-
-/// Packable value type.
-///
 #[derive(Debug, Clone)]
+/// Hold value variants used by pack and unpack formats.
 pub enum PackValue {
-    /// Signed integer (i64).
+    /// Store signed integer value.
     Int(i64),
-    /// Unsigned integer (u64).
+    /// Store unsigned integer value.
     UInt(u64),
-    /// 32-bit float.
+    /// Store f32 value.
     Float(f32),
-    /// 64-bit float.
+    /// Store f64 value.
     Double(f64),
-    /// String (UTF-8).
+    /// Store UTF-8 string value.
     Str(String),
-    /// Raw bytes.
+    /// Store raw bytes value.
     Bytes(Vec<u8>),
 }
-
-/// Byte order selection for pack/unpack operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Select byte order for scalar reads and writes.
 enum Endian {
+    /// Use little-endian byte order.
     Little,
+    /// Use big-endian byte order.
     Big,
 }
-
-/// Packs values according to a format string into a `ByteData` buffer.
-///
-/// Format characters:
-///
-///
-/// `Result<ByteData, String>`.
+/// Pack values by format string and return ByteData or error.
 pub fn pack(format: &str, values: &[PackValue]) -> Result<ByteData, String> {
     let mut buf = Vec::new();
     let mut endian = Endian::Little;
     let mut val_idx = 0usize;
-
     for ch in format.chars() {
         match ch {
             '<' => {
@@ -162,21 +157,13 @@ pub fn pack(format: &str, values: &[PackValue]) -> Result<ByteData, String> {
             }
         }
     }
-
     Ok(ByteData::from_bytes(buf))
 }
-
-/// Unpacks values from a byte buffer according to a format string.
-///
-/// Return all decoded values followed by the next unread byte offset.
-///
-///
-/// `Result<(Vec<PackValue>, usize), String>` — decoded values and next byte position.
+/// Unpack values by format string and return values with next offset.
 pub fn unpack(format: &str, data: &[u8], offset: usize) -> Result<(Vec<PackValue>, usize), String> {
     let mut values = Vec::new();
     let mut endian = Endian::Little;
     let mut pos = offset;
-
     for ch in format.chars() {
         match ch {
             '<' => {
@@ -304,7 +291,7 @@ pub fn unpack(format: &str, data: &[u8], offset: usize) -> Result<(Vec<PackValue
                     ));
                 }
                 let s = String::from_utf8_lossy(&data[start..pos]).into_owned();
-                pos += 1; // consume the null byte
+                pos += 1;
                 values.push(PackValue::Str(s));
             }
             _ => {
@@ -312,22 +299,12 @@ pub fn unpack(format: &str, data: &[u8], offset: usize) -> Result<(Vec<PackValue
             }
         }
     }
-
     Ok((values, pos))
 }
-
-/// Compute the total byte size that `pack` would produce for the given format and values.
-///
-/// For fixed-width types (`b`/`B`/`h`/`H`/`i`/`I`/`l`/`L`/`f`/`d`/`n`) the values are not
-/// accessed, so an empty slice may be passed. String types (`s`/`z`) require the corresponding
-/// `PackValue::Str` entry to compute the size.
-///
-///
-/// `Result<usize, String>`.
+/// Compute packed byte size for format and provided values.
 pub fn get_packed_size(format: &str, values: &[PackValue]) -> Result<usize, String> {
     let mut size = 0usize;
     let mut str_idx = 0usize;
-
     for ch in format.chars() {
         match ch {
             '<' | '>' => {}
@@ -349,25 +326,21 @@ pub fn get_packed_size(format: &str, values: &[PackValue]) -> Result<usize, Stri
             's' => {
                 let s = get_as_string(values, str_idx, 's')?;
                 str_idx += 1;
-                size += 4 + s.len(); // u32 length prefix + content
+                size += 4 + s.len();
             }
             'z' => {
                 let s = get_as_string(values, str_idx, 'z')?;
                 str_idx += 1;
-                size += s.len() + 1; // content + null terminator
+                size += s.len() + 1;
             }
             _ => {
                 return Err(format!("getPackedSize: unknown format character '{}'", ch));
             }
         }
     }
-
     Ok(size)
 }
-
-// ── Internal helpers ────────────────────────────────────────────────────────
-
-/// Extract value as i64 from slot `idx`, or return an error.
+/// Extract value at index as i64; return error when missing or wrong type.
 fn get_as_i64(values: &[PackValue], idx: usize, fmt: char) -> Result<i64, String> {
     match values.get(idx) {
         Some(PackValue::Int(n)) => Ok(*n),
@@ -384,8 +357,7 @@ fn get_as_i64(values: &[PackValue], idx: usize, fmt: char) -> Result<i64, String
         )),
     }
 }
-
-/// Extract value as u64 from slot `idx`, or return an error.
+/// Extract value at index as u64; return error when missing or wrong type.
 fn get_as_u64(values: &[PackValue], idx: usize, fmt: char) -> Result<u64, String> {
     match values.get(idx) {
         Some(PackValue::UInt(n)) => Ok(*n),
@@ -402,8 +374,7 @@ fn get_as_u64(values: &[PackValue], idx: usize, fmt: char) -> Result<u64, String
         )),
     }
 }
-
-/// Extract value as f64 from slot `idx`, or return an error.
+/// Extract value at index as f64; return error when missing or wrong type.
 fn get_as_f64(values: &[PackValue], idx: usize, fmt: char) -> Result<f64, String> {
     match values.get(idx) {
         Some(PackValue::Double(d)) => Ok(*d),
@@ -420,8 +391,7 @@ fn get_as_f64(values: &[PackValue], idx: usize, fmt: char) -> Result<f64, String
         )),
     }
 }
-
-/// Extract value as `String` from slot `idx`, or return an error.
+/// Extract value at index as String; return error when missing or not text.
 fn get_as_string(values: &[PackValue], idx: usize, fmt: char) -> Result<String, String> {
     match values.get(idx) {
         Some(PackValue::Str(s)) => Ok(s.clone()),
@@ -441,8 +411,7 @@ fn get_as_string(values: &[PackValue], idx: usize, fmt: char) -> Result<String, 
         )),
     }
 }
-
-/// Assert `data[pos..pos+count]` is in bounds.
+/// Check that slice has enough bytes at pos for count; return bounds error otherwise.
 fn check_bounds(data: &[u8], pos: usize, count: usize, fmt: char) -> Result<(), String> {
     if pos + count > data.len() {
         Err(format!(
@@ -456,26 +425,22 @@ fn check_bounds(data: &[u8], pos: usize, count: usize, fmt: char) -> Result<(), 
         Ok(())
     }
 }
-
-/// Read a single byte from `data` at `pos`.
+/// Read one byte at pos; return error on out-of-bounds.
 fn read1(data: &[u8], pos: usize, fmt: char) -> Result<u8, String> {
     check_bounds(data, pos, 1, fmt)?;
     Ok(data[pos])
 }
-
-/// Read 2 bytes from `data` at `pos`.
+/// Read two bytes at pos; return error on out-of-bounds.
 fn read2(data: &[u8], pos: usize, fmt: char) -> Result<[u8; 2], String> {
     check_bounds(data, pos, 2, fmt)?;
     Ok([data[pos], data[pos + 1]])
 }
-
-/// Read 4 bytes from `data` at `pos`.
+/// Read four bytes at pos; return error on out-of-bounds.
 fn read4(data: &[u8], pos: usize, fmt: char) -> Result<[u8; 4], String> {
     check_bounds(data, pos, 4, fmt)?;
     Ok([data[pos], data[pos + 1], data[pos + 2], data[pos + 3]])
 }
-
-/// Read 8 bytes from `data` at `pos`.
+/// Read eight bytes at pos; return error on out-of-bounds.
 fn read8(data: &[u8], pos: usize, fmt: char) -> Result<[u8; 8], String> {
     check_bounds(data, pos, 8, fmt)?;
     Ok([

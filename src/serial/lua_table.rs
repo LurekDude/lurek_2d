@@ -1,43 +1,16 @@
-//! `SerialValue`: shared intermediate representation for all serial format modules.
-//!
-//! Active format modules (json, toml, csv, msgpack, xml) convert to/from
-//! `SerialValue`.
-//! `Lua-table` is the canonical name because the primary use case is bridging
-//! between Lua tables and text serialization formats.
-
 use indexmap::IndexMap;
 use mlua::prelude::{Lua, LuaResult, LuaValue};
 use std::fmt;
-
-/// A Lurek2D serializable value — the common intermediate representation
-/// shared by all serial format modules.
-///
-/// # Variants
-/// - `Null` — Absent or nil value.
-/// - `Bool` — Boolean.
-/// - `Int` — 64-bit signed integer.
-/// - `Float` — 64-bit floating-point.
-/// - `Str` — UTF-8 string.
-/// - `Seq` — Ordered sequence of values.
-/// - `Map` — Ordered string-keyed map of values.
 #[derive(Debug, Clone)]
 pub enum SerialValue {
-    /// Absent or nil value.
     Null,
-    /// Boolean value.
     Bool(bool),
-    /// 64-bit signed integer.
     Int(i64),
-    /// 64-bit floating-point.
     Float(f64),
-    /// UTF-8 string.
     Str(String),
-    /// Ordered sequence of values.
     Seq(Vec<SerialValue>),
-    /// Ordered string-keyed map of values.
     Map(IndexMap<String, SerialValue>),
 }
-
 impl fmt::Display for SerialValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -50,15 +23,6 @@ impl fmt::Display for SerialValue {
         }
     }
 }
-
-/// Converts a `SerialValue` tree into a Lua value tree.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The active Lua state.
-/// - `val` — `&SerialValue`. The value to convert.
-///
-/// # Returns
-/// `LuaResult<LuaValue<'lua>>`.
 pub fn to_lua<'lua>(lua: &'lua Lua, val: &SerialValue) -> LuaResult<LuaValue<'lua>> {
     match val {
         SerialValue::Null => Ok(LuaValue::Nil),
@@ -82,14 +46,6 @@ pub fn to_lua<'lua>(lua: &'lua Lua, val: &SerialValue) -> LuaResult<LuaValue<'lu
         }
     }
 }
-
-/// Converts a Lua value tree into a `SerialValue` tree.
-///
-/// # Parameters
-/// - `val` — `&LuaValue`. The Lua value to convert.
-///
-/// # Returns
-/// `LuaResult<SerialValue>`.
 pub fn from_lua(val: &LuaValue) -> LuaResult<SerialValue> {
     match val {
         LuaValue::Nil => Ok(SerialValue::Null),
@@ -108,9 +64,6 @@ pub fn from_lua(val: &LuaValue) -> LuaResult<SerialValue> {
                 .to_string(),
         )),
         LuaValue::Table(t) => {
-            // Heuristic: if the table's raw_len > 0 and every integer key
-            // 1..=raw_len is non-nil, treat it as a sequence (Lua array).
-            // Otherwise fall through to the map (dictionary) path.
             let raw_len = t.raw_len();
             if raw_len > 0 {
                 let mut is_seq = true;
@@ -130,8 +83,6 @@ pub fn from_lua(val: &LuaValue) -> LuaResult<SerialValue> {
                     return Ok(SerialValue::Seq(arr));
                 }
             }
-            // Fall through to map path: iterate all key-value pairs,
-            // coercing numeric keys to strings for SerialValue::Map.
             let mut map = IndexMap::new();
             for pair in t.clone().pairs::<LuaValue, LuaValue>() {
                 let (k, v) = pair?;

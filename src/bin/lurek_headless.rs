@@ -1,18 +1,13 @@
-//! Non-graphical CLI binary for Lurek2D tooling workflows.
-//! Three commands: `validate` (runs tools/validate/validate_game.py),
-//! `pack` (zips a game directory to a `.lurek` archive),
-//! `screenshot-batch` (drives lurek2d headless screenshot capture per game dir).
-//! No wgpu, no winit; depends only on std, zip, and std::process::Command.
+//! Headless utility commands for validation, packing, and screenshot automation.
+//! Executes tooling workflows without creating a windowed runtime session.
 
 use std::env;
 use std::fs::{self, File};
 use std::io::{Seek, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
-
 use zip::write::FileOptions;
-
-/// Print CLI usage summary to stderr.
+/// Print CLI usage and supported subcommands.
 fn print_usage() {
     eprintln!("lurek_headless <command> [args]\n");
     eprintln!("Commands:");
@@ -20,8 +15,7 @@ fn print_usage() {
     eprintln!("  pack <game_dir> <output.lurek>");
     eprintln!("  screenshot-batch <games_root> <output_dir> [frames]");
 }
-
-/// Run tools/validate/validate_game.py on an optional game directory; return Err on non-zero exit.
+/// Run the game validator script for one game directory or default discovery path.
 fn run_validate(game_dir: Option<String>) -> Result<(), String> {
     let mut cmd = Command::new("python");
     cmd.arg("tools/validate/validate_game.py");
@@ -37,8 +31,7 @@ fn run_validate(game_dir: Option<String>) -> Result<(), String> {
         Err(format!("validator exited with status {}", status))
     }
 }
-
-/// Recursively add all files under `dir` into `zip` with paths relative to `root`.
+/// Recursively add files from `dir` into ZIP archive using paths relative to `root`.
 fn add_dir_to_zip<W: Write + Seek>(
     zip: &mut zip::ZipWriter<W>,
     root: &Path,
@@ -47,7 +40,6 @@ fn add_dir_to_zip<W: Write + Seek>(
     let options: FileOptions<'_, ()> = FileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
         .unix_permissions(0o644);
-
     for entry in fs::read_dir(dir).map_err(|e| format!("read_dir failed: {}", e))? {
         let entry = entry.map_err(|e| format!("dir entry failed: {}", e))?;
         let path = entry.path();
@@ -55,7 +47,6 @@ fn add_dir_to_zip<W: Write + Seek>(
             add_dir_to_zip(zip, root, &path)?;
             continue;
         }
-
         let rel = path
             .strip_prefix(root)
             .map_err(|e| format!("strip_prefix failed: {}", e))?;
@@ -69,14 +60,12 @@ fn add_dir_to_zip<W: Write + Seek>(
     }
     Ok(())
 }
-
-/// Pack the game directory at `game_dir` into a ZIP archive at `output`; return Err if main.lua is absent.
+/// Pack a game directory into a `.lurek` archive after checking for `main.lua`.
 fn run_pack(game_dir: String, output: String) -> Result<(), String> {
     let root = PathBuf::from(&game_dir);
     if !root.join("main.lua").exists() {
         return Err(format!("'{}' does not contain main.lua", root.display()));
     }
-
     let out_path = PathBuf::from(output);
     if let Some(parent) = out_path.parent() {
         if !parent.as_os_str().is_empty() {
@@ -84,7 +73,6 @@ fn run_pack(game_dir: String, output: String) -> Result<(), String> {
                 .map_err(|e| format!("failed to create output directory: {}", e))?;
         }
     }
-
     let file = File::create(&out_path)
         .map_err(|e| format!("failed to create archive '{}': {}", out_path.display(), e))?;
     let mut zip = zip::ZipWriter::new(file);
@@ -93,39 +81,33 @@ fn run_pack(game_dir: String, output: String) -> Result<(), String> {
         .map_err(|e| format!("failed to finalize archive: {}", e))?;
     Ok(())
 }
-
-/// Capture one screenshot PNG per game subdirectory under `games_root` via lurek2d headless; save to `out_dir`.
+/// Run screenshot capture for each valid game folder under `games_root`.
 fn run_screenshot_batch(games_root: String, out_dir: String, frames: u32) -> Result<(), String> {
     let root = PathBuf::from(games_root);
     let out = PathBuf::from(out_dir);
     fs::create_dir_all(&out).map_err(|e| format!("failed to create output dir: {}", e))?;
-
     let engine_bin = if cfg!(windows) {
         PathBuf::from("lurek2d.exe")
     } else {
         PathBuf::from("lurek2d")
     };
-
     for entry in fs::read_dir(&root).map_err(|e| format!("read_dir failed: {}", e))? {
         let entry = entry.map_err(|e| format!("dir entry failed: {}", e))?;
         let game_dir = entry.path();
         if !game_dir.is_dir() || !game_dir.join("main.lua").exists() {
             continue;
         }
-
         let name = game_dir
             .file_name()
             .and_then(|n| n.to_str())
             .ok_or_else(|| "invalid game folder name".to_string())?;
         let shot_path = out.join(format!("{}.png", name));
-
         let status = Command::new(&engine_bin)
             .arg(&game_dir)
             .arg(format!("--screenshot={}", shot_path.display()))
             .arg(format!("--screenshot-frames={}", frames))
             .status()
             .map_err(|e| format!("failed to run lurek2d for '{}': {}", game_dir.display(), e))?;
-
         if !status.success() {
             return Err(format!(
                 "screenshot command failed for '{}' with status {}",
@@ -134,17 +116,15 @@ fn run_screenshot_batch(games_root: String, out_dir: String, frames: u32) -> Res
             ));
         }
     }
-
     Ok(())
 }
-
+/// Parse command-line arguments, execute selected command, and map errors to exit codes.
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     let Some(cmd) = args.next() else {
         print_usage();
         return ExitCode::from(2);
     };
-
     let result = match cmd.as_str() {
         "validate" => run_validate(args.next()),
         "pack" => {
@@ -175,7 +155,6 @@ fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
-
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {

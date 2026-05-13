@@ -1,25 +1,21 @@
-//! Describe events emitted by animation playback updates.
-
-// ---- Type: AnimEvent ----
-
-/// Events emitted by [`Animation::update`](crate::animation::Animation::update).
+//! Animation playback events emitted by the controller.
+//! Owns `AnimEvent` only.
+//! Does not own the event queue; callers drain and handle events.
+/// Event emitted by `Animation`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnimEvent {
-    /// A non-looping clip reached its final frame and stopped.
+    /// Playback finished.
     Finished,
-    /// The active frame changed to `frame_index` (position within the clip's
-    /// `frame_indices` list).
+    /// Frame index changed.
     FrameChanged {
-        /// 0-based index within the clip's frame list.
+        /// New frame index.
         frame_index: usize,
     },
-    /// A looping clip wrapped back to its first frame.
+    /// Playback wrapped back to the start.
     Looped,
 }
-
 impl AnimEvent {
-    // ---- Implementation: AnimEvent ----
-    /// Return the event type as a Lua-friendly string.
+    /// Return the canonical event type name.
     pub fn type_name(&self) -> &'static str {
         match self {
             Self::Finished => "finished",
@@ -27,8 +23,7 @@ impl AnimEvent {
             Self::Looped => "looped",
         }
     }
-
-    /// Return the frame index for `FrameChanged` events, or `None`.
+    /// Return the frame index for `FrameChanged`, or `None` for other events.
     pub fn frame_index(&self) -> Option<usize> {
         match self {
             Self::FrameChanged { frame_index } => Some(*frame_index),

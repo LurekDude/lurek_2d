@@ -1,23 +1,5 @@
-//! Image operation visualization helpers.
-//!
-//! Side-by-side image comparisons, pixel-transform grids, and HSV colour
-//! wheels rendered as CPU-side [`ImageData`].
-
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
-
-/// Draw a side-by-side comparison of multiple images.
-///
-/// Places each input image horizontally with a label below, with 5px padding.
-///
-/// # Parameters
-/// - `images` — `&[&ImageData]`. Images to display side-by-side.
-/// - `labels` — `&[&str]`. Labels for each column.
-/// - `width` — `u32`. Total output width.
-/// - `height` — `u32`. Total output height.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_image_comparison_to_image(
     images: &[&ImageData],
     labels: &[&str],
@@ -26,16 +8,13 @@ pub fn draw_image_comparison_to_image(
 ) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);
-
     if images.is_empty() {
         return img;
     }
-
     let count = images.len() as u32;
     let padding = 5u32;
     let slot_w = (width - padding * (count + 1)) / count;
-    let max_h = height.saturating_sub(30); // leave room for labels
-
+    let max_h = height.saturating_sub(30);
     for (idx, &src) in images.iter().enumerate() {
         let x_off = padding + idx as u32 * (slot_w + padding);
         let y_off = 10u32;
@@ -56,23 +35,10 @@ pub fn draw_image_comparison_to_image(
     }
     img
 }
-
-/// Draw a 4-column pixel transform grid: original, invert, grayscale, sepia.
-///
-/// Takes a source pattern (100×height) and produces a 4-column display.
-///
-/// # Parameters
-/// - `col_w` — `u32`. Width of each column.
-/// - `col_h` — `u32`. Height of each column.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
     let width = col_w * 4;
     let height = col_h;
     let mut img = ImageData::new(width, height);
-
-    // Column 1: original red-green gradient
     for y in 0..col_h {
         for x in 0..col_w {
             let r = (x * 255 / col_w) as u8;
@@ -81,8 +47,6 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
             img.set_pixel(x, y, r, g, b, 255);
         }
     }
-
-    // Column 2: invert
     for y in 0..col_h {
         for x in 0..col_w {
             if let Some((r, g, b, _a)) = img.get_pixel(x, y) {
@@ -90,8 +54,6 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
             }
         }
     }
-
-    // Column 3: grayscale
     for y in 0..col_h {
         for x in 0..col_w {
             if let Some((r, g, b, _a)) = img.get_pixel(x, y) {
@@ -100,8 +62,6 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
             }
         }
     }
-
-    // Column 4: sepia tone
     for y in 0..col_h {
         for x in 0..col_w {
             if let Some((r, g, b, _a)) = img.get_pixel(x, y) {
@@ -124,17 +84,6 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
     }
     img
 }
-
-/// Draw an HSV colour wheel.
-///
-/// Generates radial hue-saturation gradient in a circle centred in the image.
-///
-/// # Parameters
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_color_wheel_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     let cx = width as f32 / 2.0;

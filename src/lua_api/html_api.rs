@@ -1,33 +1,18 @@
-//! `lurek.html` — Lightweight pure-Rust HTML/CSS layout engine Lua bindings.
-//!
-//! Thin Lua wrapper for `crate::html`. Exposes `HtmlDocument` and `HtmlElement`
-//! as userdata and registers `lurek.html.newDocument`, `lurek.html.loadDocument`,
-//! and `lurek.html.supports` as module-level constructors.
-
+use super::SharedState;
+use crate::html::{parse_css_color_rgba, HtmlDocument, HtmlDocumentOptions, HtmlElementId};
+use crate::render::{DrawMode, RenderCommand};
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::Path;
 use std::rc::Rc;
-
-use super::SharedState;
-use crate::html::{parse_css_color_rgba, HtmlDocument, HtmlDocumentOptions, HtmlElementId};
-use crate::render::{DrawMode, RenderCommand};
-
-// -------------------------------------------------------------------------------
-// LuaHtmlDocument / LuaHtmlElement — lurek.html wrappers
-// -------------------------------------------------------------------------------
-
-/// Lua wrapper around a shared `HtmlDocument` and its callback registry.
 #[derive(Clone)]
 struct LuaHtmlDocument {
     inner: Rc<RefCell<HtmlDocument>>,
     callbacks: Rc<RefCell<HtmlCallbacks>>,
     state: Rc<RefCell<SharedState>>,
 }
-
 impl LuaHtmlDocument {
-    /// Creates a new Lua-facing document from an owned `HtmlDocument`.
     fn new(document: HtmlDocument, state: Rc<RefCell<SharedState>>) -> Self {
         Self {
             inner: Rc::new(RefCell::new(document)),
@@ -35,8 +20,6 @@ impl LuaHtmlDocument {
             state,
         }
     }
-
-    /// Returns a Lua-facing handle to one element inside this document.
     fn element_handle(&self, element_id: HtmlElementId) -> LuaHtmlElement {
         LuaHtmlElement {
             document: self.inner.clone(),
@@ -47,8 +30,6 @@ impl LuaHtmlDocument {
         }
     }
 }
-
-/// Lua wrapper that references a single element inside a shared `HtmlDocument`.
 #[derive(Clone)]
 struct LuaHtmlElement {
     document: Rc<RefCell<HtmlDocument>>,
@@ -57,132 +38,62 @@ struct LuaHtmlElement {
     element_id: HtmlElementId,
     generation: u64,
 }
-
-/// Per-document event callback registry keyed by auto-incrementing handle ids.
 #[derive(Default)]
 struct HtmlCallbacks {
-    /// Monotonic handle counter.
     next_handle: u64,
-    /// Document-level event listeners.
     document: HashMap<u64, HtmlListener>,
-    /// Per-element event listeners.
     elements: HashMap<HtmlElementId, HashMap<u64, HtmlListener>>,
 }
-
-/// One registered Lua callback for a specific event name.
 struct HtmlListener {
-    /// The DOM event name this listener responds to (e.g. `"click"`, `"keydown"`).
     event: String,
-    /// Registry key for the Lua callback function.
     key: LuaRegistryKey,
 }
-
-/// Mutable flags shared across an event dispatch cycle.
 #[derive(Default)]
 struct HtmlEventFlags {
-    /// Whether `event.preventDefault()` was called.
     default_prevented: bool,
-    /// Whether `event.stopPropagation()` was called.
     propagation_stopped: bool,
 }
-
-/// Data payload attached to a dispatched HTML event.
 #[derive(Default)]
 struct HtmlEventPayload {
-    /// Mouse X coordinate, if applicable.
     x: Option<f32>,
-    /// Mouse Y coordinate, if applicable.
     y: Option<f32>,
-    /// Mouse button index, if applicable.
     button: Option<u32>,
-    /// Keyboard key name, if applicable.
     key: Option<String>,
-    /// Raw text input, if applicable.
     text: Option<String>,
-    /// Current input value, if applicable.
     value: Option<String>,
 }
-
-// -------------------------------------------------------------------------------
-// impl LuaUserData for LuaHtmlDocument
-// -------------------------------------------------------------------------------
-
 impl LuaUserData for LuaHtmlDocument {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // -- setHtml --
-        /// Replaces this document's markup and invalidates existing element handles.
-        /// @param | html | string | HTML markup string to load into the document.
-        /// @return | nil | No value is returned.
         methods.add_method("setHtml", |_, this, html: String| {
             this.inner.borrow_mut().set_html(html);
             Ok(())
         });
-
-        // -- getHtml --
-        /// Returns the source markup used by this document.
-        /// @return | string | Current document HTML markup.
         methods.add_method("getHtml", |_, this, ()| {
             Ok(this.inner.borrow().get_html().to_string())
         });
-
-        // -- setCss --
-        /// Replaces this document's stylesheet text.
-        /// @param | css | string | Stylesheet text to replace the current CSS rules.
-        /// @return | nil | No value is returned.
         methods.add_method("setCss", |_, this, css: String| {
             this.inner.borrow_mut().set_css(css);
             Ok(())
         });
-
-        // -- addCss --
-        /// Appends stylesheet text after existing CSS rules.
-        /// @param | css | string | Stylesheet text to append after existing CSS rules.
-        /// @return | nil | No value is returned.
         methods.add_method("addCss", |_, this, css: String| {
             this.inner.borrow_mut().add_css(css);
             Ok(())
         });
-
-        // -- clearCss --
-        /// Removes all stylesheet rules from this document.
-        /// @return | nil | No value is returned.
         methods.add_method("clearCss", |_, this, ()| {
             this.inner.borrow_mut().clear_css();
             Ok(())
         });
-
-        // -- setViewport --
-        /// Sets the document layout viewport in UI pixels.
-        /// @param | w | number | Viewport width in UI pixels.
-        /// @param | h | number | Viewport height in UI pixels.
-        /// @return | nil | No value is returned.
         methods.add_method("setViewport", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().set_viewport(w, h);
             Ok(())
         });
-
-        // -- getViewport --
-        /// Returns the document layout viewport in UI pixels.
-        /// @return | number | Viewport width in UI pixels.
-        /// @return | number | Viewport height in UI pixels.
         methods.add_method("getViewport", |_, this, ()| {
             Ok(this.inner.borrow().viewport())
         });
-
-        // -- update --
-        /// Advances document state and runs layout if needed.
-        /// @param | dt | number | Delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
         });
-
-        // -- draw --
-        /// Builds draw commands and enqueues them into the frame render queue.
-        /// @param | x | number? | Optional X offset for the draw origin.
-        /// @param | y | number? | Optional Y offset for the draw origin.
-        /// @return | nil | No value is returned.
         methods.add_method("draw", |_, this, (x, y): (Option<f32>, Option<f32>)| {
             let dx = x.unwrap_or(0.0);
             let dy = y.unwrap_or(0.0);
@@ -191,12 +102,6 @@ impl LuaUserData for LuaHtmlDocument {
             enqueue_html_draw_commands(&mut document, &mut state, dx, dy);
             Ok(())
         });
-
-        // -- render --
-        /// Backward-compatible alias for `draw`, kept for existing demos.
-        /// @param | x | number? | Optional X offset for the draw origin.
-        /// @param | y | number? | Optional Y offset for the draw origin.
-        /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
             let dx = x.unwrap_or(0.0);
             let dy = y.unwrap_or(0.0);
@@ -205,56 +110,23 @@ impl LuaUserData for LuaHtmlDocument {
             enqueue_html_draw_commands(&mut document, &mut state, dx, dy);
             Ok(())
         });
-
-        // -- relayout --
-        /// Forces a layout pass immediately.
-        /// @return | nil | No value is returned.
         methods.add_method("relayout", |_, this, ()| {
             this.inner.borrow_mut().relayout();
             Ok(())
         });
-
-        // -- isDirty --
-        /// Returns whether DOM, CSS, viewport, or layout state changed.
-        /// @return | boolean | True when the document needs to be redrawn or relaid out.
         methods.add_method("isDirty", |_, this, ()| Ok(this.inner.borrow().is_dirty()));
-
-        // -- getRoot --
-        /// Returns the root element for this document.
-        /// @return | LHtmlElement | Root element handle for this document.
         methods.add_method("getRoot", |lua, this, ()| {
             lua.create_userdata(this.element_handle(this.inner.borrow().root()))
         });
-
-        // -- getElementById --
-        /// Finds the first element whose id attribute matches the given value, or nil.
-        /// @param | id | string | Element id attribute to look up.
-        /// @return | LHtmlElement | Matching element handle.
         methods.add_method("getElementById", |lua, this, id: String| {
             html_element_value(lua, this, this.inner.borrow().get_element_by_id(&id))
         });
-
-        // -- query --
-        /// Finds the first element matching a supported selector.
-        /// @param | selector | string | CSS selector to evaluate.
-        /// @return | LHtmlElement | First element that matches the selector.
         methods.add_method("query", |lua, this, selector: String| {
             html_element_value(lua, this, this.inner.borrow().query(&selector))
         });
-
-        // -- queryAll --
-        /// Returns all elements matching a supported selector in document order.
-        /// @param | selector | string | CSS selector to evaluate.
-        /// @return | table | Array of matching `LHtmlElement` handles.
         methods.add_method("queryAll", |lua, this, selector: String| {
             html_element_table(lua, this, this.inner.borrow().query_all(&selector))
         });
-
-        // -- on --
-        /// Registers a document-level event listener.
-        /// @param | event | string | DOM event name to listen for.
-        /// @param | fn | function | Lua callback to invoke when the event fires.
-        /// @return | integer | Listener handle that can be passed to `off`.
         methods.add_method("on", |lua, this, (event, func): (String, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let mut callbacks = this.callbacks.borrow_mut();
@@ -265,24 +137,12 @@ impl LuaUserData for LuaHtmlDocument {
                 .insert(handle, HtmlListener { event, key });
             Ok(handle)
         });
-
-        // -- off --
-        /// Removes a document-level event listener.
-        /// @param | handle | integer | Listener handle returned by `on`.
-        /// @return | nil | No value is returned.
         methods.add_method("off", |lua, this, handle: u64| {
             if let Some(listener) = this.callbacks.borrow_mut().document.remove(&handle) {
                 lua.remove_registry_value(listener.key)?;
             }
             Ok(())
         });
-
-        // -- mousepressed --
-        /// Forwards a mouse press and emits a minimal click event.
-        /// @param | x | number | Mouse X coordinate in UI pixels.
-        /// @param | y | number | Mouse Y coordinate in UI pixels.
-        /// @param | button | integer? | Optional mouse button index.
-        /// @return | boolean | True when the press was consumed by the document.
         methods.add_method(
             "mousepressed",
             |lua, this, (x, y, button): (f32, f32, Option<u32>)| {
@@ -304,13 +164,6 @@ impl LuaUserData for LuaHtmlDocument {
                 Ok(consumed || prevented)
             },
         );
-
-        // -- mousereleased --
-        /// Forwards a mouse release event.
-        /// @param | x | number | Mouse X coordinate in UI pixels.
-        /// @param | y | number | Mouse Y coordinate in UI pixels.
-        /// @param | button | integer? | Optional mouse button index.
-        /// @return | boolean | True when the release was consumed by the document.
         methods.add_method(
             "mousereleased",
             |_, this, (x, y, button): (f32, f32, Option<u32>)| {
@@ -321,29 +174,12 @@ impl LuaUserData for LuaHtmlDocument {
                     .is_some())
             },
         );
-
-        // -- mousemoved --
-        /// Forwards a mouse move event.
-        /// @param | x | number | Mouse X coordinate in UI pixels.
-        /// @param | y | number | Mouse Y coordinate in UI pixels.
-        /// @return | boolean | True when the movement affected hovered state.
         methods.add_method("mousemoved", |_, this, (x, y): (f32, f32)| {
             Ok(this.inner.borrow_mut().mouse_moved(x, y).is_some())
         });
-
-        // -- wheelmoved --
-        /// Forwards a mouse wheel event.
-        /// @param | dx | number | Horizontal wheel delta.
-        /// @param | dy | number | Vertical wheel delta.
-        /// @return | boolean | True when the wheel event affected the document.
         methods.add_method("wheelmoved", |_, this, (dx, dy): (f32, f32)| {
             Ok(this.inner.borrow().wheel_moved(dx, dy).is_some())
         });
-
-        // -- keypressed --
-        /// Forwards a key press and emits a keydown event.
-        /// @param | key | string | Key name to dispatch.
-        /// @return | boolean | True when the key press was consumed by the document.
         methods.add_method("keypressed", |lua, this, key: String| {
             let target = this.inner.borrow().key_pressed(&key);
             let consumed = target.is_some();
@@ -359,11 +195,6 @@ impl LuaUserData for LuaHtmlDocument {
             )?;
             Ok(consumed || prevented)
         });
-
-        // -- textinput --
-        /// Forwards text input and emits an input event for focused input elements.
-        /// @param | text | string | Text input payload to insert.
-        /// @return | boolean | True when the text input was consumed by the document.
         methods.add_method("textinput", |lua, this, text: String| {
             let target = this.inner.borrow_mut().text_input(&text);
             let value = target.and_then(|id| this.inner.borrow().text(id));
@@ -381,31 +212,14 @@ impl LuaUserData for LuaHtmlDocument {
             )?;
             Ok(consumed || prevented)
         });
-
-        // -- type --
-        /// Returns the type name of this object.
-        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LHtmlDocument"));
-
-        // -- typeOf --
-        /// Returns true if this object is of the given type.
-        /// @param | name | string | Type name to compare against.
-        /// @return | boolean | True when the type name matches this object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LHtmlDocument" || name == "Object")
         });
     }
 }
-
-// -------------------------------------------------------------------------------
-// impl LuaUserData for LuaHtmlElement
-// -------------------------------------------------------------------------------
-
 impl LuaUserData for LuaHtmlElement {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // -- getDocument --
-        /// Returns the owning HtmlDocument.
-        /// @return | LHtmlDocument | Document handle that owns this element.
         methods.add_method("getDocument", |lua, this, ()| {
             lua.create_userdata(LuaHtmlDocument {
                 inner: this.document.clone(),
@@ -413,10 +227,6 @@ impl LuaUserData for LuaHtmlElement {
                 state: this.state.clone(),
             })
         });
-
-        // -- getTagName --
-        /// Returns this element's tag name.
-        /// @return | string | Tag name of this element.
         methods.add_method("getTagName", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -426,10 +236,6 @@ impl LuaUserData for LuaHtmlElement {
                 .map(|element| element.tag_name().to_string())
                 .unwrap_or_default())
         });
-
-        // -- getId --
-        /// Returns this element's id or nil.
-        /// @return | string | Current `id` attribute value.
         methods.add_method("getId", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -438,11 +244,6 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .and_then(|element| element.id_attribute().map(str::to_string)))
         });
-
-        // -- setId --
-        /// Sets or removes this element's id.
-        /// @param | id | string? | New `id` attribute value.
-        /// @return | nil | No value is returned.
         methods.add_method("setId", |_, this, id: Option<String>| {
             check_html_element(this)?;
             this.document
@@ -450,10 +251,6 @@ impl LuaUserData for LuaHtmlElement {
                 .set_id_attribute(this.element_id, id);
             Ok(())
         });
-
-        // -- getText --
-        /// Returns this element's text content.
-        /// @return | string | Text content of this element.
         methods.add_method("getText", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -462,20 +259,11 @@ impl LuaUserData for LuaHtmlElement {
                 .text(this.element_id)
                 .unwrap_or_default())
         });
-
-        // -- setText --
-        /// Replaces this element's text content.
-        /// @param | text | string | Replacement text content.
-        /// @return | nil | No value is returned.
         methods.add_method("setText", |_, this, text: String| {
             check_html_element(this)?;
             this.document.borrow_mut().set_text(this.element_id, text);
             Ok(())
         });
-
-        // -- getHtml --
-        /// Returns this element's inner HTML.
-        /// @return | string | Inner HTML markup for this element.
         methods.add_method("getHtml", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -484,11 +272,6 @@ impl LuaUserData for LuaHtmlElement {
                 .element_html(this.element_id)
                 .unwrap_or_default())
         });
-
-        // -- setHtml --
-        /// Replaces this element's inner HTML.
-        /// @param | html | string | Replacement inner HTML markup.
-        /// @return | nil | No value is returned.
         methods.add_method("setHtml", |_, this, html: String| {
             check_html_element(this)?;
             this.document
@@ -496,11 +279,6 @@ impl LuaUserData for LuaHtmlElement {
                 .set_element_html(this.element_id, &html);
             Ok(())
         });
-
-        // -- appendHtml --
-        /// Appends HTML inside this element.
-        /// @param | html | string | HTML markup to append inside the element.
-        /// @return | nil | No value is returned.
         methods.add_method("appendHtml", |_, this, html: String| {
             check_html_element(this)?;
             this.document
@@ -508,20 +286,11 @@ impl LuaUserData for LuaHtmlElement {
                 .append_element_html(this.element_id, &html);
             Ok(())
         });
-
-        // -- remove --
-        /// Removes this element from the document tree.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |_, this, ()| {
             check_html_element(this)?;
             this.document.borrow_mut().remove_element(this.element_id);
             Ok(())
         });
-
-        // -- getAttribute --
-        /// Returns an attribute value or nil.
-        /// @param | name | string | Attribute name to read.
-        /// @return | string | Attribute value for the requested name.
         methods.add_method("getAttribute", |_, this, name: String| {
             check_html_element(this)?;
             Ok(this
@@ -530,12 +299,6 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .and_then(|element| element.attribute(&name).map(str::to_string)))
         });
-
-        // -- setAttribute --
-        /// Sets or removes an attribute value.
-        /// @param | name | string | Attribute name to update.
-        /// @param | value | string? | New attribute value.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setAttribute",
             |_, this, (name, value): (String, Option<String>)| {
@@ -546,11 +309,6 @@ impl LuaUserData for LuaHtmlElement {
                 Ok(())
             },
         );
-
-        // -- removeAttribute --
-        /// Removes the named attribute from this element; does nothing if absent.
-        /// @param | name | string | Attribute name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("removeAttribute", |_, this, name: String| {
             check_html_element(this)?;
             this.document
@@ -558,11 +316,6 @@ impl LuaUserData for LuaHtmlElement {
                 .set_attribute(this.element_id, &name, None);
             Ok(())
         });
-
-        // -- hasClass --
-        /// Returns whether this element has a CSS class.
-        /// @param | name | string | CSS class name to check.
-        /// @return | boolean | True when the element has the class.
         methods.add_method("hasClass", |_, this, name: String| {
             check_html_element(this)?;
             Ok(this
@@ -571,21 +324,11 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .is_some_and(|element| element.has_class(&name)))
         });
-
-        // -- addClass --
-        /// Adds a CSS class to this element.
-        /// @param | name | string | CSS class name to add.
-        /// @return | nil | No value is returned.
         methods.add_method("addClass", |_, this, name: String| {
             check_html_element(this)?;
             this.document.borrow_mut().add_class(this.element_id, &name);
             Ok(())
         });
-
-        // -- removeClass --
-        /// Removes a CSS class from this element.
-        /// @param | name | string | CSS class name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("removeClass", |_, this, name: String| {
             check_html_element(this)?;
             this.document
@@ -593,12 +336,6 @@ impl LuaUserData for LuaHtmlElement {
                 .remove_class(this.element_id, &name);
             Ok(())
         });
-
-        // -- toggleClass --
-        /// Toggles a CSS class and returns the final state.
-        /// @param | name | string | CSS class name to toggle.
-        /// @param | force | boolean? | Optional forced final state.
-        /// @return | boolean | Final presence of the CSS class after toggling.
         methods.add_method(
             "toggleClass",
             |_, this, (name, force): (String, Option<bool>)| {
@@ -610,21 +347,10 @@ impl LuaUserData for LuaHtmlElement {
                     .unwrap_or(false))
             },
         );
-
-        // -- getStyle --
-        /// Returns an inline or stylesheet value for a property.
-        /// @param | name | string | CSS property name to read.
-        /// @return | string | Resolved style value for the property.
         methods.add_method("getStyle", |_, this, name: String| {
             check_html_element(this)?;
             Ok(this.document.borrow().style_value(this.element_id, &name))
         });
-
-        // -- setStyle --
-        /// Sets or removes an inline style value.
-        /// @param | name | string | CSS property name to update.
-        /// @param | value | string? | New inline style value.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setStyle",
             |_, this, (name, value): (String, Option<String>)| {
@@ -635,13 +361,6 @@ impl LuaUserData for LuaHtmlElement {
                 Ok(())
             },
         );
-
-        // -- getRect --
-        /// Returns this element's last computed layout rectangle.
-        /// @return | number | Layout X position in UI pixels.
-        /// @return | number | Layout Y position in UI pixels.
-        /// @return | number | Layout width in UI pixels.
-        /// @return | number | Layout height in UI pixels.
         methods.add_method("getRect", |_, this, ()| {
             check_html_element(this)?;
             let mut document = this.document.borrow_mut();
@@ -654,29 +373,16 @@ impl LuaUserData for LuaHtmlElement {
                 .unwrap_or_default();
             Ok((rect.x, rect.y, rect.w, rect.h))
         });
-
-        // -- focus --
-        /// Gives focus to this element.
-        /// @return | nil | No value is returned.
         methods.add_method("focus", |_, this, ()| {
             check_html_element(this)?;
             this.document.borrow_mut().focus(this.element_id);
             Ok(())
         });
-
-        // -- blur --
-        /// Clears focus from this element if it currently has focus.
-        /// @return | nil | No value is returned.
         methods.add_method("blur", |_, this, ()| {
             check_html_element(this)?;
             this.document.borrow_mut().blur(this.element_id);
             Ok(())
         });
-
-        // -- query --
-        /// Finds the first descendant matching a selector.
-        /// @param | selector | string | CSS selector to evaluate.
-        /// @return | LHtmlElement | First descendant that matches the selector.
         methods.add_method("query", |lua, this, selector: String| {
             check_html_element(this)?;
             let document = LuaHtmlDocument {
@@ -692,11 +398,6 @@ impl LuaUserData for LuaHtmlElement {
                     .query_from(this.element_id, &selector),
             )
         });
-
-        // -- queryAll --
-        /// Returns all descendants matching a selector.
-        /// @param | selector | string | CSS selector to evaluate.
-        /// @return | table | Array of matching descendant `LHtmlElement` handles.
         methods.add_method("queryAll", |lua, this, selector: String| {
             check_html_element(this)?;
             let document = LuaHtmlDocument {
@@ -712,12 +413,6 @@ impl LuaUserData for LuaHtmlElement {
                     .query_all_from(this.element_id, &selector),
             )
         });
-
-        // -- on --
-        /// Registers an element event listener.
-        /// @param | event | string | DOM event name to listen for.
-        /// @param | fn | function | Lua callback to invoke when the event fires.
-        /// @return | integer | Listener handle that can be passed to `off`.
         methods.add_method("on", |lua, this, (event, func): (String, LuaFunction)| {
             check_html_element(this)?;
             let key = lua.create_registry_value(func)?;
@@ -731,11 +426,6 @@ impl LuaUserData for LuaHtmlElement {
                 .insert(handle, HtmlListener { event, key });
             Ok(handle)
         });
-
-        // -- off --
-        /// Removes an element event listener.
-        /// @param | handle | integer | Listener handle returned by `on`.
-        /// @return | nil | No value is returned.
         methods.add_method("off", |lua, this, handle: u64| {
             if let Some(listeners) = this
                 .callbacks
@@ -749,27 +439,12 @@ impl LuaUserData for LuaHtmlElement {
             }
             Ok(())
         });
-
-        // -- type --
-        /// Returns the type name of this object.
-        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LHtmlElement"));
-
-        // -- typeOf --
-        /// Returns true if this object is of the given type.
-        /// @param | name | string | Type name to compare against.
-        /// @return | boolean | True when the type name matches this object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LHtmlElement" || name == "Object")
         });
     }
 }
-
-// -------------------------------------------------------------------------------
-// Helper functions
-// -------------------------------------------------------------------------------
-
-/// Wraps an optional element id into a Lua userdata value or nil.
 fn html_element_value<'lua>(
     lua: &'lua Lua,
     document: &LuaHtmlDocument,
@@ -782,8 +457,6 @@ fn html_element_value<'lua>(
         None => Ok(LuaValue::Nil),
     }
 }
-
-/// Wraps a vector of element ids into a Lua table of userdata.
 fn html_element_table<'lua>(
     lua: &'lua Lua,
     document: &LuaHtmlDocument,
@@ -795,9 +468,6 @@ fn html_element_table<'lua>(
     }
     Ok(table)
 }
-
-/// Validates that an element handle still points to a live element and the document
-/// generation has not changed since the handle was created.
 fn check_html_element(element: &LuaHtmlElement) -> LuaResult<()> {
     let document = element.document.borrow();
     if document.generation() != element.generation {
@@ -812,9 +482,6 @@ fn check_html_element(element: &LuaHtmlElement) -> LuaResult<()> {
     }
     Ok(())
 }
-
-/// Dispatches an HTML event through the bubble chain and document-level listeners,
-/// returning `true` if any callback was invoked or default was prevented.
 fn emit_html_event(
     lua: &Lua,
     document: &LuaHtmlDocument,
@@ -865,8 +532,6 @@ fn emit_html_event(
     }
     Ok(called || flags.borrow().default_prevented)
 }
-
-/// Collects all registered listeners for a specific element and event name.
 fn collect_element_listeners<'lua>(
     lua: &'lua Lua,
     document: &LuaHtmlDocument,
@@ -883,8 +548,6 @@ fn collect_element_listeners<'lua>(
         .map(|listener| lua.registry_value(&listener.key))
         .collect()
 }
-
-/// Collects all registered document-level listeners for a specific event name.
 fn collect_document_listeners<'lua>(
     lua: &'lua Lua,
     document: &LuaHtmlDocument,
@@ -898,9 +561,6 @@ fn collect_document_listeners<'lua>(
         .map(|listener| lua.registry_value(&listener.key))
         .collect()
 }
-
-/// Builds the Lua event table passed to listener callbacks, with `preventDefault`,
-/// `stopPropagation`, and `isDefaultPrevented` methods.
 fn create_html_event_table<'lua>(
     lua: &'lua Lua,
     document: &LuaHtmlDocument,
@@ -941,7 +601,6 @@ fn create_html_event_table<'lua>(
         table.set("value", value.clone())?;
     }
     let prevent_flags = flags.clone();
-    /// Prevents the default browser action associated with this event.
     table.set(
         "preventDefault",
         lua.create_function(move |_, ()| {
@@ -950,7 +609,6 @@ fn create_html_event_table<'lua>(
         })?,
     )?;
     let stop_flags = flags.clone();
-    /// Stops the event from bubbling up to parent elements.
     table.set(
         "stopPropagation",
         lua.create_function(move |_, ()| {
@@ -958,15 +616,12 @@ fn create_html_event_table<'lua>(
             Ok(())
         })?,
     )?;
-    /// Returns true if `preventDefault` has been called on this event.
-    /// @return | boolean | True when `preventDefault()` has been called.
     table.set(
         "isDefaultPrevented",
         lua.create_function(move |_, ()| Ok(flags.borrow().default_prevented))?,
     )?;
     Ok(table)
 }
-
 fn enqueue_html_draw_commands(
     document: &mut HtmlDocument,
     state: &mut SharedState,
@@ -974,12 +629,10 @@ fn enqueue_html_draw_commands(
     y: f32,
 ) {
     let commands = document.draw_commands(x, y);
-
     for command in commands {
         if command.rect.w <= 0.0 || command.rect.h <= 0.0 {
             continue;
         }
-
         match command.kind.as_str() {
             "box" => {
                 if let Some(bg) = command
@@ -998,7 +651,6 @@ fn enqueue_html_draw_commands(
                         h: command.rect.h,
                     });
                 }
-
                 if let Some(border) = command.color.as_deref().and_then(parse_css_color) {
                     state.render_commands.push(RenderCommand::SetColor(
                         border[0], border[1], border[2], border[3],
@@ -1017,17 +669,14 @@ fn enqueue_html_draw_commands(
                 if text.is_empty() {
                     continue;
                 }
-
                 let Some(font_key) = state.active_font.or(state.default_font) else {
                     continue;
                 };
-
                 let fg = command
                     .color
                     .as_deref()
                     .and_then(parse_css_color)
                     .unwrap_or([1.0, 1.0, 1.0, 1.0]);
-
                 state
                     .render_commands
                     .push(RenderCommand::SetColor(fg[0], fg[1], fg[2], fg[3]));
@@ -1043,17 +692,14 @@ fn enqueue_html_draw_commands(
         }
     }
 }
-
 fn parse_css_color(raw: &str) -> Option<[f32; 4]> {
     parse_css_color_rgba(raw)
 }
-
 fn parse_document_options(
     opts: Option<LuaTable>,
 ) -> LuaResult<(HtmlDocumentOptions, Option<String>)> {
     let mut options = HtmlDocumentOptions::default();
     let mut css_path = None;
-
     if let Some(opts) = opts {
         options.css = opts.get::<_, Option<String>>("css")?;
         css_path = opts.get::<_, Option<String>>("cssPath")?;
@@ -1064,10 +710,8 @@ fn parse_document_options(
             options.height = height;
         }
     }
-
     Ok((options, css_path))
 }
-
 fn companion_css_path(path: &str) -> Option<String> {
     let trimmed = path.trim();
     if trimmed.is_empty() {
@@ -1080,20 +724,8 @@ fn companion_css_path(path: &str) -> Option<String> {
             .into_owned(),
     )
 }
-
-// -------------------------------------------------------------------------------
-// register — lurek.html module-level constructors
-// -------------------------------------------------------------------------------
-
-/// Registers the `lurek.html` module table with `newDocument`, `loadDocument`, and `supports`.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let html = lua.create_table()?;
-
-    // -- newDocument --
-    /// Creates a detached HTML document from markup and optional CSS/viewport options.
-    /// @param | html | string | Initial HTML markup string for the document.
-    /// @param | opts | table? | Optional CSS and viewport configuration table.
-    /// @return | LHtmlDocument | Newly created detached HTML document.
     let state_for_new = state.clone();
     html.set(
         "newDocument",
@@ -1107,22 +739,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             },
         )?,
     )?;
-
-    // -- loadDocument --
-    /// Loads an HTML UI document from the game filesystem sandbox.
-    /// @param | path | string | Relative game path to the HTML source file.
-    /// @param | opts | table? | Optional CSS and viewport configuration table.
-    /// @param | opts.css | string? | Optional inline CSS text.
-    /// @param | opts.cssPath | string? | Optional relative path to a CSS file.
-    /// If omitted and no inline CSS is provided, a companion `*.css` file next to
-    /// `path` is loaded when present.
-    /// @return | LHtmlDocument | Loaded HTML document.
     let state_for_load = state.clone();
     html.set(
         "loadDocument",
         lua.create_function(move |lua, (path, opts): (String, Option<LuaTable>)| {
             let (mut options, css_path) = parse_document_options(opts)?;
-
             let source = {
                 let state = state_for_load.borrow();
                 state.fs.read_string(&path).map_err(|e| {
@@ -1131,7 +752,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     ))
                 })?
             };
-
             if options.css.is_none() {
                 if let Some(css_path) = css_path {
                     let css = {
@@ -1153,23 +773,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     }
                 }
             }
-
             lua.create_userdata(LuaHtmlDocument::new(
                 HtmlDocument::with_options(source, options),
                 state_for_load.clone(),
             ))
         })?,
     )?;
-
-    // -- supports --
-    /// Returns whether the active HTML facade supports a named feature.
-    /// @param | feature | string | Feature name to query.
-    /// @return | boolean | True when the feature is supported.
     html.set(
         "supports",
         lua.create_function(|_, feature: String| Ok(HtmlDocument::supports(&feature)))?,
     )?;
-
     luna.set("html", html)?;
     Ok(())
 }

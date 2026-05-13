@@ -1,22 +1,18 @@
-//! neuroevolution helpers that evolve neural-network parameter vectors.
+//! Neuroevolution wrapper that maps chromosomes to neural networks.
+//! Owns `Neuroevolution` only and delegates population logic to `GeneticAlgorithm`.
+//! Does not own training data; callers assign fitness externally.
 use crate::ai::{genetic::GeneticAlgorithm, neural_net::NeuralNet};
-
-// ---- Type: Neuroevolution ----
-
-/// Neuroevolution trainer: evolves a population of neural network weight vectors.
+/// GA-backed neural-network population manager.
 pub struct Neuroevolution {
     /// Underlying genetic algorithm.
     pub ga: GeneticAlgorithm,
-    /// Layer specifications: `(inputs, outputs, activation_name)`.
+    /// Template layer specification used to build networks from chromosomes.
     template_layer_spec: Vec<(usize, usize, String)>,
-    /// Number of completed generation evolutions.
+    /// Current generation counter.
     pub generation: usize,
 }
-
-// ---- Implementation: Neuroevolution ----
-
 impl Neuroevolution {
-    /// Create a new neuroevolution trainer for the given network topology.
+    /// Create a population for the provided layer spec.
     pub fn new(layer_spec: Vec<(usize, usize, &str)>, pop_size: usize, seed: u64) -> Self {
         let gene_count = Self::total_params(&layer_spec);
         let ga = GeneticAlgorithm::new(pop_size, gene_count, seed);
@@ -29,59 +25,48 @@ impl Neuroevolution {
             generation: 0,
         }
     }
-
-    /// Return the total parameter count implied by the given layer spec.
+    /// Return the flattened parameter count for the template spec.
     fn total_params(spec: &[(usize, usize, &str)]) -> usize {
         spec.iter().map(|(i, o, _)| i * o + o).sum()
     }
-
     /// Return the population size.
     pub fn pop_size(&self) -> usize {
         self.ga.pop_size()
     }
-
-    /// Builds a `NeuralNet` from the weight chromosome at index `i`.
+    /// Build a neural net from chromosome `i`; returns `None` when the index is invalid.
     pub fn chromosome_to_net(&self, i: usize) -> Option<NeuralNet> {
         let c = self.ga.population.get(i)?;
         let mut net = self.build_empty_net();
         net.set_weights(&c.genes);
         Some(net)
     }
-
-    /// Set the fitness for chromosome at index `i`.
+    /// Assign fitness to chromosome `i` when present.
     pub fn set_fitness(&mut self, i: usize, fitness: f32) {
         if let Some(c) = self.ga.population.get_mut(i) {
             c.fitness = fitness;
         }
     }
-
-    /// Advances one generation using the GA.
+    /// Advance the underlying genetic algorithm and generation counter.
     pub fn evolve(&mut self) {
         self.ga.evolve();
         self.generation += 1;
     }
-
-    /// Return a `NeuralNet` loaded with the weights of the best chromosome.
+    /// Build the network for the best chromosome, or `None` if the population is empty.
     pub fn best_network(&self) -> Option<NeuralNet> {
         let best = self.ga.best()?;
         let mut net = self.build_empty_net();
         net.set_weights(&best.genes);
         Some(net)
     }
-
-    /// Return the fitness of the best chromosome.
+    /// Return the best fitness in the current population, or 0.0 if empty.
     pub fn best_fitness(&self) -> f32 {
         self.ga.best().map(|c| c.fitness).unwrap_or(0.0)
     }
-
-    /// Return a reference to the raw population chromosomes.
+    /// Return the current chromosome slice.
     pub fn population(&self) -> &[crate::ai::genetic::Chromosome] {
         &self.ga.population
     }
-
-    // ---- Internal Helpers ----
-
-    /// Builds an empty (zeroed weights) net matching the stored topology.
+    /// Build a network with the template layers but zeroed parameters.
     fn build_empty_net(&self) -> NeuralNet {
         let mut net = NeuralNet::new();
         for (inputs, outputs, act_str) in &self.template_layer_spec {
@@ -91,4 +76,3 @@ impl Neuroevolution {
         net
     }
 }
-

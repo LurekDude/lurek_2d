@@ -1,19 +1,17 @@
-//! Deterministic xorshift64 PRNG for sampling.
+//! Own deterministic 64-bit xorshift PRNG scoped exclusively to dataframe sampling.
+//! Not a cryptographic generator. Kept `pub(crate)` to prevent accidental use outside
+//! this module. Zero seeds are promoted to 1 to avoid the degenerate all-zero state.
+//! Replace only this file if a higher-quality RNG is ever needed; callers will not change.
 
-/// Minimal xorshift64 generator.
 pub(crate) struct Xorshift64 {
     state: u64,
 }
-
 impl Xorshift64 {
-    /// Create a new RNG with the given seed. Seed `0` is remapped to `1`.
     pub(crate) fn new(seed: u64) -> Self {
         Self {
             state: if seed == 0 { 1 } else { seed },
         }
     }
-
-    /// Return the next pseudo-random `u64`.
     pub(crate) fn next_u64(&mut self) -> u64 {
         let mut x = self.state;
         x ^= x << 13;
@@ -22,13 +20,9 @@ impl Xorshift64 {
         self.state = x;
         x
     }
-
-    /// Return a pseudo-random `f64` in `[0, 1)`.
     pub(crate) fn next_f64(&mut self) -> f64 {
         (self.next_u64() & 0x001F_FFFF_FFFF_FFFF) as f64 / (1u64 << 53) as f64
     }
-
-    /// Return a pseudo-random `usize` in `[0, max)`.
     pub(crate) fn next_usize(&mut self, max: usize) -> usize {
         (self.next_u64() % max as u64) as usize
     }

@@ -1,54 +1,25 @@
-//! Structured error types and result alias for the Lurek2D engine.
-//!
-//! All engine-level error conditions are expressed as variants of [`EngineError`], a
-//! `thiserror`-derived enum that carries a human-readable description and belongs to one
-//! of the six [`ErrorCategory`] groups: `Init`, `Runtime`, `Resource`, `Script`,
-//! `System`, or `Filesystem`.
-//!
-//! This module also provides [`EngineResult<T>`], a type alias for
-//! `Result<T, EngineError>`, which should be used in public APIs that can fail.
-//!
-//! # Design goal
-//!
-//! Every error variant has a stable four-digit numeric code (e.g. `E1001`) that can be
-//! displayed in the error screen and referenced in documentation without changing across
-//! releases.  This makes it straightforward for users to search for a specific error online
-//! or in the Lurek2D issue tracker.
-//!
-//! Lua errors are wrapped as [`EngineError::LuaError`] so they can flow through the same
-//! result type and be presented by [`crate::app::error_screen::ErrorScreen`].
+//! Engine error taxonomy and transport-friendly snapshots.
+//! Maps subsystem failures to stable error codes, categories, and recovery hints.
 
 use thiserror::Error;
-
-/// Error category for grouping related engine errors.
-///
-/// # Variants
-/// - `Init` — Init variant.
-/// - `Runtime` — Runtime variant.
-/// - `Resource` — Resource variant.
-/// - `Script` — Script variant.
-/// - `System` — System variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// High-level classification used to group runtime failures.
 pub enum ErrorCategory {
-    /// Startup / initialization failures.
+    /// Startup and initialization failures.
     Init,
-    /// Runtime failures during the game loop.
+    /// Frame-time subsystem execution failures.
     Runtime,
-    /// Missing or invalid assets/resources.
+    /// Asset and handle lifecycle failures.
     Resource,
-    /// Lua script execution errors.
+    /// Script execution or callback failures.
     Script,
-    /// Filesystem and sandboxed I/O errors.
+    /// Filesystem path or IO policy failures.
     Filesystem,
-    /// System-level or I/O errors.
+    /// OS-level or infrastructure failures.
     System,
 }
-
 impl ErrorCategory {
-    /// Returns the category name as a lowercase string.
-    ///
-    /// # Returns
-    /// `&'static str`.
+    /// Map error category to stable lowercase identifier string.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Init => "init",
@@ -60,69 +31,48 @@ impl ErrorCategory {
         }
     }
 }
-
-/// All possible error conditions that can occur in the Lurek2D engine.
-///
-/// Each variant carries a stable error code (`E1001`–`E1012`) and belongs to an
-/// [`ErrorCategory`] for structured error reporting.
-///
-/// # Variants
-/// - `InitializationError` — Engine startup failure (window, renderer, Lua VM).
-/// - `RenderError` — Error during frame rendering.
-/// - `InputError` — Error reading or processing input state.
-/// - `AudioError` — Failure in the audio subsystem.
-/// - `PhysicsError` — Error in the physics world or body simulation.
-/// - `FileSystemError` — Sandboxed I/O failure.
-/// - `LuaError` — Lua script execution or binding error.
-/// - `WindowError` — Window creation or event loop failure.
-/// - `ConfigError` — `conf.toml` parse error.
-/// - `ResourceNotFound` — A requested asset was not found in the game directory.
-/// - `ResourceNotLoaded` — A resource was released but a stale handle was accessed.
-/// - `IoError` — Low-level I/O error (from `std::io::Error`).
 #[derive(Debug, Error)]
+/// Engine-wide error enum used by runtime APIs and subsystem adapters.
 pub enum EngineError {
     #[error("Initialization error: {0}")]
+    /// Failure while bootstrapping runtime components.
     InitializationError(String),
-
     #[error("Render error: {0}")]
+    /// Failure while issuing or presenting render work.
     RenderError(String),
-
     #[error("Input error: {0}")]
+    /// Failure while handling keyboard, mouse, or gamepad input.
     InputError(String),
-
     #[error("Audio error: {0}")]
+    /// Failure while decoding or playing audio content.
     AudioError(String),
-
     #[error("Physics error: {0}")]
+    /// Failure while stepping or configuring physics state.
     PhysicsError(String),
-
     #[error("Filesystem error: {0}")]
+    /// Failure while resolving or accessing game filesystem paths.
     FileSystemError(String),
-
     #[error("Lua error: {0}")]
+    /// Failure raised from Lua execution.
     LuaError(String),
-
     #[error("Window error: {0}")]
+    /// Failure while creating or managing window state.
     WindowError(String),
-
     #[error("Config error: {0}")]
+    /// Failure while parsing or validating configuration.
     ConfigError(String),
-
     #[error("Resource not found: {0}")]
+    /// Referenced resource path or key was not found.
     ResourceNotFound(String),
-
     #[error("Resource not loaded: {0}")]
+    /// Referenced resource handle exists but has no loaded payload.
     ResourceNotLoaded(String),
-
     #[error("IO error: {0}")]
+    /// Wrapped standard library IO failure.
     IoError(#[from] std::io::Error),
 }
-
 impl EngineError {
-    /// Returns the stable error code for this variant.
-    ///
-    /// # Returns
-    /// `&'static str`.
+    /// Return stable machine-readable error code for this variant.
     pub fn code(&self) -> &'static str {
         match self {
             Self::InitializationError(_) => "E1001",
@@ -139,11 +89,7 @@ impl EngineError {
             Self::IoError(_) => "E1012",
         }
     }
-
-    /// Returns the error category for this variant.
-    ///
-    /// # Returns
-    /// `ErrorCategory`.
+    /// Return high-level category used for diagnostics grouping.
     pub fn category(&self) -> ErrorCategory {
         match self {
             Self::InitializationError(_) | Self::WindowError(_) | Self::ConfigError(_) => {
@@ -159,11 +105,7 @@ impl EngineError {
             Self::IoError(_) => ErrorCategory::System,
         }
     }
-
-    /// Returns a human-readable recovery hint for this error variant.
-    ///
-    /// # Returns
-    /// `&'static str`.
+    /// Return operator hint describing likely remediation path.
     pub fn recovery_hint(&self) -> &'static str {
         match self {
             Self::InitializationError(_) => "Check GPU drivers and display configuration.",
@@ -189,47 +131,23 @@ impl EngineError {
         }
     }
 }
-
-/// Convenience alias for `Result<T, EngineError>` used throughout the engine.
-///
-/// # Returns
-/// Wraps any value type `T` in a `Result` that carries an `EngineError` on failure.
+/// Convenience alias for runtime results that use `EngineError`.
 pub type EngineResult<T> = Result<T, EngineError>;
-
-/// A serialisable snapshot of an engine error.
-///
-/// This struct captures all fields of an [`EngineError`] needed for
-/// diagnostics: the human-readable message, numeric code, category name, and a
-/// recovery hint. Used by `lurek.runtime.errorSnapshot()` and by the engine's
-/// JSON crash reporter.
-///
-/// # Fields
-/// - `message` — The display message for this error.
-/// - `code` — The four-digit numeric code, e.g. `"E1004"`.
-/// - `category` — The category name, e.g. `"filesystem"`.
-/// - `recovery_hint` — Short actionable hint to present to the user.
 #[derive(Debug, Clone)]
+/// Serializable error view used by logs, UI overlays, and tooling output.
 pub struct ErrorSnapshot {
-    /// Display message for this error.
+    /// Human-readable error message text.
     pub message: String,
-    /// Stable four-digit code, e.g. `"E1004"`.
+    /// Stable short error code.
     pub code: &'static str,
-    /// Category name, e.g. `"filesystem"`.
+    /// Stable category identifier.
     pub category: &'static str,
-    /// Short actionable recovery hint.
+    /// Suggested recovery hint for operators.
     pub recovery_hint: &'static str,
 }
-
 impl ErrorSnapshot {
-    /// Serialises the snapshot to a compact JSON string.
-    ///
-    /// The output has the form
-    /// `{"message":"...","code":"...","category":"...","hint":"..."}`.
-    ///
-    /// # Returns
-    /// `String`.
+    /// Encode snapshot as compact JSON for external consumers.
     pub fn to_json(&self) -> String {
-        // Escape double quotes and backslashes so the JSON is always valid.
         let escaped = self.message.replace('\\', "\\\\").replace('"', "\\\"");
         format!(
             r#"{{"message":"{}","code":"{}","category":"{}","hint":"{}"}}"#,
@@ -237,12 +155,8 @@ impl ErrorSnapshot {
         )
     }
 }
-
 impl EngineError {
-    /// Creates an [`ErrorSnapshot`] capturing all diagnostic fields of this error.
-    ///
-    /// # Returns
-    /// [`ErrorSnapshot`].
+    /// Build snapshot payload from this error value.
     pub fn snapshot(&self) -> ErrorSnapshot {
         ErrorSnapshot {
             message: self.to_string(),
@@ -252,5 +166,3 @@ impl EngineError {
         }
     }
 }
-
-// Tests migrated to tests/rust/unit/runtime_tests.rs

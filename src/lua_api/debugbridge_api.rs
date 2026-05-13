@@ -1,41 +1,16 @@
-//! `lurek.debugbridge` - TCP debug server bindings for runtime inspection and control.
-//!
-//! Embeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.
-//! External tools (VS Code extension, MCP server) connect to inspect and
-//! control the game at runtime. Network I/O runs on a background thread;
-//! Lua-dependent methods are queued and dispatched via `poll()` on the main thread.
-
+use super::SharedState;
+use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingResponse};
+use mlua::prelude::*;
 use std::cell::RefCell;
 use std::net::TcpListener;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
-
-use mlua::prelude::*;
-
-use super::SharedState;
-
-use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingResponse};
-
-// ---------------------------------------------------------------------------
-// Registration
-// ---------------------------------------------------------------------------
-
-/// Registers the `lurek.debugbridge` namespace.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let db = lua.create_table()?;
-
-    // Shared state between Lua closures and the TCP thread
     let shared: Arc<Mutex<BridgeShared>> = Arc::new(Mutex::new(BridgeShared::new()));
     let running: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
-    // Store thread join handle
     let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> = Arc::new(Mutex::new(None));
-
-    // -- start --
-
-    /// Start the TCP debug server on 127.0.0.1:port.
-    /// @param | port | integer? | Optional TCP port to bind on localhost.
-    /// @return | boolean | Whether the server was started.
     let sh = shared.clone();
     let run = running.clone();
     let th = thread_handle.clone();
@@ -67,17 +42,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
-
-    // -- stop --
-    /// Stop the TCP debug server and close all connections.
-    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
         "stop",
         lua.create_function(move |_, ()| {
             run.store(false, Ordering::Relaxed);
-            // Wait for thread to finish
             if let Ok(mut h) = th.lock() {
                 if let Some(handle) = h.take() {
                     let _ = handle.join();
@@ -86,40 +56,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- isRunning --
-    /// Returns whether the server is currently running.
-    /// @return | boolean | Whether the debug server is active.
     let run = running.clone();
     db.set(
         "isRunning",
         lua.create_function(move |_, ()| Ok(run.load(Ordering::Relaxed)))?,
     )?;
-
-    // -- getPort --
-    /// Returns the server port (0 if not running).
-    /// @return | integer | Bound TCP port, or 0 when stopped.
     let sh = shared.clone();
     db.set(
         "getPort",
         lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.port).unwrap_or(0)))?,
     )?;
-
-    // -- getClientCount --
-    /// Returns the number of connected TCP clients.
-    /// @return | integer | Number of currently connected clients.
     let sh = shared.clone();
     db.set(
         "getClientCount",
         lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.client_count).unwrap_or(0)))?,
     )?;
-
-    // -- poll --
-    /// Poll for pending Lua-dependent requests from TCP clients.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set("poll", lua.create_function(move |lua, ()| {
-            // Auto-record frame time from lurek.timer.getDelta - no manual call needed.
             if let Ok(lurek_tbl) = lua.globals().get::<_, LuaTable>("lurek") {
                 if let Ok(time_tbl) = lurek_tbl.get::<_, LuaTable>("time") {
                     if let Ok(get_delta) = time_tbl.get::<_, LuaFunction>("getDelta") {
@@ -138,7 +91,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
                 s.pending_requests.drain(..).collect()
             };
-
             for req in requests {
                 let result = match req.method.as_str() {
                     "eval" => {
@@ -147,10 +99,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                             .get("code")
                             .and_then(|v| v.as_str())
                             .unwrap_or("");
-                        // LUA-EVAL-JUSTIFIED: lua.load() here is the core feature of the debug-bridge
-                        // eval endpoint - it executes user-supplied Lua code from the connected
-                        // debug client.  This cannot be expressed as a Rust tbl.set() call
-                        // because the code string is dynamic and unknown at registration time.
                         match lua.load(code).eval::<LuaMultiValue>() {
                             Ok(vals) => {
                                 let values: Vec<serde_json::Value> = vals
@@ -165,9 +113,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                         }
                     }
                     "getCallStack" => {
-                        // LUA-EVAL-JUSTIFIED: lua.load() is required here because `debug.getinfo` is a
-                        // Lua C function that operates inside the Lua VM's debug state; mlua
-                        // provides no equivalent Rust API for stack-frame introspection.
                         let stack_result: LuaResult<LuaTable> = lua
                             .load(concat!(
                                 "local frames = {}\n",
@@ -207,7 +152,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                         }
                     }
                     "getLocals" => {
-                        // Locals introspection requires debug library
                         let level = req
                             .params
                             .get("level")
@@ -276,7 +220,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     }
                     _ => serde_json::json!({"error": "unknown method"}),
                 };
-
                 if let Ok(mut s) = sh.lock() {
                     s.pending_responses.push_back(PendingResponse {
                         id: req.id,
@@ -288,14 +231,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- capturePrint --
-
-    /// Captures a print message and broadcasts it to connected clients.
-    /// @param | msg | string | Print message text.
-    /// @param | source | string? | Optional source name for the message.
-    /// @param | line | integer? | Optional source line number.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "capturePrint",
@@ -311,11 +246,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
-
-    // -- getPrintHistory --
-    /// Returns the print history.
-    /// @param | count | integer? | Optional maximum number of recent entries to return.
-    /// @return | table | Print history entries.
     let sh = shared.clone();
     db.set(
         "getPrintHistory",
@@ -327,7 +257,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 Some(0) | None => s.print_history.iter().cloned().collect::<Vec<_>>(),
                 Some(n) => {
                     let start = s.print_history.len().saturating_sub(n);
-                    s.print_history.iter().skip(start).cloned().collect::<Vec<_>>()
+                    s.print_history
+                        .iter()
+                        .skip(start)
+                        .cloned()
+                        .collect::<Vec<_>>()
                 }
             };
             let tbl = lua.create_table()?;
@@ -342,10 +276,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
-
-    // -- clearPrintHistory --
-    /// Clears the print history.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "clearPrintHistory",
@@ -357,11 +287,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- setMaxPrintHistory --
-    /// Sets the maximum print history size.
-    /// @param | max | integer | Maximum number of entries to retain.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "setMaxPrintHistory",
@@ -373,11 +298,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- getPerformance --
-
-    /// Returns performance statistics.
-    /// @return | table | Performance metrics table.
     let sh = shared.clone();
     db.set(
         "getPerformance",
@@ -397,12 +317,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
-
-    // -- requestScreenshot --
-
-    /// Flags a screenshot request for the next frame.
-    /// @param | scale | integer? | Optional screenshot scale factor clamped to 1 through 8.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "requestScreenshot",
@@ -415,10 +329,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- isScreenshotRequested --
-    /// Returns whether a screenshot is currently requested.
-    /// @return | boolean | Whether a screenshot request is pending.
     let sh = shared.clone();
     db.set(
         "isScreenshotRequested",
@@ -426,13 +336,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(sh.lock().map(|s| s.screenshot_requested).unwrap_or(false))
         })?,
     )?;
-
-    // -- broadcast --
-
-    /// Broadcasts a JSON event to all connected clients.
-    /// @param | event | string | Event name to broadcast.
-    /// @param | json_data | string | JSON payload string for the event.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "broadcast",
@@ -444,10 +347,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- getProtocolInfo --
-    /// Returns bridge protocol information including version and capabilities.
-    /// @return | table | Protocol metadata table.
     let sh = shared.clone();
     db.set(
         "getProtocolInfo",
@@ -466,10 +365,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(t)
         })?,
     )?;
-
-    // -- consumeHotReloadRequest --
-    /// Consumes and clears a pending remote hot-reload request.
-    /// @return | boolean | True when a remote reload request was pending.
     let sh = shared.clone();
     db.set(
         "consumeHotReloadRequest",
@@ -482,17 +377,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(requested)
         })?,
     )?;
-
-    // -- debugbridge namespace --
     lurek.set("debugbridge", db)?;
     Ok(())
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-// Convert a Lua value to a serde_json::Value for TCP responses.
 fn lua_value_to_json(val: &LuaValue) -> serde_json::Value {
     match val {
         LuaValue::Nil => serde_json::Value::Null,

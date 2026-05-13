@@ -1,87 +1,74 @@
-﻿//! Automation playback engine for timed synthetic input injection.
-//! Defines Simulator, PlaybackState, StepEventSink, ConditionParser, and event dispatch.
-//! Drives step-to-EventQueue translation on each update call.
-//! Not Send/Sync; owned by the Lua thread via Rc<RefCell<Simulator>>.
+//! `Simulator` drives deterministic script playback: loads `Script` values, advances
+//! time, dispatches input events via `StepEventSink`, handles macros, conditions,
+//! assertions, pixel-diff visual asserts, and playback-speed scaling.
+//! Does not own event dispatch internals; depends on `EventQueue` and `timer`.
 
-use std::collections::HashMap;
-use std::path::Path;
-
+use super::script::MAX_STEPS;
+use super::{Action, Script, Step};
 use crate::event::{Event, EventArg, EventQueue};
 use crate::input::{
     EVENT_KEY_PRESSED, EVENT_KEY_RELEASED, EVENT_MOUSE_MOVED, EVENT_MOUSE_PRESSED,
     EVENT_MOUSE_RELEASED, EVENT_TEXT_INPUT, EVENT_WHEEL_MOVED,
 };
-use crate::timer::accumulate_scaled_micros;
-
-use super::script::MAX_STEPS;
-use super::{Action, Script, Step};
 use crate::log_msg;
 use crate::runtime::log_messages::{AT01_SIM_INIT, AT02_SCRIPT_LOAD};
-
-// ---- Type: StepEventSink ----
-
-/// EventQueue abstraction for Simulator; decouples update_with_sink from the live queue in tests.
+use crate::timer::accumulate_scaled_micros;
+use std::collections::HashMap;
+use std::path::Path;
+/// Sink for events produced by the simulator during step dispatch.
 pub trait StepEventSink {
-    /// Push a synthetic event into the sink.
+    /// Push one `Event` into the sink for later processing by the engine event loop.
     fn push_event(&mut self, event: Event);
 }
-
+/// `StepEventSink` implementation that routes simulator events into the engine `EventQueue`.
 impl StepEventSink for EventQueue {
+    /// Forward the event into the underlying `EventQueue`.
     fn push_event(&mut self, event: Event) {
         self.push(event);
     }
 }
-
-// ---- Type: PlaybackState ----
-
 #[derive(Debug, Clone, PartialEq)]
-/// Playback state of Simulator; controls whether update advances elapsed and dispatches steps.
+/// Internal playback lifecycle state for the active script.
 enum PlaybackState {
-    /// No script selected or playback explicitly stopped.
+    /// No script is active; simulator is waiting for `start()`.
     Idle,
-    /// Active playback; update advances elapsed time and dispatches due steps.
+    /// Script is active and advancing time each `update()` call.
     Running,
-    /// Playback suspended; update is a no-op until resumed.
+    /// Script is suspended; time does not advance until `resume()` is called.
     Paused,
-    /// All steps dispatched; no further steps will fire.
+    /// All steps have been dispatched successfully.
     Complete,
-    /// Playback halted by a failed assertion.
+    /// A step assertion or macro error halted the script; `last_error` holds the reason.
     Failed,
 }
-
-// ---- Type: Simulator ----
-
 #[derive(Debug)]
-/// Automation playback engine; registry of named Scripts with step-to-EventQueue dispatch.
+/// Drives automation script playback by advancing time and dispatching `Step` events.
 pub struct Simulator {
-    /// Registry of loaded scripts indexed by name; duplicate names replace prior entries.
+    /// Registry of loaded scripts keyed by their `Script::name`.
     scripts: HashMap<String, Script>,
-    /// Name of the currently active script; None in Idle state.
+    /// Name of the currently playing script, or `None` when idle.
     active_script: Option<String>,
-    /// Microseconds elapsed since the last start call; frozen when Paused.
+    /// Total elapsed playback time in microseconds, scaled by `playback_speed`.
     elapsed_micros: u64,
-    /// Sub-microsecond carry from floating-point dt accumulation.
+    /// Sub-microsecond carry used by `accumulate_scaled_micros` to avoid drift.
     dt_carry_micros: f64,
-    /// Index of the next step to dispatch; steps below this index have already fired.
+    /// Index of the next step to evaluate in the active script.
     next_step_idx: usize,
-    /// Current playback state controlling update behavior.
+    /// Current playback lifecycle state.
     state: PlaybackState,
-    /// Named macro scripts stored separately from the main registry for CallMacro expansion.
+    /// Named macro library inlined by `CallMacro` steps during playback.
     macros: HashMap<String, Script>,
-    /// dt multiplier applied on each update call; clamped >= 0.0.
+    /// Time-scale factor applied during `update()`; 1.0 = real-time, 0.0 = paused.
     playback_speed: f32,
-    /// Hint flag for game-side overlay rendering of simulated input position.
+    /// When true, enables visual highlighting of dispatched steps in debug tools.
     highlight_mode: bool,
-    /// Named boolean conditions evaluated by when/assert step expressions.
+    /// Named boolean flags evaluated by `when` and `assert` condition expressions.
     conditions: HashMap<String, bool>,
-    /// Most recent assertion failure message; cleared on start.
+    /// Error message from the most recent failure, set when state transitions to `Failed`.
     last_error: Option<String>,
 }
-
-// ---- Implementation: Simulator ----
-
 impl Simulator {
-    /// Create a Simulator with empty script registry in Idle state.
+    /// Create a new idle `Simulator` with no scripts, macros, or conditions loaded.
     pub fn new() -> Self {
         log_msg!(debug, AT01_SIM_INIT);
         Self {
@@ -98,33 +85,27 @@ impl Simulator {
             last_error: None,
         }
     }
-
-    /// Register a script by name, replacing any existing entry with the same name.
+    /// Register a `Script` by name; replaces any existing script with the same name.
     pub fn load(&mut self, script: Script) {
         log_msg!(debug, AT02_SCRIPT_LOAD, "{}", script.name);
         self.scripts.insert(script.name.clone(), script);
     }
-
-    /// Remove the named script; stop playback if it is active; return true if found.
+    /// Remove the named script; stops playback if it is currently active. Returns `true` if the script existed.
     pub fn unload(&mut self, name: &str) -> bool {
-        // If the active script is being unloaded, stop playback.
         if self.active_script.as_deref() == Some(name) {
             self.stop();
         }
         self.scripts.remove(name).is_some()
     }
-
-    /// Return true if a script with the given name is registered.
+    /// Return `true` if a script with `name` is registered.
     pub fn has_script(&self, name: &str) -> bool {
         self.scripts.contains_key(name)
     }
-
-    /// Return an unordered snapshot of all registered script names.
+    /// Return the names of all currently loaded scripts.
     pub fn get_scripts(&self) -> Vec<String> {
         self.scripts.keys().cloned().collect()
     }
-
-    /// Start playback of the named script from the beginning; return Err if the name is not loaded.
+    /// Begin playback of the named script from the start; error if the script is not loaded.
     pub fn start(&mut self, name: &str) -> Result<(), String> {
         if !self.scripts.contains_key(name) {
             return Err(format!("simulator.start: script '{}' is not loaded", name));
@@ -137,8 +118,7 @@ impl Simulator {
         self.last_error = None;
         Ok(())
     }
-
-    /// Stop playback and reset to Idle; script registry is unaffected.
+    /// Halt playback and reset all playback state to idle.
     pub fn stop(&mut self) {
         self.active_script = None;
         self.elapsed_micros = 0;
@@ -146,90 +126,74 @@ impl Simulator {
         self.next_step_idx = 0;
         self.state = PlaybackState::Idle;
     }
-
-    /// Transition from Running to Paused; no-op if not Running.
+    /// Suspend playback; time stops advancing until `resume()` is called.
     pub fn pause(&mut self) {
         if self.state == PlaybackState::Running {
             self.state = PlaybackState::Paused;
         }
     }
-
-    /// Transition from Paused to Running; no-op if not Paused.
+    /// Resume a paused script; no-op if not in `Paused` state.
     pub fn resume(&mut self) {
         if self.state == PlaybackState::Paused {
             self.state = PlaybackState::Running;
         }
     }
-
-    /// Return true when state is Running.
+    /// Return `true` when the script is actively advancing time.
     pub fn is_running(&self) -> bool {
         self.state == PlaybackState::Running
     }
-
-    /// Return true when state is Paused.
+    /// Return `true` when the script is suspended.
     pub fn is_paused(&self) -> bool {
         self.state == PlaybackState::Paused
     }
-
-    /// Return true when all steps have been dispatched.
+    /// Return `true` when all steps have been dispatched without error.
     pub fn is_complete(&self) -> bool {
         self.state == PlaybackState::Complete
     }
-
-    /// Return true if playback stopped due to a failed assertion.
+    /// Return `true` when playback halted due to an assertion or macro error.
     pub fn is_failed(&self) -> bool {
         self.state == PlaybackState::Failed
     }
-
-    /// Return the most recent automation failure string.
+    /// Return the error message from the most recent failure, or `None` if no failure.
     pub fn last_error(&self) -> Option<&str> {
         self.last_error.as_deref()
     }
-
-    /// Return the index of the next step to be dispatched; 0 when idle.
+    /// Return the index of the next step that will be evaluated on the next `update()`.
     pub fn current_step(&self) -> usize {
         self.next_step_idx
     }
-
-    /// Return the step count of the active script; 0 when no script is active.
+    /// Return the total step count of the active script, or 0 when none is active.
     pub fn step_count(&self) -> usize {
         self.active_script
             .as_ref()
             .and_then(|name| self.scripts.get(name))
             .map_or(0, |s| s.step_count())
     }
-
-    /// Return the name of the active script; None when idle.
+    /// Return the name of the currently active script, or `None` when idle.
     pub fn current_script(&self) -> Option<&str> {
         self.active_script.as_deref()
     }
-
-    /// Return seconds elapsed since the last start call; 0.0 when idle, frozen when paused.
+    /// Return elapsed playback time in seconds (scaled by `playback_speed`).
     pub fn elapsed_time(&self) -> f32 {
         self.elapsed_micros as f32 / 1_000_000.0
     }
-
-    /// Set a named boolean condition used by when/assert step fields.
+    /// Set a named boolean condition used by `when` and `assert` step expressions.
     pub fn set_condition(&mut self, name: String, value: bool) {
         self.conditions.insert(name, value);
     }
-
-    /// Return a named condition value; None if the name is not set.
+    /// Return the current value of a named condition, or `None` if not set.
     pub fn get_condition(&self, name: &str) -> Option<bool> {
         self.conditions.get(name).copied()
     }
-
-    /// Return a clone of the named script; None if not registered.
+    /// Return a clone of the registered script with `name`, or `None` if not loaded.
     pub fn get_script(&self, name: &str) -> Option<Script> {
         self.scripts.get(name).cloned()
     }
-
-    /// Return the step limit for the named script; None if not registered.
+    /// Return the step limit of the named script, or `None` if the script is not loaded.
     pub fn get_script_step_limit(&self, name: &str) -> Option<usize> {
         self.scripts.get(name).map(|s| s.get_step_limit())
     }
-
-    /// Set the step limit on the named script (clamped to `1..=MAX_STEPS`); return false if not found.
+    /// Apply a new step limit to the named script; returns `true` if the script exists.
     pub fn set_script_step_limit(&mut self, name: &str, limit: usize) -> bool {
         if let Some(script) = self.scripts.get_mut(name) {
             script.set_step_limit(limit);
@@ -238,13 +202,11 @@ impl Simulator {
             false
         }
     }
-
-    /// Save a Script as a named macro for later CallMacro expansion.
+    /// Register a named macro `Script` that can be inlined by `CallMacro` steps.
     pub fn save_macro(&mut self, name: String, script: Script) {
         self.macros.insert(name, script);
     }
-
-    /// Load the named macro into the script registry and start playback; return Err if not found.
+    /// Load the named macro as a regular script and start it immediately.
     pub fn play_macro(&mut self, name: &str) -> Result<(), String> {
         let macro_script = self
             .macros
@@ -255,61 +217,48 @@ impl Simulator {
         self.load(macro_script);
         self.start(&script_name)
     }
-
-    /// Return true if a macro with the given name has been saved.
+    /// Return `true` if a macro named `name` is registered.
     pub fn has_macro(&self, name: &str) -> bool {
         self.macros.contains_key(name)
     }
-
-    /// Return an unordered snapshot of all saved macro names.
+    /// Return the names of all registered macros.
     pub fn list_macros(&self) -> Vec<String> {
         self.macros.keys().cloned().collect()
     }
-
-    /// Set the dt multiplier for playback speed; clamped to >= 0.0.
+    /// Set the playback speed multiplier; clamped to >= 0.0.
     pub fn set_playback_speed(&mut self, factor: f32) {
         self.playback_speed = factor.max(0.0);
     }
-
-    /// Return the current playback speed multiplier; default is 1.0.
+    /// Return the current playback speed multiplier.
     pub fn get_playback_speed(&self) -> f32 {
         self.playback_speed
     }
-
-    /// Set the highlight overlay hint flag for game-side rendering of simulated input.
+    /// Enable or disable visual step-highlight mode used by debug tooling.
     pub fn set_highlight_mode(&mut self, enable: bool) {
         self.highlight_mode = enable;
     }
-
-    /// Return whether the highlight overlay hint is active.
+    /// Return `true` when visual step-highlight mode is active.
     pub fn is_highlight_mode(&self) -> bool {
         self.highlight_mode
     }
-
-    /// Advance the playback clock by `dt` seconds and dispatch all due steps into `event_queue`.
+    /// Advance the simulator by `dt` seconds and dispatch due steps into `event_queue`.
     pub fn update(&mut self, dt: f32, event_queue: &mut EventQueue) {
         self.update_with_sink(dt, event_queue);
     }
-
-    /// Advance playback by `dt` and dispatch due steps into a generic StepEventSink.
     pub fn update_with_sink<S: StepEventSink>(&mut self, dt: f32, event_sink: &mut S) {
         if self.state != PlaybackState::Running {
             return;
         }
-
         accumulate_scaled_micros(
             &mut self.elapsed_micros,
             &mut self.dt_carry_micros,
             dt,
             self.playback_speed,
         );
-
         let script_name = match &self.active_script {
             Some(name) => name.clone(),
             None => return,
         };
-
-        // Dispatch all steps whose time has been reached.
         while let Some(step) = self
             .scripts
             .get(&script_name)
@@ -319,33 +268,25 @@ impl Simulator {
             if step_time_micros(&step) > self.elapsed_micros {
                 break;
             }
-
             if let Err(err) = self.execute_step(&script_name, &step, event_sink) {
                 self.last_error = Some(err);
                 self.state = PlaybackState::Failed;
                 break;
             }
-
             self.next_step_idx += 1;
         }
-
         if self.state == PlaybackState::Failed {
             return;
         }
-
         let step_count = self
             .scripts
             .get(&script_name)
             .map(|s| s.steps.len())
             .unwrap_or(0);
-
-        // Check if all steps have been dispatched.
         if self.next_step_idx >= step_count {
             self.state = PlaybackState::Complete;
         }
     }
-
-    /// Execute one step: evaluate when/assert conditions, then dispatch or handle its action.
     fn execute_step<S: StepEventSink>(
         &mut self,
         script_name: &str,
@@ -357,7 +298,6 @@ impl Simulator {
                 return Ok(());
             }
         }
-
         if let Some(expr) = step.assert.as_deref() {
             if !evaluate_condition_expr(expr, &self.conditions)? {
                 return Err(format!(
@@ -366,7 +306,6 @@ impl Simulator {
                 ));
             }
         }
-
         match step.action {
             Action::CallMacro => self.expand_macro_step(script_name, step),
             Action::Assert => {
@@ -392,8 +331,7 @@ impl Simulator {
             }
         }
     }
-
-    /// Inline a named macro's steps into the active script at the current step's time offset.
+    /// Inline the macro named by `step.macro_name` into the active script at the current position.
     fn expand_macro_step(&mut self, script_name: &str, step: &Step) -> Result<(), String> {
         let macro_name = step
             .macro_name
@@ -404,21 +342,18 @@ impl Simulator {
             .get(macro_name)
             .cloned()
             .ok_or_else(|| format!("simulator.callMacro: macro '{}' not found", macro_name))?;
-
         let active = self.scripts.get_mut(script_name).ok_or_else(|| {
             format!(
                 "simulator.callMacro: active script '{}' not found",
                 script_name
             )
         })?;
-
         let base_time = step.time.max(0.0);
         let mut injected = Vec::with_capacity(macro_script.steps.len());
         for mut nested in macro_script.steps {
             nested.time = base_time + nested.time.max(0.0);
             injected.push(nested);
         }
-
         let insert_at = self.next_step_idx.saturating_add(1);
         active.steps.splice(insert_at..insert_at, injected);
         if active.steps.len() > MAX_STEPS {
@@ -426,8 +361,7 @@ impl Simulator {
         }
         Ok(())
     }
-
-    /// Pixel-diff baseline and actual images; return Err when diff exceeds step.max_diff.
+    /// Load and compare `step.baseline` vs `step.actual` images; error if pixel diff exceeds `step.max_diff`.
     fn run_visual_assert(&self, step: &Step) -> Result<(), String> {
         let baseline = step
             .baseline
@@ -448,8 +382,6 @@ impl Simulator {
             Ok(())
         }
     }
-
-    /// Translate a Step into its Event and push it into the sink; Wait/Repeat/macro variants are no-ops.
     fn dispatch_step<S: StepEventSink>(step: &Step, event_queue: &mut S) {
         match step.action {
             Action::KeyPress => {
@@ -534,19 +466,15 @@ impl Simulator {
             | Action::Repeat
             | Action::CallMacro
             | Action::Assert
-            | Action::VisualAssert => {
-                // No-op - just a timed delay.
-            }
+            | Action::VisualAssert => {}
         }
     }
 }
-
-/// Convert step.time (seconds) to integer microseconds; negative times clamp to 0.
+/// Convert step time (seconds) to microseconds for comparison with `elapsed_micros`.
 fn step_time_micros(step: &Step) -> u64 {
     (step.time.max(0.0) as f64 * 1_000_000.0).round() as u64
 }
-
-/// Parse and evaluate a boolean condition expression against the condition registry; return Err on syntax error.
+/// Evaluate a boolean condition expression string (&&, ||, !, parentheses, named flags).
 fn evaluate_condition_expr(expr: &str, conditions: &HashMap<String, bool>) -> Result<bool, String> {
     let mut parser = ConditionParser::new(expr);
     let value = parser.parse_expr(conditions)?;
@@ -560,25 +488,23 @@ fn evaluate_condition_expr(expr: &str, conditions: &HashMap<String, bool>) -> Re
         ))
     }
 }
-
-/// Recursive-descent parser for boolean condition expressions used by when/assert step fields.
+/// Recursive-descent parser for condition expressions evaluated against a named-flag table.
 struct ConditionParser<'a> {
+    /// Source expression string being parsed.
     src: &'a str,
+    /// Current byte offset into `src`.
     idx: usize,
 }
-
 impl<'a> ConditionParser<'a> {
-    /// Create a parser for the given condition expression string.
+    /// Create a parser positioned at the start of `src`.
     fn new(src: &'a str) -> Self {
         Self { src, idx: 0 }
     }
-
-    /// Return true when all input has been consumed.
+    /// Return `true` when the parser has consumed the entire source string.
     fn is_eof(&self) -> bool {
         self.idx >= self.src.len()
     }
-
-    /// Advance idx past any leading whitespace characters.
+    /// Advance `idx` past any leading whitespace characters.
     fn skip_ws(&mut self) {
         while let Some(ch) = self.peek_char() {
             if ch.is_whitespace() {
@@ -588,13 +514,11 @@ impl<'a> ConditionParser<'a> {
             }
         }
     }
-
-    /// Return the next character without advancing idx.
+    /// Return the next character without advancing, or `None` at end of input.
     fn peek_char(&self) -> Option<char> {
         self.src[self.idx..].chars().next()
     }
-
-    /// Consume a specific token after skipping whitespace; return true if consumed.
+    /// Try to consume the exact `token` string; return `true` if it matched and was consumed.
     fn eat(&mut self, token: &str) -> bool {
         self.skip_ws();
         if self.src[self.idx..].starts_with(token) {
@@ -604,13 +528,11 @@ impl<'a> ConditionParser<'a> {
             false
         }
     }
-
-    /// Parse a full boolean expression starting at idx.
+    /// Parse a full boolean expression (entry point delegates to `parse_or`).
     fn parse_expr(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
         self.parse_or(conditions)
     }
-
-    /// Parse zero or more `||`-separated terms.
+    /// Parse one or more `||`-separated operands and return their OR.
     fn parse_or(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
         let mut lhs = self.parse_and(conditions)?;
         loop {
@@ -623,8 +545,7 @@ impl<'a> ConditionParser<'a> {
         }
         Ok(lhs)
     }
-
-    /// Parse zero or more `&&`-separated factors.
+    /// Parse one or more `&&`-separated operands and return their AND.
     fn parse_and(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
         let mut lhs = self.parse_not(conditions)?;
         loop {
@@ -637,8 +558,7 @@ impl<'a> ConditionParser<'a> {
         }
         Ok(lhs)
     }
-
-    /// Parse an optional leading `!` and its operand.
+    /// Parse a `!`-negated sub-expression, or delegate to `parse_primary`.
     fn parse_not(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
         if self.eat("!") {
             Ok(!self.parse_not(conditions)?)
@@ -646,8 +566,7 @@ impl<'a> ConditionParser<'a> {
             self.parse_primary(conditions)
         }
     }
-
-    /// Parse a parenthesised expression, `true`/`false` literal, or condition name identifier.
+    /// Parse a parenthesised sub-expression, `true`/`false` literal, or named condition lookup.
     fn parse_primary(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
         self.skip_ws();
         if self.eat("(") {
@@ -660,7 +579,6 @@ impl<'a> ConditionParser<'a> {
             }
             return Ok(value);
         }
-
         let ident = self.parse_identifier();
         match ident.as_deref() {
             Some("true") => Ok(true),
@@ -672,8 +590,7 @@ impl<'a> ConditionParser<'a> {
             )),
         }
     }
-
-    /// Consume and return an alphanumeric/`_`/`.`/`-` identifier; None if none present.
+    /// Consume an identifier token (alphanumeric, `_`, `.`, `-`) and return it, or `None`.
     fn parse_identifier(&mut self) -> Option<String> {
         self.skip_ws();
         let mut end = self.idx;
@@ -693,8 +610,7 @@ impl<'a> ConditionParser<'a> {
         }
     }
 }
-
-/// Load two RGBA images and return total absolute pixel channel diff, clamped to u32::MAX.
+/// Load and compare two RGBA images, returning total per-channel absolute pixel diff.
 fn diff_images(baseline: &Path, actual: &Path) -> Result<u32, String> {
     let base = ::image::open(baseline)
         .map_err(|e| {
@@ -714,13 +630,11 @@ fn diff_images(baseline: &Path, actual: &Path) -> Result<u32, String> {
             )
         })?
         .to_rgba8();
-
     let (bw, bh) = base.dimensions();
     let (aw, ah) = act.dimensions();
     let shared_w = bw.min(aw);
     let shared_h = bh.min(ah);
     let mut total = 0u64;
-
     for y in 0..shared_h {
         for x in 0..shared_w {
             let b = base.get_pixel(x, y).0;
@@ -730,20 +644,17 @@ fn diff_images(baseline: &Path, actual: &Path) -> Result<u32, String> {
             }
         }
     }
-
     let shared_pixels = (shared_w as u64) * (shared_h as u64);
     let base_pixels = (bw as u64) * (bh as u64);
     let act_pixels = (aw as u64) * (ah as u64);
     let unmatched = (base_pixels - shared_pixels) + (act_pixels - shared_pixels);
     total += unmatched * 4 * 255;
-
     Ok(total.min(u32::MAX as u64) as u32)
 }
-
+/// Provides the Default behavior contract for Simulator.
 impl Default for Simulator {
+    /// Create default simulator state.
     fn default() -> Self {
         Self::new()
     }
 }
-
-// Tests migrated to tests/rust/unit/automation_tests.rs

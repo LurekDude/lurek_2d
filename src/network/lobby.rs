@@ -1,75 +1,28 @@
-//! LAN lobby discovery via UDP broadcast.
-//!
-//! [`broadcast_lobby`] advertises a game session on the local network by
-//! sending a short announcement datagram to the subnet broadcast address.
-//! [`discover_lobbies`] listens for those datagrams for a short window and
-//! collects unique [`LobbyInfo`] records.
-//!
-//! The wire format is a plain ASCII string:
-//! ```text
-//! name=<name>;host=<host>;port=<port>;players=<count>;max=<max>
-//! ```
-//! Fields are separated by `;` and values must not contain `;` or `=`.
-//! The discovery port is fixed at [`LOBBY_PORT`].
-
 use std::net::{Ipv4Addr, SocketAddr, UdpSocket};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
-
-/// UDP port used for LAN lobby broadcast and discovery.
 pub const LOBBY_PORT: u16 = 47_777;
-
-/// Metadata about a discoverable game lobby.
-///
-/// # Fields
-/// - `name` — Human-readable session name.
-/// - `host` — IP address string of the advertising host.
-/// - `port` — Game listen port (not the lobby port).
-/// - `player_count` — Current number of connected players.
-/// - `max_players` — Maximum players this session accepts.
 #[derive(Debug, Clone, PartialEq)]
 pub struct LobbyInfo {
-    /// Human-readable session name.
     pub name: String,
-    /// IP address string of the advertising host.
     pub host: String,
-    /// Game listen port on the advertising host.
     pub port: u16,
-    /// Current number of connected players.
     pub player_count: u32,
-    /// Maximum players this session accepts.
     pub max_players: u32,
 }
-
 impl LobbyInfo {
-    /// Serialises this lobby record into the wire format.
-    ///
-    /// # Returns
-    /// `String` — `"name=…;host=…;port=…;players=…;max=…"`.
     pub fn to_wire(&self) -> String {
         format!(
             "name={};host={};port={};players={};max={}",
             self.name, self.host, self.port, self.player_count, self.max_players
         )
     }
-
-    /// Parses a lobby record from the wire format.
-    ///
-    /// Returns `None` if any required field is missing or malformed.
-    ///
-    /// # Parameters
-    /// - `s` — `&str` — the raw datagram payload.
-    /// - `sender` — `SocketAddr` — used to fill `host` when the host field is `0`.
-    ///
-    /// # Returns
-    /// `Option<LobbyInfo>`.
     pub fn from_wire(s: &str, sender: SocketAddr) -> Option<Self> {
         let mut name = None;
         let mut host = None;
         let mut port = None;
         let mut player_count = None;
         let mut max_players = None;
-
         for kv in s.split(';') {
             let mut parts = kv.splitn(2, '=');
             let key = parts.next()?.trim();
@@ -83,7 +36,6 @@ impl LobbyInfo {
                 _ => {}
             }
         }
-
         Some(Self {
             name: name?,
             host: host.unwrap_or_else(|| sender.ip().to_string()),
@@ -93,21 +45,6 @@ impl LobbyInfo {
         })
     }
 }
-
-/// Broadcasts a lobby announcement to the subnet once.
-///
-/// Binds an ephemeral UDP socket with `SO_BROADCAST` enabled and sends a
-/// single datagram to `255.255.255.255:<LOBBY_PORT>`. The receiving end is
-/// [`discover_lobbies`].
-///
-/// Returns an error description if the socket cannot be created or the send
-/// fails.
-///
-/// # Parameters
-/// - `info` — `&LobbyInfo` — the lobby to advertise.
-///
-/// # Returns
-/// `Result<(), String>`.
 pub fn broadcast_lobby(info: &LobbyInfo) -> Result<(), String> {
     let socket = UdpSocket::bind("0.0.0.0:0").map_err(|e| format!("lobby broadcast bind: {e}"))?;
     socket
@@ -120,22 +57,6 @@ pub fn broadcast_lobby(info: &LobbyInfo) -> Result<(), String> {
         .map_err(|e| format!("lobby broadcast send: {e}"))?;
     Ok(())
 }
-
-/// Listens for lobby announcements on [`LOBBY_PORT`] for `timeout_ms` milliseconds.
-///
-/// Opens a UDP socket bound to `0.0.0.0:<LOBBY_PORT>` with `SO_REUSEADDR`
-/// and collects all unique [`LobbyInfo`] records received within the window.
-/// "Unique" is determined by `(host, port)` — duplicate announcements from
-/// the same host are silently dropped.
-///
-/// Returns an empty `Vec` if the socket cannot be bound (e.g., the port is
-/// already in use and `SO_REUSEADDR` is unavailable).
-///
-/// # Parameters
-/// - `timeout_ms` — `u64` — discovery window in milliseconds (clamped to 5 000 ms).
-///
-/// # Returns
-/// `Vec<LobbyInfo>`.
 pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
     let deadline = Duration::from_millis(timeout_ms.min(5_000));
     let Ok(socket) = UdpSocket::bind(SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), LOBBY_PORT))
@@ -148,13 +69,9 @@ pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
     {
         return Vec::new();
     }
-
     let mut results: Vec<LobbyInfo> = Vec::new();
     let start = Instant::now();
     let mut buf = [0u8; 512];
-
-    // Poll loop: read datagrams until the deadline expires.
-    // Each received datagram is parsed and deduplicated by (host, port).
     loop {
         if start.elapsed() >= deadline {
             break;
@@ -172,42 +89,28 @@ pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
             }
             Err(ref e)
                 if e.kind() == std::io::ErrorKind::WouldBlock
-                    || e.kind() == std::io::ErrorKind::TimedOut =>
-            {
-                // No data yet — keep polling until deadline.
-            }
+                    || e.kind() == std::io::ErrorKind::TimedOut => {}
             Err(_) => break,
         }
     }
     results
 }
-
-/// Simple in-memory room record used by matchmaking helpers.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RoomInfo {
-    /// Room identifier.
     pub id: String,
-    /// Human-readable room name.
     pub name: String,
-    /// Room host/player label.
     pub host: String,
-    /// Current number of room players.
     pub player_count: u32,
-    /// Maximum allowed room players.
     pub max_players: u32,
 }
-
 #[derive(Debug, Default)]
 struct RoomRegistry {
     rooms: Vec<RoomInfo>,
 }
-
 fn rooms() -> &'static Mutex<RoomRegistry> {
     static REGISTRY: OnceLock<Mutex<RoomRegistry>> = OnceLock::new();
     REGISTRY.get_or_init(|| Mutex::new(RoomRegistry::default()))
 }
-
-/// Creates a room in the local matchmaking registry.
 pub fn create_room(name: &str, host: &str, max_players: u32) -> RoomInfo {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let id = format!("room-{}", reg.rooms.len() + 1);
@@ -221,8 +124,6 @@ pub fn create_room(name: &str, host: &str, max_players: u32) -> RoomInfo {
     reg.rooms.push(room.clone());
     room
 }
-
-/// Lists all rooms from the local matchmaking registry.
 pub fn list_rooms() -> Vec<RoomInfo> {
     rooms()
         .lock()
@@ -230,8 +131,6 @@ pub fn list_rooms() -> Vec<RoomInfo> {
         .rooms
         .clone()
 }
-
-/// Joins a room by id.
 pub fn join_room(id: &str) -> Option<RoomInfo> {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let room = reg.rooms.iter_mut().find(|r| r.id == id)?;
@@ -241,8 +140,6 @@ pub fn join_room(id: &str) -> Option<RoomInfo> {
     room.player_count += 1;
     Some(room.clone())
 }
-
-/// Leaves a room by id.
 pub fn leave_room(id: &str) -> Option<RoomInfo> {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let room = reg.rooms.iter_mut().find(|r| r.id == id)?;

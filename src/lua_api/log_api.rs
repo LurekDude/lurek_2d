@@ -1,26 +1,10 @@
-//! `lurek.log` - Structured game-level logging API.
-//!
-//! Exposes convenience logging functions so Lua scripts can emit messages at
-//! specific severity levels and query or change the active log level at
-//! runtime. Also supports configurable output sinks (file, memory ring buffer)
-//! in addition to the default stderr channel, similar to Python's `logging`
-//! module handlers.
-
+use super::SharedState;
+use crate::log as log_domain;
+use crate::log::sinks::{Sink, SinkKind, SinkLevel, SinkRegistry};
+use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::rc::Rc;
-
-use super::SharedState;
-use mlua::prelude::*;
-
-use crate::log as log_domain;
-use crate::log::sinks::{Sink, SinkKind, SinkLevel, SinkRegistry};
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-// Helper: dispatch a plain message to the given sinks registry.
 fn dispatch(
     lua: &Lua,
     sinks: &Rc<RefCell<SinkRegistry>>,
@@ -48,8 +32,6 @@ fn dispatch(
         }
     }
 }
-
-// Helper: dispatch a structured message with key-value fields to sinks.
 fn dispatch_structured(
     lua: &Lua,
     sinks: &Rc<RefCell<SinkRegistry>>,
@@ -86,8 +68,6 @@ fn dispatch_structured(
         }
     }
 }
-
-// Helper: convert a Lua table of mixed values to a BTreeMap<String, String>.
 fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
     let mut fields = BTreeMap::new();
     for pair in tbl.pairs::<String, LuaValue>() {
@@ -104,7 +84,6 @@ fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
     }
     Ok(fields)
 }
-
 fn lua_table_to_tags(value: LuaValue) -> LuaResult<Option<Vec<String>>> {
     match value {
         LuaValue::Nil => Ok(None),
@@ -131,7 +110,6 @@ fn lua_table_to_tags(value: LuaValue) -> LuaResult<Option<Vec<String>>> {
         ))),
     }
 }
-
 fn config_bool(config: &LuaTable, key: &str, default: bool) -> bool {
     config
         .get::<_, Option<bool>>(key)
@@ -139,7 +117,6 @@ fn config_bool(config: &LuaTable, key: &str, default: bool) -> bool {
         .flatten()
         .unwrap_or(default)
 }
-
 fn config_string(config: &LuaTable, key: &str, default: &str) -> String {
     config
         .get::<_, Option<String>>(key)
@@ -147,26 +124,12 @@ fn config_string(config: &LuaTable, key: &str, default: &str) -> String {
         .flatten()
         .unwrap_or_else(|| default.to_string())
 }
-
-// ---------------------------------------------------------------------------
-// Register
-// ---------------------------------------------------------------------------
-
-/// Registers the `lurek.log` API table with the Lua VM.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
-
-    // Shared sinks registry for this VM - lives as long as the Lua closures do.
     let sinks: Rc<RefCell<SinkRegistry>> = Rc::new(RefCell::new(SinkRegistry::new()));
     let callback_keys: Rc<RefCell<BTreeMap<u64, LuaRegistryKey>>> =
         Rc::new(RefCell::new(BTreeMap::new()));
     let callback_keys_all = callback_keys.clone();
-
-    // -- debug --
-    /// Emits a message at debug severity to the engine log and all registered sinks.
-    /// @param | message | string | The text content of the log message
-    /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys_print = callback_keys_all.clone();
     tbl.set(
@@ -178,12 +141,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- info --
-    /// Emits a message at info severity to the engine log and all registered sinks.
-    /// @param | message | string | The text content of the log message
-    /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -195,12 +152,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- warn --
-    /// Emits a message at warning severity to the engine log and all registered sinks.
-    /// @param | message | string | The text content of the warning message
-    /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -212,12 +163,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- error --
-    /// Emits a message at error severity to the engine log and all registered sinks.
-    /// @param | message | string | The text content of the error message
-    /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -229,13 +174,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- print --
-    /// Emits a log message at an arbitrary severity level specified as a string.
-    /// @param | level | string | Severity name: "debug", "info", "warn", "error", or "trace"
-    /// @param | message | string | The text content of the log message
-    /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -270,11 +208,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
-
-    // -- setLevel --
-    /// Sets the global minimum severity threshold for the engine log backend.
-    /// @param | level | string | One of "error", "warn", "info", "debug", "trace", or "off"
-    /// @return | nil | No return value.
     tbl.set("setLevel", lua.create_function(|_, level: String| {
         match level.to_lowercase().as_str() {
             "error" | "warn" | "warning" | "info" | "debug" | "trace" | "off" | "none" => {
@@ -286,19 +219,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             ))),
         }
     })?)?;
-
-    // -- getLevel --
-    /// Returns the name of the current global minimum severity threshold as a lowercase string (e.g.
-    /// @return | string | The active log level name
     tbl.set(
         "getLevel",
         lua.create_function(|_, ()| Ok(log_domain::get_level()))?,
     )?;
-
-    // -- addSink --
-    /// Creates and registers a new log output sink from the given configuration table.
-    /// @param | config | table | Configuration table with keys: type (string), level (string), path (string, for file/rotating), capacity (integer, for memory), max_bytes (integer, for rotating), keep_files (integer, for rotating)
-    /// @return | integer | The unique identifier of the newly created sink
     let s = sinks.clone();
     let callback_keys_for_add = callback_keys_all.clone();
     tbl.set(
@@ -363,11 +287,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(id)
         })?,
     )?;
-
-    // -- removeSink --
-    /// Removes a previously registered log sink by its numeric identifier.
-    /// @param | id | integer | The sink identifier returned by addSink
-    /// @return | boolean | True if the sink existed and was removed
     let s = sinks.clone();
     let callback_keys_for_remove = callback_keys.clone();
     tbl.set(
@@ -382,10 +301,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(removed)
         })?,
     )?;
-
-    // -- clearSinks --
-    /// Removes every registered log sink, returning the logging system to its default state where messages go only to the engine log backend (stderr).
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys_for_clear = callback_keys.clone();
     tbl.set(
@@ -398,10 +313,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- listSinks --
-    /// Returns an array-like table where each entry is a table describing one registered sink.
-    /// @return | table | Array of sink descriptor tables
     let s = sinks.clone();
     tbl.set(
         "listSinks",
@@ -420,12 +331,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(out)
         })?,
     )?;
-
-    // -- readMemory --
-    /// Reads log entries stored in a memory-type sink.
-    /// @param | id | integer | The memory sink identifier returned by addSink
-    /// @param | drain | boolean? | When true, clears read entries from the buffer (default false)
-    /// @return | table | Array of log entry tables
     let s = sinks.clone();
     tbl.set(
         "readMemory",
@@ -463,11 +368,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             }
         })?,
     )?;
-
-    // -- flushFile --
-    /// Forces the operating system to write any buffered data for a file-type sink to disk.
-    /// @param | id | integer | The file sink identifier returned by addSink
-    /// @return | nil | No return value.
     let s = sinks.clone();
     tbl.set(
         "flushFile",
@@ -478,13 +378,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- struct --
-    /// Emits a structured log message that includes arbitrary key-value metadata alongside the human-readable text.
-    /// @param | level | string | Severity name: "debug", "info", "warn", or "error"
-    /// @param | message | string | The human-readable log message
-    /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -507,12 +400,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
-
-    // -- debug_fields --
-    /// Emits a structured log message at debug severity with key-value metadata.
-    /// @param | message | string | The human-readable log message
-    /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -533,12 +420,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- info_fields --
-    /// Emits a structured log message at info severity with key-value metadata.
-    /// @param | message | string | The human-readable log message
-    /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -559,12 +440,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- warn_fields --
-    /// Emits a structured log message at warning severity with key-value metadata.
-    /// @param | message | string | The human-readable warning message
-    /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -585,12 +460,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
-    // -- error_fields --
-    /// Emits a structured log message at error severity with key-value metadata.
-    /// @param | message | string | The human-readable error message
-    /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
-    /// @return | nil | No return value.
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
     tbl.set(
@@ -611,7 +480,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
-
     lurek.set("log", tbl)?;
     Ok(())
 }

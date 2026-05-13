@@ -1,23 +1,4 @@
-//! Poisson disk sampling for point distribution.
-//!
-//! Implements Bridson's algorithm to place points with a guaranteed minimum
-//! distance between each pair.
-
 use super::lcg::Lcg;
-
-/// Generates Poisson disk sample points using Bridson's algorithm.
-///
-/// # Parameters
-/// - `width` — `f32`.
-/// - `height` — `f32`.
-/// - `min_dist` — `f32`.
-/// - `max_attempts` — `u32`.
-/// - `seed` — `u64`.
-///
-/// # Returns
-/// `Vec<(f32, f32)>`.
-///
-/// Returns a list of (x, y) points with minimum distance `min_dist` between them.
 pub fn poisson_disk(
     width: f32,
     height: f32,
@@ -26,18 +7,13 @@ pub fn poisson_disk(
     seed: u64,
 ) -> Vec<(f32, f32)> {
     use std::f32::consts::PI;
-
     let mut rng = Lcg::new(seed);
-
     let cell_size = min_dist / std::f32::consts::SQRT_2;
     let grid_w = (width / cell_size).ceil() as usize + 1;
     let grid_h = (height / cell_size).ceil() as usize + 1;
     let mut grid: Vec<Option<usize>> = vec![None; grid_w * grid_h];
-
     let mut points: Vec<(f32, f32)> = Vec::new();
     let mut active: Vec<usize> = Vec::new();
-
-    // Initial point
     let first = (rng.next_f32() * width, rng.next_f32() * height);
     points.push(first);
     active.push(0);
@@ -46,25 +22,20 @@ pub fn poisson_disk(
     if gx < grid_w && gy < grid_h {
         grid[gy * grid_w + gx] = Some(0);
     }
-
     while !active.is_empty() {
         let idx = (rng.next() as usize) % active.len();
         let point = points[active[idx]];
         let mut found = false;
-
         for _ in 0..max_attempts {
             let angle = rng.next_f32() * 2.0 * PI;
             let dist = min_dist + rng.next_f32() * min_dist;
             let nx = point.0 + angle.cos() * dist;
             let ny = point.1 + angle.sin() * dist;
-
             if nx < 0.0 || ny < 0.0 || nx >= width || ny >= height {
                 continue;
             }
-
             let gx = (nx / cell_size) as usize;
             let gy = (ny / cell_size) as usize;
-
             let mut too_close = false;
             let search_radius = 2usize;
             for dy in 0..=(search_radius * 2) {
@@ -91,7 +62,6 @@ pub fn poisson_disk(
                     break;
                 }
             }
-
             if !too_close {
                 let new_idx = points.len();
                 points.push((nx, ny));
@@ -103,11 +73,9 @@ pub fn poisson_disk(
                 break;
             }
         }
-
         if !found {
             active.swap_remove(idx);
         }
     }
-
     points
 }

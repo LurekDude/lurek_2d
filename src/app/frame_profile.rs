@@ -1,11 +1,8 @@
-//! Frame timing statistics compact formatting.
-//! Formats app tick, update, render, and callback durations as single-line text.
+﻿//! Tiny formatter for per-frame timing diagnostics.
+//! Converts frame profile metrics to a compact log/debug string.
 
 use crate::runtime::FrameProfile;
-
-// ---- Helper Functions: Frame Profile Formatting ----
-
-/// Builds a compact one-line summary used by overlays and Lua tooling.
+/// Format one `FrameProfile` sample as a compact single-line timing string.
 pub fn format_frame_profile_line(profile: &FrameProfile) -> String {
     format!(
         "tick={:.2}ms update={:.2}ms render={:.2}ms cb={:.2}ms",

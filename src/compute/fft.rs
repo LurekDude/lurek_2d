@@ -1,25 +1,14 @@
-﻿//! FFT owns radix-2 spectral transforms for real sample buffers.
-//! It implements iterative Cooley-Tukey butterflies on padded power-of-two
-//! complex arrays and exposes forward, inverse, and magnitude outputs.
-
 use std::f64::consts::PI;
-
-// Local complex primitive.
-
 #[derive(Clone, Copy, Debug, Default)]
 struct Complex {
     re: f64,
     im: f64,
 }
-
-// Complex arithmetic.
-
 impl Complex {
     #[inline]
     fn new(re: f64, im: f64) -> Self {
         Self { re, im }
     }
-
     #[inline]
     fn mul(self, rhs: Self) -> Self {
         Self {
@@ -27,7 +16,6 @@ impl Complex {
             im: self.re * rhs.im + self.im * rhs.re,
         }
     }
-
     #[inline]
     fn add(self, rhs: Self) -> Self {
         Self {
@@ -35,7 +23,6 @@ impl Complex {
             im: self.im + rhs.im,
         }
     }
-
     #[inline]
     fn sub(self, rhs: Self) -> Self {
         Self {
@@ -44,10 +31,6 @@ impl Complex {
         }
     }
 }
-
-// Bit-reversal helpers.
-
-/// Return the bit-reversed index for the requested bit width.
 #[inline]
 fn bit_reverse(mut x: usize, bits: u32) -> usize {
     let mut y = 0usize;
@@ -57,8 +40,6 @@ fn bit_reverse(mut x: usize, bits: u32) -> usize {
     }
     y
 }
-
-/// Pad input samples to next power-of-two length and return complex buffer.
 fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     let n = next_power_of_two(data.len().max(1));
     let mut buf = vec![Complex::default(); n];
@@ -67,8 +48,6 @@ fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     }
     buf
 }
-
-/// Return the smallest power of two greater than or equal to n.
 #[inline]
 pub fn next_power_of_two(n: usize) -> usize {
     if n.is_power_of_two() {
@@ -77,10 +56,6 @@ pub fn next_power_of_two(n: usize) -> usize {
         n.next_power_of_two()
     }
 }
-
-// Iterative radix-2 core.
-
-/// Run in-place radix-2 FFT; input length must already be a power of two.
 fn fft_inplace(buf: &mut [Complex], inverse: bool) {
     let n = buf.len();
     debug_assert!(
@@ -88,16 +63,12 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
         "fft_inplace requires a power-of-two length"
     );
     let bits = n.trailing_zeros();
-
-    // Reorder coefficients into bit-reversed input order.
     for i in 0..n {
         let j = bit_reverse(i, bits);
         if i < j {
             buf.swap(i, j);
         }
     }
-
-    // Execute butterfly stages from size 2 up to size n.
     let sign = if inverse { 1.0_f64 } else { -1.0_f64 };
     let mut half_len = 1usize;
     while half_len < n {
@@ -118,7 +89,6 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
         }
         half_len = len;
     }
-
     if inverse {
         let scale = 1.0 / n as f64;
         for c in buf.iter_mut() {
@@ -127,17 +97,11 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
         }
     }
 }
-
-// Public API.
-
-/// Compute forward FFT from real samples and return complex frequency bins.
 pub fn fft(data: &[f64]) -> Vec<(f64, f64)> {
     let mut buf = to_complex_padded(data);
     fft_inplace(&mut buf, false);
     buf.iter().map(|c| (c.re, c.im)).collect()
 }
-
-/// Compute inverse FFT from complex bins and return reconstructed real samples.
 pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     let n = next_power_of_two(freqs.len().max(1));
     let mut buf: Vec<Complex> = freqs.iter().map(|&(re, im)| Complex::new(re, im)).collect();
@@ -145,8 +109,6 @@ pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     fft_inplace(&mut buf, true);
     buf.iter().map(|c| c.re).collect()
 }
-
-/// Compute magnitude spectrum for each bin produced by fft.
 pub fn fft_magnitude(data: &[f64]) -> Vec<f64> {
     fft(data)
         .iter()

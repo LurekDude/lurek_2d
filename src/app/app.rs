@@ -1,21 +1,7 @@
-//! LurekApp: winit event loop, Lua runtime, and rendering coordination.
-//! Owns frame pacing, input handling, window lifecycle, and async asset loading.
-
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::Instant;
-
-use crate::event::EventArg;
-use crate::filesystem::watcher::FileWatcher;
-use mlua::prelude::*;
-use winit::application::ApplicationHandler;
-use winit::event::{ElementState, MouseButton, WindowEvent};
-use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
-use winit::keyboard::PhysicalKey;
-use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
+//! Main runtime application loop and platform orchestration.
+//! Bridges winit events, renderer surface lifecycle, Lua callbacks, input routing,
+//! hot-reload watchers, splash/error/debug overlays, and game loading handoff.
+//! Does not own feature subsystem logic; coordinates subsystem calls and state.
 
 use super::debug_overlay::DebugOverlay;
 use super::error_screen::ErrorScreen;
@@ -23,27 +9,15 @@ use super::lua_callbacks::{
     call_lua_callback_checked_with_timeout, call_lua_callback_with_timeout,
 };
 use super::splash_screen::{load_splash_branding, make_splash_commands, SplashBranding};
+use crate::event::EventArg;
+use crate::filesystem::watcher::FileWatcher;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
+#[allow(unused_imports)]
+use crate::log_msg;
 use crate::lua_api::create_lua_vm;
 use crate::render::renderer::{RenderCommand, TextureData};
 use crate::render::GpuRenderer;
-use crate::runtime::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
-};
-use crate::runtime::{FullscreenType, SharedState};
-use crate::window::{center_window_on_monitor, move_window_to_display, select_startup_monitor};
-use slotmap::SlotMap;
-
-use gilrs::{
-    ff::{BaseEffect, BaseEffectType, Effect, EffectBuilder, Envelope, Repeat, Replay, Ticks},
-    Axis as GilrsAxis, Button as GilrsButton, Event as GilrsEvent, EventType as GilrsEventType,
-    GamepadId as GilrsGamepadId, Gilrs,
-};
-
-#[allow(unused_imports)]
-use crate::log_msg;
-/// Re-export of runtime configuration used to construct and run the app.
 pub use crate::runtime::config::Config;
 use crate::runtime::log_messages::{
     L003_GAME_LOADED, L006_SPLASH_SCREEN, L007_NO_MAIN_LUA, L010_RENDER_ERROR, L011_LUA_ERROR,
@@ -56,19 +30,36 @@ use crate::runtime::log_messages::{
     L077_DRAG_HOVER, L078_DRAG_HOVER_CANCEL, L079_DRAG_DROP_IGNORED, L080_GAME_DIR, L081_LOG_FILE,
     L082_LOG_FILE_FAIL, L083_DROP_ARCHIVE, L084_DROP_ARCHIVE_FAIL,
 };
-/// Re-export of runtime window-state data used by viewport helpers.
+use crate::runtime::resource_keys::{
+    CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
+};
 pub use crate::runtime::shared_state::WindowState;
-
-// ---- Helper Functions: Viewport and Layout ----
-
-/// Update viewport scale and offset for the given scale mode and window dimensions.
+use crate::runtime::{FullscreenType, SharedState};
+use crate::window::{center_window_on_monitor, move_window_to_display, select_startup_monitor};
+use gilrs::{
+    ff::{BaseEffect, BaseEffectType, Effect, EffectBuilder, Envelope, Repeat, Replay, Ticks},
+    Axis as GilrsAxis, Button as GilrsButton, Event as GilrsEvent, EventType as GilrsEventType,
+    GamepadId as GilrsGamepadId, Gilrs,
+};
+use mlua::prelude::*;
+use slotmap::SlotMap;
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::Instant;
+use winit::application::ApplicationHandler;
+use winit::event::{ElementState, MouseButton, WindowEvent};
+use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
+use winit::keyboard::PhysicalKey;
+use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
+/// Recompute viewport scale and offset from game-space size to current window size.
 pub fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
-    // Clamp game dimensions to at least 1 to prevent division by zero.
     let gw = ws.game_width.max(1.0);
     let gh = ws.game_height.max(1.0);
     match ws.scale_mode_str.as_str() {
         "letterbox" => {
-            // Uniform scale: pick the smaller axis ratio, center the other.
             let s = (win_w as f32 / gw).min(win_h as f32 / gh);
             ws.viewport_scale_x = s;
             ws.viewport_scale_y = s;
@@ -76,14 +67,12 @@ pub fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
             ws.viewport_offset_y = (win_h as f32 - gh * s) * 0.5;
         }
         "stretch" => {
-            // Non-uniform: fill entire window, may distort aspect ratio.
             ws.viewport_scale_x = win_w as f32 / gw;
             ws.viewport_scale_y = win_h as f32 / gh;
             ws.viewport_offset_x = 0.0;
             ws.viewport_offset_y = 0.0;
         }
         "pixel" => {
-            // Integer scaling only (floor to nearest whole pixel multiple).
             let s = ((win_w as f32 / gw).min(win_h as f32 / gh))
                 .floor()
                 .max(1.0);
@@ -93,7 +82,6 @@ pub fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
             ws.viewport_offset_y = (win_h as f32 - gh * s) * 0.5;
         }
         _ => {
-            // "none" - pass-through, no scaling
             ws.viewport_scale_x = 1.0;
             ws.viewport_scale_y = 1.0;
             ws.viewport_offset_x = 0.0;
@@ -101,177 +89,144 @@ pub fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
         }
     }
 }
-
-// ---- Type: RunState ----
-
-/// Tracks whether the engine is running normally, showing an error, or shutting down.
+/// High-level app runtime state used by the frame/event loop.
 pub enum RunState {
-    /// Normal game execution.
+    /// Normal game/runtime execution.
     Running,
-    /// An error occurred; the error screen is being displayed.
+    /// Fatal error mode that renders an `ErrorScreen`.
     Error(ErrorScreen),
-    /// The user requested a restart from the error screen.
+    /// Transition state while rebuilding runtime after reload/restart.
     Restarting,
 }
-
-/// Return splash-window title with engine version appended.
+/// Build splash window title with engine version suffix.
 pub fn splash_window_title(base_title: &str) -> String {
     format!("{} v{}", base_title, env!("CARGO_PKG_VERSION"))
 }
-
-/// Return largest aspect-fitted size that fits within a bounding box.
+/// Fit source size into max bounds while preserving aspect ratio.
 pub fn fit_contain_size(src_w: u32, src_h: u32, max_w: f32, max_h: f32) -> (f32, f32) {
-    // Clamp to at least 1 to avoid division by zero.
     let src_w = src_w.max(1) as f32;
     let src_h = src_h.max(1) as f32;
-    // Pick the smaller axis ratio so the image fits entirely.
     let scale = (max_w.max(1.0) / src_w).min(max_h.max(1.0) / src_h);
     (src_w * scale, src_h * scale)
 }
-
-// ---- Type: LurekApp ----
-
-/// Lurek2D application state managed by the winit event loop.
+/// Central app runtime state shared by winit callbacks and frame update/render flow.
 pub struct LurekApp {
+    /// Holds config state.
     config: Config,
+    /// Holds game_dir state.
     game_dir: PathBuf,
-
-    // Initialised in `resumed()`.
+    /// Holds window state.
     window: Option<Arc<Window>>,
+    /// Holds surface state.
     surface: Option<wgpu::Surface<'static>>,
+    /// Holds surface_format state.
     surface_format: wgpu::TextureFormat,
+    /// Holds surface_alpha_mode state.
     surface_alpha_mode: wgpu::CompositeAlphaMode,
+    /// Holds surface_present_modes state.
     surface_present_modes: Vec<wgpu::PresentMode>,
+    /// Holds surface_present_mode state.
     surface_present_mode: wgpu::PresentMode,
+    /// Holds surface_usage state.
     surface_usage: wgpu::TextureUsages,
+    /// Holds renderer state.
     renderer: Option<GpuRenderer>,
-
-    // Lua runtime.
-    /// Active Lua VM for the currently loaded game session.
+    /// Holds lua state.
     pub lua: Option<Lua>,
-    /// Shared runtime state exposed across subsystems and callbacks.
+    /// Holds state state.
     pub state: Option<Rc<RefCell<SharedState>>>,
+    /// Holds has_game state.
     has_game: bool,
-
-    // Frame-rate limiting.
+    /// Holds last_frame state.
     last_frame: Instant,
-
-    // Main-loop pipeline state.
-    /// `true` after the `ready` callback has fired for the first time.
+    /// Holds ready_fired state.
     ready_fired: bool,
-    /// Accumulator for fixed-timestep `process_physics` callbacks (seconds).
+    /// Holds physics_accumulator state.
     physics_accumulator: f64,
-    /// Accumulator for fixed-timestep `fixedUpdate` Lua callbacks (seconds).
-    ///
-    /// Driven by `PerformanceConfig::fixed_update_tick_rate`.  Remains `0.0`
-    /// when the fixed-update loop is disabled.
+    /// Holds fixed_update_accumulator state.
     fixed_update_accumulator: f64,
-
-    // Input tracking for keypressed / keyreleased callbacks.
+    /// Holds prev_mouse state.
     prev_mouse: [bool; 5],
+    /// Holds mouse_x state.
     mouse_x: f32,
+    /// Holds mouse_y state.
     mouse_y: f32,
-
-    // Gamepad hardware polling via gilrs.
+    /// Holds gilrs state.
     gilrs: Option<Gilrs>,
-    /// Active force-feedback effects keyed by Lua-visible gamepad id.
+    /// Holds gamepad_effects state.
     gamepad_effects: HashMap<usize, Effect>,
-
-    /// Current engine run state (normal, error, or restarting).
+    /// Holds run_state state.
     pub run_state: RunState,
-
-    /// Debug overlay showing FPS and draw call count.
+    /// Holds debug_overlay state.
     debug_overlay: DebugOverlay,
-
-    /// Error message from conf.toml loading, displayed after window opens.
+    /// Holds conf_error state.
     conf_error: Option<String>,
-
-    /// Polling watcher used to detect `conf.toml` changes for hot-reload.
+    /// Holds conf_watcher state.
     conf_watcher: FileWatcher,
-    /// Polling watcher for Lua script and source-file changes.
+    /// Holds content_script_watcher state.
     content_script_watcher: FileWatcher,
-    /// Polling watcher for binary/text assets that should trigger live reload.
+    /// Holds content_asset_watcher state.
     content_asset_watcher: FileWatcher,
-
-    /// True when the game_dir was explicitly passed as a CLI argument.
+    /// Holds explicit_game_dir state.
     explicit_game_dir: bool,
-
-    /// Current window VSync mode (1 = Fifo/vsync, 0 = no-vsync, -1 = Mailbox when supported).
+    /// Holds window_vsync_mode state.
     window_vsync_mode: i32,
-
-    /// Lazily-initialised TTF fonts shared by both the splash and error screens.
-    ///
-    /// Tuple: (font_store, title_key at 36 pt, body_key at 18 pt).
+    /// Holds engine_fonts state.
     engine_fonts: Option<(SlotMap<FontKey, crate::render::Font>, FontKey, FontKey)>,
-
-    /// Cached embedded PNG branding used by the no-game splash screen.
+    /// Holds splash_branding state.
     splash_branding: Option<SplashBranding>,
-
-    /// Prevents retrying splash branding decode every frame after a load failure.
+    /// Holds splash_branding_failed state.
     splash_branding_failed: bool,
-
-    /// Tracks whether any Ctrl modifier (left or right) is currently held.
-    ///
-    /// Updated by `ModifiersChanged` events so that the error screen key handler can
-    /// detect Ctrl+C without relying on `SharedState` (which may be `None`).
+    /// Holds ctrl_held state.
     ctrl_held: bool,
-
-    /// `false` until the first `RedrawRequested` triggers `init_lua()`, ensuring
-    /// the splash frame is visible before the Lua VM blocks the event loop.
+    /// Holds lua_initialized state.
     lua_initialized: bool,
-
-    /// Whether a file or folder is currently being dragged over the window.
+    /// Holds drag_hover state.
     drag_hover: bool,
-
-    /// Maximum allowed surface dimension from GPU limits.
+    /// Holds max_surface_dim state.
     max_surface_dim: u32,
-
-    /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
+    /// Holds render_cmd_buf state.
     render_cmd_buf: Vec<RenderCommand>,
-    /// Reused strong references for auto-collected parallax layers.
+    /// Holds auto_parallax_buf state.
     auto_parallax_buf: Vec<Rc<RefCell<crate::parallax::ParallaxLayer>>>,
-    /// Reused strong references for auto-collected tilemaps.
+    /// Holds auto_tilemap_buf state.
     auto_tilemap_buf: Vec<Rc<RefCell<crate::tilemap::TileMap>>>,
-    /// Reused command buffer for auto-collected particle draws.
+    /// Holds auto_particle_cmd_buf state.
     auto_particle_cmd_buf: Vec<RenderCommand>,
-    /// Reused command buffer for auto-collected GUI draws.
+    /// Holds auto_ui_cmd_buf state.
     auto_ui_cmd_buf: Vec<RenderCommand>,
-
-    /// If `Some`, write an auto-screenshot PNG to this absolute path and quit.
+    /// Holds auto_screenshot_path state.
     auto_screenshot_path: Option<PathBuf>,
-    /// Minimum number of rendered game frames to wait before capturing (default 3).
+    /// Holds auto_screenshot_frames state.
     auto_screenshot_frames: u32,
-    /// Wall-clock seconds after game start to wait before capturing (overrides frame count when set).
+    /// Holds auto_screenshot_time state.
     auto_screenshot_time: Option<f32>,
-    /// `true` once the auto-screenshot has been written (prevents double-capture).
+    /// Holds auto_screenshot_done state.
     auto_screenshot_done: bool,
-    /// Count of rendered game frames since `has_game` became `true`.
+    /// Holds auto_screenshot_frame_count state.
     auto_screenshot_frame_count: u32,
-    /// Wall-clock time when the first game frame started (used as a safety-exit deadline).
+    /// Holds auto_screenshot_start state.
     auto_screenshot_start: Option<Instant>,
-    /// Explicit initial window position in physical pixels, bypasses monitor centering.
+    /// Holds window_pos state.
     window_pos: Option<(i32, i32)>,
-
-    /// Keeps a drag-dropped `.lurek` / `.lurek` archive's temporary extraction directory alive.
-    ///
-    /// `TempDir` deletes the directory when dropped; this field extends its lifetime to match
-    /// the running game session.  Replaced on every new drag-drop load.
+    /// Holds lurek_temp_dir state.
     lurek_temp_dir: Option<tempfile::TempDir>,
-
-    // Lightweight frame-stage profiler (reported once per second in logs).
+    /// Holds perf_report_started state.
     perf_report_started: Instant,
+    /// Holds perf_frames state.
     perf_frames: u32,
+    /// Holds perf_tick_ms_acc state.
     perf_tick_ms_acc: f64,
+    /// Holds perf_update_ms_acc state.
     perf_update_ms_acc: f64,
+    /// Holds perf_render_ms_acc state.
     perf_render_ms_acc: f64,
+    /// Holds perf_log_enabled state.
     perf_log_enabled: bool,
 }
-
-// ---- Implementation: LurekApp ----
-
 impl LurekApp {
-    /// Creates a new [`LurekApp`] from the given configuration and game-folder path.
     #[allow(clippy::too_many_arguments)]
+    /// Build app runtime state and initialize filesystem watchers from startup config.
     pub fn new(
         config: Config,
         game_dir: PathBuf,
@@ -292,7 +247,6 @@ impl LurekApp {
             &mut content_script_watcher,
             &mut content_asset_watcher,
         );
-
         LurekApp {
             config,
             game_dir,
@@ -352,11 +306,11 @@ impl LurekApp {
             perf_log_enabled: std::env::var("LUREK_PERF_LOG").ok().as_deref() == Some("1"),
         }
     }
-
+    /// Return callback_timeout_ms result.
     fn callback_timeout_ms(&self) -> Option<f32> {
         self.config.performance.lua_callback_timeout_ms
     }
-
+    /// Update state in refresh_content_watchers.
     fn refresh_content_watchers(&mut self) {
         self.content_script_watcher = FileWatcher::new();
         self.content_asset_watcher = FileWatcher::new();
@@ -366,22 +320,19 @@ impl LurekApp {
             &mut self.content_asset_watcher,
         );
     }
-
+    /// Update state in perf_record_frame.
     fn perf_record_frame(&mut self, tick_ms: f64, update_ms: f64, render_ms: f64) {
         if !self.perf_log_enabled {
             return;
         }
-
         self.perf_frames += 1;
         self.perf_tick_ms_acc += tick_ms;
         self.perf_update_ms_acc += update_ms;
         self.perf_render_ms_acc += render_ms;
-
         let elapsed = self.perf_report_started.elapsed().as_secs_f64();
         if elapsed < 1.0 {
             return;
         }
-
         let n = (self.perf_frames as f64).max(1.0);
         log::info!(
             "PERF frame_cpu_ms avg: tick={:.3}, update={:.3}, render={:.3}, total={:.3}, fps_est={:.1}",
@@ -391,18 +342,17 @@ impl LurekApp {
             (self.perf_tick_ms_acc + self.perf_update_ms_acc + self.perf_render_ms_acc) / n,
             n / elapsed,
         );
-
         self.perf_report_started = Instant::now();
         self.perf_frames = 0;
         self.perf_tick_ms_acc = 0.0;
         self.perf_update_ms_acc = 0.0;
         self.perf_render_ms_acc = 0.0;
     }
-
+    /// Return wants_splash_screen result.
     fn wants_splash_screen(&self) -> bool {
         !self.explicit_game_dir && !self.game_dir.join("main.lua").exists()
     }
-
+    /// Return current_window_title result.
     fn current_window_title(&self) -> String {
         if self.wants_splash_screen() {
             splash_window_title(&self.config.window.title)
@@ -410,14 +360,12 @@ impl LurekApp {
             self.config.window.title.clone()
         }
     }
-
-    /// Pick best [`wgpu::PresentMode`] for requested mode; return mode and mapped id.
+    /// Select supported present mode and normalized vsync flag from requested mode.
     pub fn resolve_present_mode(
         available_modes: &[wgpu::PresentMode],
         requested_mode: i32,
     ) -> (wgpu::PresentMode, i32) {
         let supports = |mode| available_modes.contains(&mode);
-
         match requested_mode {
             -1 if supports(wgpu::PresentMode::Mailbox) => {
                 return (wgpu::PresentMode::Mailbox, -1);
@@ -430,47 +378,33 @@ impl LurekApp {
             }
             _ => {}
         }
-
         if requested_mode == 0 && supports(wgpu::PresentMode::AutoNoVsync) {
             return (wgpu::PresentMode::AutoNoVsync, 0);
         }
-
         if requested_mode != 0 && supports(wgpu::PresentMode::AutoVsync) {
             return (wgpu::PresentMode::AutoVsync, 1);
         }
-
         if supports(wgpu::PresentMode::Immediate) {
             return (wgpu::PresentMode::Immediate, 0);
         }
-
         if supports(wgpu::PresentMode::Mailbox) {
             return (wgpu::PresentMode::Mailbox, -1);
         }
-
         if supports(wgpu::PresentMode::Fifo) {
             return (wgpu::PresentMode::Fifo, 1);
         }
-
         if requested_mode == 0 {
             (wgpu::PresentMode::AutoNoVsync, 0)
         } else {
             (wgpu::PresentMode::AutoVsync, 1)
         }
     }
-
-    /// Clamps surface dimensions to the GPU's maximum texture size, ensuring wgpu never panics.
-    ///
-    /// # Parameters
-    /// - `w` - Requested width in physical pixels.
-    /// - `h` - Requested height in physical pixels.
-    ///
-    /// # Returns
-    /// `(u32, u32)` clamped width and height, each at least 1.
+    /// Return clamp_surface_dims result.
     fn clamp_surface_dims(&self, w: u32, h: u32) -> (u32, u32) {
         let m = self.max_surface_dim.max(1);
         (w.max(1).min(m), h.max(1).min(m))
     }
-
+    /// Return surface_configuration result.
     fn surface_configuration(&self, width: u32, height: u32) -> wgpu::SurfaceConfiguration {
         wgpu::SurfaceConfiguration {
             usage: self.surface_usage,
@@ -483,62 +417,49 @@ impl LurekApp {
             desired_maximum_frame_latency: 2,
         }
     }
-
+    /// Update state in apply_vsync_mode.
     fn apply_vsync_mode(&mut self, requested_mode: i32) {
         let (present_mode, vsync_mode) =
             Self::resolve_present_mode(&self.surface_present_modes, requested_mode);
-
         self.surface_present_mode = present_mode;
         self.window_vsync_mode = vsync_mode;
         self.config.window.vsync = vsync_mode != 0;
-
         if let Some(state) = &self.state {
             state.borrow_mut().window_state.vsync_mode = vsync_mode;
         }
-
         self.reconfigure_surface();
     }
-
+    /// Update state in init_gpu.
     fn init_gpu(&mut self, window: Arc<Window>) {
         let t0 = Instant::now();
         let width = self.config.window.width;
         let height = self.config.window.height;
-
-        // Resolve graphics backend from conf.toml ([graphics].backend).
-        // Falls back to WGPU_BACKEND env var, then to the platform-native primary backend.
         let backends = wgpu::util::backend_bits_from_env().unwrap_or(
             match self.config.render.backend.as_str() {
                 "dx12" => wgpu::Backends::DX12,
                 "vulkan" => wgpu::Backends::VULKAN,
                 "metal" => wgpu::Backends::METAL,
-                _ => wgpu::Backends::PRIMARY, // "auto" or any unrecognised value
+                _ => wgpu::Backends::PRIMARY,
             },
         );
-
-        // Resolve power preference from conf.toml ([graphics].power_preference).
         let power_preference = match self.config.render.power_preference.as_str() {
             "low" => wgpu::PowerPreference::LowPower,
             "none" => wgpu::PowerPreference::None,
-            _ => wgpu::PowerPreference::HighPerformance, // "high" or any unrecognised value
+            _ => wgpu::PowerPreference::HighPerformance,
         };
-
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             backends,
             ..Default::default()
         });
-
-        // SAFETY: The surface lifetime is tied to the Arc<Window> which outlives the surface.
         let surface: wgpu::Surface<'static> = instance
             .create_surface(Arc::clone(&window))
             .expect("Failed to create wgpu surface");
-
         let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
             power_preference,
             compatible_surface: Some(&surface),
             force_fallback_adapter: false,
         }))
         .expect("No compatible GPU adapter found. Try installing a display driver.");
-
         let adapter_info = adapter.get_info();
         log_msg!(
             info,
@@ -550,14 +471,11 @@ impl LurekApp {
             self.config.render.backend,
             self.config.render.power_preference,
         );
-
         let (device, queue) = pollster::block_on(adapter.request_device(
             &wgpu::DeviceDescriptor {
                 label: Some("Lurek2D Device"),
                 required_features: wgpu::Features::empty(),
                 required_limits: {
-                    // Start from the safe downlevel baseline but raise the texture-dimension
-                    // ceiling to whatever the adapter actually supports (RTX 4060: 32768).
                     let mut limits = wgpu::Limits::downlevel_defaults();
                     limits.max_texture_dimension_2d = adapter
                         .limits()
@@ -570,7 +488,6 @@ impl LurekApp {
             None,
         ))
         .expect("Failed to create wgpu device");
-
         let caps = surface.get_capabilities(&adapter);
         let surface_format = caps
             .formats
@@ -578,7 +495,6 @@ impl LurekApp {
             .copied()
             .find(|f| f.is_srgb())
             .unwrap_or(caps.formats[0]);
-
         self.surface_format = surface_format;
         self.surface_alpha_mode = caps.alpha_modes[0];
         self.surface_present_modes = caps.present_modes.clone();
@@ -590,11 +506,8 @@ impl LurekApp {
         };
         (self.surface_present_mode, self.window_vsync_mode) =
             Self::resolve_present_mode(&self.surface_present_modes, self.window_vsync_mode);
-
-        // Read GPU limits and store the max surface dimension to prevent surface configure panics.
         self.max_surface_dim = device.limits().max_texture_dimension_2d;
         log_msg!(info, L034_GPU_TEX_DIM, "{}", self.max_surface_dim);
-
         let (cw, ch) = self.clamp_surface_dims(width, height);
         if cw != width || ch != height {
             log_msg!(
@@ -609,9 +522,7 @@ impl LurekApp {
             );
         }
         surface.configure(&device, &self.surface_configuration(cw, ch));
-
         let renderer = GpuRenderer::new(device, queue, surface_format, cw, ch);
-
         self.surface = Some(surface);
         self.renderer = Some(renderer);
         self.window = Some(window);
@@ -626,27 +537,21 @@ impl LurekApp {
             height,
         );
     }
-
-    /// Re-initialises the Lua VM and per-game pipeline state for a new game session.
+    /// Update state in init_lua.
     pub fn init_lua(&mut self) {
-        // Reset per-game pipeline state.
         self.ready_fired = false;
         self.physics_accumulator = 0.0;
         self.fixed_update_accumulator = 0.0;
-
-        // Show conf.toml error if present
         if let Some(conf_err) = self.conf_error.take() {
             self.run_state = RunState::Error(ErrorScreen::from_error(&format!(
                 "Configuration Error\n{}",
                 conf_err
             )));
         }
-
         let window_title = self.current_window_title();
         if let Some(window) = &self.window {
             window.set_title(&window_title);
         }
-
         let mut shared_state = SharedState::new(
             self.config.window.width,
             self.config.window.height,
@@ -660,14 +565,13 @@ impl LurekApp {
         shared_state.window = self.window.as_ref().map(Arc::clone);
         shared_state.physics_run.fixed_dt =
             1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
-        shared_state.physics_run.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
-            Some(rate) if rate > 0 => 1.0 / rate as f64,
-            _ => 0.0,
-        };
+        shared_state.physics_run.fixed_update_dt =
+            match self.config.performance.fixed_update_tick_rate {
+                Some(rate) if rate > 0 => 1.0 / rate as f64,
+                _ => 0.0,
+            };
         shared_state.frame_budget_warn_ms = self.config.performance.frame_budget_warn_ms;
         shared_state.lua_callback_timeout_ms = self.callback_timeout_ms();
-
-        // Initialize viewport state from config.
         {
             let ws = &mut shared_state.window_state;
             ws.game_width = self
@@ -684,13 +588,8 @@ impl LurekApp {
             let (ww, wh) = (shared_state.window_width, shared_state.window_height);
             recompute_viewport(ws, ww, wh);
         }
-
         let state = Rc::new(RefCell::new(shared_state));
-
-        // Load the embedded bitmap default fonts before Lua starts - all lurek.render.print()
-        // calls without an active font will use these instead of the bitmap fallback.
         state.borrow_mut().load_default_fonts();
-
         let lua = match create_lua_vm(state.clone(), &self.config.modules) {
             Ok(l) => l,
             Err(e) => {
@@ -703,7 +602,6 @@ impl LurekApp {
                 return;
             }
         };
-
         let main_lua = self.game_dir.join("main.lua");
         if main_lua.exists() {
             log_msg!(info, L003_GAME_LOADED, "{}", main_lua.display());
@@ -734,16 +632,14 @@ impl LurekApp {
             }
         } else {
             if self.explicit_game_dir {
-                // Explicitly passed a directory but it has no main.lua
                 log_msg!(warn, L007_NO_MAIN_LUA, "{}", self.game_dir.display());
             }
             log_msg!(info, L006_SPLASH_SCREEN);
         }
-
         self.lua = Some(lua);
         self.state = Some(state);
     }
-
+    /// Update state in tick_frame.
     fn tick_frame(&mut self) {
         if let Some(state) = &self.state {
             let mut st = state.borrow_mut();
@@ -757,14 +653,11 @@ impl LurekApp {
             for gp in &mut st.gamepads {
                 gp.begin_frame();
             }
-
-            // Sync debug overlay state from Lua.
             self.debug_overlay.enabled = st.debug_overlay_enabled;
         }
-
         self.apply_pending_window_actions();
     }
-
+    /// Update state in apply_pending_window_actions.
     fn apply_pending_window_actions(&mut self) {
         let window = match &self.window {
             Some(w) => w.clone(),
@@ -774,8 +667,6 @@ impl LurekApp {
             Some(s) => s.clone(),
             None => return,
         };
-
-        // Extract all pending actions while holding the borrow, then drop before applying.
         let (
             pending_title,
             pending_fullscreen,
@@ -822,14 +713,10 @@ impl LurekApp {
                 st.window_state.pending_scale_mode.take(),
             )
         };
-
-        // Apply pending title
         if let Some(title) = pending_title {
             window.set_title(&title);
             state.borrow_mut().window_title = title;
         }
-
-        // Apply pending fullscreen
         if let Some(fullscreen) = pending_fullscreen {
             if fullscreen {
                 use winit::window::Fullscreen;
@@ -852,25 +739,17 @@ impl LurekApp {
                 state.borrow_mut().window_state.fullscreen = false;
             }
         }
-
-        // Apply pending position
         if let Some((x, y)) = pending_position {
             window.set_outer_position(winit::dpi::PhysicalPosition::new(x, y));
         }
-
-        // Apply pending display switch by centering the current window on that monitor.
         if let Some(display_index) = pending_display_index {
             if !move_window_to_display(window.as_ref(), display_index) {
                 log::warn!("Requested display index {} is not available", display_index);
             }
         }
-
-        // Apply pending size
         if let Some((w, h)) = pending_size {
             let _ = window.request_inner_size(winit::dpi::PhysicalSize::new(w, h));
         }
-
-        // Apply pending minimize/maximize/restore
         if pending_minimize {
             window.set_minimized(true);
         }
@@ -881,13 +760,9 @@ impl LurekApp {
             window.set_minimized(false);
             window.set_maximized(false);
         }
-
-        // Apply pending attention
         if pending_attention {
             window.request_user_attention(Some(winit::window::UserAttentionType::Informational));
         }
-
-        // Apply pending icon
         if let Some(icon_path) = pending_icon_path {
             let icon = {
                 let st = state.borrow();
@@ -897,13 +772,10 @@ impl LurekApp {
                 window.set_window_icon(Some(icon));
             }
         }
-
         if let Some(vsync_mode) = pending_vsync {
             self.apply_vsync_mode(vsync_mode);
         }
-
         window.set_ime_allowed(text_input_enabled);
-
         let requested_grab_mode = if mouse_relative_mode {
             CursorGrabMode::Locked
         } else if mouse_grabbed {
@@ -911,7 +783,6 @@ impl LurekApp {
         } else {
             CursorGrabMode::None
         };
-
         if let Err(error) = window.set_cursor_grab(requested_grab_mode) {
             if mouse_relative_mode {
                 if let Err(confined_error) = window.set_cursor_grab(CursorGrabMode::Confined) {
@@ -921,27 +792,21 @@ impl LurekApp {
                 log_msg!(debug, L072_CURSOR_GRAB_LOCK_FAIL, "{}", error);
             }
         }
-
         window.set_cursor_visible(if mouse_relative_mode {
             false
         } else {
             mouse_visible
         });
         window.set_cursor(system_cursor_to_winit_cursor(mouse_cursor));
-
         if let Some((x, y)) = pending_cursor_position {
             let cursor_position = winit::dpi::PhysicalPosition::new(x as f64, y as f64);
             if let Err(error) = window.set_cursor_position(cursor_position) {
                 log_msg!(debug, L073_CURSOR_POS_FAIL, "{}", error);
             }
         }
-
-        // Apply pending close
         if pending_close {
             state.borrow_mut().quit_requested = true;
         }
-
-        // Apply pending scale mode
         if let Some(new_mode) = pending_scale_mode {
             if matches!(
                 new_mode.as_str(),
@@ -956,39 +821,33 @@ impl LurekApp {
             }
         }
     }
-
+    /// Update state in game_update.
     fn game_update(&mut self) {
         let (Some(lua), Some(state)) = (&self.lua, &self.state) else {
             return;
         };
         let callback_timeout_ms = self.callback_timeout_ms();
-
-        // Count frames for the auto-screenshot delay.
         if self.auto_screenshot_path.is_some() && !self.auto_screenshot_done {
             if self.auto_screenshot_frame_count == 0 {
                 self.auto_screenshot_start = Some(Instant::now());
             }
             self.auto_screenshot_frame_count += 1;
         }
-
-        // ---- Stage 1: ready callback (fires once, before first process) ----
         if !self.ready_fired {
             self.ready_fired = true;
-            if let Err(e) = call_lua_callback_checked_with_timeout(lua, "ready", (), callback_timeout_ms) {
+            if let Err(e) =
+                call_lua_callback_checked_with_timeout(lua, "ready", (), callback_timeout_ms)
+            {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
         }
-
         let dt = state.borrow().clock.delta();
         let mut frame_profile = crate::runtime::FrameProfile::default();
-
-        // ---- Stage 2: process_physics (fixed timestep, may fire 0..N times) ----
         {
             let phase_start = Instant::now();
             let fixed_dt = state.borrow().physics_run.fixed_dt;
             self.physics_accumulator += dt;
-            // Safety cap: read from shared state, defaults to 8.
             let max_steps = state.borrow().physics_run.max_steps as usize;
             let mut steps = 0;
             while self.physics_accumulator >= fixed_dt && steps < max_steps {
@@ -1006,14 +865,11 @@ impl LurekApp {
             }
             frame_profile.process_physics_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 2b: fixedUpdate (independent fixed timestep, may fire 0..N times) ----
         {
             let phase_start = Instant::now();
             let fixed_dt = state.borrow().physics_run.fixed_update_dt;
             if fixed_dt > 0.0 {
                 self.fixed_update_accumulator += dt;
-                // Safety cap: max 8 fixedUpdate steps per frame.
                 let max_steps = 8;
                 let mut steps = 0;
                 while self.fixed_update_accumulator >= fixed_dt && steps < max_steps {
@@ -1032,8 +888,6 @@ impl LurekApp {
             }
             frame_profile.fixed_update_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 3: process(dt) (variable timestep, once per frame) ----
         {
             let phase_start = Instant::now();
             if let Err(e) =
@@ -1044,37 +898,27 @@ impl LurekApp {
             }
             frame_profile.process_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 4: process_late(dt) (after process, before render) ----
         {
             let phase_start = Instant::now();
-            if let Err(e) = call_lua_callback_checked_with_timeout(
-                lua,
-                "process_late",
-                dt,
-                callback_timeout_ms,
-            ) {
+            if let Err(e) =
+                call_lua_callback_checked_with_timeout(lua, "process_late", dt, callback_timeout_ms)
+            {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
             frame_profile.process_late_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 5: render (main draw pass) ----
         {
             let mut s = state.borrow_mut();
             s.render_commands.clear();
             s.raycaster_output = None;
         }
-
-        // ---- Stage 5a: auto-collect parallax layers (draw order 2 - before game world) ----
         {
             let s = state.borrow();
             let cam_x = s.camera.position.x;
             let cam_y = s.camera.position.y;
             let screen_w = s.window_state.game_width;
             let screen_h = s.window_state.game_height;
-            // Collect strong refs while holding the borrow; drop before borrow_mut below.
             self.auto_parallax_buf.clear();
             self.auto_parallax_buf
                 .extend(s.auto_parallax_layers.iter().filter_map(|w| w.upgrade()));
@@ -1085,14 +929,11 @@ impl LurekApp {
                     .generate_render_commands(cam_x, cam_y, screen_w, screen_h);
                 state.borrow_mut().render_commands.extend(cmds);
             }
-            // Purge stale weak refs once per frame.
             state
                 .borrow_mut()
                 .auto_parallax_layers
                 .retain(|w| w.upgrade().is_some());
         }
-
-        // ---- Stage 5b: auto-collect tilemaps (draw order 3 - background layers) ----
         {
             let s = state.borrow();
             let cam_x = s.camera.position.x;
@@ -1109,14 +950,11 @@ impl LurekApp {
                     .generate_render_commands(0.0, 0.0, cam_x, cam_y, cam_w, cam_h);
                 state.borrow_mut().render_commands.extend(cmds);
             }
-            // Purge stale weak refs once per frame.
             state
                 .borrow_mut()
                 .auto_tilemaps
                 .retain(|w| w.upgrade().is_some());
         }
-
-        // ---- Stage 5c: Lua render callback (draw order 4 - game world) ----
         {
             let phase_start = Instant::now();
             if let Err(e) =
@@ -1127,29 +965,33 @@ impl LurekApp {
             }
             frame_profile.draw_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 5d: auto-collect raycaster scene (draw order 5 - 3D FPS view) ----
-        // Converts RaycasterScene quads to DrawTexturedQuad commands, depth-sorted
-        // back-to-front so the painter's algorithm renders correctly.
         {
             let scene_opt = state.borrow_mut().raycaster_output.take();
             if let Some(scene) = scene_opt {
                 #[derive(Clone)]
+                /// Screen-space textured quad with depth used for raycaster depth sorting.
                 struct DepthQuad {
+                    /// Quad corners in screen space.
                     corners: [crate::math::Vec2; 4],
+                    /// UV coordinates per corner.
                     uvs: [crate::math::Vec2; 4],
+                    /// Reciprocal depth values per corner for perspective-correct interpolation.
                     corner_w: [f32; 4],
+                    /// Texture key used for textured draw.
                     texture_key: TextureKey,
+                    /// Per-quad tint/light colour multiplier.
                     color: [f32; 4],
+                    /// Depth key used for painter-style ordering.
                     depth: f32,
                 }
+                /// Depth-sorted render item used by the raycaster composition path.
                 enum DepthItem {
+                    /// Textured wall/floor/ceiling quad.
                     Quad(DepthQuad),
+                    /// Mesh model with depth key.
                     Model(crate::render::Mesh, f32),
                 }
-
                 let mut depth_items: Vec<DepthItem> = Vec::with_capacity(scene.quad_count());
-
                 for wall in &scene.walls {
                     if let Some(key) = wall.texture_key {
                         depth_items.push(DepthItem::Quad(DepthQuad {
@@ -1199,7 +1041,6 @@ impl LurekApp {
                 for model in &scene.models {
                     depth_items.push(DepthItem::Model(model.mesh.clone(), model.depth));
                 }
-
                 depth_items.sort_by(|a, b| {
                     let ad = match a {
                         DepthItem::Quad(q) => q.depth,
@@ -1211,7 +1052,6 @@ impl LurekApp {
                     };
                     bd.partial_cmp(&ad).unwrap_or(std::cmp::Ordering::Equal)
                 });
-
                 let mut s = state.borrow_mut();
                 for item in depth_items {
                     match item {
@@ -1240,11 +1080,6 @@ impl LurekApp {
                 }
             }
         }
-
-        // ---- Stage 5e: auto-collect particle systems (draw order 6 - after game world) ----
-        // NOTE: Scripts that manually call `system:render()` inside `lurek.render()`
-        // will have their particles rendered twice (once by Lua, once here).  Use
-        // one approach per particle system: either manual Lua render OR auto-collect.
         {
             self.auto_particle_cmd_buf.clear();
             {
@@ -1259,8 +1094,6 @@ impl LurekApp {
                 .render_commands
                 .extend(self.auto_particle_cmd_buf.iter().cloned());
         }
-
-        // ---- Stage 6: render_ui (UI/HUD overlay pass) ----
         {
             let phase_start = Instant::now();
             if let Err(e) =
@@ -1271,11 +1104,14 @@ impl LurekApp {
             }
             frame_profile.draw_ui_ms = phase_start.elapsed().as_secs_f64() as f32 * 1000.0;
         }
-
-        // ---- Stage 6a: auto-collect GUI context (draw order 9 - after render_ui) ----
         {
             self.auto_ui_cmd_buf.clear();
-            if let Some(rc) = state.borrow().auto_ui_ctx.as_ref().and_then(|w| w.upgrade()) {
+            if let Some(rc) = state
+                .borrow()
+                .auto_ui_ctx
+                .as_ref()
+                .and_then(|w| w.upgrade())
+            {
                 self.auto_ui_cmd_buf
                     .extend(rc.borrow_mut().generate_render_commands());
             }
@@ -1284,8 +1120,6 @@ impl LurekApp {
                 .render_commands
                 .extend(self.auto_ui_cmd_buf.iter().cloned());
         }
-
-        // Append debug overlay commands after game draw
         let (fps, draw_calls, w) = {
             let st = state.borrow();
             (st.fps, st.render_stats.draw_calls, st.window_width)
@@ -1297,8 +1131,6 @@ impl LurekApp {
         if !overlay_cmds.is_empty() {
             state.borrow_mut().render_commands.extend(overlay_cmds);
         }
-
-        // Optional on-screen shader compile diagnostics controlled by lurek.effect.
         if let Some(font_key) = overlay_font {
             let shader_err = {
                 let st = state.borrow();
@@ -1321,7 +1153,6 @@ impl LurekApp {
                     });
             }
         }
-
         frame_profile.callback_total_ms = frame_profile.process_physics_ms
             + frame_profile.fixed_update_ms
             + frame_profile.process_ms
@@ -1330,14 +1161,13 @@ impl LurekApp {
             + frame_profile.draw_ui_ms;
         state.borrow_mut().frame_profile = frame_profile;
     }
-
+    /// Update state in render.
     fn render(&mut self) {
         let (Some(renderer), Some(surface), Some(state)) =
             (&mut self.renderer, &self.surface, &self.state)
         else {
             return;
         };
-
         let (
             commands,
             default_filter,
@@ -1386,9 +1216,6 @@ impl LurekApp {
                 std::mem::take(&mut st.fonts),
             )
         };
-
-        // Wrap draw commands with viewport transform when scale mode is active.
-        // Uses the reusable render_cmd_buf to avoid a per-frame heap allocation.
         let use_viewport = vp_mode != "none"
             && (vp_scale_x != 1.0 || vp_scale_y != 1.0 || vp_offset_x != 0.0 || vp_offset_y != 0.0);
         if use_viewport {
@@ -1421,13 +1248,9 @@ impl LurekApp {
         } else {
             &commands
         };
-
         let screenshot_supported = self.surface_usage.contains(wgpu::TextureUsages::COPY_SRC);
         let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
         let capture_screen_image = screen_capture_requested && screenshot_supported;
-
-        // Auto-screenshot: capture pixels this frame once enough frames/time have elapsed.
-        // When --screenshot-time is set, use wall-clock elapsed; otherwise use frame count.
         let auto_screenshot_ready = match self.auto_screenshot_time {
             Some(secs) => {
                 self.auto_screenshot_start
@@ -1441,7 +1264,6 @@ impl LurekApp {
             && !self.auto_screenshot_done
             && self.auto_screenshot_path.is_some()
             && auto_screenshot_ready;
-
         let screenshot_pixels = {
             let s_ref = state.borrow();
             renderer.render_frame(
@@ -1486,8 +1308,6 @@ impl LurekApp {
                 None
             }
         };
-
-        // Put moved resources back into SharedState.
         {
             let mut st = state.borrow_mut();
             st.fonts = fonts;
@@ -1506,10 +1326,7 @@ impl LurekApp {
                         });
             }
         }
-
-        // Copy render stats to SharedState for Lua access.
         state.borrow_mut().render_stats = renderer.render_stats.clone();
-
         if let Some(request) = screenshot_request {
             if !screenshot_supported {
                 log_msg!(error, L074_SCREENSHOT_NO_READBACK, "path: {}", request.path);
@@ -1541,8 +1358,6 @@ impl LurekApp {
             }
             state.borrow_mut().pending_screenshot = None;
         }
-
-        // Auto-screenshot: write pixels directly to the absolute path and quit.
         if should_auto_capture {
             if let Some(ref path) = self.auto_screenshot_path.clone() {
                 if let Some((width, height, pixels)) = screenshot_pixels {
@@ -1585,8 +1400,6 @@ impl LurekApp {
                 state.borrow_mut().quit_requested = true;
             }
         }
-
-        // ---- Frame budget warning ----
         if let Some(budget_ms) = self.config.performance.frame_budget_warn_ms {
             let elapsed_ms = self.last_frame.elapsed().as_secs_f64() * 1000.0;
             if elapsed_ms > budget_ms as f64 {
@@ -1598,7 +1411,7 @@ impl LurekApp {
             }
         }
     }
-
+    /// Update state in render_splash.
     fn render_splash(&mut self) {
         let (Some(renderer), Some(surface)) = (&mut self.renderer, &self.surface) else {
             return;
@@ -1607,12 +1420,9 @@ impl LurekApp {
             .state
             .as_ref()
             .map_or(0.0, |s| s.borrow().clock.total());
-
-        // Lazily initialise shared bitmap engine fonts (used by both splash and error screens).
         if self.engine_fonts.is_none() {
             let mut fonts: SlotMap<FontKey, crate::render::Font> = SlotMap::with_key();
             let all = crate::render::Font::load_all_sizes();
-            // title = nearest to 36px (index 5 = 22px), small = nearest to 18px (index 4 = 18px)
             let title_idx = crate::render::Font::nearest_size(36);
             let small_idx = crate::render::Font::nearest_size(18);
             let mut title_key = None;
@@ -1634,14 +1444,11 @@ impl LurekApp {
             .engine_fonts
             .as_mut()
             .expect("engine_fonts initialized above");
-
         if self.splash_branding.is_none() && !self.splash_branding_failed {
             self.splash_branding = load_splash_branding();
             self.splash_branding_failed = self.splash_branding.is_none();
         }
-
         let branding = self.splash_branding.as_ref();
-
         let cmds = make_splash_commands(
             renderer.width,
             renderer.height,
@@ -1681,13 +1488,11 @@ impl LurekApp {
             }
         }
     }
-
+    /// Update state in render_error.
     fn render_error(&mut self, error_screen: &ErrorScreen) {
         let (Some(renderer), Some(surface)) = (&mut self.renderer, &self.surface) else {
             return;
         };
-
-        // Re-use the shared bitmap engine fonts (same sizes as the splash screen).
         if self.engine_fonts.is_none() {
             let mut fonts: SlotMap<FontKey, crate::render::Font> = SlotMap::with_key();
             let all = crate::render::Font::load_all_sizes();
@@ -1712,7 +1517,6 @@ impl LurekApp {
             .engine_fonts
             .as_mut()
             .expect("engine_fonts initialized above");
-
         let cmds = error_screen.build_render_commands(
             renderer.width,
             renderer.height,
@@ -1749,18 +1553,7 @@ impl LurekApp {
             }
         }
     }
-
-    /// Extracts a `.lurek` or `.lurek` archive into a fresh temp directory.
-    ///
-    /// Returns the extracted directory path and a `TempDir` handle (which must be kept alive
-    /// for the duration of the game session).  Rejects zip-slip paths with `..` or absolute
-    /// components before writing any entry to disk.
-    ///
-    /// # Parameters
-    /// - `archive_path` - Path to the `.lurek` or `.lurek` file on disk.
-    ///
-    /// # Returns
-    /// `Ok((PathBuf, TempDir))` on success, or a descriptive error string on failure.
+    /// Extract `.lurek` archive into a temp directory and reject unsafe paths.
     fn extract_lurek_archive(
         archive_path: &std::path::Path,
     ) -> Result<(std::path::PathBuf, tempfile::TempDir), String> {
@@ -1771,14 +1564,11 @@ impl LurekApp {
             .map_err(|e| format!("Invalid ZIP archive '{}': {}", archive_path.display(), e))?;
         let temp_dir =
             tempfile::tempdir().map_err(|e| format!("Failed to create temp dir: {}", e))?;
-
         for i in 0..archive.len() {
             let mut entry = archive
                 .by_index(i)
                 .map_err(|e| format!("Archive entry {}: {}", i, e))?;
             let entry_name = entry.name().to_owned();
-
-            // Reject zip-slip: only allow Normal and CurDir components.
             let relative = std::path::Path::new(&entry_name);
             for component in relative.components() {
                 match component {
@@ -1791,7 +1581,6 @@ impl LurekApp {
                     }
                 }
             }
-
             let dest = temp_dir.path().join(relative);
             if entry.is_dir() {
                 std::fs::create_dir_all(&dest)
@@ -1807,14 +1596,12 @@ impl LurekApp {
                     .map_err(|e| format!("Cannot write '{}': {}", dest.display(), e))?;
             }
         }
-
         let dir = temp_dir.path().to_path_buf();
         Ok((dir, temp_dir))
     }
-
+    /// Update state in restart_game.
     fn restart_game(&mut self) {
         self.refresh_content_watchers();
-        // Reset Lua state and reinitialise
         self.lua = None;
         self.state = None;
         self.has_game = false;
@@ -1822,18 +1609,16 @@ impl LurekApp {
         self.run_state = RunState::Running;
         self.init_lua();
     }
-
+    /// Update state in poll_content_hot_reload.
     fn poll_content_hot_reload(&mut self) {
         if !self.has_game {
             return;
         }
-
         let script_changed = !self.content_script_watcher.poll().is_empty();
         let asset_changed = !self.content_asset_watcher.poll().is_empty();
         if !(script_changed || asset_changed) {
             return;
         }
-
         log::info!(
             "content hot-reload triggered (scripts_changed={}, assets_changed={})",
             script_changed,
@@ -1841,28 +1626,24 @@ impl LurekApp {
         );
         self.restart_game();
     }
-
+    /// Update state in poll_config_hot_reload.
     fn poll_config_hot_reload(&mut self) {
         if self.conf_watcher.poll().is_empty() {
             return;
         }
-
         let (new_config, load_err) = Config::load(&self.game_dir);
         if let Some(err) = load_err {
             log::warn!("conf.toml hot-reload failed: {}", err);
             return;
         }
-
         self.config = new_config;
         self.window_vsync_mode = if self.config.window.vsync { 1 } else { 0 };
         if let Some(level) = self.config.log_level.as_deref() {
             crate::runtime::log_messages::set_log_level(level);
         }
-
         if let Some(window) = &self.window {
             window.set_title(&self.current_window_title());
         }
-
         if let Some(state) = &self.state {
             let mut st = state.borrow_mut();
             st.physics_run.fixed_dt = 1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
@@ -1889,10 +1670,9 @@ impl LurekApp {
             recompute_viewport(&mut st.window_state, ww, wh);
             st.config_reload_revision = st.config_reload_revision.saturating_add(1);
         }
-
         log::info!("conf.toml hot-reloaded successfully");
     }
-
+    /// Update state in reconfigure_surface.
     fn reconfigure_surface(&mut self) {
         let Some((w, h)) = self
             .renderer
@@ -1908,7 +1688,7 @@ impl LurekApp {
         };
         surface.configure(&renderer.device, &surface_config);
     }
-
+    /// Update state in handle_resize.
     fn handle_resize(&mut self, width: u32, height: u32) {
         if width == 0 || height == 0 {
             return;
@@ -1926,7 +1706,6 @@ impl LurekApp {
             st.window_height = height;
             recompute_viewport(&mut st.window_state, width, height);
         }
-        // Fire lurek.resize(w, h) callback
         if self.has_game {
             if let Some(lua) = &self.lua {
                 call_lua_callback_with_timeout(
@@ -1938,14 +1717,13 @@ impl LurekApp {
             }
         }
     }
-
+    /// Update state in poll_gamepads.
     fn poll_gamepads(&mut self) {
         let callback_timeout_ms = self.callback_timeout_ms();
         let Some(gilrs) = &mut self.gilrs else { return };
         let Some(state) = &self.state else { return };
         let has_game = self.has_game;
         let lua = self.lua.as_ref();
-
         while let Some(GilrsEvent { id, event, .. }) = gilrs.next_event() {
             let id_usize = usize::from(id);
             let id_u32 = id_usize as u32;
@@ -2071,19 +1849,16 @@ impl LurekApp {
                 _ => {}
             }
         }
-
         self.process_pending_gamepad_vibration();
     }
-
+    /// Update state in process_pending_gamepad_vibration.
     fn process_pending_gamepad_vibration(&mut self) {
         let Some(gilrs) = &mut self.gilrs else { return };
         let Some(state) = &self.state else { return };
-
         let requests = {
             let mut st = state.borrow_mut();
             std::mem::take(&mut st.gamepad_vibration_requests)
         };
-
         for req in requests {
             if let Some(effect) = Self::build_gamepad_vibration_effect(gilrs, req) {
                 if effect.play().is_ok() {
@@ -2092,7 +1867,7 @@ impl LurekApp {
             }
         }
     }
-
+    /// Build force-feedback effect from queued vibration request when device supports it.
     fn build_gamepad_vibration_effect(
         gilrs: &mut Gilrs,
         request: crate::input::GamepadVibrationRequest,
@@ -2106,22 +1881,18 @@ impl LurekApp {
                 break;
             }
         }
-
         let target_id = target_id?;
         if !ff_supported {
             return None;
         }
-
         let low_mag = (request.low_freq.clamp(0.0, 1.0) * u16::MAX as f32) as u16;
         let high_mag = (request.high_freq.clamp(0.0, 1.0) * u16::MAX as f32) as u16;
         let play_for = Ticks::from_ms(request.duration_ms.max(1));
-
         let scheduling = Replay {
             after: Ticks::from_ms(0),
             play_for,
             with_delay: Ticks::from_ms(0),
         };
-
         let mut builder = EffectBuilder::new();
         builder
             .gamepads(&[target_id])
@@ -2138,11 +1909,10 @@ impl LurekApp {
                 scheduling,
                 envelope: Envelope::default(),
             });
-
         builder.finish(gilrs).ok()
     }
 }
-
+/// Return gilrs_button_to_u32 result.
 fn gilrs_button_to_u32(btn: GilrsButton) -> u32 {
     match btn {
         GilrsButton::South => 0,
@@ -2162,7 +1932,7 @@ fn gilrs_button_to_u32(btn: GilrsButton) -> u32 {
         _ => 255,
     }
 }
-
+/// Return gilrs_axis_to_u32 result.
 fn gilrs_axis_to_u32(axis: GilrsAxis) -> u32 {
     match axis {
         GilrsAxis::LeftStickX => 0,
@@ -2174,7 +1944,7 @@ fn gilrs_axis_to_u32(axis: GilrsAxis) -> u32 {
         _ => 255,
     }
 }
-
+/// Grow gamepad state vector and return mutable slot for `id_usize`.
 fn ensure_gamepad_slot(
     gamepads: &mut Vec<crate::input::GamepadState>,
     id_usize: usize,
@@ -2183,10 +1953,9 @@ fn ensure_gamepad_slot(
         let new_id = gamepads.len() as u32;
         gamepads.push(crate::input::GamepadState::new(new_id));
     }
-
     &mut gamepads[id_usize]
 }
-
+/// Return format_gilrs_uuid result.
 fn format_gilrs_uuid(uuid_bytes: [u8; 16]) -> String {
     format!(
         "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
@@ -2208,7 +1977,7 @@ fn format_gilrs_uuid(uuid_bytes: [u8; 16]) -> String {
         uuid_bytes[15],
     )
 }
-
+/// Return system_cursor_to_winit_cursor result.
 fn system_cursor_to_winit_cursor(cursor: SystemCursor) -> CursorIcon {
     match cursor {
         SystemCursor::Arrow => CursorIcon::Default,
@@ -2224,11 +1993,7 @@ fn system_cursor_to_winit_cursor(cursor: SystemCursor) -> CursorIcon {
         SystemCursor::No => CursorIcon::NotAllowed,
     }
 }
-
-/// Loads the embedded engine icon PNG and converts it to a [`winit::window::Icon`].
-///
-/// Used as the default window icon when the game's `conf.toml` does not supply a
-/// custom icon path. Returns `None` if the embedded bytes cannot be decoded.
+/// Return load_embedded_icon result.
 fn load_embedded_icon() -> Option<winit::window::Icon> {
     let image = match ::image::load_from_memory(std::include_bytes!(concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -2250,7 +2015,7 @@ fn load_embedded_icon() -> Option<winit::window::Icon> {
         }
     }
 }
-
+/// Return load_window_icon result.
 fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::Icon> {
     let resolved_path = {
         let path = Path::new(icon_path);
@@ -2260,7 +2025,6 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
             game_dir.join(path)
         }
     };
-
     let image = match ::image::open(&resolved_path) {
         Ok(image) => image,
         Err(error) => {
@@ -2274,7 +2038,6 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
             return None;
         }
     };
-
     let rgba = image.to_rgba8();
     let (width, height) = (rgba.width(), rgba.height());
     match winit::window::Icon::from_rgba(rgba.into_raw(), width, height) {
@@ -2291,22 +2054,18 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
         }
     }
 }
-
+/// Register watchers for script and asset files under `game_dir`.
 fn register_content_watchers(
     game_dir: &Path,
     script_watcher: &mut FileWatcher,
     asset_watcher: &mut FileWatcher,
 ) {
-    fn walk_dir(
-        root: &Path,
-        script_watcher: &mut FileWatcher,
-        asset_watcher: &mut FileWatcher,
-    ) {
+    /// Walk directory tree and register paths by extension.
+    fn walk_dir(root: &Path, script_watcher: &mut FileWatcher, asset_watcher: &mut FileWatcher) {
         let entries = match std::fs::read_dir(root) {
             Ok(entries) => entries,
             Err(_) => return,
         };
-
         for entry in entries.flatten() {
             let path = entry.path();
             if path.is_dir() {
@@ -2318,7 +2077,6 @@ fn register_content_watchers(
                 walk_dir(&path, script_watcher, asset_watcher);
                 continue;
             }
-
             let ext = path
                 .extension()
                 .and_then(|e| e.to_str())
@@ -2334,16 +2092,15 @@ fn register_content_watchers(
             }
         }
     }
-
     walk_dir(game_dir, script_watcher, asset_watcher);
 }
-
+/// Provides the ApplicationHandler behavior contract for LurekApp.
 impl ApplicationHandler for LurekApp {
+    /// Update state in resumed.
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         if self.window.is_some() {
             return;
-        } // already initialised
-
+        }
         let initial_title = self.current_window_title();
         let mut window_attrs = Window::default_attributes()
             .with_visible(false)
@@ -2354,26 +2111,20 @@ impl ApplicationHandler for LurekApp {
             ))
             .with_resizable(self.config.window.resizable)
             .with_decorations(!self.config.window.borderless);
-
-        // Apply minimum window size if both dimensions are set
         if let (Some(w), Some(h)) = (self.config.window.min_width, self.config.window.min_height) {
             window_attrs = window_attrs.with_min_inner_size(winit::dpi::PhysicalSize::new(w, h));
         }
-
         let startup_monitor = select_startup_monitor(event_loop, self.config.window.display_index);
-
         let window = Arc::new(
             event_loop
                 .create_window(window_attrs)
                 .expect("Failed to create window"),
         );
-
         if self.config.window.fullscreen {
             window.set_fullscreen(Some(winit::window::Fullscreen::Borderless(
                 startup_monitor.clone(),
             )));
         } else if let Some((wx, wy)) = self.window_pos {
-            // Explicit position supplied (e.g. from --window-x / --window-y).
             window.set_outer_position(winit::dpi::PhysicalPosition::new(wx, wy));
         } else if let Some(monitor) = startup_monitor.as_ref() {
             center_window_on_monitor(
@@ -2383,40 +2134,30 @@ impl ApplicationHandler for LurekApp {
                 self.config.window.height,
             );
         }
-
         if self.config.window.maximized && !self.config.window.fullscreen {
             window.set_maximized(true);
         }
-
         if let Some(icon_path) = self.config.window.icon.as_deref() {
             if let Some(icon) = load_window_icon(&self.game_dir, icon_path) {
                 window.set_window_icon(Some(icon));
             }
         } else {
-            // No icon configured - fall back to the embedded engine icon.
             if let Some(icon) = load_embedded_icon() {
                 window.set_window_icon(Some(icon));
             }
         }
-
         self.init_gpu(window);
-
-        // Initialize gilrs gamepad polling (can happen before Lua VM).
         match Gilrs::new() {
             Ok(g) => self.gilrs = Some(g),
             Err(e) => log_msg!(warn, L038_GILRS_UNAVAILABLE, "{}", e),
         }
         self.last_frame = Instant::now();
-
-        // Show the native window before requesting the first redraw.
-        // On Windows, a still-hidden window may never receive that redraw,
-        // which would stall startup before init_lua() runs.
         if let Some(win) = &self.window {
             win.set_visible(true);
             win.request_redraw();
         }
     }
-
+    /// Update state in window_event.
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
         match event {
             WindowEvent::CloseRequested => {
@@ -2426,11 +2167,9 @@ impl ApplicationHandler for LurekApp {
                 }
                 event_loop.exit();
             }
-
             WindowEvent::Resized(size) => {
                 self.handle_resize(size.width, size.height);
             }
-
             WindowEvent::ScaleFactorChanged {
                 scale_factor,
                 inner_size_writer: _,
@@ -2438,9 +2177,7 @@ impl ApplicationHandler for LurekApp {
                 if let Some(state) = &self.state {
                     state.borrow_mut().window_state.dpi_scale = scale_factor;
                 }
-                // A subsequent Resized event will call handle_resize() to reconfigure the surface.
             }
-
             WindowEvent::Focused(focused) => {
                 if let Some(state) = &self.state {
                     state.borrow_mut().window_state.focused = focused;
@@ -2456,7 +2193,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::Occluded(occluded) => {
                 if let Some(state) = &self.state {
                     state.borrow_mut().window_state.visible = !occluded;
@@ -2472,19 +2208,16 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::CursorEntered { .. } => {
                 if let Some(state) = &self.state {
                     state.borrow_mut().window_state.mouse_focused = true;
                 }
             }
-
             WindowEvent::CursorLeft { .. } => {
                 if let Some(state) = &self.state {
                     state.borrow_mut().window_state.mouse_focused = false;
                 }
             }
-
             WindowEvent::ModifiersChanged(mods) => {
                 let state_mods = mods.state();
                 self.ctrl_held = state_mods.control_key();
@@ -2497,16 +2230,12 @@ impl ApplicationHandler for LurekApp {
                     );
                 }
             }
-
             WindowEvent::KeyboardInput { event, .. } => {
-                // Resolve physical scancode string.
                 let scancode_str = if let PhysicalKey::Code(code) = event.physical_key {
                     winit_scancode_to_string(code).map(|s| s.to_string())
                 } else {
                     None
                 };
-
-                // Check key repeat suppression.
                 if event.repeat {
                     let repeat_enabled = self
                         .state
@@ -2514,12 +2243,9 @@ impl ApplicationHandler for LurekApp {
                         .map(|s| s.borrow().keyboard.has_key_repeat())
                         .unwrap_or(false);
                     if !repeat_enabled {
-                        // Still update scancode tracking but skip callbacks.
                         return;
                     }
                 }
-
-                // Update scancode state.
                 if let Some(sc) = &scancode_str {
                     if let Some(state) = &self.state {
                         let mut st = state.borrow_mut();
@@ -2529,9 +2255,7 @@ impl ApplicationHandler for LurekApp {
                         }
                     }
                 }
-
                 if let Some(key_str) = winit_key_to_string(&event.logical_key) {
-                    // Handle error mode keys before normal processing.
                     if matches!(self.run_state, RunState::Error(_)) {
                         if event.state == ElementState::Pressed {
                             if key_str == "escape" {
@@ -2557,17 +2281,14 @@ impl ApplicationHandler for LurekApp {
                                 return;
                             }
                         }
-                        return; // Swallow all other keys in error mode.
+                        return;
                     }
-
                     match event.state {
                         ElementState::Pressed => {
-                            // Check quit on Escape.
                             if key_str == "escape" {
                                 event_loop.exit();
                                 return;
                             }
-                            // Toggle debug overlay on F12.
                             if key_str == "f12" {
                                 self.debug_overlay.enabled = !self.debug_overlay.enabled;
                                 if let Some(state) = &self.state {
@@ -2632,7 +2353,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::Ime(winit::event::Ime::Commit(text)) => {
                 if let Some(state) = &self.state {
                     let mut st = state.borrow_mut();
@@ -2652,9 +2372,7 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::CursorMoved { position, .. } => {
-                // Transform window-space coordinates to game-space via inverse viewport.
                 let (gx, gy) = if let Some(state) = &self.state {
                     let st = state.borrow();
                     let ws = &st.window_state;
@@ -2680,7 +2398,6 @@ impl ApplicationHandler for LurekApp {
                     st.mouse.y = gy;
                 }
             }
-
             WindowEvent::MouseWheel { delta, .. } => {
                 let (dx, dy) = match delta {
                     winit::event::MouseScrollDelta::LineDelta(x, y) => (x as f64, y as f64),
@@ -2700,7 +2417,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::MouseInput {
                 state: btn_state,
                 button,
@@ -2766,24 +2482,16 @@ impl ApplicationHandler for LurekApp {
                     self.prev_mouse[i] = pressed;
                 }
             }
-
             WindowEvent::RedrawRequested => {
-                // --- First-frame Lua init -------------------------------------
-                // On the very first redraw, initialise Lua and jump directly
-                // into game rendering. We intentionally skip splash rendering
-                // here to avoid any stale splash texture bindings leaking into
-                // the first game frame.
                 if !self.lua_initialized {
                     if let Some(win) = &self.window {
                         win.set_visible(true);
                     }
                     self.init_lua();
                     self.lua_initialized = true;
-                    // Start the screenshot safety timer now that the game is loaded.
                     if self.auto_screenshot_path.is_some() {
                         self.auto_screenshot_start = Some(Instant::now());
                     }
-                    // Sync window state into SharedState now that state exists.
                     if let (Some(window), Some(state)) = (&self.window, &self.state) {
                         let mut st = state.borrow_mut();
                         st.window_state.fullscreen = window.fullscreen().is_some();
@@ -2797,30 +2505,22 @@ impl ApplicationHandler for LurekApp {
                     }
                     return;
                 }
-
-                // Handle restart request from error screen.
                 if matches!(self.run_state, RunState::Restarting) {
                     self.restart_game();
                     return;
                 }
-
-                // Check quit flag from Lua (e.g., lurek.event.quit()).
                 if let Some(state) = &self.state {
                     if state.borrow().quit_requested {
                         event_loop.exit();
                         return;
                     }
                 }
-
                 let tick_start = Instant::now();
                 self.poll_gamepads();
                 self.tick_frame();
                 let tick_ms = tick_start.elapsed().as_secs_f64() * 1000.0;
-
                 let mut update_ms = 0.0;
                 let mut render_ms = 0.0;
-
-                // Temporarily take run_state to avoid borrow issues with render_error.
                 let run_state = std::mem::replace(&mut self.run_state, RunState::Running);
                 match run_state {
                     RunState::Error(ref screen) => {
@@ -2828,7 +2528,6 @@ impl ApplicationHandler for LurekApp {
                         self.render_error(screen);
                         render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
                         self.run_state = run_state;
-                        // In screenshot mode quit immediately instead of waiting for user input.
                         if self.auto_screenshot_path.is_some() {
                             if let Some(state) = &self.state {
                                 state.borrow_mut().quit_requested = true;
@@ -2842,7 +2541,6 @@ impl ApplicationHandler for LurekApp {
                             let update_start = Instant::now();
                             self.game_update();
                             update_ms = update_start.elapsed().as_secs_f64() * 1000.0;
-
                             let render_start = Instant::now();
                             self.render();
                             render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
@@ -2852,11 +2550,8 @@ impl ApplicationHandler for LurekApp {
                             render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
                         }
                     }
-                    RunState::Restarting => {
-                        // Handled above; should not reach here.
-                    }
+                    RunState::Restarting => {}
                 }
-
                 if let Some(state) = &self.state {
                     let mut st = state.borrow_mut();
                     st.frame_profile.app_tick_ms = tick_ms as f32;
@@ -2864,10 +2559,8 @@ impl ApplicationHandler for LurekApp {
                     st.frame_profile.app_render_ms = render_ms as f32;
                     st.frame_profile.app_frame_total_ms = (tick_ms + update_ms + render_ms) as f32;
                 }
-
                 self.perf_record_frame(tick_ms, update_ms, render_ms);
             }
-
             WindowEvent::Touch(touch) => {
                 let id = touch.id;
                 let x = touch.location.x;
@@ -2886,7 +2579,6 @@ impl ApplicationHandler for LurekApp {
                         }
                     }
                 });
-
                 match touch.phase {
                     winit::event::TouchPhase::Started => {
                         let dx = 0.0;
@@ -2949,8 +2641,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
-            // Drag-and-drop: allow loading a game folder by dropping it onto the window.
             WindowEvent::HoveredFile(path) => {
                 log_msg!(debug, L077_DRAG_HOVER, "{}", path.display());
                 if !self.has_game {
@@ -2960,7 +2650,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::HoveredFileCancelled => {
                 log_msg!(debug, L078_DRAG_HOVER_CANCEL);
                 if self.drag_hover {
@@ -2970,7 +2659,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
             }
-
             WindowEvent::DroppedFile(path) => {
                 log::debug!("[lurek drag-drop] DroppedFile: {}", path.display());
                 log_msg!(info, L043_DROP_FILE, "{}", path.display());
@@ -2982,12 +2670,10 @@ impl ApplicationHandler for LurekApp {
                 }
                 if !self.has_game {
                     let main_lua = path.join("main.lua");
-                    // Check for .lurek archive format first.
                     let is_lurek_archive = path
                         .extension()
                         .map(|e| e.eq_ignore_ascii_case("lurek"))
                         .unwrap_or(false);
-
                     if is_lurek_archive {
                         log_msg!(info, L083_DROP_ARCHIVE, "{}", path.display());
                         match LurekApp::extract_lurek_archive(&path) {
@@ -3009,7 +2695,6 @@ impl ApplicationHandler for LurekApp {
                     } else if path.is_dir() {
                         log_msg!(warn, L007_NO_MAIN_LUA, "no main.lua in: {}", path.display());
                     } else if let Some(parent) = path.parent() {
-                        // User may have dropped a file inside the game folder.
                         let parent_main = parent.join("main.lua");
                         if parent_main.exists() {
                             log_msg!(info, L044_DROP_GAME, "parent folder: {}", parent.display());
@@ -3022,33 +2707,21 @@ impl ApplicationHandler for LurekApp {
                     log_msg!(debug, L079_DRAG_DROP_IGNORED);
                 }
             }
-
             _ => {}
         }
     }
-
+    /// Update state in about_to_wait.
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         use std::time::Duration;
-
-        // Check for a Lua-triggered reload before the file-watcher poll so both
-        // paths funnel through the same `poll_config_hot_reload` logic.
         if let Some(state) = &self.state {
             let requested = state.borrow().pending_config_reload;
             if requested {
                 state.borrow_mut().pending_config_reload = false;
-                // Force the conf_watcher to be treated as changed so the next
-                // poll_config_hot_reload call performs a full reload.
                 self.conf_watcher.force_changed();
             }
         }
         self.poll_config_hot_reload();
         self.poll_content_hot_reload();
-
-        // Safety-net: if screenshot mode has been active too long without a capture,
-        // force-quit so batch tools never hang indefinitely.
-        //
-        // The timeout is derived from the requested capture delay plus a grace
-        // period, so `--screenshot-time=3` is not aborted right at 3 seconds.
         if !self.auto_screenshot_done {
             if let Some(start) = self.auto_screenshot_start {
                 let expected_capture_secs = match self.auto_screenshot_time {
@@ -3059,7 +2732,6 @@ impl ApplicationHandler for LurekApp {
                     }
                 };
                 let deadline_secs = (expected_capture_secs + 2.0).max(3.0);
-
                 if start.elapsed() > Duration::from_secs_f32(deadline_secs) {
                     if let Some(state) = &self.state {
                         state.borrow_mut().quit_requested = true;
@@ -3069,7 +2741,6 @@ impl ApplicationHandler for LurekApp {
                 }
             }
         }
-
         let target = Duration::from_secs_f64(1.0 / self.config.performance.target_fps as f64);
         let elapsed = self.last_frame.elapsed();
         if elapsed >= target {
@@ -3077,15 +2748,9 @@ impl ApplicationHandler for LurekApp {
             if let Some(win) = &self.window {
                 win.request_redraw();
             }
-            // Stay in Poll so we re-enter about_to_wait immediately after RedrawRequested.
             event_loop.set_control_flow(ControlFlow::Poll);
         } else {
             let remaining = target - elapsed;
-            // On Windows, WaitUntil granularity is ~15 ms even with timeBeginPeriod(1),
-            // which causes the event loop to oversleep and caps frame rate at ~7 fps.
-            // Use a hybrid: sleep most of the budget with std::thread::sleep (which is
-            // accurate to ~1 ms when timeBeginPeriod(1) is active), then spin the last
-            // fraction to hit the deadline precisely without burning 100% CPU.
             #[cfg(target_os = "windows")]
             {
                 if remaining > Duration::from_micros(1500) {
@@ -3101,42 +2766,19 @@ impl ApplicationHandler for LurekApp {
         }
     }
 }
-
-// ---- Type: App ----
-
-/// Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
-///
-/// # Fields
-/// - `config` - `Config`.
-/// - `conf_error` - `Option<String>`.
+/// Thin bootstrap wrapper that owns startup config and launches `LurekApp` event loop.
 pub struct App {
+    /// Runtime configuration loaded before app startup.
     config: Config,
-    /// Error message from conf.toml loading, propagated to the error screen.
+    /// Optional configuration parse error passed to first-frame error handling.
     conf_error: Option<String>,
 }
-
-// ---- Implementation: App ----
-
 impl App {
-    /// Creates a new `App` with the given `Config` and an optional conf.toml error.
-    ///
-    /// # Parameters
-    /// - `config` - `Config`.
-    /// - `conf_error` - `Option<String>`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create bootstrap app wrapper with config and optional pre-start config error.
     pub fn new(config: Config, conf_error: Option<String>) -> Self {
         App { config, conf_error }
     }
-
-    /// Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.
-    ///
-    /// # Parameters
-    /// - `game_dir` - Path to the game directory.
-    /// - `explicit_game_dir` - `true` when the user explicitly passed a path argument.
-    /// - `screenshot_path` - If `Some`, take a screenshot at this absolute path and quit.
-    /// - `screenshot_frames` - Minimum rendered game frames before capturing (default 3).
+    /// Start the winit event loop and run the runtime for the selected game directory.
     pub fn run(
         self,
         game_dir: PathBuf,
@@ -3152,7 +2794,6 @@ impl App {
             self.config.log_append,
             self.config.log_level.as_deref(),
         );
-        // Initialise the message catalog before any log_msg! calls.
         crate::runtime::messages::init();
         log_msg!(
             info,
@@ -3161,12 +2802,8 @@ impl App {
             env!("CARGO_PKG_VERSION"),
         );
         log_msg!(info, L080_GAME_DIR, "{}", game_dir.display());
-
         let event_loop = EventLoop::new().expect("Failed to create event loop");
-        // Start with Poll so the first frame and init_lua run as fast as
-        // possible. about_to_wait() switches to WaitUntil after that.
         event_loop.set_control_flow(ControlFlow::Poll);
-
         let mut app = LurekApp::new(
             self.config,
             game_dir,
@@ -3178,20 +2815,10 @@ impl App {
             window_pos,
         );
         event_loop.run_app(&mut app).expect("Event loop error");
-
         log_msg!(info, crate::runtime::log_messages::L002_ENGINE_STOP);
     }
 }
-
-// ---- Helper Functions: Logging ----
-
-/// Initialises logging to both stderr and a log file.
-///
-/// `log_file` is a path relative to `game_dir` (or absolute). When `None`,
-/// the file is placed at `cwd/lurek2d.log`.  When `log_append` is `true` the
-/// file is opened in append mode instead of being truncated.
-/// `log_level` overrides the build-mode default level when `Some` - valid values:
-/// `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
+/// Initialize logger with file sink and selected level filters.
 fn init_logging(
     game_dir: &Path,
     log_file: Option<&str>,
@@ -3199,8 +2826,6 @@ fn init_logging(
     log_level: Option<&str>,
 ) {
     use std::io::Write as _;
-
-    // Resolve log file path: custom path relative to game_dir, or cwd/lurek2d.log default.
     let log_path = if let Some(custom) = log_file {
         let p = std::path::Path::new(custom);
         if p.is_absolute() {
@@ -3213,8 +2838,6 @@ fn init_logging(
             .unwrap_or_else(|_| std::path::PathBuf::from("."))
             .join("lurek.log")
     };
-
-    // Open or create the log file, respecting the append flag.
     let file_result = if log_append {
         std::fs::OpenOptions::new()
             .create(true)
@@ -3227,9 +2850,6 @@ fn init_logging(
             .truncate(true)
             .open(&log_path)
     };
-
-    // Use explicit log_level from conf.toml if provided; otherwise fall back to
-    // build-mode default (debug builds: Debug, release builds: Error).
     let level = match log_level {
         Some("error") => log::LevelFilter::Error,
         Some("warn") => log::LevelFilter::Warn,
@@ -3244,28 +2864,18 @@ fn init_logging(
             }
         }
     };
-
-    // wgpu/wgpu_hal emit noisy INFO ("Device::maintain", "Adapter Vulkan AdapterInfo")
-    // and WARN ("Unrecognized present mode") messages that users cannot act on.
-    // In release we hard-floor these crates at Error; in debug at Warn so GPU
-    // errors still surface without the chatter.
     let wgpu_level = if cfg!(debug_assertions) {
         log::LevelFilter::Warn
     } else {
         log::LevelFilter::Error
     };
-
     match file_result {
         Ok(file) => {
-            // Use a Mutex so the File impl is Send + Sync.
             let file = std::sync::Arc::new(std::sync::Mutex::new(file));
             let file_clone = std::sync::Arc::clone(&file);
-
             env_logger::Builder::new()
                 .filter_level(level)
                 .parse_default_env()
-                // Hard-floor noisy wgpu internals AFTER parse_default_env() so
-                // a broad RUST_LOG=info can't let them pollute the log.
                 .filter_module("wgpu", wgpu_level)
                 .filter_module("wgpu_core", wgpu_level)
                 .filter_module("wgpu_hal", wgpu_level)
@@ -3273,9 +2883,7 @@ fn init_logging(
                 .format(move |buf, record| {
                     let ts = buf.timestamp_millis();
                     let line = format!("[{}] {:5} {}\n", ts, record.level(), record.args());
-                    // Write to stderr (env_logger's buf is already going there)
                     writeln!(buf, "[{}] {:5} {}", ts, record.level(), record.args())?;
-                    // Also write plain text (no ANSI) to the file.
                     if let Ok(mut f) = file_clone.lock() {
                         let _ = f.write_all(line.as_bytes());
                     }
@@ -3304,12 +2912,7 @@ fn init_logging(
         }
     }
 }
-
-// ---- Helper Functions: App Runtime Utilities ----
-
-/// Tries calling `lurek.errorhandler(msg)`. If it exists and succeeds, returns its
-/// error screen (showing that the handler was called). If it fails or doesn't exist,
-/// returns the default error screen for the original error.
+/// Return try_errorhandler_or_screen result.
 fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
     let msg = format!("{}", err);
     log_msg!(error, L011_LUA_ERROR, "runtime: {}", msg);
@@ -3317,12 +2920,9 @@ fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
         if let Ok(handler) = lurek.get::<_, LuaFunction>("errorhandler") {
             match handler.call::<_, ()>(msg.clone()) {
                 Ok(()) => {
-                    // Handler ran successfully - still show error screen since
-                    // the game state is likely corrupt.
                     return ErrorScreen::from_lua_error(err);
                 }
                 Err(handler_err) => {
-                    // Handler itself errored. Show both errors.
                     let combined = format!(
                         "Error in lurek.errorhandler\nOriginal error: {}\n\nHandler error: {}",
                         msg, handler_err
@@ -3334,6 +2934,3 @@ fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
     }
     ErrorScreen::from_lua_error(err)
 }
-
-// NOTE: Tests private internals (recompute_viewport, fit_contain_size,
-// splash_window_title, resolve_present_mode, init_lua) - stays inline

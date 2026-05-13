@@ -1,11 +1,4 @@
-﻿//! Analytics owns statistical reducers and 1D signal transforms for NdArray.
-//! Functions operate on flat row-major element order and return dense outputs.
-
 use crate::compute::array::NdArray;
-
-// Cumulative operations.
-
-/// Build cumulative sum where output i stores the sum of elements 0 through i.
 pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     let mut out = NdArray::zeros(&[n], a.dtype())?;
@@ -16,10 +9,6 @@ pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-// Difference operations.
-
-/// Apply forward difference order times and return an array shortened by order.
 pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     if order == 0 {
         return Ok(a.clone());
@@ -31,7 +20,6 @@ pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
             order, n
         ));
     }
-    // Materialize values and iteratively apply adjacent subtraction.
     let mut vals: Vec<f64> = (0..n).map(|i| a.get_f64(i)).collect();
     for _ in 0..order {
         vals = vals.windows(2).map(|w| w[1] - w[0]).collect();
@@ -43,10 +31,6 @@ pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-// Histogram.
-
-/// Compute equal-width histogram bins and return (lo, hi, count) tuples.
 pub fn histogram(
     a: &NdArray,
     bins: usize,
@@ -60,7 +44,6 @@ pub fn histogram(
     if n == 0 {
         return Err("histogram: empty array".to_string());
     }
-
     let lo = range_lo.unwrap_or_else(|| {
         let mut m = a.get_f64(0);
         for i in 1..n {
@@ -81,13 +64,11 @@ pub fn histogram(
         }
         m
     });
-
     if hi <= lo {
         return Err(format!(
             "histogram: range_hi ({hi}) must be > range_lo ({lo})"
         ));
     }
-
     let width = (hi - lo) / bins as f64;
     let mut counts = vec![0u64; bins];
     for i in 0..n {
@@ -97,11 +78,10 @@ pub fn histogram(
         }
         let mut bin = ((v - lo) / width) as usize;
         if bin >= bins {
-            bin = bins - 1; // Keep right-edge values in the final bin.
+            bin = bins - 1;
         }
         counts[bin] += 1;
     }
-
     let result = (0..bins)
         .map(|b| {
             let bin_lo = lo + b as f64 * width;
@@ -111,10 +91,6 @@ pub fn histogram(
         .collect();
     Ok(result)
 }
-
-// Percentile.
-
-/// Compute percentile p in [0,100] with linear interpolation between ranks.
 pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     if !(0.0..=100.0).contains(&p) {
         return Err(format!("percentile p must be in [0, 100], got {p}"));
@@ -125,7 +101,6 @@ pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     }
     let mut vals: Vec<f64> = (0..n).map(|i| a.get_f64(i)).collect();
     vals.sort_by(|x, y| x.partial_cmp(y).unwrap_or(std::cmp::Ordering::Equal));
-
     let idx = (p / 100.0) * (n - 1) as f64;
     let lo = idx.floor() as usize;
     let hi = idx.ceil() as usize;
@@ -135,10 +110,6 @@ pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     let frac = idx - lo as f64;
     Ok(vals[lo] * (1.0 - frac) + vals[hi] * frac)
 }
-
-// Covariance and correlation.
-
-/// Compute population covariance for two arrays with equal element counts.
 pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -155,8 +126,6 @@ pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
         / n as f64;
     Ok(cov)
 }
-
-/// Compute Pearson correlation and return error when variance is zero.
 pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -167,7 +136,6 @@ pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     }
     let mean_a: f64 = (0..n).map(|i| a.get_f64(i)).sum::<f64>() / n as f64;
     let mean_b: f64 = (0..n).map(|i| b.get_f64(i)).sum::<f64>() / n as f64;
-
     let mut num = 0.0_f64;
     let mut ss_a = 0.0_f64;
     let mut ss_b = 0.0_f64;
@@ -184,10 +152,6 @@ pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     }
     Ok(num / denom)
 }
-
-// Normalization.
-
-/// Rescale values linearly into [out_min, out_max] and return the new array.
 pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArray, String> {
     if out_max <= out_min {
         return Err(format!(
@@ -219,8 +183,6 @@ pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArra
     }
     Ok(out)
 }
-
-/// Standardize values to z-scores and return error when standard deviation is zero.
 pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     if n == 0 {
@@ -238,10 +200,6 @@ pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
-
-// 1D signal operations.
-
-/// Convolve 1D signal with kernel and return full zero-padded output.
 #[allow(clippy::needless_range_loop)]
 pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
@@ -260,10 +218,7 @@ pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String>
     let kn = kernel.size();
     let out_len = sn + kn - 1;
     let mut out = NdArray::zeros(&[out_len], signal.dtype())?;
-
-    // Reverse kernel to match convolution definition.
     let kflip: Vec<f64> = (0..kn).rev().map(|i| kernel.get_f64(i)).collect();
-
     for o in 0..out_len {
         let mut acc = 0.0_f64;
         for k in 0..kn {
@@ -276,8 +231,6 @@ pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String>
     }
     Ok(out)
 }
-
-/// Correlate template over signal and return valid-length output.
 pub fn correlate1d(signal: &NdArray, template: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
         return Err(format!(
@@ -309,5 +262,3 @@ pub fn correlate1d(signal: &NdArray, template: &NdArray) -> Result<NdArray, Stri
     }
     Ok(out)
 }
-
-// No inline tests in src; unit tests belong under tests/rust/unit.

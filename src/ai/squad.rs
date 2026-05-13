@@ -1,23 +1,23 @@
-//! squad grouping, membership, and formation offset helpers.
+//! Squad formation helpers for AI membership, leaders, and spacing offsets.
+//! Owns `FormationType` and `Squad`.
+//! Does not own tactical movement; callers use the formation positions they compute.
 use crate::ai::blackboard::Blackboard;
-
-/// Formation shapes for squad positioning.
+/// Supported squad formation shapes.
 #[derive(Debug, Clone, PartialEq)]
 pub enum FormationType {
-    /// No formation — all members occupy the leader's position.
+    /// No formation offset.
     None,
-    /// Horizontal line centered on the leader. Members spread left/right.
+    /// Members spread horizontally around the leader.
     Line,
-    /// V-shaped wedge with alternating left/right rows behind the leader.
+    /// Members stack vertically behind the leader.
     Wedge,
-    /// Equal-angle circular distribution around the leader.
+    /// Members orbit the leader in a circle.
     Circle,
-    /// Vertical column trailing directly behind the leader.
+    /// Members stack vertically behind the leader.
     Column,
 }
-
 impl FormationType {
-    /// Parse a Lua string into a `FormationType`. Unrecognised strings default to `None`.
+    /// Parse a lowercase formation name; unknown strings map to `None`.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "line" => Self::Line,
@@ -27,8 +27,7 @@ impl FormationType {
             _ => Self::None,
         }
     }
-
-    /// Return the canonical lowercase Lua string for this formation type.
+    /// Return the canonical lowercase formation name.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::None => "none",
@@ -39,25 +38,23 @@ impl FormationType {
         }
     }
 }
-
-/// A named group of agents with formation positioning and shared state.
+/// Squad membership, formation state, and local blackboard.
 pub struct Squad {
-    /// Human-readable squad identifier.
+    /// Squad name.
     pub name: String,
-    /// Agent names belonging to this squad (insertion order).
+    /// Member names in formation order.
     pub members: Vec<String>,
-    /// Name of the designated leader, if any.
+    /// Optional leader name.
     pub leader: Option<String>,
-    /// Current formation shape.
+    /// Selected formation type.
     pub formation: FormationType,
-    /// World-unit distance between adjacent formation slots.
+    /// Distance between adjacent members in pixels.
     pub formation_spacing: f32,
-    /// Shared key-value store accessible to all squad members.
+    /// Squad-local blackboard.
     pub blackboard: Blackboard,
 }
-
 impl Squad {
-    /// Create a new squad with no members, no leader, and default formation spacing of 30 world units.
+    /// Create an empty squad with default spacing.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -68,8 +65,7 @@ impl Squad {
             blackboard: Blackboard::new(),
         }
     }
-
-    /// Computes the ideal world-space position for the member at `member_idx` within the current formation, relative to `leader_pos`.
+    /// Return the target position for one member relative to a leader position.
     pub fn get_formation_position(&self, member_idx: usize, leader_pos: (f32, f32)) -> (f32, f32) {
         let spacing = self.formation_spacing;
         match self.formation {
@@ -109,4 +105,3 @@ impl Squad {
         }
     }
 }
-

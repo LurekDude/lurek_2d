@@ -1,26 +1,6 @@
-//! Window management — Tier 1 Engine Subsystem.
-//!
-//! Provides pure Rust functions for reading and writing [`crate::runtime::shared_state::WindowState`]
-//! fields.  **No winit calls are made in this module.**  Deferred window operations are placed in
-//! `pending_*` fields and consumed by `engine::app::App` at the start of the next frame.
-//!
-//! ## Files
-//!
-//! | File | Scope |
-//! |------|-------|
-//! | `management` | Title, fullscreen, vsync, position, size, minimize, maximize, close, icon |
-//! | `viewport` | Logical dimensions, scale mode, pixel ↔ game-space coordinate conversion |
-//! | `event_loop` | Event-loop monitor helpers used by `app` for startup and display switching |
-
-/// Window management commands: title, fullscreen, position, size, minimize, maximize, close, icon.
-pub mod management;
-
-/// Viewport utilities: logical dimensions, scale mode, pixel ↔ game-space conversion.
-pub mod viewport;
-
-/// Reserved for future platform-specific event loop integration.
 pub mod event_loop;
-
+pub mod management;
+pub mod viewport;
 pub use event_loop::{
     center_window_on_monitor, current_display_index, desktop_dimensions_for_display,
     display_name_for_display, get_displays, move_window_to_display, select_startup_monitor,

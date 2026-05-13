@@ -1,70 +1,85 @@
-//! DSP effects: lock-free parameters, biquads, reverb, modulation, dynamics.
-//! AtomicParam: bit-cast f32 via AtomicU32; EffectParams: effect type + 3 parameters.
-
-use rodio::Source;
-use std::sync::atomic::{AtomicU32, Ordering};
-use std::sync::{Arc, RwLock};
+//! DSP effect chain for real-time audio processing on rodio sources.
+//! Owns `EffectType` (15 variants), `EffectParams` (lock-free parameter storage), `AtomicParam`,
+//! `ActiveEffect` (per-instance biquad/delay/modulation state), `SharedEffectGraph` (Arc<RwLock>
+//! shared with `Bus`), and `DynamicEffectSource` (rodio `Source` wrapper that applies the chain).
 
 use crate::log_msg;
 use crate::runtime::log_messages::{DP01, DP02, DP03};
-
-/// Lock-free atomic f32 using bit-cast to AtomicU32.
+use rodio::Source;
+use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{Arc, RwLock};
 #[derive(Debug)]
+/// Lock-free f32 parameter shared between the audio thread and the Lua API via atomic bit-cast.
 pub struct AtomicParam {
+    /// Bit-cast f32 stored as u32 for atomic load/store via `Relaxed` ordering.
     val: AtomicU32,
 }
-
 impl AtomicParam {
-    /// Create new parameter initialized to val.
+    /// Create a new `AtomicParam` initialised to `val`.
     pub fn new(val: f32) -> Self {
         Self {
             val: AtomicU32::new(val.to_bits()),
         }
     }
-
-    /// Return current value (relaxed atomicity).
+    /// Return the current f32 value using `Relaxed` ordering.
     pub fn get(&self) -> f32 {
         f32::from_bits(self.val.load(Ordering::Relaxed))
     }
-
-    /// Store new value (relaxed atomicity).
+    /// Store a new f32 value using `Relaxed` ordering.
     pub fn set(&self, val: f32) {
         self.val.store(val.to_bits(), Ordering::Relaxed);
     }
 }
-
-/// Audio effect type: filter, EQ, reverb, modulation, dynamics.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// DSP effect algorithm applied by `ActiveEffect::process` per sample.
 pub enum EffectType {
+    /// Biquad low-pass filter (cutoff, Q, mix).
     Lowpass,
+    /// Biquad high-pass filter (cutoff, Q, mix).
     Highpass,
+    /// Biquad band-pass filter (cutoff, Q, mix).
     Bandpass,
+    /// Biquad notch filter (cutoff, bandwidth).
     Notch,
+    /// Biquad low-shelf EQ (cutoff, gain_db, Q).
     LowShelf,
+    /// Biquad high-shelf EQ (cutoff, gain_db, Q).
     HighShelf,
+    /// Biquad peaking/bell EQ (cutoff, gain_db, Q).
     BellEq,
+    /// Short comb-based reverb (mix); 50 ms delay line.
     Reverb,
+    /// Long comb-based reverb (mix); 120 ms delay line.
     Reverb2,
+    /// Modulated chorus (rate, depth, mix); 20 ms delay line.
     Chorus,
+    /// LFO-modulated flanger (rate, depth, mix); 5 ms delay line.
     Flanger,
+    /// LFO-modulated phaser (rate, depth, mix); 10 ms all-pass delay.
     Phaser,
+    /// Soft-clip distortion (drive, mix).
     Distortion,
+    /// Peak limiter with envelope follower (threshold, release).
     Limiter,
+    /// Dynamic-range compressor (threshold, ratio, makeup_gain).
     Compressor,
 }
-
-/// Effect slot configuration: type and atomic parameters.
 #[derive(Debug)]
+/// Shared, lock-free parameter block for one DSP effect; shared between Lua API and audio thread.
 pub struct EffectParams {
+    /// Unique integer ID assigned when the effect is added to a `Bus` effect chain.
     pub id: u32,
+    /// Algorithm variant that determines how `p1`/`p2`/`p3` are interpreted.
     pub typ: EffectType,
+    /// Primary parameter (e.g. cutoff Hz, drive, threshold, rate) — meaning is type-specific.
     pub p1: AtomicParam,
+    /// Secondary parameter (e.g. gain_db, bandwidth, depth, ratio) — meaning is type-specific.
     pub p2: AtomicParam,
+    /// Tertiary parameter (e.g. mix, Q, makeup_gain) — meaning is type-specific.
     pub p3: AtomicParam,
 }
-
 impl EffectParams {
-    /// Create new effect slot.
+    /// Create new `EffectParams` with `id`, `typ`, and all parameters initialised to 0.0.
     pub fn new(id: u32, typ: EffectType) -> Self {
         log_msg!(debug, DP01, "id={}", id);
         Self {
@@ -75,8 +90,7 @@ impl EffectParams {
             p3: AtomicParam::new(0.0),
         }
     }
-
-    /// Set a named parameter; return error if unsupported for this effect type.
+    /// Set a named parameter on this effect; error if `param` is not valid for `typ`.
     pub fn set_param(&self, param: &str, value: f32) -> Result<(), String> {
         match self.typ {
             EffectType::Lowpass | EffectType::Highpass | EffectType::Bandpass => match param {
@@ -216,25 +230,31 @@ impl EffectParams {
         }
     }
 }
-
-/// Active effect runtime state: filter history, delay buffer, modulation phase.
 #[derive(Clone)]
+/// Per-source instantiation of a DSP effect with its own filter and delay-line state.
 pub struct ActiveEffect {
+    /// Shared parameter block read each sample; updated lock-free from the Lua API.
     pub params: Arc<EffectParams>,
+    /// Biquad x[n-1] delay element per channel.
     pub bq_x1: [f32; 2],
+    /// Biquad x[n-2] delay element per channel.
     pub bq_x2: [f32; 2],
+    /// Biquad y[n-1] delay element per channel.
     pub bq_y1: [f32; 2],
+    /// Biquad y[n-2] delay element per channel.
     pub bq_y2: [f32; 2],
+    /// Circular delay line used by reverb, chorus, flanger, and phaser effects.
     pub comb_buf: Vec<f32>,
+    /// Write position in `comb_buf`; advanced circularly each sample.
     pub comb_pos: usize,
+    /// Envelope follower state for limiter and compressor gain tracking.
     pub compressor_env: f32,
+    /// LFO phase in radians for chorus, flanger, and phaser modulation.
     pub lfo_phase: f32,
 }
-
 impl ActiveEffect {
-    /// Creates new effect runtime state, allocating delay buffers.
+    /// Allocate `ActiveEffect` for `params`, sizing `comb_buf` based on effect type and `sample_rate`.
     pub fn new(params: Arc<EffectParams>, sample_rate: u32, channels: u16) -> Self {
-        // Allocate a delay buffer large enough for the effect's maximum delay requirement.
         let comb_len = match params.typ {
             EffectType::Reverb | EffectType::Chorus => {
                 let ms = if params.typ == EffectType::Chorus {
@@ -250,14 +270,10 @@ impl ActiveEffect {
             EffectType::Flanger => {
                 ((sample_rate as f32 * 0.005) as usize * channels as usize).max(1)
             }
-            EffectType::Phaser => {
-                ((sample_rate as f32 * 0.01) as usize * channels as usize).max(1)
-            }
+            EffectType::Phaser => ((sample_rate as f32 * 0.01) as usize * channels as usize).max(1),
             _ => 1,
         };
-
         log_msg!(debug, DP02, "sr={} ch={}", sample_rate, channels);
-
         Self {
             params,
             bq_x1: [0.0; 2],
@@ -270,13 +286,11 @@ impl ActiveEffect {
             lfo_phase: 0.0,
         }
     }
-
-    /// Processes one sample through the effect.
+    /// Apply the effect to one `sample` on `channel`, returning the processed output sample.
     pub fn process(&mut self, sample: f32, channel: u16, sample_rate: u32) -> f32 {
         let c = (channel as usize) % 2;
         let typ = self.params.typ;
         let sr = sample_rate as f32;
-
         match typ {
             EffectType::Lowpass | EffectType::Highpass | EffectType::Bandpass => {
                 let f0 = self.params.p1.get().clamp(20.0, 20000.0);
@@ -284,7 +298,6 @@ impl ActiveEffect {
                 let w0 = 2.0 * std::f32::consts::PI * f0 / sr;
                 let alpha = w0.sin() / (2.0 * q);
                 let cos_w0 = w0.cos();
-
                 let (b0, b1, b2, a0, a1, a2) = match typ {
                     EffectType::Lowpass => (
                         (1.0 - cos_w0) / 2.0,
@@ -312,20 +325,16 @@ impl ActiveEffect {
                     ),
                     _ => unreachable!(),
                 };
-
                 let x0 = sample;
                 let out = (b0 / a0) * x0 + (b1 / a0) * self.bq_x1[c] + (b2 / a0) * self.bq_x2[c]
                     - (a1 / a0) * self.bq_y1[c]
                     - (a2 / a0) * self.bq_y2[c];
-
                 self.bq_x2[c] = self.bq_x1[c];
                 self.bq_x1[c] = x0;
                 self.bq_y2[c] = self.bq_y1[c];
                 self.bq_y1[c] = out;
-
                 out
             }
-
             EffectType::Notch => {
                 let f0 = self.params.p1.get().clamp(20.0, 20000.0);
                 let bw = self.params.p2.get().clamp(10.0, 5000.0).max(10.0);
@@ -334,21 +343,18 @@ impl ActiveEffect {
                 let alpha = w0.sin() / (2.0 * q);
                 let cos_w0 = w0.cos();
                 let a0 = 1.0 + alpha;
-
                 let x0 = sample;
                 let out = (1.0 / a0) * x0
                     + (-2.0 * cos_w0 / a0) * self.bq_x1[c]
                     + (1.0 / a0) * self.bq_x2[c]
                     - (-2.0 * cos_w0 / a0) * self.bq_y1[c]
                     - ((1.0 - alpha) / a0) * self.bq_y2[c];
-
                 self.bq_x2[c] = self.bq_x1[c];
                 self.bq_x1[c] = x0;
                 self.bq_y2[c] = self.bq_y1[c];
                 self.bq_y1[c] = out;
                 out
             }
-
             EffectType::LowShelf | EffectType::HighShelf => {
                 let f0 = self.params.p1.get().clamp(20.0, 20000.0);
                 let gain_db = self.params.p2.get().clamp(-24.0, 24.0);
@@ -357,7 +363,6 @@ impl ActiveEffect {
                 let cos_w0 = w0.cos();
                 let sin_w0 = w0.sin();
                 let alpha = sin_w0 / 2.0 * (a_gain + 1.0 / a_gain).sqrt();
-
                 let (b0, b1, b2, a0, a1, a2) = if typ == EffectType::LowShelf {
                     (
                         a_gain
@@ -387,19 +392,16 @@ impl ActiveEffect {
                         (a_gain + 1.0) - (a_gain - 1.0) * cos_w0 - 2.0 * a_gain.sqrt() * alpha,
                     )
                 };
-
                 let x0 = sample;
                 let out = (b0 / a0) * x0 + (b1 / a0) * self.bq_x1[c] + (b2 / a0) * self.bq_x2[c]
                     - (a1 / a0) * self.bq_y1[c]
                     - (a2 / a0) * self.bq_y2[c];
-
                 self.bq_x2[c] = self.bq_x1[c];
                 self.bq_x1[c] = x0;
                 self.bq_y2[c] = self.bq_y1[c];
                 self.bq_y1[c] = out;
                 out
             }
-
             EffectType::BellEq => {
                 let f0 = self.params.p1.get().clamp(20.0, 20000.0);
                 let gain_db = self.params.p2.get().clamp(-24.0, 24.0);
@@ -410,107 +412,79 @@ impl ActiveEffect {
                 let alpha = w0.sin() / (2.0 * q);
                 let cos_w0 = w0.cos();
                 let a0 = 1.0 + alpha / a_gain;
-
                 let x0 = sample;
                 let out = ((1.0 + alpha * a_gain) / a0) * x0
                     + ((-2.0 * cos_w0) / a0) * self.bq_x1[c]
                     + ((1.0 - alpha * a_gain) / a0) * self.bq_x2[c]
                     - ((-2.0 * cos_w0) / a0) * self.bq_y1[c]
                     - ((1.0 - alpha / a_gain) / a0) * self.bq_y2[c];
-
                 self.bq_x2[c] = self.bq_x1[c];
                 self.bq_x1[c] = x0;
                 self.bq_y2[c] = self.bq_y1[c];
                 self.bq_y1[c] = out;
                 out
             }
-
             EffectType::Reverb | EffectType::Chorus => {
-                let p1 = self.params.p1.get(); // room_size / decay
-                let p2 = self.params.p2.get(); // mix
-
+                let p1 = self.params.p1.get();
+                let p2 = self.params.p2.get();
                 let delayed = self.comb_buf[self.comb_pos];
                 self.comb_buf[self.comb_pos] = sample + delayed * p1;
                 self.comb_pos = (self.comb_pos + 1) % self.comb_buf.len();
-
                 sample * (1.0 - p2) + delayed * p2
             }
-
             EffectType::Reverb2 => {
                 let room_size = self.params.p1.get().clamp(0.0, 1.0);
                 let damping = self.params.p2.get().clamp(0.0, 1.0);
                 let mix = self.params.p3.get().clamp(0.0, 1.0);
-
                 let buf_len = self.comb_buf.len().max(1);
                 let tap_offsets = [buf_len / 4, buf_len / 3, buf_len / 2, (buf_len * 2) / 3];
-
                 let mut wet = 0.0_f32;
                 for offset in tap_offsets {
                     let tap_pos = (self.comb_pos + buf_len - offset) % buf_len;
                     wet += self.comb_buf[tap_pos];
                 }
-                wet *= 0.25; // average across taps
-
-                // Apply damping to stored signal
+                wet *= 0.25;
                 let store = sample + wet * room_size * (1.0 - damping);
                 self.comb_buf[self.comb_pos] = store;
                 self.comb_pos = (self.comb_pos + 1) % buf_len;
-
                 sample * (1.0 - mix) + wet * mix
             }
-
-            // -- Flanger (LFO-modulated short delay) ----------------------------------
             EffectType::Flanger => {
                 let rate = self.params.p1.get().clamp(0.01, 10.0);
                 let depth = self.params.p2.get().clamp(0.0, 1.0);
                 let mix = self.params.p3.get().clamp(0.0, 1.0);
                 let buf_len = self.comb_buf.len().max(2);
-
-                // Only advance LFO on the left/first channel to keep L+R in sync
                 if c == 0 {
                     self.lfo_phase = (self.lfo_phase + 2.0 * std::f32::consts::PI * rate / sr)
                         % (2.0 * std::f32::consts::PI);
                 }
-
-                // modulate delay position within the buffer
-                let lfo_val = (self.lfo_phase.sin() + 1.0) * 0.5; // 0..1
-                let delay_samps = ((buf_len - 1) as f32 * depth * lfo_val) as usize;
-                let tap_pos =
-                    (self.comb_pos + buf_len - delay_samps.clamp(0, buf_len - 1)) % buf_len;
-                let delayed = self.comb_buf[tap_pos];
-
-                self.comb_buf[self.comb_pos] = sample;
-                self.comb_pos = (self.comb_pos + 1) % buf_len;
-
-                sample * (1.0 - mix) + delayed * mix
-            }
-
-            // -- Phaser (allpass approximation via short comb modulation) -------------
-            EffectType::Phaser => {
-                let rate = self.params.p1.get().clamp(0.01, 10.0);
-                let depth = self.params.p2.get().clamp(0.0, 1.0);
-                let mix = self.params.p3.get().clamp(0.0, 1.0);
-                let buf_len = self.comb_buf.len().max(2);
-
-                if c == 0 {
-                    self.lfo_phase = (self.lfo_phase + 2.0 * std::f32::consts::PI * rate / sr)
-                        % (2.0 * std::f32::consts::PI);
-                }
-
                 let lfo_val = (self.lfo_phase.sin() + 1.0) * 0.5;
                 let delay_samps = ((buf_len - 1) as f32 * depth * lfo_val) as usize;
                 let tap_pos =
                     (self.comb_pos + buf_len - delay_samps.clamp(0, buf_len - 1)) % buf_len;
                 let delayed = self.comb_buf[tap_pos];
-
                 self.comb_buf[self.comb_pos] = sample;
                 self.comb_pos = (self.comb_pos + 1) % buf_len;
-
-                // Allpass-like blend: inverting the delayed signal creates phase cancellation
+                sample * (1.0 - mix) + delayed * mix
+            }
+            EffectType::Phaser => {
+                let rate = self.params.p1.get().clamp(0.01, 10.0);
+                let depth = self.params.p2.get().clamp(0.0, 1.0);
+                let mix = self.params.p3.get().clamp(0.0, 1.0);
+                let buf_len = self.comb_buf.len().max(2);
+                if c == 0 {
+                    self.lfo_phase = (self.lfo_phase + 2.0 * std::f32::consts::PI * rate / sr)
+                        % (2.0 * std::f32::consts::PI);
+                }
+                let lfo_val = (self.lfo_phase.sin() + 1.0) * 0.5;
+                let delay_samps = ((buf_len - 1) as f32 * depth * lfo_val) as usize;
+                let tap_pos =
+                    (self.comb_pos + buf_len - delay_samps.clamp(0, buf_len - 1)) % buf_len;
+                let delayed = self.comb_buf[tap_pos];
+                self.comb_buf[self.comb_pos] = sample;
+                self.comb_pos = (self.comb_pos + 1) % buf_len;
                 sample * (1.0 - mix) + (sample - delayed) * mix
             }
-
-            // -- Distortion (hard-clip waveshaper) ------------------------------------
             EffectType::Distortion => {
                 let drive = self.params.p1.get().max(1.0);
                 let mix = self.params.p2.get().clamp(0.0, 1.0);
@@ -519,30 +493,22 @@ impl ActiveEffect {
                 let clipped = driven.clamp(-1.0, 1.0) * threshold;
                 sample * (1.0 - mix) + clipped * mix
             }
-
-            // -- Brick-wall limiter ---------------------------------------------------
             EffectType::Limiter => {
                 let threshold = self.params.p1.get().clamp(0.001, 1.0);
                 let release = self.params.p2.get().clamp(0.001, 1.0);
                 let abs_s = sample.abs();
                 if abs_s > threshold {
                     let gain = threshold / abs_s;
-                    // Smooth the gain reduction using a simple one-pole envelope
                     self.compressor_env = self.compressor_env * (1.0 - release) + gain * release;
                 } else {
-                    // Recover towards 1.0 at release speed
                     self.compressor_env = (self.compressor_env + release).min(1.0);
                 }
                 sample * self.compressor_env
             }
-
-            // -- Compressor -----------------------------------------------------------
             EffectType::Compressor => {
                 let threshold = self.params.p1.get().clamp(0.0, 1.0);
                 let ratio = self.params.p2.get().max(1.0);
                 let makeup = self.params.p3.get().max(0.0);
-
-                // Simple feed-forward RMS compressor with a 10 ms envelope follower
                 let attack = 1.0 - (-1.0_f32 / (0.01 * sr)).exp();
                 let release_coeff = 1.0 - (-1.0_f32 / (0.1 * sr)).exp();
                 let level = sample.abs();
@@ -551,7 +517,6 @@ impl ActiveEffect {
                 } else {
                     self.compressor_env += release_coeff * (level - self.compressor_env);
                 }
-
                 let gain = if self.compressor_env > threshold && threshold > 0.0 {
                     let db_over = 20.0 * (self.compressor_env / threshold).log10();
                     let db_reduced = db_over / ratio;
@@ -560,23 +525,18 @@ impl ActiveEffect {
                 } else {
                     1.0 + makeup
                 };
-
                 sample * gain
             }
         }
     }
 }
-
-/// Shared, thread-safe graph of active DSP effects owned by a sound source.
-/// The main thread pushes `Arc<EffectParams>` entries into the graph; the audio
-/// thread observes them via a non-blocking `try_read` lock on every sample batch
-/// and synchronises its `active_effects` list accordingly.
+/// Arc-wrapped effect parameter list shared between `Bus` (writer) and `DynamicEffectSource` (reader).
 pub struct SharedEffectGraph {
+    /// List of effect parameter blocks; `DynamicEffectSource` re-syncs its `ActiveEffect` vec from this.
     pub effects: Arc<RwLock<Vec<Arc<EffectParams>>>>,
 }
-
 impl SharedEffectGraph {
-    /// Creates an empty `SharedEffectGraph` with no effects in the chain.
+    /// Create an empty `SharedEffectGraph`.
     pub fn new() -> Self {
         log_msg!(debug, DP03);
         Self {
@@ -584,30 +544,31 @@ impl SharedEffectGraph {
         }
     }
 }
-
+/// `Default` impl: returns `SharedEffectGraph::new()`.
 impl Default for SharedEffectGraph {
+    /// Create default shared effect graph.
     fn default() -> Self {
         Self::new()
     }
 }
-
 impl SharedEffectGraph {}
-
-/// A rodio `Source` wrapper that applies a dynamic chain of DSP effects to an inner audio source.
-/// On every audio-thread call to `Iterator::next`, `DynamicEffectSource` checks whether the
-/// shared effect list has changed (`sync_effects`) and processes the sample through each
-/// `ActiveEffect` in sequence before returning it to the mixer.
+/// Rodio `Source` wrapper that applies the `SharedEffectGraph` effect chain sample by sample.
 pub struct DynamicEffectSource<I: Source<Item = f32>> {
+    /// Upstream rodio source supplying raw f32 samples.
     input: I,
+    /// Shared parameter list polled each frame to sync the local `active_effects` vec.
     shared_graph: Arc<RwLock<Vec<Arc<EffectParams>>>>,
+    /// Per-source `ActiveEffect` instances kept in sync with `shared_graph` each frame.
     active_effects: Vec<ActiveEffect>,
+    /// Current interleaved channel index, reset to 0 after `channels - 1`.
     current_channel: u16,
+    /// Sample rate in Hz captured from `input` at construction.
     sample_rate: u32,
+    /// Channel count captured from `input` at construction.
     channels: u16,
 }
-
 impl<I: Source<Item = f32>> DynamicEffectSource<I> {
-    /// Wraps an inner audio source with a dynamic DSP effect chain.
+    /// Wrap `input` with the given `shared_graph`; captures sample rate and channel count.
     pub fn new(input: I, shared_graph: Arc<RwLock<Vec<Arc<EffectParams>>>>) -> Self {
         let sample_rate = input.sample_rate();
         let channels = input.channels();
@@ -620,11 +581,10 @@ impl<I: Source<Item = f32>> DynamicEffectSource<I> {
             channels,
         }
     }
-
+    /// Re-sync `active_effects` from `shared_graph` if the effect count changed (called per frame).
     fn sync_effects(&mut self) {
         if let Ok(guard) = self.shared_graph.try_read() {
             let shared_len = guard.len();
-            // simple diffing: just replace if sizes differ. In a real engine, we'd check IDs
             if self.active_effects.len() != shared_len {
                 self.active_effects.clear();
                 for ef in guard.iter() {
@@ -645,49 +605,41 @@ impl<I: Source<Item = f32>> DynamicEffectSource<I> {
         }
     }
 }
-
 impl<I: Source<Item = f32>> Iterator for DynamicEffectSource<I> {
     type Item = I::Item;
-
+    /// Advance the upstream source, apply the full effect chain per sample, and return the result.
     fn next(&mut self) -> Option<Self::Item> {
         let sample_opt = self.input.next();
         if let Some(sample) = sample_opt {
             if self.current_channel == 0 {
-                // only sync on frames, not interleaved channels
                 self.sync_effects();
             }
-
             let mut current_val = sample;
             for ef in &mut self.active_effects {
                 current_val = ef.process(current_val, self.current_channel, self.sample_rate);
             }
-
             self.current_channel = (self.current_channel + 1) % self.channels;
-
-            // convert back to whatever sample type the pipeline uses
             Some(current_val)
         } else {
             None
         }
     }
 }
-
 impl<I: Source<Item = f32>> Source for DynamicEffectSource<I> {
+    /// Delegate `current_frame_len` to the upstream source.
     fn current_frame_len(&self) -> Option<usize> {
         self.input.current_frame_len()
     }
-
+    /// Delegate `channels` to the upstream source.
     fn channels(&self) -> u16 {
         self.input.channels()
     }
-
+    /// Delegate `sample_rate` to the upstream source.
     fn sample_rate(&self) -> u32 {
         self.input.sample_rate()
     }
-
+    /// Delegate `total_duration` to the upstream source.
     fn total_duration(&self) -> Option<std::time::Duration> {
         self.input.total_duration()
     }
 }
-
-

@@ -1,17 +1,16 @@
-//! Audio playback device enumeration (stub layer).
-//! Currently returns default device only; cross-platform device switching not yet implemented.
+﻿//! Audio device enumeration and selection stubs exposed to the Lua API.
+//! Returns a hard-coded "Default" device list until platform device enumeration is implemented.
+//! Does not own playback state or mixer resources.
 
-/// Return available playback device names.
+/// Return the list of available audio output device names; currently always `["Default"]`.
 pub fn get_playback_devices() -> Vec<String> {
     vec!["Default".to_string()]
 }
-
-/// Return the active playback device name.
+/// Return the name of the currently active audio output device; currently always `"Default"`.
 pub fn get_playback_device() -> String {
     "Default".to_string()
 }
-
-/// Select playback device by name; return error if not found.
+/// Activate the named audio output device; error if `name` is not in `get_playback_devices()`.
 pub fn set_playback_device(name: &str) -> Result<(), crate::runtime::error::EngineError> {
     if get_playback_devices().iter().any(|d| d == name) {
         Ok(())
@@ -22,4 +21,3 @@ pub fn set_playback_device(name: &str) -> Result<(), crate::runtime::error::Engi
         )))
     }
 }
-

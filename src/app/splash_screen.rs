@@ -1,39 +1,31 @@
-//! Splash-screen branding asset loading and render-command generation.
-//! Loads embedded PNG assets and builds draw commands for splash-screen display.
+﻿//! Splash-screen branding asset loader and command composer.
+//! Decodes embedded logo/banner textures, stores them in temporary texture slots,
+//! and builds draw commands for idle and drag-hover splash states.
 
 use super::app::fit_contain_size;
 use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
 use crate::runtime::resource_keys::{FontKey, TextureKey};
 use slotmap::SlotMap;
-
-// ---- Type: SplashTexture ----
-
 #[derive(Clone, Copy)]
-/// Splash texture with key and dimensions.
+/// Handle and dimensions for one splash texture uploaded to render texture storage.
 pub struct SplashTexture {
-    /// Texture handle stored in the splash texture map.
+    /// Slot-map key of the uploaded texture.
     pub texture_key: TextureKey,
-    /// Source image width in pixels.
+    /// Texture width in pixels.
     pub width: u32,
-    /// Source image height in pixels.
+    /// Texture height in pixels.
     pub height: u32,
 }
-
-// ---- Type: SplashBranding ----
-
-/// Loaded splash-screen branding resources (textures, icon, banner).
+/// Embedded splash-branding assets prepared for splash-screen rendering.
 pub struct SplashBranding {
-    /// Texture storage containing decoded embedded splash assets.
+    /// Temporary texture storage containing loaded splash images.
     pub textures: SlotMap<TextureKey, TextureData>,
-    /// Large centered icon shown in the upper splash area.
+    /// Center icon texture metadata.
     pub large_icon: SplashTexture,
-    /// Banner image shown below the large icon.
+    /// Banner texture metadata.
     pub banner: SplashTexture,
 }
-
-// ---- Helper Functions: Splash Asset Loading ----
-
-/// Load embedded splash branding textures and return ready-to-draw bundle; return None on decode failure.
+/// Decode embedded icon/banner PNG assets and upload them into splash texture storage.
 pub fn load_splash_branding() -> Option<SplashBranding> {
     let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
     let large_icon = {
@@ -51,7 +43,6 @@ pub fn load_splash_branding() -> Option<SplashBranding> {
                 return None;
             }
         };
-
         let rgba = image.to_rgba8();
         let (width, height) = rgba.dimensions();
         match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
@@ -70,7 +61,6 @@ pub fn load_splash_branding() -> Option<SplashBranding> {
             }
         }
     };
-
     let banner = {
         let image = match ::image::load_from_memory(std::include_bytes!(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -86,7 +76,6 @@ pub fn load_splash_branding() -> Option<SplashBranding> {
                 return None;
             }
         };
-
         let rgba = image.to_rgba8();
         let (width, height) = rgba.dimensions();
         match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
@@ -105,16 +94,14 @@ pub fn load_splash_branding() -> Option<SplashBranding> {
             }
         }
     };
-
     Some(SplashBranding {
         textures,
         large_icon,
         banner,
     })
 }
-
 #[allow(clippy::vec_init_then_push)]
-/// Builds splash-screen render commands for branding and drag-and-drop hint text.
+/// Build render commands for splash screen branding and drag-and-drop hint text.
 pub fn make_splash_commands(
     width: u32,
     height: u32,
@@ -135,12 +122,9 @@ pub fn make_splash_commands(
         .get_mut(small_key)
         .map(|f| f.text_width(hint_text))
         .unwrap_or(0.0);
-
     let top_margin = 24.0_f32;
     let hint_band_top = height_f - 82.0;
-
     let mut cmds: Vec<RenderCommand> = Vec::new();
-
     if let Some(branding) = branding {
         let (icon_w, icon_h) = fit_contain_size(
             branding.large_icon.width,
@@ -154,16 +138,13 @@ pub fn make_splash_commands(
             width_f * 0.80,
             height_f * 0.22,
         );
-
         let banner_center_min = top_margin + banner_h * 0.5;
         let banner_center_max = (hint_band_top - 18.0 - banner_h * 0.5).max(banner_center_min);
         let banner_center_y = (height_f * 0.72).clamp(banner_center_min, banner_center_max);
-
         let icon_center_min = top_margin + icon_h * 0.5;
         let icon_center_max =
             (banner_center_y - banner_h * 0.5 - 32.0 - icon_h * 0.5).max(icon_center_min);
         let icon_center_y = (height_f * 0.33).clamp(icon_center_min, icon_center_max);
-
         cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 1.0));
         cmds.push(RenderCommand::DrawImageEx {
             texture_key: branding.large_icon.texture_key,
@@ -188,7 +169,6 @@ pub fn make_splash_commands(
             effect: None,
         });
     }
-
     if drag_hover {
         cmds.push(RenderCommand::SetColor(0.40, 0.80, 0.40, 0.15));
         cmds.push(RenderCommand::Rectangle {
@@ -209,6 +189,5 @@ pub fn make_splash_commands(
         y: height_f - 55.0,
         scale: 1.0,
     });
-
     cmds
 }

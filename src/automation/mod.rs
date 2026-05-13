@@ -1,15 +1,14 @@
-//! Input-playback automation for timed synthetic event injection.
-//! Owns Script (named step container), Simulator (playback engine),
-//! Step (timed event record), and Action (12 input event variants).
-//! Injects events into crate::event::EventQueue; does not own render or audio output.
+//! Input replay and deterministic test automation.
+//! Owns `Script` (ordered step list), `Simulator` (playback engine), and `Step`/`Action`
+//! (timed event descriptors). Does not own event dispatch internals or game logic.
+//! Depends on `event::EventQueue`, input constants, and `timer::accumulate_scaled_micros`.
 
-/// Timed step record and Action enum consumed by Script and Simulator.
-pub mod step;
-/// Named, time-sorted step container with TOML parsing and repeat expansion.
+/// `Script`: ordered, time-sorted step sequences with TOML parsing and repeat expansion.
 pub mod script;
-/// Playback engine driving step dispatch into EventQueue per update call.
+/// `Simulator`: drives script playback, macro inlining, condition evaluation, and visual asserts.
 pub mod simulator;
-
+/// `Action` and `Step` types: timed input event descriptors for automation scripts.
+pub mod step;
 pub use script::Script;
 pub use simulator::Simulator;
 pub use step::{Action, Step};

@@ -1,31 +1,5 @@
-//! Diagnostic and visualization helpers for [`Raycaster2D`].
-//!
-//! Provides `draw_*_to_image` methods that render raycaster state into
-//! [`ImageData`] bitmaps for debugging, top-down views, first-person
-//! previews, depth maps, line-of-sight overlays, and camera sweep mosaics.
-
 use super::dda::Raycaster2D;
-
 impl Raycaster2D {
-    // ------------------------------------------------------------------
-    // Visualization
-    // ------------------------------------------------------------------
-
-    /// Render a top-down map view to an image.
-    ///
-    /// Each cell is drawn as a `scale × scale` block. Wall cells are colored
-    /// by their cell value, empty cells use the dark background color.
-    /// The player position is marked with a yellow circle and rays are cast
-    /// in all directions to show the line-of-sight fan.
-    ///
-    /// # Parameters
-    /// - `player_x` — `f32`. Player X position in cell coordinates.
-    /// - `player_y` — `f32`. Player Y position in cell coordinates.
-    /// - `player_angle` — `f32`. Player look direction in radians.
-    /// - `scale` — `u32`. Pixel size of each grid cell.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_top_down_to_image(
         &self,
         player_x: f32,
@@ -33,7 +7,7 @@ impl Raycaster2D {
         player_angle: f32,
         scale: u32,
     ) -> crate::image::ImageData {
-        let _ = player_angle; // reserved for future directional indicator
+        let _ = player_angle;
         let w = self.width();
         let h = self.height();
         let mut img = crate::image::ImageData::new(w * scale, h * scale);
@@ -56,7 +30,6 @@ impl Raycaster2D {
                 }
             }
         }
-        // Draw player
         img.draw_circle(
             (player_x * scale as f32) as i32,
             (player_y * scale as f32) as i32,
@@ -66,7 +39,6 @@ impl Raycaster2D {
             0,
             255,
         );
-        // Cast rays in all directions
         for angle_deg in (0..360).step_by(15) {
             let angle = (angle_deg as f32).to_radians();
             if let Some(hit) = self.cast_ray(player_x, player_y, angle, 20.0) {
@@ -86,24 +58,6 @@ impl Raycaster2D {
         }
         img
     }
-
-    /// Render a first-person column view to an image.
-    ///
-    /// Casts `width` rays across the given FOV from the player position and
-    /// draws vertical wall columns with distance-based shading. A sky gradient
-    /// fills the top half and a floor gradient fills the bottom half.
-    ///
-    /// # Parameters
-    /// - `player_x` — `f32`. Player X in cell coordinates.
-    /// - `player_y` — `f32`. Player Y in cell coordinates.
-    /// - `angle` — `f32`. Look direction in radians.
-    /// - `fov` — `f32`. Field of view in radians.
-    /// - `width` — `u32`. Output image width (one ray per column).
-    /// - `height` — `u32`. Output image height.
-    /// - `max_dist` — `f32`. Maximum ray distance.
-    ///
-    /// # Returns
-    /// `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_view_to_image(
         &self,
@@ -117,7 +71,6 @@ impl Raycaster2D {
     ) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         let half_h = height / 2;
-        // Sky gradient
         for y in 0..half_h {
             let t = y as f32 / half_h as f32;
             let r = (20.0 + t * 30.0) as u8;
@@ -127,7 +80,6 @@ impl Raycaster2D {
                 img.set_pixel(x, y, r, g, b, 255);
             }
         }
-        // Floor gradient
         for y in half_h..height {
             let t = (y - half_h) as f32 / half_h as f32;
             let g = (80.0 - t * 40.0) as u8;
@@ -135,7 +87,6 @@ impl Raycaster2D {
                 img.set_pixel(x, y, g + 30, g + 10, g / 2 + 10, 255);
             }
         }
-        // Cast rays and draw wall columns
         let rays = self.cast_rays(player_x, player_y, angle, fov, width, max_dist);
         for (x, hit) in rays.iter().enumerate() {
             if hit.hit {
@@ -168,24 +119,6 @@ impl Raycaster2D {
         }
         img
     }
-
-    /// Render a depth-map column view with sky gradient and cell-value coloring.
-    ///
-    /// Casts `num_rays` across the given FOV and draws shaded wall columns
-    /// colored by cell value against a sky gradient background.
-    ///
-    /// # Parameters
-    /// - `player_x` — `f32`. Player X in cell coordinates.
-    /// - `player_y` — `f32`. Player Y in cell coordinates.
-    /// - `player_angle` — `f32`. Look direction in radians.
-    /// - `fov` — `f32`. Field of view in radians.
-    /// - `num_rays` — `u32`. Number of columns.
-    /// - `width` — `u32`. Output image width.
-    /// - `height` — `u32`. Output image height.
-    /// - `max_dist` — `f32`. Maximum ray distance.
-    ///
-    /// # Returns
-    /// `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_depth_map_to_image(
         &self,
@@ -201,7 +134,6 @@ impl Raycaster2D {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
         let half = height / 2;
-        // Sky gradient
         for y in 0..half {
             let t = y as f32 / half as f32;
             let r = (30.0 + t * 50.0) as u8;
@@ -231,22 +163,6 @@ impl Raycaster2D {
         }
         img
     }
-
-    /// Render a line-of-sight test between two points overlaid on the grid.
-    ///
-    /// Draws walls as filled blocks, performs a LOS check between `(ax,ay)`
-    /// and `(bx,by)`, and draws the connecting line green (visible) or red
-    /// (blocked) with endpoint markers.
-    ///
-    /// # Parameters
-    /// - `ax` — `f32`. Start X in cell coordinates.
-    /// - `ay` — `f32`. Start Y in cell coordinates.
-    /// - `bx` — `f32`. End X in cell coordinates.
-    /// - `by` — `f32`. End Y in cell coordinates.
-    /// - `scale` — `u32`. Pixel size per grid cell.
-    ///
-    /// # Returns
-    /// `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_line_of_sight_to_image(
         &self,
@@ -260,7 +176,6 @@ impl Raycaster2D {
         let h = self.height();
         let mut img = crate::image::ImageData::new(w * scale, h * scale);
         img.fill(40, 40, 50, 255);
-        // Draw walls
         for y in 0..h {
             for x in 0..w {
                 if self.get_cell(x, y) > 0 {
@@ -308,24 +223,6 @@ impl Raycaster2D {
         );
         img
     }
-
-    /// Render a mosaic of first-person views from evenly-spaced angles.
-    ///
-    /// Creates `num_frames` views arranged in a 4-column grid, each
-    /// `frame_w × frame_h` pixels, sweeping the camera through a full
-    /// rotation around `(x, y)`.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`. Player X in cell coordinates.
-    /// - `y` — `f32`. Player Y in cell coordinates.
-    /// - `fov` — `f32`. Field of view in radians.
-    /// - `max_dist` — `f32`. Maximum ray distance.
-    /// - `num_frames` — `u32`. Number of views.
-    /// - `frame_w` — `u32`. Width of each view.
-    /// - `frame_h` — `u32`. Height of each view.
-    ///
-    /// # Returns
-    /// `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_camera_sweep_to_image(
         &self,
@@ -369,23 +266,6 @@ impl Raycaster2D {
         }
         img
     }
-
-    /// Draw a first-person textured raycaster view with procedural textures.
-    ///
-    /// Each cell value maps to a procedural texture (brick, stone, wood, metal,
-    /// marble, mosaic). Includes sky gradient, stars, and perspective floor.
-    ///
-    /// # Parameters
-    /// - `ox` — `f32`. Camera X position.
-    /// - `oy` — `f32`. Camera Y position.
-    /// - `angle` — `f32`. Camera facing angle.
-    /// - `fov` — `f32`. Field of view in radians.
-    /// - `width` — `u32`. Image width.
-    /// - `height` — `u32`. Image height.
-    /// - `max_dist` — `f32`. Maximum ray distance.
-    ///
-    /// # Returns
-    /// `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_textured_view_to_image(
         &self,
@@ -399,8 +279,6 @@ impl Raycaster2D {
     ) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         let half_h = height / 2;
-
-        // Sky gradient + stars
         for y in 0..half_h {
             let t = y as f32 / half_h as f32;
             let r = (10.0 + t * 20.0) as u8;
@@ -427,8 +305,6 @@ impl Raycaster2D {
                 img.set_pixel(sx, sy, 255, 255, 240, 200);
             }
         }
-
-        // Floor with perspective checker
         for y in half_h..height {
             let t = (y - half_h) as f32 / half_h as f32;
             let base_g = (60.0 - t * 30.0) as u8;
@@ -440,17 +316,13 @@ impl Raycaster2D {
                 img.set_pixel(x, y, r, g2, b, 255);
             }
         }
-
-        // Cast rays
         let rays = self.cast_rays(ox, oy, angle, fov, width, max_dist);
-
         for (x, hit) in rays.iter().enumerate() {
             if hit.hit {
                 let wall_h = (300.0 / hit.distance.max(0.2)) as i32;
                 let top = half_h as i32 - wall_h / 2;
                 let bot = half_h as i32 + wall_h / 2;
                 let shade = (1.0 - hit.distance / max_dist).max(0.2);
-
                 for y in top.max(0)..bot.min(height as i32) {
                     let frac_y = (y - top) as f32 / (bot - top).max(1) as f32;
                     let frac_x = (hit.distance * 3.7) % 1.0;
@@ -463,7 +335,6 @@ impl Raycaster2D {
                 }
             }
         }
-
         img.draw_label(
             "PROCEDURAL TEXTURED RAYCASTER",
             (width / 4) as i32,
@@ -474,12 +345,9 @@ impl Raycaster2D {
         );
         img
     }
-
-    /// Map a cell value plus texture coordinates to a procedural colour.
     fn procedural_texture_color(cell: u32, frac_y: f32, frac_x: f32) -> (u8, u8, u8) {
         match cell {
             1 => {
-                // Brick pattern
                 let brick_y = (frac_y * 4.0) as u32;
                 let offset = if brick_y.is_multiple_of(2) { 0 } else { 4 };
                 let is_mortar =
@@ -537,7 +405,6 @@ impl Raycaster2D {
                 let tx = (frac_x * 5.0) as u32;
                 let ty = (frac_y * 5.0) as u32;
                 let tile_hue = ((tx * 73 + ty * 41) % 6) as f32 * 60.0;
-                // Inline HSV→RGB
                 let h = tile_hue % 360.0;
                 let s = 0.6f32;
                 let v = 0.8f32;

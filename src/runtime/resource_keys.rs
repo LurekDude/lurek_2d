@@ -1,72 +1,34 @@
-//! Typed resource keys for generational ID-based resource pools.
-//!
-//! Each key type maps to a specific resource category, preventing
-//! accidental cross-pool lookups at compile time.
-//!
-//! This module is part of Lurek2D's `engine` subsystem and provides the implementation
-//! details for resource keys-related operations and data management.
-//! Key types exported from this module: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `ShapeKey`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! Slot-map key declarations for runtime resource registries.
+//! Keeps handle types distinct across textures, shaders, meshes, and auxiliary assets.
 
 use slotmap::new_key_type;
-
 new_key_type! {
-    /// Key for texture resources stored in SharedState.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for texture storage entries.
     pub struct TextureKey;
-    /// Key for font resources stored in SharedState.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for font storage entries.
     pub struct FontKey;
-    /// Key for canvas off-screen render targets.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for render-canvas storage entries.
     pub struct CanvasKey;
-    /// Key for audio source entries in the Mixer.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for sound storage entries.
     pub struct SoundKey;
-    /// Key for particle system instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for particle system storage entries.
     pub struct ParticleKey;
-    /// Key for sprite batch instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for sprite-batch storage entries.
     pub struct SpriteBatchKey;
-    /// Key for custom shader instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for shader storage entries.
     pub struct ShaderKey;
-    /// Key for mesh instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for mesh storage entries.
     pub struct MeshKey;
-    /// Key for compound shape instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for compound-shape storage entries.
     pub struct ShapeKey;
-    /// Key for audio bus instances in the Mixer.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for audio bus storage entries.
     pub struct BusKey;
-    /// Key for MIDI player instances.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for MIDI player storage entries.
     pub struct MidiPlayerKey;
-    /// Key for queueable audio source instances in the Mixer.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for queued-audio playback entries.
     pub struct QueueableKey;
-    /// Key for light source instances in LightWorld.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for light storage entries.
     pub struct LightKey;
-    /// Key for shadow occluder instances in LightWorld.
-    /// # Fields
-    /// Opaque slotmap key — no public fields.
+    /// Key for occluder storage entries.
     pub struct OccluderKey;
 }

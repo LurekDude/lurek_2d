@@ -1,115 +1,119 @@
-//! AI module composition root and re-export surface for engine runtime.
-/// Autonomous agent with kinematic state (position, velocity) and pluggable
+//! AI subsystem — agents, decision models, steering, planning, and perception.
+//! Owns FSM, behavior tree, GOAP, HTN, utility AI, Q-learning, MCTS, neural-net,
+//! neuroevolution, ORCA, context steering, squad formation, needs, emotion, traits,
+//! dialogue, and director systems. Does not own rendering or physics integration.
+//! Depends on `crate::runtime::log_messages` for structured log codes.
+
+/// Core agent type and decision model wiring.
 pub mod agent;
-/// Hierarchical behavior tree with composite nodes (sequence, selector, parallel),
+/// Behavior tree nodes and execution runtime.
 pub mod behavior_tree;
-/// Typed key-value store with optional parent-chain lookup, used for sharing
+/// Shared key-value memory for AI systems.
 pub mod blackboard;
-/// RTS-style ordered command queue supporting enqueue, interrupt (push-front),
+/// Command queue for deferred AI actions.
 pub mod command_queue;
-/// Finite state machine with named states (enter/update/exit callbacks) and
+/// Finite-state machine helpers.
 pub mod fsm;
-/// Goal-Oriented Action Planning (GOAP) solver using A* search over boolean
+/// Goal-oriented action planning types.
 pub mod goap;
-/// Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning
+/// Reinforcement learning with a tabular Q-learner.
 pub mod qlearner;
-/// Debug render commands and image export for AI subsystems.
+/// AI-focused debug and visualization helpers.
 pub mod render;
-/// Squad coordination: named groups of agents with formation offset computation
+/// Squad membership and formation logic.
 pub mod squad;
-/// Reynolds-style autonomous steering behaviors (seek, flee, arrive, wander,
+/// Steering behaviors and movement guidance.
 pub mod steering;
-/// Multi-axis utility scorer: evaluates actions through response-curve
+/// Utility-AI scoring and action selection.
 pub mod utility_ai;
-/// Spatial AI container that owns all agents, provides O(1) name-based lookup,
+/// Abstract world view consumed by AI logic.
 pub mod world;
 
-// -- New subsystems --
-/// Multi-armed bandit: epsilon-greedy, UCB1, and Thompson sampling for online
+/// Multi-armed bandit strategies and statistics.
 pub mod bandit;
-/// Context steering: radial interest/danger ring evaluation producing smooth,
+/// Context-steering behavior composition.
 pub mod context_steering;
-/// AI Director: tension-driven dynamic pacing controller with phase state
-pub mod director;
-/// Dialogue AI: topic/branch selector driven by FSM state, BT status,
+/// Dialogue state, branches, and topic selection.
 pub mod dialogue;
-/// Emotion model: named affective dimensions (anger, fear, joy) that rise on
+/// Encounter pacing and high-level director logic.
+pub mod director;
+/// Emotion state tracking and decay.
 pub mod emotion;
-/// Genetic algorithm: tournament selection, uniform crossover, Gaussian
+/// Genetic algorithm primitives.
 pub mod genetic;
-/// Hierarchical Task Network (HTN) planner: compound task decomposition via
+/// Hierarchical task network planning.
 pub mod htn;
-/// AI Level-of-Detail: distance-based tier assignment and frame skip gating
+/// AI level-of-detail switching.
 pub mod lod;
-/// Monte Carlo Tree Search (MCTS): UCT-based game-tree search with
+/// Monte Carlo tree search support.
 pub mod mcts;
-/// Sims-style needs/drives: named satisfaction values that decay over time,
+/// Need evaluation and advertisement system.
 pub mod needs;
-/// Feedforward neural network for AI inference (forward pass only; train
+/// Feed-forward neural network helpers.
 pub mod neural_net;
-/// Neuroevolution: genetic algorithm wrapper specialised for evolving neural
+/// Neuroevolution orchestration.
 pub mod neuroevolution;
-/// ORCA: Optimal Reciprocal Collision Avoidance for smooth crowd navigation
+/// ORCA-based local avoidance.
 pub mod orca;
-/// Perception and sensing: sight cones, hearing radii, stimuli events, and
+/// Perception stimuli, sensors, and world state.
 pub mod perception;
-/// Strategic AI: throttled high-level goal evaluator that re-runs every N
+/// Higher-level strategy selection.
 pub mod strategy;
-/// Named float personality trait profiles with timed additive modifiers and
+/// Personality traits and archetype presets.
 pub mod traits;
 
-/// Agent model and decision mode exports.
+/// Base agent type and decision-model enum.
 pub use agent::{Agent, DecisionModel};
-/// Behavior tree node/status/runtime exports.
+/// Behavior tree nodes, statuses, and policies.
 pub use behavior_tree::{BTNode, BTStatus, BehaviorTree, ParallelPolicy};
-/// Blackboard container and typed value exports.
+/// Blackboard storage shared by AI systems.
 pub use blackboard::{Blackboard, BlackboardValue};
-/// Command queue command and queue exports.
+/// Deferred command queue and command variants.
 pub use command_queue::{Command, CommandQueue};
-/// FSM callbacks, machine, and transition exports.
+/// Finite-state machine building blocks.
 pub use fsm::{StateCallbacks, StateMachine, Transition};
-/// GOAP action, goal, and planner exports.
+/// GOAP planner inputs and planner type.
 pub use goap::{GOAPAction, GOAPGoal, GOAPPlanner};
-/// Tabular Q-learning runtime export.
+/// Tabular reinforcement learner.
 pub use qlearner::QLearner;
-/// Squad and formation shape exports.
+/// Squad container and formation mode.
 pub use squad::{FormationType, Squad};
-/// Steering behavior and helper exports.
+/// Steering behavior primitives and helpers.
 pub use steering::*;
-/// Utility AI action scoring exports.
+/// Utility-AI considerations, response curves, and actions.
 pub use utility_ai::{Consideration, ResponseCurve, UAAction, UtilityAI};
-/// World container export for AI runtime state.
+/// AI-facing world abstraction.
 pub use world::AIWorld;
 
-/// Multi-armed bandit strategy exports.
+/// Multi-armed bandit policies and arm stats.
 pub use bandit::{Bandit, BanditArm, BanditStrategy};
-/// Context steering behavior and solver exports.
+/// Context-steering behaviors and runtime type.
 pub use context_steering::{ContextBehavior, ContextBehaviorKind, ContextSteering};
-/// Director pacing controller exports.
-pub use director::{AIDirector, DirectorConfig, DirectorPhase};
-/// Dialogue topic, branch, and selector exports.
+/// Dialogue decision types.
 pub use dialogue::{DialogueAI, DialogueBranch, DialogueTopic};
-/// Emotion state and model exports.
+/// High-level encounter director types.
+pub use director::{AIDirector, DirectorConfig, DirectorPhase};
+/// Emotion model types.
 pub use emotion::{Emotion, EmotionModel};
-/// Genetic chromosome and algorithm exports.
+/// Genetic algorithm public types.
 pub use genetic::{Chromosome, GeneticAlgorithm};
-/// HTN task decomposition and planner exports.
+/// HTN planner domain and task types.
 pub use htn::{HTNDomain, HTNMethod, HTNPlanner, HTNTask, WorldState};
-/// AI level-of-detail tiering exports.
+/// AI level-of-detail types.
 pub use lod::{AILod, LodTier};
-/// Monte Carlo tree search exports.
+/// Monte Carlo tree search configuration and engine.
 pub use mcts::{MCTSConfig, MCTSEngine};
-/// Needs model and advertisement exports.
+/// Need system state and advertisements.
 pub use needs::{Need, NeedAdvertisement, NeedSystem};
-/// Neural net layers and activation exports.
+/// Neural-network layer and activation types.
 pub use neural_net::{Activation, NeuralLayer, NeuralNet};
-/// Neuroevolution runtime export.
+/// Neuroevolution entry point.
 pub use neuroevolution::Neuroevolution;
-/// ORCA crowd-avoidance exports.
+/// ORCA avoidance solver types.
 pub use orca::{ORCAAgent, ORCASolver};
-/// Perception sensors and stimuli exports.
+/// Perception events, sensors, and stimulus world.
 pub use perception::{DetectedStimulus, Sensor, Stimulus, StimulusType, StimulusWorld};
-/// Strategic planning exports.
+/// Strategy layer goals and controller.
 pub use strategy::{StrategicGoal, StrategyAI};
-/// Trait profile and modifier exports.
+/// Trait profiles, modifiers, and archetypes.
 pub use traits::{TraitArchetypes, TraitModifier, TraitProfile};

@@ -1,45 +1,12 @@
-//! Multi-level isometric tilemap for OpenXcom-style rendering.
-//!
-//! Each map cell holds four tile parts rendered in painter's algorithm order:
-//! `Floor`, `NorthWall`, `WestWall`, `Object`. Z-levels stack vertically with
-//! a configurable pixel offset so higher floors appear above lower ones.
-
-// ---------------------------------------------------------------------------
-// IsoTilePart
-// ---------------------------------------------------------------------------
-
-/// Named convenience constants for the default 4-part isometric layout.
-/// Games configured with a different `part_count` may assign any meaning to their slots.
-///
-/// # Variants
-/// - `Floor` — Floor variant.
-/// - `NorthWall` — NorthWall variant.
-/// - `WestWall` — WestWall variant.
-/// - `Object` — Object variant.
-///
-/// Matching OpenXcom's FLOOR → NORTH_WALL → WEST_WALL → OBJECT sequence
-/// ensures correct painter's algorithm occlusion within a single cell.
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IsoTilePart {
-    /// Ground surface — drawn first, lowest in the cell.
     Floor = 0,
-    /// Wall facing north (the top-right edge of the diamond).
     NorthWall = 1,
-    /// Wall facing west (the top-left edge of the diamond).
     WestWall = 2,
-    /// Object / furniture / unit sitting on top of the floor.
     Object = 3,
 }
-
 impl IsoTilePart {
-    /// Converts a 0-based index to an [`IsoTilePart`]. Returns `None` for indices ≥ 4.
-    ///
-    /// # Parameters
-    /// - `i` — `u32`.
-    ///
-    /// # Returns
-    /// `Option<Self>`.
     pub fn from_index(i: u32) -> Option<Self> {
         match i {
             0 => Some(Self::Floor),
@@ -49,65 +16,22 @@ impl IsoTilePart {
             _ => None,
         }
     }
-
-    /// Returns the 0-based index of this part. Consult the module-level documentation for the broader usage context and preconditions.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn index(self) -> u32 {
         self as u32
     }
 }
-
-// ---------------------------------------------------------------------------
-// IsoTile
-// ---------------------------------------------------------------------------
-
-/// One map cell containing per-slot GIDs. The number of slots equals the owning `IsoMap::part_count`.
-///
-/// # Fields
-/// - `parts` — `Vec<u32>`.
-///
-/// A GID of `0` means the slot is empty — `draw_iter` still yields the item
-/// so callers can decide whether to skip it.
 #[derive(Debug, Clone)]
 pub struct IsoTile {
-    /// Part slot GIDs. Length equals `IsoMap::part_count`. Index 0 is the first part.
-    /// Default 4-part schema: 0 = Floor, 1 = NorthWall, 2 = WestWall, 3 = Object.
     pub parts: Vec<u32>,
 }
-
-// ---------------------------------------------------------------------------
-// IsoLevel
-// ---------------------------------------------------------------------------
-
-/// One Z-level of the isometric map — a 2-D grid of [`IsoTile`]s.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `visible` — `bool`.
 #[derive(Debug, Clone)]
 pub struct IsoLevel {
-    /// Width of this level in tiles.
     pub width: u32,
-    /// Height of this level in tiles.
     pub height: u32,
-    /// When `false`, `draw_iter` skips all items from this level.
     pub visible: bool,
     tiles: Vec<IsoTile>,
 }
-
 impl IsoLevel {
-    /// Creates a new level filled with empty tiles (all GIDs = 0).
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    /// - `part_count` — `u32`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(width: u32, height: u32, part_count: u32) -> Self {
         let pc = part_count as usize;
         Self {
@@ -121,7 +45,6 @@ impl IsoLevel {
                 .collect(),
         }
     }
-
     fn index(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
             Some((y * self.width + x) as usize)
@@ -129,142 +52,37 @@ impl IsoLevel {
             None
         }
     }
-
-    /// Returns the [`IsoTile`] at `(x, y)`, or `None` if out of bounds.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `Option<&IsoTile>`.
     pub fn get_tile(&self, x: u32, y: u32) -> Option<&IsoTile> {
         self.index(x, y).map(|i| &self.tiles[i])
     }
-
-    /// Returns mutable access to the [`IsoTile`] at `(x, y)`, or `None` if OOB.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `Option<&mut IsoTile>`.
     pub fn get_tile_mut(&mut self, x: u32, y: u32) -> Option<&mut IsoTile> {
         self.index(x, y).map(|i| &mut self.tiles[i])
     }
 }
-
-// ---------------------------------------------------------------------------
-// IsoDrawItem
-// ---------------------------------------------------------------------------
-
-/// One renderable item produced by [`IsoMap::draw_iter`] in painter's order.
-///
-/// # Fields
-/// - `level` — `u32`.
-/// - `tile_x` — `u32`.
-/// - `tile_y` — `u32`.
-/// - `part` — `u32`.
-/// - `gid` — `u32`.
-/// - `screen_x` — `f32`.
-/// - `screen_y` — `f32`.
-///
-/// `level`, `tile_x`, `tile_y`, and `part` are all **0-based** Rust values.
-/// The Lua API converts them to 1-based before passing them to scripts.
 #[derive(Debug, Clone)]
 pub struct IsoDrawItem {
-    /// Z-level index (0-based).
     pub level: u32,
-    /// Tile column (0-based).
     pub tile_x: u32,
-    /// Tile row (0-based).
     pub tile_y: u32,
-    /// Part slot index (0-based). Meaning is defined by the owning IsoMap's part schema.
-    /// The default 4-part schema uses: 0 = Floor, 1 = NorthWall, 2 = WestWall, 3 = Object.
     pub part: u32,
-    /// Tile GID. `0` means the slot is empty.
     pub gid: u32,
-    /// Screen X position (top-left of the tile sprite).
     pub screen_x: f32,
-    /// Screen Y position (top-left of the tile sprite).
     pub screen_y: f32,
 }
-
-// ---------------------------------------------------------------------------
-// IsoMap
-// ---------------------------------------------------------------------------
-
-/// Multi-level isometric tilemap with painter's-algorithm draw iteration.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `tile_w` — `u32`.
-/// - `tile_h` — `u32`.
-/// - `level_height` — `u32`.
-/// - `origin_x` — `f32`.
-/// - `origin_y` — `f32`.
-/// - `part_count` — `u32`.
-/// - `part_order` — `Vec<u32>`.
-///
-/// # Coordinate system
-///
-/// ```text
-/// screen_x = origin_x + (tx - ty) * tile_w / 2
-/// screen_y = origin_y + (tx + ty) * tile_h / 2 - tz * level_height
-/// ```
-///
-/// # Draw order
-///
-/// [`draw_iter`](IsoMap::draw_iter) yields items in the correct painter's
-/// algorithm order for a standard isometric view with the camera positioned at
-/// the top-left corner:
-///
-/// 1. Diagonal `d = tx + ty` increases from `0` to `(W-1) + (H-1)`.
-/// 2. For each diagonal, tiles iterate in ascending `tx` order.
-/// 3. For each tile, Z-levels iterate from bottom (`0`) to `active_z`.
-/// 4. For each Z-level, parts iterate Floor → NorthWall → WestWall → Object.
-///
-/// # Fields
 #[derive(Debug, Clone)]
 pub struct IsoMap {
-    /// Map width in tiles (same for every level).
     pub width: u32,
-    /// Map height in tiles (same for every level).
     pub height: u32,
-    /// Tile footprint width in pixels (the full diamond width).
     pub tile_w: u32,
-    /// Tile footprint height in pixels (the full diamond height, typically tile_w / 2).
     pub tile_h: u32,
-    /// Vertical pixel offset between consecutive Z-levels.
     pub level_height: u32,
-    /// Screen X origin (pixel position of tile (0, 0) at level 0).
     pub origin_x: f32,
-    /// Screen Y origin (pixel position of tile (0, 0) at level 0).
     pub origin_y: f32,
-    /// Number of GID slots per tile. Default 4 (Floor, NorthWall, WestWall, Object).
     pub part_count: u32,
-    /// Draw order for parts — indices into the 0-based part slot range. Length must equal `part_count`.
     pub part_order: Vec<u32>,
     levels: Vec<IsoLevel>,
 }
-
 impl IsoMap {
-    /// Creates an [`IsoMap`] with no levels. Returns a fully initialised instance with all fields set to their initial values.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    /// - `tile_w` — `u32`.
-    /// - `tile_h` — `u32`.
-    /// - `level_height` — `u32`.
-    /// - `part_count` — `u32`. Number of GID slots per tile. Clamped to a minimum of 1.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// Add levels with [`add_level`](Self::add_level) before placing tiles.
     pub fn new(
         width: u32,
         height: u32,
@@ -287,68 +105,23 @@ impl IsoMap {
             levels: Vec::new(),
         }
     }
-
-    // -----------------------------------------------------------------------
-    // Level management
-    // -----------------------------------------------------------------------
-
-    /// Appends a new empty Z-level and returns its 0-based index.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn add_level(&mut self) -> usize {
         let idx = self.levels.len();
         self.levels
             .push(IsoLevel::new(self.width, self.height, self.part_count));
         idx
     }
-
-    /// Returns the number of Z-levels currently in the map.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn get_level_count(&self) -> usize {
         self.levels.len()
     }
-
-    /// Sets the visibility of level `z`. Invisible levels are skipped in [`draw_iter`](Self::draw_iter).
-    ///
-    /// # Parameters
-    /// - `z` — `usize`.
-    /// - `visible` — `bool`.
-    ///
-    /// Does nothing if `z` is out of range.
     pub fn set_level_visible(&mut self, z: usize, visible: bool) {
         if let Some(level) = self.levels.get_mut(z) {
             level.visible = visible;
         }
     }
-
-    /// Returns the visibility of level `z`, or `true` if `z` is out of range.
-    ///
-    /// # Parameters
-    /// - `z` — `usize`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn get_level_visible(&self, z: usize) -> bool {
         self.levels.get(z).is_none_or(|l| l.visible)
     }
-
-    // -----------------------------------------------------------------------
-    // Tile access
-    // -----------------------------------------------------------------------
-
-    /// Writes `gid` into the `part` slot of tile `(x, y)` on level `z`.
-    ///
-    /// # Parameters
-    /// - `z` — `usize`.
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    /// - `part` — `u32`.
-    /// - `gid` — `u32`.
-    ///
-    /// Out-of-bounds coordinates or invalid `part` values (>= part_count) are ignored.
     pub fn set_tile_part(&mut self, z: usize, x: u32, y: u32, part: u32, gid: u32) {
         if part >= self.part_count {
             return;
@@ -361,19 +134,6 @@ impl IsoMap {
             }
         }
     }
-
-    /// Reads the GID in the `part` slot of tile `(x, y)` on level `z`.
-    ///
-    /// # Parameters
-    /// - `z` — `usize`.
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    /// - `part` — `u32`.
-    ///
-    /// # Returns
-    /// `u32`.
-    ///
-    /// Returns `0` for any out-of-bounds access or invalid `part` (>= part_count).
     pub fn get_tile_part(&self, z: usize, x: u32, y: u32, part: u32) -> u32 {
         if part >= self.part_count {
             return 0;
@@ -383,15 +143,6 @@ impl IsoMap {
             .and_then(|l| l.get_tile(x, y))
             .map_or(0, |t| t.parts.get(part as usize).copied().unwrap_or(0))
     }
-
-    /// Fills every cell in level `z` with `gid` for the given `part`.
-    ///
-    /// # Parameters
-    /// - `z` — `usize`.
-    /// - `part` — `u32`.
-    /// - `gid` — `u32`.
-    ///
-    /// Does nothing if `z` is out of range or `part` >= part_count.
     pub fn fill_level(&mut self, z: usize, part: u32, gid: u32) {
         if part >= self.part_count {
             return;
@@ -404,38 +155,10 @@ impl IsoMap {
             }
         }
     }
-
-    // -----------------------------------------------------------------------
-    // Origin
-    // -----------------------------------------------------------------------
-
-    /// Sets the screen pixel origin — the position where tile `(0, 0)` at level `0` projects.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
     pub fn set_origin(&mut self, x: f32, y: f32) {
         self.origin_x = x;
         self.origin_y = y;
     }
-
-    // -----------------------------------------------------------------------
-    // Coordinate conversion
-    // -----------------------------------------------------------------------
-
-    /// Projects isometric tile coordinates `(tx, ty, tz)` to screen pixels.
-    ///
-    /// # Parameters
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `tz` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
-    ///
-    /// All inputs are 0-based floats; `tz` may be fractional for interpolation.
-    ///
-    /// Returns `(screen_x, screen_y)`.
     pub fn tile_to_screen(&self, tx: f32, ty: f32, tz: f32) -> (f32, f32) {
         let hw = self.tile_w as f32 / 2.0;
         let hh = self.tile_h as f32 / 2.0;
@@ -443,86 +166,40 @@ impl IsoMap {
         let sy = self.origin_y + (tx + ty) * hh - tz * self.level_height as f32;
         (sx, sy)
     }
-
-    /// Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
-    ///
-    /// # Parameters
-    /// - `sx` — `f32`.
-    /// - `sy` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
-    ///
-    /// Returns `(tx, ty)` as 0-based floats. Use `floor()` for integer cell lookup.
     pub fn screen_to_tile(&self, sx: f32, sy: f32) -> (f32, f32) {
         let rel_x = sx - self.origin_x;
         let rel_y = sy - self.origin_y;
         let hw = self.tile_w as f32 / 2.0;
         let hh = self.tile_h as f32 / 2.0;
-        // Inverse of: sx = (tx - ty) * hw,  sy = (tx + ty) * hh
         let tx = (rel_x / hw + rel_y / hh) / 2.0;
         let ty = (rel_y / hh - rel_x / hw) / 2.0;
         (tx, ty)
     }
-
-    // -----------------------------------------------------------------------
-    // Draw iteration
-    // -----------------------------------------------------------------------
-
-    /// Returns all draw items in painter's algorithm order for rendering up to
-    ///
-    /// # Parameters
-    /// - `active_z` — `usize`.
-    ///
-    /// # Returns
-    /// `Vec<IsoDrawItem>`.
-    /// and including level `active_z`.
-    ///
-    /// If `active_z` >= the number of levels, it is clamped to the last level.
-    ///
-    /// **Every** tile part is yielded, including those with `gid == 0`. Lua can
-    /// skip drawing when `gid == 0` to keep the Rust side simple.
-    ///
-    /// # Order
-    /// For each diagonal `d` (0 … W+H-2), for each `(tx, ty)` in that diagonal
-    /// with ascending `tx`, for each `z` in `0..=active_z` (if the level is
-    /// visible), for each part in Floor, NorthWall, WestWall, Object order.
     pub fn draw_iter(&self, active_z: usize) -> Vec<IsoDrawItem> {
         if self.levels.is_empty() || self.width == 0 || self.height == 0 {
             return Vec::new();
         }
-
         let max_z = active_z.min(self.levels.len() - 1);
         let w = self.width as usize;
         let h = self.height as usize;
-
         let pc = self.part_count as usize;
-        // Estimate capacity: W * H * (max_z+1) * part_count parts
         let mut items = Vec::with_capacity(w * h * (max_z + 1) * pc);
-
         let max_d = (w + h).saturating_sub(2);
-
         for d in 0..=max_d {
-            // tx ranges from max(0, d - (h-1)) to min(w-1, d)
             let tx_min = d.saturating_sub(h - 1);
             let tx_max = d.min(w - 1);
-
             for tx in tx_min..=tx_max {
                 let ty = d - tx;
-
                 for z in 0..=max_z {
                     let level = &self.levels[z];
                     if !level.visible {
                         continue;
                     }
-
                     let tile = match level.get_tile(tx as u32, ty as u32) {
                         Some(t) => t,
                         None => continue,
                     };
-
                     let (sx, sy) = self.tile_to_screen(tx as f32, ty as f32, z as f32);
-
                     for &part in &self.part_order {
                         let gid = tile.parts.get(part as usize).copied().unwrap_or(0);
                         items.push(IsoDrawItem {
@@ -538,39 +215,14 @@ impl IsoMap {
                 }
             }
         }
-
         items
     }
-
-    // -----------------------------------------------------------------------
-    // Part schema
-    // -----------------------------------------------------------------------
-
-    /// Returns the number of GID slots per tile.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn get_part_count(&self) -> u32 {
         self.part_count
     }
-
-    /// Returns the current draw order as a slice of part slot indices.
-    ///
-    /// # Returns
-    /// `&[u32]`.
     pub fn get_part_order(&self) -> &[u32] {
         &self.part_order
     }
-
-    /// Sets the draw order for tile parts. Each value is a 0-based slot index.
-    ///
-    /// # Parameters
-    /// - `order` — `Vec<u32>`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
-    ///
-    /// Returns `Err` if `order.len() != part_count` or any index >= `part_count`.
     pub fn set_part_order(&mut self, order: Vec<u32>) -> Result<(), String> {
         if order.len() != self.part_count as usize {
             return Err(format!(
@@ -591,4 +243,3 @@ impl IsoMap {
         Ok(())
     }
 }
-// ---------------------------------------------------------------------------

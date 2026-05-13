@@ -1,10 +1,13 @@
-//! Group-by aggregation and pivot table operations.
+//! Own grouped and correlated dataframe transformation methods extending `DataFrame`.
+//! Groups rows by a key column, aggregates across any supported `AggFn` mode, and builds
+//! cross-tabulation pivots. Also provides Pearson correlation between two numeric columns
+//! and a square correlation matrix over all numeric columns. All methods preserve first-seen
+//! key order, skip nil values in numeric paths, and return new frames without mutating self.
 
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
-
 impl DataFrame {
-    /// Group by column and aggregate; return (group_key, agg_value) frame.
     #[allow(clippy::needless_range_loop)]
+    /// Aggregate values by group key and return grouped result frame.
     pub fn group_agg(
         &self,
         group_col: ColRef,
@@ -25,10 +28,8 @@ impl DataFrame {
             AggFn::Last => "last",
         };
         let out_col = format!("{}_{}", agg_name_base, agg_label);
-
         let data = self.raw_data();
         let n = self.nrows();
-
         let mut key_order: Vec<String> = Vec::new();
         let mut groups: std::collections::HashMap<String, Vec<f64>> =
             std::collections::HashMap::new();
@@ -37,7 +38,6 @@ impl DataFrame {
         let mut last_vals: std::collections::HashMap<String, CellValue> =
             std::collections::HashMap::new();
         let mut counts: std::collections::HashMap<String, u64> = std::collections::HashMap::new();
-
         for i in 0..n {
             let key = format!("{}", data[gci][i]);
             if !groups.contains_key(&key) {
@@ -54,10 +54,8 @@ impl DataFrame {
             }
             last_vals.insert(key, data[aci][i].clone());
         }
-
         let mut key_col: Vec<CellValue> = Vec::new();
         let mut val_col: Vec<CellValue> = Vec::new();
-
         for key in &key_order {
             let nums = &groups[key];
             let agg_val = match agg_fn {
@@ -92,19 +90,13 @@ impl DataFrame {
             key_col.push(CellValue::Text(key.clone()));
             val_col.push(agg_val);
         }
-
         Ok(DataFrame::from_raw(
             vec![group_name, out_col],
             vec![key_col, val_col],
         ))
     }
-
-    // -----------------------------------------------------------------------
-    // Pivot table
-    // -----------------------------------------------------------------------
-
-    /// Build a pivot table.
     #[allow(clippy::needless_range_loop)]
+    /// Pivot row and column keys into cross-tabulated frame.
     pub fn pivot(
         &self,
         row_col: ColRef,
@@ -116,12 +108,10 @@ impl DataFrame {
         let vci = self.resolve_col(val_col)?;
         let data = self.raw_data();
         let n = self.nrows();
-
         let mut row_keys: Vec<String> = Vec::new();
         let mut col_keys: Vec<String> = Vec::new();
         let mut cells: std::collections::HashMap<(String, String), CellValue> =
             std::collections::HashMap::new();
-
         for i in 0..n {
             let rk = format!("{}", data[rci][i]);
             let ck = format!("{}", data[cci][i]);
@@ -135,16 +125,13 @@ impl DataFrame {
                 .entry((rk, ck))
                 .or_insert_with(|| data[vci][i].clone());
         }
-
         let mut col_names: Vec<String> = vec![self.columns()[rci].clone()];
         col_names.extend(col_keys.iter().cloned());
-
         let row_data: Vec<CellValue> = row_keys
             .iter()
             .map(|k| CellValue::Text(k.clone()))
             .collect();
         let mut out_data: Vec<Vec<CellValue>> = vec![row_data];
-
         for ck in &col_keys {
             let col: Vec<CellValue> = row_keys
                 .iter()
@@ -157,21 +144,14 @@ impl DataFrame {
                 .collect();
             out_data.push(col);
         }
-
         Ok(DataFrame::from_raw(col_names, out_data))
     }
-
-    // -----------------------------------------------------------------------
-    // Correlation
-    // -----------------------------------------------------------------------
-
-    /// Pearson correlation coefficient between two columns.
+    /// Compute Pearson correlation between two numeric columns.
     pub fn corr(&self, col_a: ColRef, col_b: ColRef) -> Result<f64, String> {
         let cia = self.resolve_col(col_a)?;
         let cib = self.resolve_col(col_b)?;
         let data = self.raw_data();
         let n = self.nrows();
-
         let pairs: Vec<(f64, f64)> = (0..n)
             .filter_map(
                 |i| match (data[cia][i].as_number(), data[cib][i].as_number()) {
@@ -180,7 +160,6 @@ impl DataFrame {
                 },
             )
             .collect();
-
         let k = pairs.len();
         if k < 2 {
             return Err("corr: need at least 2 paired non-nil rows".to_string());
@@ -203,26 +182,21 @@ impl DataFrame {
         }
         Ok(num / denom)
     }
-
-    /// Build a correlation matrix DataFrame for all numeric columns.
+    /// Build numeric-column correlation matrix frame.
     pub fn correlation_matrix(&self) -> DataFrame {
         let cols = self.columns();
         let data = self.raw_data();
-
         let num_cols: Vec<(usize, String)> = cols
             .iter()
             .enumerate()
             .filter(|(ci, _)| data[*ci].iter().any(|v| v.as_number().is_some()))
             .map(|(ci, n)| (ci, n.clone()))
             .collect();
-
         if num_cols.is_empty() {
             return DataFrame::new();
         }
-
         let n = self.nrows();
         let nc = num_cols.len();
-
         let corr_data: Vec<Vec<f64>> = (0..nc)
             .map(|i| {
                 (0..nc)
@@ -266,23 +240,19 @@ impl DataFrame {
                     .collect()
             })
             .collect();
-
         let mut col_names: Vec<String> = vec!["column".to_string()];
         col_names.extend(num_cols.iter().map(|(_, n)| n.clone()));
-
         let label_col: Vec<CellValue> = num_cols
             .iter()
             .map(|(_, n)| CellValue::Text(n.clone()))
             .collect();
         let mut out_data: Vec<Vec<CellValue>> = vec![label_col];
-
         for (j, _) in num_cols.iter().enumerate() {
             let col: Vec<CellValue> = (0..nc)
                 .map(|i| CellValue::Number(corr_data[i][j]))
                 .collect();
             out_data.push(col);
         }
-
         DataFrame::from_raw(col_names, out_data)
     }
 }

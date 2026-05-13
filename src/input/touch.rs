@@ -1,84 +1,29 @@
-//! Touch input state tracking for Lurek2D.
-//!
-//! This module is part of Lurek2D's `input` subsystem and provides the implementation
-//! details for touch-related operations and data management.
-//! Key types exported from this module: `TouchPoint`, `TouchState`.
-//! Primary functions: `new()`, `touch_start()`, `touch_move()`, `touch_end()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
 use std::collections::{HashMap, HashSet};
-
-/// Snapshot of one active touch point with its screen-space position and pressure.
-///
-/// # Fields
-/// - `id` — `u64`.
-/// - `x` — `f64`.
-/// - `y` — `f64`.
-/// - `pressure` — `f64`.
 #[derive(Debug, Clone, Copy)]
 pub struct TouchPoint {
-    /// Unique ID of this touch.
     pub id: u64,
-    /// X position in window coordinates.
     pub x: f64,
-    /// Y position in window coordinates.
     pub y: f64,
-    /// Pressure (0.0 to 1.0, if available).
     pub pressure: f64,
 }
-
-/// Tracks all active touch points by their winit-assigned finger ID.
-///
-/// # Fields
-/// - `touches` — `HashMap<u64`.
 #[derive(Debug, Default)]
 pub struct TouchState {
-    /// Currently active touch points, keyed by touch ID.
     touches: HashMap<u64, TouchPoint>,
-    /// Touch IDs that began this frame.
     touches_pressed: HashSet<u64>,
-    /// Touch IDs that ended this frame.
     touches_released: HashSet<u64>,
 }
-
 impl TouchState {
-    /// Creates a new empty touch state. Returns a fully initialised instance with all fields set to their initial values.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }
-
-    /// Clears per-frame touch transition flags.
-    ///
-    /// Call once at the start of each frame before processing touch events.
     pub fn begin_frame(&mut self) {
         self.touches_pressed.clear();
         self.touches_released.clear();
     }
-
-    /// Inserts a new touch start or updates the position and pressure of an ongoing touch.
-    ///
-    /// # Parameters
-    /// - `id` — `u64`.
-    /// - `x` — `f64`.
-    /// - `y` — `f64`.
-    /// - `pressure` — `f64`.
     pub fn touch_start(&mut self, id: u64, x: f64, y: f64, pressure: f64) {
         self.touches_pressed.insert(id);
         self.touches.insert(id, TouchPoint { id, x, y, pressure });
     }
-
-    /// Updates the position of an existing touch point.
-    ///
-    /// # Parameters
-    /// - `id` — `u64`.
-    /// - `x` — `f64`.
-    /// - `y` — `f64`.
-    /// - `pressure` — `f64`.
     pub fn touch_move(&mut self, id: u64, x: f64, y: f64, pressure: f64) {
         if let Some(touch) = self.touches.get_mut(&id) {
             touch.x = x;
@@ -86,49 +31,22 @@ impl TouchState {
             touch.pressure = pressure;
         }
     }
-
-    /// Removes a touch point when the finger is lifted (touch-end event).
-    ///
-    /// # Parameters
-    /// - `id` — `u64`.
     pub fn touch_end(&mut self, id: u64) {
         self.touches_released.insert(id);
         self.touches.remove(&id);
     }
-
-    /// Returns whether a touch with `id` started this frame.
     pub fn was_pressed(&self, id: u64) -> bool {
         self.touches_pressed.contains(&id)
     }
-
-    /// Returns whether a touch with `id` ended this frame.
     pub fn was_released(&self, id: u64) -> bool {
         self.touches_released.contains(&id)
     }
-
-    /// Returns all active touch points. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `Vec<TouchPoint>`.
     pub fn get_touches(&self) -> Vec<TouchPoint> {
         self.touches.values().copied().collect()
     }
-
-    /// Returns a specific touch point by ID. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Parameters
-    /// - `id` — `u64`.
-    ///
-    /// # Returns
-    /// `Option<TouchPoint>`.
     pub fn get_touch(&self, id: u64) -> Option<TouchPoint> {
         self.touches.get(&id).copied()
     }
-
-    /// Returns the number of active touches. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn get_touch_count(&self) -> usize {
         self.touches.len()
     }

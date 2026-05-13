@@ -1,8 +1,4 @@
-//! Built-in particle presets for common game effects.
-
 use crate::particle::{EmissionShape, ParticleConfig};
-
-/// Flame-like burst: warm colors, upward drift, short life.
 pub fn fire() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 80.0,
@@ -27,8 +23,6 @@ pub fn fire() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
-
-/// Soft smoke plume with slow movement and long fade.
 pub fn smoke() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 30.0,
@@ -53,8 +47,6 @@ pub fn smoke() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
-
-/// Downward rain streaks.
 pub fn rain() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 220.0,
@@ -69,8 +61,6 @@ pub fn rain() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
-
-/// Snow fall with gentle drift.
 pub fn snow() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 60.0,
@@ -86,8 +76,6 @@ pub fn snow() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
-
-/// Short-lived sparks with high initial speed.
 pub fn sparks() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 0.0,

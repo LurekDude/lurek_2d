@@ -247,8 +247,7 @@ mod server_tests {
             joins.push(std::thread::spawn(move || {
                 let msg = format!(
                     r#"{{"id":{},"method":"getClientCount","params":{{"nonce":"{}"}}}}"#,
-                    i,
-                    nonce_cloned
+                    i, nonce_cloned
                 );
                 handle_client_message(&msg, i as usize, &shared_cloned);
             }));
@@ -274,7 +273,9 @@ mod server_tests {
         });
 
         let mut stream = TcpStream::connect(addr).unwrap();
-        stream.set_read_timeout(Some(Duration::from_secs(1))).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .unwrap();
         let mut reader = BufReader::new(stream.try_clone().unwrap());
 
         writeln!(stream, "{{\"id\":1,\"method\":\"ping\"}}").unwrap();

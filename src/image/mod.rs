@@ -1,50 +1,18 @@
-//! CPU-side pixel-level image manipulation.
-//!
-//! Provides `ImageData` for reading and writing individual pixels in RGBA8 format,
-//! and `CompressedImageData` for holding DDS/DXT compressed GPU texture data.
-//!
-//! This module is part of Lurek2D's `image` subsystem and provides the implementation
-//! details for mod-related operations and data management.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
-/// RGBA8 pixel buffer with per-pixel read/write access.
 pub mod image_data;
 pub use image_data::ImageData;
-
-/// Image-processing effects (brightness, blur, sharpen, geometric transforms, etc.).
-pub mod effects;
-
-/// DDS/DXT compressed GPU texture data, loaded without CPU decompression.
 pub mod compressed;
+pub mod effects;
 pub use compressed::{CompressedFormat, CompressedImageData};
-
-/// Color palette lookup table mapping source colors to target colors for shader-based palette swapping.
 pub mod palette_lut;
 pub use palette_lut::PaletteLUT;
-
-/// Compositing layer stack: [`ImageLayer`] + [`LayeredImage`] with Porter-Duff "over" merge.
 pub mod layers;
 pub use layers::{ImageLayer, LayeredImage};
-
-/// Standalone visualization helpers for Tier 1 modules (animation, camera, etc.).
-pub mod visualization;
-
-/// Binary `.lim` format serialization for [`ImageData`] and [`LayeredImage`].
-pub mod serial;
-
-/// GPU render-command generation for [`ImageData`].
 pub mod render;
-
-/// GPU texture handle with dimensions, format, and filtering.
+pub mod serial;
 pub mod texture;
-/// Atlas of named sub-regions within a single texture.
 pub mod texture_atlas;
-
+pub mod visualization;
 pub use texture::{premultiply_alpha_rgba8_in_place, Texture, TextureColorSpace};
 pub use texture_atlas::{NineSliceInsets, TextureAtlas};
-
-/// Province pixel grid: O(1) coordinate lookup and single-pass adjacency detection.
 pub mod province_grid;
 pub use province_grid::{AdjacencyPair, ProvinceGrid};

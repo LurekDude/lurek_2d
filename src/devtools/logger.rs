@@ -1,21 +1,5 @@
-//! Scope: Level-filtered in-process logger with rolling history and timestamps.
-//! This file defines Logger, LogLevel, LogEntry, and history management.
-//! It owns level filtering, history eviction, and optional file output.
-
-use std::collections::VecDeque;
 use crate::devtools::time_anchor::TimeAnchor;
-
-// ── level ordering ─────────────────────────────────────────────────────────
-
-/// Log severity level.
-///
-/// # Variants
-/// - `Trace` — Most verbose; disabled by default.
-/// - `Debug` — Detailed diagnostics.
-/// - `Info` — Normal lifecycle events.
-/// - `Warn` — Recoverable unexpected conditions.
-/// - `Error` — Errors that affect correctness.
-/// - `Fatal` — Unrecoverable errors.
+use std::collections::VecDeque;
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
     Trace = 0,
@@ -25,15 +9,7 @@ pub enum LogLevel {
     Error = 4,
     Fatal = 5,
 }
-
 impl LogLevel {
-    /// Parse a case-insensitive level name string.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<LogLevel>`.
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_ascii_lowercase().as_str() {
@@ -46,11 +22,6 @@ impl LogLevel {
             _ => None,
         }
     }
-
-    /// Returns the canonical lowercase name string.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Trace => "trace",
@@ -62,65 +33,25 @@ impl LogLevel {
         }
     }
 }
-
-// ── single log entry ───────────────────────────────────────────────────────
-
-/// A single log entry captured in the rolling history.
-///
-/// # Fields
-/// - `level` — `String`.
-/// - `timestamp` — `f64`.
-/// - `message` — `String`.
-/// - `source` — `String`.
-/// - `line` — `u32`.
-/// - `category` — `Option<String>`.
 #[derive(Debug, Clone)]
 pub struct LogEntry {
-    /// Severity level name (e.g. `"info"`).
     pub level: String,
-    /// Seconds since the logger's epoch.
     pub timestamp: f64,
-    /// The log message text.
     pub message: String,
-    /// Source file or caller label.
     pub source: String,
-    /// Source line number (0 if unknown).
     pub line: u32,
-    /// Optional category tag for filtering (e.g. `"audio"`, `"physics"`).
     pub category: Option<String>,
 }
-
-// ── Logger ─────────────────────────────────────────────────────────────────
-
-/// Structured in-process logger with level filtering and rolling history.
-///
-/// # Fields
-/// - `min_level` — `LogLevel`.
-/// - `console_enabled` — `bool`.
-/// - `log_file` — `String`.
-/// - `history` — `VecDeque<LogEntry>`.
-/// - `max_history` — `usize`.
-/// - `epoch` — `Instant`.
 #[derive(Debug)]
 pub struct Logger {
-    /// Minimum level for a message to be recorded.
     pub min_level: LogLevel,
-    /// Mirror messages to stderr when `true`.
     pub console_enabled: bool,
-    /// Append messages to this path when non-empty.
     pub log_file: String,
-    /// Rolling history of recorded entries.
     pub history: VecDeque<LogEntry>,
-    /// Maximum number of entries retained.
     pub max_history: usize,
     epoch: TimeAnchor,
 }
-
 impl Logger {
-    /// Creates a new logger with sensible defaults (level = `Info`, console on, 1 000 entry history).
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self {
             min_level: LogLevel::Info,
@@ -131,23 +62,9 @@ impl Logger {
             epoch: TimeAnchor::new(),
         }
     }
-
-    /// Seconds elapsed since the logger was created.
-    ///
-    /// # Returns
-    /// `f64`.
     pub fn elapsed(&self) -> f64 {
         self.epoch.elapsed_seconds()
     }
-
-    /// Records a message at the given level, respecting the minimum filter.
-    ///
-    /// # Parameters
-    /// - `level` — `&str`.
-    /// - `message` — `&str`.
-    /// - `source` — `&str`.
-    /// - `line` — `u32`.
-    /// - `category` — `Option<&str>`.
     pub fn push(
         &mut self,
         level: &str,
@@ -198,14 +115,6 @@ impl Logger {
             let _ = self.history.pop_front();
         }
     }
-
-    /// Returns the last `count` entries (or all when `count` is `None` or zero).
-    ///
-    /// # Parameters
-    /// - `count` — `Option<usize>`.
-    ///
-    /// # Returns
-    /// `Vec<&LogEntry>`.
     pub fn tail(&self, count: Option<usize>) -> Vec<&LogEntry> {
         let n = match count {
             None | Some(0) => self.history.len(),
@@ -216,14 +125,6 @@ impl Logger {
             .skip(self.history.len().saturating_sub(n))
             .collect()
     }
-
-    /// Filters history by category tag (case-insensitive prefix match).
-    ///
-    /// # Parameters
-    /// - `cat` — `&str`.
-    ///
-    /// # Returns
-    /// `Vec<&LogEntry>`.
     pub fn filter_category<'a>(&'a self, cat: &str) -> Vec<&'a LogEntry> {
         let lower = cat.to_ascii_lowercase();
         self.history
@@ -236,13 +137,10 @@ impl Logger {
             })
             .collect()
     }
-
-    /// Clears all log history without changing settings.
     pub fn clear(&mut self) {
         self.history.clear();
     }
 }
-
 impl Default for Logger {
     fn default() -> Self {
         Self::new()

@@ -1,31 +1,20 @@
-//! CSS selector matcher — evaluates compiled selectors against a live element arena.
-//!
-//! Supports type, class (`.foo`), id (`#id`), attribute (`[attr]`, `[attr="val"]`),
-//! descendant (` `), and child (`>`) combinators.  Pseudo-classes are not yet
-//! implemented; they are silently ignored during matching.
-
 use crate::html::element::{HtmlElement, HtmlElementId};
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Combinator {
     Descendant,
     Child,
 }
-
 #[derive(Clone, Debug, Default)]
 struct SimpleSelector {
     tag: Option<String>,
     id: Option<String>,
     classes: Vec<String>,
 }
-
 #[derive(Clone, Debug)]
 struct SelectorPart {
     selector: SimpleSelector,
     combinator: Option<Combinator>,
 }
-
-/// Returns `true` if `element_id` satisfies the CSS `selector` within the element arena.
 pub(crate) fn matches_selector(
     elements: &[HtmlElement],
     element_id: HtmlElementId,
@@ -37,7 +26,6 @@ pub(crate) fn matches_selector(
     }
     matches_part_chain(elements, element_id, &parts, parts.len() - 1)
 }
-
 fn matches_part_chain(
     elements: &[HtmlElement],
     element_id: HtmlElementId,
@@ -72,7 +60,6 @@ fn matches_part_chain(
         }
     }
 }
-
 fn matches_simple(element: &HtmlElement, selector: &SimpleSelector) -> bool {
     if let Some(tag) = &selector.tag {
         if element.tag_name() != tag {
@@ -89,7 +76,6 @@ fn matches_simple(element: &HtmlElement, selector: &SimpleSelector) -> bool {
         .iter()
         .all(|class_name| element.has_class(class_name))
 }
-
 fn parse_selector(selector: &str) -> Vec<SelectorPart> {
     let mut parts = Vec::new();
     let mut token = String::new();
@@ -115,7 +101,6 @@ fn parse_selector(selector: &str) -> Vec<SelectorPart> {
     }
     parts
 }
-
 fn push_part(parts: &mut Vec<SelectorPart>, token: &mut String, combinator: Option<Combinator>) {
     let trimmed = token.trim();
     if !trimmed.is_empty() {
@@ -126,7 +111,6 @@ fn push_part(parts: &mut Vec<SelectorPart>, token: &mut String, combinator: Opti
     }
     token.clear();
 }
-
 fn parse_simple(token: &str) -> SimpleSelector {
     let mut selector = SimpleSelector::default();
     let mut cursor = 0;

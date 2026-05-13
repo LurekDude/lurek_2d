@@ -1,27 +1,9 @@
-//! Graph algorithms — connected components, cycle detection, topological sort.
-//!
-//! This module is part of Lurek2D's `graph` subsystem and provides the implementation
-//! details for algorithms-related operations and data management.
-//! Primary functions: `get_components()`, `has_cycle()`, `topological_sort()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
-use std::collections::{HashMap, HashSet, VecDeque};
-
 use super::core::Graph;
-
+use std::collections::{HashMap, HashSet, VecDeque};
 impl Graph {
-    /// Find weakly connected components (treating all edges as undirected).
-    ///
-    /// # Returns
-    /// `Vec<Vec<u64>>`.
-    /// Returns a vector of components, each a vector of node IDs.
     pub fn get_components(&self) -> Vec<Vec<u64>> {
         let mut visited: HashSet<u64> = HashSet::new();
         let mut components = Vec::new();
-
-        // Build adjacency list (undirected)
         let mut adj: HashMap<u64, HashSet<u64>> = HashMap::new();
         for &nid in self.nodes.keys() {
             adj.entry(nid).or_default();
@@ -34,7 +16,6 @@ impl Graph {
                 }
             }
         }
-
         for &nid in self.nodes.keys() {
             if visited.contains(&nid) {
                 continue;
@@ -43,7 +24,6 @@ impl Graph {
             let mut queue = VecDeque::new();
             queue.push_back(nid);
             visited.insert(nid);
-
             while let Some(current) = queue.pop_front() {
                 component.push(current);
                 if let Some(neighbors) = adj.get(&current) {
@@ -58,20 +38,12 @@ impl Graph {
             component.sort();
             components.push(component);
         }
-
         components
     }
-
-    /// Detect whether the directed graph contains a cycle (DFS-based).
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn has_cycle(&self) -> bool {
-        let mut white: HashSet<u64> = self.nodes.keys().copied().collect(); // unvisited
-        let mut gray: HashSet<u64> = HashSet::new(); // in current path
-        let mut black: HashSet<u64> = HashSet::new(); // fully processed
-
-        // Build directed adjacency list
+        let mut white: HashSet<u64> = self.nodes.keys().copied().collect();
+        let mut gray: HashSet<u64> = HashSet::new();
+        let mut black: HashSet<u64> = HashSet::new();
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
         for &nid in self.nodes.keys() {
             adj.entry(nid).or_default();
@@ -83,7 +55,6 @@ impl Graph {
                 }
             }
         }
-
         while let Some(&start) = white.iter().next() {
             if Self::dfs_cycle(start, &adj, &mut white, &mut gray, &mut black) {
                 return true;
@@ -91,8 +62,6 @@ impl Graph {
         }
         false
     }
-
-    /// Recursive DFS for cycle detection.
     fn dfs_cycle(
         node: u64,
         adj: &HashMap<u64, Vec<u64>>,
@@ -102,36 +71,26 @@ impl Graph {
     ) -> bool {
         white.remove(&node);
         gray.insert(node);
-
         if let Some(neighbors) = adj.get(&node) {
             for &next in neighbors {
                 if black.contains(&next) {
                     continue;
                 }
                 if gray.contains(&next) {
-                    return true; // back edge → cycle
+                    return true;
                 }
                 if Self::dfs_cycle(next, adj, white, gray, black) {
                     return true;
                 }
             }
         }
-
         gray.remove(&node);
         black.insert(node);
         false
     }
-
-    /// Topological sort using Kahn's algorithm.
-    ///
-    /// # Returns
-    /// `Option<Vec<u64>>`.
-    /// Returns `None` if the graph contains a cycle.
     pub fn topological_sort(&self) -> Option<Vec<u64>> {
-        // Build directed adjacency list and in-degree map
         let mut in_degree: HashMap<u64, usize> = HashMap::new();
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
-
         for &nid in self.nodes.keys() {
             in_degree.entry(nid).or_insert(0);
             adj.entry(nid).or_default();
@@ -144,20 +103,16 @@ impl Graph {
                 }
             }
         }
-
-        // Start with nodes that have no incoming edges
         let mut queue: VecDeque<u64> = in_degree
             .iter()
             .filter(|(_, &deg)| deg == 0)
             .map(|(&id, _)| id)
             .collect();
-        // Sort for deterministic output
         let mut sorted_start: Vec<u64> = queue.drain(..).collect();
         sorted_start.sort();
         for id in sorted_start {
             queue.push_back(id);
         }
-
         let mut result = Vec::new();
         while let Some(node) = queue.pop_front() {
             result.push(node);
@@ -177,34 +132,20 @@ impl Graph {
                 }
             }
         }
-
         if result.len() == self.nodes.len() {
             Some(result)
         } else {
-            None // cycle detected
+            None
         }
     }
-
-    /// Kruskal's Minimum Spanning Tree.
-    ///
-    /// # Returns
-    /// `Vec<u64>`.
-    ///
-    /// Treats all edges as undirected. Returns a list of edge IDs included in the MST.
-    /// Returns an empty vec if the graph is empty or has no edges.
     pub fn mst_kruskal(&self) -> Vec<u64> {
         if self.nodes.is_empty() {
             return Vec::new();
         }
-
-        // Collect and sort edges by weight (ascending)
         let mut sorted_edges: Vec<(&u64, f64)> =
             self.edges.iter().map(|(id, e)| (id, e.weight)).collect();
         sorted_edges.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
-
-        // Union-find with path compression
         let mut parent: HashMap<u64, u64> = self.nodes.keys().map(|&id| (id, id)).collect();
-
         fn find(parent: &mut HashMap<u64, u64>, x: u64) -> u64 {
             if parent[&x] != x {
                 let p = find(parent, parent[&x]);
@@ -212,7 +153,6 @@ impl Graph {
             }
             parent[&x]
         }
-
         let mut result = Vec::new();
         for (&edge_id, _) in &sorted_edges {
             let edge = &self.edges[&edge_id];
@@ -225,17 +165,7 @@ impl Graph {
         }
         result
     }
-
-    /// Greedy graph colouring (node-colouring, not edge-colouring).
-    ///
-    /// # Returns
-    /// `HashMap<u64, usize>`.
-    ///
-    /// Assigns each node the smallest non-negative integer colour that is not already used
-    /// by any adjacent node.  Treats all edges as undirected.  Returns an empty map when
-    /// the graph has no nodes.
     pub fn color_graph(&self) -> HashMap<u64, usize> {
-        // Build undirected adjacency list.
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
         for id in self.nodes.keys() {
             adj.entry(*id).or_default();
@@ -248,9 +178,7 @@ impl Graph {
                 }
             }
         }
-
         let mut colors: HashMap<u64, usize> = HashMap::new();
-        // Sort node IDs for deterministic output.
         let mut node_ids: Vec<u64> = self.nodes.keys().copied().collect();
         node_ids.sort_unstable();
         for id in node_ids {
@@ -263,14 +191,6 @@ impl Graph {
         }
         colors
     }
-
-    /// Bipartite check via 2-colouring BFS.
-    ///
-    /// # Returns
-    /// `bool`.
-    ///
-    /// Returns `true` when the graph is bipartite (all edges cross between the two sets).
-    /// Treats all edges as undirected.  A graph with no edges is trivially bipartite.
     pub fn is_bipartite(&self) -> bool {
         let mut color: HashMap<u64, u8> = HashMap::new();
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
@@ -285,7 +205,6 @@ impl Graph {
                 }
             }
         }
-
         for &start in self.nodes.keys() {
             if color.contains_key(&start) {
                 continue;
@@ -311,21 +230,6 @@ impl Graph {
         }
         true
     }
-
-    /// A* search from `from` to `to` using optional spatial positions for the heuristic.
-    ///
-    /// # Parameters
-    /// - `from` — `u64`.
-    /// - `to` — `u64`.
-    /// - `node_positions` — `&HashMap<u64, (f32, f32)>`.
-    ///
-    /// # Returns
-    /// `Option<Vec<u64>>`.
-    ///
-    /// `node_positions` maps node IDs to `(x, y)` coordinates. An empty map degrades to
-    /// Dijkstra (zero heuristic).
-    ///
-    /// Returns the ordered list of node IDs from `from` to `to`, or `None` if unreachable.
     pub fn astar_graph(
         &self,
         from: u64,
@@ -333,7 +237,6 @@ impl Graph {
         node_positions: &HashMap<u64, (f32, f32)>,
     ) -> Option<Vec<u64>> {
         use std::collections::BinaryHeap;
-
         #[derive(Clone)]
         struct ANode {
             id: u64,
@@ -356,14 +259,12 @@ impl Graph {
                     .unwrap_or(std::cmp::Ordering::Equal)
             }
         }
-
         if !self.nodes.contains_key(&from) || !self.nodes.contains_key(&to) {
             return None;
         }
         if from == to {
             return Some(vec![from]);
         }
-
         let goal_pos = node_positions.get(&to).copied();
         let heuristic = |id: u64| -> f32 {
             if let (Some((ax, ay)), Some((bx, by))) = (node_positions.get(&id), goal_pos) {
@@ -372,17 +273,14 @@ impl Graph {
                 0.0
             }
         };
-
         let mut g_cost: HashMap<u64, f32> = HashMap::new();
         let mut came_from: HashMap<u64, u64> = HashMap::new();
         let mut open: BinaryHeap<ANode> = BinaryHeap::new();
-
         g_cost.insert(from, 0.0);
         open.push(ANode {
             id: from,
             f: heuristic(from),
         });
-
         while let Some(ANode { id, .. }) = open.pop() {
             if id == to {
                 let mut path = vec![to];
@@ -395,7 +293,6 @@ impl Graph {
                 return Some(path);
             }
             let cur_g = *g_cost.get(&id).unwrap_or(&f32::MAX);
-
             for &edge_id in self.outgoing_edge_ids_slice(id) {
                 let Some(edge) = self.edges.get(&edge_id) else {
                     continue;
@@ -407,7 +304,6 @@ impl Graph {
                 if !self.nodes.contains_key(&nb) {
                     continue;
                 }
-
                 let new_g = cur_g + edge.weight.max(0.0) as f32;
                 if new_g < *g_cost.get(&nb).unwrap_or(&f32::MAX) {
                     g_cost.insert(nb, new_g);
@@ -418,7 +314,6 @@ impl Graph {
                     });
                 }
             }
-
             for &edge_id in self.incoming_edge_ids_slice(id) {
                 let Some(edge) = self.edges.get(&edge_id) else {
                     continue;
@@ -430,7 +325,6 @@ impl Graph {
                 if !self.nodes.contains_key(&nb) {
                     continue;
                 }
-
                 let new_g = cur_g + edge.weight.max(0.0) as f32;
                 if new_g < *g_cost.get(&nb).unwrap_or(&f32::MAX) {
                     g_cost.insert(nb, new_g);

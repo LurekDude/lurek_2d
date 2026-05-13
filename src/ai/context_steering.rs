@@ -1,92 +1,86 @@
-//! radial context-steering evaluator using interest and danger rings.
+//! Context steering grid sampler for interest and danger rings.
+//! Owns `ContextBehaviorKind`, `ContextBehavior`, and `ContextSteering`.
+//! Does not own pathfinding or physics; it computes direction bins only.
+//! Depends on `std::f32::consts::TAU` for ring-angle mapping.
 use std::f32::consts::{PI, TAU};
-
-// ---- Type: ContextBehaviorKind ----
-
-/// Variant of a context steering behavior defining how it fills the ring.
+/// Behavior kind used by context steering slots.
 #[derive(Clone)]
 pub enum ContextBehaviorKind {
-    /// Fill interest slots pointing toward `(x, y)` from the agent position.
+    /// Interest toward a target point.
     SeekTarget {
-        /// Target world position x.
+        /// Target X coordinate.
         x: f32,
-        /// Target world position y.
+        /// Target Y coordinate.
         y: f32,
     },
-    /// Fill danger slots pointing away from a point within a given radius.
+    /// Danger around a point within a radius.
     AvoidPoint {
-        /// Danger source position x.
+        /// Point X coordinate.
         x: f32,
-        /// Danger source position y.
+        /// Point Y coordinate.
         y: f32,
-        /// Radius within which this danger is relevant.
+        /// Avoidance radius.
         radius: f32,
     },
-    /// Fill interest toward slightly randomised directions for wandering.
+    /// Interest in a heading with jitter.
     Wander {
-        /// Current wander angle in radians (updated each `evaluate` call).
+        /// Current wander angle.
         angle: f32,
-        /// Maximum angle change per `evaluate` call in radians.
+        /// Angular jitter factor.
         jitter: f32,
     },
-    /// Fill interest in a fixed world-space direction (compass heading).
+    /// Interest in a fixed direction.
     Direction {
-        /// Direction in radians.
+        /// Direction angle in radians.
         angle: f32,
     },
-    /// Fill danger for slots pointing toward world bounds.
+    /// Danger near world bounds.
     AvoidBounds {
-        /// Left world boundary.
+        /// Minimum X bound.
         min_x: f32,
-        /// Bottom world boundary.
+        /// Minimum Y bound.
         min_y: f32,
-        /// Right world boundary.
+        /// Maximum X bound.
         max_x: f32,
-        /// Top world boundary.
+        /// Maximum Y bound.
         max_y: f32,
-        /// Distance from boundary at which danger begins.
+        /// Margin distance before avoidance starts.
         margin: f32,
     },
 }
-
-// ---- Type: ContextBehavior ----
-
-/// A single context steering behavior with a weight and enabled flag.
+/// Single behavior contribution to a context-steering ring.
 #[derive(Clone)]
 pub struct ContextBehavior {
-    /// What kind of fill this behavior performs.
+    /// Behavior kind.
     pub kind: ContextBehaviorKind,
-    /// Multiplier applied to scores written by this behavior.
+    /// Contribution weight.
     pub weight: f32,
-    /// If `true`, fills the interest ring; if `false`, fills the danger ring.
+    /// `true` for interest, `false` for danger.
     pub is_interest: bool,
-    /// When `false`, the behavior is ignored during evaluation.
+    /// Whether this behavior participates in evaluation.
     pub enabled: bool,
 }
-
-// ---- Type: ContextSteering ----
-
-/// Radial context steering evaluator producing a smooth, obstacle-aware movement direction.
+/// Slot-based steering accumulator with interest, danger, and result rings.
 pub struct ContextSteering {
+    /// Number of angular slots in the ring.
     slot_count: usize,
-    /// Interest ring: N slots, value = desire to go in that direction.
+    /// Interest weights by slot.
     interest: Vec<f32>,
-    /// Danger ring: N slots, value = danger of going in that direction.
+    /// Danger weights by slot.
     danger: Vec<f32>,
-    /// Result ring: interest - danger.
+    /// Final result weights by slot.
     result: Vec<f32>,
-    /// All registered behaviors.
+    /// Registered behaviors.
     behaviors: Vec<ContextBehavior>,
-    /// Chosen direction angle in radians from last evaluate call.
+    /// Chosen heading in radians from the last evaluation.
     chosen_dir: f32,
-    /// Chosen magnitude (0 if no interest).
+    /// Chosen magnitude from the last evaluation.
     chosen_magnitude: f32,
-    /// Running wander direction angle, mutated per evaluate.
+    /// Internal wander angle accumulator.
     wander_angle: f32,
 }
-
 impl ContextSteering {
-    /// Create a new context steering evaluator with `slot_count` direction slots.
+    /// Create a context-steering sampler with at least four slots.
     pub fn new(slot_count: usize) -> Self {
         let n = slot_count.max(4);
         Self {
@@ -100,13 +94,11 @@ impl ContextSteering {
             wander_angle: 0.0,
         }
     }
-
-    /// Return the number of direction slots.
+    /// Return the number of angular slots.
     pub fn slot_count(&self) -> usize {
         self.slot_count
     }
-
-    /// Add a behavior that fills the interest ring (where to go).
+    /// Add an interest behavior.
     pub fn add_interest(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -115,8 +107,7 @@ impl ContextSteering {
             enabled: true,
         });
     }
-
-    /// Add a behavior that fills the danger ring (where NOT to go).
+    /// Add a danger behavior.
     pub fn add_danger(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -125,13 +116,11 @@ impl ContextSteering {
             enabled: true,
         });
     }
-
-    /// Add a `SeekTarget` interest behavior pointing toward `(tx, ty)`.
+    /// Add a seek-target interest behavior.
     pub fn add_seek_target(&mut self, tx: f32, ty: f32, weight: f32) {
         self.add_interest(ContextBehaviorKind::SeekTarget { x: tx, y: ty }, weight);
     }
-
-    /// Add a `Wander` interest behavior.
+    /// Add a wander interest behavior.
     pub fn add_wander(&mut self, jitter: f32, weight: f32) {
         self.add_interest(
             ContextBehaviorKind::Wander {
@@ -141,13 +130,11 @@ impl ContextSteering {
             weight,
         );
     }
-
-    /// Add an `AvoidPoint` danger behavior.
+    /// Add a point-avoidance danger behavior.
     pub fn add_avoid_point(&mut self, x: f32, y: f32, radius: f32, weight: f32) {
         self.add_danger(ContextBehaviorKind::AvoidPoint { x, y, radius }, weight);
     }
-
-    /// Add an `AvoidBounds` danger behavior.
+    /// Add a world-bounds avoidance danger behavior.
     pub fn add_avoid_bounds(
         &mut self,
         min_x: f32,
@@ -168,28 +155,21 @@ impl ContextSteering {
             weight,
         );
     }
-
-    /// Clears all behaviors, resetting the evaluator to a blank state.
+    /// Remove all registered behaviors.
     pub fn clear_behaviors(&mut self) {
         self.behaviors.clear();
     }
-
-    /// Evaluates interest and danger rings from the current agent position and
+    /// Evaluate all behaviors and return the chosen steering direction vector.
     pub fn evaluate(&mut self, ax: f32, ay: f32, vx: f32, vy: f32) -> (f32, f32) {
-        // Reset rings
         for v in &mut self.interest {
             *v = 0.0;
         }
         for v in &mut self.danger {
             *v = 0.0;
         }
-
         let n = self.slot_count;
         let slot_angle = TAU / n as f32;
-
-        // Use a local copy of behaviors to avoid borrow conflicts
         let behaviors: Vec<ContextBehavior> = self.behaviors.clone();
-
         for b in &behaviors {
             if !b.enabled {
                 continue;
@@ -217,7 +197,6 @@ impl ContextSteering {
                     }
                 }
                 ContextBehaviorKind::Wander { jitter, .. } => {
-                    // Perturb wander angle each evaluation
                     let hash_jitter = ((ay * 7.3 + ax * 3.7 + vx + vy).sin() * 43_758.547) % 1.0;
                     self.wander_angle += (hash_jitter * 2.0 - 1.0) * jitter;
                     fill_cone(ring, self.wander_angle, slot_angle, b.weight, n);
@@ -232,7 +211,6 @@ impl ContextSteering {
                     max_y,
                     margin,
                 } => {
-                    // Write danger for slots pointing toward nearby bounds
                     if ax - min_x < *margin {
                         fill_cone(
                             ring,
@@ -272,8 +250,6 @@ impl ContextSteering {
                 }
             }
         }
-
-        // Compute result: interest masked by danger
         let mut best_idx = 0;
         let mut best_val = f32::NEG_INFINITY;
         for i in 0..n {
@@ -287,42 +263,28 @@ impl ContextSteering {
                 best_idx = i;
             }
         }
-
         if best_val <= 0.0 {
             self.chosen_magnitude = 0.0;
             return (0.0, 0.0);
         }
-
         let chosen_angle = best_idx as f32 * slot_angle;
         self.chosen_dir = chosen_angle;
         self.chosen_magnitude = best_val;
         (chosen_angle.cos(), chosen_angle.sin())
     }
-
-    /// Return the chosen direction angle from the last `evaluate` call (radians).
     pub fn chosen_direction(&self) -> f32 {
         self.chosen_dir
     }
-
-    /// Return the chosen magnitude (net interest score) from the last `evaluate` call.
     pub fn chosen_magnitude(&self) -> f32 {
         self.chosen_magnitude
     }
-
-    /// Return a copy of the current interest ring values.
     pub fn interest_map(&self) -> Vec<f32> {
         self.interest.clone()
     }
-
-    /// Return a copy of the current danger ring values.
     pub fn danger_map(&self) -> Vec<f32> {
         self.danger.clone()
     }
 }
-
-// ---- Type: Helpers ----
-
-/// Fills a gaussian-like lobe of slots centered on `target_angle`.
 #[allow(clippy::needless_range_loop)]
 fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, n: usize) {
     for i in 0..n {
@@ -334,8 +296,6 @@ fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, 
         }
     }
 }
-
-/// Normalised angular difference in `(-, ]`.
 fn angle_diff_f32(a: f32, b: f32) -> f32 {
     let mut d = a - b;
     while d > PI {
@@ -346,4 +306,3 @@ fn angle_diff_f32(a: f32, b: f32) -> f32 {
     }
     d
 }
-

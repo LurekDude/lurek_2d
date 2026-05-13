@@ -1,42 +1,19 @@
-//! Procedural world generation utilities.
-//!
-//! Cave maps, Voronoi diagrams, flood fill, Poisson disk sampling,
-//! noise functions, dungeon generators, heightmaps, WFC, L-systems,
-//! name generation, biome classification, and world-level topology graphs.
-
-/// Biome classification layer over heightmap and noise data.
 pub mod biome;
-/// Binary Space Partitioning dungeon generator.
 pub mod bsp;
-/// Cellular automata cave/dungeon generation.
 pub mod cellular;
-/// Shared scalar-map color conversion helpers.
 pub mod color;
-/// BFS flood fill on a flat grid.
 pub mod flood_fill;
-/// Heightmap generation using fractal noise, erosion, and normalization.
 pub mod heightmap;
-/// Linear congruential generator for deterministic procgen.
 pub mod lcg;
-/// L-system string rewriter for procedural plant/structure generation.
 pub mod lsystem;
-/// Markov chain name generator.
 pub mod namegen;
-/// Procedural noise functions and generators: Perlin, Simplex, Worley, fractal combinators.
 pub mod noise;
-/// Poisson disk sampling for point distribution.
 pub mod poisson;
-/// Procedural generation visualization: `NoiseGrid`.
 pub mod render;
-/// Rooms-and-corridors dungeon generator.
 pub mod rooms;
-/// Voronoi diagram generation with optional warp.
 pub mod voronoi;
-/// Wave Function Collapse tile grid generator.
 pub mod wfc;
-/// World-level topology graph with pathfinding and MST.
 pub mod world_graph;
-
 pub use biome::{biome_map_to_rgba, BiomeClassifier, BiomeRules, BiomeType};
 pub use bsp::{
     bsp_dungeon, bsp_dungeon_with_prefabs, BspDungeon, BspOpts, BspPrefabStamp, BspRoom,

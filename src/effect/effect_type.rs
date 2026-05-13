@@ -1,87 +1,31 @@
-//! Built-in post-processing effect type definitions.
-//!
-//! Enumerates all shader passes recognised by the engine's post-processing
-//! pipeline and provides parameter presets for each.
-
 use std::collections::HashMap;
-
-/// Built-in effect types for the post-processing pipeline.
-///
-/// Each variant maps to a distinct full-screen shader pass implemented in
-/// `lua_api`. The `Custom` variant defers to an external shader ID supplied
-/// via `PostFxEffect::new_custom`. Use `PostFxEffectType::from_name` to
-/// parse effect names from Lua strings, and `PostFxEffect::default_params`
-/// to retrieve the canonical starting parameters for each type.
-///
-/// # Variants
-/// - `Bloom` — HDR bloom with threshold and intensity parameters.
-/// - `Blur` — Gaussian blur with configurable radius and strength.
-/// - `Crt` — CRT monitor simulation with scanline strength.
-/// - `Godrays` — Light ray / god ray screen-space effect with intensity.
-/// - `Vignette` — Screen edge darkening with configurable strength.
-/// - `ColourGrade` — Colour grading with brightness, contrast, and saturation.
-/// - `Chromatic` — Chromatic aberration with pixel offset.
-/// - `Pixelate` — Block pixelation effect with configurable block size.
-/// - `Sepia` — Warm sepia tone mapping with configurable strength.
-/// - `Grayscale` — Desaturate to greyscale with configurable strength.
-/// - `Invert` — Colour inversion with configurable strength.
-/// - `Scanlines` — Horizontal scanline bars (CRT-free) with strength and spacing.
-/// - `EdgeDetect` — Sobel edge detection outline with configurable strength.
-/// - `HueShift` — Hue rotation in degrees.
-/// - `Noise` — Random per-pixel noise with configurable strength.
-/// - `Custom` — User-provided shader pass created via `newPass()`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PostFxEffectType {
-    /// HDR bloom with threshold + intensity parameters.
     Bloom,
-    /// Gaussian blur with radius parameter.
     Blur,
-    /// CRT monitor simulation with scanline strength.
     Crt,
-    /// Light ray / god ray effect with intensity.
     Godrays,
-    /// Screen edge darkening with strength.
     Vignette,
-    /// Colour grading / tone mapping.
     ColourGrade,
-    /// Chromatic aberration with offset.
     Chromatic,
-    /// Block pixelation effect.
     Pixelate,
-    /// Warm sepia tone mapping.
     Sepia,
-    /// Desaturate to greyscale.
     Grayscale,
-    /// Colour inversion.
     Invert,
-    /// Horizontal scanline bars (CRT-free).
     Scanlines,
-    /// Sobel edge detection outline.
     EdgeDetect,
-    /// Hue rotation in degrees.
     HueShift,
-    /// Random per-pixel noise.
     Noise,
-    /// Custom shader pass (created via `newPass()`).
     Custom,
-    /// Radial blur simulating a camera depth-of-field effect.
     DepthOfField,
-    /// Accumulative directional motion blur.
     MotionBlur,
-    /// Palette-based colour remapping using a lookup texture.
     PaletteSwap,
-    /// 3D LUT-based colour grading for cinematic tones.
     ColorLut,
-    /// UV-distortion wave simulating water or heat shimmer.
     WaterDistort,
-    /// Unsharp-mask sharpening pass.
     Sharpen,
-    /// Ordered Bayer-matrix dithering for retro palette reduction.
     Dither,
-    /// Sobel-edge outline tinted with a configurable colour.
     Outline,
 }
-
 impl PostFxEffectType {
     const NAME_MAP: &'static [(Self, &'static str)] = &[
         (Self::Bloom, "bloom"),
@@ -109,7 +53,6 @@ impl PostFxEffectType {
         (Self::Dither, "dither"),
         (Self::Outline, "outline"),
     ];
-
     const BUILT_IN_TYPES: &'static [Self] = &[
         Self::Bloom,
         Self::Blur,
@@ -135,33 +78,18 @@ impl PostFxEffectType {
         Self::Dither,
         Self::Outline,
     ];
-
-    /// Parses a string name into an effect type.
-    ///
-    /// # Parameters
-    /// - `name` — `&str` — One of the built-in effect names.
-    ///
-    /// # Returns
-    /// `Option<Self>` — `None` if the name is unrecognised.
     pub fn from_name(name: &str) -> Option<Self> {
         Self::BUILT_IN_TYPES
             .iter()
             .copied()
             .find(|effect_type| effect_type.name() == name)
     }
-
-    /// Returns names of all built-in (non-custom) effect types.
     pub fn built_in_names() -> Vec<&'static str> {
         Self::BUILT_IN_TYPES
             .iter()
             .map(|effect_type| effect_type.name())
             .collect()
     }
-
-    /// Returns the string name of this effect type.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn name(&self) -> &'static str {
         Self::NAME_MAP
             .iter()
@@ -169,8 +97,6 @@ impl PostFxEffectType {
             .map(|(_, name)| *name)
             .expect("PostFxEffectType::NAME_MAP must include every enum variant")
     }
-
-    /// Returns an uppercase label suitable for debug overlays and visual catalogs.
     pub fn debug_label(&self) -> &'static str {
         match self {
             Self::Vignette => "VIGNETTE",
@@ -199,19 +125,6 @@ impl PostFxEffectType {
             Self::Outline => "OUTLINE",
         }
     }
-
-    /// Returns the default parameters for this built-in effect type.
-    ///
-    /// Each built-in effect ships with carefully chosen defaults that look
-    /// reasonable out of the box: bloom at 0.7 threshold / 1.0 intensity;
-    /// blur at radius 2.0 / strength 1.0; CRT scanlines at 0.3; godrays at
-    /// intensity 1.0; vignette at strength 0.5; colour grading at neutral
-    /// 1.0 / 1.0 / 1.0; chromatic aberration at offset 2.0. Returns an
-    /// empty map for `Custom` effects since custom shaders define their own
-    /// uniform interfaces.
-    ///
-    /// # Returns
-    /// `HashMap<String, f32>` — Canonical default parameters for this effect.
     pub fn default_params(&self) -> HashMap<String, f32> {
         let mut m = HashMap::new();
         match self {

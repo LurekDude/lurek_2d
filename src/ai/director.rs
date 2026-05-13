@@ -1,21 +1,19 @@
-//! pacing director that maps gameplay pressure to AI phase decisions.
-// ---- Type: DirectorPhase ----
-
-/// Current pacing phase of the AI Director state machine.
+//! AI director tension model controlling encounter pacing and spawn pressure.
+//! Owns `DirectorPhase`, `DirectorConfig`, and `AIDirector`.
+//! Does not own combat spawns; it only computes pacing scalars.
+/// Director pacing phase.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectorPhase {
-    /// Tension is rising; enemies begin massing.
+    /// Tension is rising toward a peak.
     BuildUp,
-    /// Tension at maximum; peak aggression spawn rates.
+    /// Peak pressure phase.
     Peak,
-    /// Post-peak high-tension window before relief.
+    /// High pressure maintained after a peak.
     Sustain,
-    /// Tension fell below relief threshold; loot/safety period.
+    /// Low pressure recovery phase.
     Relief,
 }
-
 impl DirectorPhase {
-    /// Return the canonical string label for this phase.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::BuildUp => "build_up",
@@ -25,27 +23,24 @@ impl DirectorPhase {
         }
     }
 }
-
-// ---- Type: DirectorConfig ----
-
-/// Configuration thresholds and decay rates for [`AIDirector`].
+/// Tunable thresholds for the AI director.
 pub struct DirectorConfig {
-    /// Tension lost per second when no events arrive.
+    /// Tension decay per second.
     pub tension_decay_rate: f32,
-    /// Tension level `[0, 1]` at which the director enters `Peak` phase.
+    /// Tension threshold that triggers a peak phase.
     pub peak_threshold: f32,
-    /// Tension level `[0, 1]` below which relief is triggered after sustain.
+    /// Tension threshold below which recovery can begin.
     pub relief_threshold: f32,
-    /// How many seconds the director spends in `Sustain` before allowing relief.
+    /// Minimum sustain time after a peak.
     pub sustain_duration: f32,
-    /// Maximum tension delta added from a single event, regardless of pushed intensity.
+    /// Maximum tension added by one event.
     pub max_tension_per_event: f32,
-    /// Multiplier applied to game's spawn rate during peak/sustain phases.
+    /// Spawn multiplier used during high pressure.
     pub peak_spawn_factor: f32,
-    /// Multiplier applied to game's loot rate during relief phase.
+    /// Loot multiplier used during relief.
     pub relief_loot_factor: f32,
 }
-
+/// `Default` provides the tuned pacing config used by `AIDirector::new`.
 impl Default for DirectorConfig {
     fn default() -> Self {
         Self {
@@ -59,24 +54,23 @@ impl Default for DirectorConfig {
         }
     }
 }
-
-// ---- Type: AIDirector ----
-
-/// Dynamic pacing and difficulty director.
+/// Runtime director state used by pacing systems.
 pub struct AIDirector {
-    /// Pacing configuration.
+    /// Active tuning values.
     pub config: DirectorConfig,
+    /// Current tension in `[0, 1]`.
     tension: f32,
+    /// Current pacing phase.
     phase: DirectorPhase,
+    /// Time spent in sustain phase.
     sustain_timer: f32,
-    /// Total elapsed time in seconds since director was created.
+    /// Time since creation or last reset.
     elapsed: f32,
-    /// Total number of events pushed since creation.
+    /// Total number of submitted events.
     total_events: u32,
 }
-
 impl AIDirector {
-    /// Create a new director with default configuration starting in `Relief` phase.
+    /// Create a director with default config.
     pub fn new() -> Self {
         Self {
             config: DirectorConfig::default(),
@@ -87,8 +81,7 @@ impl AIDirector {
             total_events: 0,
         }
     }
-
-    /// Create a director with a custom configuration.
+    /// Create a director with a custom config.
     pub fn with_config(config: DirectorConfig) -> Self {
         Self {
             config,
@@ -99,52 +92,40 @@ impl AIDirector {
             total_events: 0,
         }
     }
-
-    /// Return the current tension level in `[0.0, 1.0]`.
+    /// Return the current tension.
     pub fn tension(&self) -> f32 {
         self.tension
     }
-
-    /// Return the current pacing phase.
+    /// Return the current phase.
     pub fn phase(&self) -> DirectorPhase {
         self.phase
     }
-
-    /// Return the current phase as a string label.
+    /// Return the current phase as a string tag.
     pub fn phase_str(&self) -> &'static str {
         self.phase.as_str()
     }
-
-    /// Return the total elapsed time in seconds.
+    /// Return elapsed seconds.
     pub fn elapsed(&self) -> f32 {
         self.elapsed
     }
-
-    /// Return the total number of events pushed to this director.
+    /// Return total events received.
     pub fn total_events(&self) -> u32 {
         self.total_events
     }
-
-    /// Pushes a stress event that raises tension. `intensity` is clamped to `max_tension_per_event` before being added to the current tension level.
+    /// Add one event and clamp the resulting tension to `[0, 1]`.
     pub fn push_event(&mut self, intensity: f32) {
         let clamped = intensity.clamp(0.0, self.config.max_tension_per_event);
         self.tension = (self.tension + clamped).clamp(0.0, 1.0);
         self.total_events += 1;
     }
-
-    /// Advances the director by `dt` seconds. Decays tension, transitions between pacing phases, and advances the sustain timer.
+    /// Advance the director and update phase transitions.
     pub fn update(&mut self, dt: f32) {
         self.elapsed += dt;
-
-        // Decay tension
         if self.phase != DirectorPhase::Peak && self.phase != DirectorPhase::Sustain {
             self.tension = (self.tension - self.config.tension_decay_rate * dt).max(0.0);
         } else {
-            // Slower decay during high phases
             self.tension = (self.tension - self.config.tension_decay_rate * 0.3 * dt).max(0.0);
         }
-
-        // Phase transitions
         match self.phase {
             DirectorPhase::Relief | DirectorPhase::BuildUp => {
                 if self.tension >= self.config.peak_threshold {
@@ -170,8 +151,7 @@ impl AIDirector {
             }
         }
     }
-
-    /// Return a spawn rate multiplier for game systems.
+    /// Return the current spawn rate multiplier.
     pub fn spawn_rate_factor(&self) -> f32 {
         match self.phase {
             DirectorPhase::BuildUp => {
@@ -181,8 +161,7 @@ impl AIDirector {
             DirectorPhase::Relief => 0.25,
         }
     }
-
-    /// Return a loot drop multiplier for game systems (highest during relief).
+    /// Return the current loot multiplier.
     pub fn loot_factor(&self) -> f32 {
         match self.phase {
             DirectorPhase::Relief => self.config.relief_loot_factor,
@@ -190,8 +169,7 @@ impl AIDirector {
             DirectorPhase::Peak | DirectorPhase::Sustain => 0.5,
         }
     }
-
-    /// Return an ambient intensity value `[0.0, 1.0]` for music and atmosphere.
+    /// Return the current ambient intensity scalar.
     pub fn ambient_intensity(&self) -> f32 {
         match self.phase {
             DirectorPhase::Peak => (self.tension * 0.5 + 0.5).clamp(0.0, 1.0),
@@ -200,20 +178,18 @@ impl AIDirector {
             DirectorPhase::Relief => (self.tension * 0.5).max(0.1),
         }
     }
-
-    /// Manually overrides the tension to a specific value (for scripted sequences).
+    /// Set tension directly and clamp it to `[0, 1]`.
     pub fn set_tension(&mut self, value: f32) {
         self.tension = value.clamp(0.0, 1.0);
     }
-
-    /// Resets tension to zero and transitions to Relief phase.
+    /// Reset tension, phase, and timers to their initial state.
     pub fn reset(&mut self) {
         self.tension = 0.0;
         self.phase = DirectorPhase::Relief;
         self.sustain_timer = 0.0;
     }
 }
-
+/// `Default` delegates to `AIDirector::new`.
 impl Default for AIDirector {
     fn default() -> Self {
         Self::new()

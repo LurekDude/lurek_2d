@@ -1,42 +1,16 @@
-//! Heightmap generation using fractal noise, erosion, and normalization.
-//!
-//! Produces a 2D grid of elevation values in [0, 1] suitable for terrain generation,
-//! shadow maps, or any application requiring smooth height data.
-
 use crate::procgen::noise::{FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
 use crate::procgen::scalar_map_to_rgba_bytes;
-
-/// Options for heightmap generation.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `scale` — `f64`.
-/// - `octaves` — `u32`.
-/// - `lacunarity` — `f64`.
-/// - `persistence` — `f64`.
-/// - `seed` — `u64`.
-/// - `erosion_passes` — `u32`.
 #[derive(Debug, Clone)]
 pub struct HeightmapOpts {
-    /// Map width in cells.
     pub width: u32,
-    /// Map height in cells.
     pub height: u32,
-    /// Coordinate scale (zoom). Larger = more zoomed out.
     pub scale: f64,
-    /// Number of noise octaves for fractal detail.
     pub octaves: u32,
-    /// Frequency multiplier per octave.
     pub lacunarity: f64,
-    /// Amplitude multiplier per octave (persistence).
     pub persistence: f64,
-    /// Random seed.
     pub seed: u64,
-    /// Number of hydraulic erosion passes.
     pub erosion_passes: u32,
 }
-
 impl Default for HeightmapOpts {
     fn default() -> Self {
         Self {
@@ -51,31 +25,13 @@ impl Default for HeightmapOpts {
         }
     }
 }
-
-/// A 2D heightmap with float elevation values.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `cells` — `Vec<f32>`.
 #[derive(Debug, Clone)]
 pub struct Heightmap {
-    /// Map width.
     pub width: u32,
-    /// Map height.
     pub height: u32,
-    /// Elevation values in row-major order.
     pub cells: Vec<f32>,
 }
-
 impl Heightmap {
-    /// Generate a heightmap from the given options.
-    ///
-    /// # Parameters
-    /// - `opts` — `&HeightmapOpts`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn generate(opts: &HeightmapOpts) -> Self {
         let gen = NoiseGenerator::new(opts.seed);
         let map_opts = MapGenOptions {
@@ -89,10 +45,8 @@ impl Heightmap {
             offset_x: 0.0,
             offset_y: 0.0,
         };
-
         let raw = gen.generate_map(opts.width, opts.height, &map_opts);
         let cells: Vec<f32> = raw.iter().map(|&v| v as f32).collect();
-
         let mut hm = Self {
             width: opts.width,
             height: opts.height,
@@ -105,10 +59,6 @@ impl Heightmap {
         }
         hm
     }
-
-    /// Builds a heightmap from an existing flat scalar array.
-    ///
-    /// Missing values are filled with `0.0` and excess values are ignored.
     pub fn from_noise_map(width: u32, height: u32, values: &[f64]) -> Self {
         let len = (width * height) as usize;
         let mut cells = Vec::with_capacity(len);
@@ -123,10 +73,6 @@ impl Heightmap {
         hm.normalize();
         hm
     }
-
-    /// Converts a cellular map (`0`/`1`) into a normalized heightmap.
-    ///
-    /// Cells equal to `floor_value` become 0.0, all others become 1.0.
     pub fn from_cellular(width: u32, height: u32, cells: &[u8], floor_value: u8) -> Self {
         let len = (width * height) as usize;
         let mut out = Vec::with_capacity(len);
@@ -140,27 +86,15 @@ impl Heightmap {
             cells: out,
         }
     }
-
-    /// Get the elevation at `(x, y)`, clamped to valid range.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get(&self, x: u32, y: u32) -> f32 {
         let x = x.min(self.width.saturating_sub(1));
         let y = y.min(self.height.saturating_sub(1));
         self.cells[(y * self.width + x) as usize]
     }
-
     fn set(&mut self, x: u32, y: u32, v: f32) {
         let idx = (y * self.width + x) as usize;
         self.cells[idx] = v;
     }
-
-    /// Normalize all elevation values to [0, 1].
     pub fn normalize(&mut self) {
         let min = self.cells.iter().cloned().fold(f32::MAX, f32::min);
         let max = self.cells.iter().cloned().fold(f32::MIN, f32::max);
@@ -172,13 +106,6 @@ impl Heightmap {
             *v = (*v - min) / range;
         }
     }
-
-    /// Apply simplified hydraulic erosion: sediment flows from high to low neighbours.
-    ///
-    /// # Parameters
-    /// - `passes` — `u32`.
-    ///
-    /// Each pass moves a fraction of height from each cell to its lowest neighbor.
     pub fn erode(&mut self, passes: u32) {
         for _ in 0..passes {
             let w = self.width;
@@ -186,7 +113,6 @@ impl Heightmap {
             for y in 0..h {
                 for x in 0..w {
                     let center = self.get(x, y);
-                    // Find the lowest of 4-directional neighbours
                     let dirs: [(i32, i32); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
                     let mut lowest_val = center;
                     let mut lowest_dir: Option<(u32, u32)> = None;
@@ -212,11 +138,6 @@ impl Heightmap {
             }
         }
     }
-
-    /// Convert the heightmap to RGBA bytes (grayscale: `r = g = b = height * 255`, `a = 255`).
-    ///
-    /// # Returns
-    /// `Vec<u8>`.
     pub fn to_rgba_bytes(&self) -> Vec<u8> {
         scalar_map_to_rgba_bytes(&self.cells)
     }

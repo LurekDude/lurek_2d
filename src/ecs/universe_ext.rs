@@ -1,9 +1,7 @@
 use super::Universe;
 use crate::ecs::lua_table::deep_copy_table;
 use mlua::{Function, Lua, Result as LuaResult, Table, Value as LuaValue};
-
 impl Universe {
-    /// Returns alive entities that have ALL `with` components and NONE of the `without` components.
     pub fn query_not(
         &self,
         lua: &Lua,
@@ -27,7 +25,6 @@ impl Universe {
                         result.push(Self::pack_id(slot, self.current_gen(slot)));
                     }
                 } else if with_names.is_empty() {
-                    // Entity with no components passes if no `with` filter.
                     result.push(Self::pack_id(slot, self.current_gen(slot)));
                 }
             }
@@ -37,8 +34,6 @@ impl Universe {
         result.sort();
         Ok(result)
     }
-
-    /// Calls `callback(id, comp1, comp2, …)` for every alive entity that has ALL listed components.
     pub fn query_multi(&self, lua: &Lua, names: &[String], callback: Function) -> LuaResult<()> {
         if names.is_empty() {
             return Ok(());
@@ -71,8 +66,6 @@ impl Universe {
         }
         Ok(())
     }
-
-    /// Spawns `count` entities from a blueprint, applying the same optional overrides to each.
     pub fn spawn_bulk(
         &mut self,
         lua: &Lua,
@@ -91,15 +84,11 @@ impl Universe {
         }
         Ok(ids)
     }
-
-    /// Serializes all alive entities to a Lua table snapshot.
     pub fn serialize_to_table<'lua>(&self, lua: &'lua Lua) -> LuaResult<Table<'lua>> {
         let snapshot = lua.create_table()?;
-
         let entities_arr = lua.create_table()?;
         let mut sorted_slots: Vec<u32> = self.alive.iter().copied().collect();
         sorted_slots.sort();
-
         for (i, slot) in sorted_slots.iter().enumerate() {
             let slot = *slot;
             let generation = self.current_gen(slot);
@@ -108,7 +97,6 @@ impl Universe {
             entry.set("id", id)?;
             entry.set("slot", slot)?;
             entry.set("gen", generation)?;
-
             let components = lua.create_table()?;
             if let Some(ref key) = self.component_store {
                 let store: Table = lua.registry_value(key)?;
@@ -124,7 +112,6 @@ impl Universe {
                 }
             }
             entry.set("components", components)?;
-
             let tags = lua.create_table()?;
             if let Some(tag_list) = self.string_tags.get(&slot) {
                 for (j, t) in tag_list.iter().enumerate() {
@@ -132,14 +119,11 @@ impl Universe {
                 }
             }
             entry.set("tags", tags)?;
-
             entry.set("layer", self.layers.get(&slot).copied().unwrap_or(0))?;
-
             entry.set(
                 "bitmap",
                 self.bitmap_masks.get(&slot).copied().unwrap_or(0u64) as i64,
             )?;
-
             if let Some(&parent_slot) = self.parents.get(&slot) {
                 if self.alive.contains(&parent_slot) {
                     entry.set(
@@ -148,21 +132,16 @@ impl Universe {
                     )?;
                 }
             }
-
             entities_arr.set(i + 1, entry)?;
         }
         snapshot.set("entities", entities_arr)?;
-
         let btnames = lua.create_table()?;
         for (j, name) in self.bitmap_tag_names.iter().enumerate() {
             btnames.set(j + 1, name.as_str())?;
         }
         snapshot.set("bitmap_tags", btnames)?;
-
         Ok(snapshot)
     }
-
-    /// Restores entity state from a snapshot produced by `serialize_to_table`.
     pub fn deserialize_from_table(&mut self, lua: &Lua, snapshot: Table) -> LuaResult<()> {
         self.alive.clear();
         self.free_list.clear();
@@ -192,7 +171,6 @@ impl Universe {
         }
         self.ensure_stores(lua)?;
         let comp_store = self.get_component_store(lua)?;
-
         if let Ok(btnames) = snapshot.get::<_, Table>("bitmap_tags") {
             for name in btnames.clone().sequence_values::<String>() {
                 let name = name?;
@@ -201,7 +179,6 @@ impl Universe {
                 }
             }
         }
-
         let entities: Table = snapshot.get("entities")?;
         let mut parent_data: Vec<(u32, u32)> = Vec::new();
         for entry_val in entities.clone().sequence_values::<Table>() {
@@ -209,13 +186,11 @@ impl Universe {
             let id: u32 = entry.get("id")?;
             let slot = Self::unpack_slot(id);
             let generation: u8 = entry.get("gen").unwrap_or(0);
-
             self.alive.insert(slot);
             *self.generations.entry(slot).or_insert(0) = generation;
             if slot >= self.next_id {
                 self.next_id = slot + 1;
             }
-
             let comp_row = lua.create_table()?;
             if let Ok(components) = entry.get::<_, Table>("components") {
                 for pair in components.clone().pairs::<LuaValue, LuaValue>() {
@@ -226,7 +201,6 @@ impl Universe {
             comp_store.set(slot, comp_row.clone())?;
             #[cfg(feature = "ecs-archetype")]
             self.reindex_component_row(slot, &comp_row)?;
-
             if let Ok(tags) = entry.get::<_, Table>("tags") {
                 let mut tag_list = Vec::new();
                 for t in tags.sequence_values::<String>() {
@@ -238,22 +212,18 @@ impl Universe {
                     self.string_tags.insert(slot, tag_list);
                 }
             }
-
             let layer: i32 = entry.get("layer").unwrap_or(0);
             if layer != 0 {
                 self.layers.insert(slot, layer);
             }
-
             let bitmap: i64 = entry.get("bitmap").unwrap_or(0);
             if bitmap != 0 {
                 self.bitmap_masks.insert(slot, bitmap as u64);
             }
-
             if let Ok(parent_id) = entry.get::<_, u32>("parent") {
                 parent_data.push((slot, parent_id));
             }
         }
-
         for (child_slot, parent_id) in parent_data {
             let parent_slot = Self::unpack_slot(parent_id);
             if self.alive.contains(&parent_slot) {
@@ -264,7 +234,6 @@ impl Universe {
                     .push(child_slot);
             }
         }
-
         Ok(())
     }
 }

@@ -1,25 +1,6 @@
-//! Particle system visualization / diagnostic renderers.
-//!
-//! Each function produces a CPU-side `ImageData` depicting the state of a
-//! `ParticleSystem` — useful for headless evidence tests and debug overlays
-//! without requiring a GPU context.
-
 use super::emitter::ParticleSystem;
 use super::math::{interpolate_alphas, interpolate_colors, interpolate_sizes};
 use crate::image::ImageData;
-
-/// Render all live particles to an `ImageData`.
-///
-/// Each particle is drawn with its color interpolated from age. The emitter
-/// position is marked with a white dot.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `width` — `u32`. Output image width.
-/// - `height` — `u32`. Output image height.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -44,7 +25,6 @@ pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData 
             let gi = (cg * 255.0) as u8;
             let bi = (cb * 255.0) as u8;
             let ai = (alpha * 255.0) as u8;
-            // Safe circle draw
             let y0 = (py - size).max(0);
             let y1 = (py + size + 1).min(h);
             let x0 = (px - size).max(0);
@@ -61,7 +41,6 @@ pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData 
             }
         }
     }
-    // Emitter marker
     img.draw_circle(
         ps.emitter_x as i32,
         ps.emitter_y as i32,
@@ -73,17 +52,6 @@ pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData 
     );
     img
 }
-
-/// Render an explosion burst: particles radiate from center with
-/// age-based red-to-yellow coloring.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_explosion_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(10, 8, 15, 255);
@@ -98,16 +66,6 @@ pub fn draw_explosion_to_image(ps: &ParticleSystem, width: u32, height: u32) -> 
     img.draw_label("EXPLOSION", 4, 4, 255, 160, 60);
     img
 }
-
-/// Render particles styled as falling rain streaks.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_rain_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(30, 35, 50, 255);
@@ -128,16 +86,6 @@ pub fn draw_rain_to_image(ps: &ParticleSystem, width: u32, height: u32) -> Image
     img.draw_label("RAIN", 4, 4, 140, 180, 255);
     img
 }
-
-/// Render particles as hot orange sparks with short trails.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_spark_trail_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(10, 8, 12, 255);
@@ -161,19 +109,6 @@ pub fn draw_spark_trail_to_image(ps: &ParticleSystem, width: u32, height: u32) -
     img.draw_label("SPARKS", 4, 4, 255, 200, 80);
     img
 }
-
-/// Render particles over a provided background image.
-///
-/// Particles are drawn on top of `bg` without overwriting pixels that
-/// fall outside particle areas. The background pixels are preserved
-/// where no particle overlaps.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `bg` — `ImageData`. Background image to composite over.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_over_image(ps: &ParticleSystem, mut bg: ImageData) -> ImageData {
     let w = bg.width() as i32;
     let h = bg.height() as i32;
@@ -217,17 +152,6 @@ pub fn draw_over_image(ps: &ParticleSystem, mut bg: ImageData) -> ImageData {
     );
     bg
 }
-
-/// Paint live spark particles onto an existing mutable image.
-///
-/// Draws each live particle as a coloured dot using heat-map colours
-/// (yellow-hot at full life, red at end of life). Unlike
-/// `draw_spark_trail_to_image`, this does not create a new canvas —
-/// it composites directly onto the supplied `img`.
-///
-/// # Parameters
-/// - `ps` — `&ParticleSystem`.
-/// - `img` — `&mut ImageData`. Target canvas to paint onto.
 pub fn paint_onto(ps: &ParticleSystem, img: &mut ImageData) {
     let w = img.width() as i32;
     let h = img.height() as i32;
@@ -247,17 +171,6 @@ pub fn paint_onto(ps: &ParticleSystem, img: &mut ImageData) {
         img.set_pixel(px as u32, py as u32, r, g, b, 255);
     }
 }
-
-/// Renders a bar chart of particle lifecycle counts over time into an `ImageData` frame.
-///
-/// # Parameters
-/// - `snapshots` — `&[(u32, usize)]`.
-/// - `max_particles` — `usize`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-///
-/// # Returns
-/// `ImageData`.
 pub fn draw_lifecycle_to_image(
     snapshots: &[(u32, usize)],
     max_particles: usize,

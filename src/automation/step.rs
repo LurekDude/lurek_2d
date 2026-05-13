@@ -1,38 +1,36 @@
-﻿//! Action enum and Step record for automation script events.
-//! Defines 12 Action variants with string-to-variant conversion and Step with 20 optional fields.
-//! Consumed by Script (storage) and Simulator (event dispatch).
-
-// ---- Type: Action ----
+//! `Action` enum and `Step` struct for automation scripts.
+//! `Action` maps lowercase string identifiers to input event kinds; `Step` holds a
+//! timed payload for keyboard, mouse, text, wait, macro-call, and assert events.
+//! Consumed exclusively by `Script` and `Simulator` in this module.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-/// Synthetic input event kind injected into EventQueue by Simulator.
+/// Input event kind dispatched by a `Step` during automation playback.
 pub enum Action {
-    /// Inject a keypressed event with key name and optional scancode.
+    /// Fires a key-pressed event with key name and scancode.
     KeyPress,
-    /// Inject a keyreleased event with key name and optional scancode.
+    /// Fires a key-released event with key name and scancode.
     KeyRelease,
-    /// Inject a mousemoved event with absolute position and movement delta.
+    /// Fires a mouse-moved event with absolute position and delta.
     MouseMove,
-    /// Inject a mousepressed event with position, button index, and click count.
+    /// Fires a mouse-button-pressed event at the given position.
     MousePress,
-    /// Inject a mousereleased event with position and button index.
+    /// Fires a mouse-button-released event at the given position.
     MouseRelease,
-    /// Inject a wheelmoved event with horizontal and vertical scroll deltas.
+    /// Fires a mouse-wheel-moved event with scroll delta x/y.
     MouseWheel,
-    /// Inject a textinput event with a Unicode string payload.
+    /// Fires a text-input event carrying a UTF-8 string payload.
     TextInput,
-    /// Timed delay; no event is dispatched.
+    /// No-op; holds the time cursor until the next step fires.
     Wait,
-    /// Script-authoring marker for repeat expansion; no event dispatched.
+    /// Sentinel produced by `expand_repeats`; not dispatched as an event.
     Repeat,
-    /// Expand a named macro script's steps into the active timeline at this time offset.
+    /// Inlines a named macro `Script` at the current step position.
     CallMacro,
-    /// Fail playback when the step's assert expression evaluates to false.
+    /// Evaluates a condition expression; fails the script if false.
     Assert,
-    /// Fail playback when pixel diff between baseline and actual images exceeds max_diff.
+    /// Compares two image files pixel-by-pixel within `max_diff` tolerance.
     VisualAssert,
 }
-
 const ACTION_MAPPINGS: [(&str, Action); 12] = [
     ("keypress", Action::KeyPress),
     ("keyrelease", Action::KeyRelease),
@@ -47,18 +45,14 @@ const ACTION_MAPPINGS: [(&str, Action); 12] = [
     ("assert", Action::Assert),
     ("visualassert", Action::VisualAssert),
 ];
-
-// ---- Implementation: Action ----
-
 impl Action {
-    /// Parse a lowercase action string into the matching variant; return None for unrecognised input.
+    /// Parse a lowercase action string (e.g. "keypress") and return the matching `Action`, or `None`.
     pub fn parse_action(s: &str) -> Option<Action> {
         ACTION_MAPPINGS
             .iter()
             .find_map(|(name, action)| (*name == s).then_some(*action))
     }
-
-    /// Return the canonical lowercase string for this variant; valid input to `parse_action`.
+    /// Return the canonical lowercase string key for this variant; defaults to "wait" if not found.
     pub fn as_str(&self) -> &'static str {
         ACTION_MAPPINGS
             .iter()
@@ -66,58 +60,52 @@ impl Action {
             .unwrap_or("wait")
     }
 }
-
-// ---- Type: Step ----
-
 #[derive(Debug, Clone)]
-/// Single timed event record in an automation Script with action-specific optional fields.
+/// One timed input event in an automation `Script`; carries all optional field payloads.
 pub struct Step {
-    /// Seconds from script start when Simulator dispatches this step; equal-time steps all fire in one update.
+    /// Playback timestamp in seconds at which this step fires.
     pub time: f32,
-    /// Action variant that determines which event is dispatched and which optional fields are read.
+    /// Input event kind dispatched when this step fires.
     pub action: Action,
-    /// Key name for KeyPress/KeyRelease (e.g. `"space"`); used as scancode fallback when scancode is None.
+    /// Key name string (e.g. "a", "space") for `KeyPress`/`KeyRelease` steps.
     pub key: Option<String>,
-    /// Scancode override for key events; supersedes key in `effective_scancode` when set.
+    /// Scancode string; `effective_scancode` falls back to `key` when absent.
     pub scancode: Option<String>,
-    /// Mouse X screen coordinate for move/press/release; defaults to 0.0 when None.
+    /// Cursor or wheel absolute X coordinate in game-space pixels.
     pub x: Option<f64>,
-    /// Mouse Y screen coordinate for move/press/release; defaults to 0.0 when None.
+    /// Cursor or wheel absolute Y coordinate in game-space pixels.
     pub y: Option<f64>,
-    /// Mouse X movement delta for mousemove; defaults to 0.0 when None.
+    /// Mouse-move delta X since the previous position.
     pub dx: Option<f64>,
-    /// Mouse Y movement delta for mousemove; defaults to 0.0 when None.
+    /// Mouse-move delta Y since the previous position.
     pub dy: Option<f64>,
-    /// Mouse button index (1=left, 2=right, 3=middle) for press/release; defaults to 1 when None.
+    /// Mouse button index (1 = left, 2 = right, 3 = middle) for press/release steps.
     pub button: Option<u32>,
-    /// Unicode text payload for TextInput; dispatched event receives "" when None.
+    /// UTF-8 text payload for `TextInput` steps.
     pub text: Option<String>,
-    /// Whether the keypressed event is a key-repeat; defaults to false.
+    /// True when the key event is a keyboard auto-repeat hold.
     pub is_repeat: bool,
-    /// Consecutive click count for MousePress; defaults to 1 when None.
+    /// Click count for `MousePress` (e.g. 2 for a double-click).
     pub clicks: Option<u32>,
-    /// Extra copies of this step generated during Script construction; 3 means 1 original + 3 copies.
+    /// How many additional clones `expand_repeats` generates from this step.
     pub repeat: Option<u32>,
-    /// Seconds between generated repeat copies; defaults to 0.0 when None.
+    /// Seconds between each repeated clone inserted by `expand_repeats`.
     pub repeat_interval: Option<f32>,
-    /// Macro name referenced by CallMacro steps.
+    /// Macro name to inline for `CallMacro` steps.
     pub macro_name: Option<String>,
-    /// Boolean expression gate; step is skipped when present and evaluates to false.
+    /// Condition expression; the step is skipped if it evaluates to false.
     pub when: Option<String>,
-    /// Boolean expression assertion; playback fails when present and evaluates to false.
+    /// Condition expression; the script fails with an error if it evaluates to false.
     pub assert: Option<String>,
-    /// Baseline image path for VisualAssert.
+    /// Path to the baseline reference image for `VisualAssert` steps.
     pub baseline: Option<String>,
-    /// Actual image path for VisualAssert.
+    /// Path to the actual rendered image compared against `baseline` in `VisualAssert`.
     pub actual: Option<String>,
-    /// Maximum allowed pixel diff for VisualAssert.
+    /// Maximum allowed total pixel-channel difference for `VisualAssert` to pass.
     pub max_diff: Option<u32>,
 }
-
-// ---- Implementation: Step ----
-
 impl Step {
-    /// Create a Step with time and action set; all optional fields default to None, is_repeat to false.
+    /// Create a `Step` at `time` seconds with the given `action`; all optional fields default to `None`.
     pub fn new(time: f32, action: Action) -> Self {
         Self {
             time,
@@ -142,11 +130,8 @@ impl Step {
             max_diff: None,
         }
     }
-
-    /// Return scancode if set, else key; None only when both fields are None.
+    /// Return `scancode` if set, otherwise fall back to `key`; `None` when both are absent.
     pub fn effective_scancode(&self) -> Option<&str> {
         self.scancode.as_deref().or(self.key.as_deref())
     }
 }
-
-// Tests migrated to tests/rust/unit/automation_tests.rs

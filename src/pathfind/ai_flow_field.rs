@@ -1,44 +1,13 @@
-//! Dijkstra-based flow field for crowd pathfinding.
-//! Moved from `ai/flowfield`; used by the Lua `lurek.ai.newFlowField` API.
-//!
-//! Note: this type operates on [`SimpleGrid`].  The higher-level
-//! [`crate::pathfind::FlowField`] operates on [`NavGrid`] instead.
-
 use std::collections::VecDeque;
-
-/// BFS flow field that stores normalized direction vectors toward a goal.
-///
-/// # Fields
-/// - `width` — `usize`.
-/// - `height` — `usize`.
-/// - `goal` — `Option<(usize, usize)>`.
-///
-/// Built from a SimpleGrid. Each cell stores a direction vector and BFS distance.
 pub struct FlowField {
-    /// Grid width.
     pub width: usize,
-    /// Grid height.
     pub height: usize,
-    /// Normalized direction per cell toward goal; (0,0) if unreachable.
     directions: Vec<(f32, f32)>,
-    /// BFS distance per cell; f32::INFINITY if unreachable.
     distances: Vec<f32>,
-    /// Current goal cell (0-based), if set.
     pub goal: Option<(usize, usize)>,
-    /// Walkability data copied from the SimpleGrid.
     walkable: Vec<bool>,
 }
-
 impl FlowField {
-    /// Creates a new FlowField from a SimpleGrid's dimensions and walkability.
-    ///
-    /// # Parameters
-    /// - `width` — `usize`.
-    /// - `height` — `usize`.
-    /// - `walkable` — `Vec<bool>`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(width: usize, height: usize, walkable: Vec<bool>) -> Self {
         let total = width * height;
         Self {
@@ -50,44 +19,30 @@ impl FlowField {
             walkable,
         }
     }
-
-    /// Sets the goal cell and triggers BFS recomputation.
-    ///
-    /// # Parameters
-    /// - `gx` — `usize`.
-    /// - `gy` — `usize`.
     pub fn set_goal(&mut self, gx: usize, gy: usize) {
         self.goal = Some((gx, gy));
         self.compute();
     }
-
-    /// Recomputes the flow field from the current goal.
     pub fn compute(&mut self) {
         let total = self.width * self.height;
         self.distances = vec![f32::INFINITY; total];
         self.directions = vec![(0.0, 0.0); total];
-
         let (gx, gy) = match self.goal {
             Some(g) => g,
             None => return,
         };
-
         if gx >= self.width || gy >= self.height {
             return;
         }
-
         let goal_idx = gy * self.width + gx;
         if !self.walkable[goal_idx] {
             return;
         }
-
         self.distances[goal_idx] = 0.0;
         let mut queue = VecDeque::new();
         queue.push_back((gx, gy));
-
         while let Some((cx, cy)) = queue.pop_front() {
             let curr_dist = self.distances[cy * self.width + cx];
-
             for &(dx, dy) in &[
                 (-1i32, 0),
                 (1, 0),
@@ -117,18 +72,14 @@ impl FlowField {
                 }
             }
         }
-
-        // Compute direction vectors
         for y in 0..self.height {
             for x in 0..self.width {
                 let idx = y * self.width + x;
                 if self.distances[idx] == f32::INFINITY || (x == gx && y == gy) {
                     continue;
                 }
-                // Direction = toward neighbor with lowest distance
                 let mut best_dir = (0.0f32, 0.0f32);
                 let mut best_dist = self.distances[idx];
-
                 for &(dx, dy) in &[
                     (-1i32, 0),
                     (1, 0),
@@ -150,8 +101,6 @@ impl FlowField {
                         best_dir = (dx as f32, dy as f32);
                     }
                 }
-
-                // Normalize
                 let mag = (best_dir.0 * best_dir.0 + best_dir.1 * best_dir.1).sqrt();
                 if mag > 0.001 {
                     self.directions[idx] = (best_dir.0 / mag, best_dir.1 / mag);
@@ -159,15 +108,6 @@ impl FlowField {
             }
         }
     }
-
-    /// Gets the normalized direction toward the goal for a cell (0-based).
-    ///
-    /// # Parameters
-    /// - `x` — `usize`.
-    /// - `y` — `usize`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
     pub fn get_direction(&self, x: usize, y: usize) -> (f32, f32) {
         if x < self.width && y < self.height {
             self.directions[y * self.width + x]
@@ -175,15 +115,6 @@ impl FlowField {
             (0.0, 0.0)
         }
     }
-
-    /// Gets the BFS distance for a cell (0-based). Returns f32::INFINITY if unreachable.
-    ///
-    /// # Parameters
-    /// - `x` — `usize`.
-    /// - `y` — `usize`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_distance(&self, x: usize, y: usize) -> f32 {
         if x < self.width && y < self.height {
             self.distances[y * self.width + x]
@@ -192,21 +123,17 @@ impl FlowField {
         }
     }
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
     fn open_grid(w: usize, h: usize) -> Vec<bool> {
         vec![true; w * h]
     }
-
     #[test]
     fn new_field_has_no_goal() {
         let ff = FlowField::new(4, 4, open_grid(4, 4));
         assert!(ff.goal.is_none());
     }
-
     #[test]
     fn set_goal_computes_directions() {
         let mut ff = FlowField::new(4, 4, open_grid(4, 4));
@@ -216,16 +143,14 @@ mod tests {
         assert!(ff.get_distance(0, 0) > 0.0);
         assert!(ff.get_distance(0, 0) < f32::INFINITY);
     }
-
     #[test]
     fn blocked_goal_stays_infinity() {
         let mut walkable = open_grid(3, 3);
-        walkable[2 * 3 + 2] = false; // block (2,2)
+        walkable[2 * 3 + 2] = false;
         let mut ff = FlowField::new(3, 3, walkable);
         ff.set_goal(2, 2);
         assert_eq!(ff.get_distance(0, 0), f32::INFINITY);
     }
-
     #[test]
     fn direction_points_toward_goal() {
         let mut ff = FlowField::new(5, 1, open_grid(5, 1));
@@ -233,7 +158,6 @@ mod tests {
         let (dx, _dy) = ff.get_direction(0, 0);
         assert!(dx > 0.0, "should point right toward goal");
     }
-
     #[test]
     fn out_of_bounds_returns_defaults() {
         let ff = FlowField::new(2, 2, open_grid(2, 2));

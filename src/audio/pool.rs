@@ -1,19 +1,23 @@
-//! Round-robin polyphony pool for repeated playback of a single audio file.
-//! SoundPool: cycles through pre-loaded voice keys for cost-effective concurrent playback.
+﻿//! `SoundPool` — round-robin voice allocator for one-shot/polyphonic sound playback.
+//! Stores a fixed set of preloaded `SoundKey` voices for one file path and returns the
+//! next key on each trigger to avoid voice stealing conflicts.
 
 use crate::runtime::resource_keys::SoundKey;
-
-/// Round-robin voice pool cycling through pre-loaded source keys.
+/// Round-robin pool of preloaded source keys representing voices for one sound asset.
 pub struct SoundPool {
+    /// Source keys used as available voices.
     keys: Vec<SoundKey>,
+    /// Next voice index used by `next_voice`.
     next: usize,
+    /// Original source file path associated with these voices.
     file_path: String,
+    /// Per-pool gain multiplier applied when triggering a voice.
     volume: f32,
+    /// Optional target bus name for routed playback.
     bus_name: Option<String>,
 }
-
 impl SoundPool {
-    /// Create new pool from pre-loaded voice keys.
+    /// Create a pool with `keys` and source `file_path`, defaulting to volume=1.0 and no bus.
     pub fn new(keys: Vec<SoundKey>, file_path: String) -> Self {
         Self {
             keys,
@@ -23,57 +27,46 @@ impl SoundPool {
             bus_name: None,
         }
     }
-
-    /// Return voice count.
+    /// Return number of voices in this pool.
     pub fn voice_count(&self) -> usize {
         self.keys.len()
     }
-
-    /// Return the source file path.
+    /// Return source file path associated with this pool.
     pub fn file_path(&self) -> &str {
         &self.file_path
     }
-
-    /// Return shared volume (default 1.0).
+    /// Return current pool gain multiplier.
     pub fn volume(&self) -> f32 {
         self.volume
     }
-
-    /// Set shared volume (clamped >= 0.0).
+    /// Set pool gain multiplier; values below 0.0 are clamped to 0.0.
     pub fn set_volume(&mut self, vol: f32) {
         self.volume = vol.max(0.0);
     }
-
-    /// Return the assigned bus name, if any.
+    /// Return assigned bus name, or `None` if unassigned.
     pub fn bus_name(&self) -> Option<&str> {
         self.bus_name.as_deref()
     }
-
-    /// Assign all voices to a named bus.
+    /// Assign this pool to bus `name`.
     pub fn set_bus(&mut self, name: &str) {
         self.bus_name = Some(name.to_owned());
     }
-
-    /// Clear the bus assignment.
+    /// Remove any bus assignment from this pool.
     pub fn clear_bus(&mut self) {
         self.bus_name = None;
     }
-
-    /// Return next voice key, cycling through all voices.
+    /// Return next voice key in round-robin order and advance the cursor.
     pub fn next_voice(&mut self) -> SoundKey {
         let key = self.keys[self.next % self.keys.len()];
         self.next = (self.next + 1) % self.keys.len();
         key
     }
-
-    /// Return all voice keys as a slice.
+    /// Return all voice keys managed by this pool.
     pub fn all_keys(&self) -> &[SoundKey] {
         &self.keys
     }
-
-    /// Return true if pool has at least one voice.
+    /// Return `true` when the pool contains at least one voice key.
     pub fn is_valid(&self) -> bool {
         !self.keys.is_empty()
     }
 }
-

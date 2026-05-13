@@ -1,89 +1,67 @@
-//! Aseprite JSON export parser producing `AsepriteFrameData` and `AsepriteTagData`.
-//! Handles both array-format and hash-format `"frames"` exports.
-//! Does not own animation runtime state; output feeds `AnimClip`/`AnimFrame` construction.
-
+//! Aseprite JSON importer for frame rectangles and animation tags.
+//! Owns `AsepriteFrameData`, `AsepriteDirection`, `AsepriteTagData`, and `AsepriteParsed`.
+//! Does not own textures or rendering; it only parses metadata.
+//! Depends on `serde_json::Value` for JSON traversal.
 use serde_json::Value;
-
-// ---- Type: AsepriteFrameData ----
-
-/// Pixel-level frame rectangle from an Aseprite JSON export; consumed by `load_aseprite_json`.
+/// One frame rectangle parsed from an Aseprite sheet.
 #[derive(Debug, Clone)]
 pub struct AsepriteFrameData {
-    /// Left edge of the frame within the sprite sheet in pixels.
+    /// Frame X coordinate in the sheet.
     pub x: u32,
-    /// Top edge of the frame within the sprite sheet in pixels.
+    /// Frame Y coordinate in the sheet.
     pub y: u32,
     /// Frame width in pixels.
     pub w: u32,
     /// Frame height in pixels.
     pub h: u32,
-    /// Display duration for this frame in milliseconds.
+    /// Frame duration in milliseconds.
     pub duration_ms: u32,
 }
-
-// ---- Type: AsepriteDirection ----
-
-/// Playback direction encoded in an Aseprite frame tag; maps to `ClipPlaybackMode`.
 #[derive(Debug, Clone, PartialEq)]
+/// Playback direction declared by an Aseprite tag.
 pub enum AsepriteDirection {
-    /// Plays frames from `from` to `to`.
+    /// Play frames in ascending order.
     Forward,
-    /// Plays frames from `to` to `from`.
+    /// Play frames in reverse order.
     Reverse,
-    /// Plays forward then reverses.
+    /// Play forward then backward.
     PingPong,
 }
-
-// ---- Type: AsepriteTagData ----
-
-/// Named frame-tag range from an Aseprite JSON export; consumed by `load_aseprite_json`.
 #[derive(Debug, Clone)]
+/// Frame tag extracted from Aseprite metadata.
 pub struct AsepriteTagData {
-    /// Human-readable clip name.
+    /// Tag name.
     pub name: String,
-    /// 0-based index of the first frame in this tag.
+    /// First frame index.
     pub from: usize,
-    /// 0-based index of the last frame in this tag (inclusive).
+    /// Last frame index.
     pub to: usize,
     /// Playback direction.
     pub direction: AsepriteDirection,
 }
-
-// ---- Type: AsepriteParsed ----
-
-/// Fully parsed Aseprite JSON export; output of `load_aseprite_json`.
 #[derive(Debug, Clone)]
+/// Parsed Aseprite sheet metadata.
 pub struct AsepriteParsed {
-    /// All frame rectangles in export order.
+    /// All frame rectangles in playback order.
     pub frames: Vec<AsepriteFrameData>,
-    /// Named animation ranges (frame tags).
+    /// All parsed frame tags.
     pub tags: Vec<AsepriteTagData>,
-    /// Total sprite sheet width in pixels.
+    /// Sheet width in pixels.
     pub sheet_width: u32,
-    /// Total sprite sheet height in pixels.
+    /// Sheet height in pixels.
     pub sheet_height: u32,
 }
-
-// ---- Helper Functions: JSON Parsing ----
-
-/// Parse an Aseprite JSON export string (array or hash `"frames"` formats) into `AsepriteParsed`; returns error on malformed input.
+/// Parse an Aseprite JSON string into frame and tag metadata.
 pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
     let root: Value =
         serde_json::from_str(json_str).map_err(|e| format!("aseprite: JSON parse error: {}", e))?;
-
-    // Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ frames Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
     let frames_val = root.get("frames").ok_or("aseprite: missing 'frames' key")?;
-
     let mut frames: Vec<AsepriteFrameData> = Vec::new();
-
     if let Some(arr) = frames_val.as_array() {
-        // Array format: [{filename, frame:{x,y,w,h}, duration}, ...]
         for entry in arr {
             frames.push(parse_frame_entry(entry)?);
         }
     } else if let Some(obj) = frames_val.as_object() {
-        // Hash format: {"name": {frame:{x,y,w,h}, duration}, ...}
-        // Sort keys to preserve stable frame order (numeric suffix if present).
         let mut entries: Vec<(&String, &Value)> = obj.iter().collect();
         entries.sort_by_key(|(k, _)| {
             let base = k.trim_end_matches(".png").trim_end_matches(".jpg");
@@ -98,23 +76,16 @@ pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
     } else {
         return Err("aseprite: 'frames' must be an array or object".to_string());
     }
-
-    // Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ meta Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
     let meta = root.get("meta").ok_or("aseprite: missing 'meta' key")?;
-
     let size = meta.get("size").ok_or("aseprite: missing 'meta.size'")?;
-
     let sheet_width = size
         .get("w")
         .and_then(Value::as_u64)
         .ok_or("aseprite: missing 'meta.size.w'")? as u32;
-
     let sheet_height = size
         .get("h")
         .and_then(Value::as_u64)
         .ok_or("aseprite: missing 'meta.size.h'")? as u32;
-
-    // Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ frameTags Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
     let mut tags: Vec<AsepriteTagData> = Vec::new();
     if let Some(tag_arr) = meta.get("frameTags").and_then(Value::as_array) {
         for tag_val in tag_arr {
@@ -148,7 +119,6 @@ pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
             });
         }
     }
-
     Ok(AsepriteParsed {
         frames,
         tags,
@@ -156,13 +126,11 @@ pub fn load_aseprite_json(json_str: &str) -> Result<AsepriteParsed, String> {
         sheet_height,
     })
 }
-
-/// Parse a single frame entry from either array or hash format.
+/// Parse one frame entry object into `AsepriteFrameData`.
 fn parse_frame_entry(entry: &Value) -> Result<AsepriteFrameData, String> {
     let frame_obj = entry
         .get("frame")
         .ok_or("aseprite: frame entry missing 'frame' object")?;
-
     let x = frame_obj
         .get("x")
         .and_then(Value::as_u64)
@@ -180,7 +148,6 @@ fn parse_frame_entry(entry: &Value) -> Result<AsepriteFrameData, String> {
         .and_then(Value::as_u64)
         .ok_or("aseprite: frame missing 'h'")? as u32;
     let duration_ms = entry.get("duration").and_then(Value::as_u64).unwrap_or(100) as u32;
-
     Ok(AsepriteFrameData {
         x,
         y,

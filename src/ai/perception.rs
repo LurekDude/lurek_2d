@@ -1,22 +1,21 @@
-//! perception model for stimuli storage, sensing, and awareness updates.
+//! Sensory stimuli and detection helpers for the AI perception layer.
+//! Owns `StimulusType`, `Stimulus`, `DetectedStimulus`, `StimulusWorld`, and `Sensor`.
+//! Does not own any AI reaction; callers decide how to use detected stimuli.
+//! Depends on `HashMap` for custom sensor ranges.
 use std::collections::HashMap;
-
-// ---- Type: StimulusType ----
-
-/// The sensory channel of a [`Stimulus`].
+/// Stimulus classification used by the sensor world.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StimulusType {
-    /// Detected via line-of-sight cone; requires sensor facing direction.
+    /// Visual stimulus.
     Visual,
-    /// Detected in all directions within `hearing_range`; ignores facing.
+    /// Audible stimulus.
     Auditory,
-    /// Game-defined custom sense type identified by a label string.
+    /// Custom stimulus label.
     Custom(String),
 }
-
 impl StimulusType {
-    /// Parse a string into a `StimulusType`.
     #[allow(clippy::should_implement_trait)]
+    /// Parse a stimulus type name; unknown strings become `Custom`.
     pub fn from_str(s: &str) -> Self {
         match s {
             "visual" => Self::Visual,
@@ -24,8 +23,7 @@ impl StimulusType {
             other => Self::Custom(other.to_string()),
         }
     }
-
-    /// Return the canonical string name of this stimulus type.
+    /// Return a display string for the stimulus type.
     pub fn as_str(&self) -> String {
         match self {
             Self::Visual => "visual".to_string(),
@@ -34,67 +32,58 @@ impl StimulusType {
         }
     }
 }
-
-// ---- Type: Stimulus ----
-
-/// A world-space sensory event that agents can detect.
+/// Source stimulus stored in the world.
 pub struct Stimulus {
-    /// Unique ID assigned by the owning `StimulusWorld`.
+    /// Stable world id.
     pub id: u64,
-    /// Sensory channel.
+    /// Stimulus kind.
     pub stimulus_type: StimulusType,
-    /// World-space position.
+    /// World position.
     pub position: (f32, f32),
-    /// Current intensity in `[0.0, 1.0]`. Decremented by `decay_rate * dt` each frame.
+    /// Intensity in `[0, 1]`.
     pub intensity: f32,
-    /// Maximum detection radius in world units.
+    /// Effective range.
     pub radius: f32,
-    /// Intensity lost per second. `0.0` = permanent (manually removed).
+    /// Intensity decay per second.
     pub decay_rate: f32,
-    /// Optional name of the agent or entity that emitted this stimulus.
+    /// Optional source name.
     pub source_name: Option<String>,
-    /// Arbitrary game-defined label (e.g. `"gunshot"`, `"footstep"`).
+    /// Optional gameplay tag.
     pub tag: Option<String>,
 }
-
-// ---- Type: DetectedStimulus ----
-
-/// Result record produced when a sensor successfully detects a stimulus.
+/// Stimulus result returned by `Sensor::detect`.
 pub struct DetectedStimulus {
-    /// ID of the originating stimulus in the `StimulusWorld`.
+    /// Id of the matched source stimulus.
     pub stimulus_id: u64,
-    /// Sensory channel used to detect this stimulus.
+    /// Matched stimulus type.
     pub stimulus_type: StimulusType,
-    /// World-space position of the stimulus.
+    /// Source position.
     pub position: (f32, f32),
-    /// Intensity at the moment of detection.
+    /// Source intensity.
     pub intensity: f32,
-    /// Distance from the senso's position to the stimulus.
+    /// Distance from the sensor.
     pub distance: f32,
-    /// Source agent/entity name if provided.
+    /// Optional source name.
     pub source_name: Option<String>,
-    /// Arbitrary game tag if provided.
+    /// Optional gameplay tag.
     pub tag: Option<String>,
 }
-
-// ---- Type: StimulusWorld ----
-
-/// Scene-level registry of active sensory stimuli.
+/// Container for all stimuli available to sensors.
 pub struct StimulusWorld {
+    /// Stored stimuli.
     stimuli: Vec<Stimulus>,
+    /// Next allocated stimulus id.
     next_id: u64,
 }
-
 impl StimulusWorld {
-    /// Create a new empty stimulus world.
+    /// Create an empty stimulus world.
     pub fn new() -> Self {
         Self {
             stimuli: Vec::new(),
             next_id: 0,
         }
     }
-
-    /// Registers a new stimulus in the world. Returns its assigned ID.
+    /// Insert a stimulus and return its assigned id.
     pub fn add(&mut self, stimulus: Stimulus) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
@@ -103,8 +92,7 @@ impl StimulusWorld {
         self.stimuli.push(s);
         id
     }
-
-    /// Convenience method: emits a visual stimulus.
+    /// Add a visual stimulus.
     pub fn add_visual(
         &mut self,
         x: f32,
@@ -124,8 +112,7 @@ impl StimulusWorld {
             tag,
         })
     }
-
-    /// Convenience method: emits an auditory stimulus.
+    /// Add an auditory stimulus.
     pub fn add_auditory(
         &mut self,
         x: f32,
@@ -146,9 +133,8 @@ impl StimulusWorld {
             tag,
         })
     }
-
-    /// Convenience method: emits a custom-type stimulus.
     #[allow(clippy::too_many_arguments)]
+    /// Add a custom stimulus type.
     pub fn add_custom(
         &mut self,
         sense_type: &str,
@@ -170,15 +156,13 @@ impl StimulusWorld {
             tag,
         })
     }
-
-    /// Remove a stimulus by ID. Returns `true` if it was found and removed.
+    /// Remove a stimulus by id and return `true` when one was removed.
     pub fn remove(&mut self, id: u64) -> bool {
         let before = self.stimuli.len();
         self.stimuli.retain(|s| s.id != id);
         self.stimuli.len() < before
     }
-
-    /// Decays all stimuli by `dt` and removes those whose intensity has dropped
+    /// Decay all stimuli and drop exhausted entries.
     pub fn update(&mut self, dt: f32) {
         for s in &mut self.stimuli {
             if s.decay_rate > 0.0 {
@@ -187,55 +171,48 @@ impl StimulusWorld {
         }
         self.stimuli.retain(|s| s.intensity > 0.0);
     }
-
-    /// Return a reference to all currently active stimuli.
+    /// Return the active stimuli slice.
     pub fn stimuli(&self) -> &[Stimulus] {
         &self.stimuli
     }
-
     /// Return the number of active stimuli.
     pub fn count(&self) -> usize {
         self.stimuli.len()
     }
-
-    /// Remove all stimuli immediately.
+    /// Remove all stimuli.
     pub fn clear(&mut self) {
         self.stimuli.clear();
     }
 }
-
+/// `Default` delegates to `StimulusWorld::new`.
+/// `Default` delegates to `StimulusWorld::new`.
 impl Default for StimulusWorld {
     fn default() -> Self {
         Self::new()
     }
 }
-
-// ---- Type: Sensor ----
-
-/// Agent-level sensing configuration and awareness state.
+/// Perception configuration and transient awareness state.
 pub struct Sensor {
-    /// Sight range in world units.
+    /// Sight radius.
     pub sight_range: f32,
-    /// Full cone angle in degrees (180 = quarter-circle each side; 360 = omnidirectional).
+    /// Sight cone width in degrees.
     pub sight_angle: f32,
-    /// Hearing range in world units.
+    /// Hearing radius.
     pub hearing_range: f32,
-    /// Current facing direction in radians (0 = right, /2 = up).
+    /// Facing angle in radians.
     pub facing: f32,
-    /// Current awareness level in `[0.0, 1.0]`.
+    /// Current awareness in `[0, 1]`.
     pub awareness: f32,
-    /// Awareness rise per second per detected stimulus count (not multiplied by count).
+    /// Awareness rise rate.
     pub awareness_rise: f32,
-    /// Awareness decay per second when no stimuli are detected.
+    /// Awareness decay rate.
     pub awareness_decay: f32,
-    /// Awareness threshold in `[0.0, 1.0]` above which the sensor is considered alerted.
+    /// Threshold used for alert state.
     pub alert_threshold: f32,
-    /// Per-custom-sense detection ranges. Key = type label, value = range.
+    /// Custom detection ranges per label.
     pub custom_ranges: HashMap<String, f32>,
 }
-
 impl Sensor {
-    /// Create a sensor with default parameters suitable for a typical guard agent.
     pub fn new() -> Self {
         Self {
             sight_range: 200.0,
@@ -249,8 +226,6 @@ impl Sensor {
             custom_ranges: HashMap::new(),
         }
     }
-
-    /// Return `true` if a given world-space target position is inside this
     pub fn can_see(&self, sensor_pos: (f32, f32), target_pos: (f32, f32)) -> bool {
         let dx = target_pos.0 - sensor_pos.0;
         let dy = target_pos.1 - sensor_pos.1;
@@ -266,8 +241,6 @@ impl Sensor {
         let diff = angle_diff(angle_to, self.facing);
         diff.abs() <= half_cone
     }
-
-    /// Return `true` if an auditory stimulus can be heard from `sensor_pos`.
     pub fn can_hear(&self, sensor_pos: (f32, f32), stimulus: &Stimulus) -> bool {
         if stimulus.stimulus_type != StimulusType::Auditory {
             return false;
@@ -277,8 +250,6 @@ impl Sensor {
         let dist = (dx * dx + dy * dy).sqrt();
         dist <= self.hearing_range.min(stimulus.radius)
     }
-
-    /// Queries the `StimulusWorld` for all stimuli detectable from `sensor_pos`
     pub fn detect(&self, sensor_pos: (f32, f32), world: &StimulusWorld) -> Vec<DetectedStimulus> {
         let mut out = Vec::new();
         for stim in world.stimuli() {
@@ -310,8 +281,6 @@ impl Sensor {
         }
         out
     }
-
-    /// Updates the awareness level based on the number of stimuli detected this frame.
     pub fn update_awareness(&mut self, detected_count: usize, dt: f32) {
         if detected_count > 0 {
             self.awareness = (self.awareness + self.awareness_rise * dt).min(1.0);
@@ -319,27 +288,19 @@ impl Sensor {
             self.awareness = (self.awareness - self.awareness_decay * dt).max(0.0);
         }
     }
-
-    /// Return `true` when awareness has reached or exceeded `alert_threshold`.
     pub fn is_alert(&self) -> bool {
         self.awareness >= self.alert_threshold
     }
-
-    /// Registers a detection range for a custom sense channel.
     pub fn add_custom_range(&mut self, type_label: &str, range: f32) {
         self.custom_ranges.insert(type_label.to_string(), range);
     }
 }
-
+/// `Default` delegates to `Sensor::new`.
 impl Default for Sensor {
     fn default() -> Self {
         Self::new()
     }
 }
-
-// ---- Type: Helper ----
-
-/// Return the signed angular difference between `a` and `b` in radians,
 fn angle_diff(a: f32, b: f32) -> f32 {
     let mut diff = a - b;
     while diff > std::f32::consts::PI {
@@ -350,4 +311,3 @@ fn angle_diff(a: f32, b: f32) -> f32 {
     }
     diff
 }
-

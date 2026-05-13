@@ -1,9 +1,5 @@
-//! Particle-vs-physics collision helper.
-
 use crate::particle::ParticleSystem;
 use crate::physics::World;
-
-/// Applies simple collision response against colliders in a physics world.
 pub fn collide_with_world(
     system: &mut ParticleSystem,
     world: &World,

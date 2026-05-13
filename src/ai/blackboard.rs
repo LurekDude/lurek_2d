@@ -1,31 +1,28 @@
-//! hierarchical blackboard store for typed shared AI data.
-use std::collections::HashMap;
-
+//! Blackboard key/value store shared between AI agents and their parent scope.
+//! Owns `BlackboardValue` (typed variants) and `Blackboard` (the store with optional parent).
+//! Does not own Lua callbacks; query/set wrappers live in `lua_api/ai_api.rs`.
+//! Depends on `crate::runtime::log_messages` for structured log codes.
 use crate::log_msg;
 use crate::runtime::log_messages::{BB01, BB02, BB03};
-
-/// A typed value stored in a blackboard slot.
+use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub enum BlackboardValue {
-    /// A 64-bit floating-point number. Used for health, distances, scores, etc.
+    /// 64-bit floating-point numeric value.
     Number(f64),
-    /// A boolean flag. Used for state flags like "is_alert", "has_weapon".
+    /// Boolean flag value.
     Bool(bool),
-    /// A string value. Used for state names, target identifiers, etc.
+    /// UTF-8 string value.
     Text(String),
 }
-
-/// A hierarchical key-value store for sharing named data between AI subsystems.
 #[derive(Clone)]
 pub struct Blackboard {
-    /// Local key-value entries. Keys are case-sensitive strings.
+    /// Local key/value entries owned by this board.
     pub(crate) entries: HashMap<String, BlackboardValue>,
-    /// Optional parent blackboard for hierarchical read-through.
+    /// Optional parent board consulted when a key is absent locally.
     pub(crate) parent: Option<Box<Blackboard>>,
 }
-
 impl Blackboard {
-    /// Create an empty Blackboard with no parent.
+    /// Create an empty blackboard with no parent.
     pub fn new() -> Self {
         log_msg!(debug, BB01);
         Self {
@@ -33,14 +30,12 @@ impl Blackboard {
             parent: None,
         }
     }
-
-    /// Set a number value in the local store.
+    /// Write a `Number` value under `key`, overwriting any existing entry.
     pub fn set_number(&mut self, key: &str, value: f64) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Number(value));
     }
-
-    /// Gets a number value, walking the parent chain. Returns `default` if not found.
+    /// Read a `Number` by key; walks the parent chain, returns `default` if absent.
     pub fn get_number(&self, key: &str, default: f64) -> f64 {
         if let Some(BlackboardValue::Number(v)) = self.entries.get(key) {
             return *v;
@@ -50,14 +45,12 @@ impl Blackboard {
         }
         default
     }
-
-    /// Set a boolean value in the local store.
+    /// Write a `Bool` value under `key`, overwriting any existing entry.
     pub fn set_bool(&mut self, key: &str, value: bool) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Bool(value));
     }
-
-    /// Gets a boolean value, walking the parent chain. Returns `default` if not found.
+    /// Read a `Bool` by key; walks the parent chain, returns `default` if absent.
     pub fn get_bool(&self, key: &str, default: bool) -> bool {
         if let Some(BlackboardValue::Bool(v)) = self.entries.get(key) {
             return *v;
@@ -67,14 +60,12 @@ impl Blackboard {
         }
         default
     }
-
-    /// Set a string value in the local store.
+    /// Write a `Text` value under `key`, overwriting any existing entry.
     pub fn set_string(&mut self, key: &str, value: &str) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Text(value.to_string()));
     }
-
-    /// Gets a string value, walking the parent chain. Returns `default` if not found.
+    /// Read a `Text` by key; walks the parent chain, returns `default` if absent.
     pub fn get_string(&self, key: &str, default: &str) -> String {
         if let Some(BlackboardValue::Text(v)) = self.entries.get(key) {
             return v.clone();
@@ -84,8 +75,7 @@ impl Blackboard {
         }
         default.to_string()
     }
-
-    /// Check if a key exists locally or in any ancestor.
+    /// Return `true` if `key` exists in this board or any ancestor.
     pub fn has(&self, key: &str) -> bool {
         if self.entries.contains_key(key) {
             return true;
@@ -95,42 +85,37 @@ impl Blackboard {
         }
         false
     }
-
-    /// Remove a key from the local store only.
+    /// Remove `key` from the local entries only; parent is not affected.
     pub fn remove(&mut self, key: &str) {
         log_msg!(trace, BB02, "{}", key);
         self.entries.remove(key);
     }
-
-    /// Clears all local entries. Parent is unaffected.
+    /// Remove all local entries; parent is not affected.
     pub fn clear(&mut self) {
         let count = self.entries.len();
         self.entries.clear();
         log_msg!(debug, BB03, "{}", count);
     }
-
-    /// Return all local key names.
+    /// Return all local key names as a new `Vec`; does not include parent keys.
     pub fn keys(&self) -> Vec<String> {
         self.entries.keys().cloned().collect()
     }
-
-    /// Return the number of local entries. Runs in O(1) time.
+    /// Return the number of entries in the local board, excluding the parent.
     pub fn size(&self) -> usize {
         self.entries.len()
     }
-
-    /// Set the parent Blackboard for hierarchical lookup.
+    /// Attach a parent board; looked up when a local key is missing.
     pub fn set_parent(&mut self, parent: Blackboard) {
         self.parent = Some(Box::new(parent));
     }
-
-    /// Return a reference to the parent Blackboard, if any.
+    /// Return a reference to the parent board, or `None` if none is set.
     pub fn parent(&self) -> Option<&Blackboard> {
         self.parent.as_deref()
     }
 }
-
+/// `Default` delegates to `Blackboard::new`.
 impl Default for Blackboard {
+    /// `Default` delegates to `Blackboard::new`.
     fn default() -> Self {
         Self::new()
     }

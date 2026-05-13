@@ -1,80 +1,39 @@
-//! 2D pathfinding grid with A*, Dijkstra, BFS, and flow field generation.
-//!
-//! Cells are addressed with 0-based `(x, y)` coordinates. The Lua layer
-//! converts to/from 1-based indices.
-//!
-//! This module is part of Lurek2D's `pathfind` subsystem and provides the implementation
-//! details for grid-related operations and data management.
-//! Key types exported from this module: `Grid`.
-//! Primary functions: `new()`, `width()`, `height()`, `set_walkable()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
 use crate::log_msg;
 use crate::runtime::log_messages::{PF01_GRID_INIT, PF03_NO_PATH};
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque};
-
-/// A node in the A*/Dijkstra priority queue.
 #[derive(Debug, Clone)]
 struct Node {
     cost: f32,
     x: u32,
     y: u32,
 }
-
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
         self.cost == other.cost
     }
 }
-
 impl Eq for Node {}
-
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        // Reversed for min-heap behaviour in BinaryHeap (max-heap by default)
         other
             .cost
             .partial_cmp(&self.cost)
             .unwrap_or(Ordering::Equal)
     }
 }
-
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
-
-/// 2D pathfinding grid with per-cell walkability and movement costs.
-///
-/// Supports A*, Dijkstra, and BFS pathfinding as well as flow field generation.
-/// All coordinates are 0-based.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `walkable` — `Vec<bool>`.
-/// - `costs` — `Vec<f32>`.
 pub struct Grid {
     width: u32,
     height: u32,
     walkable: Vec<bool>,
     costs: Vec<f32>,
 }
-
 impl Grid {
-    /// Creates a new grid where every cell is walkable with the given movement cost.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// # Parameters
-    /// - `width`  — Number of columns.
-    /// - `height` — Number of rows.
-    /// - `default_cost` — Initial movement cost for every cell.
     pub fn new(width: u32, height: u32, default_cost: f32) -> Self {
         let len = (width as usize) * (height as usize);
         log_msg!(debug, PF01_GRID_INIT, "{}x{}", width, height);
@@ -85,24 +44,12 @@ impl Grid {
             costs: vec![default_cost; len],
         }
     }
-
-    /// Returns the grid width in cells.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn width(&self) -> u32 {
         self.width
     }
-
-    /// Returns the grid height in cells.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn height(&self) -> u32 {
         self.height
     }
-
-    /// Converts 2D coordinates to a flat index, returning `None` if out of bounds.
     #[inline]
     fn idx(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
@@ -111,58 +58,22 @@ impl Grid {
             None
         }
     }
-
-    /// Sets whether the cell at `(x, y)` is walkable.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    /// - `walkable` — `bool`.
     pub fn set_walkable(&mut self, x: u32, y: u32, walkable: bool) {
         if let Some(i) = self.idx(x, y) {
             self.walkable[i] = walkable;
         }
     }
-
-    /// Returns whether the cell at `(x, y)` is walkable.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_walkable(&self, x: u32, y: u32) -> bool {
         self.idx(x, y).is_some_and(|i| self.walkable[i])
     }
-
-    /// Sets the movement cost of the cell at `(x, y)`.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    /// - `cost` — `f32`.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: f32) {
         if let Some(i) = self.idx(x, y) {
             self.costs[i] = cost;
         }
     }
-
-    /// Returns the movement cost of the cell at `(x, y)`.
-    ///
-    /// # Parameters
-    /// - `x` — `u32`.
-    /// - `y` — `u32`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_cost(&self, x: u32, y: u32) -> f32 {
         self.idx(x, y).map_or(1.0, |i| self.costs[i])
     }
-
-    // ── Neighbour helpers ──────────────────────────────────────────────
-
-    /// Returns 4-directional neighbours (no diagonals).
     fn neighbors4(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut out = Vec::with_capacity(4);
         if x > 0 {
@@ -179,8 +90,6 @@ impl Grid {
         }
         out
     }
-
-    /// Returns 8-directional neighbours (including diagonals).
     fn neighbors8(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut out = Vec::with_capacity(8);
         for dy in [-1i32, 0, 1] {
@@ -197,26 +106,6 @@ impl Grid {
         }
         out
     }
-
-    // ── A* ─────────────────────────────────────────────────────────────
-
-    /// Finds a path from `(sx, sy)` to `(gx, gy)` using A*.
-    ///
-    /// # Parameters
-    /// - `sx` — `u32`.
-    /// - `sy` — `u32`.
-    /// - `gx` — `u32`.
-    /// - `gy` — `u32`.
-    /// - `diagonal` — `bool`.
-    ///
-    /// # Returns
-    /// `Option<Vec<(u32, u32)>>`.
-    ///
-    /// When `diagonal` is `true`, 8-directional movement is allowed and the
-    /// heuristic uses Euclidean distance; otherwise 4-directional movement with
-    /// Manhattan distance.
-    ///
-    /// Returns `None` if no path exists.
     pub fn find_path_astar(
         &self,
         sx: u32,
@@ -232,7 +121,6 @@ impl Grid {
             log_msg!(warn, PF03_NO_PATH, "start or goal not walkable");
             return None;
         }
-
         let heuristic = |x: u32, y: u32| -> f32 {
             let dx = (x as f32 - gx as f32).abs();
             let dy = (y as f32 - gy as f32).abs();
@@ -242,11 +130,9 @@ impl Grid {
                 dx + dy
             }
         };
-
         let mut g_score = vec![f32::MAX; len];
         let mut came_from: Vec<usize> = (0..len).collect();
         let mut closed = vec![false; len];
-
         g_score[start] = 0.0;
         let mut open = BinaryHeap::new();
         open.push(Node {
@@ -254,7 +140,6 @@ impl Grid {
             x: sx,
             y: sy,
         });
-
         while let Some(current) = open.pop() {
             let ci = self.idx(current.x, current.y).unwrap();
             if ci == goal {
@@ -264,7 +149,6 @@ impl Grid {
                 continue;
             }
             closed[ci] = true;
-
             let nbrs = if diagonal {
                 self.neighbors8(current.x, current.y)
             } else {
@@ -294,20 +178,6 @@ impl Grid {
         }
         None
     }
-
-    /// Finds a path from `(sx, sy)` to `(gx, gy)` using Dijkstra's algorithm.
-    ///
-    /// # Parameters
-    /// - `sx` — `u32`.
-    /// - `sy` — `u32`.
-    /// - `gx` — `u32`.
-    /// - `gy` — `u32`.
-    /// - `diagonal` — `bool`.
-    ///
-    /// # Returns
-    /// `Option<Vec<(u32, u32)>>`.
-    ///
-    /// Equivalent to A* with heuristic = 0. Respects cell costs.
     pub fn find_path_dijkstra(
         &self,
         sx: u32,
@@ -322,11 +192,9 @@ impl Grid {
         if !self.walkable[start] || !self.walkable[goal] {
             return None;
         }
-
         let mut dist = vec![f32::MAX; len];
         let mut came_from: Vec<usize> = (0..len).collect();
         let mut closed = vec![false; len];
-
         dist[start] = 0.0;
         let mut open = BinaryHeap::new();
         open.push(Node {
@@ -334,7 +202,6 @@ impl Grid {
             x: sx,
             y: sy,
         });
-
         while let Some(current) = open.pop() {
             let ci = self.idx(current.x, current.y).unwrap();
             if ci == goal {
@@ -344,7 +211,6 @@ impl Grid {
                 continue;
             }
             closed[ci] = true;
-
             let nbrs = if diagonal {
                 self.neighbors8(current.x, current.y)
             } else {
@@ -374,20 +240,6 @@ impl Grid {
         }
         None
     }
-
-    /// Finds a shortest-hop path from `(sx, sy)` to `(gx, gy)` using BFS.
-    ///
-    /// # Parameters
-    /// - `sx` — `u32`.
-    /// - `sy` — `u32`.
-    /// - `gx` — `u32`.
-    /// - `gy` — `u32`.
-    /// - `diagonal` — `bool`.
-    ///
-    /// # Returns
-    /// `Option<Vec<(u32, u32)>>`.
-    ///
-    /// Ignores cell costs — every walkable step has equal weight.
     pub fn find_path_bfs(
         &self,
         sx: u32,
@@ -402,14 +254,11 @@ impl Grid {
         if !self.walkable[start] || !self.walkable[goal] {
             return None;
         }
-
         let mut visited = vec![false; len];
         let mut came_from: Vec<usize> = (0..len).collect();
         visited[start] = true;
-
         let mut queue = VecDeque::new();
         queue.push_back((sx, sy));
-
         while let Some((cx, cy)) = queue.pop_front() {
             let ci = self.idx(cx, cy).unwrap();
             if ci == goal {
@@ -432,8 +281,6 @@ impl Grid {
         }
         None
     }
-
-    /// Reconstruct a path from `came_from` links.
     fn reconstruct(&self, came_from: Vec<usize>, start: usize, goal: usize) -> Vec<(u32, u32)> {
         let mut path = Vec::new();
         let mut cur = goal;
@@ -449,38 +296,20 @@ impl Grid {
         path.reverse();
         path
     }
-
-    // ── Flow field ─────────────────────────────────────────────────────
-
-    /// Builds a flow field pointing toward `(gx, gy)`.
-    ///
-    /// # Parameters
-    /// - `gx` — `u32`.
-    /// - `gy` — `u32`.
-    ///
-    /// # Returns
-    /// `Vec<(f32, f32)>`.
-    ///
-    /// Returns a flat `width * height` vector of `(dx, dy)` direction pairs.
-    /// Unreachable or wall cells get `(0.0, 0.0)`.
     pub fn build_flow_field(&self, gx: u32, gy: u32) -> Vec<(f32, f32)> {
         let len = (self.width as usize) * (self.height as usize);
         let goal = match self.idx(gx, gy) {
             Some(i) => i,
             None => return vec![(0.0, 0.0); len],
         };
-
         let mut dist = vec![f32::MAX; len];
         dist[goal] = 0.0;
-
         let mut open = BinaryHeap::new();
         open.push(Node {
             cost: 0.0,
             x: gx,
             y: gy,
         });
-
-        // Dijkstra from goal
         let mut closed = vec![false; len];
         while let Some(current) = open.pop() {
             let ci = self.idx(current.x, current.y).unwrap();
@@ -488,7 +317,6 @@ impl Grid {
                 continue;
             }
             closed[ci] = true;
-
             for (nx, ny) in self.neighbors4(current.x, current.y) {
                 let ni = self.idx(nx, ny).unwrap();
                 if !self.walkable[ni] || closed[ni] {
@@ -505,8 +333,6 @@ impl Grid {
                 }
             }
         }
-
-        // Build direction vectors
         let mut field = vec![(0.0f32, 0.0f32); len];
         for y in 0..self.height {
             for x in 0..self.width {

@@ -1,50 +1,43 @@
-//! hierarchical task network planner with recursive decomposition.
+//! Hierarchical task network planning over symbolic world state values.
+//! Owns `WorldState`, `HTNTask`, `HTNMethod`, `HTNDomain`, and `HTNPlanner`.
+//! Does not execute actions; it only decomposes tasks into a plan.
 use std::collections::HashMap;
-
-// World State
-
-/// Snapshot of agent/world boolean and numeric state used during HTN planning.
+/// Symbolic world state keyed by string names.
 pub type WorldState = HashMap<String, f32>;
-
-// ---- Type: HTNTask ----
-
-/// A hierarchical task - either a compound task (decomposable) or a primitive task (executable).
+/// Compound or primitive task in an HTN domain.
 pub enum HTNTask {
-    /// A compound task that must be decomposed via its methods.
+    /// Compound task with a set of alternative methods.
     Compound {
-        /// Unique name of this compound task.
+        /// Task name.
         name: String,
-        /// Ordered list of decomposition methods; first applicable method wins.
+        /// Methods that can decompose this task.
         methods: Vec<HTNMethod>,
     },
-    /// A directly executable primitive task with optional state effects.
+    /// Primitive task that directly changes world state.
     Primitive {
-        /// Unique name of this primitive task (returned in the plan output).
+        /// Task name.
         name: String,
-        /// World-state keys that must be `>= 0.5` to include this task.
+        /// Preconditions that must be satisfied.
         preconditions: Vec<String>,
-        /// World-state keys set to `1.0` after executing this primitive.
+        /// Effects that set keys to 1.0.
         effects: Vec<String>,
-        /// World-state keys set to `0.0` after executing this primitive.
+        /// Effects that set keys to 0.0.
         effects_clear: Vec<String>,
     },
 }
-
 impl HTNTask {
-    /// Return the name of this task.
+    /// Return the task name.
     pub fn name(&self) -> &str {
         match self {
             Self::Compound { name, .. } => name.as_str(),
             Self::Primitive { name, .. } => name.as_str(),
         }
     }
-
-    /// Return `true` if this is a primitive task.
+    /// Return `true` for primitive tasks.
     pub fn is_primitive(&self) -> bool {
         matches!(self, Self::Primitive { .. })
     }
-
-    /// Check whether a primitiv's preconditions are satisfied in the given state.
+    /// Return `true` when the task preconditions are satisfied.
     pub fn preconditions_met(&self, state: &WorldState) -> bool {
         match self {
             Self::Primitive { preconditions, .. } => preconditions
@@ -53,8 +46,7 @@ impl HTNTask {
             Self::Compound { .. } => true,
         }
     }
-
-    /// Applies this primitiv's effects to a mutable world-state clone.
+    /// Apply primitive effects to the world state.
     pub fn apply_effects(&self, state: &mut WorldState) {
         if let Self::Primitive {
             effects,
@@ -71,21 +63,17 @@ impl HTNTask {
         }
     }
 }
-
-// ---- Type: HTNMethod ----
-
-/// One decomposition pathway for a compound task.
+/// One method that decomposes a compound task into subtasks.
 pub struct HTNMethod {
-    /// Descriptive name for this method (used for debug/logging).
+    /// Method name.
     pub name: String,
-    /// World-state keys that must be `>= 0.5` for this method to trigger.
+    /// Preconditions that must be satisfied for the method to apply.
     pub preconditions: Vec<String>,
-    /// Ordered task names to push onto the planning stack when this method applies.
+    /// Subtasks produced by the method.
     pub sub_tasks: Vec<String>,
 }
-
 impl HTNMethod {
-    /// Create a method with no preconditions (always applicable).
+    /// Create a method with no preconditions.
     pub fn always(name: &str, sub_tasks: Vec<&str>) -> Self {
         Self {
             name: name.to_string(),
@@ -93,8 +81,7 @@ impl HTNMethod {
             sub_tasks: sub_tasks.into_iter().map(|s| s.to_string()).collect(),
         }
     }
-
-    /// Create a method with preconditions.
+    /// Create a method with explicit preconditions.
     pub fn with_preconditions(name: &str, preconditions: Vec<&str>, sub_tasks: Vec<&str>) -> Self {
         Self {
             name: name.to_string(),
@@ -102,35 +89,29 @@ impl HTNMethod {
             sub_tasks: sub_tasks.into_iter().map(|s| s.to_string()).collect(),
         }
     }
-
-    /// Return `true` if this metho's preconditions are satisfied in `state`.
+    /// Return `true` when the method preconditions are satisfied.
     pub fn is_applicable(&self, state: &WorldState) -> bool {
         self.preconditions
             .iter()
             .all(|k| state.get(k).copied().unwrap_or(0.0) >= 0.5)
     }
 }
-
-// ---- Type: HTNDomain ----
-
-/// Registry of all HTN tasks for an agent archetype.
+/// Task registry used by the planner.
 #[derive(Default)]
 pub struct HTNDomain {
+    /// Registered tasks by name.
     tasks: HashMap<String, HTNTask>,
 }
-
 impl HTNDomain {
     /// Create an empty domain.
     pub fn new() -> Self {
         Self::default()
     }
-
-    /// Registers an `HTNTask` in the domain. Overwrites any existing task with the same name.
+    /// Register a task by its name.
     pub fn register(&mut self, task: HTNTask) {
         self.tasks.insert(task.name().to_string(), task);
     }
-
-    /// Convenience: registers a primitive task with given preconditions and effects.
+    /// Add a primitive task.
     pub fn add_primitive(
         &mut self,
         name: &str,
@@ -145,33 +126,26 @@ impl HTNDomain {
             effects_clear: effects_clear.into_iter().map(|s| s.to_string()).collect(),
         });
     }
-
-    /// Convenience: registers a compound task with a list of methods.
+    /// Add a compound task.
     pub fn add_compound(&mut self, name: &str, methods: Vec<HTNMethod>) {
         self.register(HTNTask::Compound {
             name: name.to_string(),
             methods,
         });
     }
-
-    /// Looks up a task by name.
+    /// Return a task by name.
     pub fn get(&self, name: &str) -> Option<&HTNTask> {
         self.tasks.get(name)
     }
-
-    /// Return the number of registered tasks.
+    /// Return the number of tasks in the domain.
     pub fn task_count(&self) -> usize {
         self.tasks.len()
     }
 }
-
-// ---- Type: HTNPlanner ----
-
-/// Stateless HTN planner. Executes planning via recursive decomposition.
+/// HTN planner that decomposes a root task into a linear action list.
 pub struct HTNPlanner;
-
 impl HTNPlanner {
-    /// Plans from `root_task` against `domain` and `initial_state`.
+    /// Plan from `root_task` and return a primitive task sequence, or `None` on failure.
     pub fn plan(
         domain: &HTNDomain,
         root_task: &str,
@@ -186,8 +160,7 @@ impl HTNPlanner {
             None
         }
     }
-
-    /// Internal recursive decomposition. Returns `true` when the stack is fully resolved.
+    /// Recursively decompose a stack of tasks into primitives.
     fn decompose(
         domain: &HTNDomain,
         mut stack: Vec<String>,
@@ -202,9 +175,8 @@ impl HTNPlanner {
             stack.pop();
             let task = match domain.get(&task_name) {
                 Some(t) => t,
-                None => return false, // Unknown task
+                None => return false,
             };
-
             match task {
                 HTNTask::Primitive { .. } => {
                     if !task.preconditions_met(state) {
@@ -219,11 +191,9 @@ impl HTNPlanner {
                             Some(m) => m,
                             None => return false,
                         };
-                    // Push sub-tasks in reverse so the stack pops them left-to-right
                     let mut subtasks: Vec<String> = applicable.sub_tasks.clone();
                     subtasks.reverse();
                     stack.extend(subtasks);
-                    // Recurse for the remaining stack
                     return Self::decompose(domain, stack, state, plan, depth + 1);
                 }
             }
@@ -231,4 +201,3 @@ impl HTNPlanner {
         true
     }
 }
-

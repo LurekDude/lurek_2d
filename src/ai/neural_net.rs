@@ -1,25 +1,23 @@
-//! feedforward neural network inference and weight serialization helpers.
-
-// ---- Type: Activation ----
-
-/// Element-wise activation function applied at the output of a neural layer.
+//! Feed-forward neural network primitives: activation functions, layers, and nets.
+//! Owns `Activation`, `NeuralLayer`, and `NeuralNet`.
+//! Does not own training loops; callers provide weights and run forward passes.
+/// Activation function used by a layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Activation {
-    /// `max(0, x)` - standard rectified linear unit.
+    /// Rectified linear unit.
     ReLU,
-    /// `1 / (1 + e^(-x))` - squashes to `(0, 1)`.
+    /// Logistic sigmoid.
     Sigmoid,
-    /// `tanh(x)` - squashes to `(-1, 1)`.
+    /// Hyperbolic tangent.
     Tanh,
-    /// Identity - no activation.
+    /// No activation.
     Linear,
-    /// Normalised exponentials - useful for the output layer of categorical policies.
+    /// Softmax over the output vector.
     Softmax,
 }
-
 impl Activation {
-    /// Parse a string into an `Activation`. Case-insensitive.
     #[allow(clippy::should_implement_trait)]
+    /// Parse a lowercase activation name; unknown strings map to `Linear`.
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "relu" => Self::ReLU,
@@ -29,8 +27,7 @@ impl Activation {
             _ => Self::Linear,
         }
     }
-
-    /// Return the canonical lowercase string name.
+    /// Return the canonical activation name.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::ReLU => "relu",
@@ -40,8 +37,7 @@ impl Activation {
             Self::Softmax => "softmax",
         }
     }
-
-    /// Applies the activation in-place to a mutable slice.
+    /// Apply the activation in place to `v`.
     pub fn apply(self, v: &mut [f32]) {
         match self {
             Self::ReLU => {
@@ -72,27 +68,21 @@ impl Activation {
         }
     }
 }
-
-// ---- Type: NeuralLayer ----
-
-/// A single fully-connected layer in a neural network.
+/// Dense layer with row-major weights and per-output biases.
 pub struct NeuralLayer {
-    /// Number of inputs to this layer.
+    /// Number of input units.
     pub inputs: usize,
-    /// Number of outputs (neurons) in this layer.
+    /// Number of output units.
     pub outputs: usize,
-    /// Weight matrix: `[outputs - inputs]` row-major.
+    /// Weight matrix stored row-major by output.
     pub weights: Vec<f32>,
-    /// Bias vector: one per output neuron.
+    /// Bias per output unit.
     pub biases: Vec<f32>,
-    /// Activation function applied after the linear transform.
+    /// Layer activation.
     pub activation: Activation,
 }
-
-// ---- Implementation: NeuralLayer ----
-
 impl NeuralLayer {
-    /// Create a new zeroed layer.
+    /// Create a zeroed dense layer.
     pub fn new(inputs: usize, outputs: usize, activation: Activation) -> Self {
         Self {
             inputs,
@@ -102,14 +92,12 @@ impl NeuralLayer {
             activation,
         }
     }
-
-    /// Return the total number of weight parameters (weights + biases).
+    /// Return the number of learnable parameters in the layer.
     pub fn param_count(&self) -> usize {
         self.inputs * self.outputs + self.outputs
     }
-
-    /// Performs the forward pass: `output = activation(W * input + b)`.
     #[allow(clippy::needless_range_loop)]
+    /// Compute the layer output for `input`.
     pub fn forward(&self, input: &[f32]) -> Vec<f32> {
         let mut out = vec![0.0f32; self.outputs];
         for o in 0..self.outputs {
@@ -123,33 +111,27 @@ impl NeuralLayer {
         out
     }
 }
-
-// ---- Type: NeuralNet ----
-
-/// Feedforward neural network stack.
+/// Ordered stack of dense layers.
 #[derive(Default)]
 pub struct NeuralNet {
+    /// Layer list from input to output.
     layers: Vec<NeuralLayer>,
 }
-
 impl NeuralNet {
-    /// Create a new empty neural network.
+    /// Create an empty neural net.
     pub fn new() -> Self {
         Self::default()
     }
-
-    /// Append a fully-connected layer to the network.
+    /// Append a new dense layer.
     pub fn add_layer(&mut self, inputs: usize, outputs: usize, activation: Activation) {
         self.layers
             .push(NeuralLayer::new(inputs, outputs, activation));
     }
-
-    /// Return the total number of trainable parameters across all layers.
+    /// Return the total number of learnable parameters.
     pub fn param_count(&self) -> usize {
         self.layers.iter().map(|l| l.param_count()).sum()
     }
-
-    /// Runs the forward pass and returns output activations.
+    /// Run a forward pass through all layers.
     pub fn forward(&self, input: &[f32]) -> Vec<f32> {
         let mut buf: Vec<f32> = input.to_vec();
         for layer in &self.layers {
@@ -157,8 +139,7 @@ impl NeuralNet {
         }
         buf
     }
-
-    /// Copies all weights from a flat slice into the networ's layers.
+    /// Load flattened weights and biases; returns `false` when the shape mismatches.
     pub fn set_weights(&mut self, weights: &[f32]) -> bool {
         if weights.len() != self.param_count() {
             return false;
@@ -177,8 +158,7 @@ impl NeuralNet {
         }
         true
     }
-
-    /// Flattens all layer weights and biases into a single `Vec<f32>`.
+    /// Return the flattened weights and biases.
     pub fn get_weights(&self) -> Vec<f32> {
         let mut out = Vec::with_capacity(self.param_count());
         for layer in &self.layers {
@@ -187,10 +167,8 @@ impl NeuralNet {
         }
         out
     }
-
     /// Return the number of layers.
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }
 }
-

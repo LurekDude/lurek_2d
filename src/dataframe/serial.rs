@@ -1,22 +1,20 @@
-//! CSV and JSON serialization for DataFrames.
+//! Own serialization and deserialization helpers for `DataFrame` and `Database` across three
+//! formats: CSV (text rows with header), JSON (array-of-objects), and a compact binary layout.
+//! All directions (read and write) are supported. `to_string_table` renders a padded ASCII table
+//! for debug output. `Database` serialization wraps all tables in a single keyed JSON object.
+//! No network or file I/O; callers pre-read bytes and pass them in. Primary consumer is
+//! `src/lua_api/dataframe_api.rs`.
 
 use crate::dataframe::frame::{CellValue, DataFrame};
-
-// ---------------------------------------------------------------------------
-// CSV (RFC 4180)
-// ---------------------------------------------------------------------------
-
-/// Parse CSV text and return a DataFrame with quoted-field handling and basic type inference.
+/// Parse CSV text and return DataFrame or validation error.
 pub fn from_csv(s: &str) -> Result<DataFrame, String> {
     let records = parse_csv_records(s)?;
     if records.is_empty() {
         return Ok(DataFrame::new());
     }
-
     let headers: Vec<String> = records[0].iter().map(|h| h.to_string()).collect();
     let ncols = headers.len();
     let mut data: Vec<Vec<CellValue>> = vec![Vec::new(); ncols];
-
     for (row_i, record) in records.iter().skip(1).enumerate() {
         if record.len() != ncols {
             return Err(format!(
@@ -29,20 +27,15 @@ pub fn from_csv(s: &str) -> Result<DataFrame, String> {
             data[ci].push(auto_detect_type(field));
         }
     }
-
     Ok(DataFrame::from_raw(headers, data))
 }
-
-/// Auto-detect the type of a CSV field value.
 fn auto_detect_type(s: &str) -> CellValue {
     if s.is_empty() {
         return CellValue::Nil;
     }
-    // Try number
     if let Ok(n) = s.parse::<f64>() {
         return CellValue::Number(n);
     }
-    // Try bool
     match s.to_lowercase().as_str() {
         "true" => return CellValue::Bool(true),
         "false" => return CellValue::Bool(false),
@@ -50,8 +43,6 @@ fn auto_detect_type(s: &str) -> CellValue {
     }
     CellValue::Text(s.to_string())
 }
-
-/// Parse CSV text into a list of records (each record is a list of fields).
 fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
     let mut records: Vec<Vec<String>> = Vec::new();
     let mut current_record: Vec<String> = Vec::new();
@@ -60,18 +51,15 @@ fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
     let chars: Vec<char> = s.chars().collect();
     let len = chars.len();
     let mut i = 0;
-
     while i < len {
         let c = chars[i];
         if in_quotes {
             if c == '"' {
-                // Check for escaped quote ""
                 if i + 1 < len && chars[i + 1] == '"' {
                     current_field.push('"');
                     i += 2;
                     continue;
                 }
-                // End of quoted field
                 in_quotes = false;
                 i += 1;
                 continue;
@@ -89,7 +77,6 @@ fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
                     i += 1;
                 }
                 '\r' => {
-                    // Handle \r\n or bare \r
                     current_record.push(std::mem::take(&mut current_field));
                     records.push(std::mem::take(&mut current_record));
                     if i + 1 < len && chars[i + 1] == '\n' {
@@ -110,23 +97,17 @@ fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
             }
         }
     }
-
-    // Final field/record
     if !current_field.is_empty() || !current_record.is_empty() {
         current_record.push(current_field);
         records.push(current_record);
     }
-
     Ok(records)
 }
-
-/// Serialize a DataFrame to CSV format.
 impl DataFrame {
-    /// Serialize to CSV string (RFC 4180).
     #[allow(clippy::needless_range_loop)]
+    /// Serialize DataFrame to CSV string.
     pub fn to_csv(&self) -> String {
         let mut out = String::new();
-        // Header row
         for (i, name) in self.columns().iter().enumerate() {
             if i > 0 {
                 out.push(',');
@@ -134,7 +115,6 @@ impl DataFrame {
             csv_write_field(&mut out, name);
         }
         out.push('\n');
-        // Data rows
         let nrows = self.nrows();
         let data = self.raw_data();
         for row_idx in 0..nrows {
@@ -150,8 +130,6 @@ impl DataFrame {
         out
     }
 }
-
-/// Write a field to CSV, quoting if necessary.
 fn csv_write_field(out: &mut String, field: &str) {
     if field.contains(',') || field.contains('"') || field.contains('\n') || field.contains('\r') {
         out.push('"');
@@ -166,12 +144,7 @@ fn csv_write_field(out: &mut String, field: &str) {
         out.push_str(field);
     }
 }
-
-// ---------------------------------------------------------------------------
-// JSON (hand-rolled)
-// ---------------------------------------------------------------------------
-
-/// Parse JSON (array-of-objects) into a DataFrame.
+/// Parse JSON table payload and return DataFrame.
 pub fn from_json(s: &str) -> Result<DataFrame, String> {
     let trimmed = s.trim();
     if trimmed.is_empty() || trimmed == "[]" {
@@ -180,13 +153,10 @@ pub fn from_json(s: &str) -> Result<DataFrame, String> {
     if !trimmed.starts_with('[') {
         return Err("JSON must be an array of objects".to_string());
     }
-
     let objects = parse_json_array(trimmed)?;
     if objects.is_empty() {
         return Ok(DataFrame::new());
     }
-
-    // Collect all column names in order of first appearance
     let mut col_names: Vec<String> = Vec::new();
     for obj in &objects {
         for (key, _) in obj {
@@ -195,11 +165,9 @@ pub fn from_json(s: &str) -> Result<DataFrame, String> {
             }
         }
     }
-
     let ncols = col_names.len();
     let nrows = objects.len();
     let mut data: Vec<Vec<CellValue>> = vec![Vec::with_capacity(nrows); ncols];
-
     for obj in &objects {
         let lookup: std::collections::HashMap<&str, &CellValue> =
             obj.iter().map(|(k, v)| (k.as_str(), v)).collect();
@@ -212,22 +180,17 @@ pub fn from_json(s: &str) -> Result<DataFrame, String> {
             data[ci].push(val);
         }
     }
-
     Ok(DataFrame::from_raw(col_names, data))
 }
-
-/// Parse a JSON array and return a vector of object records.
 fn parse_json_array(s: &str) -> Result<Vec<Vec<(String, CellValue)>>, String> {
     let chars: Vec<char> = s.chars().collect();
     let len = chars.len();
     let mut pos = 0;
-
     pos = skip_ws(&chars, pos);
     if pos >= len || chars[pos] != '[' {
         return Err("expected '['".to_string());
     }
     pos += 1;
-
     let mut objects = Vec::new();
     loop {
         pos = skip_ws(&chars, pos);
@@ -248,11 +211,8 @@ fn parse_json_array(s: &str) -> Result<Vec<Vec<(String, CellValue)>>, String> {
         objects.push(obj);
         pos = new_pos;
     }
-
     Ok(objects)
 }
-
-/// Parse a single JSON object, returning key-value pairs and the new position.
 fn parse_json_object(
     chars: &[char],
     start: usize,
@@ -263,7 +223,6 @@ fn parse_json_object(
         return Err(format!("expected '{{' at position {pos}"));
     }
     pos += 1;
-
     let mut pairs = Vec::new();
     loop {
         pos = skip_ws(chars, pos);
@@ -281,25 +240,18 @@ fn parse_json_object(
             pos += 1;
             pos = skip_ws(chars, pos);
         }
-
-        // Key
         let (key, new_pos) = parse_json_string(chars, pos)?;
         pos = skip_ws(chars, new_pos);
         if pos >= len || chars[pos] != ':' {
             return Err(format!("expected ':' after key at position {pos}"));
         }
         pos += 1;
-
-        // Value
         let (val, new_pos) = parse_json_value(chars, pos)?;
         pos = new_pos;
         pairs.push((key, val));
     }
-
     Ok((pairs, pos))
 }
-
-/// Parse a JSON string (double-quoted).
 fn parse_json_string(chars: &[char], start: usize) -> Result<(String, usize), String> {
     let len = chars.len();
     let mut pos = skip_ws(chars, start);
@@ -328,7 +280,6 @@ fn parse_json_string(chars: &[char], start: usize) -> Result<(String, usize), St
                 'b' => s.push('\u{0008}'),
                 'f' => s.push('\u{000C}'),
                 'u' => {
-                    // \uXXXX
                     if pos + 4 >= len {
                         return Err("incomplete \\u escape".to_string());
                     }
@@ -352,22 +303,18 @@ fn parse_json_string(chars: &[char], start: usize) -> Result<(String, usize), St
     }
     Err("unterminated string".to_string())
 }
-
-/// Parse a JSON value (string, number, bool, null, object, array).
 fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), String> {
     let len = chars.len();
     let pos = skip_ws(chars, start);
     if pos >= len {
         return Err("unexpected end of JSON value".to_string());
     }
-
     match chars[pos] {
         '"' => {
             let (s, new_pos) = parse_json_string(chars, pos)?;
             Ok((CellValue::Text(s), new_pos))
         }
         't' => {
-            // true
             if pos + 4 <= len && chars[pos..pos + 4].iter().collect::<String>() == "true" {
                 Ok((CellValue::Bool(true), pos + 4))
             } else {
@@ -375,7 +322,6 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
             }
         }
         'f' => {
-            // false
             if pos + 5 <= len && chars[pos..pos + 5].iter().collect::<String>() == "false" {
                 Ok((CellValue::Bool(false), pos + 5))
             } else {
@@ -383,7 +329,6 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
             }
         }
         'n' => {
-            // null
             if pos + 4 <= len && chars[pos..pos + 4].iter().collect::<String>() == "null" {
                 Ok((CellValue::Nil, pos + 4))
             } else {
@@ -391,7 +336,6 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
             }
         }
         '-' | '0'..='9' => {
-            // Number
             let mut end = pos;
             while end < len
                 && (chars[end].is_ascii_digit()
@@ -410,13 +354,11 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
             Ok((CellValue::Number(n), end))
         }
         '{' => {
-            // Nested object — store as Text representation
             let (obj, new_pos) = parse_json_object(chars, pos)?;
             let repr: Vec<String> = obj.iter().map(|(k, v)| format!("{k}={v}")).collect();
             Ok((CellValue::Text(format!("{{{}}}", repr.join(","))), new_pos))
         }
         '[' => {
-            // Nested array — skip and store as Text
             let (repr, new_pos) = skip_json_array(chars, pos)?;
             Ok((CellValue::Text(repr), new_pos))
         }
@@ -426,8 +368,6 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
         )),
     }
 }
-
-/// Skip a JSON array, returning its text representation and the new position.
 fn skip_json_array(chars: &[char], start: usize) -> Result<(String, usize), String> {
     let len = chars.len();
     let pos = start;
@@ -447,7 +387,6 @@ fn skip_json_array(chars: &[char], start: usize) -> Result<(String, usize), Stri
                 }
             }
             '"' => {
-                // Skip string
                 end += 1;
                 while end < len && chars[end] != '"' {
                     if chars[end] == '\\' {
@@ -462,8 +401,6 @@ fn skip_json_array(chars: &[char], start: usize) -> Result<(String, usize), Stri
     }
     Err("unterminated array".to_string())
 }
-
-/// Skip whitespace.
 fn skip_ws(chars: &[char], start: usize) -> usize {
     let mut pos = start;
     while pos < chars.len() && chars[pos].is_ascii_whitespace() {
@@ -471,11 +408,9 @@ fn skip_ws(chars: &[char], start: usize) -> usize {
     }
     pos
 }
-
-/// Serialize a DataFrame to JSON (array-of-objects).
 impl DataFrame {
-    /// Serialize to JSON string (array-of-objects format).
     #[allow(clippy::needless_range_loop)]
+    /// Serialize DataFrame to JSON table string.
     pub fn to_json(&self) -> String {
         let mut out = String::from("[");
         let nrows = self.nrows();
@@ -501,8 +436,6 @@ impl DataFrame {
         out
     }
 }
-
-/// Escape a string for JSON output.
 fn json_escape_string(out: &mut String, s: &str) {
     for c in s.chars() {
         match c {
@@ -518,8 +451,6 @@ fn json_escape_string(out: &mut String, s: &str) {
         }
     }
 }
-
-/// Write a CellValue as a JSON value.
 fn json_write_value(out: &mut String, val: &CellValue) {
     match val {
         CellValue::Nil => out.push_str("null"),
@@ -540,45 +471,21 @@ fn json_write_value(out: &mut String, val: &CellValue) {
         }
     }
 }
-
-// ---------------------------------------------------------------------------
-// LVDF Binary Format
-// ---------------------------------------------------------------------------
-
-// Wire format:
-//   Magic:   "LVDF" (4 bytes)
-//   Version: u8 = 1
-//   ncols:   u32 LE
-//   nrows:   u32 LE
-//   For each column:
-//     name_len: u32 LE
-//     name:     UTF-8 bytes
-//   For each column, for each row:
-//     tag: u8  (0=Nil, 1=Number, 2=Text, 3=Bool)
-//     payload: (Number=8 bytes f64 LE, Text=u32 LE len + bytes, Bool=1 byte, Nil=none)
-
 impl DataFrame {
-    /// Serialize to LVDF binary format.
+    /// Serialize DataFrame to compact binary format bytes.
     pub fn to_binary(&self) -> Vec<u8> {
         let mut buf = Vec::new();
-        // Magic
         buf.extend_from_slice(b"LVDF");
-        // Version
         buf.push(1u8);
-        // ncols, nrows
         let ncols = self.ncols() as u32;
         let nrows = self.nrows() as u32;
         buf.extend_from_slice(&ncols.to_le_bytes());
         buf.extend_from_slice(&nrows.to_le_bytes());
-
-        // Column names
         for name in self.columns() {
             let name_bytes = name.as_bytes();
             buf.extend_from_slice(&(name_bytes.len() as u32).to_le_bytes());
             buf.extend_from_slice(name_bytes);
         }
-
-        // Cell data
         let data = self.raw_data();
         for col in data {
             for cell in col {
@@ -601,41 +508,28 @@ impl DataFrame {
                 }
             }
         }
-
         buf
     }
 }
-
-/// Deserialize a DataFrame from LVDF binary format.
+/// Parse compact binary payload and return DataFrame.
 pub fn from_binary(data: &[u8]) -> Result<DataFrame, String> {
     let len = data.len();
     if len < 13 {
         return Err("LVDF data too short".to_string());
     }
-
-    // Magic
     if &data[0..4] != b"LVDF" {
         return Err("invalid LVDF magic bytes".to_string());
     }
-
-    // Version
     let version = data[4];
     if version != 1 {
         return Err(format!("unsupported LVDF version: {version}"));
     }
-
-    // ncols, nrows
     let ncols = u32::from_le_bytes([data[5], data[6], data[7], data[8]]) as usize;
     let nrows = u32::from_le_bytes([data[9], data[10], data[11], data[12]]) as usize;
-
-    // Guard against unreasonable sizes
     if ncols > 10_000 || nrows > 10_000_000 {
         return Ok(DataFrame::new());
     }
-
     let mut pos = 13;
-
-    // Column names
     let mut column_names = Vec::with_capacity(ncols);
     for _ in 0..ncols {
         if pos + 4 > len {
@@ -652,8 +546,6 @@ pub fn from_binary(data: &[u8]) -> Result<DataFrame, String> {
         column_names.push(name.to_string());
         pos += name_len;
     }
-
-    // Cell data
     let mut columns: Vec<Vec<CellValue>> = vec![Vec::with_capacity(nrows); ncols];
     #[allow(clippy::needless_range_loop)]
     for ci in 0..ncols {
@@ -714,27 +606,18 @@ pub fn from_binary(data: &[u8]) -> Result<DataFrame, String> {
             columns[ci].push(cell);
         }
     }
-
     Ok(DataFrame::from_raw(column_names, columns))
 }
-
-// ---------------------------------------------------------------------------
-// ASCII table
-// ---------------------------------------------------------------------------
-
 impl DataFrame {
-    /// Format the DataFrame as an ASCII table for debug display.
     #[allow(clippy::needless_range_loop)]
+    /// Render DataFrame as padded string table.
     pub fn to_string_table(&self) -> String {
         let cols = self.columns();
         let nrows = self.nrows();
         let data = self.raw_data();
-
         if cols.is_empty() {
             return "(empty DataFrame)".to_string();
         }
-
-        // Compute column widths
         let mut widths: Vec<usize> = cols.iter().map(|n| n.len()).collect();
         for row_idx in 0..nrows {
             for (ci, w) in widths.iter_mut().enumerate() {
@@ -744,18 +627,13 @@ impl DataFrame {
                 }
             }
         }
-
         let mut out = String::new();
-
-        // Separator line
         let sep: String = widths
             .iter()
             .map(|w| "-".repeat(*w + 2))
             .collect::<Vec<_>>()
             .join("+");
         let sep = format!("+{sep}+\n");
-
-        // Header
         out.push_str(&sep);
         out.push('|');
         for (ci, name) in cols.iter().enumerate() {
@@ -763,8 +641,6 @@ impl DataFrame {
         }
         out.push('\n');
         out.push_str(&sep);
-
-        // Rows
         for row_idx in 0..nrows {
             out.push('|');
             for ci in 0..cols.len() {
@@ -774,15 +650,12 @@ impl DataFrame {
             out.push('\n');
         }
         out.push_str(&sep);
-
         out
     }
 }
-
 use crate::dataframe::frame::Database;
-
 impl Database {
-    /// Serialize all tables to a JSON object string.
+    /// Serialize Database tables to JSON string.
     pub fn to_json(&self) -> String {
         let names = self.list_tables();
         let mut out = String::from("{");

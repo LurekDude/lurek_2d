@@ -1,20 +1,20 @@
-//! Engine entry point: window, event loop, Lua callbacks, and frame rendering.
-//! Coordinates subsystems via [`App::run()`]; only module at top of dependency graph.
+//! Application orchestration layer.
+//! Owns startup flow, frame/update lifecycle integration, Lua callback dispatch hooks,
+//! splash/debug/error presentation helpers, and runtime-facing app utilities.
 
-/// Application state and main loop orchestration.
 #[allow(clippy::module_inception)]
+/// Core application runtime: event loop bridge, frame lifecycle, and orchestration.
 pub mod app;
-/// Frame timing statistics formatting.
-pub mod frame_profile;
-/// Lua callback invocation with timeout control.
-pub mod lua_callbacks;
-/// Splash-screen branding asset loading and rendering.
-pub mod splash_screen;
-/// Frame rate and draw-call diagnostic overlay.
+/// Debug HUD overlay rendered on top of game output.
 pub mod debug_overlay;
-/// Fallback error display for runtime and Lua failures.
+/// User-facing fatal error rendering and formatting helpers.
 pub mod error_screen;
-
+/// Frame profile formatting helpers.
+pub mod frame_profile;
+/// Lua callback invocation wrappers with optional instruction timeout guard.
+pub mod lua_callbacks;
+/// Splash branding asset loading and splash render-command generation.
+pub mod splash_screen;
 pub use app::App;
 pub use debug_overlay::DebugOverlay;
 pub use error_screen::ErrorScreen;

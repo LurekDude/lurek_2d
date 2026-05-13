@@ -1,39 +1,17 @@
-//! Grid-based pathfinding: A★, HPA★, flow fields, and unit-size-aware navigation.
-//! Also includes adjacency-graph A★ for province and world-graph navigation.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
-/// AI flow field (simple walkability grid, moved from ai/flowfield).
 pub mod ai_flow_field;
-/// AStar, Dijkstra, and line-of-sight on NavGrid.
 pub mod astar;
-/// Async pathfinding thread pool for off-thread NavGrid queries.
 pub mod async_pool;
-/// Bidirectional A* for halved search space on large grids.
 pub mod bidir;
-/// Flow field pathfinding for crowd steering (NavGrid-based).
 pub mod flow_field;
-/// Adjacency-graph pathfinding (A* and Dijkstra) over abstract neighbor maps.
-/// Suitable for province-level and world-graph navigation.
 pub mod graph_path;
-/// 2D walkable grid with A*, Dijkstra, BFS, and flow field generation.
 pub mod grid;
-/// Hierarchical pathfinding A* (HPA*) with abstract graph and level-of-detail.
 pub mod hpa;
-/// Multi-layer spatial float grid for strategic area analysis and influence mapping.
 pub mod influence_map;
-/// Navigation grid with per-cell costs, diagonal modes, and HPA* support.
 pub mod nav_grid;
-/// Polygon navmesh for non-tile pathfinding.
 pub mod navmesh;
-/// Weighted walkability grid with `Cell` type (moved from ai/pathgrid).
 pub mod pathgrid;
-/// Debug render commands and image export for pathfinding data structures.
 pub mod render;
-/// Unit-radius-aware pathfinding wrapper over NavGrid.
 pub mod unit_pathfinder;
-
 pub use ai_flow_field::FlowField as SimpleFlowField;
 pub use astar::{astar, line_of_sight, smooth_path};
 pub use async_pool::PathThreadPool;
@@ -47,19 +25,12 @@ pub use nav_grid::{DiagonalMode, NavGrid};
 pub use navmesh::NavMesh;
 pub use pathgrid::{Cell, PathGrid};
 pub use unit_pathfinder::{UnitPathfinder, Waypoint};
-
-/// Graph-based A* and Dijkstra range query for node-edge world graphs.
 #[cfg(feature = "graph")]
 pub mod graph_nav;
-/// Hexagonal grid pathfinding with axial coordinate support and optional pathing costs.
 pub mod hex_grid;
-/// Isometric grid pathfinding backed by a flat cost array with walkability masking.
 pub mod iso_grid;
-/// Jump Point Search — faster A* variant optimised for uniform-cost grids.
 pub mod jps;
-/// Precomputed Dijkstra range map for reachability and movement-budget queries.
 pub mod range_map;
-
 #[cfg(feature = "graph")]
 pub use graph_nav::{graph_astar, graph_range};
 pub use hex_grid::{HexGrid, HexLayout};

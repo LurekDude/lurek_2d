@@ -1,73 +1,14 @@
-//! Extended shape types for physics bodies.
-//!
-//! Provides polygon, edge, and chain shapes beyond the basic rect/circle.
-//!
-//! This module is part of Lurek2D's `physics` subsystem and provides the implementation
-//! details for shape-related operations and data management.
-//! Key types exported from this module: `Shape`.
-//! Primary functions: `to_rapier_collider()`, `regular_polygon()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
-
 use crate::math::Vec2;
 use rapier2d::prelude::*;
-
-/// Extended collision shape for physics bodies.
-///
-/// Goes beyond `BodyShape` to support convex polygons, edges, and chains.
-///
-/// # Variants
-/// - `Rect` — Axis-aligned rectangle with width and height.
-/// - `Circle` — Circle with a radius.
-/// - `Polygon` — Convex polygon (max 8 vertices).
-/// - `Edge` — Line segment between two points.
-/// - `Chain` — Connected chain of edges, optionally closed.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Shape {
-    /// Axis-aligned rectangle.
-    Rect {
-        /// Full width.
-        width: f32,
-        /// Full height.
-        height: f32,
-    },
-    /// Circle shape.
-    Circle {
-        /// Radius.
-        radius: f32,
-    },
-    /// Convex polygon (max 8 vertices).
-    Polygon {
-        /// Polygon vertices in counter-clockwise order.
-        vertices: Vec<Vec2>,
-    },
-    /// Line segment between two points.
-    Edge {
-        /// Start point.
-        v1: Vec2,
-        /// End point.
-        v2: Vec2,
-    },
-    /// Connected chain of edges.
-    Chain {
-        /// Chain vertices.
-        vertices: Vec<Vec2>,
-        /// Whether the chain forms a closed loop.
-        closed: bool,
-    },
+    Rect { width: f32, height: f32 },
+    Circle { radius: f32 },
+    Polygon { vertices: Vec<Vec2> },
+    Edge { v1: Vec2, v2: Vec2 },
+    Chain { vertices: Vec<Vec2>, closed: bool },
 }
-
 impl Shape {
-    /// Converts this shape into a rapier2d `ColliderBuilder`.
-    ///
-    /// Returns `None` if the shape cannot be converted (e.g. degenerate convex hull).
-    ///
-    /// # Parameters
-    /// - `&self` — The shape to convert.
-    ///
-    /// # Returns
-    /// `Some(ColliderBuilder)` on success, `None` for degenerate geometry.
     pub(crate) fn to_rapier_collider(&self) -> Option<ColliderBuilder> {
         match self {
             Shape::Rect { width, height } => {
@@ -98,19 +39,6 @@ impl Shape {
             }
         }
     }
-
-    /// Creates a `Shape` from a type string and flat float argument list.
-    ///
-    /// For `polygon` and `chain`, `args` contains interleaved x/y vertex pairs.
-    /// For `chain`, `closed` controls whether the chain forms a loop.
-    ///
-    /// # Parameters
-    /// - `shape_type` — One of `rectangle`, `circle`, `polygon`, `edge`, `chain`.
-    /// - `args` — Flat f32 arg list extracted from Lua multivalue.
-    /// - `closed` — Only used for `chain`; ignored for other types.
-    ///
-    /// # Returns
-    /// `Ok(Shape)` on success, `Err(String)` for invalid types or insufficient args.
     pub fn from_parts(shape_type: &str, args: &[f32], closed: bool) -> Result<Self, String> {
         match shape_type {
             "rectangle" => {
@@ -170,18 +98,6 @@ impl Shape {
             )),
         }
     }
-
-    /// Creates a regular polygon with the given radius and number of sides.
-    ///
-    /// Vertices are placed on a circle of the given radius, evenly spaced.
-    /// Minimum 3 sides, maximum 8 sides (clamped).
-    ///
-    /// # Parameters
-    /// - `radius` — Circumscribed circle radius.
-    /// - `sides` — Number of sides (clamped to 3–8).
-    ///
-    /// # Returns
-    /// A `Shape::Polygon` with the computed vertices.
     pub fn regular_polygon(radius: f32, sides: u32) -> Self {
         let sides = sides.clamp(3, 8);
         let mut vertices = Vec::with_capacity(sides as usize);
@@ -192,40 +108,15 @@ impl Shape {
         Shape::Polygon { vertices }
     }
 }
-
-/// A standalone shape value holding geometry and default fixture parameters.
-///
-/// Created via `lurek.physics.newCircleShape` et al. and attached to bodies
-/// with `lurek.physics.attachShape`. Can be reused across multiple bodies.
-///
-/// # Fields
-/// - `shape` — `Shape`. The underlying collision geometry.
-/// - `density` — `f32`. Mass density (default 1.0).
-/// - `friction` — `f32`. Surface friction coefficient (default 0.5).
-/// - `restitution` — `f32`. Bounciness: 0 = inelastic, 1 = fully elastic (default 0.0).
-/// - `sensor` — `bool`. If true, the shape detects overlaps without physical response.
 #[derive(Debug, Clone)]
 pub struct StandaloneShape {
-    /// The underlying collision geometry.
     pub shape: Shape,
-    /// Mass density (default 1.0).
     pub density: f32,
-    /// Surface friction coefficient (default 0.5).
     pub friction: f32,
-    /// Bounciness: 0 = inelastic, 1 = fully elastic (default 0.0).
     pub restitution: f32,
-    /// If true, the shape detects overlaps but produces no physical forces.
     pub sensor: bool,
 }
-
 impl StandaloneShape {
-    /// Creates a new `StandaloneShape` with default fixture parameters.
-    ///
-    /// # Parameters
-    /// - `shape` — `Shape`. The collision geometry.
-    ///
-    /// # Returns
-    /// `StandaloneShape` with density=1.0, friction=0.5, restitution=0.0, sensor=false.
     pub fn new(shape: Shape) -> Self {
         StandaloneShape {
             shape,
@@ -235,11 +126,6 @@ impl StandaloneShape {
             sensor: false,
         }
     }
-
-    /// Returns the shape type name.
-    ///
-    /// # Returns
-    /// One of `"circle"`, `"rectangle"`, `"polygon"`, `"edge"`, `"chain"`.
     pub fn get_type(&self) -> &str {
         match &self.shape {
             Shape::Circle { .. } => "circle",
@@ -249,11 +135,6 @@ impl StandaloneShape {
             Shape::Chain { .. } => "chain",
         }
     }
-
-    /// Returns the radius for circle shapes.
-    ///
-    /// # Returns
-    /// `Some(f32)` for `Shape::Circle`; `None` for all other variants.
     pub fn get_radius(&self) -> Option<f32> {
         if let Shape::Circle { radius } = &self.shape {
             Some(*radius)
@@ -261,13 +142,6 @@ impl StandaloneShape {
             None
         }
     }
-
-    /// Returns an axis-aligned bounding box for this shape as `(min_x, min_y, max_x, max_y)`.
-    ///
-    /// All coordinates are shape-local (centred at origin).
-    ///
-    /// # Returns
-    /// `(f32, f32, f32, f32)` — min_x, min_y, max_x, max_y.
     pub fn get_bounding_box(&self) -> (f32, f32, f32, f32) {
         match &self.shape {
             Shape::Circle { radius } => (-radius, -radius, *radius, *radius),

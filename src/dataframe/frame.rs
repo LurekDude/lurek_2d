@@ -1,54 +1,51 @@
-//! Core DataFrame types and cell storage.
-
-use std::cmp::Ordering;
-use std::collections::HashMap;
+//! Own core tabular data types for the dataframe module: typed cell values, column selectors,
+//! column-major frame storage, row iteration, named-table database container, and aggregation
+//! mode enum. Query, sort, serialization, and vectorized logic live in sibling files and extend
+//! the types here through separate `impl` blocks. Primary consumer is `src/lua_api/dataframe_api.rs`.
+//! No graphics, audio, or physics logic belongs here.
 
 use crate::dataframe::rng::Xorshift64;
-
-/// A single cell value in a DataFrame column.
+use std::cmp::Ordering;
+use std::collections::HashMap;
 #[derive(Debug, Clone, PartialEq)]
+/// Hold typed value stored in one dataframe cell.
 pub enum CellValue {
-    /// Missing / null value.
+    /// Represent missing value.
     Nil,
-    /// 64-bit floating-point number.
+    /// Represent numeric value.
     Number(f64),
-    /// UTF-8 string.
+    /// Represent string value.
     Text(String),
-    /// Boolean value.
+    /// Represent boolean value.
     Bool(bool),
 }
-
 impl CellValue {
-    /// Return `true` when the value is `Nil`.
+    /// Return true when cell is nil.
     pub fn is_nil(&self) -> bool {
         matches!(self, CellValue::Nil)
     }
-
-    /// Return the contained number, or `None`.
+    /// Return numeric value when cell stores number.
     pub fn as_number(&self) -> Option<f64> {
         match self {
             CellValue::Number(n) => Some(*n),
             _ => None,
         }
     }
-
-    /// Return the contained text as a string slice, or `None`.
+    /// Return text slice when cell stores text.
     pub fn as_text(&self) -> Option<&str> {
         match self {
             CellValue::Text(s) => Some(s.as_str()),
             _ => None,
         }
     }
-
-    /// Return the contained boolean, or `None`.
+    /// Return bool value when cell stores boolean.
     pub fn as_bool(&self) -> Option<bool> {
         match self {
             CellValue::Bool(b) => Some(*b),
             _ => None,
         }
     }
-
-    /// Comparison for sorting. Nil sorts to end; among non-nil values
+    /// Compare values for deterministic sort ordering.
     pub fn cmp_for_sort(&self, other: &CellValue) -> Ordering {
         match (self, other) {
             (CellValue::Nil, CellValue::Nil) => Ordering::Equal,
@@ -59,7 +56,6 @@ impl CellValue {
             }
             (CellValue::Text(a), CellValue::Text(b)) => a.cmp(b),
             (CellValue::Bool(a), CellValue::Bool(b)) => a.cmp(b),
-            // Cross-type: Number < Text < Bool
             (CellValue::Number(_), _) => Ordering::Less,
             (_, CellValue::Number(_)) => Ordering::Greater,
             (CellValue::Text(_), CellValue::Bool(_)) => Ordering::Less,
@@ -67,7 +63,7 @@ impl CellValue {
         }
     }
 }
-
+/// Implement `Display` for `CellValue` used by string-table rendering and debug output.
 impl std::fmt::Display for CellValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -84,47 +80,33 @@ impl std::fmt::Display for CellValue {
         }
     }
 }
-
-/// Column reference: string name or 1-based integer index.
-/// When constructed from Lua, `Index` holds the raw 1-based value.
-/// `DataFrame::resolve_col` converts it to a 0-based column index.
 #[derive(Debug, Clone)]
+/// Select column by name or one-based index.
 pub enum ColRef {
-    /// Reference by column name.
+    /// Select column by exact name.
     Name(String),
-    /// Reference by 1-based column index.
+    /// Select column by one-based position.
     Index(usize),
 }
-
-/// In-memory column-major tabular data.
-/// Data is stored as `data[col_index][row_index]`. All public methods
-/// that accept row indices use **0-based** indexing; the Lua binding
-/// layer is responsible for converting from 1-based.
 #[derive(Clone)]
+/// Hold columnar dataframe storage.
 pub struct DataFrame {
     pub(crate) column_names: Vec<String>,
     pub(crate) data: Vec<Vec<CellValue>>,
 }
-
-/// Borrowing row iterator for [`DataFrame`].
-/// Yields one row at a time as a vector of `(column_name, cell_ref)` pairs,
-/// avoiding full-table materialization.
+/// Iterate rows as vectors of column-name and cell references.
 pub struct DataFrameRowIter<'a> {
     df: &'a DataFrame,
     next_row: usize,
 }
-
 impl<'a> Iterator for DataFrameRowIter<'a> {
     type Item = Vec<(&'a str, &'a CellValue)>;
-
     fn next(&mut self) -> Option<Self::Item> {
         if self.next_row >= self.df.nrows() {
             return None;
         }
-
         let row_index = self.next_row;
         self.next_row += 1;
-
         let row = self
             .df
             .column_names
@@ -135,18 +117,12 @@ impl<'a> Iterator for DataFrameRowIter<'a> {
         Some(row)
     }
 }
-
-/// Named catalog of DataFrames.
+/// Hold named tables for SQL-like database queries.
 pub struct Database {
     tables: HashMap<String, DataFrame>,
 }
-
-// ---------------------------------------------------------------------------
-// DataFrame implementation
-// ---------------------------------------------------------------------------
-
 impl DataFrame {
-    /// Create an empty DataFrame with no columns or rows.
+    /// Create empty dataframe.
     pub fn new() -> Self {
         log::debug!("dataframe: new empty DataFrame created");
         Self {
@@ -154,8 +130,7 @@ impl DataFrame {
             data: Vec::new(),
         }
     }
-
-    /// Return the number of rows.
+    /// Return number of rows.
     pub fn nrows(&self) -> usize {
         if self.data.is_empty() {
             0
@@ -163,23 +138,19 @@ impl DataFrame {
             self.data[0].len()
         }
     }
-
-    /// Return the number of columns.
+    /// Return number of columns.
     pub fn ncols(&self) -> usize {
         self.column_names.len()
     }
-
-    /// Return the column names.
+    /// Return ordered column names.
     pub fn columns(&self) -> &[String] {
         &self.column_names
     }
-
-    /// Return the row count.
+    /// Return row count alias.
     pub fn count(&self) -> usize {
         self.nrows()
     }
-
-    /// Resolve a `ColRef` to a 0-based column index.
+    /// Resolve column selector to zero-based index.
     pub fn resolve_col(&self, col: ColRef) -> Result<usize, String> {
         match col {
             ColRef::Name(ref name) => self
@@ -199,8 +170,7 @@ impl DataFrame {
             }
         }
     }
-
-    /// Add a new column, filling existing rows with `default`.
+    /// Add new column filled with default values.
     pub fn add_column(&mut self, name: &str, default: CellValue) -> Result<(), String> {
         if self.column_names.contains(&name.to_string()) {
             return Err(format!("column already exists: {name}"));
@@ -210,16 +180,14 @@ impl DataFrame {
         self.data.push(vec![default; n]);
         Ok(())
     }
-
-    /// Remove a column resolved by `ColRef` and return an error when it is missing.
+    /// Remove selected column.
     pub fn remove_column(&mut self, col: ColRef) -> Result<(), String> {
         let idx = self.resolve_col(col)?;
         self.column_names.remove(idx);
         self.data.remove(idx);
         Ok(())
     }
-
-    /// Rename a column.
+    /// Rename selected column.
     pub fn rename_column(&mut self, col: ColRef, new_name: &str) -> Result<(), String> {
         let idx = self.resolve_col(col)?;
         if self.column_names.contains(&new_name.to_string()) {
@@ -228,24 +196,20 @@ impl DataFrame {
         self.column_names[idx] = new_name.to_string();
         Ok(())
     }
-
-    /// Return a reference to the column data resolved by `ColRef`.
+    /// Return selected column slice.
     pub fn get_column(&self, col: ColRef) -> Result<&[CellValue], String> {
         let idx = self.resolve_col(col)?;
         Ok(&self.data[idx])
     }
-
-    /// Add a row from name-value pairs. Missing columns receive `Nil`.
+    /// Append row from sparse key-value input and return row index.
     pub fn add_row(&mut self, values: &[(String, CellValue)]) -> usize {
         let row_idx = self.nrows();
-        // Auto-create any columns that appear in this row but don't yet exist
         for (key, _) in values.iter() {
             if !self.column_names.contains(key) {
                 self.column_names.push(key.clone());
                 self.data.push(vec![CellValue::Nil; row_idx]);
             }
         }
-        // Build a lookup for provided values
         let lookup: HashMap<&str, &CellValue> =
             values.iter().map(|(k, v)| (k.as_str(), v)).collect();
         for (ci, name) in self.column_names.iter().enumerate() {
@@ -258,8 +222,7 @@ impl DataFrame {
         }
         row_idx
     }
-
-    /// Remove a row by 0-based index and return an error when it is out of range.
+    /// Remove row by index.
     pub fn remove_row(&mut self, row: usize) -> Result<(), String> {
         let n = self.nrows();
         if row >= n {
@@ -270,8 +233,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Get a full row as name-value pairs (0-based index).
+    /// Return cloned row values by index.
     pub fn get_row(&self, row: usize) -> Result<Vec<(String, CellValue)>, String> {
         let n = self.nrows();
         if row >= n {
@@ -284,16 +246,14 @@ impl DataFrame {
             .map(|(ci, name)| (name.clone(), self.data[ci][row].clone()))
             .collect())
     }
-
-    /// Iterate rows lazily as borrowed `(column_name, cell)` pairs.
+    /// Return iterator over row views.
     pub fn iter_rows(&self) -> DataFrameRowIter<'_> {
         DataFrameRowIter {
             df: self,
             next_row: 0,
         }
     }
-
-    /// Get a single cell value (0-based row, ColRef for column).
+    /// Return cloned cell value at row and column.
     pub fn get_value(&self, row: usize, col: ColRef) -> Result<CellValue, String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
@@ -302,8 +262,7 @@ impl DataFrame {
         }
         Ok(self.data[ci][row].clone())
     }
-
-    /// Set a single cell value (0-based row, ColRef for column).
+    /// Set cell value at row and column.
     pub fn set_value(&mut self, row: usize, col: ColRef, val: CellValue) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
@@ -313,27 +272,23 @@ impl DataFrame {
         self.data[ci][row] = val;
         Ok(())
     }
-
-    /// Deep-clone this DataFrame.
+    /// Clone dataframe deeply.
     pub fn clone_df(&self) -> DataFrame {
         DataFrame {
             column_names: self.column_names.clone(),
             data: self.data.clone(),
         }
     }
-
-    /// Return a mutable reference to a column's cell data, resolved by `ColRef`.
+    /// Return mutable column vector for selected column.
     pub fn column_data_mut(&mut self, col: ColRef) -> Result<&mut Vec<CellValue>, String> {
         let ci = self.resolve_col(col)?;
         Ok(&mut self.data[ci])
     }
-
-    /// Create a DataFrame from raw column names and column-major data.
+    /// Build dataframe from raw column names and data vectors.
     pub fn from_raw(column_names: Vec<String>, data: Vec<Vec<CellValue>>) -> Self {
         Self { column_names, data }
     }
-
-    /// Create a DataFrame from row-major values using explicit column names.
+    /// Build dataframe from row-major data.
     pub fn from_rows(column_names: Vec<String>, rows: Vec<Vec<CellValue>>) -> Result<Self, String> {
         if column_names.is_empty() {
             if rows.is_empty() {
@@ -343,7 +298,6 @@ impl DataFrame {
                 "from_rows: column_names cannot be empty when rows are provided".to_string(),
             );
         }
-
         for (i, row) in rows.iter().enumerate() {
             if row.len() != column_names.len() {
                 return Err(format!(
@@ -353,26 +307,21 @@ impl DataFrame {
                 ));
             }
         }
-
         let mut data = vec![Vec::with_capacity(rows.len()); column_names.len()];
         for row in rows {
             for (ci, cell) in row.into_iter().enumerate() {
                 data[ci].push(cell);
             }
         }
-
         Ok(Self::from_raw(column_names, data))
     }
-
-    /// Get a reference to the underlying column-major data.
+    /// Return raw column storage reference.
     pub fn raw_data(&self) -> &Vec<Vec<CellValue>> {
         &self.data
     }
-
-    /// Generate a DataFrame with random data.
+    /// Generate random dataframe from typed column definitions.
     pub fn random(defs: &[(String, String)], n_rows: usize, seed: Option<u64>) -> DataFrame {
         let mut rng = Xorshift64::new(seed.unwrap_or(0));
-
         let names_pool = [
             "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack",
             "Kate", "Leo", "Mia", "Nick", "Olivia", "Pat", "Quinn", "Rose", "Sam", "Tina", "Uma",
@@ -385,10 +334,8 @@ impl DataFrame {
             "small", "large", "old",
         ];
         let alpha = b"abcdefghijklmnopqrstuvwxyz0123456789";
-
         let column_names: Vec<String> = defs.iter().map(|(name, _)| name.clone()).collect();
         let mut data: Vec<Vec<CellValue>> = Vec::with_capacity(defs.len());
-
         for (_, hint) in defs {
             let mut col = Vec::with_capacity(n_rows);
             for row_i in 0..n_rows {
@@ -443,12 +390,11 @@ impl DataFrame {
                         CellValue::Text(u)
                     }
                     "sentence" => {
-                        let n_words = 4 + rng.next_usize(7); // 4-10 words
+                        let n_words = 4 + rng.next_usize(7);
                         let sentence: Vec<&str> = (0..n_words)
                             .map(|_| words[rng.next_usize(words.len())])
                             .collect();
                         let mut s = sentence.join(" ");
-                        // Capitalize first letter
                         if let Some(first) = s.get_mut(0..1) {
                             first.make_ascii_uppercase();
                         }
@@ -460,14 +406,11 @@ impl DataFrame {
             }
             data.push(col);
         }
-
         DataFrame { column_names, data }
     }
-
-    /// Create a new `DataFrame` with an extra computed column.
+    /// Evaluate arithmetic expression per row and append result column.
     pub fn with_eval(&self, col_name: &str, expr: &str) -> Result<DataFrame, String> {
         let tokens = tokenize_expr(expr)?;
-        // Validate all column references exist.
         for tok in &tokens {
             if let ExprToken::ColRef(name) = tok {
                 if !self.column_names.contains(name) {
@@ -490,8 +433,7 @@ impl DataFrame {
         result.data.push(computed);
         Ok(result)
     }
-
-    /// Reshapes this DataFrame from long to wide format (pivot table).
+    /// Build pivot table from row key, column key, and value key.
     pub fn pivot_table(
         &self,
         row_key: ColRef,
@@ -503,8 +445,6 @@ impl DataFrame {
         let ci = self.resolve_col(col_key)?;
         let vi = self.resolve_col(value_key)?;
         let n = self.nrows();
-
-        // Collect unique row-key and col-key values (insertion order).
         let mut row_vals: Vec<CellValue> = Vec::new();
         let mut col_vals: Vec<CellValue> = Vec::new();
         for row in 0..n {
@@ -517,28 +457,20 @@ impl DataFrame {
                 col_vals.push(cv);
             }
         }
-
-        // Build result columns: first = row-key label, then one per unique col-key value.
         let mut out_names: Vec<String> = Vec::with_capacity(1 + col_vals.len());
         out_names.push(self.column_names[ri].clone());
         for cv in &col_vals {
             out_names.push(format!("{cv}"));
         }
-
         let n_rows = row_vals.len();
         let n_out_cols = 1 + col_vals.len();
         let mut out_data: Vec<Vec<CellValue>> = vec![vec![CellValue::Nil; n_rows]; n_out_cols];
-
-        // Fill row-label column.
         for (r, rv) in row_vals.iter().enumerate() {
             out_data[0][r] = rv.clone();
         }
-
-        // Accumulate values into buckets keyed by (row_idx, col_idx).
         let mut buckets: Vec<Vec<Vec<f64>>> = vec![vec![Vec::new(); col_vals.len()]; n_rows];
         let mut first_vals: Vec<Vec<Option<CellValue>>> = vec![vec![None; col_vals.len()]; n_rows];
         let mut last_vals: Vec<Vec<Option<CellValue>>> = vec![vec![None; col_vals.len()]; n_rows];
-
         for row in 0..n {
             let rv = &self.data[ri][row];
             let cv = &self.data[ci][row];
@@ -557,8 +489,6 @@ impl DataFrame {
             }
             last_vals[r_idx][c_idx] = Some(vv.clone());
         }
-
-        // Aggregate and fill output data.
         for r_idx in 0..n_rows {
             for c_idx in 0..col_vals.len() {
                 let vals = &buckets[r_idx][c_idx];
@@ -574,7 +504,6 @@ impl DataFrame {
                     "first" => first_vals[r_idx][c_idx].clone().unwrap_or(CellValue::Nil),
                     "last" => last_vals[r_idx][c_idx].clone().unwrap_or(CellValue::Nil),
                     _ => {
-                        // "mean" is the default
                         if vals.is_empty() {
                             CellValue::Nil
                         } else {
@@ -585,7 +514,6 @@ impl DataFrame {
                 out_data[c_idx + 1][r_idx] = cell;
             }
         }
-
         log::debug!(
             "dataframe: pivot_table → {} rows × {} cols",
             n_rows,
@@ -593,8 +521,7 @@ impl DataFrame {
         );
         Ok(DataFrame::from_raw(out_names, out_data))
     }
-
-    /// Appends a rolling mean column to a copy of this DataFrame.
+    /// Compute rolling mean and return dataframe with appended column.
     pub fn rolling_mean(
         &self,
         src_col: ColRef,
@@ -638,13 +565,8 @@ impl DataFrame {
         log::debug!("dataframe: rolling_mean window={window} → '{result_col}'");
         Ok(out)
     }
-
-    /// Appends a rolling sum column to a copy of this DataFrame.
-    /// For each row `i`, sums the `window` most recent rows (including row `i`).
-    /// Rows before a full window use the available data. Non-`Number` cells
-    /// within the window contribute `0.0`. If the entire window is non-numeric
-    /// the result is `Nil`.
     #[allow(clippy::needless_range_loop)]
+    /// Compute rolling sum and return dataframe with appended column.
     pub fn rolling_sum(
         &self,
         src_col: ColRef,
@@ -683,8 +605,7 @@ impl DataFrame {
         log::debug!("dataframe: rolling_sum window={window} → '{result_col}'");
         Ok(out)
     }
-
-    /// Appends a dense-rank column to a copy of this DataFrame.
+    /// Compute rank for numeric column and return dataframe with rank column.
     pub fn rank_column(
         &self,
         src_col: ColRef,
@@ -694,8 +615,6 @@ impl DataFrame {
         let ci = self.resolve_col(src_col)?;
         let n = self.nrows();
         let src = &self.data[ci];
-
-        // Collect (row_index, value) for numeric cells only.
         let mut indexed: Vec<(usize, f64)> = (0..n)
             .filter_map(|i| {
                 if let CellValue::Number(v) = &src[i] {
@@ -705,15 +624,11 @@ impl DataFrame {
                 }
             })
             .collect();
-
-        // Sort by value according to the requested order.
         if order == "desc" {
             indexed.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
         } else {
             indexed.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
         }
-
-        // Assign dense ranks (tied values share the same rank, no gaps).
         let mut ranks: Vec<CellValue> = vec![CellValue::Number(0.0); n];
         let mut rank = 1usize;
         let mut prev_val: Option<f64> = None;
@@ -728,7 +643,6 @@ impl DataFrame {
                 rank += 1;
             }
         }
-
         let mut out = self.clone_df();
         if out.column_names.contains(&result_col.to_string()) {
             return Err(format!("rank_column: column '{result_col}' already exists"));
@@ -739,11 +653,6 @@ impl DataFrame {
         Ok(out)
     }
 }
-
-// ---------------------------------------------------------------------------
-// Expression evaluator (internal helpers for with_eval)
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone)]
 enum ExprToken {
     Num(f64),
@@ -752,8 +661,6 @@ enum ExprToken {
     LParen,
     RParen,
 }
-
-/// Tokenises an arithmetic expression string.
 fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
     let mut tokens = Vec::new();
     let mut chars = expr.chars().peekable();
@@ -806,10 +713,7 @@ fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
     }
     Ok(tokens)
 }
-
-/// Evaluates a flat (no parentheses) token sequence for a single row using
 fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result<f64, String> {
-    // Convert tokens to values, resolving column references.
     let mut values: Vec<f64> = Vec::new();
     let mut ops: Vec<char> = Vec::new();
     let mut expect_value = true;
@@ -840,7 +744,6 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
             }
             ExprToken::Op(op) => {
                 if expect_value && *op == '-' {
-                    // Unary minus: push a -1 multiplier
                     values.push(-1.0);
                     ops.push('*');
                 } else {
@@ -852,7 +755,6 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
                 }
             }
             ExprToken::LParen | ExprToken::RParen => {
-                // Parentheses not yet supported in the simple evaluator.
                 return Err("with_eval: parentheses are not supported".to_string());
             }
         }
@@ -860,7 +762,6 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
     if expect_value {
         return Err("with_eval: expression ends with operator".to_string());
     }
-    // Apply * and / first.
     let mut i = 0;
     while i < ops.len() {
         if ops[i] == '*' || ops[i] == '/' {
@@ -878,7 +779,6 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
             i += 1;
         }
     }
-    // Apply + and -.
     let mut result = values[0];
     for (op, &v) in ops.iter().zip(values[1..].iter()) {
         match op {
@@ -889,78 +789,63 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
     }
     Ok(result)
 }
-
+/// Implement `Default` for `DataFrame` by delegating to `DataFrame::new`.
 impl Default for DataFrame {
     fn default() -> Self {
         Self::new()
     }
 }
-
-// ---------------------------------------------------------------------------
-// Database implementation
-// ---------------------------------------------------------------------------
-
 impl Database {
-    /// Create an empty database with no tables.
+    /// Create empty database.
     pub fn new() -> Self {
         Self {
             tables: HashMap::new(),
         }
     }
-
-    /// Add a table by name or replace the existing table with the same name.
+    /// Insert or replace table by name.
     pub fn add_table(&mut self, name: &str, df: DataFrame) {
         self.tables.insert(name.to_string(), df);
     }
-
-    /// Get a shared reference to a table by name.
+    /// Return immutable table reference by name.
     pub fn get_table(&self, name: &str) -> Option<&DataFrame> {
         self.tables.get(name)
     }
-
-    /// Get a mutable reference to a table by name.
+    /// Return mutable table reference by name.
     pub fn get_table_mut(&mut self, name: &str) -> Option<&mut DataFrame> {
         self.tables.get_mut(name)
     }
-
-    /// Remove a table by name; return error if not found.
+    /// Remove table by name.
     pub fn remove_table(&mut self, name: &str) -> Result<(), String> {
         if self.tables.remove(name).is_none() {
             return Err(format!("table not found: {name}"));
         }
         Ok(())
     }
-
-    /// Check whether a table with the given name exists.
+    /// Return true when table exists.
     pub fn has_table(&self, name: &str) -> bool {
         self.tables.contains_key(name)
     }
-
-    /// Return the names of all tables, sorted alphabetically.
+    /// Return sorted list of table names.
     pub fn list_tables(&self) -> Vec<String> {
         let mut names: Vec<String> = self.tables.keys().cloned().collect();
         names.sort();
         names
     }
-
-    /// Return the number of tables.
+    /// Return number of tables.
     pub fn table_count(&self) -> usize {
         self.tables.len()
     }
-
-    /// Remove all tables. After this call the container is in the same state as immediately after construction.
+    /// Remove all tables.
     pub fn clear(&mut self) {
         self.tables.clear();
     }
-
-    /// Merge all tables from `other` into this database.
+    /// Merge another database into self by table name.
     pub fn merge(&mut self, other: Database) {
         for (name, df) in other.tables {
             self.tables.insert(name, df);
         }
     }
-
-    /// Deep-clone this Database and all contained DataFrames.
+    /// Clone database deeply.
     pub fn clone_db(&self) -> Database {
         let mut db = Database::new();
         for (name, df) in &self.tables {
@@ -969,38 +854,32 @@ impl Database {
         db
     }
 }
-
+/// Implement `Default` for `Database` by delegating to `Database::new`.
 impl Default for Database {
     fn default() -> Self {
         Self::new()
     }
 }
-
-// ---------------------------------------------------------------------------
-// Aggregation function type
-// ---------------------------------------------------------------------------
-
-/// Aggregation function variants for group-by and pivot operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Select aggregation mode for grouped operations.
 pub enum AggFn {
-    /// Arithmetic mean of numeric values in the group.
+    /// Compute arithmetic mean.
     Mean,
-    /// Sum of numeric values in the group.
+    /// Compute numeric sum.
     Sum,
-    /// Minimum numeric value in the group.
+    /// Compute numeric minimum.
     Min,
-    /// Maximum numeric value in the group.
+    /// Compute numeric maximum.
     Max,
-    /// Count of non-nil values in the group.
+    /// Compute non-nil count.
     Count,
-    /// First value encountered in the group (preserves order).
+    /// Select first seen value.
     First,
-    /// Last value encountered in the group (preserves order).
+    /// Select last seen value.
     Last,
 }
-
 impl AggFn {
-    /// Parse a string into an `AggFn`.
+    /// Parse aggregation label and return mode or error.
     pub fn parse(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
             "mean" => Ok(Self::Mean),

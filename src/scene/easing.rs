@@ -1,12 +1,3 @@
-//! Internal easing helpers shared by scene transitions.
-
-/// Bounce ease-out helper used by transition curves.
-///
-/// # Parameters
-/// - `t` - `f32` normalised to `[0, 1]`.
-///
-/// # Returns
-/// `f32` eased value.
 pub(crate) fn bounce_out(t: f32) -> f32 {
     const N1: f32 = 7.5625;
     const D1: f32 = 2.75;

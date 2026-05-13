@@ -39,8 +39,23 @@ Comments exist for AI agents reading the code. Goal: maximum signal per token. N
 
 ### Regular Rust files (`src/` excluding `src/lua_api/`)
 
+**What requires a doc comment**
+Every one of the following lines must have a `///` comment directly above it — no exceptions, no qualifications:
+- `pub fn`, `pub async fn`
+- `fn` (every private function, without exception)
+- `pub struct`, `struct`
+- `pub enum`, `enum`
+- `pub mod` (every occurrence, in any file)
+- `pub type`, `pub const`, `pub static`
+- `impl Trait for Type` — one `///` line above: what the trait provides for this type
+- Every field inside a struct — pub and private — one `///` line each
+- Every variant inside an enum — one `///` line each
+
+Plain `impl Type { }` (inherent impl) does NOT get a `///` on the `impl` line itself — document only the items inside.
+
 **File level (`//!`)**
-Up to ~600 characters. Write it as a wrapped, readable paragraph of 3-6 short lines when needed. Concrete facts only: what the file owns, key types it defines, what it does NOT own, and direct dependencies. Describe the file's role once; do not repeat the `pub mod`/`pub use` list, enumerate the body below, or restate content that is already obvious from the declarations. No generic phrases like "this module provides".
+Up to ~600 characters. Write as a wrapped paragraph of 3-6 short lines. Concrete facts only: what the file owns, its purpose and role in the system, what it does NOT own, and key dependencies.
+**NEVER list method names, function names, struct names, pub mod names, or any symbol from the file body.** The reader can see declarations directly. Write WHY and WHAT THIS FILE IS — not a table of contents, not a symbol index.
 
 **Struct (`///`)**
 One line: role in the system + which other type uses it.
@@ -48,6 +63,10 @@ Every field — pub and private — one `///` line: what it holds + range/units/
 
 **Enum (`///`)**
 One line: purpose. Every variant: one line — when it applies.
+
+**Impl blocks (`///`)**
+Every `impl Trait for Type` block gets one `///` line above it: what the trait provides for this type.
+Plain `impl Type { }` blocks (inherent impl) do NOT get a `///` on the `impl` line itself — document only the methods inside.
 
 **Methods and functions (`///`)**
 One line only. State what it does AND what it returns, including edge cases inline.

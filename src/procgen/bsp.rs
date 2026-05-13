@@ -1,93 +1,39 @@
-//! Binary Space Partitioning dungeon generator.
-//!
-//! Recursively splits a rectangle into leaves, places a room in each leaf,
-//! then connects sibling rooms with a corridor.
-
 use crate::procgen::lcg::Lcg;
-
-/// A room placed within the dungeon.
-///
-/// # Fields
-/// - `x` — `u32`.
-/// - `y` — `u32`.
-/// - `w` — `u32`.
-/// - `h` — `u32`.
 #[derive(Debug, Clone)]
 pub struct BspRoom {
-    /// Left edge (column).
     pub x: u32,
-    /// Top edge (row).
     pub y: u32,
-    /// Width in cells.
     pub w: u32,
-    /// Height in cells.
     pub h: u32,
 }
-
-/// A generated BSP dungeon.
-///
-/// # Fields
-/// - `rooms` — `Vec<BspRoom>`.
-/// - `corridors` — `Vec<(u32, u32, u32, u32)>`.
 #[derive(Debug, Clone)]
 pub struct BspDungeon {
-    /// All rooms placed in leaf nodes.
     pub rooms: Vec<BspRoom>,
-    /// Corridors connecting pairs of rooms: `(x1, y1, x2, y2)`.
     pub corridors: Vec<(u32, u32, u32, u32)>,
 }
-
-/// Stamp template that can be projected onto BSP rooms.
 #[derive(Debug, Clone)]
 pub struct BspPrefabStamp {
-    /// Prefab identifier.
     pub name: String,
-    /// Prefab width in cells.
     pub width: u32,
-    /// Prefab height in cells.
     pub height: u32,
 }
-
-/// Placement metadata for a BSP prefab projection.
 #[derive(Debug, Clone)]
 pub struct PlacedBspPrefab {
-    /// Prefab identifier.
     pub name: String,
-    /// Placement origin X in dungeon space.
     pub x: u32,
-    /// Placement origin Y in dungeon space.
     pub y: u32,
-    /// Placement width.
     pub width: u32,
-    /// Placement height.
     pub height: u32,
 }
-
-/// Options controlling BSP dungeon generation.
-///
-/// # Fields
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `min_size` — `u32`.
-/// - `max_depth` — `u32`.
-/// - `seed` — `u64`.
-/// - `padding` — `u32`.
 #[derive(Debug, Clone)]
 pub struct BspOpts {
-    /// Total dungeon width in cells.
     pub width: u32,
-    /// Total dungeon height in cells.
     pub height: u32,
-    /// Minimum room dimension in any axis.
     pub min_size: u32,
-    /// Maximum recursion depth.
     pub max_depth: u32,
-    /// Random seed.
     pub seed: u64,
-    /// Padding between room edge and partition edge.
     pub padding: u32,
 }
-
 impl Default for BspOpts {
     fn default() -> Self {
         Self {
@@ -100,19 +46,10 @@ impl Default for BspOpts {
         }
     }
 }
-
-/// Generate a BSP dungeon from the given options.
-///
-/// # Parameters
-/// - `opts` — `&BspOpts`.
-///
-/// # Returns
-/// `BspDungeon`.
 pub fn bsp_dungeon(opts: &BspOpts) -> BspDungeon {
     let mut rng = Lcg::new(opts.seed);
     let mut rooms = Vec::new();
     let mut corridors = Vec::new();
-
     let root = Partition {
         x: 0,
         y: 0,
@@ -128,14 +65,8 @@ pub fn bsp_dungeon(opts: &BspOpts) -> BspDungeon {
         &mut rooms,
         &mut corridors,
     );
-
     BspDungeon { rooms, corridors }
 }
-
-/// Generates a BSP dungeon and returns prefab placements centered in rooms.
-///
-/// This function produces placement metadata only; callers decide how to stamp
-/// into concrete tile grids.
 pub fn bsp_dungeon_with_prefabs(
     opts: &BspOpts,
     prefabs: &[BspPrefabStamp],
@@ -145,7 +76,6 @@ pub fn bsp_dungeon_with_prefabs(
     if prefabs.is_empty() {
         return (dungeon, placements);
     }
-
     for (i, room) in dungeon.rooms.iter().enumerate() {
         let prefab = &prefabs[i % prefabs.len()];
         if prefab.width == 0 || prefab.height == 0 {
@@ -164,10 +94,8 @@ pub fn bsp_dungeon_with_prefabs(
             height: prefab.height,
         });
     }
-
     (dungeon, placements)
 }
-
 #[derive(Clone)]
 struct Partition {
     x: u32,
@@ -175,13 +103,11 @@ struct Partition {
     w: u32,
     h: u32,
 }
-
 impl Partition {
     fn center(&self) -> (u32, u32) {
         (self.x + self.w / 2, self.y + self.h / 2)
     }
 }
-
 fn split(
     part: Partition,
     depth: u32,
@@ -193,9 +119,7 @@ fn split(
 ) -> Partition {
     let can_split_h = part.w >= min_size * 2 + 2;
     let can_split_v = part.h >= min_size * 2 + 2;
-
     if depth == 0 || (!can_split_h && !can_split_v) {
-        // Leaf: place a room
         let pad = opts.padding;
         let max_rw = part.w.saturating_sub(pad * 2).max(min_size);
         let max_rh = part.h.saturating_sub(pad * 2).max(min_size);
@@ -217,14 +141,11 @@ fn split(
         });
         return part;
     }
-
-    // Choose split direction
     let split_horizontal = if can_split_h && can_split_v {
         rng.next().is_multiple_of(2)
     } else {
         can_split_h
     };
-
     let (left, right) = if split_horizontal {
         let split_at = min_size + (rng.next() as u32) % (part.w - min_size * 2).max(1);
         let left = Partition {
@@ -256,14 +177,10 @@ fn split(
         };
         (left, right)
     };
-
     let lp = split(left, depth - 1, min_size, opts, rng, rooms, corridors);
     let rp = split(right, depth - 1, min_size, opts, rng, rooms, corridors);
-
-    // Connect the two sub-partitions with an L-shaped corridor
     let (x1, y1) = lp.center();
     let (x2, y2) = rp.center();
     corridors.push((x1, y1, x2, y2));
-
     part
 }

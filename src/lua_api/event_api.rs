@@ -1,35 +1,18 @@
-//! `lurek.event` - Event queue polling and pub-sub signal dispatch.
-
 use super::SharedState;
+use crate::event::{event_arg_to_lua_value, event_to_lua_multi, EventArg, EventPriority, Signal};
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::rc::Rc;
-
-use crate::event::{event_arg_to_lua_value, event_to_lua_multi, EventArg, EventPriority, Signal};
-
-// ---------------------------------------------------------------------------
-// LuaSignal UserData
-// ---------------------------------------------------------------------------
-
-/// Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 #[derive(Clone)]
 pub struct LuaSignal {
     inner: Rc<RefCell<Signal>>,
     callbacks: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
-    /// Handles that auto-remove after their first fire.
     once_handles: Rc<RefCell<HashSet<u64>>>,
-    /// Optional filter predicate stored per-handle; skips callback if it returns false.
     filter_fns: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
 }
-
 impl LuaUserData for LuaSignal {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // -- register --
-        /// Registers a Lua callback function for the named event and returns a numeric handle ID.
-        /// @param | name | string | The event name to subscribe to (case-sensitive)
-        /// @param | callback | function | The Lua function to invoke when the event fires
-        /// @return | integer | A unique handle ID for this subscription
         methods.add_method(
             "register",
             |lua, this, (name, callback): (String, LuaFunction)| {
@@ -39,11 +22,6 @@ impl LuaUserData for LuaSignal {
                 Ok(handle)
             },
         );
-
-        // -- emit --
-        /// Fires all callbacks registered for the named event, passing any extra arguments to each callback function.
-        /// @param | name | string | The event name to emit (case-sensitive)
-        /// @return | nil | No return value.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let name: String = match iter.next() {
@@ -65,7 +43,6 @@ impl LuaUserData for LuaSignal {
                 let filter_fns = this.filter_fns.borrow();
                 let once_handles = this.once_handles.borrow();
                 for handle in &handles {
-                    // Evaluate filter predicate if present.
                     if let Some(fkey) = filter_fns.get(handle) {
                         let filter_fn: LuaFunction = lua.registry_value(fkey)?;
                         let pass: bool = filter_fn
@@ -84,7 +61,6 @@ impl LuaUserData for LuaSignal {
                     }
                 }
             }
-            // Fire wildcard callbacks.
             let wildcard_handles = this.inner.borrow().get_wildcard_handles(&name);
             {
                 let callbacks = this.callbacks.borrow();
@@ -96,7 +72,6 @@ impl LuaUserData for LuaSignal {
                     }
                 }
             }
-            // Auto-remove once handles after emit.
             for handle in to_remove {
                 this.inner.borrow_mut().remove(handle);
                 if let Some(key) = this.callbacks.borrow_mut().remove(&handle) {
@@ -109,11 +84,6 @@ impl LuaUserData for LuaSignal {
             }
             Ok(())
         });
-
-        // -- remove --
-        /// Removes a previously registered subscription identified by its numeric handle.
-        /// @param | handle | integer | The subscription handle returned by `register` or `once`
-        /// @return | boolean | True if the subscription existed and was removed
         methods.add_method("remove", |lua, this, handle: u64| {
             let removed = this.inner.borrow_mut().remove(handle);
             if removed {
@@ -123,11 +93,6 @@ impl LuaUserData for LuaSignal {
             }
             Ok(removed)
         });
-
-        // -- clear --
-        /// Removes every callback registered for the specified event name and releases their Lua registry entries.
-        /// @param | name | string | The event name whose callbacks should be cleared
-        /// @return | integer | The number of callbacks that were removed
         methods.add_method("clear", |lua, this, name: String| {
             let handles = this.inner.borrow().get_handles(&name);
             let count = this.inner.borrow_mut().clear(&name);
@@ -139,10 +104,6 @@ impl LuaUserData for LuaSignal {
             }
             Ok(count)
         });
-
-        // -- clearAll --
-        /// Removes every callback across all event names in this Signal instance, effectively resetting it to an empty state.
-        /// @return | integer | The total number of callbacks that were removed
         methods.add_method("clearAll", |lua, this, ()| {
             let count = this.inner.borrow_mut().clear_all();
             let mut cbs = this.callbacks.borrow_mut();
@@ -151,27 +112,12 @@ impl LuaUserData for LuaSignal {
             }
             Ok(count)
         });
-
-        // -- getCount --
-        /// Returns the number of callbacks currently registered for the specified event name.
-        /// @param | name | string | The event name to query
-        /// @return | integer | The number of active callbacks for this event
         methods.add_method("getCount", |_, this, name: String| {
             Ok(this.inner.borrow().get_count(&name))
         });
-
-        // -- getTotalCount --
-        /// Returns the total number of callbacks registered across all event names in this Signal instance.
-        /// @return | integer | The total number of active callbacks
         methods.add_method("getTotalCount", |_, this, ()| {
             Ok(this.inner.borrow().get_total_count())
         });
-
-        // -- once --
-        /// Registers a one-shot callback that fires at most once for the named event and then automatically removes itself.
-        /// @param | name | string | The event name to subscribe to (case-sensitive)
-        /// @param | callback | function | The Lua function to invoke exactly once
-        /// @return | integer | A unique handle ID for this one-shot subscription
         methods.add_method(
             "once",
             |lua, this, (name, callback): (String, LuaFunction)| {
@@ -182,13 +128,6 @@ impl LuaUserData for LuaSignal {
                 Ok(handle)
             },
         );
-
-        // -- registerWithFilter --
-        /// Registers a callback with an associated filter predicate function.
-        /// @param | name | string | The event name to subscribe to (case-sensitive)
-        /// @param | callback | function | The Lua function to invoke when the filter passes
-        /// @param | filter | function | A predicate function that receives emit args and returns boolean
-        /// @return | integer | A unique handle ID for this filtered subscription
         methods.add_method(
             "registerWithFilter",
             |lua, this, (name, callback, filter): (String, LuaFunction, LuaFunction)| {
@@ -200,12 +139,6 @@ impl LuaUserData for LuaSignal {
                 Ok(handle)
             },
         );
-
-        // -- connect --
-        /// Subscribes to an event name or wildcard glob pattern and returns a handle.
-        /// @param | name | string | An event name or wildcard pattern (e.g. "player.*")
-        /// @param | func | function | The Lua function to invoke when a matching event fires
-        /// @return | integer | A unique handle ID for this subscription
         methods.add_method(
             "connect",
             |lua, this, (name, func): (String, LuaFunction)| {
@@ -219,31 +152,15 @@ impl LuaUserData for LuaSignal {
                 Ok(handle)
             },
         );
-
-        // -- type --
-        /// Returns the string type name of this userdata object.
-        /// @return | string | The type name (e.g. "LScheduler", "LCamera", "LSignal")
         methods.add_method("type", |_, _, ()| Ok("LSignal"));
-
-        // -- typeOf --
-        /// Returns true if the given type name matches this object's type or any parent type.
-        /// @param | name | string | type name to test
-        /// @return | boolean | True if the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSignal" || name == "Signal" || name == "Object")
         });
     }
 }
-
-// ---------------------------------------------------------------------------
-// Register
-// ---------------------------------------------------------------------------
-
-/// Registers the `lurek.signal` API table with the Lua VM.
 #[allow(clippy::type_complexity)]
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
-
     fn parse_priority(value: &LuaValue) -> LuaResult<EventPriority> {
         match value {
             LuaValue::String(s) => {
@@ -264,11 +181,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             )),
         }
     }
-
-    // -- exit --
-    /// Pushes an exit event onto the engine event queue, requesting a graceful shutdown at the end of the current frame.
-    /// @param | code | integer? | Optional OS exit code (default 0)
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "exit",
@@ -279,10 +191,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- poll --
-    /// Returns an iterator function that pops events one at a time from the engine event queue.
-    /// @return | function | An iterator function that yields (name, ...) tuples
     let s = state.clone();
     tbl.set(
         "poll",
@@ -294,10 +202,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
-
-    // -- clear --
-    /// Discards every pending event in the engine event queue without processing them.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "clear",
@@ -306,10 +210,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- newSignal --
-    /// Creates and returns a new independent Signal pub-sub dispatcher.
-    /// @return | LSignal | A new empty Signal instance
     tbl.set(
         "newSignal",
         lua.create_function(|_, ()| {
@@ -321,13 +221,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
-
-    // -- pump --
-    /// Synchronises OS-level windowing events into the engine event queue.
-    ///
-    /// In Lurek2D this is an API-parity no-op because window/input events are
-    /// already pushed by the runtime loop.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "pump",
@@ -336,13 +229,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- wait --
-    /// Blocks the current thread until the next engine event arrives or the optional timeout elapses.
-    /// @param | timeout | number? | Maximum seconds to wait (nil = wait indefinitely)
-    /// @return | boolean | True when an event was received before the timeout elapsed.
-    /// @return | string | Name of the received event.
-    /// @return | table | Payload array for the received event.
     let s = state.clone();
     tbl.set(
         "wait",
@@ -372,10 +258,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
-
-    // -- restart --
-    /// Requests that the engine perform a full restart at the beginning of the next frame.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "restart",
@@ -384,10 +266,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- quit --
-    /// Alias for `exit()` - requests the engine to stop gracefully at the end of the current frame with exit code 0.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "quit",
@@ -398,19 +276,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // Deferred event queue " events pushed via pushDeferred are batched and
-    // only dispatched to the main queue when flushDeferred is called.
     let deferred_queue: Rc<RefCell<Vec<(String, Vec<EventArg>, EventPriority)>>> =
         Rc::new(RefCell::new(Vec::new()));
-
-    // -- pushDeferred --
-    /// Pushes a named event into the deferred buffer instead of the main queue.
-    ///
-    /// Scalar payload values are copied directly. Table payload values are
-    /// shallow-cloned (scalar keys and scalar values only).
-    /// @param | name | string | The event name to defer
-    /// @return | nil | No return value.
     let deferred = deferred_queue.clone();
     tbl.set(
         "pushDeferred",
@@ -437,12 +304,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- pushDeferredPriority --
-    /// Pushes a named event into the deferred buffer with explicit queue priority.
-    /// @param | name | string | The event name to defer
-    /// @param | priority | string | Queue lane: "high" or "normal"
-    /// @return | nil | No return value.
     let deferred = deferred_queue.clone();
     tbl.set(
         "pushDeferredPriority",
@@ -467,7 +328,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     ))
                 }
             };
-
             let mut event_args = Vec::new();
             for val in iter {
                 event_args.push(EventArg::from_lua_val(&val)?);
@@ -476,10 +336,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- flushDeferred --
-    /// Moves all events from the deferred buffer into the main engine event queue and clears the buffer.
-    /// @return | integer | The number of deferred events moved to the main queue
     let deferred = deferred_queue.clone();
     let s = state.clone();
     tbl.set(
@@ -495,16 +351,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(count)
         })?,
     )?;
-
-    // History ring-buffer " stores the last N emitted events when history is enabled.
     let history_buf: Rc<RefCell<VecDeque<(String, Vec<EventArg>)>>> =
         Rc::new(RefCell::new(VecDeque::new()));
     let history_cap: Rc<RefCell<usize>> = Rc::new(RefCell::new(0));
-
-    // -- enableHistory --
-    /// Enables event history recording, keeping a ring buffer of the last `capacity` events pushed via `push()`.
-    /// @param | capacity | integer | Maximum number of events to retain (0 to disable)
-    /// @return | nil | No return value.
     let cap = history_cap.clone();
     let hist = history_buf.clone();
     tbl.set(
@@ -518,10 +367,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- getHistory --
-    /// Returns an array of recently pushed events as tables.
-    /// @return | table | Array of {name: string, args: table} event records
     let hist = history_buf.clone();
     tbl.set(
         "getHistory",
@@ -542,10 +387,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
-
-    // -- clearHistory --
-    /// Clears all recorded event history entries from the ring buffer.
-    /// @return | nil | No return value.
     let hist_c = history_buf.clone();
     tbl.set(
         "clearHistory",
@@ -554,14 +395,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- push --
-    /// Pushes a custom named event onto the main engine event queue with optional payload arguments.
-    ///
-    /// Scalar payload values are copied directly. Table payload values are
-    /// shallow-cloned (scalar keys and scalar values only).
-    /// @param | name | string | The event name to push (case-sensitive)
-    /// @return | nil | No return value.
     let s = state.clone();
     let hist_p = history_buf.clone();
     let cap_p = history_cap.clone();
@@ -598,15 +431,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
-    // -- pushPriority --
-    /// Pushes a custom named event onto a selected queue lane.
-    /// @param | name | string | The event name to push (case-sensitive)
-    /// @param | priority | string | Queue lane: "high" or "normal"
-    ///
-    /// Scalar payload values are copied directly. Table payload values are
-    /// shallow-cloned (scalar keys and scalar values only).
-    /// @return | nil | No return value.
     let s = state.clone();
     let hist_p = history_buf.clone();
     let cap_p = history_cap.clone();
@@ -633,18 +457,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     ))
                 }
             };
-
             let mut event_args = Vec::new();
             for val in iter {
                 event_args.push(EventArg::from_lua_val(&val)?);
             }
-
             s.borrow_mut().event_queue.push_event_with_priority(
                 &name,
                 event_args.clone(),
                 priority,
             );
-
             let cap_val = *cap_p.borrow();
             if cap_val > 0 {
                 let mut buf = hist_p.borrow_mut();
@@ -656,7 +477,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-
     lurek.set("event", tbl)?;
     Ok(())
 }

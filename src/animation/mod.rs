@@ -1,48 +1,55 @@
-//! Sprite animation system: named clips, frame pools, speed control, and frame-level events.
-//!
-//! This is a Tier 1 engine module. It imports only from `crate::math`.
-//!
-//! An [`Animation`] stores a pool of [`AnimFrame`] entries (each defining a source
-//! rectangle and optional per-frame duration) and any number of named [`AnimClip`]s
-//! that reference those frames by index. Call [`Animation::update`] each tick and
-//! inspect [`Animation::drain_events`] for playback notifications.
+//! Animation subsystem — clips, frames, state machines, blending, and Aseprite import.
+//! Owns AnimClip, Animation controller, AnimStateMachine, BlendLayerSet, AnimCurve,
+//! AnimPropertyTimeline, AnimSyncGroup, SpineAnimBridge, and AnimRenderParams.
+//! Does not own texture loading or physics. Depends on `crate::math::Rect` and `crate::render`.
 
-/// Aseprite JSON export parser.
+/// Aseprite JSON parsing and tag extraction.
 pub mod aseprite;
-/// Blend-layer system for compositing multiple animation clips.
+/// Blend layers and masks for layered animation output.
 pub mod blend;
-/// Named clip: frame index list, FPS, and looping flag.
+/// Clip definitions and playback mode metadata.
 pub mod clip;
-/// [`Animation`] controller: frame pool, clip management, and update logic.
+/// Runtime animation playback controller.
 pub mod controller;
-/// Keyframe-based animation curves with per-segment easing.
+/// Curve and property timeline support.
 pub mod curve;
-/// Playback events emitted by [`Animation::update`].
+/// Playback events emitted during clip advancement.
 pub mod event;
-/// Single animation frame: source quad and optional per-frame duration.
+/// Frame geometry and per-frame timing.
 pub mod frame;
-/// Render-command generation for sprite animations.
+/// Conversion from frames to render commands.
 pub mod render;
-/// Bridge between [`AnimStateMachine`] and a Spine [`Skeleton`].
+/// Optional Spine integration bridge.
 pub mod spine_bridge;
-/// Finite-state machine for parameter-driven animation control.
+/// Animation state machine and transition rules.
 pub mod state_machine;
-/// Named animation synchronisation groups.
+/// Synchronization groups for coordinating multiple animations.
 pub mod sync_group;
 
+/// Aseprite import helpers and parsed data structures.
 pub use aseprite::{
     load_aseprite_json, AsepriteDirection, AsepriteFrameData, AsepriteParsed, AsepriteTagData,
 };
+/// Blend-layer data used by composite animation playback.
 pub use blend::{BlendLayer, BlendLayerSet, BlendMask};
+/// Clip playback primitives.
 pub use clip::{AnimClip, ClipPlaybackMode};
+/// Primary animation playback controller.
 pub use controller::Animation;
+/// Property timeline curve container.
 pub use curve::AnimPropertyTimeline;
+/// Events produced by the animation controller.
 pub use event::AnimEvent;
+/// Frame rectangle and duration types.
 pub use frame::{AnimFrame, AnimationFrame};
+/// Rendering parameters for animation draw commands.
 pub use render::AnimRenderParams;
+/// Spine integration entry point.
 pub use spine_bridge::SpineAnimBridge;
+/// State machine configuration, conditions, and transitions.
 pub use state_machine::{
     AnimParamValue, AnimStateConfig, AnimStateMachine, AnimTransition, ConditionOp, ConditionValue,
     TransitionCondition,
 };
+/// Group synchronizer for multiple playback controllers.
 pub use sync_group::AnimSyncGroup;

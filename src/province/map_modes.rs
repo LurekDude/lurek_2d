@@ -1,20 +1,11 @@
-//! Province map-mode utilities.
-
 use crate::province::types::ProvinceStyle;
-
-/// Built-in map modes supported by the province engine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProvinceMapMode {
-    /// Use base political color directly.
     Political,
-    /// Use grayscale by terrain type index for debugging/terrain mode.
     Terrain,
-    /// Show visibility/fog state as intensity mask.
     Visibility,
 }
-
 impl ProvinceMapMode {
-    /// Maps mode to stable API token.
     pub fn as_str(self) -> &'static str {
         match self {
             ProvinceMapMode::Political => "political",
@@ -22,8 +13,6 @@ impl ProvinceMapMode {
             ProvinceMapMode::Visibility => "visibility",
         }
     }
-
-    /// Parses mode from API token.
     pub fn parse_str(value: &str) -> Option<Self> {
         match value {
             "political" => Some(ProvinceMapMode::Political),
@@ -33,8 +22,6 @@ impl ProvinceMapMode {
         }
     }
 }
-
-/// Resolves output color for one province style in selected map mode.
 pub fn resolve_color(mode: ProvinceMapMode, style: &ProvinceStyle) -> [f32; 4] {
     match mode {
         ProvinceMapMode::Political => style.political_color,

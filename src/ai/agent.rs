@@ -1,35 +1,34 @@
-//! agent entity model and decision-mode wiring used by AIWorld.
-//! It also defines decision-mode selection used by the update loop to choose FSM, BT, steering, or custom flow.
-use std::collections::HashSet;
-
+//! AI agent state and the decision-model selector used by the AI subsystem.
+//! Owns `DecisionModel` (which AI branch drives the agent) and `Agent` (runtime state).
+//! Does not execute AI logic or callbacks; those live in the owner systems and Lua API.
+//! Depends on `Blackboard`, `EmotionModel`, `NeedSystem`, `Sensor`, and `TraitProfile`.
 use crate::ai::blackboard::Blackboard;
 use crate::ai::emotion::EmotionModel;
 use crate::ai::needs::NeedSystem;
 use crate::ai::perception::Sensor;
 use crate::ai::traits::TraitProfile;
-
-/// Controls which AI subsystems are ticked for an agent during `AIWorld::update`.
+use std::collections::HashSet;
+/// Active AI decision strategy assigned to an `Agent`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DecisionModel {
-    /// Ticks only the attached StateMachine. Transitions are evaluated each frame, applying guards and triggering enter/update/exit callbacks.
+    /// Finite-state machine only.
     Fsm,
-    /// Ticks only the attached BehaviorTree. The tree is traversed from root each frame, resuming at any running leaf.
+    /// Behavior tree only.
     Bt,
-    /// Ticks only the attached SteeringManager. Behaviors are combined (weighted sum or priority) to produce a final velocity impulse.
+    /// Steering behaviors only.
     Steering,
-    /// Ticks the StateMachine first (which may update steering targets via blackboard), then runs the SteeringManager to apply forces.
+    /// Finite-state machine combined with steering.
     FsmSteering,
-    /// Ticks the BehaviorTree first (which may update steering targets via blackboard or direct writes), then runs the SteeringManager.
+    /// Behavior tree combined with steering.
     BtSteering,
-    /// A user-defined Lua callback drives this agent's decisions.
+    /// Custom strategy driven by a Lua callback.
     Custom {
-        /// Opaque ID referencing the Lua callback in the API-layer registry.
+        /// Registry index of the Lua decision callback.
         callback_id: u32,
     },
 }
-
 impl DecisionModel {
-    /// Parse a Lua-side string identifier into the corresponding `DecisionModel`.
+    /// Parse a string tag into a `DecisionModel`; returns `None` for unknown tags.
     pub fn parse_str(s: &str) -> Option<Self> {
         match s {
             "fsm" => Some(Self::Fsm),
@@ -40,8 +39,7 @@ impl DecisionModel {
             _ => None,
         }
     }
-
-    /// Return the canonical Lua string identifier for this decision model.
+    /// Return the canonical string tag for this model.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Fsm => "fsm",
@@ -53,47 +51,45 @@ impl DecisionModel {
         }
     }
 }
-
-/// An autonomous AI agent with kinematic state and pluggable decision subsystems.
+/// Runtime state for one AI-controlled entity in the world.
 pub struct Agent {
-    /// Unique name within the owning AIWorld. Used for lookup and Lua API references.
+    /// Unique agent name.
     pub name: String,
-    /// Update priority - agents with higher values are ticked first.
+    /// Scheduling priority; higher values are processed first.
     pub priority: i32,
-    /// World-space position as (x, y). Updated by steering forces each frame.
+    /// World-space position in pixels.
     pub position: (f32, f32),
-    /// Current velocity vector (vx, vy). Clamped to `max_speed` magnitude.
+    /// World-space velocity in pixels per second.
     pub velocity: (f32, f32),
-    /// Maximum speed magnitude in world units per second. Steering behaviors scale forces accordingly.
+    /// Maximum movement speed.
     pub max_speed: f32,
-    /// Maximum steering force magnitude. The combined force from all active behaviors is clamped to this.
+    /// Maximum steering force magnitude.
     pub max_force: f32,
-    /// Determines which subsystems the world ticks for this agent (FSM, BT, steering, hybrid, or custom).
+    /// Active decision strategy.
     pub decision_model: DecisionModel,
-    /// Per-agent local blackboard for storing state. Parent-chained to the world's global blackboard.
+    /// Per-agent key/value store.
     pub blackboard: Blackboard,
-    /// String tags for group queries (e.g., "enemy", "patrol", "ranged"). Used for filtering subsystem updates.
+    /// String tags attached to this agent.
     pub tags: HashSet<String>,
-    /// Index into the AIWorld's FSM storage, if this agent has an attached state machine.
+    /// Index into the FSM arena when the model uses FSM.
     pub fsm_index: Option<usize>,
-    /// Index into the AIWorld's BehaviorTree storage, if this agent has an attached tree.
+    /// Index into the behavior-tree arena when the model uses BT.
     pub bt_index: Option<usize>,
-    /// Index into the AIWorld's SteeringManager storage, if this agent has steering behaviors.
+    /// Index into the steering arena when the model uses steering.
     pub steering_index: Option<usize>,
-    /// Optional personality trait profile (aggression, caution, loyalty, etc.). Influences decision-making.
+    /// Optional trait profile.
     pub trait_profile: Option<TraitProfile>,
-    /// Optional sensor for simulated perception (sight, hearing, custom senses).
+    /// Optional sensory perception filter.
     pub sensor: Option<Sensor>,
-    /// Optional emotion model for affective state (anger, fear, joy, etc.). Impacts responses.
+    /// Optional emotional state model.
     pub emotion_model: Option<EmotionModel>,
-    /// Optional need system (hunger, safety, rest, etc.). Feeds goal prioritization.
+    /// Optional needs system.
     pub need_system: Option<NeedSystem>,
-    /// LOD tier index assigned by [`crate::ai::lod::AILod`]. Tier 0 = full detail; higher tiers skip subsystems.
+    /// Current LOD tier index.
     pub lod_tier: usize,
 }
-
 impl Agent {
-    /// Create a new agent with sensible default kinematic state.
+    /// Create a new agent with default movement, AI, and support systems.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),

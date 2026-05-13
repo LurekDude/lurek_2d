@@ -1,10 +1,13 @@
-//! Rolling window operations: mean, sum, min, max, rank, pct-change, cumsum.
+//! Own rolling and ranking window extension methods for `DataFrame` used in the query pipeline.
+//! All methods append their result as a new named column and mutate `self` in place.
+//! Window operations are nil-safe: nil rows are excluded from numeric aggregations and
+//! produce nil output cells. Rank is dense over valid rows only; cumulative sum propagates
+//! nil as nil. No SQL or filter logic here; those live in `../sql.rs` and `filter.rs`.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
-
 impl DataFrame {
-    /// Add rolling mean column; rows before window get Nil.
     #[allow(clippy::needless_range_loop)]
+    /// Compute rolling mean and append output column.
     pub fn with_rolling_mean(
         &mut self,
         col: ColRef,
@@ -44,8 +47,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add rolling sum column; rows before window get Nil.
+    /// Compute rolling sum and append output column.
     pub fn with_rolling_sum(
         &mut self,
         col: ColRef,
@@ -76,8 +78,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add rolling minimum column; rows before window get Nil.
+    /// Compute rolling minimum and append output column.
     pub fn with_rolling_min(
         &mut self,
         col: ColRef,
@@ -112,8 +113,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add rolling maximum column; rows before window get Nil.
+    /// Compute rolling maximum and append output column.
     pub fn with_rolling_max(
         &mut self,
         col: ColRef,
@@ -148,27 +148,19 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    // -----------------------------------------------------------------------
-    // Derived column operations
-    // -----------------------------------------------------------------------
-
-    /// Add a rank column.
+    /// Compute rank over numeric column and append output column.
     pub fn with_rank(&mut self, col: ColRef, ascending: bool, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
         let data = self.raw_data();
-
         let mut indexed: Vec<(usize, f64)> = (0..n)
             .filter_map(|i| data[ci][i].as_number().map(|v| (i, v)))
             .collect();
-
         if ascending {
             indexed.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
         } else {
             indexed.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
         }
-
         let mut rank_out = vec![CellValue::Nil; n];
         let mut i = 0;
         while i < indexed.len() {
@@ -183,7 +175,6 @@ impl DataFrame {
             }
             i = j;
         }
-
         self.add_column(name, CellValue::Nil)?;
         let new_ci = self.ncols() - 1;
         for (i, v) in rank_out.into_iter().enumerate() {
@@ -191,8 +182,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add a percentage-change column.
+    /// Compute row-to-row percent change and append output column.
     pub fn with_pct_change(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
@@ -217,8 +207,7 @@ impl DataFrame {
         }
         Ok(())
     }
-
-    /// Add a cumulative-sum column.
+    /// Compute cumulative sum and append output column.
     pub fn with_cumsum(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();

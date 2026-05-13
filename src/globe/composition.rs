@@ -1,20 +1,12 @@
-//! Multi-globe split composition helpers.
-
-use crate::globe::registry::GlobeRegistry;
 use crate::globe::draw::emit_globe_frame;
+use crate::globe::registry::GlobeRegistry;
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::FontKey;
-
-/// One split-screen viewport description.
 #[derive(Debug, Clone, Copy)]
 pub struct SplitViewport {
-    /// Center X in pixels.
     pub cx: f32,
-    /// Center Y in pixels.
     pub cy: f32,
 }
-
-/// Emit merged frame commands from multiple globes for tactical/strategic split views.
 pub fn emit_split_frame(
     reg: &GlobeRegistry,
     entries: &[(&str, SplitViewport)],

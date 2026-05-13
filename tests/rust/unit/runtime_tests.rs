@@ -564,8 +564,7 @@ mod evict_lru_total_budget_tests {
         );
         // Evicted handles must be queued for GPU release.
         assert!(
-            st.released_texture_handles
-                .contains(&tex_a.data().as_ffi()),
+            st.released_texture_handles.contains(&tex_a.data().as_ffi()),
             "tex_a handle must be released"
         );
     }
@@ -636,4 +635,3 @@ mod pending_config_reload_tests {
         assert!(!st.pending_config_reload);
     }
 }
-

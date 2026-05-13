@@ -1,15 +1,5 @@
-//! Minimal HTML parser — converts a UTF-8 HTML string into the element arena used
-//! by [`super::document::HtmlDocument`].
-//!
-//! The parser is intentionally lenient: unrecognised attributes are stored verbatim,
-//! unclosed tags are implicitly closed, and unknown entities are passed through as-is.
-//! This matches browser-grade fault tolerance for game UI markup.
-
-use std::collections::BTreeMap;
-
 use crate::html::element::{HtmlElement, HtmlElementId};
-
-/// Parses `html` and appends new elements under `parent`, returning the direct child ids.
+use std::collections::BTreeMap;
 pub(crate) fn parse_into(
     html: &str,
     elements: &mut Vec<HtmlElement>,
@@ -79,14 +69,12 @@ pub(crate) fn parse_into(
     }
     roots
 }
-
 fn split_tag(source: &str) -> (&str, &str) {
     let mut parts = source.splitn(2, char::is_whitespace);
     let tag = parts.next().unwrap_or_default();
     let attrs = parts.next().unwrap_or_default();
     (tag, attrs)
 }
-
 fn parse_attributes(source: &str) -> BTreeMap<String, String> {
     let mut attrs = BTreeMap::new();
     let bytes = source.as_bytes();
@@ -138,13 +126,11 @@ fn parse_attributes(source: &str) -> BTreeMap<String, String> {
     }
     attrs
 }
-
 fn apply_attributes(element: &mut HtmlElement, attrs: BTreeMap<String, String>) {
     for (name, value) in attrs {
         element.set_attribute(&name, Some(value));
     }
 }
-
 fn push_text(elements: &mut [HtmlElement], element_id: HtmlElementId, text: &str) {
     let text = decode_entities(text);
     let collapsed = text.split_whitespace().collect::<Vec<_>>().join(" ");
@@ -157,19 +143,14 @@ fn push_text(elements: &mut [HtmlElement], element_id: HtmlElementId, text: &str
     }
     element.text.push_str(&collapsed);
 }
-
-/// Escapes `&`, `<`, and `>` for safe inclusion in HTML text content.
 pub(crate) fn escape_text(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
 }
-
-/// Escapes `&`, `<`, `>`, and `"` for safe inclusion in HTML attribute values.
 pub(crate) fn escape_attribute(text: &str) -> String {
     escape_text(text).replace('"', "&quot;")
 }
-
 fn decode_entities(text: &str) -> String {
     text.replace("&lt;", "<")
         .replace("&gt;", ">")

@@ -1,8 +1,3 @@
-//! Frame emission for the globe module.
-//!
-//! `emit_globe_frame` converts a `Globe` snapshot into a flat `Vec<RenderCommand>`
-//! suitable for the Lurek2D render queue. No GPU state is held here.
-
 use crate::globe::fog::FogStore;
 use crate::globe::label::LabelStore;
 use crate::globe::layer::LayerStore;
@@ -15,14 +10,9 @@ use crate::math::sphere::great_circle_path;
 use crate::math::Vec2;
 use crate::render::renderer::{BlendMode, DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
-use slotmap::KeyData;
 use crate::runtime::resource_keys::TextureKey;
+use slotmap::KeyData;
 use std::collections::HashMap;
-
-/// Emit all render commands for one globe frame.
-///
-/// `default_font` is the `FontKey` to use for labels and marker text.
-/// Pass `None` to suppress all text rendering.
 #[allow(clippy::too_many_arguments)]
 pub fn emit_globe_frame(
     spec: &GlobeSpec,
@@ -39,7 +29,6 @@ pub fn emit_globe_frame(
     sim_time_sec: f32,
 ) -> Vec<RenderCommand> {
     let mut cmds: Vec<RenderCommand> = Vec::new();
-
     let view = build_view_matrix(spec, camera);
     let sun = sun_direction(spec);
     let lod = camera.lod();
@@ -48,12 +37,8 @@ pub fn emit_globe_frame(
     let cx = camera.screen_cx;
     let cy = camera.screen_cy;
     let radius = spec.radius;
-
     emit_atmosphere_halo(&mut cmds, spec, camera);
-
-    // ── 1. Province polygons ─────────────────────────────────────────────────
     for province in graph.iter() {
-        // Fog check
         if let Some(viewer) = active_viewer {
             if let FogState::Hidden = fog.state(viewer, province.id) {
                 if let Some(proj) = project_province(province, &view, spec, camera, 0.0) {
@@ -68,15 +53,12 @@ pub fn emit_globe_frame(
                 continue;
             }
         }
-
         let intensity =
             province_intensity(province.centroid.0, province.centroid.1, &sun, spec.ambient);
-
         let mut base = layers
             .effective_color(province.id)
             .unwrap_or(province.base_color);
         apply_heat_layers(&mut base, province, heat_layers);
-
         if let Some(viewer) = active_viewer {
             if let FogState::Explored = fog.state(viewer, province.id) {
                 base[0] *= 0.45;
@@ -84,14 +66,12 @@ pub fn emit_globe_frame(
                 base[2] *= 0.45;
             }
         }
-
         let tint = [
             (base[0] * intensity).clamp(0.0, 1.0),
             (base[1] * intensity).clamp(0.0, 1.0),
             (base[2] * intensity).clamp(0.0, 1.0),
             base[3],
         ];
-
         if let Some(proj) = project_province(province, &view, spec, camera, intensity) {
             let texture_key = province
                 .attrs
@@ -106,13 +86,12 @@ pub fn emit_globe_frame(
                 tint,
                 blend: BlendMode::Alpha,
             });
-
-            // Borders at Mid/Near LOD
             if spec.render_borders && lod >= LodTier::Mid {
                 let [br, bg, bb, ba] = spec.border_color;
                 cmds.push(RenderCommand::SetLineWidth(spec.border_width));
                 cmds.push(RenderCommand::SetColor(br, bg, bb, ba));
-                let border_verts = smooth_polyline(&proj.screen_verts, spec.border_smoothing_passes);
+                let border_verts =
+                    smooth_polyline(&proj.screen_verts, spec.border_smoothing_passes);
                 let mut pts: Vec<f32> = border_verts.iter().flat_map(|v| [v.x, v.y]).collect();
                 if let Some(first) = border_verts.first() {
                     pts.push(first.x);
@@ -124,22 +103,13 @@ pub fn emit_globe_frame(
             }
         }
     }
-
-    // ── 2. Arcs (great-circle paths) ─────────────────────────────────────────
     for arc in arcs.values() {
         if !arc.visible {
             continue;
         }
         let [ar, ag, ab, aa] = arc.color;
         let pts = project_arc(
-            arc.from.0,
-            arc.from.1,
-            arc.to.0,
-            arc.to.1,
-            arc.steps,
-            &view,
-            spec,
-            camera,
+            arc.from.0, arc.from.1, arc.to.0, arc.to.1, arc.steps, &view, spec, camera,
         );
         if pts.len() < 4 {
             continue;
@@ -148,8 +118,6 @@ pub fn emit_globe_frame(
         cmds.push(RenderCommand::SetColor(ar, ag, ab, aa));
         cmds.push(RenderCommand::Polyline { points: pts });
     }
-
-    // ── 3. Markers ────────────────────────────────────────────────────────────
     for marker in markers.iter_visible() {
         if let Some(screen) =
             project_point(marker.lat_deg, marker.lon_deg, &view, radius, zoom, cx, cy)
@@ -169,7 +137,6 @@ pub fn emit_globe_frame(
                 y: screen.y,
                 r,
             });
-
             if marker.style.rotation_deg_per_sec.abs() > 0.0 {
                 let ang = sim_time_sec * marker.style.rotation_deg_per_sec.to_radians();
                 let dx = ang.cos() * (r + 3.0);
@@ -179,8 +146,6 @@ pub fn emit_globe_frame(
                     points: vec![screen.x, screen.y, screen.x + dx, screen.y + dy],
                 });
             }
-
-            // Marker label
             if let (Some(label_text), Some(font_key)) = (&marker.label, default_font) {
                 cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 1.0));
                 cmds.push(RenderCommand::Print {
@@ -193,8 +158,6 @@ pub fn emit_globe_frame(
             }
         }
     }
-
-    // ── 4. Labels (Mid/Near LOD only) ─────────────────────────────────────────
     if lod >= LodTier::Mid {
         if let Some(font_key) = default_font {
             for label in labels.iter_visible(lod_u8) {
@@ -215,10 +178,8 @@ pub fn emit_globe_frame(
             }
         }
     }
-
     cmds
 }
-
 fn build_province_uvs(province: &Province, rect: Option<[f32; 4]>) -> Vec<Vec2> {
     let [u0, v0, u1, v1] = rect.unwrap_or([0.0, 0.0, 1.0, 1.0]);
     province
@@ -231,7 +192,6 @@ fn build_province_uvs(province: &Province, rect: Option<[f32; 4]>) -> Vec<Vec2> 
         })
         .collect()
 }
-
 fn apply_heat_layers(base: &mut [f32; 4], province: &Province, heat_layers: &[HeatLayer]) {
     let mut sorted: Vec<&HeatLayer> = heat_layers.iter().filter(|l| l.visible).collect();
     sorted.sort_by_key(|l| l.z_order);
@@ -255,7 +215,6 @@ fn apply_heat_layers(base: &mut [f32; 4], province: &Province, heat_layers: &[He
         base[2] = base[2] * (1.0 - heat[3]) + heat[2] * heat[3];
     }
 }
-
 fn emit_atmosphere_halo(cmds: &mut Vec<RenderCommand>, spec: &GlobeSpec, camera: &OrbitCamera) {
     if !spec.show_atmosphere {
         return;
@@ -278,7 +237,6 @@ fn emit_atmosphere_halo(cmds: &mut Vec<RenderCommand>, spec: &GlobeSpec, camera:
         r: outer + spec.atmosphere_width * 0.5,
     });
 }
-
 fn smooth_polyline(points: &[Vec2], passes: u8) -> Vec<Vec2> {
     if points.len() < 3 || passes == 0 {
         return points.to_vec();
@@ -299,11 +257,6 @@ fn smooth_polyline(points: &[Vec2], passes: u8) -> Vec<Vec2> {
     }
     current
 }
-
-/// Pre-project a great-circle arc into a flat screenspace point list.
-///
-/// Returns `[x0, y0, x1, y1, …]`. May return fewer points if the arc is
-/// entirely on the back of the globe.
 #[allow(clippy::too_many_arguments)]
 pub fn project_arc(
     lat_a: f32,

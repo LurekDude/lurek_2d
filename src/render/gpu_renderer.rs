@@ -1,21 +1,3 @@
-//! GPU-accelerated 2D renderer for Lurek2D, backed by wgpu.
-//!
-//! Processes a `RenderCommand` queue each frame, tessellates geometry on the CPU,
-//! uploads vertex / index data to GPU buffers, and issues a single render pass.
-//!
-//! # Design
-//! - Two render pipelines: *color* (solid + gradient shapes) and *texture* (images, sprites).
-//! - Transform stack maintained during command processing — standard `push/pop` transform stack semantics.
-//! - Colored geometry is batched in one draw call; each distinct texture source is one draw call.
-//! - Draw order: colored shapes first (in submission order), textured images second.
-
-use std::collections::{HashMap, HashSet};
-use std::f32::consts::PI;
-use std::sync::mpsc;
-use std::time::Instant;
-
-use bytemuck::{Pod, Zeroable};
-
 use crate::log_msg;
 use crate::math::{Mat3, Vec2};
 use crate::render::mesh::Mesh;
@@ -31,50 +13,38 @@ use crate::runtime::log_messages::{
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
+use bytemuck::{Pod, Zeroable};
 use slotmap::{SlotMap, SparseSecondaryMap};
-
-// ─── Vertex types ────────────────────────────────────────────────────────────
-
-/// Vertex for solid-color geometry.
+use std::collections::{HashMap, HashSet};
+use std::f32::consts::PI;
+use std::sync::mpsc;
+use std::time::Instant;
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct ColorVertex {
     position: [f32; 2],
     color: [f32; 4],
 }
-
-/// Vertex for textured (sprite) geometry.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct TexVertex {
     position: [f32; 2],
     uv: [f32; 2],
     color: [f32; 4],
-    /// Per-vertex perspective depth. Set to 1.0 for flat/UI quads.
     w_depth: f32,
     _pad: [f32; 3],
 }
-
-/// Vertex for the 2D lighting pass with per-light shadow information.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct LightVertex {
     position: [f32; 2],
     uv: [f32; 2],
     color: [f32; 4],
-    /// Normalized V coordinate into the shadow atlas (−1.0 = no shadow map).
     shadow_v: f32,
-    /// Shadow settings: `[filter_mode, softness, texel_size, _reserved]`.
     shadow_params: [f32; 4],
 }
-
-/// Resolution (width) of each 1D radial shadow map.
 const SHADOW_MAP_RES: usize = 256;
-
-/// Maximum number of shadow-mapped lights in a single frame.
 const MAX_SHADOW_LIGHTS: usize = 128;
-
-/// Uniform buffer containing the viewport dimensions for NDC conversion.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct ViewportUniform {
@@ -85,103 +55,68 @@ struct ViewportUniform {
     view_col1: [f32; 4],
     view_col2: [f32; 4],
 }
-
-// ─── GPU texture wrapper ──────────────────────────────────────────────────────
-
 struct GpuTexture {
     _texture: wgpu::Texture,
-    // Kept alive so the bind_group's TextureView reference stays valid.
     view: wgpu::TextureView,
     bind_group: wgpu::BindGroup,
     width: u32,
     height: u32,
 }
-
 struct DepthStencilTarget {
     _texture: wgpu::Texture,
     view: wgpu::TextureView,
     width: u32,
     height: u32,
 }
-
 struct PendingSurfaceReadback {
     buffer: wgpu::Buffer,
     padded_bytes_per_row: u32,
     width: u32,
     height: u32,
 }
-
-/// Reference to a GPU-side texture used during render batching.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum TexRef {
     Texture(TextureKey),
     Canvas(CanvasKey),
     FontAtlas(FontKey),
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const MAX_COLOR_VERTS: u64 = 1 << 19; // 524 288 vertices
-const MAX_COLOR_IDXS: u64 = 1 << 21; // 2 097 152 indices
-const MAX_TEX_VERTS: u64 = 1 << 14; // 16 384 vertices
-const MAX_TEX_IDXS: u64 = 1 << 16; // 65 536 indices
-
+const MAX_COLOR_VERTS: u64 = 1 << 19;
+const MAX_COLOR_IDXS: u64 = 1 << 21;
+const MAX_TEX_VERTS: u64 = 1 << 14;
+const MAX_TEX_IDXS: u64 = 1 << 16;
 const MAX_LIGHT_QUADS: usize = 128;
-
-/// Per-frame rendering statistics.
-///
-/// # Fields
-/// - `draw_calls` — `u32`.
-/// - `texture_switches` — `u32`.
-/// - `canvas_switches` — `u32`.
-/// - `shader_switches` — `u32`.
-/// - `batched_draws` — `u32`.
-/// - `cpu_render_ms` — `f32`.
 #[derive(Debug, Default, Clone)]
 pub struct RenderStats {
-    /// Number of draw calls issued this frame.
     pub draw_calls: u32,
-    /// Number of texture bind group switches this frame.
     pub texture_switches: u32,
-    /// Number of canvas target switches this frame.
     pub canvas_switches: u32,
-    /// Number of pipeline (shader/blend) switches this frame.
     pub shader_switches: u32,
-    /// Number of draw calls eliminated by coalescing.
     pub batched_draws: u32,
-    /// CPU time spent inside `render_frame` for the last frame, in milliseconds.
     pub cpu_render_ms: f32,
 }
-
-/// Optional scissor rectangle in physical pixels: `(x, y, width, height)`.
 type ScissorRect = Option<(u32, u32, u32, u32)>;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum RenderTargetId {
     Screen,
     Canvas(CanvasKey),
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum GeometryKind {
     Color,
     Texture,
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum StencilMode {
     Disabled,
     Write(crate::render::renderer::StencilAction),
     Test(crate::render::renderer::CompareMode),
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct PipelineKey {
     blend_mode: BlendMode,
     color_mask_bits: u32,
     stencil_mode: StencilMode,
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum PipelineSelectionKey {
     Default {
@@ -194,7 +129,6 @@ enum PipelineSelectionKey {
         pipeline: PipelineKey,
     },
 }
-
 #[derive(Debug, Clone, Copy)]
 struct PreparedDraw {
     target: RenderTargetId,
@@ -209,7 +143,6 @@ struct PreparedDraw {
     stencil_mode: StencilMode,
     stencil_reference: u32,
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum ShaderUniformKind {
     Float,
@@ -219,7 +152,6 @@ enum ShaderUniformKind {
     Int,
     Bool,
 }
-
 struct GpuShader {
     source: String,
     uniform_signature: Vec<(String, ShaderUniformKind)>,
@@ -232,8 +164,6 @@ struct GpuShader {
     color_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
     texture_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
 }
-
-/// Returns the wgpu `BlendState` for a given `BlendMode`.
 fn blend_state_for(mode: BlendMode) -> wgpu::BlendState {
     match mode {
         BlendMode::Alpha => wgpu::BlendState::ALPHA_BLENDING,
@@ -279,9 +209,6 @@ fn blend_state_for(mode: BlendMode) -> wgpu::BlendState {
         },
     }
 }
-
-// ─── WGSL shaders (embedded inline) ─────────────────────────────────────────
-
 const COLOR_SHADER: &str = r#"
 struct VertexInput {
     @location(0) position: vec2<f32>,
@@ -300,7 +227,6 @@ struct Viewport {
     view_col2: vec4<f32>,
 }
 @group(0) @binding(0) var<uniform> viewport: Viewport;
-
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
@@ -321,7 +247,6 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> { return in.color; }
 "#;
-
 const TEXTURE_SHADER: &str = r#"
 struct VertexInput {
     @location(0) position: vec2<f32>,
@@ -345,7 +270,6 @@ struct Viewport {
 @group(0) @binding(0) var<uniform>  viewport:   Viewport;
 @group(1) @binding(0) var           t_diffuse:  texture_2d<f32>;
 @group(1) @binding(1) var           s_diffuse:  sampler;
-
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
@@ -368,7 +292,6 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     return textureSample(t_diffuse, s_diffuse, in.uv) * in.color;
 }
 "#;
-
 const LIGHT_SHADER: &str = r#"
 struct VertexInput {
     @location(0) position: vec2<f32>,
@@ -395,7 +318,6 @@ struct Viewport {
 @group(0) @binding(0) var<uniform> viewport: Viewport;
 @group(1) @binding(0) var shadow_atlas: texture_2d<f32>;
 @group(1) @binding(1) var shadow_sampler: sampler;
-
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {
     var out: VertexOutput;
@@ -416,14 +338,11 @@ fn vs_main(in: VertexInput) -> VertexOutput {
     out.shadow_params = in.shadow_params;
     return out;
 }
-
 fn sample_shadow_row(u: f32, v: f32, mode: f32, texel_size: f32) -> f32 {
     if mode < 0.5 {
         return textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, v)).r;
     }
-
     if mode < 1.5 {
-        // 5-tap PCF
         var acc = 0.0;
         acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 2.0 * texel_size, v)).r;
         acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 1.0 * texel_size, v)).r;
@@ -432,8 +351,6 @@ fn sample_shadow_row(u: f32, v: f32, mode: f32, texel_size: f32) -> f32 {
         acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 2.0 * texel_size, v)).r;
         return acc / 5.0;
     }
-
-    // 13-tap PCF
     var acc = 0.0;
     acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 6.0 * texel_size, v)).r;
     acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 5.0 * texel_size, v)).r;
@@ -450,7 +367,6 @@ fn sample_shadow_row(u: f32, v: f32, mode: f32, texel_size: f32) -> f32 {
     acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 6.0 * texel_size, v)).r;
     return acc / 13.0;
 }
-
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let center = vec2<f32>(0.5, 0.5);
@@ -458,29 +374,23 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let dist   = length(delta) * 2.0;
     let falloff = clamp(1.0 - dist, 0.0, 1.0);
     let intensity = falloff * falloff;
-
-    // Shadow attenuation.
     var shadow = 1.0;
     if in.shadow_v >= 0.0 {
-        let angle = atan2(delta.y, delta.x);                     // [-π, π]
-        let u     = (angle + 3.14159265) / (2.0 * 3.14159265);  // [0, 1]
+        let angle = atan2(delta.y, delta.x);
+        let u     = (angle + 3.14159265) / (2.0 * 3.14159265);
         let shadow_dist = sample_shadow_row(
             u,
             in.shadow_v,
             in.shadow_params.x,
             in.shadow_params.z,
         );
-        let frag_dist   = dist * 0.5;                            // normalised to radius
+        let frag_dist   = dist * 0.5;
         let edge = max(1e-4, in.shadow_params.y * 0.05);
         shadow = 1.0 - smoothstep(shadow_dist - edge, shadow_dist + edge, frag_dist);
     }
-
     return vec4<f32>(in.color.rgb * intensity * shadow, 1.0);
 }
 "#;
-
-// ─── GpuRenderer ─────────────────────────────────────────────────────────────
-
 struct LightGpuState {
     #[allow(dead_code)]
     accum_texture: wgpu::Texture,
@@ -490,7 +400,6 @@ struct LightGpuState {
     composite_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
-    /// 1D-per-row shadow atlas.  Width = `SHADOW_MAP_RES`, height = `MAX_SHADOW_LIGHTS`.
     shadow_atlas_texture: wgpu::Texture,
     #[allow(dead_code)]
     shadow_atlas_view: wgpu::TextureView,
@@ -498,24 +407,9 @@ struct LightGpuState {
     width: u32,
     height: u32,
 }
-
-/// GPU-accelerated renderer that processes `RenderCommand` queues via wgpu.
-///
-/// # Fields
-/// - `device` — `wgpu::Device`.
-/// - `queue` — `wgpu::Queue`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `render_stats` — `RenderStats`.
-///
-/// Owns the wgpu `Device` and `Queue`. The caller (App) owns the `Surface`
-/// and configuration; `render_frame` receives a shared reference each frame.
 pub struct GpuRenderer {
-    /// wgpu logical device.
     pub(crate) device: wgpu::Device,
-    /// wgpu command queue.
     pub(crate) queue: wgpu::Queue,
-
     viewport_bind_group_layout: wgpu::BindGroupLayout,
     default_color_shader: wgpu::ShaderModule,
     default_texture_shader: wgpu::ShaderModule,
@@ -524,11 +418,9 @@ pub struct GpuRenderer {
     default_color_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
     default_texture_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
     shader_cache: SparseSecondaryMap<ShaderKey, GpuShader>,
-
     viewport_buffer: wgpu::Buffer,
     viewport_bind_group: wgpu::BindGroup,
     texture_bind_group_layout: wgpu::BindGroupLayout,
-
     color_vertex_buffer: wgpu::Buffer,
     color_index_buffer: wgpu::Buffer,
     tex_vertex_buffer: wgpu::Buffer,
@@ -537,46 +429,20 @@ pub struct GpuRenderer {
     color_index_capacity: u64,
     tex_vertex_capacity: u64,
     tex_index_capacity: u64,
-
     gpu_textures: SparseSecondaryMap<TextureKey, GpuTexture>,
-
-    /// Maps font key → GPU texture for font atlas textures.
     font_atlas_textures: SparseSecondaryMap<FontKey, GpuTexture>,
-
-    /// GPU canvas textures (off-screen render targets).
     canvas_gpu_textures: SparseSecondaryMap<CanvasKey, GpuTexture>,
-
     screen_stencil_target: Option<DepthStencilTarget>,
     canvas_stencil_targets: SparseSecondaryMap<CanvasKey, DepthStencilTarget>,
     canvas_needs_clear: SparseSecondaryMap<CanvasKey, bool>,
-
-    /// The surface texture format, needed for creating canvas-compatible pipelines.
     surface_format: wgpu::TextureFormat,
-
-    /// Renderer output dimensions in physical pixels.
     pub width: u32,
-    /// Renderer output dimensions in physical pixels.
     pub height: u32,
-
-    /// Per-frame rendering statistics from the last completed frame.
     pub render_stats: RenderStats,
-
-    /// Lazily-created GPU resources for the 2D lighting pass.
     light_gpu: Option<LightGpuState>,
-
-    /// Lazily-created post-FX pipeline — `None` until the first `BeginPostFx` command.
     postfx_pipeline: Option<crate::render::postfx_pipeline::PostFxPipeline>,
-    /// Per-stack off-screen capture textures keyed by stack_id.
     postfx_capture: HashMap<u64, crate::render::postfx_pipeline::PostFxTexture>,
 }
-
-/// Computes a 1D radial shadow map for a single light.
-///
-/// For each angular sample the function casts a ray from the light centre and
-/// finds the nearest occluder edge.  The result is a `Vec<f32>` of length
-/// `SHADOW_MAP_RES` where each element is the **normalised** distance (0–1
-/// relative to `light_radius`) to the closest occluder at that angle.  A value
-/// of 1.0 means no occluder is closer than the light radius.
 fn compute_1d_shadow_map(
     light_x: f32,
     light_y: f32,
@@ -586,17 +452,13 @@ fn compute_1d_shadow_map(
 ) -> Vec<f32> {
     let mut map = vec![1.0f32; SHADOW_MAP_RES];
     let inv_res = 1.0 / SHADOW_MAP_RES as f32;
-
-    // Pre-collect all occluder edges in light-local space so the inner loop
-    // iterates a flat Vec instead of nested iterators (occluders × edges × resolution).
     struct Edge {
         ax: f32,
         ay: f32,
-        sx: f32, // edge direction: b - a
+        sx: f32,
         sy: f32,
     }
     let mut edges: Vec<Edge> = Vec::new();
-
     for occ_ref in occluders {
         let occ = occ_ref.borrow();
         if !occ.enabled {
@@ -610,10 +472,9 @@ fn compute_1d_shadow_map(
         if n < 2 {
             continue;
         }
-        // Build edge list from this occluder's polygon, expressed in light-local coordinates.
         for j in 0..n {
             let a = verts[j];
-            let b = verts[(j + 1) % n]; // Wrap around to close the polygon.
+            let b = verts[(j + 1) % n];
             let ax = a.x + occ.position.x - light_x;
             let ay = a.y + occ.position.y - light_y;
             let bx = b.x + occ.position.x - light_x;
@@ -626,35 +487,24 @@ fn compute_1d_shadow_map(
             });
         }
     }
-
     if edges.is_empty() {
         return map;
     }
-
     let inv_radius = 1.0 / light_radius;
-
     #[allow(clippy::needless_range_loop)]
     for i in 0..SHADOW_MAP_RES {
-        // Map angular slot to a ray direction in [-π, π] covering the full circle.
         let angle = (i as f32 * inv_res) * std::f32::consts::TAU - PI;
         let dir_x = angle.cos();
         let dir_y = angle.sin();
         let mut min_dist = 1.0f32;
-
         for e in &edges {
-            // 2D ray–segment intersection via the parametric cross-product form:
-            //   Ray:     P = t * (dir_x, dir_y)          for t > 0
-            //   Segment: Q = (ax, ay) + u * (sx, sy)     for u ∈ [0, 1]
-            // Solving simultaneously yields t and u from the 2×2 system.
             let cross_ds = dir_x * e.sy - dir_y * e.sx;
             if cross_ds.abs() < 1e-8 {
-                continue; // Ray is parallel to this edge — skip.
+                continue;
             }
             let inv_cross = 1.0 / cross_ds;
             let t = (e.ax * e.sy - e.ay * e.sx) * inv_cross;
             let u = (e.ax * dir_y - e.ay * dir_x) * inv_cross;
-
-            // Valid hit: ray goes forward (t > 0), intersection lies on the edge segment [0,1].
             if t > 0.0 && (0.0..=1.0).contains(&u) {
                 let norm_dist = t * inv_radius;
                 if norm_dist < min_dist && norm_dist < 1.0 {
@@ -662,26 +512,11 @@ fn compute_1d_shadow_map(
                 }
             }
         }
-
         map[i] = min_dist;
     }
     map
 }
-
 impl GpuRenderer {
-    /// Creates a new `GpuRenderer` from an already-created wgpu device and queue.
-    ///
-    /// # Parameters
-    /// - `device` — `wgpu::Device`.
-    /// - `queue` — `wgpu::Queue`.
-    /// - `surface_format` — `wgpu::TextureFormat`.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// `surface_format` must match the format used when configuring the wgpu `Surface`.
     pub fn new(
         device: wgpu::Device,
         queue: wgpu::Queue,
@@ -689,7 +524,6 @@ impl GpuRenderer {
         width: u32,
         height: u32,
     ) -> Self {
-        // ── Viewport uniform ──────────────────────────────────────────────
         let viewport_data = ViewportUniform {
             size: [width as f32, height as f32],
             time: 0.0,
@@ -705,8 +539,6 @@ impl GpuRenderer {
             mapped_at_creation: false,
         });
         queue.write_buffer(&viewport_buffer, 0, bytemuck::bytes_of(&viewport_data));
-
-        // ── Bind group layouts ────────────────────────────────────────────
         let viewport_bgl = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("viewport_bgl"),
             entries: &[wgpu::BindGroupLayoutEntry {
@@ -741,8 +573,6 @@ impl GpuRenderer {
                 },
             ],
         });
-
-        // ── Viewport bind group ────────────────────────────────────────────
         let viewport_bg = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("viewport_bg"),
             layout: &viewport_bgl,
@@ -751,8 +581,6 @@ impl GpuRenderer {
                 resource: viewport_buffer.as_entire_binding(),
             }],
         });
-
-        // ── Default shaders and layouts ───────────────────────────────────
         let color_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("color_shader"),
             source: wgpu::ShaderSource::Wgsl(COLOR_SHADER.into()),
@@ -761,7 +589,6 @@ impl GpuRenderer {
             label: Some("texture_shader"),
             source: wgpu::ShaderSource::Wgsl(TEXTURE_SHADER.into()),
         });
-
         let color_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("color_layout"),
             bind_group_layouts: &[&viewport_bgl],
@@ -772,8 +599,6 @@ impl GpuRenderer {
             bind_group_layouts: &[&viewport_bgl, &texture_bgl],
             push_constant_ranges: &[],
         });
-
-        // ── Vertex / index buffers ────────────────────────────────────────
         let color_vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("color_vbo"),
             size: MAX_COLOR_VERTS * std::mem::size_of::<ColorVertex>() as u64,
@@ -798,7 +623,6 @@ impl GpuRenderer {
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
-
         GpuRenderer {
             device,
             queue,
@@ -836,14 +660,6 @@ impl GpuRenderer {
             postfx_capture: HashMap::new(),
         }
     }
-
-    /// Updates the viewport uniform after a window resize.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    ///
-    /// Surface reconfiguration is the caller's responsibility (see `App::handle_resize`).
     pub fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
@@ -860,7 +676,6 @@ impl GpuRenderer {
         self.screen_stencil_target = None;
         self.light_gpu = None;
     }
-
     fn grow_capacity(current: u64, needed: u64) -> u64 {
         let mut cap = current.max(1);
         while cap < needed {
@@ -871,7 +686,6 @@ impl GpuRenderer {
         }
         cap.max(needed)
     }
-
     fn ensure_geometry_buffer_capacity(
         &mut self,
         color_verts_needed: usize,
@@ -890,7 +704,6 @@ impl GpuRenderer {
             });
             self.color_vertex_capacity = new_cap;
         }
-
         let color_i_needed = color_idxs_needed as u64;
         if color_i_needed > self.color_index_capacity {
             let new_cap = Self::grow_capacity(self.color_index_capacity, color_i_needed);
@@ -902,7 +715,6 @@ impl GpuRenderer {
             });
             self.color_index_capacity = new_cap;
         }
-
         let tex_v_needed = tex_verts_needed as u64;
         if tex_v_needed > self.tex_vertex_capacity {
             let new_cap = Self::grow_capacity(self.tex_vertex_capacity, tex_v_needed);
@@ -918,7 +730,6 @@ impl GpuRenderer {
                 self.tex_vertex_capacity
             );
         }
-
         let tex_i_needed = tex_idxs_needed as u64;
         if tex_i_needed > self.tex_index_capacity {
             let new_cap = Self::grow_capacity(self.tex_index_capacity, tex_i_needed);
@@ -935,7 +746,6 @@ impl GpuRenderer {
             );
         }
     }
-
     fn create_sampler(&self, default_filter: &(String, String, u32)) -> wgpu::Sampler {
         let min_filter = parse_filter_mode(&default_filter.0);
         let mag_filter = parse_filter_mode(&default_filter.1);
@@ -945,7 +755,6 @@ impl GpuRenderer {
             } else {
                 1
             };
-
         self.device.create_sampler(&wgpu::SamplerDescriptor {
             address_mode_u: wgpu::AddressMode::ClampToEdge,
             address_mode_v: wgpu::AddressMode::ClampToEdge,
@@ -956,7 +765,6 @@ impl GpuRenderer {
             ..Default::default()
         })
     }
-
     fn create_texture_bind_group(
         &self,
         view: &wgpu::TextureView,
@@ -978,8 +786,6 @@ impl GpuRenderer {
             ],
         })
     }
-
-    /// Creates a `GpuTexture` from raw RGBA8 pixel data (does not store it).
     fn create_gpu_texture_raw(
         &self,
         pixels: &[u8],
@@ -1032,15 +838,6 @@ impl GpuRenderer {
             height,
         }
     }
-
-    /// Uploads raw RGBA8 pixel data as a new GPU texture stored under the given key.
-    ///
-    /// # Parameters
-    /// - `key` — `TextureKey`.
-    /// - `pixels` — `&[u8]`.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    /// - `default_filter` — `&(String, String, u32)`.
     pub fn upload_texture(
         &mut self,
         key: TextureKey,
@@ -1053,8 +850,6 @@ impl GpuRenderer {
         let gt = self.create_gpu_texture_raw(pixels, width, height, color_space, default_filter);
         self.gpu_textures.insert(key, gt);
     }
-
-    /// Ensures a font's glyph atlas is uploaded as a GPU texture, returning `true` if ready.
     fn ensure_font_atlas(
         &mut self,
         font_key: FontKey,
@@ -1062,7 +857,6 @@ impl GpuRenderer {
         default_filter: &(String, String, u32),
     ) -> bool {
         let (data, w, h) = font.atlas_data();
-
         if font.is_dirty() || !self.font_atlas_textures.contains_key(font_key) {
             let gt = self.create_gpu_texture_raw(
                 data,
@@ -1074,20 +868,8 @@ impl GpuRenderer {
             self.font_atlas_textures.insert(font_key, gt);
             font.mark_clean();
         }
-
         self.font_atlas_textures.contains_key(font_key)
     }
-
-    /// Creates an off-screen GPU canvas texture stored under the given key.
-    ///
-    /// # Parameters
-    /// - `key` — `CanvasKey`.
-    /// - `width` — `u32`.
-    /// - `height` — `u32`.
-    /// - `default_filter` — `&(String, String, u32)`.
-    ///
-    /// The texture is created with `RENDER_ATTACHMENT | TEXTURE_BINDING` so it can
-    /// be rendered to and then sampled as a regular image.
     pub fn create_canvas(
         &mut self,
         key: CanvasKey,
@@ -1124,7 +906,6 @@ impl GpuRenderer {
         );
         self.canvas_needs_clear.insert(key, true);
     }
-
     fn create_depth_stencil_target(
         &self,
         width: u32,
@@ -1153,7 +934,6 @@ impl GpuRenderer {
             height,
         }
     }
-
     fn ensure_screen_stencil_target(&mut self) {
         let needs_recreate = self
             .screen_stencil_target
@@ -1168,7 +948,6 @@ impl GpuRenderer {
             ));
         }
     }
-
     fn ensure_canvas_stencil_target(&mut self, key: CanvasKey, width: u32, height: u32) {
         let needs_recreate = self
             .canvas_stencil_targets
@@ -1182,7 +961,6 @@ impl GpuRenderer {
             );
         }
     }
-
     fn prune_released_resources(
         &mut self,
         textures: &SlotMap<TextureKey, TextureData>,
@@ -1199,7 +977,6 @@ impl GpuRenderer {
         for key in stale_textures {
             self.gpu_textures.remove(key);
         }
-
         let stale_fonts: Vec<FontKey> = self
             .font_atlas_textures
             .iter()
@@ -1209,7 +986,6 @@ impl GpuRenderer {
         for key in stale_fonts {
             self.font_atlas_textures.remove(key);
         }
-
         let stale_canvases: Vec<CanvasKey> = self
             .canvas_gpu_textures
             .iter()
@@ -1221,7 +997,6 @@ impl GpuRenderer {
             self.canvas_stencil_targets.remove(key);
             self.canvas_needs_clear.remove(key);
         }
-
         let stale_shaders: Vec<ShaderKey> = self
             .shader_cache
             .iter()
@@ -1232,8 +1007,6 @@ impl GpuRenderer {
             self.shader_cache.remove(key);
         }
     }
-
-    /// Lazily creates or recreates GPU resources for the 2D lighting pass.
     fn ensure_light_resources(&mut self) {
         let needs_recreate = match &self.light_gpu {
             Some(lg) => lg.width != self.width || lg.height != self.height,
@@ -1242,11 +1015,8 @@ impl GpuRenderer {
         if !needs_recreate {
             return;
         }
-
         let w = self.width;
         let h = self.height;
-
-        // ── Light accumulation texture (screen-sized) ──
         let accum_texture = self.device.create_texture(&wgpu::TextureDescriptor {
             label: Some("light_accum_texture"),
             size: wgpu::Extent3d {
@@ -1269,8 +1039,6 @@ impl GpuRenderer {
         });
         let accum_bind_group =
             self.create_texture_bind_group(&accum_view, &sampler, "light_accum_bg");
-
-        // ── Shadow atlas texture (SHADOW_MAP_RES × MAX_SHADOW_LIGHTS, R32Float) ──
         let shadow_atlas_texture = self.device.create_texture(&wgpu::TextureDescriptor {
             label: Some("shadow_atlas_texture"),
             size: wgpu::Extent3d {
@@ -1287,8 +1055,6 @@ impl GpuRenderer {
         });
         let shadow_atlas_view =
             shadow_atlas_texture.create_view(&wgpu::TextureViewDescriptor::default());
-
-        // Shadow atlas bind group layout — unfilterable R32Float.
         let shadow_bgl = self
             .device
             .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -1331,8 +1097,6 @@ impl GpuRenderer {
                 },
             ],
         });
-
-        // ── Light pipeline layout: viewport + shadow atlas ──
         let light_pipeline_layout =
             self.device
                 .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -1340,17 +1104,12 @@ impl GpuRenderer {
                     bind_group_layouts: &[&self.viewport_bind_group_layout, &shadow_bgl],
                     push_constant_ranges: &[],
                 });
-
-        // ── Light radial-falloff shader ──
         let light_module = self
             .device
             .create_shader_module(wgpu::ShaderModuleDescriptor {
                 label: Some("light_shader"),
                 source: wgpu::ShaderSource::Wgsl(LIGHT_SHADER.into()),
             });
-
-        // Additive pipeline — renders light quads onto the accumulation texture.
-        // Uses LightVertex with shadow_v attribute.
         let additive_pipeline =
             self.device
                 .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -1391,9 +1150,6 @@ impl GpuRenderer {
                     multiview: None,
                     cache: None,
                 });
-
-        // Composite pipeline — draws the accumulation texture over the scene
-        // with multiply blending. Needs depth/stencil to match the screen target.
         let composite_pipeline = create_render_pipeline(
             &self.device,
             self.surface_format,
@@ -1407,8 +1163,6 @@ impl GpuRenderer {
             },
             "fs_main",
         );
-
-        // ── Vertex / index buffers for light quads + composite quad ──
         let max_verts = (MAX_LIGHT_QUADS + 1) * 4;
         let max_idxs = (MAX_LIGHT_QUADS + 1) * 6;
         let vertex_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
@@ -1423,7 +1177,6 @@ impl GpuRenderer {
             usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
-
         self.light_gpu = Some(LightGpuState {
             accum_texture,
             accum_view,
@@ -1439,40 +1192,6 @@ impl GpuRenderer {
             height: h,
         });
     }
-
-    /// Processes a frame: uploads new textures, tessellates commands, renders to surface, presents.
-    ///
-    /// # Parameters
-    /// - `surface` — `&wgpu::Surface<'static>`.
-    /// - `commands` — `&[RenderCommand]`.
-    /// - `textures` — `&SlotMap<TextureKey, TextureData>`.
-    /// - `fonts` — `&mut SlotMap<FontKey, crate::render::Font>`.
-    /// - `sprite_batches` — `&SlotMap<SpriteBatchKey, crate::sprite::SpriteBatch>`.
-    /// - `canvases` — `&SlotMap<CanvasKey, crate::render::Canvas>`.
-    /// - `meshes` — `&SlotMap<MeshKey, Mesh>`.
-    /// - `shaders` — `&SlotMap<ShaderKey, Shader>`.
-    /// - `default_filter` — `&(String, String, u32)`.
-    /// - `background_color` — `[f32`.
-    /// - `capture_screenshot` — `bool`.
-    ///
-    /// Returns `Err(wgpu::SurfaceError)` on transient errors; the caller should reconfigure on
-    /// `SurfaceError::Lost`. When `capture_screenshot` is `true`, a successful frame may also
-    /// return `Ok(Some((width, height, rgba_pixels)))` containing the presented screen image.
-    /// Returns `true` when the AABB of a primitive is within the visible viewport after the
-    /// full model→camera transform is applied.
-    ///
-    /// Used for CPU-side viewport culling before tessellation.  Adds a generous `margin` of
-    /// 4 pixels to avoid popping artefacts on primitives that are barely outside the viewport.
-    ///
-    /// Only applied when rendering to the screen target; canvas-to-canvas draws always proceed.
-    ///
-    /// # Parameters
-    /// - `x`, `y` — top-left of the primitive's AABB in model space.
-    /// - `w`, `h` — width and height of the AABB.  For shapes centred on (x, y), pass the
-    ///   full extent (e.g. `w = 2.0 * radius`).
-    /// - `model` — current CPU-side model matrix (top of the transform stack).
-    /// - `camera` — camera-view matrix (same one uploaded as `view_col*` uniform).
-    /// - `vp_w`, `vp_h` — viewport dimensions in logical pixels.
     #[inline]
     #[allow(clippy::too_many_arguments)]
     fn aabb_visible_2d(
@@ -1485,14 +1204,12 @@ impl GpuRenderer {
         vp_w: f32,
         vp_h: f32,
     ) -> bool {
-        // Four corners of the AABB in model space.
         let corners = [
             crate::math::Vec2 { x, y },
             crate::math::Vec2 { x: x + w, y },
             crate::math::Vec2 { x, y: y + h },
             crate::math::Vec2 { x: x + w, y: y + h },
         ];
-        // MVP = camera * model  (same order as the vertex shader).
         let mvp = *camera * *model;
         let mut min_x = f32::INFINITY;
         let mut max_x = f32::NEG_INFINITY;
@@ -1516,8 +1233,6 @@ impl GpuRenderer {
         const MARGIN: f32 = 4.0;
         max_x >= -MARGIN && min_x <= vp_w + MARGIN && max_y >= -MARGIN && min_y <= vp_h + MARGIN
     }
-
-    /// Executes one complete GPU render pass, processing the full `RenderCommand` queue into the wgpu surface.
     #[allow(clippy::too_many_arguments)]
     pub fn render_frame(
         &mut self,
@@ -1539,8 +1254,6 @@ impl GpuRenderer {
     ) -> Result<Option<(u32, u32, Vec<u8>)>, wgpu::SurfaceError> {
         let frame_start = Instant::now();
         self.prune_released_resources(textures, fonts, canvases, shaders);
-
-        // Lazily upload any TextureData added since last frame.
         for (key, tex_data) in textures.iter() {
             if !self.gpu_textures.contains_key(key) {
                 self.upload_texture(
@@ -1553,23 +1266,17 @@ impl GpuRenderer {
                 );
             }
         }
-
-        // Lazily create GPU textures for any new canvases.
         for (key, canvas) in canvases.iter() {
             if !self.canvas_gpu_textures.contains_key(key) {
                 self.create_canvas(key, canvas.width, canvas.height, default_filter);
             }
         }
-
-        // Reset per-frame stats.
         self.render_stats = RenderStats::default();
-
         let mut all_color_verts: Vec<ColorVertex> = Vec::new();
         let mut all_color_idxs: Vec<u32> = Vec::new();
         let mut all_tex_verts: Vec<TexVertex> = Vec::new();
         let mut all_tex_idxs: Vec<u32> = Vec::new();
         let mut draws: Vec<PreparedDraw> = Vec::new();
-
         let mut current_target = RenderTargetId::Screen;
         let mut current_blend_mode = BlendMode::Alpha;
         let mut current_scissor: Option<(f32, f32, f32, f32)> = None;
@@ -1582,11 +1289,8 @@ impl GpuRenderer {
         let mut stencil_mode = StencilMode::Disabled;
         let mut stencil_reference = 0u8;
         let mut active_shader: Option<ShaderKey> = None;
-        // Deferred post-FX work: (stack_id, passes, width, height). Processed after all draw
-        // calls are flushed so that the final composited frame image is readable.
         let mut pending_postfx: Vec<(u64, Vec<crate::render::renderer::PostFxPass>, u32, u32)> =
             Vec::new();
-
         for cmd in commands {
             match cmd {
                 RenderCommand::SetColor(r, g, b, a) => {
@@ -1595,8 +1299,6 @@ impl GpuRenderer {
                 RenderCommand::SetLineWidth(w) => {
                     line_width = *w;
                 }
-
-                // ── Transform stack ──────────────────────────────────────
                 RenderCommand::PushTransform => {
                     let top = *transform_stack.last().unwrap();
                     transform_stack.push(top);
@@ -1635,11 +1337,9 @@ impl GpuRenderer {
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
-
                 RenderCommand::Rectangle { mode, x, y, w, h } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
-                    // Viewport culling: skip tessellation when the rect is entirely off-screen.
                     if current_target == RenderTargetId::Screen
                         && !Self::aabb_visible_2d(
                             *x,
@@ -1696,7 +1396,6 @@ impl GpuRenderer {
                 } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
-                    // Viewport culling: skip tessellation when the rounded rect is off-screen.
                     if current_target == RenderTargetId::Screen
                         && !Self::aabb_visible_2d(
                             *x,
@@ -1747,7 +1446,6 @@ impl GpuRenderer {
                 RenderCommand::Circle { mode, x, y, r } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
-                    // Viewport culling: skip tessellation when the circle is entirely off-screen.
                     if current_target == RenderTargetId::Screen
                         && !Self::aabb_visible_2d(
                             x - r,
@@ -1797,7 +1495,6 @@ impl GpuRenderer {
                 RenderCommand::Ellipse { mode, x, y, rx, ry } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
-                    // Viewport culling: skip tessellation when the ellipse is entirely off-screen.
                     if current_target == RenderTargetId::Screen
                         && !Self::aabb_visible_2d(
                             x - rx,
@@ -2034,11 +1731,9 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
                 RenderCommand::SetBlendMode(mode) => {
                     current_blend_mode = *mode;
                 }
-
                 RenderCommand::Print {
                     font_key,
                     ref text,
@@ -2055,7 +1750,6 @@ impl GpuRenderer {
                                 self.target_dimensions(current_target, canvases);
                             let scissor =
                                 normalize_scissor(current_scissor, target_width, target_height);
-
                             let mut cursor_x = *x;
                             for ch in text.chars() {
                                 if let Some(glyph) = font.glyph(ch) {
@@ -2066,7 +1760,6 @@ impl GpuRenderer {
                                         let gy = *y
                                             + (font_size - glyph.offset_y - glyph.height as f32)
                                                 * ratio;
-
                                         let mut verts = Vec::with_capacity(4);
                                         let mut idxs = Vec::with_capacity(6);
                                         push_tex_quad(
@@ -2110,7 +1803,6 @@ impl GpuRenderer {
                         }
                     }
                 }
-
                 RenderCommand::DrawImage {
                     texture_key,
                     x,
@@ -2121,7 +1813,6 @@ impl GpuRenderer {
                         let w = gt.width as f32;
                         let h = gt.height as f32;
                         let t = transform_stack.last().unwrap();
-                        // Viewport culling: skip tessellation when the image is entirely off-screen.
                         if current_target == RenderTargetId::Screen
                             && !Self::aabb_visible_2d(
                                 *x,
@@ -2191,8 +1882,6 @@ impl GpuRenderer {
                         let w = gt.width as f32;
                         let h = gt.height as f32;
                         let t = transform_stack.last().unwrap();
-                        // Viewport culling: skip tessellation when the image is entirely off-screen.
-                        // Scale the AABB by |sx|/|sy| to account for applied scaling.
                         if current_target == RenderTargetId::Screen
                             && !Self::aabb_visible_2d(
                                 *x - *ox * sx.abs(),
@@ -2310,7 +1999,6 @@ impl GpuRenderer {
                         );
                     }
                 }
-
                 RenderCommand::DrawTexturedQuad {
                     corners,
                     uvs,
@@ -2344,7 +2032,6 @@ impl GpuRenderer {
                         );
                     }
                 }
-
                 RenderCommand::DrawBatch { batch_key } => {
                     if let Some(batch) = sprite_batches.get(*batch_key) {
                         let tex_key = batch.texture_key();
@@ -2369,8 +2056,6 @@ impl GpuRenderer {
                                 let v0 = entry.quad_y / tex_h;
                                 let u1 = (entry.quad_x + qw) / tex_w;
                                 let v1 = (entry.quad_y + qh) / tex_h;
-
-                                // Engine-level viewport culling for batched sprites.
                                 if current_target == RenderTargetId::Screen
                                     && !Self::aabb_visible_2d(
                                         entry.x - entry.ox * entry.sx.abs(),
@@ -2385,7 +2070,6 @@ impl GpuRenderer {
                                 {
                                     continue;
                                 }
-
                                 push_tex_quad(
                                     &mut verts,
                                     &mut idxs,
@@ -2491,19 +2175,15 @@ impl GpuRenderer {
                 RenderCommand::SetPointSize(size) => {
                     point_size = *size;
                 }
-
                 RenderCommand::SetScissor(rect) => {
                     current_scissor = *rect;
                 }
-
                 RenderCommand::SetColorMask(r, g, b, a) => {
                     color_mask_bits = color_write_mask_bits((*r, *g, *b, *a));
                 }
-
                 RenderCommand::SetWireframe(enabled) => {
                     wireframe = *enabled;
                 }
-
                 RenderCommand::Points { points } => {
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
@@ -2549,7 +2229,6 @@ impl GpuRenderer {
                         let wrapped = font.wrap_text(text, *limit / ratio);
                         let lh = font.line_height() * ratio;
                         let font_size = font.size();
-
                         if self.ensure_font_atlas(*font_key, font, default_filter) {
                             let t = transform_stack.last().unwrap();
                             let (target_width, target_height) =
@@ -2565,7 +2244,6 @@ impl GpuRenderer {
                                 };
                                 let line_x = *x + x_offset;
                                 let line_y = *y + i as f32 * lh;
-
                                 let mut cursor_x = line_x;
                                 for ch in line.chars() {
                                     if let Some(glyph) = font.glyph(ch) {
@@ -2578,7 +2256,6 @@ impl GpuRenderer {
                                                     - glyph.offset_y
                                                     - glyph.height as f32)
                                                     * ratio;
-
                                             let mut verts = Vec::with_capacity(4);
                                             let mut idxs = Vec::with_capacity(6);
                                             push_tex_quad(
@@ -2624,7 +2301,6 @@ impl GpuRenderer {
                         }
                     }
                 }
-
                 RenderCommand::StencilBegin { action, value } => {
                     stencil_mode = StencilMode::Write(*action);
                     stencil_reference = *value;
@@ -2657,7 +2333,6 @@ impl GpuRenderer {
                         let sin_r = rotation.sin();
                         let parent = transform_stack.last().unwrap();
                         let tri_indices = mesh.triangulate();
-
                         if let Some(tex_key) = mesh.texture {
                             if self.gpu_textures.contains_key(tex_key) {
                                 let mut verts = Vec::with_capacity(tri_indices.len());
@@ -2759,7 +2434,6 @@ impl GpuRenderer {
                     let sin_r = rotation.sin();
                     let parent = transform_stack.last().unwrap();
                     let tri_indices = mesh.triangulate();
-
                     if let Some(tex_key) = mesh.texture {
                         if self.gpu_textures.contains_key(tex_key) {
                             let mut verts = Vec::with_capacity(tri_indices.len());
@@ -2889,11 +2563,11 @@ impl GpuRenderer {
                                 current_color,
                                 dx,
                                 dy,
-                                0.0, // no rotation
-                                1.0, // sx
-                                1.0, // sy
-                                0.0, // ox
-                                0.0, // oy
+                                0.0,
+                                1.0,
+                                1.0,
+                                0.0,
+                                0.0,
                                 dw,
                                 dh,
                                 u0,
@@ -2924,8 +2598,6 @@ impl GpuRenderer {
                 RenderCommand::SetShader(shader) => {
                     active_shader = shader.filter(|key| shaders.contains_key(*key));
                 }
-                // DrawShape is not yet GPU-implemented;
-                // silence non-exhaustive-pattern error until renderer support is added.
                 RenderCommand::DrawShape { .. } => {}
                 RenderCommand::DrawParticleSystem { ref particles } => {
                     if particles.is_empty() {
@@ -3137,7 +2809,6 @@ impl GpuRenderer {
                                 let cap_r = half * 0.4;
                                 let cos_r = inst.rotation.cos();
                                 let sin_r = inst.rotation.sin();
-                                // Central rectangle
                                 let corners = [
                                     (-half_len, -cap_r),
                                     (half_len, -cap_r),
@@ -3164,7 +2835,6 @@ impl GpuRenderer {
                                     base + 2,
                                     base + 3,
                                 ]);
-                                // Half-circle caps at each end
                                 const N: usize = 8;
                                 for side in [1.0_f32, -1.0] {
                                     let cap_cx = inst.x + cos_r * half_len * side;
@@ -3217,7 +2887,6 @@ impl GpuRenderer {
                         );
                     }
                 }
-                // ── Extended RenderCommand variants ─────────────────────────
                 RenderCommand::DrawQuadBezier {
                     start,
                     control,
@@ -3263,7 +2932,6 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
                 RenderCommand::DrawCubicBezier {
                     start,
                     c1,
@@ -3316,7 +2984,6 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
                 RenderCommand::DrawPath {
                     segments: path_segs,
                     mode,
@@ -3451,7 +3118,6 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
                 RenderCommand::DrawGradientRect {
                     x,
                     y,
@@ -3469,7 +3135,6 @@ impl GpuRenderer {
                             a[3] + (b[3] - a[3]) * f,
                         ]
                     };
-                    // corner order: TL, TR, BR, BL
                     let corner_colors: [[f32; 4]; 4] = match direction {
                         GradientDirection::Horizontal => [*color1, *color2, *color2, *color1],
                         GradientDirection::Vertical => [*color1, *color1, *color2, *color2],
@@ -3512,7 +3177,6 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
                 RenderCommand::DrawColoredPolygon {
                     vertices,
                     colors,
@@ -3571,7 +3235,6 @@ impl GpuRenderer {
                         );
                     }
                 }
-
                 RenderCommand::DrawIsoCubeTile {
                     screen_x,
                     screen_y,
@@ -3590,7 +3253,6 @@ impl GpuRenderer {
                     let sy = *screen_y;
                     let hw = *half_w;
                     let hh = *half_h;
-                    // Face corner sets (clockwise: TL, TR, BR, BL equivalent)
                     let top_corners = [
                         Vec2::new(sx, sy - hh),
                         Vec2::new(sx + hw, sy),
@@ -3617,7 +3279,6 @@ impl GpuRenderer {
                     ];
                     let (tw, th) = self.target_dimensions(current_target, canvases);
                     let scissor = normalize_scissor(current_scissor, tw, th);
-                    // Draw each face — textured if a key is provided, else colored polygon.
                     for (corners, color, tex_opt) in [
                         (&top_corners, top_color, top_texture),
                         (&left_corners, left_color, left_texture),
@@ -3682,7 +3343,6 @@ impl GpuRenderer {
                         }
                     }
                 }
-
                 RenderCommand::DrawHexTile {
                     cx,
                     cy,
@@ -3728,12 +3388,9 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
-                // State-machine stubs — sort group tracking is NYI in the GPU renderer.
                 RenderCommand::BeginSortGroup { .. } => {}
                 RenderCommand::PushSortKey(_) => {}
                 RenderCommand::FlushSortGroup { .. } => {}
-
                 RenderCommand::DrawPhysicsDebug { shapes, config } => {
                     let t = transform_stack.last().unwrap();
                     let lw = config.line_width;
@@ -3765,7 +3422,6 @@ impl GpuRenderer {
                                 lw,
                             );
                         } else if !shape.hull_verts.is_empty() {
-                            // Transform hull verts (body-local) by the shape's world angle + position.
                             let cos_a = shape.angle.cos();
                             let sin_a = shape.angle.sin();
                             let flat: Vec<f32> = shape
@@ -3787,7 +3443,6 @@ impl GpuRenderer {
                                 lw,
                             );
                         } else {
-                            // Rotated box: compute 4 corners from half-extents and angle.
                             let cos_a = shape.angle.cos();
                             let sin_a = shape.angle.sin();
                             let corners: [[f32; 2]; 4] = [
@@ -3830,7 +3485,6 @@ impl GpuRenderer {
                         );
                     }
                 }
-
                 RenderCommand::DrawSpineSkeleton { slots } => {
                     let t = transform_stack.last().unwrap();
                     let (tw, th) = self.target_dimensions(current_target, canvases);
@@ -3866,7 +3520,6 @@ impl GpuRenderer {
                         }
                     }
                 }
-
                 RenderCommand::DrawBevelRect {
                     x,
                     y,
@@ -3884,7 +3537,6 @@ impl GpuRenderer {
                     let iy = *y + bw;
                     let iw = *w - 2.0 * bw;
                     let ih = *h - 2.0 * bw;
-                    // Determine the highlight/shadow colour for each edge based on style.
                     let (top_c, left_c, bottom_c, right_c) = match style {
                         BevelStyle::Raised => (*highlight, *highlight, *shadow, *shadow),
                         BevelStyle::Sunken => (*shadow, *shadow, *highlight, *highlight),
@@ -3894,7 +3546,6 @@ impl GpuRenderer {
                     };
                     let mut verts: Vec<ColorVertex> = Vec::new();
                     let mut idxs: Vec<u32> = Vec::new();
-                    // Inner fill rectangle.
                     if iw > 0.0 && ih > 0.0 {
                         self.tess_rect(
                             &mut verts,
@@ -3909,7 +3560,6 @@ impl GpuRenderer {
                             line_width,
                         );
                     }
-                    // Helper: push a trapezoid quad with mixed-corner colours.
                     let push_bevel_quad =
                         |cv: &mut Vec<ColorVertex>,
                          ci: &mut Vec<u32>,
@@ -3932,14 +3582,12 @@ impl GpuRenderer {
                                 base + 3,
                             ]);
                         };
-                    // Top bevel strip (outer-top-left → outer-top-right → inner-top-right → inner-top-left)
                     push_bevel_quad(
                         &mut verts,
                         &mut idxs,
                         &[(*x, *y), (*x + *w, *y), (ix + iw, iy), (ix, iy)],
                         &[top_c, top_c, top_c, top_c],
                     );
-                    // Bottom bevel strip
                     push_bevel_quad(
                         &mut verts,
                         &mut idxs,
@@ -3951,14 +3599,12 @@ impl GpuRenderer {
                         ],
                         &[bottom_c, bottom_c, bottom_c, bottom_c],
                     );
-                    // Left bevel strip
                     push_bevel_quad(
                         &mut verts,
                         &mut idxs,
                         &[(*x, *y), (ix, iy), (ix, iy + ih), (*x, *y + *h)],
                         &[left_c, left_c, left_c, left_c],
                     );
-                    // Right bevel strip
                     push_bevel_quad(
                         &mut verts,
                         &mut idxs,
@@ -3986,12 +3632,8 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-
-                // Compositing layer management is handled at a higher level; stubs only.
                 RenderCommand::PushLayer { .. } => {}
                 RenderCommand::PopLayer { .. } => {}
-
-                // Post-FX capture and apply.
                 RenderCommand::BeginPostFx { stack_id } => {
                     if self.postfx_pipeline.is_none() {
                         self.postfx_pipeline =
@@ -4022,9 +3664,7 @@ impl GpuRenderer {
                 } => {
                     pending_postfx.push((*stack_id, passes.clone(), *width, *height));
                 }
-                RenderCommand::DrawRichText { .. } => {
-                    // Rich text rendering: not yet implemented in GPU renderer.
-                }
+                RenderCommand::DrawRichText { .. } => {}
                 RenderCommand::DrawConvexFan {
                     vertices,
                     tint,
@@ -4066,11 +3706,6 @@ impl GpuRenderer {
                 }
             }
         }
-
-        // ── Draw-call coalescing ─────────────────────────────────────────────
-        // Merge adjacent PreparedDraw entries that share identical GPU state
-        // and have contiguous index ranges.  This reduces the number of draw
-        // calls dispatched per frame without altering draw order.
         {
             let before = draws.len();
             let mut merged = Vec::with_capacity(draws.len());
@@ -4100,8 +3735,6 @@ impl GpuRenderer {
             }
             draws = merged;
         }
-
-        // ── Buffer saturation diagnostics (warn at ≥90% capacity) ───────────────────────────────
         {
             let color_v_pct = all_color_verts.len() * 100 / self.color_vertex_capacity as usize;
             if color_v_pct >= 90 {
@@ -4132,15 +3765,12 @@ impl GpuRenderer {
                 );
             }
         }
-
         self.ensure_geometry_buffer_capacity(
             all_color_verts.len(),
             all_color_idxs.len(),
             all_tex_verts.len(),
             all_tex_idxs.len(),
         );
-
-        // Write geometry data to GPU buffers.
         if !all_color_verts.is_empty() {
             self.queue.write_buffer(
                 &self.color_vertex_buffer,
@@ -4165,7 +3795,6 @@ impl GpuRenderer {
                 bytemuck::cast_slice(&all_tex_idxs),
             );
         }
-
         let output = surface.get_current_texture()?;
         let view = output
             .texture
@@ -4176,11 +3805,9 @@ impl GpuRenderer {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("render_encoder"),
             });
-
         let mut screen_started = false;
         let mut touched_canvases: HashSet<CanvasKey> = HashSet::new();
         let mut cursor = 0usize;
-
         while cursor < draws.len() {
             let target = draws[cursor].target;
             match target {
@@ -4195,10 +3822,8 @@ impl GpuRenderer {
                     self.ensure_canvas_stencil_target(key, canvas.width, canvas.height);
                 }
             }
-
             let (target_width, target_height) = self.target_dimensions(target, canvases);
             self.update_viewport_uniform(target_width, target_height, camera_matrix, frame_time);
-
             let (color_view, color_load, stencil_view, stencil_load, clear_canvas_after_pass) =
                 match target {
                     RenderTargetId::Screen => {
@@ -4244,7 +3869,6 @@ impl GpuRenderer {
                         )
                     }
                 };
-
             {
                 let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                     label: Some("ordered_render_pass"),
@@ -4266,10 +3890,8 @@ impl GpuRenderer {
                     }),
                     ..Default::default()
                 });
-
                 let mut previous_pipeline: Option<PipelineSelectionKey> = None;
                 let mut previous_texture: Option<TexRef> = None;
-
                 while cursor < draws.len() && draws[cursor].target == target {
                     let draw = draws[cursor];
                     let pipeline_key = self.pipeline_selection_key(draw);
@@ -4289,7 +3911,6 @@ impl GpuRenderer {
                     cursor += 1;
                 }
             }
-
             if let Some(key) = clear_canvas_after_pass {
                 self.canvas_needs_clear.insert(key, false);
             }
@@ -4297,7 +3918,6 @@ impl GpuRenderer {
                 screen_started = true;
             }
         }
-
         if !screen_started {
             self.update_viewport_uniform(self.width, self.height, camera_matrix, frame_time);
             let screen_stencil_view = &self.screen_stencil_target.as_ref().unwrap().view;
@@ -4327,22 +3947,13 @@ impl GpuRenderer {
                 ..Default::default()
             });
         }
-
-        // ====== LIGHT RENDERING PASS ======
         if light_world.enabled && !light_world.lights.is_empty() {
             self.ensure_light_resources();
-
-            // ── Compute 1D shadow maps for shadow-enabled lights ──
             let mut shadow_row = 0usize;
-            // Pre-collect occluders to avoid borrow issues.
             let occluder_list: Vec<&crate::light::occluder::Occluder> =
                 light_world.occluders.values().collect();
-
-            // Map from light SlotMap index → shadow atlas row (None = no shadow).
             let mut light_shadow_rows: Vec<Option<usize>> = Vec::new();
-            // CPU shadow data rows to upload.
             let mut shadow_rows_data: Vec<(usize, Vec<f32>)> = Vec::new();
-
             for (_, light) in light_world.lights.iter() {
                 if !light.enabled || light.radius * light.energy <= 0.0 {
                     light_shadow_rows.push(None);
@@ -4363,8 +3974,6 @@ impl GpuRenderer {
                     light_shadow_rows.push(None);
                 }
             }
-
-            // Upload shadow atlas rows to GPU.
             if let Some(lg) = self.light_gpu.as_ref() {
                 for (row, data) in &shadow_rows_data {
                     self.queue.write_texture(
@@ -4392,13 +4001,10 @@ impl GpuRenderer {
                     );
                 }
             }
-
-            // ── Tessellate one quad per enabled light ──
             let mut light_verts: Vec<LightVertex> = Vec::new();
             let mut light_idxs: Vec<u32> = Vec::new();
             let mut light_count = 0usize;
             let atlas_height = MAX_SHADOW_LIGHTS as f32;
-
             for ((_, light), shadow_opt) in light_world.lights.iter().zip(light_shadow_rows.iter())
             {
                 if !light.enabled {
@@ -4429,7 +4035,6 @@ impl GpuRenderer {
                 };
                 let softness = (light.shadow_smooth * light.shadow_softness).max(0.0);
                 let shadow_params = [filter_mode, softness, 1.0 / SHADOW_MAP_RES as f32, 0.0];
-
                 let base = light_verts.len() as u32;
                 light_verts.push(LightVertex {
                     position: [light.x - r, light.y - r],
@@ -4462,8 +4067,6 @@ impl GpuRenderer {
                 light_idxs.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
                 light_count += 1;
             }
-
-            // ── Composite full-screen quad (screen-space) ──
             let composite_base = light_verts.len() as u32;
             let sw = self.width as f32;
             let sh = self.height as f32;
@@ -4504,8 +4107,6 @@ impl GpuRenderer {
                 composite_base + 3,
             ]);
             let composite_idx_start = (light_count * 6) as u32;
-
-            // ── Upload light geometry ──
             {
                 let lg = self.light_gpu.as_ref().unwrap();
                 self.queue
@@ -4513,10 +4114,6 @@ impl GpuRenderer {
                 self.queue
                     .write_buffer(&lg.index_buffer, 0, bytemuck::cast_slice(&light_idxs));
             }
-
-            // ── Pass 1: Accumulate lights onto the light buffer ──
-            // Light positions are in world space — the camera matrix transforms
-            // them to screen space in the vertex shader, just like scene geometry.
             self.update_viewport_uniform(self.width, self.height, camera_matrix, frame_time);
             {
                 let lg = self.light_gpu.as_ref().unwrap();
@@ -4539,7 +4136,6 @@ impl GpuRenderer {
                     depth_stencil_attachment: None,
                     ..Default::default()
                 });
-
                 if light_count > 0 {
                     pass.set_pipeline(&lg.additive_pipeline);
                     pass.set_bind_group(0, &self.viewport_bind_group, &[]);
@@ -4549,9 +4145,6 @@ impl GpuRenderer {
                     pass.draw_indexed(0..(light_count * 6) as u32, 0, 0..1);
                 }
             }
-
-            // ── Pass 2: Composite light buffer over scene (multiply blend) ──
-            // Use identity camera so the full-screen quad maps 1:1 to pixels.
             self.update_viewport_uniform(self.width, self.height, &Mat3::identity(), frame_time);
             {
                 let lg = self.light_gpu.as_ref().unwrap();
@@ -4576,7 +4169,6 @@ impl GpuRenderer {
                     }),
                     ..Default::default()
                 });
-
                 pass.set_pipeline(&lg.composite_pipeline);
                 pass.set_bind_group(0, &self.viewport_bind_group, &[]);
                 pass.set_bind_group(1, &lg.accum_bind_group, &[]);
@@ -4586,20 +4178,13 @@ impl GpuRenderer {
                 pass.set_stencil_reference(0);
                 pass.draw_indexed(composite_idx_start..composite_idx_start + 6, 0, 0..1);
             }
-
-            // Restore camera viewport for any subsequent passes.
             self.update_viewport_uniform(self.width, self.height, camera_matrix, frame_time);
         }
-        // ==================================
-
         let pending_readback = if capture_screenshot {
             self.begin_surface_readback(&mut encoder, &output.texture, self.width, self.height)
         } else {
             None
         };
-
-        // ── Post-processing passes ───────────────────────────────────────────
-        // Apply all deferred PostFxStack passes now that the full scene is composited.
         for (stack_id, passes, w, h) in &pending_postfx {
             if let (Some(pipeline), Some(capture)) =
                 (&self.postfx_pipeline, self.postfx_capture.get(stack_id))
@@ -4618,13 +4203,11 @@ impl GpuRenderer {
                 );
             }
         }
-
         self.queue.submit(std::iter::once(encoder.finish()));
         output.present();
         self.render_stats.cpu_render_ms = frame_start.elapsed().as_secs_f32() * 1000.0;
         Ok(pending_readback.and_then(|readback| self.complete_surface_readback(readback)))
     }
-
     fn begin_surface_readback(
         &self,
         encoder: &mut wgpu::CommandEncoder,
@@ -4636,19 +4219,16 @@ impl GpuRenderer {
             log_msg!(error, G002_SCREENSHOT_ZERO_SIZE);
             return None;
         }
-
         let unpadded_bytes_per_row = width.saturating_mul(4);
         let alignment = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
         let padded_bytes_per_row = unpadded_bytes_per_row.div_ceil(alignment) * alignment;
         let buffer_size = padded_bytes_per_row as u64 * height as u64;
-
         let buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("surface_readback_buffer"),
             size: buffer_size,
             usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
             mapped_at_creation: false,
         });
-
         encoder.copy_texture_to_buffer(
             wgpu::ImageCopyTexture {
                 texture,
@@ -4670,7 +4250,6 @@ impl GpuRenderer {
                 depth_or_array_layers: 1,
             },
         );
-
         Some(PendingSurfaceReadback {
             buffer,
             padded_bytes_per_row,
@@ -4678,18 +4257,15 @@ impl GpuRenderer {
             height,
         })
     }
-
     fn complete_surface_readback(
         &self,
         readback: PendingSurfaceReadback,
     ) -> Option<(u32, u32, Vec<u8>)> {
         let slice = readback.buffer.slice(..);
         let (sender, receiver) = mpsc::channel();
-
         slice.map_async(wgpu::MapMode::Read, move |result| {
             let _ = sender.send(result.map_err(|err| err.to_string()));
         });
-
         let _ = self.device.poll(wgpu::Maintain::Wait);
         match receiver.recv() {
             Ok(Ok(())) => {}
@@ -4702,7 +4278,6 @@ impl GpuRenderer {
                 return None;
             }
         }
-
         let mut pixels = vec![0u8; (readback.width * readback.height * 4) as usize];
         {
             let mapped = slice.get_mapped_range();
@@ -4715,7 +4290,6 @@ impl GpuRenderer {
             }
         }
         readback.buffer.unmap();
-
         match self.surface_format {
             wgpu::TextureFormat::Bgra8Unorm | wgpu::TextureFormat::Bgra8UnormSrgb => {
                 for pixel in pixels.chunks_exact_mut(4) {
@@ -4728,10 +4302,8 @@ impl GpuRenderer {
                 return None;
             }
         }
-
         Some((readback.width, readback.height, pixels))
     }
-
     fn update_viewport_uniform(
         &mut self,
         width: u32,
@@ -4765,7 +4337,6 @@ impl GpuRenderer {
         self.queue
             .write_buffer(&self.viewport_buffer, 0, bytemuck::bytes_of(&data));
     }
-
     fn target_dimensions(
         &self,
         target: RenderTargetId,
@@ -4779,7 +4350,6 @@ impl GpuRenderer {
                 .unwrap_or((self.width, self.height)),
         }
     }
-
     fn target_dimensions_from_gpu(&self, target: RenderTargetId) -> (u32, u32) {
         match target {
             RenderTargetId::Screen => (self.width, self.height),
@@ -4790,7 +4360,6 @@ impl GpuRenderer {
                 .unwrap_or((self.width, self.height)),
         }
     }
-
     fn pipeline_selection_key(&self, draw: PreparedDraw) -> PipelineSelectionKey {
         let geometry = draw.geometry;
         let pipeline = PipelineKey {
@@ -4807,7 +4376,6 @@ impl GpuRenderer {
             None => PipelineSelectionKey::Default { geometry, pipeline },
         }
     }
-
     fn default_pipeline(
         &mut self,
         geometry: GeometryKind,
@@ -4817,7 +4385,6 @@ impl GpuRenderer {
             GeometryKind::Color => !self.default_color_pipelines.contains_key(&key),
             GeometryKind::Texture => !self.default_texture_pipelines.contains_key(&key),
         };
-
         if missing {
             let pipeline = match geometry {
                 GeometryKind::Color => create_render_pipeline(
@@ -4839,7 +4406,6 @@ impl GpuRenderer {
                     "fs_main",
                 ),
             };
-
             match geometry {
                 GeometryKind::Color => {
                     self.default_color_pipelines.insert(key, pipeline);
@@ -4849,20 +4415,17 @@ impl GpuRenderer {
                 }
             }
         }
-
         match geometry {
             GeometryKind::Color => self.default_color_pipelines.get(&key).unwrap(),
             GeometryKind::Texture => self.default_texture_pipelines.get(&key).unwrap(),
         }
     }
-
     fn ensure_shader_cache(&mut self, shader_key: ShaderKey, shader: &Shader) {
         let ordered_uniforms = shader.ordered_uniforms();
         let uniform_signature: Vec<(String, ShaderUniformKind)> = ordered_uniforms
             .iter()
             .map(|(name, value)| ((*name).to_string(), uniform_kind(value)))
             .collect();
-
         let needs_rebuild = self
             .shader_cache
             .get(shader_key)
@@ -4870,7 +4433,6 @@ impl GpuRenderer {
                 cached.source != shader.source || cached.uniform_signature != uniform_signature
             })
             .unwrap_or(true);
-
         if needs_rebuild {
             let uniform_bind_group_layout = if uniform_signature.is_empty() {
                 None
@@ -4896,7 +4458,6 @@ impl GpuRenderer {
                         }),
                 )
             };
-
             let uniform_buffers = uniform_signature
                 .iter()
                 .map(|_| {
@@ -4908,7 +4469,6 @@ impl GpuRenderer {
                     })
                 })
                 .collect::<Vec<_>>();
-
             let uniform_bind_group = uniform_bind_group_layout.as_ref().map(|layout| {
                 self.device.create_bind_group(&wgpu::BindGroupDescriptor {
                     label: Some("custom_shader_uniform_bg"),
@@ -4923,7 +4483,6 @@ impl GpuRenderer {
                         .collect::<Vec<_>>(),
                 })
             });
-
             let color_source = build_custom_color_shader_source(shader, &uniform_signature);
             let texture_source = build_custom_texture_shader_source(shader, &uniform_signature);
             let color_module = self
@@ -4938,7 +4497,6 @@ impl GpuRenderer {
                     label: Some("custom_texture_shader"),
                     source: wgpu::ShaderSource::Wgsl(texture_source.into()),
                 });
-
             let color_layout = {
                 let bind_group_layouts = match uniform_bind_group_layout.as_ref() {
                     Some(uniform_layout) => vec![&self.viewport_bind_group_layout, uniform_layout],
@@ -4970,7 +4528,6 @@ impl GpuRenderer {
                         push_constant_ranges: &[],
                     })
             };
-
             self.shader_cache.insert(
                 shader_key,
                 GpuShader {
@@ -4987,7 +4544,6 @@ impl GpuRenderer {
                 },
             );
         }
-
         if let Some(cache) = self.shader_cache.get(shader_key) {
             for ((_, value), buffer) in ordered_uniforms.iter().zip(cache.uniform_buffers.iter()) {
                 let bytes = uniform_bytes(value);
@@ -4995,7 +4551,6 @@ impl GpuRenderer {
             }
         }
     }
-
     fn custom_pipeline(
         &mut self,
         shader_key: ShaderKey,
@@ -5004,7 +4559,6 @@ impl GpuRenderer {
         key: PipelineKey,
     ) -> &wgpu::RenderPipeline {
         self.ensure_shader_cache(shader_key, shader);
-
         let missing = {
             let cache = self.shader_cache.get(shader_key).unwrap();
             match geometry {
@@ -5012,7 +4566,6 @@ impl GpuRenderer {
                 GeometryKind::Texture => !cache.texture_pipelines.contains_key(&key),
             }
         };
-
         if missing {
             let pipeline = {
                 let cache = self.shader_cache.get(shader_key).unwrap();
@@ -5037,7 +4590,6 @@ impl GpuRenderer {
                     ),
                 }
             };
-
             let cache = self.shader_cache.get_mut(shader_key).unwrap();
             match geometry {
                 GeometryKind::Color => {
@@ -5048,20 +4600,17 @@ impl GpuRenderer {
                 }
             }
         }
-
         let cache = self.shader_cache.get(shader_key).unwrap();
         match geometry {
             GeometryKind::Color => cache.color_pipelines.get(&key).unwrap(),
             GeometryKind::Texture => cache.texture_pipelines.get(&key).unwrap(),
         }
     }
-
     fn shader_bind_group(&self, shader_key: ShaderKey) -> Option<&wgpu::BindGroup> {
         self.shader_cache
             .get(shader_key)
             .and_then(|cache| cache.uniform_bind_group.as_ref())
     }
-
     fn texture_bind_group(&self, texture_ref: TexRef) -> Option<&wgpu::BindGroup> {
         match texture_ref {
             TexRef::Texture(key) => self
@@ -5078,7 +4627,6 @@ impl GpuRenderer {
                 .map(|texture| &texture.bind_group),
         }
     }
-
     fn issue_draw(
         &mut self,
         pass: &mut wgpu::RenderPass<'_>,
@@ -5092,20 +4640,17 @@ impl GpuRenderer {
                 return false;
             }
         }
-
         let pipeline_key = PipelineKey {
             blend_mode: draw.blend_mode,
             color_mask_bits: draw.color_mask_bits,
             stencil_mode: draw.stencil_mode,
         };
         let effective_shader = shader_for_draw(draw);
-
         pass.set_bind_group(0, &self.viewport_bind_group, &[]);
         match draw.geometry {
             GeometryKind::Color => {
                 pass.set_vertex_buffer(0, self.color_vertex_buffer.slice(..));
                 pass.set_index_buffer(self.color_index_buffer.slice(..), wgpu::IndexFormat::Uint32);
-
                 if let Some(shader_key) = effective_shader {
                     if let Some(shader) = shaders.get(shader_key) {
                         {
@@ -5133,10 +4678,8 @@ impl GpuRenderer {
                 let Some(texture_ref) = draw.texture_ref else {
                     return false;
                 };
-
                 pass.set_vertex_buffer(0, self.tex_vertex_buffer.slice(..));
                 pass.set_index_buffer(self.tex_index_buffer.slice(..), wgpu::IndexFormat::Uint32);
-
                 if let Some(shader_key) = effective_shader {
                     if let Some(shader) = shaders.get(shader_key) {
                         {
@@ -5176,7 +4719,6 @@ impl GpuRenderer {
                 }
             }
         }
-
         let (target_width, target_height) = self.target_dimensions_from_gpu(draw.target);
         match draw.scissor {
             Some((sx, sy, sw, sh)) => pass.set_scissor_rect(sx, sy, sw, sh),
@@ -5186,9 +4728,6 @@ impl GpuRenderer {
         pass.draw_indexed(draw.idx_start..draw.idx_start + draw.idx_count, 0, 0..1);
         true
     }
-
-    // ── Tessellation helpers ──────────────────────────────────────────────────
-
     #[allow(clippy::too_many_arguments)]
     fn tess_rect(
         &self,
@@ -5214,7 +4753,6 @@ impl GpuRenderer {
                 push_quad_verts(cv, ci, &pts, color);
             }
             DrawMode::Line => {
-                // Four border edges as thick lines.
                 push_thick_line(cv, ci, t, color, x, y, x + w, y, lw);
                 push_thick_line(cv, ci, t, color, x + w, y, x + w, y + h, lw);
                 push_thick_line(cv, ci, t, color, x + w, y + h, x, y + h, lw);
@@ -5222,7 +4760,6 @@ impl GpuRenderer {
             }
         }
     }
-
     #[allow(clippy::too_many_arguments)]
     fn tess_rounded_rect(
         &self,
@@ -5242,12 +4779,9 @@ impl GpuRenderer {
         let rx = rx.min(w * 0.5).max(0.0);
         let ry = ry.min(h * 0.5).max(0.0);
         const CORNER_SEGS: u32 = 8;
-
-        // Build outline path; tessellate as fan (fill) or thick line segments (line).
         let path = build_rounded_rect_path(x, y, w, h, rx, ry, CORNER_SEGS);
         match mode {
             DrawMode::Fill => {
-                // Fan from centroid.
                 push_fan_fill(cv, ci, t, color, x + w * 0.5, y + h * 0.5, &path);
             }
             DrawMode::Line => {
@@ -5260,7 +4794,6 @@ impl GpuRenderer {
             }
         }
     }
-
     #[allow(clippy::too_many_arguments)]
     fn tess_ellipse(
         &self,
@@ -5279,7 +4812,6 @@ impl GpuRenderer {
         match mode {
             DrawMode::Fill => {
                 let base = cv.len() as u32;
-                // Center vertex.
                 let c = apply(t, cx, cy);
                 cv.push(ColorVertex {
                     position: [c.0, c.1],
@@ -5316,7 +4848,6 @@ impl GpuRenderer {
             }
         }
     }
-
     #[allow(clippy::too_many_arguments)]
     fn tess_triangle(
         &self,
@@ -5352,7 +4883,6 @@ impl GpuRenderer {
             }
         }
     }
-
     #[allow(clippy::too_many_arguments)]
     fn tess_polygon(
         &self,
@@ -5370,7 +4900,6 @@ impl GpuRenderer {
         let n = vertices.len() / 2;
         match mode {
             DrawMode::Fill => {
-                // Fan from first vertex.
                 let base = cv.len() as u32;
                 for i in 0..n {
                     let p = apply(t, vertices[i * 2], vertices[i * 2 + 1]);
@@ -5401,7 +4930,6 @@ impl GpuRenderer {
             }
         }
     }
-
     #[allow(clippy::too_many_arguments)]
     fn tess_arc(
         &self,
@@ -5420,7 +4948,6 @@ impl GpuRenderer {
     ) {
         match mode {
             DrawMode::Fill => {
-                // Sector from center.
                 let base = cv.len() as u32;
                 let c = apply(t, cx, cy);
                 cv.push(ColorVertex {
@@ -5459,9 +4986,6 @@ impl GpuRenderer {
         }
     }
 }
-
-// ─── Free helpers ─────────────────────────────────────────────────────────────
-
 #[allow(clippy::too_many_arguments)]
 fn append_color_draw(
     draws: &mut Vec<PreparedDraw>,
@@ -5480,7 +5004,6 @@ fn append_color_draw(
     if idxs.is_empty() {
         return;
     }
-
     let base = all_verts.len() as u32;
     let idx_start = all_idxs.len() as u32;
     all_verts.extend_from_slice(&verts);
@@ -5499,7 +5022,6 @@ fn append_color_draw(
         stencil_reference: stencil_reference as u32,
     });
 }
-
 #[allow(clippy::too_many_arguments)]
 fn append_tex_draw(
     draws: &mut Vec<PreparedDraw>,
@@ -5519,7 +5041,6 @@ fn append_tex_draw(
     if idxs.is_empty() {
         return;
     }
-
     let base = all_verts.len() as u32;
     let idx_start = all_idxs.len() as u32;
     all_verts.extend_from_slice(&verts);
@@ -5538,7 +5059,6 @@ fn append_tex_draw(
         stencil_reference: stencil_reference as u32,
     });
 }
-
 fn normalize_scissor(rect: Option<(f32, f32, f32, f32)>, width: u32, height: u32) -> ScissorRect {
     rect.and_then(|(x, y, w, h)| {
         let left = x.max(0.0).floor() as u32;
@@ -5564,7 +5084,6 @@ fn normalize_scissor(rect: Option<(f32, f32, f32, f32)>, width: u32, height: u32
         }
     })
 }
-
 fn color_write_mask_bits(mask: (bool, bool, bool, bool)) -> u32 {
     let mut bits = 0;
     if mask.0 {
@@ -5581,11 +5100,9 @@ fn color_write_mask_bits(mask: (bool, bool, bool, bool)) -> u32 {
     }
     bits
 }
-
 fn color_write_mask_from_bits(bits: u32) -> wgpu::ColorWrites {
     wgpu::ColorWrites::from_bits_truncate(bits)
 }
-
 fn shader_for_draw(draw: PreparedDraw) -> Option<ShaderKey> {
     if matches!(draw.stencil_mode, StencilMode::Write(_)) {
         None
@@ -5593,14 +5110,12 @@ fn shader_for_draw(draw: PreparedDraw) -> Option<ShaderKey> {
         draw.shader
     }
 }
-
 fn parse_filter_mode(value: &str) -> wgpu::FilterMode {
     match value {
         "linear" => wgpu::FilterMode::Linear,
         _ => wgpu::FilterMode::Nearest,
     }
 }
-
 fn uniform_kind(value: &UniformValue) -> ShaderUniformKind {
     match value {
         UniformValue::Float(_) => ShaderUniformKind::Float,
@@ -5611,7 +5126,6 @@ fn uniform_kind(value: &UniformValue) -> ShaderUniformKind {
         UniformValue::Bool(_) => ShaderUniformKind::Bool,
     }
 }
-
 fn uniform_bytes(value: &UniformValue) -> [u8; 16] {
     let mut bytes = [0u8; 16];
     match value {
@@ -5637,7 +5151,6 @@ fn uniform_bytes(value: &UniformValue) -> [u8; 16] {
     }
     bytes
 }
-
 fn uniform_wgsl_type(kind: ShaderUniformKind) -> &'static str {
     match kind {
         ShaderUniformKind::Float => "f32",
@@ -5648,7 +5161,6 @@ fn uniform_wgsl_type(kind: ShaderUniformKind) -> &'static str {
         ShaderUniformKind::Bool => "u32",
     }
 }
-
 fn custom_uniform_declarations(
     uniform_signature: &[(String, ShaderUniformKind)],
     group_index: u32,
@@ -5664,7 +5176,6 @@ fn custom_uniform_declarations(
         })
         .collect::<String>()
 }
-
 fn custom_fragment_call_args(
     inputs: &[ShaderFragmentInput],
     color_expr: &str,
@@ -5679,7 +5190,6 @@ fn custom_fragment_call_args(
         .collect::<Vec<_>>()
         .join(", ")
 }
-
 fn build_custom_color_shader_source(
     shader: &Shader,
     uniform_signature: &[(String, ShaderUniformKind)],
@@ -5693,13 +5203,11 @@ struct VertexInput {{
     @location(0) position: vec2<f32>,
     @location(1) color: vec4<f32>,
 }}
-
 struct VertexOutput {{
     @builtin(position) clip_position: vec4<f32>,
     @location(0) color: vec4<f32>,
     @location(1) uv: vec2<f32>,
 }}
-
 struct LurekGlobals {{
     lurek_ScreenSize: vec2<f32>,
     lurek_Time: f32,
@@ -5708,10 +5216,8 @@ struct LurekGlobals {{
     view_col1: vec4<f32>,
     view_col2: vec4<f32>,
 }}
-
 @group(0) @binding(0) var<uniform> lurek: LurekGlobals;
 {uniform_decls}
-
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {{
     var out: VertexOutput;
@@ -5731,9 +5237,7 @@ fn vs_main(in: VertexInput) -> VertexOutput {{
     out.uv = vec2<f32>(0.0, 0.0);
     return out;
 }}
-
 {user_source}
-
 @fragment
 fn lurek_fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {{
     return {fragment_entry}({fragment_call_args});
@@ -5744,7 +5248,6 @@ fn lurek_fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {{
         fragment_call_args = fragment_call_args,
     )
 }
-
 fn build_custom_texture_shader_source(
     shader: &Shader,
     uniform_signature: &[(String, ShaderUniformKind)],
@@ -5760,13 +5263,11 @@ struct VertexInput {{
     @location(2) color: vec4<f32>,
     @location(3) w_depth: f32,
 }}
-
 struct VertexOutput {{
     @builtin(position) clip_position: vec4<f32>,
     @location(0) color: vec4<f32>,
     @location(1) uv: vec2<f32>,
 }}
-
 struct LurekGlobals {{
     lurek_ScreenSize: vec2<f32>,
     lurek_Time: f32,
@@ -5775,12 +5276,10 @@ struct LurekGlobals {{
     view_col1: vec4<f32>,
     view_col2: vec4<f32>,
 }}
-
 @group(0) @binding(0) var<uniform> lurek: LurekGlobals;
 @group(1) @binding(0) var t_diffuse: texture_2d<f32>;
 @group(1) @binding(1) var s_diffuse: sampler;
 {uniform_decls}
-
 @vertex
 fn vs_main(in: VertexInput) -> VertexOutput {{
     var out: VertexOutput;
@@ -5798,9 +5297,7 @@ fn vs_main(in: VertexInput) -> VertexOutput {{
     out.uv = in.uv;
     return out;
 }}
-
 {user_source}
-
 @fragment
 fn lurek_fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {{
     let sampled = textureSample(t_diffuse, s_diffuse, in.uv) * in.color;
@@ -5812,7 +5309,6 @@ fn lurek_fragment_main(in: VertexOutput) -> @location(0) vec4<f32> {{
         fragment_call_args = fragment_call_args,
     )
 }
-
 fn create_render_pipeline(
     device: &wgpu::Device,
     surface_format: wgpu::TextureFormat,
@@ -5831,7 +5327,6 @@ fn create_render_pipeline(
         unclipped_depth: false,
         conservative: false,
     };
-
     let target = Some(wgpu::ColorTargetState {
         format: surface_format,
         blend: Some(blend_state_for(key.blend_mode)),
@@ -5841,7 +5336,6 @@ fn create_render_pipeline(
             color_write_mask_from_bits(key.color_mask_bits)
         },
     });
-
     match geometry {
         GeometryKind::Color => device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("color_pipeline"),
@@ -5895,7 +5389,6 @@ fn create_render_pipeline(
         }),
     }
 }
-
 fn depth_stencil_state(stencil_mode: StencilMode) -> wgpu::DepthStencilState {
     wgpu::DepthStencilState {
         format: wgpu::TextureFormat::Depth24PlusStencil8,
@@ -5918,7 +5411,6 @@ fn depth_stencil_state(stencil_mode: StencilMode) -> wgpu::DepthStencilState {
         bias: wgpu::DepthBiasState::default(),
     }
 }
-
 fn stencil_face_state(stencil_mode: StencilMode) -> wgpu::StencilFaceState {
     match stencil_mode {
         StencilMode::Disabled => wgpu::StencilFaceState {
@@ -5941,7 +5433,6 @@ fn stencil_face_state(stencil_mode: StencilMode) -> wgpu::StencilFaceState {
         },
     }
 }
-
 fn compare_function(compare: crate::render::renderer::CompareMode) -> wgpu::CompareFunction {
     match compare {
         crate::render::renderer::CompareMode::Equal => wgpu::CompareFunction::Equal,
@@ -5954,7 +5445,6 @@ fn compare_function(compare: crate::render::renderer::CompareMode) -> wgpu::Comp
         crate::render::renderer::CompareMode::Never => wgpu::CompareFunction::Never,
     }
 }
-
 fn stencil_operation(action: crate::render::renderer::StencilAction) -> wgpu::StencilOperation {
     match action {
         crate::render::renderer::StencilAction::Replace => wgpu::StencilOperation::Replace,
@@ -5971,15 +5461,11 @@ fn stencil_operation(action: crate::render::renderer::StencilAction) -> wgpu::St
         crate::render::renderer::StencilAction::Invert => wgpu::StencilOperation::Invert,
     }
 }
-
-/// Apply the current transform matrix to a 2D point.
 #[inline]
 fn apply(t: &Mat3, x: f32, y: f32) -> (f32, f32) {
     let p = t.transform_point(Vec2 { x, y });
     (p.x, p.y)
 }
-
-/// Append a thick-line quad (two triangles) to the color buffers.
 #[allow(clippy::too_many_arguments)]
 fn push_thick_line(
     cv: &mut Vec<ColorVertex>,
@@ -6001,7 +5487,6 @@ fn push_thick_line(
     let hw = width * 0.5;
     let nx = -dy / len * hw;
     let ny = dx / len * hw;
-
     let pts = [
         apply(t, x1 + nx, y1 + ny),
         apply(t, x1 - nx, y1 - ny),
@@ -6010,8 +5495,6 @@ fn push_thick_line(
     ];
     push_quad_verts(cv, ci, &pts, color);
 }
-
-/// Push 4 vertices + 6 indices for a quad.
 fn push_quad_verts(
     cv: &mut Vec<ColorVertex>,
     ci: &mut Vec<u32>,
@@ -6027,8 +5510,6 @@ fn push_quad_verts(
     }
     ci.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
 }
-
-/// Fan-fill from a centre point over a closed polygon path.
 fn push_fan_fill(
     cv: &mut Vec<ColorVertex>,
     ci: &mut Vec<u32>,
@@ -6059,8 +5540,6 @@ fn push_fan_fill(
         ci.extend_from_slice(&[base, base + 1 + i, base + 1 + (i + 1) % n]);
     }
 }
-
-/// Build the outline path for a rounded rectangle (list of 2D points, closed).
 fn build_rounded_rect_path(
     x: f32,
     y: f32,
@@ -6071,7 +5550,6 @@ fn build_rounded_rect_path(
     segs: u32,
 ) -> Vec<(f32, f32)> {
     let mut pts = Vec::new();
-    // Each corner: top-left, top-right, bottom-right, bottom-left
     let corners = [
         (x + rx, y + ry, PI, 1.5 * PI),
         (x + w - rx, y + ry, 1.5 * PI, 2.0 * PI),
@@ -6086,11 +5564,6 @@ fn build_rounded_rect_path(
     }
     pts
 }
-
-/// Push a textured quad with full affine transform support.
-///
-/// `w`, `h` — display size of the quad before scale.
-/// `u0`, `v0`, `u1`, `v1` — normalised UV coordinates inside the texture.
 #[allow(clippy::too_many_arguments)]
 fn push_tex_quad(
     tv: &mut Vec<TexVertex>,
@@ -6111,20 +5584,16 @@ fn push_tex_quad(
     u1: f32,
     v1: f32,
 ) {
-    // Local corners before origin offset.
     let local = [(0.0, 0.0), (w, 0.0), (w, h), (0.0, h)];
     let uv = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)];
     let cos_r = rot.cos();
     let sin_r = rot.sin();
-
     let base = tv.len() as u32;
     for (i, &(lx, ly)) in local.iter().enumerate() {
-        // Apply: translate by -origin, scale, rotate, then world translate.
         let sx2 = (lx - ox) * sx;
         let sy2 = (ly - oy) * sy;
         let rx = sx2 * cos_r - sy2 * sin_r + x;
         let ry = sx2 * sin_r + sy2 * cos_r + y;
-        // Apply current camera/world transform.
         let (wx, wy) = apply(t, rx, ry);
         tv.push(TexVertex {
             position: [wx, wy],
@@ -6136,13 +5605,6 @@ fn push_tex_quad(
     }
     ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
 }
-
-/// Push a textured quad with four arbitrary screen-space corners and per-corner UVs.
-///
-/// Unlike [`push_tex_quad`], this function accepts pre-projected corner positions
-/// directly — no SRT decomposition. This supports perspective-correct quads
-/// (e.g. raycaster wall faces) where the four corners are not axis-aligned.
-/// The current world transform `t` is still applied to each corner.
 fn push_tex_quad_corners(
     tv: &mut Vec<TexVertex>,
     ti: &mut Vec<u32>,
@@ -6165,13 +5627,6 @@ fn push_tex_quad_corners(
     }
     ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
 }
-
-// ── Bitmap debug font ────────────────────────────────────────
-// Zero-dependency 5×7 pixel font for debug/error overlays.
-// Ported from src/graphic/gpu_renderer.rs.
-
-/// Returns a 5×7 bitmap pattern for the given character.
-/// Each byte represents one row; bits 4..0 are pixels left-to-right.
 #[allow(dead_code)]
 fn bitmap_char(ch: char) -> [u8; 7] {
     match ch.to_ascii_uppercase() {
@@ -6306,9 +5761,6 @@ fn bitmap_char(ch: char) -> [u8; 7] {
         ],
     }
 }
-
-/// Renders debug text using the built-in 5×7 bitmap font.
-/// Pushes colored quads into the vertex/index buffers — no font texture needed.
 #[allow(dead_code)]
 #[allow(clippy::too_many_arguments)]
 fn render_text(
@@ -6347,15 +5799,11 @@ fn render_text(
         }
     }
 }
-
-// NOTE: Tests private internals — stays inline
 #[cfg(test)]
 mod tests {
-    use std::convert::TryInto;
-
     use super::*;
     use crate::render::renderer::{CompareMode, StencilAction};
-
+    use std::convert::TryInto;
     const VALID_WGSL_FRAGMENT_SHADER: &str = r#"
 @fragment
 fn fs_main(
@@ -6365,7 +5813,6 @@ fn fs_main(
     return color + vec4<f32>(uv, 0.0, 0.0);
 }
 "#;
-
     #[test]
     fn test_phase02_live_scissor_normalization_clamps_to_target_bounds() {
         assert_eq!(
@@ -6373,32 +5820,26 @@ fn fs_main(
             Some((0, 2, 10, 6))
         );
     }
-
     #[test]
     fn test_phase02_live_scissor_normalization_discards_fully_offscreen_rects() {
         assert_eq!(normalize_scissor(Some((11.0, 0.0, 2.0, 2.0)), 10, 8), None);
     }
-
     #[test]
     fn test_phase02_live_color_mask_bits_round_trip_selected_channels() {
         let bits = color_write_mask_bits((true, false, true, false));
         let mask = color_write_mask_from_bits(bits);
-
         assert_eq!(mask, wgpu::ColorWrites::RED | wgpu::ColorWrites::BLUE);
     }
-
     #[test]
     fn test_phase02_live_filter_mode_maps_linear_and_defaults_to_nearest() {
         assert_eq!(parse_filter_mode("linear"), wgpu::FilterMode::Linear);
         assert_eq!(parse_filter_mode("nearest"), wgpu::FilterMode::Nearest);
         assert_eq!(parse_filter_mode("unsupported"), wgpu::FilterMode::Nearest);
     }
-
     #[test]
     fn test_phase02_live_uniform_bytes_pack_bool_and_vec4_values() {
         let bool_bytes = uniform_bytes(&UniformValue::Bool(true));
         let vec4_bytes = uniform_bytes(&UniformValue::Vec4([1.0, 2.0, 3.0, 4.0]));
-
         assert_eq!(u32::from_ne_bytes(bool_bytes[..4].try_into().unwrap()), 1);
         assert_eq!(
             f32::from_ne_bytes(vec4_bytes[0..4].try_into().unwrap()),
@@ -6417,7 +5858,6 @@ fn fs_main(
             4.0
         );
     }
-
     #[test]
     fn test_phase02_live_custom_color_shader_source_is_parseable_with_uniforms() {
         let uniform_signature = vec![
@@ -6427,21 +5867,18 @@ fn fs_main(
         let shader = Shader::new(VALID_WGSL_FRAGMENT_SHADER.to_string())
             .expect("expected valid fragment shader");
         let source = build_custom_color_shader_source(&shader, &uniform_signature);
-
         assert!(source.contains("@group(1) @binding(0) var<uniform> tint: vec4<f32>;"));
         assert!(source.contains("@group(1) @binding(1) var<uniform> time_scale: f32;"));
         assert!(source.contains("fn lurek_fragment_main"));
         wgpu::naga::front::wgsl::parse_str(&source)
             .expect("wrapped color shader source should remain valid WGSL");
     }
-
     #[test]
     fn test_phase02_live_custom_texture_shader_source_is_parseable_with_uniforms() {
         let uniform_signature = vec![("uv_scale".to_string(), ShaderUniformKind::Vec2)];
         let shader = Shader::new(VALID_WGSL_FRAGMENT_SHADER.to_string())
             .expect("expected valid fragment shader");
         let source = build_custom_texture_shader_source(&shader, &uniform_signature);
-
         assert!(source.contains("@group(1) @binding(0) var t_diffuse: texture_2d<f32>;"));
         assert!(source.contains("@group(1) @binding(1) var s_diffuse: sampler;"));
         assert!(source.contains("@group(2) @binding(0) var<uniform> uv_scale: vec2<f32>;"));
@@ -6449,11 +5886,9 @@ fn fs_main(
         wgpu::naga::front::wgsl::parse_str(&source)
             .expect("wrapped texture shader source should remain valid WGSL");
     }
-
     #[test]
     fn test_phase02_live_stencil_write_depth_state_enables_writes_and_action() {
         let state = depth_stencil_state(StencilMode::Write(StencilAction::IncrementWrap));
-
         assert_eq!(state.format, wgpu::TextureFormat::Depth24PlusStencil8);
         assert_eq!(state.depth_compare, wgpu::CompareFunction::Always);
         assert_eq!(state.stencil.read_mask, 0xFF);
@@ -6468,11 +5903,9 @@ fn fs_main(
             wgpu::StencilOperation::IncrementWrap
         );
     }
-
     #[test]
     fn test_phase02_live_stencil_test_depth_state_reads_without_writing() {
         let state = depth_stencil_state(StencilMode::Test(CompareMode::GreaterEqual));
-
         assert_eq!(state.stencil.read_mask, 0xFF);
         assert_eq!(state.stencil.write_mask, 0);
         assert_eq!(

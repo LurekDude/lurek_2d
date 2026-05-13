@@ -24,7 +24,7 @@ tools: [vscode/memory, vscode/runCommand, vscode/askQuestions, vscode/toolSearch
 
 ## Inputs
 - Full user request.
-- Current branch and worktree state.
+- Current branch state.
 - User constraints, forbidden files, and depth preference.
 - Prior handoff, report, or work/{session}/ artifact.
 

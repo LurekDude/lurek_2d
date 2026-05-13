@@ -1,44 +1,32 @@
-﻿//! Named step container for automation script playback.
-//! Defines Script, MAX_STEPS, and TOML parsing for the automation module.
-//! Owns time-sort invariant, repeat expansion, and step-limit enforcement.
+//! `Script` — an ordered, time-sorted sequence of automation `Step` values.
+//! Parses TOML input, expands repeat entries, enforces the step-count cap, and
+//! exposes limit controls used by `Simulator`. Does not own event dispatch or playback.
 
 use super::{Action, Step};
-
-/// Upper bound on steps per Script; construction silently truncates beyond this.
 pub(crate) const MAX_STEPS: usize = 100_000;
-
-// ---- Type: Script ----
-
 #[derive(Debug, Clone)]
-/// Named script holding time-sorted steps; loaded into Simulator by name.
+/// A time-sorted sequence of `Step` values that `Simulator` plays back deterministically.
 pub struct Script {
-    /// Script identifier used for lookup in Simulator; duplicate names overwrite the prior entry.
+    /// Human-readable identifier used as the registry key in `Simulator`.
     pub name: String,
-    /// Human-readable description from `meta.description` in TOML; unused during playback.
+    /// Optional human-readable summary loaded from `[meta] description` in TOML.
     pub description: Option<String>,
-    /// Time-sorted steps (ascending by `time`); sorted at construction, never reordered.
+    /// Sorted, capped list of steps ready for playback; at most `step_limit` entries.
     pub steps: Vec<Step>,
-    /// Per-script cap on step count; clamped to `1..=MAX_STEPS` by `set_step_limit`.
+    /// Maximum number of steps retained; defaults to `MAX_STEPS`, adjustable via `set_step_limit`.
     step_limit: usize,
 }
-
-// ---- Implementation: Script ----
-
 impl Script {
-    // ---- Helper Functions: Repeat Expansion ----
-
-    /// Expand repeat fields into individual copies with offset times; called during construction.
+    /// Expand repeat steps: clone each step with `repeat` N times at `repeat_interval` offsets.
     fn expand_repeats(steps: Vec<Step>) -> Vec<Step> {
         let mut out = Vec::new();
         for step in steps {
             let repeat_count = step.repeat.unwrap_or(0);
             let interval = step.repeat_interval.unwrap_or(0.0);
-
             let mut base = step.clone();
             base.repeat = None;
             base.repeat_interval = None;
             out.push(base);
-
             for i in 1..=repeat_count {
                 let mut clone = step.clone();
                 clone.time = step.time + (i as f32 * interval);
@@ -49,8 +37,7 @@ impl Script {
         }
         out
     }
-
-    /// Create a Script with time-sorted, MAX_STEPS-truncated steps.
+    /// Create a `Script` from a name and raw steps: expands repeats, sorts by time, caps to `MAX_STEPS`.
     pub fn new(name: impl Into<String>, steps: Vec<Step>) -> Self {
         let mut steps = Self::expand_repeats(steps);
         steps.sort_by(|a, b| {
@@ -66,8 +53,7 @@ impl Script {
             step_limit: MAX_STEPS,
         }
     }
-
-    /// Create a Script with an initial description string; otherwise identical to `new`.
+    /// Create a `Script` identical to `new` but also sets the human-readable `description` field.
     pub fn with_description(
         name: impl Into<String>,
         description: impl Into<String>,
@@ -77,41 +63,33 @@ impl Script {
         script.description = Some(description.into());
         script
     }
-
-    /// Return the step count; always <= MAX_STEPS, 0 for empty scripts.
+    /// Return the total number of steps in this script.
     pub fn step_count(&self) -> usize {
         self.steps.len()
     }
-
-    /// Set the per-script step cap (clamped to `1..=MAX_STEPS`); truncates existing steps if lower.
+    /// Clamp and apply a new step limit, truncating the step list if it exceeds `limit`; range 1..=MAX_STEPS.
     pub fn set_step_limit(&mut self, limit: usize) {
         self.step_limit = limit.clamp(1, MAX_STEPS);
         self.steps.truncate(self.step_limit);
     }
-
-    /// Return the active step limit for this script.
+    /// Return the current step limit for this script.
     pub fn get_step_limit(&self) -> usize {
         self.step_limit
     }
-
-    /// Parse a Script from a TOML string with `[meta]` and `[[steps]]` sections;
-    /// return Err on malformed input, missing action field, or unknown action string.
+    /// Parse a TOML string and construct a `Script`; returns an error string on invalid TOML or unknown action.
     pub fn from_toml(name: impl Into<String>, toml_str: &str) -> Result<Self, String> {
         let doc: toml::Value =
             toml::from_str(toml_str).map_err(|e| format!("invalid TOML: {e}"))?;
-
         let description = doc
             .get("meta")
             .and_then(|m| m.get("description"))
             .and_then(|d| d.as_str())
             .map(|s| s.to_string());
-
         let steps_values = doc
             .get("steps")
             .and_then(|s| s.as_array())
             .cloned()
             .unwrap_or_default();
-
         let mut steps = Vec::with_capacity(steps_values.len());
         for sv in &steps_values {
             let action_str = sv
@@ -172,12 +150,9 @@ impl Script {
                 .map(|n| n as u32);
             steps.push(step);
         }
-
         Ok(match description {
             Some(desc) => Self::with_description(name, desc, steps),
             None => Self::new(name, steps),
         })
     }
 }
-
-// Tests migrated to tests/rust/unit/automation_tests.rs

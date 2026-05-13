@@ -1,15 +1,6 @@
-//! Minimap ↔ province adapter (optional coupling layer).
-//!
-//! Keeps `minimap` independent from `province`: this file is the only place
-//! where both data models are translated.
-
 use crate::minimap::minimap::Minimap;
 use crate::minimap::types::FogLevel;
 use crate::province::registry::ProvinceRegistry;
-
-/// Projects province terrain IDs into minimap terrain grid.
-///
-/// The projection is direct map-space sampling with clamped overlap.
 pub fn apply_terrain(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     let w = minimap.grid_width().min(registry.width());
     let h = minimap.grid_height().min(registry.height());
@@ -25,13 +16,6 @@ pub fn apply_terrain(minimap: &mut Minimap, registry: &ProvinceRegistry) {
         }
     }
 }
-
-/// Projects province visibility state into minimap fog cells.
-///
-/// Mapping:
-/// - visibility = 0 => hidden,
-/// - visibility in [1, 127] => explored,
-/// - visibility in [128, 255] => visible.
 pub fn apply_visibility(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     let w = minimap.grid_width().min(registry.width());
     let h = minimap.grid_height().min(registry.height());
@@ -54,8 +38,6 @@ pub fn apply_visibility(minimap: &mut Minimap, registry: &ProvinceRegistry) {
         }
     }
 }
-
-/// Pushes terrain-type color palette inferred from province styles.
 pub fn apply_terrain_palette(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     for id in registry.province_ids() {
         if let Some(snap) = registry.get_province(id) {

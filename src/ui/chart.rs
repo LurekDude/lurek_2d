@@ -1,68 +1,24 @@
-//! Configurable chart rendering to `ImageData`.
-//!
-//! Provides line, bar, scatter, pie, and area chart types with a shared
-//! [`ChartConfig`] for titles, colours, grid, and axis styling.  Each chart
-//! type implements [`draw_to_image`] producing a self-contained PNG-ready
-//! `ImageData` with no GPU dependency.
-
 use crate::image::ImageData;
 use crate::math::color::Color;
-
-// ── Shared configuration ────────────────────────────────────────────────
-
-/// Common configuration shared by all chart types.
-///
-/// # Fields
-/// - `width` — `u32`. Output image width.
-/// - `height` — `u32`. Output image height.
-/// - `title` — `Option<String>`. Chart title drawn at top-left.
-/// - `bg_color` — `(u8, u8, u8)`. Background fill RGB.
-/// - `axis_color` — `(u8, u8, u8)`. Axis line RGB.
-/// - `grid_color` — `(u8, u8, u8)`. Grid line RGB.
-/// - `label_color` — `(u8, u8, u8)`. Label text RGB.
-/// - `show_grid` — `bool`. Whether to draw grid lines.
-/// - `margin` — `ChartMargin`. Pixel margins around the plot area.
 #[derive(Debug, Clone)]
 pub struct ChartConfig {
-    /// Output image width in pixels.
     pub width: u32,
-    /// Output image height in pixels.
     pub height: u32,
-    /// Optional chart title.
     pub title: Option<String>,
-    /// Background fill colour.
     pub bg_color: (u8, u8, u8),
-    /// Axis line colour.
     pub axis_color: (u8, u8, u8),
-    /// Grid line colour.
     pub grid_color: (u8, u8, u8),
-    /// Label text colour.
     pub label_color: (u8, u8, u8),
-    /// Whether to draw grid lines.
     pub show_grid: bool,
-    /// Pixel margins around the plot area.
     pub margin: ChartMargin,
 }
-
-/// Pixel margins around the chart plot area.
-///
-/// # Fields
-/// - `left` — `i32`.
-/// - `right` — `i32`.
-/// - `top` — `i32`.
-/// - `bottom` — `i32`.
 #[derive(Debug, Clone, Copy)]
 pub struct ChartMargin {
-    /// Left margin in pixels.
     pub left: i32,
-    /// Right margin in pixels.
     pub right: i32,
-    /// Top margin in pixels.
     pub top: i32,
-    /// Bottom margin in pixels.
     pub bottom: i32,
 }
-
 impl Default for ChartMargin {
     fn default() -> Self {
         Self {
@@ -73,7 +29,6 @@ impl Default for ChartMargin {
         }
     }
 }
-
 impl Default for ChartConfig {
     fn default() -> Self {
         Self {
@@ -89,25 +44,12 @@ impl Default for ChartConfig {
         }
     }
 }
-
-/// A named data series with colour.
-///
-/// # Fields
-/// - `name` — `String`.
-/// - `color` — `Color`.
-/// - `values` — `Vec<(f32, f32)>`.
 #[derive(Debug, Clone)]
 pub struct ChartSeries {
-    /// Series name for legend display.
     pub name: String,
-    /// Series drawing colour.
     pub color: Color,
-    /// Data points as `(x, y)` pairs.
     pub values: Vec<(f32, f32)>,
 }
-
-// ── Helper: draw grid + axes ────────────────────────────────────────────
-
 fn draw_grid_and_axes(
     img: &mut ImageData,
     cfg: &ChartConfig,
@@ -120,7 +62,6 @@ fn draw_grid_and_axes(
     let bottom = cfg.height as i32 - cfg.margin.bottom;
     let (gr, gg, gb) = cfg.grid_color;
     let (ar, ag, ab) = cfg.axis_color;
-
     if cfg.show_grid {
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
@@ -133,14 +74,10 @@ fn draw_grid_and_axes(
             img.draw_line(x, top, x, bottom, gr, gg, gb, 255);
         }
     }
-
-    // Axes
     img.draw_line(left, top, left, bottom, ar, ag, ab, 255);
     img.draw_line(left, bottom, right, bottom, ar, ag, ab, 255);
-
     (left, right, top, bottom)
 }
-
 fn to_rgb(color: Color) -> (u8, u8, u8) {
     (
         (color.r * 255.0) as u8,
@@ -148,7 +85,6 @@ fn to_rgb(color: Color) -> (u8, u8, u8) {
         (color.b * 255.0) as u8,
     )
 }
-
 #[allow(clippy::too_many_arguments)]
 fn draw_numeric_axes(
     img: &mut ImageData,
@@ -169,25 +105,21 @@ fn draw_numeric_axes(
     let chart_w = (right - left) as f32;
     let chart_h = (bottom - top) as f32;
     let (lr, lg, lb) = cfg.label_color;
-
     for i in 0..=x_ticks {
         let x = left + (i as f32 * chart_w / x_ticks as f32) as i32;
         let v = x_min + (x_max - x_min) * (i as f32 / x_ticks as f32);
         img.draw_line(x, bottom, x, bottom + 4, lr, lg, lb, 255);
         img.draw_label(&format!("{v:.1}"), x - 10, bottom + 8, lr, lg, lb);
     }
-
     for i in 0..=y_ticks {
         let y = bottom - (i as f32 * chart_h / y_ticks as f32) as i32;
         let v = y_min + (y_max - y_min) * (i as f32 / y_ticks as f32);
         img.draw_line(left - 4, y, left, y, lr, lg, lb, 255);
         img.draw_label(&format!("{v:.1}"), 4, y - 3, lr, lg, lb);
     }
-
     img.draw_label("X", right + 6, bottom - 4, lr, lg, lb);
     img.draw_label("Y", left - 12, top - 14, lr, lg, lb);
 }
-
 fn draw_series_legend(
     img: &mut ImageData,
     cfg: &ChartConfig,
@@ -198,12 +130,10 @@ fn draw_series_legend(
     if entries.is_empty() {
         return;
     }
-
     let panel_w = 116i32;
     let panel_h = (entries.len() as i32 * 14 + 10).max(22);
     let panel_x = right - panel_w;
     let panel_y = top + 6;
-
     img.draw_rect(
         panel_x,
         panel_y,
@@ -236,7 +166,6 @@ fn draw_series_legend(
         188,
         255,
     );
-
     let (lr, lg, lb) = cfg.label_color;
     for (idx, (name, color)) in entries.iter().enumerate() {
         let y = panel_y + 6 + idx as i32 * 14;
@@ -245,18 +174,15 @@ fn draw_series_legend(
         img.draw_label(name, panel_x + 20, y + 1, lr, lg, lb);
     }
 }
-
 fn draw_chart_title(img: &mut ImageData, cfg: &ChartConfig, x: i32, y: i32) {
     if let Some(ref title) = cfg.title {
         let (lr, lg, lb) = cfg.label_color;
         img.draw_label(title, x, y, lr, lg, lb);
     }
 }
-
 fn legend_entries_from_series(series: &[ChartSeries]) -> Vec<(&str, Color)> {
     series.iter().map(|s| (s.name.as_str(), s.color)).collect()
 }
-
 fn legend_entries_from_names<'a>(names: &'a [String], colors: &[Color]) -> Vec<(&'a str, Color)> {
     names
         .iter()
@@ -264,19 +190,15 @@ fn legend_entries_from_names<'a>(names: &'a [String], colors: &[Color]) -> Vec<(
         .map(|(name, c)| (name.as_str(), c))
         .collect()
 }
-
 fn legend_entries_from_layers(layers: &[AreaLayer]) -> Vec<(&str, Color)> {
     layers.iter().map(|l| (l.name.as_str(), l.color)).collect()
 }
-
 fn legend_entries_from_segments(segments: &[PieSegment]) -> Vec<(&str, Color)> {
     segments
         .iter()
         .map(|seg| (seg.label.as_str(), seg.color))
         .collect()
 }
-
-/// Helper to draw a filled circle safely (no out-of-bounds panics).
 #[allow(clippy::too_many_arguments)]
 fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
     let w = img.width() as i32;
@@ -296,38 +218,14 @@ fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b:
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ██  LINE CHART
-// ═══════════════════════════════════════════════════════════════════════
-
-/// A configurable line chart renderer.
-///
-/// # Fields
-/// - `config` — `ChartConfig`.
-/// - `series` — `Vec<ChartSeries>`.
-/// - `y_max` — `f32`.
-/// - `x_max` — `f32`.
 #[derive(Debug, Clone)]
 pub struct LineChart {
-    /// Chart configuration.
     pub config: ChartConfig,
-    /// Data series to plot.
     pub series: Vec<ChartSeries>,
-    /// Maximum Y value for scaling.
     pub y_max: f32,
-    /// Maximum X value for scaling.
     pub x_max: f32,
 }
-
 impl LineChart {
-    /// Creates a new line chart with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `ChartConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -336,13 +234,6 @@ impl LineChart {
             x_max: 6.0,
         }
     }
-
-    /// Adds a named data series to the chart.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    /// - `points` — `&[(f32, f32)]`.
-    /// - `color` — `Color`.
     pub fn add_series(&mut self, name: &str, points: &[(f32, f32)], color: Color) {
         self.series.push(ChartSeries {
             name: name.to_string(),
@@ -350,25 +241,14 @@ impl LineChart {
             values: points.to_vec(),
         });
     }
-
-    /// Renders the line chart to an `ImageData`.
-    ///
-    /// # Parameters
-    /// - `img` — `&mut crate::image::ImageData`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
-
         let x_div = self.x_max.ceil() as u32;
         let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, x_div.max(1), 5);
-
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
-
         draw_numeric_axes(
             img,
             cfg,
@@ -383,14 +263,11 @@ impl LineChart {
             0.0,
             self.y_max,
         );
-
         draw_chart_title(img, cfg, left + 10, 10);
         let legend_entries = legend_entries_from_series(&self.series);
         draw_series_legend(img, cfg, right, top, &legend_entries);
-
         for s in &self.series {
             let (cr, cg, cb) = to_rgb(s.color);
-
             for i in 1..s.values.len() {
                 let x0 = left + (s.values[i - 1].0 / self.x_max * chart_w) as i32;
                 let y0 = bottom - (s.values[i - 1].1 / self.y_max * chart_h) as i32;
@@ -399,7 +276,6 @@ impl LineChart {
                 img.draw_line(x0, y0, x1, y1, cr, cg, cb, 255);
                 img.draw_line(x0, y0 + 1, x1, y1 + 1, cr, cg, cb, 255);
             }
-            // Data point markers
             for pt in &s.values {
                 let x = left + (pt.0 / self.x_max * chart_w) as i32;
                 let y = bottom - (pt.1 / self.y_max * chart_h) as i32;
@@ -408,54 +284,20 @@ impl LineChart {
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ██  BAR CHART
-// ═══════════════════════════════════════════════════════════════════════
-
-/// A single category group in a bar chart.
-///
-/// # Fields
-/// - `label` — `String`.
-/// - `values` — `Vec<f32>`.
 #[derive(Debug, Clone)]
 pub struct BarCategory {
-    /// Category label.
     pub label: String,
-    /// One value per bar series.
     pub values: Vec<f32>,
 }
-
-/// A configurable grouped bar chart renderer.
-///
-/// # Fields
-/// - `config` — `ChartConfig`.
-/// - `categories` — `Vec<BarCategory>`.
-/// - `series_colors` — `Vec<Color>`.
-/// - `series_names` — `Vec<String>`.
-/// - `y_max` — `f32`.
 #[derive(Debug, Clone)]
 pub struct BarChart {
-    /// Chart configuration.
     pub config: ChartConfig,
-    /// Category groups.
     pub categories: Vec<BarCategory>,
-    /// Colour for each bar series.
     pub series_colors: Vec<Color>,
-    /// Names for each bar series.
     pub series_names: Vec<String>,
-    /// Maximum Y value for scaling.
     pub y_max: f32,
 }
-
 impl BarChart {
-    /// Creates a new bar chart with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `ChartConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -465,46 +307,24 @@ impl BarChart {
             y_max: 100.0,
         }
     }
-
-    /// Adds a bar series with a name and colour.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    /// - `color` — `Color`.
     pub fn add_series(&mut self, name: &str, color: Color) {
         self.series_names.push(name.to_string());
         self.series_colors.push(color);
     }
-
-    /// Adds a category group with its per-series values.
-    ///
-    /// # Parameters
-    /// - `label` — `&str`.
-    /// - `values` — `&[f32]`.
     pub fn add_category(&mut self, label: &str, values: &[f32]) {
         self.categories.push(BarCategory {
             label: label.to_string(),
             values: values.to_vec(),
         });
     }
-
-    /// Renders the bar chart to an `ImageData`.
-    ///
-    /// # Parameters
-    /// - `img` — `&mut crate::image::ImageData`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
-
         let (left, right, top, bottom) =
             draw_grid_and_axes(img, cfg, self.categories.len() as u32, 5);
         let chart_h = (bottom - top) as f32;
         let (lr, lg, lb) = cfg.label_color;
-
         draw_numeric_axes(
             img,
             cfg,
@@ -519,16 +339,13 @@ impl BarChart {
             0.0,
             self.y_max,
         );
-
         draw_chart_title(img, cfg, left + 10, 10);
         let legend_entries = legend_entries_from_names(&self.series_names, &self.series_colors);
         draw_series_legend(img, cfg, right, top, &legend_entries);
-
         let n_series = self.series_colors.len().max(1);
         let n_cats = self.categories.len().max(1);
         let group_w = (right - left) / n_cats as i32;
         let bar_w = (group_w / (n_series as i32 + 1)).max(4);
-
         for (ci, cat) in self.categories.iter().enumerate() {
             let group_x = left + ci as i32 * group_w;
             for (si, &val) in cat.values.iter().enumerate() {
@@ -550,38 +367,14 @@ impl BarChart {
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ██  SCATTER PLOT
-// ═══════════════════════════════════════════════════════════════════════
-
-/// A configurable scatter plot renderer.
-///
-/// # Fields
-/// - `config` — `ChartConfig`.
-/// - `series` — `Vec<ChartSeries>`.
-/// - `x_range` — `(f32, f32)`.
-/// - `y_range` — `(f32, f32)`.
 #[derive(Debug, Clone)]
 pub struct ScatterPlot {
-    /// Chart configuration.
     pub config: ChartConfig,
-    /// Data series to plot.
     pub series: Vec<ChartSeries>,
-    /// X axis range `(min, max)`.
     pub x_range: (f32, f32),
-    /// Y axis range `(min, max)`.
     pub y_range: (f32, f32),
 }
-
 impl ScatterPlot {
-    /// Creates a new scatter plot with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `ChartConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -590,13 +383,6 @@ impl ScatterPlot {
             y_range: (0.0, 1.0),
         }
     }
-
-    /// Adds a named data series to the scatter plot.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    /// - `points` — `&[(f32, f32)]`.
-    /// - `color` — `Color`.
     pub fn add_series(&mut self, name: &str, points: &[(f32, f32)], color: Color) {
         self.series.push(ChartSeries {
             name: name.to_string(),
@@ -604,23 +390,13 @@ impl ScatterPlot {
             values: points.to_vec(),
         });
     }
-
-    /// Renders the scatter plot to an `ImageData`.
-    ///
-    /// # Parameters
-    /// - `img` — `&mut crate::image::ImageData`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
-
         let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, 5, 5);
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
-
         draw_numeric_axes(
             img,
             cfg,
@@ -635,14 +411,11 @@ impl ScatterPlot {
             self.y_range.0,
             self.y_range.1,
         );
-
         draw_chart_title(img, cfg, left + 10, 10);
         let legend_entries = legend_entries_from_series(&self.series);
         draw_series_legend(img, cfg, right, top, &legend_entries);
-
         let x_span = (self.x_range.1 - self.x_range.0).max(f32::EPSILON);
         let y_span = (self.y_range.1 - self.y_range.0).max(f32::EPSILON);
-
         for s in &self.series {
             let (cr, cg, cb) = to_rgb(s.color);
             for &(x, y) in &s.values {
@@ -653,61 +426,24 @@ impl ScatterPlot {
         }
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ██  PIE CHART
-// ═══════════════════════════════════════════════════════════════════════
-
-/// A segment in a pie chart.
-///
-/// # Fields
-/// - `label` — `String`.
-/// - `value` — `f32`.
-/// - `color` — `Color`.
 #[derive(Debug, Clone)]
 pub struct PieSegment {
-    /// Segment label.
     pub label: String,
-    /// Segment value (proportion computed automatically).
     pub value: f32,
-    /// Segment fill colour.
     pub color: Color,
 }
-
-/// A configurable pie chart renderer.
-///
-/// # Fields
-/// - `config` — `ChartConfig`.
-/// - `segments` — `Vec<PieSegment>`.
 #[derive(Debug, Clone)]
 pub struct PieChart {
-    /// Chart configuration.
     pub config: ChartConfig,
-    /// Pie segments.
     pub segments: Vec<PieSegment>,
 }
-
 impl PieChart {
-    /// Creates a new pie chart with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `ChartConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
             segments: Vec::new(),
         }
     }
-
-    /// Adds a labelled segment to the pie chart.
-    ///
-    /// # Parameters
-    /// - `label` — `&str`.
-    /// - `value` — `f32`.
-    /// - `color` — `Color`.
     pub fn add_segment(&mut self, label: &str, value: f32, color: Color) {
         self.segments.push(PieSegment {
             label: label.to_string(),
@@ -715,42 +451,27 @@ impl PieChart {
             color,
         });
     }
-
-    /// Renders the pie chart to an `ImageData`.
-    ///
-    /// # Parameters
-    /// - `img` — `&mut crate::image::ImageData`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let w = cfg.width;
         let h = cfg.height;
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
-
         let total: f32 = self.segments.iter().map(|s| s.value).sum();
         if total <= 0.0 {
             return;
         }
-
         let cx = (w as f32) * 0.45;
         let cy = (h as f32) * 0.5;
         let radius = (w.min(h) as f32) * 0.325;
-
         let mut angle = -std::f32::consts::FRAC_PI_2;
-
         for seg in &self.segments {
             let pct = seg.value / total;
             let sweep = pct * 2.0 * std::f32::consts::PI;
             let end_angle = angle + sweep;
-
             let cr = (seg.color.r * 255.0) as u8;
             let cg = (seg.color.g * 255.0) as u8;
             let cb = (seg.color.b * 255.0) as u8;
-
-            // Fill segment pixel by pixel
             for py in 0..h {
                 for px in 0..w {
                     let dx = px as f32 - cx;
@@ -786,8 +507,6 @@ impl PieChart {
             }
             angle = end_angle;
         }
-
-        // Divider lines
         angle = -std::f32::consts::FRAC_PI_2;
         for seg in &self.segments {
             let sweep = seg.value / total * 2.0 * std::f32::consts::PI;
@@ -798,11 +517,9 @@ impl PieChart {
             );
             angle += sweep;
         }
-
         let (lr, lg, lb) = cfg.label_color;
         let legend_entries = legend_entries_from_segments(&self.segments);
         draw_series_legend(img, cfg, w as i32 - 10, 40, &legend_entries);
-
         let mut label_y = 44i32;
         let legend_x = (w as f32 * 0.72) as i32;
         for seg in &self.segments {
@@ -810,55 +527,22 @@ impl PieChart {
             img.draw_label(&format!("{pct:.1}%"), legend_x + 76, label_y, lr, lg, lb);
             label_y += 14;
         }
-
         draw_chart_title(img, cfg, 10, 10);
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// ██  AREA CHART
-// ═══════════════════════════════════════════════════════════════════════
-
-/// A configurable stacked area chart renderer.
-///
-/// # Fields
-/// - `config` — `ChartConfig`.
-/// - `layers` — `Vec<AreaLayer>`.
-/// - `y_max` — `f32`.
 #[derive(Debug, Clone)]
 pub struct AreaChart {
-    /// Chart configuration.
     pub config: ChartConfig,
-    /// Stacked layers (rendered bottom-to-top).
     pub layers: Vec<AreaLayer>,
-    /// Maximum Y value for scaling.
     pub y_max: f32,
 }
-
-/// A single layer in an area chart.
-///
-/// # Fields
-/// - `name` — `String`.
-/// - `values` — `Vec<f32>`.
-/// - `color` — `Color`.
 #[derive(Debug, Clone)]
 pub struct AreaLayer {
-    /// Layer name for legend display.
     pub name: String,
-    /// Data values (one per X sample).
     pub values: Vec<f32>,
-    /// Fill colour.
     pub color: Color,
 }
-
 impl AreaChart {
-    /// Creates a new area chart with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `ChartConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -866,13 +550,6 @@ impl AreaChart {
             y_max: 100.0,
         }
     }
-
-    /// Adds a stacked layer to the area chart.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    /// - `values` — `&[f32]`.
-    /// - `color` — `Color`.
     pub fn add_layer(&mut self, name: &str, values: &[f32], color: Color) {
         self.layers.push(AreaLayer {
             name: name.to_string(),
@@ -880,27 +557,16 @@ impl AreaChart {
             color,
         });
     }
-
-    /// Renders the stacked area chart to an `ImageData`.
-    ///
-    /// # Parameters
-    /// - `img` — `&mut crate::image::ImageData`.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
-
         let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, 6, 4);
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
-
         if self.layers.is_empty() {
             return;
         }
-
         let n = self.layers[0].values.len().max(2);
         draw_numeric_axes(
             img,
@@ -916,35 +582,28 @@ impl AreaChart {
             0.0,
             self.y_max,
         );
-
-        // For each x pixel, compute cumulative stack
         for x_px in left..right {
             let t = (x_px - left) as f32 / chart_w;
             let idx_f = t * (n - 1) as f32;
             let idx0 = (idx_f as usize).min(n.saturating_sub(2));
             let frac = idx_f - idx0 as f32;
-
             let mut cumulative = 0.0f32;
             let mut prev_y = bottom;
-
             for layer in &self.layers {
                 let v0 = layer.values.get(idx0).copied().unwrap_or(0.0);
                 let v1 = layer.values.get(idx0 + 1).copied().unwrap_or(v0);
                 let val = v0 + (v1 - v0) * frac;
                 cumulative += val;
-
                 let cur_y = bottom - (cumulative / self.y_max * chart_h) as i32;
                 let cr = (layer.color.r * 255.0) as u8;
                 let cg = (layer.color.g * 255.0) as u8;
                 let cb = (layer.color.b * 255.0) as u8;
-
                 for y_px in cur_y.max(top)..prev_y {
                     img.set_pixel(x_px as u32, y_px as u32, cr, cg, cb, 220);
                 }
                 prev_y = cur_y;
             }
         }
-
         let legend_entries = legend_entries_from_layers(&self.layers);
         draw_series_legend(img, cfg, right, top, &legend_entries);
         draw_chart_title(img, cfg, left + 10, 10);

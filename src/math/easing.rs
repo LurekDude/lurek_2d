@@ -1,50 +1,13 @@
-//! Standard easing functions for smooth animation and interpolation.
-//!
-//! Each function takes a normalised progress value `t` in `[0.0, 1.0]` and
-//! returns the eased value, also in `[0.0, 1.0]` for most curves.
-
 use std::f32::consts::PI;
-
-/// Linear interpolation — no easing. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn linear(t: f32) -> f32 {
     t
 }
-
-/// Quadratic ease-in — starts slow, accelerates.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_quad(t: f32) -> f32 {
     t * t
 }
-
-/// Quadratic ease-out — starts fast, decelerates.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_quad(t: f32) -> f32 {
     t * (2.0 - t)
 }
-
-/// Quadratic ease-in-out — slow start and end, fast middle.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_quad(t: f32) -> f32 {
     if t < 0.5 {
         2.0 * t * t
@@ -52,37 +15,13 @@ pub fn ease_in_out_quad(t: f32) -> f32 {
         -1.0 + (4.0 - 2.0 * t) * t
     }
 }
-
-/// Cubic ease-in — starts slow, accelerates sharply.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_cubic(t: f32) -> f32 {
     t * t * t
 }
-
-/// Cubic ease-out — starts fast, decelerates sharply.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_cubic(t: f32) -> f32 {
     let u = t - 1.0;
     u * u * u + 1.0
 }
-
-/// Cubic ease-in-out — smooth S-curve. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_cubic(t: f32) -> f32 {
     if t < 0.5 {
         4.0 * t * t * t
@@ -91,37 +30,13 @@ pub fn ease_in_out_cubic(t: f32) -> f32 {
         0.5 * u * u * u + 1.0
     }
 }
-
-/// Quartic ease-in — very slow start. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_quart(t: f32) -> f32 {
     t * t * t * t
 }
-
-/// Quartic ease-out — very slow end. Consult the module-level documentation for the broader usage context and preconditions.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_quart(t: f32) -> f32 {
     let u = t - 1.0;
     1.0 - u * u * u * u
 }
-
-/// Quartic ease-in-out — pronounced S-curve.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_quart(t: f32) -> f32 {
     if t < 0.5 {
         8.0 * t * t * t * t
@@ -130,47 +45,15 @@ pub fn ease_in_out_quart(t: f32) -> f32 {
         1.0 - 8.0 * u * u * u * u
     }
 }
-
-/// Sinusoidal ease-in — gentle sine-based acceleration.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_sine(t: f32) -> f32 {
     1.0 - (t * PI / 2.0).cos()
 }
-
-/// Sinusoidal ease-out — gentle sine-based deceleration.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_sine(t: f32) -> f32 {
     (t * PI / 2.0).sin()
 }
-
-/// Sinusoidal ease-in-out — gentle S-curve.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_sine(t: f32) -> f32 {
     0.5 * (1.0 - (PI * t).cos())
 }
-
-/// Exponential ease-in — very slow start, rapid acceleration.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_expo(t: f32) -> f32 {
     if t <= 0.0 {
         0.0
@@ -178,14 +61,6 @@ pub fn ease_in_expo(t: f32) -> f32 {
         (2.0_f32).powf(10.0 * (t - 1.0))
     }
 }
-
-/// Exponential ease-out — rapid start, very slow end.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_expo(t: f32) -> f32 {
     if t >= 1.0 {
         1.0
@@ -193,14 +68,6 @@ pub fn ease_out_expo(t: f32) -> f32 {
         1.0 - (2.0_f32).powf(-10.0 * t)
     }
 }
-
-/// Exponential ease-in-out — sharp S-curve with exponential tails.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_expo(t: f32) -> f32 {
     if t <= 0.0 {
         return 0.0;
@@ -214,14 +81,6 @@ pub fn ease_in_out_expo(t: f32) -> f32 {
         1.0 - 0.5 * (2.0_f32).powf(-20.0 * t + 10.0)
     }
 }
-
-/// Elastic ease-in — spring-like overshoot at the start.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_elastic(t: f32) -> f32 {
     if t <= 0.0 {
         return 0.0;
@@ -232,14 +91,6 @@ pub fn ease_in_elastic(t: f32) -> f32 {
     let p = 0.3_f32;
     -(2.0_f32.powf(10.0 * (t - 1.0)) * ((t - 1.0 - p / 4.0) * 2.0 * PI / p).sin())
 }
-
-/// Elastic ease-out — spring-like overshoot at the end.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_elastic(t: f32) -> f32 {
     if t <= 0.0 {
         return 0.0;
@@ -250,14 +101,6 @@ pub fn ease_out_elastic(t: f32) -> f32 {
     let p = 0.3_f32;
     2.0_f32.powf(-10.0 * t) * ((t - p / 4.0) * 2.0 * PI / p).sin() + 1.0
 }
-
-/// Elastic ease-in-out — spring-like overshoot at both ends.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_elastic(t: f32) -> f32 {
     if t <= 0.0 {
         return 0.0;
@@ -273,14 +116,6 @@ pub fn ease_in_out_elastic(t: f32) -> f32 {
         0.5 * 2.0_f32.powf(-20.0 * t + 10.0) * ((2.0 * t - 1.0 - s) * 2.0 * PI / p).sin() + 1.0
     }
 }
-
-/// Bounce ease-out — simulates a bouncing ball landing.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_bounce(t: f32) -> f32 {
     if t < 1.0 / 2.75 {
         7.5625 * t * t
@@ -295,25 +130,9 @@ pub fn ease_out_bounce(t: f32) -> f32 {
         7.5625 * t * t + 0.984375
     }
 }
-
-/// Bounce ease-in — simulates a bouncing ball launching.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_bounce(t: f32) -> f32 {
     1.0 - ease_out_bounce(1.0 - t)
 }
-
-/// Bounce ease-in-out — bouncing at both ends.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]`.
 pub fn ease_in_out_bounce(t: f32) -> f32 {
     if t < 0.5 {
         0.5 * ease_in_bounce(2.0 * t)
@@ -321,39 +140,15 @@ pub fn ease_in_out_bounce(t: f32) -> f32 {
         0.5 * ease_out_bounce(2.0 * t - 1.0) + 0.5
     }
 }
-
-/// Back ease-in — pulls back before accelerating past the start.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_back(t: f32) -> f32 {
     let s = 1.70158_f32;
     t * t * ((s + 1.0) * t - s)
 }
-
-/// Back ease-out — overshoots the target then settles back.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output; typically in `[0.0, 1.0]` (may overshoot for elastic, back, and bounce curves).
 pub fn ease_out_back(t: f32) -> f32 {
     let s = 1.70158_f32;
     let u = t - 1.0;
     u * u * ((s + 1.0) * u + s) + 1.0
 }
-
-/// Back ease-in-out — pulls back at start, overshoots at end.
-///
-/// # Parameters
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// Eased output (may overshoot for elastic, back, and bounce curves).
 pub fn ease_in_out_back(t: f32) -> f32 {
     let s = 1.70158_f32 * 1.525;
     if t < 0.5 {
@@ -364,27 +159,9 @@ pub fn ease_in_out_back(t: f32) -> f32 {
         0.5 * (t2 * t2 * ((s + 1.0) * t2 + s) + 2.0)
     }
 }
-
-/// Looks up an easing function by name and applies it to progress value `t`.
-///
-/// Supported names (case-insensitive): `"linear"`, `"inQuad"`, `"outQuad"`,
-/// `"inOutQuad"`, `"inCubic"`, `"outCubic"`, `"inOutCubic"`, `"inQuart"`,
-/// `"outQuart"`, `"inOutQuart"`, `"inSine"`, `"outSine"`, `"inOutSine"`,
-/// `"inExpo"`, `"outExpo"`, `"inOutExpo"`, `"inElastic"`, `"outElastic"`,
-/// `"inOutElastic"`, `"outBounce"`, `"inBounce"`, `"inOutBounce"`,
-/// `"inBack"`, `"outBack"`, `"inOutBack"`.
-///
-/// # Parameters
-/// - `name` — easing name string (case-insensitive)
-/// - `t` — normalised progress value in `[0.0, 1.0]`
-///
-/// # Returns
-/// `Some(f32)` with the eased value, or `None` if the name is unrecognised.
 pub fn apply(name: &str, t: f32) -> Option<f32> {
     resolve_easing_fn(name).map(|f| f(t))
 }
-
-/// Resolves a named easing function to its function pointer.
 pub fn resolve_easing_fn(name: &str) -> Option<fn(f32) -> f32> {
     match name.to_lowercase().as_str() {
         "linear" => Some(linear),

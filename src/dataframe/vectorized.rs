@@ -1,49 +1,45 @@
-//! Typed columnar storage with SIMD-friendly buffers.
-
-use std::collections::HashMap;
-
-use rayon::prelude::*;
-
+//! Own columnar storage and SIMD-friendly vectorized arithmetic accelerating `DataFrame` operations.
+//! Typed column stores carry optional per-row validity bitmasks. Scalar and binary column ops,
+//! aggregation reductions, comparison masks, and type casts are exposed on `VecFrame`. Parallel
+//! variants use rayon for multi-column workloads. Conversion to and from `DataFrame` is explicit.
+//! Primary consumer is `src/lua_api/dataframe_api.rs`. Does not own query logic or serialization.
 use crate::dataframe::frame::{CellValue, DataFrame};
-
-/// Typed flat-buffer column with an optional null/validity bitmap.
-/// Each variant stores all values as a dense `Vec<T>`, keeping memory
-/// contiguous for SIMD-friendly iteration.  The `validity` field, if
-/// present, has the same length as `data`; a `false` entry marks a null.
+use rayon::prelude::*;
+use std::collections::HashMap;
 #[derive(Debug, Clone)]
+/// Hold typed columnar storage with optional validity mask.
 pub enum ColumnStore {
-    /// 64-bit float column — primary numeric type.
+    /// Store 64-bit floating point values.
     Float64 {
-        /// Dense numeric data.
+        /// Store row values.
         data: Vec<f64>,
-        /// Per-row validity mask (`true` = not null).  `None` = all valid.
+        /// Store optional per-row validity flags.
         validity: Option<Vec<bool>>,
     },
-    /// 64-bit integer column.
+    /// Store 64-bit integer values.
     Int64 {
-        /// Dense integer data.
+        /// Store row values.
         data: Vec<i64>,
-        /// Per-row validity mask (`true` = not null).  `None` = all valid.
+        /// Store optional per-row validity flags.
         validity: Option<Vec<bool>>,
     },
-    /// Boolean column.
+    /// Store boolean values.
     Bool {
-        /// Dense boolean data.
+        /// Store row values.
         data: Vec<bool>,
-        /// Per-row validity mask.
+        /// Store optional per-row validity flags.
         validity: Option<Vec<bool>>,
     },
-    /// UTF-8 text column.
+    /// Store UTF-8 text values.
     Text {
-        /// Dense string data.
+        /// Store row values.
         data: Vec<String>,
-        /// Per-row validity mask.
+        /// Store optional per-row validity flags.
         validity: Option<Vec<bool>>,
     },
 }
-
 impl ColumnStore {
-    /// Return the dtype name as a static string slice.
+    /// Return static type name for this column variant.
     pub fn dtype_name(&self) -> &'static str {
         match self {
             ColumnStore::Float64 { .. } => "float64",
@@ -52,8 +48,7 @@ impl ColumnStore {
             ColumnStore::Text { .. } => "text",
         }
     }
-
-    /// Return the number of rows in this column.
+    /// Return number of rows in this column.
     pub fn len(&self) -> usize {
         match self {
             ColumnStore::Float64 { data, .. } => data.len(),
@@ -62,13 +57,11 @@ impl ColumnStore {
             ColumnStore::Text { data, .. } => data.len(),
         }
     }
-
-    /// Return `true` if the column has zero rows.
+    /// Return true when this column has no rows.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-
-    /// Return `true` if row `i` is valid (not null).
+    /// Return true when row at index is valid according to validity mask.
     pub fn is_valid(&self, i: usize) -> bool {
         let validity = match self {
             ColumnStore::Float64 { validity, .. } => validity,
@@ -80,8 +73,7 @@ impl ColumnStore {
             .as_ref()
             .is_none_or(|v| *v.get(i).unwrap_or(&false))
     }
-
-    /// Collect valid (non-null) f64 values from a Float64 column.
+    /// Return valid f64 values for Float64 columns, skipping nil rows.
     pub fn valid_f64s(&self) -> Option<Vec<f64>> {
         if let ColumnStore::Float64 { data, validity } = self {
             let vals: Vec<f64> = if let Some(v) = validity {
@@ -97,8 +89,7 @@ impl ColumnStore {
             None
         }
     }
-
-    /// Filter rows by a boolean mask, returning a new `ColumnStore`.
+    /// Filter rows by boolean mask and return new column.
     pub fn filter(&self, mask: &[bool]) -> ColumnStore {
         match self {
             ColumnStore::Float64 { data, validity } => {
@@ -172,33 +163,30 @@ impl ColumnStore {
         }
     }
 }
-
-/// Scalar arithmetic operation applied element-wise to an entire column.
-/// All ops operate on Float64 columns; other column types return an error.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select element-wise scalar operation applied to a column.
 pub enum ScalarOp {
-    /// Add a constant to every element.
+    /// Add scalar value to each element.
     Add,
-    /// Subtract a constant from every element.
+    /// Subtract scalar value from each element.
     Sub,
-    /// Multiply every element by a constant.
+    /// Multiply each element by scalar value.
     Mul,
-    /// Divide every element by a constant.
+    /// Divide each element by scalar value.
     Div,
-    /// Set every element to its absolute value.
+    /// Replace each element with its absolute value.
     Abs,
-    /// Apply square root to every element.
+    /// Replace each element with its square root.
     Sqrt,
-    /// Compute floor of every element.
+    /// Replace each element with its floor.
     Floor,
-    /// Compute ceiling of every element.
+    /// Replace each element with its ceiling.
     Ceil,
-    /// Negate every element.
+    /// Negate each element.
     Neg,
 }
-
 impl ScalarOp {
-    /// Parse a string into a `ScalarOp`.
+    /// Parse operation label and return variant or error.
     pub fn parse(s: &str) -> Result<ScalarOp, String> {
         match s {
             "add" => Ok(ScalarOp::Add),
@@ -214,26 +202,18 @@ impl ScalarOp {
         }
     }
 }
-
-/// Element-wise binary operation between two Float64 columns.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select element-wise binary operation between two columns.
 pub enum BinaryOp {
-    /// Element-wise addition.
     Add,
-    /// Element-wise subtraction.
     Sub,
-    /// Element-wise multiplication.
     Mul,
-    /// Element-wise division.
     Div,
-    /// Element-wise minimum.
     Min,
-    /// Element-wise maximum.
     Max,
 }
-
 impl BinaryOp {
-    /// Parse a string into a `BinaryOp`.
+    /// Parse operation label and return variant or error.
     pub fn parse(s: &str) -> Result<BinaryOp, String> {
         match s {
             "add" => Ok(BinaryOp::Add),
@@ -246,28 +226,19 @@ impl BinaryOp {
         }
     }
 }
-
-/// Column-level reduction operations.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select aggregation operation over a column.
 pub enum ReduceOp {
-    /// Sum of all valid values.
     Sum,
-    /// Arithmetic mean of all valid values.
     Mean,
-    /// Minimum value.
     Min,
-    /// Maximum value.
     Max,
-    /// Population standard deviation.
     Std,
-    /// Population variance.
     Var,
-    /// Count of valid (non-null) rows.
     Count,
 }
-
 impl ReduceOp {
-    /// Parse a string into a `ReduceOp`.
+    /// Parse operation label and return variant or error.
     pub fn parse(s: &str) -> Result<ReduceOp, String> {
         match s {
             "sum" => Ok(ReduceOp::Sum),
@@ -281,9 +252,8 @@ impl ReduceOp {
         }
     }
 }
-
-/// Comparison operator used in `VecFrame::filter_mask`.
 #[derive(Debug, Clone, Copy, PartialEq)]
+/// Select comparison operation for mask generation.
 pub enum CmpOp {
     /// Less than.
     Lt,
@@ -298,9 +268,8 @@ pub enum CmpOp {
     /// Not equal.
     Ne,
 }
-
 impl CmpOp {
-    /// Parse a string into a `CmpOp`.
+    /// Parse comparison operator string and return variant or error.
     pub fn parse(s: &str) -> Result<CmpOp, String> {
         match s {
             "<" | "lt" => Ok(CmpOp::Lt),
@@ -313,53 +282,41 @@ impl CmpOp {
         }
     }
 }
-
-/// Typed-column vectorized DataFrame.
-/// Each column is a [`ColumnStore`] — a dense typed `Vec` with an optional
-/// null bitmap.  This layout enables:
-/// Conversion helpers `VecFrame::from_dataframe` and `VecFrame::to_dataframe`
-/// bridge between the flexible `CellValue`-based API and this fast numeric layer.
 #[derive(Debug, Clone)]
+/// Hold typed columnar frame used for vectorized and parallel operations.
 pub struct VecFrame {
     column_names: Vec<String>,
     columns: Vec<ColumnStore>,
 }
-
 impl VecFrame {
-    /// Create an empty `VecFrame` with no columns.
+    /// Create empty VecFrame.
     pub fn new() -> Self {
         Self {
             column_names: Vec::new(),
             columns: Vec::new(),
         }
     }
-
-    /// Return the number of rows.  All columns must have the same length;
+    /// Return number of rows.
     pub fn nrows(&self) -> usize {
         self.columns.first().map(|c| c.len()).unwrap_or(0)
     }
-
-    /// Return the number of columns.
+    /// Return number of columns.
     pub fn ncols(&self) -> usize {
         self.column_names.len()
     }
-
-    /// Return a slice of column names.
+    /// Return ordered column names.
     pub fn columns(&self) -> &[String] {
         &self.column_names
     }
-
-    /// Return the dtype name for a column, or `None` if the column is not found.
+    /// Return type name for named column.
     pub fn col_type(&self, col: &str) -> Option<&'static str> {
         let idx = self.resolve(col).ok()?;
         Some(self.columns[idx].dtype_name())
     }
-
-    /// Convert a [`DataFrame`] into a `VecFrame`.
+    /// Convert DataFrame to VecFrame by inferring column types.
     pub fn from_dataframe(df: &DataFrame) -> VecFrame {
         let mut vf = VecFrame::new();
         for (col_idx, name) in df.columns().iter().enumerate() {
-            // borrow column data via raw_data
             let raw = df.raw_data();
             let cells = &raw[col_idx];
             let store = infer_column(cells);
@@ -368,8 +325,7 @@ impl VecFrame {
         }
         vf
     }
-
-    /// Convert this `VecFrame` back to a [`DataFrame`].
+    /// Convert VecFrame back to DataFrame.
     pub fn to_dataframe(&self) -> DataFrame {
         let nrows = self.nrows();
         let mut col_data: Vec<Vec<CellValue>> = Vec::with_capacity(self.columns.len());
@@ -392,16 +348,13 @@ impl VecFrame {
         }
         DataFrame::from_raw(self.column_names.clone(), col_data)
     }
-
-    /// Resolve a column name to a 0-based index.
     fn resolve(&self, col: &str) -> Result<usize, String> {
         self.column_names
             .iter()
             .position(|n| n == col)
             .ok_or_else(|| format!("column not found: {col}"))
     }
-
-    /// Apply a scalar operation to every element of a Float64 column in-place.
+    /// Apply scalar operation to Float64 column in place.
     pub fn col_scalar_op(&mut self, col: &str, op: ScalarOp, val: f64) -> Result<(), String> {
         let idx = self.resolve(col)?;
         if let ColumnStore::Float64 { data, validity } = &mut self.columns[idx] {
@@ -482,8 +435,7 @@ impl VecFrame {
             ))
         }
     }
-
-    /// Clamp every element of a Float64 column to `[min_val, max_val]` in-place.
+    /// Clamp Float64 column values to inclusive range in place.
     pub fn col_clamp(&mut self, col: &str, min_val: f64, max_val: f64) -> Result<(), String> {
         let idx = self.resolve(col)?;
         if let ColumnStore::Float64 { data, validity } = &mut self.columns[idx] {
@@ -501,8 +453,7 @@ impl VecFrame {
             ))
         }
     }
-
-    /// Compute `out_col[i] = left_col[i] op right_col[i]` for every row,
+    /// Compute element-wise binary operation between two numeric columns and write result column.
     pub fn col_binary_op(
         &mut self,
         out_col: &str,
@@ -513,8 +464,6 @@ impl VecFrame {
         let li = self.resolve(left_col)?;
         let ri = self.resolve(right_col)?;
         let nrows = self.nrows();
-
-        // Extract both column data without keeping borrows alive
         let left_data: Vec<f64> = match &self.columns[li] {
             ColumnStore::Float64 { data, .. } => data.clone(),
             ColumnStore::Int64 { data, .. } => data.iter().map(|v| *v as f64).collect(),
@@ -547,8 +496,6 @@ impl VecFrame {
             }
             _ => None,
         };
-
-        // Compute output — nulls propagate
         let mut out_data = Vec::with_capacity(nrows);
         let mut out_validity: Option<Vec<bool>> = None;
         for i in 0..nrows {
@@ -581,13 +528,10 @@ impl VecFrame {
                 out_data.push(result);
             }
         }
-
         let store = ColumnStore::Float64 {
             data: out_data,
             validity: out_validity,
         };
-
-        // Replace or append output column
         if let Some(oi) = self.column_names.iter().position(|n| n == out_col) {
             self.columns[oi] = store;
         } else {
@@ -596,8 +540,7 @@ impl VecFrame {
         }
         Ok(())
     }
-
-    /// Reduce an entire Float64 column to a single scalar.
+    /// Reduce numeric column to single value using selected aggregation.
     pub fn col_reduce(&self, col: &str, op: ReduceOp) -> Result<Option<f64>, String> {
         let idx = self.resolve(col)?;
         let vals = match &self.columns[idx] {
@@ -622,11 +565,9 @@ impl VecFrame {
                 ))
             }
         };
-
         if vals.is_empty() {
             return Ok(None);
         }
-
         let result = match op {
             ReduceOp::Count => Some(vals.len() as f64),
             ReduceOp::Sum => Some(vals.iter().sum()),
@@ -646,8 +587,7 @@ impl VecFrame {
         };
         Ok(result)
     }
-
-    /// Build a boolean row mask for `col[i] op val`.
+    /// Build boolean mask by comparing numeric column against scalar value.
     pub fn filter_mask(&self, col: &str, op: CmpOp, val: f64) -> Result<Vec<bool>, String> {
         let idx = self.resolve(col)?;
         let nrows = self.nrows();
@@ -676,8 +616,7 @@ impl VecFrame {
         }
         Ok(mask)
     }
-
-    /// Return a new `VecFrame` containing only rows where `mask[i]` is `true`.
+    /// Filter all columns by boolean mask and return new VecFrame.
     pub fn apply_mask(&self, mask: &[bool]) -> Result<VecFrame, String> {
         if mask.len() != self.nrows() {
             return Err(format!(
@@ -692,8 +631,7 @@ impl VecFrame {
             columns,
         })
     }
-
-    /// Cast a column to a new type.
+    /// Cast named column to target type in place.
     pub fn col_cast(&mut self, col: &str, dtype: &str) -> Result<(), String> {
         let idx = self.resolve(col)?;
         let nrows = self.nrows();
@@ -747,8 +685,7 @@ impl VecFrame {
         self.columns[idx] = new_store;
         Ok(())
     }
-
-    /// Reduce multiple columns in parallel using `rayon`, returning a map of
+    /// Reduce multiple columns in parallel and return name-to-result map.
     pub fn par_reduce(&self, cols: &[&str], op: ReduceOp) -> HashMap<String, Option<f64>> {
         cols.par_iter()
             .map(|col| {
@@ -757,15 +694,10 @@ impl VecFrame {
             })
             .collect()
     }
-
-    /// Apply a scalar operation in parallel to multiple Float64 columns.
+    /// Apply scalar operation across multiple Float64 columns in parallel.
     pub fn par_scalar_op(&mut self, cols: &[&str], op: ScalarOp, val: f64) -> Result<(), String> {
-        // Collect indices; validate first so we don't partially mutate on error.
         let indices: Result<Vec<usize>, String> = cols.iter().map(|c| self.resolve(c)).collect();
         let indices = indices?;
-
-        // Parallel mutable access: split columns into indexed slices.
-        // We build a separate data vec, apply in parallel, then write back.
         let updates: Vec<(usize, Vec<f64>)> = indices
             .par_iter()
             .filter_map(|&idx| {
@@ -788,7 +720,6 @@ impl VecFrame {
                 }
             })
             .collect();
-
         for (idx, new_data) in updates {
             if let ColumnStore::Float64 { data, .. } = &mut self.columns[idx] {
                 *data = new_data;
@@ -797,16 +728,13 @@ impl VecFrame {
         Ok(())
     }
 }
-
+/// Implement `Default` for `VecFrame` by delegating to `VecFrame::new`.
 impl Default for VecFrame {
     fn default() -> Self {
         Self::new()
     }
 }
-
-/// Infer the `ColumnStore` type from a `Vec<CellValue>` column.
 fn infer_column(cells: &[CellValue]) -> ColumnStore {
-    // Determine dominant type in one pass
     let mut has_num = false;
     let mut has_bool = false;
     let mut has_text = false;
@@ -819,11 +747,8 @@ fn infer_column(cells: &[CellValue]) -> ColumnStore {
             CellValue::Nil => has_nil = true,
         }
     }
-
-    // Decide type: pure bool, pure text, numeric (default for mixed/empty)
     let n = cells.len();
     if has_bool && !has_num && !has_text {
-        // Bool column
         let mut data = Vec::with_capacity(n);
         let mut validity = if has_nil { Some(vec![true; n]) } else { None };
         for (i, c) in cells.iter().enumerate() {
@@ -840,7 +765,6 @@ fn infer_column(cells: &[CellValue]) -> ColumnStore {
         }
         ColumnStore::Bool { data, validity }
     } else if has_text && !has_num && !has_bool {
-        // Text column
         let mut data = Vec::with_capacity(n);
         let mut validity = if has_nil { Some(vec![true; n]) } else { None };
         for (i, c) in cells.iter().enumerate() {
@@ -857,7 +781,6 @@ fn infer_column(cells: &[CellValue]) -> ColumnStore {
         }
         ColumnStore::Text { data, validity }
     } else {
-        // Float64 (numeric or mixed — bools become 0/1, text becomes NaN-validity)
         let mut data = Vec::with_capacity(n);
         let mut validity = if has_nil || has_text || has_bool {
             Some(vec![true; n])
@@ -885,8 +808,6 @@ fn infer_column(cells: &[CellValue]) -> ColumnStore {
         ColumnStore::Float64 { data, validity }
     }
 }
-
-/// Apply a single scalar op to one f64 value.
 fn apply_scalar_f64(x: f64, op: ScalarOp, val: f64) -> f64 {
     match op {
         ScalarOp::Add => x + val,
@@ -900,8 +821,6 @@ fn apply_scalar_f64(x: f64, op: ScalarOp, val: f64) -> f64 {
         ScalarOp::Neg => -x,
     }
 }
-
-/// Apply a comparison operator to two f64 values.
 fn cmp_f64(x: f64, op: CmpOp, val: f64) -> bool {
     match op {
         CmpOp::Lt => x < val,

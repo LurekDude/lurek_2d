@@ -1,59 +1,48 @@
-//! Evaluate keyframe curves and multi-property timelines for animation.
-
-use std::collections::HashMap;
-
+//! Keyframe curves for animation values and named property timelines.
+//! Owns `EasingKind`, `AnimCurve`, and `AnimPropertyTimeline`.
+//! Does not own playback; it only evaluates values over time.
 use crate::math::easing;
-
-// ---- Type: EasingKind ----
-
-/// Interpolation mode applied between each pair of consecutive keyframes.
+use std::collections::HashMap;
+/// Easing function used when interpolating between keyframes.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EasingKind {
-    /// Constant hold Ă˘â‚¬â€ť output equals the value of the preceding keyframe.
+    /// No interpolation until the next keyframe.
     Step,
     /// Linear interpolation.
     Linear,
-    /// Smooth ease-in.
+    /// Quadratic ease-in.
     EaseIn,
-    /// Smooth ease-out.
+    /// Quadratic ease-out.
     EaseOut,
-    /// Smooth ease-in-out.
+    /// Quadratic ease-in-out.
     EaseInOut,
-    /// A Lua callback computes the interpolation factor.
-    /// `callback_id` is an opaque key resolved by the Lua API layer.
+    /// Custom easing callback id.
     Custom { callback_id: u32 },
 }
-
-// ---- Type: AnimCurve ----
-
-/// A keyframe-based animation curve.
+/// Single numeric curve with sorted keyframes.
 #[derive(Debug, Clone)]
 pub struct AnimCurve {
-    /// Sorted (time, value) keyframe pairs.
+    /// Sorted keyframes as `(time, value)`.
     pub keyframes: Vec<(f32, f32)>,
-    /// Default easing applied between keyframes when not otherwise overridden.
+    /// Interpolation mode.
     pub easing: EasingKind,
 }
-
 impl AnimCurve {
-    // ---- Implementation: AnimCurve ----
-    /// Create an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
+    /// Create an empty curve with linear easing.
     pub fn new() -> Self {
         Self {
             keyframes: Vec::new(),
             easing: EasingKind::Linear,
         }
     }
-
-    /// Create an empty `AnimCurve` with the given easing kind.
+    /// Create an empty curve with the given easing.
     pub fn with_easing(easing: EasingKind) -> Self {
         Self {
             keyframes: Vec::new(),
             easing,
         }
     }
-
-    /// Add a keyframe, keeping the internal list sorted by time.
+    /// Insert or replace a keyframe while keeping the list sorted.
     pub fn add_keyframe(&mut self, time: f32, value: f32) {
         match self
             .keyframes
@@ -63,18 +52,15 @@ impl AnimCurve {
             Err(pos) => self.keyframes.insert(pos, (time, value)),
         }
     }
-
     /// Return the number of keyframes.
     pub fn keyframe_count(&self) -> usize {
         self.keyframes.len()
     }
-
     /// Remove all keyframes.
     pub fn clear(&mut self) {
         self.keyframes.clear();
     }
-
-    /// Evaluates the curve at the given time.
+    /// Evaluate the curve at time `t`.
     pub fn eval(&self, t: f32) -> f32 {
         match self.keyframes.len() {
             0 => 0.0,
@@ -87,7 +73,6 @@ impl AnimCurve {
                 if t >= last.0 {
                     return last.1;
                 }
-                // Find the segment: keyframes[i].0 <= t < keyframes[i+1].0
                 let pos = self
                     .keyframes
                     .partition_point(|(kf_t, _)| *kf_t <= t)
@@ -105,8 +90,6 @@ impl AnimCurve {
                     EasingKind::EaseIn => easing::ease_in_quad(alpha),
                     EasingKind::EaseOut => easing::ease_out_quad(alpha),
                     EasingKind::EaseInOut => easing::ease_in_out_quad(alpha),
-                    // Domain code cannot call Lua; return linear interpolation as fallback.
-                    // The Lua API layer overrides this by calling the callback directly.
                     EasingKind::Custom { .. } => alpha,
                 };
                 v0 + (v1 - v0) * alpha_eased
@@ -114,23 +97,18 @@ impl AnimCurve {
         }
     }
 }
-
-// ---- Type: AnimPropertyTimeline ----
-
-/// One shared timeline that can drive multiple named properties in parallel.
+/// Sparse multi-property timeline keyed by property name.
 #[derive(Debug, Clone)]
 pub struct AnimPropertyTimeline {
-    /// Shared timeline keyframes (time only).
+    /// Sorted keyframe times.
     times: Vec<f32>,
     /// Per-property values aligned with `times`.
     values: HashMap<String, Vec<f32>>,
-    /// Interpolation mode shared by all properties.
+    /// Interpolation mode.
     pub easing: EasingKind,
 }
-
 impl AnimPropertyTimeline {
-    // ---- Implementation: AnimPropertyTimeline ----
-    /// Create an empty property timeline with linear easing.
+    /// Create an empty timeline with linear easing.
     pub fn new() -> Self {
         Self {
             times: Vec::new(),
@@ -138,8 +116,7 @@ impl AnimPropertyTimeline {
             easing: EasingKind::Linear,
         }
     }
-
-    /// Add a keyframe for one or more named properties at the same time.
+    /// Insert a keyframe with one or more property values.
     pub fn add_keyframe<I, S>(&mut self, time: f32, props: I)
     where
         I: IntoIterator<Item = (S, f32)>,
@@ -150,7 +127,6 @@ impl AnimPropertyTimeline {
         if props_vec.is_empty() {
             return;
         }
-
         let insert_pos = match self
             .times
             .binary_search_by(|t| t.partial_cmp(&time).unwrap_or(std::cmp::Ordering::Equal))
@@ -165,7 +141,6 @@ impl AnimPropertyTimeline {
                 pos
             }
         };
-
         for (name, value) in props_vec.drain(..) {
             let values = self
                 .values
@@ -178,18 +153,15 @@ impl AnimPropertyTimeline {
             values[insert_pos] = value;
         }
     }
-
-    /// Return all property names tracked by this timeline.
+    /// Return the list of property names.
     pub fn property_names(&self) -> Vec<String> {
         self.values.keys().cloned().collect()
     }
-
-    /// Number of timeline keyframes.
+    /// Return the number of timeline keyframes.
     pub fn keyframe_count(&self) -> usize {
         self.times.len()
     }
-
-    /// Evaluates one property at time `t`.
+    /// Evaluate one property at time `t`.
     pub fn eval_property(&self, name: &str, t: f32) -> Option<f32> {
         let values = self.values.get(name)?;
         if self.times.is_empty() || values.is_empty() {
@@ -198,7 +170,6 @@ impl AnimPropertyTimeline {
         if self.times.len() == 1 {
             return Some(values[0]);
         }
-
         if t <= self.times[0] {
             return Some(values[0]);
         }
@@ -206,7 +177,6 @@ impl AnimPropertyTimeline {
         if t >= self.times[last_idx] {
             return Some(values[last_idx]);
         }
-
         let pos = self
             .times
             .partition_point(|kf_t| *kf_t <= t)
@@ -219,7 +189,6 @@ impl AnimPropertyTimeline {
         if span <= f32::EPSILON {
             return Some(v1);
         }
-
         let alpha = (t - t0) / span;
         let alpha_eased = match self.easing {
             EasingKind::Step => 0.0,
@@ -231,8 +200,7 @@ impl AnimPropertyTimeline {
         };
         Some(v0 + (v1 - v0) * alpha_eased)
     }
-
-    /// Evaluates all properties at time `t`.
+    /// Evaluate all properties at time `t`.
     pub fn eval_all(&self, t: f32) -> HashMap<String, f32> {
         let mut out = HashMap::new();
         for name in self.values.keys() {
@@ -243,13 +211,15 @@ impl AnimPropertyTimeline {
         out
     }
 }
-
+/// `Default` delegates to `AnimCurve::new`.
+/// `Default` delegates to `AnimCurve::new`.
 impl Default for AnimCurve {
     fn default() -> Self {
         Self::new()
     }
 }
-
+/// `Default` delegates to `AnimPropertyTimeline::new`.
+/// `Default` delegates to `AnimPropertyTimeline::new`.
 impl Default for AnimPropertyTimeline {
     fn default() -> Self {
         Self::new()
