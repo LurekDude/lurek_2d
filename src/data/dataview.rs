@@ -1,8 +1,6 @@
-//! Read-only windowed view into a shared byte buffer.
-//!
-//! `DataView` provides typed accessor methods over a slice of a `Vec<u8>` without
-//! copying the underlying data. All reads are little-endian. Bounds are checked
-//! on every access; out-of-range indices return an error.
+//! Scope: Read-only byte-buffer windowing.
+//! This file defines the DataView type and typed read accessors.
+//! It owns bounds-checked, little-endian reads over shared buffers.
 
 use std::sync::Arc;
 

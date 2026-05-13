@@ -1,27 +1,11 @@
-//! Statistical analytics, signal processing, and normalisation for NdArray.
-//!
-//! All functions operate on flat element order (row-major). They are
-//! **Foundations-tier** — no imports from Core Runtime or higher.
-//!
-//! Key functions: `cumsum`, `diff`, `histogram`, `percentile`, `covariance`,
-//! `pearson_corr`, `normalize_range`, `zscore`, `convolve1d`, `correlate1d`.
+﻿//! Analytics owns statistical reducers and 1D signal transforms for NdArray.
+//! Functions operate on flat row-major element order and return dense outputs.
 
 use crate::compute::array::NdArray;
 
-// ---------------------------------------------------------------------------
-// Cumulative operations
-// ---------------------------------------------------------------------------
+// Cumulative operations.
 
-/// Cumulative sum along a 1D array (or flattened elements if axis is None).
-///
-/// Returns a new array of the same shape where each element `i` is the sum
-/// of elements `0..=i`.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Build cumulative sum where output i stores the sum of elements 0 through i.
 pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     let mut out = NdArray::zeros(&[n], a.dtype())?;
@@ -33,21 +17,9 @@ pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-// ---------------------------------------------------------------------------
-// Differences
-// ---------------------------------------------------------------------------
+// Difference operations.
 
-/// Discrete difference: `out[i] = a[i+1] - a[i]` (order `n = 1`, 1D or flat).
-///
-/// Applies `order` times, so `diff(a, 2)` gives the second-order difference.
-/// The output length is `a.size() - order`.
-///
-/// # Parameters
-/// - `a`     — `&NdArray`.
-/// - `order` — `usize` number of times to apply the difference.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Apply forward difference order times and return an array shortened by order.
 pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     if order == 0 {
         return Ok(a.clone());
@@ -59,7 +31,7 @@ pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
             order, n
         ));
     }
-    // Collect floats, apply diff `order` times
+    // Materialize values and iteratively apply adjacent subtraction.
     let mut vals: Vec<f64> = (0..n).map(|i| a.get_f64(i)).collect();
     for _ in 0..order {
         vals = vals.windows(2).map(|w| w[1] - w[0]).collect();
@@ -72,24 +44,9 @@ pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-// ---------------------------------------------------------------------------
-// Histogram
-// ---------------------------------------------------------------------------
+// Histogram.
 
-/// Compute a histogram with `bins` equal-width bins.
-///
-/// Returns a `Vec<(lo, hi, count)>` tuple per bin.
-/// By default `min` and `max` are the observed minimum and maximum values;
-/// pass explicit bounds to fix them.
-///
-/// # Parameters
-/// - `a`        — `&NdArray`.
-/// - `bins`     — `usize` number of bins (must be ≥ 1).
-/// - `range_lo` — `Option<f64>`.
-/// - `range_hi` — `Option<f64>`.
-///
-/// # Returns
-/// `Result<Vec<(f64, f64, u64)>, String>`.
+/// Compute equal-width histogram bins and return (lo, hi, count) tuples.
 pub fn histogram(
     a: &NdArray,
     bins: usize,
@@ -97,7 +54,7 @@ pub fn histogram(
     range_hi: Option<f64>,
 ) -> Result<Vec<(f64, f64, u64)>, String> {
     if bins == 0 {
-        return Err("histogram: bins must be ≥ 1".to_string());
+        return Err("histogram: bins must be â‰Ą 1".to_string());
     }
     let n = a.size();
     if n == 0 {
@@ -140,7 +97,7 @@ pub fn histogram(
         }
         let mut bin = ((v - lo) / width) as usize;
         if bin >= bins {
-            bin = bins - 1; // clamp the upper edge into the last bin
+            bin = bins - 1; // Keep right-edge values in the final bin.
         }
         counts[bin] += 1;
     }
@@ -155,20 +112,9 @@ pub fn histogram(
     Ok(result)
 }
 
-// ---------------------------------------------------------------------------
-// Percentile / quantile
-// ---------------------------------------------------------------------------
+// Percentile.
 
-/// Compute the `p`-th percentile (0–100) of all elements.
-///
-/// Uses linear interpolation between adjacent sorted values.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `p` — `f64` in the range [0, 100].
-///
-/// # Returns
-/// `Result<f64, String>`.
+/// Compute percentile p in [0,100] with linear interpolation between ranks.
 pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     if !(0.0..=100.0).contains(&p) {
         return Err(format!("percentile p must be in [0, 100], got {p}"));
@@ -190,18 +136,9 @@ pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     Ok(vals[lo] * (1.0 - frac) + vals[hi] * frac)
 }
 
-// ---------------------------------------------------------------------------
-// Covariance and correlation
-// ---------------------------------------------------------------------------
+// Covariance and correlation.
 
-/// Population covariance of two 1D (or flat) arrays of equal size.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<f64, String>`.
+/// Compute population covariance for two arrays with equal element counts.
 pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -219,16 +156,7 @@ pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     Ok(cov)
 }
 
-/// Pearson correlation coefficient of two 1D (or flat) arrays.
-///
-/// Returns a value in [-1, 1]. Returns `Err` if either array has zero variance.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<f64, String>`.
+/// Compute Pearson correlation and return error when variance is zero.
 pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -257,21 +185,9 @@ pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     Ok(num / denom)
 }
 
-// ---------------------------------------------------------------------------
-// Normalisation
-// ---------------------------------------------------------------------------
+// Normalization.
 
-/// Linearly rescale all elements to [out_min, out_max].
-///
-/// All output values are clamped to the target range.
-///
-/// # Parameters
-/// - `a`       — `&NdArray`.
-/// - `out_min` — `f64` lower bound of output range.
-/// - `out_max` — `f64` upper bound of output range.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Rescale values linearly into [out_min, out_max] and return the new array.
 pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArray, String> {
     if out_max <= out_min {
         return Err(format!(
@@ -304,15 +220,7 @@ pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArra
     Ok(out)
 }
 
-/// Standardise all elements to zero mean and unit variance (z-score).
-///
-/// Returns `Err` if the standard deviation is zero.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Standardize values to z-scores and return error when standard deviation is zero.
 pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     if n == 0 {
@@ -331,21 +239,9 @@ pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-// ---------------------------------------------------------------------------
-// Signal processing — 1D convolution and correlation
-// ---------------------------------------------------------------------------
+// 1D signal operations.
 
-/// 1D convolution of `signal` with `kernel` (full output length).
-///
-/// Output length: `signal.size() + kernel.size() - 1`.
-/// Padding is zero-based.
-///
-/// # Parameters
-/// - `signal` — `&NdArray` 1D input.
-/// - `kernel` — `&NdArray` 1D filter.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Convolve 1D signal with kernel and return full zero-padded output.
 #[allow(clippy::needless_range_loop)]
 pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
@@ -365,7 +261,7 @@ pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String>
     let out_len = sn + kn - 1;
     let mut out = NdArray::zeros(&[out_len], signal.dtype())?;
 
-    // Flip the kernel (convolution definition)
+    // Reverse kernel to match convolution definition.
     let kflip: Vec<f64> = (0..kn).rev().map(|i| kernel.get_f64(i)).collect();
 
     for o in 0..out_len {
@@ -381,18 +277,7 @@ pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String>
     Ok(out)
 }
 
-/// 1D cross-correlation: slide `template` over `signal` (valid output).
-///
-/// Output length: `signal.size() - template.size() + 1`.
-/// Each output element is the dot product of the template with the
-/// corresponding window of the signal.
-///
-/// # Parameters
-/// - `signal`   — `&NdArray` 1D input (length ≥ template length).
-/// - `template` — `&NdArray` 1D pattern to search for.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
+/// Correlate template over signal and return valid-length output.
 pub fn correlate1d(signal: &NdArray, template: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
         return Err(format!(
@@ -425,6 +310,4 @@ pub fn correlate1d(signal: &NdArray, template: &NdArray) -> Result<NdArray, Stri
     Ok(out)
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+// No inline tests in src; unit tests belong under tests/rust/unit.

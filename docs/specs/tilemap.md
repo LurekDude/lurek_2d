@@ -577,3 +577,9 @@ The `tilemap` module is Lurek2D's tile-map authoring and rendering subsystem in 
 
 - Keep this module reference synchronized with `src/tilemap/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### 2026-05-12 Update
+
+- Added maintained per-layer tile-type index cache in `TileMap` (`tile_type_index_cache`) updated by `add_layer`, `set_tile`, `clear_tile`, and `fill`.
+- Added `TileMap::tile_type_index(layer)` and `TileMap::find_tiles_by_gid(layer, gid)`.
+- Exposed Lua methods: `LTileMap:tileTypeIndex(layer)` and `LTileMap:findTilesByGid(layer, gid)`.

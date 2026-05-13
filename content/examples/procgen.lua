@@ -80,6 +80,20 @@ do -- lurek.procgen.roomsDungeon
   lurek.log.info("rooms dungeon: " .. #d.rooms .. " rooms, " .. floors .. " floor tiles", "procgen")
 end
 
+--@api-stub: lurek.procgen.roomsDungeonWithPrefabs
+-- Generates a rooms dungeon and stamps prefab masks into room interiors.
+do -- lurek.procgen.roomsDungeonWithPrefabs
+  local prefabs = {
+    { name = "altar", width = 3, height = 3, mask = {
+      0,1,0,
+      1,1,1,
+      0,1,0,
+    } }
+  }
+  local d, placements = lurek.procgen.roomsDungeonWithPrefabs({ width = 40, height = 30, max_rooms = 8, seed = 21 }, prefabs, 3)
+  lurek.log.info("prefab rooms: " .. #d.rooms .. ", placements=" .. #placements, "procgen")
+end
+
 --@api-stub: lurek.procgen.heightmap
 -- Generates a heightmap using fractal noise.
 -- Tune octaves/persistence for terrain detail; erosion_passes adds simple thermal smoothing.
@@ -87,6 +101,16 @@ do -- lurek.procgen.heightmap
   local hm = lurek.procgen.heightmap({ width = 128, height = 128, scale = 0.05, octaves = 4, persistence = 0.5, seed = 99 })
   local mid = hm.cells[(hm.height / 2) * hm.width + (hm.width / 2)]
   lurek.log.info("heightmap " .. hm.width .. "x" .. hm.height .. " centre=" .. mid, "procgen")
+end
+
+--@api-stub: lurek.procgen.heightmapFromCellular
+-- Converts cellular 0/1 map data into a normalized heightmap-like table.
+do -- lurek.procgen.heightmapFromCellular
+  local w, h = 8, 8
+  local cells = {}
+  for i = 1, w * h do cells[i] = (i % 3 == 0) and 1 or 0 end
+  local hm = lurek.procgen.heightmapFromCellular(w, h, cells, 0)
+  lurek.log.debug("heightmapFromCellular cells=" .. #hm.cells, "procgen")
 end
 
 --@api-stub: lurek.procgen.wfcGenerate
@@ -126,6 +150,56 @@ do -- lurek.procgen.generateName
   lurek.log.info("npc named '" .. name .. "'", "procgen")
 end
 
+--@api-stub: lurek.procgen.newBiomeClassifier
+-- Creates a biome classifier with optional threshold overrides.
+do -- lurek.procgen.newBiomeClassifier
+  local bc = lurek.procgen.newBiomeClassifier({ ocean_threshold = 0.25, warm_temperature = 0.7 })
+  lurek.log.debug("biome classifier ready: " .. bc:type(), "procgen")
+end
+
+--@api-stub: BiomeClassifier:classify
+-- Classifies a single sample (height, moisture, temperature).
+do -- BiomeClassifier:classify
+  local bc = lurek.procgen.newBiomeClassifier()
+  local biome = bc:classify(0.62, 0.35, 0.72)
+  lurek.log.info("sample biome=" .. biome, "procgen")
+end
+
+--@api-stub: BiomeClassifier:classifyMap
+-- Classifies a full row-major map from scalar arrays.
+do -- BiomeClassifier:classifyMap
+  local bc = lurek.procgen.newBiomeClassifier()
+  local w, h = 2, 2
+  local heights = { 0.1, 0.3, 0.6, 0.9 }
+  local moisture = { 0.8, 0.3, 0.2, 0.4 }
+  local temperature = { 0.5, 0.7, 0.8, 0.2 }
+  local biomes = bc:classifyMap(w, h, heights, moisture, temperature)
+  lurek.log.debug("classifyMap produced " .. #biomes .. " cells", "procgen")
+end
+
+--@api-stub: BiomeClassifier:type
+-- Returns userdata type name.
+do -- BiomeClassifier:type
+  local bc = lurek.procgen.newBiomeClassifier()
+  local t = bc:type()
+  lurek.log.debug("biome type=" .. t, "procgen")
+end
+
+--@api-stub: BiomeClassifier:typeOf
+-- Tests type identity.
+do -- BiomeClassifier:typeOf
+  local bc = lurek.procgen.newBiomeClassifier()
+  local ok = bc:typeOf("BiomeClassifier")
+  if not ok then lurek.log.warn("unexpected biome classifier type", "procgen") end
+end
+
+--@api-stub: lurek.procgen.biomeColor
+-- Returns representative RGBA for a biome name.
+do -- lurek.procgen.biomeColor
+  local r, g, b, a = lurek.procgen.biomeColor("desert")
+  lurek.log.debug("desert rgba=" .. r .. "," .. g .. "," .. b .. "," .. a, "procgen")
+end
+
 --@api-stub: lurek.procgen.generateNames
 -- Generates N procedural names using a Markov chain.
 -- Cheaper than calling generateName N times because the chain is built once.
@@ -160,6 +234,24 @@ do -- lurek.procgen.noiseMapParallel
   local big = lurek.procgen.noiseMapParallel(256, 256, { scale_x = 0.02, scale_y = 0.02, octaves = 5, lacunarity = 2.0 })
   local sample = big[#big / 2]
   lurek.log.info("parallel noise map size=" .. #big .. " mid=" .. sample, "procgen")
+end
+
+--@api-stub: lurek.procgen.noiseMapParallelSeeded
+-- Generates a seeded parallel noise map for deterministic world generation.
+do -- lurek.procgen.noiseMapParallelSeeded
+  local map = lurek.procgen.noiseMapParallelSeeded(64, 64, { scale_x = 0.04, scale_y = 0.04, octaves = 4, seed = 12345 })
+  lurek.log.debug("seeded parallel noise first=" .. map[1], "procgen")
+end
+
+--@api-stub: lurek.procgen.bspDungeonWithPrefabs
+-- Generates BSP rooms/corridors and prefab placement metadata.
+do -- lurek.procgen.bspDungeonWithPrefabs
+  local prefabs = {
+    { name = "boss_room", width = 5, height = 5 },
+    { name = "chest_room", width = 3, height = 3 },
+  }
+  local d, p = lurek.procgen.bspDungeonWithPrefabs({ width = 60, height = 40, max_depth = 4, seed = 9 }, prefabs)
+  lurek.log.info("bsp rooms=" .. #d.rooms .. " prefab placements=" .. #p, "procgen")
 end
 
 --@api-stub: lurek.procgen.simplex2d

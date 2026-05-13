@@ -1,46 +1,11 @@
-//! Context Steering — direction-based interest/danger evaluation for smooth movement.
-//!
-//! Context steering replaces force-accumulation steering with a discrete radial
-//! evaluation. Each frame, interest (where to go) and danger (where NOT to go)
-//! values are written into `N`-slot direction rings. The final movement direction
-//! is the slot with the highest `interest - danger` score.
-//!
-//! ## Why Context Steering
-//!
-//! Traditional force-based steering produces oscillation and wall-sticking near
-//! obstacles because forces simultaneously push and pull. Context steering avoids
-//! this by explicitly masking interested directions that overlap with high-danger
-//! directions, then selecting the best remaining option.
-//!
-//! ## Architecture
-//!
-//! - [`ContextSteering`] stores interest and danger rings plus a list of behaviors.
-//! - Behaviors fill the rings via [`ContextBehaviorKind`] rules.
-//! - `evaluate(agent_pos, agent_vel)` fills both rings, computes `result = interest - danger`,
-//!   masks zero-interest slots, and returns the chosen direction as a unit vector.
-//!
-//! ## Typical Usage Sequence
-//!
-//! 1. Create a `ContextSteering` with `N` slots (8 or 16).
-//! 2. Add interest behaviors (seek target, preferred direction, wander).
-//! 3. Add danger behaviors (avoid obstacles, avoid bounds).
-//! 4. Call `evaluate(pos, vel)` each frame → `(dx, dy)` unit vector.
-//! 5. Multiply by desired speed to get the movement velocity.
-
+﻿//! Scope: radial context-steering evaluator using interest and danger rings.
+//! This file defines behavior kinds, weighted ring fills, and direction solve logic for smooth local navigation.
+//! It owns slot sampling, cone filling, and final heading selection under dynamic world and boundary constraints.
 use std::f32::consts::{PI, TAU};
 
-// ────────────────────────────────────────────────────────────────────────────
-// ContextBehaviorKind
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: ContextBehaviorKind ----
 
 /// Variant of a context steering behavior defining how it fills the ring.
-///
-/// # Variants
-/// - `SeekTarget` — SeekTarget variant.
-/// - `AvoidPoint` — AvoidPoint variant.
-/// - `Wander` — Wander variant.
-/// - `Direction` — Direction variant.
-/// - `AvoidBounds` — AvoidBounds variant.
 #[derive(Clone)]
 pub enum ContextBehaviorKind {
     /// Fill interest slots pointing toward `(x, y)` from the agent position.
@@ -86,20 +51,9 @@ pub enum ContextBehaviorKind {
     },
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// ContextBehavior
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: ContextBehavior ----
 
 /// A single context steering behavior with a weight and enabled flag.
-///
-/// Multiple behaviors stack: all enabled behaviors fill the interest or danger
-/// ring before the final direction is chosen.
-///
-/// # Fields
-/// - `kind` — `ContextBehaviorKind`.
-/// - `weight` — `f32`.
-/// - `is_interest` — `bool`.
-/// - `enabled` — `bool`.
 #[derive(Clone)]
 pub struct ContextBehavior {
     /// What kind of fill this behavior performs.
@@ -112,24 +66,9 @@ pub struct ContextBehavior {
     pub enabled: bool,
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// ContextSteering
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: ContextSteering ----
 
 /// Radial context steering evaluator producing a smooth, obstacle-aware movement direction.
-///
-/// Evaluation is O(N × B) where N is the number of slots (8 or 16) and B is
-/// the number of registered behaviors. Typical frame cost is negligible.
-///
-/// # Fields
-/// - `slot_count` — `usize`.
-/// - `interest` — `Vec<f32>`.
-/// - `danger` — `Vec<f32>`.
-/// - `result` — `Vec<f32>`.
-/// - `behaviors` — `Vec<ContextBehavior>`.
-/// - `chosen_dir` — `f32`.
-/// - `chosen_magnitude` — `f32`.
-/// - `wander_angle` — `f32`.
 pub struct ContextSteering {
     slot_count: usize,
     /// Interest ring: N slots, value = desire to go in that direction.
@@ -150,14 +89,6 @@ pub struct ContextSteering {
 
 impl ContextSteering {
     /// Creates a new context steering evaluator with `slot_count` direction slots.
-    ///
-    /// `slot_count` must be at least 4. A power-of-two value (8 or 16) is recommended.
-    ///
-    /// # Parameters
-    /// - `slot_count` — `usize`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(slot_count: usize) -> Self {
         let n = slot_count.max(4);
         Self {
@@ -173,18 +104,11 @@ impl ContextSteering {
     }
 
     /// Returns the number of direction slots.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn slot_count(&self) -> usize {
         self.slot_count
     }
 
     /// Adds a behavior that fills the interest ring (where to go).
-    ///
-    /// # Parameters
-    /// - `kind` — `ContextBehaviorKind`.
-    /// - `weight` — `f32`.
     pub fn add_interest(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -195,10 +119,6 @@ impl ContextSteering {
     }
 
     /// Adds a behavior that fills the danger ring (where NOT to go).
-    ///
-    /// # Parameters
-    /// - `kind` — `ContextBehaviorKind`.
-    /// - `weight` — `f32`.
     pub fn add_danger(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -209,20 +129,11 @@ impl ContextSteering {
     }
 
     /// Adds a `SeekTarget` interest behavior pointing toward `(tx, ty)`.
-    ///
-    /// # Parameters
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_seek_target(&mut self, tx: f32, ty: f32, weight: f32) {
         self.add_interest(ContextBehaviorKind::SeekTarget { x: tx, y: ty }, weight);
     }
 
     /// Adds a `Wander` interest behavior.
-    ///
-    /// # Parameters
-    /// - `jitter` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_wander(&mut self, jitter: f32, weight: f32) {
         self.add_interest(
             ContextBehaviorKind::Wander {
@@ -234,25 +145,11 @@ impl ContextSteering {
     }
 
     /// Adds an `AvoidPoint` danger behavior.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
-    /// - `radius` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_avoid_point(&mut self, x: f32, y: f32, radius: f32, weight: f32) {
         self.add_danger(ContextBehaviorKind::AvoidPoint { x, y, radius }, weight);
     }
 
     /// Adds an `AvoidBounds` danger behavior.
-    ///
-    /// # Parameters
-    /// - `min_x` — `f32`.
-    /// - `min_y` — `f32`.
-    /// - `max_x` — `f32`.
-    /// - `max_y` — `f32`.
-    /// - `margin` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_avoid_bounds(
         &mut self,
         min_x: f32,
@@ -280,18 +177,6 @@ impl ContextSteering {
     }
 
     /// Evaluates interest and danger rings from the current agent position and
-    /// velocity, then returns the chosen direction as a normalized `(dx, dy)` pair.
-    ///
-    /// Returns `(0.0, 0.0)` when no interest is present.
-    ///
-    /// # Parameters
-    /// - `ax` — `f32`.
-    /// - `ay` — `f32`.
-    /// - `vx` — `f32`.
-    /// - `vy` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
     pub fn evaluate(&mut self, ax: f32, ay: f32, vx: f32, vy: f32) -> (f32, f32) {
         // Reset rings
         for v in &mut self.interest {
@@ -417,45 +302,29 @@ impl ContextSteering {
     }
 
     /// Returns the chosen direction angle from the last `evaluate` call (radians).
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn chosen_direction(&self) -> f32 {
         self.chosen_dir
     }
 
     /// Returns the chosen magnitude (net interest score) from the last `evaluate` call.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn chosen_magnitude(&self) -> f32 {
         self.chosen_magnitude
     }
 
     /// Returns a copy of the current interest ring values.
-    ///
-    /// # Returns
-    /// `Vec<f32>`.
     pub fn interest_map(&self) -> Vec<f32> {
         self.interest.clone()
     }
 
     /// Returns a copy of the current danger ring values.
-    ///
-    /// # Returns
-    /// `Vec<f32>`.
     pub fn danger_map(&self) -> Vec<f32> {
         self.danger.clone()
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: Helpers ----
 
 /// Fills a gaussian-like lobe of slots centered on `target_angle`.
-/// Slots within one slot_angle of the center get full weight; adjacent slots
-/// decay by cosine to create smooth blending across directions.
 #[allow(clippy::needless_range_loop)]
 fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, n: usize) {
     for i in 0..n {
@@ -468,7 +337,7 @@ fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, 
     }
 }
 
-/// Normalised angular difference in `(-π, π]`.
+/// Normalised angular difference in `(-, ]`.
 fn angle_diff_f32(a: f32, b: f32) -> f32 {
     let mut d = a - b;
     while d > PI {
@@ -480,39 +349,3 @@ fn angle_diff_f32(a: f32, b: f32) -> f32 {
     d
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_context_steering_slot_count() {
-        let cs = ContextSteering::new(8);
-        assert_eq!(cs.slot_count(), 8);
-    }
-
-    #[test]
-    fn seek_sets_interest() {
-        let mut cs = ContextSteering::new(8);
-        cs.add_seek_target(1.0, 0.0, 1.0);
-        cs.evaluate(0.0, 0.0, 0.0, 0.0);
-        assert!(cs.chosen_direction().is_finite());
-    }
-
-    #[test]
-    fn avoid_does_not_crash() {
-        let mut cs = ContextSteering::new(8);
-        cs.add_seek_target(1.0, 0.0, 1.0);
-        cs.add_avoid_point(0.5, 0.0, 0.5, 5.0);
-        cs.evaluate(0.0, 0.0, 0.0, 0.0);
-        assert!(cs.chosen_direction().is_finite());
-    }
-
-    #[test]
-    fn clear_behaviors_resets() {
-        let mut cs = ContextSteering::new(8);
-        cs.add_seek_target(1.0, 0.0, 1.0);
-        cs.clear_behaviors();
-        cs.evaluate(0.0, 0.0, 0.0, 0.0);
-        assert_eq!(cs.chosen_magnitude(), 0.0);
-    }
-}

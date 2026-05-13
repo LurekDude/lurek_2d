@@ -1,20 +1,6 @@
-//! Vectorized columnar storage and bulk operations for DataFrames.
-//!
-//! `VecFrame` stores each column as a typed flat buffer (`Vec<f64>`, `Vec<i64>`,
-//! `Vec<bool>`, or `Vec<String>`) with a separate validity bitmap (null mask).
-//! This layout lets the Rust compiler auto-vectorize (SIMD) numeric loops and
-//! lets `rayon` parallelize multi-column bulk operations without per-cell enum
-//! dispatch, which the `CellValue`-based `DataFrame` cannot do.
-//!
-//! # When to use VecFrame vs DataFrame
-//! - Use `DataFrame` for mixed-type tables, SQL queries, CSV I/O, and join/pivot.
-//! - Convert to `VecFrame` when you need bulk numeric transforms (add scalar to
-//!   every row, column-wise reduce, multi-column parallel sweep, etc.).
-//!
-//! # Null handling
-//! Nulls are stored in a `Vec<bool>` validity mask (`true` = valid, `false` = null).
-//! When `validity` is `None` the column has no nulls (common fast path).
-//! All numeric reductions skip null rows.
+//! Scope: Vectorized columnar storage and SIMD-friendly bulk operations.
+//! This file defines ColumnStore, VecFrame, BinaryOp, and scalar/reduce operations.
+//! It owns dense typed buffers, validity masks, and parallel numeric transforms.
 
 use std::collections::HashMap;
 
@@ -22,10 +8,7 @@ use rayon::prelude::*;
 
 use crate::dataframe::frame::{CellValue, DataFrame};
 
-// ── Typed column store ──────────────────────────────────────────────────────
-
 /// Typed flat-buffer column with an optional null/validity bitmap.
-///
 /// Each variant stores all values as a dense `Vec<T>`, keeping memory
 /// contiguous for SIMD-friendly iteration.  The `validity` field, if
 /// present, has the same length as `data`; a `false` entry marks a null.
@@ -63,9 +46,6 @@ pub enum ColumnStore {
 
 impl ColumnStore {
     /// Return the dtype name as a static string slice.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn dtype_name(&self) -> &'static str {
         match self {
             ColumnStore::Float64 { .. } => "float64",
@@ -76,9 +56,6 @@ impl ColumnStore {
     }
 
     /// Return the number of rows in this column.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn len(&self) -> usize {
         match self {
             ColumnStore::Float64 { data, .. } => data.len(),
@@ -89,20 +66,11 @@ impl ColumnStore {
     }
 
     /// Return `true` if the column has zero rows.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
     /// Return `true` if row `i` is valid (not null).
-    ///
-    /// # Parameters
-    /// - `i` — `usize`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_valid(&self, i: usize) -> bool {
         let validity = match self {
             ColumnStore::Float64 { validity, .. } => validity,
@@ -116,9 +84,6 @@ impl ColumnStore {
     }
 
     /// Collect valid (non-null) f64 values from a Float64 column.
-    ///
-    /// # Returns
-    /// `Option<Vec<f64>>` — `None` if this is not a Float64 column.
     pub fn valid_f64s(&self) -> Option<Vec<f64>> {
         if let ColumnStore::Float64 { data, validity } = self {
             let vals: Vec<f64> = if let Some(v) = validity {
@@ -136,12 +101,6 @@ impl ColumnStore {
     }
 
     /// Filter rows by a boolean mask, returning a new `ColumnStore`.
-    ///
-    /// # Parameters
-    /// - `mask` — `&[bool]`.
-    ///
-    /// # Returns
-    /// `ColumnStore`.
     pub fn filter(&self, mask: &[bool]) -> ColumnStore {
         match self {
             ColumnStore::Float64 { data, validity } => {
@@ -216,10 +175,7 @@ impl ColumnStore {
     }
 }
 
-// ── Operation enums ────────────────────────────────────────────────────────
-
 /// Scalar arithmetic operation applied element-wise to an entire column.
-///
 /// All ops operate on Float64 columns; other column types return an error.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarOp {
@@ -245,12 +201,6 @@ pub enum ScalarOp {
 
 impl ScalarOp {
     /// Parse a string into a `ScalarOp`.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<ScalarOp, String>`.
     pub fn parse(s: &str) -> Result<ScalarOp, String> {
         match s {
             "add" => Ok(ScalarOp::Add),
@@ -286,12 +236,6 @@ pub enum BinaryOp {
 
 impl BinaryOp {
     /// Parse a string into a `BinaryOp`.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<BinaryOp, String>`.
     pub fn parse(s: &str) -> Result<BinaryOp, String> {
         match s {
             "add" => Ok(BinaryOp::Add),
@@ -326,12 +270,6 @@ pub enum ReduceOp {
 
 impl ReduceOp {
     /// Parse a string into a `ReduceOp`.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<ReduceOp, String>`.
     pub fn parse(s: &str) -> Result<ReduceOp, String> {
         match s {
             "sum" => Ok(ReduceOp::Sum),
@@ -365,12 +303,6 @@ pub enum CmpOp {
 
 impl CmpOp {
     /// Parse a string into a `CmpOp`.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<CmpOp, String>`.
     pub fn parse(s: &str) -> Result<CmpOp, String> {
         match s {
             "<" | "lt" => Ok(CmpOp::Lt),
@@ -384,15 +316,11 @@ impl CmpOp {
     }
 }
 
-// ── VecFrame ───────────────────────────────────────────────────────────────
-
 /// Typed-column vectorized DataFrame.
-///
 /// Each column is a [`ColumnStore`] — a dense typed `Vec` with an optional
 /// null bitmap.  This layout enables:
 /// - Auto-vectorization (SIMD) by the compiler for `f64` / `i64` arithmetic.
 /// - Parallel multi-column operations via `rayon`.
-///
 /// Conversion helpers `VecFrame::from_dataframe` and `VecFrame::to_dataframe`
 /// bridge between the flexible `CellValue`-based API and this fast numeric layer.
 #[derive(Debug, Clone)]
@@ -403,9 +331,6 @@ pub struct VecFrame {
 
 impl VecFrame {
     /// Create an empty `VecFrame` with no columns.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self {
             column_names: Vec::new(),
@@ -414,58 +339,27 @@ impl VecFrame {
     }
 
     /// Return the number of rows.  All columns must have the same length;
-    /// this returns the length of the first column, or 0 if there are none.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn nrows(&self) -> usize {
         self.columns.first().map(|c| c.len()).unwrap_or(0)
     }
 
     /// Return the number of columns.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn ncols(&self) -> usize {
         self.column_names.len()
     }
 
     /// Return a slice of column names.
-    ///
-    /// # Returns
-    /// `&[String]`.
     pub fn columns(&self) -> &[String] {
         &self.column_names
     }
 
     /// Return the dtype name for a column, or `None` if the column is not found.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<&'static str>`.
     pub fn col_type(&self, col: &str) -> Option<&'static str> {
         let idx = self.resolve(col).ok()?;
         Some(self.columns[idx].dtype_name())
     }
 
-    // ── Conversion ─────────────────────────────────────────────────────────
-
     /// Convert a [`DataFrame`] into a `VecFrame`.
-    ///
-    /// Each column is inspected cell-by-cell to determine its dominant type:
-    /// - All numbers → `Float64`
-    /// - All booleans → `Bool`
-    /// - All strings → `Text`
-    /// - Mixed or anything with `Nil` → `Float64` with null validity if numeric,
-    ///   otherwise `Text` with null validity.
-    ///
-    /// # Parameters
-    /// - `df` — `&DataFrame`.
-    ///
-    /// # Returns
-    /// `VecFrame`.
     pub fn from_dataframe(df: &DataFrame) -> VecFrame {
         let mut vf = VecFrame::new();
         for (col_idx, name) in df.columns().iter().enumerate() {
@@ -480,12 +374,6 @@ impl VecFrame {
     }
 
     /// Convert this `VecFrame` back to a [`DataFrame`].
-    ///
-    /// Float64 and Int64 columns become `CellValue::Number`; Bool → `CellValue::Bool`;
-    /// Text → `CellValue::Text`; null rows become `CellValue::Nil`.
-    ///
-    /// # Returns
-    /// `DataFrame`.
     pub fn to_dataframe(&self) -> DataFrame {
         let nrows = self.nrows();
         let mut col_data: Vec<Vec<CellValue>> = Vec::with_capacity(self.columns.len());
@@ -509,15 +397,7 @@ impl VecFrame {
         DataFrame::from_raw(self.column_names.clone(), col_data)
     }
 
-    // ── Column resolution ─────────────────────────────────────────────────
-
     /// Resolve a column name to a 0-based index.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<usize, String>`.
     fn resolve(&self, col: &str) -> Result<usize, String> {
         self.column_names
             .iter()
@@ -525,20 +405,7 @@ impl VecFrame {
             .ok_or_else(|| format!("column not found: {col}"))
     }
 
-    // ── Scalar operations ─────────────────────────────────────────────────
-
     /// Apply a scalar operation to every element of a Float64 column in-place.
-    ///
-    /// The `val` parameter is ignored for unary ops (`Abs`, `Sqrt`, `Floor`,
-    /// `Ceil`, `Neg`); pass `0.0` for those.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    /// - `op` — `ScalarOp`.
-    /// - `val` — `f64`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
     pub fn col_scalar_op(&mut self, col: &str, op: ScalarOp, val: f64) -> Result<(), String> {
         let idx = self.resolve(col)?;
         if let ColumnStore::Float64 { data, validity } = &mut self.columns[idx] {
@@ -621,14 +488,6 @@ impl VecFrame {
     }
 
     /// Clamp every element of a Float64 column to `[min_val, max_val]` in-place.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    /// - `min_val` — `f64`.
-    /// - `max_val` — `f64`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
     pub fn col_clamp(&mut self, col: &str, min_val: f64, max_val: f64) -> Result<(), String> {
         let idx = self.resolve(col)?;
         if let ColumnStore::Float64 { data, validity } = &mut self.columns[idx] {
@@ -647,22 +506,7 @@ impl VecFrame {
         }
     }
 
-    // ── Binary column operations ──────────────────────────────────────────
-
     /// Compute `out_col[i] = left_col[i] op right_col[i]` for every row,
-    /// storing the result in a new column named `out_col`.
-    ///
-    /// If `out_col` already exists it is replaced.  Both source columns must
-    /// be `Float64`; if `right_col` is `Int64` it is promoted automatically.
-    ///
-    /// # Parameters
-    /// - `out_col` — `&str`.
-    /// - `left_col` — `&str`.
-    /// - `op` — `BinaryOp`.
-    /// - `right_col` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
     pub fn col_binary_op(
         &mut self,
         out_col: &str,
@@ -757,19 +601,7 @@ impl VecFrame {
         Ok(())
     }
 
-    // ── Reductions ────────────────────────────────────────────────────────
-
     /// Reduce an entire Float64 column to a single scalar.
-    ///
-    /// Null rows are skipped.  Returns `None` if the column is empty or has
-    /// no valid values.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    /// - `op` — `ReduceOp`.
-    ///
-    /// # Returns
-    /// `Result<Option<f64>, String>`.
     pub fn col_reduce(&self, col: &str, op: ReduceOp) -> Result<Option<f64>, String> {
         let idx = self.resolve(col)?;
         let vals = match &self.columns[idx] {
@@ -819,20 +651,7 @@ impl VecFrame {
         Ok(result)
     }
 
-    // ── Comparison filter ──────────────────────────────────────────────────
-
     /// Build a boolean row mask for `col[i] op val`.
-    ///
-    /// Null rows always produce `false` in the mask.  The returned `Vec<bool>`
-    /// has one element per row.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    /// - `op` — `CmpOp`.
-    /// - `val` — `f64`.
-    ///
-    /// # Returns
-    /// `Result<Vec<bool>, String>`.
     pub fn filter_mask(&self, col: &str, op: CmpOp, val: f64) -> Result<Vec<bool>, String> {
         let idx = self.resolve(col)?;
         let nrows = self.nrows();
@@ -862,13 +681,7 @@ impl VecFrame {
         Ok(mask)
     }
 
-    /// Return a new `VecFrame` containing only the rows where `mask[i]` is `true`.
-    ///
-    /// # Parameters
-    /// - `mask` — `&[bool]`.
-    ///
-    /// # Returns
-    /// `Result<VecFrame, String>`.
+    /// Return a new `VecFrame` containing only rows where `mask[i]` is `true`.
     pub fn apply_mask(&self, mask: &[bool]) -> Result<VecFrame, String> {
         if mask.len() != self.nrows() {
             return Err(format!(
@@ -884,23 +697,7 @@ impl VecFrame {
         })
     }
 
-    // ── Type casting ──────────────────────────────────────────────────────
-
     /// Cast a column to a new type.
-    ///
-    /// Supported casts:
-    /// - `Int64` → `Float64`
-    /// - `Float64` → `Int64` (truncating)
-    /// - `Float64` / `Int64` → `Text`
-    ///
-    /// Other combinations return an error.
-    ///
-    /// # Parameters
-    /// - `col` — `&str`.
-    /// - `dtype` — `&str` — `"float64"`, `"int64"`, or `"text"`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
     pub fn col_cast(&mut self, col: &str, dtype: &str) -> Result<(), String> {
         let idx = self.resolve(col)?;
         let nrows = self.nrows();
@@ -955,19 +752,7 @@ impl VecFrame {
         Ok(())
     }
 
-    // ── Parallel multi-column operations ─────────────────────────────────
-
     /// Reduce multiple columns in parallel using `rayon`, returning a map of
-    /// column name → result.
-    ///
-    /// Columns that are not numeric are silently skipped (they map to `None`).
-    ///
-    /// # Parameters
-    /// - `cols` — `&[&str]`.
-    /// - `op` — `ReduceOp`.
-    ///
-    /// # Returns
-    /// `HashMap<String, Option<f64>>`.
     pub fn par_reduce(&self, cols: &[&str], op: ReduceOp) -> HashMap<String, Option<f64>> {
         cols.par_iter()
             .map(|col| {
@@ -978,17 +763,6 @@ impl VecFrame {
     }
 
     /// Apply a scalar operation in parallel to multiple Float64 columns.
-    ///
-    /// Non-Float64 columns named in `cols` are returned as errors in the
-    /// combined error string; processing continues for other columns.
-    ///
-    /// # Parameters
-    /// - `cols` — `&[&str]`.
-    /// - `op` — `ScalarOp`.
-    /// - `val` — `f64`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
     pub fn par_scalar_op(&mut self, cols: &[&str], op: ScalarOp, val: f64) -> Result<(), String> {
         // Collect indices; validate first so we don't partially mutate on error.
         let indices: Result<Vec<usize>, String> = cols.iter().map(|c| self.resolve(c)).collect();
@@ -1033,8 +807,6 @@ impl Default for VecFrame {
         Self::new()
     }
 }
-
-// ── Private helpers ─────────────────────────────────────────────────────────
 
 /// Infer the `ColumnStore` type from a `Vec<CellValue>` column.
 fn infer_column(cells: &[CellValue]) -> ColumnStore {

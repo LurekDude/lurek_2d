@@ -8,6 +8,8 @@
 //! Both loaders produce a `Vec<Province>` that can be inserted into a `ProvinceGraph`.
 
 use crate::globe::types::{Province, ProvinceId};
+use crate::image::province_grid::ProvinceGrid;
+use crate::math::voronoi::voronoi_from_points;
 use std::collections::HashMap;
 
 // ── TOML province list ──────────────────────────────────────────────────────
@@ -275,8 +277,106 @@ fn strip_quotes(s: &str) -> &str {
 /// Full implementation requires a flood-fill connected-component analysis and a
 /// pixel → lat/lon coordinate transform (provided by the caller as a closure).
 pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
-    // TODO(globe/P2): implement PNG color-index loader.
-    // Requires: image decoding (image crate or raw pixel read), connected-component
-    // analysis per color, convex-hull or bounding-polygon extraction, lat/lon mapping.
-    Ok(Vec::new())
+    let grid = ProvinceGrid::from_file(_path)?;
+    let width = grid.width().max(1);
+    let height = grid.height().max(1);
+
+    let mut bounds: HashMap<ProvinceId, (u32, u32, u32, u32)> = HashMap::new();
+    for y in 0..height {
+        for x in 0..width {
+            let id = grid.get_at(x, y);
+            if id == 0 {
+                continue;
+            }
+            let e = bounds.entry(id).or_insert((x, y, x, y));
+            e.0 = e.0.min(x);
+            e.1 = e.1.min(y);
+            e.2 = e.2.max(x);
+            e.3 = e.3.max(y);
+        }
+    }
+
+    let mut neighbors: HashMap<ProvinceId, Vec<ProvinceId>> = HashMap::new();
+    for (a, b, _) in grid.adjacencies() {
+        neighbors.entry(*a).or_default().push(*b);
+        neighbors.entry(*b).or_default().push(*a);
+    }
+
+    let mut out = Vec::with_capacity(bounds.len());
+    for (id, (min_x, min_y, max_x, max_y)) in bounds {
+        let to_lon = |x: u32| (x as f32 / width as f32) * 360.0 - 180.0;
+        let to_lat = |y: u32| 90.0 - (y as f32 / height as f32) * 180.0;
+
+        let lat0 = to_lat(min_y);
+        let lat1 = to_lat(max_y);
+        let lon0 = to_lon(min_x);
+        let lon1 = to_lon(max_x);
+        let vertices = vec![(lat0, lon0), (lat0, lon1), (lat1, lon1), (lat1, lon0)];
+        let centroid = ((lat0 + lat1) * 0.5, (lon0 + lon1) * 0.5);
+        let p = Province::with_data(
+            id,
+            centroid,
+            vertices,
+            neighbors.remove(&id).unwrap_or_default(),
+            [0.5, 0.5, 0.5, 1.0],
+        );
+        out.push(p);
+    }
+    Ok(out)
+}
+
+/// Generate procedural provinces with a Voronoi tessellation.
+///
+/// Input points are `(lat_deg, lon_deg)` seed positions. The function returns one
+/// province per generated Voronoi cell with neighbor links inferred from edge sharing.
+pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
+    if points.is_empty() {
+        return Vec::new();
+    }
+    let pts_xy: Vec<(f32, f32)> = points.iter().map(|(lat, lon)| (*lon, *lat)).collect();
+    let cells = voronoi_from_points(&pts_xy);
+    let mut out = Vec::with_capacity(cells.len());
+
+    for (i, cell) in cells.iter().enumerate() {
+        let id = (i + 1) as u32;
+        let mut vertices = Vec::with_capacity(cell.vertices.len().max(3));
+        if cell.vertices.is_empty() {
+            let (x, y) = cell.site;
+            vertices.push((y - 0.5, x - 0.5));
+            vertices.push((y - 0.5, x + 0.5));
+            vertices.push((y + 0.5, x));
+        } else {
+            for (x, y) in &cell.vertices {
+                let lat = (*y).clamp(-90.0, 90.0);
+                let lon = (*x).clamp(-180.0, 180.0);
+                vertices.push((lat, lon));
+            }
+        }
+        let centroid = points.get(i).copied().unwrap_or((0.0, 0.0));
+        out.push(Province::with_data(
+            id,
+            centroid,
+            vertices,
+            Vec::new(),
+            [0.45, 0.45, 0.5, 1.0],
+        ));
+    }
+
+    // Lightweight neighbor inference by centroid proximity.
+    for i in 0..out.len() {
+        let (ilat, ilon) = out[i].centroid;
+        let mut nearest: Vec<(f32, u32)> = out
+            .iter()
+            .filter(|p| p.id != out[i].id)
+            .map(|p| {
+                let dlat = ilat - p.centroid.0;
+                let dlon = ilon - p.centroid.1;
+                (dlat * dlat + dlon * dlon, p.id)
+            })
+            .collect();
+        nearest.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+        out[i].neighbors = nearest.into_iter().take(4).map(|(_, id)| id).collect();
+    }
+
+    out
 }

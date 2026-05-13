@@ -185,7 +185,7 @@ impl LuaUserData for LuaProvinceGrid {
         /// Polygons are computed once on the first call and cached — subsequent calls
         /// only push the pre-built draw commands into the render queue.
         /// Optional viewport args `(x, y, w, h)` cull off-screen shapes in world/map space.
-        /// @return | nil | No value is returned.
+        /// @return | number | Number of polygon draw commands emitted.
         methods.add_method_mut("drawShapes", |_, this, args: LuaMultiValue| {
             let viewport = if args.is_empty() {
                 None
@@ -284,6 +284,7 @@ impl LuaUserData for LuaProvinceGrid {
 
             // --- push cached commands ---
             let saved_color = this.state.borrow().current_color;
+            let mut emitted = 0usize;
             {
                 let mut st = this.state.borrow_mut();
                 for entry in this.shape_cache.as_ref().unwrap() {
@@ -299,6 +300,7 @@ impl LuaUserData for LuaProvinceGrid {
                         mode: DrawMode::Fill,
                         vertices: entry.vertices.clone(),
                     });
+                    emitted += 1;
                 }
                 st.render_commands.push(RenderCommand::SetColor(
                     saved_color[0],
@@ -308,7 +310,7 @@ impl LuaUserData for LuaProvinceGrid {
                 ));
                 st.current_color = saved_color;
             }
-            Ok(())
+            Ok(emitted as u32)
         });
 
         // -- type --

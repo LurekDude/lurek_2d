@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- docs/cag: clarified that file-level Rustdoc should be wrapped into short readable lines near the ~600-character target instead of a single long line.
+
+- docs/cag: clarified Rust module file-level doc rules in `rust-coding` and `workflow-document-rust-module` so `//!` comments stay compact, describe file ownership only, and do not repeat in-file declarations.
+
+- procgen: completed remaining IDEA items with dungeon prefab stamping (`roomsDungeonWithPrefabs`, `bspDungeonWithPrefabs`), shared scalar->RGBA helper, `Heightmap::from_cellular`/`from_noise_map` (+ Lua `heightmapFromCellular`), and seeded parallel generation via `NoiseGenerator::generate_map_parallel` (+ Lua `noiseMapParallelSeeded`); synced spec/examples and regenerated Lua docs pipeline.
+
+- tilemap/terminal/serial/procgen/spine/sprite: implemented IDEA feature batch: maintained tile-type index cache + Lua queries (`tileTypeIndex`, `findTilesByGid`), ANSI 256/24-bit color parsing, serial extension-based format detection, biome classifier layer (`newBiomeClassifier`, `biomeColor`), spine animation helpers (`poseAt`, `reverse`, `animationFromJson`), and `library/sprite/sprite_animator.lua`; synced Lua/Rust tests, examples, specs, and regenerated docs/coverage reports.
+
+- globe: Implemented IDEA feature batch in `src/globe/` including atlas UV province texturing data, atmosphere halo rendering, float-driven heat layers, marker pulse/rotation animation, 3-state fog with base64 serialization, sector grouping, border smoothing, PNG province loader, Voronoi procedural generation helper, configurable auto-rotation speed, split-view composition helpers, channel-based state snapshot sync, raycast-style pick helper, and OBJ province mesh export. Synced Lua API (`src/lua_api/globe_api.rs`), Lua tests, Rust internal tests, examples, and globe spec.
+
+- app/runtime: Completed `src/app/IDEA.md` backlog by adding content hot-reload for Lua/assets (session restart without engine restart), optional Lua callback timeout (`[performance].lua_callback_timeout_ms`), extended frame profiling (`app_tick/update/render/total`), new `lurek.engine.getFrameProfileText()`, splash extraction to `src/app/splash_screen.rs`, removal of dead `src/app/app_winit.rs`, expanded Rust app tests, refreshed Lua tests/examples/docs, and regenerated coverage reports (Lua API + examples now 100%).
+
 - devtools/debugbridge: Added nonce + hello protocol negotiation, O(1) history buffers (`VecDeque`), adaptive bridge loop pacing, broadcast rate limiting, hot-reload trigger plumbing, and expanded Rust/Lua coverage for edge cases.
 
 - graph: Added persistent adjacency indexes in `Graph` and switched pathfinding/algorithm traversals from full-edge scans to indexed per-node expansion.

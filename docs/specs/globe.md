@@ -13,15 +13,21 @@
 
 The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a projection-correct rendering of a unit sphere divided into navigable named provinces. It is a Feature Systems tier module that works entirely through the engine's existing 2D `RenderCommand` variants (`DrawConvexFan`, `Polyline`, `Circle`, `Print`), adding no new wgpu pipeline or 3D draw calls (consistent with binding constraint A-03).
 
-**Province topology.** `ProvinceGraph` stores adjacency lists keyed by `ProvinceId` (u32). Each `Province` carries a vertex polygon in lat/lon degrees, centroid coordinates, a neighbour list, a free-form attribute `HashMap`, per-edge tag sets, an optional texture name, and a base RGBA colour. Up to `MAX_PROVINCES` (8192) provinces are supported per globe instance. `ProvinceGraph` supports A\* pathfinding between provinces, reachability analysis with configurable edge-tag filtering, and nearest-province queries for click-to-select interactions.
+**Province topology.** `ProvinceGraph` stores adjacency lists keyed by `ProvinceId` (u32). Each `Province` carries a vertex polygon in lat/lon degrees, centroid coordinates, a neighbour list, a free-form attribute `HashMap`, per-edge tag sets, optional texture metadata, and a base RGBA colour. Up to `MAX_PROVINCES` (8192) provinces are supported per globe instance. `ProvinceGraph` supports A\* pathfinding between provinces, reachability analysis with configurable edge-tag filtering, and nearest-province queries for click-to-select interactions.
 
 **Orbit camera.** `OrbitCamera` tracks lat/lon look-at position, zoom multiplier, and screen-centre offset. `build_view_matrix()` converts orbital parameters to the 2D projection matrix used by the draw pass. `project_province(id)` and `project_point(lat, lon)` map lat/lon coordinates to screen space under the current projection. `LodTier` (Far / Mid / Near) derives from zoom level and gates border detail, province label rendering, and marker rendering at three LOD levels so distant views stay uncluttered.
 
 **Day/night lighting.** The sun direction derives from `GlobeSpec.time_of_day` (0–24 h) and an `axial_tilt_deg` field. Each province receives a scalar intensity value with a soft terminator band computed in `lighting.rs`. The `ambient` floor prevents night-side provinces from going fully dark. The intensity value is applied as a brightness multiplier to the province's effective colour at draw time.
 
-**Fog of war.** `FogMask` is a compact 128 × u64 bit-vector giving O(1) reveal/hide per province. `FogStore` manages one `FogMask` per viewer entity, enabling multi-faction fog-of-war without per-frame heap allocation. `reveal(province_id)`, `hide(province_id)`, `is_revealed(province_id)`. Fog intensity modulates the province colour independently of the day/night lighting multiplier.
+**Fog of war.** `FogMask` now supports three states per province (`hidden`, `explored`, `visible`) and compact base64 serialization helpers for save/network transport. `FogStore` manages one `FogMask` per viewer entity, enabling multi-faction fog-of-war without per-frame heap allocation. Fog intensity modulates province colour independently of the day/night lighting multiplier.
 
-**Markers, labels, and overlay layers.** `MarkerStore` and `LabelStore` manage point-of-interest and text overlays with lifecycle tracking: `add(id, lat, lon, data)`, `remove(id)`, `update(id, data)`. `LayerStore` holds thematic overlay layers — political, terrain, heat-map, custom — and computes a blended `effective_color` for each province at draw time from base colour, overlay contributions, fog intensity, and day/night multiplier.
+**Markers, labels, and overlay layers.** `MarkerStore` and `LabelStore` manage point-of-interest and text overlays with lifecycle tracking: `add(id, lat, lon, data)`, `remove(id)`, `update(id, data)`. Marker styles include pulse and rotation animation fields. `LayerStore` plus `HeatLayer` overlays compute blended province colours from base colour, overlay contributions, fog intensity, and day/night multiplier.
+
+**Texture + atmosphere rendering.** Province draw commands emit atlas-backed UVs (no empty UV payload) and optional per-province texture keys. Atmosphere halo commands are emitted around the visible hemisphere using 2D draw calls only.
+
+**Procedural + tooling support.** `loader.rs` includes a real PNG province loader (ProvinceGrid-backed) plus Voronoi province generation helper. `export.rs` exports province polygons as OBJ text for procedural tools.
+
+**Strategic hooks and grouping.** `Globe` supports sector grouping (`set_province_sector`), cached faction reachability maps, split-screen multi-globe composition helpers (`composition.rs`), and channel-based snapshot sync (`sync.rs`).
 
 **Arc rendering.** `Arc` records great-circle routes or range-ring annotations between two lat/lon points. The draw module converts arcs to polyline sequences in screen space and emits `RenderCommand::Polyline` entries. Useful for trade routes, missile arcs, and influence boundaries.
 
@@ -37,7 +43,9 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 
 ## Files
 
+- `composition.rs`: Split-screen composition across multiple globes.
 - `draw.rs`: Frame emission for the globe module.
+- `export.rs`: Province mesh export helpers (OBJ).
 - `fog.rs`: Per-faction fog-of-war for the globe module.
 - `label.rs`: Generic label store for the globe module.
 - `layer.rs`: Named layer registry for the globe module.
@@ -50,6 +58,7 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `province_adapter.rs`: Globe ↔ province adapter (optional coupling layer).
 - `registry.rs`: Globe registry — per-named-globe container and multi-globe manager.
 - `topology.rs`: Province adjacency graph for the globe module.
+- `sync.rs`: Channel-based globe snapshot synchronization.
 - `types.rs`: Core value types for the globe module.
 
 ## Types
@@ -209,6 +218,8 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `lurek.globe.new`: Creates a new globe instance with default settings and empty collections.
 - `lurek.globe.get`: Get an existing globe by name, or nil.
 - `lurek.globe.loadFromTOML`: Load provinces from a TOML string and create a globe.
+- `lurek.globe.loadFromPNG`: Load provinces from a color-index PNG map and create a globe.
+- `lurek.globe.generateVoronoi`: Build procedural provinces from seed points and create a globe.
 - `lurek.globe.greatCircleDistance`: Great-circle distance between two lat/lon points (in unit-sphere radians).
 - `lurek.globe.greatCirclePath`: Great-circle path as a table of {lat, lon} pairs.
 - `lurek.globe.latLonToUnit`: Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.

@@ -7,9 +7,7 @@
 
 use std::f32::consts::PI;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ZoomPulse
-// ─────────────────────────────────────────────────────────────────────────────
+// ---- Type: ZoomPulse ----
 
 /// Zoom pulse effect — brief zoom-in that decays back to the original zoom via
 /// a sine envelope.
@@ -33,6 +31,8 @@ pub struct ZoomPulse {
     /// Elapsed time since the last trigger, in seconds.
     pub elapsed: f32,
 }
+
+// ---- Implementation: ZoomPulse ----
 
 impl ZoomPulse {
     /// Creates a new, inactive `ZoomPulse`.
@@ -107,15 +107,15 @@ impl ZoomPulse {
     }
 }
 
+// ---- Default Implementation ----
+
 impl Default for ZoomPulse {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CameraSway
-// ─────────────────────────────────────────────────────────────────────────────
+// ---- Type: CameraSway ----
 
 /// Camera sway — sinusoidal x/y offset oscillation for rocking or underwater
 /// effects.
@@ -148,6 +148,8 @@ pub struct CameraSway {
     /// frame when `decay < 1.0`.
     current_factor: f32,
 }
+
+// ---- Implementation: CameraSway ----
 
 impl CameraSway {
     /// Creates a new, inactive `CameraSway`.
@@ -241,15 +243,15 @@ impl CameraSway {
     }
 }
 
+// ---- Default Implementation ----
+
 impl Default for CameraSway {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CameraBreathing
-// ─────────────────────────────────────────────────────────────────────────────
+// ---- Type: CameraBreathing ----
 
 /// Camera breathing — subtle periodic zoom oscillation for a "living camera"
 /// feel.
@@ -273,6 +275,8 @@ pub struct CameraBreathing {
     /// Accumulated phase in radians.
     pub phase: f32,
 }
+
+// ---- Implementation: CameraBreathing ----
 
 impl CameraBreathing {
     /// Creates a new, inactive `CameraBreathing` with default parameters
@@ -342,6 +346,8 @@ impl CameraBreathing {
         self.active
     }
 }
+
+// ---- Default Implementation ----
 
 impl Default for CameraBreathing {
     fn default() -> Self {

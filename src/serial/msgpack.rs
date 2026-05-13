@@ -47,11 +47,28 @@ fn serial_to_msg(val: &SerialValue) -> MsgValue {
         SerialValue::Str(s) => MsgValue::Str(s.clone()),
         SerialValue::Seq(arr) => MsgValue::Seq(arr.iter().map(serial_to_msg).collect()),
         SerialValue::Map(map) => {
-            let mut hm = std::collections::HashMap::new();
+            let mut hm = std::collections::HashMap::with_capacity(map.len());
             for (k, v) in map {
                 hm.insert(k.clone(), serial_to_msg(v));
             }
             MsgValue::Map(hm)
+        }
+    }
+}
+
+fn estimate_msg_size(val: &MsgValue) -> usize {
+    match val {
+        MsgValue::Null => 1,
+        MsgValue::Bool(_) => 1,
+        MsgValue::Int(_) => 9,
+        MsgValue::Float(_) => 9,
+        MsgValue::Str(s) => 5 + s.len(),
+        MsgValue::Seq(items) => 5 + items.iter().map(estimate_msg_size).sum::<usize>(),
+        MsgValue::Map(map) => {
+            5 + map
+                .iter()
+                .map(|(k, v)| 5 + k.len() + estimate_msg_size(v))
+                .sum::<usize>()
         }
     }
 }
@@ -85,7 +102,10 @@ fn msg_to_serial(val: MsgValue) -> SerialValue {
 /// `Result<Vec<u8>, String>`.
 pub fn encode(val: &SerialValue) -> Result<Vec<u8>, String> {
     let mv = serial_to_msg(val);
-    let bytes = rmps::to_vec_named(&mv).map_err(|e| format!("MessagePack encode error: {e}"))?;
+    let mut bytes = Vec::with_capacity(estimate_msg_size(&mv));
+    let mut serializer = rmps::Serializer::new(&mut bytes).with_struct_map();
+    mv.serialize(&mut serializer)
+        .map_err(|e| format!("MessagePack encode error: {e}"))?;
     log_msg!(debug, SR05_MSGPACK_ENC);
     Ok(bytes)
 }

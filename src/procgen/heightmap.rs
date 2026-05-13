@@ -4,6 +4,7 @@
 //! shadow maps, or any application requiring smooth height data.
 
 use crate::procgen::noise::{FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
+use crate::procgen::scalar_map_to_rgba_bytes;
 
 /// Options for heightmap generation.
 ///
@@ -105,6 +106,41 @@ impl Heightmap {
         hm
     }
 
+    /// Builds a heightmap from an existing flat scalar array.
+    ///
+    /// Missing values are filled with `0.0` and excess values are ignored.
+    pub fn from_noise_map(width: u32, height: u32, values: &[f64]) -> Self {
+        let len = (width * height) as usize;
+        let mut cells = Vec::with_capacity(len);
+        for i in 0..len {
+            cells.push(values.get(i).copied().unwrap_or(0.0) as f32);
+        }
+        let mut hm = Self {
+            width,
+            height,
+            cells,
+        };
+        hm.normalize();
+        hm
+    }
+
+    /// Converts a cellular map (`0`/`1`) into a normalized heightmap.
+    ///
+    /// Cells equal to `floor_value` become 0.0, all others become 1.0.
+    pub fn from_cellular(width: u32, height: u32, cells: &[u8], floor_value: u8) -> Self {
+        let len = (width * height) as usize;
+        let mut out = Vec::with_capacity(len);
+        for i in 0..len {
+            let v = cells.get(i).copied().unwrap_or(floor_value);
+            out.push(if v == floor_value { 0.0 } else { 1.0 });
+        }
+        Self {
+            width,
+            height,
+            cells: out,
+        }
+    }
+
     /// Get the elevation at `(x, y)`, clamped to valid range.
     ///
     /// # Parameters
@@ -182,14 +218,6 @@ impl Heightmap {
     /// # Returns
     /// `Vec<u8>`.
     pub fn to_rgba_bytes(&self) -> Vec<u8> {
-        let mut out = Vec::with_capacity(self.cells.len() * 4);
-        for &v in &self.cells {
-            let gray = (v.clamp(0.0, 1.0) * 255.0) as u8;
-            out.push(gray);
-            out.push(gray);
-            out.push(gray);
-            out.push(255);
-        }
-        out
+        scalar_map_to_rgba_bytes(&self.cells)
     }
 }

@@ -15,6 +15,30 @@ do -- lurek.tilemap.newTileSet
   lurek.log.info("grass tileset gid range " .. grass:getFirstGid() .. ".." .. (grass:getFirstGid() + grass:getTileCount() - 1), "tilemap")
 end
 
+--@api-stub: LTileMap:tileTypeIndex
+-- Returns gid->positions map for quick type queries.
+do -- LTileMap:tileTypeIndex
+  local map = lurek.tilemap.newTileMap(16, 16, 8)
+  map:addLayer("ground", 4, 4)
+  map:setTile(1, 1, 1, 7)
+  map:setTile(1, 2, 1, 7)
+  local idx = map:tileTypeIndex(1)
+  if idx[7] then
+    lurek.log.debug("gid 7 count=" .. #idx[7], "tilemap")
+  end
+end
+
+--@api-stub: LTileMap:findTilesByGid
+-- Returns all positions for a single gid.
+do -- LTileMap:findTilesByGid
+  local map = lurek.tilemap.newTileMap(16, 16, 8)
+  map:addLayer("ground", 4, 4)
+  map:setTile(1, 0, 0, 3)
+  map:setTile(1, 3, 3, 3)
+  local pos = map:findTilesByGid(1, 3)
+  lurek.log.info("found gid=3 at " .. #pos .. " positions", "tilemap")
+end
+
 --@api-stub: lurek.tilemap.newTileMap
 -- Creates a new TileMap with the given tile size and chunk size.
 -- Tile size is in pixels; chunk size groups tiles for spatial culling and defaults to 16 if omitted.

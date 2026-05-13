@@ -1,9 +1,6 @@
-//! Data compression and decompression using deflate, gzip, zlib, and LZ4.
-//!
-//! All four formats operate on whole byte buffers. `compress()` and `decompress()`
-//! are the primary entry points; LZ4 uses `lz4_flex` (block mode, size-prepended),
-//! while deflate/gzip/zlib use `flate2` with configurable compression level 0–9.
-//! For chunked I/O pipelines, use `compress_stream()` / `decompress_stream()`.
+//! Scope: Byte-buffer compression and decompression.
+//! This file defines compression formats and buffer/stream helpers.
+//! It owns codec selection, chunked I/O handling, and compression levels.
 
 use std::io::{Cursor, Read, Write};
 

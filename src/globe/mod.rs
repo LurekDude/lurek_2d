@@ -31,6 +31,10 @@
 
 /// Globe rendering and frame emitting operations.
 pub mod draw;
+/// Split-screen composition helpers for multiple globe views.
+pub mod composition;
+/// Province mesh export helpers for tooling.
+pub mod export;
 /// Fog of war subsystem for the globe.
 pub mod fog;
 /// Text labels plotted on the globe surface.
@@ -55,13 +59,16 @@ pub mod registry;
 pub mod topology;
 /// Foundational data definitions for the globe.
 pub mod types;
+/// Channel-based state synchronization for globe snapshots.
+pub mod sync;
 
 // ── Re-exports ───────────────────────────────────────────────────────────────
 pub use fog::{FogMask, FogStore};
 pub use picking::PickResult;
 pub use projection::OrbitCamera;
 pub use registry::{Globe, GlobeRegistry};
+pub use sync::{GlobeSyncChannel, GlobeSyncSnapshot};
 pub use types::{
-    GlobeError, GlobeSpec, Label, LabelStyle, Layer, LodTier, Marker, MarkerShape, MarkerStyle,
-    Province, ProvinceId, MAX_PROVINCES,
+    FogState, GlobeError, GlobeSpec, HeatLayer, Label, LabelStyle, Layer, LodTier, Marker,
+    MarkerShape, MarkerStyle, Province, ProvinceId, MAX_PROVINCES,
 };

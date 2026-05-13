@@ -37,6 +37,32 @@ pub struct BspDungeon {
     pub corridors: Vec<(u32, u32, u32, u32)>,
 }
 
+/// Stamp template that can be projected onto BSP rooms.
+#[derive(Debug, Clone)]
+pub struct BspPrefabStamp {
+    /// Prefab identifier.
+    pub name: String,
+    /// Prefab width in cells.
+    pub width: u32,
+    /// Prefab height in cells.
+    pub height: u32,
+}
+
+/// Placement metadata for a BSP prefab projection.
+#[derive(Debug, Clone)]
+pub struct PlacedBspPrefab {
+    /// Prefab identifier.
+    pub name: String,
+    /// Placement origin X in dungeon space.
+    pub x: u32,
+    /// Placement origin Y in dungeon space.
+    pub y: u32,
+    /// Placement width.
+    pub width: u32,
+    /// Placement height.
+    pub height: u32,
+}
+
 /// Options controlling BSP dungeon generation.
 ///
 /// # Fields
@@ -104,6 +130,42 @@ pub fn bsp_dungeon(opts: &BspOpts) -> BspDungeon {
     );
 
     BspDungeon { rooms, corridors }
+}
+
+/// Generates a BSP dungeon and returns prefab placements centered in rooms.
+///
+/// This function produces placement metadata only; callers decide how to stamp
+/// into concrete tile grids.
+pub fn bsp_dungeon_with_prefabs(
+    opts: &BspOpts,
+    prefabs: &[BspPrefabStamp],
+) -> (BspDungeon, Vec<PlacedBspPrefab>) {
+    let dungeon = bsp_dungeon(opts);
+    let mut placements = Vec::new();
+    if prefabs.is_empty() {
+        return (dungeon, placements);
+    }
+
+    for (i, room) in dungeon.rooms.iter().enumerate() {
+        let prefab = &prefabs[i % prefabs.len()];
+        if prefab.width == 0 || prefab.height == 0 {
+            continue;
+        }
+        if prefab.width > room.w || prefab.height > room.h {
+            continue;
+        }
+        let x = room.x + (room.w - prefab.width) / 2;
+        let y = room.y + (room.h - prefab.height) / 2;
+        placements.push(PlacedBspPrefab {
+            name: prefab.name.clone(),
+            x,
+            y,
+            width: prefab.width,
+            height: prefab.height,
+        });
+    }
+
+    (dungeon, placements)
 }
 
 #[derive(Clone)]

@@ -1,27 +1,14 @@
-//! 2D spatial operations and linear algebra for NdArray.
-//!
-//! This module is part of Lurek2D's `compute` subsystem and provides the implementation
-//! details for spatial-related operations and data management.
-//! Primary functions: `convolve2d()`, `dilate()`, `erode()`, `flood_fill()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+﻿//! Spatial owns 2D neighborhood operations for NdArray grids.
+//! It implements convolution, morphology, flood fill, region copy,
+//! matrix multiplication, and vector dot products on row-major buffers.
 
 use std::collections::VecDeque;
 
 use crate::compute::array::{DataType, NdArray};
 
-/// 2D convolution with zero-padding (same-size output).
-///
-/// # Parameters
-/// - `input` — `&NdArray`.
-/// - `kernel` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// The kernel center is at `(kR/2, kC/2)`. Both input and kernel must
-/// be 2D arrays. Output shape equals input shape.
+// Convolution.
+
+/// Convolve a 2D input with zero padding and return an output with identical shape.
 pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if input.ndim() != 2 {
         return Err(format!(
@@ -71,17 +58,9 @@ pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> 
     Ok(out)
 }
 
-/// Morphological dilation with a Manhattan-diamond structuring element.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `radius` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// For each cell, output is 1.0 if any cell within Manhattan distance `radius`
-/// is non-zero in the input, 0.0 otherwise. Input must be 2D.
+// Morphological operations.
+
+/// Dilate nonzero cells with a Manhattan-radius neighborhood and return a 0/1 field.
 pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("dilate: input must be 2D, got {}D", a.ndim()));
@@ -118,17 +97,7 @@ pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Morphological erosion with a Manhattan-diamond structuring element.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `radius` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// For each cell, output is 1.0 only if all cells within Manhattan distance
-/// `radius` are non-zero in the input, 0.0 otherwise. Input must be 2D.
+/// Erode nonzero cells with a Manhattan-radius neighborhood and return a 0/1 field.
 pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("erode: input must be 2D, got {}D", a.ndim()));
@@ -171,20 +140,7 @@ pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Flood fill using BFS with 4-connectivity.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `row` — `usize`.
-/// - `col` — `usize`.
-/// - `val` — `f64`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// Starting from `(row, col)`, fills all connected cells that have the same
-/// value as the starting cell with `val`. Returns a new array (does not
-/// mutate the original). Indices are 0-based.
+/// Flood-fill 4-connected cells from a seed and return the modified copy.
 pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("flood_fill: input must be 2D, got {}D", a.ndim()));
@@ -200,7 +156,7 @@ pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArr
     let mut out = a.clone();
     let target = out.get_f64(out.flat_index(&[row, col]).expect("index in bounds"));
 
-    // If fill value equals target, nothing to do.
+    // Exit early when target and fill values are equal.
     if (target - val).abs() < f64::EPSILON {
         return Ok(out);
     }
@@ -229,20 +185,7 @@ pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArr
     Ok(out)
 }
 
-/// Extract a rectangular sub-region from a 2D array.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `row` — `usize`.
-/// - `col` — `usize`.
-/// - `sub_rows` — `usize`.
-/// - `sub_cols` — `usize`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// Returns a new 2D array of shape `(sub_rows, sub_cols)` starting at `(row, col)`.
-/// All indices are 0-based.
+/// Copy a rectangular region into a new 2D array.
 pub fn get_region(
     a: &NdArray,
     row: usize,
@@ -275,18 +218,7 @@ pub fn get_region(
     Ok(out)
 }
 
-/// Copy a source 2D array into a target 2D array at position `(row, col)`.
-///
-/// # Parameters
-/// - `a` — `&mut NdArray`.
-/// - `row` — `usize`.
-/// - `col` — `usize`.
-/// - `src` — `&NdArray`.
-///
-/// # Returns
-/// `Result<(), String>`.
-///
-/// Modifies `a` in-place. All indices are 0-based.
+/// Write a source 2D block into a target 2D array at the requested offset.
 pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Result<(), String> {
     if a.ndim() != 2 {
         return Err(format!("set_region: target must be 2D, got {}D", a.ndim()));
@@ -317,16 +249,7 @@ pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Res
     Ok(())
 }
 
-/// Matrix multiplication of two 2D arrays: (m,k) × (k,n) → (m,n).
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<NdArray, String>`.
-///
-/// Uses a naive triple loop. Both arrays must be 2D with compatible inner dimensions.
+/// Multiply two 2D matrices with compatible inner dimensions and return the product.
 pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!(
@@ -346,7 +269,7 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     let n = b.shape()[1];
     if k_a != k_b {
         return Err(format!(
-            "matmul: inner dimensions mismatch: ({m},{k_a}) × ({k_b},{n})"
+            "matmul: inner dimensions mismatch: ({m},{k_a}) Ă— ({k_b},{n})"
         ));
     }
 
@@ -370,14 +293,7 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 
-/// Dot product of two 1D arrays (same length). Returns a scalar.
-///
-/// # Parameters
-/// - `a` — `&NdArray`.
-/// - `b` — `&NdArray`.
-///
-/// # Returns
-/// `Result<f64, String>`.
+/// Compute dot product of two equal-length 1D arrays and return the scalar result.
 pub fn dot(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     if a.ndim() != 1 {
         return Err(format!("dot: first operand must be 1D, got {}D", a.ndim()));

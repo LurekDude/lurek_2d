@@ -143,3 +143,14 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 
 - Keep this module reference synchronized with `src/spine/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### 2026-05-12 Update
+
+- Added `SkeletonAnimation` helpers in `src/spine/timeline.rs`:
+	- `pose_at(time)` (non-mutating pose snapshot)
+	- `reverse()` (time-mirrored clip clone)
+	- `from_json(&serde_json::Value)`
+- Exposed in Lua API:
+	- `LSkeletonAnimation:poseAt(time)`
+	- `LSkeletonAnimation:reverse()`
+	- `lurek.spine.animationFromJson(json)`

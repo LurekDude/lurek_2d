@@ -1290,4 +1290,36 @@ mod tilemap_core_tests {
         assert_eq!(tx, 0);
         assert_eq!(ty, 0);
     }
+
+    #[test]
+    fn tile_type_index_updates_on_set_and_clear() {
+        let mut map = TileMap::new(16, 16, 4);
+        map.add_layer("ground", 4, 4);
+
+        map.set_tile(0, 1, 1, 7);
+        map.set_tile(0, 2, 2, 7);
+        let idx = map.tile_type_index(0);
+        assert_eq!(idx.get(&7).map(|v| v.len()), Some(2));
+
+        map.clear_tile(0, 1, 1);
+        let idx2 = map.tile_type_index(0);
+        let positions = idx2.get(&7).cloned().unwrap_or_default();
+        assert_eq!(positions, vec![(2, 2)]);
+    }
+
+    #[test]
+    fn tile_type_index_updates_on_fill() {
+        let mut map = TileMap::new(16, 16, 4);
+        map.add_layer("ground", 3, 2);
+        map.fill(0, 9);
+
+        let by_gid = map.find_tiles_by_gid(0, 9);
+        assert_eq!(by_gid.len(), 6);
+        assert!(by_gid.contains(&(0, 0)));
+        assert!(by_gid.contains(&(2, 1)));
+
+        map.fill(0, 0);
+        assert!(map.find_tiles_by_gid(0, 9).is_empty());
+        assert!(map.tile_type_index(0).is_empty());
+    }
 }

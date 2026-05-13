@@ -1,13 +1,6 @@
-﻿//! Query engine for [`DataFrame`].
-//!
-//! Split into focused sub-modules:
-//!
-//! | Sub-module    | Responsibility |
-//! |---------------|----------------|
-//! | [`filter`]    | Filter, sort, join, aggregation, sampling, nil-handling, batch helpers |
-//! | [`window`]    | Rolling window ops and derived columns (rank, pct_change, cumsum) |
-//! | [`grouping`]  | Group aggregation, pivot tables, and correlation |
-//! | [`analytics`] | Normalisation, outlier detection, mode, entropy, and `percentile` |
+﻿//! Scope: Query engine sub-modules for filtering, grouping, analytics, and windowing.
+//! This file re-exports the public sub-modules and the percentile helper.
+//! It owns query implementation organization across filter, grouping, analytics, and window.
 
 pub mod analytics;
 pub mod filter;

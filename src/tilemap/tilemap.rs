@@ -121,6 +121,7 @@ pub struct TileMap {
     orientation: MapOrientation,
     tilesets: Vec<TileSet>,
     layers: Vec<TileLayer>,
+    tile_type_index_cache: Vec<HashMap<u32, Vec<(u32, u32)>>>,
     viewport: Option<Rect>,
     anim_timers: HashMap<u32, (usize, f32)>,
 }
@@ -155,6 +156,7 @@ impl TileMap {
             orientation: MapOrientation::TopDown,
             tilesets: Vec::new(),
             layers: Vec::new(),
+            tile_type_index_cache: Vec::new(),
             viewport: None,
             anim_timers: HashMap::new(),
         }
@@ -208,6 +210,7 @@ impl TileMap {
     pub fn add_layer(&mut self, name: &str, width: u32, height: u32) -> usize {
         log_msg!(debug, TM03_LAYER_ADD, "{}", name);
         self.layers.push(TileLayer::new(name, width, height));
+        self.tile_type_index_cache.push(HashMap::new());
         self.layers.len() - 1
     }
 
@@ -350,7 +353,16 @@ impl TileMap {
     pub fn set_tile(&mut self, layer: usize, x: u32, y: u32, gid: u32) {
         if let Some(l) = self.layers.get_mut(layer) {
             if let Some(idx) = l.index(x, y) {
+                let old_gid = l.tiles[idx];
                 l.tiles[idx] = gid;
+                if let Some(layer_index) = self.tile_type_index_cache.get_mut(layer) {
+                    if old_gid != 0 {
+                        remove_pos_from_gid(layer_index, old_gid, x, y);
+                    }
+                    if gid != 0 {
+                        layer_index.entry(gid).or_default().push((x, y));
+                    }
+                }
             }
         }
     }
@@ -412,7 +424,56 @@ impl TileMap {
             for tile in l.tiles.iter_mut() {
                 *tile = gid;
             }
+            if let Some(layer_index) = self.tile_type_index_cache.get_mut(layer) {
+                layer_index.clear();
+                if gid != 0 {
+                    let mut positions = Vec::with_capacity((l.width * l.height) as usize);
+                    for y in 0..l.height {
+                        for x in 0..l.width {
+                            positions.push((x, y));
+                        }
+                    }
+                    layer_index.insert(gid, positions);
+                }
+            }
         }
+    }
+
+    /// Builds a GID → positions index for a single layer.
+    ///
+    /// Scans every cell in `layer` and returns a map from each non-zero GID to
+    /// the list of `(x, y)` positions that contain that GID. This is O(W × H)
+    /// for the scan and useful for collision setup, pathfinding seeding, or any
+    /// "find all tiles of type T" query.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`. Layer index.
+    ///
+    /// # Returns
+    /// `HashMap<u32, Vec<(u32, u32)>>`. Maps each GID to a list of (x, y) tile positions.
+    pub fn tile_type_index(&self, layer: usize) -> HashMap<u32, Vec<(u32, u32)>> {
+        self.tile_type_index_cache
+            .get(layer)
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    /// Returns all `(x, y)` positions in `layer` where the tile GID matches `gid`.
+    ///
+    /// This is a convenience wrapper around [`tile_type_index`] for single-GID queries.
+    /// Use [`tile_type_index`] when you need positions for many GIDs at once.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`. Layer index.
+    /// - `gid` — `u32`. GID to search for.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`. List of (x, y) positions containing the given GID.
+    pub fn find_tiles_by_gid(&self, layer: usize, gid: u32) -> Vec<(u32, u32)> {
+        self.tile_type_index_cache
+            .get(layer)
+            .and_then(|idx| idx.get(&gid).cloned())
+            .unwrap_or_default()
     }
 
     // ------------------------------------------------------------------
@@ -1205,6 +1266,22 @@ impl TileMap {
             grid.push(row);
         }
         grid
+    }
+}
+
+fn remove_pos_from_gid(
+    layer_index: &mut HashMap<u32, Vec<(u32, u32)>>,
+    gid: u32,
+    x: u32,
+    y: u32,
+) {
+    if let Some(list) = layer_index.get_mut(&gid) {
+        if let Some(pos_idx) = list.iter().position(|&(px, py)| px == x && py == y) {
+            list.swap_remove(pos_idx);
+        }
+        if list.is_empty() {
+            layer_index.remove(&gid);
+        }
     }
 }
 

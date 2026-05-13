@@ -1,20 +1,12 @@
-//! Filter, sort, join, sampling, aggregation, and nil-handling methods.
+//! Scope: DataFrame filtering, sorting, joining, and aggregation operations.
+//! This file defines filter/sort/join/sample methods on DataFrame via extensions.
+//! It owns query predicate evaluation, batch helpers, and join semantics.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 use crate::dataframe::rng::Xorshift64;
 
 impl DataFrame {
     /// Filter rows where `col op val` is true.
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef`.
-    /// - `op` — `&str`.
-    /// - `val` — `&CellValue`.
-    ///
-    /// # Returns
-    /// `Result<DataFrame, String>`.
-    ///
-    /// Supported ops: `==`, `!=`, `<`, `<=`, `>`, `>=`, `contains`.
     pub fn filter(&self, col: ColRef, op: &str, val: &CellValue) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -52,13 +44,6 @@ impl DataFrame {
     }
 
     /// Sort by column, stable sort. Nils sort to end.
-    ///
-    /// # Parameters
-    /// - `col` — `ColRef`.
-    /// - `ascending` — `bool`.
-    ///
-    /// # Returns
-    /// `Result<DataFrame, String>`.
     pub fn sort(&self, col: ColRef, ascending: bool) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -133,8 +118,6 @@ impl DataFrame {
     }
 
     /// Group rows by the value in a column.
-    ///
-    /// Returns `(group_key, sub-DataFrame)` pairs in encounter order.
     pub fn group_by(&self, col: ColRef) -> Result<Vec<(CellValue, DataFrame)>, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -155,8 +138,6 @@ impl DataFrame {
     }
 
     /// Join with another DataFrame on matching key columns.
-    ///
-    /// `join_type`: `"inner"` or `"left"`.
     pub fn join(
         &self,
         other: &DataFrame,
@@ -248,7 +229,7 @@ impl DataFrame {
         }
     }
 
-    /// Count distinct values — returns a `(value, count)` DataFrame.
+    /// Count distinct values in a column; return a `(value, count)` DataFrame.
     pub fn count_by(&self, col: ColRef) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -368,9 +349,6 @@ impl DataFrame {
     }
 
     /// Descriptive statistics for all numeric columns.
-    ///
-    /// Returns a DataFrame with a `"stat"` label column (count/mean/std/min/25%/50%/75%/max)
-    /// and one numeric column per source numeric column.
     pub fn describe(&self) -> DataFrame {
         let cols = self.columns();
         let data = self.raw_data();
@@ -500,8 +478,6 @@ impl DataFrame {
     }
 
     /// Set all rows of a numeric column from a `Vec<f64>` (NaN → Nil).
-    ///
-    /// The slice length must equal `nrows()`.
     pub fn set_column_from_f64(&mut self, col: ColRef, values: Vec<f64>) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();

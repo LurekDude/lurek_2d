@@ -1,8 +1,6 @@
-//! Contiguous byte buffer for binary data manipulation.
-//!
-//! [`ByteData`] wraps a `Vec<u8>` with indexed get/set operations and string
-//! conversion. It is the primary mutable byte container in the engine, used by
-//! pack/unpack, compression, and the Lua `lurek.data.newByteData()` API.
+//! Scope: Contiguous byte buffer utilities.
+//! This file defines the ByteData type and byte/string conversion helpers.
+//! It owns mutable byte storage used by pack/unpack and compression APIs.
 
 /// Contiguous byte buffer for binary data manipulation.
 ///

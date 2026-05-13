@@ -1,13 +1,15 @@
-//! Helper wrappers for calling optional `lurek.*` Lua callbacks.
-//!
-//! The app loop uses these helpers to keep callback invocation behavior
-//! consistent across startup, frame update, and event paths.
+//! Scope: Lua callback invocation helpers for the app loop.
+//! This file defines checked and unchecked callback wrappers with optional timeout control.
+//! It owns consistent missing-callback handling and timeout enforcement at callback boundaries.
 
 use std::time::{Duration, Instant};
 
 use mlua::prelude::*;
 use mlua::HookTriggers;
 
+// ---- Helper Functions: Lua Callback Invocation ----
+
+/// Calls a named `lurek.*` callback and logs any runtime error.
 pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -18,6 +20,7 @@ pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(
     }
 }
 
+/// Calls a named `lurek.*` callback and returns any Lua error to the caller.
 pub fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,

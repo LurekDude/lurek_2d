@@ -1,40 +1,23 @@
-//! Core NdArray type and DataType enum.
-//!
-//! This module is part of Lurek2D's `compute` subsystem and provides the implementation
-//! details for array-related operations and data management.
-//! Key types exported from this module: `DataType`, `NdArray`.
-//! Primary functions: `parse()`, `byte_size()`, `name()`, `new()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+﻿//! Array owns dense row-major storage and indexing rules for compute.
+//! It defines dtype metadata, stride math, shape validation, and
+//! typed read/write helpers over a contiguous little-endian byte buffer.
 
-/// Maximum number of elements allowed in a single NdArray.
+/// Cap element count for one array allocation.
 const MAX_ELEMENTS: usize = 268_435_456;
 
-/// Element data type for an NdArray.
-///
-/// # Variants
-/// - `Float32` — Float32 variant.
-/// - `Float64` — Float64 variant.
-/// - `Int32` — Int32 variant.
+/// Identify scalar encoding stored in NdArray bytes.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DataType {
-    /// 32-bit IEEE 754 floating point (4 bytes).
+    /// Store one 32-bit IEEE 754 float.
     Float32,
-    /// 64-bit IEEE 754 floating point (8 bytes).
+    /// Store one 64-bit IEEE 754 float.
     Float64,
-    /// 32-bit signed integer (4 bytes).
+    /// Store one 32-bit signed integer.
     Int32,
 }
 
 impl DataType {
-    /// Parse a dtype from a string name (`"float32"`, `"float64"`, `"int32"`).
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Parse a lowercase dtype token and return the matching DataType.
     pub fn parse(s: &str) -> Result<Self, String> {
         match s {
             "float32" => Ok(DataType::Float32),
@@ -46,10 +29,7 @@ impl DataType {
         }
     }
 
-    /// Number of bytes per element for this dtype.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Return byte width for one element of this dtype.
     pub fn byte_size(self) -> usize {
         match self {
             DataType::Float32 => 4,
@@ -58,10 +38,7 @@ impl DataType {
         }
     }
 
-    /// Human-readable name for this dtype.
-    ///
-    /// # Returns
-    /// `&'static str`.
+    /// Return canonical lowercase dtype name.
     pub fn name(self) -> &'static str {
         match self {
             DataType::Float32 => "float32",
@@ -71,45 +48,26 @@ impl DataType {
     }
 }
 
-/// Dense N-dimensional numerical array with row-major strides.
-///
-/// Data is stored as a contiguous `Vec<u8>` byte buffer with a hard cap
-/// of 268,435,456 elements.
-///
-/// # Fields
-/// - `shape` — `Vec<usize>`.
-/// - `strides` — `Vec<usize>`.
-/// - `dtype` — `DataType`.
-/// - `data` — `Vec<u8>`.
+/// Hold dense row-major values with shape, strides, and dtype metadata.
 #[derive(Debug, Clone)]
 pub struct NdArray {
+    /// Store axis lengths in logical order.
     shape: Vec<usize>,
+    /// Store row-major strides for flat indexing.
     strides: Vec<usize>,
+    /// Store element encoding used by data.
     dtype: DataType,
+    /// Store contiguous little-endian element bytes.
     data: Vec<u8>,
 }
 
 impl NdArray {
-    /// Create a new zero-initialized NdArray with the given shape and dtype.
-    ///
-    /// # Parameters
-    /// - `shape` — `&[usize]`.
-    /// - `dtype` — `DataType`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Allocate a zeroed array for the requested shape and dtype.
     pub fn new(shape: &[usize], dtype: DataType) -> Result<Self, String> {
         Self::zeros(shape, dtype)
     }
 
-    /// Create a zero-initialized NdArray.
-    ///
-    /// # Parameters
-    /// - `shape` — `&[usize]`.
-    /// - `dtype` — `DataType`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Allocate a zeroed array after validating shape and element count.
     pub fn zeros(shape: &[usize], dtype: DataType) -> Result<Self, String> {
         Self::validate_shape(shape)?;
         let total = Self::element_count(shape);
@@ -124,14 +82,7 @@ impl NdArray {
         })
     }
 
-    /// Create an NdArray filled with ones (1.0 for floats, 1 for int32).
-    ///
-    /// # Parameters
-    /// - `shape` — `&[usize]`.
-    /// - `dtype` — `DataType`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Allocate an array and fill every element with numeric one.
     pub fn ones(shape: &[usize], dtype: DataType) -> Result<Self, String> {
         let mut arr = Self::zeros(shape, dtype)?;
         let total = arr.size();
@@ -141,16 +92,7 @@ impl NdArray {
         Ok(arr)
     }
 
-    /// Create a 1D NdArray with values from `start` to `stop` (exclusive) with given step.
-    ///
-    /// # Parameters
-    /// - `start` — `f64`.
-    /// - `stop` — `f64`.
-    /// - `step` — `f64`.
-    /// - `dtype` — `DataType`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Build a 1D range array and return error for invalid step or size.
     pub fn range(start: f64, stop: f64, step: f64, dtype: DataType) -> Result<Self, String> {
         if step == 0.0 {
             return Err("step must not be zero".to_string());
@@ -171,15 +113,7 @@ impl NdArray {
         Ok(arr)
     }
 
-    /// Create an NdArray from a slice of f64 values, converting to the target dtype.
-    ///
-    /// # Parameters
-    /// - `values` — `&[f64]`.
-    /// - `shape` — `&[usize]`.
-    /// - `dtype` — `DataType`.
-    ///
-    /// # Returns
-    /// `Result<Self, String>`.
+    /// Build an array from f64 input values converted into target dtype.
     pub fn from_slice(values: &[f64], shape: &[usize], dtype: DataType) -> Result<Self, String> {
         Self::validate_shape(shape)?;
         let total = Self::element_count(shape);
@@ -196,13 +130,7 @@ impl NdArray {
         Ok(arr)
     }
 
-    /// Read element at flat index as f64 (works for any dtype).
-    ///
-    /// # Parameters
-    /// - `flat` — `usize`.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Read one flat element as f64 regardless of stored dtype.
     pub fn get_f64(&self, flat: usize) -> f64 {
         let offset = flat * self.dtype.byte_size();
         match self.dtype {
@@ -227,11 +155,7 @@ impl NdArray {
         }
     }
 
-    /// Write a value (as f64) to the flat index, converting to the array's dtype.
-    ///
-    /// # Parameters
-    /// - `flat` — `usize`.
-    /// - `val` — `f64`.
+    /// Write one flat element from f64 converted into array dtype.
     pub fn set_f64(&mut self, flat: usize, val: f64) {
         let offset = flat * self.dtype.byte_size();
         match self.dtype {
@@ -250,13 +174,7 @@ impl NdArray {
         }
     }
 
-    /// Read element at flat index as i32. Only meaningful for Int32 arrays.
-    ///
-    /// # Parameters
-    /// - `flat` — `usize`.
-    ///
-    /// # Returns
-    /// `i32`.
+    /// Read one flat Int32 element as i32.
     pub fn get_i32(&self, flat: usize) -> i32 {
         let offset = flat * self.dtype.byte_size();
         let bytes: [u8; 4] = self.data[offset..offset + 4]
@@ -265,27 +183,14 @@ impl NdArray {
         i32::from_le_bytes(bytes)
     }
 
-    /// Write an i32 value at the flat index. Only meaningful for Int32 arrays.
-    ///
-    /// # Parameters
-    /// - `flat` — `usize`.
-    /// - `val` — `i32`.
+    /// Write one flat Int32 element from i32 value.
     pub fn set_i32(&mut self, flat: usize, val: i32) {
         let offset = flat * self.dtype.byte_size();
         let bytes = val.to_le_bytes();
         self.data[offset..offset + 4].copy_from_slice(&bytes);
     }
 
-    /// Convert a multi-dimensional index to a flat element offset.
-    ///
-    /// # Parameters
-    /// - `indices` — `&[usize]`.
-    ///
-    /// # Returns
-    /// `Result<usize, String>`.
-    ///
-    /// All indices are 0-based. Returns an error if indices are out of bounds
-    /// or the wrong number of dimensions is provided.
+    /// Convert multi-axis indices to one flat offset or return bounds error.
     pub fn flat_index(&self, indices: &[usize]) -> Result<usize, String> {
         if indices.len() != self.shape.len() {
             return Err(format!(
@@ -307,80 +212,48 @@ impl NdArray {
         Ok(flat)
     }
 
-    /// Returns the shape of this array as a slice.
-    ///
-    /// # Returns
-    /// `&[usize]`.
+    /// Return immutable view of shape.
     pub fn shape(&self) -> &[usize] {
         &self.shape
     }
 
-    /// Returns the element data type of this array.
-    ///
-    /// # Returns
-    /// `DataType`.
+    /// Return element dtype.
     pub fn dtype(&self) -> DataType {
         self.dtype
     }
 
-    /// Returns the total number of elements in this array.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Return total element count.
     pub fn size(&self) -> usize {
         Self::element_count(&self.shape)
     }
 
-    /// Returns the number of dimensions.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Return rank in axes.
     pub fn ndim(&self) -> usize {
         self.shape.len()
     }
 
-    /// Returns the row-major strides for this array.
-    ///
-    /// # Returns
-    /// `&[usize]`.
+    /// Return immutable view of row-major strides.
     pub fn strides(&self) -> &[usize] {
         &self.strides
     }
 
-    /// Returns a reference to the underlying byte data.
-    ///
-    /// # Returns
-    /// `&[u8]`.
+    /// Return immutable view of raw byte storage.
     pub fn data(&self) -> &[u8] {
         &self.data
     }
 
-    /// Returns a mutable reference to the underlying byte data.
-    ///
-    /// # Returns
-    /// `&mut [u8]`.
+    /// Return mutable view of raw byte storage.
     pub fn data_mut(&mut self) -> &mut [u8] {
         &mut self.data
     }
 
-    /// Sets the shape and strides directly. Used by reshape.
-    ///
-    /// # Parameters
-    /// - `crate` — parameter.
+    /// Replace shape and stride metadata during reshape.
     pub(crate) fn set_shape(&mut self, shape: Vec<usize>, strides: Vec<usize>) {
         self.shape = shape;
         self.strides = strides;
     }
 
-    /// Compute row-major strides for a given shape.
-    ///
-    /// # Parameters
-    /// - `shape` — `&[usize]`.
-    ///
-    /// # Returns
-    /// `Vec<usize>`.
-    ///
-    /// `strides[i] = product(shape[i+1.])` — so the last axis has stride 1.
+    /// Compute row-major strides with unit stride on the last axis.
     pub fn compute_strides(shape: &[usize]) -> Vec<usize> {
         let ndim = shape.len();
         let mut strides = vec![1usize; ndim];
@@ -390,7 +263,7 @@ impl NdArray {
         strides
     }
 
-    /// Validate shape constraints (at least 1 dim, element count within limits).
+    /// Validate non-empty shape with positive size under safety cap.
     fn validate_shape(shape: &[usize]) -> Result<(), String> {
         if shape.is_empty() {
             return Err("ndim must be >= 1".to_string());
@@ -412,57 +285,32 @@ impl NdArray {
         Ok(())
     }
 
-    /// Read element by multi-dimensional indices (0-based), combining flat_index + get_f64.
-    ///
-    /// # Parameters
-    /// - `indices` — `&[usize]`.
-    ///
-    /// # Returns
-    /// `Result<f64, String>`.
+    /// Read element at multi-axis indices as f64.
     pub fn get_by_indices(&self, indices: &[usize]) -> Result<f64, String> {
         let flat = self.flat_index(indices)?;
         Ok(self.get_f64(flat))
     }
 
-    /// Write a value by multi-dimensional indices (0-based), combining flat_index + set_f64.
-    ///
-    /// # Parameters
-    /// - `indices` — `&[usize]`.
-    /// - `val` — `f64`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
+    /// Write element at multi-axis indices from f64 value.
     pub fn set_by_indices(&mut self, indices: &[usize], val: f64) -> Result<(), String> {
         let flat = self.flat_index(indices)?;
         self.set_f64(flat, val);
         Ok(())
     }
 
-    /// Return all elements as a `Vec<f64>`.
-    ///
-    /// # Returns
-    /// `Vec<f64>`.
+    /// Collect all elements converted to f64.
     pub fn to_f64_vec(&self) -> Vec<f64> {
         (0..self.size()).map(|i| self.get_f64(i)).collect()
     }
 
-    /// Fill all elements with the same value, in place.
-    ///
-    /// # Parameters
-    /// - `val` - `f64` value written to every element.
+    /// Fill every element with one scalar value.
     pub fn fill(&mut self, val: f64) {
         for i in 0..self.size() {
             self.set_f64(i, val);
         }
     }
 
-    /// Map each element through `f` and return a new array.
-    ///
-    /// # Parameters
-    /// - `f` - function called once per element.
-    ///
-    /// # Returns
-    /// `Result<NdArray, String>`.
+    /// Map each element through function f and return a new array.
     pub fn map(&self, f: fn(f64) -> f64) -> Result<Self, String> {
         let mut out = Self::zeros(self.shape(), self.dtype())?;
         for i in 0..self.size() {
@@ -471,23 +319,17 @@ impl NdArray {
         Ok(out)
     }
 
-    /// Iterate over values converted to f64.
-    ///
-    /// # Returns
-    /// `impl Iterator<Item = f64> + '_`.
+    /// Iterate over elements converted to f64.
     pub fn iter_f64(&self) -> impl Iterator<Item = f64> + '_ {
         (0..self.size()).map(|i| self.get_f64(i))
     }
 
-    /// Return a human-readable summary string for debugging.
-    ///
-    /// # Returns
-    /// `String`.
+    /// Format shape and dtype into a compact debug string.
     pub fn display_string(&self) -> String {
         format!("Array({:?}, dtype={})", self.shape, self.dtype.name())
     }
 
-    /// Total number of elements for a given shape.
+    /// Multiply axis lengths to produce element count.
     fn element_count(shape: &[usize]) -> usize {
         shape.iter().product()
     }

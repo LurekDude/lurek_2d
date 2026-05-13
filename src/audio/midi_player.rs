@@ -1,13 +1,5 @@
-//! Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM
-//! via sine-additive synthesis, and plays through a rodio `Sink`.
-//!
-//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
-//! details for midi player-related operations and data management.
-//! Key types exported from this module: `MidiData`, `MidiPlayer`.
-//! Primary functions: `new()`, `load()`, `load_data()`, `is_loaded()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! MIDI synthesis and playback (currently disabled; midly removed from Cargo.toml).
+
 
 use crate::audio::PlayState;
 use crate::runtime::resource_keys::BusKey;
@@ -19,58 +11,19 @@ use crate::log_msg;
 use crate::runtime::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};
 use std::path::Path;
 
-/// Pre-parsed MIDI metadata extracted during `load()`.
-///
-/// # Fields
-/// - `duration_secs` â€” `f64`.
-/// - `ticks_per_beat` â€” `u16`.
-/// - `original_tempo_bpm` â€” `f64`.
-/// - `track_count` â€” `usize`.
-/// - `track_names` â€” `Vec<Option<String>>`.
-/// - `note_count` â€” `usize`.
-/// - `channel_count` â€” `usize`.
+/// Pre-parsed MIDI metadata: duration, tempo, track/channel info.
 #[derive(Debug, Clone)]
 pub struct MidiData {
-    /// Total duration of the MIDI file in seconds.
     pub duration_secs: f64,
-    /// Ticks per beat from the MIDI header.
     pub ticks_per_beat: u16,
-    /// Original tempo in BPM (from the first tempo meta event, or 120 default).
     pub original_tempo_bpm: f64,
-    /// Number of tracks in the MIDI file.
     pub track_count: usize,
-    /// Track names extracted from TrackName meta events (None if unnamed).
     pub track_names: Vec<Option<String>>,
-    /// Total number of NoteOn events across all tracks.
     pub note_count: usize,
-    /// Number of unique MIDI channels used.
     pub channel_count: usize,
 }
 
-/// Software MIDI player with sine-additive synthesis.
-///
-/// Parses MIDI via `midly`, renders all tracks to a PCM buffer on `play()`,
-/// and feeds the result into a `rodio::Sink`. Supports per-channel volume,
-/// muting, track muting, tempo scaling, looping, and bus routing.
-/// All synthesis is done on the Rust side so no external soundfont is needed
-/// for basic MIDI playback (though `MidiState` enables SF2 loading).
-///
-/// # Fields
-/// - `midi_data` â€” `Option<MidiData>`.
-/// - `raw_midi` â€” `Option<Vec<u8>>`.
-/// - `file_path` â€” `Option<String>`.
-/// - `volume` â€” `f32`.
-/// - `looping` â€” `bool`.
-/// - `tempo_scale` â€” `f32`.
-/// - `current_bpm` â€” `f64`.
-/// - `channel_muted` â€” `[bool; 16]`.
-/// - `channel_volume` â€” `[f32; 16]`.
-/// - `channel_instrument` â€” `[u8; 16]`.
-/// - `track_muted` â€” `Vec<bool>`.
-/// - `position_secs` â€” `f64`.
-/// - `sink` â€” `Option<rodio::Sink>`.
-/// - `play_state` â€” `PlayState`.
-/// - `bus_key` â€” `Option<BusKey>`.
+/// MIDI player with sine-additive synthesis (currently stub - midly disabled).
 pub struct MidiPlayer {
     midi_data: Option<MidiData>,
     raw_midi: Option<Vec<u8>>,
@@ -88,10 +41,9 @@ pub struct MidiPlayer {
     play_state: PlayState,
     bus_key: Option<BusKey>,
     /// PCM output sample rate in Hz. Default 44100.
-    ///
-    /// Clamped to 8000â€“192000 by `set_output_sample_rate`.
+    /// Clamped to 8000-192000 by `set_output_sample_rate`.
     output_sample_rate: u32,
-    /// PCM output channel count. Default 2 (stereo). Range: 1â€“2.
+    /// PCM output channel count. Default 2 (stereo). Range: 1-2.
     output_channels: u16,
 }
 
@@ -103,9 +55,6 @@ impl Default for MidiPlayer {
 
 impl MidiPlayer {
     /// Creates a new MidiPlayer with default settings.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         MidiPlayer {
             midi_data: None,
@@ -129,12 +78,6 @@ impl MidiPlayer {
     }
 
     /// Loads and parses a MIDI file from the given path.
-    ///
-    /// # Parameters
-    /// - `path` â€” `&Path`.
-    ///
-    /// # Returns
-    /// `bool`.
     /// Returns `true` if loading succeeded.
     pub fn load(&mut self, path: &Path) -> bool {
         let bytes = match std::fs::read(path) {
@@ -154,13 +97,7 @@ impl MidiPlayer {
         }
     }
 
-    /// Loads MIDI from raw bytes (e.g., embedded data).
-    ///
-    /// # Parameters
-    /// - `data` â€” `Vec<u8>`.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Loads MIDI from raw bytes (stub - midly disabled).
     pub fn load_data(&mut self, _data: Vec<u8>) -> bool {
         // MIDI disabled: midly crate removed from Cargo.toml.
         // To re-enable: restore midly = "0.5" in Cargo.toml, uncomment the
@@ -169,27 +106,17 @@ impl MidiPlayer {
         false
     }
 
-    /// Returns whether a MIDI file is currently loaded.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if a MIDI file is loaded.
     pub fn is_loaded(&self) -> bool {
         self.midi_data.is_some()
     }
 
-    /// Returns the file path of the loaded MIDI, if any.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
+    /// Returns the MIDI file path, if any.
     pub fn file_path(&self) -> Option<&str> {
         self.file_path.as_deref()
     }
 
-    /// Plays the loaded MIDI through the given output stream handle.
-    ///
-    /// # Parameters
-    /// - `stream_handle` â€” `&rodio::OutputStreamHandle`.
-    /// Renders the full MIDI to PCM using sine-additive synthesis.
+    /// Plays loaded MIDI, rendering to PCM with sine-additive synthesis.
     pub fn play(&mut self, stream_handle: &rodio::OutputStreamHandle) {
         if self.midi_data.is_none() || self.raw_midi.is_none() {
             return;
@@ -215,7 +142,7 @@ impl MidiPlayer {
         }
     }
 
-    /// Stops playback and resets position to 0.
+    /// Stops playback and seeks to 0.
     pub fn stop(&mut self) {
         if let Some(sink) = self.sink.take() {
             sink.stop();
@@ -232,7 +159,7 @@ impl MidiPlayer {
         self.play_state = PlayState::Paused;
     }
 
-    /// Resumes paused playback.
+    /// Resumes playback from pause.
     pub fn resume(&mut self) {
         if let Some(ref sink) = self.sink {
             sink.play();
@@ -242,125 +169,79 @@ impl MidiPlayer {
         }
     }
 
-    /// Returns whether the player is currently playing.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if player is playing.
     pub fn is_playing(&self) -> bool {
         self.play_state == PlayState::Playing
     }
 
-    /// Returns whether the player is paused. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if player is paused.
     pub fn is_paused(&self) -> bool {
         self.play_state == PlayState::Paused
     }
 
-    /// Seeks to a position in seconds.
-    ///
-    /// # Parameters
-    /// - `secs` â€” `f64`.
+    /// Seeks to position in seconds.
     pub fn seek(&mut self, secs: f64) {
         self.position_secs = secs.max(0.0);
     }
 
-    /// Returns the current playback position in seconds.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns playback position in seconds.
     pub fn tell(&self) -> f64 {
         self.position_secs
     }
 
-    /// Returns the duration of the loaded MIDI in seconds.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns duration in seconds.
     pub fn duration(&self) -> f64 {
         self.midi_data.as_ref().map_or(0.0, |d| d.duration_secs)
     }
 
-    /// Sets the master volume (0.0 = silent, values above 1.0 amplify).
-    ///
-    /// # Parameters
-    /// - `vol` â€” `f32`.
+    /// Sets master volume, clamped >= 0.0.
     pub fn set_volume(&mut self, vol: f32) {
         self.volume = vol.max(0.0);
     }
 
-    /// Returns the master volume.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Returns master volume.
     pub fn volume(&self) -> f32 {
         self.volume
     }
 
-    /// Sets whether playback should loop. Replaces the current looping value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `looping` â€” `bool`.
+    /// Sets whether playback loops.
     pub fn set_looping(&mut self, looping: bool) {
         self.looping = looping;
     }
 
-    /// Returns whether playback is set to loop.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if looping is enabled.
     pub fn is_looping(&self) -> bool {
         self.looping
     }
 
-    /// Sets the tempo scale factor (minimum 0.01).
-    ///
-    /// # Parameters
-    /// - `scale` â€” `f32`.
+    /// Sets tempo scale (clamped >= 0.01).
     pub fn set_tempo_scale(&mut self, scale: f32) {
         self.tempo_scale = scale.max(0.01);
     }
 
-    /// Returns the current tempo scale factor.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Returns the tempo scale factor.
     pub fn tempo_scale(&self) -> f32 {
         self.tempo_scale
     }
 
-    /// Returns the current effective BPM.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns current effective BPM.
     pub fn current_bpm(&self) -> f64 {
         self.current_bpm
     }
 
-    /// Returns the original tempo in BPM from the MIDI file.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns original MIDI tempo (BPM).
     pub fn original_tempo(&self) -> f64 {
         self.midi_data
             .as_ref()
             .map_or(120.0, |d| d.original_tempo_bpm)
     }
 
-    /// Returns the ticks-per-beat value from the MIDI header.
-    ///
-    /// # Returns
-    /// `u16`.
+    /// Returns ticks-per-beat from MIDI header.
     pub fn ticks_per_beat(&self) -> u16 {
         self.midi_data.as_ref().map_or(0, |d| d.ticks_per_beat)
     }
 
-    /// Sets the volume for a specific MIDI channel (0-15).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    /// - `vol` â€” `f32`.
+    /// Sets volume for MIDI channel (0-15).
     pub fn set_channel_volume(&mut self, ch: usize, vol: f32) {
         if ch < 16 {
             self.channel_volume[ch] = vol.max(0.0);
@@ -368,12 +249,6 @@ impl MidiPlayer {
     }
 
     /// Returns the volume for a specific MIDI channel (0-15).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn channel_volume(&self, ch: usize) -> f32 {
         if ch < 16 {
             self.channel_volume[ch]
@@ -383,10 +258,6 @@ impl MidiPlayer {
     }
 
     /// Sets the mute state for a specific MIDI channel (0-15).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    /// - `muted` â€” `bool`.
     pub fn set_channel_muted(&mut self, ch: usize, muted: bool) {
         if ch < 16 {
             self.channel_muted[ch] = muted;
@@ -394,21 +265,11 @@ impl MidiPlayer {
     }
 
     /// Returns whether a specific MIDI channel (0-15) is muted.
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_channel_muted(&self, ch: usize) -> bool {
         ch < 16 && self.channel_muted[ch]
     }
 
     /// Sets the instrument (program number) for a MIDI channel (0-15).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    /// - `inst` â€” `u8`.
     pub fn set_channel_instrument(&mut self, ch: usize, inst: u8) {
         if ch < 16 {
             self.channel_instrument[ch] = inst;
@@ -416,12 +277,6 @@ impl MidiPlayer {
     }
 
     /// Returns the instrument (program number) for a MIDI channel (0-15).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
-    ///
-    /// # Returns
-    /// `u8`.
     pub fn channel_instrument(&self, ch: usize) -> u8 {
         if ch < 16 {
             self.channel_instrument[ch]
@@ -431,17 +286,11 @@ impl MidiPlayer {
     }
 
     /// Returns the number of unique MIDI channels used in the loaded file.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn channel_count(&self) -> usize {
         self.midi_data.as_ref().map_or(0, |d| d.channel_count)
     }
 
     /// Solos a channel (mutes all others).
-    ///
-    /// # Parameters
-    /// - `ch` â€” `usize`.
     pub fn solo_channel(&mut self, ch: usize) {
         for i in 0..16 {
             self.channel_muted[i] = i != ch;
@@ -454,20 +303,11 @@ impl MidiPlayer {
     }
 
     /// Returns the number of tracks in the loaded MIDI file.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn track_count(&self) -> usize {
         self.midi_data.as_ref().map_or(0, |d| d.track_count)
     }
 
     /// Returns the name of a track by index, if it has one.
-    ///
-    /// # Parameters
-    /// - `idx` â€” `usize`.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
     pub fn track_name(&self, idx: usize) -> Option<&str> {
         self.midi_data
             .as_ref()
@@ -476,10 +316,6 @@ impl MidiPlayer {
     }
 
     /// Sets the mute state for a specific track by index.
-    ///
-    /// # Parameters
-    /// - `idx` â€” `usize`.
-    /// - `muted` â€” `bool`.
     pub fn set_track_muted(&mut self, idx: usize, muted: bool) {
         if idx < self.track_muted.len() {
             self.track_muted[idx] = muted;
@@ -487,82 +323,51 @@ impl MidiPlayer {
     }
 
     /// Returns whether a specific track is muted.
-    ///
-    /// # Parameters
-    /// - `idx` â€” `usize`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_track_muted(&self, idx: usize) -> bool {
         idx < self.track_muted.len() && self.track_muted[idx]
     }
 
     /// Returns the total number of NoteOn events in the loaded MIDI.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn note_count(&self) -> usize {
         self.midi_data.as_ref().map_or(0, |d| d.note_count)
     }
 
     /// Sets the audio bus key for mixer routing.
-    ///
-    /// # Parameters
-    /// - `key` â€” `Option<BusKey>`.
     pub fn set_bus_key(&mut self, key: Option<BusKey>) {
         self.bus_key = key;
     }
 
     /// Returns the audio bus key, if assigned.
-    ///
-    /// # Returns
-    /// `Option<BusKey>`.
     pub fn bus_key(&self) -> Option<BusKey> {
         self.bus_key
     }
 
     /// Returns the current playback state.
-    ///
-    /// # Returns
-    /// `PlayState`.
     pub fn play_state(&self) -> PlayState {
         self.play_state
     }
 
     /// Returns the PCM output sample rate in Hz.
-    ///
-    /// # Returns
-    /// `u32`.
     pub fn get_output_sample_rate(&self) -> u32 {
         self.output_sample_rate
     }
 
-    /// Sets the PCM output sample rate in Hz (clamped to 8000â€“192000).
-    ///
-    /// # Parameters
-    /// - `rate` â€” `u32`.
+    /// Sets the PCM output sample rate in Hz (clamped to 8000-192000).
     pub fn set_output_sample_rate(&mut self, rate: u32) {
         self.output_sample_rate = rate.clamp(8000, 192_000);
     }
 
     /// Returns the PCM output channel count (1 = mono, 2 = stereo).
-    ///
-    /// # Returns
-    /// `u16`.
     pub fn get_output_channels(&self) -> u16 {
         self.output_channels
     }
 
-    /// Sets the PCM output channel count (clamped to 1â€“2).
-    ///
-    /// # Parameters
-    /// - `channels` â€” `u16`.
+    /// Sets the PCM output channel count (clamped to 1-2).
     pub fn set_output_channels(&mut self, channels: u16) {
         self.output_channels = channels.clamp(1, 2);
     }
 
     /// Renders the loaded MIDI to a PCM buffer at the configured output sample rate and channel count.
-    ///
     /// Uses sine-additive synthesis: each active note generates a sine wave
     /// at the MIDI note frequency, amplitude scaled by `velocity/127` and channel volume.
     fn render_to_pcm(&self) -> Vec<i16> {
@@ -581,7 +386,6 @@ fn midi_note_to_freq(note: u8) -> f64 {
 }
 
 /// Renders a single sine-wave note into a stereo PCM buffer.
-///
 /// Writes from `start_sample` to `end_sample` (exclusive), adding the sine value
 /// to existing samples (additive synthesis). Amplitude is clamped to prevent overflow.
 /// Kept for when MIDI is re-enabled (midly restored in Cargo.toml).
@@ -608,3 +412,4 @@ fn render_note(
         }
     }
 }
+

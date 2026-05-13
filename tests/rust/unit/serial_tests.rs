@@ -121,6 +121,21 @@ mod codec_tests {
     };
     use std::io::Cursor;
 
+    fn lcg_next(state: &mut u64) -> u64 {
+        *state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+        *state
+    }
+
+    fn random_ascii(seed: u64, len: usize) -> String {
+        let mut s = String::with_capacity(len);
+        let mut st = seed;
+        for _ in 0..len {
+            let v = (lcg_next(&mut st) % 95) as u8 + 32;
+            s.push(v as char);
+        }
+        s
+    }
+
     #[test]
     fn detect_format_finds_json() {
         assert_eq!(
@@ -180,6 +195,24 @@ mod codec_tests {
                 assert!(matches!(root.get("player"), Some(SerialValue::Map(_))));
             }
             other => panic!("expected map, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn fuzz_text_parsers_do_not_panic_on_random_inputs() {
+        let formats = [
+            SerialFormat::Json,
+            SerialFormat::Toml,
+            SerialFormat::Csv,
+            SerialFormat::Xml,
+            SerialFormat::Ini,
+        ];
+
+        for i in 0..128_u64 {
+            let input = random_ascii(0xDEADBEEF_u64 ^ i, (i as usize % 128) + 1);
+            for fmt in formats {
+                let _ = decode_text(&input, Some(fmt), DecodeOptions::default());
+            }
         }
     }
 }

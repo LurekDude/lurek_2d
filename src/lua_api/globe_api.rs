@@ -8,9 +8,11 @@ use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 
 use crate::globe::loader;
+use crate::globe::export::export_provinces_to_obj;
 use crate::globe::registry::{Globe, GlobeRegistry};
 use crate::globe::types::{
-    GlobeSpec, LabelStyle, Layer, LodTier, MarkerStyle, Province, MAX_PROVINCES,
+    FogState, GlobeSpec, HeatLayer, LabelStyle, Layer, LodTier, MarkerStyle, Province,
+    MAX_PROVINCES,
 };
 use crate::math::sphere::{great_circle_distance, great_circle_path, lat_lon_to_unit};
 
@@ -151,6 +153,111 @@ impl LuaUserData for LuaGlobe {
             this.with(|g| g.get_province(id).and_then(|p| p.attrs.get(&key).cloned()))
         });
 
+        // -- setProvinceTexture --
+        /// Set texture raw handle and atlas UV rectangle for a province.
+        /// @param | id | integer | Province ID.
+        /// @param | texture_raw | integer | Raw texture handle from LImage id.
+        /// @param | u0 | number | UV min U.
+        /// @param | v0 | number | UV min V.
+        /// @param | u1 | number | UV max U.
+        /// @param | v1 | number | UV max V.
+        /// @return | boolean | True when province exists.
+        methods.add_method_mut(
+            "setProvinceTexture",
+            |_, this, (id, tex_raw, u0, v0, u1, v1): (u32, u64, f32, f32, f32, f32)| {
+                this.with_mut(|g| {
+                    if let Some(p) = g.get_province_mut(id) {
+                        p.attrs.insert("__texture_raw".to_string(), tex_raw.to_string());
+                        p.texture_uv_rect = Some([u0, v0, u1, v1]);
+                        true
+                    } else {
+                        false
+                    }
+                })
+            },
+        );
+
+        // -- clearProvinceTexture --
+        /// Clear texture mapping for a province.
+        /// @param | id | integer | Province ID.
+        /// @return | boolean | True when province exists.
+        methods.add_method_mut("clearProvinceTexture", |_, this, id: u32| {
+            this.with_mut(|g| {
+                if let Some(p) = g.get_province_mut(id) {
+                    p.attrs.remove("__texture_raw");
+                    p.texture_uv_rect = None;
+                    true
+                } else {
+                    false
+                }
+            })
+        });
+
+        // -- setProvinceSector --
+        /// Assign province to a sector/strategic zone.
+        /// @param | id | integer | Province ID.
+        /// @param | sector | string | Sector name.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("setProvinceSector", |_, this, (id, sector): (u32, String)| {
+            this.with_mut(|g| g.set_province_sector(id, sector))
+        });
+
+        // -- getProvinceSector --
+        /// Return sector name of a province.
+        /// @param | id | integer | Province ID.
+        /// @return | string | Sector name when assigned.
+        methods.add_method("getProvinceSector", |_, this, id: u32| {
+            this.with(|g| g.province_sector(id).map(|s| s.to_string()))
+        });
+
+        // -- getSectorProvinces --
+        /// Return province IDs in a sector.
+        /// @param | sector | string | Sector name.
+        /// @return | table | Array of province IDs.
+        methods.add_method("getSectorProvinces", |lua, this, sector: String| {
+            let ids = this.with(|g| g.sector_provinces(&sector))?;
+            let t = lua.create_table()?;
+            for (i, id) in ids.iter().enumerate() {
+                t.set(i + 1, *id)?;
+            }
+            Ok(t)
+        });
+
+        // -- setHeatLayer --
+        /// Configure a float-driven heat-map layer.
+        /// @param | name | string | Layer name.
+        /// @param | attr_key | string | Province attr key with float value.
+        /// @param | min | number | Minimum value.
+        /// @param | max | number | Maximum value.
+        /// @param | alpha | number | Layer alpha.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "setHeatLayer",
+            |_, this, (name, attr_key, min, max, alpha): (String, String, f32, f32, f32)| {
+                this.with_mut(|g| {
+                    g.set_heat_layer(HeatLayer {
+                        name,
+                        attr_key,
+                        min_value: min,
+                        max_value: max,
+                        cold_color: [0.1, 0.2, 0.9, 1.0],
+                        hot_color: [0.9, 0.2, 0.1, 1.0],
+                        alpha: alpha.clamp(0.0, 1.0),
+                        visible: true,
+                        z_order: 0,
+                    })
+                })
+            },
+        );
+
+        // -- removeHeatLayer --
+        /// Remove a heat-map layer by name.
+        /// @param | name | string | Heat layer name.
+        /// @return | boolean | True when layer existed.
+        methods.add_method_mut("removeHeatLayer", |_, this, name: String| {
+            this.with_mut(|g| g.remove_heat_layer(&name))
+        });
+
         // ── Camera ──────────────────────────────────────────────────────────
 
         // -- pan --
@@ -219,6 +326,31 @@ impl LuaUserData for LuaGlobe {
             this.with(|g| g.pick_screen(sx, sy).map(|r| r.province_id))
         });
 
+        // -- pickRaycast --
+        /// Raycast-style picking by marching from globe center toward screen point.
+        /// @param | sx | number | Target screen x coordinate.
+        /// @param | sy | number | Target screen y coordinate.
+        /// @param | steps | integer? | Optional march step count.
+        /// @return | integer | Picked province ID when found.
+        methods.add_method("pickRaycast", |_, this, (sx, sy, steps): (f32, f32, Option<u32>)| {
+            let n = steps.unwrap_or(24).max(1);
+            this.with(|g| {
+                let cx = g.camera.screen_cx;
+                let cy = g.camera.screen_cy;
+                let dx = sx - cx;
+                let dy = sy - cy;
+                for i in 1..=n {
+                    let t = i as f32 / n as f32;
+                    let px = cx + dx * t;
+                    let py = cy + dy * t;
+                    if let Some(hit) = g.pick_screen(px, py) {
+                        return Some(hit.province_id);
+                    }
+                }
+                None
+            })
+        });
+
         // -- pickLatLon --
         /// Returns (lat, lon) of the screen point on the globe surface, or nil.
         /// @param | sx | number | Screen x coordinate.
@@ -243,6 +375,57 @@ impl LuaUserData for LuaGlobe {
         /// @return | nil | No value is returned.
         methods.add_method_mut("setActiveViewer", |_, this, viewer: Option<String>| {
             this.with_mut(|g| g.active_viewer = viewer)
+        });
+
+        // -- setFogState --
+        /// Set fog state (`hidden`, `explored`, `visible`) for one province.
+        /// @param | viewer | string | Viewer name.
+        /// @param | id | integer | Province ID.
+        /// @param | state | string | Fog state string.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "setFogState",
+            |_, this, (viewer, id, state): (String, u32, String)| {
+                let st = match state.as_str() {
+                    "visible" => FogState::Visible,
+                    "explored" => FogState::Explored,
+                    _ => FogState::Hidden,
+                };
+                this.with_mut(|g| g.fog.set_state(&viewer, id, st))
+            },
+        );
+
+        // -- getFogState --
+        /// Get fog state string for province and viewer.
+        /// @param | viewer | string | Viewer name.
+        /// @param | id | integer | Province ID.
+        /// @return | string | `hidden`, `explored`, or `visible`.
+        methods.add_method("getFogState", |_, this, (viewer, id): (String, u32)| {
+            this.with(|g| {
+                match g.fog.state(&viewer, id) {
+                    FogState::Visible => "visible",
+                    FogState::Explored => "explored",
+                    FogState::Hidden => "hidden",
+                }
+                .to_string()
+            })
+        });
+
+        // -- encodeFogBase64 --
+        /// Serialize viewer fog mask to base64.
+        /// @param | viewer | string | Viewer name.
+        /// @return | string | Base64 fog payload.
+        methods.add_method("encodeFogBase64", |_, this, viewer: String| {
+            this.with(|g| g.fog.to_base64(&viewer).unwrap_or_default())
+        });
+
+        // -- decodeFogBase64 --
+        /// Load viewer fog mask from base64 payload.
+        /// @param | viewer | string | Viewer name.
+        /// @param | payload | string | Base64 encoded mask.
+        /// @return | boolean | True when decode succeeded.
+        methods.add_method_mut("decodeFogBase64", |_, this, (viewer, payload): (String, String)| {
+            this.with_mut(|g| g.fog.load_base64(&viewer, &payload).is_ok())
         });
 
         // -- revealProvince --
@@ -329,6 +512,40 @@ impl LuaUserData for LuaGlobe {
         /// @return | nil | No value is returned.
         methods.add_method_mut("setMarkerVisible", |_, this, (id, vis): (u32, bool)| {
             this.with_mut(|g| g.markers.set_visible(id, vis))
+        });
+
+        // -- setMarkerPulse --
+        /// Configure pulsing marker animation.
+        /// @param | id | integer | Marker ID.
+        /// @param | hz | number | Pulse frequency in Hz.
+        /// @param | amplitude | number | Pulse amplitude in [0,1].
+        /// @return | boolean | True when marker exists.
+        methods.add_method_mut("setMarkerPulse", |_, this, (id, hz, amp): (u32, f32, f32)| {
+            this.with_mut(|g| {
+                if let Some(m) = g.markers.get_mut(id) {
+                    m.style.pulse_hz = hz.max(0.0);
+                    m.style.pulse_amplitude = amp.clamp(0.0, 1.0);
+                    true
+                } else {
+                    false
+                }
+            })
+        });
+
+        // -- setMarkerRotation --
+        /// Configure marker rotation speed.
+        /// @param | id | integer | Marker ID.
+        /// @param | deg_per_sec | number | Rotation speed.
+        /// @return | boolean | True when marker exists.
+        methods.add_method_mut("setMarkerRotation", |_, this, (id, dps): (u32, f32)| {
+            this.with_mut(|g| {
+                if let Some(m) = g.markers.get_mut(id) {
+                    m.style.rotation_deg_per_sec = dps;
+                    true
+                } else {
+                    false
+                }
+            })
         });
 
         // -- setMarkerAttr --
@@ -488,6 +705,14 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.spec.rotation_deg = deg)
         });
 
+        // -- setAutoRotationSpeed --
+        /// Set automatic globe spin speed in degrees per second.
+        /// @param | deg_per_sec | number | Speed in deg/s.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("setAutoRotationSpeed", |_, this, dps: f32| {
+            this.with_mut(|g| g.spec.auto_rotation_deg_per_sec = dps)
+        });
+
         // -- update --
         /// Advance globe simulation by dt seconds.
         /// @param | dt | number | Delta time in seconds.
@@ -539,6 +764,41 @@ impl LuaUserData for LuaGlobe {
                 Ok(t)
             },
         );
+
+        // -- cacheReachability --
+        /// Build and cache default reachability for a faction.
+        /// @param | faction | string | Faction key.
+        /// @param | start_id | integer | Start province ID.
+        /// @param | max_cost | number | Max traversal cost.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "cacheReachability",
+            |_, this, (faction, start_id, max_cost): (String, u32, f64)| {
+                this.with_mut(|g| g.cache_reachability_default(faction, start_id, max_cost))
+            },
+        );
+
+        // -- getCachedReachability --
+        /// Return cached reachability map for a faction.
+        /// @param | faction | string | Faction key.
+        /// @return | table | Province->cost map.
+        methods.add_method("getCachedReachability", |lua, this, faction: String| {
+            let t = lua.create_table()?;
+            let map = this.with(|g| g.cached_reachability(&faction).cloned())?;
+            if let Some(map) = map {
+                for (id, cost) in map {
+                    t.set(id, cost)?;
+                }
+            }
+            Ok(t)
+        });
+
+        // -- exportProvinceMeshOBJ --
+        /// Export province polygons as OBJ text.
+        /// @return | string | OBJ payload.
+        methods.add_method("exportProvinceMeshOBJ", |_, this, ()| {
+            this.with(export_provinces_to_obj)
+        });
 
         // ── Arc management ──────────────────────────────────────────────────
 
@@ -732,6 +992,15 @@ fn parse_globe_spec(tbl: Option<LuaTable>) -> GlobeSpec {
         if let Ok(v) = t.get::<_, f32>("ambient") {
             spec.ambient = v;
         }
+        if let Ok(v) = t.get::<_, f32>("auto_rotation_deg_per_sec") {
+            spec.auto_rotation_deg_per_sec = v;
+        }
+        if let Ok(v) = t.get::<_, f32>("atmosphere_width") {
+            spec.atmosphere_width = v.max(0.0);
+        }
+        if let Ok(v) = t.get::<_, u8>("border_smoothing_passes") {
+            spec.border_smoothing_passes = v;
+        }
     }
     spec
 }
@@ -815,6 +1084,82 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     let spec = parse_globe_spec(spec_tbl);
                     let provinces =
                         loader::load_from_toml_str(&toml_src).map_err(mlua::Error::RuntimeError)?;
+                    {
+                        let mut guard = reg.lock().map_err(|e| {
+                            mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                        })?;
+                        let globe = guard.create(name.clone(), spec);
+                        for p in provinces {
+                            let _ = globe.add_province(p);
+                        }
+                    }
+                    Ok(LuaGlobe {
+                        reg: reg.clone(),
+                        name,
+                        state: s.clone(),
+                    })
+                },
+            )?,
+        )?;
+    }
+
+    // -- loadFromPNG --
+    {
+        let reg = registry.clone();
+        let s = state.clone();
+        /// Load provinces from a color-index PNG file and create a globe.
+        /// @param | name | string | Globe name.
+        /// @param | png_path | string | PNG file path.
+        /// @param | spec | table? | Optional globe specification table.
+        /// @return | LGlobe | Loaded globe instance.
+        tbl.set(
+            "loadFromPNG",
+            lua.create_function(
+                move |_, (name, png_path, spec_tbl): (String, String, Option<LuaTable>)| {
+                    let spec = parse_globe_spec(spec_tbl);
+                    let provinces =
+                        loader::load_from_png_file(&png_path).map_err(mlua::Error::RuntimeError)?;
+                    {
+                        let mut guard = reg.lock().map_err(|e| {
+                            mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))
+                        })?;
+                        let globe = guard.create(name.clone(), spec);
+                        for p in provinces {
+                            let _ = globe.add_province(p);
+                        }
+                    }
+                    Ok(LuaGlobe {
+                        reg: reg.clone(),
+                        name,
+                        state: s.clone(),
+                    })
+                },
+            )?,
+        )?;
+    }
+
+    // -- generateVoronoi --
+    {
+        let reg = registry.clone();
+        let s = state.clone();
+        /// Generate procedural Voronoi provinces from seed points.
+        /// @param | name | string | Globe name.
+        /// @param | seeds | table | Array of `{lat, lon}` seed pairs.
+        /// @param | spec | table? | Optional globe specification table.
+        /// @return | LGlobe | Generated globe instance.
+        tbl.set(
+            "generateVoronoi",
+            lua.create_function(
+                move |_, (name, seeds_tbl, spec_tbl): (String, LuaTable, Option<LuaTable>)| {
+                    let spec = parse_globe_spec(spec_tbl);
+                    let mut seeds = Vec::new();
+                    for item in seeds_tbl.sequence_values::<LuaTable>() {
+                        let p = item?;
+                        let lat: f32 = p.get(1)?;
+                        let lon: f32 = p.get(2)?;
+                        seeds.push((lat, lon));
+                    }
+                    let provinces = loader::generate_voronoi_provinces(&seeds);
                     {
                         let mut guard = reg.lock().map_err(|e| {
                             mlua::Error::RuntimeError(format!("registry lock poisoned: {e}"))

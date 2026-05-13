@@ -25,12 +25,16 @@
 
 /// Rolling FPS and frame-time statistics with percentile reporting.
 pub mod frame_stats;
+/// Shared helpers for converting Lua runtime values to text.
+pub mod lua_display;
 /// Level-filtered, categorised in-process log with rolling history.
 pub mod logger;
 /// Hierarchical zone-based frame profiler.
 pub mod profiler;
 /// Interactive Lua REPL console with bounded input history.
 pub mod repl;
+/// Shared elapsed-time anchor used by logger/profiler internals.
+pub mod time_anchor;
 /// Polling mtime watcher for hot-reload detection.
 pub mod watcher;
 

@@ -1,7 +1,6 @@
-//! Base64 and hex encoding/decoding for binary-to-text transport.
-//!
-//! Exposes `encode()` and `decode()` behind an [`EncodeFormat`] enum.
-//! Base64 uses RFC 4648 standard alphabet; hex produces lowercase output.
+//! Scope: Binary-to-text encoding and decoding.
+//! This file defines EncodeFormat plus encode and decode helpers.
+//! It owns base64 and lowercase-hex transport conversions.
 
 use base64::Engine;
 

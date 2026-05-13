@@ -7,8 +7,11 @@
 use crate::camera::effects::{CameraBreathing, CameraSway, ZoomPulse};
 use crate::math::{Mat3, Rect, Vec2};
 
+// ---- Type: CameraFollowEasing ----
+
 /// Easing mode used by camera follow interpolation.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+/// Easing mode used by camera follow interpolation.
 pub enum CameraFollowEasing {
     /// Linear interpolation.
     Linear,
@@ -17,6 +20,8 @@ pub enum CameraFollowEasing {
     /// Ease-out cubic interpolation.
     EaseOutCubic,
 }
+
+// ---- Implementation: CameraFollowEasing ----
 
 impl CameraFollowEasing {
     fn apply(self, t: f32) -> f32 {
@@ -29,9 +34,7 @@ impl CameraFollowEasing {
     }
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// Existing Camera (kept for backward compatibility)
-// ═════════════════════════════════════════════════════════════════════════
+// ---- Type: Camera ----
 
 /// Basic camera with position, zoom, and rotation.
 ///
@@ -49,6 +52,8 @@ pub struct Camera {
     /// Rotation in radians (counter-clockwise positive).
     pub rotation: f32,
 }
+
+// ---- Implementation: Camera ----
 
 impl Camera {
     /// Creates a new `Camera` with the given position, zoom, and rotation.
@@ -107,6 +112,8 @@ impl Camera {
     }
 }
 
+// ---- Default Implementation ----
+
 impl Default for Camera {
     fn default() -> Self {
         Camera {
@@ -117,9 +124,7 @@ impl Default for Camera {
     }
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// Camera2D — Phase 24
-// ═════════════════════════════════════════════════════════════════════════
+// ---- Type: Camera2D ----
 
 /// Full-featured 2D camera with smooth follow, dead zone, bounds clamping,
 ///
@@ -151,7 +156,7 @@ pub struct Camera2D {
     /// will never extend beyond these bounds.
     pub bounds: Option<Rect>,
 
-    // ── Follow system ───────────────────────────────────────────────────
+    // ---- Helper Functions: Follow System ----
     /// Target world position the camera tries to follow.
     pub target: Option<Vec2>,
     /// Interpolation speed for smooth following. `0.0` = instant snap.
@@ -165,7 +170,7 @@ pub struct Camera2D {
     /// Follow interpolation easing mode.
     pub follow_easing: CameraFollowEasing,
 
-    // ── Shake ───────────────────────────────────────────────────────────
+    // ---- Helper Functions: Shake ----
     /// Current shake intensity (pixels).
     shake_intensity: f32,
     /// Total shake duration in seconds.
@@ -175,11 +180,11 @@ pub struct Camera2D {
     /// Current frame's shake offset (applied in [`view_matrix`](Self::view_matrix)).
     shake_offset: Vec2,
 
-    // ── Internal ────────────────────────────────────────────────────────
+    // ---- Helper Functions: Internal State ----
     /// Previous target for velocity estimation (look-ahead).
     prev_target: Option<Vec2>,
 
-    // ── Constraints ──────────────────────────────────────────────────────
+    // ---- Helper Functions: Constraints ----
     /// Minimum zoom level constraint (`0.1` = 10% zoom, optional).
     zoom_min: Option<f32>,
     /// Maximum zoom level constraint (`10.0` = 1000% zoom, optional).
@@ -197,7 +202,7 @@ pub struct Camera2D {
     /// Target rotation used when damping is active.
     rotation_target: f32,
 
-    // ── Effects ──────────────────────────────────────────────────────────
+    // ---- Helper Functions: Effects ----
     /// Zoom pulse: brief zoom-in with sine envelope decay.
     pub zoom_pulse: ZoomPulse,
     /// Camera sway: sinusoidal x/y offset oscillation.
@@ -205,6 +210,8 @@ pub struct Camera2D {
     /// Camera breathing: subtle periodic zoom oscillation.
     pub breathing: CameraBreathing,
 }
+
+// ---- Implementation: Camera2D ----
 
 impl Camera2D {
     /// Creates a new `Camera2D` centred at the origin with the given viewport
@@ -247,7 +254,7 @@ impl Camera2D {
         }
     }
 
-    // ── Position / zoom / rotation ──────────────────────────────────────
+    // ---- Helper Functions: Position Zoom Rotation ----
 
     /// Sets the camera position in world space.
     ///
@@ -314,7 +321,7 @@ impl Camera2D {
         self.follow_easing
     }
 
-    // ── Zoom constraints ────────────────────────────────────────────────
+    // ---- Helper Functions: Zoom Constraints ----
 
     /// Sets minimum and maximum zoom level constraints.
     ///
@@ -367,7 +374,7 @@ impl Camera2D {
         self.zoom_damping
     }
 
-    // ── Rotation constraints ────────────────────────────────────────────
+    // ---- Helper Functions: Rotation Constraints ----
 
     /// Sets minimum and maximum rotation constraints in radians.
     ///
@@ -420,7 +427,7 @@ impl Camera2D {
         self.rotation_damping
     }
 
-    // ── Follow presets ──────────────────────────────────────────────────
+    // ---- Helper Functions: Follow Presets ----
 
     /// Sets up a tight follow configuration: fast response, small dead zone, look-ahead.
     ///
@@ -503,7 +510,7 @@ impl Camera2D {
         );
     }
 
-    // ── Viewport ────────────────────────────────────────────────────────
+    // ---- Helper Functions: Viewport ----
 
     /// Sets the viewport rectangle in screen pixels.
     ///
@@ -529,7 +536,7 @@ impl Camera2D {
         )
     }
 
-    // ── Bounds ──────────────────────────────────────────────────────────
+    // ---- Helper Functions: Bounds ----
 
     /// Sets world-space bounds for camera clamping.
     ///
@@ -563,7 +570,7 @@ impl Camera2D {
         self.bounds.is_some()
     }
 
-    // ── Movement helpers ────────────────────────────────────────────────
+    // ---- Helper Functions: Movement ----
 
     /// Translates the camera by `(dx, dy)` in world space.
     ///
@@ -584,7 +591,7 @@ impl Camera2D {
         self.position = Vec2::new(x, y);
     }
 
-    // ── Coordinate conversion ───────────────────────────────────────────
+    // ---- Helper Functions: Coordinate Conversion ----
 
     /// Converts screen coordinates to world coordinates.
     ///
@@ -643,7 +650,7 @@ impl Camera2D {
         (cx - half_w, cy - half_h, half_w * 2.0, half_h * 2.0)
     }
 
-    // ── Follow / dead zone / look-ahead ─────────────────────────────────
+    // ---- Helper Functions: Follow Dead Zone Look Ahead ----
 
     /// Sets the dead zone half-extents. Pass `(0, 0)` for no dead zone.
     ///
@@ -718,7 +725,7 @@ impl Camera2D {
         self.look_ahead
     }
 
-    // ── Shake ───────────────────────────────────────────────────────────
+    // ---- Helper Functions: Shake Control ----
 
     /// Starts a camera shake effect.
     ///
@@ -746,11 +753,11 @@ impl Camera2D {
     ///
     /// Call once per frame with the delta time in seconds.
     pub fn update(&mut self, dt: f32) {
-        // ── 1. Follow target ────────────────────────────────────────────
+        // ---- Helper Functions: Update Stage 1 Follow Target ----
         if let Some(target) = self.target {
             let mut desired = target;
 
-            // ── 2. Dead zone ────────────────────────────────────────────
+            // ---- Helper Functions: Update Stage 2 Dead Zone ----
             if let Some((hw, hh)) = self.dead_zone {
                 let dx = target.x - self.position.x;
                 let dy = target.y - self.position.y;
@@ -760,7 +767,7 @@ impl Camera2D {
                 }
             }
 
-            // ── 3. Look-ahead ───────────────────────────────────────────
+            // ---- Helper Functions: Update Stage 3 Look Ahead ----
             if self.look_ahead > 0.0 {
                 if let Some(prev) = self.prev_target {
                     let vx = target.x - prev.x;
@@ -770,7 +777,7 @@ impl Camera2D {
                 }
             }
 
-            // ── 4. Smooth interpolation ─────────────────────────────────
+            // ---- Helper Functions: Update Stage 4 Smooth Interpolation ----
             if self.follow_smooth > 0.0 {
                 let t = self.follow_easing.apply((self.follow_smooth * dt).min(1.0));
                 self.position.x += (desired.x - self.position.x) * t;
@@ -782,7 +789,7 @@ impl Camera2D {
             self.prev_target = Some(target);
         }
 
-        // ── 5. Bounds clamping ──────────────────────────────────────────
+        // ---- Helper Functions: Update Stage 5 Bounds Clamping ----
         if let Some(bounds) = self.bounds {
             let z = if self.zoom_target.abs() > f32::EPSILON {
                 self.zoom_target
@@ -809,7 +816,7 @@ impl Camera2D {
             }
         }
 
-        // ── 6. Shake ────────────────────────────────────────────────────
+        // ---- Helper Functions: Update Stage 6 Shake ----
         if self.shake_timer > 0.0 {
             self.shake_timer -= dt;
             if self.shake_timer <= 0.0 {
@@ -826,7 +833,7 @@ impl Camera2D {
             }
         }
 
-        // ── 7. Zoom damping & constraints ───────────────────────────────
+        // ---- Helper Functions: Update Stage 7 Zoom Damping And Constraints ----
         if let Some(min_z) = self.zoom_min {
             self.zoom_target = self.zoom_target.max(min_z);
         }
@@ -841,7 +848,7 @@ impl Camera2D {
             self.zoom += (self.zoom_target - self.zoom) * alpha;
         }
 
-        // ── 8. Rotation damping & constraints ───────────────────────────
+        // ---- Helper Functions: Update Stage 8 Rotation Damping And Constraints ----
         if let Some(min_r) = self.rotation_min {
             self.rotation_target = self.rotation_target.max(min_r);
         }
@@ -857,7 +864,7 @@ impl Camera2D {
             self.rotation += (self.rotation_target - self.rotation) * alpha;
         }
 
-        // ── 9. Camera effects ────────────────────────────────────────────
+        // ---- Helper Functions: Update Stage 9 Camera Effects ----
         self.zoom_pulse.update(dt);
         self.sway.update(dt);
         self.breathing.update(dt);

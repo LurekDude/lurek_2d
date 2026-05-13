@@ -1,39 +1,17 @@
-//! MIDI SoundFont state management.
-//!
-//! Provides `MidiState` for tracking whether a SoundFont (SF2) file has
-//! been loaded for MIDI instrument rendering.
-//!
-//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
-//! details for midi-related operations and data management.
-//! Key types exported from this module: `MidiState`.
-//! Primary functions: `new()`, `set_soundfont()`, `has_soundfont()`, `clear_soundfont()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! MIDI SoundFont state tracking.
 
-/// MIDI SoundFont state.
-///
-/// Tracks whether a SoundFont (SF2) file has been loaded and stores its raw
-/// bytes for future MIDI decoding. At most one SoundFont can be active at a
-/// time; loading a new one replaces the previous. The data is validated for a
-/// valid RIFF/sfbk header before being stored.
-///
-/// # Fields
-/// - `soundfont_data` — `Option<Vec<u8>>`.
-/// - `soundfont_path` — `Option<String>`.
+/// MIDI SoundFont state: loaded SF2 data and path.
+
 #[derive(Debug, Clone, Default)]
 pub struct MidiState {
-    /// Raw SF2 SoundFont data, or `None` if no SoundFont is loaded.
+    /// Raw SF2 data.
     soundfont_data: Option<Vec<u8>>,
-    /// Path of the loaded SoundFont file, if any.
+    /// Path to loaded SF2.
     soundfont_path: Option<String>,
 }
 
 impl MidiState {
-    /// Create a new empty MidiState with no SoundFont loaded.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Creates a new empty state.
     pub fn new() -> Self {
         Self {
             soundfont_data: None,
@@ -41,17 +19,7 @@ impl MidiState {
         }
     }
 
-    /// Load a SoundFont from raw SF2 data. Replaces the current soundfont value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `data` — `Vec<u8>`.
-    /// - `path` — `Option<String>`.
-    ///
-    /// # Returns
-    /// `Result<(), String>`.
-    ///
-    /// Validates the RIFF header before storing. Returns an error if
-    /// the data is too small or has an invalid header.
+    /// Loads SF2 data. Validates RIFF/sfbk header.
     pub fn set_soundfont(&mut self, data: Vec<u8>, path: Option<String>) -> Result<(), String> {
         // Minimal SF2 header validation: must start with RIFF
         if data.len() < 12 {
@@ -69,35 +37,25 @@ impl MidiState {
         Ok(())
     }
 
-    /// Check whether a SoundFont is currently loaded.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if a SoundFont is loaded.
     pub fn has_soundfont(&self) -> bool {
         self.soundfont_data.is_some()
     }
 
-    /// Clear the loaded SoundFont, freeing its memory.
+    /// Clears the loaded SoundFont.
     pub fn clear_soundfont(&mut self) {
         self.soundfont_data = None;
         self.soundfont_path = None;
     }
 
-    /// Get the path of the loaded SoundFont, if any.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
+    /// Returns the SoundFont path, if any.
     pub fn soundfont_path(&self) -> Option<&str> {
         self.soundfont_path.as_deref()
     }
 
-    /// Get a reference to the raw SoundFont data, if loaded.
-    ///
-    /// # Returns
-    /// `Option<&[u8]>`.
+    /// Returns a reference to the raw SoundFont data, if loaded.
     pub fn soundfont_data(&self) -> Option<&[u8]> {
         self.soundfont_data.as_deref()
     }
 }
 
-// Tests migrated to tests/rust/unit/audio_tests.rs

@@ -1,13 +1,12 @@
-//! Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
-//!
-//! [`AnimStateMachine`] owns an [`Animation`] controller and drives clip selection based on
-//! named parameters (`float`, `bool`, `int`) and simple comparison conditions.
+//! Scope: Drive animation clip changes from parameterized finite-state transitions.
+//! This file defines state-machine types, transition conditions, and helper parsers.
+//! It owns transition evaluation and state-to-clip control behavior.
 
 use std::collections::HashMap;
 
 use super::controller::Animation;
 
-// ── Parameter value ──────────────────────────────────────────────────────────
+// ---- Type: AnimParamValue ----
 
 /// Value held by an animation parameter.
 ///
@@ -25,7 +24,7 @@ pub enum AnimParamValue {
     Int(i32),
 }
 
-// ── Condition types ──────────────────────────────────────────────────────────
+// ---- Type: ConditionOp ----
 
 /// Comparison operator for a transition condition.
 ///
@@ -47,6 +46,8 @@ pub enum ConditionOp {
     Neq,
 }
 
+// ---- Type: ConditionValue ----
+
 /// Right-hand side value for a transition condition.
 ///
 /// # Variants
@@ -59,6 +60,8 @@ pub enum ConditionValue {
     /// Boolean value.
     Bool(bool),
 }
+
+// ---- Type: TransitionCondition ----
 
 /// A single condition on one named parameter.
 ///
@@ -76,7 +79,7 @@ pub struct TransitionCondition {
     pub value: ConditionValue,
 }
 
-// ── Transition ───────────────────────────────────────────────────────────────
+// ---- Type: AnimTransition ----
 
 /// A directed state transition with a single condition.
 ///
@@ -94,7 +97,7 @@ pub struct AnimTransition {
     pub condition: TransitionCondition,
 }
 
-// ── State config ─────────────────────────────────────────────────────────────
+// ---- Type: AnimStateConfig ----
 
 /// Configuration for a single state in the state machine.
 ///
@@ -109,7 +112,7 @@ pub struct AnimStateConfig {
     pub looping: bool,
 }
 
-// ── AnimStateMachine ─────────────────────────────────────────────────────────
+// ---- Type: AnimStateMachine ----
 
 /// Parameter-driven finite-state machine for animation control.
 ///
@@ -137,6 +140,7 @@ pub struct AnimStateMachine {
 }
 
 impl AnimStateMachine {
+    // ---- Implementation: AnimStateMachine ----
     /// Creates a new state machine with an owned animation and a named initial state.
     ///
     /// # Parameters
@@ -368,7 +372,7 @@ impl AnimStateMachine {
     }
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ---- Helper Functions: Condition Evaluation ----
 
 /// Applies a comparison operator to two `f32` values.
 pub fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
@@ -433,95 +437,4 @@ pub fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
     }
 
     Err(format!("parse_condition: cannot find operator in '{}'", s))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::animation::controller::Animation;
-    use crate::math::Rect;
-
-    fn make_anim() -> Animation {
-        let mut anim = Animation::new();
-        anim.add_frame(Rect::new(0.0, 0.0, 32.0, 32.0));
-        anim.add_frame(Rect::new(32.0, 0.0, 32.0, 32.0));
-        anim.add_clip("idle", vec![0], 1.0, true);
-        anim.add_clip("walk", vec![0, 1], 10.0, true);
-        anim
-    }
-
-    #[test]
-    fn initial_state_is_set() {
-        let sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        assert_eq!(sm.get_state(), "idle");
-    }
-
-    #[test]
-    fn add_state_and_force_transition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        assert!(sm.force_state("walk"));
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn force_nonexistent_state_returns_false() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        assert!(!sm.force_state("flying"));
-    }
-
-    #[test]
-    fn param_driven_transition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "speed > 0.1");
-        sm.set_param_float("speed", 0.5);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn param_below_threshold_stays() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "speed > 0.1");
-        sm.set_param_float("speed", 0.05);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "idle");
-    }
-
-    #[test]
-    fn bool_param_condition() {
-        let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-        sm.add_state("idle", "idle", true);
-        sm.add_state("walk", "walk", true);
-        sm.add_transition("idle", "walk", "moving == true");
-        sm.set_param_bool("moving", true);
-        sm.update(0.016);
-        assert_eq!(sm.get_state(), "walk");
-    }
-
-    #[test]
-    fn parse_condition_gt() {
-        let c = parse_condition("speed > 5.0").unwrap();
-        assert_eq!(c.param, "speed");
-        assert_eq!(c.op, ConditionOp::Gt);
-    }
-
-    #[test]
-    fn parse_condition_invalid_returns_error() {
-        assert!(parse_condition("noop").is_err());
-    }
-
-    #[test]
-    fn compare_nums_helpers() {
-        assert!(compare_nums(2.0, 1.0, &ConditionOp::Gt));
-        assert!(!compare_nums(1.0, 2.0, &ConditionOp::Gt));
-        assert!(compare_nums(1.0, 1.0, &ConditionOp::Eq));
-        assert!(compare_nums(1.0, 2.0, &ConditionOp::Neq));
-    }
 }

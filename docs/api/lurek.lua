@@ -8357,17 +8357,55 @@ function LGlobe:addMarker(mtype, lat, lon, label) end
 ---@return boolean True when the province was added.
 function LGlobe:addProvince(p) end
 
+--- Build and cache default reachability for a faction.
+---@param faction string Faction key.
+---@param start_id integer Start province ID.
+---@param max_cost number Max traversal cost.
+---@return nil No value is returned.
+function LGlobe:cacheReachability(faction, start_id, max_cost) end
+
+--- Clear texture mapping for a province.
+---@param id integer Province ID.
+---@return boolean True when province exists.
+function LGlobe:clearProvinceTexture(id) end
+
+--- Load viewer fog mask from base64 payload.
+---@param viewer string Viewer name.
+---@param payload string Base64 encoded mask.
+---@return boolean True when decode succeeded.
+function LGlobe:decodeFogBase64(viewer, payload) end
+
+--- Serialize viewer fog mask to base64.
+---@param viewer string Viewer name.
+---@return string Base64 fog payload.
+function LGlobe:encodeFogBase64(viewer) end
+
+--- Export province polygons as OBJ text.
+---@return string OBJ payload.
+function LGlobe:exportProvinceMeshOBJ() end
+
 --- Find the shortest province path from `from_id` to `to_id`.
 ---@param from_id integer Starting province ID.
 ---@param to_id integer Target province ID.
 ---@return table Array of province IDs for the path.
 function LGlobe:findPath(from_id, to_id) end
 
+--- Return cached reachability map for a faction.
+---@param faction string Faction key.
+---@return table Province->cost map.
+function LGlobe:getCachedReachability(faction) end
+
 --- Get the current camera (lat, lon, zoom).
 ---@return number Camera latitude in degrees.
 ---@return number Camera longitude in degrees.
 ---@return number Camera zoom level.
 function LGlobe:getCamera() end
+
+--- Get fog state string for province and viewer.
+---@param viewer string Viewer name.
+---@param id integer Province ID.
+---@return string `hidden`, `explored`, or `visible`.
+function LGlobe:getFogState(viewer, id) end
 
 --- Returns the current LOD tier as a string: "far", "mid", or "near".
 ---@return string Current LOD tier.
@@ -8393,6 +8431,16 @@ function LGlobe:getNeighbors(id) end
 ---@param key string Attribute name.
 ---@return string Attribute value when present.
 function LGlobe:getProvinceAttr(id, key) end
+
+--- Return sector name of a province.
+---@param id integer Province ID.
+---@return string Sector name when assigned.
+function LGlobe:getProvinceSector(id) end
+
+--- Return province IDs in a sector.
+---@param sector string Sector name.
+---@return table Array of province IDs.
+function LGlobe:getSectorProvinces(sector) end
 
 --- Gets the current simulated time of day for daylight computation.
 ---@return number Current time of day in hours.
@@ -8436,6 +8484,13 @@ function LGlobe:pick(sx, sy) end
 ---@return number Picked longitude in degrees.
 function LGlobe:pickLatLon(sx, sy) end
 
+--- Raycast-style picking by marching from globe center toward screen point.
+---@param sx number Target screen x coordinate.
+---@param sy number Target screen y coordinate.
+---@param steps? integer Optional march step count.
+---@return integer Picked province ID when found.
+function LGlobe:pickRaycast(sx, sy, steps) end
+
 --- Returns the number of provinces.
 ---@return integer Number of provinces.
 function LGlobe:provinceCount() end
@@ -8450,6 +8505,11 @@ function LGlobe:reachable(start_id, max_cost) end
 ---@param id integer Arc ID to remove.
 ---@return boolean True when the arc existed.
 function LGlobe:removeArc(id) end
+
+--- Remove a heat-map layer by name.
+---@param name string Heat layer name.
+---@return boolean True when layer existed.
+function LGlobe:removeHeatLayer(name) end
 
 --- Removes a text label from the globe map by its unique string identifier.
 ---@param id integer Label ID to remove.
@@ -8487,6 +8547,11 @@ function LGlobe:revealProvince(viewer, id) end
 ---@return nil No value is returned.
 function LGlobe:setActiveViewer(viewer) end
 
+--- Set automatic globe spin speed in degrees per second.
+---@param deg_per_sec number Speed in deg/s.
+---@return nil No value is returned.
+function LGlobe:setAutoRotationSpeed(deg_per_sec) end
+
 --- Enable or disable province border rendering.
 ---@param show boolean Border visibility flag.
 ---@return nil No value is returned.
@@ -8498,6 +8563,22 @@ function LGlobe:setBorders(show) end
 ---@param zoom number Zoom factor.
 ---@return nil No value is returned.
 function LGlobe:setCamera(lat, lon, zoom) end
+
+--- Set fog state (`hidden`, `explored`, `visible`) for one province.
+---@param viewer string Viewer name.
+---@param id integer Province ID.
+---@param state string Fog state string.
+---@return nil No value is returned.
+function LGlobe:setFogState(viewer, id, state) end
+
+--- Configure a float-driven heat-map layer.
+---@param name string Layer name.
+---@param attr_key string Province attr key with float value.
+---@param min number Minimum value.
+---@param max number Maximum value.
+---@param alpha number Layer alpha.
+---@return nil No value is returned.
+function LGlobe:setHeatLayer(name, attr_key, min, max, alpha) end
 
 --- Updates the visible text content of an existing globe label.
 ---@param id integer Label ID to update.
@@ -8540,6 +8621,19 @@ function LGlobe:setLayerVisible(name, visible) end
 ---@return nil No value is returned.
 function LGlobe:setMarkerAttr(id, key, value) end
 
+--- Configure pulsing marker animation.
+---@param id integer Marker ID.
+---@param hz number Pulse frequency in Hz.
+---@param amplitude number Pulse amplitude in [0,1].
+---@return boolean True when marker exists.
+function LGlobe:setMarkerPulse(id, hz, amplitude) end
+
+--- Configure marker rotation speed.
+---@param id integer Marker ID.
+---@param deg_per_sec number Rotation speed.
+---@return boolean True when marker exists.
+function LGlobe:setMarkerRotation(id, deg_per_sec) end
+
 --- Sets whether this specific marker is visible on the globe.
 ---@param id integer Marker ID to update.
 ---@param visible boolean Visibility flag.
@@ -8552,6 +8646,22 @@ function LGlobe:setMarkerVisible(id, visible) end
 ---@param value string Attribute value.
 ---@return boolean True when the province exists.
 function LGlobe:setProvinceAttr(id, key, value) end
+
+--- Assign province to a sector/strategic zone.
+---@param id integer Province ID.
+---@param sector string Sector name.
+---@return nil No value is returned.
+function LGlobe:setProvinceSector(id, sector) end
+
+--- Set texture raw handle and atlas UV rectangle for a province.
+---@param id integer Province ID.
+---@param texture_raw integer Raw texture handle from LImage id.
+---@param u0 number UV min U.
+---@param v0 number UV min V.
+---@param u1 number UV max U.
+---@param v1 number UV max V.
+---@return boolean True when province exists.
+function LGlobe:setProvinceTexture(id, texture_raw, u0, v0, u1, v1) end
 
 --- Set planet rotation (degrees).
 ---@param deg number Rotation in degrees.
@@ -8615,6 +8725,13 @@ function LGlobeRegistry:type() end
 ---@return boolean True when the type matches.
 function LGlobeRegistry:typeOf(name) end
 
+--- Generate procedural Voronoi provinces from seed points.
+---@param name string Globe name.
+---@param seeds table Array of `{lat, lon}` seed pairs.
+---@param spec? table Optional globe specification table.
+---@return LGlobe Generated globe instance.
+lurek.globe.generateVoronoi = function(name, seeds, spec) end
+
 --- Get an existing globe by name, or nil.
 ---@param name string Globe name.
 ---@return LGlobe Existing globe instance when found.
@@ -8642,6 +8759,13 @@ lurek.globe.greatCirclePath = function(lat1, lon1, lat2, lon2, steps) end
 ---@param lon number Longitude in degrees.
 ---@return table Cartesian vector table with x, y, and z values.
 lurek.globe.latLonToUnit = function(lat, lon) end
+
+--- Load provinces from a color-index PNG file and create a globe.
+---@param name string Globe name.
+---@param png_path string PNG file path.
+---@param spec? table Optional globe specification table.
+---@return LGlobe Loaded globe instance.
+lurek.globe.loadFromPNG = function(name, png_path, spec) end
 
 --- Load provinces from a TOML string and create a globe.
 ---@param name string Globe name.
@@ -10228,7 +10352,7 @@ function LProvinceGrid:deserializeShapeData(bytes) end
 
 --- Draws all province shapes using their original PNG colours.
 ---@param ... LuaValue
----@return nil No value is returned.
+---@return number Number of polygon draw commands emitted.
 function LProvinceGrid:drawShapes(...) end
 
 --- Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
@@ -18391,10 +18515,54 @@ lurek.pipeline.newStep = function(name, fn) end
 ---@class lurek.procgen
 lurek.procgen = {}
 
+--- Lua-visible wrapper for [`BiomeClassifier`].
+---@class BiomeClassifier
+BiomeClassifier = {}
+
+--- Classifies a single cell given its height, moisture, and temperature (all in 0..1).
+---@param height number Elevation value in [0, 1].
+---@param moisture number Moisture value in [0, 1].
+---@param temperature number Temperature value in [0, 1]. Use 0.5 when unknown.
+---@return string Biome name (e.g. "ocean", "desert", "grassland").
+function BiomeClassifier:classify(height, moisture, temperature) end
+
+--- Classifies an entire map from flat arrays of heights, moisture, and temperature.
+---@param width integer Map width.
+---@param height integer Map height.
+---@param heights table Array of elevation values in [0, 1].
+---@param moisture table Array of moisture values in [0, 1].
+---@param temperature? table Optional array of temperature values. Defaults to 0.5.
+---@return table Array of biome name strings in row-major order.
+function BiomeClassifier:classifyMap(width, height, heights, moisture, temperature) end
+
+--- Returns the type name of this object.
+---@return string "BiomeClassifier".
+function BiomeClassifier:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string Type name.
+---@return boolean True if the type name matches.
+function BiomeClassifier:typeOf(name) end
+
+--- Returns the representative RGBA color for a biome name string.
+---@param name string Biome name (e.g. "ocean", "desert", "grassland").
+---@return integer R component 0-255.
+---@return integer G component 0-255.
+---@return integer B component 0-255.
+---@return integer A component (always 255).
+lurek.procgen.biomeColor = function(name) end
+
 --- Generates a dungeon using Binary Space Partitioning.
 ---@param opts? table Optional BSP dungeon settings.
 ---@return table Generated dungeon data.
 lurek.procgen.bspDungeon = function(opts) end
+
+--- Generates a BSP dungeon and prefab placement metadata.
+---@param opts? table Optional BSP dungeon settings.
+---@param prefabs table Array of prefab tables `{ name, width, height }`.
+---@return table Dungeon data with rooms and corridors.
+---@return table Prefab placement metadata array.
+lurek.procgen.bspDungeonWithPrefabs = function(opts, prefabs) end
 
 --- Generates a cave-like map using cellular automata.
 ---@param w integer Output grid width.
@@ -18436,6 +18604,14 @@ lurek.procgen.generateNames = function(samples, n, min_len, max_len, seed) end
 ---@return table Generated heightmap data.
 lurek.procgen.heightmap = function(opts) end
 
+--- Converts a cellular byte map (`0`/`1`) into a normalized heightmap-style response.
+---@param width integer Map width.
+---@param height integer Map height.
+---@param cells table Flat cellular byte map.
+---@param floor_value? integer Optional floor value treated as 0.0 (default 0).
+---@return table Heightmap-like table with `cells`, `width`, `height`.
+lurek.procgen.heightmapFromCellular = function(width, height, cells, floor_value) end
+
 --- Generates an L-system string.
 ---@param opts table L-system settings table.
 ---@return string Generated L-system string.
@@ -18447,6 +18623,11 @@ lurek.procgen.lsystem = function(opts) end
 ---@param step? number Optional step length.
 ---@return table Array of line-segment tables.
 lurek.procgen.lsystemSegments = function(opts, angle_deg, step) end
+
+--- Creates a new biome classifier with optional custom thresholds.
+---@param opts? table Optional rules table with fields: ocean_threshold, coast_threshold, mountain_threshold, ice_cap_threshold, cold_temperature, warm_temperature, dry_moisture, wet_moisture.
+---@return BiomeClassifier New biome classifier.
+lurek.procgen.newBiomeClassifier = function(opts) end
 
 --- Generates a noise map using the configurable NoiseGenerator.
 ---@param width integer Output width.
@@ -18461,6 +18642,13 @@ lurek.procgen.noiseMap = function(width, height, opts) end
 ---@param opts? table Optional noise generator settings.
 ---@return table Generated noise values.
 lurek.procgen.noiseMapParallel = function(width, height, opts) end
+
+--- Generates a seeded noise map in parallel using the NoiseGenerator instance path.
+---@param width integer Output width.
+---@param height integer Output height.
+---@param opts? table Optional noise generator settings including `seed`.
+---@return table Generated noise values.
+lurek.procgen.noiseMapParallelSeeded = function(width, height, opts) end
 
 --- Evaluates periodic Perlin noise at a point.
 ---@param x number Sample X coordinate.
@@ -18483,6 +18671,14 @@ lurek.procgen.poissonDisk = function(w, h, min_dist, max_attempts, seed) end
 ---@param opts? table Optional room dungeon settings.
 ---@return table Generated dungeon data.
 lurek.procgen.roomsDungeon = function(opts) end
+
+--- Generates a rooms dungeon and stamps prefabs into room interiors.
+---@param opts? table Optional room dungeon settings.
+---@param prefabs table Array of prefab tables `{ name, width, height, mask }`.
+---@param stamp_value? integer Optional tile value written for stamped cells (default 3).
+---@return table Generated dungeon data.
+---@return table Prefab placement metadata array.
+lurek.procgen.roomsDungeonWithPrefabs = function(opts, prefabs, stamp_value) end
 
 --- Returns a single Simplex noise value at the given 2-D coordinate.
 ---@param x number Sample X coordinate.
@@ -21269,6 +21465,15 @@ function LSkeletonAnimation:getEvents(from, to) end
 ---@return integer Timeline count.
 function LSkeletonAnimation:getTimelineCount() end
 
+--- Evaluates all timelines at the given time and returns a snapshot table.
+---@param time number Playback time in seconds.
+---@return table Array of `{ bone_idx, property, value }` entries.
+function LSkeletonAnimation:poseAt(time) end
+
+--- Creates a reversed copy of this animation clip.
+---@return LSkeletonAnimation New reversed animation clip.
+function LSkeletonAnimation:reverse() end
+
 --- Returns the type name of this object.
 ---@return string Lua-visible type name.
 function LSkeletonAnimation:type() end
@@ -21277,6 +21482,11 @@ function LSkeletonAnimation:type() end
 ---@param name string Type name to compare against.
 ---@return boolean True when the type matches.
 function LSkeletonAnimation:typeOf(name) end
+
+--- Builds a SkeletonAnimation from a JSON string.
+---@param json string JSON payload describing the animation clip.
+---@return LSkeletonAnimation? Parsed animation or nil on schema mismatch.
+lurek.spine.animationFromJson = function(json) end
 
 --- Creates a new empty skeleton with the given name.
 ---@param name string Skeleton name.
@@ -22825,6 +23035,12 @@ function LTileMap:drawToImage(tile_size) end
 ---@return nil No value is returned.
 function LTileMap:fill(layer, gid) end
 
+--- Returns all (x, y) positions in the layer where the tile GID matches the given value.
+---@param layer integer 1-based layer index.
+---@param gid integer Tile GID to search for.
+---@return table Array of {x, y} tables for each matching position.
+function LTileMap:findTilesByGid(layer, gid) end
+
 --- Fires the tile-exit callback for the given GID.
 ---@param gid integer Tile global ID whose callback should be fired.
 ---@param entity table Entity data passed to the callback.
@@ -23042,6 +23258,11 @@ function LTileMap:sweepRect(layer, x, y, w, h, dx, dy) end
 ---@return number World X position in pixels.
 ---@return number World Y position in pixels.
 function LTileMap:tileToWorld(tx, ty) end
+
+--- Builds a GID-to-positions index for the given layer.
+---@param layer integer 1-based layer index.
+---@return table Table mapping each GID (integer key) to an array of {x, y} tables.
+function LTileMap:tileTypeIndex(layer) end
 
 --- Converts the given layer into a 2D navigation grid.
 ---@param layer integer Layer index passed through to the underlying navigation-grid builder.

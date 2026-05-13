@@ -967,4 +967,91 @@ describe("globe strict: LGlobeRegistry methods", function()
     end)
 end)
 
+-- @describe globe extended feature coverage
+describe("globe extended feature coverage", function()
+    -- @covers lurek.globe.loadFromPNG
+    it("loadFromPNG is callable", function()
+        local ok = pcall(function()
+            lurek.globe.loadFromPNG("cov_png", "assets/textures/nonexistent.png", {})
+        end)
+        expect_type("boolean", ok)
+    end)
+
+    -- @covers lurek.globe.generateVoronoi
+    it("generateVoronoi returns userdata", function()
+        local g = lurek.globe.generateVoronoi("cov_voronoi", {{0,0}, {10,10}, {-10,-5}}, {})
+        expect_type("userdata", g)
+    end)
+
+    -- @covers LGlobe:setProvinceTexture
+    -- @covers LGlobe:clearProvinceTexture
+    -- @covers LGlobe:setProvinceSector
+    -- @covers LGlobe:getProvinceSector
+    -- @covers LGlobe:getSectorProvinces
+    -- @covers lurek.globe.new
+    it("province texture + sector APIs are callable", function()
+        local g = lurek.globe.new("cov_prov_ext")
+        g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+        expect_equal(true, g:setProvinceTexture(1, 0, 0.0, 0.0, 1.0, 1.0))
+        expect_equal(true, g:clearProvinceTexture(1))
+        g:setProvinceSector(1, "west")
+        expect_equal("west", g:getProvinceSector(1))
+        local ids = g:getSectorProvinces("west")
+        expect_true(#ids >= 1)
+    end)
+
+    -- @covers LGlobe:setHeatLayer
+    -- @covers LGlobe:removeHeatLayer
+    -- @covers lurek.globe.new
+    it("heat layer APIs are callable", function()
+        local g = lurek.globe.new("cov_heat")
+        expect_no_error(function() g:setHeatLayer("h1", "pop", 0, 100, 0.6) end)
+        expect_equal(true, g:removeHeatLayer("h1"))
+    end)
+
+    -- @covers LGlobe:setFogState
+    -- @covers LGlobe:getFogState
+    -- @covers LGlobe:encodeFogBase64
+    -- @covers LGlobe:decodeFogBase64
+    -- @covers lurek.globe.new
+    it("extended fog APIs round-trip", function()
+        local g = lurek.globe.new("cov_fog_ext")
+        g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+        g:setFogState("f1", 1, "explored")
+        expect_equal("explored", g:getFogState("f1", 1))
+        local payload = g:encodeFogBase64("f1")
+        expect_type("string", payload)
+        expect_equal(true, g:decodeFogBase64("f1", payload))
+    end)
+
+    -- @covers LGlobe:setMarkerPulse
+    -- @covers LGlobe:setMarkerRotation
+    -- @covers lurek.globe.new
+    it("marker animation APIs are callable", function()
+        local g = lurek.globe.new("cov_marker_anim")
+        local id = g:addMarker("poi", 10.0, 10.0, "A")
+        expect_equal(true, g:setMarkerPulse(id, 2.0, 0.3))
+        expect_equal(true, g:setMarkerRotation(id, 90.0))
+    end)
+
+    -- @covers LGlobe:setAutoRotationSpeed
+    -- @covers LGlobe:cacheReachability
+    -- @covers LGlobe:getCachedReachability
+    -- @covers LGlobe:pickRaycast
+    -- @covers LGlobe:exportProvinceMeshOBJ
+    -- @covers lurek.globe.new
+    it("runtime helper APIs are callable", function()
+        local g = lurek.globe.new("cov_runtime_ext")
+        g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}}, neighbors = {2} })
+        g:addProvince({ id = 2, centroid = {2,2}, vertices = {{2,2},{3,2},{3,3}}, neighbors = {1} })
+        g:setAutoRotationSpeed(0.02)
+        g:cacheReachability("blue", 1, 5.0)
+        local reach = g:getCachedReachability("blue")
+        expect_type("table", reach)
+        local _ = g:pickRaycast(640, 360, 8)
+        local obj = g:exportProvinceMeshOBJ()
+        expect_type("string", obj)
+    end)
+end)
+
 test_summary()

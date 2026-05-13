@@ -1,35 +1,17 @@
-//! Audio source type and playback state enums for the audio subsystem.
-//!
-//! The primary audio logic lives in `mixer::Mixer`. This module re-exports
-//! the public enum types used by the Lua API and engine code.
-//!
-//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
-//! details for source-related operations and data management.
-//! Key types exported from this module: `AudioSource`.
-//! Primary functions: `new()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! Legacy audio source metadata and spatial state.
+//! SpatialState: 3D positioning; AudioSource: legacy handle (superseded by Mixer SlotMap).
 
 use crate::log_msg;
 use crate::runtime::log_messages::AS01;
 
-/// 3D spatial audio state for an audio source.
-///
-/// Used to compute panning relative to the listener position.
-/// Lurek2D uses 2D x/y primarily; z is accepted but ignored for panning calculation.
-///
-/// # Fields
-/// - `position` — `[f32; 3]`. World-space position `[x, y, z]`.
-/// - `velocity` — `[f32; 3]`. World-space velocity vector (for Doppler).
-/// - `orientation` — `[f32; 6]`. Forward (xyz) + up (xyz) vectors.
+/// 3D spatial audio state: position, velocity, orientation.
 #[derive(Debug, Clone, Copy)]
 pub struct SpatialState {
     /// World-space position `[x, y, z]`.
     pub position: [f32; 3],
-    /// World-space velocity vector (for Doppler effect calculation).
+    /// World-space velocity (Doppler effect).
     pub velocity: [f32; 3],
-    /// Forward direction followed by up direction (6 floats total).
+    /// Forward + up direction vectors `[fx, fy, fz, ux, uy, uz]`.
     pub orientation: [f32; 6],
 }
 
@@ -43,36 +25,20 @@ impl Default for SpatialState {
     }
 }
 
-/// Handle for a loaded audio asset (legacy compatibility shim).
-///
-/// # Fields
-/// - `id` — `usize`.
-/// - `file_path` — `String`.
-/// - `volume` — `f32`.
-/// - `looping` — `bool`.
-///
-/// Superseded by `Mixer`'s `SlotMap<SoundKey, AudioEntry>`. Kept for API
-/// compatibility but not used in the active code path.
+/// Legacy audio source handle (superseded by SlotMap-based mixer).
 pub struct AudioSource {
-    /// Numeric index (legacy, unused by SlotMap-based mixer).
+    /// Numeric ID (legacy, unused).
     pub id: usize,
-    /// Path to the audio file, relative to the game directory.
+    /// File path relative to game directory.
     pub file_path: String,
-    /// Playback volume in `[0.0, 2.0]`; defaults to `1.0`.
+    /// Playback volume (default 1.0).
     pub volume: f32,
-    /// Whether the source should loop on completion; defaults to `false`.
+    /// Loop on completion.
     pub looping: bool,
 }
 
 impl AudioSource {
-    /// Creates a new `AudioSource` with default volume (1.0) and looping disabled.
-    ///
-    /// # Parameters
-    /// - `id` — `usize`.
-    /// - `file_path` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Creates a new audio source with default volume (1.0), looping disabled.
     pub fn new(id: usize, file_path: &str) -> Self {
         log_msg!(debug, AS01, "{}", file_path);
         AudioSource {
@@ -84,4 +50,3 @@ impl AudioSource {
     }
 }
 
-// Tests migrated to tests/rust/unit/audio_tests.rs

@@ -530,6 +530,51 @@ impl LuaUserData for LuaTileMap {
             Ok(())
         });
 
+        // -- tileTypeIndex --
+        /// Builds a GID-to-positions index for the given layer.
+        /// Returns a table mapping each non-zero GID to an array of {x, y} positions.
+        /// Useful for "find all tiles of type T" queries.
+        /// @param | layer | integer | 1-based layer index.
+        /// @return | table | Table mapping each GID (integer key) to an array of {x, y} tables.
+        methods.add_method("tileTypeIndex", |lua, this, layer: usize| {
+            if layer == 0 {
+                return Err(mlua::Error::RuntimeError("layer must be >= 1".into()));
+            }
+            let index = this.inner.borrow().tile_type_index(layer - 1);
+            let result = lua.create_table()?;
+            for (gid, positions) in index {
+                let arr = lua.create_table()?;
+                for (i, (x, y)) in positions.iter().enumerate() {
+                    let pos = lua.create_table()?;
+                    pos.set("x", *x)?;
+                    pos.set("y", *y)?;
+                    arr.set(i + 1, pos)?;
+                }
+                result.set(gid, arr)?;
+            }
+            Ok(result)
+        });
+
+        // -- findTilesByGid --
+        /// Returns all (x, y) positions in the layer where the tile GID matches the given value.
+        /// @param | layer | integer | 1-based layer index.
+        /// @param | gid | integer | Tile GID to search for.
+        /// @return | table | Array of {x, y} tables for each matching position.
+        methods.add_method("findTilesByGid", |lua, this, (layer, gid): (usize, u32)| {
+            if layer == 0 {
+                return Err(mlua::Error::RuntimeError("layer must be >= 1".into()));
+            }
+            let positions = this.inner.borrow().find_tiles_by_gid(layer - 1, gid);
+            let arr = lua.create_table()?;
+            for (i, (x, y)) in positions.iter().enumerate() {
+                let pos = lua.create_table()?;
+                pos.set("x", *x)?;
+                pos.set("y", *y)?;
+                arr.set(i + 1, pos)?;
+            }
+            Ok(arr)
+        });
+
         // -- setViewport --
         /// Sets the viewport rectangle for rendering culling.
         /// @param | x | number | Viewport left position in world pixels.

@@ -13,11 +13,11 @@ use crate::globe::picking::{pick, PickResult};
 use crate::globe::projection::OrbitCamera;
 use crate::globe::topology::ProvinceGraph;
 use crate::globe::types::{
-    Arc as GlobeArc, GlobeError, GlobeSpec, Province, ProvinceId, MAX_PROVINCES,
+    Arc as GlobeArc, GlobeError, GlobeSpec, HeatLayer, Province, ProvinceId, MAX_PROVINCES,
 };
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::FontKey;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// Owns all domain stores for one named globe simulation.
 #[derive(Debug, Default)]
@@ -44,6 +44,14 @@ pub struct Globe {
     pub arc_next_id: u32,
     /// Which viewer's fog mask is active, if any.
     pub active_viewer: Option<String>,
+    /// Heat-map overlays driven by numeric province attributes.
+    pub heat_layers: Vec<HeatLayer>,
+    /// Province grouping into sectors or strategic zones.
+    pub sectors: HashMap<String, HashSet<ProvinceId>>,
+    /// Optional cached reachability by faction key.
+    pub reachability_cache: HashMap<String, HashMap<ProvinceId, f64>>,
+    /// Internal simulation clock in seconds.
+    pub sim_time_sec: f32,
 }
 
 impl Globe {
@@ -102,7 +110,9 @@ impl Globe {
     pub fn update(&mut self, dt: f32) {
         let speed = 1.0; // degrees / simulated-hour
         self.spec.time_of_day = (self.spec.time_of_day + dt * speed / 3600.0) % 24.0;
-        self.spec.rotation_deg = (self.spec.rotation_deg + dt * 0.01) % 360.0;
+        self.spec.rotation_deg =
+            (self.spec.rotation_deg + dt * self.spec.auto_rotation_deg_per_sec) % 360.0;
+        self.sim_time_sec += dt.max(0.0);
     }
 
     /// Pick the province under a screen coordinate.
@@ -123,10 +133,63 @@ impl Globe {
             &self.markers,
             &self.labels,
             &self.layers,
+            &self.heat_layers,
             &self.arcs,
             self.active_viewer.as_deref(),
             default_font,
+            self.sim_time_sec,
         )
+    }
+
+    /// Upsert a heat-map layer.
+    pub fn set_heat_layer(&mut self, layer: HeatLayer) {
+        if let Some(existing) = self.heat_layers.iter_mut().find(|l| l.name == layer.name) {
+            *existing = layer;
+            return;
+        }
+        self.heat_layers.push(layer);
+    }
+
+    /// Remove a heat-map layer by name.
+    pub fn remove_heat_layer(&mut self, name: &str) -> bool {
+        let before = self.heat_layers.len();
+        self.heat_layers.retain(|l| l.name != name);
+        self.heat_layers.len() != before
+    }
+
+    /// Assign province to a sector group.
+    pub fn set_province_sector(&mut self, id: ProvinceId, sector: impl Into<String>) {
+        let sector = sector.into();
+        for ids in self.sectors.values_mut() {
+            ids.remove(&id);
+        }
+        self.sectors.entry(sector).or_default().insert(id);
+    }
+
+    /// Get sector name for a province, if assigned.
+    pub fn province_sector(&self, id: ProvinceId) -> Option<&str> {
+        self.sectors
+            .iter()
+            .find_map(|(name, ids)| if ids.contains(&id) { Some(name.as_str()) } else { None })
+    }
+
+    /// Return provinces in a sector.
+    pub fn sector_provinces(&self, sector: &str) -> Vec<ProvinceId> {
+        self.sectors
+            .get(sector)
+            .map(|set| set.iter().copied().collect())
+            .unwrap_or_default()
+    }
+
+    /// Cache default reachability for faction hooks.
+    pub fn cache_reachability_default(&mut self, faction: impl Into<String>, start: ProvinceId, max_cost: f64) {
+        let map = self.graph.reachable_default(start, max_cost);
+        self.reachability_cache.insert(faction.into(), map);
+    }
+
+    /// Get cached reachability map for faction.
+    pub fn cached_reachability(&self, faction: &str) -> Option<&HashMap<ProvinceId, f64>> {
+        self.reachability_cache.get(faction)
     }
 }
 

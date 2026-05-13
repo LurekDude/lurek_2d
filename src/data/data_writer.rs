@@ -1,8 +1,6 @@
-//! Write-cursor companion to [`DataView`](super::DataView).
-//!
-//! `DataWriter` provides typed write methods into a growable byte buffer.
-//! All multi-byte writes are little-endian unless a `_be` variant is used.
-//! The cursor auto-advances after each write; explicit `seek` is also supported.
+//! Scope: Growable byte-buffer writing.
+//! This file defines the DataWriter type and typed write helpers.
+//! It owns cursor advancement and little-endian default encoding.
 
 /// A growable byte buffer with a write cursor.
 ///

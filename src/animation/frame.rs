@@ -1,6 +1,10 @@
-//! [`AnimFrame`] â€” a single animation frame with a source rectangle and optional duration.
+//! Scope: Represent one animation frame and compatibility aliases.
+//! This file defines the animation frame data structure and constructor.
+//! It owns per-frame source-quad and optional frame-duration data.
 
 use crate::math::Rect;
+
+// ---- Type: AnimFrame ----
 
 /// A single animation frame with a source rectangle and optional duration.
 ///
@@ -19,13 +23,14 @@ pub struct AnimFrame {
 }
 
 impl AnimFrame {
+    // ---- Implementation: AnimFrame ----
     /// Creates a new frame from source quad and duration.
     pub fn new(quad: Rect, duration: f32) -> Self {
         Self { quad, duration }
     }
 }
 
-// â”€â”€ Backward-compatibility alias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---- Type: AnimationFrame Alias ----
 
 /// Backward-compatible alias for [`AnimFrame`].
 ///

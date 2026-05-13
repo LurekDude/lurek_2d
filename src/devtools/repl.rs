@@ -1,16 +1,8 @@
-//! REPL console for interactive Lua evaluation inside a running game session.
-//!
-//! [`ReplConsole`] wraps a Lua VM handle and provides:
-//!
-//! - `eval(input, lua)` — execute a Lua snippet; returns the result as a string.
-//! - `history()` — ordered list of evaluated inputs (most recent last).
-//! - `clear()` — wipe the history buffer.
-//!
-//! History is bounded to `max_history` entries (default 200).  When the limit
-//! is reached the oldest entry is dropped automatically.
-//!
-//! This module is pure-Rust data.  The Lua-side API lives in
-//! `src/lua_api/devtools_api.rs`.
+//! Scope: Interactive Lua REPL console with bounded input history.
+//! This file defines ReplConsole and expression evaluation with wrapping.
+//! It owns evaluation fallback paths and history buffer management.
+
+use crate::devtools::lua_display::value_to_string;
 
 /// Interactive Lua REPL with a bounded input history buffer.
 ///
@@ -65,7 +57,7 @@ impl ReplConsole {
         // Try to eval as an expression first (prepend "return").
         let expr = format!("return {input}");
         let result: String = match lua.load(&expr).eval::<mlua::Value>() {
-            Ok(v) => lua_value_to_string(&v),
+            Ok(v) => value_to_string(&v),
             Err(_) => {
                 // Fall back to running as a statement block.
                 match lua.load(input).exec() {
@@ -118,23 +110,5 @@ impl ReplConsole {
             self.history.remove(0);
         }
         self.history.push(entry);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Internal display helper
-// ---------------------------------------------------------------------------
-
-fn lua_value_to_string(v: &mlua::Value) -> String {
-    match v {
-        mlua::Value::Nil => "nil".to_string(),
-        mlua::Value::Boolean(b) => b.to_string(),
-        mlua::Value::Integer(i) => i.to_string(),
-        mlua::Value::Number(n) => format!("{n}"),
-        mlua::Value::String(s) => s.to_str().unwrap_or("<string>").to_string(),
-        mlua::Value::Table(_) => "<table>".to_string(),
-        mlua::Value::Function(_) => "<function>".to_string(),
-        mlua::Value::UserData(_) => "<userdata>".to_string(),
-        _ => "<value>".to_string(),
     }
 }

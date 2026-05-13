@@ -1,7 +1,6 @@
-//! Rolling frame-time statistics: averages, percentiles, and FPS.
-//!
-//! [`FrameStats`] maintains a fixed-capacity ring of frame durations and
-//! derives aggregate statistics on demand without allocating per query.
+//! Scope: Rolling frame-time statistics with aggregate percentile queries.
+//! This file defines FrameStats, FrameSnapshot, and per-frame recording.
+//! It owns fixed-capacity ring storage and percentile interpolation.
 
 use std::collections::VecDeque;
 

@@ -1,10 +1,11 @@
-//! Rolling window and derived-column operations: rank, pct_change, cumsum.
+//! Scope: Rolling-window and derived-column operations for time-series data.
+//! This file defines rolling_mean, rank, pct_change, cumsum methods on DataFrame.
+//! It owns window semantics, null-row handling, and per-column transformations.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 
 impl DataFrame {
     /// Add a rolling-mean column.
-    ///
     /// Rows with fewer than `window` predecessors get `Nil`.
     /// `window` must be ≥ 1.
     #[allow(clippy::needless_range_loop)]
@@ -157,8 +158,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Add a rank column.
-    ///
-    /// Rank is 1-based; ties get the average rank; Nil rows get `Nil`.
     pub fn with_rank(&mut self, col: ColRef, ascending: bool, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
@@ -198,8 +197,6 @@ impl DataFrame {
     }
 
     /// Add a percentage-change column.
-    ///
-    /// First row gets `Nil`. Rows where the previous value is zero get `Nil`.
     pub fn with_pct_change(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();
@@ -226,8 +223,6 @@ impl DataFrame {
     }
 
     /// Add a cumulative-sum column.
-    ///
-    /// Nil source rows produce `Nil` output and do not advance the accumulator.
     pub fn with_cumsum(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let n = self.nrows();

@@ -1,32 +1,18 @@
-//! Fast Fourier Transform (FFT) and Inverse FFT for the compute subsystem.
-//!
-//! Implements an iterative Cooley-Tukey radix-2 decimation-in-time algorithm.
-//! Inputs are automatically zero-padded to the next power of two. This keeps
-//! the implementation free of dynamic dispatch and external C libraries while
-//! remaining accurate enough for game audio analysis, procedural waveforms,
-//! and 2-D convolution via the convolution theorem.
-//!
-//! # Typical Usage
-//! ```lua
-//! local freqs = lurek.compute.fft({ 1, 0, -1, 0, 1, 0, -1, 0 })
-//! -- freqs is an array of { re = ..., im = ... } tables
-//! ```
-//!
-//! # Architecture Note
-//! Part of the **Foundations** module group (`compute`). Has no render, audio,
-//! input, or Lua dependencies.
+﻿//! FFT owns radix-2 spectral transforms for real sample buffers.
+//! It implements iterative Cooley-Tukey butterflies on padded power-of-two
+//! complex arrays and exposes forward, inverse, and magnitude outputs.
 
 use std::f64::consts::PI;
 
-// ---------------------------------------------------------------------------
-// Internal complex primitive
-// ---------------------------------------------------------------------------
+// Local complex primitive.
 
 #[derive(Clone, Copy, Debug, Default)]
 struct Complex {
     re: f64,
     im: f64,
 }
+
+// Complex arithmetic.
 
 impl Complex {
     #[inline]
@@ -59,11 +45,9 @@ impl Complex {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Bit-reversal permutation
-// ---------------------------------------------------------------------------
+// Bit-reversal helpers.
 
-/// Computes bit-reversal permutation index for n bits.
+/// Return the bit-reversed index for the requested bit width.
 #[inline]
 fn bit_reverse(mut x: usize, bits: u32) -> usize {
     let mut y = 0usize;
@@ -74,7 +58,7 @@ fn bit_reverse(mut x: usize, bits: u32) -> usize {
     y
 }
 
-/// Pads `data` to the next power of two and returns complex numbers.
+/// Pad input samples to next power-of-two length and return complex buffer.
 fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     let n = next_power_of_two(data.len().max(1));
     let mut buf = vec![Complex::default(); n];
@@ -84,7 +68,7 @@ fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     buf
 }
 
-/// Returns the smallest power of two ≥ `n`.
+/// Return the smallest power of two greater than or equal to n.
 #[inline]
 pub fn next_power_of_two(n: usize) -> usize {
     if n.is_power_of_two() {
@@ -94,19 +78,9 @@ pub fn next_power_of_two(n: usize) -> usize {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Core iterative Cooley-Tukey FFT (in-place)
-// ---------------------------------------------------------------------------
+// Iterative radix-2 core.
 
-/// Performs an in-place decimation-in-time radix-2 FFT.
-///
-/// # Design Rationale
-/// Iterative (bottom-up) Cooley-Tukey avoids recursion overhead. The input
-/// buffer length **must** be a power of two.
-///
-/// # Parameters
-/// - `buf` — mutable slice of [`Complex`] values; length must be a power of two.
-/// - `inverse` — `true` for inverse transform (normalises by 1/N).
+/// Run in-place radix-2 FFT; input length must already be a power of two.
 fn fft_inplace(buf: &mut [Complex], inverse: bool) {
     let n = buf.len();
     debug_assert!(
@@ -115,7 +89,7 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
     );
     let bits = n.trailing_zeros();
 
-    // Bit-reversal permutation.
+    // Reorder coefficients into bit-reversed input order.
     for i in 0..n {
         let j = bit_reverse(i, bits);
         if i < j {
@@ -123,7 +97,7 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
         }
     }
 
-    // Butterfly stages.
+    // Execute butterfly stages from size 2 up to size n.
     let sign = if inverse { 1.0_f64 } else { -1.0_f64 };
     let mut half_len = 1usize;
     while half_len < n {
@@ -154,46 +128,16 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
+// Public API.
 
-/// Computes the discrete Fourier transform (DFT) of `data`.
-///
-/// The input is zero-padded to the next power of two. Returns an array of
-/// `(re, im)` complex pairs with the same length as the padded input.
-///
-/// # Parameters
-/// - `data` — real-valued sample array (arbitrary length).
-///
-/// # Returns
-/// `Vec<(f64, f64)>` — complex frequency-domain coefficients.
-///
-/// # Design Rationale
-/// Returning `Vec<(f64, f64)>` keeps the domain layer Lua-agnostic. The Lua
-/// API wrapper in `compute_api.rs` converts this to a table of `{re, im}` tables.
+/// Compute forward FFT from real samples and return complex frequency bins.
 pub fn fft(data: &[f64]) -> Vec<(f64, f64)> {
     let mut buf = to_complex_padded(data);
     fft_inplace(&mut buf, false);
     buf.iter().map(|c| (c.re, c.im)).collect()
 }
 
-/// Computes the inverse discrete Fourier transform.
-///
-/// Accepts complex frequency-domain coefficients as `(re, im)` pairs and
-/// returns real-valued time-domain samples. The output length equals the
-/// input length (which must be a power of two).
-///
-/// # Parameters
-/// - `freqs` — complex coefficient pairs from a previous call to [`fft`].
-///
-/// # Returns
-/// `Vec<f64>` — real part of the reconstructed time-domain signal.
-///
-/// # Design Rationale
-/// Only the real component of the inverse transform is returned because
-/// a forward FFT of purely real input produces a Hermitian-symmetric
-/// spectrum; rounding errors keep the imaginary part negligible.
+/// Compute inverse FFT from complex bins and return reconstructed real samples.
 pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     let n = next_power_of_two(freqs.len().max(1));
     let mut buf: Vec<Complex> = freqs.iter().map(|&(re, im)| Complex::new(re, im)).collect();
@@ -202,16 +146,7 @@ pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     buf.iter().map(|c| c.re).collect()
 }
 
-/// Returns the magnitude spectrum of `data` as `|X[k]|` values.
-///
-/// Convenience wrapper that calls [`fft`] and computes the absolute value of
-/// each complex coefficient. Useful for audio-amplitude analysis.
-///
-/// # Parameters
-/// - `data` — real-valued sample array.
-///
-/// # Returns
-/// `Vec<f64>` — magnitude at each frequency bin.
+/// Compute magnitude spectrum for each bin produced by fft.
 pub fn fft_magnitude(data: &[f64]) -> Vec<f64> {
     fft(data)
         .iter()

@@ -1,14 +1,6 @@
-//! SQL-like query parser and executor for DataFrame.
-//!
-//! Supports a subset of SQL: SELECT, WHERE, GROUP BY, HAVING, ORDER BY,
-//! LIMIT/OFFSET, aggregate functions, and JOIN (for Database queries).
-//!
-//! This module is part of Lurek2D's `dataframe` subsystem and provides the implementation
-//! details for sql-related operations and data management.
-//! Primary functions: `query_sql()`, `query_sql_database()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! Scope: SQL-like query parsing and execution for DataFrame and Database.
+//! This file defines Token, Lexer, Parser, and query-execution types.
+//! It owns SQL subset parsing, predicate evaluation, and multi-table joins.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
 
@@ -664,16 +656,6 @@ impl Parser {
 // ---------------------------------------------------------------------------
 
 /// Execute a SQL query on a single DataFrame.
-///
-/// # Parameters
-/// - `df` — `&DataFrame`.
-/// - `sql` — `&str`.
-///
-/// # Returns
-/// `Result<DataFrame, String>`.
-///
-/// Supports: SELECT, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET,
-/// and aggregate functions (COUNT, SUM, AVG, MIN, MAX).
 pub fn query_sql(df: &DataFrame, sql: &str) -> Result<DataFrame, String> {
     let tokens = tokenize(sql)?;
     let mut parser = Parser::new(tokens);
@@ -682,13 +664,6 @@ pub fn query_sql(df: &DataFrame, sql: &str) -> Result<DataFrame, String> {
 }
 
 /// Execute a SQL query on a Database (supports FROM and JOIN).
-///
-/// # Parameters
-/// - `db` — `&Database`.
-/// - `sql` — `&str`.
-///
-/// # Returns
-/// `Result<DataFrame, String>`.
 pub fn query_sql_database(db: &Database, sql: &str) -> Result<DataFrame, String> {
     let tokens = tokenize(sql)?;
     let mut parser = Parser::new(tokens);

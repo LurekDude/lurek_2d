@@ -1,14 +1,11 @@
-//! Render-command generation for camera transforms.
-//!
-//! Converts a [`Camera`] or [`Camera2D`] into transform-stack
-//! [`RenderCommand`]s (push/translate/scale/rotate/pop).
-//! Pure CPU — no wgpu, winit, or mlua.
+//! Build transform-stack `RenderCommand` sequences from camera state.
+//! Keep this file CPU-only and independent from wgpu and Lua bindings.
 
 use crate::camera::types::{Camera, Camera2D};
 use crate::render::renderer::RenderCommand;
 
 impl Camera {
-    /// Appends begin-transform camera commands into an existing command buffer.
+    /// Append begin-scope transform commands for this camera into `out`.
     pub fn append_begin_render_commands(&self, out: &mut Vec<RenderCommand>) {
         out.push(RenderCommand::PushTransform);
         out.push(RenderCommand::Translate {
@@ -28,42 +25,19 @@ impl Camera {
         }
     }
 
-    /// Produces transform-stack render commands for this camera.
-    ///
-    /// Returns a `PushTransform`, then `Translate` (negate position),
-    /// `Rotate`, `Scale` (zoom), ready for the caller to append draw
-    /// commands and finish with `PopTransform`.
-    ///
-    /// The returned vec does **not** include `PopTransform` — the caller
-    /// must pair each `begin_render_commands()` with a `PopTransform`
-    /// after all scene draw calls.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
+    /// Build and return begin-scope transform commands without trailing `PopTransform`.
     pub fn begin_render_commands(&self) -> Vec<RenderCommand> {
         let mut cmds = Vec::with_capacity(4);
         self.append_begin_render_commands(&mut cmds);
         cmds
     }
 
-    /// Returns the `PopTransform` command that closes the camera scope.
-    ///
-    /// # Returns
-    /// `RenderCommand`.
+    /// Return the transform command that closes camera scope.
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
     }
 
-    /// Wrap `scene_commands` in the camera's transform scope.
-    ///
-    /// Produces `[PushTransform, Translate, (Rotate)?, (Scale)?, ...scene_commands..., PopTransform]`.
-    /// Convenience wrapper around `begin_render_commands()` / `end_render_command()`.
-    ///
-    /// # Parameters
-    /// - `scene_commands` — `Vec<RenderCommand>`. Draw calls to wrap.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
+    /// Wrap scene commands in camera transform scope and return full command sequence.
     pub fn generate_render_commands(
         &self,
         scene_commands: Vec<RenderCommand>,
@@ -76,7 +50,7 @@ impl Camera {
 }
 
 impl Camera2D {
-    /// Appends begin-transform camera commands into an existing command buffer.
+    /// Append begin-scope transform commands with effects and shake offsets.
     pub fn append_begin_render_commands(&self, out: &mut Vec<RenderCommand>) {
         out.push(RenderCommand::PushTransform);
 
@@ -101,41 +75,19 @@ impl Camera2D {
         }
     }
 
-    /// Produces transform-stack render commands for this camera.
-    ///
-    /// Includes the effective zoom (with pulse and breathing effects) and
-    /// position offsets (including sway and shake).
-    ///
-    /// Returns a `PushTransform`, then `Translate` (negate position + sway + shake),
-    /// `Rotate`, `Scale` (effective zoom), ready for the caller to append draw
-    /// commands and finish with `PopTransform`.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
+    /// Build and return begin-scope transform commands using effective zoom and render offset.
     pub fn begin_render_commands(&self) -> Vec<RenderCommand> {
         let mut cmds = Vec::with_capacity(4);
         self.append_begin_render_commands(&mut cmds);
         cmds
     }
 
-    /// Returns the `PopTransform` command that closes the camera scope.
-    ///
-    /// # Returns
-    /// `RenderCommand`.
+    /// Return the transform command that closes camera scope.
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
     }
 
-    /// Wrap `scene_commands` in the camera's transform scope.
-    ///
-    /// Produces `[PushTransform, Translate, (Rotate)?, (Scale)?, ...scene_commands..., PopTransform]`.
-    /// Convenience wrapper around `begin_render_commands()` / `end_render_command()`.
-    ///
-    /// # Parameters
-    /// - `scene_commands` — `Vec<RenderCommand>`. Draw calls to wrap.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
+    /// Wrap scene commands in camera transform scope and return full command sequence.
     pub fn generate_render_commands(
         &self,
         scene_commands: Vec<RenderCommand>,

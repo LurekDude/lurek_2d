@@ -1,27 +1,10 @@
-//! Aseprite JSON export parser for sprite animation data.
-//!
-//! Parses the JSON exported by Aseprite (File → Export Sprite Sheet → Output → JSON Data)
-//! and converts frame and tag data into types that [`Animation::load_from_aseprite`] can consume.
-//!
-//! # Format boundary
-//!
-//! | Module | JSON format | Primary output |
-//! |---|---|---|
-//! | `animation::aseprite` (this module) | Aseprite export (`"frames"` array + `"meta"` + `"frameTags"`) | [`AsepriteData`] consumed by [`Animation::load_from_aseprite`] |
-//! | `sprite::atlas` | TexturePacker JSON (hash or array, `"frames"` + `"meta"`) | [`SpriteAtlas`] with named region lookup |
-//!
-//! These two parsers handle **different JSON schemas** produced by different tools for
-//! different use cases.  They must not be merged:
-//! - Aseprite JSON carries per-frame duration data and animation tag information.
-//!   It is consumed solely by the animation subsystem.
-//! - TexturePacker JSON carries named sprite regions without animation metadata.
-//!   It is consumed by the sprite/rendering subsystem.
-//!
-//! If you need to drive an animation from a TexturePacker atlas, pass the region
-//! quads through `Animation::add_frames_from_rects`.  The bridge between the two
-//! systems is intentionally at the Lua/game-code layer, not inside the parsers.
+//! Scope: Parse Aseprite JSON exports into animation frame and tag data.
+//! This file defines parsed Aseprite data types and JSON parsing helpers.
+//! It owns schema validation and conversion into animation-ready structures.
 
 use serde_json::Value;
+
+// ---- Type: AsepriteFrameData ----
 
 /// Pixel-level frame rectangle extracted from an Aseprite JSON export.
 ///
@@ -45,6 +28,8 @@ pub struct AsepriteFrameData {
     pub duration_ms: u32,
 }
 
+// ---- Type: AsepriteDirection ----
+
 /// Playback direction of an Aseprite frame tag.
 ///
 /// # Variants
@@ -60,6 +45,8 @@ pub enum AsepriteDirection {
     /// Plays frames forward then backward.
     PingPong,
 }
+
+// ---- Type: AsepriteTagData ----
 
 /// Frame tag (named clip range) from an Aseprite JSON export.
 ///
@@ -80,6 +67,8 @@ pub struct AsepriteTagData {
     pub direction: AsepriteDirection,
 }
 
+// ---- Type: AsepriteParsed ----
+
 /// Result of parsing an Aseprite JSON export.
 ///
 /// # Fields
@@ -98,6 +87,8 @@ pub struct AsepriteParsed {
     /// Total sprite sheet height in pixels.
     pub sheet_height: u32,
 }
+
+// ---- Helper Functions: JSON Parsing ----
 
 /// Parses an Aseprite JSON export string into an [`AsepriteParsed`] result.
 ///

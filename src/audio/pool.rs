@@ -1,27 +1,8 @@
-//! Polyphonic sound pool for round-robin voice allocation.
-//!
-//! `SoundPool` pre-loads `N` copies of the same audio file into the [`crate::audio::mixer::Mixer`]
-//! and hands them out in a round-robin cycle.  When all voices are busy the oldest voice is
-//! silently re-triggered, giving predictable polyphony without dynamic allocations at play time.
-//!
-//! The `SoundPool` owns only the `SoundKey` slice and metadata; all actual audio work is
-//! delegated to the `Mixer`.  Game code accesses pools exclusively through `lurek.audio.newPool`
-//! and the returned `LuaSoundPool` UserData.
+//! Round-robin voice pooling for polyphonic playback of a single audio file.
 
 use crate::runtime::resource_keys::SoundKey;
 
-/// A round-robin voice pool for polyphonic playback of a single audio file.
-///
-/// Holds `voice_count` pre-loaded [`SoundKey`] handles and cycles through them on each
-/// `next_voice` call.  The mapping to physical audio operations is performed by the caller
-/// (typically the `LuaSoundPool` Lua UserData registered in `src/lua_api/audio_api.rs`).
-///
-/// # Fields
-/// - `keys`        — `Vec<SoundKey>`. Pre-loaded voice handles.
-/// - `next`        — `usize`. Ring-buffer cursor; advances modulo `voice_count` on each play.
-/// - `file_path`   — `String`. Path used when the keys were loaded.
-/// - `volume`      — `f32`. Shared base volume applied to all voices on next play.
-/// - `bus_name`    — `Option<String>`. Named bus to route all voices to.
+/// Round-robin voice pool cycling through pre-loaded source keys.
 pub struct SoundPool {
     keys: Vec<SoundKey>,
     next: usize,
@@ -31,17 +12,7 @@ pub struct SoundPool {
 }
 
 impl SoundPool {
-    /// Creates a new `SoundPool` from a set of pre-loaded voice keys.
-    ///
-    /// Call `Mixer::load_pool` rather than constructing this directly; it handles the
-    /// actual `load_source` calls.
-    ///
-    /// # Parameters
-    /// - `keys`      — `Vec<SoundKey>`. Pre-loaded voice handles (length = voice count).
-    /// - `file_path` — `String`. The original source path (stored for diagnostics).
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Creates a new pool from pre-loaded voice keys.
     pub fn new(keys: Vec<SoundKey>, file_path: String) -> Self {
         Self {
             keys,
@@ -52,52 +23,32 @@ impl SoundPool {
         }
     }
 
-    /// Returns the number of voices in the pool.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Returns voice count.
     pub fn voice_count(&self) -> usize {
         self.keys.len()
     }
 
-    /// Returns the source path originally used to create this pool.
-    ///
-    /// # Returns
-    /// `&str`.
+    /// Returns the source file path.
     pub fn file_path(&self) -> &str {
         &self.file_path
     }
 
-    /// Returns the shared volume applied to all voices.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Returns shared volume (default 1.0).
     pub fn volume(&self) -> f32 {
         self.volume
     }
 
-    /// Sets the shared volume for all future plays.
-    ///
-    /// # Parameters
-    /// - `vol` — `f32`. Volume multiplier in `[0.0, ∞)`.
+    /// Sets shared volume (clamped >= 0.0).
     pub fn set_volume(&mut self, vol: f32) {
         self.volume = vol.max(0.0);
     }
 
-    /// Returns the bus assignment for all voices, if any.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
+    /// Returns the assigned bus name, if any.
     pub fn bus_name(&self) -> Option<&str> {
         self.bus_name.as_deref()
     }
 
-    /// Sets the named audio bus that all voices will be routed to.
-    ///
-    /// The assignment is applied when voices are played.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Bus name.
+    /// Assigns all voices to a named bus.
     pub fn set_bus(&mut self, name: &str) {
         self.bus_name = Some(name.to_owned());
     }
@@ -107,33 +58,21 @@ impl SoundPool {
         self.bus_name = None;
     }
 
-    /// Advances the cursor and returns the next voice key for playback.
-    ///
-    /// Wraps around when all voices have been used.
-    ///
-    /// # Returns
-    /// `SoundKey`. The key to pass to `Mixer::play`.
+    /// Returns next voice key, cycling through all voices.
     pub fn next_voice(&mut self) -> SoundKey {
         let key = self.keys[self.next % self.keys.len()];
         self.next = (self.next + 1) % self.keys.len();
         key
     }
 
-    /// Returns a slice of all voice keys.
-    ///
-    /// # Returns
-    /// `&[SoundKey]`.
+    /// Returns all voice keys as a slice.
     pub fn all_keys(&self) -> &[SoundKey] {
         &self.keys
     }
 
-    /// Returns `true` if the pool was created with at least one voice.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Returns `true` if pool has at least one voice.
     pub fn is_valid(&self) -> bool {
         !self.keys.is_empty()
     }
 }
 
-// Tests migrated to tests/rust/unit/audio_tests.rs

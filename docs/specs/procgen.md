@@ -179,3 +179,34 @@ The `procgen` module is Lurek2D's procedural content generation library — a Fo
 
 - Keep this module reference synchronized with `src/procgen/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### 2026-05-12 Update
+
+- Added biome classification layer (`src/procgen/biome.rs`):
+	- `BiomeType`, `BiomeRules`, `BiomeClassifier`
+	- `BiomeClassifier::classify`, `BiomeClassifier::classify_map`
+	- `biome_map_to_rgba`
+- Added Lua API in `lurek.procgen`:
+	- `newBiomeClassifier(opts?)`
+	- `biomeColor(name)`
+	- Userdata methods: `BiomeClassifier:classify`, `BiomeClassifier:classifyMap`, `BiomeClassifier:type`, `BiomeClassifier:typeOf`.
+
+- Added prefab stamping support for dungeon generators:
+	- Rust: `rooms_dungeon_with_prefabs(opts, prefabs, stamp_value)`
+	- Rust: `bsp_dungeon_with_prefabs(opts, prefabs)`
+	- Lua: `lurek.procgen.roomsDungeonWithPrefabs(opts?, prefabs, stamp_value?)`
+	- Lua: `lurek.procgen.bspDungeonWithPrefabs(opts?, prefabs)`
+	- Prefab placement metadata is returned to Lua for deterministic post-processing.
+
+- Added Heightmap helper constructors:
+	- `Heightmap::from_noise_map(width, height, values)`
+	- `Heightmap::from_cellular(width, height, cells, floor_value)`
+	- Lua: `lurek.procgen.heightmapFromCellular(width, height, cells, floor_value?)`
+
+- Added seeded parallel map generation:
+	- Rust: `NoiseGenerator::generate_map_parallel(width, height, opts)`
+	- Lua: `lurek.procgen.noiseMapParallelSeeded(width, height, opts?)`
+
+- Deduplicated scalar-map grayscale conversion:
+	- Shared helper: `scalar_map_to_rgba_bytes(values)`
+	- Used by `Heightmap::to_rgba_bytes` and `NoiseGrid::to_rgba_bytes`.

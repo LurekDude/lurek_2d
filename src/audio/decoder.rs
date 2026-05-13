@@ -1,50 +1,37 @@
-//! Streaming audio decoder for chunked PCM reading.
-//!
-//! `Decoder` reads an audio file and returns PCM data in fixed-size buffer
-//! chunks, enabling streaming playback without loading the entire file into
-//! memory.
+//! Streaming PCM chunk decoding from audio files.
 
 use crate::log_msg;
 use crate::runtime::log_messages::AD01_AUDIO_DECODED;
 use crate::runtime::EngineError;
 
-/// Streaming audio decoder that reads PCM in fixed-size chunks.
-///
-/// The decoder eagerly reads the full file on construction (using rodio's
-/// decoder), then serves chunks of `buffer_size` samples on each call to
-/// `decode()`. This provides a chunk-at-a-time API while keeping file I/O
-/// simple and reliable across platforms.
-///
-/// # Fields
-/// - `path` â€” `String`.
-/// - `sample_rate` â€” `u32`.
-/// - `channels` â€” `u16`.
-/// - `bit_depth` â€” `u16`.
-/// - `buffer_size` â€” `usize`.
+/// Streaming audio decoder that loads a file to memory and serves fixed-size chunks.
 pub struct Decoder {
     /// Source file path.
     pub path: String,
     /// Sample rate in Hz.
     pub sample_rate: u32,
-    /// Number of audio channels.
+    /// Channel count.
     pub channels: u16,
-    /// Bit depth of the PCM data.
+    /// Output bit depth.
     pub bit_depth: u16,
-    /// Number of samples returned per `decode()` call.
+    /// Max samples per `decode()` call.
     pub buffer_size: usize,
+    /// Cursor in interleaved sample units.
     cursor: usize,
+    /// Fully decoded interleaved PCM buffer.
     pcm: Vec<i16>,
 }
 
 impl Decoder {
-    /// Load an audio file and prepare it for chunked decoding.
+    /// Loads an audio file into memory and creates a chunk decoder.
     ///
-    /// # Parameters
-    /// - `path` â€” `&str`.
-    /// - `buffer_size` â€” `usize`. Number of samples per chunk.
+    /// # Arguments
+    /// * `path` - Input audio file path.
+    /// * `buffer_size` - Max samples returned by one `decode()` call.
     ///
-    /// # Returns
-    /// `Result<Self, EngineError>`.
+    /// # Errors
+    /// Returns `EngineError::FileSystemError` when opening the file fails.
+    /// Returns `EngineError::AudioError` when decoding fails.
     pub fn from_file(path: &str, buffer_size: usize) -> Result<Self, EngineError> {
         use rodio::Source;
         use std::fs::File;
@@ -70,10 +57,7 @@ impl Decoder {
         })
     }
 
-    /// Return the next chunk of samples, or `None` at EOF.
-    ///
-    /// # Returns
-    /// `Option<Vec<i16>>`.
+    /// Returns the next fixed-size chunk, or `None` at end of stream.
     pub fn decode(&mut self) -> Option<Vec<i16>> {
         if self.cursor >= self.pcm.len() {
             return None;
@@ -84,10 +68,7 @@ impl Decoder {
         Some(chunk)
     }
 
-    /// Return the total duration in seconds.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns total decoded duration in seconds.
     pub fn get_duration(&self) -> f64 {
         if self.sample_rate == 0 || self.channels == 0 {
             return 0.0;
@@ -95,19 +76,16 @@ impl Decoder {
         self.pcm.len() as f64 / (self.sample_rate as f64 * self.channels as f64)
     }
 
-    /// Seek to a time offset in seconds.
+    /// Seeks to position in seconds.
     ///
-    /// # Parameters
-    /// - `offset` â€” `f64`.
+    /// # Arguments
+    /// * `offset` - Target time in seconds.
     pub fn seek(&mut self, offset: f64) {
         let sample_pos = (offset * self.sample_rate as f64 * self.channels as f64) as usize;
         self.cursor = sample_pos.min(self.pcm.len());
     }
 
-    /// Return the current playback position in seconds.
-    ///
-    /// # Returns
-    /// `f64`.
+    /// Returns current playback position in seconds.
     pub fn tell(&self) -> f64 {
         if self.sample_rate == 0 || self.channels == 0 {
             return 0.0;
@@ -116,16 +94,11 @@ impl Decoder {
     }
 
     /// Returns whether this decoder supports seeking.
-    ///
-    /// Always `true` because PCM data is fully buffered in memory.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_seekable(&self) -> bool {
         true
     }
 
-    /// Reset playback to the beginning.
+    /// Rewinds playback to the beginning.
     pub fn rewind(&mut self) {
         self.cursor = 0;
     }

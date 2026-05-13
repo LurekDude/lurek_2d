@@ -1,35 +1,20 @@
-//! Camera path follower and smooth-zoom tween for [`super::Camera2D`].
-//!
-//! Both types are designed to live inside the Lua API wrapper (`LuaCamera2D`)
-//! rather than inside the domain `Camera2D`, keeping the domain free of
-//! animation state.
+//! Own camera-local path and zoom tweens used by the Lua wrapper layer.
+//! Keep animation state outside `Camera2D` domain state.
 
-// ---------------------------------------------------------------------------
-// CameraPath
-// ---------------------------------------------------------------------------
-
-/// Animates a camera along a series of world-space waypoints over a fixed
-/// duration using linear interpolation between consecutive points.
-///
-/// Call [`CameraPath::update`] every frame with the delta-time; it returns the
-/// interpolated `(x, y)` position while the path is active and `None` once it
-/// has finished.
 #[derive(Clone)]
+/// Animate waypoints over fixed duration and return interpolated world positions.
 pub struct CameraPath {
     waypoints: Vec<[f32; 2]>,
-    /// Total animation duration in seconds.
+    /// Store total animation duration in seconds.
     pub duration: f32,
-    /// Time elapsed since the path was started.
+    /// Store elapsed animation time in seconds.
     pub elapsed: f32,
-    /// `true` while the path is playing.
+    /// Mark whether the path is active.
     pub active: bool,
 }
 
 impl CameraPath {
-    /// Creates a new `CameraPath`.
-    ///
-    /// `waypoints` must contain at least two points; if fewer are provided
-    /// the path is considered immediately done.
+    /// Create a path from waypoints and return it with clamped positive duration.
     pub fn new(waypoints: Vec<[f32; 2]>, duration: f32) -> Self {
         CameraPath {
             waypoints,
@@ -39,8 +24,7 @@ impl CameraPath {
         }
     }
 
-    /// Advances the path by `dt` seconds and returns the current position, or
-    /// `None` when the path has completed.
+    /// Advance the path by `dt` and return current position; return `None` when inactive or invalid.
     pub fn update(&mut self, dt: f32) -> Option<(f32, f32)> {
         if !self.active || self.waypoints.len() < 2 {
             return None;
@@ -51,7 +35,6 @@ impl CameraPath {
             let last = self.waypoints.last().copied().unwrap_or([0.0, 0.0]);
             return Some((last[0], last[1]));
         }
-        // Progress across all segments.
         let t = (self.elapsed / self.duration).clamp(0.0, 1.0);
         let num_segs = (self.waypoints.len() - 1) as f32;
         let seg_t = t * num_segs;
@@ -66,7 +49,7 @@ impl CameraPath {
         ))
     }
 
-    /// Returns the fractional progress `[0, 1]` of the path.
+    /// Return normalized path progress in `[0, 1]`, or `1` when duration is non-positive.
     pub fn progress(&self) -> f32 {
         if self.duration <= 0.0 {
             1.0
@@ -75,29 +58,21 @@ impl CameraPath {
         }
     }
 
-    /// Resets the path back to the beginning.
+    /// Reset elapsed time to zero and reactivate the path.
     pub fn reset(&mut self) {
         self.elapsed = 0.0;
         self.active = true;
     }
 }
 
-// ---------------------------------------------------------------------------
-// ZoomTween
-// ---------------------------------------------------------------------------
-
-/// Easing mode for camera-local tweens.
-///
-/// This type is intentionally camera-scoped and should be used when animating
-/// camera-only state (`CameraPath`, `CameraZoomTween`). For generic gameplay
-/// tweening, use the shared tween module.
+/// Select easing curve used by camera-local tweens.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CameraTweenEasing {
-    /// Linear interpolation.
+    /// Apply linear interpolation.
     Linear,
-    /// Smoothstep interpolation (`t*t*(3-2*t)`).
+    /// Apply smoothstep interpolation.
     SmoothStep,
-    /// Ease-out cubic interpolation.
+    /// Apply cubic ease-out interpolation.
     EaseOutCubic,
 }
 
@@ -112,34 +87,30 @@ impl CameraTweenEasing {
     }
 }
 
-/// Smoothly transitions a camera zoom level from a start value to a target
-/// value over a fixed duration.
-///
-/// Call [`ZoomTween::update`] every frame; it returns the current zoom while
-/// active and `None` once it has finished.
 #[derive(Clone)]
+/// Animate zoom from start value to target value over fixed duration.
 pub struct CameraZoomTween {
-    /// Zoom level at the start of the tween.
+    /// Store zoom at tween start.
     pub start_zoom: f32,
-    /// Desired final zoom level.
+    /// Store target zoom reached at completion.
     pub target_zoom: f32,
-    /// Total duration in seconds.
+    /// Store total tween duration in seconds.
     pub duration: f32,
-    /// Time elapsed since the tween was started.
+    /// Store elapsed tween time in seconds.
     pub elapsed: f32,
-    /// `true` while the tween is running.
+    /// Mark whether the tween is active.
     pub active: bool,
-    /// Easing mode used for interpolation.
+    /// Store easing function selection.
     pub easing: CameraTweenEasing,
 }
 
 impl CameraZoomTween {
-    /// Creates a new `CameraZoomTween` with linear easing.
+    /// Create a linear zoom tween and return it.
     pub fn new(start_zoom: f32, target_zoom: f32, duration: f32) -> Self {
         Self::new_with_easing(start_zoom, target_zoom, duration, CameraTweenEasing::Linear)
     }
 
-    /// Creates a new `CameraZoomTween` with explicit easing.
+    /// Create a zoom tween with explicit easing and return it.
     pub fn new_with_easing(
         start_zoom: f32,
         target_zoom: f32,
@@ -156,8 +127,7 @@ impl CameraZoomTween {
         }
     }
 
-    /// Advances the tween by `dt` seconds and returns the current zoom, or
-    /// `None` when the tween has completed.
+    /// Advance tween by `dt` and return zoom sample; return target once on completion.
     pub fn update(&mut self, dt: f32) -> Option<f32> {
         if !self.active {
             return None;
@@ -171,7 +141,7 @@ impl CameraZoomTween {
         Some(self.start_zoom + (self.target_zoom - self.start_zoom) * t)
     }
 
-    /// Returns the fractional progress `[0, 1]` of the tween.
+    /// Return normalized tween progress in `[0, 1]`, or `1` when duration is non-positive.
     pub fn progress(&self) -> f32 {
         if self.duration <= 0.0 {
             1.0
@@ -181,5 +151,5 @@ impl CameraZoomTween {
     }
 }
 
-/// Backward-compatible alias for camera-local zoom tween.
+/// Alias `CameraZoomTween` for backward compatibility.
 pub type ZoomTween = CameraZoomTween;

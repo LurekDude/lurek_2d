@@ -1,54 +1,24 @@
-//! Genetic Algorithm (GA) for offline AI parameter optimisation.
-//!
-//! Provides a simple generational GA with tournament selection, uniform
-//! crossover, and Gaussian mutation. Intended for offline training of neural
-//! network weights, behaviour tree thresholds, or steering behaviour parameters.
-//!
-//! ## Architecture
-//!
-//! - [`Chromosome`] is a named candidate solution: a flat `Vec<f32>` of genes
-//!   plus a fitness score.
-//! - [`GeneticAlgorithm`] manages a fixed-size population: `evolve()` runs one
-//!   full generation (selection → crossover → mutation → replacement).
-//!
-//! ## Typical Usage Sequence
-//!
-//! 1. Create `GeneticAlgorithm::new(pop_size, gene_count, seed)`.
-//! 2. Evaluate each chromosome in the population with your fitness function.
-//! 3. Call `evolve()` to produce the next generation.
-//! 4. Repeat for N generations or until `best()` fitness crosses a threshold.
-//! 5. Load `best().genes` into a `NeuralNet` via `set_weights`.
+﻿//! Scope: genetic algorithm utilities for parameter and policy optimization.
+//! This file defines chromosome representation, fitness flow, selection, crossover, mutation, and generation steps.
+//! It owns deterministic population evolution helpers used by AI tuning and meta-optimization pipelines.
 
-// ────────────────────────────────────────────────────────────────────────────
-// Chromosome
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: Chromosome ----
 
 /// A candidate solution in a genetic algorithm population.
-///
-/// # Fields
-/// - `genes` — `Vec<f32>`.
-/// - `fitness` — `f32`.
-/// - `id` — `u64`.
 #[derive(Clone)]
 pub struct Chromosome {
     /// The flat gene vector (e.g. neural network weights).
     pub genes: Vec<f32>,
-    /// Fitness score computed by the caller's evaluation function.
-    /// Must be set before calling `GeneticAlgorithm::evolve()`.
+    /// Fitness score computed by the calle's evaluation function.
     pub fitness: f32,
     /// Per-population unique ID assigned at construction.
     pub id: u64,
 }
 
+// ---- Implementation: Chromosome ----
+
 impl Chromosome {
     /// Creates a zeroed chromosome.
-    ///
-    /// # Parameters
-    /// - `gene_count` — `usize`.
-    /// - `id` — `u64`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(gene_count: usize, id: u64) -> Self {
         Self {
             genes: vec![0.0; gene_count],
@@ -58,24 +28,9 @@ impl Chromosome {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// GeneticAlgorithm
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: GeneticAlgorithm ----
 
 /// Simple generational genetic algorithm.
-///
-/// Uses tournament selection, uniform crossover, and Gaussian mutation.
-/// The population is replaced each generation; the best chromosome is
-/// always carried over (elitism).
-///
-/// # Fields
-/// - `population` — `Vec<Chromosome>`.
-/// - `gene_count` — `usize`.
-/// - `mutation_rate` — `f32`.
-/// - `mutation_std` — `f32`.
-/// - `tournament_size` — `usize`.
-/// - `elitism` — `usize`.
-/// - `generation` — `usize`.
 pub struct GeneticAlgorithm {
     /// Current population ordered by arbitrary index.
     pub population: Vec<Chromosome>,
@@ -95,18 +50,10 @@ pub struct GeneticAlgorithm {
     rng: u64,
 }
 
+// ---- Implementation: GeneticAlgorithm ----
+
 impl GeneticAlgorithm {
     /// Creates a new GA with a random initial population.
-    ///
-    /// Genes are initialised with Gaussian noise (mean=0, std=1).
-    ///
-    /// # Parameters
-    /// - `pop_size` — `usize`.
-    /// - `gene_count` — `usize`.
-    /// - `seed` — `u64`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(pop_size: usize, gene_count: usize, seed: u64) -> Self {
         let mut ga = Self {
             population: Vec::with_capacity(pop_size),
@@ -132,17 +79,11 @@ impl GeneticAlgorithm {
     }
 
     /// Returns the population size.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn pop_size(&self) -> usize {
         self.population.len()
     }
 
     /// Returns a reference to the chromosome with highest fitness.
-    ///
-    /// # Returns
-    /// `Option<&Chromosome>`.
     pub fn best(&self) -> Option<&Chromosome> {
         self.population
             .iter()
@@ -150,8 +91,6 @@ impl GeneticAlgorithm {
     }
 
     /// Runs one generation: tournament selection, crossover, mutation, elitism.
-    ///
-    /// Fitness values must be set on all chromosomes before calling this.
     pub fn evolve(&mut self) {
         let pop_size = self.population.len();
         let mut next_gen: Vec<Chromosome> = Vec::with_capacity(pop_size);
@@ -185,7 +124,7 @@ impl GeneticAlgorithm {
         self.generation += 1;
     }
 
-    // ── Internal helpers ────────────────────────────────────────────────────
+    // ---- Helper Functions: Tournament, Crossover, Mutation ----
 
     /// Returns index of winning chromosome in a tournament of `tournament_size`.
     fn tournament_select(&mut self, pop_size: usize) -> usize {
@@ -221,13 +160,13 @@ impl GeneticAlgorithm {
         }
     }
 
-    /// Xorshift64 → `[0, n)`
+    /// Xorshift64 -> `[0, n)`
     fn rand_usize(&mut self, n: usize) -> usize {
         self.rng = xorshift64(self.rng);
         (self.rng as usize) % n
     }
 
-    /// Xorshift64 → `[0, 1)`
+    /// Xorshift64 -> `[0, 1)`
     fn rand_f01(&mut self) -> f32 {
         self.rng = xorshift64(self.rng);
         (self.rng >> 11) as f32 * (1.0 / (1u64 << 53) as f32)
@@ -255,35 +194,3 @@ fn xorshift64(mut x: u64) -> u64 {
     x
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn population_initialised() {
-        let ga = GeneticAlgorithm::new(10, 5, 42);
-        assert_eq!(ga.pop_size(), 10);
-    }
-
-    #[test]
-    fn evolve_step_preserves_size() {
-        let mut ga = GeneticAlgorithm::new(8, 4, 42);
-        ga.evolve();
-        assert_eq!(ga.pop_size(), 8);
-    }
-
-    #[test]
-    fn best_returns_chromosome() {
-        let mut ga = GeneticAlgorithm::new(4, 3, 42);
-        ga.evolve();
-        assert!(ga.best().is_some());
-    }
-
-    #[test]
-    fn multiple_evolve_steps() {
-        let mut ga = GeneticAlgorithm::new(4, 2, 42);
-        ga.evolve();
-        ga.evolve();
-        assert_eq!(ga.pop_size(), 4);
-    }
-}

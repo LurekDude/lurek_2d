@@ -71,6 +71,22 @@ mod ansi_tests {
         let normal_span = spans.iter().find(|s| s.text == "normal").unwrap();
         assert!(normal_span.fg.is_none());
     }
+
+    #[test]
+    fn parse_spans_supports_256_fg_color() {
+        let spans = parse_ansi_spans("\x1b[38;5;196mhot\x1b[0m");
+        let hot = spans.iter().find(|s| s.text == "hot").unwrap();
+        let fg = hot.fg.as_ref().unwrap();
+        assert_eq!((fg.r, fg.g, fg.b), (255, 0, 0));
+    }
+
+    #[test]
+    fn parse_spans_supports_truecolor_bg() {
+        let spans = parse_ansi_spans("\x1b[48;2;10;20;30mcell\x1b[0m");
+        let cell = spans.iter().find(|s| s.text == "cell").unwrap();
+        let bg = cell.bg.as_ref().unwrap();
+        assert_eq!((bg.r, bg.g, bg.b), (10, 20, 30));
+    }
 }
 
 // ── widget ────────────────────────────────────────────────────────────────────

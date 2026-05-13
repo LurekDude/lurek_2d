@@ -1,11 +1,8 @@
-//! Blend-layer system for compositing multiple animation clips on a single sprite.
-//!
-//! A [`BlendLayerSet`] holds an ordered list of [`BlendLayer`] entries.  Each layer
-//! references a named clip, carries a normalised weight (`0.0`â€“`1.0`), and can be
-//! restricted to a named bone/joint set via a [`BlendMask`].
-//!
-//! This module is pure-Rust data â€” it contains no Lua bindings.  See
-//! `src/lua_api/animation_api.rs` for the `lurek.animation.*` exposure.
+//! Scope: Manage blend layers that combine multiple animation clips.
+//! This file defines blend masks, layers, and layer-set management operations.
+//! It owns layer uniqueness, weight clamping, and mask assignment behavior.
+
+// ---- Type: BlendMask ----
 
 /// Restricts a [`BlendLayer`] to a named subset of bone or joint identifiers.
 ///
@@ -21,6 +18,7 @@ pub struct BlendMask {
 }
 
 impl BlendMask {
+    // ---- Implementation: BlendMask ----
     /// Creates a mask that affects all bones (no filtering).
     ///
     /// # Returns
@@ -56,6 +54,8 @@ impl BlendMask {
     }
 }
 
+// ---- Type: BlendLayer ----
+
 /// One layer in a [`BlendLayerSet`]: a named clip at a given blend weight.
 ///
 /// # Fields
@@ -76,6 +76,7 @@ pub struct BlendLayer {
 }
 
 impl BlendLayer {
+    // ---- Implementation: BlendLayer ----
     /// Creates a new blend layer.
     ///
     /// # Parameters
@@ -96,6 +97,8 @@ impl BlendLayer {
     }
 }
 
+// ---- Type: BlendLayerSet ----
+
 /// Ordered set of blend layers for a single sprite's animation.
 ///
 /// Layers are evaluated from bottom to top; higher layers blend over lower ones
@@ -110,6 +113,7 @@ pub struct BlendLayerSet {
 }
 
 impl BlendLayerSet {
+    // ---- Implementation: BlendLayerSet ----
     /// Creates an empty blend layer set.
     ///
     /// # Returns

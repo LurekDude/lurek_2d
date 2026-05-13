@@ -208,6 +208,18 @@ mod fog_tests {
         // Unknown viewer → no mask → full visibility.
         assert!(store.is_visible("ghost", 99));
     }
+
+    #[test]
+    fn fog_mask_base64_round_trip_preserves_states() {
+        let mut mask = FogMask::all_hidden();
+        mask.reveal(1);
+        mask.explore(2);
+        let encoded = mask.to_base64();
+        let decoded = FogMask::from_base64(&encoded).expect("decode should succeed");
+        assert!(decoded.is_visible(1));
+        assert_eq!(decoded.count_explored(), 1);
+        assert!(!decoded.is_visible(2));
+    }
 }
 
 // ── lighting ──────────────────────────────────────────────────────────────────
@@ -638,6 +650,20 @@ mod projection_tests {
         let n = normalize_v3(v);
         let len = (n.x * n.x + n.y * n.y + n.z * n.z).sqrt();
         assert!((len - 1.0).abs() < 1e-6);
+    }
+}
+
+// ── loader/voronoi ───────────────────────────────────────────────────────────
+
+mod loader_tests {
+    use lurek2d::globe::loader::generate_voronoi_provinces;
+
+    #[test]
+    fn voronoi_generation_creates_provinces_for_seeds() {
+        let seeds = vec![(0.0, 0.0), (10.0, 10.0), (-10.0, -15.0)];
+        let provinces = generate_voronoi_provinces(&seeds);
+        assert_eq!(provinces.len(), seeds.len());
+        assert!(provinces.iter().all(|p| !p.vertices.is_empty()));
     }
 }
 

@@ -650,6 +650,31 @@ describe("unit: migrated from integration/test_procgen_tilemap.lua", function()
             expect_true(type(layer[1]) == "string", "biome should be a string")
         end)
 
+        -- @covers lurek.procgen.biomeColor
+        it("biomeColor returns rgba tuple", function()
+            local r, g, b, a = lurek.procgen.biomeColor("desert")
+            expect_type("number", r)
+            expect_type("number", g)
+            expect_type("number", b)
+            expect_type("number", a)
+        end)
+
+        -- @covers lurek.procgen.newBiomeClassifier
+        it("newBiomeClassifier returns userdata", function()
+            local bc = lurek.procgen.newBiomeClassifier({ ocean_threshold = 0.2 })
+            expect_type("userdata", bc)
+        end)
+
+        -- @covers BiomeClassifier:classifyMap
+        -- @covers BiomeClassifier:classify
+        it("BiomeClassifier classifies map samples", function()
+            local bc = lurek.procgen.newBiomeClassifier()
+            local out = bc:classifyMap(2, 2, { 0.1, 0.3, 0.7, 0.9 }, { 0.8, 0.2, 0.4, 0.1 }, { 0.5, 0.7, 0.6, 0.2 })
+            expect_type("table", out)
+            expect_equal(4, #out)
+            expect_type("string", bc:classify(0.6, 0.3, 0.7))
+        end)
+
 end)
 
 test_summary()

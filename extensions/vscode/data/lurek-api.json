@@ -7516,6 +7516,66 @@
           "objectType": null
         },
         {
+          "name": "loadFromPNG",
+          "fullPath": "lurek.globe.loadFromPNG",
+          "signature": "(name, png_path, [spec_tbl])",
+          "description": "Load provinces from a color-index PNG file and create a globe.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Globe name.",
+              "optional": false
+            },
+            {
+              "name": "png_path",
+              "type": "string",
+              "description": "PNG file path.",
+              "optional": false
+            },
+            {
+              "name": "spec",
+              "type": "table",
+              "description": "Optional globe specification table.",
+              "optional": true
+            }
+          ],
+          "returns": "LGlobe",
+          "returnType": "LGlobe",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "generateVoronoi",
+          "fullPath": "lurek.globe.generateVoronoi",
+          "signature": "(name, seeds_tbl, [spec_tbl])",
+          "description": "Generate procedural Voronoi provinces from seed points.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Globe name.",
+              "optional": false
+            },
+            {
+              "name": "seeds",
+              "type": "table",
+              "description": "Array of `{lat, lon}` seed pairs.",
+              "optional": false
+            },
+            {
+              "name": "spec",
+              "type": "table",
+              "description": "Optional globe specification table.",
+              "optional": true
+            }
+          ],
+          "returns": "LGlobe",
+          "returnType": "LGlobe",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "greatCircleDistance",
           "fullPath": "lurek.globe.greatCircleDistance",
           "signature": "(la, lo, lb, lo2)",
@@ -15747,6 +15807,30 @@
           "objectType": null
         },
         {
+          "name": "bspDungeonWithPrefabs",
+          "fullPath": "lurek.procgen.bspDungeonWithPrefabs",
+          "signature": "([opts], prefabs_tbl)",
+          "description": "Generates a BSP dungeon and prefab placement metadata.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional BSP dungeon settings.",
+              "optional": true
+            },
+            {
+              "name": "prefabs",
+              "type": "table",
+              "description": "Array of prefab tables `{ name, width, height }`.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "roomsDungeon",
           "fullPath": "lurek.procgen.roomsDungeon",
           "signature": "([opts])",
@@ -15765,6 +15849,36 @@
           "objectType": null
         },
         {
+          "name": "roomsDungeonWithPrefabs",
+          "fullPath": "lurek.procgen.roomsDungeonWithPrefabs",
+          "signature": "([opts], prefabs_tbl, [stamp_value])",
+          "description": "Generates a rooms dungeon and stamps prefabs into room interiors.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional room dungeon settings.",
+              "optional": true
+            },
+            {
+              "name": "prefabs",
+              "type": "table",
+              "description": "Array of prefab tables `{ name, width, height, mask }`.",
+              "optional": false
+            },
+            {
+              "name": "stamp_value",
+              "type": "integer",
+              "description": "Optional tile value written for stamped cells (default 3).",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "heightmap",
           "fullPath": "lurek.procgen.heightmap",
           "signature": "([opts])",
@@ -15774,6 +15888,42 @@
               "name": "opts",
               "type": "table",
               "description": "Optional heightmap settings.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "heightmapFromCellular",
+          "fullPath": "lurek.procgen.heightmapFromCellular",
+          "signature": "(width, height, cells_tbl, [floor_value])",
+          "description": "Converts a cellular byte map (`0`/`1`) into a normalized heightmap-style response.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Map width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Map height.",
+              "optional": false
+            },
+            {
+              "name": "cells",
+              "type": "table",
+              "description": "Flat cellular byte map.",
+              "optional": false
+            },
+            {
+              "name": "floor_value",
+              "type": "integer",
+              "description": "Optional floor value treated as 0.0 (default 0).",
               "optional": true
             }
           ],
@@ -16023,6 +16173,36 @@
           "objectType": null
         },
         {
+          "name": "noiseMapParallelSeeded",
+          "fullPath": "lurek.procgen.noiseMapParallelSeeded",
+          "signature": "(width, height, [opts])",
+          "description": "Generates a seeded noise map in parallel using the NoiseGenerator instance path.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Output width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Output height.",
+              "optional": false
+            },
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional noise generator settings including `seed`.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "simplex2d",
           "fullPath": "lurek.procgen.simplex2d",
           "signature": "(x, y)",
@@ -16073,6 +16253,42 @@
           ],
           "returns": "number",
           "returnType": "number",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newBiomeClassifier",
+          "fullPath": "lurek.procgen.newBiomeClassifier",
+          "signature": "([opts])",
+          "description": "Creates a new biome classifier with optional custom thresholds.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional rules table with fields: ocean_threshold, coast_threshold, mountain_threshold, ice_cap_threshold, cold_temperature, warm_temperature, dry_moisture, wet_moisture.",
+              "optional": true
+            }
+          ],
+          "returns": "BiomeClassifier",
+          "returnType": "BiomeClassifier",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "biomeColor",
+          "fullPath": "lurek.procgen.biomeColor",
+          "signature": "(name)",
+          "description": "Returns the representative RGBA color for a biome name string.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Biome name (e.g. \"ocean\", \"desert\", \"grassland\").",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": false,
           "objectType": null
         }
@@ -20776,6 +20992,24 @@
           ],
           "returns": "LSkeletonAnimation",
           "returnType": "LSkeletonAnimation",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "animationFromJson",
+          "fullPath": "lurek.spine.animationFromJson",
+          "signature": "(json)",
+          "description": "Builds a SkeletonAnimation from a JSON string.",
+          "parameters": [
+            {
+              "name": "json",
+              "type": "string",
+              "description": "JSON payload describing the animation clip.",
+              "optional": false
+            }
+          ],
+          "returns": "LSkeletonAnimation?",
+          "returnType": "LSkeletonAnimation?",
           "isMethod": false,
           "objectType": null
         }
@@ -25592,6 +25826,113 @@
     }
   ],
   "classes": [
+    {
+      "name": "BiomeClassifier",
+      "description": "Lua-visible wrapper for [`BiomeClassifier`].",
+      "methods": [
+        {
+          "name": "classify",
+          "fullPath": "BiomeClassifier:classify",
+          "signature": "(h, m, t)",
+          "description": "Classifies a single cell given its height, moisture, and temperature (all in 0..1).",
+          "parameters": [
+            {
+              "name": "height",
+              "type": "number",
+              "description": "Elevation value in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "moisture",
+              "type": "number",
+              "description": "Moisture value in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "temperature",
+              "type": "number",
+              "description": "Temperature value in [0, 1]. Use 0.5 when unknown.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "BiomeClassifier"
+        },
+        {
+          "name": "classifyMap",
+          "fullPath": "BiomeClassifier:classifyMap",
+          "signature": "(width, height, ht, mt, [tt])",
+          "description": "Classifies an entire map from flat arrays of heights, moisture, and temperature.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Map width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Map height.",
+              "optional": false
+            },
+            {
+              "name": "heights",
+              "type": "table",
+              "description": "Array of elevation values in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "moisture",
+              "type": "table",
+              "description": "Array of moisture values in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "temperature",
+              "type": "table",
+              "description": "Optional array of temperature values. Defaults to 0.5.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "BiomeClassifier"
+        },
+        {
+          "name": "type",
+          "fullPath": "BiomeClassifier:type",
+          "signature": "()",
+          "description": "Returns the type name of this object.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "BiomeClassifier"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "BiomeClassifier:typeOf",
+          "signature": "(name)",
+          "description": "Returns true if this object is of the given type.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type name.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "BiomeClassifier"
+        }
+      ]
+    },
     {
       "name": "LAIBlackboard",
       "description": "Lua-side wrapper around a [`Blackboard`].",
@@ -49279,6 +49620,192 @@
           "objectType": "LGlobe"
         },
         {
+          "name": "setProvinceTexture",
+          "fullPath": "LGlobe:setProvinceTexture",
+          "signature": "(id, tex_raw, u0, v0, u1, v1)",
+          "description": "Set texture raw handle and atlas UV rectangle for a province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            },
+            {
+              "name": "texture_raw",
+              "type": "integer",
+              "description": "Raw texture handle from LImage id.",
+              "optional": false
+            },
+            {
+              "name": "u0",
+              "type": "number",
+              "description": "UV min U.",
+              "optional": false
+            },
+            {
+              "name": "v0",
+              "type": "number",
+              "description": "UV min V.",
+              "optional": false
+            },
+            {
+              "name": "u1",
+              "type": "number",
+              "description": "UV max U.",
+              "optional": false
+            },
+            {
+              "name": "v1",
+              "type": "number",
+              "description": "UV max V.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "clearProvinceTexture",
+          "fullPath": "LGlobe:clearProvinceTexture",
+          "signature": "(id)",
+          "description": "Clear texture mapping for a province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "setProvinceSector",
+          "fullPath": "LGlobe:setProvinceSector",
+          "signature": "(id, sector)",
+          "description": "Assign province to a sector/strategic zone.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            },
+            {
+              "name": "sector",
+              "type": "string",
+              "description": "Sector name.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "getProvinceSector",
+          "fullPath": "LGlobe:getProvinceSector",
+          "signature": "(id)",
+          "description": "Return sector name of a province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "getSectorProvinces",
+          "fullPath": "LGlobe:getSectorProvinces",
+          "signature": "(sector)",
+          "description": "Return province IDs in a sector.",
+          "parameters": [
+            {
+              "name": "sector",
+              "type": "string",
+              "description": "Sector name.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "setHeatLayer",
+          "fullPath": "LGlobe:setHeatLayer",
+          "signature": "(name, attr_key, min, max, alpha)",
+          "description": "Configure a float-driven heat-map layer.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Layer name.",
+              "optional": false
+            },
+            {
+              "name": "attr_key",
+              "type": "string",
+              "description": "Province attr key with float value.",
+              "optional": false
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "description": "Minimum value.",
+              "optional": false
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "description": "Maximum value.",
+              "optional": false
+            },
+            {
+              "name": "alpha",
+              "type": "number",
+              "description": "Layer alpha.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "removeHeatLayer",
+          "fullPath": "LGlobe:removeHeatLayer",
+          "signature": "(name)",
+          "description": "Remove a heat-map layer by name.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Heat layer name.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
           "name": "pan",
           "fullPath": "LGlobe:pan",
           "signature": "(dlat, dlon)",
@@ -49397,6 +49924,36 @@
           "objectType": "LGlobe"
         },
         {
+          "name": "pickRaycast",
+          "fullPath": "LGlobe:pickRaycast",
+          "signature": "(sx, sy, [steps])",
+          "description": "Raycast-style picking by marching from globe center toward screen point.",
+          "parameters": [
+            {
+              "name": "sx",
+              "type": "number",
+              "description": "Target screen x coordinate.",
+              "optional": false
+            },
+            {
+              "name": "sy",
+              "type": "number",
+              "description": "Target screen y coordinate.",
+              "optional": false
+            },
+            {
+              "name": "steps",
+              "type": "integer",
+              "description": "Optional march step count.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
           "name": "pickLatLon",
           "fullPath": "LGlobe:pickLatLon",
           "signature": "(sx, sy)",
@@ -49435,6 +49992,102 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "setFogState",
+          "fullPath": "LGlobe:setFogState",
+          "signature": "(viewer, id, state)",
+          "description": "Set fog state (`hidden`, `explored`, `visible`) for one province.",
+          "parameters": [
+            {
+              "name": "viewer",
+              "type": "string",
+              "description": "Viewer name.",
+              "optional": false
+            },
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            },
+            {
+              "name": "state",
+              "type": "string",
+              "description": "Fog state string.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "getFogState",
+          "fullPath": "LGlobe:getFogState",
+          "signature": "(viewer, id)",
+          "description": "Get fog state string for province and viewer.",
+          "parameters": [
+            {
+              "name": "viewer",
+              "type": "string",
+              "description": "Viewer name.",
+              "optional": false
+            },
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province ID.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "encodeFogBase64",
+          "fullPath": "LGlobe:encodeFogBase64",
+          "signature": "(viewer)",
+          "description": "Serialize viewer fog mask to base64.",
+          "parameters": [
+            {
+              "name": "viewer",
+              "type": "string",
+              "description": "Viewer name.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "decodeFogBase64",
+          "fullPath": "LGlobe:decodeFogBase64",
+          "signature": "(viewer, payload)",
+          "description": "Load viewer fog mask from base64 payload.",
+          "parameters": [
+            {
+              "name": "viewer",
+              "type": "string",
+              "description": "Viewer name.",
+              "optional": false
+            },
+            {
+              "name": "payload",
+              "type": "string",
+              "description": "Base64 encoded mask.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LGlobe"
         },
@@ -49633,6 +50286,60 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "setMarkerPulse",
+          "fullPath": "LGlobe:setMarkerPulse",
+          "signature": "(id, hz, amp)",
+          "description": "Configure pulsing marker animation.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Marker ID.",
+              "optional": false
+            },
+            {
+              "name": "hz",
+              "type": "number",
+              "description": "Pulse frequency in Hz.",
+              "optional": false
+            },
+            {
+              "name": "amplitude",
+              "type": "number",
+              "description": "Pulse amplitude in [0,1].",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "setMarkerRotation",
+          "fullPath": "LGlobe:setMarkerRotation",
+          "signature": "(id, dps)",
+          "description": "Configure marker rotation speed.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Marker ID.",
+              "optional": false
+            },
+            {
+              "name": "deg_per_sec",
+              "type": "number",
+              "description": "Rotation speed.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LGlobe"
         },
@@ -49978,6 +50685,24 @@
           "objectType": "LGlobe"
         },
         {
+          "name": "setAutoRotationSpeed",
+          "fullPath": "LGlobe:setAutoRotationSpeed",
+          "signature": "(dps)",
+          "description": "Set automatic globe spin speed in degrees per second.",
+          "parameters": [
+            {
+              "name": "deg_per_sec",
+              "type": "number",
+              "description": "Speed in deg/s.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
           "name": "update",
           "fullPath": "LGlobe:update",
           "signature": "(dt)",
@@ -50058,6 +50783,65 @@
           ],
           "returns": "table",
           "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "cacheReachability",
+          "fullPath": "LGlobe:cacheReachability",
+          "signature": "(faction, start_id, max_cost)",
+          "description": "Build and cache default reachability for a faction.",
+          "parameters": [
+            {
+              "name": "faction",
+              "type": "string",
+              "description": "Faction key.",
+              "optional": false
+            },
+            {
+              "name": "start_id",
+              "type": "integer",
+              "description": "Start province ID.",
+              "optional": false
+            },
+            {
+              "name": "max_cost",
+              "type": "number",
+              "description": "Max traversal cost.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "getCachedReachability",
+          "fullPath": "LGlobe:getCachedReachability",
+          "signature": "(faction)",
+          "description": "Return cached reachability map for a faction.",
+          "parameters": [
+            {
+              "name": "faction",
+              "type": "string",
+              "description": "Faction key.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGlobe"
+        },
+        {
+          "name": "exportProvinceMeshOBJ",
+          "fullPath": "LGlobe:exportProvinceMeshOBJ",
+          "signature": "()",
+          "description": "Export province polygons as OBJ text.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
           "isMethod": true,
           "objectType": "LGlobe"
         },
@@ -84241,8 +85025,8 @@
               "optional": false
             }
           ],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "number",
+          "returnType": "number",
           "isMethod": true,
           "objectType": "LProvinceGrid"
         },
@@ -95282,6 +96066,35 @@
           "parameters": [],
           "returns": "integer",
           "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LSkeletonAnimation"
+        },
+        {
+          "name": "poseAt",
+          "fullPath": "LSkeletonAnimation:poseAt",
+          "signature": "(time)",
+          "description": "Evaluates all timelines at the given time and returns a snapshot table.",
+          "parameters": [
+            {
+              "name": "time",
+              "type": "number",
+              "description": "Playback time in seconds.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LSkeletonAnimation"
+        },
+        {
+          "name": "reverse",
+          "fullPath": "LSkeletonAnimation:reverse",
+          "signature": "()",
+          "description": "Creates a reversed copy of this animation clip.",
+          "parameters": [],
+          "returns": "LSkeletonAnimation",
+          "returnType": "LSkeletonAnimation",
           "isMethod": true,
           "objectType": "LSkeletonAnimation"
         },
@@ -108523,6 +109336,48 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTileMap"
+        },
+        {
+          "name": "tileTypeIndex",
+          "fullPath": "LTileMap:tileTypeIndex",
+          "signature": "(layer)",
+          "description": "Builds a GID-to-positions index for the given layer.",
+          "parameters": [
+            {
+              "name": "layer",
+              "type": "integer",
+              "description": "1-based layer index.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LTileMap"
+        },
+        {
+          "name": "findTilesByGid",
+          "fullPath": "LTileMap:findTilesByGid",
+          "signature": "(layer, gid)",
+          "description": "Returns all (x, y) positions in the layer where the tile GID matches the given value.",
+          "parameters": [
+            {
+              "name": "layer",
+              "type": "integer",
+              "description": "1-based layer index.",
+              "optional": false
+            },
+            {
+              "name": "gid",
+              "type": "integer",
+              "description": "Tile GID to search for.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": true,
           "objectType": "LTileMap"
         },

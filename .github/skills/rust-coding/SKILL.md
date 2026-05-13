@@ -30,6 +30,98 @@ description: "Load this skill when writing or reviewing Rust engine code. It own
 - Keep `unsafe` blocks small, one-purpose, and accompanied by a `// SAFETY:` comment that explains the invariant. No `unsafe` for convenience when a safe alternative exists.
 - Prefer explicit module imports over glob imports (`use module::*`). Glob imports make it impossible to grep what the file actually depends on during refactors.
 - Tests in `tests/rust/unit/` name their test functions `test_<behavior>_<condition>`. Keep each test assertion to one failure mode so failing tests name the problem immediately.
+
+## Rustdoc Comment Standards — AI-First, Compact
+
+Comments exist for AI agents reading the code. Goal: maximum signal per token. No prose, no repetition, no filler.
+
+---
+
+### Regular Rust files (`src/` excluding `src/lua_api/`)
+
+**File level (`//!`)**
+Up to ~600 characters. Write it as a wrapped, readable paragraph of 3-6 short lines when needed. Concrete facts only: what the file owns, key types it defines, what it does NOT own, and direct dependencies. Describe the file's role once; do not repeat the `pub mod`/`pub use` list, enumerate the body below, or restate content that is already obvious from the declarations. No generic phrases like "this module provides".
+
+**Struct (`///`)**
+One line: role in the system + which other type uses it.
+Every field — pub and private — one `///` line: what it holds + range/units/invariant when non-obvious.
+
+**Enum (`///`)**
+One line: purpose. Every variant: one line — when it applies.
+
+**Methods and functions (`///`)**
+One line only. State what it does AND what it returns, including edge cases inline.
+No `# Arguments`, no `# Returns`, no `# Errors` sections.
+
+Single compact example (only one):
+- `/// Decodes file and returns chunk decoder; returns error on open/decode failure.`
+
+**Forbidden Phrases in Rustdoc**
+- No AI-generated prose: "returns a fully initialised instance", "the insertion is O(1) amortised", "this accessor incurs no allocation", "call it freely in hot paths".
+- No synonym inflation: "alias for `foo()`", "alias of `foo()`", "shorthand for", "convenience wrapper".
+- No placeholders: "placeholder", "empty placeholder", "tombstone", "replacement value" (if it has a real purpose, name that purpose instead).
+- No `incurs no allocation`, `O(1)`, `amortised` — these are implementation details, not user-facing docs.
+- No `returns` when opening a function doc. Use imperative: "Return" or "Read" or "Parse" instead of "Returns".
+
+**Rules (tool-aligned)**
+- Enforced by tools: every `.rs` file has `//!` module doc (see `tools/audit/audit_module.py`, check D-01).
+- Enforced by tools: every `pub` item has `///` doc (see `tools/audit/audit_module.py`, check D-02).
+- Tooling parses plain `///` and `//!` text; no structured rustdoc sections are required by scanners.
+- Keep comments compact one-liners when possible to minimize token cost for AI agents.
+- For regular files, avoid `# Arguments` / `# Returns` / `# Errors` sections unless a prompt explicitly requires them.
+- Every doc comment must be a concrete technical fact, not a sentence structure template.
+
+---
+
+### Lua API files (`src/lua_api/`)
+
+These files expose `lurek.*` to Lua. Contract source of truth is `tools/validate/validate_lua_api.py`.
+
+**File level (`//!`)**
+Use canonical header format expected by validator.
+- Format: ``//! `lurek.<module>` -- <concrete description>``.
+- Example: ``//! `lurek.audio` -- Audio bindings for source playback, bus routing, and DSP controls.``
+
+
+**Structs, fields, enums, helpers in `src/lua_api/`**
+Same compact one-liner rule as all other Rust files. No `# Fields` block.
+- Example struct line: ``/// Lua-side handle for an audio source registered in `Mixer`.``
+- Example field line: ``/// Slot-map key identifying this source in `Mixer`.``
+- This applies to private helpers too: every helper function gets one concrete `///` line.
+
+
+**Docs for Lua-registered calls only**
+Only methods/functions actually registered to Lua (`methods.add_method`, `methods.add_method_mut`, `methods.add_function`, `tbl.set(... create_function ...)`) must use verbose tagged markers.
+- Required shape above each registered call:
+- One summary `///` line.
+- Zero or more `@param` lines when method takes Lua args.
+- At least one `@return` line always.
+- Example (text form): ``/// Sets playback volume.`` + ``/// @param | vol | number | Volume multiplier, clamped to >= 0.0.`` + ``/// @return | nil | No value is returned.``
+
+
+**Marker format (required)**
+- `/// @param | <lua_name> | <lua_type> | <description>`
+- `/// @return | <lua_type> | <description>`
+- `lua_type` values: `number`, `integer`, `string`, `boolean`, `nil`, `Source`, `Bus`, `table`, etc.
+- Every registered Lua call must have at least one `@return` marker.
+- Keep `@param` / `@return` descriptions to one line — they appear verbatim in generated API docs.
+- Do not mix marker styles: never use `@param name : type` in files validated by `validate_lua_api.py`.
+
+**Validator-enforced checks (must stay true)**
+- Header exists and matches ``//! `lurek.<module>` ...``.
+- `pub fn register(...)` exists and has canonical Lua/LuaTable signature.
+- No rustdoc sections `/// # Parameters` or `/// # Returns`.
+- Tagged docs use exact pipe format:
+    - `/// @param | name | type | description`
+    - `/// @return | type | description`
+- No `@return | any | ...`.
+- No optional/union return types (`?`, `, nil`, `|nil`).
+
+**Forbidden in `src/lua_api/`**
+- `/// # Parameters`
+- `/// # Returns`
+- `@return | any | ...`
+- Optional/union return types like `number?`, `number, nil`, `Type|nil`
 ## Companion File Index
 - None.
 

@@ -583,4 +583,39 @@ describe("spine migrated from render unit", function()
     end)
 end)
 
+-- @describe animationFromJson(json)
+describe("animationFromJson(json)", function()
+        -- @covers lurek.spine.animationFromJson
+        it("parses valid json into LSkeletonAnimation", function()
+                local json = [[
+                {
+                    "name":"parsed",
+                    "duration":1.0,
+                    "timelines":[
+                        {"bone_idx":0,"property":"x","keys":[
+                            {"time":0.0,"value":0.0,"easing":"linear"},
+                            {"time":1.0,"value":2.0,"easing":"linear"}
+                        ]}
+                    ],
+                    "events":[{"time":0.5,"name":"tick","value":1.0}]
+                }
+                ]]
+                local anim = lurek.spine.animationFromJson(json)
+                expect_type("userdata", anim)
+        end)
+end)
+
+    -- @describe poseAt(time)
+    describe("poseAt(time)", function()
+        -- @covers LSkeletonAnimation:poseAt
+        -- @covers lurek.spine.newSkeletonAnimation
+        it("returns a table snapshot", function()
+            local sa = lurek.spine.newSkeletonAnimation("pose_probe", 1.0)
+            sa:addKeyframe(0, "x", 0.0, 0.0, "linear")
+            sa:addKeyframe(0, "x", 1.0, 5.0, "linear")
+            local pose = sa:poseAt(0.5)
+            expect_type("table", pose)
+        end)
+    end)
+
 test_summary()

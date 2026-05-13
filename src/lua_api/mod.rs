@@ -144,6 +144,7 @@ pub mod render_api;
 pub mod system_api;
 
 /// Registers the `lurek.devtools.*` developer diagnostics API.
+#[cfg(feature = "devtools-plugin")]
 pub mod devtools_api;
 
 /// Registers the `lurek.debugbridge.*` TCP debug server API.

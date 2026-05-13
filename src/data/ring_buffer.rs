@@ -1,8 +1,8 @@
-//! Fixed-capacity circular ring buffer.
-//!
-//! [`RingBuffer<T>`] stores up to `capacity` elements in a circular layout.
-//! Pushing onto a full buffer silently overwrites the oldest element.
-//! Pop/peek operate in FIFO order (oldest first).
+//! Scope: Fixed-capacity circular ring storage.
+//! This file defines the RingBuffer type and FIFO buffer operations.
+//! It owns overwrite-on-full behavior and oldest-first iteration order.
+
+// ---- Type: RingBuffer ----
 
 /// A fixed-capacity circular ring buffer.
 ///
@@ -12,13 +12,17 @@
 /// # Type Parameters
 /// - `T` — Element type; must implement `Clone`.
 pub struct RingBuffer<T: Clone> {
+    /// Backing storage for ring slots.
     data: Vec<Option<T>>,
+    /// Maximum number of elements the buffer can hold.
     capacity: usize,
     /// Index of the oldest element (read/pop position).
     head: usize,
     /// Number of elements currently stored.
     len: usize,
 }
+
+// ---- Implementation: RingBuffer ----
 
 impl<T: Clone> RingBuffer<T> {
     /// Creates a new ring buffer with the given capacity.

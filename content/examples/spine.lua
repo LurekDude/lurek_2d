@@ -313,6 +313,48 @@ do -- Skeleton:blendAnimation
   lurek.log.info("blend applied", "spine")
 end
 
+--@api-stub: LSkeletonAnimation:poseAt
+-- Evaluates a clip pose without mutating a skeleton.
+do -- LSkeletonAnimation:poseAt
+  local clip = lurek.spine.newSkeletonAnimation("probe", 1.0)
+  clip:addKeyframe(0, "x", 0.0, 0.0, "linear")
+  clip:addKeyframe(0, "x", 1.0, 10.0, "linear")
+  local pose = clip:poseAt(0.5)
+  lurek.log.debug("poseAt entries=" .. #pose, "spine")
+end
+
+--@api-stub: LSkeletonAnimation:reverse
+-- Creates a reversed clip copy.
+do -- LSkeletonAnimation:reverse
+  local clip = lurek.spine.newSkeletonAnimation("walk", 1.0)
+  clip:addKeyframe(0, "y", 0.0, 0.0, "linear")
+  clip:addKeyframe(0, "y", 1.0, 4.0, "linear")
+  local rev = clip:reverse()
+  lurek.log.debug("reversed clip duration=" .. rev:getDuration(), "spine")
+end
+
+--@api-stub: lurek.spine.animationFromJson
+-- Builds an animation clip from a JSON payload.
+do -- lurek.spine.animationFromJson
+  local json = [[
+    {
+      "name":"json_clip",
+      "duration":1.0,
+      "timelines":[
+        {"bone_idx":0,"property":"rotation","keys":[
+          {"time":0.0,"value":0.0,"easing":"linear"},
+          {"time":1.0,"value":1.57,"easing":"ease_out"}
+        ]}
+      ],
+      "events":[{"time":0.5,"name":"hit","value":1.0}]
+    }
+  ]]
+  local clip = lurek.spine.animationFromJson(json)
+  if clip ~= nil then
+    lurek.log.info("animationFromJson ok", "spine")
+  end
+end
+
 --@api-stub: LSkeleton:playAnimation
 -- Starts playback of a named animation on this skeleton.
 -- loop=true repeats indefinitely; false plays once and freezes at the last frame.

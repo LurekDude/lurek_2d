@@ -1,10 +1,10 @@
-//! Normalisation, outlier detection, mode, entropy, and the `percentile` helper.
+//! Scope: Statistical analysis and normalization for numeric data.
+//! This file defines normalise, outlier detection, mode, entropy, and percentile helpers.
+//! It owns percentile interpolation, z-score normalization, and distribution stats.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 
 /// Linear-interpolation percentile on a **sorted** slice.
-///
-/// Returns 0.0 for an empty slice.
 pub fn percentile(sorted: &[f64], pct: f64) -> f64 {
     if sorted.is_empty() {
         return 0.0;
@@ -25,8 +25,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Add a z-score column.
-    ///
-    /// Nil rows produce `Nil`. Returns `Err` if std dev is zero.
     pub fn zscore_col(&mut self, col: ColRef, name: &str) -> Result<(), String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -56,8 +54,6 @@ impl DataFrame {
     }
 
     /// Add a min-max normalised column, scaled to `[out_min, out_max]`.
-    ///
-    /// Nil rows produce `Nil`. If min == max, all values map to the midpoint.
     pub fn normalize_col(
         &mut self,
         col: ColRef,
@@ -103,9 +99,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Return rows where `col` deviates more than `threshold` std devs from the mean.
-    ///
-    /// Uses the z-score method. Returns an empty DataFrame if the column is empty
-    /// or all values are Nil.
     pub fn outliers(&self, col: ColRef, threshold: f64) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -134,9 +127,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Return the most frequent non-nil value in a column.
-    ///
-    /// For ties, the first-encountered winner is returned. Returns `CellValue::Nil`
-    /// if the column contains only Nil values or is empty.
     pub fn mode_val(&self, col: ColRef) -> Result<CellValue, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();
@@ -159,9 +149,6 @@ impl DataFrame {
     }
 
     /// Shannon entropy (bits) of the value distribution in a column.
-    ///
-    /// Nil values are treated as a distinct category. Returns 0.0 for an empty
-    /// column.
     pub fn entropy(&self, col: ColRef) -> Result<f64, String> {
         let ci = self.resolve_col(col)?;
         let data = self.raw_data();

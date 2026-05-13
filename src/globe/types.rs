@@ -41,6 +41,8 @@ pub struct Province {
     pub edge_tags: HashMap<(ProvinceId, ProvinceId), HashSet<String>>,
     /// Optional texture key string (resolved to a `TextureKey` at draw time).
     pub texture: Option<String>,
+    /// Optional atlas UV rectangle `[u0, v0, u1, v1]` in normalized coordinates.
+    pub texture_uv_rect: Option<[f32; 4]>,
     /// Base fill color `[r,g,b,a]` used when no texture is assigned.
     pub base_color: [f32; 4],
 }
@@ -62,6 +64,7 @@ impl Province {
             attrs: HashMap::new(),
             edge_tags: HashMap::new(),
             texture: None,
+            texture_uv_rect: None,
             base_color: [0.5, 0.5, 0.5, 1.0],
         }
     }
@@ -84,9 +87,44 @@ impl Province {
             attrs: HashMap::new(),
             edge_tags: HashMap::new(),
             texture: None,
+            texture_uv_rect: None,
             base_color,
         }
     }
+}
+
+/// Fog state with partial discovery support.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FogState {
+    /// Province is fully hidden.
+    Hidden = 0,
+    /// Province was explored earlier but is not currently visible.
+    Explored = 1,
+    /// Province is currently visible.
+    Visible = 2,
+}
+
+/// Heat-map layer driven by float attributes stored on provinces.
+#[derive(Debug, Clone)]
+pub struct HeatLayer {
+    /// Unique layer name.
+    pub name: String,
+    /// Province attribute key used as source value.
+    pub attr_key: String,
+    /// Minimum value mapped to `cold_color`.
+    pub min_value: f32,
+    /// Maximum value mapped to `hot_color`.
+    pub max_value: f32,
+    /// Color used at or below `min_value`.
+    pub cold_color: [f32; 4],
+    /// Color used at or above `max_value`.
+    pub hot_color: [f32; 4],
+    /// Heat layer opacity multiplier.
+    pub alpha: f32,
+    /// Render visibility toggle.
+    pub visible: bool,
+    /// Draw order among heat layers.
+    pub z_order: i32,
 }
 
 // ── Globe specification ────────────────────────────────────────────────────────
@@ -124,6 +162,14 @@ pub struct GlobeSpec {
     pub ambient: f32,
     /// Draw atmospheric rim glow.
     pub show_atmosphere: bool,
+    /// Atmosphere color tint.
+    pub atmosphere_color: [f32; 4],
+    /// Atmosphere halo width in pixels.
+    pub atmosphere_width: f32,
+    /// Number of Chaikin smoothing passes for borders.
+    pub border_smoothing_passes: u8,
+    /// Automatic spin speed in degrees per second.
+    pub auto_rotation_deg_per_sec: f32,
     /// Background color behind the globe.
     pub background_color: [f32; 4],
 }
@@ -140,6 +186,10 @@ impl Default for GlobeSpec {
             border_width: 1.0,
             ambient: 0.08,
             show_atmosphere: true,
+            atmosphere_color: [0.30, 0.55, 0.95, 0.35],
+            atmosphere_width: 14.0,
+            border_smoothing_passes: 1,
+            auto_rotation_deg_per_sec: 0.01,
             background_color: [0.02, 0.02, 0.08, 1.0],
         }
     }
@@ -194,6 +244,12 @@ pub struct MarkerStyle {
     pub icon_texture: Option<String>,
     /// Fallback primitive shape if no icon is set.
     pub shape: MarkerShape,
+    /// Pulse speed in Hz (0 disables pulsing).
+    pub pulse_hz: f32,
+    /// Relative pulse amplitude in [0, 1].
+    pub pulse_amplitude: f32,
+    /// Icon rotation speed in degrees per second.
+    pub rotation_deg_per_sec: f32,
 }
 
 /// Primitive fallback shape for an icon-less marker.
@@ -213,6 +269,9 @@ impl Default for MarkerStyle {
             size: 8.0,
             icon_texture: None,
             shape: MarkerShape::Circle,
+            pulse_hz: 0.0,
+            pulse_amplitude: 0.0,
+            rotation_deg_per_sec: 0.0,
         }
     }
 }

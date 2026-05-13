@@ -1,64 +1,56 @@
-//! Lazy query pipeline for [`DataFrame`].
-//!
-//! [`LazyQuery`] records a sequence of operations (filter, sort, select,
-//! head, tail) without materialising intermediate results.  Calling
-//! [`LazyQuery::collect`] executes all steps in order and returns a fully
-//! evaluated [`DataFrame`].
-//!
-//! This avoids allocating a full intermediate `DataFrame` for every step
-//! in a multi-stage pipeline.
-//!
-//! # Example (Rust)
-//! ```ignore
-//! let result = df.lazy()
-//!     .filter("age", ">", CellValue::Number(25.0))
-//!     .sort("score", false)
-//!     .head(10)
-//!     .collect()?;
-//! ```
-//!
-//! # Example (Lua)
-//! ```lua
-//! local result = df:lazy()
-//!     :filter("age", ">", 25)
-//!     :sort("score", false)
-//!     :head(10)
-//!     :collect()
-//! ```
+//! Scope: Lazy query pipeline for deferred DataFrame operations.
+//! This file defines LazyQuery and the Step operation types.
+//! It owns query composition without materializing intermediate frames.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 
 /// A single deferred operation.
 #[derive(Clone)]
 enum Step {
+    /// Filter rows by `col op val`.
     Filter {
+        /// Target column name.
         col: String,
+        /// Comparison operator string.
         op: String,
+        /// Comparison value.
         val: CellValue,
     },
+    /// Sort rows by one column.
     Sort {
+        /// Target column name.
         col: String,
+        /// Sort order flag.
         ascending: bool,
     },
+    /// Keep only selected columns.
     Select {
+        /// Ordered selected column names.
         cols: Vec<String>,
     },
+    /// Keep first `n` rows.
     Head(usize),
+    /// Keep last `n` rows.
     Tail(usize),
+    /// Keep inclusive row slice `[start, end]`.
     Slice {
+        /// Inclusive slice start.
         start: usize,
+        /// Inclusive slice end.
         end: usize,
     },
+    /// Drop rows where one column is `Nil`.
     DropNil(String),
+    /// Limit output row count.
     Limit(usize),
 }
 
-/// A lazy query pipeline built from a source [`DataFrame`].
-///
-/// Calling [`collect`](LazyQuery::collect) applies all recorded steps and
-/// returns the resulting `DataFrame`.
+/// Lazy query pipeline built from a source [`DataFrame`].
+/// Call [`collect`](LazyQuery::collect) to apply recorded steps and return the resulting `DataFrame`.
 pub struct LazyQuery {
+    /// Source DataFrame consumed by collection.
     source: DataFrame,
+    /// Recorded deferred steps in insertion order.
     steps: Vec<Step>,
 }
 
@@ -71,17 +63,12 @@ impl LazyQuery {
         }
     }
 
-    /// Create an empty placeholder used when consuming `self` via `std::mem::replace`.
-    ///
-    /// The tombstone holds an empty DataFrame and no steps; collecting it returns
-    /// an empty DataFrame.
+    /// Create an empty pipeline used as a replacement value.
     pub fn tombstone() -> Self {
         Self::new(DataFrame::new())
     }
 
     /// Add a filter step: keep rows where `col op val` is true.
-    ///
-    /// Supported ops: `==`, `!=`, `<`, `<=`, `>`, `>=`, `contains`.
     pub fn filter(mut self, col: &str, op: &str, val: CellValue) -> Self {
         self.steps.push(Step::Filter {
             col: col.to_string(),
@@ -130,7 +117,7 @@ impl LazyQuery {
         self
     }
 
-    /// Alias for `head` — limit the result to `n` rows.
+    /// Limit the result to `n` rows.
     pub fn limit(mut self, n: usize) -> Self {
         self.steps.push(Step::Limit(n));
         self
@@ -159,14 +146,7 @@ impl LazyQuery {
 }
 
 impl DataFrame {
-    /// Begin a lazy evaluation pipeline over this DataFrame.
-    ///
-    /// The original DataFrame is cloned once; the clone is consumed by the
-    /// pipeline.  No allocation occurs for intermediate steps until
-    /// [`LazyQuery::collect`] is called.
-    ///
-    /// # Returns
-    /// [`LazyQuery`] — a chainable pipeline builder.
+    /// Begin a lazy pipeline by cloning this DataFrame and return a chainable [`LazyQuery`].
     pub fn lazy(&self) -> LazyQuery {
         LazyQuery::new(self.clone_df())
     }

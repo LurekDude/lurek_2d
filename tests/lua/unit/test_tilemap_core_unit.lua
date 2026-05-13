@@ -2541,4 +2541,41 @@ describe("tilemap migrated from integration/tilemap_camera", function()
     end)
 end)
 
+-- @describe tile type index helpers
+describe("tile type index helpers", function()
+    -- @covers LTileMap:tileTypeIndex
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers LTileMap:addLayer
+    -- @covers LTileMap:setTile
+    it("tileTypeIndex returns gid buckets with positions", function()
+        local tm = lurek.tilemap.newTileMap(16, 16, 8)
+        tm:addLayer("g", 4, 4)
+        tm:setTile(1, 2, 2, 5)
+        tm:setTile(1, 3, 2, 5)
+
+        local idx = tm:tileTypeIndex(1)
+        expect_type("table", idx)
+        expect_type("table", idx[5])
+        expect_true(#idx[5] >= 2)
+    end)
+
+    -- @covers LTileMap:findTilesByGid
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers LTileMap:addLayer
+    -- @covers LTileMap:setTile
+    -- @covers LTileMap:clearTile
+    it("findTilesByGid tracks updates after clear", function()
+        local tm = lurek.tilemap.newTileMap(16, 16, 8)
+        tm:addLayer("g", 4, 4)
+        tm:setTile(1, 1, 1, 9)
+        tm:setTile(1, 4, 4, 9)
+        local before = tm:findTilesByGid(1, 9)
+        expect_equal(2, #before)
+
+        tm:clearTile(1, 1, 1)
+        local after = tm:findTilesByGid(1, 9)
+        expect_equal(1, #after)
+    end)
+end)
+
 test_summary()

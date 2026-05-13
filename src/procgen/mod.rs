@@ -2,12 +2,16 @@
 //!
 //! Cave maps, Voronoi diagrams, flood fill, Poisson disk sampling,
 //! noise functions, dungeon generators, heightmaps, WFC, L-systems,
-//! name generation, and world-level topology graphs.
+//! name generation, biome classification, and world-level topology graphs.
 
+/// Biome classification layer over heightmap and noise data.
+pub mod biome;
 /// Binary Space Partitioning dungeon generator.
 pub mod bsp;
 /// Cellular automata cave/dungeon generation.
 pub mod cellular;
+/// Shared scalar-map color conversion helpers.
+pub mod color;
 /// BFS flood fill on a flat grid.
 pub mod flood_fill;
 /// Heightmap generation using fractal noise, erosion, and normalization.
@@ -33,8 +37,13 @@ pub mod wfc;
 /// World-level topology graph with pathfinding and MST.
 pub mod world_graph;
 
-pub use bsp::{bsp_dungeon, BspDungeon, BspOpts, BspRoom};
+pub use biome::{biome_map_to_rgba, BiomeClassifier, BiomeRules, BiomeType};
+pub use bsp::{
+    bsp_dungeon, bsp_dungeon_with_prefabs, BspDungeon, BspOpts, BspPrefabStamp, BspRoom,
+    PlacedBspPrefab,
+};
 pub use cellular::{cellular_automata, CellularOpts};
+pub use color::scalar_map_to_rgba_bytes;
 pub use flood_fill::flood_fill;
 pub use heightmap::{Heightmap, HeightmapOpts};
 pub use lsystem::LSystem;
@@ -46,7 +55,10 @@ pub use noise::{
 };
 pub use poisson::poisson_disk;
 pub use render::NoiseGrid;
-pub use rooms::{rooms_dungeon, Room, RoomsDungeon, RoomsOpts};
+pub use rooms::{
+    rooms_dungeon, rooms_dungeon_with_prefabs, PlacedRoomPrefab, Room, RoomPrefabStamp,
+    RoomsDungeon, RoomsOpts,
+};
 pub use voronoi::{voronoi_diagram, VoronoiOpts};
 pub use wfc::{wfc_generate, WfcGrid, WfcOpts, WfcRules, WfcTile};
 pub use world_graph::{generate_world_graph, WorldEdge, WorldGraph, WorldRegion};

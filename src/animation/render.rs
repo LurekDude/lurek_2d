@@ -1,12 +1,13 @@
-//! Render-command generation for sprite animations.
-//!
-//! Provides a helper to convert the current animation frame into a
-//! [`RenderCommand::DrawQuad`].  Pure CPU â€” no wgpu, winit, or mlua.
+//! Scope: Build render commands from current animation frame data.
+//! This file defines render parameters and frame-to-command conversion helpers.
+//! It owns translation from animation quads to draw-quad command payloads.
 
 use crate::animation::controller::Animation;
 use crate::math::Rect;
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::TextureKey;
+
+// ---- Type: AnimRenderParams ----
 
 /// Parameters for rendering an animated sprite.
 ///
@@ -49,6 +50,7 @@ pub struct AnimRenderParams {
 }
 
 impl Animation {
+    // ---- Implementation: Animation Render Helpers ----
     /// Produces a single `DrawQuad` render command for the current frame.
     ///
     /// Returns `None` if no clip is active or the animation has no frames.
@@ -64,6 +66,8 @@ impl Animation {
         Some(quad_to_draw_command(&quad, params))
     }
 }
+
+// ---- Helper Functions: Render Command Conversion ----
 
 /// Converts a source quad and render parameters into a `DrawQuad` command.
 ///
@@ -92,5 +96,3 @@ pub fn quad_to_draw_command(quad: &Rect, params: &AnimRenderParams) -> RenderCom
         effect: None,
     }
 }
-
-// â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

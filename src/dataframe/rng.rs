@@ -1,4 +1,6 @@
-//! Shared deterministic pseudo-random generator for dataframe operations.
+//! Scope: Deterministic pseudo-random number generation for DataFrame sampling.
+//! This file defines the Xorshift64 PRNG type and its state progression.
+//! It owns seed initialization and reproducible random selection.
 
 /// Minimal deterministic xorshift64 PRNG used by dataframe helpers.
 pub(crate) struct Xorshift64 {

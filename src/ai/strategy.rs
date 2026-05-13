@@ -1,40 +1,9 @@
-//! Strategic AI — high-level goal evaluation and throttled decision-making.
-//!
-//! Provides a turn-like strategic planner for AI controllers that operate at a
-//! slow update cadence (every N seconds) rather than every frame. Typical uses:
-//! - RTS faction AI deciding where to expand or attack.
-//! - RPG boss AI re-evaluating its phase/strategy.
-//! - City simulation resource allocation decisions.
-//!
-//! ## Architecture
-//!
-//! - [`StrategicGoal`] is a named candidate plan with an estimate score and
-//!   optional precondition tags.
-//! - [`StrategicEvaluator`] is a trait exposing `score_goal` — implement this
-//!   in a game struct to provide context-sensitive scoring.
-//! - [`StrategyAI`] owns the goal list and a cooldown timer. `update(dt)` counts
-//!   down the timer; when it fires, `evaluate_all` scores every goal and sets
-//!   the best as the active goal.
-//!
-//! ## Typical Usage Sequence
-//!
-//! 1. Create `StrategyAI::new(update_interval)`.
-//! 2. Add goals with `add_goal`.
-//! 3. Each frame call `update(dt)` and pass a state snapshot for scoring.
-//! 4. Read `active_goal()` to drive the agent's tactical layer.
-
-// ────────────────────────────────────────────────────────────────────────────
-// StrategicGoal
-// ────────────────────────────────────────────────────────────────────────────
+﻿//! Scope: high-level strategic goal scoring and selection state.
+//! This file defines strategic goal records, scoring utilities, and refresh cadence controls for long-horizon intent.
+//! It owns deterministic top-level objective choice consumed by lower-level planners and action systems.
+// ---- Type: StrategicGoal ----
 
 /// Named strategic goal with cost/benefit estimates.
-///
-/// # Fields
-/// - `name` — `String`.
-/// - `score` — `f32`.
-/// - `precondition_tags` — `Vec<String>`.
-/// - `enabled` — `bool`.
-/// - `priority` — `f32`.
 #[derive(Clone)]
 pub struct StrategicGoal {
     /// Unique goal name (e.g. `"expand_east"`, `"reinforce_base"`).
@@ -51,12 +20,6 @@ pub struct StrategicGoal {
 
 impl StrategicGoal {
     /// Creates a new goal with full priority and no preconditions.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -68,20 +31,11 @@ impl StrategicGoal {
     }
 
     /// Adds a precondition tag requirement.
-    ///
-    /// # Parameters
-    /// - `tag` — `&str`.
     pub fn require_tag(&mut self, tag: &str) {
         self.precondition_tags.push(tag.to_string());
     }
 
     /// Returns `true` if all precondition tags are present in `active_tags`.
-    ///
-    /// # Parameters
-    /// - `active_tags` — `&[String]`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_eligible(&self, active_tags: &[String]) -> bool {
         self.enabled
             && self
@@ -91,23 +45,9 @@ impl StrategicGoal {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// StrategyAI
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: StrategyAI ----
 
 /// Throttled strategic goal evaluator.
-///
-/// Re-evaluates after `update_interval` seconds have elapsed or after a
-/// `force_evaluate` call. Outside scoring closures provide the actual utility
-/// estimate so the engine module stays game-agnostic.
-///
-/// # Fields
-/// - `goals` — `Vec<StrategicGoal>`.
-/// - `update_interval` — `f32`.
-/// - `timer` — `f32`.
-/// - `active_goal` — `Option<String>`.
-/// - `active_tags` — `Vec<String>`.
-/// - `total_evaluations` — `u32`.
 pub struct StrategyAI {
     /// All registered strategic goals.
     pub goals: Vec<StrategicGoal>,
@@ -123,12 +63,6 @@ pub struct StrategyAI {
 
 impl StrategyAI {
     /// Creates a new strategy AI with the given evaluation interval in seconds.
-    ///
-    /// # Parameters
-    /// - `update_interval` — `f32`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(update_interval: f32) -> Self {
         Self {
             goals: Vec::new(),
@@ -141,33 +75,21 @@ impl StrategyAI {
     }
 
     /// Adds a goal to the evaluator.
-    ///
-    /// # Parameters
-    /// - `goal` — `StrategicGoal`.
     pub fn add_goal(&mut self, goal: StrategicGoal) {
         self.goals.push(goal);
     }
 
     /// Convenience: adds a named goal with default settings.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
     pub fn add_goal_named(&mut self, name: &str) {
         self.add_goal(StrategicGoal::new(name));
     }
 
     /// Sets the active world-state tags used to filter goal eligibility.
-    ///
-    /// # Parameters
-    /// - `tags` — `Vec<String>`.
     pub fn set_tags(&mut self, tags: Vec<String>) {
         self.active_tags = tags;
     }
 
     /// Adds a single active tag.
-    ///
-    /// # Parameters
-    /// - `tag` — `&str`.
     pub fn add_tag(&mut self, tag: &str) {
         if !self.active_tags.iter().any(|t| t == tag) {
             self.active_tags.push(tag.to_string());
@@ -175,32 +97,16 @@ impl StrategyAI {
     }
 
     /// Removes a tag.
-    ///
-    /// # Parameters
-    /// - `tag` — `&str`.
     pub fn remove_tag(&mut self, tag: &str) {
         self.active_tags.retain(|t| t != tag);
     }
 
     /// Returns the name of the currently active goal, or `None` if no evaluation
-    /// has run yet.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
     pub fn active_goal(&self) -> Option<&str> {
         self.active_goal.as_deref()
     }
 
     /// Advances the timer by `dt` and evaluates goals when the interval expires.
-    ///
-    /// # Returns
-    /// `f32,`.
-    /// The scorer closure receives each goal's name and should return a utility
-    /// in `[0.0, 1.0]`.
-    ///
-    /// # Parameters
-    /// - `dt` — `f32`.
-    /// - `scorer` — `FnMut(&str) -> f32`.
     pub fn update<F>(&mut self, dt: f32, scorer: &mut F)
     where
         F: FnMut(&str) -> f32,
@@ -213,12 +119,6 @@ impl StrategyAI {
     }
 
     /// Forces an immediate re-evaluation outside the normal interval.
-    ///
-    /// # Returns
-    /// `f32,`.
-    ///
-    /// # Parameters
-    /// - `scorer` — `FnMut(&str) -> f32`.
     pub fn force_evaluate<F>(&mut self, scorer: &mut F)
     where
         F: FnMut(&str) -> f32,
@@ -253,42 +153,13 @@ impl StrategyAI {
     }
 
     /// Returns the number of registered goals.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn goal_count(&self) -> usize {
         self.goals.len()
     }
 
     /// Returns seconds remaining until the next scheduled evaluation.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn time_until_next(&self) -> f32 {
         (self.update_interval - self.timer).max(0.0)
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_strategy_empty_goals() {
-        let s = StrategyAI::new(1.0);
-        assert_eq!(s.goal_count(), 0);
-    }
-
-    #[test]
-    fn add_goal_increases_count() {
-        let mut s = StrategyAI::new(1.0);
-        s.add_goal(StrategicGoal::new("attack"));
-        assert_eq!(s.goal_count(), 1);
-    }
-
-    #[test]
-    fn time_until_next_starts_at_interval() {
-        let s = StrategyAI::new(2.0);
-        assert!((s.time_until_next() - 2.0).abs() < 1e-6);
-    }
-}

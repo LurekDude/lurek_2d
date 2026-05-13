@@ -1,12 +1,9 @@
-//! Hierarchical frame profiler with zone push/pop and rolling frame storage.
-//!
-//! The profiler tracks nested timing zones — each [`profilePush`][lurek.devtools.profilePush]
-//! opens a zone and each [`profilePop`][lurek.devtools.profilePop] closes it.
-//! Completed frames are stored in a capped ring and can be queried for the
-//! flame-graph data needed by an overlay panel.
+//! Scope: Hierarchical frame profiler with zone timing and tree structure.
+//! This file defines Profiler, ProfileZone, and frame-by-frame recording.
+//! It owns zone push/pop, frame completion, and nested hierarchy maintenance.
 
-use std::time::Instant;
 use std::collections::VecDeque;
+use crate::devtools::time_anchor::TimeAnchor;
 
 // ── zone ──────────────────────────────────────────────────────────────────
 
@@ -80,7 +77,7 @@ pub struct Profiler {
     pub max_frames: usize,
     /// Stack entries: (name, start_time, accumulated_children).
     zone_stack: Vec<(String, f64, Vec<ProfileZone>)>,
-    epoch: Instant,
+    epoch: TimeAnchor,
 }
 
 impl Profiler {
@@ -94,7 +91,7 @@ impl Profiler {
             frames: VecDeque::new(),
             max_frames: 300,
             zone_stack: Vec::new(),
-            epoch: Instant::now(),
+            epoch: TimeAnchor::new(),
         }
     }
 
@@ -103,7 +100,7 @@ impl Profiler {
     /// # Returns
     /// `f64`.
     pub fn elapsed(&self) -> f64 {
-        self.epoch.elapsed().as_secs_f64()
+        self.epoch.elapsed_seconds()
     }
 
     /// Opens a named timing zone.

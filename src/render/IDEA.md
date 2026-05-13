@@ -10,3 +10,4 @@
 - TODO(dedup): doprecyzować odpowiedzialność `render` vs `pipeline` (nazewnictwo i zakres).
 - TODO(dedup): doprecyzować granicę `render` vs `effect` dla mapowania parametrów post-fx.
 - TODO(helper): wydzielić wspólne helpery shader/blend/shadow map i usunąć duplikacje w `postfx_pipeline`.
+- DONE(FEAT): podstawowe implementacje thick lines - `gpu_renderer.rs` ma `push_thick_line()` renderujący linie jako grube quady.

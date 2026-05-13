@@ -377,36 +377,7 @@ pub fn perlin4d(x: f32, y: f32, z: f32, w: f32, seed: u32) -> f32 {
 /// Produces `width * height` values in row-major order using the given `MapGenOptions`.
 /// Significantly faster than [`NoiseGenerator::generate_map`] on multi-core machines.
 pub fn generate_noise_map_parallel(w: u32, h: u32, opts: &MapGenOptions) -> Vec<f64> {
-    let len = (w as usize) * (h as usize);
-    let scale_x = opts.scale_x;
-    let scale_y = opts.scale_y;
-    let offset_x = opts.offset_x;
-    let offset_y = opts.offset_y;
-    let octaves = opts.octaves;
-    let lacunarity = opts.lacunarity;
-    let persistence = opts.persistence;
-    let kind = opts.kind;
-    let fractal = opts.fractal;
-    let seed: u64 = 0; // parallel version uses seed 0 (use NoiseGenerator for seeded parallel maps)
-
-    let gen = NoiseGenerator::new(seed);
-
-    (0..len)
-        .into_par_iter()
-        .map(|idx| {
-            let ix = (idx % w as usize) as u32;
-            let iy = (idx / w as usize) as u32;
-            let nx = (ix as f64 + offset_x) * scale_x;
-            let ny = (iy as f64 + offset_y) * scale_y;
-            match fractal {
-                FractalType::Fbm => gen.fbm(nx, ny, octaves, lacunarity, persistence, kind),
-                FractalType::Ridged => gen.ridged(nx, ny, octaves, lacunarity, persistence, kind),
-                FractalType::Turbulence => {
-                    gen.turbulence(nx, ny, octaves, lacunarity, persistence, kind)
-                }
-            }
-        })
-        .collect()
+    NoiseGenerator::new(0).generate_map_parallel(w, h, opts)
 }
 
 // ── Private f32 helpers ────────────────────────────────────────────────────
@@ -1296,6 +1267,41 @@ impl NoiseGenerator {
             }
         }
         map
+    }
+
+    /// Generates a 2D noise map in parallel using rayon.
+    ///
+    /// This is the seeded parallel equivalent of [`generate_map`].
+    pub fn generate_map_parallel(&self, width: u32, height: u32, opts: &MapGenOptions) -> Vec<f64> {
+        let len = (width as usize) * (height as usize);
+        let scale_x = opts.scale_x;
+        let scale_y = opts.scale_y;
+        let offset_x = opts.offset_x;
+        let offset_y = opts.offset_y;
+        let octaves = opts.octaves;
+        let lacunarity = opts.lacunarity;
+        let persistence = opts.persistence;
+        let kind = opts.kind;
+        let fractal = opts.fractal;
+
+        (0..len)
+            .into_par_iter()
+            .map(|idx| {
+                let ix = (idx % width as usize) as u32;
+                let iy = (idx / width as usize) as u32;
+                let nx = (ix as f64 + offset_x) * scale_x;
+                let ny = (iy as f64 + offset_y) * scale_y;
+                match fractal {
+                    FractalType::Fbm => self.fbm(nx, ny, octaves, lacunarity, persistence, kind),
+                    FractalType::Ridged => {
+                        self.ridged(nx, ny, octaves, lacunarity, persistence, kind)
+                    }
+                    FractalType::Turbulence => {
+                        self.turbulence(nx, ny, octaves, lacunarity, persistence, kind)
+                    }
+                }
+            })
+            .collect()
     }
 }
 

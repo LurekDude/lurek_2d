@@ -1,35 +1,5 @@
-//! Core audio mixer that owns every loaded sound and drives playback through rodio.
-//!
-//! [`Mixer`] is the single point of entry for all audio operations in Lurek2D.  It opens the
-//! system's default output stream on construction (via rodio) and maintains a slot-map of
-//! [`AudioEntry`] records — one per loaded sound.  Each entry embeds a `rodio::Sink` for
-//! playback control and cached metadata (duration, fade parameters, loop flag, filters).
-//!
-//! # Source types
-//!
-//! The mixer supports two loading strategies selected at load time:
-//! - **Static** — the raw file bytes are decoded and held in an `Arc<Vec<u8>>` inside the
-//!   entry.  Playback restarts by re-decoding from that in-memory buffer, giving very low
-//!   latency at the cost of higher RAM usage.  Best for short sound effects.
-//! - **Stream** — the file is opened fresh from disk on each play call and decoded
-//!   incrementally.  Lower memory overhead for long music tracks.
-//!
-//! # Bus routing
-//!
-//! Every sound can be assigned to a named audio bus stored in a secondary slot-map.
-//! Volume and pitch for a playing source are the product of the per-source values and the
-//! values of its assigned bus.  Setting a bus to paused suspends every source on that bus.
-//!
-//! # Master volume
-//!
-//! A single master-volume scalar is applied on top of all per-source and per-bus volumes,
-//! letting game code provide a global volume slider without touching individual sources.
-//!
-//! # Time tracking
-//!
-//! Because rodio `Sink` does not expose a playback position, the mixer tracks play-start
-//! instants and accumulated pre-pause seconds manually so `lurek.audio.getTime` can return
-//! the current position in the stream.
+//! Core audio mixer: source management, playback control, effects, spatial audio.
+//! Mixer: central registry of loaded sounds, active sinks, buses, queueable sources.
 
 use std::collections::VecDeque;
 use std::io::BufReader;
@@ -51,25 +21,16 @@ use crate::runtime::resource_keys::BusKey;
 use crate::runtime::resource_keys::QueueableKey;
 use crate::runtime::resource_keys::SoundKey;
 
-/// Type of audio source.
-///
-/// # Variants
-/// - `Static` — Static variant.
-/// - `Stream` — Stream variant.
+/// Audio source type: memory-decoded or streamed from disk.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SourceType {
-    /// Decoded to memory buffer — low latency, higher memory.
+    /// Decoded to memory buffer - low latency, higher memory.
     Static,
-    /// Streamed from file on playback — low memory.
+    /// Streamed from file on playback - low memory.
     Stream,
 }
 
-/// Playback state of an audio source.
-///
-/// # Variants
-/// - `Stopped` — Stopped variant.
-/// - `Playing` — Playing variant.
-/// - `Paused` — Paused variant.
+/// Audio playback state.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PlayState {
     /// Not playing, at beginning.
@@ -91,68 +52,36 @@ struct AudioEntry {
     pan: f32,
     play_state: PlayState,
     bus_key: Option<BusKey>,
-    /// Cached total duration in seconds, computed on first play.
     duration_secs: Option<f32>,
-    /// Instant when playback last started or resumed.
     play_start: Option<Instant>,
-    /// Accumulated playback seconds before the last pause.
     accumulated_secs: f32,
-    /// Lowpass filter cutoff frequency in Hz. `None` = no filter.
     lowpass_cutoff: Option<u32>,
-    /// Highpass filter cutoff frequency in Hz. `None` = no filter.
     highpass_cutoff: Option<u32>,
-    /// Fade-in duration in seconds applied on next play. `None` = no fade.
     fade_in_duration: Option<f32>,
-    /// Optional 3D spatial state; `None` = non-spatial (no panning by position).
     spatial: Option<crate::audio::SpatialState>,
-    /// Mid-side stereo width multiplier. `1.0` = unchanged, `0.0` = mono, `>1.0` = widened.
     stereo_width: f32,
-    /// Optional random pitch range `(min, max)` applied on each play.
     pitch_range: Option<(f32, f32)>,
-    /// Peak amplitude in \[0, 1\] reported by the game via `setMeter` or updated
-    /// automatically during playback analysis.  Defaults to `0.0`.
     pub peak: f32,
 }
 
-/// A manually-fed streaming audio source that accepts raw f32 PCM data pushed buffer-by-buffer.
-///
-/// Game code pushes audio data into the free-buffer queue via `queue_buffer`. The engine
-/// counts how many buffers are still waiting to be consumed, giving game scripts control
-/// over exactly when audio data is produced and played.
-///
-/// # Fields
-/// - `sample_rate` — `u32`. PCM sample rate in Hz (e.g. 44100).
-/// - `bit_depth` — `u8`. Bit depth per sample (8 or 16).
-/// - `channels` — `u8`. Number of audio channels (1 = mono, 2 = stereo).
-/// - `buffer_count` — `usize`. Maximum number of queued buffers.
-/// - `queued_buffers` — `VecDeque<Vec<f32>>`. FIFO queue of pending f32 PCM buffers.
-/// - `free_buffers` — `usize`. Number of buffer slots currently available.
+/// Queueable PCM source: game code pushes buffers via `queue_buffer`.
 pub struct QueueableSource {
-    /// PCM sample rate in Hz (e.g. 44100).
+    /// Sample rate in Hz.
     pub sample_rate: u32,
-    /// Bit depth per sample (8 or 16).
+    /// Bit depth.
     pub bit_depth: u8,
-    /// Number of audio channels (1 = mono, 2 = stereo).
+    /// Channel count.
     pub channels: u8,
-    /// Maximum number of queued buffers.
+    /// Max queued buffers.
     pub buffer_count: usize,
-    /// FIFO queue of pending raw f32 PCM buffers.
+    /// Pending f32 PCM buffers.
     pub queued_buffers: VecDeque<Vec<f32>>,
-    /// Number of buffer slots currently available for new data.
+    /// Available buffer slots.
     pub free_buffers: usize,
 }
 
 impl QueueableSource {
-    /// Creates a new `QueueableSource` with all buffer slots free.
-    ///
-    /// # Parameters
-    /// - `sample_rate` — `u32`. PCM sample rate in Hz.
-    /// - `bit_depth` — `u8`. Bit depth per sample (8 or 16).
-    /// - `channels` — `u8`. Channel count (1 = mono, 2 = stereo).
-    /// - `buffer_count` — `usize`. Maximum queued buffers.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Creates a new queueable source with all buffer slots free.
     pub fn new(sample_rate: u32, bit_depth: u8, channels: u8, buffer_count: usize) -> Self {
         QueueableSource {
             sample_rate,
@@ -164,15 +93,7 @@ impl QueueableSource {
         }
     }
 
-    /// Pushes a buffer of f32 PCM samples into the queue.
-    ///
-    /// Returns `Err` if no free buffer slots remain.
-    ///
-    /// # Parameters
-    /// - `data` — `&[f32]`. PCM samples to enqueue.
-    ///
-    /// # Returns
-    /// `Result<(), EngineError>`.
+    /// Pushes an f32 PCM buffer. Returns `Err` if no free slots.
     pub fn queue_buffer(&mut self, data: &[f32]) -> Result<(), EngineError> {
         if self.free_buffers == 0 {
             return Err(EngineError::AudioError(
@@ -184,53 +105,31 @@ impl QueueableSource {
         Ok(())
     }
 
-    /// Returns the number of buffer slots currently available.
-    ///
-    /// # Returns
-    /// `usize`.
+    /// Returns free buffer slot count.
     pub fn free_buffer_count(&self) -> usize {
         self.free_buffers
     }
 }
-
-///
-/// The `Mixer` is the single point of entry for all audio operations in
-/// Lurek2D. It owns a `SlotMap<SoundKey, AudioEntry>` for O(1) lookup and safe
-/// handle invalidation, a `SlotMap<BusKey, Bus>` for named routing groups, and
-/// a master volume applied on top of all per-source and per-bus values. Uses
-/// `rodio::Sink` per source for independent playback control.
-///
-/// # Fields
-/// - `_stream` — `Option<rodio::OutputStream>`.
-/// - `stream_handle` — `Option<rodio::OutputStreamHandle>`.
-/// - `sources` — `SlotMap<SoundKey, AudioEntry>`.
-/// - `master_volume` — `f32`.
-/// - `buses` — `SlotMap<BusKey, Bus>`.
-/// - `listener_position` — `[f32; 3]`. Listener position for spatial audio.
-/// - `listener_orientation` — `[f32; 6]`. Listener orientation (forward + up vectors).
-/// - `listener_velocity` — `[f32; 3]`. Listener velocity for Doppler calculation.
-/// - `doppler_scale` — `f32`. Global Doppler effect scale factor.
-/// - `distance_model` — `String`. Distance attenuation model name.
-/// - `queueables` — `SlotMap<QueueableKey, QueueableSource>`. Manually-fed streaming sources.
+/// Central audio registry: manages sources, buses, playback, effects, spatial audio.
 pub struct Mixer {
     _stream: Option<rodio::OutputStream>,
     stream_handle: Option<rodio::OutputStreamHandle>,
     sources: SlotMap<SoundKey, AudioEntry>,
     master_volume: f32,
     buses: SlotMap<BusKey, Bus>,
-    /// Listener position `[x, y, z]` for spatial audio.
+    /// Listener position `[x, y, z]`.
     listener_position: [f32; 3],
-    /// Listener orientation: forward (xyz) followed by up (xyz).
+    /// Listener orientation: forward (xyz) + up (xyz).
     listener_orientation: [f32; 6],
-    /// Listener velocity `[x, y, z]` for Doppler calculation.
+    /// Listener velocity `[x, y, z]`.
     listener_velocity: [f32; 3],
-    /// Global Doppler effect scale factor (1.0 = default, 0.0 = disabled).
+    /// Global Doppler scale (1.0 = default).
     doppler_scale: f32,
-    /// Distance attenuation model name (e.g. `"inverse_clamped"`).
+    /// Distance attenuation model name.
     distance_model: String,
-    /// Manually-fed queueable audio sources.
+    /// Queueable PCM sources.
     queueables: SlotMap<QueueableKey, QueueableSource>,
-    /// Master peak level in \[0.0, 1.0\].  Set by Lua via `setMeter`; read by `getMeter`.
+    /// Master peak level.
     pub master_peak: f32,
 }
 
@@ -241,13 +140,8 @@ impl Default for Mixer {
 }
 
 impl Mixer {
-    /// Creates a new `Mixer`, attempting to open the default system audio output.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// Falls back gracefully (with a warning log) if no audio device is available,
-    /// so the engine can run in headless or CI environments without crashing.
+    /// Creates a new mixer, attempting to open system audio output.
+    /// Fails gracefully if no audio device is available (headless/CI environments).
     pub fn new() -> Self {
         let (stream, handle) = match rodio::OutputStream::try_default() {
             Ok((s, h)) => (Some(s), Some(h)),
@@ -272,26 +166,12 @@ impl Mixer {
         }
     }
 
-    /// Returns a reference to the output stream handle, if available.
-    ///
-    /// # Returns
-    /// `Option<&rodio::OutputStreamHandle>`.
-    ///
-    /// Used by `MidiPlayer` to create its own `Sink` for playback.
+    /// Returns reference to the stream handle for creating custom sinks.
     pub fn stream_handle(&self) -> Option<&rodio::OutputStreamHandle> {
         self.stream_handle.as_ref()
     }
 
-    /// Registers a new audio file path with the given source type and returns its key.
-    ///
-    /// # Parameters
-    /// - `file_path` — `&str`.
-    /// - `source_type` — `SourceType`.
-    ///
-    /// # Returns
-    /// `SoundKey`.
-    ///
-    /// The file is not opened here — loading is deferred until `play` is called.
+    /// Registers a new audio file, returns its key. File loading deferred until play.
     pub fn load_source(&mut self, file_path: &str, source_type: SourceType) -> SoundKey {
         self.sources.insert(AudioEntry {
             file_path: file_path.to_string(),
@@ -317,14 +197,7 @@ impl Mixer {
         })
     }
 
-    /// Plays the audio source identified by `key`, loading and decoding the file on demand.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `game_dir` — `&Path`.
-    ///
-    /// For static sources, decoded data is cached in memory on first play.
-    /// Respects per-source volume, pitch, pan, looping, master volume, and active filters.
+    /// Plays the source, decoding on demand. Respects volume/pitch/pan/looping/filters/bus state.
     pub fn play(&mut self, key: SoundKey, game_dir: &Path) {
         let master_vol = self.master_volume;
 
@@ -351,7 +224,7 @@ impl Mixer {
             }
         }
 
-        // Collect parameters — immutable borrow ends here
+        // Collect parameters - immutable borrow ends here
         let params = self.sources.get(key).map(|entry| {
             let was_stopped = entry.play_state == PlayState::Stopped;
             (
@@ -425,10 +298,7 @@ impl Mixer {
         }
     }
 
-    /// Stops playback of a sound and resets its position to the beginning.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
+    /// Stops playback and resets to beginning.
     pub fn stop(&mut self, key: SoundKey) {
         if let Some(entry) = self.sources.get_mut(key) {
             if let Some(sink) = entry.sink.take() {
@@ -440,11 +310,7 @@ impl Mixer {
         }
     }
 
-    /// Sets the per-source playback volume, clamped to `[0.0, 2.0]`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `volume` — `f32`.
+    /// Sets per-source volume, clamped to `[0.0, 2.0]`.
     pub fn set_volume(&mut self, key: SoundKey, volume: f32) {
         let vol = volume.clamp(0.0, 2.0);
         if let Some(entry) = self.sources.get_mut(key) {
@@ -455,21 +321,12 @@ impl Mixer {
         }
     }
 
-    /// Returns the per-source playback volume. Defaults to `1.0`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Returns per-source volume (default 1.0).
     pub fn get_volume(&self, key: SoundKey) -> f32 {
         self.sources.get(key).map_or(1.0, |e| e.volume)
     }
 
     /// Pauses playback of the audio source identified by \key\.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn pause(&mut self, key: SoundKey) {
         if let Some(entry) = self.sources.get_mut(key) {
             if let Some(ref sink) = entry.sink {
@@ -487,9 +344,6 @@ impl Mixer {
     }
 
     /// Resumes playback of a paused audio source identified by \key\.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn resume(&mut self, key: SoundKey) {
         if let Some(entry) = self.sources.get_mut(key) {
             if let Some(ref sink) = entry.sink {
@@ -503,10 +357,6 @@ impl Mixer {
     }
 
     /// Sets the playback speed (pitch) for the source, clamped to `[0.1, 4.0]`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `pitch` — `f32`.
     pub fn set_pitch(&mut self, key: SoundKey, pitch: f32) {
         let p = pitch.clamp(0.1, 4.0);
         if let Some(entry) = self.sources.get_mut(key) {
@@ -518,34 +368,17 @@ impl Mixer {
     }
 
     /// Returns the pitch (playback speed) for the source. Defaults to `1.0`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_pitch(&self, key: SoundKey) -> f32 {
         self.sources.get(key).map_or(1.0, |e| e.pitch)
     }
 
     /// Sets the playback speed (pitch) for the source, clamped to `[0.1, 4.0]`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `speed` — `f32`.
-    ///
     /// Legacy alias for `set_pitch`.
     pub fn set_speed(&mut self, key: SoundKey, speed: f32) {
         self.set_pitch(key, speed);
     }
 
     /// Returns whether the audio source is currently playing (not paused and not empty).
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_playing(&self, key: SoundKey) -> bool {
         if let Some(entry) = self.sources.get(key) {
             if let Some(ref sink) = entry.sink {
@@ -556,12 +389,6 @@ impl Mixer {
     }
 
     /// Returns the playback state of the source, synced with the underlying sink.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `PlayState`.
     pub fn get_play_state(&self, key: SoundKey) -> PlayState {
         if let Some(entry) = self.sources.get(key) {
             if let Some(ref sink) = entry.sink {
@@ -579,32 +406,16 @@ impl Mixer {
     }
 
     /// Returns whether the source is paused. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_paused(&self, key: SoundKey) -> bool {
         self.get_play_state(key) == PlayState::Paused
     }
 
     /// Returns whether the source is stopped. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_stopped(&self, key: SoundKey) -> bool {
         self.get_play_state(key) == PlayState::Stopped
     }
 
     /// Sets the looping flag for the source. Takes effect on next `play` call.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `looping` — `bool`.
     pub fn set_looping(&mut self, key: SoundKey, looping: bool) {
         if let Some(entry) = self.sources.get_mut(key) {
             entry.looping = looping;
@@ -612,22 +423,11 @@ impl Mixer {
     }
 
     /// Returns whether the source is set to loop.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_looping(&self, key: SoundKey) -> bool {
         self.sources.get(key).is_some_and(|e| e.looping)
     }
 
     /// Plays the audio source in an infinite loop.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `game_dir` — `&Path`.
-    ///
     /// Sets looping to true and then calls `play`. Kept for backward compatibility.
     pub fn play_looping(&mut self, key: SoundKey, game_dir: &Path) {
         self.set_looping(key, true);
@@ -635,12 +435,6 @@ impl Mixer {
     }
 
     /// Sets the stereo pan for the source, clamped to `[-1.0, 1.0]`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `pan` — `f32`.
-    ///
-    /// `-1.0` = full left, `0.0` = center, `1.0` = full right.
     /// Applied via `rodio::source::ChannelVolume` on the next `play` call.
     pub fn set_pan(&mut self, key: SoundKey, pan: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
@@ -649,20 +443,11 @@ impl Mixer {
     }
 
     /// Returns the stereo pan for the source. Defaults to `0.0` (center).
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_pan(&self, key: SoundKey) -> f32 {
         self.sources.get(key).map_or(0.0, |e| e.pan)
     }
 
     /// Sets the master volume applied to all sources, clamped to `[0.0, 1.0]`.
-    ///
-    /// # Parameters
-    /// - `volume` — `f32`.
     pub fn set_master_volume(&mut self, volume: f32) {
         self.master_volume = volume.clamp(0.0, 1.0);
         for entry in self.sources.values() {
@@ -673,28 +458,16 @@ impl Mixer {
     }
 
     /// Returns the master volume. Defaults to `1.0`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_master_volume(&self) -> f32 {
         self.master_volume
     }
 
     /// Returns the source type for the given key.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<SourceType>`.
     pub fn get_source_type(&self, key: SoundKey) -> Option<SourceType> {
         self.sources.get(key).map(|e| e.source_type)
     }
 
     /// Returns the number of actively playing (not paused, not empty) sources.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn get_active_source_count(&self) -> usize {
         self.sources
             .values()
@@ -709,20 +482,11 @@ impl Mixer {
     }
 
     /// Returns the total number of loaded sources.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn get_source_count(&self) -> usize {
         self.sources.len()
     }
 
     /// Returns whether the given source key still refers to a loaded audio source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn contains_source(&self, key: SoundKey) -> bool {
         self.sources.contains_key(key)
     }
@@ -770,13 +534,6 @@ impl Mixer {
     }
 
     /// Clones a source, sharing cached decoded data (for static sources).
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<SoundKey>`.
-    ///
     /// The clone starts in Stopped state with no active sink.
     pub fn clone_source(&mut self, key: SoundKey) -> Option<SoundKey> {
         let entry = self.sources.get(key)?;
@@ -806,13 +563,6 @@ impl Mixer {
     }
 
     /// Stops and removes the audio source identified by `key`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `bool`.
-    ///
     /// Returns `true` if the source existed and was removed.
     pub fn release(&mut self, key: SoundKey) -> bool {
         if let Some(entry) = self.sources.remove(key) {
@@ -825,14 +575,9 @@ impl Mixer {
         }
     }
 
-    /// Sets the peak amplitude for a source (0.0–1.0).
-    ///
+    /// Sets the peak amplitude for a source (0.0-1.0).
     /// Used by Lua scripts (and, in future, by automated analysis) to record the
     /// current signal level of a source.  Clamped to \[0.0, 1.0\].
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `peak` — `f32`.
     pub fn set_peak(&mut self, key: SoundKey, peak: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
             entry.peak = peak.clamp(0.0, 1.0);
@@ -841,26 +586,13 @@ impl Mixer {
 
     /// Returns the stored peak amplitude for a source, or `0.0` if the source
     /// does not exist.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn get_peak(&self, key: SoundKey) -> f32 {
         self.sources.get(key).map_or(0.0, |e| e.peak)
     }
 
     /// Returns the average peak amplitude of all sources currently assigned to
     /// the given bus.
-    ///
     /// Returns `0.0` if the bus has no assigned sources.
-    ///
-    /// # Parameters
-    /// - `bus_key` — `BusKey`.
-    ///
-    /// # Returns
-    /// `f32`.
     pub fn bus_peak(&self, bus_key: BusKey) -> f32 {
         let mut total = 0.0f32;
         let mut count = 0usize;
@@ -878,23 +610,11 @@ impl Mixer {
     }
 
     /// Creates a new named bus and returns its key.
-    ///
-    /// # Parameters
-    /// - `name` — `impl Into<String>`.
-    ///
-    /// # Returns
-    /// `BusKey`.
     pub fn new_bus(&mut self, name: impl Into<String>) -> BusKey {
         self.buses.insert(Bus::new(name))
     }
 
     /// Returns an immutable reference to the bus, if it exists.
-    ///
-    /// # Parameters
-    /// - `key` — `BusKey`.
-    ///
-    /// # Returns
-    /// `Option<&Bus>`.
     pub fn get_bus_by_name(&self, name: &str) -> Option<BusKey> {
         self.buses
             .iter()
@@ -903,32 +623,16 @@ impl Mixer {
     }
 
     /// Gets a bus by key.
-    ///
-    /// # Parameters
-    /// - `key` — `BusKey`.
-    ///
-    /// # Returns
-    /// `Option<&Bus>`.
     pub fn get_bus(&self, key: BusKey) -> Option<&Bus> {
         self.buses.get(key)
     }
 
     /// Returns a mutable reference to the bus, if it exists.
-    ///
-    /// # Parameters
-    /// - `key` — `BusKey`.
-    ///
-    /// # Returns
-    /// `Option<&mut Bus>`.
     pub fn get_bus_mut(&mut self, key: BusKey) -> Option<&mut Bus> {
         self.buses.get_mut(key)
     }
 
     /// Assigns a source to a bus. Pass `None` to remove the bus assignment.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `bus_key` — `Option<BusKey>`.
     pub fn set_source_bus(&mut self, key: SoundKey, bus_key: Option<BusKey>) {
         if let Some(entry) = self.sources.get_mut(key) {
             entry.bus_key = bus_key;
@@ -936,23 +640,10 @@ impl Mixer {
     }
 
     /// Returns the bus key assigned to a source, if any.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<BusKey>`.
     pub fn get_source_bus(&self, key: SoundKey) -> Option<BusKey> {
         self.sources.get(key).and_then(|e| e.bus_key)
     }
     /// Returns the cached duration of the audio source in seconds, if known.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<f32>`.
-    ///
     /// For static sources, duration is populated on first `play` call.
     /// Returns `None` if the source has never been played or if the decoder
     /// could not determine the duration (e.g. some streaming formats).
@@ -961,13 +652,6 @@ impl Mixer {
     }
 
     /// Returns the approximate current playback position in seconds.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `f32`.
-    ///
     /// Based on wall-clock elapsed time. Returns `0.0` for stopped sources or
     /// invalid keys. When playing, includes accumulated time from previous
     /// play segments plus time elapsed since the last `play` or `resume`.
@@ -990,7 +674,6 @@ impl Mixer {
     }
 
     /// Builds a rodio `Sink` from decoded audio, applying filters and effects.
-    ///
     /// Supports `skip_duration` (seek), fade-in, lowpass/highpass filters (via f32 round-trip),
     /// and stereo pan via `ChannelVolume`. Returns the sink and cached source duration.
     #[allow(clippy::too_many_arguments)]
@@ -1046,8 +729,8 @@ impl Mixer {
             source
         };
 
-        // Lowpass / highpass / DSP bus effects — these require f32 samples, so we
-        // convert i16→f32, apply filters in series, then convert back to i16.
+        // Lowpass / highpass / DSP bus effects - these require f32 samples, so we
+        // convert i16-f32, apply filters in series, then convert back to i16.
         let source: Box<dyn rodio::Source<Item = i16> + Send> =
             if lowpass_cutoff.is_some() || highpass_cutoff.is_some() || bus_effects.is_some() {
                 let f32_src: Box<dyn rodio::Source<Item = f32> + Send> =
@@ -1096,12 +779,6 @@ impl Mixer {
     }
 
     /// Seeks the source to `position_secs` by rebuilding the sink from the new offset.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `position_secs` — `f32`.
-    /// - `game_dir` — `&Path`.
-    ///
     /// For stopped sources, updates `accumulated_secs` so `tell()` reflects the position.
     /// For playing or paused sources, stops the current sink and restarts from `position_secs`
     /// using `skip_duration`. No-op for invalid keys.
@@ -1203,10 +880,6 @@ impl Mixer {
     }
 
     /// Sets a lowpass filter cutoff in Hz. Applied on next `play` or `seek`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `cutoff_hz` — `u32`.
     pub fn set_lowpass(&mut self, key: SoundKey, cutoff_hz: u32) {
         if let Some(e) = self.sources.get_mut(key) {
             e.lowpass_cutoff = Some(cutoff_hz);
@@ -1214,9 +887,6 @@ impl Mixer {
     }
 
     /// Removes the lowpass filter from the source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn clear_lowpass(&mut self, key: SoundKey) {
         if let Some(e) = self.sources.get_mut(key) {
             e.lowpass_cutoff = None;
@@ -1224,10 +894,6 @@ impl Mixer {
     }
 
     /// Sets a highpass filter cutoff in Hz. Applied on next `play` or `seek`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `cutoff_hz` — `u32`.
     pub fn set_highpass(&mut self, key: SoundKey, cutoff_hz: u32) {
         if let Some(e) = self.sources.get_mut(key) {
             e.highpass_cutoff = Some(cutoff_hz);
@@ -1235,9 +901,6 @@ impl Mixer {
     }
 
     /// Removes the highpass filter from the source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn clear_highpass(&mut self, key: SoundKey) {
         if let Some(e) = self.sources.get_mut(key) {
             e.highpass_cutoff = None;
@@ -1245,9 +908,6 @@ impl Mixer {
     }
 
     /// Removes all filters (lowpass and highpass) from the source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn clear_filter(&mut self, key: SoundKey) {
         if let Some(e) = self.sources.get_mut(key) {
             e.lowpass_cutoff = None;
@@ -1256,32 +916,16 @@ impl Mixer {
     }
 
     /// Returns the lowpass cutoff frequency in Hz, if set.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<u32>`.
     pub fn get_lowpass(&self, key: SoundKey) -> Option<u32> {
         self.sources.get(key).and_then(|e| e.lowpass_cutoff)
     }
 
     /// Returns the highpass cutoff frequency in Hz, if set.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<u32>`.
     pub fn get_highpass(&self, key: SoundKey) -> Option<u32> {
         self.sources.get(key).and_then(|e| e.highpass_cutoff)
     }
 
     /// Sets the fade-in duration in seconds. Applied on next `play`.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `duration_secs` — `f32`.
     pub fn set_fade_in(&mut self, key: SoundKey, duration_secs: f32) {
         if let Some(e) = self.sources.get_mut(key) {
             e.fade_in_duration = Some(duration_secs.max(0.0));
@@ -1289,9 +933,6 @@ impl Mixer {
     }
 
     /// Removes the fade-in setting from the source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn clear_fade_in(&mut self, key: SoundKey) {
         if let Some(e) = self.sources.get_mut(key) {
             e.fade_in_duration = None;
@@ -1299,31 +940,15 @@ impl Mixer {
     }
 
     /// Returns the fade-in duration in seconds, if set.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Option<f32>`.
     pub fn get_fade_in(&self, key: SoundKey) -> Option<f32> {
         self.sources.get(key).and_then(|e| e.fade_in_duration)
     }
 
-    // ── Spatial audio ────────────────────────────────────────────────────────
+    // -- Spatial audio --------------------------------------------------------
 
     /// Sets the 3D spatial position of an audio source.
-    ///
     /// Also recomputes the `pan` value using 2D projection so the change takes
     /// effect immediately on the next `play` call.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`. The source to update.
-    /// - `x` — `f32`. X position.
-    /// - `y` — `f32`. Y position.
-    /// - `z` — `f32`. Z position (accepted but projection uses x/y for panning).
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_source_position(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
             let state = entry
@@ -1336,12 +961,6 @@ impl Mixer {
     }
 
     /// Returns the 3D spatial position of an audio source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`. The source to query.
-    ///
-    /// # Returns
-    /// `[f32; 3]` — `[x, y, z]` position, or `[0.0, 0.0, 0.0]` if not set.
     pub fn get_source_position(&self, key: SoundKey) -> [f32; 3] {
         self.sources
             .get(key)
@@ -1351,15 +970,6 @@ impl Mixer {
     }
 
     /// Sets the spatial velocity of an audio source (used for Doppler calculation).
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`. The source to update.
-    /// - `x` — `f32`. X velocity.
-    /// - `y` — `f32`. Y velocity.
-    /// - `z` — `f32`. Z velocity.
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_source_velocity(&mut self, key: SoundKey, x: f32, y: f32, z: f32) {
         if let Some(entry) = self.sources.get_mut(key) {
             let state = entry
@@ -1370,12 +980,6 @@ impl Mixer {
     }
 
     /// Returns the spatial velocity of an audio source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`. The source to query.
-    ///
-    /// # Returns
-    /// `[f32; 3]` — velocity vector, or `[0.0, 0.0, 0.0]` if not set.
     pub fn get_source_velocity(&self, key: SoundKey) -> [f32; 3] {
         self.sources
             .get(key)
@@ -1385,18 +989,6 @@ impl Mixer {
     }
 
     /// Sets the spatial orientation of an audio source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `fx` — `f32`. Forward x.
-    /// - `fy` — `f32`. Forward y.
-    /// - `fz` — `f32`. Forward z.
-    /// - `ux` — `f32`. Up x.
-    /// - `uy` — `f32`. Up y.
-    /// - `uz` — `f32`. Up z.
-    ///
-    /// # Returns
-    /// `()`.
     #[allow(clippy::too_many_arguments)]
     pub fn set_source_orientation(
         &mut self,
@@ -1417,12 +1009,6 @@ impl Mixer {
     }
 
     /// Returns the spatial orientation of an audio source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `[f32; 6]` — forward xyz followed by up xyz; defaults to `[0,0,-1, 0,1,0]`.
     pub fn get_source_orientation(&self, key: SoundKey) -> [f32; 6] {
         self.sources
             .get(key)
@@ -1432,38 +1018,16 @@ impl Mixer {
     }
 
     /// Sets the 3D listener position for spatial audio.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`. X position.
-    /// - `y` — `f32`. Y position.
-    /// - `z` — `f32`. Z position.
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_listener_position(&mut self, x: f32, y: f32, z: f32) {
         self.listener_position = [x, y, z];
     }
 
     /// Returns the 3D listener position.
-    ///
-    /// # Returns
-    /// `[f32; 3]`.
     pub fn get_listener_position(&self) -> [f32; 3] {
         self.listener_position
     }
 
     /// Sets the listener orientation (forward + up vectors).
-    ///
-    /// # Parameters
-    /// - `fx` — `f32`. Forward x.
-    /// - `fy` — `f32`. Forward y.
-    /// - `fz` — `f32`. Forward z.
-    /// - `ux` — `f32`. Up x.
-    /// - `uy` — `f32`. Up y.
-    /// - `uz` — `f32`. Up z.
-    ///
-    /// # Returns
-    /// `()`.
     #[allow(clippy::too_many_arguments)]
     pub fn set_listener_orientation(
         &mut self,
@@ -1478,84 +1042,43 @@ impl Mixer {
     }
 
     /// Returns the listener orientation (forward xyz + up xyz).
-    ///
-    /// # Returns
-    /// `[f32; 6]`.
     pub fn get_listener_orientation(&self) -> [f32; 6] {
         self.listener_orientation
     }
 
     /// Sets the listener velocity for Doppler calculation.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`. X velocity.
-    /// - `y` — `f32`. Y velocity.
-    /// - `z` — `f32`. Z velocity.
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_listener_velocity(&mut self, x: f32, y: f32, z: f32) {
         self.listener_velocity = [x, y, z];
     }
 
     /// Returns the listener velocity.
-    ///
-    /// # Returns
-    /// `[f32; 3]`.
     pub fn get_listener_velocity(&self) -> [f32; 3] {
         self.listener_velocity
     }
 
     /// Sets the global Doppler effect scale.
-    ///
-    /// # Parameters
-    /// - `scale` — `f32`. Multiplier; `1.0` = default, `0.0` = disabled.
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_doppler_scale(&mut self, scale: f32) {
         self.doppler_scale = scale.max(0.0);
     }
 
     /// Returns the global Doppler effect scale.
-    ///
-    /// # Returns
-    /// `f32` — current scale.
     pub fn get_doppler_scale(&self) -> f32 {
         self.doppler_scale
     }
 
     /// Sets the distance attenuation model.
-    ///
-    /// # Parameters
-    /// - `model` — `&str`. One of `"none"`, `"inverse"`, `"inverse_clamped"`, `"linear"`, `"linear_clamped"`, `"exponent"`, `"exponent_clamped"`.
-    ///
-    /// # Returns
-    /// `()`.
     pub fn set_distance_model(&mut self, model: &str) {
         self.distance_model = model.to_string();
     }
 
     /// Returns the current distance attenuation model name.
-    ///
-    /// # Returns
-    /// `&str`.
     pub fn get_distance_model(&self) -> &str {
         &self.distance_model
     }
 
-    // ── Queueable sources ────────────────────────────────────────────────────
+    // -- Queueable sources ----------------------------------------------------
 
     /// Creates a new queueable source and returns its key.
-    ///
-    /// # Parameters
-    /// - `sample_rate` — `u32`. PCM sample rate in Hz.
-    /// - `bit_depth` — `u8`. Bit depth per sample (8 or 16).
-    /// - `channels` — `u8`. Channel count (1 = mono, 2 = stereo).
-    /// - `buffer_count` — `usize`. Maximum number of queued buffers.
-    ///
-    /// # Returns
-    /// `QueueableKey`.
     pub fn new_queueable(
         &mut self,
         sample_rate: u32,
@@ -1572,13 +1095,6 @@ impl Mixer {
     }
 
     /// Pushes a buffer of f32 PCM samples into a queueable source.
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey`. The queueable source to push to.
-    /// - `data` — `&[f32]`. PCM samples to enqueue.
-    ///
-    /// # Returns
-    /// `Result<(), EngineError>`.
     pub fn queue_buffer(&mut self, key: QueueableKey, data: &[f32]) -> Result<(), EngineError> {
         self.queueables
             .get_mut(key)
@@ -1587,12 +1103,6 @@ impl Mixer {
     }
 
     /// Returns the number of free buffer slots for a queueable source.
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey`.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn queueable_free_buffer_count(&self, key: QueueableKey) -> usize {
         self.queueables
             .get(key)
@@ -1602,9 +1112,6 @@ impl Mixer {
 
     /// Marks a queueable source as playing (state bookkeeping only; actual PCM playback
     /// is driven by game code dequeuing buffers via `queue_buffer`).
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey`.
     pub fn play_queueable(&mut self, key: QueueableKey) {
         // Queueable play is a no-op at the rodio level in this implementation;
         // game code controls output by queuing buffers.
@@ -1613,9 +1120,6 @@ impl Mixer {
     }
 
     /// Stops a queueable source, draining all queued buffers.
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey`.
     pub fn stop_queueable(&mut self, key: QueueableKey) {
         if let Some(qs) = self.queueables.get_mut(key) {
             let cap = qs.buffer_count;
@@ -1625,32 +1129,17 @@ impl Mixer {
     }
 
     /// Releases a queueable source, removing it from the slot-map.
-    ///
-    /// # Parameters
-    /// - `key` — `QueueableKey`.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the key was valid and the source was removed.
     pub fn release_queueable(&mut self, key: QueueableKey) -> bool {
         self.queueables.remove(key).is_some()
     }
 
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
     // Stereo width
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
 
     /// Sets the stereo width multiplier for a source.
-    ///
-    /// `1.0` = unchanged, `0.0` = full mono collapse, values above `1.0` widen
     /// the stereo image.  The value is stored on the entry and applied by the
     /// render callback.
-    ///
-    /// # Parameters
-    /// - `key`   — `SoundKey`.
-    /// - `width` — `f32`. Stereo width factor.
-    ///
-    /// # Returns
-    /// `Result<(), String>`. Errors if the key is invalid.
     pub fn set_stereo_width(&mut self, key: SoundKey, width: f32) -> Result<(), String> {
         let entry = self
             .sources
@@ -1661,12 +1150,6 @@ impl Mixer {
     }
 
     /// Returns the current stereo width for a source.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    ///
-    /// # Returns
-    /// `Result<f32, String>`. Errors if the key is invalid.
     pub fn get_stereo_width(&self, key: SoundKey) -> Result<f32, String> {
         self.sources
             .get(key)
@@ -1674,22 +1157,12 @@ impl Mixer {
             .ok_or_else(|| "invalid SoundKey".to_string())
     }
 
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
     // Random pitch
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
 
     /// Sets a random pitch range applied on each call to `play`.
-    ///
     /// Each time the source is played, the engine picks a uniform random value in
-    /// `[min, max]` and applies it as the pitch multiplier.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
-    /// - `min` — `f32`. Minimum pitch multiplier (e.g. `0.9`).
-    /// - `max` — `f32`. Maximum pitch multiplier (e.g. `1.1`).
-    ///
-    /// # Returns
-    /// `Result<(), String>`. Errors if the key is invalid or `min > max`.
     pub fn set_random_pitch(&mut self, key: SoundKey, min: f32, max: f32) -> Result<(), String> {
         if min > max {
             return Err(format!("random pitch min ({}) > max ({})", min, max));
@@ -1703,30 +1176,20 @@ impl Mixer {
     }
 
     /// Clears any random pitch range set on a source, restoring fixed pitch.
-    ///
-    /// # Parameters
-    /// - `key` — `SoundKey`.
     pub fn clear_random_pitch(&mut self, key: SoundKey) {
         if let Some(entry) = self.sources.get_mut(key) {
             entry.pitch_range = None;
         }
     }
 
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
     // Crossfade
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
 
     /// Crossfades from `from_key` to `to_key` over `duration_secs`.
-    ///
     /// The target source starts playing with a fade-in equal to `duration_secs`; the source
     /// source is stopped immediately.  True fade-out is not currently supported in the rodio
     /// backend, so the source source cuts at the moment the target begins.
-    ///
-    /// # Parameters
-    /// - `from_key`     — `SoundKey`. Source to stop.
-    /// - `to_key`       — `SoundKey`. Source to start with fade-in.
-    /// - `duration_secs` — `f32`. Fade-in duration in seconds.
-    /// - `game_dir`     — `&Path`. Game directory for file resolution.
     pub fn crossfade(
         &mut self,
         from_key: SoundKey,
@@ -1739,21 +1202,14 @@ impl Mixer {
         self.stop(from_key);
     }
 
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
     // Bus metering (stub)
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
 
     /// Returns the peak signal level for the named bus.
-    ///
     /// This is a stub implementation that returns `0.0`.  True per-bus metering
     /// requires an audio-thread callback, which is out of scope for the current
     /// rodio backend.
-    ///
-    /// # Parameters
-    /// - `bus_name` — `&str`. Name of the bus.
-    ///
-    /// # Returns
-    /// `Result<f32, String>`. Errors if no bus with that name exists.
     pub fn get_bus_peak(&self, bus_name: &str) -> Result<f32, String> {
         self.get_bus_by_name(bus_name)
             .map(|key| self.bus_peak(key))
@@ -1761,38 +1217,23 @@ impl Mixer {
     }
 
     /// Returns the RMS signal level for the named bus.
-    ///
     /// This is a stub implementation that returns `0.0`.  True per-bus RMS
     /// requires an audio-thread callback, which is out of scope for the current
     /// rodio backend.
-    ///
-    /// # Parameters
-    /// - `bus_name` — `&str`. Name of the bus.
-    ///
-    /// # Returns
-    /// `Result<f32, String>`. Errors if no bus with that name exists.
     pub fn get_bus_rms(&self, bus_name: &str) -> Result<f32, String> {
         self.get_bus_by_name(bus_name)
             .map(|_| 0.0_f32)
             .ok_or_else(|| format!("unknown bus '{}'", bus_name))
     }
 
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
     // Sound pool
-    // ───────────────────────────────────────────────────────────────────────────
+    // ---------------------------------------------------------------------------
 
     /// Loads `voice_count` copies of the file at `file_path` and returns a [`crate::audio::SoundPool`].
-    ///
     /// Each voice is a separate [`SoundKey`] pointing to the same file path so they can play
     /// simultaneously without sharing a sink.  The caller drives playback through the returned
     /// pool.
-    ///
-    /// # Parameters
-    /// - `file_path`   — `&str`. Path to the audio file relative to `game_dir`.
-    /// - `voice_count` — `usize`. Number of simultaneous voices. Must be ≥ 1.
-    ///
-    /// # Returns
-    /// `Result<crate::audio::SoundPool, String>`. Errors if `voice_count` is zero.
     pub fn new_pool(
         &mut self,
         file_path: &str,
@@ -1812,3 +1253,4 @@ impl Mixer {
 }
 
 // Tests migrated to tests/rust/unit/audio_tests.rs
+

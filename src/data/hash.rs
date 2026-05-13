@@ -1,12 +1,6 @@
-//! Cryptographic hash functions for data integrity verification.
-//!
-//! [`hash()`] computes a digest over an in-memory byte slice and returns a
-//! hex-encoded string. Supported algorithms: MD5, SHA-1, SHA-256, SHA-512.
-//! MD5 and SHA-1 are provided for compatibility checks only — not for security.
-//!
-//! [`crc32()`] computes a CRC-32 checksum of a byte slice using the IEEE
-//! polynomial. Useful for non-security integrity checks and binary format
-//! validation.
+//! Scope: Cryptographic hashing and checksums.
+//! This file defines HashAlgorithm plus hash and crc32 helpers.
+//! It owns digest selection and hex-encoded integrity outputs.
 
 use md5::Digest;
 use sha1;

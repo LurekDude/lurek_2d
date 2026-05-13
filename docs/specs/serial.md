@@ -101,3 +101,15 @@ Coverage scope:
 - Example usage: `content/examples/serial.lua`
 - Architecture constraints: `docs/architecture/philosophy.md`
 - Changelog: `docs/CHANGELOG.md`
+
+### 2026-05-12 Update
+
+- Added `SerialFormat::from_extension(path)` in `src/serial/codec.rs`.
+- Supported extension mapping: `json`, `toml`, `csv`, `msgpack`/`mpk`, `xml`, `ini`/`cfg`.
+- MessagePack allocation path optimized:
+  - `MsgValue::Map` bridge map now preallocates by source size.
+  - `encode()` preallocates output buffer via recursive size estimate before serde serialization.
+- Added parser fuzz-style robustness tests in Rust unit suite for text codecs (`json`, `toml`, `xml`, `csv`, `ini`) to validate no-panic behavior for randomized ASCII inputs.
+- Dedup boundary clarified:
+  - `serial` is the single owner of CSV and MessagePack encode/decode implementations.
+  - `save` consumes `serial` APIs and does not implement parallel CSV/MsgPack codecs.

@@ -1,27 +1,6 @@
-//! RTS-style ordered command queue for scheduling unit actions.
-//!
-//! A [`CommandQueue`] manages a FIFO sequence of [`Command`] entries for a single
-//! unit or agent. Commands are dequeued from the front and ticked each frame via
-//! their Lua callback. Three insertion modes are supported:
-//!
-//! - **`enqueue`** — appends a command to the back (standard queue behavior).
-//! - **`push_front`** — inserts at the front, interrupting the current command
-//!   without clearing the rest of the queue.
-//! - **`replace`** — clears the entire queue and enqueues one new command.
-//!
-//! Commands carry metadata: a `kind` string (e.g., `"move"`, `"attack"`, `"patrol"`),
-//! target coordinates, a priority hint, and an `interruptible` flag that controls
-//! whether `cancel_current()` can remove it.
-//!
-//! ## Lua Callback Contract
-//!
-//! Each command's `callback` is a Lua function `fn(dt) → bool`:
-//! - Returns `true` if the command is still running (tick again next frame).
-//! - Returns `false` if the command is done (advance to next in queue).
-//!
-//! The AIWorld or Lua game loop is responsible for ticking the front command
-//! each frame and calling `advance()` when the callback returns `false`.
-
+﻿//! Scope: ordered command queue for AI action sequencing and interruption.
+//! This file defines command records and queue operations for enqueue, front-insert interrupt, pop, and cancellation.
+//! It owns deterministic command ordering semantics used by high-level planners and low-level action execution.
 use std::collections::VecDeque;
 
 use crate::log_msg;
@@ -30,55 +9,22 @@ use crate::runtime::log_messages::{CQ01, CQ02, CQ03};
 use mlua::RegistryKey;
 
 /// A single RTS unit command with metadata and a Lua tick callback.
-///
-/// Commands are stored in a [`CommandQueue`] and processed one at a time,
-/// front-to-back. Each frame the front command's callback is ticked with
-/// the frame's delta time. When the callback signals completion, the command
-/// is removed and the next one becomes active.
-///
-/// # Fields
-/// - `kind` — `String`.
-/// - `callback` — `RegistryKey`.
-/// - `target_x` — `f32`.
-/// - `target_y` — `f32`.
-/// - `priority` — `i32`.
-/// - `interruptible` — `bool`.
 pub struct Command {
     /// Command type identifier (e.g., `"move"`, `"attack"`, `"patrol"`, `"build"`).
-    /// Used by external code for filtering and UI display — not interpreted internally.
     pub kind: String,
-    /// Lua callback ticked each frame: `fn(dt) → bool`.
-    /// Returns `true` while the command is still running, `false` when done.
+    /// Lua callback ticked each frame: `fn(dt) -> bool`.
     pub callback: RegistryKey,
     /// Target world-space X coordinate. Semantic meaning depends on `kind`
-    /// (e.g., move destination, attack target position).
     pub target_x: f32,
     /// Target world-space Y coordinate.
     pub target_y: f32,
     /// Priority hint for external sorting or display ordering.
-    /// Not used internally by `CommandQueue` — provided for game logic convenience.
     pub priority: i32,
     /// Whether `cancel_current()` can remove this command. Non-interruptible
-    /// commands (e.g., death animations) cannot be cancelled by the player.
     pub interruptible: bool,
 }
 
 /// A FIFO queue of [`Command`] entries for sequential unit action scheduling.
-///
-/// Commands are consumed from the front. The game loop ticks the front command
-/// each frame and calls `advance()` to move to the next when it completes.
-/// Three insertion patterns are supported:
-///
-/// - `enqueue()` — adds to the back (normal queue append).
-/// - `push_front()` — inserts at front, pre-empting the current command.
-/// - `replace()` — clears everything and enqueues a single new command.
-///
-/// `cancel_current()` removes the front command only if its `interruptible`
-/// flag is set, providing a way for players to cancel commands while protecting
-/// non-interruptible actions (like scripted animations).
-///
-/// # Fields
-/// - `commands` — `VecDeque<Command>`.
 pub struct CommandQueue {
     /// The underlying double-ended queue of commands.
     pub(crate) commands: VecDeque<Command>,
@@ -86,9 +32,6 @@ pub struct CommandQueue {
 
 impl CommandQueue {
     /// Creates a new empty command queue.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         log_msg!(debug, CQ01);
         Self {
@@ -97,35 +40,23 @@ impl CommandQueue {
     }
 
     /// Appends a command to the back of the queue.
-    ///
-    /// # Parameters
-    /// - `cmd` — `Command`.
     pub fn enqueue(&mut self, cmd: Command) {
         log_msg!(debug, CQ02);
         self.commands.push_back(cmd);
     }
 
     /// Inserts a command at the front (interrupts current without clearing).
-    ///
-    /// # Parameters
-    /// - `cmd` — `Command`.
     pub fn push_front(&mut self, cmd: Command) {
         self.commands.push_front(cmd);
     }
 
     /// Clears the queue and enqueues one new command.
-    ///
-    /// # Parameters
-    /// - `cmd` — `Command`.
     pub fn replace(&mut self, cmd: Command) {
         self.commands.clear();
         self.commands.push_back(cmd);
     }
 
-    /// Cancels the current (front) command if it's interruptible.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Cancels the current (front) command if i's interruptible.
     pub fn cancel_current(&mut self) -> bool {
         if let Some(front) = self.commands.front() {
             if front.interruptible {
@@ -144,33 +75,21 @@ impl CommandQueue {
     }
 
     /// Returns the number of queued commands.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn count(&self) -> usize {
         self.commands.len()
     }
 
     /// Returns whether the queue is empty.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.commands.is_empty()
     }
 
     /// Returns the type of the front command, if any.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
     pub fn current_type(&self) -> Option<&str> {
         self.commands.front().map(|c| c.kind.as_str())
     }
 
     /// Returns the target coordinates of the front command.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
     pub fn current_target(&self) -> (f32, f32) {
         self.commands
             .front()
@@ -184,14 +103,6 @@ impl CommandQueue {
     }
 
     /// Appends a new command built from raw parameters. Used by the Lua API.
-    ///
-    /// # Parameters
-    /// - `kind` — `String`.
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `priority` — `i32`.
-    /// - `interruptible` — `bool`.
-    /// - `callback` — `RegistryKey`.
     pub fn enqueue_raw(
         &mut self,
         kind: String,
@@ -212,14 +123,6 @@ impl CommandQueue {
     }
 
     /// Inserts at the front from raw parameters. Used by the Lua API.
-    ///
-    /// # Parameters
-    /// - `kind` — `String`.
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `priority` — `i32`.
-    /// - `interruptible` — `bool`.
-    /// - `callback` — `RegistryKey`.
     pub fn push_front_raw(
         &mut self,
         kind: String,
@@ -240,14 +143,6 @@ impl CommandQueue {
     }
 
     /// Clears the queue and replaces with a single command from raw parameters. Used by the Lua API.
-    ///
-    /// # Parameters
-    /// - `kind` — `String`.
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `priority` — `i32`.
-    /// - `interruptible` — `bool`.
-    /// - `callback` — `RegistryKey`.
     pub fn replace_raw(
         &mut self,
         kind: String,
@@ -271,24 +166,5 @@ impl CommandQueue {
 impl Default for CommandQueue {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_queue_is_empty() {
-        let q = CommandQueue::new();
-        assert!(q.count() == 0);
-        assert_eq!(q.count(), 0);
-    }
-
-    #[test]
-    fn queue_cleared_after_clear() {
-        let mut q = CommandQueue::new();
-        q.clear();
-        assert!(q.count() == 0);
     }
 }

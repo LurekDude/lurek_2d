@@ -1,11 +1,10 @@
-//! Named animation synchronisation groups.
-//!
-//! An [`AnimSyncGroup`] holds a collection of [`Animation`](crate::animation::Animation)
-//! keys (slot-map `DefaultKey`) that should all receive the same [`tick`](no-link) call
-//! together.  The group itself does **not** own the animations â€” it only stores the keys.
-//! Ticking is performed in the Lua API layer so that it can borrow `SharedState`.
+//! Scope: Group animation keys that should advance in lock-step.
+//! This file defines a sync-group container over animation resource keys.
+//! It owns membership tracking for synchronized animation updates.
 
 use slotmap::DefaultKey;
+
+// ---- Type: AnimSyncGroup ----
 
 /// A named set of animation keys that advance in lock-step.
 ///
@@ -17,6 +16,7 @@ pub struct AnimSyncGroup {
 }
 
 impl AnimSyncGroup {
+    // ---- Implementation: AnimSyncGroup ----
     /// Creates an empty `AnimSyncGroup`.
     pub fn new() -> Self {
         Self {

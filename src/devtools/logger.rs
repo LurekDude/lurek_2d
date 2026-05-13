@@ -1,12 +1,9 @@
-//! Structured logger for the developer-tools system.
-//!
-//! Provides a level-filtered, history-buffered in-process logger.  Messages
-//! are timestamped by seconds elapsed since the [`Logger`] was created and
-//! optionally mirrored to stderr.  The rolling history makes previous log
-//! output available for overlay display or programmatic inspection.
+//! Scope: Level-filtered in-process logger with rolling history and timestamps.
+//! This file defines Logger, LogLevel, LogEntry, and history management.
+//! It owns level filtering, history eviction, and optional file output.
 
-use std::time::Instant;
 use std::collections::VecDeque;
+use crate::devtools::time_anchor::TimeAnchor;
 
 // ── level ordering ─────────────────────────────────────────────────────────
 
@@ -116,7 +113,7 @@ pub struct Logger {
     pub history: VecDeque<LogEntry>,
     /// Maximum number of entries retained.
     pub max_history: usize,
-    epoch: Instant,
+    epoch: TimeAnchor,
 }
 
 impl Logger {
@@ -131,7 +128,7 @@ impl Logger {
             log_file: String::new(),
             history: VecDeque::new(),
             max_history: 1_000,
-            epoch: Instant::now(),
+            epoch: TimeAnchor::new(),
         }
     }
 
@@ -140,7 +137,7 @@ impl Logger {
     /// # Returns
     /// `f64`.
     pub fn elapsed(&self) -> f64 {
-        self.epoch.elapsed().as_secs_f64()
+        self.epoch.elapsed_seconds()
     }
 
     /// Records a message at the given level, respecting the minimum filter.

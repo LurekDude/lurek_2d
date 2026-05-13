@@ -91,6 +91,34 @@ pub struct RoomsDungeon {
     pub grid: Vec<u8>,
 }
 
+/// Stamp template that can be projected onto generated dungeon rooms.
+#[derive(Debug, Clone)]
+pub struct RoomPrefabStamp {
+    /// Prefab identifier, passed through to output metadata.
+    pub name: String,
+    /// Flat cell mask in row-major order. Non-zero values are stamped.
+    pub mask: Vec<u8>,
+    /// Prefab width in cells.
+    pub width: u32,
+    /// Prefab height in cells.
+    pub height: u32,
+}
+
+/// Result placement metadata for a prefab stamp.
+#[derive(Debug, Clone)]
+pub struct PlacedRoomPrefab {
+    /// Prefab identifier.
+    pub name: String,
+    /// Placement origin X in dungeon grid.
+    pub x: u32,
+    /// Placement origin Y in dungeon grid.
+    pub y: u32,
+    /// Placement width.
+    pub width: u32,
+    /// Placement height.
+    pub height: u32,
+}
+
 /// Generate a rooms-and-corridors dungeon.
 ///
 /// # Parameters
@@ -165,4 +193,78 @@ pub fn rooms_dungeon(opts: &RoomsOpts) -> RoomsDungeon {
         corridors,
         grid,
     }
+}
+
+/// Generates a rooms dungeon and stamps prefabs into room interiors.
+///
+/// Prefabs are applied in room order (cyclic if there are more rooms than prefabs).
+/// Stamped cells overwrite wall/floor/corridor values with `stamp_value` where mask > 0.
+pub fn rooms_dungeon_with_prefabs(
+    opts: &RoomsOpts,
+    prefabs: &[RoomPrefabStamp],
+    stamp_value: u8,
+) -> (RoomsDungeon, Vec<PlacedRoomPrefab>) {
+    let mut dungeon = rooms_dungeon(opts);
+    let placements = apply_prefab_stamps(
+        &mut dungeon.grid,
+        opts.width,
+        opts.height,
+        &dungeon.rooms,
+        prefabs,
+        stamp_value,
+    );
+    (dungeon, placements)
+}
+
+fn apply_prefab_stamps(
+    grid: &mut [u8],
+    grid_w: u32,
+    grid_h: u32,
+    rooms: &[Room],
+    prefabs: &[RoomPrefabStamp],
+    stamp_value: u8,
+) -> Vec<PlacedRoomPrefab> {
+    if prefabs.is_empty() {
+        return Vec::new();
+    }
+
+    let mut out = Vec::new();
+    for (i, room) in rooms.iter().enumerate() {
+        let prefab = &prefabs[i % prefabs.len()];
+        if prefab.width == 0 || prefab.height == 0 {
+            continue;
+        }
+        if prefab.width > room.w || prefab.height > room.h {
+            continue;
+        }
+
+        let ox = room.x + (room.w - prefab.width) / 2;
+        let oy = room.y + (room.h - prefab.height) / 2;
+        for py in 0..prefab.height {
+            for px in 0..prefab.width {
+                let pi = (py * prefab.width + px) as usize;
+                if prefab.mask.get(pi).copied().unwrap_or(0) == 0 {
+                    continue;
+                }
+                let gx = ox + px;
+                let gy = oy + py;
+                if gx < grid_w && gy < grid_h {
+                    let gi = (gy * grid_w + gx) as usize;
+                    if let Some(cell) = grid.get_mut(gi) {
+                        *cell = stamp_value;
+                    }
+                }
+            }
+        }
+
+        out.push(PlacedRoomPrefab {
+            name: prefab.name.clone(),
+            x: ox,
+            y: oy,
+            width: prefab.width,
+            height: prefab.height,
+        });
+    }
+
+    out
 }

@@ -6,6 +6,7 @@
 
 use crate::image::ImageData;
 use crate::procgen::noise::perlin_noise_periodic;
+use crate::procgen::scalar_map_to_rgba_bytes;
 use crate::render::renderer::{DrawMode, RenderCommand};
 
 /// A precomputed 2-D noise grid sampled from periodic Perlin noise.
@@ -66,12 +67,7 @@ impl NoiseGrid {
     /// # Returns
     /// `Vec<u8>` in RGBA order.
     pub fn to_rgba_bytes(&self) -> Vec<u8> {
-        let mut buf = Vec::with_capacity(self.cells.len() * 4);
-        for &v in &self.cells {
-            let g = (v * 255.0) as u8;
-            buf.extend_from_slice(&[g, g, g, 255]);
-        }
-        buf
+        scalar_map_to_rgba_bytes(&self.cells)
     }
 
     /// Generate render commands visualising the noise grid as a greyscale tile mosaic.

@@ -1967,6 +1967,7 @@ Define any of these in `main.lua`. All are optional.
   LTileMap:clearTile( layer, x, y )  -> nil  -- Clears a tile (sets GID to 0) at (x, y) on the given layer (1-based).
   LTileMap:drawToImage( tile_size )  -> LImageData  -- Renders the tile map to a CPU ImageData using the given tile pixel size.
   LTileMap:fill( layer, gid )  -> nil  -- Fills an entire layer with the given GID (1-based layer).
+  LTileMap:findTilesByGid( layer, gid )  -> table  -- Returns all (x, y) positions in the layer where the tile GID matches the given value.
   LTileMap:fireTileExit( gid, entity, tx, ty )  -> nil  -- Fires the tile-exit callback for the given GID.
   LTileMap:fireTileStep( gid, entity, tx, ty )  -> nil  -- Fires the tile-step callback for the given GID.
   LTileMap:getChunkSize( )  -> integer  -- Returns the chunk size used for spatial partitioning.
@@ -2000,6 +2001,7 @@ Define any of these in `main.lua`. All are optional.
   LTileMap:setViewport( x, y, w, h )  -> nil  -- Sets the viewport rectangle for rendering culling.
   LTileMap:sweepRect( layer, x, y, w, h, dx, dy )  -> number  -- Performs a swept AABB collision test against solid tiles on a 1-based layer.
   LTileMap:tileToWorld( tx, ty )  -> number  -- Converts tile coordinates to world pixel coordinates (1-based input).
+  LTileMap:tileTypeIndex( layer )  -> table  -- Builds a GID-to-positions index for the given layer.
   LTileMap:toNavGrid( layer, gids_tbl )  -> table  -- Converts the given layer into a 2D navigation grid.
   LTileMap:type( )  -> string  -- Returns the type name of this object.
   LTileMap:typeOf( name )  -> boolean  -- Returns true if this object is of the given type.
@@ -3138,7 +3140,7 @@ Define any of these in `main.lua`. All are optional.
   LProvinceGrid:adjacencies( )  -> table  -- Returns an array of adjacency records. Each record is {province_a, province_b, border_p...
   LProvinceGrid:borderSegments( )  -> table  -- Returns merged border segments as
   LProvinceGrid:deserializeShapeData( bytes )  -> table  -- Deserializes province geometry from raw bytes produced by serializeShapeData.
-  LProvinceGrid:drawShapes( ... )  -> nil  -- Draws all province shapes using their original PNG colours.
+  LProvinceGrid:drawShapes( ... )  -> number  -- Draws all province shapes using their original PNG colours.
   LProvinceGrid:getAt( x, y )  -> integer  -- Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of...
   LProvinceGrid:getHeight( )  -> integer  -- Returns the grid height in pixels.
   LProvinceGrid:getPolygons( )  -> table  -- Returns the raw border-trace polygon(s) for every province.
@@ -4734,10 +4736,12 @@ Define any of these in `main.lua`. All are optional.
 > `lurek.globe` - Geoscape globe simulation, province data, and world map helpers.
 
 ```lua
+  lurek.globe.generateVoronoi( name, seeds_tbl, [spec_tbl] )  -> LGlobe  -- Generate procedural Voronoi provinces from seed points.
   lurek.globe.get( name )  -> LGlobe  -- Get an existing globe by name, or nil.
   lurek.globe.greatCircleDistance( la, lo, lb, lo2 )  -> number  -- Great-circle distance between two lat/lon points (in unit-sphere radians).
   lurek.globe.greatCirclePath( la, lo, lb, lo2, n )  -> table  -- Great-circle path as a table of {lat, lon} pairs.
   lurek.globe.latLonToUnit( lat, lon )  -> table  -- Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
+  lurek.globe.loadFromPNG( name, png_path, [spec_tbl] )  -> LGlobe  -- Load provinces from a color-index PNG file and create a globe.
   lurek.globe.loadFromTOML( name, toml_src, [spec_tbl] )  -> LGlobe  -- Load provinces from a TOML string and create a globe.
   lurek.globe.new( name, [spec_tbl] )  -> LGlobe  -- Creates a new globe instance with default settings and empty collections.
 ```
@@ -4752,13 +4756,22 @@ Define any of these in `main.lua`. All are optional.
   LGlobe:addLayer( name, [z_order] )  -> nil  -- Add or replace a named thematic layer.
   LGlobe:addMarker( mtype, lat, lon, [label] )  -> integer  -- Add a marker. Returns marker ID.
   LGlobe:addProvince( p )  -> boolean  -- Adds a province from a table with id, centroid, vertices, neighbors, and base_color fie...
+  LGlobe:cacheReachability( faction, start_id, max_cost )  -> nil  -- Build and cache default reachability for a faction.
+  LGlobe:clearProvinceTexture( id )  -> boolean  -- Clear texture mapping for a province.
+  LGlobe:decodeFogBase64( viewer, payload )  -> boolean  -- Load viewer fog mask from base64 payload.
+  LGlobe:encodeFogBase64( viewer )  -> string  -- Serialize viewer fog mask to base64.
+  LGlobe:exportProvinceMeshOBJ( )  -> string  -- Export province polygons as OBJ text.
   LGlobe:findPath( from_id, to_id )  -> table  -- Find the shortest province path from `from_id` to `to_id`.
+  LGlobe:getCachedReachability( faction )  -> table  -- Return cached reachability map for a faction.
   LGlobe:getCamera( )  -> number  -- Get the current camera (lat, lon, zoom).
+  LGlobe:getFogState( viewer, id )  -> string  -- Get fog state string for province and viewer.
   LGlobe:getLod( )  -> string  -- Returns the current LOD tier as a string: "far", "mid", or "near".
   LGlobe:getMarkerAttr( id, key )  -> string  -- Get a string attribute from a marker.
   LGlobe:getName( )  -> string  -- Returns the string identifier name assigned to this globe instance.
   LGlobe:getNeighbors( id )  -> table  -- Returns the neighbor IDs of a province.
   LGlobe:getProvinceAttr( id, key )  -> string  -- Gets a string attribute from a province.
+  LGlobe:getProvinceSector( id )  -> string  -- Return sector name of a province.
+  LGlobe:getSectorProvinces( sector )  -> table  -- Return province IDs in a sector.
   LGlobe:getTimeOfDay( )  -> number  -- Gets the current simulated time of day for daylight computation.
   LGlobe:hideProvince( viewer, id )  -> nil  -- Hide a province for a viewer.
   LGlobe:isVisible( viewer, id )  -> boolean  -- Returns true if the province is visible to the viewer.
@@ -4766,9 +4779,11 @@ Define any of these in `main.lua`. All are optional.
   LGlobe:pan( dlat, dlon )  -> nil  -- Pan the orbit camera by delta-latitude and delta-longitude (degrees).
   LGlobe:pick( sx, sy )  -> integer  -- Returns the province ID under screen coordinates, or nil.
   LGlobe:pickLatLon( sx, sy )  -> number  -- Returns (lat, lon) of the screen point on the globe surface, or nil.
+  LGlobe:pickRaycast( sx, sy, [steps] )  -> integer  -- Raycast-style picking by marching from globe center toward screen point.
   LGlobe:provinceCount( )  -> integer  -- Returns the number of provinces.
   LGlobe:reachable( start_id, max_cost )  -> table  -- Return all provinces reachable within `max_cost` steps from `start_id`.
   LGlobe:removeArc( id )  -> boolean  -- Removes an arc from the globe map by its unique string identifier.
+  LGlobe:removeHeatLayer( name )  -> boolean  -- Remove a heat-map layer by name.
   LGlobe:removeLabel( id )  -> boolean  -- Removes a text label from the globe map by its unique string identifier.
   LGlobe:removeLayer( name )  -> boolean  -- Removes a texture layer from the globe map by its unique string identifier.
   LGlobe:removeMarker( id )  -> boolean  -- Removes a marker from the globe map by its unique string identifier.
@@ -4776,16 +4791,23 @@ Define any of these in `main.lua`. All are optional.
   LGlobe:revealAll( viewer )  -> nil  -- Reveal all provinces for a viewer.
   LGlobe:revealProvince( viewer, id )  -> nil  -- Reveal a province for a viewer.
   LGlobe:setActiveViewer( [viewer] )  -> nil  -- Set the faction/viewer whose fog mask filters rendering.
+  LGlobe:setAutoRotationSpeed( dps )  -> nil  -- Set automatic globe spin speed in degrees per second.
   LGlobe:setBorders( show )  -> nil  -- Enable or disable province border rendering.
   LGlobe:setCamera( lat, lon, z )  -> nil  -- Set the camera position directly.
+  LGlobe:setFogState( viewer, id, state )  -> nil  -- Set fog state (`hidden`, `explored`, `visible`) for one province.
+  LGlobe:setHeatLayer( name, attr_key, min, max, alpha )  -> nil  -- Configure a float-driven heat-map layer.
   LGlobe:setLabelText( id, text )  -> nil  -- Updates the visible text content of an existing globe label.
   LGlobe:setLabelVisible( id, vis )  -> nil  -- Sets whether this specific label is visible on the globe.
   LGlobe:setLayerAlpha( name, alpha )  -> nil  -- Set layer opacity (0.0–1.0).
   LGlobe:setLayerColor( layer, id, r, g, b, a )  -> nil  -- Set a per-province color override on a layer.
   LGlobe:setLayerVisible( name, vis )  -> nil  -- Sets whether this specific texture layer is visible on the globe.
   LGlobe:setMarkerAttr( id, key, val )  -> nil  -- Set a string attribute on a marker.
+  LGlobe:setMarkerPulse( id, hz, amp )  -> boolean  -- Configure pulsing marker animation.
+  LGlobe:setMarkerRotation( id, dps )  -> boolean  -- Configure marker rotation speed.
   LGlobe:setMarkerVisible( id, vis )  -> nil  -- Sets whether this specific marker is visible on the globe.
   LGlobe:setProvinceAttr( id, key, val )  -> boolean  -- Sets a string attribute on a province.
+  LGlobe:setProvinceSector( id, sector )  -> nil  -- Assign province to a sector/strategic zone.
+  LGlobe:setProvinceTexture( id, tex_raw, u0, v0, u1, v1 )  -> boolean  -- Set texture raw handle and atlas UV rectangle for a province.
   LGlobe:setRotation( deg )  -> nil  -- Set planet rotation (degrees).
   LGlobe:setTimeOfDay( t )  -> nil  -- Set time of day (0.0–24.0 hours).
   LGlobe:type( )  -> string  -- Returns the type name of this object.
@@ -5670,24 +5692,41 @@ Define any of these in `main.lua`. All are optional.
 > `lurek.procgen` - Stateless procedural generation utilities.
 
 ```lua
+  lurek.procgen.biomeColor( name )  -> integer  -- Returns the representative RGBA color for a biome name string.
   lurek.procgen.bspDungeon( [opts] )  -> table  -- Generates a dungeon using Binary Space Partitioning.
+  lurek.procgen.bspDungeonWithPrefabs( [opts], prefabs_tbl )  -> table  -- Generates a BSP dungeon and prefab placement metadata.
   lurek.procgen.cellularAutomata( w, h, [opts] )  -> table  -- Generates a cave-like map using cellular automata.
   lurek.procgen.floodFill( )  -> table  -- BFS flood fill on a flat grid of bytes.
   lurek.procgen.generateName( )  -> string  -- Generates a single procedural name using a Markov chain.
   lurek.procgen.generateNames( )  -> table  -- Generates N procedural names using a Markov chain.
   lurek.procgen.heightmap( [opts] )  -> table  -- Generates a heightmap using fractal noise.
+  lurek.procgen.heightmapFromCellular( width, height, cells_tbl, [floor_value] )  -> table  -- Converts a cellular byte map (`0`/`1`) into a normalized heightmap-style response.
   lurek.procgen.lsystem( opts )  -> string  -- Generates an L-system string.
   lurek.procgen.lsystemSegments( opts, [angle_deg], [step] )  -> table  -- Generates L-system line segments for rendering.
+  lurek.procgen.newBiomeClassifier( [opts] )  -> BiomeClassifier  -- Creates a new biome classifier with optional custom thresholds.
   lurek.procgen.noiseMap( width, height, [opts] )  -> table  -- Generates a noise map using the configurable NoiseGenerator.
   lurek.procgen.noiseMapParallel( width, height, [opts] )  -> table  -- Generates a noise map using rayon parallel processing.
+  lurek.procgen.noiseMapParallelSeeded( width, height, [opts] )  -> table  -- Generates a seeded noise map in parallel using the NoiseGenerator instance path.
   lurek.procgen.perlinNoise( x, y, px, py )  -> number  -- Evaluates periodic Perlin noise at a point.
   lurek.procgen.poissonDisk( w, h, min_dist, [max_attempts], [seed] )  -> table  -- Generates Poisson disk sample points using Bridson's algorithm.
   lurek.procgen.roomsDungeon( [opts] )  -> table  -- Generates a rooms-and-corridors dungeon.
+  lurek.procgen.roomsDungeonWithPrefabs( [opts], prefabs_tbl, [stamp_value] )  -> table  -- Generates a rooms dungeon and stamps prefabs into room interiors.
   lurek.procgen.simplex2d( x, y )  -> number  -- Returns a single Simplex noise value at the given 2-D coordinate.
   lurek.procgen.simplex3d( x, y, z )  -> number  -- Returns a single Simplex noise value at the given 3-D coordinate.
   lurek.procgen.voronoi( w, h, pts_tbl, [opts_tbl] )  -> table  -- Generates a Voronoi diagram for a set of seed points.
   lurek.procgen.wfcGenerate( opts )  -> table  -- Generates a tile grid using Wave Function Collapse.
   lurek.procgen.worldGraph( width, height, region_count, [seed] )  -> table  -- Generates a world graph with scattered regions and edges.
+```
+
+**`BiomeClassifier`** methods:
+
+> Lua-visible wrapper for [`BiomeClassifier`].
+
+```lua
+  BiomeClassifier:classify( h, m, t )  -> string  -- Classifies a single cell given its height, moisture, and temperature (all in 0..1).
+  BiomeClassifier:classifyMap( width, height, ht, mt, [tt] )  -> table  -- Classifies an entire map from flat arrays of heights, moisture, and temperature.
+  BiomeClassifier:type( )  -> string  -- Returns the type name of this object.
+  BiomeClassifier:typeOf( name )  -> boolean  -- Returns true if this object is of the given type.
 ```
 
 ## lurek.province {#province}
@@ -5886,6 +5925,7 @@ Define any of these in `main.lua`. All are optional.
 > `lurek.spine` - Skeletal animation with bones, slots, timelines, constraints, and skins.
 
 ```lua
+  lurek.spine.animationFromJson( json )  -> LSkeletonAnimation?  -- Builds a SkeletonAnimation from a JSON string.
   lurek.spine.newSkeleton( name )  -> LSkeleton  -- Creates a new empty skeleton with the given name.
   lurek.spine.newSkeletonAnimation( name, duration )  -> LSkeletonAnimation  -- Creates a new empty SkeletonAnimation clip with the given name and duration.
 ```
@@ -5932,6 +5972,8 @@ Define any of these in `main.lua`. All are optional.
   LSkeletonAnimation:getDuration( )  -> number  -- Returns the total duration of the animation in seconds.
   LSkeletonAnimation:getEvents( from, to )  -> table  -- Returns event entries in the half-open interval `(from, to]`.
   LSkeletonAnimation:getTimelineCount( )  -> integer  -- Returns the number of bone timelines in this animation.
+  LSkeletonAnimation:poseAt( time )  -> table  -- Evaluates all timelines at the given time and returns a snapshot table.
+  LSkeletonAnimation:reverse( )  -> LSkeletonAnimation  -- Creates a reversed copy of this animation clip.
   LSkeletonAnimation:type( )  -> string  -- Returns the type name of this object.
   LSkeletonAnimation:typeOf( name )  -> boolean  -- Returns whether this object is of the given type.
 ```

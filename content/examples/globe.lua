@@ -258,6 +258,109 @@ end
 --@api-stub: LGlobe:removeMarker
 -- Removes a marker from the globe map by its unique string identifier.
 -- Call when a unit is destroyed or an event expires so the marker no longer renders or participates in picking.
+
+--@api-stub: lurek.globe.loadFromPNG
+-- Load provinces from PNG map.
+do -- lurek.globe.loadFromPNG
+  local ok, g = pcall(function()
+    return lurek.globe.loadFromPNG("png_demo", "assets/textures/nonexistent.png", {})
+  end)
+  if ok and g then lurek.log.debug("png globe loaded", "globe") end
+end
+
+--@api-stub: lurek.globe.generateVoronoi
+-- Generate procedural Voronoi provinces from seeds.
+do -- lurek.globe.generateVoronoi
+  local g = lurek.globe.generateVoronoi("voronoi_demo", {
+    {0.0, 0.0}, {10.0, 20.0}, {-20.0, 30.0},
+  }, {})
+  lurek.log.info("voronoi provinces=" .. g:provinceCount(), "globe")
+end
+
+--@api-stub: LGlobe:setProvinceTexture
+do -- Globe:setProvinceTexture
+  local g = lurek.globe.new("tex_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:setProvinceTexture(1, 0, 0.0, 0.0, 1.0, 1.0)
+end
+
+--@api-stub: LGlobe:clearProvinceTexture
+do -- Globe:clearProvinceTexture
+  local g = lurek.globe.new("cleartex_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:clearProvinceTexture(1)
+end
+
+--@api-stub: LGlobe:setProvinceSector
+--@api-stub: LGlobe:getProvinceSector
+--@api-stub: LGlobe:getSectorProvinces
+do -- Globe sector api
+  local g = lurek.globe.new("sector_demo", {})
+  g:addProvince({ id = 2, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:setProvinceSector(2, "north")
+  local _ = g:getProvinceSector(2)
+  local _ids = g:getSectorProvinces("north")
+end
+
+--@api-stub: LGlobe:setHeatLayer
+--@api-stub: LGlobe:removeHeatLayer
+do -- Globe heat layer api
+  local g = lurek.globe.new("heat_demo", {})
+  g:setHeatLayer("population", "pop", 0.0, 100.0, 0.5)
+  g:removeHeatLayer("population")
+end
+
+--@api-stub: LGlobe:setFogState
+--@api-stub: LGlobe:getFogState
+--@api-stub: LGlobe:encodeFogBase64
+--@api-stub: LGlobe:decodeFogBase64
+do -- Globe fog extended api
+  local g = lurek.globe.new("fogx_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  g:setFogState("p1", 1, "explored")
+  local _state = g:getFogState("p1", 1)
+  local data = g:encodeFogBase64("p1")
+  g:decodeFogBase64("p1", data)
+end
+
+--@api-stub: LGlobe:setMarkerPulse
+--@api-stub: LGlobe:setMarkerRotation
+do -- Globe marker animation api
+  local g = lurek.globe.new("marker_anim_demo", {})
+  local id = g:addMarker("poi", 10.0, 10.0, "A")
+  g:setMarkerPulse(id, 2.0, 0.2)
+  g:setMarkerRotation(id, 120.0)
+end
+
+--@api-stub: LGlobe:setAutoRotationSpeed
+do -- Globe auto rotation api
+  local g = lurek.globe.new("autorot_demo", {})
+  g:setAutoRotationSpeed(0.02)
+end
+
+--@api-stub: LGlobe:cacheReachability
+--@api-stub: LGlobe:getCachedReachability
+do -- Globe AI reachability api
+  local g = lurek.globe.new("reach_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}}, neighbors = {2} })
+  g:addProvince({ id = 2, centroid = {2,2}, vertices = {{2,2},{3,2},{3,3}}, neighbors = {1} })
+  g:cacheReachability("blue", 1, 5.0)
+  local _map = g:getCachedReachability("blue")
+end
+
+--@api-stub: LGlobe:pickRaycast
+do -- Globe:pickRaycast
+  local g = lurek.globe.new("raypick_demo", {})
+  local _ = g:pickRaycast(640, 360, 16)
+end
+
+--@api-stub: LGlobe:exportProvinceMeshOBJ
+do -- Globe:exportProvinceMeshOBJ
+  local g = lurek.globe.new("obj_demo", {})
+  g:addProvince({ id = 1, centroid = {0,0}, vertices = {{0,0},{1,0},{1,1}} })
+  local obj = g:exportProvinceMeshOBJ()
+  lurek.filesystem.write("save/globe_mesh.obj", obj)
+end
 do -- Globe:removeMarker
   local g = lurek.globe.new("rmmark_demo", {})
   local id = g:addMarker("ufo", 30.0, -60.0, "Bogey-1")

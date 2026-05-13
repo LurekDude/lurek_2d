@@ -1,72 +1,64 @@
-//! Audio subsystem for Lurek2D games.
-//!
-//! This module provides sound loading, playback, and volume management through
-//! a [`Mixer`] that wraps the [rodio](https://crates.io/crates/rodio) audio library.
-//! Game code accesses audio through the `lurek.audio` Lua bindings in [`crate::lua_api`],
-//! which delegates all work to [`Mixer`] and [`Bus`] instances stored in `SharedState`.
-//!
-//! # Key types
-//!
-//! - [`Mixer`] — central audio mixer; manages all loaded sounds, their playback state,
-//!   volume, pitch, pan, looping, and fade effects.
-//! - [`Bus`] — named group that applies a shared volume and pause state to every source
-//!   assigned to it (e.g. a "music" bus or "sfx" bus).
-//! - [`AudioSource`] — lightweight handle for a loaded audio file, carrying the path and
-//!   default playback settings.
-//! - [`SourceType`] — controls whether a sound is decoded fully into memory (`Static`) or
-//!   read incrementally from disk during playback (`Stream`).
-//! - [`PlayState`] — the current playback status of a source: `Stopped`, `Playing`, or `Paused`.
-//!
-//! # Design notes
-//!
-//! Buses are pure data containers; the mixer multiplies source volume/pitch by bus values on
-//! every `set_volume` or `update` call.  Audio sources are tracked in a slot-map keyed by
-//! [`crate::runtime::resource_keys::SoundKey`], giving O(1) lookup and safe handle
-//! invalidation when sources are released.
+//! Audio subsystem: mixer, buses, playback state, DSP effects (via rodio).
+//! lurek.audio Lua bindings delegate to Mixer + Bus in SharedState.
 
-/// Named audio bus for grouping sources under shared volume/pitch/pause controls.
+/// Named audio bus: shared volume/pitch/pause/effects.
 pub mod bus;
-/// Streaming audio decoder for chunked PCM reading.
+/// Decoder: streaming audio reading via rodio.
 pub mod decoder;
-/// Software MIDI synthesizer with sine-additive PCM rendering.
+/// MIDI player: sine-additive synthesis (currently disabled - midly removed).
 pub mod midi_player;
-/// Low-level audio mixer using rodio for playback and volume control.
+/// Mixer: sound loading, playback, volume, bus routing.
 pub mod mixer;
-/// Audio source handle holding path, volume, and loop settings.
+/// AudioSource: handle with path, volume, looping state.
 pub mod source;
 
+/// Re-export from bus.
 pub use bus::Bus;
+/// Re-export from decoder.
 pub use decoder::Decoder;
+/// Re-export from midi_player.
 pub use midi_player::MidiPlayer;
+/// Re-export from mixer.
 pub use mixer::Mixer;
+/// Re-export from mixer.
 pub use mixer::PlayState;
+/// Re-export from mixer.
 pub use mixer::QueueableSource;
+/// Re-export from mixer.
 pub use mixer::SourceType;
+/// Re-export from source.
 pub use source::AudioSource;
+/// Re-export from source.
 pub use source::SpatialState;
-/// Decoded PCM sample buffer with per-sample read/write access.
+/// SoundData: f32 PCM buffer, procedural waveforms, DSP operations.
 pub mod sound_data;
+/// Re-export from sound_data.
 pub use sound_data::SoundData;
 
-/// MIDI SoundFont state management.
+/// MidiState: loaded SoundFont data and path.
 pub mod midi;
+/// Re-export from midi.
 pub use midi::MidiState;
 
-/// DSP effect chain sources for dynamic audio processing.
+/// DSP effects: biquads, reverb, modulation, dynamics, lock-free parameters.
 pub mod dsp;
+/// Re-exports from dsp.
 pub use dsp::{AtomicParam, DynamicEffectSource, EffectParams, EffectType};
 
-/// Polyphonic sound pool for round-robin voice allocation.
+/// SoundPool: round-robin voice cycling for polyphony.
 pub mod pool;
+/// Re-export from pool.
 pub use pool::SoundPool;
 
-/// Offline DSP processing — decode, transform, and re-encode audio files.
+/// Offline: decode, apply effects, normalize, write WAV.
 pub mod offline;
+/// Re-export from offline.
 pub use offline::OfflineEffect;
 
-/// Waveform and spectrogram visualisation to PNG images.
+/// Visualizer: waveform and spectrogram PNG rendering.
 pub mod visualizer;
 
-/// Audio device enumeration and selection (playback device facade).
+/// Facade: playback device enumeration (stub).
 pub mod facade;
+/// Re-exports from facade.
 pub use facade::{get_playback_device, get_playback_devices, set_playback_device};

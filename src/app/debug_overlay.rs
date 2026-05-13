@@ -1,10 +1,11 @@
-//! Debug overlay for displaying FPS and draw call statistics.
-//!
-//! Renders green text on a semi-transparent background in the top-right corner
-//! of the screen. Can be toggled at runtime via F12 or `lurek.runtime.setDebugOverlay()`.
+//! Scope: Debug overlay rendering for runtime performance indicators.
+//! This file defines the DebugOverlay type and command generation for overlay text.
+//! It owns visibility toggling and draw-command composition for FPS and draw-call stats.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
+
+// ---- Type: DebugOverlay ----
 
 /// Debug overlay showing FPS and render statistics.
 ///
@@ -19,7 +20,9 @@ pub struct DebugOverlay {
 }
 
 impl DebugOverlay {
-    /// Creates a new disabled debug overlay. Returns a fully initialised instance with all fields set to their initial values.
+    // ---- Implementation: DebugOverlay ----
+
+    /// Creates a new disabled debug overlay.
     ///
     /// # Returns
     /// `Self`.
@@ -98,6 +101,8 @@ impl DebugOverlay {
 }
 
 impl Default for DebugOverlay {
+    // ---- Default Implementation ----
+
     fn default() -> Self {
         Self::new()
     }

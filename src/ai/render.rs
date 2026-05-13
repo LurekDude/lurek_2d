@@ -1,23 +1,15 @@
-//! Debug render-command generation for AI subsystems.
-//!
-//! Adds `generate_render_commands` and (where applicable) `draw_to_image` to
-//! `StateMachine` and `BehaviorTree`.  Pure CPU — no wgpu, winit, or mlua imports.
-
+﻿//! Scope: debug-render command builders for AI inspection overlays.
+//! This file defines render-side helper data used to visualise AI internals such as paths, targets, and sensors.
+//! It owns non-authoritative debug output only; no gameplay decision state is mutated by this module.
 use crate::ai::behavior_tree::{BTNode, BTStatus, BehaviorTree};
 use crate::ai::fsm::StateMachine;
 use crate::image::ImageData;
 use crate::render::renderer::{DrawMode, RenderCommand};
 
-// ── StateMachine ──────────────────────────────────────────────────────────────
+// ---- Extension: StateMachine render helpers ----
 
 impl StateMachine {
     /// Generate debug render commands representing the finite state machine.
-    ///
-    /// Draws each state as a labelled box and highlights the active state.
-    /// Boxes are laid out in a horizontal row; the active state is tinted white.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let mut state_names: Vec<&str> = self.states.keys().map(|s| s.as_str()).collect();
         state_names.sort_unstable();
@@ -81,16 +73,6 @@ impl StateMachine {
     }
 
     /// Render the FSM to a CPU image.
-    ///
-    /// States are drawn as horizontal colour-coded strips: active=white,
-    /// inactive=dark blue, on a near-black background.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`. Output image width in pixels.
-    /// - `height` — `u32`. Output image height in pixels.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
@@ -130,7 +112,7 @@ impl StateMachine {
     }
 }
 
-// ── BehaviorTree ──────────────────────────────────────────────────────────────
+// ---- Extension: BehaviorTree render helpers ----
 
 /// Count the total number of nodes in a behavior tree recursively.
 fn bt_node_count(node: &BTNode) -> usize {
@@ -216,7 +198,7 @@ fn emit_bt_commands(
     for child in children {
         let cx = gap + (depth + 1) as f32 * (node_w + gap);
         let cy = gap + child_slot as f32 * (node_h + gap);
-        // Line from this node's right edge to child's left edge
+        // Line from this nod's right edge to chil's left edge
         cmds.push(RenderCommand::SetColor(0.5, 0.5, 0.5, 0.5));
         cmds.push(RenderCommand::Line {
             x1: x + node_w,
@@ -232,13 +214,6 @@ fn emit_bt_commands(
 
 impl BehaviorTree {
     /// Generate debug render commands that outline the behavior tree structure.
-    ///
-    /// Nodes are arranged in a depth-column layout: depth increases left to right,
-    /// siblings are stacked top to bottom.  Edges connecting parent to child are drawn
-    /// as simple lines.  Returns an empty `Vec` when the tree has no root.
-    ///
-    /// # Returns
-    /// `Vec<RenderCommand>`.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let root = match &self.root {
             Some(r) => r,
@@ -268,17 +243,6 @@ impl BehaviorTree {
     }
 
     /// Render the behavior tree structure to a CPU image.
-    ///
-    /// Nodes are drawn as small coloured rectangles in a depth-column layout.
-    /// Node colour is determined by its variant (composite=blue, decorator=orange,
-    /// leaf=green).  The overall status dot is drawn in the top-left corner.
-    ///
-    /// # Parameters
-    /// - `width` — `u32`. Output image width in pixels.
-    /// - `height` — `u32`. Output image height in pixels.
-    ///
-    /// # Returns
-    /// `ImageData`.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(15, 15, 25, 255);

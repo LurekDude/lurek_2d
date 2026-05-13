@@ -1,12 +1,12 @@
-//! Visual error screen for displaying Lua and engine errors to the user.
-//!
-//! Generates `RenderCommand` sequences that render a blue error screen,
-//! including the error title, message, traceback, and instructions
-//! to quit or restart.
+//! Scope: Error-screen presentation for runtime and Lua failures.
+//! This file defines ErrorScreen and helper functions for wrapping and formatting error text.
+//! It owns deterministic error text layout and render-command generation for fallback display.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::error::EngineError;
 use crate::runtime::resource_keys::FontKey;
+
+// ---- Type: ErrorScreen ----
 
 /// Blue error screen background color.
 const ERROR_BG: [f32; 4] = [0.11, 0.22, 0.53, 1.0];
@@ -41,6 +41,8 @@ pub struct ErrorScreen {
 }
 
 impl ErrorScreen {
+    // ---- Implementation: ErrorScreen ----
+
     /// Creates an `ErrorScreen` from a plain error message string.
     ///
     /// # Parameters
@@ -265,6 +267,8 @@ impl ErrorScreen {
         }
     }
 }
+
+// ---- Helper Functions: Text Formatting ----
 
 /// Wraps a text string at word boundaries to fit within `max_chars` columns.
 ///

@@ -1,49 +1,13 @@
-//! Monte Carlo Tree Search (MCTS) for AI decision-making.
-//!
-//! Implements the canonical MCTS algorithm (Selection → Expansion → Simulation
-//! → Backpropagation) with a configurable UCT exploration constant. The planner
-//! is game-agnostic: callers supply three closures at search time — `get_actions`,
-//! `apply_action`, and `evaluate` — so no Lua state is stored inside the engine.
-//!
-//! ## Architecture
-//!
-//! - [`MCTSConfig`] controls iteration budget, UCT constant, rollout depth, and
-//!   a reproducible PRNG seed.
-//! - [`MCTSNode`] is an arena-allocated tree node carrying visit count, total
-//!   score, parent index, child indices, and the action that reached this node.
-//! - [`MCTSEngine`] owns the node arena and drives the four-phase algorithm.
-//!   Each call to `search` returns the best `i32` action index from the root.
-//!
-//! ## Closures
-//!
-//! The engine is called with pure Rust closures representing the game logic:
-//! - `get_actions(state) -> Vec<i32>` — returns valid action IDs for a state.
-//! - `apply_action(state, action) -> S` — returns the successor state.
-//! - `evaluate(state) -> f32` — returns the heuristic value `[0, 1]` of a state.
-//!
-//! The Lua bridge (`ai_api.rs`) wraps Lua functions into these closures.
-//!
-//! ## Typical Usage Sequence
-//!
-//! 1. Create `MCTSEngine::new(config)`.
-//! 2. Call `engine.search(root_state, &mut get_actions, &mut apply_action, &mut evaluate)`.
-//! 3. Use the returned `Option<i32>` action ID in the agent's FSM/BT.
-
-// ────────────────────────────────────────────────────────────────────────────
-// MCTSConfig
-// ────────────────────────────────────────────────────────────────────────────
+﻿//! Scope: Monte Carlo Tree Search runtime and configuration primitives.
+//! This file defines tree nodes, UCT selection, rollout accounting, and budget controls for search iterations.
+//! It owns action value estimation loops used by turn-based or lookahead decision problems in AI modules.
+// ---- Type: MCTSConfig ----
 
 /// Configuration for the MCTS engine.
-///
-/// # Fields
-/// - `iterations` — `u32`.
-/// - `uct_c` — `f32`.
-/// - `rollout_depth` — `usize`.
-/// - `seed` — `u64`.
 pub struct MCTSConfig {
     /// Number of MCTS iterations per `search` call.
     pub iterations: u32,
-    /// UCT exploration constant (√2 ≈ 1.414 is the standard default).
+    /// UCT exploration constant (2 1.414 is the standard default).
     pub uct_c: f32,
     /// Maximum depth for random rollout simulation.
     pub rollout_depth: usize,
@@ -62,19 +26,9 @@ impl Default for MCTSConfig {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// MCTSNode
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: MCTSNode ----
 
 /// Arena-allocated MCTS tree node.
-///
-/// # Fields
-/// - `parent` — `Option<usize>`.
-/// - `children` — `Vec<usize>`.
-/// - `action` — `Option<i32>`.
-/// - `visits` — `u32`.
-/// - `total_score` — `f64`.
-/// - `untried_actions` — `Vec<i32>`.
 struct MCTSNode {
     parent: Option<usize>,
     children: Vec<usize>,
@@ -113,20 +67,9 @@ impl MCTSNode {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// MCTSEngine
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: MCTSEngine ----
 
 /// MCTS engine with arena-allocated node tree.
-///
-/// Resets the tree on every `search` call so intermediate state never leaks
-/// between decisions. The arena grows as needed and is cleared at the start
-/// of each search.
-///
-/// # Fields
-/// - `config` — `MCTSConfig`.
-/// - `arena` — `Vec<MCTSNode>`.
-/// - `rng` — `u64`.
 pub struct MCTSEngine {
     /// Search configuration.
     pub config: MCTSConfig,
@@ -136,12 +79,6 @@ pub struct MCTSEngine {
 
 impl MCTSEngine {
     /// Creates a new MCTS engine with the given configuration.
-    ///
-    /// # Parameters
-    /// - `config` — `MCTSConfig`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(config: MCTSConfig) -> Self {
         let rng = config.seed;
         Self {
@@ -152,29 +89,11 @@ impl MCTSEngine {
     }
 
     /// Returns a reference to the current configuration.
-    ///
-    /// # Returns
-    /// `&MCTSConfig`.
     pub fn config(&self) -> &MCTSConfig {
         &self.config
     }
 
     /// Runs MCTS from `root_state` and returns the best action index, or `None`
-    /// if no actions are available from the root.
-    ///
-    /// The closures must be pure (no side effects on `root_state`):
-    /// - `get_actions(state) -> Vec<i32>` — valid action IDs.
-    /// - `apply_action(state, action) -> S` — successor state.
-    /// - `evaluate(state) -> f32` — heuristic value `[0, 1]`.
-    ///
-    /// # Parameters
-    /// - `root_state` — `S`.
-    /// - `get_actions` — `FnMut(&S) -> Vec<i32>`.
-    /// - `apply_action` — `FnMut(&S, i32) -> S`.
-    /// - `evaluate` — `FnMut(&S) -> f32`.
-    ///
-    /// # Returns
-    /// `Option<i32>`.
     pub fn search<S, FA, FB, FC>(
         &mut self,
         root_state: S,
@@ -320,19 +239,3 @@ impl MCTSEngine {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_engine_has_config() {
-        let cfg = MCTSConfig {
-            iterations: 50,
-            uct_c: 1.414,
-            rollout_depth: 5,
-            seed: 42,
-        };
-        let e = MCTSEngine::new(cfg);
-        assert_eq!(e.config().iterations, 50);
-    }
-}

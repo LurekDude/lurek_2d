@@ -1,20 +1,11 @@
-//! Group aggregation, pivot table, and correlation.
+//! Scope: Group aggregation, pivot tables, and multi-column correlation analysis.
+//! This file defines group_by, pivot, and correlation methods on DataFrame.
+//! It owns distinct-value grouping, pivot-table materialization, and pairwise stats.
 
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
 
 impl DataFrame {
-    /// Aggregate `agg_col` grouped by `group_col`.
-    ///
-    /// Returns a two-column DataFrame: `(group_key, aggregated_value)`.
-    /// The value column is named `<agg_col_name>_<fn>`.
-    ///
-    /// # Parameters
-    /// - `group_col` — `ColRef`.
-    /// - `agg_col`   — `ColRef`.
-    /// - `agg_fn`    — `AggFn`.
-    ///
-    /// # Returns
-    /// `Result<DataFrame, String>`.
+    /// Group `group_col` and aggregate `agg_col` with the given function; return a two-column DataFrame `(group_key, aggregated_value)`.
     #[allow(clippy::needless_range_loop)]
     pub fn group_agg(
         &self,
@@ -115,13 +106,9 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Build a pivot table.
-    ///
     /// - Rows: unique values of `row_col`.
     /// - Columns: unique values of `col_col`.
     /// - Cells: first matching value from `val_col`; missing pairs → `Nil`.
-    ///
-    /// # Returns
-    /// `Result<DataFrame, String>`.
     #[allow(clippy::needless_range_loop)]
     pub fn pivot(
         &self,
@@ -184,9 +171,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Pearson correlation coefficient between two columns.
-    ///
-    /// Rows where either column is Nil are skipped. Returns `Err` if fewer
-    /// than 2 paired rows exist, or if either column has zero variance.
     pub fn corr(&self, col_a: ColRef, col_b: ColRef) -> Result<f64, String> {
         let cia = self.resolve_col(col_a)?;
         let cib = self.resolve_col(col_b)?;
@@ -226,9 +210,6 @@ impl DataFrame {
     }
 
     /// Build a correlation matrix DataFrame for all numeric columns.
-    ///
-    /// Returns a DataFrame with a leading `"column"` label column and one
-    /// numeric column per source numeric column.
     pub fn correlation_matrix(&self) -> DataFrame {
         let cols = self.columns();
         let data = self.raw_data();

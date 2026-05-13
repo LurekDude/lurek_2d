@@ -252,6 +252,13 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - Keep this module reference synchronized with `src/terminal/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
 
+### 2026-05-12 Update
+
+- ANSI parser now supports extended SGR color forms:
+	- 256-color palette: `38;5;<n>` (fg), `48;5;<n>` (bg)
+	- 24-bit true-color: `38;2;<r>;<g>;<b>` (fg), `48;2;<r>;<g>;<b>` (bg)
+- Added internal helpers in `src/terminal/ansi.rs`: `parse_extended_color` and `color256`.
+
 ### New in 0.14.1
 
 - `Terminal.cell_width_override: Option<f32>` and `cell_height_override: Option<f32>` — per-terminal cell pixel size override (default `None`).

@@ -1,31 +1,12 @@
-//! Keyframe-based animation curves with per-segment easing.
-//!
-//! An [`AnimCurve`] holds a list of `(time, value)` keyframes in ascending time
-//! order and evaluates the interpolated value at any time `t` using the selected
-//! [`EasingKind`].
-//!
-//! # Design boundary vs `tween`
-//!
-//! | Concept | Module | Scope | Lifecycle |
-//! |---|---|---|---|
-//! | [`AnimCurve`] | `animation::curve` | One named property driven by keyframes within an animation context | Driven by the animation controller — resets or loops with the clip |
-//! | [`AnimPropertyTimeline`] | `animation::curve` | Multiple named properties on one shared time axis | Same as `AnimCurve` — animation-scoped |
-//! | `TweenState` | `tween::state` | One numeric property interpolated from A to B over a fixed duration | Driven independently of any animation; managed by the tween engine |
-//!
-//! Use `AnimCurve` / `AnimPropertyTimeline` when the curve is permanently attached
-//! to an animation clip (e.g. scaling a sprite's alpha over its play duration).
-//! Use `TweenState` for one-shot or explicitly triggered interpolations that are
-//! independent of the animation state (e.g. a UI fade, a camera zoom).
-//!
-//! Both live in Tier 1 and depend only on `crate::math::easing`.  They intentionally
-//! share no Rust types so that either subsystem can change its easing or keyframe
-//! representation without coupling to the other.
+//! Scope: Evaluate keyframe curves and multi-property timelines for animation.
+//! This file defines easing kinds, single-property curves, and shared timelines.
+//! It owns interpolation behavior and keyframe ordering rules.
 
 use std::collections::HashMap;
 
 use crate::math::easing;
 
-// â”€â”€ EasingKind â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---- Type: EasingKind ----
 
 /// Interpolation mode applied between each pair of consecutive keyframes.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -45,7 +26,7 @@ pub enum EasingKind {
     Custom { callback_id: u32 },
 }
 
-// â”€â”€ AnimCurve â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---- Type: AnimCurve ----
 
 /// A keyframe-based animation curve.
 ///
@@ -63,6 +44,7 @@ pub struct AnimCurve {
 }
 
 impl AnimCurve {
+    // ---- Implementation: AnimCurve ----
     /// Creates an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
     ///
     /// # Returns
@@ -167,6 +149,8 @@ impl AnimCurve {
     }
 }
 
+// ---- Type: AnimPropertyTimeline ----
+
 /// One shared timeline that can drive multiple named properties in parallel.
 #[derive(Debug, Clone)]
 pub struct AnimPropertyTimeline {
@@ -179,6 +163,7 @@ pub struct AnimPropertyTimeline {
 }
 
 impl AnimPropertyTimeline {
+    // ---- Implementation: AnimPropertyTimeline ----
     /// Creates an empty property timeline with linear easing.
     pub fn new() -> Self {
         Self {

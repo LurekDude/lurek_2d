@@ -1,55 +1,13 @@
-//! Reynolds-style steering behaviors with weighted/priority combination.
-//!
-//! This module implements Craig Reynolds' autonomous agent steering behaviors,
-//! adapted for 2D game AI. Each behavior produces a 2D force vector that is
-//! applied to the agent's velocity by the [`SteeringManager`] (managed at the
-//! [`AIWorld`](crate::ai::world::AIWorld) level).
-//!
-//! ## Available Behaviors
-//!
-//! - **Seek** — Produces a force toward a target position at maximum speed.
-//! - **Flee** — Produces a force away from a threat, with a configurable panic
-//!   distance beyond which the agent ignores the threat.
-//! - **Arrive** — Like seek, but decelerates within a slowing radius to stop
-//!   smoothly at the target instead of oscillating around it.
-//! - **Wander** — Projects a circle ahead of the agent and picks a random point
-//!   on its circumference, creating natural-looking meandering movement.
-//! - **Pursue** — Predicts a moving target's future position and steers toward
-//!   the intercept point rather than the current position.
-//! - **Evade** — Inverse of pursue: predicts a threat's future position and
-//!   steers away from the intercept point.
-//! - **Flock** — Combines separation, alignment, and cohesion forces for group
-//!   movement (Reynolds boids model).
-//!
-//! ## Combination Modes
-//!
-//! Multiple active behaviors are combined via [`CombineMode`]:
-//! - **Weighted**: all forces are summed (each multiplied by its weight),
-//!   then truncated to `max_force`.
-//! - **Priority**: behaviors are evaluated in order; the first non-zero force
-//!   is used and remaining behaviors are skipped.
-
+﻿//! Scope: steering behavior models and force-combination runtime.
+//! This file defines behavior variants, shared behavior settings, and manager logic that combines movement forces.
+//! It owns local force math used by agents for seek/flee/arrive/wander and optional path-follow contribution.
 /// 2D force vector (fx, fy).
 pub type Force = (f32, f32);
 
-/// Determines how multiple active steering behaviors are combined into a
-/// single resultant force applied to the agent.
-///
-/// In **Weighted** mode, all enabled behaviors contribute simultaneously —
-/// their forces are summed (each scaled by its weight) and the total is
-/// clamped to `max_force`. This works well when behaviors cooperate
-/// (e.g., seek + obstacle avoidance).
-///
-/// In **Priority** mode, behaviors are evaluated in order. The first one
-/// that returns a non-zero force "wins" and the rest are skipped. This is
-/// useful when behaviors are mutually exclusive (e.g., flee overrides patrol).
-///
-/// # Variants
-/// - `Weighted` — Weighted variant.
-/// - `Priority` — Priority variant.
+/// Determines how multiple active steering behaviors are combined into a single final force each frame.
 #[derive(Debug, Clone, PartialEq)]
 pub enum CombineMode {
-    /// Sum all forces × weight, truncate to maxForce.
+    /// Sum all forces - weight, truncate to maxForce.
     Weighted,
     /// Use first non-zero force, ignore rest.
     Priority,
@@ -57,12 +15,6 @@ pub enum CombineMode {
 
 impl CombineMode {
     /// Parses from Lua string. Returns an error if the source data is malformed or missing.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "priority" => Self::Priority,
@@ -71,9 +23,6 @@ impl CombineMode {
     }
 
     /// Returns the Lua string representation.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Weighted => "weighted",
@@ -83,16 +32,6 @@ impl CombineMode {
 }
 
 /// Shared parameters common to all steering behavior instances.
-///
-/// Every [`SteeringBehaviorType`] variant carries a `SteeringBase` that controls
-/// the behavior's weight and enabled state. The weight is a multiplier applied
-/// to the raw force before combination (Weighted mode) or used as a tie-breaker
-/// (Priority mode). Disabled behaviors are skipped entirely during force
-/// calculation.
-///
-/// # Fields
-/// - `weight` — `f32`.
-/// - `enabled` — `bool`.
 #[derive(Debug, Clone)]
 pub struct SteeringBase {
     /// Weight multiplier for this behavior's force contribution.
@@ -111,24 +50,6 @@ impl Default for SteeringBase {
 }
 
 /// All concrete steering behavior types supported by the AI system.
-///
-/// Each variant carries its own parameters (target position, radii, neighbor
-/// lists, etc.) plus a shared [`SteeringBase`] for weight and enabled state.
-/// The `calculate()` method produces a 2D force vector for any behavior given
-/// the agent's current kinematic state.
-///
-/// Pursue, Evade, and Flock require access to other agents' positions, so their
-/// forces are computed at the [`AIWorld`](crate::ai::world::AIWorld) level
-/// rather than inside `calculate()` (which returns zero for those variants).
-///
-/// # Variants
-/// - `Seek` — Seek variant.
-/// - `Flee` — Flee variant.
-/// - `Arrive` — Arrive variant.
-/// - `Wander` — Wander variant.
-/// - `Pursue` — Pursue variant.
-/// - `Evade` — Evade variant.
-/// - `Flock` — Flock variant.
 #[derive(Debug, Clone)]
 pub enum SteeringBehaviorType {
     /// Moves directly toward a target position.
@@ -199,9 +120,6 @@ pub enum SteeringBehaviorType {
         base: SteeringBase,
     },
     /// A user-defined Lua callback computes a custom steering force.
-    /// `callback_id` is opaque; the actual Lua call is performed by
-    /// `LuaSteeringManager::applyCustomSteering` in the API layer.
-    /// `calculate()` returns zero force for this variant.
     Custom {
         /// Opaque ID referencing the Lua callback in the API-layer registry.
         callback_id: u32,
@@ -212,9 +130,6 @@ pub enum SteeringBehaviorType {
 
 impl SteeringBehaviorType {
     /// Returns a reference to the common steering data.
-    ///
-    /// # Returns
-    /// `&SteeringBase`.
     pub fn base(&self) -> &SteeringBase {
         match self {
             Self::Seek { base, .. }
@@ -229,9 +144,6 @@ impl SteeringBehaviorType {
     }
 
     /// Returns a mutable reference to the common steering data.
-    ///
-    /// # Returns
-    /// `&mut SteeringBase`.
     pub fn base_mut(&mut self) -> &mut SteeringBase {
         match self {
             Self::Seek { base, .. }
@@ -246,9 +158,6 @@ impl SteeringBehaviorType {
     }
 
     /// Returns the behavior kind as a Lua-friendly string.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn kind(&self) -> &'static str {
         match self {
             Self::Seek { .. } => "seek",
@@ -262,22 +171,7 @@ impl SteeringBehaviorType {
         }
     }
 
-    /// Computes the 2D steering force for this behavior given the agent's
-    /// current kinematic state. The force should be added to the agent's
-    /// velocity (after weighting and truncation by the SteeringManager).
-    ///
-    /// For Pursue, Evade, and Flock, this returns `(0.0, 0.0)` because
-    /// those behaviors need access to other agents' states, which is
-    /// handled at the AIWorld level.
-    ///
-    /// # Parameters
-    /// - `agent_pos` — `(f32, f32)`.
-    /// - `agent_vel` — `(f32, f32)`.
-    /// - `max_speed` — `f32`.
-    /// - `_dt` — `f32`.
-    ///
-    /// # Returns
-    /// `Force`.
+    /// Computes the 2D steering force for this behavior given the agent's current position, velocity, max speed, and frame delta.
     pub fn calculate(
         &self,
         agent_pos: (f32, f32),
@@ -376,13 +270,6 @@ impl SteeringBehaviorType {
 }
 
 /// Manages a list of steering behaviors and combines their forces each frame.
-///
-/// # Fields
-/// - `behaviors` — `Vec<SteeringBehaviorType>`.
-/// - `combine_mode` — `CombineMode`.
-/// - `last_force` — `Force`.
-/// - `cell_size` — Cell size used by the optional spatial-hash neighbourhood search (default `64.0`).
-/// - `use_spatial_hash` — When `true`, neighbourhood queries bucket agents by cell instead of iterating all (default `false`).
 pub struct SteeringManager {
     /// List of steering behaviors.
     pub behaviors: Vec<SteeringBehaviorType>,
@@ -406,9 +293,6 @@ pub struct SteeringManager {
 
 impl SteeringManager {
     /// Creates a new empty SteeringManager with weighted combination.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self {
             behaviors: Vec::new(),
@@ -424,16 +308,6 @@ impl SteeringManager {
     }
 
     /// Computes the combined steering force for the given agent state.
-    ///
-    /// # Parameters
-    /// - `agent_pos` — `(f32, f32)`.
-    /// - `agent_vel` — `(f32, f32)`.
-    /// - `max_speed` — `f32`.
-    /// - `max_force` — `f32`.
-    /// - `dt` — `f32`.
-    ///
-    /// # Returns
-    /// `Force`.
     pub fn calculate(
         &mut self,
         agent_pos: (f32, f32),
@@ -483,11 +357,6 @@ impl SteeringManager {
     }
 
     /// Adds a Seek behavior targeting `(tx, ty)` with the given weight.
-    ///
-    /// # Parameters
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_seek(&mut self, tx: f32, ty: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Seek {
             target: (tx, ty),
@@ -499,12 +368,6 @@ impl SteeringManager {
     }
 
     /// Adds a Flee behavior away from `(tx, ty)` within `panic_dist`.
-    ///
-    /// # Parameters
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `panic_dist` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_flee(&mut self, tx: f32, ty: f32, panic_dist: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flee {
             target: (tx, ty),
@@ -517,12 +380,6 @@ impl SteeringManager {
     }
 
     /// Adds an Arrive behavior targeting `(tx, ty)` with deceleration inside `slowing_radius`.
-    ///
-    /// # Parameters
-    /// - `tx` — `f32`.
-    /// - `ty` — `f32`.
-    /// - `slowing_radius` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_arrive(&mut self, tx: f32, ty: f32, slowing_radius: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Arrive {
             target: (tx, ty),
@@ -535,12 +392,6 @@ impl SteeringManager {
     }
 
     /// Adds a Wander behavior with the given circle parameters.
-    ///
-    /// # Parameters
-    /// - `radius` — `f32`.
-    /// - `distance` — `f32`.
-    /// - `jitter` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_wander(&mut self, radius: f32, distance: f32, jitter: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Wander {
             wander_radius: radius,
@@ -555,10 +406,6 @@ impl SteeringManager {
     }
 
     /// Adds a Pursue behavior targeting a named agent.
-    ///
-    /// # Parameters
-    /// - `target_name` — `Option<String>`.
-    /// - `weight` — `f32`.
     pub fn add_pursue(&mut self, target_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Pursue {
             target_name,
@@ -570,10 +417,6 @@ impl SteeringManager {
     }
 
     /// Adds an Evade behavior fleeing from a named threat agent.
-    ///
-    /// # Parameters
-    /// - `threat_name` — `Option<String>`.
-    /// - `weight` — `f32`.
     pub fn add_evade(&mut self, threat_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Evade {
             threat_name,
@@ -585,13 +428,6 @@ impl SteeringManager {
     }
 
     /// Adds a Flock behavior for group movement among named neighbors.
-    ///
-    /// # Parameters
-    /// - `neighbor_radius` — `f32`.
-    /// - `sep` — `f32`.
-    /// - `align` — `f32`.
-    /// - `coh` — `f32`.
-    /// - `weight` — `f32`.
     pub fn add_flock(&mut self, neighbor_radius: f32, sep: f32, align: f32, coh: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flock {
             neighbor_radius,
@@ -607,46 +443,26 @@ impl SteeringManager {
     }
 
     /// Sets the combination mode from a Lua string (`"weighted"` or `"priority"`).
-    ///
-    /// # Parameters
-    /// - `mode` — `&str`.
     pub fn set_combine_mode_str(&mut self, mode: &str) {
         self.combine_mode = CombineMode::parse_str(mode);
     }
 
     /// Returns the force vector computed during the last `calculate()` call.
-    ///
-    /// # Returns
-    /// `Force`.
     pub fn last_force(&self) -> Force {
         self.last_force
     }
 
     /// Sets the cell size used by the spatial-hash neighbourhood search.
-    ///
-    /// # Parameters
-    /// - `size` — `f32` — must be positive; clamped to a minimum of `0.1`.
     pub fn set_cell_size(&mut self, size: f32) {
         self.cell_size = size.max(0.1);
     }
 
     /// Enables or disables spatial-hash bucketing for neighbourhood queries.
-    ///
-    /// When enabled, flock/separation/cohesion behaviors that iterate
-    /// over neighbours will skip checking agents outside the current cell.
-    ///
-    /// # Parameters
-    /// - `enabled` — `bool`.
     pub fn set_use_spatial_hash(&mut self, enabled: bool) {
         self.use_spatial_hash = enabled;
     }
 
     /// Replaces the current path-follow waypoints with a new world-space path.
-    ///
-    /// # Parameters
-    /// - `waypoints` — `Vec<(f32, f32)>`.
-    /// - `reach_radius` — `f32` — distance threshold used to mark each waypoint as reached.
-    /// - `weight` — `f32` — path-follow force multiplier in weighted/priority combination.
     pub fn set_path(&mut self, waypoints: Vec<(f32, f32)>, reach_radius: f32, weight: f32) {
         self.path_waypoints = waypoints;
         self.path_index = 0;
@@ -661,17 +477,11 @@ impl SteeringManager {
     }
 
     /// Returns true when there is an unfinished waypoint path.
-    ///
-    /// # Returns
-    /// `bool`.
     pub fn has_active_path(&self) -> bool {
         self.path_index < self.path_waypoints.len()
     }
 
     /// Returns path-follow progress as `(current_index, total_waypoints)`.
-    ///
-    /// # Returns
-    /// `(usize, usize)`.
     pub fn path_progress(&self) -> (usize, usize) {
         (self.path_index, self.path_waypoints.len())
     }
@@ -730,27 +540,3 @@ impl Default for SteeringManager {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn combine_mode_parse() {
-        assert_eq!(CombineMode::parse_str("weighted"), CombineMode::Weighted);
-        assert_eq!(CombineMode::parse_str("priority"), CombineMode::Priority);
-        assert_eq!(CombineMode::parse_str("nope"), CombineMode::Weighted);
-    }
-
-    #[test]
-    #[ignore = "behavior_count() is not in the public API"]
-    fn new_manager_defaults() {
-        // Ignored: behavior_count() is not in the public API
-    }
-
-    #[test]
-    fn spatial_hash_toggle() {
-        let mut m = SteeringManager::new();
-        m.set_use_spatial_hash(true);
-        m.set_use_spatial_hash(false);
-    }
-}

@@ -1,4 +1,8 @@
-//! [`AnimEvent`] â€” events emitted during animation playback.
+//! Scope: Describe events emitted by animation playback updates.
+//! This file defines event variants and query helpers for event payloads.
+//! It owns the event contract produced by the animation controller.
+
+// ---- Type: AnimEvent ----
 
 /// Events emitted by [`Animation::update`](crate::animation::Animation::update).
 ///
@@ -23,6 +27,7 @@ pub enum AnimEvent {
 }
 
 impl AnimEvent {
+    // ---- Implementation: AnimEvent ----
     /// Returns the event type as a Lua-friendly string.
     ///
     /// # Returns

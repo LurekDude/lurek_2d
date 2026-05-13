@@ -1,20 +1,9 @@
-//! Dialogue AI helper that combines FSM/BT/Utility signals to choose
-//! conversation topics and branches.
-//!
-//! The module is intentionally data-driven: game code feeds current decision
-//! context (FSM state, BT status, utility action scores), then asks the planner
-//! to choose the best topic/branch.
-
+﻿//! Scope: dialogue decision helpers connected to AI runtime state.
+//! This file defines dialogue topics, branch scoring, and selection utilities used by conversation-driven agents.
+//! It owns deterministic topic/branch ranking inputs from blackboard, needs, emotion, and strategic context.
 use std::collections::HashMap;
 
 /// One branch candidate under a dialogue topic.
-///
-/// # Fields
-/// - `id` — `String`.
-/// - `weight` — `f32`.
-/// - `required_fsm_state` — `Option<String>`.
-/// - `required_bt_status` — `Option<String>`.
-/// - `utility_key` — `Option<String>`.
 #[derive(Debug, Clone)]
 pub struct DialogueBranch {
     /// Branch identifier returned to Lua/game logic.
@@ -30,14 +19,6 @@ pub struct DialogueBranch {
 }
 
 /// One dialogue topic with weighted branch options.
-///
-/// # Fields
-/// - `id` — `String`.
-/// - `weight` — `f32`.
-/// - `required_fsm_state` — `Option<String>`.
-/// - `required_bt_status` — `Option<String>`.
-/// - `utility_key` — `Option<String>`.
-/// - `branches` — `Vec<DialogueBranch>`.
 #[derive(Debug, Clone)]
 pub struct DialogueTopic {
     /// Topic identifier returned to Lua/game logic.
@@ -55,12 +36,6 @@ pub struct DialogueTopic {
 }
 
 /// Dialogue planner state and scoring context.
-///
-/// # Fields
-/// - `topics` — `Vec<DialogueTopic>`.
-/// - `fsm_state` — `Option<String>`.
-/// - `bt_status` — `Option<String>`.
-/// - `utility_scores` — `HashMap<String, f32>`.
 pub struct DialogueAI {
     /// Registered dialogue topics.
     pub topics: Vec<DialogueTopic>,
@@ -74,9 +49,6 @@ pub struct DialogueAI {
 
 impl DialogueAI {
     /// Creates a new empty dialogue planner.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new() -> Self {
         Self {
             topics: Vec::new(),
@@ -87,26 +59,16 @@ impl DialogueAI {
     }
 
     /// Sets the current FSM state used by topic/branch gate checks.
-    ///
-    /// # Parameters
-    /// - `state` — `Option<String>`.
     pub fn set_fsm_state(&mut self, state: Option<String>) {
         self.fsm_state = state;
     }
 
     /// Sets the current BT status used by topic/branch gate checks.
-    ///
-    /// # Parameters
-    /// - `status` — `Option<String>`.
     pub fn set_bt_status(&mut self, status: Option<String>) {
         self.bt_status = status;
     }
 
     /// Sets one utility score used when ranking topics/branches.
-    ///
-    /// # Parameters
-    /// - `key` — `String`.
-    /// - `score` — `f32`.
     pub fn set_utility_score(&mut self, key: String, score: f32) {
         self.utility_scores.insert(key, score);
     }
@@ -117,13 +79,6 @@ impl DialogueAI {
     }
 
     /// Adds a dialogue topic.
-    ///
-    /// # Parameters
-    /// - `id` — `String`.
-    /// - `weight` — `f32`.
-    /// - `required_fsm_state` — `Option<String>`.
-    /// - `required_bt_status` — `Option<String>`.
-    /// - `utility_key` — `Option<String>`.
     pub fn add_topic(
         &mut self,
         id: String,
@@ -143,17 +98,6 @@ impl DialogueAI {
     }
 
     /// Adds a branch under an existing topic.
-    ///
-    /// # Parameters
-    /// - `topic_id` — `&str`.
-    /// - `id` — `String`.
-    /// - `weight` — `f32`.
-    /// - `required_fsm_state` — `Option<String>`.
-    /// - `required_bt_status` — `Option<String>`.
-    /// - `utility_key` — `Option<String>`.
-    ///
-    /// # Returns
-    /// `bool` — true if topic exists and branch was added.
     pub fn add_branch(
         &mut self,
         topic_id: &str,
@@ -177,9 +121,6 @@ impl DialogueAI {
     }
 
     /// Selects the best topic for the current context.
-    ///
-    /// # Returns
-    /// `Option<String>`.
     pub fn select_topic(&self) -> Option<String> {
         let mut best: Option<(&DialogueTopic, f32)> = None;
         for topic in &self.topics {
@@ -194,12 +135,6 @@ impl DialogueAI {
     }
 
     /// Selects the best branch for a given topic id and current context.
-    ///
-    /// # Parameters
-    /// - `topic_id` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<String>`.
     pub fn select_branch(&self, topic_id: &str) -> Option<String> {
         let topic = self.topics.iter().find(|t| t.id == topic_id)?;
         let mut best: Option<(&DialogueBranch, f32)> = None;
@@ -215,9 +150,6 @@ impl DialogueAI {
     }
 
     /// Returns the number of registered topics.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn topic_count(&self) -> usize {
         self.topics.len()
     }

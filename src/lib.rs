@@ -87,6 +87,7 @@ pub mod data;
 /// In-memory column-major tabular data (lurek.dataframe).
 pub mod dataframe;
 /// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
+#[cfg(feature = "devtools-plugin")]
 pub mod devtools;
 /// Format-agnostic serialization: JSON, TOML, CSV, MessagePack, XML, and schema tools via shared SerialValue.
 pub mod serial;

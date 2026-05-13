@@ -1,8 +1,6 @@
-//! TCP server thread for the Lurek2D debug bridge.
-//!
-//! Runs a non-blocking accept loop that multiplexes reads from all connected
-//! clients, dispatches background-safe methods immediately, and queues
-//! main-thread methods for later execution via `poll()`.
+//! Scope: TCP server accept loop and message dispatch for debug bridge.
+//! This file defines server_thread and handle_client_message functions.
+//! It owns non-blocking I/O, JSON parsing, and background-safe method handling.
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;

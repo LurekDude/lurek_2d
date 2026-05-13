@@ -43,7 +43,7 @@ impl FileWatcher {
     /// changes *after* the `watch()` call.
     pub fn watch<P: AsRef<Path>>(&mut self, path: P) {
         let key = path.as_ref().to_string_lossy().into_owned();
-        let mtime = read_mtime(&key);
+        let mtime = read_mtime(Path::new(&key));
         self.paths.insert(key, mtime);
     }
 
@@ -68,7 +68,7 @@ impl FileWatcher {
     pub fn poll(&mut self) -> Vec<PathBuf> {
         let mut changed = Vec::new();
         for (key, last) in &mut self.paths {
-            let current = read_mtime(key);
+            let current = read_mtime(Path::new(key));
             if current != *last {
                 *last = current;
                 changed.push(PathBuf::from(key.clone()));
@@ -110,6 +110,6 @@ impl Default for FileWatcher {
 
 /// Read modification time for `path`.  Returns `None` if the file does not
 /// exist or metadata cannot be obtained (permissions, etc.).
-fn read_mtime(path: &str) -> Option<SystemTime> {
+pub fn read_mtime(path: &Path) -> Option<SystemTime> {
     std::fs::metadata(path).ok()?.modified().ok()
 }

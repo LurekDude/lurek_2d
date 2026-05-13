@@ -1,12 +1,7 @@
-//! Offline audio processing utilities.
-//!
-//! Decodes a WAV file, threads samples through a chain of [`crate::audio::dsp`] effects, and
-//! writes the result back to disk as a 16-bit PCM WAV.  All work happens synchronously in the
-//! calling thread â€” no audio device is opened.
-//!
-//! # Entry points
-//! - [`process_offline`] â€” apply an [`OfflineEffect`] chain and save the output.
-//! - [`normalize_file`] â€” scale peak amplitude to a target level and save.
+//! Scope: Offline audio processing and file export.
+//! This file defines OfflineEffect and the synchronous processing helpers.
+//! It owns decoding, DSP chaining, and writing processed audio files.
+//! Offline audio processing: decode, apply effects, write WAV.
 
 use std::{
     fs::File,
@@ -18,10 +13,7 @@ use rodio::{Decoder, Source};
 
 use crate::audio::dsp::{ActiveEffect, AtomicParam, EffectParams, EffectType};
 
-/// Create the parent directory of `path` if it does not already exist.
-///
-/// Returns `Ok(())` when `path` has no parent component (e.g. a bare file name),
-/// or when the directory already exists.
+/// Creates the parent directory of `path` if it does not already exist.
 fn ensure_parent_dir(path: &str) -> Result<(), String> {
     if let Some(parent) = std::path::Path::new(path).parent() {
         if !parent.as_os_str().is_empty() && !parent.exists() {
@@ -37,20 +29,8 @@ fn ensure_parent_dir(path: &str) -> Result<(), String> {
     Ok(())
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Public types
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-/// Descriptor for a single DSP effect used in offline processing.
-///
-/// Parameters map to the same `p1`/`p2`/`p3` slots as the real-time
-/// [`EffectParams`]: see [`EffectType`] variant docs for the meaning of each slot.
-///
-/// # Fields
-/// - `typ`  â€” `EffectType`. The effect algorithm to apply.
-/// - `p1`   â€” `f32`. Primary parameter (cutoff, room\_size, drive, threshold, â€¦).
-/// - `p2`   â€” `f32`. Secondary parameter (q, mix, ratio, gain\_db, â€¦).
-/// - `p3`   â€” `f32`. Tertiary parameter (mix, makeup\_gain, release, â€¦).
+/// DSP effect for offline processing: type and parameters (p1, p2, p3).
+#[derive(Debug, Clone, Copy)]
 pub struct OfflineEffect {
     pub typ: EffectType,
     pub p1: f32,
@@ -58,23 +38,12 @@ pub struct OfflineEffect {
     pub p3: f32,
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Public API
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Decodes `input_path`, applies `effects` in series, and writes the result to `output_path`.
-///
 /// The output is a 16-bit PCM mono/stereo WAV file with the same sample rate and
 /// channel count as the input.  An empty `effects` slice performs a passthrough.
-///
-/// # Parameters
-/// - `input_path`  â€” `&str`. Path to the source WAV file.
-/// - `output_path` â€” `&str`. Destination path for the processed WAV.
-/// - `effects`     â€” `&[OfflineEffect]`. Ordered chain of effects.
-///
-/// # Returns
-/// `Result<(), String>`. Returns an error string if the input cannot be decoded or
-/// the output cannot be written.
+/// Returns an error string when decode or write fails.
+/// Decodes input, applies effects chain, writes 16-bit PCM WAV.
 pub fn process_offline(
     input_path: &str,
     output_path: &str,
@@ -108,19 +77,7 @@ pub fn process_offline(
     write_wav_i16(output_path, &samples, sample_rate, channels)
 }
 
-/// Normalises the peak amplitude of `input_path` to `target_level` and writes to `output_path`.
-///
-/// The input is decoded to f32, scaled so that the peak magnitude equals `target_level`,
-/// and the result is saved as a 16-bit PCM WAV.
-///
-/// # Parameters
-/// - `input_path`   â€” `&str`. Path to the source WAV file.
-/// - `output_path`  â€” `&str`. Destination path for the normalised WAV.
-/// - `target_level` â€” `f32`. Target peak level in `(0.0, 1.0]`.
-///
-/// # Returns
-/// `Result<(), String>`. Returns an error if the target is outside the allowed range or the
-/// file cannot be read or written.
+/// Normalizes to target_level, writes 16-bit PCM WAV.
 pub fn normalize_file(
     input_path: &str,
     output_path: &str,
@@ -147,17 +104,12 @@ pub fn normalize_file(
     write_wav_i16(output_path, &samples, sample_rate, channels)
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Internal helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /// Decodes a WAV file to 32-bit floats using the `rodio` decoder.
-///
-/// # Parameters
-/// - `path` â€” `&str`. Path to the WAV file.
-///
-/// # Returns
-/// `Result<(Vec<f32>, u32, u16), String>`. Returns `(samples, sample_rate, channels)`.
+/// Returns `(samples, sample_rate, channels)` on success.
 fn read_wav_f32(path: &str) -> Result<(Vec<f32>, u32, u16), String> {
     let file = File::open(path).map_err(|e| format!("file not found: {}: {}", path, e))?;
     let reader = BufReader::new(file);
@@ -172,15 +124,6 @@ fn read_wav_f32(path: &str) -> Result<(Vec<f32>, u32, u16), String> {
 }
 
 /// Writes a 16-bit PCM WAV file to `path`.
-///
-/// # Parameters
-/// - `path`        â€” `&str`. Destination path.
-/// - `samples`     â€” `&[f32]`. Interleaved f32 samples in `[-1.0, 1.0]`.
-/// - `sample_rate` â€” `u32`. Sample rate in Hz.
-/// - `channels`    â€” `u16`. Number of interleaved channels.
-///
-/// # Returns
-/// `Result<(), String>`.
 fn write_wav_i16(
     path: &str,
     samples: &[f32],
@@ -236,3 +179,6 @@ fn write_wav_i16(
 
     w.flush().map_err(|e| e.to_string())
 }
+
+
+

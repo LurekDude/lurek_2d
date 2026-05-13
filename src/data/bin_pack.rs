@@ -1,28 +1,6 @@
-//! Lurek2D Binary Pack Format — format-string based binary serialization.
-//!
-//! Provides `write`, `read`, and `measure_size` for the `lurek.data` module.
-//! Format strings use space-separated named type tokens.
-//!
-//! # Format string tokens
-//!
-//! | Token  | Type                       | Byte size  |
-//! |--------|----------------------------|------------|
-//! | `le`   | switch to little-endian    | (modifier) |
-//! | `be`   | switch to big-endian       | (modifier) |
-//! | `u8`   | unsigned 8-bit integer     | 1          |
-//! | `u16`  | unsigned 16-bit integer    | 2          |
-//! | `u32`  | unsigned 32-bit integer    | 4          |
-//! | `u64`  | unsigned 64-bit integer    | 8          |
-//! | `i8`   | signed 8-bit integer       | 1          |
-//! | `i16`  | signed 16-bit integer      | 2          |
-//! | `i32`  | signed 32-bit integer      | 4          |
-//! | `i64`  | signed 64-bit integer      | 8          |
-//! | `f32`  | 32-bit float               | 4          |
-//! | `f64`  | 64-bit float               | 8          |
-//! | `bool` | boolean (u8: 0=false)      | 1          |
-//! | `str`  | u32-length-prefixed UTF-8  | 4 + len    |
-//! | `cstr` | null-terminated UTF-8      | len + 1    |
-//! | `pad`  | zero padding byte          | 1          |
+//! Scope: Binary pack format serialization and parsing.
+//! This file defines BinValue, Token, and the pack/read/write helpers.
+//! It owns named-token format parsing and byte-order handling for packed data.
 
 use crate::data::byte_data::ByteData;
 

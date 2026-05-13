@@ -443,6 +443,39 @@ impl LuaUserData for LuaSkeletonAnimation {
             Ok(this.inner.timelines.len())
         });
 
+        // -- poseAt --
+        /// Evaluates all timelines at the given time and returns a snapshot table.
+        /// @param | time | number | Playback time in seconds.
+        /// @return | table | Array of `{ bone_idx, property, value }` entries.
+        methods.add_method("poseAt", |lua, this, time: f32| {
+            let snapshot = this.inner.pose_at(time);
+            let arr = lua.create_table()?;
+            for (i, (bone_idx, prop, value)) in snapshot.iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("bone_idx", *bone_idx)?;
+                let prop_name = match prop {
+                    BoneProperty::X => "x",
+                    BoneProperty::Y => "y",
+                    BoneProperty::Rotation => "rotation",
+                    BoneProperty::ScaleX => "scale_x",
+                    BoneProperty::ScaleY => "scale_y",
+                };
+                entry.set("property", prop_name)?;
+                entry.set("value", *value)?;
+                arr.set(i + 1, entry)?;
+            }
+            Ok(arr)
+        });
+
+        // -- reverse --
+        /// Creates a reversed copy of this animation clip.
+        /// @return | LSkeletonAnimation | New reversed animation clip.
+        methods.add_method("reverse", |lua, this, ()| {
+            lua.create_userdata(LuaSkeletonAnimation {
+                inner: this.inner.reverse(),
+            })
+        });
+
         // -- type --
         /// Returns the type name of this object.
         /// @return | string | Lua-visible type name.
@@ -495,6 +528,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     events: Vec::new(),
                 },
             })
+        })?,
+    )?;
+
+    // -- animationFromJson --
+    /// Builds a SkeletonAnimation from a JSON string.
+    /// @param | json | string | JSON payload describing the animation clip.
+    /// @return | LSkeletonAnimation? | Parsed animation or nil on schema mismatch.
+    tbl.set(
+        "animationFromJson",
+        lua.create_function(|lua, json: String| {
+            let parsed: serde_json::Value = serde_json::from_str(&json)
+                .map_err(|e| LuaError::RuntimeError(format!("animationFromJson: {e}")))?;
+            match SkeletonAnimation::from_json(&parsed) {
+                Some(anim) => Ok(LuaValue::UserData(
+                    lua.create_userdata(LuaSkeletonAnimation { inner: anim })?,
+                )),
+                None => Ok(LuaValue::Nil),
+            }
         })?,
     )?;
 

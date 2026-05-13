@@ -39,6 +39,27 @@ impl SerialFormat {
         }
     }
 
+    /// Detect format by file extension (e.g., `.json`, `.toml`, `.csv`).
+    /// Returns `None` if the extension cannot be mapped to a format.
+    pub fn from_extension(path: &str) -> Option<Self> {
+        let path_lower = path.to_ascii_lowercase();
+        let ext = if let Some(dot_idx) = path_lower.rfind('.') {
+            &path_lower[dot_idx + 1..]
+        } else {
+            return None;
+        };
+
+        match ext {
+            "json" => Some(Self::Json),
+            "toml" => Some(Self::Toml),
+            "csv" => Some(Self::Csv),
+            "msgpack" | "mpk" => Some(Self::MsgPack),
+            "xml" => Some(Self::Xml),
+            "ini" | "cfg" => Some(Self::Ini),
+            _ => None,
+        }
+    }
+
     /// Canonical lowercase name for the format.
     pub fn as_str(self) -> &'static str {
         match self {

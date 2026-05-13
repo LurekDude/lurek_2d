@@ -5,16 +5,120 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::procgen::biome::{BiomeClassifier, BiomeRules, BiomeType};
 use crate::procgen::heightmap::Heightmap;
 use crate::procgen::lsystem::LSystem;
 use crate::procgen::namegen::NameGen;
 use crate::procgen::noise::{simplex_noise_2d, simplex_noise_3d};
 use crate::procgen::world_graph::generate_world_graph;
 use crate::procgen::{
-    bsp_dungeon, cellular_automata, flood_fill, generate_noise_map_parallel, perlin_noise_periodic,
-    poisson_disk, rooms_dungeon, voronoi_diagram, BspOpts, CellularOpts, HeightmapOpts,
-    MapGenOptions, NoiseGenerator, RoomsOpts, VoronoiOpts, WfcOpts, WfcRules, WfcTile,
+    bsp_dungeon, bsp_dungeon_with_prefabs, cellular_automata, flood_fill,
+    generate_noise_map_parallel, perlin_noise_periodic, poisson_disk, rooms_dungeon,
+    rooms_dungeon_with_prefabs, voronoi_diagram, BspOpts, BspPrefabStamp, CellularOpts,
+    HeightmapOpts, MapGenOptions, NoiseGenerator, RoomPrefabStamp, RoomsOpts, VoronoiOpts,
+    WfcOpts, WfcRules, WfcTile,
 };
+
+// -------------------------------------------------------------------------------
+// BiomeClassifier Lua wrapper
+// -------------------------------------------------------------------------------
+
+/// Lua-visible wrapper for [`BiomeClassifier`].
+pub struct LuaBiomeClassifier(BiomeClassifier);
+
+impl LuaUserData for LuaBiomeClassifier {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- classify --
+        /// Classifies a single cell given its height, moisture, and temperature (all in 0..1).
+        /// @param | height | number | Elevation value in [0, 1].
+        /// @param | moisture | number | Moisture value in [0, 1].
+        /// @param | temperature | number | Temperature value in [0, 1]. Use 0.5 when unknown.
+        /// @return | string | Biome name (e.g. "ocean", "desert", "grassland").
+        methods.add_method("classify", |_, this, (h, m, t): (f32, f32, f32)| {
+            Ok(this.0.classify(h, m, t).as_str())
+        });
+
+        // -- classifyMap --
+        /// Classifies an entire map from flat arrays of heights, moisture, and temperature.
+        /// @param | width | integer | Map width.
+        /// @param | height | integer | Map height.
+        /// @param | heights | table | Array of elevation values in [0, 1].
+        /// @param | moisture | table | Array of moisture values in [0, 1].
+        /// @param | temperature | table? | Optional array of temperature values. Defaults to 0.5.
+        /// @return | table | Array of biome name strings in row-major order.
+        methods.add_method(
+            "classifyMap",
+            |lua, this, (width, height, ht, mt, tt): (u32, u32, LuaTable, LuaTable, Option<LuaTable>)| {
+                let n = (width * height) as usize;
+                let heights: Vec<f32> = (1..=n).filter_map(|i| ht.get::<_, f32>(i).ok()).collect();
+                let moisture: Vec<f32> = (1..=n).filter_map(|i| mt.get::<_, f32>(i).ok()).collect();
+                let temperature: Vec<f32> = if let Some(t) = tt {
+                    (1..=n).filter_map(|i| t.get::<_, f32>(i).ok()).collect()
+                } else {
+                    Vec::new()
+                };
+                let biomes = this.0.classify_map(width, height, &heights, &moisture, &temperature);
+                let out = lua.create_table()?;
+                for (i, b) in biomes.iter().enumerate() {
+                    out.set(i + 1, b.as_str())?;
+                }
+                Ok(out)
+            },
+        );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | "BiomeClassifier".
+        methods.add_method("type", |_, _, ()| Ok("BiomeClassifier"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param | name | string | Type name.
+        /// @return | boolean | True if the type name matches.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "BiomeClassifier" || name == "Object")
+        });
+    }
+}
+
+impl BiomeRules {
+    /// Reads optional fields from a Lua table into a [`BiomeRules`] struct.
+    pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
+        let mut rules = Self::default();
+        if let Ok(v) = t.get::<_, f32>("ocean_threshold") { rules.ocean_threshold = v; }
+        if let Ok(v) = t.get::<_, f32>("coast_threshold") { rules.coast_threshold = v; }
+        if let Ok(v) = t.get::<_, f32>("mountain_threshold") { rules.mountain_threshold = v; }
+        if let Ok(v) = t.get::<_, f32>("ice_cap_threshold") { rules.ice_cap_threshold = v; }
+        if let Ok(v) = t.get::<_, f32>("cold_temperature") { rules.cold_temperature = v; }
+        if let Ok(v) = t.get::<_, f32>("warm_temperature") { rules.warm_temperature = v; }
+        if let Ok(v) = t.get::<_, f32>("dry_moisture") { rules.dry_moisture = v; }
+        if let Ok(v) = t.get::<_, f32>("wet_moisture") { rules.wet_moisture = v; }
+        Ok(rules)
+    }
+}
+
+impl BiomeType {
+    /// Parses a biome name string to a [`BiomeType`]. Falls back to `Grassland` for unknown names.
+    pub fn from_name(s: &str) -> Self {
+        match s {
+            "ocean" => Self::Ocean,
+            "coast" => Self::Coast,
+            "beach" => Self::Beach,
+            "desert" => Self::Desert,
+            "grassland" => Self::Grassland,
+            "shrubland" => Self::Shrubland,
+            "tropical_rainforest" => Self::TropicalRainforest,
+            "temperate_forest" => Self::TemperateForest,
+            "taiga" => Self::Taiga,
+            "tundra" => Self::Tundra,
+            "mountain" => Self::Mountain,
+            "ice_cap" => Self::IceCap,
+            "swamp" => Self::Swamp,
+            "savanna" => Self::Savanna,
+            _ => Self::Grassland,
+        }
+    }
+}
 
 // -------------------------------------------------------------------------------
 // Register
@@ -225,6 +329,72 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- bspDungeonWithPrefabs --
+    /// Generates a BSP dungeon and prefab placement metadata.
+    /// @param | opts | table? | Optional BSP dungeon settings.
+    /// @param | prefabs | table | Array of prefab tables `{ name, width, height }`.
+    /// @return | table | Dungeon data with rooms and corridors.
+    /// @return | table | Prefab placement metadata array.
+    tbl.set(
+        "bspDungeonWithPrefabs",
+        lua.create_function(|lua, (opts, prefabs_tbl): (Option<LuaTable>, LuaTable)| {
+            let mut cfg = BspOpts::default();
+            if let Some(t) = opts {
+                if let Ok(v) = t.get::<_, u32>("width") { cfg.width = v; }
+                if let Ok(v) = t.get::<_, u32>("height") { cfg.height = v; }
+                if let Ok(v) = t.get::<_, u32>("min_size") { cfg.min_size = v; }
+                if let Ok(v) = t.get::<_, u32>("max_depth") { cfg.max_depth = v; }
+                if let Ok(v) = t.get::<_, u64>("seed") { cfg.seed = v; }
+                if let Ok(v) = t.get::<_, u32>("padding") { cfg.padding = v; }
+            }
+
+            let mut prefabs = Vec::new();
+            for v in prefabs_tbl.sequence_values::<LuaTable>() {
+                let p = v?;
+                let name: String = p.get("name").unwrap_or_else(|_| String::from("prefab"));
+                let width: u32 = p.get("width").unwrap_or(1);
+                let height: u32 = p.get("height").unwrap_or(1);
+                prefabs.push(BspPrefabStamp { name, width, height });
+            }
+
+            let (d, placements) = bsp_dungeon_with_prefabs(&cfg, &prefabs);
+
+            let rooms_tbl = lua.create_table()?;
+            for (i, r) in d.rooms.iter().enumerate() {
+                let rt = lua.create_table()?;
+                rt.set("x", r.x)?;
+                rt.set("y", r.y)?;
+                rt.set("w", r.w)?;
+                rt.set("h", r.h)?;
+                rooms_tbl.set(i + 1, rt)?;
+            }
+            let corr_tbl = lua.create_table()?;
+            for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
+                let ct = lua.create_table()?;
+                ct.set("x1", x1)?;
+                ct.set("y1", y1)?;
+                ct.set("x2", x2)?;
+                ct.set("y2", y2)?;
+                corr_tbl.set(i + 1, ct)?;
+            }
+            let out = lua.create_table()?;
+            out.set("rooms", rooms_tbl)?;
+            out.set("corridors", corr_tbl)?;
+
+            let p_tbl = lua.create_table()?;
+            for (i, p) in placements.iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set("name", p.name.as_str())?;
+                t.set("x", p.x)?;
+                t.set("y", p.y)?;
+                t.set("width", p.width)?;
+                t.set("height", p.height)?;
+                p_tbl.set(i + 1, t)?;
+            }
+            Ok((out, p_tbl))
+        })?,
+    )?;
+
     // -- roomsDungeon --
     /// Generates a rooms-and-corridors dungeon.
     /// @param | opts | table? | Optional room dungeon settings.
@@ -286,6 +456,87 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- roomsDungeonWithPrefabs --
+    /// Generates a rooms dungeon and stamps prefabs into room interiors.
+    /// @param | opts | table? | Optional room dungeon settings.
+    /// @param | prefabs | table | Array of prefab tables `{ name, width, height, mask }`.
+    /// @param | stamp_value | integer? | Optional tile value written for stamped cells (default 3).
+    /// @return | table | Generated dungeon data.
+    /// @return | table | Prefab placement metadata array.
+    tbl.set(
+        "roomsDungeonWithPrefabs",
+        lua.create_function(|lua, (opts, prefabs_tbl, stamp_value): (Option<LuaTable>, LuaTable, Option<u8>)| {
+            let mut cfg = RoomsOpts::default();
+            if let Some(t) = opts {
+                if let Ok(v) = t.get::<_, u32>("width") { cfg.width = v; }
+                if let Ok(v) = t.get::<_, u32>("height") { cfg.height = v; }
+                if let Ok(v) = t.get::<_, u32>("max_rooms") { cfg.max_rooms = v; }
+                if let Ok(v) = t.get::<_, u32>("min_room_size") { cfg.min_room_size = v; }
+                if let Ok(v) = t.get::<_, u32>("max_room_size") { cfg.max_room_size = v; }
+                if let Ok(v) = t.get::<_, u64>("seed") { cfg.seed = v; }
+            }
+
+            let mut prefabs = Vec::new();
+            for v in prefabs_tbl.sequence_values::<LuaTable>() {
+                let p = v?;
+                let name: String = p.get("name").unwrap_or_else(|_| String::from("prefab"));
+                let width: u32 = p.get("width").unwrap_or(1);
+                let height: u32 = p.get("height").unwrap_or(1);
+                let mut mask = Vec::new();
+                if let Ok(mtbl) = p.get::<_, LuaTable>("mask") {
+                    for mv in mtbl.sequence_values::<u8>() {
+                        mask.push(mv?);
+                    }
+                }
+                prefabs.push(RoomPrefabStamp { name, width, height, mask });
+            }
+
+            let (d, placements) = rooms_dungeon_with_prefabs(&cfg, &prefabs, stamp_value.unwrap_or(3));
+
+            let rooms_tbl = lua.create_table()?;
+            for (i, r) in d.rooms.iter().enumerate() {
+                let rt = lua.create_table()?;
+                rt.set("x", r.x)?;
+                rt.set("y", r.y)?;
+                rt.set("w", r.w)?;
+                rt.set("h", r.h)?;
+                rooms_tbl.set(i + 1, rt)?;
+            }
+            let corr_tbl = lua.create_table()?;
+            for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
+                let ct = lua.create_table()?;
+                ct.set("x1", x1)?;
+                ct.set("y1", y1)?;
+                ct.set("x2", x2)?;
+                ct.set("y2", y2)?;
+                corr_tbl.set(i + 1, ct)?;
+            }
+            let grid_tbl = lua.create_table()?;
+            for (i, &v) in d.grid.iter().enumerate() {
+                grid_tbl.set(i + 1, v)?;
+            }
+            let out = lua.create_table()?;
+            out.set("rooms", rooms_tbl)?;
+            out.set("corridors", corr_tbl)?;
+            out.set("grid", grid_tbl)?;
+            out.set("width", cfg.width)?;
+            out.set("height", cfg.height)?;
+
+            let p_tbl = lua.create_table()?;
+            for (i, p) in placements.iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set("name", p.name.as_str())?;
+                t.set("x", p.x)?;
+                t.set("y", p.y)?;
+                t.set("width", p.width)?;
+                t.set("height", p.height)?;
+                p_tbl.set(i + 1, t)?;
+            }
+
+            Ok((out, p_tbl))
+        })?,
+    )?;
+
     // -- heightmap --
     /// Generates a heightmap using fractal noise.
     /// @param | opts | table? | Optional heightmap settings.
@@ -327,6 +578,33 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             }
             let res = lua.create_table()?;
             res.set("cells", out)?;
+            res.set("width", hm.width)?;
+            res.set("height", hm.height)?;
+            Ok(res)
+        })?,
+    )?;
+
+    // -- heightmapFromCellular --
+    /// Converts a cellular byte map (`0`/`1`) into a normalized heightmap-style response.
+    /// @param | width | integer | Map width.
+    /// @param | height | integer | Map height.
+    /// @param | cells | table | Flat cellular byte map.
+    /// @param | floor_value | integer? | Optional floor value treated as 0.0 (default 0).
+    /// @return | table | Heightmap-like table with `cells`, `width`, `height`.
+    tbl.set(
+        "heightmapFromCellular",
+        lua.create_function(|lua, (width, height, cells_tbl, floor_value): (u32, u32, LuaTable, Option<u8>)| {
+            let mut cells = Vec::with_capacity((width * height) as usize);
+            for v in cells_tbl.sequence_values::<u8>() {
+                cells.push(v?);
+            }
+            let hm = Heightmap::from_cellular(width, height, &cells, floor_value.unwrap_or(0));
+            let out_cells = lua.create_table()?;
+            for (i, &v) in hm.cells.iter().enumerate() {
+                out_cells.set(i + 1, v)?;
+            }
+            let res = lua.create_table()?;
+            res.set("cells", out_cells)?;
             res.set("width", hm.width)?;
             res.set("height", hm.height)?;
             Ok(res)
@@ -665,6 +943,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- noiseMapParallelSeeded --
+    /// Generates a seeded noise map in parallel using the NoiseGenerator instance path.
+    /// @param | width | integer | Output width.
+    /// @param | height | integer | Output height.
+    /// @param | opts | table? | Optional noise generator settings including `seed`.
+    /// @return | table | Generated noise values.
+    tbl.set(
+        "noiseMapParallelSeeded",
+        lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
+            let mut cfg = MapGenOptions::default();
+            let mut seed = 0_u64;
+            if let Some(t) = opts {
+                if let Ok(v) = t.get::<_, f64>("scale_x") { cfg.scale_x = v; }
+                if let Ok(v) = t.get::<_, f64>("scale_y") { cfg.scale_y = v; }
+                if let Ok(v) = t.get::<_, u32>("octaves") { cfg.octaves = v; }
+                if let Ok(v) = t.get::<_, f64>("lacunarity") { cfg.lacunarity = v; }
+                if let Ok(v) = t.get::<_, f64>("persistence") { cfg.persistence = v; }
+                if let Ok(v) = t.get::<_, f64>("offset_x") { cfg.offset_x = v; }
+                if let Ok(v) = t.get::<_, f64>("offset_y") { cfg.offset_y = v; }
+                if let Ok(v) = t.get::<_, u64>("seed") { seed = v; }
+            }
+            let g = NoiseGenerator::new(seed);
+            let map = g.generate_map_parallel(width, height, &cfg);
+            let out = lua.create_table()?;
+            for (i, &val) in map.iter().enumerate() {
+                out.set(i + 1, val)?;
+            }
+            Ok(out)
+        })?,
+    )?;
+
     // -- simplex2d --
     /// Returns a single Simplex noise value at the given 2-D coordinate.
     /// @param | x | number | Sample X coordinate.
@@ -684,6 +993,39 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "simplex3d",
         lua.create_function(|_, (x, y, z): (f32, f32, f32)| Ok(simplex_noise_3d(x, y, z)))?,
+    )?;
+
+    // ── Biome classification ───────────────────────────────────────────────
+
+    // -- newBiomeClassifier --
+    /// Creates a new biome classifier with optional custom thresholds.
+    /// @param | opts | table? | Optional rules table with fields: ocean_threshold, coast_threshold, mountain_threshold, ice_cap_threshold, cold_temperature, warm_temperature, dry_moisture, wet_moisture.
+    /// @return | BiomeClassifier | New biome classifier.
+    tbl.set(
+        "newBiomeClassifier",
+        lua.create_function(|lua, opts: Option<LuaTable>| {
+            let rules = opts
+                .map(|t| BiomeRules::from_lua_table(&t))
+                .transpose()?
+                .unwrap_or_default();
+            lua.create_userdata(LuaBiomeClassifier(BiomeClassifier::new(rules)))
+        })?,
+    )?;
+
+    // -- biomeColor --
+    /// Returns the representative RGBA color for a biome name string.
+    /// @param | name | string | Biome name (e.g. "ocean", "desert", "grassland").
+    /// @return | integer | R component 0-255.
+    /// @return | integer | G component 0-255.
+    /// @return | integer | B component 0-255.
+    /// @return | integer | A component (always 255).
+    tbl.set(
+        "biomeColor",
+        lua.create_function(|_, name: String| {
+            let bt = BiomeType::from_name(&name);
+            let [r, g, b, a] = bt.color_rgba();
+            Ok((r, g, b, a))
+        })?,
     )?;
 
     luna.set("procgen", tbl)?;

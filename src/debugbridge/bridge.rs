@@ -1,8 +1,6 @@
-//! Shared state types for the Lurek2D TCP debug bridge.
-//!
-//! These types are exchanged between the TCP server thread and the Lua main
-//! thread without any Lua dependency.  All fields are intentionally `pub` so
-//! both threads can read and write them through the shared `Arc<Mutex<BridgeShared>>`.
+//! Scope: Shared state types for TCP debug bridge communication.
+//! This file defines PendingRequest, PendingResponse, PrintEntry, and BridgeShared.
+//! It owns request/response queuing, print history, and performance metrics.
 
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};

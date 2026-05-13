@@ -390,3 +390,124 @@ fn current_bone_property(bone: &Bone, prop: &BoneProperty) -> f32 {
         BoneProperty::ScaleY => bone.local_scale_y,
     }
 }
+
+impl SkeletonAnimation {
+    /// Returns the bone transform values for all timelines at `time` without
+    /// modifying any skeleton.
+    ///
+    /// Useful for scrubbing or previewing a specific pose without side-effects.
+    ///
+    /// # Parameters
+    /// - `time` — `f32`. Playback time in seconds.
+    ///
+    /// # Returns
+    /// `Vec<(usize, BoneProperty, f32)>` — (bone_idx, property, value) tuples.
+    pub fn pose_at(&self, time: f32) -> Vec<(usize, BoneProperty, f32)> {
+        self.timelines
+            .iter()
+            .map(|tl| (tl.bone_idx, tl.property.clone(), tl.evaluate(time)))
+            .collect()
+    }
+
+    /// Returns a new animation with all keyframe times mirrored so the clip plays
+    /// in reverse.
+    ///
+    /// The new clip has the same duration and name suffixed with `_reversed`.
+    /// All events are also time-mirrored.
+    ///
+    /// # Returns
+    /// `Self` â€" reversed animation clip.
+    pub fn reverse(&self) -> Self {
+        let dur = self.duration;
+        let timelines: Vec<BoneTimeline> = self
+            .timelines
+            .iter()
+            .map(|tl| {
+                let mut flipped = BoneTimeline::new(tl.bone_idx, tl.property.clone());
+                for kf in tl.keys.iter().rev() {
+                    flipped.add_key(dur - kf.time, kf.value, kf.easing.clone());
+                }
+                flipped
+            })
+            .collect();
+        let events: Vec<EventKeyframe> = self
+            .events
+            .iter()
+            .map(|e| EventKeyframe::new(dur - e.time, &e.name, e.value))
+            .collect();
+        Self {
+            name: format!("{}_reversed", self.name),
+            duration: dur,
+            timelines,
+            events,
+        }
+    }
+
+    /// Deserialises a [`SkeletonAnimation`] from a JSON value (as produced by the
+    /// `serial` module or the Lua `lurek.serial.decode` API).
+    ///
+    /// Expected JSON structure:
+    /// ```json
+    /// {
+    ///   "name": "walk",
+    ///   "duration": 1.2,
+    ///   "timelines": [
+    ///     { "bone_idx": 0, "property": "rotation",
+    ///       "keys": [{"time": 0.0, "value": 0.0, "easing": "linear"}, ...] }
+    ///   ],
+    ///   "events": [{"time": 0.5, "name": "footstep", "value": 0.0}]
+    /// }
+    /// ```
+    ///
+    /// # Parameters
+    /// - `v` â€" `&serde_json::Value`. JSON animation object.
+    ///
+    /// # Returns
+    /// `Option<Self>`. Returns `None` if required fields are missing or malformed.
+    pub fn from_json(v: &serde_json::Value) -> Option<Self> {
+        let name = v.get("name")?.as_str()?.to_owned();
+        let duration = v.get("duration")?.as_f64()? as f32;
+        let mut anim = Self::new(name, duration);
+
+        if let Some(timelines) = v.get("timelines").and_then(|t| t.as_array()) {
+            for tl_val in timelines {
+                let bone_idx = tl_val.get("bone_idx")?.as_u64()? as usize;
+                let property = match tl_val.get("property")?.as_str()? {
+                    "x" => BoneProperty::X,
+                    "y" => BoneProperty::Y,
+                    "rotation" => BoneProperty::Rotation,
+                    "scale_x" => BoneProperty::ScaleX,
+                    "scale_y" => BoneProperty::ScaleY,
+                    _ => continue,
+                };
+                let mut tl = BoneTimeline::new(bone_idx, property);
+                if let Some(keys) = tl_val.get("keys").and_then(|k| k.as_array()) {
+                    for kf in keys {
+                        let t = kf.get("time").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                        let val = kf.get("value").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                        let easing = match kf.get("easing").and_then(|e| e.as_str()).unwrap_or("linear") {
+                            "ease_in" => EasingType::EaseIn,
+                            "ease_out" => EasingType::EaseOut,
+                            "ease_in_out" => EasingType::EaseInOut,
+                            "step" => EasingType::Step,
+                            _ => EasingType::Linear,
+                        };
+                        tl.add_key(t, val, easing);
+                    }
+                }
+                anim.add_timeline(tl);
+            }
+        }
+
+        if let Some(events) = v.get("events").and_then(|e| e.as_array()) {
+            for ev in events {
+                let t = ev.get("time").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                let ev_name = ev.get("name").and_then(|v| v.as_str()).unwrap_or("").to_owned();
+                let val = ev.get("value").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                anim.add_event_key(t, ev_name, val);
+            }
+        }
+
+        Some(anim)
+    }
+}

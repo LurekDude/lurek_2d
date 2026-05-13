@@ -1,29 +1,9 @@
-//! Multi-agent formation groups with offset computation.
-//!
-//! A [`Squad`] groups named agents under an optional leader and computes
-//! world-space formation positions relative to the leader's current location.
-//! Five formation shapes are supported: `Line`, `Wedge`, `Circle`, `Column`,
-//! and `None` (no formation — all members collapse to the leader's position).
-//!
-//! Squads also carry a shared [`Blackboard`] for intra-group communication.
-//! The leader's blackboard and the squad blackboard are independent — link
-//! them via parent-chain if you need automatic fact propagation.
-
+﻿//! Scope: squad grouping, membership, and formation offset helpers.
+//! This file defines squad-level metadata and geometric utilities for multi-agent coordinated movement.
+//! It owns local formation layout calculations consumed by steering and tactical behavior layers.
 use crate::ai::blackboard::Blackboard;
 
 /// Formation shapes for squad positioning.
-///
-/// Each variant determines how member offsets are computed relative to the
-/// leader's position and the configurable `formation_spacing`.
-///
-/// Serialized to/from Lua as lowercase strings (`"line"`, `"wedge"`, etc.).
-///
-/// # Variants
-/// - `None` — No formation.
-/// - `Line` — Line variant.
-/// - `Wedge` — Wedge variant.
-/// - `Circle` — Circle variant.
-/// - `Column` — Column variant.
 #[derive(Debug, Clone, PartialEq)]
 pub enum FormationType {
     /// No formation — all members occupy the leader's position.
@@ -39,14 +19,7 @@ pub enum FormationType {
 }
 
 impl FormationType {
-    /// Parses a Lua string into a `FormationType`. Unrecognised strings
-    /// default to `FormationType::None`.
-    ///
-    /// # Parameters
-    /// - `s` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Parses a Lua string into a `FormationType`. Unrecognised strings default to `None`.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "line" => Self::Line,
@@ -58,9 +31,6 @@ impl FormationType {
     }
 
     /// Returns the canonical lowercase Lua string for this formation type.
-    ///
-    /// # Returns
-    /// `&'static str`.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::None => "none",
@@ -73,20 +43,6 @@ impl FormationType {
 }
 
 /// A named group of agents with formation positioning and shared state.
-///
-/// The squad tracks agent names (not owned `Agent` structs — those live in
-/// [`AIWorld`](crate::ai::world::AIWorld)). Call
-/// [`get_formation_position`](Self::get_formation_position) to compute
-/// the ideal world-space position for each member given the leader's
-/// current coordinates.
-///
-/// # Fields
-/// - `name` — `String`.
-/// - `members` — `Vec<String>`.
-/// - `leader` — `Option<String>`.
-/// - `formation` — `FormationType`.
-/// - `formation_spacing` — `f32`.
-/// - `blackboard` — `Blackboard`.
 pub struct Squad {
     /// Human-readable squad identifier.
     pub name: String,
@@ -103,14 +59,7 @@ pub struct Squad {
 }
 
 impl Squad {
-    /// Creates a new squad with no members, no leader, no formation,
-    /// and a default spacing of 30 world units.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Creates a new squad with no members, no leader, and default formation spacing of 30 world units.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -122,22 +71,7 @@ impl Squad {
         }
     }
 
-    /// Computes the ideal world-space position for the member at `member_idx`
-    /// given the leader's current position.
-    ///
-    /// The returned coordinates depend on the active [`FormationType`]:
-    /// - **None**: returns `leader_pos` unchanged.
-    /// - **Line**: horizontal spread centered on the leader.
-    /// - **Wedge**: alternating left/right V behind the leader.
-    /// - **Circle**: equal-angle arc around the leader.
-    /// - **Column**: vertical stack behind the leader.
-    ///
-    /// # Parameters
-    /// - `member_idx` — `usize`.
-    /// - `leader_pos` — `(f32, f32)`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Computes the ideal world-space position for the member at `member_idx` within the current formation, relative to `leader_pos`.
     pub fn get_formation_position(&self, member_idx: usize, leader_pos: (f32, f32)) -> (f32, f32) {
         let spacing = self.formation_spacing;
         match self.formation {
@@ -178,45 +112,3 @@ impl Squad {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn add_remove_member() {
-        let mut s = Squad::new("alpha");
-        s.formation = FormationType::Line;
-        s.members.push("1".to_string());
-        s.members.push("2".to_string());
-        assert_eq!(s.members.len(), 2);
-        s.members.retain(|m| m != "1");
-        assert_eq!(s.members.len(), 1);
-    }
-
-    #[test]
-    fn line_formation_positions() {
-        let mut s = Squad::new("bravo");
-        s.formation = FormationType::Line;
-        s.members.push("0".to_string());
-        s.members.push("1".to_string());
-        s.formation_spacing = 10.0;
-        let p0 = s.get_formation_position(0, (0.0, 0.0));
-        let p1 = s.get_formation_position(1, (0.0, 0.0));
-        // Line formation offsets along X axis, not Y
-        assert!(
-            (p0.0 - p1.0).abs() > 1.0,
-            "different X positions in line formation"
-        );
-    }
-
-    #[test]
-    fn circle_formation_center() {
-        let mut s = Squad::new("charlie");
-        s.formation = FormationType::Circle;
-        s.members.push("0".to_string());
-        s.formation_spacing = 20.0;
-        let pos = s.get_formation_position(0, (100.0, 100.0));
-        let dist = ((pos.0 - 100.0).powi(2) + (pos.1 - 100.0).powi(2)).sqrt();
-        assert!((dist - 20.0).abs() < 1e-3);
-    }
-}

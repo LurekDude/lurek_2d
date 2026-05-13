@@ -1,23 +1,40 @@
-//! Splash-screen asset loading and command generation.
+//! Scope: Splash-screen branding asset loading and rendering commands.
+//! This file defines branding data types and command builders for the no-game splash screen.
+//! It owns embedded texture decode and splash draw-command composition.
 
 use super::app::fit_contain_size;
 use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
 use crate::runtime::resource_keys::{FontKey, TextureKey};
 use slotmap::SlotMap;
 
+// ---- Type: SplashTexture ----
+
 #[derive(Clone, Copy)]
+/// Texture metadata used when drawing splash branding images.
 pub struct SplashTexture {
+    /// Texture handle stored in the splash texture map.
     pub texture_key: TextureKey,
+    /// Source image width in pixels.
     pub width: u32,
+    /// Source image height in pixels.
     pub height: u32,
 }
 
+// ---- Type: SplashBranding ----
+
+/// Loaded splash branding resources kept for repeated frame rendering.
 pub struct SplashBranding {
+    /// Texture storage containing decoded embedded splash assets.
     pub textures: SlotMap<TextureKey, TextureData>,
+    /// Large centered icon shown in the upper splash area.
     pub large_icon: SplashTexture,
+    /// Banner image shown below the large icon.
     pub banner: SplashTexture,
 }
 
+// ---- Helper Functions: Splash Asset Loading ----
+
+/// Loads embedded splash branding textures and returns them as a ready-to-draw bundle.
 pub fn load_splash_branding() -> Option<SplashBranding> {
     let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
     let large_icon = {
@@ -98,6 +115,7 @@ pub fn load_splash_branding() -> Option<SplashBranding> {
 }
 
 #[allow(clippy::vec_init_then_push)]
+/// Builds splash-screen render commands for branding and drag-and-drop hint text.
 pub fn make_splash_commands(
     width: u32,
     height: u32,

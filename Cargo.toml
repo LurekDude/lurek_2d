@@ -9,10 +9,12 @@ readme = "README.md"
 
 [features]
 # LuaJIT — default scripting backend; JIT compilation for x86_64 desktop (Windows/Linux/macOS).
-default = ["lua-jit", "automation-plugin", "ui-charts", "ui-layout-loader", "graph", "graph-parallel"]
+default = ["lua-jit", "automation-plugin", "devtools-plugin", "ui-charts", "ui-layout-loader", "graph", "graph-parallel"]
 lua-jit = ["mlua/luajit", "mlua/vendored"]
 # Lua 5.4 fallback — use on platforms where LuaJIT is unavailable (WASM, some ARM targets).
 lua54 = ["mlua/lua54", "mlua/vendored"]
+# Optional developer-tools module and Lua bridge.
+devtools-plugin = ["dep:notify"]
 # Automation module plugin gate (enabled by default).
 automation-plugin = []
 # ECS sparse-index fast path for multi-component queries (opt-in).
@@ -160,6 +162,7 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 # Temporary directory management (used for .lurek extraction at runtime)
 tempfile = "3"
 tobj = "4"
+notify = { version = "6", optional = true }
 
 [dev-dependencies]
 

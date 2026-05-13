@@ -1,38 +1,13 @@
-//! Bridge between [`AnimStateMachine`] and a Spine [`Skeleton`].
-//!
-//! # Responsibility
-//!
-//! `SpineAnimBridge` translates FSM state-change events into skeleton animation
-//! commands.  It owns the [`Skeleton`] and is updated alongside the state machine
-//! every frame.
-//!
-//! # Ownership boundary
-//!
-//! - The FSM controls *when* to switch animations and *what parameter values mean*.
-//! - The bridge controls *which skeleton animation clip* maps to a given FSM state.
-//! - The skeleton controls *how* the clip is applied to bones and world transforms.
-//!
-//! This separation lets game code share one FSM-parameter system (speed, grounded,
-//! attacking …) and drive both the sprite animation and the skeletal rig with the
-//! same conditions.
-//!
-//! # Typical usage
-//!
-//! ```
-//! // Rust side:
-//! let mut bridge = SpineAnimBridge::new(skeleton);
-//! bridge.map("idle", "skeleton_idle");      // FSM state → skeleton clip name
-//! bridge.map("walk", "skeleton_walk");
-//!
-//! // each frame:
-//! bridge.update(dt, &mut state_machine);
-//! let slots = bridge.skeleton().slots();    // use slots for rendering
-//! ```
+//! Scope: Bridge animation state-machine transitions into Spine skeleton playback.
+//! This file defines a state-to-clip mapping bridge around a Spine skeleton.
+//! It owns applying mapped skeleton clip changes when FSM states change.
 
 use std::collections::HashMap;
 
 use super::state_machine::AnimStateMachine;
 use crate::spine::skeleton::Skeleton;
+
+// ---- Type: SpineAnimBridge ----
 
 /// Bridge that couples an [`AnimStateMachine`] to a [`Skeleton`].
 ///
@@ -54,6 +29,7 @@ pub struct SpineAnimBridge {
 }
 
 impl SpineAnimBridge {
+    // ---- Implementation: SpineAnimBridge ----
     /// Creates a new bridge wrapping the given skeleton.
     ///
     /// No state mappings are registered yet; call [`map`](Self::map) for each

@@ -1,46 +1,9 @@
-//! ORCA — Optimal Reciprocal Collision Avoidance for smooth crowd navigation.
-//!
-//! Implements a simplified 2D ORCA solver based on the formulation by van den Berg
-//! et al. (2011). Each agent observes its neighbours and computes a new velocity
-//! that lies in the intersection of linear half-planes (velocity obstacles)
-//! constructed from those neighbours. The linear programming sub-problem is
-//! solved by iterating half-planes in order and projecting onto each constraint.
-//!
-//! ## Architecture
-//!
-//! - [`ORCAAgent`] carries position, velocity, preferred velocity, radius, and
-//!   the computed `safe_velocity` output from the last `compute` call.
-//! - [`ORCASolver`] owns a flat list of agents and drives the per-frame solve.
-//!   Agents can be added, removed by index, and updated positionally. After
-//!   `compute(dt)`, each agent's `safe_velocity` is filled.
-//!
-//! ## Limitations (intentional)
-//!
-//! - No raycasting or obstacle geometry — add avoidance with context steering.
-//! - Time horizon is fixed at construction; dynamic horizons need solver rebuilds.
-//! - No parallelism; use one solver per crowd chunk for large counts.
-//!
-//! ## Typical Usage Sequence
-//!
-//! 1. Create `ORCASolver::new(time_horizon)`.
-//! 2. Call `add_agent` for each navigating entity.
-//! 3. Each frame: update `preferred_velocity` on each agent, then `compute(dt)`.
-//! 4. Read `agent.safe_velocity` to move each entity.
-//! 5. Update `agent.position` and `agent.velocity` to match the physics result.
-
-// ────────────────────────────────────────────────────────────────────────────
-// ORCAAgent
-// ────────────────────────────────────────────────────────────────────────────
+﻿//! Scope: ORCA crowd avoidance solver and per-agent avoidance state.
+//! This file defines velocity-obstacle constraints and solves collision-avoidant preferred velocity outputs.
+//! It owns local reciprocal avoidance math used for dense-agent navigation without global path replanning.
+// ---- Type: ORCAAgent ----
 
 /// A single agent participating in ORCA collision avoidance.
-///
-/// # Fields
-/// - `position` — `(f32, f32)`.
-/// - `velocity` — `(f32, f32)`.
-/// - `preferred_velocity` — `(f32, f32)`.
-/// - `safe_velocity` — `(f32, f32)`.
-/// - `radius` — `f32`.
-/// - `max_speed` — `f32`.
 #[derive(Clone)]
 pub struct ORCAAgent {
     /// Current world-space position.
@@ -59,15 +22,6 @@ pub struct ORCAAgent {
 
 impl ORCAAgent {
     /// Creates an agent at the given position with zero velocity.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
-    /// - `radius` — `f32`.
-    /// - `max_speed` — `f32`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(x: f32, y: f32, radius: f32, max_speed: f32) -> Self {
         Self {
             position: (x, y),
@@ -80,9 +34,7 @@ impl ORCAAgent {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
 // Half-plane
-// ────────────────────────────────────────────────────────────────────────────
 
 /// A velocity-space linear constraint: `dot(normal, v - point) >= 0`.
 #[derive(Clone, Copy)]
@@ -91,20 +43,11 @@ struct HalfPlane {
     normal: (f32, f32),
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// ORCASolver
-// ────────────────────────────────────────────────────────────────────────────
+// ---- Type: ORCASolver ----
 
 /// ORCA crowd solver for a flat list of agents.
-///
-/// One solver per crowd cluster. Call `compute(dt)` once per frame after
-/// setting each agent's `preferred_velocity`.
-///
-/// # Fields
-/// - `time_horizon` — `f32`.
-/// - `agents` — `Vec<ORCAAgent>`.
 pub struct ORCASolver {
-    /// Time horizon in seconds — how far ahead to plan avoidances.
+    /// Time horizon in seconds - how far ahead to plan avoidances.
     pub time_horizon: f32,
     /// Flat list of participating agents.
     pub agents: Vec<ORCAAgent>,
@@ -112,15 +55,6 @@ pub struct ORCASolver {
 
 impl ORCASolver {
     /// Creates a new solver with a given time horizon in seconds.
-    ///
-    /// A shorter horizon (e.g. `2.0`) reacts quickly but looks jittery.
-    /// A longer horizon (e.g. `10.0`) produces smoother paths.
-    ///
-    /// # Parameters
-    /// - `time_horizon` — `f32`.
-    ///
-    /// # Returns
-    /// `Self`.
     pub fn new(time_horizon: f32) -> Self {
         Self {
             time_horizon: time_horizon.max(0.1),
@@ -129,12 +63,6 @@ impl ORCASolver {
     }
 
     /// Adds an agent to the solver and returns its index.
-    ///
-    /// # Parameters
-    /// - `agent` — `ORCAAgent`.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn add_agent(&mut self, agent: ORCAAgent) -> usize {
         let idx = self.agents.len();
         self.agents.push(agent);
@@ -142,15 +70,6 @@ impl ORCASolver {
     }
 
     /// Removes the agent at `index` by swapping with the last agent.
-    /// Returns the removed agent, or `None` if index is out of bounds.
-    ///
-    /// IMPORTANT: this changes the index of the previously-last agent.
-    ///
-    /// # Parameters
-    /// - `index` — `usize`.
-    ///
-    /// # Returns
-    /// `Option<ORCAAgent>`.
     pub fn remove_agent(&mut self, index: usize) -> Option<ORCAAgent> {
         if index < self.agents.len() {
             Some(self.agents.swap_remove(index))
@@ -160,21 +79,11 @@ impl ORCASolver {
     }
 
     /// Returns the number of agents in the solver.
-    ///
-    /// # Returns
-    /// `usize`.
     pub fn agent_count(&self) -> usize {
         self.agents.len()
     }
 
     /// Runs one ORCA frame: for each agent, computes velocity-space half-planes
-    /// from all neighbours, then finds the velocity closest to `preferred_velocity`
-    /// that satisfies every half-plane.
-    ///
-    /// After `compute`, read `agent.safe_velocity` on each agent.
-    ///
-    /// # Parameters
-    /// - `dt` — `f32`.
     #[allow(clippy::needless_range_loop)]
     pub fn compute(&mut self, _dt: f32) {
         let n = self.agents.len();
@@ -256,7 +165,6 @@ impl ORCASolver {
     }
 
     /// Solves the linear program: find velocity closest to `preferred` that
-    /// satisfies all half-planes and has magnitude ≤ `max_speed`.
     fn linear_program(preferred: (f32, f32), max_speed: f32, planes: &[HalfPlane]) -> (f32, f32) {
         let mut vx = preferred.0;
         let mut vy = preferred.1;
@@ -288,17 +196,3 @@ impl ORCASolver {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    #[ignore = "ORCASolver::new() requires time_horizon arg; ORCANeighbour removed; compute API changed"]
-    fn no_neighbours_preferred_velocity() {
-        // Ignored: ORCASolver::new() now requires time_horizon: f32
-    }
-
-    #[test]
-    #[ignore = "ORCANeighbour removed from public API; compute API changed"]
-    fn single_obstacle_adjusts_velocity() {
-        // Ignored: ORCANeighbour struct no longer exists in the public API
-    }
-}

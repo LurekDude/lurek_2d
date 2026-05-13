@@ -1,46 +1,20 @@
-//! Virtual resolution viewport with manual transform application.
-//!
-//! Maps a fixed game resolution onto an arbitrary window size using
-//! letterboxing, stretching, or pixel-perfect scaling.
-//!
-//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
-//! details for viewport-related operations and data management.
-//! Key types exported from this module: `ScaleMode`, `Viewport`.
-//! Primary functions: `new()`, `resize()`, `get_scale()`, `get_offset()`.
-//!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! Map a fixed game resolution into window pixels.
+//! Own scale and offset computation for letterbox, stretch, and pixel-perfect modes.
+//! Keep window-to-game and game-to-window coordinate conversion in one place.
 
-/// Scale mode for virtual resolution mapping.
-///
-/// # Variants
-/// - `Letterbox` — Letterbox variant.
-/// - `Stretch` — Stretch variant.
-/// - `PixelPerfect` — PixelPerfect variant.
 #[derive(Debug, Clone, PartialEq)]
+/// Select how game coordinates scale into the window.
 pub enum ScaleMode {
-    /// Uniform scale with black bars to preserve aspect ratio.
+    /// Keep aspect ratio and add bars when needed.
     Letterbox,
-    /// Non-uniform scale that fills the entire window.
+    /// Fill window using independent x and y scales.
     Stretch,
-    /// Integer-only scale for crisp pixel art.
+    /// Use integer scale to keep pixel-art edges crisp.
     PixelPerfect,
 }
 
 impl ScaleMode {
-    /// Computes scale and offset for this scale mode given game and window dimensions.
-    ///
-    /// # Parameters
-    /// - `game_width` — Game-space width.
-    /// - `game_height` — Game-space height.
-    /// - `window_width` — Physical window width.
-    /// - `window_height` — Physical window height.
-    ///
-    /// # Returns
-    /// `(scale_x, scale_y, offset_x, offset_y)` tuple.
-    ///
-    /// This is a shared utility function used by both `Viewport` and `ViewportScale`
-    /// to reduce code duplication and ensure consistent behavior.
+    /// Compute `(scale_x, scale_y, offset_x, offset_y)` for game and window dimensions.
     pub fn compute_transforms(
         &self,
         game_width: f32,
@@ -73,49 +47,26 @@ impl ScaleMode {
     }
 }
 
-/// Virtual resolution with manual transform application.
-///
-/// # Fields
-/// - `game_width` — `f32`.
-/// - `game_height` — `f32`.
-/// - `scale_mode` — `ScaleMode`.
-/// - `scale_x` — `f32`.
-/// - `scale_y` — `f32`.
-/// - `offset_x` — `f32`.
-/// - `offset_y` — `f32`.
-///
-/// Maintains a mapping between a fixed game coordinate space and the
-/// actual window pixel dimensions. Call `resize()` whenever the window
-/// size changes.
+/// Store viewport mapping from virtual game space to window space.
 pub struct Viewport {
-    /// Game-space width in virtual pixels.
+    /// Store game-space width in virtual pixels.
     pub game_width: f32,
-    /// Game-space height in virtual pixels.
+    /// Store game-space height in virtual pixels.
     pub game_height: f32,
-    /// Active scale mode.
+    /// Store current scale mode.
     pub scale_mode: ScaleMode,
-    /// Horizontal scale factor.
+    /// Store horizontal scale factor.
     pub scale_x: f32,
-    /// Vertical scale factor.
+    /// Store vertical scale factor.
     pub scale_y: f32,
-    /// Horizontal offset in window pixels (for centering).
+    /// Store horizontal offset in window pixels.
     pub offset_x: f32,
-    /// Vertical offset in window pixels (for centering).
+    /// Store vertical offset in window pixels.
     pub offset_y: f32,
 }
 
 impl Viewport {
-    /// Create a viewport with the given game dimensions and scale mode.
-    ///
-    /// # Parameters
-    /// - `game_width` — `f32`.
-    /// - `game_height` — `f32`.
-    /// - `scale_mode` — `ScaleMode`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// Initially assumes the window size equals the game size (scale 1:1).
+    /// Create a viewport with unit scale and zero offsets and return it.
     pub fn new(game_width: f32, game_height: f32, scale_mode: ScaleMode) -> Self {
         Self {
             game_width,
@@ -128,11 +79,7 @@ impl Viewport {
         }
     }
 
-    /// Recompute scale and offset based on the current window size.
-    ///
-    /// # Parameters
-    /// - `window_width` — `f32`.
-    /// - `window_height` — `f32`.
+    /// Recompute scale and offset from the current window dimensions.
     pub fn resize(&mut self, window_width: f32, window_height: f32) {
         let (scale_x, scale_y, offset_x, offset_y) = self.scale_mode.compute_transforms(
             self.game_width,
@@ -146,54 +93,32 @@ impl Viewport {
         self.offset_y = offset_y;
     }
 
-    /// Current scale factors `(scale_x, scale_y)`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Return current scale factors `(scale_x, scale_y)`.
     pub fn get_scale(&self) -> (f32, f32) {
         (self.scale_x, self.scale_y)
     }
 
-    /// Current offset `(offset_x, offset_y)`. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Return current pixel offsets `(offset_x, offset_y)`.
     pub fn get_offset(&self) -> (f32, f32) {
         (self.offset_x, self.offset_y)
     }
 
-    /// Game dimensions `(game_width, game_height)`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Return game dimensions `(game_width, game_height)`.
     pub fn get_game_dimensions(&self) -> (f32, f32) {
         (self.game_width, self.game_height)
     }
 
-    /// Reference to the current scale mode. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `&ScaleMode`.
+    /// Return current scale mode by reference.
     pub fn get_scale_mode(&self) -> &ScaleMode {
         &self.scale_mode
     }
 
-    /// Set the scale mode. Call `resize()` afterwards to recompute.
-    ///
-    /// # Parameters
-    /// - `mode` — `ScaleMode`.
+    /// Set scale mode; resized transform values update on next `resize` call.
     pub fn set_scale_mode(&mut self, mode: ScaleMode) {
         self.scale_mode = mode;
     }
 
-    /// Convert screen coordinates to game coordinates.
-    ///
-    /// # Parameters
-    /// - `screen_x` — `f32`.
-    /// - `screen_y` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Convert window coordinates to game coordinates and return the pair.
     pub fn to_game(&self, screen_x: f32, screen_y: f32) -> (f32, f32) {
         (
             (screen_x - self.offset_x) / self.scale_x,
@@ -201,14 +126,7 @@ impl Viewport {
         )
     }
 
-    /// Convert game coordinates to screen coordinates.
-    ///
-    /// # Parameters
-    /// - `game_x` — `f32`.
-    /// - `game_y` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Convert game coordinates to window coordinates and return the pair.
     pub fn to_screen(&self, game_x: f32, game_y: f32) -> (f32, f32) {
         (
             game_x * self.scale_x + self.offset_x,

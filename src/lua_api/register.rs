@@ -15,13 +15,16 @@ use super::automation_api;
 
 use super::{
     ai_api, animation_api, audio_api, camera_api, compute_api, data_api, dataframe_api,
-    debugbridge_api, devtools_api, docs_api, ecs_api, effect_api, engine_api, event_api,
+    debugbridge_api, docs_api, ecs_api, effect_api, engine_api, event_api,
     filesystem_api, globe_api, html_api, i18n_api, image_api, input_api, light_api,
     log_api, math_api, minimap_api, mods_api, network_api, parallax_api, particle_api,
     pathfind_api, patterns_api, physics_api, pipeline_api, procgen_api, province_api,
     raycaster_api, render_api, save_api, scene_api, serial_api, spine_api, sprite_api, system_api,
     terminal_api, thread_api, tilemap_api, timer_api, tween_api, ui_api, window_api,
 };
+
+#[cfg(feature = "devtools-plugin")]
+use super::devtools_api;
 
 #[cfg(feature = "graph")]
 use super::graph_api;
@@ -104,6 +107,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     }
 
     // devtools: lurek.devtools
+    #[cfg(feature = "devtools-plugin")]
     if modules.debug {
         devtools_api::register(&lua, &lurek, state.clone())?;
     }
