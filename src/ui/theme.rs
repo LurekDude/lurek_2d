@@ -1,19 +1,37 @@
+//! Widget visual style definitions and the `Theme` registry for `lurek.ui`.
+//! `WidgetStyle` holds per-widget RGBA colours and metrics; `Theme` maps `(WidgetType, WidgetState)` pairs to styles.
+//! `Theme::default_dark` is the built-in dark preset; callers may override individual states via `set_style`.
+//! Depends on `crate::ui::widget::{WidgetState, WidgetType}`.
+
 use crate::ui::widget::{WidgetState, WidgetType};
 use std::collections::HashMap;
+/// Per-state visual properties for a single widget type.
 #[derive(Debug, Clone)]
 pub struct WidgetStyle {
+    /// Background fill RGBA in `[0.0, 1.0]` per channel.
     pub bg_color: [f32; 4],
+    /// Foreground (text/icon) RGBA.
     pub fg_color: [f32; 4],
+    /// Border line RGBA.
     pub border_color: [f32; 4],
+    /// Border thickness in pixels.
     pub border_width: f32,
+    /// Corner rounding radius in pixels.
     pub corner_radius: f32,
+    /// Font size in points.
     pub font_size: f32,
+    /// Drop-shadow RGBA; fully transparent disables shadow.
     pub shadow_color: [f32; 4],
+    /// Drop-shadow pixel offset `[dx, dy]`.
     pub shadow_offset: [f32; 2],
+    /// Top-edge highlight strip alpha; 0 disables the strip.
     pub highlight_alpha: f32,
+    /// Optional gradient end RGBA; `None` = flat fill.
     pub gradient_end: Option<[f32; 4]>,
+    /// Text alignment string: `"left"`, `"center"`, or `"right"`.
     pub text_align: String,
 }
+/// Provide a dark-grey `WidgetStyle` with no shadow, left text alignment, and 14pt font.
 impl Default for WidgetStyle {
     fn default() -> Self {
         Self {
@@ -31,24 +49,30 @@ impl Default for WidgetStyle {
         }
     }
 }
+/// Style registry mapping `(WidgetType, WidgetState)` keys to `WidgetStyle` values; used by `GuiContext` and render.
 #[derive(Debug, Clone)]
 pub struct Theme {
+    /// Internal map from `(WidgetType, WidgetState)` to style overrides.
     pub styles: HashMap<(WidgetType, WidgetState), WidgetStyle>,
 }
 impl Theme {
+    /// Create a theme with no style overrides.
     pub fn new() -> Self {
         Self {
             styles: HashMap::new(),
         }
     }
+    /// Register `style` for `(widget_type, state)`, replacing any previous entry.
     pub fn set_style(&mut self, widget_type: WidgetType, state: WidgetState, style: WidgetStyle) {
         self.styles.insert((widget_type, state), style);
     }
+    /// Return the style for `(widget_type, state)`, falling back to `WidgetState::Normal` if the exact state is absent.
     pub fn get_style(&self, widget_type: WidgetType, state: WidgetState) -> Option<&WidgetStyle> {
         self.styles
             .get(&(widget_type, state))
             .or_else(|| self.styles.get(&(widget_type, WidgetState::Normal)))
     }
+    /// Render all four `Button` states as labelled tiles into a new `ImageData` of `width × height` pixels.
     pub fn draw_button_states_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(45, 45, 55, 255);
@@ -113,12 +137,14 @@ impl Theme {
         img
     }
 }
+/// Provide a default `Theme` via `Self::new()`.
 impl Default for Theme {
     fn default() -> Self {
         Self::new()
     }
 }
 impl Theme {
+    /// Create the built-in dark theme preset with styles for all standard widget types and states.
     pub fn default_dark() -> Self {
         let mut t = Self::new();
         let mk = |bg: [f32; 4],

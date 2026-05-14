@@ -1,35 +1,52 @@
+//! Locale catalog storage, lookup, coverage analysis, and table flattening.
+
 use serde_json;
 use std::cell::RefCell;
 use std::collections::HashMap;
+/// Error raised when a locale or key lookup fails.
 #[derive(Debug, thiserror::Error)]
 pub enum CatalogError {
+    /// Requested locale does not exist in the catalog.
     #[error("unknown locale: {0}")]
     UnknownLocale(String),
+    /// Requested translation key is missing after fallback lookup.
     #[error("key not found: {0}")]
     KeyNotFound(String),
 }
+/// Missing-key coverage data for a reference locale.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CoverageGap {
+    /// Translation key absent from one or more locales.
     pub key: String,
+    /// Locales where the key is missing.
     pub missing_in: Vec<String>,
 }
+/// Locale-indexed translation store with lookup and coverage caches.
 #[derive(Debug, Default)]
 pub struct Catalog {
+    /// Active locale used for lookups and category queries.
     pub locale: String,
+    /// Ordered fallback locales consulted after the active locale.
     pub fallbacks: Vec<String>,
+    /// Per-locale translation tables keyed by locale code.
     pub tables: HashMap<String, HashMap<String, String>>,
+    /// Cached category list for the active locale.
     categories_cache: RefCell<Option<(String, Vec<String>)>>,
     #[allow(clippy::type_complexity)]
+    /// Cached word index for the active locale.
     index_cache: RefCell<Option<(String, HashMap<String, Vec<String>>)>>,
 }
 impl Catalog {
+    /// Create an empty catalog with default state.
     pub fn new() -> Self {
         Self::default()
     }
+    /// Insert or replace a locale table and clear caches.
     pub fn load(&mut self, locale: &str, table: HashMap<String, String>) {
         self.tables.insert(locale.to_string(), table);
         self.invalidate_caches();
     }
+    /// Remove a locale table and return whether anything changed.
     pub fn unload(&mut self, locale: &str) -> bool {
         let removed = self.tables.remove(locale).is_some();
         if removed {
@@ -37,24 +54,29 @@ impl Catalog {
         }
         removed
     }
+    /// Return whether a locale table exists.
     pub fn has_locale(&self, locale: &str) -> bool {
         self.tables.contains_key(locale)
     }
+    /// Return all loaded locale codes.
     pub fn locales(&self) -> Vec<&str> {
         self.tables.keys().map(String::as_str).collect()
     }
+    /// Return whether the active locale contains a key.
     pub fn has_key(&self, key: &str) -> bool {
         self.tables
             .get(&self.locale)
             .map(|t| t.contains_key(key))
             .unwrap_or(false)
     }
+    /// Return keys for the active locale.
     pub fn keys(&self) -> Vec<&str> {
         self.tables
             .get(&self.locale)
             .map(|t| t.keys().map(String::as_str).collect())
             .unwrap_or_default()
     }
+    /// Return a translation for a key from the active locale or fallbacks.
     pub fn get<'a>(&'a self, key: &str) -> Result<&'a str, CatalogError> {
         if let Some(v) = self.tables.get(&self.locale).and_then(|t| t.get(key)) {
             return Ok(v.as_str());
@@ -66,9 +88,11 @@ impl Catalog {
         }
         Err(CatalogError::KeyNotFound(key.to_string()))
     }
+    /// Return the translation for a key or the key itself when missing.
     pub fn translate<'a>(&'a self, key: &'a str) -> &'a str {
         self.get(key).unwrap_or(key)
     }
+    /// Set a single translation value and clear caches.
     pub fn set_key(&mut self, locale: &str, key: &str, value: &str) {
         self.tables
             .entry(locale.to_string())
@@ -76,9 +100,11 @@ impl Catalog {
             .insert(key.to_string(), value.to_string());
         self.invalidate_caches();
     }
+    /// Clone and return a locale table when it exists.
     pub fn export(&self, locale: &str) -> Option<HashMap<String, String>> {
         self.tables.get(locale).cloned()
     }
+    /// Merge multiple translation entries into a locale and clear caches.
     pub fn merge(&mut self, locale: &str, entries: HashMap<String, String>) {
         let table = self.tables.entry(locale.to_string()).or_default();
         for (k, v) in entries {
@@ -86,9 +112,11 @@ impl Catalog {
         }
         self.invalidate_caches();
     }
+    /// Return the number of keys in the active locale.
     pub fn key_count(&self) -> usize {
         self.tables.get(&self.locale).map(|t| t.len()).unwrap_or(0)
     }
+    /// Return sorted category prefixes for the active locale.
     pub fn categories(&self) -> Vec<String> {
         {
             let cache = self.categories_cache.borrow();
@@ -111,6 +139,7 @@ impl Catalog {
         *self.categories_cache.borrow_mut() = Some((self.locale.clone(), result.clone()));
         result
     }
+    /// Return sorted keys in a category for the active locale.
     pub fn keys_in_category<'a>(&'a self, category: &str) -> Vec<&'a str> {
         let Some(table) = self.tables.get(&self.locale) else {
             return Vec::new();
@@ -124,6 +153,7 @@ impl Catalog {
         result.sort();
         result
     }
+    /// Search active-locale values for a query and return matching key-value pairs.
     pub fn search<'a>(&'a self, query: &str, limit: usize) -> Vec<(&'a str, &'a str)> {
         let Some(table) = self.tables.get(&self.locale) else {
             return Vec::new();
@@ -140,6 +170,7 @@ impl Catalog {
         }
         results
     }
+    /// Build or return a cached word index for the active locale.
     pub fn build_index(&self) -> HashMap<String, Vec<String>> {
         {
             let cache = self.index_cache.borrow();
@@ -171,6 +202,7 @@ impl Catalog {
         *self.index_cache.borrow_mut() = Some((self.locale.clone(), index.clone()));
         index
     }
+    /// Return keys missing from locales compared to a reference locale.
     pub fn coverage_gaps(&self, reference_locale: &str) -> Vec<CoverageGap> {
         let Some(ref_table) = self.tables.get(reference_locale) else {
             return Vec::new();
@@ -207,11 +239,13 @@ impl Catalog {
         gaps.sort_by(|a, b| a.key.cmp(&b.key));
         gaps
     }
+    /// Clear cached derived data for the active locale.
     fn invalidate_caches(&self) {
         *self.categories_cache.borrow_mut() = None;
         *self.index_cache.borrow_mut() = None;
     }
 }
+/// Validate a locale code using language and region subtags.
 pub fn is_valid_locale_code(code: &str) -> bool {
     if code.is_empty() || code.len() > 35 {
         return false;
@@ -230,6 +264,7 @@ pub fn is_valid_locale_code(code: &str) -> bool {
     }
     true
 }
+/// Return whether a locale is written right-to-left.
 pub fn is_rtl(locale: &str) -> bool {
     const RTL_LANGS: &[&str] = &["ar", "he", "fa", "ur", "yi", "dv", "sd", "ku", "ckb"];
     let prefix = locale
@@ -239,6 +274,7 @@ pub fn is_rtl(locale: &str) -> bool {
         .to_lowercase();
     RTL_LANGS.contains(&prefix.as_str())
 }
+/// Detect a system locale from standard environment variables.
 pub fn detect_system_locale() -> Option<String> {
     for var in &["LANG", "LANGUAGE", "LC_ALL", "LC_MESSAGES"] {
         if let Ok(val) = std::env::var(var) {
@@ -254,6 +290,7 @@ pub fn detect_system_locale() -> Option<String> {
     }
     None
 }
+/// Flatten a TOML table into dot-separated string keys.
 pub fn flat_table_from_toml(input: &str) -> Result<HashMap<String, String>, String> {
     let value: toml::Value = input
         .parse::<toml::Value>()
@@ -262,6 +299,7 @@ pub fn flat_table_from_toml(input: &str) -> Result<HashMap<String, String>, Stri
     flatten_toml_value(&value, "", &mut out);
     Ok(out)
 }
+/// Flatten a JSON object into dot-separated string keys.
 pub fn flat_table_from_json(input: &str) -> Result<HashMap<String, String>, String> {
     let value: serde_json::Value =
         serde_json::from_str(input).map_err(|e| format!("JSON parse error: {e}"))?;
@@ -269,6 +307,7 @@ pub fn flat_table_from_json(input: &str) -> Result<HashMap<String, String>, Stri
     flatten_json_value(&value, "", &mut out);
     Ok(out)
 }
+/// Flatten a TOML value tree into a flat translation table.
 fn flatten_toml_value(val: &toml::Value, prefix: &str, out: &mut HashMap<String, String>) {
     match val {
         toml::Value::Table(map) => {
@@ -293,6 +332,7 @@ fn flatten_toml_value(val: &toml::Value, prefix: &str, out: &mut HashMap<String,
         }
     }
 }
+/// Flatten a JSON value tree into a flat translation table.
 fn flatten_json_value(val: &serde_json::Value, prefix: &str, out: &mut HashMap<String, String>) {
     match val {
         serde_json::Value::Object(map) => {

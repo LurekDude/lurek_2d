@@ -111,6 +111,7 @@ impl DataWriter {
 }
 /// Implement `Default` by delegating to `DataWriter::new`.
 impl Default for DataWriter {
+    /// Create default writer with empty buffer.
     fn default() -> Self {
         Self::new()
     }

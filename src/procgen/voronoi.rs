@@ -1,10 +1,22 @@
+//! Voronoi diagram generator for `src/procgen`.
+//! Owns `VoronoiOpts`, `voronoi_diagram`, and the `simple_hash_noise` warp helper.
+//! Does not own Poisson sampling or world-graph construction — those live in
+//! `poisson.rs` and `world_graph.rs`.
+
 use super::lcg::Lcg;
+
+/// Options controlling domain warp applied before Voronoi distance computation.
 #[derive(Debug, Clone)]
 pub struct VoronoiOpts {
+    /// Frequency of the warp noise; smaller = broader distortion.
     pub warp_scale: f32,
+    /// Displacement magnitude in pixels; 0.0 = no warp.
     pub warp_strength: f32,
+    /// Seed for the internal `Lcg` used when warp is active.
     pub seed: u64,
 }
+
+/// Provide defaults with no domain warp (strength = 0).
 impl Default for VoronoiOpts {
     fn default() -> Self {
         Self {
@@ -14,6 +26,11 @@ impl Default for VoronoiOpts {
         }
     }
 }
+
+/// Compute a Voronoi diagram for `points` on a `width × height` grid.
+///
+/// Returns `(region_indices, f1_distances, f2_distances)` where each element
+/// is a flat row-major buffer; `f1` is distance to closest point, `f2` to second closest.
 pub fn voronoi_diagram(
     width: u32,
     height: u32,
@@ -68,6 +85,7 @@ pub fn voronoi_diagram(
     }
     (regions, distances, second_distances)
 }
+/// Hash `(x, y)` and `seed` to a [-1, 1) float for domain-warp displacement.
 fn simple_hash_noise(x: f32, y: f32, seed: u64) -> f32 {
     let h = (x as u64)
         .wrapping_mul(374761393)

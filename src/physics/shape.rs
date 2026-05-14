@@ -1,14 +1,27 @@
+//! Physics shape definitions for `Body` and standalone colliders.
+//! `Shape` describes the geometry; `StandaloneShape` wraps it with material properties.
+//! Translation to rapier2d colliders happens here via `to_rapier_collider`.
+
 use crate::math::Vec2;
 use rapier2d::prelude::*;
+
+/// Physics primitive shape used in `Body` and `StandaloneShape`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Shape {
+    /// Axis-aligned box.
     Rect { width: f32, height: f32 },
+    /// Circle.
     Circle { radius: f32 },
+    /// Convex polygon (3–8 vertices).
     Polygon { vertices: Vec<Vec2> },
+    /// Single line segment.
     Edge { v1: Vec2, v2: Vec2 },
+    /// Open or closed polyline.
     Chain { vertices: Vec<Vec2>, closed: bool },
 }
+/// Conversion helpers for `Shape`.
 impl Shape {
+    /// Convert this shape to a rapier `ColliderBuilder`; return `None` for degenerate inputs.
     pub(crate) fn to_rapier_collider(&self) -> Option<ColliderBuilder> {
         match self {
             Shape::Rect { width, height } => {
@@ -39,6 +52,7 @@ impl Shape {
             }
         }
     }
+    /// Parse a shape from a string type tag and flat argument list; `closed` applies to chains.
     pub fn from_parts(shape_type: &str, args: &[f32], closed: bool) -> Result<Self, String> {
         match shape_type {
             "rectangle" => {
@@ -98,6 +112,7 @@ impl Shape {
             )),
         }
     }
+    /// Create a regular convex polygon with `sides` (clamped 3–8) inscribed in `radius`.
     pub fn regular_polygon(radius: f32, sides: u32) -> Self {
         let sides = sides.clamp(3, 8);
         let mut vertices = Vec::with_capacity(sides as usize);
@@ -108,15 +123,23 @@ impl Shape {
         Shape::Polygon { vertices }
     }
 }
+/// A `Shape` combined with material properties for standalone collision testing.
 #[derive(Debug, Clone)]
 pub struct StandaloneShape {
+    /// Underlying geometry.
     pub shape: Shape,
+    /// Mass per area unit.
     pub density: f32,
+    /// Friction coefficient 0.0..=1.0.
     pub friction: f32,
+    /// Restitution coefficient 0.0..=1.0.
     pub restitution: f32,
+    /// When true, this shape detects overlaps without generating forces.
     pub sensor: bool,
 }
+/// Accessors for `StandaloneShape`.
 impl StandaloneShape {
+    /// Create a standalone shape with default material values.
     pub fn new(shape: Shape) -> Self {
         StandaloneShape {
             shape,
@@ -126,6 +149,7 @@ impl StandaloneShape {
             sensor: false,
         }
     }
+    /// Return a static string label for the shape type.
     pub fn get_type(&self) -> &str {
         match &self.shape {
             Shape::Circle { .. } => "circle",
@@ -135,6 +159,7 @@ impl StandaloneShape {
             Shape::Chain { .. } => "chain",
         }
     }
+    /// Return the circle radius when the inner shape is a `Circle`; otherwise `None`.
     pub fn get_radius(&self) -> Option<f32> {
         if let Shape::Circle { radius } = &self.shape {
             Some(*radius)
@@ -142,6 +167,7 @@ impl StandaloneShape {
             None
         }
     }
+    /// Return the local-space AABB as `(min_x, min_y, max_x, max_y)`.
     pub fn get_bounding_box(&self) -> (f32, f32, f32, f32) {
         match &self.shape {
             Shape::Circle { radius } => (-radius, -radius, *radius, *radius),

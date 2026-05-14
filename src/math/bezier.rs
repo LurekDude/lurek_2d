@@ -1,8 +1,16 @@
+//! Arbitrary-degree Bézier curve: evaluation via de Casteljau / Bernstein, arc-length sampling,
+//! derivative curve, and control-point mutation.  Used by tween paths, camera rails, and
+//! Lua spline helpers.  Does not own spline chains — see spline.rs.
+
 use crate::math::vec2::Vec2;
+
+/// Arbitrary-degree Bézier curve backed by a dynamic control-point list.
 pub struct BezierCurve {
+    /// Ordered control points defining the curve; at least 2 are required.
     control_points: Vec<Vec2>,
 }
 impl BezierCurve {
+    /// Construct a Bézier curve from `points`; panics when fewer than 2 are supplied.
     pub fn new(points: Vec<Vec2>) -> Self {
         assert!(
             points.len() >= 2,
@@ -12,6 +20,7 @@ impl BezierCurve {
             control_points: points,
         }
     }
+    /// Evaluate the curve at parameter `t` (clamped to `[0,1]`) using Bernstein basis.
     pub fn evaluate(&self, t: f32) -> Vec2 {
         let n = self.control_points.len();
         if n == 2 {
@@ -33,6 +42,7 @@ impl BezierCurve {
         }
         point
     }
+    /// Sample the full curve at `segments+1` evenly spaced parameter values.
     pub fn render(&self, segments: usize) -> Vec<Vec2> {
         let segments = segments.max(1);
         let mut result = Vec::with_capacity(segments + 1);
@@ -42,6 +52,7 @@ impl BezierCurve {
         }
         result
     }
+    /// Sample the curve between `t_start` and `t_end` at `segments+1` evenly spaced values.
     pub fn render_segment(&self, t_start: f32, t_end: f32, segments: usize) -> Vec<Vec2> {
         let segments = segments.max(1);
         let mut result = Vec::with_capacity(segments + 1);
@@ -51,6 +62,7 @@ impl BezierCurve {
         }
         result
     }
+    /// Return the first derivative curve as a new `BezierCurve` with degree reduced by one.
     pub fn get_derivative(&self) -> BezierCurve {
         let n = self.control_points.len();
         if n < 2 {
@@ -73,9 +85,11 @@ impl BezierCurve {
             control_points: derivative_points,
         }
     }
+    /// Return the control point at `index`, or `None` when out of range.
     pub fn get_control_point(&self, index: usize) -> Option<Vec2> {
         self.control_points.get(index).copied()
     }
+    /// Set control point at `index`; returns `false` when out of range.
     pub fn set_control_point(&mut self, index: usize, point: Vec2) -> bool {
         if index < self.control_points.len() {
             self.control_points[index] = point;
@@ -84,6 +98,7 @@ impl BezierCurve {
             false
         }
     }
+    /// Insert `point` at `index`, or append when `index` is `None` or out of range.
     pub fn insert_control_point(&mut self, point: Vec2, index: Option<usize>) {
         match index {
             Some(i) if i <= self.control_points.len() => {
@@ -92,6 +107,7 @@ impl BezierCurve {
             _ => self.control_points.push(point),
         }
     }
+    /// Remove the control point at `index`; returns `false` when fewer than 3 points remain or index is out of range.
     pub fn remove_control_point(&mut self, index: usize) -> bool {
         if self.control_points.len() <= 2 || index >= self.control_points.len() {
             return false;
@@ -99,15 +115,18 @@ impl BezierCurve {
         self.control_points.remove(index);
         true
     }
+    /// Return the number of control points.
     pub fn get_control_point_count(&self) -> usize {
         self.control_points.len()
     }
+    /// Translate all control points by `(dx, dy)`.
     pub fn translate(&mut self, dx: f32, dy: f32) {
         for p in &mut self.control_points {
             p.x += dx;
             p.y += dy;
         }
     }
+    /// Rotate all control points by `angle` radians around origin `(ox, oy)`.
     pub fn rotate(&mut self, angle: f32, ox: f32, oy: f32) {
         let cos_a = angle.cos();
         let sin_a = angle.sin();
@@ -118,12 +137,14 @@ impl BezierCurve {
             p.y = oy + dx * sin_a + dy * cos_a;
         }
     }
+    /// Scale all control points by factor `s` relative to origin `(ox, oy)`.
     pub fn scale(&mut self, s: f32, ox: f32, oy: f32) {
         for p in &mut self.control_points {
             p.x = ox + (p.x - ox) * s;
             p.y = oy + (p.y - oy) * s;
         }
     }
+    /// Return the approximate arc length via 100-sample numeric integration.
     pub fn length(&self) -> f32 {
         const SAMPLES: usize = 100;
         let mut total = 0.0f32;
@@ -138,10 +159,12 @@ impl BezierCurve {
         }
         total
     }
+    /// Return the evaluated point as `(x, y)` at parameter `t`.
     pub fn get_interpolated_position(&self, t: f32) -> (f32, f32) {
         let p = self.evaluate(t);
         (p.x, p.y)
     }
+    /// Return the point at arc-length `distance` from t=0 via `samples`-step linear walk.
     pub fn evaluate_at_distance(&self, distance: f32, samples: usize) -> Vec2 {
         let samples = samples.max(8);
         if distance <= 0.0 {
@@ -166,12 +189,14 @@ impl BezierCurve {
         }
         self.evaluate(1.0)
     }
+    /// Return the tangent angle in radians at parameter `t` using the derivative curve.
     pub fn get_interpolated_angle(&self, t: f32) -> f32 {
         let deriv = self.get_derivative();
         let tangent = deriv.evaluate(t);
         tangent.y.atan2(tangent.x)
     }
 }
+/// Clone the curve by duplicating its control-point list.
 impl Clone for BezierCurve {
     fn clone(&self) -> Self {
         Self {

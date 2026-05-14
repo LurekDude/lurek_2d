@@ -1,4 +1,11 @@
+//! Angular FOV polygon calculation using segment endpoint sampling.
+//! Casts rays at each segment endpoint angle (± epsilon) and collects hit
+//! positions to build a visibility polygon around `(ox, oy)`. Used by the
+//! segment-based 2D raycaster path; does not depend on DDA or the grid.
+
 use super::segment::{cast_ray_2d, Segment};
+/// Cast radial rays at all segment-endpoint angles from `(ox, oy)` and return
+/// an interleaved `[x0, y0, x1, y1, ...]` visibility polygon sorted by angle.
 pub fn field_of_view(ox: f32, oy: f32, segments: &[Segment], radius: f32) -> Vec<f32> {
     let mut angles: Vec<f32> = Vec::new();
     let epsilon = 1e-4;

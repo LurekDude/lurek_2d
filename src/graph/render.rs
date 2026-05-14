@@ -1,6 +1,12 @@
+//! Graph render helpers that emit a simple node-and-edge preview.
+//!
+//! Owns layout and renderer command emission for graph previews.
+//! It does not persist positions or simulation state.
+
 use crate::graph::core::Graph;
 use crate::render::renderer::{DrawMode, RenderCommand};
 impl Graph {
+    /// Generate a simple circular graph preview as renderer commands.
     pub fn generate_render_commands(&self, width: f32, height: f32) -> Vec<RenderCommand> {
         let mut node_ids: Vec<u64> = self.nodes.keys().copied().collect();
         node_ids.sort_unstable();

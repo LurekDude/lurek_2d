@@ -1,12 +1,23 @@
+//! Named layer stack with per-layer opacity, visibility, and alpha compositing.
+//! Owns `ImageLayer` (single layer) and `LayeredImage` (ordered stack with merge).
+//! Does not own GPU resources or serialization — callers handle persistence.
+//! Depends on `image_data::ImageData` for per-layer pixel storage.
+
 use super::image_data::ImageData;
+/// A single named image layer with opacity, visibility, and pixel data.
 #[derive(Debug, Clone)]
 pub struct ImageLayer {
+    /// Layer display name.
     pub name: String,
+    /// Layer opacity in the 0.0-1.0 range.
     pub opacity: f32,
+    /// Whether the layer participates in compositing.
     pub visible: bool,
+    /// Layer pixel data.
     pub data: ImageData,
 }
 impl ImageLayer {
+    /// Create a visible opaque layer with a blank canvas of the given size.
     pub fn new(name: impl Into<String>, width: u32, height: u32) -> Self {
         Self {
             name: name.into(),
@@ -16,13 +27,18 @@ impl ImageLayer {
         }
     }
 }
+/// A same-sized stack of image layers that can be merged into one image.
 #[derive(Debug, Clone)]
 pub struct LayeredImage {
+    /// Canvas width in pixels.
     pub(super) width: u32,
+    /// Canvas height in pixels.
     pub(super) height: u32,
+    /// Ordered layer list from back to front.
     pub(super) layers: Vec<ImageLayer>,
 }
 impl LayeredImage {
+    /// Create an empty layered image with the given canvas size.
     pub fn new(width: u32, height: u32) -> Self {
         Self {
             width,
@@ -30,20 +46,25 @@ impl LayeredImage {
             layers: Vec::new(),
         }
     }
+    /// Return the canvas width in pixels.
     pub fn width(&self) -> u32 {
         self.width
     }
+    /// Return the canvas height in pixels.
     pub fn height(&self) -> u32 {
         self.height
     }
+    /// Return the number of layers in the stack.
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }
+    /// Append a new blank layer and return its index.
     pub fn add_layer(&mut self, name: impl Into<String>) -> usize {
         self.layers
             .push(ImageLayer::new(name, self.width, self.height));
         self.layers.len() - 1
     }
+    /// Remove a layer by index and return it when present.
     pub fn remove_layer(&mut self, index: usize) -> Option<ImageLayer> {
         if index < self.layers.len() {
             Some(self.layers.remove(index))
@@ -51,12 +72,15 @@ impl LayeredImage {
             None
         }
     }
+    /// Return a layer by index.
     pub fn get_layer(&self, index: usize) -> Option<&ImageLayer> {
         self.layers.get(index)
     }
+    /// Return a mutable layer by index.
     pub fn get_layer_mut(&mut self, index: usize) -> Option<&mut ImageLayer> {
         self.layers.get_mut(index)
     }
+    /// Set a layer opacity and clamp it to the valid range.
     pub fn set_opacity(&mut self, index: usize, opacity: f32) -> bool {
         if let Some(layer) = self.layers.get_mut(index) {
             layer.opacity = opacity.clamp(0.0, 1.0);
@@ -65,6 +89,7 @@ impl LayeredImage {
             false
         }
     }
+    /// Set a layer visibility flag and return whether the layer existed.
     pub fn set_visible(&mut self, index: usize, visible: bool) -> bool {
         if let Some(layer) = self.layers.get_mut(index) {
             layer.visible = visible;
@@ -73,6 +98,7 @@ impl LayeredImage {
             false
         }
     }
+    /// Rename a layer and return whether the layer existed.
     pub fn set_name(&mut self, index: usize, name: impl Into<String>) -> bool {
         if let Some(layer) = self.layers.get_mut(index) {
             layer.name = name.into();
@@ -81,6 +107,7 @@ impl LayeredImage {
             false
         }
     }
+    /// Replace a layer image with a copied source image or a pasted canvas copy.
     pub fn set_layer_image(&mut self, index: usize, source: &ImageData) -> bool {
         if let Some(layer) = self.layers.get_mut(index) {
             if source.width() == self.width && source.height() == self.height {
@@ -95,6 +122,7 @@ impl LayeredImage {
             false
         }
     }
+    /// Swap two layers and return false when either index is invalid.
     pub fn swap_layers(&mut self, a: usize, b: usize) -> bool {
         let len = self.layers.len();
         if a >= len || b >= len || a == b {
@@ -103,6 +131,7 @@ impl LayeredImage {
         self.layers.swap(a, b);
         true
     }
+    /// Move a layer to another position and return false when either index is invalid.
     pub fn move_layer(&mut self, from_index: usize, to_index: usize) -> bool {
         let len = self.layers.len();
         if from_index >= len || to_index >= len {
@@ -112,6 +141,7 @@ impl LayeredImage {
         self.layers.insert(to_index, layer);
         true
     }
+    /// Merge visible layers front-to-back into a new image.
     pub fn merge(&self) -> ImageData {
         let mut result = ImageData::new(self.width, self.height);
         let pixels_len = (self.width * self.height * 4) as usize;

@@ -1,7 +1,15 @@
+//! `RenderCommand` generation for the minimap: terrain cells, fog, overlays, pings, objects, and markers.
+//! Owns the `generate_render_commands` impl block on `Minimap`; all rendering logic lives here.
+//! Does not own GPU pipeline state; it emits `RenderCommand` values consumed by `src/render/renderer.rs`.
+//! Called via `Minimap::build_render_commands` from `src/lua_api/minimap_api.rs`.
+
 use super::minimap::Minimap;
 use super::types::{FogLevel, OverlayShape};
 use crate::render::renderer::{DrawMode, RenderCommand};
+
+/// Provide `RenderCommand` generation for `Minimap`.
 impl Minimap {
+    /// Build the full ordered `RenderCommand` list for this minimap at screen origin `(screen_x, screen_y)`.
     pub fn generate_render_commands(&self, screen_x: f32, screen_y: f32) -> Vec<RenderCommand> {
         let mut cmds = Vec::new();
         let owner_colors = self.owner_colors_by_cell();

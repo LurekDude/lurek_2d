@@ -1,3 +1,8 @@
+//! Scene construction for a single raycaster frame: floor/ceiling tile quads,
+//! wall face quads, lowered-floor side walls, roof geometry, and billboard sprites.
+//! Computes projections from world-space tiles to screen-space quads consumed by
+//! `RaycasterScene`. Does not own DDA ray stepping or depth buffering.
+
 use crate::math::{Color, Vec2};
 use crate::raycaster::dda::Raycaster2D;
 use crate::raycaster::lighting::{compute_lighting, PointLight};
@@ -5,13 +10,19 @@ use crate::raycaster::projection::distance_shade;
 use crate::raycaster::ray_hit::RayHit;
 use crate::raycaster::scene::{BillboardSprite, CeilingQuad, FloorQuad, RaycasterScene, WallQuad};
 use crate::runtime::resource_keys::TextureKey;
+/// A floor cell that sits below the standard floor plane, used for pits and step-down areas.
 #[derive(Debug, Clone, Copy)]
 pub struct LoweredFloorCell {
+    /// Texture applied to the lowered floor surface.
     pub texture_key: TextureKey,
+    /// Downward offset from the standard floor plane (positive = lower), range 0..1.
     pub depth_offset: f32,
+    /// RGB tint multiplier applied to the floor surface color.
     pub tint: [f32; 3],
+    /// When true the cell blocks movement even though it has a floor texture.
     pub blocked: bool,
 }
+/// Build a 4-corner array for an axis-aligned rectangle in screen space.
 fn corners_from_rect(x: f32, y: f32, w: f32, h: f32) -> [Vec2; 4] {
     [
         Vec2::new(x, y),
@@ -20,6 +31,7 @@ fn corners_from_rect(x: f32, y: f32, w: f32, h: f32) -> [Vec2; 4] {
         Vec2::new(x, y + h),
     ]
 }
+/// Return the standard [0,0]..[1,1] UV coordinates for a quad's four corners.
 fn rect_uvs() -> [Vec2; 4] {
     [
         Vec2::new(0.0, 0.0),
@@ -28,6 +40,7 @@ fn rect_uvs() -> [Vec2; 4] {
         Vec2::new(0.0, 1.0),
     ]
 }
+/// Return the fractional part of `v` in [0,1), wrapping negative values.
 fn frac01(v: f32) -> f32 {
     let f = v - v.floor();
     if f < 0.0 {
@@ -36,12 +49,14 @@ fn frac01(v: f32) -> f32 {
         f
     }
 }
+/// Return the grid cell just before a ray hit; used to look up the floor/ceiling texture at the approach tile.
 #[allow(dead_code)]
 fn floor_cell_before_hit(hit: &RayHit, ray_angle: f32) -> (u32, u32) {
     let wx = (hit.hit_x - ray_angle.cos() * 0.5).max(0.0);
     let wy = (hit.hit_y - ray_angle.sin() * 0.5).max(0.0);
     (wx.floor() as u32, wy.floor() as u32)
 }
+/// Build quad UV coordinates from near and far world-space fractional positions for a floor column strip.
 #[allow(dead_code)]
 fn column_uvs_from_world(near_x: f32, near_y: f32, far_x: f32, far_y: f32) -> [Vec2; 4] {
     let nu = frac01(near_x);
@@ -55,21 +70,30 @@ fn column_uvs_from_world(near_x: f32, near_y: f32, far_x: f32, far_y: f32) -> [V
         Vec2::new(fu, fv),
     ]
 }
+/// Minimum camera-depth before which floor/ceiling geometry is discarded to avoid near-plane artifacts.
 const FLOOR_NEAR: f32 = 0.05;
+/// Fraction of `ambient_light` applied to tiles that have a ceiling texture (simulates enclosed space).
 const ROOFED_AMBIENT_FACTOR: f32 = 0.20;
+/// Project world point `(wx, wy)` onto the camera forward axis; return signed camera-space depth.
 #[inline]
 fn camera_depth(wx: f32, wy: f32, px: f32, py: f32, cos_a: f32, sin_a: f32) -> f32 {
     let rx = wx - px;
     let ry = wy - py;
     rx * cos_a + ry * sin_a
 }
+/// Cached projection of one grid corner to screen space for floor/ceiling quad building.
 #[derive(Debug, Clone, Copy)]
 struct ProjectedGroundPoint {
+    /// Screen-space X coordinate of the corner.
     sx: f32,
+    /// Screen-space Y coordinate of the floor plane at this corner.
     floor_y: f32,
+    /// Screen-space Y coordinate of the ceiling plane at this corner.
     ceil_y: f32,
+    /// Camera-space depth (positive forward), used for perspective-correct UV interpolation.
     cx: f32,
 }
+/// Project world corner `(wx, wy)` to screen space for both floor and ceiling planes; return a `ProjectedGroundPoint`.
 #[allow(clippy::too_many_arguments)]
 #[inline]
 fn project_ground_point(
@@ -99,6 +123,7 @@ fn project_ground_point(
         cx,
     }
 }
+/// Project world point `(wx, wy)` onto a single horizontal plane at `plane_offset`; return `(screen_x, screen_y, camera_depth)`.
 #[allow(clippy::too_many_arguments)]
 #[inline]
 fn project_horizontal_plane(
@@ -121,10 +146,12 @@ fn project_horizontal_plane(
     let sy = horizon + proj_dist * plane_offset / cx;
     (snap_half(sx), snap_half(sy), cx)
 }
+/// Round `v` to the nearest 0.5 to reduce sub-pixel jitter on floor/ceiling edges.
 #[inline]
 fn snap_half(v: f32) -> f32 {
     (v * 2.0).round() * 0.5
 }
+/// Emit `FloorQuad`, `CeilingQuad`, and lowered-floor side `WallQuad` entries for all visible open tiles.
 #[allow(clippy::too_many_arguments)]
 fn build_floor_tiles(
     raycaster: &Raycaster2D,
@@ -536,6 +563,7 @@ fn build_floor_tiles(
         }
     }
 }
+/// Emit `WallQuad` entries for each visible solid-cell face and its optional roof geometry.
 #[allow(clippy::too_many_arguments)]
 fn build_wall_faces(
     raycaster: &Raycaster2D,
@@ -803,6 +831,7 @@ fn build_wall_faces(
         }
     }
 }
+/// Multiply `base` color by `light_rgb` and `shade`; preserve alpha.
 fn lit_surface_color(base: &Color, light_rgb: [f32; 3], shade: f32) -> Color {
     Color::new(
         base.r * light_rgb[0] * shade,
@@ -811,36 +840,60 @@ fn lit_surface_color(base: &Color, light_rgb: [f32; 3], shade: f32) -> Color {
         base.a,
     )
 }
+/// Convert a `Color` to a `[r, g, b, a]` f32 array used as a light multiplier.
 fn color_to_light(c: &Color) -> [f32; 4] {
     [c.r, c.g, c.b, c.a]
 }
+/// All camera and world parameters consumed by `RaycasterScene::build` each frame.
 #[derive(Debug, Clone)]
 pub struct SceneBuildParams {
+    /// Player world X position.
     pub player_x: f32,
+    /// Player world Y position.
     pub player_y: f32,
+    /// Player view angle in radians.
     pub player_angle: f32,
+    /// Horizontal field of view in radians.
     pub fov: f32,
+    /// Number of DDA rays cast across the screen width.
     pub ray_count: u32,
+    /// Maximum tile distance at which geometry is rendered.
     pub max_distance: f32,
+    /// Render target width in pixels.
     pub screen_width: f32,
+    /// Render target height in pixels.
     pub screen_height: f32,
+    /// Base ambient light level, 0.0..1.0.
     pub ambient_light: f32,
+    /// Distance at which walls are fully dark; controls distance-shading fall-off.
     pub shade_distance: f32,
+    /// Flat tint color for untextured floor surfaces.
     pub floor_color: Color,
+    /// Flat tint color for untextured ceiling surfaces.
     pub ceiling_color: Color,
+    /// Camera eye height as a fraction of cell height, 0.1..0.9.
     pub camera_height: f32,
+    /// Vertical offset applied to the horizon line in pixels (positive = up).
     pub horizon_offset: f32,
 }
+/// A billboard sprite placed in world space and projected to screen by `RaycasterScene::build`.
 #[derive(Debug, Clone)]
 pub struct WorldSprite {
+    /// World X position of the sprite center.
     pub world_x: f32,
+    /// World Y position of the sprite center.
     pub world_y: f32,
+    /// Texture used for the billboard quad.
     pub texture_key: TextureKey,
+    /// World-space size of the sprite (height and width are equal).
     pub size: f32,
 }
+/// Callback type mapping a wall cell value to an optional `TextureKey`.
 pub type TextureLookup = dyn Fn(u32) -> Option<TextureKey>;
+/// Callback type mapping a grid `(x, y)` cell to an optional `TextureKey`.
 pub type CellTextureLookup = dyn Fn(u32, u32) -> Option<TextureKey>;
 impl RaycasterScene {
+    /// Build a complete `RaycasterScene` from camera params, lights, sprites, and texture lookups.
     #[allow(clippy::too_many_arguments)]
     pub fn build(
         raycaster: &Raycaster2D,

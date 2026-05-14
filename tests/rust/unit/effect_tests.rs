@@ -151,3 +151,12 @@ mod effect_type_tests {
         }
     }
 }
+
+#[path = "effect_effect_tests.rs"]
+mod effect_effect_tests;
+
+#[path = "effect_render_tests.rs"]
+mod effect_render_tests;
+
+#[path = "effect_stack_tests.rs"]
+mod effect_stack_tests;

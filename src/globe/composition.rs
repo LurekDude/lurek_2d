@@ -1,12 +1,21 @@
+//! Globe frame composition helpers for multi-viewport rendering.
+//!
+//! Owns viewport remapping when multiple globes render into one frame.
+//! Actual globe draw command generation stays in the draw module.
+
 use crate::globe::draw::emit_globe_frame;
 use crate::globe::registry::GlobeRegistry;
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::FontKey;
+/// Screen center override for one split viewport.
 #[derive(Debug, Clone, Copy)]
 pub struct SplitViewport {
+    /// Screen center x coordinate for the viewport.
     pub cx: f32,
+    /// Screen center y coordinate for the viewport.
     pub cy: f32,
 }
+/// Emit render commands for several globes with per-entry viewport centers.
 pub fn emit_split_frame(
     reg: &GlobeRegistry,
     entries: &[(&str, SplitViewport)],

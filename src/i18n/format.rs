@@ -1,3 +1,6 @@
+//! Locale-aware number and date formatting helpers.
+
+/// Return decimal and thousands separators for a locale prefix.
 pub fn locale_separators(locale: &str) -> (char, char) {
     const COMMA_DECIMAL: &[&str] = &[
         "de", "fr", "es", "it", "pt", "nl", "pl", "ru", "tr", "sv", "da", "fi", "nb", "cs", "hu",
@@ -10,6 +13,7 @@ pub fn locale_separators(locale: &str) -> (char, char) {
         ('.', ',')
     }
 }
+/// Format a number with explicit separators and fixed decimal places.
 pub fn format_number(n: f64, decimals: usize, decimal_sep: char, thousands_sep: char) -> String {
     let factor = 10_f64.powi(decimals as i32);
     let rounded = (n * factor).round() / factor;
@@ -42,6 +46,7 @@ pub fn format_number(n: f64, decimals: usize, decimal_sep: char, thousands_sep: 
         )
     }
 }
+/// Format a Unix timestamp using locale-aware date patterns.
 pub fn format_date(timestamp: i64, fmt: &str, locale: &str) -> String {
     let days_total = timestamp.div_euclid(86_400);
     let (year, month, day) = days_to_ymd(days_total);
@@ -73,6 +78,7 @@ pub fn format_date(timestamp: i64, fmt: &str, locale: &str) -> String {
         }
     }
 }
+/// Convert a day count since the Unix epoch to year, month, and day.
 pub fn days_to_ymd(days: i64) -> (i32, u32, u32) {
     let z = days + 719_468;
     let era = (if z >= 0 { z } else { z - 146_096 }).div_euclid(146_097);
@@ -86,6 +92,7 @@ pub fn days_to_ymd(days: i64) -> (i32, u32, u32) {
     let y = if m <= 2 { y + 1 } else { y };
     (y as i32, m, d)
 }
+/// Return long and short English month name tables.
 pub fn month_name_tables() -> ([&'static str; 12], [&'static str; 12]) {
     (
         [

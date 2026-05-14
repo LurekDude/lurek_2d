@@ -1,5 +1,10 @@
+//! Physics-driven collision response for particle systems against rapier colliders.
+//! Owns `collide_with_world`, which probes the `physics::World` AABB query and reflects velocity on hit.
+//! Does not own the physics world or particle state lifetimes; both are borrowed for the duration of the call.
+
 use crate::particle::ParticleSystem;
 use crate::physics::World;
+/// Reflect all particles in `system` that overlap a rapier collider in `world`; uses AABB probe of `probe_radius` and `restitution` coefficient.
 pub fn collide_with_world(
     system: &mut ParticleSystem,
     world: &World,

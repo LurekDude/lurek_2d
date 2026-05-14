@@ -205,11 +205,17 @@ impl ScalarOp {
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Select element-wise binary operation between two columns.
 pub enum BinaryOp {
+    /// Add left and right values.
     Add,
+    /// Subtract right from left values.
     Sub,
+    /// Multiply left and right values.
     Mul,
+    /// Divide left by right values.
     Div,
+    /// Keep smaller of both values.
     Min,
+    /// Keep larger of both values.
     Max,
 }
 impl BinaryOp {
@@ -229,12 +235,19 @@ impl BinaryOp {
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Select aggregation operation over a column.
 pub enum ReduceOp {
+    /// Sum all valid values.
     Sum,
+    /// Compute arithmetic mean.
     Mean,
+    /// Compute smallest value.
     Min,
+    /// Compute largest value.
     Max,
+    /// Compute standard deviation.
     Std,
+    /// Compute variance.
     Var,
+    /// Count valid values.
     Count,
 }
 impl ReduceOp {
@@ -285,7 +298,9 @@ impl CmpOp {
 #[derive(Debug, Clone)]
 /// Hold typed columnar frame used for vectorized and parallel operations.
 pub struct VecFrame {
+    /// Store ordered column names.
     column_names: Vec<String>,
+    /// Store typed column payloads.
     columns: Vec<ColumnStore>,
 }
 impl VecFrame {
@@ -348,6 +363,7 @@ impl VecFrame {
         }
         DataFrame::from_raw(self.column_names.clone(), col_data)
     }
+    /// Resolve column name to zero-based index.
     fn resolve(&self, col: &str) -> Result<usize, String> {
         self.column_names
             .iter()
@@ -730,10 +746,12 @@ impl VecFrame {
 }
 /// Implement `Default` for `VecFrame` by delegating to `VecFrame::new`.
 impl Default for VecFrame {
+    /// Create default empty vectorized frame.
     fn default() -> Self {
         Self::new()
     }
 }
+/// Infer best column storage type from a vector of cell values.
 fn infer_column(cells: &[CellValue]) -> ColumnStore {
     let mut has_num = false;
     let mut has_bool = false;
@@ -808,6 +826,7 @@ fn infer_column(cells: &[CellValue]) -> ColumnStore {
         ColumnStore::Float64 { data, validity }
     }
 }
+/// Apply scalar operation to one f64 value and return transformed value.
 fn apply_scalar_f64(x: f64, op: ScalarOp, val: f64) -> f64 {
     match op {
         ScalarOp::Add => x + val,
@@ -821,6 +840,7 @@ fn apply_scalar_f64(x: f64, op: ScalarOp, val: f64) -> f64 {
         ScalarOp::Neg => -x,
     }
 }
+/// Compare one value against scalar and return predicate result.
 fn cmp_f64(x: f64, op: CmpOp, val: f64) -> bool {
     match op {
         CmpOp::Lt => x < val,

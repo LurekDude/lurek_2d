@@ -1,19 +1,30 @@
+//! Simple rectangular grid for A\*, Dijkstra, BFS, and flow-field queries.
+//! Does not own NavGrid or nav-agent state; consumed by `src/pathfind/` helpers
+//! and `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{PF01_GRID_INIT, PF03_NO_PATH};
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque};
+/// Internal priority-queue node carrying position and accumulated cost.
 #[derive(Debug, Clone)]
 struct Node {
+    /// Accumulated cost used as the heap priority.
     cost: f32,
+    /// Grid column.
     x: u32,
+    /// Grid row.
     y: u32,
 }
+/// Equality by cost.
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
         self.cost == other.cost
     }
 }
 impl Eq for Node {}
+
+/// Reverse ordering so `BinaryHeap` is a min-heap on cost.
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
         other
@@ -22,18 +33,26 @@ impl Ord for Node {
             .unwrap_or(Ordering::Equal)
     }
 }
+/// Delegates to `Ord`.
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Flat 2-D grid with per-cell walkability flags and movement costs.
 pub struct Grid {
+    /// Cell columns.
     width: u32,
+    /// Cell rows.
     height: u32,
+    /// Flat walkability mask; false means the cell is blocked.
     walkable: Vec<bool>,
+    /// Per-cell movement cost; default is `default_cost` passed to `new`.
     costs: Vec<f32>,
 }
+/// Construction and pathfinding methods for `Grid`.
 impl Grid {
+    /// Create a fully walkable `width × height` grid where every cell starts at `default_cost`.
     pub fn new(width: u32, height: u32, default_cost: f32) -> Self {
         let len = (width as usize) * (height as usize);
         log_msg!(debug, PF01_GRID_INIT, "{}x{}", width, height);
@@ -44,12 +63,15 @@ impl Grid {
             costs: vec![default_cost; len],
         }
     }
+    /// Return the grid width in cells.
     pub fn width(&self) -> u32 {
         self.width
     }
+    /// Return the grid height in cells.
     pub fn height(&self) -> u32 {
         self.height
     }
+    /// Convert `(x, y)` to a flat index; return `None` when out of bounds.
     #[inline]
     fn idx(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
@@ -58,22 +80,27 @@ impl Grid {
             None
         }
     }
+    /// Set the walkability of cell `(x, y)`; silently ignores out-of-bounds coordinates.
     pub fn set_walkable(&mut self, x: u32, y: u32, walkable: bool) {
         if let Some(i) = self.idx(x, y) {
             self.walkable[i] = walkable;
         }
     }
+    /// Return true when `(x, y)` is in bounds and walkable.
     pub fn is_walkable(&self, x: u32, y: u32) -> bool {
         self.idx(x, y).is_some_and(|i| self.walkable[i])
     }
+    /// Set the movement cost for cell `(x, y)`; silently ignores out-of-bounds coordinates.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: f32) {
         if let Some(i) = self.idx(x, y) {
             self.costs[i] = cost;
         }
     }
+    /// Return the movement cost at `(x, y)`; returns 1.0 when out of bounds.
     pub fn get_cost(&self, x: u32, y: u32) -> f32 {
         self.idx(x, y).map_or(1.0, |i| self.costs[i])
     }
+    /// Return the 4-connected walkable neighbours of `(x, y)`.
     fn neighbors4(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut out = Vec::with_capacity(4);
         if x > 0 {
@@ -90,6 +117,7 @@ impl Grid {
         }
         out
     }
+    /// Return the 8-connected walkable neighbours of `(x, y)` (no walkability filter, caller checks).
     fn neighbors8(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut out = Vec::with_capacity(8);
         for dy in [-1i32, 0, 1] {
@@ -106,6 +134,7 @@ impl Grid {
         }
         out
     }
+    /// Run A\* from `(sx,sy)` to `(gx,gy)`; use diagonal neighbours when `diagonal` is true.
     pub fn find_path_astar(
         &self,
         sx: u32,
@@ -178,6 +207,7 @@ impl Grid {
         }
         None
     }
+    /// Run Dijkstra from `(sx,sy)` to `(gx,gy)`; respects movement costs, no heuristic.
     pub fn find_path_dijkstra(
         &self,
         sx: u32,
@@ -240,6 +270,7 @@ impl Grid {
         }
         None
     }
+    /// Run BFS (unweighted) from `(sx,sy)` to `(gx,gy)`; ignores movement costs.
     pub fn find_path_bfs(
         &self,
         sx: u32,
@@ -281,6 +312,7 @@ impl Grid {
         }
         None
     }
+    /// Walk `came_from` back from `goal` to `start` and return the ordered path.
     fn reconstruct(&self, came_from: Vec<usize>, start: usize, goal: usize) -> Vec<(u32, u32)> {
         let mut path = Vec::new();
         let mut cur = goal;
@@ -296,6 +328,7 @@ impl Grid {
         path.reverse();
         path
     }
+    /// Build a 4-directional Dijkstra flow field toward `(gx, gy)`; returns one `(dx,dy)` per cell.
     pub fn build_flow_field(&self, gx: u32, gy: u32) -> Vec<(f32, f32)> {
         let len = (self.width as usize) * (self.height as usize);
         let goal = match self.idx(gx, gy) {

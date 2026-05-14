@@ -1,23 +1,45 @@
+//! Chunked tile-map terrain that generates static collision bodies into a `World`.
+//! Cells are boolean solid/empty; dirty chunks are rebuilt with run-length merged AABB bodies.
+//! Serialises to a compact bitpacked byte buffer for save/load.
+
 use super::body::{Body, BodyShape, BodyType};
 use super::world::World;
 use std::collections::{HashMap, HashSet};
+
+/// Chunk dimension in cells per axis.
 const CHUNK_SIZE: u32 = 16;
+
+/// Key identifying a chunk by its chunk-grid coordinates.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ChunkId {
+    /// Column index in chunk space.
     pub cx: u32,
+    /// Row index in chunk space.
     pub cy: u32,
 }
+
+/// Tile-based terrain map that synchronises static physics bodies with a `World`.
 pub struct TerrainMap {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// World units per cell side.
     pub cell_size: f32,
+    /// World-space x origin of the grid.
     pub offset_x: f32,
+    /// World-space y origin of the grid.
     pub offset_y: f32,
+    /// Flat row-major solidity flags.
     cells: Vec<bool>,
+    /// Body ids spawned per chunk.
     chunk_body_ids: HashMap<ChunkId, Vec<usize>>,
+    /// Chunks that need their bodies rebuilt on the next `flush`.
     dirty_chunks: HashSet<ChunkId>,
 }
+/// All methods for `TerrainMap`.
 impl TerrainMap {
+    /// Create an empty terrain map of `width`×`height` cells with `cell_size` world units each.
     pub fn new(width: u32, height: u32, cell_size: f32) -> Self {
         let total = (width * height) as usize;
         Self {
@@ -31,6 +53,7 @@ impl TerrainMap {
             dirty_chunks: HashSet::new(),
         }
     }
+    /// Set the solid state of cell `(cx,cy)`; marks the owning chunk dirty when the value changes.
     pub fn set_cell(&mut self, cx: u32, cy: u32, solid: bool) {
         if cx >= self.width || cy >= self.height {
             return;
@@ -41,12 +64,14 @@ impl TerrainMap {
             self.mark_dirty(cx, cy);
         }
     }
+    /// Return whether cell `(cx,cy)` is solid; false when out of bounds.
     pub fn get_cell(&self, cx: u32, cy: u32) -> bool {
         if cx >= self.width || cy >= self.height {
             return false;
         }
         self.cells[(cy * self.width + cx) as usize]
     }
+    /// Set all cells within `radius` world units of `(wx,wy)` to `solid`.
     pub fn fill_circle(&mut self, wx: f32, wy: f32, radius: f32, solid: bool) {
         let cell_cx = ((wx - self.offset_x) / self.cell_size) as i64;
         let cell_cy = ((wy - self.offset_y) / self.cell_size) as i64;
@@ -69,6 +94,7 @@ impl TerrainMap {
             }
         }
     }
+    /// Set all cells overlapping the world-space rectangle to `solid`.
     pub fn fill_rect(&mut self, wx: f32, wy: f32, w: f32, h: f32, solid: bool) {
         let x0 = ((wx - self.offset_x) / self.cell_size).floor() as i64;
         let y0 = ((wy - self.offset_y) / self.cell_size).floor() as i64;
@@ -82,6 +108,7 @@ impl TerrainMap {
             }
         }
     }
+    /// Set every cell to `solid` and mark all chunks dirty.
     pub fn fill_all(&mut self, solid: bool) {
         for v in self.cells.iter_mut() {
             *v = solid;
@@ -94,15 +121,18 @@ impl TerrainMap {
             }
         }
     }
+    /// Return true when any chunks are pending a `flush`.
     pub fn is_dirty(&self) -> bool {
         !self.dirty_chunks.is_empty()
     }
+    /// Mark the chunk containing `(cx,cy)` as dirty.
     fn mark_dirty(&mut self, cx: u32, cy: u32) {
         self.dirty_chunks.insert(ChunkId {
             cx: cx / CHUNK_SIZE,
             cy: cy / CHUNK_SIZE,
         });
     }
+    /// Rebuild bodies in all dirty chunks and sync them into `world`.
     pub fn flush(&mut self, world: &mut World) {
         let dirty: Vec<ChunkId> = self.dirty_chunks.drain().collect();
         for chunk in dirty {
@@ -154,6 +184,7 @@ impl TerrainMap {
             }
         }
     }
+    /// Remove isolated single-cell pillars with no support; return the count removed.
     pub fn collapse_columns(&mut self) -> u32 {
         let mut count = 0u32;
         for cy in (0..self.height.saturating_sub(1)).rev() {
@@ -177,6 +208,7 @@ impl TerrainMap {
         }
         count
     }
+    /// Return the world-space centres of all solid cells.
     pub fn solid_cell_positions(&self) -> Vec<(f32, f32)> {
         let mut out = Vec::new();
         for cy in 0..self.height {
@@ -190,6 +222,7 @@ impl TerrainMap {
         }
         out
     }
+    /// Spawn a dynamic debris body in `world` for each position in `positions`; return body ids.
     pub fn spawn_debris_at(
         &self,
         world: &mut World,
@@ -213,6 +246,7 @@ impl TerrainMap {
             })
             .collect()
     }
+    /// Encode the terrain as RGBA pixel data using `solid_rgba` and `empty_rgba`.
     pub fn to_image_data(&self, solid_rgba: [u8; 4], empty_rgba: [u8; 4]) -> Vec<u8> {
         let mut buf = Vec::with_capacity((self.width * self.height * 4) as usize);
         for &solid in &self.cells {
@@ -221,6 +255,7 @@ impl TerrainMap {
         }
         buf
     }
+    /// Serialise to a compact byte buffer: `width u32 LE` + `height u32 LE` + `cell_size f32 LE` + bitpacked cells.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::new();
         buf.extend_from_slice(&self.width.to_le_bytes());
@@ -244,6 +279,7 @@ impl TerrainMap {
         }
         buf
     }
+    /// Deserialise from a byte buffer produced by `to_bytes`; marks all chunks dirty; return `None` on error.
     #[allow(clippy::needless_range_loop)]
     pub fn from_bytes(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 12 {
@@ -282,6 +318,7 @@ impl TerrainMap {
             dirty_chunks,
         })
     }
+    /// Load bytes into this map if dimensions match; return false on mismatch or parse error.
     pub fn load_from_bytes(&mut self, bytes: &[u8]) -> bool {
         match TerrainMap::from_bytes(bytes) {
             Some(loaded) if loaded.width == self.width && loaded.height == self.height => {

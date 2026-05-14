@@ -1,5 +1,11 @@
+//! Globe export helpers for external geometry formats.
+//!
+//! Owns simple serialization of province polygons into OBJ text.
+//! It does not project or triangulate geometry.
+
 use crate::globe::registry::Globe;
 use std::fmt::Write;
+/// Export province polygons as a flat OBJ string with one object per province.
 pub fn export_provinces_to_obj(globe: &Globe) -> String {
     let mut out = String::new();
     let mut vertex_base: u32 = 1;

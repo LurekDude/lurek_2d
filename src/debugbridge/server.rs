@@ -1,9 +1,15 @@
+//! Run debug bridge TCP loop and dispatch JSON-RPC client messages.
+//! Keep connection handling, response writes, and event broadcast in one place.
+//! Do not store long-lived bridge state outside synchronized shared container.
+//! Depend on TCP sockets, buffered reads, and atomic running flags.
+
 use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+/// Run the server loop and return when running flag becomes false.
 pub fn server_thread(
     listener: TcpListener,
     shared: Arc<Mutex<BridgeShared>>,
@@ -96,6 +102,7 @@ pub fn server_thread(
         });
     }
 }
+/// Parse one client message, update shared state, and queue response side effects.
 pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<BridgeShared>>) {
     let parsed: serde_json::Value = match serde_json::from_str(line) {
         Ok(v) => v,

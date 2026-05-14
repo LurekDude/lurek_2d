@@ -1,3 +1,9 @@
+//! LIMG binary serialization for flat `ImageData` and layered `LayeredImage` stacks.
+//! Format: 6-byte header (magic `LIMG`, version byte, type flag) followed by zlib-compressed payload.
+//! Owns encode/decode for both flat (type 0) and layered (type 1) variants.
+//! Does not own filesystem paths beyond direct `std::fs` calls; callers manage paths.
+//! Depends on `flate2` for zlib compression.
+
 use super::image_data::ImageData;
 use super::layers::LayeredImage;
 use flate2::read::ZlibDecoder;
@@ -8,14 +14,17 @@ const MAGIC: &[u8; 4] = b"LIMG";
 const VERSION: u8 = 1;
 const TYPE_FLAT: u8 = 0;
 const TYPE_LAYERED: u8 = 1;
+/// Save a flat image as LIMG bytes on disk.
 pub fn save_image(img: &ImageData, path: &str) -> Result<(), String> {
     let data = encode_flat(img)?;
     std::fs::write(path, &data).map_err(|e| format!("LIMG write error '{}': {}", path, e))
 }
+/// Load a flat image from disk and decode it from LIMG bytes.
 pub fn load_image(path: &str) -> Result<ImageData, String> {
     let data = std::fs::read(path).map_err(|e| format!("LIMG read error '{}': {}", path, e))?;
     load_image_from_bytes(&data, path)
 }
+/// Load a flat image from raw LIMG bytes and validate the type flag.
 pub fn load_image_from_bytes(data: &[u8], label: &str) -> Result<ImageData, String> {
     let (type_flag, payload) = parse_header(data)?;
     if type_flag != TYPE_FLAT {
@@ -26,14 +35,17 @@ pub fn load_image_from_bytes(data: &[u8], label: &str) -> Result<ImageData, Stri
     }
     decode_flat(payload)
 }
+/// Save a layered image as LIMG bytes on disk.
 pub fn save_layered(stack: &LayeredImage, path: &str) -> Result<(), String> {
     let data = encode_layered(stack)?;
     std::fs::write(path, &data).map_err(|e| format!("LIMG write error '{}': {}", path, e))
 }
+/// Load a layered image from disk and decode it from LIMG bytes.
 pub fn load_layered(path: &str) -> Result<LayeredImage, String> {
     let data = std::fs::read(path).map_err(|e| format!("LIMG read error '{}': {}", path, e))?;
     load_layered_from_bytes(&data, path)
 }
+/// Load a layered image from raw LIMG bytes and validate the type flag.
 pub fn load_layered_from_bytes(data: &[u8], label: &str) -> Result<LayeredImage, String> {
     let (type_flag, payload) = parse_header(data)?;
     if type_flag != TYPE_LAYERED {
@@ -44,6 +56,7 @@ pub fn load_layered_from_bytes(data: &[u8], label: &str) -> Result<LayeredImage,
     }
     decode_layered(payload)
 }
+/// Build a LIMG header for the requested payload type.
 fn write_header(type_flag: u8) -> Vec<u8> {
     let mut buf = Vec::with_capacity(6);
     buf.extend_from_slice(MAGIC);
@@ -51,6 +64,7 @@ fn write_header(type_flag: u8) -> Vec<u8> {
     buf.push(type_flag);
     buf
 }
+/// Compress raw bytes with zlib and return the encoded payload.
 fn compress(raw: &[u8]) -> Result<Vec<u8>, String> {
     let mut enc = ZlibEncoder::new(Vec::new(), Compression::default());
     enc.write_all(raw)
@@ -58,6 +72,7 @@ fn compress(raw: &[u8]) -> Result<Vec<u8>, String> {
     enc.finish()
         .map_err(|e| format!("zlib finish error: {}", e))
 }
+/// Decompress zlib-compressed bytes and return the raw payload.
 fn decompress(compressed: &[u8]) -> Result<Vec<u8>, String> {
     let mut dec = ZlibDecoder::new(compressed);
     let mut out = Vec::new();
@@ -65,30 +80,37 @@ fn decompress(compressed: &[u8]) -> Result<Vec<u8>, String> {
         .map_err(|e| format!("zlib decompress error: {}", e))?;
     Ok(out)
 }
+/// Append a little-endian `u16` to a byte buffer.
 fn push_u16(buf: &mut Vec<u8>, v: u16) {
     buf.extend_from_slice(&v.to_le_bytes());
 }
+/// Append a little-endian `u32` to a byte buffer.
 fn push_u32(buf: &mut Vec<u8>, v: u32) {
     buf.extend_from_slice(&v.to_le_bytes());
 }
+/// Append a little-endian `f32` to a byte buffer.
 fn push_f32(buf: &mut Vec<u8>, v: f32) {
     buf.extend_from_slice(&v.to_le_bytes());
 }
+/// Read a little-endian `u16` from a byte slice at the requested offset.
 fn read_u16(buf: &[u8], offset: usize) -> Result<u16, String> {
     buf.get(offset..offset + 2)
         .map(|b| u16::from_le_bytes([b[0], b[1]]))
         .ok_or_else(|| format!("LIMG truncated at offset {} (expected u16)", offset))
 }
+/// Read a little-endian `u32` from a byte slice at the requested offset.
 fn read_u32(buf: &[u8], offset: usize) -> Result<u32, String> {
     buf.get(offset..offset + 4)
         .map(|b| u32::from_le_bytes([b[0], b[1], b[2], b[3]]))
         .ok_or_else(|| format!("LIMG truncated at offset {} (expected u32)", offset))
 }
+/// Read a little-endian `f32` from a byte slice at the requested offset.
 fn read_f32(buf: &[u8], offset: usize) -> Result<f32, String> {
     buf.get(offset..offset + 4)
         .map(|b| f32::from_le_bytes([b[0], b[1], b[2], b[3]]))
         .ok_or_else(|| format!("LIMG truncated at offset {} (expected f32)", offset))
 }
+/// Encode a flat image into a LIMG byte vector.
 pub fn encode_flat(img: &ImageData) -> Result<Vec<u8>, String> {
     let mut buf = write_header(TYPE_FLAT);
     push_u32(&mut buf, img.width);
@@ -97,6 +119,7 @@ pub fn encode_flat(img: &ImageData) -> Result<Vec<u8>, String> {
     buf.extend_from_slice(&compressed);
     Ok(buf)
 }
+/// Decode a flat image from a LIMG payload.
 pub fn decode_flat(payload: &[u8]) -> Result<ImageData, String> {
     if payload.len() < 8 {
         return Err("LIMG flat payload too short".into());
@@ -124,6 +147,7 @@ pub fn decode_flat(payload: &[u8]) -> Result<ImageData, String> {
     }
     ImageData::from_bytes(width, height, pixels).map_err(|e| format!("LIMG flat: {}", e))
 }
+/// Encode a layered image into a LIMG byte vector.
 fn encode_layered(stack: &LayeredImage) -> Result<Vec<u8>, String> {
     let mut buf = write_header(TYPE_LAYERED);
     push_u32(&mut buf, stack.width);
@@ -147,6 +171,7 @@ fn encode_layered(stack: &LayeredImage) -> Result<Vec<u8>, String> {
     }
     Ok(buf)
 }
+/// Decode a layered image from a LIMG payload.
 fn decode_layered(payload: &[u8]) -> Result<LayeredImage, String> {
     if payload.len() < 12 {
         return Err("LIMG layered payload too short".into());
@@ -220,6 +245,7 @@ fn decode_layered(payload: &[u8]) -> Result<LayeredImage, String> {
     }
     Ok(stack)
 }
+/// Parse a LIMG header and return the type flag plus the remaining payload.
 pub fn parse_header(data: &[u8]) -> Result<(u8, &[u8]), String> {
     if data.len() < 6 {
         return Err("LIMG file too short to contain a valid header".into());

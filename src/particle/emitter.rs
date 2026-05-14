@@ -1,3 +1,8 @@
+//! `ParticleSystem` — the live emitter that owns a pool of particles and drives their update loop.
+//! Owns spawning, per-frame physics integration, death handling, sub-system management, and render command generation.
+//! Does not own the renderer or physics world; callers feed `RenderCommand` output to the renderer.
+//! Key dependencies: `particle::config`, `particle::emission`, `particle::math`, `render::renderer`.
+
 use super::config::{
     Attractor, BounceBounds, EmissionShape, EmitterState, InsertMode, ParticleConfig,
 };
@@ -10,24 +15,40 @@ use crate::log_msg;
 use crate::particle::shapes::ParticleShape;
 use crate::render::renderer::{ParticleInstance, ParticleRenderShape, RenderCommand};
 use crate::runtime::log_messages::{PE01, PE02, PE03, PE04};
+/// Live particle emitter containing the active particle pool, physics state, and sub-system list.
 #[derive(Clone, Debug)]
 pub struct ParticleSystem {
+    /// Configuration snapshot used for spawning and update parameters.
     pub config: ParticleConfig,
+    /// Active particle pool.
     pub particles: Vec<Particle>,
+    /// World-space X position of this emitter.
     pub emitter_x: f32,
+    /// World-space Y position of this emitter.
     pub emitter_y: f32,
+    /// Fractional emission accumulator; drives continuous spawning between frames.
     pub emit_accumulator: f32,
+    /// Current emitter operating state: active, paused, or stopped.
     pub state: EmitterState,
+    /// Total age of the emitter in seconds since last `start`.
     pub emitter_age: f32,
+    /// Emitter X position at the previous frame; used for motion interpolation.
     pub prev_emitter_x: f32,
+    /// Emitter Y position at the previous frame; used for motion interpolation.
     pub prev_emitter_y: f32,
+    /// Active point attractors applied to all particles each frame.
     pub attractors: Vec<Attractor>,
+    /// Optional axis-aligned bounce boundary that reflects particles.
     pub bounce_bounds: Option<BounceBounds>,
+    /// Child sub-systems spawned on particle death.
     pub sub_systems: Vec<ParticleSystem>,
+    /// Particle pool indices waiting for a custom spawn-offset callback.
     pub pending_custom_offsets: Vec<usize>,
+    /// `(world_x, world_y, vx, vy)` entries for particles that died this frame.
     pub pending_deaths: Vec<(f32, f32, f32, f32)>,
 }
 impl ParticleSystem {
+    /// Create a new system from `config`; allocates the particle pool upfront.
     pub fn new(config: ParticleConfig) -> Self {
         log_msg!(debug, PE01, "max {} particles", config.max_particles);
         Self {
@@ -47,6 +68,7 @@ impl ParticleSystem {
             pending_deaths: Vec::new(),
         }
     }
+    /// Advance all particles by `dt` seconds: integrate physics, retire dead particles, and spawn new ones.
     #[allow(clippy::unnecessary_unwrap)]
     pub fn update(&mut self, dt: f32) {
         if self.state == EmitterState::Paused {
@@ -197,6 +219,7 @@ impl ParticleSystem {
         self.prev_emitter_x = self.emitter_x;
         self.prev_emitter_y = self.emitter_y;
     }
+    /// Spawn a single particle using the current config; inserts according to `insert_mode`.
     fn emit_one(&mut self) {
         let lifetime = rand_range(self.config.lifetime_min, self.config.lifetime_max);
         let speed = rand_range(self.config.speed_min, self.config.speed_max);
@@ -260,6 +283,7 @@ impl ParticleSystem {
             self.pending_custom_offsets.push(new_idx);
         }
     }
+    /// Burst-spawn up to `count` particles immediately, capped by `max_particles`.
     pub fn emit(&mut self, count: u32) {
         for _ in 0..count {
             if self.particles.len() >= self.config.max_particles as usize {
@@ -268,9 +292,11 @@ impl ParticleSystem {
             self.emit_one();
         }
     }
+    /// Return the number of live particles in the pool.
     pub fn count(&self) -> usize {
         self.particles.len()
     }
+    /// Clear all particles and reset the accumulator and age.
     pub fn reset(&mut self) {
         log_msg!(debug, PE04);
         self.particles.clear();
@@ -279,47 +305,59 @@ impl ParticleSystem {
         self.pending_custom_offsets.clear();
         self.pending_deaths.clear();
     }
+    /// Transition to `Active` and reset `emitter_age` to zero.
     pub fn start(&mut self) {
         log_msg!(debug, PE02);
         self.state = EmitterState::Active;
         self.emitter_age = 0.0;
     }
+    /// Transition to `Stopped`; existing particles continue to live but no new ones are emitted.
     pub fn stop(&mut self) {
         log_msg!(debug, PE03);
         self.state = EmitterState::Stopped;
     }
+    /// Transition to `Paused`; update loop stops advancing but particles freeze in place.
     pub fn pause(&mut self) {
         self.state = EmitterState::Paused;
     }
+    /// Resume from `Paused` or `Stopped`; transitions to `Active`.
     pub fn resume(&mut self) {
         if self.state == EmitterState::Paused || self.state == EmitterState::Stopped {
             self.state = EmitterState::Active;
         }
     }
+    /// Update the emitter's world-space position, recording the previous position for motion blur.
     pub fn move_to(&mut self, x: f32, y: f32) {
         self.prev_emitter_x = self.emitter_x;
         self.prev_emitter_y = self.emitter_y;
         self.emitter_x = x;
         self.emitter_y = y;
     }
+    /// Return a new `ParticleSystem` with the same config but no live particles.
     pub fn clone_config(&self) -> ParticleSystem {
         ParticleSystem::new(self.config.clone())
     }
+    /// Return `true` when the emitter state is `Active`.
     pub fn is_active(&self) -> bool {
         self.state == EmitterState::Active
     }
+    /// Return `true` when the emitter state is `Paused`.
     pub fn is_paused(&self) -> bool {
         self.state == EmitterState::Paused
     }
+    /// Return `true` when the emitter state is `Stopped`.
     pub fn is_stopped(&self) -> bool {
         self.state == EmitterState::Stopped
     }
+    /// Return `true` when the particle pool is empty.
     pub fn is_empty(&self) -> bool {
         self.particles.is_empty()
     }
+    /// Return `true` when the pool has reached `max_particles`.
     pub fn is_full(&self) -> bool {
         self.particles.len() >= self.config.max_particles as usize
     }
+    /// Build `RenderCommand` values for all live particles at world offset `(ox, oy)`, including sub-systems.
     pub fn build_render_commands(&self, ox: f32, oy: f32) -> Vec<RenderCommand> {
         if self.particles.is_empty() {
             return Vec::new();
@@ -403,6 +441,7 @@ impl ParticleSystem {
         }
         all_cmds
     }
+    /// Run the update loop for up to `seconds` in 50 ms steps to pre-populate the particle pool.
     pub fn warm_up(&mut self, seconds: f32) {
         const STEP: f32 = 0.05;
         let clamped = seconds.clamp(0.0, 30.0);
@@ -413,6 +452,7 @@ impl ParticleSystem {
             remaining -= dt;
         }
     }
+    /// Add a point attractor at `(x, y)` with given `strength` and influence `radius`.
     pub fn add_attractor(&mut self, x: f32, y: f32, strength: f32, radius: f32) {
         self.attractors.push(Attractor {
             x,
@@ -421,12 +461,15 @@ impl ParticleSystem {
             radius,
         });
     }
+    /// Remove all attractors.
     pub fn clear_attractors(&mut self) {
         self.attractors.clear();
     }
+    /// Return the number of active attractors.
     pub fn attractor_count(&self) -> usize {
         self.attractors.len()
     }
+    /// Set the axis-aligned bounce boundary; particles reflect on crossing any edge.
     pub fn set_bounds(&mut self, x_min: f32, x_max: f32, y_min: f32, y_max: f32, restitution: f32) {
         self.bounce_bounds = Some(BounceBounds {
             x_min,
@@ -436,20 +479,25 @@ impl ParticleSystem {
             restitution: restitution.clamp(0.0, 1.0),
         });
     }
+    /// Remove the bounce boundary.
     pub fn clear_bounds(&mut self) {
         self.bounce_bounds = None;
     }
+    /// Append a child sub-system; returns its index in `sub_systems`.
     pub fn add_sub_system(&mut self, config: ParticleConfig) -> usize {
         let sub = ParticleSystem::new(config);
         self.sub_systems.push(sub);
         self.sub_systems.len() - 1
     }
+    /// Return the number of active sub-systems.
     pub fn sub_system_count(&self) -> usize {
         self.sub_systems.len()
     }
+    /// Drain and return all `(world_x, world_y, vx, vy)` death events accumulated since the last call.
     pub fn drain_pending_deaths(&mut self) -> Vec<(f32, f32, f32, f32)> {
         std::mem::take(&mut self.pending_deaths)
     }
+    /// Drain and return particle pool indices that need a custom spawn-offset callback applied.
     pub fn drain_custom_offsets(&mut self) -> Vec<usize> {
         std::mem::take(&mut self.pending_custom_offsets)
     }

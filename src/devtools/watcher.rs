@@ -1,3 +1,8 @@
+//! Track watched files and detect modifications for developer hot-reload flows.
+//! Support both polling-based mtime checks and optional native watcher events.
+//! Do not apply reload logic or script recompilation decisions in this module.
+//! Depend on filesystem metadata and optional notify backend when enabled.
+
 use crate::filesystem::watcher::read_mtime;
 #[cfg(feature = "devtools-plugin")]
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
@@ -7,18 +12,25 @@ use std::path::{Path, PathBuf};
 use std::sync::mpsc::{channel, Receiver};
 use std::time::SystemTime;
 #[derive(Debug, Default)]
+/// Store watched paths and last observed modification timestamps.
 pub struct FileWatcher {
+    /// Map each watched path to its last observed mtime, or None when absent.
     pub paths: HashMap<PathBuf, Option<SystemTime>>,
     #[cfg(feature = "devtools-plugin")]
+    /// Hold optional native watcher state when plugin support is enabled.
     native: Option<NativeWatcher>,
 }
 #[cfg(feature = "devtools-plugin")]
 #[derive(Debug)]
+/// Bundle notify watcher instance and receiver for queued native events.
 struct NativeWatcher {
+    /// Own the platform watcher registration and event callback.
     watcher: RecommendedWatcher,
+    /// Receive file-system events emitted by the native watcher callback.
     rx: Receiver<notify::Result<Event>>,
 }
 impl FileWatcher {
+    /// Create watcher state and return native-backed watcher when feature is enabled.
     pub fn new() -> Self {
         #[cfg(feature = "devtools-plugin")]
         {
@@ -33,6 +45,7 @@ impl FileWatcher {
             Self::default()
         }
     }
+    /// Start watching a path and return unit.
     pub fn watch(&mut self, path: &str) {
         let p = PathBuf::from(path);
         #[cfg(feature = "devtools-plugin")]
@@ -41,6 +54,7 @@ impl FileWatcher {
         }
         self.paths.entry(p).or_insert(None);
     }
+    /// Stop watching a path and return true when an entry was removed.
     pub fn unwatch(&mut self, path: &str) -> bool {
         let removed = self.paths.remove(Path::new(path)).is_some();
         #[cfg(feature = "devtools-plugin")]
@@ -51,12 +65,14 @@ impl FileWatcher {
         }
         removed
     }
+    /// Return watched paths as owned strings.
     pub fn watched_paths(&self) -> Vec<String> {
         self.paths
             .keys()
             .map(|p| p.to_string_lossy().into_owned())
             .collect()
     }
+    /// Poll all watched paths and return changed path strings.
     pub fn poll(&mut self) -> Vec<String> {
         let mut changed = std::collections::BTreeSet::new();
         #[cfg(feature = "devtools-plugin")]
@@ -80,6 +96,7 @@ impl FileWatcher {
         }
         changed.into_iter().collect()
     }
+    /// Unregister all native watches, clear tracked paths, and return unit.
     pub fn clear(&mut self) {
         #[cfg(feature = "devtools-plugin")]
         if let Some(native) = self.native.as_mut() {
@@ -89,12 +106,14 @@ impl FileWatcher {
         }
         self.paths.clear();
     }
+    /// Mark all watched paths as stale so next poll reports them as changed.
     pub fn force_changed(&mut self) {
         for last in self.paths.values_mut() {
             *last = Some(std::time::UNIX_EPOCH);
         }
     }
     #[cfg(feature = "devtools-plugin")]
+    /// Build native watcher state and return None when backend creation fails.
     fn build_native() -> Option<NativeWatcher> {
         let (tx, rx) = channel();
         let watcher = RecommendedWatcher::new(
@@ -107,6 +126,7 @@ impl FileWatcher {
         Some(NativeWatcher { watcher, rx })
     }
     #[cfg(feature = "devtools-plugin")]
+    /// Drain queued native events into changed-path set and return unit.
     fn drain_native_events(&mut self, changed: &mut std::collections::BTreeSet<String>) {
         let Some(native) = self.native.as_mut() else {
             return;

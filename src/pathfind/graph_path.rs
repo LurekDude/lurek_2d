@@ -1,24 +1,39 @@
+//! Province-level A\* and Dijkstra reachability for strategy-game maps.
+//! Operates on province adjacency lists with per-province and per-edge tag costs.
+//! Does not own province data or Lua bindings; consumed by `src/province/` and `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
+/// Result of a province-level pathfinding query.
 #[derive(Debug, Clone)]
 pub struct ProvincePath {
+    /// Ordered sequence of province ids from start to destination, inclusive.
     pub provinces: Vec<u32>,
+    /// Summed move cost along the chosen path.
     pub total_cost: f64,
 }
+/// Per-province and per-edge-tag move-cost configuration passed to path queries.
 #[derive(Debug, Clone, Default)]
 pub struct ProvinceCostFn {
+    /// Base cost applied to every traversable province.
     pub default_cost: f64,
+    /// Per-province cost additions keyed by province id.
     pub province_costs: HashMap<u32, f64>,
+    /// Edge surcharges applied when a crossing edge carries the given tag.
     pub tag_costs: HashMap<String, f64>,
+    /// Province ids that cannot be entered; paths will not pass through them.
     pub blocked: HashSet<u32>,
 }
+/// Construction and cost helpers for `ProvinceCostFn`.
 impl ProvinceCostFn {
+    /// Create a default cost function with `default_cost = 1.0` and no blocked provinces.
     pub fn new() -> Self {
         Self {
             default_cost: 1.0,
             ..Default::default()
         }
     }
+    /// Return the total cost to enter `province_id`, or `None` when blocked or infinite.
     fn cost_for(&self, province_id: u32) -> Option<f64> {
         if self.blocked.contains(&province_id) {
             return None;
@@ -36,6 +51,7 @@ impl ProvinceCostFn {
             Some(total)
         }
     }
+    /// Sum tag surcharges for an edge whose tag set intersects `edge_tags`.
     fn edge_cost(&self, edge_tags: &HashSet<String>) -> f64 {
         let mut extra = 0.0;
         for (tag, &cost) in &self.tag_costs {
@@ -46,21 +62,28 @@ impl ProvinceCostFn {
         extra
     }
 }
+/// Internal priority-queue node for province-level A\* and Dijkstra.
 struct AStarNode {
+    /// Province id held by this node.
     province_id: u32,
+    /// f-score (g + h for A\*, g for Dijkstra).
     f_score: f64,
 }
+/// Equality by f-score.
 impl PartialEq for AStarNode {
     fn eq(&self, other: &Self) -> bool {
         self.f_score == other.f_score
     }
 }
 impl Eq for AStarNode {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for AStarNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap on f-score.
 impl Ord for AStarNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other
@@ -69,6 +92,7 @@ impl Ord for AStarNode {
             .unwrap_or(Ordering::Equal)
     }
 }
+/// Run A\* across province adjacency; return the cheapest path and its cost, or `None` when unreachable.
 pub fn find_province_path(
     neighbors: &HashMap<u32, Vec<u32>>,
     centroids: &HashMap<u32, (f32, f32)>,
@@ -151,6 +175,7 @@ pub fn find_province_path(
     }
     None
 }
+/// Return all provinces reachable from `start` within `max_cost` as a map of `province_id → cost`.
 pub fn province_reachable(
     neighbors: &HashMap<u32, Vec<u32>>,
     edge_tags: &HashMap<(u32, u32), HashSet<String>>,
@@ -206,6 +231,7 @@ pub fn province_reachable(
         .filter(|(id, _)| visited.contains(id))
         .collect()
 }
+/// Return Euclidean distance between two centroid points.
 fn centroid_distance(a: &(f32, f32), b: &(f32, f32)) -> f64 {
     let dx = (a.0 - b.0) as f64;
     let dy = (a.1 - b.1) as f64;

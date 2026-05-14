@@ -1,20 +1,33 @@
+//! HTML selector parsing and element matching.
+
 use crate::html::element::{HtmlElement, HtmlElementId};
+/// Selector relationship used between adjacent selector parts.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Combinator {
+    /// Match any ancestor chain between selector parts.
     Descendant,
+    /// Match only the direct parent between selector parts.
     Child,
 }
+/// A selector fragment with optional tag, id, and class filters.
 #[derive(Clone, Debug, Default)]
 struct SimpleSelector {
+    /// Optional tag name filter.
     tag: Option<String>,
+    /// Optional id filter.
     id: Option<String>,
+    /// Required class names for the fragment.
     classes: Vec<String>,
 }
+/// A parsed selector fragment and the relationship to its left neighbor.
 #[derive(Clone, Debug)]
 struct SelectorPart {
+    /// Matching terms for this fragment.
     selector: SimpleSelector,
+    /// Relationship to the next fragment toward the root.
     combinator: Option<Combinator>,
 }
+/// Return whether a selector matches an element in the provided tree.
 pub(crate) fn matches_selector(
     elements: &[HtmlElement],
     element_id: HtmlElementId,
@@ -26,6 +39,7 @@ pub(crate) fn matches_selector(
     }
     matches_part_chain(elements, element_id, &parts, parts.len() - 1)
 }
+/// Match the selector chain from the current part back toward the root.
 fn matches_part_chain(
     elements: &[HtmlElement],
     element_id: HtmlElementId,
@@ -60,6 +74,7 @@ fn matches_part_chain(
         }
     }
 }
+/// Check whether a simple selector matches a single element.
 fn matches_simple(element: &HtmlElement, selector: &SimpleSelector) -> bool {
     if let Some(tag) = &selector.tag {
         if element.tag_name() != tag {
@@ -76,6 +91,7 @@ fn matches_simple(element: &HtmlElement, selector: &SimpleSelector) -> bool {
         .iter()
         .all(|class_name| element.has_class(class_name))
 }
+/// Parse a selector string into selector parts and combinators.
 fn parse_selector(selector: &str) -> Vec<SelectorPart> {
     let mut parts = Vec::new();
     let mut token = String::new();
@@ -101,6 +117,7 @@ fn parse_selector(selector: &str) -> Vec<SelectorPart> {
     }
     parts
 }
+/// Push the current selector token into the part list when it is non-empty.
 fn push_part(parts: &mut Vec<SelectorPart>, token: &mut String, combinator: Option<Combinator>) {
     let trimmed = token.trim();
     if !trimmed.is_empty() {
@@ -111,6 +128,7 @@ fn push_part(parts: &mut Vec<SelectorPart>, token: &mut String, combinator: Opti
     }
     token.clear();
 }
+/// Parse a simple selector token into tag, id, and class filters.
 fn parse_simple(token: &str) -> SimpleSelector {
     let mut selector = SimpleSelector::default();
     let mut cursor = 0;

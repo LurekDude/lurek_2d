@@ -1,26 +1,42 @@
+//! Globe province loading from TOML, PNG grids, and generated Voronoi points.
+//!
+//! Owns lightweight parsing and conversion into shared province types.
+//! Registry insertion and render behavior stay outside this module.
+
 use crate::globe::types::{Province, ProvinceId};
 use crate::image::province_grid::ProvinceGrid;
 use crate::math::voronoi::voronoi_from_points;
 use std::collections::HashMap;
+/// Parsed TOML province record before conversion into the shared province type.
 #[derive(Debug, Clone)]
 struct TomlProvince {
+    /// Province identifier.
     id: ProvinceId,
+    /// Province centroid as latitude and longitude.
     centroid: [f32; 2],
+    /// Province polygon vertices as latitude and longitude pairs.
     vertices: Vec<[f32; 2]>,
+    /// Neighboring province ids.
     neighbors: Vec<ProvinceId>,
+    /// Optional base RGBA color.
     base_color: Option<[f32; 4]>,
+    /// Optional province texture name.
     texture: Option<String>,
+    /// Arbitrary string attributes.
     attrs: HashMap<String, String>,
 }
+/// Load provinces from a TOML string or return a parse error.
 pub fn load_from_toml_str(src: &str) -> Result<Vec<Province>, String> {
     let doc = parse_toml_province_list(src)?;
     Ok(doc.into_iter().map(toml_province_to_province).collect())
 }
+/// Load provinces from a TOML file path or return a parse or I/O error.
 pub fn load_from_toml_file(path: &str) -> Result<Vec<Province>, String> {
     let src =
         std::fs::read_to_string(path).map_err(|e| format!("cannot read '{}': {}", path, e))?;
     load_from_toml_str(&src)
 }
+/// Convert a parsed TOML province into the shared province type.
 fn toml_province_to_province(tp: TomlProvince) -> Province {
     let verts: Vec<(f32, f32)> = tp.vertices.iter().map(|v| (v[0], v[1])).collect();
     let mut p = Province::new(tp.id, verts);
@@ -31,6 +47,7 @@ fn toml_province_to_province(tp: TomlProvince) -> Province {
     p.attrs = tp.attrs;
     p
 }
+/// Parse a TOML province list using the local lightweight parser.
 fn parse_toml_province_list(src: &str) -> Result<Vec<TomlProvince>, String> {
     let mut provinces: Vec<TomlProvince> = Vec::new();
     let mut current: Option<TomlProvinceBuilder> = None;
@@ -71,17 +88,26 @@ fn parse_toml_province_list(src: &str) -> Result<Vec<TomlProvince>, String> {
     }
     Ok(provinces)
 }
+/// Incremental TOML province builder used by the lightweight parser.
 #[derive(Default)]
 struct TomlProvinceBuilder {
+    /// Optional province identifier.
     id: Option<ProvinceId>,
+    /// Optional centroid pair.
     centroid: Option<[f32; 2]>,
+    /// Collected province vertices.
     vertices: Vec<[f32; 2]>,
+    /// Collected neighbor ids.
     neighbors: Vec<ProvinceId>,
+    /// Optional base RGBA color.
     base_color: Option<[f32; 4]>,
+    /// Optional texture name.
     texture: Option<String>,
+    /// Collected string attributes.
     attrs: HashMap<String, String>,
 }
 impl TomlProvinceBuilder {
+    /// Finalize the builder into a TOML province or return a missing-field error.
     fn build(self) -> Result<TomlProvince, String> {
         Ok(TomlProvince {
             id: self.id.ok_or("province missing 'id'")?,
@@ -94,6 +120,7 @@ impl TomlProvinceBuilder {
         })
     }
 }
+/// Parse one non-attribute TOML field into the province builder.
 fn parse_field(line: &str, b: &mut TomlProvinceBuilder) -> Result<(), String> {
     let eq = line
         .find('=')
@@ -123,6 +150,7 @@ fn parse_field(line: &str, b: &mut TomlProvinceBuilder) -> Result<(), String> {
     }
     Ok(())
 }
+/// Parse one string key-value pair line and call the supplied sink.
 fn parse_kv_string(line: &str, mut f: impl FnMut(String, String)) {
     if let Some(eq) = line.find('=') {
         let k = line[..eq].trim().to_string();
@@ -130,9 +158,11 @@ fn parse_kv_string(line: &str, mut f: impl FnMut(String, String)) {
         f(k, v);
     }
 }
+/// Parse a u32 literal or return a parse error.
 fn parse_u32(s: &str) -> Result<u32, String> {
     s.trim().parse().map_err(|_| format!("not a u32: '{}'", s))
 }
+/// Parse a two-element float array or return a parse error.
 fn parse_f32_pair(s: &str) -> Result<[f32; 2], String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     let parts: Vec<&str> = inner.split(',').collect();
@@ -150,6 +180,7 @@ fn parse_f32_pair(s: &str) -> Result<[f32; 2], String> {
             .map_err(|_| format!("bad f32 '{}'", parts[1]))?,
     ])
 }
+/// Parse a four-element float array or return a parse error.
 fn parse_f32_4(s: &str) -> Result<[f32; 4], String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     let parts: Vec<&str> = inner.split(',').collect();
@@ -162,6 +193,7 @@ fn parse_f32_4(s: &str) -> Result<[f32; 4], String> {
     }
     Ok(out)
 }
+/// Parse an array of two-element float arrays or return a parse error.
 fn parse_f32_pair_array(s: &str) -> Result<Vec<[f32; 2]>, String> {
     let s = s.trim().trim_start_matches('[').trim_end_matches(']');
     let mut out = Vec::new();
@@ -186,6 +218,7 @@ fn parse_f32_pair_array(s: &str) -> Result<Vec<[f32; 2]>, String> {
     }
     Ok(out)
 }
+/// Parse a u32 array or return a parse error.
 fn parse_u32_array(s: &str) -> Result<Vec<u32>, String> {
     let inner = s.trim().trim_start_matches('[').trim_end_matches(']');
     if inner.trim().is_empty() {
@@ -196,6 +229,7 @@ fn parse_u32_array(s: &str) -> Result<Vec<u32>, String> {
         .map(|p| p.trim().parse().map_err(|_| format!("bad u32 '{}'", p)))
         .collect()
 }
+/// Strip matching single or double quotes from a string literal.
 fn strip_quotes(s: &str) -> &str {
     let s = s.trim();
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
@@ -204,6 +238,7 @@ fn strip_quotes(s: &str) -> &str {
         s
     }
 }
+/// Load provinces from a PNG province grid or return a decode or I/O error.
 pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
     let grid = ProvinceGrid::from_file(_path)?;
     let width = grid.width().max(1);
@@ -248,6 +283,7 @@ pub fn load_from_png_file(_path: &str) -> Result<Vec<Province>, String> {
     }
     Ok(out)
 }
+/// Generate approximate provinces from Voronoi input points.
 pub fn generate_voronoi_provinces(points: &[(f32, f32)]) -> Vec<Province> {
     if points.is_empty() {
         return Vec::new();

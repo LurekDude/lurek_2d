@@ -1,5 +1,11 @@
+//! CPU-side software rasterizer for `RaycasterScene`. Rasterizes scene quads
+//! (floors, ceilings, walls, sprites) into an `ImageData` pixel buffer using
+//! flat-colored rectangles. Used for headless testing and CPU fallback paths.
+//! Does not own scene construction or GPU upload.
+
 use crate::image::ImageData;
 use crate::raycaster::scene::RaycasterScene;
+/// Fill a screen-space rectangle with the given RGBA `light` color; clamps to image bounds.
 fn fill_rect(img: &mut ImageData, x0: f32, y0: f32, x1: f32, y1: f32, light: [f32; 4]) {
     let w = img.width();
     let h = img.height();
@@ -18,6 +24,7 @@ fn fill_rect(img: &mut ImageData, x0: f32, y0: f32, x1: f32, y1: f32, light: [f3
     }
 }
 impl RaycasterScene {
+    /// Rasterize this scene into a new `ImageData` of `width × height`; draws ceilings, floors, walls, then sprites back-to-front.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         for ceil in &self.ceilings {

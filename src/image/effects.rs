@@ -1,10 +1,20 @@
+//! Image-space effects, filters, resampling, and compositing helpers for `ImageData`.
+//! Owns brightness, contrast, saturation, gamma, noise, blur, sharpen, resize (bilinear/Lanczos3),
+//! flip, crop, blit (alpha-compositing), nine-slice drawing, and pixel diff.
+//! Does not own GPU pipelines; all operations produce or mutate CPU-side `ImageData`.
+//! Depends on `image_data::ImageData` and the `rayon` crate for parallel pixel mapping.
+
 use super::image_data::ImageData;
+/// Resize kernels supported by the image resampler.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResizeFilter {
+    /// Bilinear interpolation.
     Bilinear,
+    /// Lanczos3 windowed-sinc interpolation.
     Lanczos3,
 }
 impl ResizeFilter {
+    /// Parse a resize filter name and return the selected filter when recognized.
     pub fn parse(value: &str) -> Option<Self> {
         match value.to_ascii_lowercase().as_str() {
             "bilinear" | "linear" => Some(Self::Bilinear),
@@ -13,6 +23,7 @@ impl ResizeFilter {
         }
     }
 }
+/// Return the normalized sinc weight for the input value.
 fn sinc(x: f32) -> f32 {
     if x.abs() < f32::EPSILON {
         1.0
@@ -21,6 +32,7 @@ fn sinc(x: f32) -> f32 {
         px.sin() / px
     }
 }
+/// Return the Lanczos window weight for a distance and window size.
 fn lanczos_weight(x: f32, a: f32) -> f32 {
     let ax = x.abs();
     if ax >= a {
@@ -30,6 +42,7 @@ fn lanczos_weight(x: f32, a: f32) -> f32 {
     }
 }
 impl ImageData {
+    /// Scale RGB channels by a factor in place.
     pub fn brightness(&mut self, factor: f32) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let r = (r as f32 * factor).clamp(0.0, 255.0) as u8;
@@ -38,12 +51,14 @@ impl ImageData {
             (r, g, b, a)
         });
     }
+    /// Adjust contrast around the midpoint in place.
     pub fn contrast(&mut self, factor: f32) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let apply = |ch: u8| ((ch as f32 - 128.0) * factor + 128.0).clamp(0.0, 255.0) as u8;
             (apply(r), apply(g), apply(b), a)
         });
     }
+    /// Blend RGB channels toward luminance by the given factor.
     pub fn saturation(&mut self, factor: f32) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let luma = 0.2126 * r as f32 + 0.7152 * g as f32 + 0.0722 * b as f32;
@@ -51,6 +66,7 @@ impl ImageData {
             (lerp(r as f32), lerp(g as f32), lerp(b as f32), a)
         });
     }
+    /// Apply gamma correction to RGB channels in place.
     pub fn gamma(&mut self, gamma: f32) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let apply =
@@ -58,6 +74,7 @@ impl ImageData {
             (apply(r), apply(g), apply(b), a)
         });
     }
+    /// Blend RGB channels toward a tint color by the given factor.
     pub fn tint(&mut self, tr: u8, tg: u8, tb: u8, factor: f32) {
         self.map_pixel_par(move |_, _, r, g, b, a| {
             let lerp = |from: u8, to: u8| {
@@ -66,12 +83,14 @@ impl ImageData {
             (lerp(r, tr), lerp(g, tg), lerp(b, tb), a)
         });
     }
+    /// Convert the image to grayscale in place.
     pub fn grayscale(&mut self) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let luma = (0.2126 * r as f32 + 0.7152 * g as f32 + 0.0722 * b as f32).round() as u8;
             (luma, luma, luma, a)
         });
     }
+    /// Apply a sepia tone in place.
     pub fn sepia(&mut self) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let rf = r as f32;
@@ -83,9 +102,11 @@ impl ImageData {
             (nr, ng, nb, a)
         });
     }
+    /// Invert the RGB channels in place.
     pub fn invert(&mut self) {
         self.map_pixel_par(|_, _, r, g, b, a| (255 - r, 255 - g, 255 - b, a));
     }
+    /// Convert the image to a hard thresholded grayscale image.
     pub fn threshold(&mut self, value: u8) {
         self.map_pixel_par(move |_, _, r, g, b, a| {
             let luma = (0.2126 * r as f32 + 0.7152 * g as f32 + 0.0722 * b as f32).round() as u8;
@@ -93,6 +114,7 @@ impl ImageData {
             (v, v, v, a)
         });
     }
+    /// Reduce color depth to the requested number of levels.
     pub fn posterize(&mut self, levels: u8) {
         let levels = levels.max(2);
         let l = levels as f32 - 1.0;
@@ -101,9 +123,11 @@ impl ImageData {
             (apply(r), apply(g), apply(b), a)
         });
     }
+    /// Fill the whole image with a solid color.
     pub fn fill(&mut self, r: u8, g: u8, b: u8, a: u8) {
         self.map_pixel_par(move |_, _, _, _, _, _| (r, g, b, a));
     }
+    /// Add repeatable random noise to RGB channels.
     pub fn noise(&mut self, amount: u8) {
         if amount == 0 {
             return;
@@ -128,12 +152,14 @@ impl ImageData {
             }
         }
     }
+    /// Scale the alpha channel by a factor in place.
     pub fn alpha_mask(&mut self, factor: f32) {
         self.map_pixel(|_, _, r, g, b, a| {
             let na = (a as f32 * factor).clamp(0.0, 255.0) as u8;
             (r, g, b, na)
         });
     }
+    /// Flip the image horizontally in place.
     pub fn flip_horizontal(&mut self) {
         let w = self.width as usize;
         let h = self.height as usize;
@@ -149,6 +175,7 @@ impl ImageData {
             }
         }
     }
+    /// Flip the image vertically in place.
     pub fn flip_vertical(&mut self) {
         let w = self.width as usize;
         let h = self.height as usize;
@@ -160,6 +187,7 @@ impl ImageData {
             }
         }
     }
+    /// Return a new image rotated 90 degrees clockwise.
     pub fn rotate_90_cw(&self) -> ImageData {
         let old_w = self.width;
         let old_h = self.height;
@@ -177,6 +205,7 @@ impl ImageData {
         }
         out
     }
+    /// Return a cropped copy of the image or `None` when the region is invalid.
     pub fn crop(&self, x: u32, y: u32, w: u32, h: u32) -> Option<ImageData> {
         if w == 0 || h == 0 || x + w > self.width || y + h > self.height {
             return None;
@@ -190,6 +219,7 @@ impl ImageData {
         }
         Some(out)
     }
+    /// Resize the image with nearest-neighbor sampling.
     pub fn resize_nearest(&self, new_w: u32, new_h: u32) -> ImageData {
         let mut out = ImageData::new(new_w, new_h);
         if new_w == 0 || new_h == 0 || self.width == 0 || self.height == 0 {
@@ -206,6 +236,7 @@ impl ImageData {
         }
         out
     }
+    /// Blur the image with a separable box kernel and return a new image.
     #[allow(clippy::needless_range_loop)]
     pub fn blur(&self, radius: u32) -> ImageData {
         if radius == 0 {
@@ -254,6 +285,7 @@ impl ImageData {
         }
         out
     }
+    /// Sharpen the image with a 3x3 kernel and return a new image.
     pub fn sharpen(&self) -> ImageData {
         let w = self.width as i32;
         let h = self.height as i32;
@@ -281,9 +313,11 @@ impl ImageData {
         }
         out
     }
+    /// Resize the image with bilinear interpolation by default.
     pub fn resize(&self, new_w: u32, new_h: u32) -> Option<ImageData> {
         self.resize_with_filter(new_w, new_h, ResizeFilter::Bilinear)
     }
+    /// Resize the image with the requested filter and return `None` for zero-sized output.
     pub fn resize_with_filter(
         &self,
         new_w: u32,
@@ -298,6 +332,7 @@ impl ImageData {
             ResizeFilter::Lanczos3 => Some(self.resize_lanczos3(new_w, new_h)),
         }
     }
+    /// Resize the image with bilinear sampling.
     fn resize_bilinear(&self, new_w: u32, new_h: u32) -> Option<ImageData> {
         let src_w = self.width as f32;
         let src_h = self.height as f32;
@@ -331,6 +366,7 @@ impl ImageData {
         }
         Some(out)
     }
+    /// Resize the image with Lanczos3 sampling.
     fn resize_lanczos3(&self, new_w: u32, new_h: u32) -> ImageData {
         let a = 3.0f32;
         let src_w = self.width as i32;
@@ -381,6 +417,7 @@ impl ImageData {
         }
         out
     }
+    /// Blend another image into this image using alpha or overwrite when fully opaque.
     pub fn blit(&mut self, src: &ImageData, dst_x: i32, dst_y: i32) {
         let dw = self.width as i32;
         let dh = self.height as i32;
@@ -441,6 +478,7 @@ impl ImageData {
             }
         }
     }
+    /// Draw a nine-slice region from a source image into this image.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_nine_slice(
         &mut self,
@@ -580,6 +618,7 @@ impl ImageData {
         )?;
         Ok(())
     }
+    /// Return a copied rectangular region or `None` when out of bounds.
     pub fn get_region(&self, x: u32, y: u32, w: u32, h: u32) -> Option<ImageData> {
         if w == 0 || h == 0 || x + w > self.width || y + h > self.height {
             return None;
@@ -594,6 +633,7 @@ impl ImageData {
         }
         Some(out)
     }
+    /// Compute a bytewise difference score between two images.
     pub fn diff(&self, other: &ImageData) -> u32 {
         let same_dims = self.width == other.width && self.height == other.height;
         if same_dims {
@@ -621,6 +661,7 @@ impl ImageData {
             total + extra_self + extra_other
         }
     }
+    /// Convolve the image with a square kernel and return an error on invalid input.
     #[allow(clippy::needless_range_loop)]
     pub fn convolve(&self, kernel: &[f64], ksize: usize) -> Result<ImageData, String> {
         if ksize == 0 {

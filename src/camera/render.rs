@@ -1,6 +1,12 @@
+//! Camera-to-render command adapters for transform stack setup.
+//! Owns command emission for beginning and ending camera-scoped draw passes.
+//! Keeps render command construction separate from renderer execution details.
+//! Depends on camera state types and RenderCommand enum variants.
+
 use crate::camera::types::{Camera, Camera2D};
 use crate::render::renderer::RenderCommand;
 impl Camera {
+    /// Append camera begin-transform commands and return after extending output.
     pub fn append_begin_render_commands(&self, out: &mut Vec<RenderCommand>) {
         out.push(RenderCommand::PushTransform);
         out.push(RenderCommand::Translate {
@@ -19,14 +25,17 @@ impl Camera {
             });
         }
     }
+    /// Build begin-transform command list and return it for immediate submission.
     pub fn begin_render_commands(&self) -> Vec<RenderCommand> {
         let mut cmds = Vec::with_capacity(4);
         self.append_begin_render_commands(&mut cmds);
         cmds
     }
+    /// Return render command that restores transform stack after camera pass.
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
     }
+    /// Wrap scene commands with camera begin/end transforms and return combined list.
     pub fn generate_render_commands(
         &self,
         scene_commands: Vec<RenderCommand>,
@@ -38,6 +47,7 @@ impl Camera {
     }
 }
 impl Camera2D {
+    /// Append 2D camera begin-transform commands and return after extending output.
     pub fn append_begin_render_commands(&self, out: &mut Vec<RenderCommand>) {
         out.push(RenderCommand::PushTransform);
         let (offset_x, offset_y) = self.render_offset();
@@ -58,14 +68,17 @@ impl Camera2D {
             });
         }
     }
+    /// Build 2D begin-transform command list and return it for submission.
     pub fn begin_render_commands(&self) -> Vec<RenderCommand> {
         let mut cmds = Vec::with_capacity(4);
         self.append_begin_render_commands(&mut cmds);
         cmds
     }
+    /// Return render command that restores transform stack after 2D camera pass.
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
     }
+    /// Wrap scene commands with 2D camera transforms and return combined list.
     pub fn generate_render_commands(
         &self,
         scene_commands: Vec<RenderCommand>,

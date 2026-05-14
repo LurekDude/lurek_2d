@@ -1,5 +1,12 @@
+//! Tilemap-to-RenderCommand conversion helpers.
+//! Adds `generate_render_commands` to `TileMap` for camera-culled GID-to-color fallback rendering.
+//! Does not own the render pipeline; output is handed to the render layer unchanged.
+//! Depends on `tilemap` and `render`.
+
 use super::tilemap::TileMap;
 use crate::render::renderer::{DrawMode, RenderCommand};
+
+/// Map a GID to a debug-palette RGB triple for fallback colored tile rendering.
 fn gid_to_color(gid: u32) -> (f32, f32, f32) {
     if gid >= 10 {
         match gid {
@@ -19,6 +26,7 @@ fn gid_to_color(gid: u32) -> (f32, f32, f32) {
 impl TileMap {
     #[allow(clippy::too_many_arguments)]
     #[allow(clippy::manual_clamp)]
+    /// Generate camera-culled `RenderCommand` primitives for all visible layers; returns an empty vec when the map has no layers or zero tile size.
     pub fn generate_render_commands(
         &self,
         offset_x: f32,

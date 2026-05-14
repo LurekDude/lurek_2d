@@ -1,19 +1,227 @@
+//! Biome classification for procedural world generation in `src/procgen`.
+//! Owns `BiomeType` variants, per-variant RGBA colors, threshold-driven `BiomeRules`,
+//! and `BiomeClassifier` which maps (height, moisture, temperature) triples to biome
+//! variants. Does not own heightmap or noise generation — those live in `heightmap.rs`
+//! and `noise.rs`.
+
+/// Biome variant covering terrain from ocean to ice cap.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum BiomeType {
+    /// Deep water below coast threshold.
     Ocean,
+    /// Shallow coastal water between ocean and beach thresholds.
     Coast,
+    /// Low dry land at the water's edge.
     Beach,
+    /// Hot arid low-to-mid elevation zone.
     Desert,
+    /// Temperate moderate-moisture lowland.
     Grassland,
+    /// Dry temperate scrubland.
     Shrubland,
+    /// Hot wet equatorial forest.
     TropicalRainforest,
+    /// Cool wet mid-elevation forest.
     TemperateForest,
+    /// Cold boreal conifer zone.
     Taiga,
+    /// Cold dry treeless plain.
     Tundra,
+    /// Rocky high-elevation terrain below ice cap.
     Mountain,
+    /// Permanent ice and snow above ice cap threshold.
     IceCap,
+    /// Wet low-temperature waterlogged zone.
     Swamp,
+    /// Warm moderate-moisture tropical grassland.
     Savanna,
+}
+
+impl BiomeType {
+    /// Return the canonical snake_case string token for this biome.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Ocean => "ocean",
+            Self::Coast => "coast",
+            Self::Beach => "beach",
+            Self::Desert => "desert",
+            Self::Grassland => "grassland",
+            Self::Shrubland => "shrubland",
+            Self::TropicalRainforest => "tropical_rainforest",
+            Self::TemperateForest => "temperate_forest",
+            Self::Taiga => "taiga",
+            Self::Tundra => "tundra",
+            Self::Mountain => "mountain",
+            Self::IceCap => "ice_cap",
+            Self::Swamp => "swamp",
+            Self::Savanna => "savanna",
+        }
+    }
+
+    /// Return the representative RGBA color `[r, g, b, 255]` for this biome variant.
+    pub fn color_rgba(self) -> [u8; 4] {
+        match self {
+            Self::Ocean => [30, 60, 150, 255],
+            Self::Coast => [60, 100, 180, 255],
+            Self::Beach => [220, 200, 150, 255],
+            Self::Desert => [210, 180, 90, 255],
+            Self::Grassland => [100, 160, 70, 255],
+            Self::Shrubland => [140, 160, 80, 255],
+            Self::TropicalRainforest => [30, 120, 30, 255],
+            Self::TemperateForest => [50, 130, 60, 255],
+            Self::Taiga => [70, 110, 80, 255],
+            Self::Tundra => [180, 200, 180, 255],
+            Self::Mountain => [120, 110, 100, 255],
+            Self::IceCap => [230, 240, 255, 255],
+            Self::Swamp => [60, 80, 50, 255],
+            Self::Savanna => [160, 180, 80, 255],
+        }
+    }
+}
+
+/// Scalar thresholds that drive biome classification; all values are normalised 0..=1.
+#[derive(Debug, Clone)]
+pub struct BiomeRules {
+    /// Height at or below which the cell is ocean.
+    pub ocean_threshold: f32,
+    /// Height at or below which (above ocean) the cell is coastal.
+    pub coast_threshold: f32,
+    /// Height at or above which the cell is mountain.
+    pub mountain_threshold: f32,
+    /// Height at or above which the cell is ice cap regardless of temperature.
+    pub ice_cap_threshold: f32,
+    /// Temperature below which cold-biome branches are selected.
+    pub cold_temperature: f32,
+    /// Temperature at or above which warm-biome branches are selected.
+    pub warm_temperature: f32,
+    /// Moisture below which dry-biome branches are selected.
+    pub dry_moisture: f32,
+    /// Moisture at or above which wet-biome branches are selected.
+    pub wet_moisture: f32,
+}
+
+/// Provide default thresholds suitable for an Earth-like world.
+impl Default for BiomeRules {
+    fn default() -> Self {
+        Self {
+            ocean_threshold: 0.30,
+            coast_threshold: 0.35,
+            mountain_threshold: 0.75,
+            ice_cap_threshold: 0.90,
+            cold_temperature: 0.25,
+            warm_temperature: 0.65,
+            dry_moisture: 0.25,
+            wet_moisture: 0.70,
+        }
+    }
+}
+
+/// Stateless classifier that maps (height, moisture, temperature) to a `BiomeType`.
+#[derive(Debug, Clone)]
+pub struct BiomeClassifier {
+    /// Threshold configuration used for all classification calls.
+    rules: BiomeRules,
+}
+
+impl BiomeClassifier {
+    /// Create a classifier using the provided rules.
+    pub fn new(rules: BiomeRules) -> Self {
+        Self { rules }
+    }
+
+    /// Create a classifier with `BiomeRules::default()`.
+    pub fn default_rules() -> Self {
+        Self::new(BiomeRules::default())
+    }
+
+    /// Classify a single cell and return its `BiomeType`; all inputs must be normalised 0..=1.
+    pub fn classify(&self, height: f32, moisture: f32, temperature: f32) -> BiomeType {
+        let r = &self.rules;
+        if height <= r.ocean_threshold {
+            return BiomeType::Ocean;
+        }
+        if height <= r.coast_threshold {
+            return if moisture < r.dry_moisture {
+                BiomeType::Beach
+            } else {
+                BiomeType::Coast
+            };
+        }
+        if height >= r.ice_cap_threshold {
+            return BiomeType::IceCap;
+        }
+        if height >= r.mountain_threshold {
+            return if temperature < r.cold_temperature {
+                BiomeType::IceCap
+            } else {
+                BiomeType::Mountain
+            };
+        }
+        if temperature < r.cold_temperature {
+            return if moisture < r.dry_moisture {
+                BiomeType::Tundra
+            } else {
+                BiomeType::Taiga
+            };
+        }
+        if moisture <= r.dry_moisture {
+            return if temperature >= r.warm_temperature {
+                BiomeType::Desert
+            } else {
+                BiomeType::Shrubland
+            };
+        }
+        if moisture >= r.wet_moisture {
+            return if temperature >= r.warm_temperature {
+                BiomeType::TropicalRainforest
+            } else if height > 0.45 {
+                BiomeType::TemperateForest
+            } else {
+                BiomeType::Swamp
+            };
+        }
+        if temperature >= r.warm_temperature {
+            BiomeType::Savanna
+        } else if moisture > 0.5 {
+            BiomeType::TemperateForest
+        } else {
+            BiomeType::Grassland
+        }
+    }
+
+    /// Classify every cell in a flat `width × height_map` grid; missing slice entries default to neutral values.
+    pub fn classify_map(
+        &self,
+        width: u32,
+        height_map: u32,
+        heights: &[f32],
+        moisture: &[f32],
+        temperature: &[f32],
+    ) -> Vec<BiomeType> {
+        let n = (width * height_map) as usize;
+        let mut biomes = Vec::with_capacity(n);
+        for i in 0..n {
+            let h = heights.get(i).copied().unwrap_or(0.0);
+            let m = moisture.get(i).copied().unwrap_or(0.5);
+            let t = temperature.get(i).copied().unwrap_or(0.5);
+            biomes.push(self.classify(h, m, t));
+        }
+        biomes
+    }
+
+    /// Return a shared reference to the active `BiomeRules`.
+    pub fn rules(&self) -> &BiomeRules {
+        &self.rules
+    }
+}
+
+/// Convert a slice of `BiomeType` values to a flat RGBA byte buffer at 4 bytes per cell.
+pub fn biome_map_to_rgba(biomes: &[BiomeType]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(biomes.len() * 4);
+    for &b in biomes {
+        out.extend_from_slice(&b.color_rgba());
+    }
+    out
 }
 impl BiomeType {
     pub fn as_str(self) -> &'static str {

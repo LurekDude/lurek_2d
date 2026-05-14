@@ -1,23 +1,38 @@
+//! Graph pathfinding helpers for shortest paths, reachability, and neighbor queries.
+//!
+//! Owns Dijkstra-style traversal over the graph edge set.
+//! Item movement still happens in simulation code.
+
 use super::core::Graph;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
+/// Result of a graph path query.
 #[derive(Debug, Clone)]
 pub struct PathResult {
+    /// Node ids in path order.
     pub nodes: Vec<u64>,
+    /// Edge ids in path order.
     pub edges: Vec<u64>,
+    /// Total path cost.
     pub cost: f64,
 }
+/// Priority-queue state used by Dijkstra traversal.
 #[derive(PartialEq)]
 struct DijkstraState {
+    /// Current accumulated cost.
     cost: f64,
+    /// Node id associated with this queue entry.
     node_id: u64,
 }
+/// Marks Dijkstra queue entries as equatable.
 impl Eq for DijkstraState {}
+/// Orders Dijkstra queue entries by lowest cost first.
 impl PartialOrd for DijkstraState {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Orders Dijkstra queue entries by lowest cost first.
 impl Ord for DijkstraState {
     fn cmp(&self, other: &Self) -> Ordering {
         other
@@ -28,6 +43,7 @@ impl Ord for DijkstraState {
     }
 }
 impl Graph {
+    /// Find the cheapest active path between two nodes.
     pub fn find_path(&self, from: u64, to: u64) -> Option<PathResult> {
         if !self.has_node(from) || !self.has_node(to) {
             return None;
@@ -97,6 +113,7 @@ impl Graph {
         }
         None
     }
+    /// Find the cheapest active path for an item type between two nodes.
     pub fn find_path_for_item(&self, item_id: u64, from: u64, to: u64) -> Option<PathResult> {
         let item_type = self.items.get(&item_id)?.item_type.clone();
         if !self.has_node(from) || !self.has_node(to) {
@@ -173,9 +190,11 @@ impl Graph {
         }
         None
     }
+    /// Return the cheapest path cost between two nodes.
     pub fn get_distance(&self, from: u64, to: u64) -> Option<f64> {
         self.find_path(from, to).map(|p| p.cost)
     }
+    /// Return nodes reachable from a source within an optional cost limit.
     pub fn get_reachable(&self, from: u64, max_dist: Option<f64>) -> Vec<u64> {
         if !self.has_node(from) {
             return Vec::new();
@@ -246,6 +265,7 @@ impl Graph {
         }
         result
     }
+    /// Return active neighboring node ids connected to the supplied node.
     pub fn get_neighbors(&self, node_id: u64) -> Vec<u64> {
         let mut result = HashSet::new();
         for &edge_id in self.outgoing_edge_ids_slice(node_id) {
@@ -266,6 +286,7 @@ impl Graph {
         }
         result.into_iter().collect()
     }
+    /// Reconstruct a path result from predecessor links and the final cost.
     fn reconstruct_path(
         &self,
         prev: &HashMap<u64, (u64, u64)>,

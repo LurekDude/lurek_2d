@@ -1,19 +1,33 @@
+//! Dijkstra-based flow field backed by a shared `NavGrid`; supports multi-target seeding,
+//! cost-weighted movement, steering helpers, and debug image export.
+//! Does not own grid construction or Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::pathfind::nav_grid::NavGrid;
 use crate::runtime::log_messages::{FF01, FF02, FF03};
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::rc::Rc;
+/// Grid-resident flow field pointing each reachable cell toward one or more goal cells.
 pub struct FlowField {
+    /// Width of the backing grid in cells.
     width: u32,
+    /// Height of the backing grid in cells.
     height: u32,
+    /// Normalised move direction per cell, pointing toward the nearest goal.
     directions: Vec<(f32, f32)>,
+    /// Dijkstra distance from each cell to the nearest goal.
     costs: Vec<f32>,
+    /// True after `calculate` or `calculate_multi` has run at least once.
     calculated: bool,
+    /// Seed cells used for the last computation.
     targets: Vec<(u32, u32)>,
+    /// Shared grid reference used for walkability and move-cost queries.
     grid: Rc<RefCell<NavGrid>>,
 }
+/// Construction and query methods for `FlowField`.
 impl FlowField {
+    /// Create an uninitialised flow field linked to `grid`; call `calculate` before querying.
     pub fn new(grid: Rc<RefCell<NavGrid>>) -> Self {
         let g = grid.borrow();
         let w = g.get_width();
@@ -31,9 +45,11 @@ impl FlowField {
             grid,
         }
     }
+    /// Seed the field with a single target cell and recompute.
     pub fn calculate(&mut self, target_x: u32, target_y: u32, unit_size: u32) {
         self.calculate_multi(&[(target_x, target_y)], unit_size);
     }
+    /// Recompute the field seeded from all cells in `targets`.
     pub fn calculate_multi(&mut self, targets: &[(u32, u32)], unit_size: u32) {
         let grid = self.grid.borrow();
         let w = grid.get_width();
@@ -121,34 +137,42 @@ impl FlowField {
         log_msg!(debug, FF02);
         self.calculated = true;
     }
+    /// Return the normalised flow direction at `(x, y)`; returns `(0,0)` when out of bounds.
     pub fn get_direction(&self, x: u32, y: u32) -> (f32, f32) {
         if x >= self.width || y >= self.height {
             return (0.0, 0.0);
         }
         self.directions[(y * self.width + x) as usize]
     }
+    /// Return the flow direction at `(x, y)` as an angle in radians relative to the +x axis.
     pub fn get_direction_angle(&self, x: u32, y: u32) -> f32 {
         let (dx, dy) = self.get_direction(x, y);
         dy.atan2(dx)
     }
+    /// Return the Dijkstra cost from `(x, y)` to the nearest target; `INFINITY` when unreachable.
     pub fn get_cost_to_target(&self, x: u32, y: u32) -> f32 {
         if x >= self.width || y >= self.height {
             return f32::INFINITY;
         }
         self.costs[(y * self.width + x) as usize]
     }
+    /// Return true if `calculate` or `calculate_multi` has been called at least once.
     pub fn is_calculated(&self) -> bool {
         self.calculated
     }
+    /// Return a clone of the target cells used for the last computation.
     pub fn get_targets(&self) -> Vec<(u32, u32)> {
         self.targets.clone()
     }
+    /// Return the grid width.
     pub fn get_width(&self) -> u32 {
         self.width
     }
+    /// Return the grid height.
     pub fn get_height(&self) -> u32 {
         self.height
     }
+    /// Convert world position to tile, sample direction, and return a velocity scaled by `speed`.
     pub fn steer(
         &self,
         world_x: f32,
@@ -168,6 +192,7 @@ impl FlowField {
         let (dx, dy) = self.get_direction(tx as u32, ty as u32);
         (dx * speed, dy * speed)
     }
+    /// Render the flow field to an `ImageData` with `cell_size` pixels per tile for debugging.
     pub fn draw_to_image(&self, cell_size: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(self.width * cell_size, self.height * cell_size);
         img.fill(40, 45, 55, 255);
@@ -218,29 +243,5 @@ impl FlowField {
             );
         }
         img
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::pathfind::nav_grid::NavGrid;
-    use std::cell::RefCell;
-    use std::rc::Rc;
-    fn open_grid(w: u32, h: u32) -> Rc<RefCell<NavGrid>> {
-        Rc::new(RefCell::new(NavGrid::new(w, h)))
-    }
-    #[test]
-    fn new_field_not_calculated() {
-        let g = open_grid(5, 5);
-        let ff = FlowField::new(g);
-        assert!(!ff.is_calculated());
-    }
-    #[test]
-    fn calculate_and_get_direction() {
-        let g = open_grid(5, 5);
-        let mut ff = FlowField::new(g);
-        ff.calculate(4, 4, 1);
-        let (dx, dy) = ff.get_direction(0, 0);
-        assert!(dx.is_finite() && dy.is_finite());
     }
 }

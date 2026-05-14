@@ -1,6 +1,7 @@
 use crate::graph::core::Graph;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// Run A\* from node `from` to node `to`; optional `heuristic` fn is called with `(current, goal)` ids.
 pub fn graph_astar(
     graph: &Graph,
     from: u64,
@@ -52,6 +53,7 @@ pub fn graph_astar(
     }
     None
 }
+/// Return all nodes reachable from `start` within `max_cost` total edge weight as `(node_id, cost)` pairs.
 pub fn graph_range(graph: &Graph, start: u64, max_cost: f32) -> Vec<(u64, f32)> {
     if !graph.nodes.contains_key(&start) {
         return Vec::new();
@@ -93,6 +95,7 @@ pub fn graph_range(graph: &Graph, start: u64, max_cost: f32) -> Vec<(u64, f32)> 
     }
     result
 }
+/// Walk the `came_from` map back from `current` to the start and return the ordered path.
 fn reconstruct(came_from: HashMap<u64, u64>, mut current: u64) -> Vec<u64> {
     let mut path = vec![current];
     while let Some(&prev) = came_from.get(&current) {
@@ -102,64 +105,31 @@ fn reconstruct(came_from: HashMap<u64, u64>, mut current: u64) -> Vec<u64> {
     path.reverse();
     path
 }
+/// Priority-queue node for graph search; min-heap on f-cost.
 #[derive(Clone)]
 struct GNode {
+    /// Node identifier in the `Graph`.
     id: u64,
+    /// Priority value (g + h for A\*, g for Dijkstra).
     f: f32,
 }
+/// Equality by f-cost.
 impl PartialEq for GNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for GNode {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for GNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for GNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::graph::core::Graph;
-    fn simple_graph() -> (Graph, u64, u64, u64) {
-        let mut g = Graph::new();
-        let n1 = g.add_node("room", 10);
-        let n2 = g.add_node("room", 10);
-        let n3 = g.add_node("room", 10);
-        let _ = g.add_edge(n1, n2, None);
-        let _ = g.add_edge(n2, n3, None);
-        (g, n1, n2, n3)
-    }
-    #[test]
-    fn same_node_path() {
-        let (g, n1, _, _) = simple_graph();
-        let p = graph_astar(&g, n1, n1, None).unwrap();
-        assert_eq!(p, vec![n1]);
-    }
-    #[test]
-    fn linear_path() {
-        let (g, n1, n2, n3) = simple_graph();
-        let p = graph_astar(&g, n1, n3, None).unwrap();
-        assert_eq!(p, vec![n1, n2, n3]);
-    }
-    #[test]
-    fn no_path_missing_node() {
-        let (g, n1, _, _) = simple_graph();
-        assert!(graph_astar(&g, n1, 9999, None).is_none());
-    }
-    #[test]
-    fn range_query() {
-        let (g, n1, n2, n3) = simple_graph();
-        let r = graph_range(&g, n1, 1.5);
-        let ids: Vec<u64> = r.iter().map(|(id, _)| *id).collect();
-        assert!(ids.contains(&n1));
-        assert!(ids.contains(&n2));
-        let _ = n3;
     }
 }

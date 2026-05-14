@@ -1,58 +1,100 @@
+//! Graph simulation update passes for decay, transit, flow, conversion, and queues.
+//!
+//! Owns the per-step mutation order and emitted graph events.
+//! Pathfinding and storage types live in sibling modules.
+
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::node::FlowMode;
 use crate::log_msg;
 use crate::runtime::log_messages::{GR01, GR02};
+/// Simulation event emitted by graph updates.
 #[derive(Debug, Clone)]
 pub enum GraphEvent {
+    /// Item entered a node.
     ItemEnter {
+        /// Item id that entered.
         item_id: u64,
+        /// Destination node id.
         node_id: u64,
     },
+    /// Item left a node.
     ItemLeave {
+        /// Item id that left.
         item_id: u64,
+        /// Source node id.
         node_id: u64,
     },
+    /// Item decayed and was removed from play.
     ItemDecay {
+        /// Item id that decayed.
         item_id: u64,
     },
+    /// Node converted items into new output items.
     ItemConvert {
+        /// Node that performed the conversion.
         node_id: u64,
+        /// Consumed item ids.
         consumed: Vec<u64>,
+        /// Produced item ids.
         produced: Vec<u64>,
     },
+    /// Item was lost because it could not enter a node.
     ItemLost {
+        /// Item id that was lost.
         item_id: u64,
+        /// Node that rejected or destroyed the item.
         node_id: u64,
     },
+    /// Item entered an edge transit buffer.
     EdgeEnter {
+        /// Item id that entered transit.
         item_id: u64,
+        /// Edge id that accepted the item.
         edge_id: u64,
     },
+    /// Item left an edge transit buffer.
     EdgeLeave {
+        /// Item id that left transit.
         item_id: u64,
+        /// Edge id that released the item.
         edge_id: u64,
     },
+    /// Demand pulled supply from another node.
     DemandFulfilled {
+        /// Node that requested the items.
         demand_node: u64,
+        /// Node that supplied the items.
         supply_node: u64,
+        /// Item type that moved.
         item_type: String,
+        /// Number of items fulfilled.
         count: u32,
     },
+    /// Supply record reached zero.
     SupplyDepleted {
+        /// Node whose supply was depleted.
         node_id: u64,
+        /// Item type that ran out.
         item_type: String,
     },
+    /// Item entered a node queue.
     ItemQueued {
+        /// Queued item id.
         item_id: u64,
+        /// Node id that queued the item.
         node_id: u64,
     },
+    /// Item left a node queue and entered the node inventory.
     ItemDequeued {
+        /// Dequeued item id.
         item_id: u64,
+        /// Node id that dequeued the item.
         node_id: u64,
     },
 }
 impl Graph {
+    /// Run one simulation update and return the emitted events.
     pub fn update(&mut self, dt: f64) -> Vec<GraphEvent> {
         log_msg!(debug, GR01);
         let mut events = Vec::new();
@@ -66,9 +108,11 @@ impl Graph {
         log_msg!(debug, GR02, "{}", events.len());
         events
     }
+    /// Run one simulation update with dt set to 1.0.
     pub fn step(&mut self) -> Vec<GraphEvent> {
         self.update(1.0)
     }
+    /// Run one simulation update using parallel decay processing when enabled.
     #[cfg(feature = "graph-parallel")]
     pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
         use rayon::prelude::*;
@@ -112,10 +156,12 @@ impl Graph {
         log_msg!(debug, GR02, "{}", events.len());
         events
     }
+    /// Run one simulation update when the parallel feature is disabled.
     #[cfg(not(feature = "graph-parallel"))]
     pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
         self.update(dt)
     }
+    /// Apply item decay and emit decay events.
     fn process_decay(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let mut dead_ids = Vec::new();
         for item in self.items.values_mut() {
@@ -139,6 +185,7 @@ impl Graph {
             }
         }
     }
+    /// Advance edge transit progress and resolve arrivals.
     fn process_transit(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let mut arrivals: Vec<(u64, u64, u64)> = Vec::new();
         let edge_info: Vec<(u64, u64, f64, f64, Vec<u64>)> = self
@@ -234,6 +281,7 @@ impl Graph {
             }
         }
     }
+    /// Reduce edge cooldown timers by the update delta.
     fn process_cooldowns(&mut self, dt: f64) {
         for edge in self.edges.values_mut() {
             if edge.cooldown_timer > 0.0 {
@@ -241,6 +289,7 @@ impl Graph {
             }
         }
     }
+    /// Push items from push-capable nodes onto outgoing edges.
     fn process_push_flow(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let push_nodes: Vec<u64> = self
             .nodes
@@ -319,6 +368,7 @@ impl Graph {
             }
         }
     }
+    /// Pull items into pull-capable nodes from incoming edges.
     fn process_pull_flow(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let pull_nodes: Vec<u64> = self
             .nodes
@@ -411,6 +461,7 @@ impl Graph {
             }
         }
     }
+    /// Consume matching inputs and produce outputs for node conversion rules.
     fn process_conversions(&mut self, events: &mut Vec<GraphEvent>) {
         let node_ids: Vec<u64> = self.nodes.keys().copied().collect();
         for nid in node_ids {
@@ -480,6 +531,7 @@ impl Graph {
             }
         }
     }
+    /// Move queued items into node inventories when processing time and capacity allow.
     fn process_queues(&mut self, dt: f64, events: &mut Vec<GraphEvent>) {
         let node_ids: Vec<u64> = self.nodes.keys().copied().collect();
         for nid in node_ids {

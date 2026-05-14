@@ -1,31 +1,48 @@
+//! Globe snapshot transfer helpers for camera state and province ownership.
+//!
+//! Owns the data bridge used by sync and replay flows.
+//! It does not perform graph updates or rendering.
+
 use crate::globe::registry::Globe;
 use crate::globe::types::ProvinceId;
 use std::collections::HashMap;
 use std::sync::mpsc::{channel, Receiver, Sender};
+/// Serializable globe state used for snapshot transfer.
 #[derive(Debug, Clone)]
 pub struct GlobeSyncSnapshot {
+    /// Globe name included in the snapshot.
     pub name: String,
+    /// Camera latitude, longitude, and zoom.
     pub camera: (f32, f32, f32),
+    /// Globe rotation in degrees.
     pub rotation_deg: f32,
+    /// Time of day captured in the snapshot.
     pub time_of_day: f32,
+    /// Province owner strings keyed by province id.
     pub owner_attrs: HashMap<ProvinceId, String>,
 }
+/// Channel pair used to send and receive globe snapshots.
 #[derive(Debug)]
 pub struct GlobeSyncChannel {
+    /// Sender side of the snapshot channel.
     pub tx: Sender<GlobeSyncSnapshot>,
+    /// Receiver side of the snapshot channel.
     pub rx: Receiver<GlobeSyncSnapshot>,
 }
 impl GlobeSyncChannel {
+    /// Create a new snapshot channel pair.
     pub fn new() -> Self {
         let (tx, rx) = channel();
         Self { tx, rx }
     }
 }
+/// Create a default snapshot channel pair.
 impl Default for GlobeSyncChannel {
     fn default() -> Self {
         Self::new()
     }
 }
+/// Build a snapshot from the current globe state.
 pub fn build_snapshot(globe: &Globe) -> GlobeSyncSnapshot {
     let mut owner_attrs = HashMap::new();
     for p in globe.graph.iter() {
@@ -45,6 +62,7 @@ pub fn build_snapshot(globe: &Globe) -> GlobeSyncSnapshot {
         owner_attrs,
     }
 }
+/// Apply a snapshot to a mutable globe instance.
 pub fn apply_snapshot(globe: &mut Globe, snap: &GlobeSyncSnapshot) {
     globe.camera.lat_deg = snap.camera.0;
     globe.camera.lon_deg = snap.camera.1;

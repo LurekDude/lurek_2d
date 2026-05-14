@@ -488,6 +488,7 @@ fn coerce_f64(values: &[BinValue], idx: usize, token: &str) -> Result<f64, Strin
         )),
     }
 }
+/// Coerce value at index to bool; return error when missing or incompatible.
 fn coerce_bool(values: &[BinValue], idx: usize, token: &str) -> Result<bool, String> {
     match values.get(idx) {
         Some(BinValue::Bool(b)) => Ok(*b),
@@ -501,6 +502,7 @@ fn coerce_bool(values: &[BinValue], idx: usize, token: &str) -> Result<bool, Str
         )),
     }
 }
+/// Coerce value at index to string; return error when missing or incompatible.
 fn coerce_str(values: &[BinValue], idx: usize, token: &str) -> Result<String, String> {
     match values.get(idx) {
         Some(BinValue::Str(s)) => Ok(s.clone()),

@@ -1,5 +1,8 @@
+//! HTML token parsing, attribute decoding, and text escaping helpers.
+
 use crate::html::element::{HtmlElement, HtmlElementId};
 use std::collections::BTreeMap;
+/// Parse HTML into a live element tree and return the top-level child ids.
 pub(crate) fn parse_into(
     html: &str,
     elements: &mut Vec<HtmlElement>,
@@ -69,12 +72,14 @@ pub(crate) fn parse_into(
     }
     roots
 }
+/// Split a tag header into the tag name and the remaining attribute text.
 fn split_tag(source: &str) -> (&str, &str) {
     let mut parts = source.splitn(2, char::is_whitespace);
     let tag = parts.next().unwrap_or_default();
     let attrs = parts.next().unwrap_or_default();
     (tag, attrs)
 }
+/// Parse a tag attribute string into a normalized attribute map.
 fn parse_attributes(source: &str) -> BTreeMap<String, String> {
     let mut attrs = BTreeMap::new();
     let bytes = source.as_bytes();
@@ -126,11 +131,13 @@ fn parse_attributes(source: &str) -> BTreeMap<String, String> {
     }
     attrs
 }
+/// Apply parsed attributes to an element by reusing the element setter.
 fn apply_attributes(element: &mut HtmlElement, attrs: BTreeMap<String, String>) {
     for (name, value) in attrs {
         element.set_attribute(&name, Some(value));
     }
 }
+/// Append collapsed text content to an element after decoding entities.
 fn push_text(elements: &mut [HtmlElement], element_id: HtmlElementId, text: &str) {
     let text = decode_entities(text);
     let collapsed = text.split_whitespace().collect::<Vec<_>>().join(" ");
@@ -143,14 +150,17 @@ fn push_text(elements: &mut [HtmlElement], element_id: HtmlElementId, text: &str
     }
     element.text.push_str(&collapsed);
 }
+/// Escape text for HTML text nodes.
 pub(crate) fn escape_text(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
 }
+/// Escape text for HTML attribute values.
 pub(crate) fn escape_attribute(text: &str) -> String {
     escape_text(text).replace('"', "&quot;")
 }
+/// Decode the small entity set supported by the HTML parser.
 fn decode_entities(text: &str) -> String {
     text.replace("&lt;", "<")
         .replace("&gt;", ">")

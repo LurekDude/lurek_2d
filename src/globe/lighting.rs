@@ -1,6 +1,12 @@
+//! Globe lighting helpers for sun direction, intensity, and terminator fade.
+//!
+//! Owns simple math used by projection and render code.
+//! It does not manage scene state or material setup.
+
 use crate::globe::types::GlobeSpec;
 use crate::math::sphere::{lat_lon_to_unit, rot_y};
 use crate::math::Vec3;
+/// Compute the sun direction in world space from globe rotation and time of day.
 pub fn sun_direction(spec: &GlobeSpec) -> Vec3 {
     let sun_lon_deg = 180.0 - spec.time_of_day * 360.0;
     let sun_lat_deg = spec.axial_tilt_deg * (spec.time_of_day * std::f32::consts::TAU).sin();
@@ -10,6 +16,7 @@ pub fn sun_direction(spec: &GlobeSpec) -> Vec3 {
     let len = sun_world.length().max(1e-12);
     Vec3::new(sun_world.x / len, sun_world.y / len, sun_world.z / len)
 }
+/// Compute province light intensity from the centroid and sun direction.
 pub fn province_intensity(
     centroid_lat_deg: f32,
     centroid_lon_deg: f32,
@@ -20,6 +27,7 @@ pub fn province_intensity(
     let dot = normal.x * sun_dir.x + normal.y * sun_dir.y + normal.z * sun_dir.z;
     dot.max(ambient).min(1.0)
 }
+/// Compute province intensities for a sequence of centroid positions.
 #[allow(clippy::extra_unused_lifetimes)]
 pub fn compute_intensities<'a>(
     centroids: impl Iterator<Item = (f32, f32)>,
@@ -30,6 +38,7 @@ pub fn compute_intensities<'a>(
         .map(|(lat, lon)| province_intensity(lat, lon, sun_dir, ambient))
         .collect()
 }
+    /// Convert sun alignment into an alpha value around the terminator band.
 pub fn terminator_alpha(
     centroid_lat_deg: f32,
     centroid_lon_deg: f32,

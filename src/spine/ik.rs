@@ -1,13 +1,27 @@
+//! Inverse-kinematics constraint for 2-bone chains in the spine skeleton system.
+//! Owns IKConstraint: stores chain indices and target, solves root and elbow rotations via law-of-cosines.
+//! Does not own world-space accumulation — callers must re-run pose update after solve().
+
 use super::bone::Bone;
+
+/// 2-bone IK constraint that drives root and elbow rotations toward a world-space target.
 #[derive(Debug, Clone)]
 pub struct IKConstraint {
+    /// Identifier for this constraint within the skeleton.
     pub name: String,
+    /// Indices into the skeleton bone array; index 0 = root, index 1 = elbow (2-bone limit).
     pub bone_chain: Vec<usize>,
+    /// World-space target X position that the chain tip should reach.
     pub target_x: f32,
+    /// World-space target Y position that the chain tip should reach.
     pub target_y: f32,
+    /// When true, elbow bends in the positive (counter-clockwise) direction.
     pub bend_positive: bool,
 }
+
+/// Constructor and solve methods for IKConstraint.
 impl IKConstraint {
+    /// Create a new IKConstraint with the given chain indices and bend direction; target defaults to (0, 0).
     pub fn new(name: impl Into<String>, bone_chain: Vec<usize>, bend_positive: bool) -> Self {
         Self {
             name: name.into(),
@@ -17,10 +31,12 @@ impl IKConstraint {
             bend_positive,
         }
     }
+    /// Update the world-space target position for this constraint.
     pub fn set_target(&mut self, x: f32, y: f32) {
         self.target_x = x;
         self.target_y = y;
     }
+    /// Solve root and elbow local_rotation angles using law-of-cosines 2-bone IK; no-op when chain length < 2 or indices out of bounds.
     #[allow(clippy::ptr_arg)]
     pub fn solve(&self, bones: &mut Vec<Bone>) {
         if self.bone_chain.len() < 2 {

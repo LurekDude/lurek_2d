@@ -1,16 +1,28 @@
+//! Tiled TMX map file parser for orthogonal, isometric, staggered, and hexagonal maps.
+//! Owns all TMX data types and the `load_tmx` entry point; supports CSV, base64, zlib, and gzip tile encodings.
+//! Does not own `TileMap` construction; callers convert `TmxMap` into engine types using the loaded data.
+//! Depends on `roxmltree`, `base64`, `flate2`, `log`, and `runtime::log_messages`.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{TL01, TL02};
 use base64::Engine as _;
 use flate2::read::{GzDecoder, ZlibDecoder};
 use std::io::Read;
+
+/// Map projection type as declared in the TMX `<map orientation="...">` attribute.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmxOrientation {
+    /// Standard square-tile top-down grid.
     Orthogonal,
+    /// Diamond-shaped isometric grid.
     Isometric,
+    /// Staggered isometric or hexagonal grid where alternate rows/columns are offset.
     Staggered,
+    /// True hexagonal grid with `hexsidelength`.
     Hexagonal,
 }
 impl TmxOrientation {
+    /// Parse the Tiled `orientation` attribute string; defaults to `Orthogonal` on unknown values.
     fn from_str(s: &str) -> Self {
         match s {
             "isometric" => Self::Isometric,
@@ -20,80 +32,135 @@ impl TmxOrientation {
         }
     }
 }
+/// Which grid axis is staggered in `Staggered` and `Hexagonal` maps.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmxStaggerAxis {
+    /// Columns are staggered.
     X,
+    /// Rows are staggered.
     Y,
 }
+/// Parsed `<tileset>` element, which may be external (`source` present) or inline.
 #[derive(Debug, Clone)]
 pub struct TmxTileset {
+    /// First global GID assigned to this tileset.
     pub first_gid: u32,
+    /// Path to an external `.tsx` source file, when used.
     pub source: Option<String>,
+    /// Tileset name as declared in the TMX file.
     pub name: String,
+    /// Width of each tile in pixels.
     pub tile_width: u32,
+    /// Height of each tile in pixels.
     pub tile_height: u32,
+    /// Pixel gap between tiles in the sheet image.
     pub spacing: u32,
+    /// Pixel border around the edge of the sheet image.
     pub margin: u32,
+    /// Total tile count declared in the tileset.
     pub tile_count: u32,
+    /// Number of tile columns in the sheet image.
     pub columns: u32,
+    /// Relative path to the tileset image file.
     pub image_source: Option<String>,
+    /// Image width in pixels.
     pub image_width: u32,
+    /// Image height in pixels.
     pub image_height: u32,
+    /// Local tile IDs marked as solid via objectgroup or `solid=true` property.
     pub solid_tiles: Vec<u32>,
 }
+/// Parsed `<layer>` (tile layer) element.
 #[derive(Debug, Clone)]
 pub struct TmxTileLayer {
+    /// Layer name.
     pub name: String,
+    /// Tile count along X.
     pub width: u32,
+    /// Tile count along Y.
     pub height: u32,
+    /// Visibility flag.
     pub visible: bool,
+    /// Opacity from 0.0 (transparent) to 1.0 (opaque).
     pub opacity: f32,
+    /// Horizontal draw offset in pixels.
     pub offset_x: f32,
+    /// Vertical draw offset in pixels.
     pub offset_y: f32,
+    /// Row-major GID array with flip flags masked out; length equals `width * height`.
     pub tiles: Vec<u32>,
 }
+/// Parsed `<objectgroup>` element.
 #[derive(Debug, Clone)]
 pub struct TmxObjectLayer {
+    /// Layer name.
     pub name: String,
+    /// Visibility flag.
     pub visible: bool,
+    /// All objects in this layer.
     pub objects: Vec<TmxObject>,
 }
+/// Parsed `<object>` element inside an objectgroup.
 #[derive(Debug, Clone)]
 pub struct TmxObject {
+    /// Unique object ID within the map.
     pub id: u32,
+    /// Human-readable name.
     pub name: String,
+    /// Object `type` or `class` attribute.
     pub obj_type: String,
+    /// World X position in pixels.
     pub x: f32,
+    /// World Y position in pixels.
     pub y: f32,
+    /// Bounding width in pixels; 0 for point objects.
     pub width: f32,
+    /// Bounding height in pixels; 0 for point objects.
     pub height: f32,
+    /// Tile GID when the object is a tile object; `0` for shape objects.
     pub gid: u32,
 }
+/// A single map layer, either tile data or objects.
 #[derive(Debug, Clone)]
 pub enum TmxLayer {
+    /// A tile data layer.
     Tile(TmxTileLayer),
+    /// An object group layer.
     Object(TmxObjectLayer),
 }
+/// Top-level parsed TMX map.
 #[derive(Debug, Clone)]
 pub struct TmxMap {
+    /// Map width in tiles.
     pub width: u32,
+    /// Map height in tiles.
     pub height: u32,
+    /// Tile width in pixels.
     pub tile_width: u32,
+    /// Tile height in pixels.
     pub tile_height: u32,
+    /// Projection type.
     pub orientation: TmxOrientation,
+    /// Stagger axis for `Staggered`/`Hexagonal` maps.
     pub stagger_axis: Option<TmxStaggerAxis>,
+    /// Hex side length in pixels for `Hexagonal` maps.
     pub hex_side_length: u32,
+    /// All attached tilesets in declaration order.
     pub tilesets: Vec<TmxTileset>,
+    /// All layers in declaration order.
     pub layers: Vec<TmxLayer>,
+    /// Optional background fill color `[a, r, g, b]`.
     pub background_color: Option<[u8; 4]>,
 }
 impl TmxMap {
+    /// Iterate over all tile layers in declaration order.
     pub fn tile_layers(&self) -> impl Iterator<Item = &TmxTileLayer> {
         self.layers.iter().filter_map(|l| match l {
             TmxLayer::Tile(t) => Some(t),
             _ => None,
         })
     }
+    /// Iterate over all object layers in declaration order.
     pub fn object_layers(&self) -> impl Iterator<Item = &TmxObjectLayer> {
         self.layers.iter().filter_map(|l| match l {
             TmxLayer::Object(o) => Some(o),
@@ -101,6 +168,7 @@ impl TmxMap {
         })
     }
 }
+/// Parse an XML-encoded TMX map string; returns a `TmxMap` or an error string describing the first failure.
 pub fn load_tmx(xml: &str) -> Result<TmxMap, String> {
     log_msg!(debug, TL01, "{} bytes", xml.len());
     let doc = roxmltree::Document::parse(xml).map_err(|e| format!("TMX XML parse error: {e}"))?;
@@ -156,6 +224,7 @@ pub fn load_tmx(xml: &str) -> Result<TmxMap, String> {
         background_color,
     })
 }
+/// Parse a `<tileset>` XML node into a `TmxTileset`; returns early with a stub when `source` attribute is present.
 fn parse_tileset(node: &roxmltree::Node) -> Result<TmxTileset, String> {
     let first_gid = attr_u32(node, "firstgid")?;
     if let Some(src) = node.attribute("source") {
@@ -253,6 +322,7 @@ fn parse_tileset(node: &roxmltree::Node) -> Result<TmxTileset, String> {
         solid_tiles,
     })
 }
+/// Parse a `<layer>` XML node into a `TmxTileLayer`, decoding CSV, base64, or XML tile data.
 fn parse_tile_layer(
     node: &roxmltree::Node,
     map_w: u32,
@@ -302,6 +372,7 @@ fn parse_tile_layer(
         tiles,
     })
 }
+/// Decode XML-encoded tile GIDs from `<tile gid="...">` children; pads or truncates to `w * h`.
 fn parse_xml_tiles(data: &roxmltree::Node, w: u32, h: u32) -> Result<Vec<u32>, String> {
     let cap = (w * h) as usize;
     let mut tiles = Vec::with_capacity(cap);
@@ -317,6 +388,7 @@ fn parse_xml_tiles(data: &roxmltree::Node, w: u32, h: u32) -> Result<Vec<u32>, S
     tiles.resize(cap, 0);
     Ok(tiles)
 }
+/// Decode CSV-encoded tile GIDs; strips flip flags; pads or truncates to `w * h`.
 fn parse_csv_tiles(data: &roxmltree::Node, w: u32, h: u32) -> Result<Vec<u32>, String> {
     let text = data.text().unwrap_or("").trim().to_string();
     let cap = (w * h) as usize;
@@ -334,6 +406,7 @@ fn parse_csv_tiles(data: &roxmltree::Node, w: u32, h: u32) -> Result<Vec<u32>, S
     tiles.resize(cap, 0);
     Ok(tiles)
 }
+/// Decode base64 tile data with optional `zlib`, `gzip`, or no compression; returns an error for unsupported `zstd`.
 fn parse_base64_tiles(
     data: &roxmltree::Node,
     compression: &str,
@@ -381,6 +454,7 @@ fn parse_base64_tiles(
     tiles.resize(cap, 0);
     Ok(tiles)
 }
+/// Parse an `<objectgroup>` XML node into a `TmxObjectLayer`.
 fn parse_object_layer(node: &roxmltree::Node) -> Result<TmxObjectLayer, String> {
     let name = node.attribute("name").unwrap_or("").to_string();
     let visible = node.attribute("visible") != Some("0");
@@ -396,6 +470,7 @@ fn parse_object_layer(node: &roxmltree::Node) -> Result<TmxObjectLayer, String> 
         objects,
     })
 }
+/// Parse a single `<object>` XML node into a `TmxObject`.
 fn parse_object(node: &roxmltree::Node) -> TmxObject {
     TmxObject {
         id: node
@@ -431,6 +506,7 @@ fn parse_object(node: &roxmltree::Node) -> TmxObject {
             .unwrap_or(0),
     }
 }
+/// Read a required u32 attribute `name` from `node`; returns an error string when absent or unparseable.
 fn attr_u32(node: &roxmltree::Node, name: &str) -> Result<u32, String> {
     node.attribute(name)
         .ok_or_else(|| {
@@ -442,6 +518,7 @@ fn attr_u32(node: &roxmltree::Node, name: &str) -> Result<u32, String> {
         .parse::<u32>()
         .map_err(|e| format!("TMX: attribute '{name}' is not a valid u32: {e}"))
 }
+/// Parse a Tiled hex color string (`#RRGGBB` or `#AARRGGBB`) into `[a, r, g, b]`; returns `None` on parse failure.
 fn parse_tiled_color(s: &str) -> Option<[u8; 4]> {
     let s = s.trim_start_matches('#');
     match s.len() {

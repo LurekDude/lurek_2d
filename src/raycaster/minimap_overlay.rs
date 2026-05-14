@@ -1,15 +1,27 @@
+//! Minimap overlay utilities: tile visibility sampling, light accumulation, pixel-map
+//! extraction around the player, and a directional arrow renderer. Consumed by the
+//! raycaster Lua API to draw an in-game minimap texture. Does not own DDA stepping.
+
 use super::dda::Raycaster2D;
 use super::lighting::{compute_lighting, PointLight};
 use std::collections::HashSet;
+/// A tile sample used to build a minimap view window centered on the player.
 #[derive(Debug, Clone)]
 pub struct MinimapTileSample {
+    /// Grid X coordinate of this tile.
     pub x: u32,
+    /// Grid Y coordinate of this tile.
     pub y: u32,
+    /// True when this tile is a solid wall.
     pub blocked: bool,
+    /// True when this tile has direct line-of-sight from the player.
     pub visible: bool,
+    /// Accumulated RGB light at this tile's center.
     pub light: [f32; 3],
+    /// Luminance (average of `light` channels) in 0.0..1.0.
     pub luma: f32,
 }
+/// Return true when the Bresenham grid path from `(x0,y0)` to `(x1,y1)` is unobstructed.
 fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
     let mut x = x0;
     let mut y = y0;
@@ -34,6 +46,7 @@ fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i3
     }
     true
 }
+/// Compute accumulated RGB light for the center of tile `(x, y)` using `compute_lighting`.
 pub fn compute_tile_light(
     raycaster: &Raycaster2D,
     x: u32,
@@ -52,6 +65,7 @@ pub fn compute_tile_light(
     };
     compute_lighting(wx, wy, ambient, lights, &wall_at)
 }
+/// Return all `MinimapTileSample`s in a `radius`-tile square window centered on `(center_x, center_y)`.
 pub fn build_minimap_tile_window(
     raycaster: &Raycaster2D,
     center_x: f32,
@@ -90,6 +104,7 @@ pub fn build_minimap_tile_window(
     }
     out
 }
+/// Cast a FOV fan of `count` rays from `(ox, oy)` and collect all traversed tile coordinates.
 #[allow(clippy::too_many_arguments)]
 pub fn reveal_cells_from_rays(
     raycaster: &Raycaster2D,
@@ -138,6 +153,7 @@ pub fn reveal_cells_from_rays(
     }
     cells
 }
+/// Render a `view_radius`-tile minimap pixel grid centered on the player; return `(pixels, width, height)`.
 #[allow(clippy::too_many_arguments)]
 pub fn extract_minimap(
     raycaster: &Raycaster2D,
@@ -194,6 +210,7 @@ pub fn extract_minimap(
     );
     (pixels, pixel_w, pixel_h)
 }
+/// Draw a filled circle with a forward-direction line at `(center_x, center_y)` into a raw RGBA pixel slice.
 #[allow(clippy::too_many_arguments)]
 pub fn draw_player_arrow(
     pixels: &mut [u8],

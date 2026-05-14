@@ -1,3 +1,5 @@
+//! Screen overlay controller for weather, ambient light, flashes, fades, and haze.
+
 use super::ambient::AmbientState;
 use super::atmosphere::{
     CloudState, FilmGrainState, FogState, HeatHazeState, LightningState, VignetteState,
@@ -6,24 +8,41 @@ use super::screen_effects::{FadeState, FlashState, ShakeState};
 use super::weather::{WeatherParticle, WeatherState, WeatherType};
 use crate::log_msg;
 use crate::runtime::log_messages::{OV01, OV02, OV03};
+/// Owns every screen-space overlay state block applied on top of world rendering.
 pub struct Overlay {
+    /// Current overlay target width in pixels.
     pub width: u32,
+    /// Current overlay target height in pixels.
     pub height: u32,
+    /// Weather particle simulation and configuration.
     pub weather: WeatherState,
+    /// Ambient tint state derived from time-of-day.
     pub ambient: AmbientState,
+    /// Timed flash overlay state.
     pub flash: FlashState,
+    /// Camera shake state and offsets.
     pub shake: ShakeState,
+    /// Timed fade overlay state.
     pub fade: FadeState,
+    /// Cloud overlay configuration.
     pub clouds: CloudState,
+    /// Fog overlay configuration.
     pub fog: FogState,
+    /// Heat haze distortion configuration.
     pub heat_haze: HeatHazeState,
+    /// Vignette darkening configuration.
     pub vignette: VignetteState,
+    /// Film grain configuration.
     pub film_grain: FilmGrainState,
+    /// Lightning flash overlay state.
     pub lightning: LightningState,
+    /// Water distortion overlay configuration and timer.
     pub water: crate::effect::water_overlay::WaterOverlayState,
+    /// Optional custom overlay shader name.
     pub custom_shader: Option<String>,
 }
 impl Overlay {
+    /// Creates an overlay initialized with default state blocks for the target size.
     pub fn new(width: u32, height: u32) -> Self {
         log_msg!(debug, OV01, "{}x{}", width, height);
         Self {
@@ -44,6 +63,7 @@ impl Overlay {
             custom_shader: None,
         }
     }
+    /// Advances every active overlay subsystem by `dt` seconds.
     pub fn update(&mut self, dt: f32) {
         if self.ambient.enabled {
             self.ambient.color = self.ambient.compute_color_from_time();
@@ -97,6 +117,7 @@ impl Overlay {
         }
         self.water.update(dt);
     }
+    /// Advances particle spawn and movement for the active weather mode.
     fn update_weather(&mut self, dt: f32) {
         let max_particles = (self.weather.intensity * 200.0) as usize;
         let w = self.width as f32;
@@ -126,6 +147,7 @@ impl Overlay {
             }
         }
     }
+    /// Creates one weather particle with parameters derived from the active weather mode.
     fn spawn_particle(&mut self, width: f32) -> WeatherParticle {
         let frac = self.weather.next_unit();
         let x = frac * width;
@@ -148,6 +170,7 @@ impl Overlay {
             alpha,
         }
     }
+    /// Starts a flash overlay with the supplied color, alpha, and duration.
     pub fn trigger_flash(&mut self, r: f32, g: f32, b: f32, a: f32, duration: f32) {
         log_msg!(
             debug,
@@ -164,6 +187,7 @@ impl Overlay {
         self.flash.duration = duration;
         self.flash.elapsed = 0.0;
     }
+    /// Starts a camera shake with the supplied intensity and duration.
     pub fn trigger_shake(&mut self, intensity: f32, duration: f32) {
         log_msg!(
             debug,
@@ -179,6 +203,7 @@ impl Overlay {
         self.shake.offset_x = 0.0;
         self.shake.offset_y = 0.0;
     }
+    /// Starts a fade toward the supplied target alpha over the given duration.
     pub fn trigger_fade(&mut self, r: f32, g: f32, b: f32, target_alpha: f32, duration: f32) {
         self.fade.start_alpha = self.fade.color[3];
         self.fade.active = true;
@@ -187,13 +212,16 @@ impl Overlay {
         self.fade.duration = duration;
         self.fade.elapsed = 0.0;
     }
+    /// Starts a short lightning flash using the configured lightning state.
     pub fn trigger_lightning(&mut self) {
         self.lightning.active = true;
         self.lightning.elapsed = 0.0;
     }
+    /// Returns the current camera shake offset.
     pub fn get_shake_offset(&self) -> (f32, f32) {
         (self.shake.offset_x, self.shake.offset_y)
     }
+    /// Returns whether any overlay subsystem is currently enabled or animating.
     pub fn is_active(&self) -> bool {
         self.weather.enabled
             || self.ambient.enabled
@@ -208,6 +236,7 @@ impl Overlay {
             || self.lightning.active
             || self.water.enabled
     }
+    /// Restores every overlay subsystem to its default inactive state.
     pub fn clear(&mut self) {
         self.weather = WeatherState::default();
         self.ambient = AmbientState::default();
@@ -223,19 +252,24 @@ impl Overlay {
         self.water = crate::effect::water_overlay::WaterOverlayState::default();
         self.custom_shader = None;
     }
+    /// Updates the overlay target dimensions.
     pub fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
     }
+    /// Returns the overlay target width.
     pub fn get_width(&self) -> u32 {
         self.width
     }
+    /// Returns the overlay target height.
     pub fn get_height(&self) -> u32 {
         self.height
     }
+    /// Returns the overlay target dimensions as `(width, height)`.
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
+    /// Computes the current flash alpha after time decay.
     pub fn get_flash_alpha(&self) -> f32 {
         if !self.flash.active {
             return 0.0;
@@ -243,6 +277,7 @@ impl Overlay {
         let progress = self.flash.elapsed / self.flash.duration;
         self.flash.color[3] * (1.0 - progress)
     }
+    /// Computes the current lightning flash alpha after time decay.
     pub fn get_lightning_alpha(&self) -> f32 {
         if !self.lightning.active {
             return 0.0;
@@ -250,6 +285,7 @@ impl Overlay {
         let progress = self.lightning.elapsed / self.lightning.duration;
         self.lightning.color[3] * (1.0 - progress)
     }
+    /// Builds render commands for currently active full-screen overlay layers.
     pub fn build_render_commands(&self) -> Vec<crate::render::renderer::RenderCommand> {
         use crate::render::renderer::{DrawMode, RenderCommand};
         let mut cmds = Vec::new();
@@ -303,6 +339,7 @@ impl Overlay {
         }
         cmds
     }
+    /// Renders a debug image showing current flash, shake, and fade state.
     pub fn draw_state_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
@@ -336,6 +373,7 @@ impl Overlay {
         img
     }
     #[allow(clippy::too_many_arguments)]
+    /// Renders a frame strip showing the time evolution of a flash overlay.
     pub fn draw_flash_sequence_to_image(
         &mut self,
         r: f32,
@@ -371,6 +409,7 @@ impl Overlay {
         }
         img
     }
+    /// Renders a debug image showing a series of shake offsets as a trail.
     pub fn draw_shake_trail_to_image(
         offsets: &[(f32, f32)],
         width: u32,
@@ -394,6 +433,7 @@ impl Overlay {
         }
         img
     }
+    /// Renders a frame strip showing fade alpha samples across multiple steps.
     pub fn draw_fade_transition_to_image(
         steps: &[f32],
         panel_w: u32,
@@ -414,6 +454,7 @@ impl Overlay {
         }
         img
     }
+    /// Renders a debug panel previewing flash, shake, fade, and lightning triggers.
     pub fn draw_trigger_panel_to_image(
         &mut self,
         width: u32,

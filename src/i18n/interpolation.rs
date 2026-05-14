@@ -1,4 +1,7 @@
+//! Template interpolation helpers for localized strings.
+
 use std::collections::HashMap;
+/// Replace `{name}` placeholders from a string map and keep unknown placeholders intact.
 pub fn interpolate(template: &str, vars: &HashMap<String, String>) -> String {
     let mut out = String::with_capacity(template.len() + 16);
     let mut chars = template.chars().peekable();
@@ -39,6 +42,7 @@ pub fn interpolate(template: &str, vars: &HashMap<String, String>) -> String {
     }
     out
 }
+/// Build a variable map from key-value pairs and interpolate the template.
 pub fn interpolate_pairs(template: &str, pairs: &[(String, String)]) -> String {
     let vars: HashMap<String, String> = pairs.iter().cloned().collect();
     interpolate(template, &vars)

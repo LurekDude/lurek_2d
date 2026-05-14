@@ -1,4 +1,9 @@
+//! Easing curve gallery and cubic Bezier visualizations rendered to `ImageData`.
+//! Draws multi-panel grids with labeled curves; handles overshoot values above 1.0.
+//! Does not own easing definitions — callers pass `(&str, &dyn Fn(f32)->f32)` slices.
+//! Depends on `crate::image::ImageData`.
 use crate::image::ImageData;
+/// Render a gallery of easing curves in a grid into an image.
 pub fn easing_gallery_to_image(
     curves: &[(&str, &dyn Fn(f32) -> f32)],
     chart_w: u32,
@@ -36,6 +41,7 @@ pub fn easing_gallery_to_image(
     img
 }
 #[allow(clippy::type_complexity)]
+/// Render multiple easing curves overlaid on a single chart into an image.
 pub fn easing_comparison_to_image(
     curves: &[(&str, (u8, u8, u8), fn(f32) -> f32)],
     width: u32,
@@ -64,6 +70,7 @@ pub fn easing_comparison_to_image(
     img
 }
 #[allow(clippy::type_complexity)]
+/// Render a set of Bezier curves with control points into an image.
 pub fn bezier_curves_to_image(
     curves: &[(Vec<crate::math::vec2::Vec2>, (u8, u8, u8))],
     width: u32,
@@ -109,6 +116,7 @@ pub fn bezier_curves_to_image(
     }
     img
 }
+/// Render an advanced Bezier demo with derivatives, segments, and edit operations into an image.
 pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     use crate::math::bezier::BezierCurve;
     use crate::math::vec2::Vec2;

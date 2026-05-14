@@ -1,3 +1,7 @@
+//! Province camera / view-transform helpers: fit, screen-to-map, cell hit-test, and zoom-at-point.
+//! Pure math; no dependencies on registry, render, or Lua state.
+
+/// Return (cam_x, cam_y, zoom) that fits the full map centred on screen; clamps zoom to ≥ 0.0001.
 pub fn fit_camera_to_screen(
     map_w: u32,
     map_h: u32,
@@ -16,6 +20,7 @@ pub fn fit_camera_to_screen(
     let cam_y = (screen_h - sh * zoom) * 0.5;
     (cam_x, cam_y, zoom)
 }
+/// Convert a screen pixel coordinate to a floating-point map coordinate using camera offset and zoom; denom clamped to ≥ 0.0001.
 pub fn screen_to_map(
     screen_x: f32,
     screen_y: f32,
@@ -27,6 +32,7 @@ pub fn screen_to_map(
     let denom = (zoom * pixel_size).max(0.0001);
     ((screen_x - cam_x) / denom, (screen_y - cam_y) / denom)
 }
+/// Convert a map coordinate to an integer cell (x, y); return None if out-of-bounds or non-finite.
 pub fn map_to_cell(map_x: f32, map_y: f32, map_w: u32, map_h: u32) -> Option<(u32, u32)> {
     if !map_x.is_finite() || !map_y.is_finite() {
         return None;
@@ -44,6 +50,7 @@ pub fn map_to_cell(map_x: f32, map_y: f32, map_w: u32, map_h: u32) -> Option<(u3
         None
     }
 }
+/// Return the new camera (x, y) after zooming from old_zoom to new_zoom keeping anchor_x/anchor_y stationary.
 pub fn zoom_camera_at(
     anchor_x: f32,
     anchor_y: f32,

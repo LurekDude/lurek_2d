@@ -1,19 +1,31 @@
+//! Palette lookup table for pixel-exact color remapping of `ImageData` buffers.
+//! Owns `PaletteLUT`: a paired from/to color list with apply, cycle, and mutate helpers.
+//! Uses a `HashMap` fast-path for tables wider than 16 entries, linear scan otherwise.
+//! Does not own image storage or GPU resources.
+
 use crate::math::Color;
 use std::collections::HashMap;
+/// Source-to-target color mapping used to remap image pixels.
+#[derive(Debug, Clone)]
 pub struct PaletteLUT {
+    /// Colors to match in the source image.
     pub from_colors: Vec<Color>,
+    /// Replacement colors written into the image.
     pub to_colors: Vec<Color>,
 }
 impl PaletteLUT {
+    /// Create an empty palette lookup table.
     pub fn new() -> Self {
         Self {
             from_colors: Vec::new(),
             to_colors: Vec::new(),
         }
     }
+    /// Return the number of color pairs stored in the table.
     pub fn get_color_count(&self) -> usize {
         self.from_colors.len()
     }
+    /// Set a color pair at an index and grow the table when needed.
     pub fn set_color(&mut self, index: usize, from: Color, to: Color) {
         while self.from_colors.len() <= index {
             self.from_colors.push(Color::WHITE);
@@ -22,16 +34,20 @@ impl PaletteLUT {
         self.from_colors[index] = from;
         self.to_colors[index] = to;
     }
+    /// Return the source color at an index.
     pub fn get_from_color(&self, index: usize) -> Option<Color> {
         self.from_colors.get(index).copied()
     }
+    /// Return the replacement color at an index.
     pub fn get_to_color(&self, index: usize) -> Option<Color> {
         self.to_colors.get(index).copied()
     }
+    /// Clear all stored color pairs.
     pub fn clear(&mut self) {
         self.from_colors.clear();
         self.to_colors.clear();
     }
+    /// Rotate replacement colors by the requested offset.
     pub fn cycle_to_colors(&mut self, offset: i32) {
         if self.to_colors.len() <= 1 {
             return;
@@ -43,6 +59,7 @@ impl PaletteLUT {
         }
         self.to_colors.rotate_right(shift as usize);
     }
+    /// Apply the palette lookup to an image buffer in place.
     pub fn apply(&self, img: &mut crate::image::image_data::ImageData) {
         if self.from_colors.is_empty() {
             return;
@@ -104,7 +121,9 @@ impl PaletteLUT {
         }
     }
 }
+/// Build a default palette lookup table.
 impl Default for PaletteLUT {
+    /// Return a new empty palette lookup table.
     fn default() -> Self {
         Self::new()
     }

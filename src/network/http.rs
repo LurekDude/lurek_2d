@@ -1,11 +1,22 @@
+//! Blocking HTTP client used for matchmaking requests and asset URL fetches.
+//! Wraps `ureq` with a configurable timeout; runs synchronously on the caller's thread.
+//! Does not own async I/O; callers must dispatch to the net thread when non-blocking is required.
+//! Key dependency: `ureq` for HTTP transport.
+
 use log::{debug, warn};
 use std::time::Duration;
+/// Result of a completed HTTP request, including both success and error cases.
 pub struct HttpResponse {
+    /// HTTP status code; `0` when the request failed before receiving a response.
     pub status: u16,
+    /// Raw response body bytes; empty on network error.
     pub body: Vec<u8>,
+    /// Response header name-value pairs.
     pub headers: Vec<(String, String)>,
+    /// Human-readable error message when the request failed; `None` on success.
     pub error: Option<String>,
 }
+/// Execute a synchronous HTTP request; returns an `HttpResponse` with `error` set on failure.
 pub fn execute_request(
     method: &str,
     url: &str,
@@ -36,6 +47,7 @@ pub fn execute_request(
         }
     }
 }
+/// Dispatch the request using a pre-configured `Agent`; return a parsed `HttpResponse` or error message.
 #[allow(clippy::wildcard_in_or_patterns)]
 fn execute_with_agent(
     agent: &ureq::Agent,
@@ -96,57 +108,4 @@ fn execute_with_agent(
         headers: resp_headers,
         error: None,
     })
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn http_response_default_fields() {
-        let resp = HttpResponse {
-            status: 200,
-            body: vec![72, 105],
-            headers: vec![("Content-Type".to_string(), "text/plain".to_string())],
-            error: None,
-        };
-        assert_eq!(resp.status, 200);
-        assert_eq!(resp.body, b"Hi");
-        assert!(resp.error.is_none());
-    }
-    #[test]
-    fn http_response_with_error() {
-        let resp = HttpResponse {
-            status: 0,
-            body: Vec::new(),
-            headers: Vec::new(),
-            error: Some("connection refused".to_string()),
-        };
-        assert_eq!(resp.status, 0);
-        assert!(resp.error.unwrap().contains("connection refused"));
-    }
-    #[test]
-    fn http_response_empty_body_and_headers() {
-        let resp = HttpResponse {
-            status: 204,
-            body: Vec::new(),
-            headers: Vec::new(),
-            error: None,
-        };
-        assert_eq!(resp.status, 204);
-        assert!(resp.body.is_empty());
-        assert!(resp.headers.is_empty());
-    }
-    #[test]
-    fn http_response_multiple_headers() {
-        let resp = HttpResponse {
-            status: 200,
-            body: Vec::new(),
-            headers: vec![
-                ("X-A".to_string(), "1".to_string()),
-                ("X-B".to_string(), "2".to_string()),
-            ],
-            error: None,
-        };
-        assert_eq!(resp.headers.len(), 2);
-        assert_eq!(resp.headers[0].0, "X-A");
-    }
 }

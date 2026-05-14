@@ -1,38 +1,65 @@
+//! Core graph container for nodes, edges, items, indexes, and serialization.
+//!
+//! Owns graph storage plus index maintenance for fast traversal.
+//! Higher-level algorithms and simulation passes live in sibling modules.
+
 use super::edge::Edge;
 use super::item::{GraphItem, ItemPosition};
 use super::node::{Node, OverflowPolicy};
 use crate::log_msg;
 use crate::runtime::log_messages::{GC01, GC02, GC03, GC04};
 use std::collections::{HashMap, HashSet};
+/// Aggregate counts derived from the current graph state.
 #[derive(Debug, Clone)]
 pub struct GraphStats {
+    /// Total node count.
     pub nodes: usize,
+    /// Total edge count.
     pub edges: usize,
+    /// Total item count.
     pub items: usize,
+    /// Number of active nodes.
     pub active_nodes: usize,
+    /// Number of active edges.
     pub active_edges: usize,
+    /// Number of items currently in transit.
     pub items_in_transit: usize,
+    /// Number of items currently on nodes.
     pub items_on_nodes: usize,
+    /// Sum of node demand quantities.
     pub total_demand: i32,
+    /// Sum of node supply quantities.
     pub total_supply: i32,
+    /// Number of queued items across all nodes.
     pub queued_items: usize,
 }
+/// Main graph container with nodes, edges, items, and adjacency indexes.
 pub struct Graph {
+    /// Stored nodes by id.
     pub nodes: HashMap<u64, Node>,
+    /// Stored edges by id.
     pub edges: HashMap<u64, Edge>,
+    /// Stored items by id.
     pub items: HashMap<u64, GraphItem>,
+    /// Outgoing edge ids keyed by source node id.
     outgoing_index: HashMap<u64, Vec<u64>>,
+    /// Incoming edge ids keyed by destination node id.
     incoming_index: HashMap<u64, Vec<u64>>,
+    /// Next node id to assign.
     next_node_id: u64,
+    /// Next edge id to assign.
     next_edge_id: u64,
+    /// Next item id to assign.
     next_item_id: u64,
 }
+/// Create an empty graph with fresh id counters.
 impl Default for Graph {
     fn default() -> Self {
         Self::new()
     }
 }
 impl Graph {
+    /// Create an empty graph with fresh id counters.
     pub fn new() -> Self {
         Self {
             nodes: HashMap::new(),
@@ -45,6 +72,7 @@ impl Graph {
             next_item_id: 1,
         }
     }
+    /// Add an edge id to the outgoing and incoming indexes.
     fn index_edge(&mut self, edge_id: u64, from_node: u64, to_node: u64) {
         self.outgoing_index
             .entry(from_node)
@@ -55,6 +83,7 @@ impl Graph {
             .or_default()
             .push(edge_id);
     }
+    /// Remove an edge id from the outgoing and incoming indexes.
     fn unindex_edge(&mut self, edge_id: u64, from_node: u64, to_node: u64) {
         if let Some(ids) = self.outgoing_index.get_mut(&from_node) {
             ids.retain(|&id| id != edge_id);
@@ -63,18 +92,21 @@ impl Graph {
             ids.retain(|&id| id != edge_id);
         }
     }
+    /// Return the indexed outgoing edge ids for a node.
     pub(crate) fn outgoing_edge_ids_slice(&self, node_id: u64) -> &[u64] {
         self.outgoing_index
             .get(&node_id)
             .map(Vec::as_slice)
             .unwrap_or(&[])
     }
+    /// Return the indexed incoming edge ids for a node.
     pub(crate) fn incoming_edge_ids_slice(&self, node_id: u64) -> &[u64] {
         self.incoming_index
             .get(&node_id)
             .map(Vec::as_slice)
             .unwrap_or(&[])
     }
+    /// Add a node and return its assigned id.
     pub fn add_node(&mut self, node_type: &str, capacity: i32) -> u64 {
         let id = self.next_node_id;
         self.next_node_id += 1;
@@ -84,6 +116,7 @@ impl Graph {
         self.incoming_index.entry(id).or_default();
         id
     }
+    /// Remove a node and all connected edges, returning true when it existed.
     pub fn remove_node(&mut self, node_id: u64) -> bool {
         if self.nodes.remove(&node_id).is_none() {
             return false;
@@ -107,15 +140,19 @@ impl Graph {
         log_msg!(debug, GC02, "{}", node_id);
         true
     }
+    /// Return true when the node id exists.
     pub fn has_node(&self, node_id: u64) -> bool {
         self.nodes.contains_key(&node_id)
     }
+    /// Return all node ids in arbitrary order.
     pub fn get_node_ids(&self) -> Vec<u64> {
         self.nodes.keys().copied().collect()
     }
+    /// Return the number of nodes.
     pub fn get_node_count(&self) -> usize {
         self.nodes.len()
     }
+    /// Add an edge and return its assigned id or an error when either endpoint is missing.
     pub fn add_edge(&mut self, from: u64, to: u64, edge_type: Option<&str>) -> Result<u64, String> {
         if !self.nodes.contains_key(&from) {
             return Err(format!("source node {from} does not exist"));
@@ -131,6 +168,7 @@ impl Graph {
         log_msg!(debug, GC03, "{} -> {} (id={})", from, to, id);
         Ok(id)
     }
+    /// Remove an edge and detach any items in transit, returning true when it existed.
     pub fn remove_edge(&mut self, edge_id: u64) -> bool {
         if let Some(edge) = self.edges.remove(&edge_id) {
             self.unindex_edge(edge_id, edge.from_node, edge.to_node);
@@ -145,15 +183,19 @@ impl Graph {
             false
         }
     }
+    /// Return true when the edge id exists.
     pub fn has_edge(&self, edge_id: u64) -> bool {
         self.edges.contains_key(&edge_id)
     }
+    /// Return all edge ids in arbitrary order.
     pub fn get_edge_ids(&self) -> Vec<u64> {
         self.edges.keys().copied().collect()
     }
+    /// Return the number of edges.
     pub fn get_edge_count(&self) -> usize {
         self.edges.len()
     }
+    /// Return the first outgoing edge id that connects the supplied nodes.
     pub fn get_edge_between(&self, from: u64, to: u64) -> Option<u64> {
         self.outgoing_edge_ids_slice(from)
             .iter()
@@ -167,6 +209,7 @@ impl Graph {
                 })
             })
     }
+    /// Build a new graph containing only the selected nodes and connected data.
     pub fn subgraph(&self, node_ids: &[u64]) -> Self {
         let requested: HashSet<u64> = node_ids
             .iter()
@@ -293,6 +336,7 @@ impl Graph {
         }
         sub
     }
+    /// Create an item and return its assigned id.
     pub fn create_item(&mut self, item_type: &str, decay_time: f64) -> u64 {
         let id = self.next_item_id;
         self.next_item_id += 1;
@@ -300,6 +344,7 @@ impl Graph {
             .insert(id, GraphItem::new(id, item_type, decay_time));
         id
     }
+    /// Add an item to a node and return whether the placement succeeded.
     pub fn add_item_to_node(&mut self, item_id: u64, node_id: u64) -> Result<bool, String> {
         if !self.items.contains_key(&item_id) {
             return Err(format!("item {item_id} does not exist"));
@@ -336,6 +381,7 @@ impl Graph {
         }
         Ok(true)
     }
+    /// Remove an item from the graph and all node or edge containers.
     pub fn remove_item(&mut self, item_id: u64) -> bool {
         if self.items.remove(&item_id).is_none() {
             return false;
@@ -349,15 +395,19 @@ impl Graph {
         }
         true
     }
+    /// Return true when the item id exists.
     pub fn has_item(&self, item_id: u64) -> bool {
         self.items.contains_key(&item_id)
     }
+    /// Return all item ids in arbitrary order.
     pub fn get_item_ids(&self) -> Vec<u64> {
         self.items.keys().copied().collect()
     }
+    /// Return the number of items.
     pub fn get_item_count(&self) -> usize {
         self.items.len()
     }
+    /// Send an item onto an edge and return whether the transfer succeeded.
     pub fn send_item(&mut self, item_id: u64, edge_id: u64) -> Result<bool, String> {
         let item = self
             .items
@@ -394,6 +444,7 @@ impl Graph {
         };
         Ok(true)
     }
+    /// Return aggregate counts derived from the current graph state.
     pub fn get_stats(&self) -> GraphStats {
         let mut stats = GraphStats {
             nodes: self.nodes.len(),
@@ -428,12 +479,15 @@ impl Graph {
         }
         stats
     }
+    /// Return outgoing edge ids for a node.
     pub fn get_outgoing_edges(&self, node_id: u64) -> Vec<u64> {
         self.outgoing_edge_ids_slice(node_id).to_vec()
     }
+    /// Return incoming edge ids for a node.
     pub fn get_incoming_edges(&self, node_id: u64) -> Vec<u64> {
         self.incoming_edge_ids_slice(node_id).to_vec()
     }
+    /// Return edge ids by requested direction or an error when the direction is invalid.
     pub fn get_edges_by_direction(
         &self,
         node_id: u64,
@@ -458,6 +512,7 @@ impl Graph {
             )),
         }
     }
+    /// Draw a simple circular graph preview into an image buffer.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(25, 25, 35, 255);
@@ -504,6 +559,7 @@ impl Graph {
         }
         img
     }
+    /// Serialize nodes and edges into a JSON-like value map.
     pub fn serialize(&self) -> HashMap<String, serde_json::Value> {
         use serde_json::{json, Value};
         let mut nodes_arr: Vec<Value> = self
@@ -527,6 +583,7 @@ impl Graph {
         map.insert("edges".to_string(), Value::Array(edges_arr));
         map
     }
+    /// Deserialize a graph from the JSON-like value map or return a shape error.
     pub fn deserialize(data: &HashMap<String, serde_json::Value>) -> Result<Self, String> {
         let mut g = Self::new();
         if let Some(nodes_val) = data.get("nodes") {

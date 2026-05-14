@@ -1,22 +1,40 @@
+//! Core tilemap types: `TileMap` with layered `TileLayer` storage, sweep-cast collision, and autotile resolution.
+//! Owns tile GID storage, layer visibility/tint/parallax, tileset attachment, autotile bitmask computation,
+//! viewport, animation timers, and debug render-command generation.
+//! Does not own the render pipeline, physics, or asset loading — these are handled by callers.
+//! Depends on `tileset`, `mapgen`, `render`, `image`, `math`, and `log`.
+
 use super::mapgen::MapOrientation;
 use super::tileset::TileSet;
 use crate::log_msg;
 use crate::math::{Rect, Vec2};
 use crate::runtime::log_messages::{TM01_TILEMAP_INIT, TM02_TILESET_ADD, TM03_LAYER_ADD};
 use std::collections::HashMap;
+
+/// A single tile layer with per-tile GID and optional per-tile tint data.
 #[derive(Debug, Clone)]
 pub struct TileLayer {
+    /// Layer identifier shown in editors and log messages.
     pub name: String,
+    /// Tile count along the X axis.
     pub width: u32,
+    /// Tile count along the Y axis.
     pub height: u32,
+    /// Whether this layer is included in render-command output.
     pub visible: bool,
+    /// Multiplicative tint `[r, g, b, a]` applied to every tile in the layer.
     pub tint: [f32; 4],
+    /// World-space draw offset applied to this layer.
     pub offset: Vec2,
+    /// Per-axis parallax scroll factor; `(1, 1)` = full scroll, `(0, 0)` = fixed.
     pub parallax: Vec2,
+    /// Flat GID array in row-major order; `0` means empty.
     tiles: Vec<u32>,
+    /// Optional per-tile tint override; `None` falls back to `tint`.
     tile_tints: Vec<Option<[f32; 4]>>,
 }
 impl TileLayer {
+    /// Create a fully-empty `TileLayer` of `width × height` tiles with all GIDs set to `0`.
     fn new(name: &str, width: u32, height: u32) -> Self {
         let cap = (width * height) as usize;
         Self {
@@ -31,6 +49,7 @@ impl TileLayer {
             tile_tints: vec![None; cap],
         }
     }
+    /// Convert `(x, y)` into a flat index; returns `None` when out of bounds.
     fn index(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
             Some((y * self.width + x) as usize)
@@ -39,27 +58,44 @@ impl TileLayer {
         }
     }
 }
+/// Result of a continuous sweep-cast between a moving AABB and a tile AABB.
 #[derive(Debug, Clone, Copy)]
 pub struct SweepResult {
+    /// World-space contact point at the moment of first collision.
     pub contact_point: Vec2,
+    /// Surface normal at the collision face.
     pub normal: Vec2,
+    /// Grid X coordinate of the hit tile.
     pub tile_x: u32,
+    /// Grid Y coordinate of the hit tile.
     pub tile_y: u32,
+    /// Normalized time of impact in [0, 1] along the displacement vector.
     pub t: f32,
 }
+/// Multi-layer tile map with tileset attachment, collision, autotile, animation, and debug rendering.
 #[derive(Debug, Clone)]
 pub struct TileMap {
+    /// Width of each tile in pixels.
     tile_width: u32,
+    /// Height of each tile in pixels.
     tile_height: u32,
+    /// Chunk size used by the streaming chunk sub-system.
     chunk_size: u32,
+    /// World-space coordinate interpretation (TopDown, Isometric, Hex, etc.).
     orientation: MapOrientation,
+    /// Ordered list of tilesets attached to this map.
     tilesets: Vec<TileSet>,
+    /// Ordered list of tile layers.
     layers: Vec<TileLayer>,
+    /// Per-layer GID-to-position reverse index for fast `find_tiles_by_gid`.
     tile_type_index_cache: Vec<HashMap<u32, Vec<(u32, u32)>>>,
+    /// Optional viewport rect for camera-culled render-command generation.
     viewport: Option<Rect>,
+    /// Per-GID animation state `(frame_index, elapsed_ms)`.
     anim_timers: HashMap<u32, (usize, f32)>,
 }
 impl TileMap {
+    /// Create an empty `TileMap` with the given tile dimensions and chunk size.
     pub fn new(tile_width: u32, tile_height: u32, chunk_size: u32) -> Self {
         log_msg!(
             debug,
@@ -81,65 +117,81 @@ impl TileMap {
             anim_timers: HashMap::new(),
         }
     }
+    /// Append a tileset and take ownership; called during map load or runtime attachment.
     pub fn add_tileset(&mut self, ts: TileSet) {
         log_msg!(debug, TM02_TILESET_ADD);
         self.tilesets.push(ts);
     }
+    /// Return the tileset at `index`, or `None` when out of range.
     pub fn get_tileset(&self, index: usize) -> Option<&TileSet> {
         self.tilesets.get(index)
     }
+    /// Return the number of attached tilesets.
     pub fn get_tileset_count(&self) -> usize {
         self.tilesets.len()
     }
+    /// Add a new empty layer of `width × height` tiles; return its layer index.
     pub fn add_layer(&mut self, name: &str, width: u32, height: u32) -> usize {
         log_msg!(debug, TM03_LAYER_ADD, "{}", name);
         self.layers.push(TileLayer::new(name, width, height));
         self.tile_type_index_cache.push(HashMap::new());
         self.layers.len() - 1
     }
+    /// Return the total number of layers.
     pub fn get_layer_count(&self) -> usize {
         self.layers.len()
     }
+    /// Return the name of layer `idx`, or `None` when out of range.
     pub fn get_layer_name(&self, idx: usize) -> Option<&str> {
         self.layers.get(idx).map(|l| l.name.as_str())
     }
+    /// Set the visibility flag on layer `idx`; no-op when out of range.
     pub fn set_layer_visible(&mut self, idx: usize, visible: bool) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.visible = visible;
         }
     }
+    /// Return `true` when layer `idx` is visible; returns `false` when out of range.
     pub fn get_layer_visible(&self, idx: usize) -> bool {
         self.layers.get(idx).is_some_and(|l| l.visible)
     }
+    /// Set the tint RGBA of layer `idx`; no-op when out of range.
     pub fn set_layer_color(&mut self, idx: usize, r: f32, g: f32, b: f32, a: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.tint = [r, g, b, a];
         }
     }
+    /// Return the tint `[r, g, b, a]` of layer `idx`; returns `[0; 4]` when out of range.
     pub fn get_layer_color(&self, idx: usize) -> [f32; 4] {
         self.layers.get(idx).map_or([0.0; 4], |l| l.tint)
     }
+    /// Set the world-space draw offset `(ox, oy)` of layer `idx`; no-op when out of range.
     pub fn set_layer_offset(&mut self, idx: usize, ox: f32, oy: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.offset = Vec2::new(ox, oy);
         }
     }
+    /// Return the draw offset of layer `idx`; returns `Vec2::ZERO` when out of range.
     pub fn get_layer_offset(&self, idx: usize) -> Vec2 {
         self.layers.get(idx).map_or(Vec2::ZERO, |l| l.offset)
     }
+    /// Set the parallax factor `(px, py)` of layer `idx`; no-op when out of range.
     pub fn set_layer_parallax(&mut self, idx: usize, px: f32, py: f32) {
         if let Some(layer) = self.layers.get_mut(idx) {
             layer.parallax = Vec2::new(px, py);
         }
     }
+    /// Return the parallax factor of layer `idx`; returns `(1, 1)` when out of range.
     pub fn get_layer_parallax(&self, idx: usize) -> Vec2 {
         self.layers
             .get(idx)
             .map_or(Vec2::new(1.0, 1.0), |l| l.parallax)
     }
+    /// Return the `(width, height)` tile dimensions of layer `idx`, or `None` when out of range.
     pub fn get_layer_dimensions(&self, idx: usize) -> Option<(u32, u32)> {
         self.layers.get(idx).map(|l| (l.width, l.height))
     }
+    /// Write GID `gid` at `(x, y)` in layer `layer`; updates the type-index cache; no-op when out of bounds.
     pub fn set_tile(&mut self, layer: usize, x: u32, y: u32, gid: u32) {
         if let Some(l) = self.layers.get_mut(layer) {
             if let Some(idx) = l.index(x, y) {
@@ -156,6 +208,7 @@ impl TileMap {
             }
         }
     }
+    /// Return the GID at `(x, y)` in layer `layer`; returns `0` when out of bounds.
     pub fn get_tile(&self, layer: usize, x: u32, y: u32) -> u32 {
         if let Some(l) = self.layers.get(layer) {
             if let Some(idx) = l.index(x, y) {
@@ -165,6 +218,7 @@ impl TileMap {
         0
     }
     #[allow(clippy::too_many_arguments)]
+    /// Set a per-tile RGBA tint override at `(x, y)` in `layer`; no-op when out of bounds.
     pub fn set_tile_tint(&mut self, layer: usize, x: u32, y: u32, r: f32, g: f32, b: f32, a: f32) {
         if let Some(l) = self.layers.get_mut(layer) {
             if let Some(idx) = l.index(x, y) {
@@ -172,9 +226,11 @@ impl TileMap {
             }
         }
     }
+    /// Set the tile at `(x, y)` in `layer` to GID `0`; updates the type-index cache.
     pub fn clear_tile(&mut self, layer: usize, x: u32, y: u32) {
         self.set_tile(layer, x, y, 0);
     }
+    /// Fill all tiles in `layer` with `gid`; rebuilds the type-index cache for that layer.
     pub fn fill(&mut self, layer: usize, gid: u32) {
         if let Some(l) = self.layers.get_mut(layer) {
             for tile in l.tiles.iter_mut() {
@@ -194,24 +250,29 @@ impl TileMap {
             }
         }
     }
+    /// Return a copy of the GID-to-positions index for `layer`; empty map when out of range.
     pub fn tile_type_index(&self, layer: usize) -> HashMap<u32, Vec<(u32, u32)>> {
         self.tile_type_index_cache
             .get(layer)
             .cloned()
             .unwrap_or_default()
     }
+    /// Return all `(x, y)` positions for tiles matching `gid` in `layer`; empty vec when not found.
     pub fn find_tiles_by_gid(&self, layer: usize, gid: u32) -> Vec<(u32, u32)> {
         self.tile_type_index_cache
             .get(layer)
             .and_then(|idx| idx.get(&gid).cloned())
             .unwrap_or_default()
     }
+    /// Set the active camera viewport rect; enables culled render-command generation.
     pub fn set_viewport(&mut self, x: f32, y: f32, w: f32, h: f32) {
         self.viewport = Some(Rect::new(x, y, w, h));
     }
+    /// Return the viewport as `(x, y, w, h)`, or `None` when not set.
     pub fn get_viewport(&self) -> Option<(f32, f32, f32, f32)> {
         self.viewport.map(|v| (v.x, v.y, v.width, v.height))
     }
+    /// Advance all GID animation timers by `dt` seconds; updates frame indices for each animated tileset.
     pub fn update(&mut self, dt: f32) {
         let dt_ms = dt * 1000.0;
         for ts in &self.tilesets {
@@ -233,6 +294,7 @@ impl TileMap {
             }
         }
     }
+    /// Convert world position `(wx, wy)` to tile grid coordinates; clamps negative values to `0`.
     pub fn world_to_tile(&self, wx: f32, wy: f32) -> (u32, u32) {
         let tx = if wx < 0.0 {
             0
@@ -246,30 +308,38 @@ impl TileMap {
         };
         (tx, ty)
     }
+    /// Convert tile grid coordinates `(tx, ty)` to world-space top-left pixel position.
     pub fn tile_to_world(&self, tx: u32, ty: u32) -> (f32, f32) {
         (
             tx as f32 * self.tile_width as f32,
             ty as f32 * self.tile_height as f32,
         )
     }
+    /// Return tile width in pixels.
     pub fn get_tile_width(&self) -> u32 {
         self.tile_width
     }
+    /// Return tile height in pixels.
     pub fn get_tile_height(&self) -> u32 {
         self.tile_height
     }
+    /// Return tile dimensions as `(width, height)` in pixels.
     pub fn get_tile_dimensions(&self) -> (u32, u32) {
         (self.tile_width, self.tile_height)
     }
+    /// Return the streaming chunk size.
     pub fn get_chunk_size(&self) -> u32 {
         self.chunk_size
     }
+    /// Return the map orientation.
     pub fn get_orientation(&self) -> MapOrientation {
         self.orientation
     }
+    /// Set the map orientation.
     pub fn set_orientation(&mut self, orientation: MapOrientation) {
         self.orientation = orientation;
     }
+    /// Resolve global GID `gid` to a `(tileset_index, local_id)` pair; returns `None` for GID `0` or unknown GIDs.
     fn resolve_gid(&self, gid: u32) -> Option<(usize, u32)> {
         if gid == 0 {
             return None;
@@ -282,6 +352,7 @@ impl TileMap {
         }
         None
     }
+    /// Return `true` when the tile at `(x, y)` in `layer` is marked solid in its tileset.
     pub fn is_solid(&self, layer: usize, x: u32, y: u32) -> bool {
         let gid = self.get_tile(layer, x, y);
         if let Some((ts_idx, local_id)) = self.resolve_gid(gid) {
@@ -290,6 +361,7 @@ impl TileMap {
             false
         }
     }
+    /// Return `true` when any tile overlapped by `rect` in `layer` is solid.
     pub fn rect_overlaps_solid(&self, layer: usize, rect: Rect) -> bool {
         let (tx0, ty0) = self.world_to_tile(rect.x, rect.y);
         let (tx1, ty1) =
@@ -303,6 +375,7 @@ impl TileMap {
         }
         false
     }
+    /// Continuous AABB sweep through solid tiles in `layer` along `(dx, dy)`; returns the earliest hit or `None`.
     pub fn sweep_rect(&self, layer: usize, rect: Rect, dx: f32, dy: f32) -> Option<SweepResult> {
         if dx == 0.0 && dy == 0.0 {
             return None;
@@ -333,6 +406,7 @@ impl TileMap {
         }
         best
     }
+    /// Apply 4-neighbour autotile GID substitution to all non-empty tiles in `layer` matching `type_name`.
     pub fn apply_autotile(&mut self, layer: usize, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),
@@ -354,6 +428,7 @@ impl TileMap {
             self.set_tile(layer, x, y, gid);
         }
     }
+    /// Apply 4-neighbour autotile substitution to the 3×3 neighbourhood around `(x, y)` only.
     pub fn apply_autotile_at(&mut self, layer: usize, x: u32, y: u32, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),
@@ -379,6 +454,7 @@ impl TileMap {
             self.set_tile(layer, x, y, gid);
         }
     }
+    /// Apply 8-neighbour autotile GID substitution to all non-empty tiles in `layer` matching `type_name`.
     pub fn apply_autotile_8(&mut self, layer: usize, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),
@@ -400,6 +476,7 @@ impl TileMap {
             self.set_tile(layer, x, y, gid);
         }
     }
+    /// Apply 8-neighbour autotile substitution to the 3×3 neighbourhood around `(x, y)` only.
     pub fn apply_autotile_8_at(&mut self, layer: usize, x: u32, y: u32, type_name: &str) {
         let (width, height) = match self.layers.get(layer) {
             Some(l) => (l.width, l.height),
@@ -425,6 +502,7 @@ impl TileMap {
             self.set_tile(layer, x, y, gid);
         }
     }
+    /// Compute the 4-bit cardinal-neighbour bitmask for `(x, y)` in `layer`; bits: N=1, E=2, S=4, W=8.
     fn compute_bitmask_4(&self, layer: usize, x: u32, y: u32, width: u32, height: u32) -> u8 {
         let mut mask = 0u8;
         if y > 0 && self.get_tile(layer, x, y - 1) != 0 {
@@ -441,6 +519,7 @@ impl TileMap {
         }
         mask
     }
+    /// Compute the 8-bit full-neighbour bitmask for `(x, y)` in `layer`; cardinals=1..8, diagonals=16..128.
     fn compute_bitmask_8(&self, layer: usize, x: u32, y: u32, width: u32, height: u32) -> u16 {
         let n = y > 0 && self.get_tile(layer, x, y - 1) != 0;
         let e = x + 1 < width && self.get_tile(layer, x + 1, y) != 0;
@@ -473,6 +552,7 @@ impl TileMap {
         }
         mask
     }
+    /// Search all tilesets for a 4-bit autotile match for `type_name` and `bitmask`; returns the global GID or `None`.
     fn lookup_autotile_4(&self, type_name: &str, bitmask: u8) -> Option<u32> {
         for ts in &self.tilesets {
             if let Some(local_id) = ts.get_auto_tile_id(type_name, bitmask) {
@@ -481,6 +561,7 @@ impl TileMap {
         }
         None
     }
+    /// Search all tilesets for an 8-bit autotile match for `type_name` and `bitmask`; returns the global GID or `None`.
     fn lookup_autotile_8(&self, type_name: &str, bitmask: u16) -> Option<u32> {
         for ts in &self.tilesets {
             if let Some(local_id) = ts.get_auto_tile_id_8(type_name, bitmask) {
@@ -489,6 +570,7 @@ impl TileMap {
         }
         None
     }
+    /// Render all layers to an `ImageData` using the debug color palette; `tile_size` is the render pixel size per tile.
     pub fn draw_to_image(&self, tile_size: u32) -> crate::image::ImageData {
         if self.layers.is_empty() {
             return crate::image::ImageData::new(1, 1);
@@ -542,6 +624,7 @@ impl TileMap {
         }
         img
     }
+    /// Build a flat `RenderCommand` list for all visible layers using the debug color palette and `offset`.
     pub fn build_render_commands(
         &self,
         offset_x: f32,
@@ -613,6 +696,7 @@ impl TileMap {
         }
         cmds
     }
+    /// Render world-space highlight points and a grid overlay into an `ImageData` of `img_width × img_height`.
     pub fn draw_with_highlight_to_image(
         &self,
         img_width: u32,
@@ -658,6 +742,7 @@ impl TileMap {
         }
         img
     }
+    /// Render all layers side-by-side with colour-coded GIDs into an `ImageData` of `width × height` pixels.
     pub fn draw_layers_to_image(
         &self,
         tile_px: u32,
@@ -707,6 +792,7 @@ impl TileMap {
         img.draw_label("TILEMAP LAYERS OK", 80, (height - 20) as i32, 100, 255, 100);
         img
     }
+    /// Convert a layer to a boolean walkability grid; `walkable_gids` are treated as passable, GID `0` is always passable.
     pub fn to_nav_grid(&self, layer: usize, walkable_gids: &[u32]) -> Vec<Vec<bool>> {
         let (width, height) = self.get_layer_dimensions(layer).unwrap_or((0, 0));
         let mut grid: Vec<Vec<bool>> = Vec::with_capacity(height as usize);
@@ -722,6 +808,7 @@ impl TileMap {
         grid
     }
 }
+/// Remove position `(x, y)` from the GID entry in `layer_index`; removes the key entirely when the list becomes empty.
 fn remove_pos_from_gid(layer_index: &mut HashMap<u32, Vec<(u32, u32)>>, gid: u32, x: u32, y: u32) {
     if let Some(list) = layer_index.get_mut(&gid) {
         if let Some(pos_idx) = list.iter().position(|&(px, py)| px == x && py == y) {
@@ -732,6 +819,7 @@ fn remove_pos_from_gid(layer_index: &mut HashMap<u32, Vec<(u32, u32)>>, gid: u32
         }
     }
 }
+/// Swept AABB-vs-AABB narrow-phase test; returns a `SweepResult` when the expanded target is hit in `[0, 1)`, or `None`.
 fn sweep_aabb_vs_aabb(
     mover: Rect,
     dx: f32,

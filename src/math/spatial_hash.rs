@@ -1,18 +1,36 @@
+//! Uniform-grid spatial hash for fast AABB, circle, and segment queries over string-keyed items.
+//! Used by particle systems, tile queries, and the Lua spatial query API.
+//! Does not own physics collision shapes — those belong in src/physics/ via rapier.
+//! Items are keyed by String id; use AabbTree instead when numeric keys are preferred.
+
 use std::collections::{HashMap, HashSet};
+
+/// A spatial item registered in the hash grid, describing its AABB.
 #[derive(Debug, Clone)]
 pub struct SpatialItem {
+    /// Caller-assigned identifier matching the key in the hash.
     pub id: String,
+    /// Left edge of the item's AABB.
     pub x: f32,
+    /// Top edge of the item's AABB.
     pub y: f32,
+    /// Width of the item's AABB.
     pub w: f32,
+    /// Height of the item's AABB.
     pub h: f32,
 }
+
+/// Uniform-grid hash mapping `(cell_x, cell_y)` integer keys to sets of item ids.
 pub struct SpatialHash {
+    /// World-space size of each grid cell; smaller values improve query precision at higher memory cost.
     cell_size: f32,
+    /// All currently registered items indexed by their string id.
     items: HashMap<String, SpatialItem>,
+    /// Cell buckets mapping grid coordinates to sets of overlapping item ids.
     buckets: HashMap<(i32, i32), HashSet<String>>,
 }
 impl SpatialHash {
+    /// Construct an empty hash with the given uniform `cell_size`.
     pub fn new(cell_size: f32) -> Self {
         Self {
             cell_size,
@@ -20,16 +38,20 @@ impl SpatialHash {
             buckets: HashMap::new(),
         }
     }
+    /// Return the world-space cell size.
     pub fn cell_size(&self) -> f32 {
         self.cell_size
     }
+    /// Return the number of items currently registered.
     pub fn item_count(&self) -> usize {
         self.items.len()
     }
+    /// Map world-space coordinate `v` to a signed grid cell index.
     #[inline]
     fn cell(&self, v: f32) -> i32 {
         (v / self.cell_size).floor() as i32
     }
+    /// Return the inclusive cell-grid range `(min_cx, min_cy, max_cx, max_cy)` covering the given AABB.
     fn cell_range(&self, x: f32, y: f32, w: f32, h: f32) -> (i32, i32, i32, i32) {
         (
             self.cell(x),
@@ -38,6 +60,7 @@ impl SpatialHash {
             self.cell(y + h),
         )
     }
+    /// Register or replace item `id` with AABB `(x, y, w, h)`, inserting it into all overlapping cells.
     pub fn insert(&mut self, id: String, x: f32, y: f32, w: f32, h: f32) {
         self.remove_internal(&id);
         let (cx0, cy0, cx1, cy1) = self.cell_range(x, y, w, h);
@@ -49,10 +72,12 @@ impl SpatialHash {
         self.items
             .insert(id.clone(), SpatialItem { id, x, y, w, h });
     }
+    /// Remove item `id` from all grid cells and delete it.
     pub fn remove(&mut self, id: &str) {
         self.remove_internal(id);
         self.items.remove(id);
     }
+    /// Erase item `id` from all its current cells without removing the item record.
     fn remove_internal(&mut self, id: &str) {
         if let Some(item) = self.items.get(id) {
             let (cx0, cy0, cx1, cy1) = self.cell_range(item.x, item.y, item.w, item.h);
@@ -65,13 +90,16 @@ impl SpatialHash {
             }
         }
     }
+    /// Replace item `id`'s AABB; equivalent to `insert` (re-registers in new cells).
     pub fn update(&mut self, id: String, x: f32, y: f32, w: f32, h: f32) {
         self.insert(id, x, y, w, h);
     }
+    /// Remove all items and clear all cell buckets.
     pub fn clear(&mut self) {
         self.items.clear();
         self.buckets.clear();
     }
+    /// Return ids of all items whose AABB overlaps the query rectangle, deduplicated.
     pub fn query_rect(&self, x: f32, y: f32, w: f32, h: f32) -> Vec<String> {
         let (cx0, cy0, cx1, cy1) = self.cell_range(x, y, w, h);
         let mut seen: HashSet<&str> = HashSet::new();
@@ -100,6 +128,7 @@ impl SpatialHash {
         }
         result
     }
+    /// Return ids of all items whose AABB overlaps the circle, verified by nearest-point distance.
     pub fn query_circle(&self, cx: f32, cy: f32, radius: f32) -> Vec<String> {
         let rx = cx - radius;
         let ry = cy - radius;
@@ -133,6 +162,7 @@ impl SpatialHash {
         }
         result
     }
+    /// Return ids of all items whose AABB the segment (x1,y1)-(x2,y2) passes through, using a slab test.
     pub fn query_segment(&self, x1: f32, y1: f32, x2: f32, y2: f32) -> Vec<String> {
         let min_x = x1.min(x2);
         let min_y = y1.min(y2);
@@ -160,6 +190,7 @@ impl SpatialHash {
         }
         result
     }
+    /// Return true when segment (x1,y1)-(x2,y2) intersects AABB at (ax, ay, aw, ah) via parametric slab.
     #[allow(clippy::too_many_arguments)]
     fn segment_aabb(
         x1: f32,

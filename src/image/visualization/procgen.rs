@@ -1,5 +1,10 @@
+//! Procedural-generation debug visualizations: cellular automata, Voronoi, dungeon maps, Delaunay triangulation.
+//! Renders pre-computed grid/region/point data — does not run the generator itself.
+//! Does not own procgen algorithms; callers supply flat arrays for grid cells, regions, and point sets.
+//! Depends on `super::hsv_to_rgb_viz` and `crate::image::ImageData`.
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
+/// Render a cellular automata grid with cell size and alive-cell color into an image.
 pub fn cellular_grid_to_image(
     grid: &[u8],
     grid_w: u32,
@@ -22,6 +27,7 @@ pub fn cellular_grid_to_image(
     }
     img
 }
+/// Render Voronoi cells for a set of seed points into an image.
 pub fn voronoi_to_image(
     regions: &[u32],
     width: u32,
@@ -38,6 +44,7 @@ pub fn voronoi_to_image(
     }
     img
 }
+/// Render point samples as colored dots into an image.
 pub fn points_to_image(
     points: &[(f64, f64)],
     width: u32,
@@ -54,6 +61,7 @@ pub fn points_to_image(
     }
     img
 }
+/// Render a dungeon grid with wall and floor tiles scaled by cell size into an image.
 pub fn dungeon_grid_to_image(grid: &[u8], grid_w: u32, grid_h: u32, cell_size: u32) -> ImageData {
     let mut img = ImageData::new(grid_w * cell_size, grid_h * cell_size);
     img.fill(15, 15, 25, 255);
@@ -78,6 +86,7 @@ pub fn dungeon_grid_to_image(grid: &[u8], grid_w: u32, grid_h: u32, cell_size: u
     }
     img
 }
+/// Render point samples as HSV-colored circles into an image.
 pub fn colored_points_to_image(points: &[(f32, f32)], width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -91,6 +100,7 @@ pub fn colored_points_to_image(points: &[(f32, f32)], width: u32, height: u32) -
     }
     img
 }
+/// Render a Delaunay triangulation with edges and circumcenters into an image.
 pub fn draw_delaunay_to_image(
     points: &[(f64, f64)],
     triangles: &[[f64; 6]],

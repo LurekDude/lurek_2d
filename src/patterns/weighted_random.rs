@@ -1,16 +1,29 @@
+//! Weight-based random selection with add/remove, weight update, and without-replacement pick_n.
+//! Callers supply normalized samples (0.0..1.0) so the module stays deterministic and testable.
+
+/// A single candidate with a weight and debug label.
 #[derive(Debug, Clone)]
 pub struct WeightedEntry {
+    /// Unique entry id.
     pub id: u64,
+    /// Non-negative selection weight.
     pub weight: f64,
+    /// Debug label.
     pub label: String,
 }
+/// Weighted random selector over a mutable entry list.
 #[derive(Debug, Clone)]
 pub struct WeightedRandom {
+    /// All candidate entries.
     entries: Vec<WeightedEntry>,
+    /// Next entry id to assign.
     next_id: u64,
+    /// Incremented on every structural change to detect stale caches.
     pub revision: u64,
 }
+/// All methods for `WeightedRandom`.
 impl WeightedRandom {
+    /// Create an empty selector.
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
@@ -18,6 +31,7 @@ impl WeightedRandom {
             revision: 0,
         }
     }
+    /// Add an entry with `weight` and `label`; return its id.
     pub fn add(&mut self, weight: f64, label: &str) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
@@ -29,6 +43,7 @@ impl WeightedRandom {
         self.revision += 1;
         id
     }
+    /// Remove the entry with `id`; return true when it existed.
     pub fn remove(&mut self, id: u64) -> bool {
         if let Some(pos) = self.entries.iter().position(|e| e.id == id) {
             self.entries.swap_remove(pos);
@@ -38,6 +53,7 @@ impl WeightedRandom {
             false
         }
     }
+    /// Update the weight of entry `id`; return false when not found.
     pub fn set_weight(&mut self, id: u64, weight: f64) -> bool {
         if let Some(e) = self.entries.iter_mut().find(|e| e.id == id) {
             e.weight = weight.max(0.0);
@@ -47,9 +63,11 @@ impl WeightedRandom {
             false
         }
     }
+    /// Return the sum of all entry weights.
     pub fn total_weight(&self) -> f64 {
         self.entries.iter().map(|e| e.weight).sum()
     }
+    /// Select one entry using normalized `sample` (0.0..1.0); return `None` when total weight is zero.
     pub fn pick(&self, sample: f64) -> Option<u64> {
         let total = self.total_weight();
         if total <= 0.0 {
@@ -65,6 +83,7 @@ impl WeightedRandom {
         }
         self.entries.last().map(|e| e.id)
     }
+    /// Select up to `count` distinct entries without replacement using `samples`; return their ids.
     pub fn pick_n(&self, count: usize, samples: &[f64]) -> Vec<u64> {
         if count == 0 || self.entries.is_empty() {
             return Vec::new();
@@ -91,18 +110,23 @@ impl WeightedRandom {
         }
         out
     }
+    /// Return all entries in insertion order.
     pub fn entries(&self) -> &[WeightedEntry] {
         &self.entries
     }
+    /// Return the number of entries.
     pub fn len(&self) -> usize {
         self.entries.len()
     }
+    /// Return true when there are no entries.
     pub fn is_empty(&self) -> bool {
         self.entries.is_empty()
     }
+    /// Return the entry with `id`, or `None`.
     pub fn get(&self, id: u64) -> Option<&WeightedEntry> {
         self.entries.iter().find(|e| e.id == id)
     }
+    /// Remove all entries and increment revision.
     pub fn clear(&mut self) {
         self.entries.clear();
         self.revision += 1;

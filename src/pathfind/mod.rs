@@ -1,3 +1,8 @@
+//! Pathfinding subsystem: grid-based A\*, bidirectional search, JPS, HPA\*, flow fields,
+//! navmesh triangulation, influence maps, and async request pooling.
+//! Does not own physics collision or Lua API bindings.
+//! Consumed by `src/ai/`, `src/physics/`, and `src/lua_api/pathfind_api.rs`.
+
 pub mod ai_flow_field;
 pub mod astar;
 pub mod async_pool;

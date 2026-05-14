@@ -1,8 +1,15 @@
+//! Render output helpers for `Terminal`. Converts the live cell grid into
+//! `RenderCommand` sequences or a rasterised `ImageData` thumbnail. Does not
+//! own the cell data or font metrics; those are owned by `terminal_state` and
+//! callers. Depends on `render::RenderCommand` and `image::ImageData`.
+
 use super::terminal_state::Terminal;
 use crate::image::ImageData;
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
+
 impl Terminal {
+    /// Build a `RenderCommand` list for the current cell grid using `font_key`, `char_w`/`char_h` cell dimensions, and `scale`.
     pub fn generate_render_commands(
         &self,
         font_key: FontKey,
@@ -44,6 +51,8 @@ impl Terminal {
         }
         cmds
     }
+
+    /// Rasterise the cell grid into a `width`×`height` `ImageData` thumbnail; non-space cells are drawn as solid colored rectangles.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(18, 18, 28, 255);

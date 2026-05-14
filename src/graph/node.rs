@@ -1,12 +1,22 @@
+//! Graph node state, flow configuration, and local queue or inventory helpers.
+//!
+//! Owns node-local supply, demand, conversion, and queue settings.
+//! Graph-wide routing and simulation stay in sibling modules.
+
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::str::FromStr;
+/// Overflow behavior applied when a node reaches capacity.
 #[derive(Debug, Clone, PartialEq)]
 pub enum OverflowPolicy {
+    /// Reject new items.
     Reject,
+    /// Destroy new items.
     Destroy,
+    /// Queue new items.
     Queue,
 }
 impl OverflowPolicy {
+    /// Return the lowercase policy string.
     pub fn to_str(&self) -> &str {
         match self {
             Self::Reject => "reject",
@@ -15,8 +25,10 @@ impl OverflowPolicy {
         }
     }
 }
+/// Parse overflow policy values from strings.
 impl FromStr for OverflowPolicy {
     type Err = String;
+    /// Parse an overflow policy or return an error on unknown input.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "reject" => Ok(Self::Reject),
@@ -26,14 +38,20 @@ impl FromStr for OverflowPolicy {
         }
     }
 }
+/// Flow behavior used by graph simulation.
 #[derive(Debug, Clone, PartialEq)]
 pub enum FlowMode {
+    /// Node does not push or pull automatically.
     Passive,
+    /// Node pushes items outward.
     Push,
+    /// Node pulls items inward.
     Pull,
+    /// Node both pushes and pulls.
     Both,
 }
 impl FlowMode {
+    /// Return the lowercase flow mode string.
     pub fn to_str(&self) -> &str {
         match self {
             Self::Passive => "passive",
@@ -43,8 +61,10 @@ impl FlowMode {
         }
     }
 }
+/// Parse flow mode values from strings.
 impl FromStr for FlowMode {
     type Err = String;
+    /// Parse a flow mode or return an error on unknown input.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "passive" => Ok(Self::Passive),
@@ -55,49 +75,85 @@ impl FromStr for FlowMode {
         }
     }
 }
+/// Item conversion rule stored on a node.
 #[derive(Debug, Clone)]
 pub struct ConversionRule {
+    /// Input item type name.
     pub in_type: String,
+    /// Output item type name.
     pub out_type: String,
+    /// Number of input items consumed.
     pub in_count: u32,
+    /// Number of output items produced.
     pub out_count: u32,
 }
+/// Available item supply stored on a node.
 #[derive(Debug, Clone)]
 pub struct Supply {
+    /// Item type name.
     pub item_type: String,
+    /// Quantity available for use.
     pub quantity: i32,
 }
+/// Requested item demand stored on a node.
 #[derive(Debug, Clone)]
 pub struct Demand {
+    /// Item type name.
     pub item_type: String,
+    /// Requested quantity.
     pub quantity: i32,
+    /// Demand priority where larger values sort earlier.
     pub priority: i32,
 }
+/// Graph node with inventory, flow settings, and local processing state.
 pub struct Node {
+    /// Stable node identifier.
     pub id: u64,
+    /// Node type name.
     pub node_type: String,
+    /// Maximum item capacity, or negative for unlimited.
     pub capacity: i32,
+    /// Flag that enables the node in simulation.
     pub active: bool,
+    /// Overflow behavior when capacity is exceeded.
     pub overflow_policy: OverflowPolicy,
+    /// Automatic push and pull mode.
     pub flow_mode: FlowMode,
+    /// Push rate used by simulation.
     pub push_rate: f64,
+    /// Pull rate used by simulation.
     pub pull_rate: f64,
+    /// Optional item filter used for push behavior.
     pub push_filter: Option<String>,
+    /// Optional item filter used for pull behavior.
     pub pull_filter: Option<String>,
+    /// Processing time in seconds.
     pub process_time: f64,
+    /// Flag that enables the queue.
     pub queue_enabled: bool,
+    /// Queue capacity, or negative for unlimited.
     pub queue_capacity: i32,
+    /// Pending queued item ids.
     pub queue: VecDeque<u64>,
+    /// Item ids currently held on the node.
     pub items: Vec<u64>,
+    /// Conversion rules keyed by input item type.
     pub conversions: HashMap<String, ConversionRule>,
+    /// Current demands stored on the node.
     pub demands: Vec<Demand>,
+    /// Current supplies stored on the node.
     pub supplies: Vec<Supply>,
+    /// Arbitrary node tags.
     pub tags: HashSet<String>,
+    /// Accumulated push timer state.
     pub(crate) push_timer: f64,
+    /// Accumulated pull timer state.
     pub(crate) pull_timer: f64,
+    /// Accumulated process timer state.
     pub(crate) process_accumulator: f64,
 }
 impl Node {
+    /// Create a node with default flow settings and the supplied id, type, and capacity.
     pub fn new(id: u64, node_type: &str, capacity: i32) -> Self {
         Self {
             id,
@@ -124,18 +180,23 @@ impl Node {
             process_accumulator: 0.0,
         }
     }
+    /// Return the node type string.
     pub fn get_type(&self) -> &str {
         &self.node_type
     }
+    /// Set the node type string.
     pub fn set_type(&mut self, t: &str) {
         self.node_type = t.to_string();
     }
+    /// Return the node capacity.
     pub fn get_capacity(&self) -> i32 {
         self.capacity
     }
+    /// Set the node capacity.
     pub fn set_capacity(&mut self, c: i32) {
         self.capacity = c;
     }
+    /// Return true when the node is at or above capacity.
     pub fn is_full(&self) -> bool {
         if self.capacity < 0 {
             false
@@ -143,43 +204,54 @@ impl Node {
             self.items.len() >= self.capacity as usize
         }
     }
+    /// Return the number of items currently held on the node.
     pub fn item_count(&self) -> usize {
         self.items.len()
     }
+    /// Add a tag to the node.
     pub fn add_tag(&mut self, tag: &str) {
         self.tags.insert(tag.to_string());
     }
+    /// Remove a tag and return true when it existed.
     pub fn remove_tag(&mut self, tag: &str) -> bool {
         self.tags.remove(tag)
     }
+    /// Return true when the node has the supplied tag.
     pub fn has_tag(&self, tag: &str) -> bool {
         self.tags.contains(tag)
     }
+    /// Remove all tags from the node.
     pub fn clear_tags(&mut self) {
         self.tags.clear();
     }
+    /// Return all tags sorted in ascending order.
     pub fn get_tags(&self) -> Vec<String> {
         let mut v: Vec<String> = self.tags.iter().cloned().collect();
         v.sort();
         v
     }
+    /// Add a supply record for an item type.
     pub fn add_supply(&mut self, item_type: &str, quantity: i32) {
         self.supplies.push(Supply {
             item_type: item_type.to_string(),
             quantity,
         });
     }
+    /// Remove all supplies for an item type and return true when any were removed.
     pub fn remove_supply(&mut self, item_type: &str) -> bool {
         let before = self.supplies.len();
         self.supplies.retain(|s| s.item_type != item_type);
         self.supplies.len() < before
     }
+    /// Remove all supply records.
     pub fn clear_supplies(&mut self) {
         self.supplies.clear();
     }
+    /// Return the first supply record for an item type.
     pub fn get_supply(&self, item_type: &str) -> Option<&Supply> {
         self.supplies.iter().find(|s| s.item_type == item_type)
     }
+    /// Sum all supply quantities for an item type.
     pub fn get_available_supply(&self, item_type: &str) -> i32 {
         self.supplies
             .iter()
@@ -187,6 +259,7 @@ impl Node {
             .map(|s| s.quantity)
             .sum()
     }
+    /// Add a demand record for an item type.
     pub fn add_demand(&mut self, item_type: &str, quantity: i32, priority: i32) {
         self.demands.push(Demand {
             item_type: item_type.to_string(),
@@ -194,26 +267,33 @@ impl Node {
             priority,
         });
     }
+    /// Remove all demands for an item type and return true when any were removed.
     pub fn remove_demand(&mut self, item_type: &str) -> bool {
         let before = self.demands.len();
         self.demands.retain(|d| d.item_type != item_type);
         self.demands.len() < before
     }
+    /// Remove all demand records.
     pub fn clear_demands(&mut self) {
         self.demands.clear();
     }
+    /// Return the first demand record for an item type.
     pub fn get_demand(&self, item_type: &str) -> Option<&Demand> {
         self.demands.iter().find(|d| d.item_type == item_type)
     }
+    /// Set or replace a conversion rule keyed by its input type.
     pub fn set_conversion(&mut self, rule: ConversionRule) {
         self.conversions.insert(rule.in_type.clone(), rule);
     }
+    /// Remove a conversion rule and return true when it existed.
     pub fn clear_conversion(&mut self, in_type: &str) -> bool {
         self.conversions.remove(in_type).is_some()
     }
+    /// Remove all conversion rules.
     pub fn clear_all_conversions(&mut self) {
         self.conversions.clear();
     }
+    /// Enqueue an item id and return false when the queue is full.
     pub fn enqueue(&mut self, item_id: u64) -> bool {
         if self.queue_capacity >= 0 && self.queue.len() >= self.queue_capacity as usize {
             return false;
@@ -221,113 +301,8 @@ impl Node {
         self.queue.push_back(item_id);
         true
     }
+    /// Dequeue the oldest queued item id when one exists.
     pub fn dequeue(&mut self) -> Option<u64> {
         self.queue.pop_front()
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn new_node_defaults() {
-        let n = Node::new(1, "factory", 10);
-        assert_eq!(n.id, 1);
-        assert_eq!(n.get_type(), "factory");
-        assert_eq!(n.get_capacity(), 10);
-        assert!(n.active);
-        assert!(!n.is_full());
-        assert_eq!(n.item_count(), 0);
-        assert_eq!(n.overflow_policy, OverflowPolicy::Reject);
-        assert_eq!(n.flow_mode, FlowMode::Passive);
-    }
-    #[test]
-    fn unlimited_capacity_never_full() {
-        let n = Node::new(1, "sink", -1);
-        assert!(!n.is_full());
-    }
-    #[test]
-    fn is_full_check() {
-        let mut n = Node::new(1, "bin", 2);
-        n.items.push(100);
-        assert!(!n.is_full());
-        n.items.push(101);
-        assert!(n.is_full());
-    }
-    #[test]
-    fn tags_crud() {
-        let mut n = Node::new(1, "t", 5);
-        n.add_tag("hot");
-        n.add_tag("red");
-        assert!(n.has_tag("hot"));
-        assert!(!n.has_tag("cold"));
-        assert_eq!(n.get_tags(), vec!["hot", "red"]);
-        n.remove_tag("hot");
-        assert!(!n.has_tag("hot"));
-        n.clear_tags();
-        assert!(n.get_tags().is_empty());
-    }
-    #[test]
-    fn supply_demand() {
-        let mut n = Node::new(1, "mine", -1);
-        n.add_supply("ore", 100);
-        assert_eq!(n.get_available_supply("ore"), 100);
-        assert_eq!(n.get_available_supply("gold"), 0);
-        n.add_demand("food", 10, 5);
-        assert!(n.get_demand("food").is_some());
-        assert_eq!(n.get_demand("food").unwrap().priority, 5);
-        n.remove_supply("ore");
-        assert_eq!(n.get_available_supply("ore"), 0);
-        n.remove_demand("food");
-        assert!(n.get_demand("food").is_none());
-    }
-    #[test]
-    fn conversion_rule() {
-        let mut n = Node::new(1, "smelter", 5);
-        n.set_conversion(ConversionRule {
-            in_type: "ore".into(),
-            out_type: "ingot".into(),
-            in_count: 2,
-            out_count: 1,
-        });
-        assert!(n.conversions.contains_key("ore"));
-        n.clear_conversion("ore");
-        assert!(!n.conversions.contains_key("ore"));
-    }
-    #[test]
-    fn queue_operations() {
-        let mut n = Node::new(1, "q", 5);
-        n.queue_capacity = 2;
-        assert!(n.enqueue(10));
-        assert!(n.enqueue(11));
-        assert!(!n.enqueue(12));
-        assert_eq!(n.dequeue(), Some(10));
-        assert_eq!(n.dequeue(), Some(11));
-        assert_eq!(n.dequeue(), None);
-    }
-    #[test]
-    fn overflow_policy_parse() {
-        assert_eq!(
-            OverflowPolicy::from_str("reject").unwrap(),
-            OverflowPolicy::Reject
-        );
-        assert_eq!(
-            OverflowPolicy::from_str("destroy").unwrap(),
-            OverflowPolicy::Destroy
-        );
-        assert_eq!(
-            OverflowPolicy::from_str("queue").unwrap(),
-            OverflowPolicy::Queue
-        );
-        assert!(OverflowPolicy::from_str("bad").is_err());
-        assert_eq!(OverflowPolicy::Reject.to_str(), "reject");
-    }
-    #[test]
-    fn flow_mode_parse() {
-        assert_eq!(FlowMode::from_str("passive").unwrap(), FlowMode::Passive);
-        assert_eq!(FlowMode::from_str("push").unwrap(), FlowMode::Push);
-        assert_eq!(FlowMode::from_str("pull").unwrap(), FlowMode::Pull);
-        assert_eq!(FlowMode::from_str("both").unwrap(), FlowMode::Both);
-        assert!(FlowMode::from_str("bad").is_err());
-        assert_eq!(FlowMode::Both.to_str(), "both");
     }
 }

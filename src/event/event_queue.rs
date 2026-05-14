@@ -1,37 +1,61 @@
+//! Priority event queueing and Lua value conversion helpers.
+
 use std::collections::VecDeque;
 use std::sync::{Condvar, Mutex};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Selects which internal queue receives a queued event first.
 pub enum EventPriority {
+    /// Enqueues into the high-priority queue.
     High,
+    /// Enqueues into the normal-priority queue.
     Normal,
 }
 #[derive(Debug, Clone)]
+/// Key types supported when copying Lua tables into event payloads.
 pub enum EventTableKey {
+    /// String key copied from Lua.
     Str(String),
+    /// Numeric key copied from Lua.
     Num(f64),
+    /// Boolean key copied from Lua.
     Bool(bool),
 }
 #[derive(Debug, Clone)]
+/// Payload value types supported by queued events.
 pub enum EventArg {
+    /// String payload copied from Lua.
     Str(String),
+    /// Numeric payload copied from Lua.
     Num(f64),
+    /// Boolean payload copied from Lua.
     Bool(bool),
+    /// Explicit Lua `nil` payload.
     Nil,
+    /// Shallow table payload copied as key-value pairs.
     Table(Vec<(EventTableKey, EventArg)>),
 }
 #[derive(Debug, Clone)]
+/// One queued event with a name and positional argument list.
 pub struct Event {
+    /// Event name delivered to Lua listeners.
     pub name: String,
+    /// Positional payload arguments carried by the event.
     pub args: Vec<EventArg>,
 }
 #[derive(Debug)]
+/// Stores pending events in separate high- and normal-priority FIFO queues.
 pub struct EventQueue {
+    /// High-priority events polled before normal ones.
     high_events: VecDeque<Event>,
+    /// Normal-priority events polled after the high-priority queue is empty.
     normal_events: VecDeque<Event>,
+    /// Monotonic wake counter used to detect queue activity while waiting.
     wait_epoch: Mutex<u64>,
+    /// Condition variable used to wake threads blocked in `wait`.
     wait_condvar: Condvar,
 }
 impl EventQueue {
+    /// Creates an empty event queue with fresh wait state.
     pub fn new() -> Self {
         Self {
             high_events: VecDeque::new(),
@@ -40,9 +64,11 @@ impl EventQueue {
             wait_condvar: Condvar::new(),
         }
     }
+    /// Enqueues an event at normal priority.
     pub fn push(&mut self, event: Event) {
         self.push_with_priority(event, EventPriority::Normal);
     }
+    /// Enqueues an event into the queue selected by the supplied priority.
     pub fn push_with_priority(&mut self, event: Event, priority: EventPriority) {
         match priority {
             EventPriority::High => self.high_events.push_back(event),
@@ -50,9 +76,11 @@ impl EventQueue {
         }
         self.notify_waiters();
     }
+    /// Constructs and enqueues a normal-priority event from raw parts.
     pub fn push_event(&mut self, name: &str, args: Vec<EventArg>) {
         self.push_event_with_priority(name, args, EventPriority::Normal);
     }
+    /// Constructs and enqueues an event from raw parts using the supplied priority.
     pub fn push_event_with_priority(
         &mut self,
         name: &str,
@@ -67,22 +95,28 @@ impl EventQueue {
             priority,
         );
     }
+    /// Pops the next event, preferring the high-priority queue.
     pub fn poll(&mut self) -> Option<Event> {
         self.high_events
             .pop_front()
             .or_else(|| self.normal_events.pop_front())
     }
+    /// Removes every pending event from both priority queues.
     pub fn clear(&mut self) {
         self.high_events.clear();
         self.normal_events.clear();
     }
+    /// Returns whether both priority queues are empty.
     pub fn is_empty(&self) -> bool {
         self.high_events.is_empty() && self.normal_events.is_empty()
     }
+    /// Returns the total number of pending events across both queues.
     pub fn len(&self) -> usize {
         self.high_events.len() + self.normal_events.len()
     }
+    /// Placeholder pump hook kept for API symmetry.
     pub fn pump(&self) {}
+    /// Waits for queue activity until timeout and then returns the next event if one is available.
     pub fn wait(&mut self, timeout_ms: Option<u64>) -> Option<Event> {
         if let Some(evt) = self.poll() {
             return Some(evt);
@@ -121,6 +155,7 @@ impl EventQueue {
             },
         }
     }
+    /// Blocks until the wake epoch changes or the optional timeout expires.
     fn wait_for_epoch_change(
         &self,
         seen_epoch: &mut u64,
@@ -163,6 +198,7 @@ impl EventQueue {
             }
         }
     }
+    /// Increments the wake epoch and notifies all waiting threads.
     fn notify_waiters(&self) {
         let mut epoch_guard = match self.wait_epoch.lock() {
             Ok(guard) => guard,
@@ -173,12 +209,14 @@ impl EventQueue {
     }
 }
 impl Default for EventQueue {
+    /// Creates an empty event queue.
     fn default() -> Self {
         Self::new()
     }
 }
 use mlua::prelude::*;
 impl EventArg {
+    /// Converts a Lua value into the shallow event payload representation.
     pub fn from_lua_val(val: &LuaValue) -> LuaResult<Self> {
         match val {
             LuaValue::String(s) => Ok(EventArg::Str(
@@ -193,6 +231,7 @@ impl EventArg {
             _ => Ok(EventArg::Nil),
         }
     }
+    /// Copies a Lua table into a shallow event payload table.
     fn from_lua_table_shallow(table: &LuaTable) -> LuaResult<Self> {
         let mut out = Vec::new();
         for pair in table.clone().pairs::<LuaValue, LuaValue>() {
@@ -203,6 +242,7 @@ impl EventArg {
         }
         Ok(EventArg::Table(out))
     }
+    /// Converts one Lua table key into a supported event table key type.
     fn table_key_from_lua(value: &LuaValue) -> LuaResult<Option<EventTableKey>> {
         match value {
             LuaValue::String(s) => Ok(Some(EventTableKey::Str(
@@ -216,6 +256,7 @@ impl EventArg {
             _ => Ok(None),
         }
     }
+    /// Converts one Lua table value while collapsing nested tables to `Nil`.
     fn table_value_from_lua_shallow(value: &LuaValue) -> LuaResult<EventArg> {
         match value {
             LuaValue::String(_)
@@ -227,6 +268,7 @@ impl EventArg {
         }
     }
 }
+/// Converts an event payload value back into a Lua value.
 pub fn event_arg_to_lua_value<'lua>(lua: &'lua Lua, arg: &EventArg) -> LuaResult<LuaValue<'lua>> {
     match arg {
         EventArg::Str(s) => Ok(LuaValue::String(lua.create_string(s)?)),
@@ -248,6 +290,7 @@ pub fn event_arg_to_lua_value<'lua>(lua: &'lua Lua, arg: &EventArg) -> LuaResult
         }
     }
 }
+/// Converts an event into the Lua multi-value form used by dispatch code.
 pub fn event_to_lua_multi<'lua>(lua: &'lua Lua, event: &Event) -> LuaResult<LuaMultiValue<'lua>> {
     let mut values = Vec::with_capacity(1 + event.args.len());
     values.push(LuaValue::String(lua.create_string(&event.name)?));

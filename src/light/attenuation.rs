@@ -1,10 +1,20 @@
+//! Light attenuation curve: constant, linear, and quadratic intensity falloff by distance.
+//! `Attenuation` computes a scalar factor from 0.0 to 1.0 used by `LightWorld` to scale brightness.
+//! Does not own light color or rendering — only provides the distance-to-factor mapping.
+//! Default is no-op attenuation (constant=1, linear=0, quadratic=0).
+
+/// Quadratic attenuation coefficients for distance-based light intensity falloff.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Attenuation {
+    /// Constant term added to the denominator; prevents infinite brightness at zero distance.
     pub constant: f32,
+    /// Linear coefficient in the denominator; controls mid-range falloff slope.
     pub linear: f32,
+    /// Quadratic coefficient in the denominator; controls rapid long-range decay.
     pub quadratic: f32,
 }
 impl Attenuation {
+    /// Create a new attenuation with explicit constant, linear, and quadratic coefficients.
     pub fn new(constant: f32, linear: f32, quadratic: f32) -> Self {
         Self {
             constant,
@@ -12,6 +22,7 @@ impl Attenuation {
             quadratic,
         }
     }
+    /// Return attenuation factor at `distance`; returns 1.0 when denominator is <= 0.
     pub fn factor(&self, distance: f32) -> f32 {
         let denom = self.constant + self.linear * distance + self.quadratic * distance * distance;
         if denom <= 0.0 {
@@ -20,6 +31,7 @@ impl Attenuation {
             1.0 / denom
         }
     }
+    /// Render labeled attenuation curve plots for each config into an `ImageData` for debug output.
     pub fn draw_attenuation_curves_to_image(
         configs: &[(Attenuation, &str)],
         max_distance: f32,
@@ -73,6 +85,8 @@ impl Attenuation {
         img
     }
 }
+
+/// Provides no-op attenuation (constant=1, linear=0, quadratic=0) for full-intensity lights.
 impl Default for Attenuation {
     fn default() -> Self {
         Self {

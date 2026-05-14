@@ -1,15 +1,28 @@
+//! Per-column wall data for the legacy column-based raycaster path. Stores projected
+//! wall-slice coordinates, texture U offset, shade, and depth for each screen column.
+//! `ColumnBatch` is populated from raw ray arrays and read by the CPU-side draw path.
+//! Does not own DDA stepping or GPU upload.
+
 use crate::log_msg;
 use crate::math::Color;
 use crate::runtime::log_messages::{CB01, CB02};
+/// Projected wall-slice data for one screen column produced by a single DDA ray.
 #[derive(Debug, Clone)]
 pub struct ColumnData {
+    /// Horizontal texture coordinate for this column, 0.0..1.0.
     pub tex_u: f32,
+    /// Screen Y of the top of the wall slice.
     pub start: f32,
+    /// Screen Y of the bottom of the wall slice.
     pub end: f32,
+    /// Distance-based brightness multiplier, 0.0..1.0.
     pub shade: f32,
+    /// Cell value of the wall hit by this ray.
     pub cell_val: u32,
+    /// Camera-space depth to the wall hit.
     pub depth: f32,
 }
+/// Implement `Default` for `ColumnData` providing identity values.
 impl Default for ColumnData {
     fn default() -> Self {
         Self {
@@ -22,14 +35,21 @@ impl Default for ColumnData {
         }
     }
 }
+/// All columns for a full raycaster frame, plus screen dimensions and flat floor/ceiling colors.
 pub struct ColumnBatch {
+    /// Projected wall-slice data, one entry per screen column.
     pub columns: Vec<ColumnData>,
+    /// Render target width in pixels.
     pub screen_width: f32,
+    /// Render target height in pixels.
     pub screen_height: f32,
+    /// Flat color for floor pixels not covered by a wall slice.
     pub floor_color: Color,
+    /// Flat color for ceiling pixels not covered by a wall slice.
     pub ceiling_color: Color,
 }
 impl ColumnBatch {
+    /// Create a new `ColumnBatch` with `column_count` default columns for the given screen size.
     pub fn new(column_count: usize, screen_width: f32, screen_height: f32) -> Self {
         log_msg!(debug, CB01, "{}", column_count);
         let mut columns = Vec::with_capacity(column_count);
@@ -42,6 +62,7 @@ impl ColumnBatch {
             ceiling_color: Color::BLACK,
         }
     }
+    /// Write projected wall-slice data to column `col`; silently ignores out-of-range indices.
     pub fn set_column(
         &mut self,
         col: usize,
@@ -61,9 +82,11 @@ impl ColumnBatch {
             c.depth = 0.0;
         }
     }
+    /// Return the `ColumnData` for column `col`, or `None` if `col` is out of range.
     pub fn get_column(&self, col: usize) -> Option<&ColumnData> {
         self.columns.get(col)
     }
+    /// Populate columns from a packed float slice produced by the DDA stepper; each ray is 5 floats.
     pub fn update_from_ray_data(&mut self, rays: &[f32], _fov: f32, max_shade_dist: Option<f32>) {
         let floats_per_ray = 5;
         let ray_count = rays.len() / floats_per_ray;
@@ -93,24 +116,31 @@ impl ColumnBatch {
             }
         }
     }
+    /// Return the depth value stored in column `col`, or `None` if out of range.
     pub fn get_depth_at(&self, col: usize) -> Option<f32> {
         self.columns.get(col).map(|c| c.depth)
     }
+    /// Collect depth values from all columns into a new `Vec<f32>`.
     pub fn get_depth_buffer(&self) -> Vec<f32> {
         self.columns.iter().map(|c| c.depth).collect()
     }
+    /// Set the flat floor color.
     pub fn set_floor_color(&mut self, color: Color) {
         self.floor_color = color;
     }
+    /// Set the flat ceiling color.
     pub fn set_ceiling_color(&mut self, color: Color) {
         self.ceiling_color = color;
     }
+    /// Return the number of columns in this batch.
     pub fn get_column_count(&self) -> usize {
         self.columns.len()
     }
+    /// Return the render target width this batch was created for.
     pub fn get_screen_width(&self) -> f32 {
         self.screen_width
     }
+    /// Return the render target height this batch was created for.
     pub fn get_screen_height(&self) -> f32 {
         self.screen_height
     }

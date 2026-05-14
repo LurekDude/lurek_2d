@@ -1,16 +1,31 @@
+//! DDS compressed image decoding, format detection, and mipmap extraction.
+//! Owns the `CompressedFormat` enum and `CompressedImageData` type.
+//! Does not own GPU upload — callers pass decoded payloads to `src/render/`.
+//! Depends on the `ddsfile` crate for DDS parsing.
+
 use crate::runtime::EngineError;
+/// Compressed texture format recognized from DDS metadata.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CompressedFormat {
+    /// BC1 / DXT1 compressed texture.
     Dxt1,
+    /// BC2 / DXT3 compressed texture.
     Dxt3,
+    /// BC3 / DXT5 compressed texture.
     Dxt5,
+    /// BC7 compressed texture.
     Bc7,
+    /// ETC1 compressed texture.
     Etc1,
+    /// ETC2 RGB compressed texture.
     Etc2Rgb,
+    /// ETC2 RGBA compressed texture.
     Etc2Rgba,
+    /// Format not recognized from DDS metadata.
     Unknown,
 }
 impl CompressedFormat {
+    /// Return the lowercase format label string for this variant.
     pub fn as_str(&self) -> &'static str {
         match self {
             CompressedFormat::Dxt1 => "dxt1",
@@ -24,14 +39,20 @@ impl CompressedFormat {
         }
     }
 }
+/// DDS image data with decoded mipmap payloads and detected format.
 #[derive(Debug, Clone)]
 pub struct CompressedImageData {
+    /// Detected compressed format.
     pub format: CompressedFormat,
+    /// Base image width in pixels.
     pub width: u32,
+    /// Base image height in pixels.
     pub height: u32,
+    /// Raw mipmap payloads from the DDS file.
     pub mipmaps: Vec<Vec<u8>>,
 }
 impl CompressedImageData {
+    /// Decode DDS bytes into compressed image data or return a file-system error.
     pub fn from_dds(bytes: &[u8]) -> Result<Self, EngineError> {
         let dds = ddsfile::Dds::read(std::io::Cursor::new(bytes))
             .map_err(|e| EngineError::FileSystemError(format!("DDS parse error: {e}")))?;
@@ -55,23 +76,29 @@ impl CompressedImageData {
             mipmaps,
         })
     }
+    /// Return the base image dimensions.
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
+    /// Return the number of mipmap levels stored in this image.
     pub fn get_mipmap_count(&self) -> u32 {
         self.mipmaps.len() as u32
     }
+    /// Return the detected compressed format string.
     pub fn get_format(&self) -> &str {
         self.format.as_str()
     }
+    /// Return whether the byte slice starts with the DDS magic header.
     pub fn is_dds_magic(bytes: &[u8]) -> bool {
         bytes.len() >= 4 && bytes[..4] == [0x44, 0x44, 0x53, 0x20]
     }
+    /// Read a DDS file from disk and decode it into compressed image data.
     pub fn from_file(path: &str) -> Result<Self, EngineError> {
         let bytes = std::fs::read(path)
             .map_err(|e| EngineError::FileSystemError(format!("Cannot read '{}': {}", path, e)))?;
         Self::from_dds(&bytes)
     }
+    /// Return whether a file on disk starts with the DDS magic header.
     pub fn is_dds_file(path: &str) -> bool {
         let Ok(mut f) = std::fs::File::open(path) else {
             return false;
@@ -81,6 +108,7 @@ impl CompressedImageData {
         f.read_exact(&mut magic).is_ok() && Self::is_dds_magic(&magic)
     }
 }
+/// Detect a compressed format from DDS metadata or return `Unknown`.
 fn detect_format(dds: &ddsfile::Dds) -> CompressedFormat {
     if let Some(dxgi) = dds.get_dxgi_format() {
         use ddsfile::DxgiFormat;

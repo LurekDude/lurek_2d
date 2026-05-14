@@ -39,6 +39,8 @@ mod filesystem_tests;
 mod globe_tests;
 #[path = "rust/unit/graph_tests.rs"]
 mod graph_tests;
+#[path = "rust/unit/graph_node_tests.rs"]
+mod graph_node_tests;
 #[path = "rust/unit/gui_tests.rs"]
 mod gui_tests;
 #[path = "rust/unit/i18n_tests.rs"]

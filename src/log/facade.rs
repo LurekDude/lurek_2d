@@ -1,6 +1,15 @@
+//! Structured log facade: global level control, structured message dispatch, and level-enabled checks.
+//! Wraps the `log` crate's macros to emit tagged structured messages with optional key-value fields.
+//! Does not own sinks or buffering — routes through the `log` crate to registered appenders.
+//! Key dependencies: `crate::runtime::log_messages` for level get/set, `log` crate for dispatch.
+
 use crate::runtime::log_messages;
 use std::collections::BTreeMap;
+
+/// Ordered key-value pairs appended to structured log messages.
 pub type LogFields = BTreeMap<String, String>;
+
+/// Dispatch a structured log message at `level` with optional `tag` and `fields`; tag defaults to "Lua".
 pub fn log_structured(level: ::log::Level, tag: Option<&str>, msg: &str, fields: &LogFields) {
     let t = tag.unwrap_or("Lua");
     let body = if fields.is_empty() {
@@ -17,12 +26,18 @@ pub fn log_structured(level: ::log::Level, tag: Option<&str>, msg: &str, fields:
         ::log::Level::Trace => log::trace!("[{}] {}", t, body),
     }
 }
+
+/// Set the global log level from a string ("error", "warn", "info", "debug", "trace").
 pub fn set_level(level: &str) {
     log_messages::set_log_level(level);
 }
+
+/// Return the current global log level as a string.
 pub fn get_level() -> String {
     log_messages::get_log_level().to_string()
 }
+
+/// Return `true` if the global log filter allows messages at `level`; returns `false` for unknown strings.
 pub fn enabled_for(level: &str) -> bool {
     use ::log::LevelFilter;
     let filter = match level.to_lowercase().as_str() {

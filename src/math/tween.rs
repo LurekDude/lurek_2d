@@ -1,16 +1,33 @@
+//! Time-driven tween interpolator that drives one or more scalar values from start to target
+//! using a named easing function over a fixed duration. Used by `lurek.tween` Lua bindings
+//! and directly by the animation subsystem. Does not own timers — callers must call `update(dt)`.
+
 use crate::math::easing;
+
+/// Start/target pair for a single channel managed by a `Tween`.
 #[derive(Debug, Clone)]
 pub struct TweenValue {
+    /// Starting value at t=0.
     pub start: f64,
+    /// Target value at t=1 (end of tween).
     pub target: f64,
 }
+
+/// Multi-channel tween interpolator driven by an easing function over a fixed duration.
 pub struct Tween {
+    /// Total tween duration in seconds.
     duration: f64,
+    /// Active easing function resolved from `easing_name`.
     easing_fn: fn(f32) -> f32,
+    /// Human-readable name of the easing function, preserved for serialisation/debug.
     easing_name: String,
+    /// Elapsed time since last `reset()`, in seconds.
     clock: f64,
+    /// Registered start/target channel pairs.
     values: Vec<TweenValue>,
 }
+
+/// Resolve an easing name to a function pointer, accepting both short and `easeIn*` prefixed forms.
 fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
     easing::resolve_easing_fn(name).or_else(|| match name.to_lowercase().as_str() {
         "easeinquad" => Some(easing::ease_in_quad),
@@ -37,7 +54,9 @@ fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
         _ => None,
     })
 }
+
 impl Tween {
+    /// Create a new Tween with the given `duration` (seconds) and named easing; falls back to linear when name is unknown.
     pub fn new(duration: f64, easing_name: &str) -> Self {
         let easing_fn = resolve_easing(easing_name).unwrap_or(easing::linear);
         Self {
@@ -48,15 +67,21 @@ impl Tween {
             values: Vec::new(),
         }
     }
+
+    /// Register a `(start, target)` channel and return its index.
     pub fn add_value(&mut self, start: f64, target: f64) -> usize {
         let idx = self.values.len();
         self.values.push(TweenValue { start, target });
         idx
     }
+
+    /// Advance the clock by `dt` seconds; returns true when the tween has completed.
     pub fn update(&mut self, dt: f64) -> bool {
         self.clock += dt;
         self.clock >= self.duration
     }
+
+    /// Return the interpolated value for channel `index`; returns 0.0 for out-of-range index.
     pub fn get_value(&self, index: usize) -> f64 {
         if index >= self.values.len() {
             return 0.0;
@@ -70,27 +95,43 @@ impl Tween {
         let v = &self.values[index];
         v.start + (v.target - v.start) * eased
     }
+
+    /// Return interpolated values for all registered channels.
     pub fn get_all_values(&self) -> Vec<f64> {
         (0..self.values.len()).map(|i| self.get_value(i)).collect()
     }
+
+    /// Reset the clock to zero without clearing channels.
     pub fn reset(&mut self) {
         self.clock = 0.0;
     }
+
+    /// Set the clock to a specific time `t`, clamped to `[0, duration]`.
     pub fn set_time(&mut self, t: f64) {
         self.clock = t.clamp(0.0, self.duration);
     }
+
+    /// Return true when the clock has reached or passed the duration.
     pub fn is_complete(&self) -> bool {
         self.clock >= self.duration
     }
+
+    /// Return the number of registered value channels.
     pub fn value_count(&self) -> usize {
         self.values.len()
     }
+
+    /// Return the easing name string this tween was constructed with.
     pub fn easing_name(&self) -> &str {
         &self.easing_name
     }
+
+    /// Return the total duration in seconds.
     pub fn duration(&self) -> f64 {
         self.duration
     }
+
+    /// Return the current elapsed clock time in seconds.
     pub fn clock(&self) -> f64 {
         self.clock
     }

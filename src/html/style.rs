@@ -1,16 +1,26 @@
+//! CSS rule parsing and property filtering for HTML documents.
+
 use crate::html::element::normalise_name;
 use std::collections::BTreeMap;
+/// A parsed CSS selector with declarations and source order.
 #[derive(Clone, Debug)]
 pub(crate) struct CssRule {
+    /// Selector text used to match elements.
     pub(crate) selector: String,
+    /// Normalized declaration map for this rule.
     pub(crate) declarations: BTreeMap<String, String>,
+    /// Original source order used to resolve conflicts.
     pub(crate) order: usize,
 }
+/// Parsing output for a CSS declaration block.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct CssParseResult {
+    /// Supported declarations found in the source block.
     pub(crate) declarations: BTreeMap<String, String>,
+    /// Warnings for unsupported or malformed declarations.
     pub(crate) warnings: Vec<String>,
 }
+/// Parse CSS source strings into rule and warning lists.
 pub(crate) fn parse_stylesheets(sources: &[String]) -> (Vec<CssRule>, Vec<String>) {
     let mut rules = Vec::new();
     let mut warnings = Vec::new();
@@ -36,6 +46,7 @@ pub(crate) fn parse_stylesheets(sources: &[String]) -> (Vec<CssRule>, Vec<String
     }
     (rules, warnings)
 }
+/// Parse a CSS declaration block into normalized properties and warnings.
 pub(crate) fn parse_declarations(source: &str) -> CssParseResult {
     let mut result = CssParseResult::default();
     for declaration in source.split(';') {
@@ -57,6 +68,7 @@ pub(crate) fn parse_declarations(source: &str) -> CssParseResult {
     }
     result
 }
+/// Parse a CSS length value using a numeric basis and return pixels when possible.
 pub(crate) fn parse_length(value: Option<&str>, basis: f32) -> Option<f32> {
     let value = value?.trim();
     if value == "0" {
@@ -74,6 +86,7 @@ pub(crate) fn parse_length(value: Option<&str>, basis: f32) -> Option<f32> {
     }
     value.parse::<f32>().ok()
 }
+/// Return whether a CSS property is supported by the layout engine.
 fn is_supported_property(property: &str) -> bool {
     matches!(
         property,

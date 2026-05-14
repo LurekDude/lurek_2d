@@ -1,18 +1,33 @@
+//! Offset-coordinate hexagonal grid with flat-top and pointy-top layout support.
+//! Provides A\*, range-of-movement, line-of-sight, field-of-view, and neighbour queries.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// Hex layout convention: column or row is the flat side.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HexLayout {
+    /// Hexagons have flat sides on the left and right; columns are aligned vertically.
     FlatTop,
+    /// Hexagons have pointy sides on the top and bottom; rows are aligned horizontally.
     PointyTop,
 }
+/// Hex grid holding walkability and per-cell movement costs.
 pub struct HexGrid {
+    /// Grid column count.
     pub width: u32,
+    /// Grid row count.
     pub height: u32,
+    /// Hex topology: flat-top or pointy-top offset convention.
     layout: HexLayout,
+    /// Flat blocked flags indexed by `(row * width + col)`.
     blocked: Vec<bool>,
+    /// Per-cell movement cost.
     cost: Vec<f32>,
 }
+/// Construction and pathfinding methods for `HexGrid`.
 impl HexGrid {
+    /// Create a fully unblocked hex grid of size `width × height` using `layout`.
     pub fn new(width: u32, height: u32, layout: HexLayout) -> Self {
         let n = (width * height) as usize;
         Self {
@@ -23,19 +38,23 @@ impl HexGrid {
             cost: vec![1.0; n],
         }
     }
+    /// Mark cell `(col, row)` as blocked or passable.
     pub fn set_blocked(&mut self, col: u32, row: u32, blocked: bool) {
         if let Some(idx) = self.index(col, row) {
             self.blocked[idx] = blocked;
         }
     }
+    /// Set movement cost for cell `(col, row)`.
     pub fn set_cost(&mut self, col: u32, row: u32, cost: f32) {
         if let Some(idx) = self.index(col, row) {
             self.cost[idx] = cost;
         }
     }
+    /// Return true when `(col, row)` is out-of-bounds or explicitly blocked.
     pub fn is_blocked(&self, col: u32, row: u32) -> bool {
         self.index(col, row).is_none_or(|i| self.blocked[i])
     }
+    /// Run A\* from `from` to `to`; return ordered path or `None` when unreachable.
     pub fn find_path(&self, from: (u32, u32), to: (u32, u32)) -> Option<Vec<(u32, u32)>> {
         if self.is_blocked(from.0, from.1) || self.is_blocked(to.0, to.1) {
             return None;
@@ -70,6 +89,7 @@ impl HexGrid {
         }
         None
     }
+    /// Return true when every hex on the straight line from `from` to `to` is passable.
     pub fn line_of_sight(&self, from: (u32, u32), to: (u32, u32)) -> bool {
         let line = self.hex_line(from, to);
         for cell in &line {
@@ -79,6 +99,7 @@ impl HexGrid {
         }
         true
     }
+    /// Return all cells visible from `origin` within `max_range` hex steps.
     pub fn field_of_view(&self, origin: (u32, u32), max_range: u32) -> Vec<(u32, u32)> {
         let mut visible = Vec::new();
         for row in 0..self.height {
@@ -91,6 +112,7 @@ impl HexGrid {
         }
         visible
     }
+    /// Return all cells reachable from `origin` with total movement cost ≤ `budget`.
     pub fn range_of_movement(&self, origin: (u32, u32), budget: f32) -> Vec<(u32, u32)> {
         let mut cost_map: HashMap<(u32, u32), f32> = HashMap::new();
         let mut heap: BinaryHeap<AStarNode> = BinaryHeap::new();
@@ -123,6 +145,7 @@ impl HexGrid {
         }
         result
     }
+    /// Return the passable hex neighbours of `(col, row)` using layout-appropriate offsets.
     pub fn neighbors(&self, col: u32, row: u32) -> Vec<(u32, u32)> {
         let dirs = self.neighbor_dirs(row);
         let mut result = Vec::with_capacity(6);
@@ -139,11 +162,13 @@ impl HexGrid {
         }
         result
     }
+    /// Return the hex-grid distance between `a` and `b` in steps.
     pub fn distance(&self, a: (u32, u32), b: (u32, u32)) -> u32 {
         let (ax, ay, az) = self.to_cube(a);
         let (bx, by, bz) = self.to_cube(b);
         (((ax - bx).abs() + (ay - by).abs() + (az - bz).abs()) / 2) as u32
     }
+    /// Convert offset coordinates to cube coordinates.
     fn index(&self, col: u32, row: u32) -> Option<usize> {
         if col < self.width && row < self.height {
             Some((row * self.width + col) as usize)
@@ -151,6 +176,7 @@ impl HexGrid {
             None
         }
     }
+    /// Convert offset `(col, row)` to cube `(x, y, z)` coordinates using `layout`.
     fn to_cube(&self, cell: (u32, u32)) -> (i32, i32, i32) {
         let (col, row) = (cell.0 as i32, cell.1 as i32);
         match self.layout {
@@ -168,6 +194,7 @@ impl HexGrid {
             }
         }
     }
+    /// Convert cube `(x, _, z)` back to offset `(col, row)` using `layout`.
     #[allow(clippy::wrong_self_convention)]
     fn from_cube(&self, x: i32, _y: i32, z: i32) -> (u32, u32) {
         match self.layout {
@@ -181,6 +208,7 @@ impl HexGrid {
             }
         }
     }
+    /// Return the six `(dc, dr)` offset deltas for neighbours of `row` given the current layout.
     fn neighbor_dirs(&self, row: u32) -> [(i32, i32); 6] {
         match self.layout {
             HexLayout::PointyTop => {
@@ -193,6 +221,7 @@ impl HexGrid {
             HexLayout::FlatTop => [(1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)],
         }
     }
+    /// Return all cells on the hex line from `a` to `b` using cube-coordinate interpolation.
     fn hex_line(&self, a: (u32, u32), b: (u32, u32)) -> Vec<(u32, u32)> {
         let dist = self.distance(a, b) as usize;
         if dist == 0 {
@@ -215,6 +244,7 @@ impl HexGrid {
         result
     }
 }
+/// Round fractional cube coordinates to the nearest integer cube cell.
 fn cube_round(x: f32, y: f32, z: f32) -> (i32, i32, i32) {
     let mut rx = x.round() as i32;
     let mut ry = y.round() as i32;
@@ -231,27 +261,35 @@ fn cube_round(x: f32, y: f32, z: f32) -> (i32, i32, i32) {
     }
     (rx, ry, rz)
 }
+/// Internal A\* node holding position and f-score.
 #[derive(Clone)]
 struct AStarNode {
+    /// Hex cell position.
     pos: (u32, u32),
+    /// f-score = g + h.
     f: f32,
 }
+/// Equality by f-score.
 impl PartialEq for AStarNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for AStarNode {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for AStarNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for AStarNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
     }
 }
+/// Walk `came_from` back from `current` to the start and return the path in forward order.
 fn reconstruct_path(
     came_from: &HashMap<(u32, u32), (u32, u32)>,
     mut current: (u32, u32),

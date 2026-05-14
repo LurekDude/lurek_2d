@@ -1,5 +1,10 @@
+//! Image comparison panels, pixel-transform grids, and HSV color-wheel visualizations.
+//! Renders side-by-side labeled frames, applies per-pixel transform grids, and draws a full color wheel.
+//! Does not own source images — callers pass `&ImageData` slices.
+//! Depends on `super::hsv_to_rgb_viz` and `crate::image::ImageData`.
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
+/// Render side-by-side labeled images into a composite image.
 pub fn draw_image_comparison_to_image(
     images: &[&ImageData],
     labels: &[&str],
@@ -35,6 +40,7 @@ pub fn draw_image_comparison_to_image(
     }
     img
 }
+/// Render a grid of pixel transform samples across a palette into an image.
 pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
     let width = col_w * 4;
     let height = col_h;
@@ -84,6 +90,7 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
     }
     img
 }
+/// Render an HSV color wheel into an image.
 pub fn draw_color_wheel_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     let cx = width as f32 / 2.0;

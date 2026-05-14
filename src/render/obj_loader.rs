@@ -1,13 +1,22 @@
+//! Wavefront OBJ parser and software rasterizer for preview and mesh projection.
+//! Provides `ObjLoader` (file + text parse), `ObjModel` (geometry + materials),
+//! and CPU-side `render_to_image`/`project_to_mesh` helpers. Uses `tobj` for
+//! file loading and a hand-written parser for in-memory text. No GPU state.
+
 use crate::image::ImageData;
 use crate::render::mesh::{Mesh, MeshDrawMode, MeshVertex};
 use crate::runtime::resource_keys::TextureKey;
 use std::collections::HashMap;
 use std::path::Path;
+/// Error returned from OBJ loading or parsing.
 #[derive(Debug)]
 pub enum ObjError {
+    /// File I/O error.
     Io(std::io::Error),
+    /// Structural parse error with a human-readable message.
     Parse(String),
 }
+/// Implement `Display` for `ObjError`.
 impl std::fmt::Display for ObjError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -16,27 +25,36 @@ impl std::fmt::Display for ObjError {
         }
     }
 }
+/// Convert `std::io::Error` into `ObjError::Io`.
 impl From<std::io::Error> for ObjError {
     fn from(e: std::io::Error) -> Self {
         ObjError::Io(e)
     }
 }
+/// Simple 3-D vector used for positions, normals, and scratch arithmetic during projection.
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
+    /// X component.
     pub x: f32,
+    /// Y component.
     pub y: f32,
+    /// Z component.
     pub z: f32,
 }
 impl Vec3 {
+    /// Construct from components.
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
+    /// Return the scalar dot product of `self` and `other`.
     pub fn dot(self, other: Vec3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
+    /// Return the Euclidean length of this vector.
     pub fn len(self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
+    /// Return a unit vector; returns zero vector when length < 1e-9.
     pub fn normalise(self) -> Vec3 {
         let l = self.len();
         if l < 1e-9 {
@@ -45,10 +63,12 @@ impl Vec3 {
             Vec3::new(self.x / l, self.y / l, self.z / l)
         }
     }
+    /// Return `self - o`.
     #[allow(clippy::should_implement_trait)]
     pub fn sub(self, o: Vec3) -> Vec3 {
         Vec3::new(self.x - o.x, self.y - o.y, self.z - o.z)
     }
+    /// Return the cross product `self × o`.
     pub fn cross(self, o: Vec3) -> Vec3 {
         Vec3::new(
             self.y * o.z - self.z * o.y,
@@ -56,60 +76,85 @@ impl Vec3 {
             self.x * o.y - self.y * o.x,
         )
     }
+    /// Return `self + o`.
     #[allow(clippy::should_implement_trait)]
     pub fn add(self, o: Vec3) -> Vec3 {
         Vec3::new(self.x + o.x, self.y + o.y, self.z + o.z)
     }
+    /// Return `self * s` (scalar multiply).
     #[allow(clippy::should_implement_trait)]
     pub fn mul(self, s: f32) -> Vec3 {
         Vec3::new(self.x * s, self.y * s, self.z * s)
     }
 }
+/// Rotate `v` around the world Y-axis by `angle` radians.
 fn rotate_y(v: Vec3, angle: f32) -> Vec3 {
     let c = angle.cos();
     let s = angle.sin();
     Vec3::new(v.x * c + v.z * s, v.y, -v.x * s + v.z * c)
 }
+/// Compute a 2D edge function value used for barycentric rasterization.
 fn edge_fn(ax: f32, ay: f32, bx: f32, by: f32, px: f32, py: f32) -> f32 {
     (px - ax) * (by - ay) - (py - ay) * (bx - ax)
 }
+/// 2D texture coordinate, `u` and `v`.
 #[derive(Debug, Clone, Copy)]
 pub struct Vec2 {
+    /// Horizontal UV component.
     pub u: f32,
+    /// Vertical UV component.
     pub v: f32,
 }
+/// One triangulated OBJ face with per-vertex position/UV/normal indices and an optional material.
 #[derive(Debug, Clone)]
 pub struct ObjFace {
+    /// Per-vertex `(position_idx, uv_idx, normal_idx)` tuples.
     pub verts: [(usize, Option<usize>, Option<usize>); 3],
+    /// Index into `ObjModel::materials`, or `None` for default material.
     pub material: Option<usize>,
 }
+/// A named material from an MTL file with diffuse colour and optional diffuse texture path.
 #[derive(Debug, Clone)]
 pub struct ObjMaterial {
+    /// Material name as declared in the MTL file.
     pub name: String,
+    /// Linear RGB diffuse colour; default `[1.0, 1.0, 1.0]` (white).
     pub diffuse_color: [f32; 3],
+    /// Optional relative path to the diffuse texture image.
     pub diffuse_map: Option<String>,
 }
+/// A parsed OBJ model: vertex positions, UVs, normals, faces, and materials.
 #[derive(Debug, Clone)]
 pub struct ObjModel {
+    /// Vertex positions in local space.
     pub positions: Vec<Vec3>,
+    /// UV coordinates indexed by face vertex tuples.
     pub uvs: Vec<Vec2>,
+    /// Vertex normals indexed by face vertex tuples.
     pub normals: Vec<Vec3>,
+    /// Triangulated faces with per-vertex index tuples.
     pub faces: Vec<ObjFace>,
+    /// Materials from `.mtl` file or inline MTL declarations.
     pub materials: Vec<ObjMaterial>,
 }
 impl ObjModel {
+    /// Return the number of triangles in this model.
     pub fn face_count(&self) -> usize {
         self.faces.len()
     }
+    /// Return the number of vertex positions in this model.
     pub fn vertex_count(&self) -> usize {
         self.positions.len()
     }
+    /// Return the number of UV entries in this model.
     pub fn uv_count(&self) -> usize {
         self.uvs.len()
     }
+    /// Return the number of normal entries in this model.
     pub fn normal_count(&self) -> usize {
         self.normals.len()
     }
+    /// CPU-rasterize the model into an `ImageData` with a virtual camera, Y-rotation, and a key light.
     pub fn render_to_image(&self, width: u32, height: u32, rotation_quarters: u8) -> ImageData {
         let mut image = ImageData::new(width, height);
         if width == 0 || height == 0 || self.positions.is_empty() {
@@ -251,6 +296,7 @@ impl ObjModel {
         }
         image
     }
+    /// Project the model from `cam_pos`/`cam_target` into a `Mesh` sorted back-to-front.
     pub fn project_to_mesh(
         &self,
         cam_pos: Vec3,
@@ -348,6 +394,7 @@ impl ObjModel {
         mesh.texture = texture_key;
         mesh
     }
+    /// Project a single world-space instance with Y-rotation and uniform scale; return `(Mesh, depth)`.
     #[allow(clippy::too_many_arguments)]
     pub fn project_instance_to_mesh(
         &self,
@@ -475,8 +522,10 @@ impl ObjModel {
         )
     }
 }
+/// Stateless parser wrapper for Wavefront OBJ files.
 pub struct ObjLoader;
 impl ObjLoader {
+    /// Load and triangulate an OBJ file from `path`, using `tobj`; return error on I/O or parse failure.
     pub fn load_file(path: impl AsRef<Path>) -> Result<ObjModel, ObjError> {
         let path = path.as_ref();
         let (models, materials_result) = tobj::load_obj(
@@ -554,6 +603,7 @@ impl ObjLoader {
             materials,
         })
     }
+    /// Parse OBJ + MTL text in memory, resolving `mtllib` paths relative to `base_dir`.
     pub fn parse_obj(src: &str, base_dir: &Path) -> Result<ObjModel, ObjError> {
         let mut positions: Vec<Vec3> = Vec::new();
         let mut uvs: Vec<Vec2> = Vec::new();
@@ -622,6 +672,7 @@ impl ObjLoader {
             materials,
         })
     }
+    /// Parse MTL text; extract `newmtl`, `Kd`, and `map_Kd` entries into `ObjMaterial` list.
     fn parse_mtl(src: &str, _base_dir: &Path) -> Vec<ObjMaterial> {
         let mut out: Vec<ObjMaterial> = Vec::new();
         let mut current: Option<ObjMaterial> = None;
@@ -664,10 +715,12 @@ impl ObjLoader {
         }
         out
     }
+    /// Parse `s` as three whitespace-separated floats into a `Vec3`; return error on bad input.
     fn parse_vec3(s: &str) -> Result<Vec3, ObjError> {
         let parts = Self::split_floats(s, 3)?;
         Ok(Vec3::new(parts[0], parts[1], parts[2]))
     }
+    /// Split `s` into at least `expected` floats; return error when fewer are found.
     fn split_floats(s: &str, expected: usize) -> Result<Vec<f32>, ObjError> {
         let v: Vec<f32> = s
             .split_whitespace()
@@ -687,6 +740,7 @@ impl ObjLoader {
         }
         Ok(v)
     }
+    /// Parse a whitespace-delimited face vertex string into `(pos, uv, normal)` index triples.
     #[allow(clippy::type_complexity)]
     fn parse_face_verts(
         s: &str,
@@ -711,6 +765,7 @@ impl ObjLoader {
         }
         Ok(out)
     }
+    /// Resolve an OBJ 1-based or negative index into a 0-based index; return error when `s` is empty.
     fn parse_index(s: Option<&str>, count: usize) -> Result<usize, ObjError> {
         match s {
             None | Some("") => Err(ObjError::Parse("missing face index".into())),
@@ -727,6 +782,7 @@ impl ObjLoader {
             }
         }
     }
+    /// Like `parse_index` but return `None` for empty or missing tokens.
     fn parse_index_opt(s: Option<&str>, count: usize) -> Option<usize> {
         match s {
             None | Some("") => None,
@@ -742,17 +798,26 @@ impl ObjLoader {
         }
     }
 }
+/// Perspective camera description for `ObjModel::project_to_mesh`.
 #[derive(Debug, Clone, Copy)]
 pub struct ObjCamera {
+    /// Camera X position in world space.
     pub x: f32,
+    /// Camera Y position in world space.
     pub y: f32,
+    /// Camera Z position in world space.
     pub z: f32,
+    /// Lookat target X.
     pub target_x: f32,
+    /// Lookat target Y.
     pub target_y: f32,
+    /// Lookat target Z.
     pub target_z: f32,
+    /// Vertical field of view in degrees.
     pub fov_y_deg: f32,
 }
 impl ObjCamera {
+    /// Construct a camera from position, target, and FOV.
     pub fn new(x: f32, y: f32, z: f32, tx: f32, ty: f32, tz: f32, fov_y_deg: f32) -> Self {
         Self {
             x,
@@ -764,6 +829,7 @@ impl ObjCamera {
             fov_y_deg,
         }
     }
+    /// Return `(cam_pos, cam_target, fov_y_rad)` unpacked as `Vec3` values.
     pub fn to_vecs(&self) -> (Vec3, Vec3, f32) {
         (
             Vec3::new(self.x, self.y, self.z),

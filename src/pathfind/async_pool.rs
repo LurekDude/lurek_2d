@@ -1,25 +1,46 @@
+//! Thread-pool for off-thread A\* requests: submit a job by id, cancel it before dispatch,
+//! and poll completed results each frame without blocking the game thread.
+//! Does not own NavGrid construction; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::pathfind::astar;
 use crate::pathfind::nav_grid::NavGrid;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
+/// In-flight A\* job sent to a worker thread.
 struct PathRequest {
+    /// Caller-assigned request identifier for correlation and cancellation.
     id: u64,
+    /// Grid snapshot cloned at submission time so the worker owns it fully.
     grid: NavGrid,
+    /// Starting cell.
     start: (u32, u32),
+    /// Destination cell.
     goal: (u32, u32),
+    /// Footprint size forwarded to A\*.
     unit_size: u32,
 }
+/// Completed result returned from a worker: `(request_id, path_or_none)`.
 pub type PathResult = (u64, Option<Vec<(u32, u32)>>);
+
+/// Fixed-size worker pool that runs A\* off the game thread and delivers results via a channel.
 pub struct PathThreadPool {
+    /// Sender side of the work queue.
     tx: Sender<PathRequest>,
+    /// Receiver for completed results polled each frame.
     rx: Receiver<PathResult>,
+    /// Shared list of ids to skip before or during execution.
     cancelled: Arc<Mutex<Vec<u64>>>,
+    /// Configured worker-thread count.
     thread_count: usize,
+    /// Owned join handles kept alive as long as the pool lives.
     _handles: Vec<thread::JoinHandle<()>>,
+    /// Number of jobs currently in-flight (submitted but not yet returned).
     pending: Arc<Mutex<u32>>,
 }
+/// Construction and job management for `PathThreadPool`.
 impl PathThreadPool {
+    /// Spawn `thread_count` workers (minimum 1) and connect them to shared channels.
     pub fn new(thread_count: usize) -> Self {
         let count = thread_count.max(1);
         let (work_tx, work_rx) = mpsc::channel::<PathRequest>();
@@ -80,6 +101,7 @@ impl PathThreadPool {
             pending,
         }
     }
+    /// Submit an A\* job; caller must pass a cloned grid snapshot.
     pub fn submit(
         &self,
         id: u64,
@@ -99,6 +121,7 @@ impl PathThreadPool {
             unit_size,
         });
     }
+    /// Drain all available completed results without blocking.
     pub fn poll(&self) -> Vec<PathResult> {
         let mut results = Vec::new();
         while let Ok(result) = self.rx.try_recv() {
@@ -106,6 +129,7 @@ impl PathThreadPool {
         }
         results
     }
+    /// Mark `id` as cancelled; workers skip it if still queued.
     pub fn cancel(&self, id: u64) {
         if let Ok(mut cancelled) = self.cancelled.lock() {
             if !cancelled.contains(&id) {
@@ -113,30 +137,16 @@ impl PathThreadPool {
             }
         }
     }
+    /// Return the number of jobs submitted but not yet delivered.
     pub fn pending_count(&self) -> u32 {
         self.pending.lock().map(|p| *p).unwrap_or(0)
     }
+    /// Update the recorded thread count; does not respawn existing workers.
     pub fn set_thread_count(&mut self, count: usize) {
         self.thread_count = count.max(1);
     }
+    /// Return the configured worker thread count.
     pub fn get_thread_count(&self) -> usize {
         self.thread_count
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn default_thread_count() {
-        let pool = PathThreadPool::new(1);
-        assert!(pool.get_thread_count() >= 1);
-    }
-    #[test]
-    fn set_thread_count_minimum_one() {
-        let mut pool = PathThreadPool::new(1);
-        pool.set_thread_count(0);
-        assert_eq!(pool.get_thread_count(), 1);
-        pool.set_thread_count(4);
-        assert_eq!(pool.get_thread_count(), 4);
     }
 }

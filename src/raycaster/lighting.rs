@@ -1,11 +1,23 @@
+//! Point-light accumulation and distance-based shading for the raycaster.
+//! Computes per-tile RGB lighting from ambient level and a list of `PointLight`
+//! sources using Bresenham line-of-sight occlusion. Used by `build_scene` to
+//! shade wall and floor quads. Does not own shadow maps or GPU light passes.
+
+/// A point light placed in world space that contributes to tile-level lighting.
 #[derive(Debug, Clone)]
 pub struct PointLight {
+    /// World X position of the light source.
     pub x: f32,
+    /// World Y position of the light source.
     pub y: f32,
+    /// Maximum tile distance at which this light contributes, in tiles.
     pub radius: f32,
+    /// Brightness multiplier applied to the light contribution.
     pub intensity: f32,
+    /// RGB color of the light, each channel in 0.0..1.0.
     pub color: [f32; 3],
 }
+/// Return true when the grid path from `(x0,y0)` to `(x1,y1)` contains no wall tile (Bresenham traversal).
 fn has_line_of_sight(
     x0: i32,
     y0: i32,
@@ -39,6 +51,7 @@ fn has_line_of_sight(
     }
     true
 }
+/// Accumulate ambient and point-light contributions at world position `(x, y)`; return clamped `[r, g, b]`.
 pub fn compute_lighting(
     x: f32,
     y: f32,
@@ -70,6 +83,7 @@ pub fn compute_lighting(
     }
     [r.clamp(0.0, 1.0), g.clamp(0.0, 1.0), b.clamp(0.0, 1.0)]
 }
+/// Multiply `base_shade` by each channel of `light_color`; return clamped `[r, g, b]`.
 pub fn apply_lit_shade(base_shade: f32, light_color: [f32; 3]) -> [f32; 3] {
     [
         (base_shade * light_color[0]).clamp(0.0, 1.0),

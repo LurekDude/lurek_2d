@@ -1,13 +1,24 @@
+//! Named per-layer influence maps for AI spatial reasoning: stamping, propagation, blending, decay.
+//! Each layer is a flat grid of f32 values representing influence strength per cell.
+//! Does not own pathfinding or Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{IF01, IF02, IF03};
 use std::collections::HashMap;
+/// Grid-based influence map supporting multiple named layers.
 pub struct InfluenceMap {
+    /// Width in cells.
     pub width: usize,
+    /// Height in cells.
     pub height: usize,
+    /// World-space size of one cell.
     pub cell_size: f32,
+    /// Named layers, each a flat grid of `width * height` influence values.
     pub(crate) layers: HashMap<String, Vec<f32>>,
 }
+/// Construction and query methods for `InfluenceMap`.
 impl InfluenceMap {
+    /// Create an empty influence map with the given grid dimensions and world-space `cell_size`.
     pub fn new(width: usize, height: usize, cell_size: f32) -> Self {
         log_msg!(debug, IF01, "{}x{} cell={}", width, height, cell_size);
         Self {
@@ -17,14 +28,17 @@ impl InfluenceMap {
             layers: HashMap::new(),
         }
     }
+    /// Register a new zero-filled layer named `name`; replaces any existing layer with that name.
     pub fn add_layer(&mut self, name: &str) {
         log_msg!(debug, IF02, "{}", name);
         self.layers
             .insert(name.to_string(), vec![0.0; self.width * self.height]);
     }
+    /// Return true when a layer named `name` exists.
     pub fn has_layer(&self, name: &str) -> bool {
         self.layers.contains_key(name)
     }
+    /// Set the influence value at cell `(x, y)` on `layer`; no-op if out-of-bounds.
     pub fn set_influence(&mut self, layer: &str, x: usize, y: usize, value: f32) {
         if let Some(data) = self.layers.get_mut(layer) {
             if x < self.width && y < self.height {
@@ -32,6 +46,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Return the influence value at `(x, y)` on `layer`, or `0.0` if out-of-bounds or layer absent.
     pub fn get_influence(&self, layer: &str, x: usize, y: usize) -> f32 {
         if let Some(data) = self.layers.get(layer) {
             if x < self.width && y < self.height {
@@ -40,18 +55,23 @@ impl InfluenceMap {
         }
         0.0
     }
+    /// Return the grid width in cells.
     pub fn get_width(&self) -> usize {
         self.width
     }
+    /// Return the grid height in cells.
     pub fn get_height(&self) -> usize {
         self.height
     }
+    /// Return the world-space cell size.
     pub fn get_cell_size(&self) -> f32 {
         self.cell_size
     }
+    /// Return the names of all registered layers.
     pub fn get_layer_names(&self) -> Vec<&str> {
         self.layers.keys().map(|s| s.as_str()).collect()
     }
+    /// Add `value` (scaled by falloff and distance) to all cells within `radius` of world point `(wx, wy)` on `layer`.
     pub fn stamp_influence(
         &mut self,
         layer: &str,
@@ -86,6 +106,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Smooth `layer` by blending each cell with its 3×3 neighbourhood average, weighted by `momentum`.
     pub fn propagate(&mut self, layer: &str, momentum: f32) {
         let data = match self.layers.get(layer) {
             Some(d) => d.clone(),
@@ -119,6 +140,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Multiply every cell in `layer` by `factor`.
     pub fn decay(&mut self, layer: &str, factor: f32) {
         if let Some(data) = self.layers.get_mut(layer) {
             for v in data.iter_mut() {
@@ -126,6 +148,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Zero all cells in `layer`.
     pub fn clear_layer(&mut self, layer: &str) {
         if let Some(data) = self.layers.get_mut(layer) {
             log_msg!(debug, IF03, "{}", layer);
@@ -134,6 +157,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Zero all cells in every layer.
     pub fn clear_all(&mut self) {
         for data in self.layers.values_mut() {
             for v in data.iter_mut() {
@@ -141,6 +165,7 @@ impl InfluenceMap {
             }
         }
     }
+    /// Return the world-space position of the highest-value cell in `layer`, or `(0.0, 0.0)` if absent.
     pub fn max_position(&self, layer: &str) -> (f32, f32) {
         if let Some(data) = self.layers.get(layer) {
             let mut best_idx = 0;
@@ -161,6 +186,7 @@ impl InfluenceMap {
             (0.0, 0.0)
         }
     }
+    /// Return the world-space position of the lowest-value cell in `layer`, or `(0.0, 0.0)` if absent.
     pub fn min_position(&self, layer: &str) -> (f32, f32) {
         if let Some(data) = self.layers.get(layer) {
             let mut best_idx = 0;
@@ -181,6 +207,7 @@ impl InfluenceMap {
             (0.0, 0.0)
         }
     }
+    /// Return the sum of all cell values in `layer` that fall within world-space rectangle `(wx, wy, ww, wh)`.
     pub fn query_rect(&self, layer: &str, wx: f32, wy: f32, ww: f32, wh: f32) -> f32 {
         let data = match self.layers.get(layer) {
             Some(d) => d,
@@ -198,6 +225,7 @@ impl InfluenceMap {
         }
         sum
     }
+    /// Write `weight_a * layer_a + weight_b * layer_b` into `dest`; all three layers must exist.
     pub fn blend(
         &mut self,
         layer_a: &str,
@@ -222,6 +250,7 @@ impl InfluenceMap {
             out[i] = weight_a * a[i] + weight_b * b[i];
         }
     }
+    /// Render the "enemy" and "ally" layers into a color `ImageData` at `cell_size` pixels per cell.
     pub fn draw_to_image(&self, cell_size: u32) -> crate::image::ImageData {
         let w = self.width as u32;
         let h = self.height as u32;

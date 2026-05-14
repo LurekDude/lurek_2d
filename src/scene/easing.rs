@@ -1,3 +1,8 @@
+//! Easing curve math used internally by the scene transition system.
+//! Owns bounce_out and any future curve helpers; does not own transition state or draw logic.
+//! Used only by transition.rs — crate-internal visibility via pub(crate).
+
+/// Evaluate the bounce-out easing curve for t in [0, 1]; returns 1 at t=1.
 pub(crate) fn bounce_out(t: f32) -> f32 {
     const N1: f32 = 7.5625;
     const D1: f32 = 2.75;

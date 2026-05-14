@@ -1,20 +1,34 @@
+//! Directed acyclic graph (DAG) and top-level `Pipeline` struct for `src/pipeline`.
+//! Owns step registration, dependency validation, topological sort, parallel-group
+//! computation, sub-pipeline composition, and result collection. Does not own
+//! scheduling timers or step execution; those live in `scheduler.rs`.
+//! Depends on `step.rs` and `result.rs` within this module.
+
 use crate::log_msg;
 use crate::pipeline::result::{PipelineResult, PipelineStatus};
 use crate::pipeline::step::{PipelineStep, StepStatus};
 use crate::runtime::log_messages::{PL01_PIPELINE_INIT, PL02_STEP_ADD};
 use std::collections::{HashMap, HashSet, VecDeque};
+
+/// Controls pipeline behavior when a step fails.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ErrorMode {
+    /// Stop scheduling new steps as soon as any step fails.
     Abort,
+    /// Continue scheduling remaining steps even after a failure.
     Continue,
 }
+
 impl ErrorMode {
+    /// Return the canonical lowercase string token for this mode.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Abort => "abort",
             Self::Continue => "continue",
         }
     }
+
+    /// Parse a Lua-supplied string into `ErrorMode`; returns an error on unknown tokens.
     pub fn from_str_lua(s: &str) -> Result<Self, String> {
         match s {
             "abort" => Ok(Self::Abort),
@@ -26,13 +40,20 @@ impl ErrorMode {
         }
     }
 }
+
+/// Named DAG of `PipelineStep`s with dependency tracking and execution-order queries.
 #[derive(Debug, Clone)]
 pub struct Pipeline {
+    /// Human-readable identifier used in logs and ASCII diagrams.
     pub name: String,
+    /// All registered steps keyed by step name.
     steps: HashMap<String, PipelineStep>,
+    /// Failure handling strategy applied by the scheduler.
     pub error_mode: ErrorMode,
 }
+
 impl Pipeline {
+    /// Create an empty pipeline with `ErrorMode::Abort`; logs `PL01_PIPELINE_INIT`.
     pub fn new(name: impl Into<String>) -> Self {
         log_msg!(debug, PL01_PIPELINE_INIT);
         Self {
@@ -41,6 +62,8 @@ impl Pipeline {
             error_mode: ErrorMode::Abort,
         }
     }
+
+    /// Register a step; return error if a step with the same name already exists.
     pub fn add_step(&mut self, step: PipelineStep) -> Result<(), String> {
         if self.steps.contains_key(&step.name) {
             return Err(format!(
@@ -52,6 +75,8 @@ impl Pipeline {
         log_msg!(debug, PL02_STEP_ADD);
         Ok(())
     }
+
+    /// Remove step by name and scrub it from all other steps' dependency lists; returns `false` if not found.
     pub fn remove_step(&mut self, name: &str) -> bool {
         if self.steps.remove(name).is_none() {
             return false;
@@ -61,21 +86,33 @@ impl Pipeline {
         }
         true
     }
+
+    /// Return a shared reference to a step by name, or `None` if absent.
     pub fn get_step(&self, name: &str) -> Option<&PipelineStep> {
         self.steps.get(name)
     }
+
+    /// Return a mutable reference to a step by name, or `None` if absent.
     pub fn get_step_mut(&mut self, name: &str) -> Option<&mut PipelineStep> {
         self.steps.get_mut(name)
     }
+
+    /// Return an iterator over all registered steps in unspecified order.
     pub fn get_steps(&self) -> impl Iterator<Item = &PipelineStep> {
         self.steps.values()
     }
+
+    /// Return the count of registered steps.
     pub fn get_step_count(&self) -> usize {
         self.steps.len()
     }
+
+    /// Remove all steps from the pipeline.
     pub fn clear(&mut self) {
         self.steps.clear();
     }
+
+    /// Validate dependency references and absence of cycles; return `(valid, error_list)`.
     pub fn validate(&self) -> (bool, Vec<String>) {
         let mut errors: Vec<String> = Vec::new();
         for step in self.steps.values() {
@@ -96,10 +133,14 @@ impl Pipeline {
         let is_valid = errors.is_empty();
         (is_valid, errors)
     }
+
+    /// Return step names in topological order; return error string if a cycle is detected.
     pub fn get_execution_order(&self) -> Result<Vec<String>, String> {
         let order_refs = self.get_execution_order_refs()?;
         Ok(order_refs.into_iter().map(str::to_owned).collect())
     }
+
+    /// Compute topological order over `&str` keys using Kahn's algorithm; return cycle error if needed.
     fn get_execution_order_refs(&self) -> Result<Vec<&str>, String> {
         let mut in_degree: HashMap<&str, usize> = HashMap::new();
         let mut dependents: HashMap<&str, Vec<&str>> = HashMap::new();
@@ -151,6 +192,8 @@ impl Pipeline {
         }
         Ok(order)
     }
+
+    /// Return steps grouped into parallel levels where all steps in a group have no mutual dependencies.
     pub fn get_parallel_groups(&self) -> Result<Vec<Vec<String>>, String> {
         let topo = self.get_execution_order_refs()?;
         let mut levels: HashMap<&str, usize> = HashMap::new();
@@ -181,11 +224,15 @@ impl Pipeline {
         groups.retain(|g| !g.is_empty());
         Ok(groups)
     }
+
+    /// Reset all step statuses to `Pending` without clearing step registrations.
     pub fn reset(&mut self) {
         for step in self.steps.values_mut() {
             step.reset();
         }
     }
+
+    /// Return whether all dependencies of `step_name` have reached `Completed` or are optional-failed; returns error if step is unknown or a dep is still in-flight.
     pub fn are_deps_satisfied(
         &self,
         step_name: &str,
@@ -218,6 +265,8 @@ impl Pipeline {
         }
         Ok(true)
     }
+
+    /// Build a `PipelineResult` from final step statuses and elapsed `duration` seconds.
     pub fn collect_result(
         &self,
         step_statuses: &HashMap<String, (StepStatus, Option<String>)>,
@@ -246,6 +295,8 @@ impl Pipeline {
         };
         result
     }
+
+    /// Render the pipeline as a multi-line ASCII diagram with parallel levels and dep arrows.
     pub fn to_ascii_diagram(&self) -> String {
         let mut lines = Vec::new();
         lines.push(format!("Pipeline: \"{}\"", self.name));
@@ -277,6 +328,8 @@ impl Pipeline {
         }
         lines.join("\n")
     }
+
+    /// Merge all steps from `sub` into this pipeline under a `alias/` prefix, wiring `outer_deps` to sub entry-points; returns error if any outer dep is missing.
     pub fn add_sub_pipeline(
         &mut self,
         sub: Pipeline,
@@ -312,6 +365,8 @@ impl Pipeline {
         }
         Ok(())
     }
+
+    /// Collect all step names that directly depend on `root`; used for reverse-traversal queries.
     #[allow(dead_code)]
     fn dependents_of(&self, root: &str) -> HashSet<String> {
         let mut result = HashSet::new();

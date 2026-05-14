@@ -1,6 +1,11 @@
+//! Converts `ParallaxLayer` and `ParallaxDrawBatch` into `RenderCommand` streams.
+//! Owns the translation from parallax draw data to renderer API calls; does not own camera maths.
+//! Key dependencies: `parallax::layer`, `render::renderer::RenderCommand`.
+
 use crate::parallax::layer::{ParallaxDrawBatch, ParallaxLayer};
 use crate::render::renderer::RenderCommand;
 impl ParallaxLayer {
+/// Generate a `Vec<RenderCommand>` for this layer at the given camera position and screen size.
     pub fn generate_render_commands(
         &self,
         cam_x: f32,
@@ -15,6 +20,7 @@ impl ParallaxLayer {
         batch_to_render_commands(&batch)
     }
 }
+/// Convert a `ParallaxDrawBatch` into a flat list of `RenderCommand` values ready for submission.
 pub fn batch_to_render_commands(batch: &ParallaxDrawBatch) -> Vec<RenderCommand> {
     let [r, g, b, a] = batch.color;
     let mut cmds = Vec::with_capacity(2 + batch.tiles.len());

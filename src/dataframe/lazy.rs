@@ -6,26 +6,43 @@
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 #[derive(Clone)]
+/// Store one deferred lazy-query step applied during `collect`.
 enum Step {
+    /// Keep rows that satisfy a column predicate.
     Filter {
+        /// Store column name used by the predicate.
         col: String,
+        /// Store comparison operator string.
         op: String,
+        /// Store right-hand-side predicate value.
         val: CellValue,
     },
+    /// Reorder rows by one column.
     Sort {
+        /// Store column name used for ordering.
         col: String,
+        /// Store sort direction flag.
         ascending: bool,
     },
+    /// Keep only selected columns.
     Select {
+        /// Store ordered selected column names.
         cols: Vec<String>,
     },
+    /// Keep first N rows.
     Head(usize),
+    /// Keep last N rows.
     Tail(usize),
+    /// Keep inclusive row range.
     Slice {
+        /// Store start row index.
         start: usize,
+        /// Store end row index.
         end: usize,
     },
+    /// Remove rows where selected column is nil.
     DropNil(String),
+    /// Limit output to first N rows.
     Limit(usize),
 }
 /// Hold deferred query source frame and queued steps.

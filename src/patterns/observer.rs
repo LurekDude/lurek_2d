@@ -1,17 +1,31 @@
+//! Key-scoped observer: subscriptions registered by string key, dispatched by `watchers_for`.
+//! Supports one-shot subscriptions and a wildcard `"*"` key.
+
 use std::collections::HashMap;
+
+/// A single subscription entry for an observer.
 #[derive(Debug, Clone)]
 pub struct ObserverEntry {
+    /// Unique subscription id.
     pub id: u64,
+    /// Key this entry is registered under.
     pub key: String,
+    /// When true, the entry is removed after its first dispatch.
     pub once: bool,
 }
+/// Named observer managing per-key subscription lists.
 #[derive(Debug)]
 pub struct Observer {
+    /// Debug name.
     pub name: String,
+    /// Next subscription id to assign.
     next_id: u64,
+    /// Per-key subscription lists.
     subscriptions: HashMap<String, Vec<ObserverEntry>>,
 }
+/// All methods for `Observer`.
 impl Observer {
+    /// Create a named empty observer.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -19,6 +33,7 @@ impl Observer {
             subscriptions: HashMap::new(),
         }
     }
+    /// Register a subscription for `key`; when `once` is true it fires once then is removed; return its id.
     pub fn subscribe(&mut self, key: &str, once: bool) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
@@ -33,6 +48,7 @@ impl Observer {
             .push(entry);
         id
     }
+    /// Remove subscription with `id` across all keys; return true when it was found.
     pub fn unsubscribe(&mut self, id: u64) -> bool {
         let mut found = false;
         for subs in self.subscriptions.values_mut() {
@@ -44,6 +60,7 @@ impl Observer {
         }
         found
     }
+    /// Return ids of all watchers for `key` (plus `"*"` wildcards), removing any once-subscriptions.
     pub fn watchers_for(&mut self, key: &str) -> Vec<u64> {
         let mut ids = Vec::new();
         let mut once_ids = Vec::new();
@@ -68,12 +85,15 @@ impl Observer {
         }
         ids
     }
+    /// Remove all subscriptions for `key`.
     pub fn clear_key(&mut self, key: &str) {
         self.subscriptions.remove(key);
     }
+    /// Remove all subscriptions.
     pub fn clear_all(&mut self) {
         self.subscriptions.clear();
     }
+    /// Return the total number of active subscriptions across all keys.
     pub fn subscription_count(&self) -> usize {
         self.subscriptions.values().map(Vec::len).sum()
     }

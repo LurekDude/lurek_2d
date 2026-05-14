@@ -1,3 +1,8 @@
+//! TOML-driven retained-mode UI subsystem for `lurek.ui`. Owns widgets,
+//! containers, controls, theming, layout loading, chart rendering, and a
+//! data-graph renderer. Does not own rendering draw calls directly — those
+//! live in `render.rs`. Key dependencies: `fontdue`, `crate::render`.
+
 pub mod containers;
 pub mod context;
 pub mod controls;

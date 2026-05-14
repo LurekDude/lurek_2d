@@ -1,8 +1,14 @@
+//! Debug-render extensions for pathfinding types: `NavGrid`, `FlowField`, and `InfluenceMap`.
+//! Each impl adds `generate_render_commands` that produces `RenderCommand` vectors for overlay display.
+//! Does not own core pathfinding logic; all data reads come from the respective type's public API.
+
 use crate::pathfind::flow_field::FlowField;
 use crate::pathfind::influence_map::InfluenceMap;
 use crate::pathfind::nav_grid::NavGrid;
 use crate::render::renderer::{DrawMode, RenderCommand};
+/// Debug render for `NavGrid` as coloured filled tiles.
 impl NavGrid {
+    /// Return `RenderCommand`s that draw each cell as a red (blocked) or dark-blue (walkable) tile.
     pub fn generate_render_commands(&self, cell_size: f32) -> Vec<RenderCommand> {
         let w = self.get_width();
         let h = self.get_height();
@@ -31,7 +37,9 @@ impl NavGrid {
         cmds
     }
 }
+/// Debug render for `FlowField` as directional arrows.
 impl FlowField {
+    /// Return `RenderCommand`s drawing flow arrows coloured by cost-to-target; dots for impassable cells.
     pub fn generate_render_commands(&self, cell_size: f32) -> Vec<RenderCommand> {
         let w = self.get_width();
         let h = self.get_height();
@@ -71,7 +79,9 @@ impl FlowField {
         cmds
     }
 }
+/// Debug render for `InfluenceMap` layers.
 impl InfluenceMap {
+    /// Return `RenderCommand`s drawing influence values as green (positive) or red (negative) tiles.
     pub fn generate_render_commands(&self, layer: &str, cell_size: f32) -> Vec<RenderCommand> {
         let w = self.get_width();
         let h = self.get_height();

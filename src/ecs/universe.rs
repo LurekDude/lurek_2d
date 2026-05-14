@@ -1,3 +1,5 @@
+//! Core ECS storage for entities, components, tags, hierarchy, and blueprints.
+
 use super::relationships::RelationshipManager;
 use crate::ecs::generational_id::GenerationalId;
 use crate::ecs::lua_table::deep_copy_table;
@@ -11,40 +13,71 @@ mod ext;
 mod systems;
 const MAX_BITMAP_TAGS: usize = 63;
 #[derive(Debug, Default, Clone)]
+/// Captures component and entity changes accumulated since the previous diff read.
 pub struct SnapshotDiff {
+    /// Component additions recorded as `(entity_id, component_name)` pairs.
     pub added_components: Vec<(u32, String)>,
+    /// Component removals recorded as `(entity_id, component_name)` pairs.
     pub removed_components: Vec<(u32, String)>,
+    /// Packed entity ids deleted since the previous diff read.
     pub deleted_entities: Vec<u32>,
+    /// Packed entity ids whose component sets changed since the previous diff read.
     pub dirty_entities: Vec<u32>,
 }
+/// Owns all ECS entity state, component rows, tags, systems, and relationship data.
 pub struct Universe {
+    /// Next fresh slot id used when no recycled slots are available.
     next_id: u32,
+    /// Recycled slot ids available for reuse.
     free_list: Vec<u32>,
+    /// Live entity slots currently allocated in the universe.
     alive: HashSet<u32>,
+    /// Generation counters keyed by entity slot.
     generations: HashMap<u32, u8>,
+    /// Per-entity string tags keyed by slot.
     string_tags: HashMap<u32, Vec<String>>,
+    /// Reverse index from tag name to packed entity ids.
     tag_index: HashMap<String, Vec<u32>>,
+    /// Registered bitmap tag names ordered by bit position.
     bitmap_tag_names: Vec<String>,
+    /// Per-entity bitmap tag masks keyed by slot.
     bitmap_masks: HashMap<u32, u64>,
+    /// Per-entity layer values keyed by slot.
     layers: HashMap<u32, i32>,
+    /// Parent slot for each child slot in the entity hierarchy.
     parents: HashMap<u32, u32>,
+    /// Child slots grouped by parent slot.
     children: HashMap<u32, Vec<u32>>,
+    /// Lua registry table containing per-entity component rows.
     component_store: Option<RegistryKey>,
     #[cfg(feature = "ecs-archetype")]
+    /// Component-name index used to accelerate archetype-style queries.
     component_index: HashMap<String, HashSet<u32>>,
+    /// Lua registry table containing blueprint component templates.
     blueprint_store: Option<RegistryKey>,
+    /// Lua registry table containing registered system tables.
     system_store: Option<RegistryKey>,
+    /// Sort priority per registered system.
     system_priorities: Vec<i32>,
+    /// Execution phase name per registered system.
     system_phases: Vec<String>,
+    /// Stable name per registered system.
     system_names: Vec<String>,
+    /// Dependency name list per registered system.
     system_deps: Vec<Vec<String>>,
+    /// Buffered component-add notifications.
     add_events: Vec<(u32, String)>,
+    /// Buffered component-remove notifications.
     remove_events: Vec<(u32, String)>,
+    /// Entities whose component rows changed since the last event drain.
     dirty_set: HashSet<u32>,
+    /// Buffered entity deletions since the last diff drain.
     deleted_entities: Vec<u32>,
+    /// Relationship graph and directed link state associated with this universe.
     pub relationships: RelationshipManager,
 }
 impl Universe {
+    /// Creates an empty universe with fresh stores and counters.
     pub fn new() -> Self {
         log_msg!(debug, EN01_UNIVERSE_INIT);
         Self {
@@ -75,6 +108,7 @@ impl Universe {
             relationships: RelationshipManager::new(),
         }
     }
+    /// Lazily allocates the Lua registry tables backing components, blueprints, and systems.
     fn ensure_stores(&mut self, lua: &Lua) -> LuaResult<()> {
         if self.component_store.is_none() {
             self.component_store = Some(lua.create_registry_value(lua.create_table()?)?);
@@ -87,6 +121,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Fetches the Lua component store table, failing if the universe is not initialized.
     fn get_component_store<'lua>(&self, lua: &'lua Lua) -> LuaResult<Table<'lua>> {
         let key = self
             .component_store
@@ -94,6 +129,7 @@ impl Universe {
             .ok_or_else(|| mlua::Error::runtime("Universe not initialized"))?;
         lua.registry_value::<Table>(key)
     }
+    /// Fetches the Lua blueprint store table, failing if the universe is not initialized.
     fn get_blueprint_store<'lua>(&self, lua: &'lua Lua) -> LuaResult<Table<'lua>> {
         let key = self
             .blueprint_store
@@ -101,6 +137,7 @@ impl Universe {
             .ok_or_else(|| mlua::Error::runtime("Universe not initialized"))?;
         lua.registry_value::<Table>(key)
     }
+    /// Fetches the Lua system store table, failing if the universe is not initialized.
     pub fn get_system_store<'lua>(&self, lua: &'lua Lua) -> LuaResult<Table<'lua>> {
         let key = self
             .system_store
@@ -109,22 +146,27 @@ impl Universe {
         lua.registry_value::<Table>(key)
     }
     #[inline]
+    /// Packs a slot and generation into the public entity id format.
     pub fn pack_id(slot: u32, gen: u8) -> u32 {
         GenerationalId::pack(slot, gen)
     }
     #[inline]
+    /// Extracts the slot portion from a packed entity id.
     pub fn unpack_slot(id: u32) -> u32 {
         GenerationalId::unpack_slot(id)
     }
     #[inline]
+    /// Extracts the generation portion from a packed entity id.
     pub fn unpack_gen(id: u32) -> u8 {
         GenerationalId::unpack_gen(id)
     }
     #[inline]
+    /// Returns the current generation counter for a slot.
     fn current_gen(&self, slot: u32) -> u8 {
         *self.generations.get(&slot).unwrap_or(&0)
     }
     #[cfg(feature = "ecs-archetype")]
+    /// Rebuilds archetype query indices from one entity component row.
     fn reindex_component_row(&mut self, slot: u32, row: &Table) -> LuaResult<()> {
         for pair in row.clone().pairs::<String, LuaValue>() {
             let (name, value) = pair?;
@@ -134,6 +176,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Produces candidate slots that may contain all requested component names.
     fn candidate_slots_for_all(&self, names: &[String]) -> Vec<u32> {
         if names.is_empty() {
             return self.alive.iter().copied().collect();
@@ -165,6 +208,7 @@ impl Universe {
             self.alive.iter().copied().collect()
         }
     }
+    /// Allocates a live entity id, reusing a recycled slot when available.
     pub fn spawn(&mut self) -> u32 {
         log_msg!(debug, EN02_ENTITY_SPAWN);
         let slot = if let Some(recycled) = self.free_list.pop() {
@@ -177,6 +221,7 @@ impl Universe {
         self.alive.insert(slot);
         Self::pack_id(slot, self.current_gen(slot))
     }
+    /// Deletes one entity, clears its stored state, and recycles its slot.
     pub fn kill(&mut self, id: u32, lua: &Lua) -> LuaResult<()> {
         let slot = Self::unpack_slot(id);
         let gen = Self::unpack_gen(id);
@@ -220,6 +265,7 @@ impl Universe {
         self.deleted_entities.push(id);
         Ok(())
     }
+    /// Reassigns the parent of an entity within the hierarchy graph.
     pub fn set_parent(&mut self, entity: u32, parent: Option<u32>) {
         let entity_slot = Self::unpack_slot(entity);
         if let Some(old_parent_slot) = self.parents.remove(&entity_slot) {
@@ -236,6 +282,7 @@ impl Universe {
                 .push(entity_slot);
         }
     }
+    /// Returns the packed parent id for an entity when one is assigned.
     pub fn get_parent(&self, entity: u32) -> Option<u32> {
         let entity_slot = Self::unpack_slot(entity);
         self.parents
@@ -243,6 +290,7 @@ impl Universe {
             .copied()
             .map(|parent_slot| Self::pack_id(parent_slot, self.current_gen(parent_slot)))
     }
+    /// Returns the live packed child ids for an entity.
     pub fn get_children(&self, entity: u32) -> Vec<u32> {
         let entity_slot = Self::unpack_slot(entity);
         self.children
@@ -256,6 +304,7 @@ impl Universe {
             })
             .unwrap_or_default()
     }
+    /// Deletes an entity and every descendant reachable through the hierarchy.
     pub fn kill_recursive(&mut self, root: u32, lua: &Lua) -> LuaResult<()> {
         let mut to_kill: Vec<u32> = Vec::new();
         let mut stack: Vec<u32> = vec![root];
@@ -273,14 +322,17 @@ impl Universe {
         }
         Ok(())
     }
+    /// Returns whether a packed entity id still refers to a live slot and generation.
     pub fn is_alive(&self, id: u32) -> bool {
         let slot = Self::unpack_slot(id);
         let gen = Self::unpack_gen(id);
         self.alive.contains(&slot) && self.current_gen(slot) == gen
     }
+    /// Returns the number of live entities.
     pub fn get_entity_count(&self) -> usize {
         self.alive.len()
     }
+    /// Returns all live entity ids in ascending order.
     pub fn get_entities(&self) -> Vec<u32> {
         let mut ids: Vec<u32> = self
             .alive
@@ -290,6 +342,7 @@ impl Universe {
         ids.sort();
         ids
     }
+    /// Writes one component value into an entity row and records the change.
     pub fn set_component(
         &mut self,
         lua: &Lua,
@@ -321,6 +374,7 @@ impl Universe {
         self.dirty_set.insert(id);
         Ok(())
     }
+    /// Reads one component value from an entity row, yielding `nil` when absent.
     pub fn get_component<'lua>(
         &self,
         lua: &'lua Lua,
@@ -339,6 +393,7 @@ impl Universe {
         }
         Ok(LuaValue::Nil)
     }
+    /// Returns whether an entity row contains a non-`nil` value for the component name.
     pub fn has_component(&self, lua: &Lua, id: u32, name: &str) -> LuaResult<bool> {
         if !self.is_alive(id) {
             return Ok(false);
@@ -353,6 +408,7 @@ impl Universe {
         }
         Ok(false)
     }
+    /// Removes one component from an entity row and records the change when present.
     pub fn remove_component(&mut self, lua: &Lua, id: u32, name: &str) -> LuaResult<()> {
         let slot = Self::unpack_slot(id);
         if let Some(ref key) = self.component_store {
@@ -372,6 +428,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Lists the component names currently stored on an entity row.
     pub fn get_component_names(&self, lua: &Lua, id: u32) -> LuaResult<Vec<String>> {
         let slot = Self::unpack_slot(id);
         let mut names = Vec::new();
@@ -386,6 +443,7 @@ impl Universe {
         }
         Ok(names)
     }
+    /// Returns entity ids whose rows contain every requested component name.
     pub fn query(&self, lua: &Lua, names: &[String]) -> LuaResult<Vec<u32>> {
         let mut result = Vec::new();
         if names.is_empty() {
@@ -412,6 +470,7 @@ impl Universe {
         result.sort();
         Ok(result)
     }
+    /// Calls a Lua callback for each live entity that owns the named component.
     pub fn each(&self, lua: &Lua, name: &str, callback: Function) -> LuaResult<()> {
         if let Some(ref key) = self.component_store {
             let store: Table = lua.registry_value(key)?;
@@ -429,6 +488,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Attaches a string tag to a live entity and updates the reverse index.
     pub fn add_tag(&mut self, id: u32, tag: &str) {
         if !self.is_alive(id) {
             return;
@@ -441,6 +501,7 @@ impl Universe {
             self.tag_index.entry(tag_str).or_default().push(id);
         }
     }
+    /// Removes a string tag from an entity and the reverse tag index.
     pub fn remove_tag(&mut self, id: u32, tag: &str) {
         let slot = Self::unpack_slot(id);
         if let Some(tags) = self.string_tags.get_mut(&slot) {
@@ -450,6 +511,7 @@ impl Universe {
             entries.retain(|&tid| tid != id);
         }
     }
+    /// Returns whether an entity currently owns the given string tag.
     pub fn has_tag(&self, id: u32, tag: &str) -> bool {
         let slot = Self::unpack_slot(id);
         self.string_tags
@@ -457,10 +519,12 @@ impl Universe {
             .map(|tags| tags.iter().any(|t| t == tag))
             .unwrap_or(false)
     }
+    /// Returns all string tags currently attached to an entity.
     pub fn get_tags(&self, id: u32) -> Vec<String> {
         let slot = Self::unpack_slot(id);
         self.string_tags.get(&slot).cloned().unwrap_or_default()
     }
+    /// Returns all live entities currently indexed under the given string tag.
     pub fn get_entities_by_tag(&self, tag: &str) -> Vec<u32> {
         let mut result: Vec<u32> = self
             .iter_entities_by_tag(tag)
@@ -469,12 +533,14 @@ impl Universe {
         result.sort();
         result
     }
+    /// Iterates over entity ids indexed under the given string tag.
     pub fn iter_entities_by_tag<'a>(&'a self, tag: &'a str) -> impl Iterator<Item = u32> + 'a {
         self.tag_index
             .get(tag)
             .into_iter()
             .flat_map(|entries| entries.iter().copied())
     }
+    /// Resolves or allocates the bitmap bit position for a tag name.
     fn get_or_define_tag_bit(&mut self, name: &str) -> LuaResult<u8> {
         if let Some(pos) = self.bitmap_tag_names.iter().position(|n| n == name) {
             return Ok(pos as u8);
@@ -489,9 +555,11 @@ impl Universe {
         self.bitmap_tag_names.push(name.to_string());
         Ok(bit)
     }
+    /// Reserves and returns the bitmap bit position for a tag name.
     pub fn define_tag(&mut self, name: &str) -> LuaResult<u8> {
         self.get_or_define_tag_bit(name)
     }
+    /// Sets one bitmap tag bit on a live entity.
     pub fn bitmap_tag(&mut self, id: u32, name: &str) -> LuaResult<()> {
         if !self.is_alive(id) {
             return Ok(());
@@ -502,6 +570,7 @@ impl Universe {
         *mask |= 1u64 << bit;
         Ok(())
     }
+    /// Clears one bitmap tag bit on an entity when the tag exists.
     pub fn bitmap_untag(&mut self, id: u32, name: &str) {
         let slot = Self::unpack_slot(id);
         if let Some(pos) = self.bitmap_tag_names.iter().position(|n| n == name) {
@@ -510,6 +579,7 @@ impl Universe {
             }
         }
     }
+    /// Returns whether an entity currently has the named bitmap tag bit set.
     pub fn has_bitmap_tag(&self, id: u32, name: &str) -> bool {
         let slot = Self::unpack_slot(id);
         if let Some(pos) = self.bitmap_tag_names.iter().position(|n| n == name) {
@@ -519,6 +589,7 @@ impl Universe {
         }
         false
     }
+    /// Returns live entities whose bitmap mask includes the named tag bit.
     pub fn query_bitmap_tag(&self, name: &str) -> Vec<u32> {
         if let Some(pos) = self.bitmap_tag_names.iter().position(|n| n == name) {
             let bit = 1u64 << pos;
@@ -539,6 +610,7 @@ impl Universe {
             Vec::new()
         }
     }
+    /// Returns live entities whose bitmap mask contains any requested tag bit.
     pub fn query_bitmap_any(&self, names: &[String]) -> Vec<u32> {
         let mut combined = 0u64;
         for name in names {
@@ -563,6 +635,7 @@ impl Universe {
         result.sort();
         result
     }
+    /// Returns live entities whose bitmap mask contains every requested tag bit.
     pub fn query_bitmap_all(&self, names: &[String]) -> Vec<u32> {
         let mut combined = 0u64;
         for name in names {
@@ -589,23 +662,27 @@ impl Universe {
         result.sort();
         result
     }
+    /// Returns the bit position assigned to a bitmap tag name.
     pub fn get_bitmap_tag_bit(&self, name: &str) -> Option<u8> {
         self.bitmap_tag_names
             .iter()
             .position(|n| n == name)
             .map(|p| p as u8)
     }
+    /// Writes the layer value for a live entity.
     pub fn set_layer(&mut self, id: u32, layer: i32) {
         if self.is_alive(id) {
             self.layers.insert(Self::unpack_slot(id), layer);
         }
     }
+    /// Returns the stored layer value for an entity, defaulting to zero.
     pub fn get_layer(&self, id: u32) -> i32 {
         self.layers
             .get(&Self::unpack_slot(id))
             .copied()
             .unwrap_or(0)
     }
+    /// Returns live entities whose stored layer equals the requested value.
     pub fn get_entities_by_layer(&self, layer: i32) -> Vec<u32> {
         let mut result: Vec<u32> = self
             .alive
@@ -616,6 +693,7 @@ impl Universe {
         result.sort();
         result
     }
+    /// Returns live entities sorted by layer and then by slot id.
     pub fn get_entities_sorted(&self) -> Vec<u32> {
         let mut entities: Vec<u32> = self
             .alive
@@ -630,6 +708,7 @@ impl Universe {
         });
         entities
     }
+    /// Stores a blueprint template under a name after deep-copying its Lua table.
     pub fn define_blueprint(&mut self, lua: &Lua, name: &str, components: Table) -> LuaResult<()> {
         self.ensure_stores(lua)?;
         let bp_store = self.get_blueprint_store(lua)?;
@@ -637,6 +716,7 @@ impl Universe {
         bp_store.set(name, copy)?;
         Ok(())
     }
+    /// Builds a child blueprint by copying a parent template and applying overrides.
     pub fn extend_blueprint(
         &mut self,
         lua: &Lua,
@@ -657,6 +737,7 @@ impl Universe {
         bp_store.set(name, merged)?;
         Ok(())
     }
+    /// Spawns an entity from a named blueprint and optional override table.
     pub fn spawn_blueprint(
         &mut self,
         lua: &Lua,
@@ -683,6 +764,7 @@ impl Universe {
         store.set(slot, entity_comps)?;
         Ok(id)
     }
+    /// Returns whether a blueprint name is present in the blueprint store.
     pub fn has_blueprint(&self, lua: &Lua, name: &str) -> LuaResult<bool> {
         if let Some(ref key) = self.blueprint_store {
             let store: Table = lua.registry_value(key)?;
@@ -692,6 +774,7 @@ impl Universe {
             Ok(false)
         }
     }
+    /// Removes one named blueprint from the blueprint store.
     pub fn remove_blueprint(&self, lua: &Lua, name: &str) -> LuaResult<()> {
         if let Some(ref key) = self.blueprint_store {
             let store: Table = lua.registry_value(key)?;
@@ -699,6 +782,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Returns the names of all stored blueprints.
     pub fn list_blueprints(&self, lua: &Lua) -> LuaResult<Vec<String>> {
         let mut names = Vec::new();
         if let Some(ref key) = self.blueprint_store {
@@ -710,6 +794,7 @@ impl Universe {
         }
         Ok(names)
     }
+    /// Returns a deep-copied Lua table containing one blueprint's component template.
     pub fn get_blueprint_components<'lua>(
         &self,
         lua: &'lua Lua,
@@ -723,6 +808,7 @@ impl Universe {
         }
         Ok(LuaValue::Nil)
     }
+    /// Resets the universe to an empty state and clears its Lua-backed stores.
     pub fn clear(&mut self, lua: &Lua) -> LuaResult<()> {
         self.alive.clear();
         self.free_list.clear();
@@ -765,17 +851,20 @@ impl Universe {
         Ok(())
     }
     #[allow(clippy::type_complexity)]
+    /// Drains buffered component add and remove notifications.
     pub fn take_component_events(&mut self) -> (Vec<(u32, String)>, Vec<(u32, String)>) {
         let adds = std::mem::take(&mut self.add_events);
         let removes = std::mem::take(&mut self.remove_events);
         self.dirty_set.clear();
         (adds, removes)
     }
+    /// Returns the sorted set of entities marked dirty by component changes.
     pub fn get_dirty_entities(&self) -> Vec<u32> {
         let mut ids: Vec<u32> = self.dirty_set.iter().copied().collect();
         ids.sort();
         ids
     }
+    /// Drains buffered component and entity changes into a snapshot diff.
     pub fn take_snapshot_diff(&mut self) -> SnapshotDiff {
         let dirty_entities = self.get_dirty_entities();
         let (added_components, removed_components) = self.take_component_events();
@@ -789,6 +878,7 @@ impl Universe {
     }
 }
 impl Default for Universe {
+    /// Creates an empty universe with default storage state.
     fn default() -> Self {
         Self::new()
     }

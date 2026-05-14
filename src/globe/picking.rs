@@ -1,14 +1,24 @@
+//! Globe hit testing against projected provinces.
+//!
+//! Owns screen-space point-in-polygon checks and best-hit selection.
+//! Projection and graph traversal stay in sibling modules.
+
 use crate::globe::projection::{build_view_matrix, OrbitCamera};
 use crate::globe::topology::ProvinceGraph;
 use crate::globe::types::{GlobeSpec, ProvinceId};
 use crate::math::sphere::lat_lon_to_unit;
 use crate::math::Vec2;
+/// Province selection result returned by globe picking.
 #[derive(Debug, Clone)]
 pub struct PickResult {
+    /// Picked province id.
     pub province_id: ProvinceId,
+    /// Screen-space pointer position used for the hit test.
     pub screen_pos: (f32, f32),
+    /// Projected screen-space centroid for the picked province.
     pub centroid_screen: Vec2,
 }
+/// Return true when a point lies inside a polygon.
 fn point_in_polygon(pt: Vec2, verts: &[Vec2]) -> bool {
     if verts.len() < 3 {
         return false;
@@ -28,6 +38,7 @@ fn point_in_polygon(pt: Vec2, verts: &[Vec2]) -> bool {
     }
     inside
 }
+/// Pick the topmost province under a screen-space point or return None when no province matches.
 pub fn pick(
     sx: f32,
     sy: f32,

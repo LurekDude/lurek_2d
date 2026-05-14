@@ -29,6 +29,7 @@ pub fn from_csv(s: &str) -> Result<DataFrame, String> {
     }
     Ok(DataFrame::from_raw(headers, data))
 }
+/// Convert CSV field text to inferred cell type.
 fn auto_detect_type(s: &str) -> CellValue {
     if s.is_empty() {
         return CellValue::Nil;
@@ -43,6 +44,7 @@ fn auto_detect_type(s: &str) -> CellValue {
     }
     CellValue::Text(s.to_string())
 }
+/// Parse CSV text into row and field records with quote escaping.
 fn parse_csv_records(s: &str) -> Result<Vec<Vec<String>>, String> {
     let mut records: Vec<Vec<String>> = Vec::new();
     let mut current_record: Vec<String> = Vec::new();
@@ -130,6 +132,7 @@ impl DataFrame {
         out
     }
 }
+/// Write one CSV field with required escaping rules.
 fn csv_write_field(out: &mut String, field: &str) {
     if field.contains(',') || field.contains('"') || field.contains('\n') || field.contains('\r') {
         out.push('"');
@@ -182,6 +185,7 @@ pub fn from_json(s: &str) -> Result<DataFrame, String> {
     }
     Ok(DataFrame::from_raw(col_names, data))
 }
+/// Parse JSON array payload into object-like row values.
 fn parse_json_array(s: &str) -> Result<Vec<Vec<(String, CellValue)>>, String> {
     let chars: Vec<char> = s.chars().collect();
     let len = chars.len();
@@ -213,6 +217,7 @@ fn parse_json_array(s: &str) -> Result<Vec<Vec<(String, CellValue)>>, String> {
     }
     Ok(objects)
 }
+/// Parse JSON object starting at index and return key-value pairs with next index.
 fn parse_json_object(
     chars: &[char],
     start: usize,
@@ -252,6 +257,7 @@ fn parse_json_object(
     }
     Ok((pairs, pos))
 }
+/// Parse JSON string token and return text plus next index.
 fn parse_json_string(chars: &[char], start: usize) -> Result<(String, usize), String> {
     let len = chars.len();
     let mut pos = skip_ws(chars, start);
@@ -303,6 +309,7 @@ fn parse_json_string(chars: &[char], start: usize) -> Result<(String, usize), St
     }
     Err("unterminated string".to_string())
 }
+/// Parse JSON value token and return typed cell plus next index.
 fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), String> {
     let len = chars.len();
     let pos = skip_ws(chars, start);
@@ -368,6 +375,7 @@ fn parse_json_value(chars: &[char], start: usize) -> Result<(CellValue, usize), 
         )),
     }
 }
+/// Skip nested JSON array and return captured text plus next index.
 fn skip_json_array(chars: &[char], start: usize) -> Result<(String, usize), String> {
     let len = chars.len();
     let pos = start;
@@ -401,6 +409,7 @@ fn skip_json_array(chars: &[char], start: usize) -> Result<(String, usize), Stri
     }
     Err("unterminated array".to_string())
 }
+/// Skip ASCII whitespace and return first non-whitespace index.
 fn skip_ws(chars: &[char], start: usize) -> usize {
     let mut pos = start;
     while pos < chars.len() && chars[pos].is_ascii_whitespace() {
@@ -436,6 +445,7 @@ impl DataFrame {
         out
     }
 }
+/// Escape string into JSON-safe form.
 fn json_escape_string(out: &mut String, s: &str) {
     for c in s.chars() {
         match c {
@@ -451,6 +461,7 @@ fn json_escape_string(out: &mut String, s: &str) {
         }
     }
 }
+/// Write one cell value into JSON output buffer.
 fn json_write_value(out: &mut String, val: &CellValue) {
     match val {
         CellValue::Nil => out.push_str("null"),

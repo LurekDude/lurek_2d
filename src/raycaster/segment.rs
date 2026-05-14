@@ -1,10 +1,20 @@
+//! 2D line-segment definition and analytic ray-segment intersection for the
+//! raycaster. Used by the BSP/polygon raycaster path and visibility queries.
+//! Does not share state with the DDA grid raycaster.
+
+/// An infinite-precision 2D line segment from `(x1, y1)` to `(x2, y2)`.
 #[derive(Debug, Clone)]
 pub struct Segment {
+    /// X coordinate of the first endpoint.
     pub x1: f32,
+    /// Y coordinate of the first endpoint.
     pub y1: f32,
+    /// X coordinate of the second endpoint.
     pub x2: f32,
+    /// Y coordinate of the second endpoint.
     pub y2: f32,
 }
+/// Cast a ray from `(ox, oy)` in direction `(dx, dy)` and return the nearest hit `(x, y, segment_index)`, or `None`.
 pub fn cast_ray_2d(
     ox: f32,
     oy: f32,

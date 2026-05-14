@@ -1,14 +1,24 @@
+//! Polygon-based navigation mesh: convex polygon regions connected by a graph, with A\* corridor search.
+//! Finds world-space paths by identifying entry/goal polygons, running polygon-level A\*, and inserting centroids.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// Navigation mesh: a collection of polygons with explicit connectivity edges.
 #[derive(Debug, Clone, Default)]
 pub struct NavMesh {
+    /// Vertex lists for each polygon region.
     polygons: Vec<Vec<(f32, f32)>>,
+    /// Adjacency list: `neighbors[i]` holds polygon indices reachable from polygon `i`.
     neighbors: Vec<Vec<usize>>,
 }
+/// Construction and pathfinding methods for `NavMesh`.
 impl NavMesh {
+    /// Create an empty mesh.
     pub fn new() -> Self {
         Self::default()
     }
+    /// Add a polygon region with at least 3 vertices; return its index or `None` if fewer than 3 vertices.
     pub fn add_polygon(&mut self, vertices: Vec<(f32, f32)>) -> Option<usize> {
         if vertices.len() < 3 {
             return None;
@@ -18,6 +28,7 @@ impl NavMesh {
         self.neighbors.push(Vec::new());
         Some(id)
     }
+    /// Add a directed edge from polygon `a` to `b`; if `bidirectional`, also add the reverse edge.
     pub fn connect(&mut self, a: usize, b: usize, bidirectional: bool) -> bool {
         if a >= self.polygons.len() || b >= self.polygons.len() || a == b {
             return false;
@@ -30,9 +41,11 @@ impl NavMesh {
         }
         true
     }
+    /// Return the total number of registered polygons.
     pub fn polygon_count(&self) -> usize {
         self.polygons.len()
     }
+    /// Find a world-space path from `start` to `goal`; return centroid waypoints or `None` if either point is outside all polygons.
     pub fn find_path(&self, start: (f32, f32), goal: (f32, f32)) -> Option<Vec<(f32, f32)>> {
         let start_poly = self.find_polygon_for_point(start)?;
         let goal_poly = self.find_polygon_for_point(goal)?;
@@ -52,11 +65,13 @@ impl NavMesh {
         out.push(goal);
         Some(out)
     }
+    /// Return the index of the first polygon containing `point`, using ray-cast point-in-polygon test.
     fn find_polygon_for_point(&self, point: (f32, f32)) -> Option<usize> {
         self.polygons
             .iter()
             .position(|poly| point_in_polygon(point, poly))
     }
+    /// Compute the centroid (average vertex) of polygon `poly_id`.
     fn centroid(&self, poly_id: usize) -> (f32, f32) {
         let poly = &self.polygons[poly_id];
         let mut sx = 0.0;
@@ -68,6 +83,7 @@ impl NavMesh {
         let inv = 1.0 / poly.len() as f32;
         (sx * inv, sy * inv)
     }
+    /// Run A\* over the polygon graph from `start` to `goal`, returning an ordered list of polygon indices.
     fn astar_polygons(&self, start: usize, goal: usize) -> Option<Vec<usize>> {
         let mut open = BinaryHeap::new();
         let mut g_score: HashMap<usize, f32> = HashMap::new();
@@ -96,15 +112,18 @@ impl NavMesh {
         }
         None
     }
+    /// Return the Euclidean distance between the centroids of polygons `a` and `b`.
     fn distance(&self, a: usize, b: usize) -> f32 {
         let (ax, ay) = self.centroid(a);
         let (bx, by) = self.centroid(b);
         ((bx - ax).powi(2) + (by - ay).powi(2)).sqrt()
     }
+    /// Heuristic distance estimate for A\* (centroid-to-centroid).
     fn heuristic(&self, a: usize, b: usize) -> f32 {
         self.distance(a, b)
     }
 }
+/// Even-odd ray-cast point-in-polygon test.
 fn point_in_polygon(point: (f32, f32), polygon: &[(f32, f32)]) -> bool {
     let (px, py) = point;
     let mut inside = false;
@@ -122,6 +141,7 @@ fn point_in_polygon(point: (f32, f32), polygon: &[(f32, f32)]) -> bool {
     }
     inside
 }
+/// Walk `parent` chain from `goal` to start and return the path in forward order.
 fn reconstruct(parent: HashMap<usize, usize>, mut current: usize) -> Vec<usize> {
     let mut out = vec![current];
     while let Some(prev) = parent.get(&current) {
@@ -131,22 +151,29 @@ fn reconstruct(parent: HashMap<usize, usize>, mut current: usize) -> Vec<usize> 
     out.reverse();
     out
 }
+/// Internal A\* heap node for polygon-level search.
 #[derive(Clone)]
 struct Node {
+    /// Polygon index.
     id: usize,
+    /// f-score = g + h.
     f: f32,
 }
+/// Equality by f-score.
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for Node {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)

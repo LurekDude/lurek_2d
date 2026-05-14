@@ -1,34 +1,65 @@
+//! TOML-driven declarative layout loader for `lurek.ui` — deserialises `WidgetDef` / `LayoutDef` trees
+//! into a live `GuiContext` via `load_layout_toml` and `load_layout_def`.
+//! Also provides `render_to_image` for headless RGBA rasterisation of a loaded layout.
+//! Depends on `crate::ui::context`, `crate::math::Rect`, and `serde` / `toml` / `image`.
+
 use crate::ui::context::{GuiContext, WidgetKind};
 use serde::Deserialize;
+/// Flat description of a single widget produced by TOML deserialisation; children are nested inline.
 #[derive(Debug, Clone, Deserialize, Default)]
 pub struct WidgetDef {
+    /// Widget type name string (e.g. `"button"`, `"label"`, `"panel"`).
     pub widget_type: String,
+    /// Optional identifier assigned to `WidgetBase::id`.
     pub id: Option<String>,
+    /// X pixel position passed to `WidgetBase::x`.
     pub x: Option<f32>,
+    /// Y pixel position passed to `WidgetBase::y`.
     pub y: Option<f32>,
+    /// Pixel width passed to `WidgetBase::width`.
     pub w: Option<f32>,
+    /// Pixel height passed to `WidgetBase::height`.
     pub h: Option<f32>,
+    /// Primary text value for buttons, labels, checkboxes, etc.
     pub text: Option<String>,
+    /// Minimum value for sliders, progress bars, and spin boxes.
     pub min: Option<f64>,
+    /// Maximum value for sliders, progress bars, and spin boxes.
     pub max: Option<f64>,
+    /// Initial numeric value for sliders, progress bars, spin boxes, and badge counts.
     pub value: Option<f64>,
+    /// Initial checked state for checkboxes.
     pub checked: Option<bool>,
+    /// Initial `on` state for switches.
     pub on: Option<bool>,
+    /// Initial `WidgetBase::visible` state.
     pub visible: Option<bool>,
+    /// Initial `WidgetBase::enabled` state.
     pub enabled: Option<bool>,
+    /// Placeholder text for text-input widgets.
     pub placeholder: Option<String>,
+    /// Hover tooltip text.
     pub tooltip: Option<String>,
+    /// Layout direction string (`"horizontal"` / `"vertical"`) for layout and split panels.
     pub direction: Option<String>,
+    /// Item spacing in pixels for layout widgets.
     pub spacing: Option<f32>,
+    /// Orientation string (`"horizontal"` / `"vertical"`) for separators, scroll bars, etc.
     pub orientation: Option<String>,
+    /// Radio-button group identifier.
     pub group: Option<String>,
+    /// Nested child widget definitions; loaded recursively by `load_layout_def`.
     pub children: Option<Vec<WidgetDef>>,
 }
+/// Top-level TOML layout definition containing an optional resolution hint and the root widget tree.
 #[derive(Debug, Deserialize)]
 pub struct LayoutDef {
+    /// Optional `[width, height]` target resolution for layout and `render_to_image`.
     pub resolution: Option<[u32; 2]>,
+    /// Root widget definition; all descendants are nested under `children`.
     pub root: WidgetDef,
 }
+/// Recursively instantiate `def` and all its `children` into `ctx`; return the root widget index or an error string.
 pub fn load_layout_def(ctx: &mut GuiContext, def: &WidgetDef) -> Result<usize, String> {
     let idx = create_from_def(ctx, def)?;
     if let Some(children) = &def.children {
@@ -39,11 +70,13 @@ pub fn load_layout_def(ctx: &mut GuiContext, def: &WidgetDef) -> Result<usize, S
     }
     Ok(idx)
 }
+/// Parse `toml_src` into a `LayoutDef` and load it into `ctx`; return the root widget index or an error string.
 pub fn load_layout_toml(ctx: &mut GuiContext, toml_src: &str) -> Result<usize, String> {
     let layout_def: LayoutDef =
         toml::from_str(toml_src).map_err(|e| format!("TOML parse error: {e}"))?;
     load_layout_def(ctx, &layout_def.root)
 }
+/// Run a layout pass on `ctx` at the given resolution and save an RGBA flat-colour rasterisation to `path`.
 pub fn render_to_image(
     ctx: &mut GuiContext,
     width: u32,
@@ -72,6 +105,7 @@ pub fn render_to_image(
     image::save_buffer(path, &pixels, width, height, image::ColorType::Rgba8)
         .map_err(|e| format!("render_to_image: failed to save '{path}': {e}"))
 }
+/// Instantiate a single widget from `def` in `ctx` without recursing into children; return its index or an error.
 fn create_from_def(ctx: &mut GuiContext, def: &WidgetDef) -> Result<usize, String> {
     let widget_type = def.widget_type.to_lowercase();
     let idx = match widget_type.as_str() {
@@ -147,6 +181,7 @@ fn create_from_def(ctx: &mut GuiContext, def: &WidgetDef) -> Result<usize, Strin
     apply_base_props(ctx, idx, def);
     Ok(idx)
 }
+/// Apply position, size, id, visibility, enabled, tooltip, and type-specific value props from `def` onto widget `idx`.
 fn apply_base_props(ctx: &mut GuiContext, idx: usize, def: &WidgetDef) {
     if let Some(w) = ctx.widgets.get_mut(idx) {
         let base = w.base_mut();
@@ -217,6 +252,7 @@ fn apply_base_props(ctx: &mut GuiContext, idx: usize, def: &WidgetDef) {
         _ => {}
     }
 }
+/// Return a representative RGBA debug colour for each `WidgetKind` variant used by `render_to_image`.
 fn widget_kind_color(kind: &WidgetKind) -> [u8; 4] {
     match kind {
         WidgetKind::Panel(_) => [60, 60, 70, 200],
@@ -257,6 +293,7 @@ fn widget_kind_color(kind: &WidgetKind) -> [u8; 4] {
         WidgetKind::Custom(_) => [255, 200, 100, 200],
     }
 }
+/// Alpha-blend `color` over the pixels of `rect` inside a raw RGBA `pixels` buffer of `img_w × img_h`.
 #[allow(clippy::ptr_arg)]
 fn fill_rect(
     pixels: &mut Vec<u8>,

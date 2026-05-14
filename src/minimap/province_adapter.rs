@@ -1,6 +1,13 @@
+//! Adapter functions that populate `Minimap` state from a `ProvinceRegistry`.
+//! Owns the terrain, visibility, and colour-palette sync logic between province and minimap.
+//! Does not own either data source; both are passed by mutable and shared reference.
+//! Called by `src/lua_api/minimap_api.rs` when the game requests a province sync.
+
 use crate::minimap::minimap::Minimap;
 use crate::minimap::types::FogLevel;
 use crate::province::registry::ProvinceRegistry;
+
+/// Copy terrain types from `registry` cells into `minimap`, clipped to the smaller of the two grids.
 pub fn apply_terrain(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     let w = minimap.grid_width().min(registry.width());
     let h = minimap.grid_height().min(registry.height());
@@ -16,6 +23,8 @@ pub fn apply_terrain(minimap: &mut Minimap, registry: &ProvinceRegistry) {
         }
     }
 }
+
+/// Translate province `visibility_state` bytes into `FogLevel` values on `minimap`.
 pub fn apply_visibility(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     let w = minimap.grid_width().min(registry.width());
     let h = minimap.grid_height().min(registry.height());
@@ -38,6 +47,8 @@ pub fn apply_visibility(minimap: &mut Minimap, registry: &ProvinceRegistry) {
         }
     }
 }
+
+/// Register each province's `political_color` as the terrain colour in `minimap`.
 pub fn apply_terrain_palette(minimap: &mut Minimap, registry: &ProvinceRegistry) {
     for id in registry.province_ids() {
         if let Some(snap) = registry.get_province(id) {
@@ -45,3 +56,4 @@ pub fn apply_terrain_palette(minimap: &mut Minimap, registry: &ProvinceRegistry)
         }
     }
 }
+

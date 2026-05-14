@@ -1,16 +1,33 @@
+//! ANSI escape-code parsing for the terminal emulator. Owns color structs, span
+//! splitting, SGR attribute decoding, and the xterm-256 color cube. Does not own
+//! rendering or cell layout; consumers call `parse_ansi_spans` then forward spans
+//! to the render layer. Depends only on the standard library.
+
+/// RGB color produced by ANSI color codes or xterm-256 palette lookup.
 #[derive(Debug, Clone, PartialEq)]
 pub struct AnsiColor {
+    /// Red channel, 0–255.
     pub r: u8,
+    /// Green channel, 0–255.
     pub g: u8,
+    /// Blue channel, 0–255.
     pub b: u8,
 }
+
+/// Single run of text sharing the same SGR attributes.
 #[derive(Debug, Clone)]
 pub struct AnsiSpan {
+    /// Decoded text content with no escape sequences.
     pub text: String,
+    /// Foreground color; `None` means inherit/default.
     pub fg: Option<AnsiColor>,
+    /// Background color; `None` means inherit/default.
     pub bg: Option<AnsiColor>,
+    /// Bold attribute from SGR 1.
     pub bold: bool,
 }
+
+/// Standard 8-color CGA palette mapped to ANSI codes 30–37 and 40–47.
 static PALETTE_STANDARD: &[AnsiColor] = &[
     AnsiColor { r: 0, g: 0, b: 0 },
     AnsiColor { r: 170, g: 0, b: 0 },
@@ -37,6 +54,8 @@ static PALETTE_STANDARD: &[AnsiColor] = &[
         b: 170,
     },
 ];
+
+/// Bright 8-color palette mapped to ANSI codes 90–97 and 100–107.
 static PALETTE_BRIGHT: &[AnsiColor] = &[
     AnsiColor {
         r: 85,
@@ -79,6 +98,8 @@ static PALETTE_BRIGHT: &[AnsiColor] = &[
         b: 255,
     },
 ];
+
+/// Remove all ANSI escape sequences from `text` and return the bare string.
 pub fn strip_ansi_codes(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut chars = text.chars().peekable();
@@ -98,6 +119,8 @@ pub fn strip_ansi_codes(text: &str) -> String {
     }
     out
 }
+
+/// Parse `text` into `AnsiSpan` runs, decoding SGR color and bold attributes; returns spans in order.
 pub fn parse_ansi_spans(text: &str) -> Vec<AnsiSpan> {
     let mut spans: Vec<AnsiSpan> = Vec::new();
     let mut current_fg: Option<AnsiColor> = None;
@@ -157,6 +180,8 @@ pub fn parse_ansi_spans(text: &str) -> Vec<AnsiSpan> {
     }
     spans
 }
+
+/// Apply SGR parameter string to the mutable color and bold state; resets all on empty params.
 fn apply_sgr(
     params: &str,
     fg: &mut Option<AnsiColor>,
@@ -205,6 +230,8 @@ fn apply_sgr(
         idx += 1;
     }
 }
+
+/// Decode an xterm-256 (sub-code 5) or 24-bit RGB (sub-code 2) extended color from `parts` starting at `idx`; advances `idx` past consumed params.
 fn parse_extended_color(parts: &[u16], idx: &mut usize) -> Option<AnsiColor> {
     let sub = parts.get(*idx + 1).copied()?;
     match sub {
@@ -223,6 +250,8 @@ fn parse_extended_color(parts: &[u16], idx: &mut usize) -> Option<AnsiColor> {
         _ => None,
     }
 }
+
+/// Convert xterm-256 color index `n` to RGB; covers standard (0–7), bright (8–15), color cube (16–231), and grayscale (232–255).
 pub fn color256(n: u8) -> AnsiColor {
     match n {
         0..=7 => PALETTE_STANDARD[n as usize].clone(),
@@ -232,6 +261,7 @@ pub fn color256(n: u8) -> AnsiColor {
             let b_idx = n % 6;
             let g_idx = (n / 6) % 6;
             let r_idx = n / 36;
+            /// Map a 0–5 cube index to an 8-bit channel value (0 or 55+idx*40).
             fn cube_val(i: u8) -> u8 {
                 if i == 0 {
                     0
@@ -251,6 +281,8 @@ pub fn color256(n: u8) -> AnsiColor {
         }
     }
 }
+
+/// Return the byte length of a UTF-8 character given its leading byte.
 fn utf8_char_len(byte: u8) -> usize {
     if byte < 0x80 {
         1
@@ -262,3 +294,4 @@ fn utf8_char_len(byte: u8) -> usize {
         4
     }
 }
+

@@ -1,26 +1,47 @@
+//! Province render command generation: converts ProvinceRegistry + ProvinceRenderOptions into a RenderCommand Vec.
+//! Handles fill spans, border lines, capital markers, and text labels with viewport culling.
+//! Does not own GPU state; pushes transform/pop pairs so callers can compose into larger scenes.
 use crate::province::borders::classify_border;
 use crate::province::map_modes::{resolve_color, ProvinceMapMode};
 use crate::province::registry::ProvinceRegistry;
 use crate::province::types::{BorderClass, ProvinceId};
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
+
+/// Options controlling what gets rendered and how the province map is projected onto the screen.
 #[derive(Debug, Clone)]
 pub struct ProvinceRenderOptions {
+    /// Horizontal screen translation applied before zoom.
     pub x: f32,
+    /// Vertical screen translation applied before zoom.
     pub y: f32,
+    /// Zoom multiplier applied after translation.
     pub zoom: f32,
+    /// Size in screen pixels of one province map pixel; combined with zoom for final scale.
     pub pixel_size: f32,
+    /// Screen width in pixels, used for viewport culling.
     pub screen_w: f32,
+    /// Screen height in pixels, used for viewport culling.
     pub screen_h: f32,
+    /// Active map mode that drives fill colour selection.
     pub map_mode: ProvinceMapMode,
+    /// When true, emit fill rectangles for province spans.
     pub draw_fills: bool,
+    /// When true, emit line segments for province borders.
     pub draw_borders: bool,
+    /// When true, emit text labels at province label or centroid positions.
     pub draw_labels: bool,
+    /// When true, emit capital dot markers.
     pub draw_capitals: bool,
+    /// Line width in screen pixels for border segments.
     pub border_width: f32,
+    /// Province to highlight with a white hover outline, or None.
     pub hovered_id: Option<ProvinceId>,
+    /// Province to highlight with a yellow selection outline, or None.
     pub selected_id: Option<ProvinceId>,
 }
+
+/// Default ProvinceRenderOptions: no translation, zoom 1, pixel_size 1, political mode, fills+borders+capitals enabled.
 impl Default for ProvinceRenderOptions {
     fn default() -> Self {
         Self {
@@ -41,6 +62,8 @@ impl Default for ProvinceRenderOptions {
         }
     }
 }
+
+/// Return the RGBA line colour for a border segment based on its class.
 fn border_color(class: BorderClass) -> [f32; 4] {
     match class {
         BorderClass::LandLand => [120.0 / 255.0, 120.0 / 255.0, 120.0 / 255.0, 1.0],
@@ -49,6 +72,8 @@ fn border_color(class: BorderClass) -> [f32; 4] {
         BorderClass::Special => [1.0, 0.2, 1.0, 1.0],
     }
 }
+
+/// Compute the visible province-space bounds (left, top, right, bottom) from the render options.
 fn viewport_bounds(opts: &ProvinceRenderOptions) -> (f32, f32, f32, f32) {
     let zoom_ps = (opts.zoom * opts.pixel_size).max(0.0001);
     let left = -opts.x / zoom_ps;
@@ -57,6 +82,7 @@ fn viewport_bounds(opts: &ProvinceRenderOptions) -> (f32, f32, f32, f32) {
     let bottom = (opts.screen_h - opts.y) / zoom_ps;
     (left, top, right, bottom)
 }
+/// Generate a RenderCommand Vec for the province map: fills, borders, capitals, and labels with viewport culling.
 pub fn generate_render_commands(
     registry: &ProvinceRegistry,
     opts: &ProvinceRenderOptions,

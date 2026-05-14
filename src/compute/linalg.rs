@@ -1,5 +1,12 @@
+//! Linear algebra and geometric helper routines for NdArray data.
+//! Owns vector normalization, matrix transforms, decomposition, and solvers.
+//! Keeps linalg-specific workflows separate from generic element-wise ops.
+//! Depends on NdArray, DataType, and spatial convolution helper usage.
+
 use crate::compute::array::{DataType, NdArray};
 use crate::compute::spatial;
+
+/// Normalize 1D vector and return unit-length vector with same dtype.
 pub fn normalize_vec(v: &NdArray) -> Result<NdArray, String> {
     if v.ndim() != 1 {
         return Err(format!(
@@ -18,6 +25,7 @@ pub fn normalize_vec(v: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute 2D cross product scalar and return signed area component.
 pub fn cross2d(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     if a.size() != 2 || b.size() != 2 {
         return Err(format!(
@@ -28,6 +36,7 @@ pub fn cross2d(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     }
     Ok(a.get_f64(0) * b.get_f64(1) - a.get_f64(1) * b.get_f64(0))
 }
+/// Compute outer product of two vectors and return [m,n] matrix.
 pub fn outer(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 1 || b.ndim() != 1 {
         return Err("outer: both inputs must be 1D".to_string());
@@ -43,16 +52,19 @@ pub fn outer(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Build 2D rotation matrix and return [2,2] Float64 matrix.
 pub fn rotate2d_matrix(angle_rad: f64) -> Result<NdArray, String> {
     let (s, c) = angle_rad.sin_cos();
     let vals = [c, -s, s, c];
     NdArray::from_slice(&vals, &[2, 2], DataType::Float64)
 }
+/// Build 2D affine matrix and return [3,3] Float64 transform matrix.
 pub fn affine2d(tx: f64, ty: f64, angle_rad: f64, sx: f64, sy: f64) -> Result<NdArray, String> {
     let (s, c) = angle_rad.sin_cos();
     let vals = [sx * c, -sy * s, tx, sx * s, sy * c, ty, 0.0, 0.0, 1.0];
     NdArray::from_slice(&vals, &[3, 3], DataType::Float64)
 }
+/// Transform [N,2] points and return transformed [N,2] points array.
 pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, String> {
     if points.ndim() != 2 || points.shape()[1] != 2 {
         return Err(format!(
@@ -102,6 +114,7 @@ pub fn transform_points(matrix: &NdArray, points: &NdArray) -> Result<NdArray, S
     }
     Ok(out)
 }
+/// Build normalized odd-sized Gaussian kernel and return [size,size] matrix.
 pub fn gaussian_kernel(size: usize, sigma: f64) -> Result<NdArray, String> {
     if size == 0 {
         return Err("gaussian_kernel: size must be >= 1".to_string());
@@ -130,6 +143,7 @@ pub fn gaussian_kernel(size: usize, sigma: f64) -> Result<NdArray, String> {
     }
     NdArray::from_slice(&vals, &[size, size], DataType::Float64)
 }
+/// Compute Sobel gradients and return (gx, gy) filtered arrays.
 pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
     if input.ndim() != 2 {
         return Err(format!("sobel: expected 2D array, got {}D", input.ndim()));
@@ -149,6 +163,7 @@ pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
     Ok((gx, gy))
 }
 #[allow(clippy::needless_range_loop)]
+/// Solve linear system and return solution vector using Gaussian elimination.
 pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 || a.shape()[0] != a.shape()[1] {
         return Err(format!(
@@ -208,13 +223,21 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+
 #[derive(Debug, Clone)]
+/// Stores compact LU decomposition with row permutation metadata.
 pub struct LuDecomp {
+    /// Stores packed LU matrix data in row-major order.
     pub lu_data: Vec<f64>,
+    /// Stores row permutation indices used during pivoting.
     pub perm: Vec<usize>,
+    /// Stores matrix side length n for n-by-n matrix.
     pub n: usize,
+    /// Stores determinant sign contributed by row swaps.
     pub det_sign: i32,
 }
+
+/// Compute LU decomposition and return packed factors with pivot metadata.
 pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
     let shape = a.shape();
     if shape.len() != 2 || shape[0] != shape[1] {
@@ -271,6 +294,7 @@ pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
     })
 }
 #[allow(clippy::needless_range_loop)]
+/// Estimate dominant eigenpair and return (eigenvalue, eigenvector).
 pub fn eigenvalue_power(a: &NdArray, max_iter: u32, tol: f64) -> Result<(f64, Vec<f64>), String> {
     let shape = a.shape();
     if shape.len() != 2 || shape[0] != shape[1] {

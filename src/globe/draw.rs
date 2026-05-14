@@ -1,3 +1,8 @@
+//! Globe render command emission from province, marker, label, and arc state.
+//!
+//! Owns the translation from globe state into renderer command streams.
+//! It does not own resource loading or persistent globe state.
+
 use crate::globe::fog::FogStore;
 use crate::globe::label::LabelStore;
 use crate::globe::layer::LayerStore;
@@ -13,6 +18,7 @@ use crate::runtime::resource_keys::FontKey;
 use crate::runtime::resource_keys::TextureKey;
 use slotmap::KeyData;
 use std::collections::HashMap;
+/// Emit a full globe frame as render commands for the current globe state.
 #[allow(clippy::too_many_arguments)]
 pub fn emit_globe_frame(
     spec: &GlobeSpec,
@@ -180,6 +186,7 @@ pub fn emit_globe_frame(
     }
     cmds
 }
+/// Build province UVs from latitude/longitude vertices and an optional UV rectangle.
 fn build_province_uvs(province: &Province, rect: Option<[f32; 4]>) -> Vec<Vec2> {
     let [u0, v0, u1, v1] = rect.unwrap_or([0.0, 0.0, 1.0, 1.0]);
     province
@@ -192,6 +199,7 @@ fn build_province_uvs(province: &Province, rect: Option<[f32; 4]>) -> Vec<Vec2> 
         })
         .collect()
 }
+/// Blend visible heat layers into a province base color.
 fn apply_heat_layers(base: &mut [f32; 4], province: &Province, heat_layers: &[HeatLayer]) {
     let mut sorted: Vec<&HeatLayer> = heat_layers.iter().filter(|l| l.visible).collect();
     sorted.sort_by_key(|l| l.z_order);
@@ -215,6 +223,7 @@ fn apply_heat_layers(base: &mut [f32; 4], province: &Province, heat_layers: &[He
         base[2] = base[2] * (1.0 - heat[3]) + heat[2] * heat[3];
     }
 }
+/// Emit atmosphere halo circles when globe atmosphere rendering is enabled.
 fn emit_atmosphere_halo(cmds: &mut Vec<RenderCommand>, spec: &GlobeSpec, camera: &OrbitCamera) {
     if !spec.show_atmosphere {
         return;
@@ -237,6 +246,7 @@ fn emit_atmosphere_halo(cmds: &mut Vec<RenderCommand>, spec: &GlobeSpec, camera:
         r: outer + spec.atmosphere_width * 0.5,
     });
 }
+/// Smooth a closed polyline by repeated corner subdivision.
 fn smooth_polyline(points: &[Vec2], passes: u8) -> Vec<Vec2> {
     if points.len() < 3 || passes == 0 {
         return points.to_vec();
@@ -257,6 +267,7 @@ fn smooth_polyline(points: &[Vec2], passes: u8) -> Vec<Vec2> {
     }
     current
 }
+/// Project a great-circle arc into a flat polyline of screen coordinates.
 #[allow(clippy::too_many_arguments)]
 pub fn project_arc(
     lat_a: f32,

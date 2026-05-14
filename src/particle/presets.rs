@@ -1,4 +1,9 @@
+//! Named preset constructors returning ready-to-use `ParticleConfig` values.
+//! Each function returns a distinct visual effect configuration; callers pass the result to `ParticleSystem::new`.
+//! Does not own emitter state; all values are plain data with no side effects.
+
 use crate::particle::{EmissionShape, ParticleConfig};
+/// Return a `ParticleConfig` producing an upward fire effect with turbulence and RGB fade.
 pub fn fire() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 80.0,
@@ -23,6 +28,7 @@ pub fn fire() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
+/// Return a `ParticleConfig` producing rising smoke with growing size and fading alpha.
 pub fn smoke() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 30.0,
@@ -47,6 +53,7 @@ pub fn smoke() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
+/// Return a `ParticleConfig` producing fast downward rain streaks.
 pub fn rain() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 220.0,
@@ -61,6 +68,7 @@ pub fn rain() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
+/// Return a `ParticleConfig` producing slow-drifting white snowflakes with turbulence.
 pub fn snow() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 60.0,
@@ -76,6 +84,7 @@ pub fn snow() -> ParticleConfig {
         ..ParticleConfig::default()
     }
 }
+/// Return a `ParticleConfig` for a burst-only spark explosion; set `emission_rate > 0` or call `emit` manually.
 pub fn sparks() -> ParticleConfig {
     ParticleConfig {
         emission_rate: 0.0,

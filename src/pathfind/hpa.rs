@@ -1,61 +1,98 @@
+//! Hierarchical Pathfinding A* (HPA*): builds a chunk-level abstract graph over a NavGrid
+//! then refines abstract paths back to grid-level tile sequences.
+//! Does not own Lua bindings or NavGrid construction; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::pathfind::astar;
 use crate::pathfind::nav_grid::NavGrid;
 use crate::runtime::log_messages::{HP01, HP02, HP03};
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
+/// Directed edge in the abstract graph between two entrance nodes.
 #[derive(Debug, Clone)]
 pub struct AbstractEdge {
+    /// Index of the destination node in `AbstractGraph::nodes`.
     pub to: usize,
+    /// Traversal cost of this edge in grid-distance units.
     pub cost: f32,
 }
+/// Abstract graph node positioned at a chunk entrance cell.
 #[derive(Debug, Clone)]
 pub struct AbstractNode {
+    /// Grid column of this entrance cell.
     pub x: u32,
+    /// Grid row of this entrance cell.
     pub y: u32,
+    /// Chunk coordinates `(chunk_col, chunk_row)` that own this node.
     pub chunk: (u32, u32),
 }
+/// A rectangular region of the grid used as the unit of the abstract hierarchy.
 #[derive(Debug, Clone)]
 pub struct Chunk {
+    /// Chunk column index in the chunk grid.
     pub col: u32,
+    /// Chunk row index in the chunk grid.
     pub row: u32,
+    /// Left grid column of this chunk.
     pub x: u32,
+    /// Top grid row of this chunk.
     pub y: u32,
+    /// Width in grid cells.
     pub w: u32,
+    /// Height in grid cells.
     pub h: u32,
+    /// Indices into `AbstractGraph::nodes` for entrances belonging to this chunk.
     pub entrance_indices: Vec<usize>,
 }
+/// Full hierarchical graph: entrance nodes, inter-chunk edges, and chunk metadata.
 #[derive(Debug, Clone)]
 pub struct AbstractGraph {
+    /// All entrance nodes in the abstract graph.
     pub nodes: Vec<AbstractNode>,
+    /// Adjacency list: `edges[i]` is the list of edges from node `i`.
     pub edges: Vec<Vec<AbstractEdge>>,
+    /// All chunks indexed by `(chunk_col, chunk_row)`.
     pub chunks: HashMap<(u32, u32), Chunk>,
+    /// Underlying grid width in tiles.
     pub grid_width: u32,
+    /// Underlying grid height in tiles.
     pub grid_height: u32,
+    /// Tile size of each chunk (clamped to ≥ 2).
     pub chunk_size: u32,
 }
+/// Internal heap node for the abstract-level A\* search.
 #[derive(Debug, Clone)]
 struct HpaNode {
+    /// f-score = g + h.
     f: f32,
+    /// Actual cost from start to this node.
     g: f32,
+    /// Index into the temporary node list.
     idx: usize,
 }
+/// Equality by f-score.
 impl PartialEq for HpaNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
+
+/// Marker impl required by `Ord`.
 impl Eq for HpaNode {}
+
+/// Reverse ordering so `BinaryHeap` acts as a min-heap.
 impl Ord for HpaNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
     }
 }
+/// Delegates to `Ord`.
 impl PartialOrd for HpaNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Build an `AbstractGraph` from `grid` by partitioning into chunks of `chunk_size` and computing entrance nodes.
 pub fn build_abstract(grid: &NavGrid, chunk_size: u32) -> AbstractGraph {
     let cs = chunk_size.max(2);
     let (gw, gh) = grid.get_dimensions();
@@ -163,15 +200,24 @@ pub fn build_abstract(grid: &NavGrid, chunk_size: u32) -> AbstractGraph {
     log_msg!(debug, HP02);
     graph
 }
+/// Parameters for scanning a boundary between two adjacent chunks to detect entrance pairs.
 struct BoundaryScan {
+    /// First chunk coordinate pair.
     chunk_a: (u32, u32),
+    /// Second chunk coordinate pair.
     chunk_b: (u32, u32),
+    /// Start of the shared boundary range (inclusive).
     range_start: u32,
+    /// End of the shared boundary range (exclusive).
     range_end: u32,
+    /// Boundary row for chunk_a (horizontal) or column for chunk_a (vertical).
     coord_a: u32,
+    /// Boundary row for chunk_b (horizontal) or column for chunk_b (vertical).
     coord_b: u32,
+    /// True for a horizontal boundary (top/bottom), false for vertical (left/right).
     horizontal: bool,
 }
+/// Scan the boundary described by `scan` and add entrance node pairs to `graph`.
 fn find_boundary_entrances(grid: &NavGrid, graph: &mut AbstractGraph, scan: &BoundaryScan) {
     let BoundaryScan {
         chunk_a,
@@ -230,6 +276,7 @@ fn find_boundary_entrances(grid: &NavGrid, graph: &mut AbstractGraph, scan: &Bou
         }
     }
 }
+/// Return the index of the node at `(x, y)`, inserting it into `graph` under `chunk_key` if absent.
 fn get_or_create_node(graph: &mut AbstractGraph, x: u32, y: u32, chunk_key: (u32, u32)) -> usize {
     for (i, n) in graph.nodes.iter().enumerate() {
         if n.x == x && n.y == y {
@@ -248,6 +295,7 @@ fn get_or_create_node(graph: &mut AbstractGraph, x: u32, y: u32, chunk_key: (u32
     }
     idx
 }
+/// Sum Euclidean distances of all consecutive pairs in `path`.
 fn path_cost_f32(path: &[(u32, u32)]) -> f32 {
     let mut cost = 0.0f32;
     for i in 1..path.len() {
@@ -257,6 +305,7 @@ fn path_cost_f32(path: &[(u32, u32)]) -> f32 {
     }
     cost
 }
+/// Run HPA\* on `abstract_graph`, returning a refined grid-level path from `start` to `goal`.
 pub fn hpa_star(
     grid: &NavGrid,
     abstract_graph: &AbstractGraph,
@@ -362,6 +411,7 @@ pub fn hpa_star(
     }
     Option::None
 }
+/// Return true when `goal` is reachable from `start` via the abstract chunk graph (BFS over chunks).
 pub fn is_reachable(abstract_graph: &AbstractGraph, start: (u32, u32), goal: (u32, u32)) -> bool {
     let cs = abstract_graph.chunk_size;
     let start_chunk = (start.0 / cs, start.1 / cs);
@@ -390,6 +440,7 @@ pub fn is_reachable(abstract_graph: &AbstractGraph, start: (u32, u32), goal: (u3
     }
     false
 }
+/// Compute octile (Chebyshev with diagonal weight √2) distance between two grid cells.
 fn octile_dist(x1: u32, y1: u32, x2: u32, y2: u32) -> f32 {
     let dx = (x1 as f32 - x2 as f32).abs();
     let dy = (y1 as f32 - y2 as f32).abs();
@@ -397,6 +448,7 @@ fn octile_dist(x1: u32, y1: u32, x2: u32, y2: u32) -> f32 {
     let max = dx.max(dy);
     min * std::f32::consts::SQRT_2 + (max - min)
 }
+/// Walk `came_from` from `goal` back to `start` and return the coordinate path in forward order.
 fn reconstruct_abstract(
     came_from: &[usize],
     start: usize,
@@ -419,6 +471,7 @@ fn reconstruct_abstract(
     path.reverse();
     path
 }
+/// Replace each consecutive pair in `abstract_path` with a full A\* segment; return `None` on failure.
 fn refine_path(
     grid: &NavGrid,
     abstract_path: &[(u32, u32)],

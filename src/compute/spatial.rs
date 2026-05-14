@@ -1,5 +1,12 @@
+//! Spatial array operators for convolution, morphology, and matrix geometry.
+//! Owns neighborhood traversals, flood fill, region copy, and matrix products.
+//! Keeps spatial kernels separate from generic element-wise operation module.
+//! Depends on NdArray indexing and typed scalar access.
+
 use crate::compute::array::{DataType, NdArray};
 use std::collections::VecDeque;
+
+/// Convolve 2D input with 2D kernel and return same-sized output array.
 pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if input.ndim() != 2 {
         return Err(format!(
@@ -44,6 +51,7 @@ pub fn convolve2d(input: &NdArray, kernel: &NdArray) -> Result<NdArray, String> 
     }
     Ok(out)
 }
+/// Apply binary dilation with Manhattan radius and return dilated mask array.
 pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("dilate: input must be 2D, got {}D", a.ndim()));
@@ -77,6 +85,7 @@ pub fn dilate(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Apply binary erosion with Manhattan radius and return eroded mask array.
 pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("erode: input must be 2D, got {}D", a.ndim()));
@@ -116,6 +125,7 @@ pub fn erode(a: &NdArray, radius: usize) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Flood fill from seed coordinate and return array with replaced connected region.
 pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!("flood_fill: input must be 2D, got {}D", a.ndim()));
@@ -153,6 +163,7 @@ pub fn flood_fill(a: &NdArray, row: usize, col: usize, val: f64) -> Result<NdArr
     }
     Ok(out)
 }
+/// Copy a 2D sub-region and return extracted array of requested size.
 pub fn get_region(
     a: &NdArray,
     row: usize,
@@ -183,6 +194,7 @@ pub fn get_region(
     }
     Ok(out)
 }
+/// Write source 2D region into target array and return success or bounds error.
 pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Result<(), String> {
     if a.ndim() != 2 {
         return Err(format!("set_region: target must be 2D, got {}D", a.ndim()));
@@ -211,6 +223,7 @@ pub fn set_region(a: &mut NdArray, row: usize, col: usize, src: &NdArray) -> Res
     }
     Ok(())
 }
+/// Multiply two 2D matrices and return matrix product array.
 pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!(
@@ -251,6 +264,7 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute dot product of two 1D vectors and return scalar sum.
 pub fn dot(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     if a.ndim() != 1 {
         return Err(format!("dot: first operand must be 1D, got {}D", a.ndim()));

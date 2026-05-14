@@ -1,5 +1,10 @@
+//! Debug visualization helpers for `Raycaster2D`: top-down map, software first-person
+//! view, and depth-map image rendering. All three methods write into `ImageData`
+//! pixel buffers and are intended for development, not production rendering.
+
 use super::dda::Raycaster2D;
 impl Raycaster2D {
+    /// Render a top-down grid map with player dot and radial ray lines into an `ImageData`.
     pub fn draw_top_down_to_image(
         &self,
         player_x: f32,
@@ -58,6 +63,7 @@ impl Raycaster2D {
         }
         img
     }
+    /// Render a software first-person view with cell-colour shading into an `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_view_to_image(
         &self,
@@ -119,6 +125,7 @@ impl Raycaster2D {
         }
         img
     }
+    /// Render a depth-map greyscale view where brighter = closer, into an `ImageData`.
     #[allow(clippy::too_many_arguments)]
     pub fn draw_depth_map_to_image(
         &self,

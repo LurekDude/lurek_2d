@@ -1,6 +1,12 @@
+//! Camera debug overlay generator: draws world grid, viewport frustum, and camera center.
+//! Renders Camera2D state at a configurable world-to-image scale for debug screenshots.
+//! Does not own camera state — callers pass `&Camera2D` and viewport dimensions.
+//! Depends on `crate::camera::Camera2D` and `crate::image::ImageData`.
+
 use super::hsv_to_rgb_viz;
 use crate::camera::Camera2D;
 use crate::image::ImageData;
+/// Render a camera debug overlay into an image.
 pub fn draw_camera_debug_to_image(
     cam: &Camera2D,
     world_w: f32,
@@ -47,6 +53,7 @@ pub fn draw_camera_debug_to_image(
     img.draw_label(&info, 4, 4, 200, 200, 255);
     img
 }
+/// Render a panel comparing multiple camera zoom levels.
 pub fn draw_camera_zoom_comparison_to_image(
     cam: &Camera2D,
     zoom_levels: &[f32],
@@ -86,6 +93,7 @@ pub fn draw_camera_zoom_comparison_to_image(
     }
     img
 }
+/// Render a camera rotation comparison grid.
 pub fn camera_rotation_to_image(
     rotations: &[f32],
     labels: &[&str],
@@ -147,6 +155,7 @@ pub fn camera_rotation_to_image(
     );
     img
 }
+/// Render camera bounds, labels, and positions into an image.
 pub fn camera_bounds_to_image(
     positions: &[(f32, f32, &str, u8, u8, u8)],
     width: u32,
@@ -173,6 +182,7 @@ pub fn camera_bounds_to_image(
     );
     img
 }
+/// Render a camera trail and target markers into an image.
 pub fn camera_follow_to_image(
     trail: &[(f32, f32)],
     targets: &[(f32, f32)],
@@ -222,6 +232,7 @@ pub fn camera_follow_to_image(
     );
     img
 }
+/// Render a camera shake trail with displacement and area info into an image.
 pub fn camera_shake_to_image(
     positions: &[(f32, f32)],
     center: (f32, f32),
@@ -268,6 +279,7 @@ pub fn camera_shake_to_image(
     img.draw_label("CAMERA SHAKE AND MOVE", 100, 5, 100, 200, 100);
     img
 }
+/// Render a grid of camera rotation previews into an image.
 pub fn draw_camera_rotation_grid_to_image(
     rotations: &[(f32, &str)],
     viewport_w: f32,
@@ -328,6 +340,7 @@ pub fn draw_camera_rotation_grid_to_image(
     );
     img
 }
+/// Render camera bounds and labelled position list into an image.
 pub fn draw_camera_bounds_to_image(
     positions: &[(f32, f32, &str, u8, u8, u8)],
     width: u32,
@@ -354,6 +367,7 @@ pub fn draw_camera_bounds_to_image(
     );
     img
 }
+/// Render a camera follow trail with dead-zone overlay into an image.
 pub fn draw_camera_follow_trail_to_image(
     trail: &[(f32, f32)],
     targets: &[(f32, f32)],
@@ -400,6 +414,7 @@ pub fn draw_camera_follow_trail_to_image(
     );
     img
 }
+/// Render a camera shake trail with moved position and visible area info into an image.
 pub fn draw_camera_shake_trail_to_image(
     positions: &[(f32, f32)],
     moved_pos: (f32, f32),
@@ -449,6 +464,7 @@ pub fn draw_camera_shake_trail_to_image(
     );
     img
 }
+/// Render a camera debug overlay scaled to the full image dimensions.
 pub fn draw_camera_to_image(cam: &Camera2D, width: u32, height: u32) -> ImageData {
     draw_camera_debug_to_image(cam, width as f32, height as f32, width, height)
 }

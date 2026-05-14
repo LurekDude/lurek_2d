@@ -1,15 +1,26 @@
+//! DDA (Digital Differential Analysis) ray-grid traversal core. Owns the map grid,
+//! single/multi-hit ray casting, fan cast for a full FOV, line-of-sight queries,
+//! sprite projection, and floor-row UV sampling. Used by `build_scene`, `segment`,
+//! and `visibility`. Does not own rendering or Lua bindings.
+
 use super::ray_hit::RayHit;
 use super::sprite_projection::SpriteProjection;
 use crate::log_msg;
 use crate::runtime::log_messages::RC01;
 use std::collections::HashMap;
+/// 2D grid map and DDA ray-stepping engine used by the raycaster subsystem.
 pub struct Raycaster2D {
+    /// Map width in tiles.
     width: u32,
+    /// Map height in tiles.
     height: u32,
+    /// Flat row-major tile values; 0 = open, non-zero = wall cell type.
     cells: Vec<u32>,
+    /// Per-tile-type alpha overrides for transparent walls; default 1.0 (opaque).
     wall_alphas: HashMap<u8, f32>,
 }
 impl Raycaster2D {
+    /// Create a new empty grid of `width × height` open cells.
     pub fn new(width: u32, height: u32) -> Self {
         log_msg!(debug, RC01, "{}x{}", width, height);
         Self {
@@ -19,11 +30,13 @@ impl Raycaster2D {
             wall_alphas: HashMap::new(),
         }
     }
+    /// Set the value of cell `(x, y)`; silently ignores out-of-bounds coordinates.
     pub fn set_cell(&mut self, x: u32, y: u32, value: u32) {
         if x < self.width && y < self.height {
             self.cells[(y * self.width + x) as usize] = value;
         }
     }
+    /// Return the value of cell `(x, y)`, or 0 for out-of-bounds coordinates.
     pub fn get_cell(&self, x: u32, y: u32) -> u32 {
         if x < self.width && y < self.height {
             self.cells[(y * self.width + x) as usize]
@@ -31,29 +44,37 @@ impl Raycaster2D {
             0
         }
     }
+    /// Replace the entire cell grid with `data`; no-op if length mismatches.
     pub fn set_cells(&mut self, data: Vec<u32>) {
         if data.len() == (self.width * self.height) as usize {
             self.cells = data;
         }
     }
+    /// Return true when cell `(x, y)` has a non-zero value (solid wall).
     pub fn is_blocked(&self, x: u32, y: u32) -> bool {
         self.get_cell(x, y) > 0
     }
+    /// Return the map width in tiles.
     pub fn width(&self) -> u32 {
         self.width
     }
+    /// Return the map height in tiles.
     pub fn height(&self) -> u32 {
         self.height
     }
+    /// Return a read-only slice of the raw cell grid.
     pub fn cells(&self) -> &[u32] {
         &self.cells
     }
+    /// Set the alpha for walls of `tile_type`; clamped to 0.0..1.0.
     pub fn set_wall_alpha(&mut self, tile_type: u8, alpha: f32) {
         self.wall_alphas.insert(tile_type, alpha.clamp(0.0, 1.0));
     }
+    /// Return the wall alpha for `tile_type`; defaults to 1.0 if not set.
     pub fn get_wall_alpha(&self, tile_type: u8) -> f32 {
         self.wall_alphas.get(&tile_type).copied().unwrap_or(1.0)
     }
+    /// Cast a single DDA ray from `(ox, oy)` in direction `angle`; return the first solid hit or `None`.
     pub fn cast_ray(&self, ox: f32, oy: f32, angle: f32, max_dist: f32) -> Option<RayHit> {
         let dir_x = angle.cos();
         let dir_y = angle.sin();
@@ -126,6 +147,7 @@ impl Raycaster2D {
             }
         }
     }
+    /// Cast a ray and collect up to `max_hits` (≤ 8) consecutive hits, stopping at the first opaque wall.
     pub fn cast_ray_multi(
         &self,
         ox: f32,
@@ -235,15 +257,8 @@ impl Raycaster2D {
         }
         hits
     }
+    /// Cast `count` rays spread across `fov` from `(ox, oy)`; return one `RayHit` per ray with fish-eye correction.
     pub fn cast_rays(
-        &self,
-        ox: f32,
-        oy: f32,
-        angle: f32,
-        fov: f32,
-        count: u32,
-        max_dist: f32,
-    ) -> Vec<RayHit> {
         let mut results = Vec::with_capacity(count as usize);
         let half_fov = fov / 2.0;
         for i in 0..count {
@@ -276,6 +291,7 @@ impl Raycaster2D {
         }
         results
     }
+    /// Cast `count` rays and pack each hit as 5 floats `[dist, cell, side, tex_u, hit]`.
     pub fn cast_rays_flat(
         &self,
         ox: f32,
@@ -296,6 +312,7 @@ impl Raycaster2D {
         }
         flat
     }
+    /// Return true if the straight-line path from `(x1,y1)` to `(x2,y2)` contains no solid cell.
     pub fn line_of_sight(&self, x1: f32, y1: f32, x2: f32, y2: f32) -> bool {
         let dx = x2 - x1;
         let dy = y2 - y1;
@@ -356,6 +373,7 @@ impl Raycaster2D {
             }
         }
     }
+    /// Project world sprite at `(sx, sy)` onto the screen given player position and orientation; return a `SpriteProjection`.
     #[allow(clippy::too_many_arguments)]
     pub fn project_sprite(
         &self,
@@ -391,6 +409,7 @@ impl Raycaster2D {
             visible: true,
         }
     }
+    /// Return per-pixel `(tex_u, tex_v)` world UV coordinates for every pixel in floor row `row`.
     #[allow(clippy::too_many_arguments)]
     pub fn cast_floor_row(
         &self,

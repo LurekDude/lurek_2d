@@ -1,4 +1,11 @@
+//! Statistical and signal analytics helpers operating on NdArray values.
+//! Owns cumulative transforms, histogram computation, normalization, and correlation.
+//! Keeps analysis math separate from low-level array storage internals.
+//! Depends on NdArray constructors and typed value accessors.
+
 use crate::compute::array::NdArray;
+
+/// Compute cumulative sum and return a 1D array with running totals.
 pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     let mut out = NdArray::zeros(&[n], a.dtype())?;
@@ -9,6 +16,7 @@ pub fn cumsum(a: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute finite difference of requested order and return derived 1D array.
 pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     if order == 0 {
         return Ok(a.clone());
@@ -31,6 +39,7 @@ pub fn diff(a: &NdArray, order: usize) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute histogram bins and return (lo, hi, count) tuples for each bin.
 pub fn histogram(
     a: &NdArray,
     bins: usize,
@@ -91,6 +100,7 @@ pub fn histogram(
         .collect();
     Ok(result)
 }
+/// Compute percentile value and return interpolated sample at p in [0, 100].
 pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     if !(0.0..=100.0).contains(&p) {
         return Err(format!("percentile p must be in [0, 100], got {p}"));
@@ -110,6 +120,7 @@ pub fn percentile(a: &NdArray, p: f64) -> Result<f64, String> {
     let frac = idx - lo as f64;
     Ok(vals[lo] * (1.0 - frac) + vals[hi] * frac)
 }
+/// Compute population covariance and return scalar covariance between arrays.
 pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -126,6 +137,7 @@ pub fn covariance(a: &NdArray, b: &NdArray) -> Result<f64, String> {
         / n as f64;
     Ok(cov)
 }
+/// Compute Pearson correlation and return normalized linear correlation coefficient.
 pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     let n = a.size();
     if n != b.size() {
@@ -152,6 +164,7 @@ pub fn pearson_corr(a: &NdArray, b: &NdArray) -> Result<f64, String> {
     }
     Ok(num / denom)
 }
+/// Normalize values to output range and return scaled 1D array.
 pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArray, String> {
     if out_max <= out_min {
         return Err(format!(
@@ -183,6 +196,7 @@ pub fn normalize_range(a: &NdArray, out_min: f64, out_max: f64) -> Result<NdArra
     }
     Ok(out)
 }
+/// Normalize values to z-scores and return array with mean-zero unit variance.
 pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     let n = a.size();
     if n == 0 {
@@ -201,6 +215,7 @@ pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
     Ok(out)
 }
 #[allow(clippy::needless_range_loop)]
+/// Compute full 1D convolution and return output signal array.
 pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
         return Err(format!(
@@ -231,6 +246,7 @@ pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String>
     }
     Ok(out)
 }
+/// Compute valid 1D correlation and return sliding dot-product array.
 pub fn correlate1d(signal: &NdArray, template: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
         return Err(format!(

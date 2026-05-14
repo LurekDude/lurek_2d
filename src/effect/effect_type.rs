@@ -1,29 +1,56 @@
+//! Built-in post-effect type identifiers, names, and default parameter maps.
+
 use std::collections::HashMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+/// Enumerates the built-in post-processing effect implementations.
 pub enum PostFxEffectType {
+    /// Bright-pass glow accumulation.
     Bloom,
+    /// General-purpose image blurring.
     Blur,
+    /// CRT-style curvature and scan artifact treatment.
     Crt,
+    /// Radial light shaft rendering.
     Godrays,
+    /// Edge darkening around the viewport.
     Vignette,
+    /// Brightness, contrast, and saturation grading.
     ColourGrade,
+    /// Chromatic aberration channel offsets.
     Chromatic,
+    /// Block-based pixelation.
     Pixelate,
+    /// Brown-tinted sepia toning.
     Sepia,
+    /// Monochrome luminance conversion.
     Grayscale,
+    /// Channel inversion.
     Invert,
+    /// Horizontal scanline overlay.
     Scanlines,
+    /// Edge detection filter.
     EdgeDetect,
+    /// Hue rotation in color space.
     HueShift,
+    /// Procedural noise overlay.
     Noise,
+    /// Renderer-provided custom shader pass.
     Custom,
+    /// Focus-based blur around a focal point.
     DepthOfField,
+    /// Multi-sample motion blur.
     MotionBlur,
+    /// Palette remapping blend.
     PaletteSwap,
+    /// Color lookup-table grading.
     ColorLut,
+    /// Water-like screen distortion.
     WaterDistort,
+    /// Image sharpening filter.
     Sharpen,
+    /// Ordered dithering quantization.
     Dither,
+    /// Outline extraction and compositing.
     Outline,
 }
 impl PostFxEffectType {
@@ -78,18 +105,21 @@ impl PostFxEffectType {
         Self::Dither,
         Self::Outline,
     ];
+    /// Resolves a lowercase built-in effect name into the matching enum entry.
     pub fn from_name(name: &str) -> Option<Self> {
         Self::BUILT_IN_TYPES
             .iter()
             .copied()
             .find(|effect_type| effect_type.name() == name)
     }
+    /// Returns the lowercase names for all non-custom built-in effect types.
     pub fn built_in_names() -> Vec<&'static str> {
         Self::BUILT_IN_TYPES
             .iter()
             .map(|effect_type| effect_type.name())
             .collect()
     }
+    /// Returns the lowercase canonical name for this effect type.
     pub fn name(&self) -> &'static str {
         Self::NAME_MAP
             .iter()
@@ -97,6 +127,7 @@ impl PostFxEffectType {
             .map(|(_, name)| *name)
             .expect("PostFxEffectType::NAME_MAP must include every enum variant")
     }
+    /// Returns the uppercase debug label used in renderer diagnostics.
     pub fn debug_label(&self) -> &'static str {
         match self {
             Self::Vignette => "VIGNETTE",
@@ -125,6 +156,7 @@ impl PostFxEffectType {
             Self::Outline => "OUTLINE",
         }
     }
+    /// Returns the default scalar parameter map for this effect type.
     pub fn default_params(&self) -> HashMap<String, f32> {
         let mut m = HashMap::new();
         match self {

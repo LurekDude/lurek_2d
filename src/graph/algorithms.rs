@@ -1,6 +1,12 @@
+//! Graph algorithm helpers for components, ordering, coloring, and A* search.
+//!
+//! Owns graph-analysis routines that derive structure from the current graph.
+//! It does not mutate simulation state beyond local scratch data.
+
 use super::core::Graph;
 use std::collections::{HashMap, HashSet, VecDeque};
 impl Graph {
+    /// Return connected components as sorted node-id groups.
     pub fn get_components(&self) -> Vec<Vec<u64>> {
         let mut visited: HashSet<u64> = HashSet::new();
         let mut components = Vec::new();
@@ -40,6 +46,7 @@ impl Graph {
         }
         components
     }
+    /// Return true when the directed graph contains a cycle.
     pub fn has_cycle(&self) -> bool {
         let mut white: HashSet<u64> = self.nodes.keys().copied().collect();
         let mut gray: HashSet<u64> = HashSet::new();
@@ -62,6 +69,7 @@ impl Graph {
         }
         false
     }
+    /// Depth-first search helper that detects directed back edges.
     fn dfs_cycle(
         node: u64,
         adj: &HashMap<u64, Vec<u64>>,
@@ -88,6 +96,7 @@ impl Graph {
         black.insert(node);
         false
     }
+    /// Return a topological ordering or None when the graph has a cycle.
     pub fn topological_sort(&self) -> Option<Vec<u64>> {
         let mut in_degree: HashMap<u64, usize> = HashMap::new();
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
@@ -138,6 +147,7 @@ impl Graph {
             None
         }
     }
+    /// Return edge ids in a Kruskal minimum spanning forest.
     pub fn mst_kruskal(&self) -> Vec<u64> {
         if self.nodes.is_empty() {
             return Vec::new();
@@ -146,6 +156,7 @@ impl Graph {
             self.edges.iter().map(|(id, e)| (id, e.weight)).collect();
         sorted_edges.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
         let mut parent: HashMap<u64, u64> = self.nodes.keys().map(|&id| (id, id)).collect();
+        /// Find the disjoint-set representative for a node id.
         fn find(parent: &mut HashMap<u64, u64>, x: u64) -> u64 {
             if parent[&x] != x {
                 let p = find(parent, parent[&x]);
@@ -165,6 +176,7 @@ impl Graph {
         }
         result
     }
+    /// Assign greedy graph colors to node ids.
     pub fn color_graph(&self) -> HashMap<u64, usize> {
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
         for id in self.nodes.keys() {
@@ -191,6 +203,7 @@ impl Graph {
         }
         colors
     }
+    /// Return true when the graph is bipartite.
     pub fn is_bipartite(&self) -> bool {
         let mut color: HashMap<u64, u8> = HashMap::new();
         let mut adj: HashMap<u64, Vec<u64>> = HashMap::new();
@@ -230,6 +243,7 @@ impl Graph {
         }
         true
     }
+    /// Find an A* node path using supplied node positions as the heuristic source.
     pub fn astar_graph(
         &self,
         from: u64,
@@ -237,22 +251,29 @@ impl Graph {
         node_positions: &HashMap<u64, (f32, f32)>,
     ) -> Option<Vec<u64>> {
         use std::collections::BinaryHeap;
+        /// Open-set entry used by A* search.
         #[derive(Clone)]
         struct ANode {
+            /// Node id represented by this queue entry.
             id: u64,
+            /// Estimated total cost through this node.
             f: f32,
         }
+        /// Compare A* queue entries by estimated total cost.
         impl PartialEq for ANode {
             fn eq(&self, o: &Self) -> bool {
                 self.f == o.f
             }
         }
+        /// Marks A* queue entries as equatable.
         impl Eq for ANode {}
+        /// Orders A* queue entries by lowest estimated total cost first.
         impl PartialOrd for ANode {
             fn partial_cmp(&self, o: &Self) -> Option<std::cmp::Ordering> {
                 Some(self.cmp(o))
             }
         }
+        /// Orders A* queue entries by lowest estimated total cost first.
         impl Ord for ANode {
             fn cmp(&self, o: &Self) -> std::cmp::Ordering {
                 o.f.partial_cmp(&self.f)

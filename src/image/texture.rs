@@ -1,3 +1,9 @@
+//! CPU-side texture loading, color-space tagging, and alpha premultiplication.
+//! Owns `Texture` (slot-map handle + dimensions), `TextureColorSpace`, and `premultiply_alpha_rgba8_in_place`.
+//! Decodes images on load and stores `TextureData` in the caller-supplied `SlotMap`.
+//! Does not own GPU upload — the renderer reads `TextureData` from the slot map and uploads it.
+//! Depends on the `image` crate for decoding and `slotmap` for texture key storage.
+
 use crate::log_msg;
 use crate::render::renderer::TextureData;
 use crate::runtime::error::{EngineError, EngineResult};
@@ -5,16 +11,24 @@ use crate::runtime::log_messages::TX01_TEX_DECODED;
 use crate::runtime::resource_keys::TextureKey;
 use slotmap::SlotMap;
 use std::path::Path;
+/// Texture color space stored alongside decoded pixels.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TextureColorSpace {
+    /// Standard sRGB texture data.
     Srgb,
+    /// Linear texture data.
     Linear,
 }
+/// CPU-side texture handle and its uploaded dimensions.
 pub struct Texture {
+    /// Slot-map key for the backing texture data.
     pub key: TextureKey,
+    /// Texture width in pixels.
     pub width: u32,
+    /// Texture height in pixels.
     pub height: u32,
 }
+/// Premultiply RGB channels by alpha for each RGBA pixel in place.
 pub fn premultiply_alpha_rgba8_in_place(pixels: &mut [u8]) {
     for chunk in pixels.chunks_exact_mut(4) {
         let a = chunk[3] as f32 / 255.0;
@@ -24,6 +38,7 @@ pub fn premultiply_alpha_rgba8_in_place(pixels: &mut [u8]) {
     }
 }
 impl Texture {
+    /// Parse a texture color-space label and return the matching enum value.
     pub fn parse_color_space(value: &str) -> Option<TextureColorSpace> {
         match value.to_ascii_lowercase().as_str() {
             "srgb" => Some(TextureColorSpace::Srgb),
@@ -31,12 +46,14 @@ impl Texture {
             _ => None,
         }
     }
+    /// Load a texture with sRGB color space by default.
     pub fn load<P: AsRef<Path>>(
         path: P,
         textures: &mut SlotMap<TextureKey, TextureData>,
     ) -> EngineResult<Self> {
         Self::load_with_color_space(path, textures, TextureColorSpace::Srgb)
     }
+    /// Load a texture from disk, premultiply alpha, and store it in the texture pool.
     pub fn load_with_color_space<P: AsRef<Path>>(
         path: P,
         textures: &mut SlotMap<TextureKey, TextureData>,
@@ -63,6 +80,7 @@ impl Texture {
         log_msg!(debug, TX01_TEX_DECODED, "{}x{}", width, height);
         Ok(Texture { key, width, height })
     }
+    /// Create a texture from RGBA bytes using sRGB color space.
     pub fn from_rgba(
         width: u32,
         height: u32,
@@ -71,6 +89,7 @@ impl Texture {
     ) -> EngineResult<Self> {
         Self::from_rgba_with_color_space(width, height, pixels, textures, TextureColorSpace::Srgb)
     }
+    /// Create a texture from RGBA bytes and store it in the texture pool.
     pub fn from_rgba_with_color_space(
         width: u32,
         height: u32,

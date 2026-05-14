@@ -1,4 +1,9 @@
+//! Noise field and terrain visualizations: grayscale, height-mapped, multi-octave, and terrain coloring.
+//! Accepts arbitrary `Fn(f64,f64)->f64` noise functions; renders scaled or raw output.
+//! Does not own noise generation — callers supply the noise closure.
+//! Depends on `crate::image::ImageData`.
 use crate::image::ImageData;
+/// Render a noise function as a grayscale image, scaling range to full byte range.
 pub fn noise_to_image(
     noise_fn: impl Fn(f64, f64) -> f64,
     width: u32,
@@ -15,6 +20,7 @@ pub fn noise_to_image(
     }
     img
 }
+/// Render a noise function as a raw unscaled grayscale image.
 pub fn noise_raw_to_image(
     noise_fn: impl Fn(f64, f64) -> f64,
     width: u32,
@@ -31,6 +37,7 @@ pub fn noise_raw_to_image(
     }
     img
 }
+/// Render a noise function as a terrain color image with water, land, and mountain bands.
 pub fn noise_terrain_to_image(
     noise_fn: impl Fn(f64, f64) -> f64,
     width: u32,
@@ -60,6 +67,7 @@ pub fn noise_terrain_to_image(
     }
     img
 }
+/// Render a pre-computed heightmap slice as a grayscale image.
 pub fn heightmap_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     for y in 0..height {
@@ -100,6 +108,7 @@ pub fn heightmap_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
     }
     img
 }
+/// Render terrain elevation data as a biome-colored image.
 pub fn terrain_elevation_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     for y in 0..height {
@@ -126,6 +135,7 @@ pub fn terrain_elevation_to_image(data: &[f64], width: u32, height: u32) -> Imag
     }
     img
 }
+/// Render a noise map as a continuous-hue image.
 pub fn noise_map_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     for y in 0..height {
@@ -137,6 +147,7 @@ pub fn noise_map_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
     }
     img
 }
+/// Render multiple noise map tiles in a row for comparison into an image.
 pub fn noise_comparison_to_image(maps: &[&[f64]], tile_w: u32, tile_h: u32) -> ImageData {
     let count = maps.len() as u32;
     let mut img = ImageData::new(tile_w * count, tile_h);

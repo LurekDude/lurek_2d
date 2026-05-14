@@ -1,9 +1,20 @@
+//! Voronoi diagram generation from 2-D point sets via Bowyer-Watson Delaunay triangulation.
+//! Deduplicates input, classifies circumcenters per site, and CCW-sorts cell vertices.
+//! Used by procgen map generators and the Lua province map module.
+//! Does not own Delaunay triangulation exposed in geometry.rs — that variant is for general use.
+
 use std::collections::HashMap;
+
+/// One Voronoi region around a seed site with its polygon vertices in CCW order.
 #[derive(Debug, Clone)]
 pub struct VoronoiCell {
+    /// Seed point this cell surrounds.
     pub site: (f32, f32),
+    /// Circumcenter vertices of adjacent Delaunay triangles, sorted CCW around the site.
     pub vertices: Vec<(f32, f32)>,
 }
+
+/// Return the circumcenter of triangle (ax,ay)-(bx,by)-(cx,cy), or `None` when collinear.
 fn circumcenter(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32) -> Option<(f32, f32)> {
     let d = 2.0 * ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
     if d.abs() < 1e-10 {
@@ -16,6 +27,8 @@ fn circumcenter(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32) -> Option<
     let uy = ((bx - ax) * (cx2 - ax2) - (cx - ax) * (bx2 - ax2)) / d;
     Some((ux, uy))
 }
+
+/// Return true when point `(px, py)` lies strictly inside the circumcircle of triangle (ax,ay)-(bx,by)-(cx,cy).
 #[allow(clippy::too_many_arguments)]
 fn in_circumcircle(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, px: f32, py: f32) -> bool {
     let d = 2.0 * ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
@@ -31,16 +44,22 @@ fn in_circumcircle(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, px: f32
     let dp2 = (px - ux) * (px - ux) + (py - uy) * (py - uy);
     dp2 < r2
 }
+
+/// Index triple representing one Delaunay triangle by vertex indices into `pts`.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct Tri(usize, usize, usize);
 impl Tri {
+    /// Return the three directed edges of this triangle.
     fn edges(self) -> [(usize, usize); 3] {
         [(self.0, self.1), (self.1, self.2), (self.2, self.0)]
     }
+    /// Return true when any vertex index belongs to the super-triangle (indices >= `n_real`).
     fn contains_super(self, n_real: usize) -> bool {
         self.0 >= n_real || self.1 >= n_real || self.2 >= n_real
     }
 }
+
+/// Return the canonical edge key with the smaller index first.
 fn edge_key(a: usize, b: usize) -> (usize, usize) {
     if a < b {
         (a, b)
@@ -48,6 +67,8 @@ fn edge_key(a: usize, b: usize) -> (usize, usize) {
         (b, a)
     }
 }
+
+/// Run Bowyer-Watson incremental Delaunay triangulation on `pts`; strips super-triangle faces.
 fn bowyer_watson(pts: &[(f32, f32)], n_real: usize) -> Vec<Tri> {
     let n = pts.len();
     let mut tris: Vec<Tri> = vec![Tri(n - 3, n - 2, n - 1)];
@@ -86,6 +107,8 @@ fn bowyer_watson(pts: &[(f32, f32)], n_real: usize) -> Vec<Tri> {
         .filter(|t| !t.contains_super(n_real))
         .collect()
 }
+
+/// Compute Voronoi cells for `points`; deduplicates input and returns one cell per unique site.
 pub fn voronoi_from_points(points: &[(f32, f32)]) -> Vec<VoronoiCell> {
     if points.is_empty() {
         return Vec::new();

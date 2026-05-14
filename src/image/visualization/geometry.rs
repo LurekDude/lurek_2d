@@ -1,6 +1,11 @@
+//! Geometry debug visualizations: polygon galleries, spirals, star shapes, and intersection proofs.
+//! Renders parameterized shapes using draw_line and set_pixel on `ImageData`.
+//! Does not own geometric primitives — shapes are computed inline from parameters.
+//! Depends on `super::hsv_to_rgb_viz` and `crate::image::ImageData`.
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
 #[allow(clippy::type_complexity)]
+/// Render a gallery of regular polygons in varying sizes and colors into an image.
 pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -61,6 +66,7 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     }
     img
 }
+/// Render an Archimedes spiral by sampling angle steps into an image.
 pub fn spiral_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -81,6 +87,7 @@ pub fn spiral_to_image(width: u32, height: u32) -> ImageData {
     }
     img
 }
+/// Render filled rectangles, circles, and a brightness grid into an image.
 pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -110,6 +117,7 @@ pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
     }
     img
 }
+/// Render convex hull, polygon centroid, Bresenham line, and circle tests into an image.
 pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);
@@ -196,6 +204,7 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     img.draw_label("GEOMETRY SHAPES OK", 170, (h - 15).max(0), 100, 255, 100);
     img
 }
+/// Render segment-segment, circle-line, and circle-segment intersection proofs into an image.
 pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 35, 255);

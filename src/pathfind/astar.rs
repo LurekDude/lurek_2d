@@ -1,32 +1,48 @@
+//! A\* pathfinding over `NavGrid`: standard search, bidirectional helper, line-of-sight, and
+//! string-pull path smoothing. Does not own grid construction or Lua bindings.
+//! Consumed by `src/pathfind/bidir.rs`, `src/pathfind/unit_pathfinder.rs`, and
+//! `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::pathfind::nav_grid::{DiagonalMode, NavGrid};
 use crate::runtime::log_messages::{AT01, AT02, AT03};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 const SQRT2: f32 = std::f32::consts::SQRT_2;
+
+/// Priority-queue node used internally by the A\* open set.
 #[derive(Debug, Clone)]
 struct AStarNode {
+    /// Combined cost estimate f = g + h.
     f: f32,
+    /// Actual cost from start to this node.
     g: f32,
+    /// Grid column of this node.
     x: u32,
+    /// Grid row of this node.
     y: u32,
 }
+/// Equality by f-cost for heap deduplication.
 impl PartialEq for AStarNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for AStarNode {}
+
+/// Reverse ordering so `BinaryHeap` becomes a min-heap on f-cost.
 impl Ord for AStarNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
     }
 }
+/// Delegates to `Ord` for consistency.
 impl PartialOrd for AStarNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Return octile distance when `diagonal` is true, otherwise Manhattan distance.
 fn heuristic(x1: u32, y1: u32, x2: u32, y2: u32, diagonal: bool) -> f32 {
     let dx = (x1 as f32 - x2 as f32).abs();
     let dy = (y1 as f32 - y2 as f32).abs();
@@ -38,6 +54,8 @@ fn heuristic(x1: u32, y1: u32, x2: u32, y2: u32, diagonal: bool) -> f32 {
         dx + dy
     }
 }
+/// Run A\* on `grid` from `start` to `goal`; return `(path, reached_goal)`. Returns partial path
+/// to closest node when `max_nodes` is hit or goal is unreachable.
 pub fn astar(
     grid: &NavGrid,
     start: (u32, u32),
@@ -139,6 +157,7 @@ pub fn astar(
         (Option::None, false)
     }
 }
+/// Return walkable neighbours of `(x, y)` respecting `unit_size` and the grid's diagonal mode.
 fn neighbors_with_unit(grid: &NavGrid, x: u32, y: u32, unit_size: u32) -> Vec<(u32, u32)> {
     let w = grid.get_width();
     let h = grid.get_height();
@@ -193,6 +212,7 @@ fn neighbors_with_unit(grid: &NavGrid, x: u32, y: u32, unit_size: u32) -> Vec<(u
     }
     result
 }
+/// Walk the `came_from` parent table back from `end` to `start` and return the ordered path.
 fn reconstruct(came_from: &[u32], w: u32, start: (u32, u32), end: (u32, u32)) -> Vec<(u32, u32)> {
     let mut path = Vec::new();
     let mut cur = (end.1 * w + end.0) as usize;
@@ -213,6 +233,7 @@ fn reconstruct(came_from: &[u32], w: u32, start: (u32, u32), end: (u32, u32)) ->
     path.reverse();
     path
 }
+/// Return true when a straight Bresenham line from `(x1,y1)` to `(x2,y2)` crosses no blocked cells.
 pub fn line_of_sight(grid: &NavGrid, x1: u32, y1: u32, x2: u32, y2: u32, unit_size: u32) -> bool {
     let us = unit_size.max(1);
     let mut sx = x1 as i32;
@@ -242,6 +263,7 @@ pub fn line_of_sight(grid: &NavGrid, x1: u32, y1: u32, x2: u32, y2: u32, unit_si
         }
     }
 }
+/// Apply string-pull smoothing: reduce waypoints by skipping any that have direct line-of-sight.
 pub fn smooth_path(grid: &NavGrid, path: &[(u32, u32)], unit_size: u32) -> Vec<(u32, u32)> {
     if path.len() <= 2 {
         return path.to_vec();

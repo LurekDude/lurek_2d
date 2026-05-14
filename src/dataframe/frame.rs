@@ -65,6 +65,7 @@ impl CellValue {
 }
 /// Implement `Display` for `CellValue` used by string-table rendering and debug output.
 impl std::fmt::Display for CellValue {
+    /// Format one cell value as user-facing text.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CellValue::Nil => write!(f, "nil"),
@@ -91,16 +92,21 @@ pub enum ColRef {
 #[derive(Clone)]
 /// Hold columnar dataframe storage.
 pub struct DataFrame {
+    /// Store ordered column names.
     pub(crate) column_names: Vec<String>,
+    /// Store column-major cell values.
     pub(crate) data: Vec<Vec<CellValue>>,
 }
 /// Iterate rows as vectors of column-name and cell references.
 pub struct DataFrameRowIter<'a> {
+    /// Store source dataframe reference.
     df: &'a DataFrame,
+    /// Store next row index to emit.
     next_row: usize,
 }
 impl<'a> Iterator for DataFrameRowIter<'a> {
     type Item = Vec<(&'a str, &'a CellValue)>;
+    /// Return next row view or `None` when iteration ends.
     fn next(&mut self) -> Option<Self::Item> {
         if self.next_row >= self.df.nrows() {
             return None;
@@ -119,6 +125,7 @@ impl<'a> Iterator for DataFrameRowIter<'a> {
 }
 /// Hold named tables for SQL-like database queries.
 pub struct Database {
+    /// Store table map keyed by table name.
     tables: HashMap<String, DataFrame>,
 }
 impl DataFrame {
@@ -654,13 +661,20 @@ impl DataFrame {
     }
 }
 #[derive(Debug, Clone)]
+/// Store tokenized arithmetic expression items for `with_eval`.
 enum ExprToken {
+    /// Store numeric literal.
     Num(f64),
+    /// Store column reference token.
     ColRef(String),
+    /// Store arithmetic operator token.
     Op(char),
+    /// Store left parenthesis token.
     LParen,
+    /// Store right parenthesis token.
     RParen,
 }
+/// Tokenize arithmetic expression string for per-row evaluation.
 fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
     let mut tokens = Vec::new();
     let mut chars = expr.chars().peekable();
@@ -713,6 +727,7 @@ fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
     }
     Ok(tokens)
 }
+/// Evaluate tokenized arithmetic expression for one dataframe row.
 fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result<f64, String> {
     let mut values: Vec<f64> = Vec::new();
     let mut ops: Vec<char> = Vec::new();
@@ -791,6 +806,7 @@ fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result
 }
 /// Implement `Default` for `DataFrame` by delegating to `DataFrame::new`.
 impl Default for DataFrame {
+    /// Create default empty dataframe.
     fn default() -> Self {
         Self::new()
     }
@@ -856,6 +872,7 @@ impl Database {
 }
 /// Implement `Default` for `Database` by delegating to `Database::new`.
 impl Default for Database {
+    /// Create default empty database.
     fn default() -> Self {
         Self::new()
     }

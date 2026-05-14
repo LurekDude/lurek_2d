@@ -1,20 +1,38 @@
+//! Province id grid derived from color-coded images, with adjacency detection and polygon tracing.
+//! Owns `ProvinceGrid` (id lookup, spans, border segments, polygon extraction) and `AdjacencyPair`.
+//! Does not own map rendering or Lua exposure — callers handle those layers.
+//! Depends on `image_data::ImageData` for pixel input and `std::collections` for edge tracing.
+
 use crate::image::ImageData;
 use std::collections::{HashMap, HashSet};
+/// Adjacency summary for two provinces and the number of shared border pixels.
 pub struct AdjacencyPair {
+    /// First province id in the pair.
     pub province_a: u32,
+    /// Second province id in the pair.
     pub province_b: u32,
+    /// Number of border pixels shared by the pair.
     pub border_pixels: u32,
 }
+/// Province id grid derived from image colors and cached geometry.
 pub struct ProvinceGrid {
+    /// Grid width in pixels.
     width: u32,
+    /// Grid height in pixels.
     height: u32,
+    /// Province id for each pixel in row-major order.
     ids: Vec<u32>,
+    /// Cached adjacency triples of province ids and shared border count.
     adjacencies: Vec<(u32, u32, u32)>,
+    /// Packed RGB color for each province id.
     id_to_color: Vec<u32>,
 }
+/// Grid coordinate alias used when building polygon edges.
 type GridPoint = (u32, u32);
+/// Directed edge alias used while tracing province polygons.
 type DirectedEdge = (GridPoint, GridPoint);
 impl ProvinceGrid {
+    /// Build a province grid from an image where non-black pixels define province ids.
     pub fn from_image(img: &ImageData) -> Self {
         let width = img.width();
         let height = img.height();
@@ -59,25 +77,31 @@ impl ProvinceGrid {
             id_to_color,
         }
     }
+    /// Load an image from disk and derive province ids from it.
     pub fn from_file(path: &str) -> Result<Self, String> {
         let img = ImageData::from_file(path)?;
         Ok(Self::from_image(&img))
     }
+    /// Return the grid width in pixels.
     pub fn width(&self) -> u32 {
         self.width
     }
+    /// Return the grid height in pixels.
     pub fn height(&self) -> u32 {
         self.height
     }
+    /// Return the province id at a coordinate, or `0` when out of bounds.
     pub fn get_at(&self, x: u32, y: u32) -> u32 {
         if x >= self.width || y >= self.height {
             return 0;
         }
         self.ids[(y * self.width + x) as usize]
     }
+    /// Return the highest province id present in the grid.
     pub fn province_count(&self) -> u32 {
         self.ids.iter().copied().max().unwrap_or(0)
     }
+    /// Return the RGB color associated with a province id, or `None` for id 0.
     pub fn province_color(&self, id: u32) -> Option<(u8, u8, u8)> {
         if id == 0 {
             return None;
@@ -91,9 +115,11 @@ impl ProvinceGrid {
         let b = (packed & 0xFF) as u8;
         Some((r, g, b))
     }
+    /// Return cached adjacency triples for the grid.
     pub fn adjacencies(&self) -> &[(u32, u32, u32)] {
         &self.adjacencies
     }
+    /// Return horizontal spans for each province row segment.
     pub fn province_spans(&self) -> Vec<(u32, u32, u32, u32)> {
         let mut spans = Vec::new();
         let w = self.width as usize;
@@ -117,6 +143,7 @@ impl ProvinceGrid {
         }
         spans
     }
+    /// Return contiguous border segments between differing provinces.
     pub fn border_segments(&self) -> Vec<(u32, u32, u32, u32, u32, u32)> {
         let mut out = Vec::new();
         let w = self.width as usize;
@@ -183,6 +210,7 @@ impl ProvinceGrid {
         }
         out
     }
+    /// Trace province polygons as ordered point loops.
     pub fn province_polygons(&self) -> HashMap<u32, Vec<Vec<(u32, u32)>>> {
         let mut edges_by_province: HashMap<u32, Vec<DirectedEdge>> = HashMap::new();
         let w = self.width as usize;
@@ -234,6 +262,7 @@ impl ProvinceGrid {
         }
         polygons
     }
+    /// Return simplified province polygons with redundant vertices removed.
     pub fn province_polygons_simplified(&self) -> HashMap<u32, Vec<Vec<(u32, u32)>>> {
         let mut polygons = self.province_polygons();
         for loops in polygons.values_mut() {
@@ -245,6 +274,7 @@ impl ProvinceGrid {
         polygons.retain(|_, loops| !loops.is_empty());
         polygons
     }
+    /// Detect adjacent province pairs and count shared borders.
     fn detect_adjacencies_internal(ids: &[u32], width: u32, height: u32) -> Vec<(u32, u32, u32)> {
         let mut counts: HashMap<(u32, u32), u32> = HashMap::new();
         for y in 0..height {
@@ -276,6 +306,7 @@ impl ProvinceGrid {
         result.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
         result
     }
+    /// Trace closed loops from directed border edges.
     fn trace_loops_from_edges(edges: &[DirectedEdge]) -> Vec<Vec<GridPoint>> {
         if edges.is_empty() {
             return Vec::new();
@@ -319,6 +350,7 @@ impl ProvinceGrid {
         }
         loops
     }
+    /// Pick the next edge while tracing a polygon loop.
     fn pick_next_edge(
         prev: GridPoint,
         curr: GridPoint,
@@ -348,6 +380,7 @@ impl ProvinceGrid {
             .copied()
             .find(|cand| !used.contains(&(curr, *cand)))
     }
+    /// Rank a turn by direction preference when tracing polygon edges.
     fn turn_rank(incoming: (i64, i64), outgoing: (i64, i64)) -> u8 {
         let Some(in_dir) = Self::cardinal_dir(incoming) else {
             return 4;
@@ -364,6 +397,7 @@ impl ProvinceGrid {
             _ => 4,
         }
     }
+    /// Map a cardinal vector to a compact direction index.
     fn cardinal_dir(v: (i64, i64)) -> Option<u8> {
         match v {
             (1, 0) => Some(0),
@@ -373,6 +407,7 @@ impl ProvinceGrid {
             _ => None,
         }
     }
+    /// Remove redundant vertices from a polygon loop and keep it closed.
     fn simplify_polygon_loop(points: &[(u32, u32)]) -> Vec<(u32, u32)> {
         if points.len() < 4 {
             return points.to_vec();
@@ -433,6 +468,7 @@ impl ProvinceGrid {
         ring.push(ring[0]);
         ring
     }
+    /// Return whether the middle point can be removed without changing the polygon shape.
     fn is_redundant_vertex(prev: GridPoint, curr: GridPoint, next: GridPoint) -> bool {
         let v1 = (curr.0 as i64 - prev.0 as i64, curr.1 as i64 - prev.1 as i64);
         let v2 = (next.0 as i64 - curr.0 as i64, next.1 as i64 - curr.1 as i64);
@@ -446,6 +482,7 @@ impl ProvinceGrid {
         }
         false
     }
+    /// Collapse repeated 45-degree staircase vertices in a polygon loop.
     fn reduce_45_degree_staircase_vertices(points: &[GridPoint]) -> Vec<GridPoint> {
         let mut ring = points.to_vec();
         loop {
@@ -498,6 +535,7 @@ impl ProvinceGrid {
         }
         ring
     }
+    /// Serialize spans and border segments into a compact binary blob.
     pub fn serialize_shape_data(&self) -> Vec<u8> {
         const MAGIC: u32 = 0x5348_4150;
         const VERSION: u32 = 1;
@@ -526,6 +564,7 @@ impl ProvinceGrid {
         }
         buf
     }
+    /// Decode serialized spans and border segments from a shape-data blob.
     #[allow(clippy::type_complexity)]
     pub fn deserialize_shape_data(
         data: &[u8],

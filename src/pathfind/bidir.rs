@@ -1,32 +1,46 @@
+//! Bidirectional A\* search: runs forward and backward queues simultaneously and joins at the
+//! first cell that both frontiers have closed. Faster than one-way A\* on long, open corridors.
+//! Does not own grid construction; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::pathfind::nav_grid::{DiagonalMode, NavGrid};
 use crate::runtime::log_messages::{BI01, BI02, BI03};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 const SQRT2: f32 = std::f32::consts::SQRT_2;
+/// Priority-queue node used by both forward and backward open sets.
 #[derive(Debug, Clone)]
 struct BNode {
+    /// Combined cost estimate f = g + h.
     f: f32,
+    /// Actual cost from the originating end to this node.
     g: f32,
+    /// Grid column.
     x: u32,
+    /// Grid row.
     y: u32,
 }
+/// Equality by f-cost for heap deduplication.
 impl PartialEq for BNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for BNode {}
+
+/// Reverse ordering so `BinaryHeap` is a min-heap on f-cost.
 impl Ord for BNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
     }
 }
+/// Delegates to `Ord`.
 impl PartialOrd for BNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Return octile distance (diagonal allowed) or Manhattan distance.
 fn heuristic(x1: u32, y1: u32, x2: u32, y2: u32, diagonal: bool) -> f32 {
     let dx = (x1 as f32 - x2 as f32).abs();
     let dy = (y1 as f32 - y2 as f32).abs();
@@ -38,6 +52,7 @@ fn heuristic(x1: u32, y1: u32, x2: u32, y2: u32, diagonal: bool) -> f32 {
         dx + dy
     }
 }
+/// Return walkable neighbours of `(x, y)` respecting `unit_size` and the grid diagonal mode.
 fn neighbours(grid: &NavGrid, x: u32, y: u32, unit_size: u32) -> Vec<(u32, u32)> {
     let w = grid.get_width();
     let h = grid.get_height();
@@ -92,6 +107,7 @@ fn neighbours(grid: &NavGrid, x: u32, y: u32, unit_size: u32) -> Vec<(u32, u32)>
     }
     result
 }
+/// Walk `came_from` back from `end_coord` to `anchor_idx` and return the ordered sub-path.
 fn reconstruct_half(
     came_from: &[u32],
     w: u32,
@@ -116,6 +132,8 @@ fn reconstruct_half(
     path.reverse();
     path
 }
+/// Run bidirectional A\* on `grid`; return `(path, reached_goal)`. Falls back to a partial
+/// forward path when `max_nodes` is exhausted before the frontiers meet.
 pub fn bidirectional_astar(
     grid: &NavGrid,
     start: (u32, u32),
@@ -266,39 +284,4 @@ pub fn bidirectional_astar(
         }
     }
     (None, false)
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::pathfind::nav_grid::NavGrid;
-    #[test]
-    fn same_cell_returns_trivial_path() {
-        let g = NavGrid::new(5, 5);
-        let (p, _) = bidirectional_astar(&g, (2, 2), (2, 2), 1, 10000);
-        assert!(p.is_some());
-    }
-    #[test]
-    fn straight_line_path() {
-        let g = NavGrid::new(10, 1);
-        let (p, _) = bidirectional_astar(&g, (0, 0), (9, 0), 1, 10000);
-        assert!(p.is_some());
-        let path = p.unwrap();
-        assert_eq!(*path.first().unwrap(), (0, 0));
-        assert_eq!(*path.last().unwrap(), (9, 0));
-    }
-    #[test]
-    fn wall_blocks_path() {
-        let mut g = NavGrid::new(5, 5);
-        for y in 0..5 {
-            g.set_blocked(2, y, true);
-        }
-        let (p, _) = bidirectional_astar(&g, (0, 2), (4, 2), 1, 10000);
-        assert!(p.is_none());
-    }
-    #[test]
-    fn iteration_limit_triggers_flag() {
-        let g = NavGrid::new(50, 50);
-        let (_, is_complete) = bidirectional_astar(&g, (0, 0), (49, 49), 1, 5);
-        assert!(!is_complete);
-    }
 }

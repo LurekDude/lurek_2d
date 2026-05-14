@@ -1,4 +1,10 @@
+//! Math helpers for particle keyframe interpolation and random sampling.
+//! Owns `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`, `rand_range`, and `rand_normal`.
+//! Re-exports `lerp` from `crate::math` for convenience.
+//! All functions are pure; no state is mutated.
+
 pub use crate::math::lerp;
+/// Evaluate the particle size at normalised lifetime `t` with optional per-particle `variation` in `[0.0, 1.0]`.
 pub fn interpolate_sizes(sizes: &[f32], t: f32, variation: f32) -> f32 {
     if sizes.is_empty() {
         return 1.0;
@@ -14,6 +20,7 @@ pub fn interpolate_sizes(sizes: &[f32], t: f32, variation: f32) -> f32 {
     let base = lerp(sizes[idx], sizes[idx + 1], local_t);
     base * (1.0 - variation)
 }
+/// Evaluate the RGBA colour keyframe at normalised lifetime `t`; returns white when the slice is empty.
 pub fn interpolate_colors(colors: &[[f32; 4]], t: f32) -> [f32; 4] {
     if colors.is_empty() {
         return [1.0, 1.0, 1.0, 1.0];
@@ -33,6 +40,7 @@ pub fn interpolate_colors(colors: &[[f32; 4]], t: f32) -> [f32; 4] {
         lerp(colors[idx][3], colors[idx + 1][3], local_t),
     ]
 }
+/// Evaluate the alpha keyframe at normalised lifetime `t`; returns 1.0 when the slice is empty.
 pub fn interpolate_alphas(alphas: &[f32], t: f32) -> f32 {
     if alphas.is_empty() {
         return 1.0;
@@ -47,12 +55,14 @@ pub fn interpolate_alphas(alphas: &[f32], t: f32) -> f32 {
     let local_t = pos - idx as f32;
     lerp(alphas[idx], alphas[idx + 1], local_t)
 }
+/// Return a uniform random `f32` in `[min, max]`; returns `min` when the range is degenerate.
 pub(crate) fn rand_range(min: f32, max: f32) -> f32 {
     if (max - min).abs() < f32::EPSILON {
         return min;
     }
     min + fastrand::f32() * (max - min)
 }
+/// Return a Box-Muller normal sample with mean 0 and std 1.
 pub(crate) fn rand_normal() -> f32 {
     let u1 = fastrand::f32().max(f32::EPSILON);
     let u2 = fastrand::f32();

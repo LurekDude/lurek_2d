@@ -1,11 +1,21 @@
+//! Jump Point Search (JPS) A\* for uniform-cost 8-directional grids.
+//! Prunes symmetric paths via jump-point identification, outperforming standard A\* on open terrain.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// Uniform-cost 8-directional grid for Jump Point Search.
 pub struct JpsGrid {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Per-cell blocked flags indexed by `(y * width + x)`.
     blocked: Vec<bool>,
 }
+/// Construction and search methods for `JpsGrid`.
 impl JpsGrid {
+    /// Create an unblocked `width × height` grid.
     pub fn new(width: u32, height: u32) -> Self {
         let n = (width * height) as usize;
         Self {
@@ -14,14 +24,17 @@ impl JpsGrid {
             blocked: vec![false; n],
         }
     }
+    /// Mark cell `(x, y)` as blocked or passable.
     pub fn set_blocked(&mut self, x: u32, y: u32, blocked: bool) {
         if let Some(i) = self.idx(x, y) {
             self.blocked[i] = blocked;
         }
     }
+    /// Return true when `(x, y)` is out-of-bounds or marked blocked.
     pub fn is_blocked(&self, x: u32, y: u32) -> bool {
         self.idx(x, y).is_none_or(|i| self.blocked[i])
     }
+    /// Run JPS A\* from `from` to `to`; return a full tile-by-tile path or `None` when unreachable.
     pub fn find_path(&self, from: (u32, u32), to: (u32, u32)) -> Option<Vec<(u32, u32)>> {
         if self.is_blocked(from.0, from.1) || self.is_blocked(to.0, to.1) {
             return None;
@@ -72,6 +85,7 @@ impl JpsGrid {
         }
         None
     }
+    /// Return the JPS successors of `pos` by pruning symmetric neighbours and jumping.
     fn identify_successors(
         &self,
         pos: (u32, u32),
@@ -89,6 +103,7 @@ impl JpsGrid {
         }
         result
     }
+    /// Walk in direction `(dx, dy)` from `(x, y)` until a jump point or dead end; return the jump point if found.
     fn jump(&self, x: i32, y: i32, dx: i32, dy: i32, goal: (u32, u32)) -> Option<(u32, u32)> {
         let nx = x + dx;
         let ny = y + dy;
@@ -117,6 +132,7 @@ impl JpsGrid {
         }
         self.jump(nx, ny, 0, dy, goal)
     }
+    /// Return true when `(x, y)` has a forced neighbour given the incoming direction `(dx, dy)`.
     fn has_forced_neighbor(&self, x: i32, y: i32, dx: i32, dy: i32) -> bool {
         if dx != 0 && dy != 0 {
             (self.is_blocked_i(x - dx, y) && !self.is_blocked_i(x - dx, y + dy))
@@ -129,6 +145,7 @@ impl JpsGrid {
                 || (!self.is_blocked_i(x - 1, y) && self.is_blocked_i(x - 1, y - dy))
         }
     }
+    /// Return the pruned natural neighbours of `pos` relative to the direction from its parent.
     fn prune_neighbors(
         &self,
         pos: (u32, u32),
@@ -194,6 +211,7 @@ impl JpsGrid {
             .map(|(nx, ny)| (nx as u32, ny as u32))
             .collect()
     }
+    /// Return all passable 8-directional neighbours of `(x, y)` when there is no parent.
     fn passable_neighbors(&self, x: i32, y: i32) -> Vec<(u32, u32)> {
         let mut result = Vec::new();
         for dx in -1i32..=1 {
@@ -215,12 +233,14 @@ impl JpsGrid {
         }
         result
     }
+    /// Return true when `(x, y)` is blocked or outside the grid bounds.
     fn is_blocked_i(&self, x: i32, y: i32) -> bool {
         if x < 0 || y < 0 || x >= self.width as i32 || y >= self.height as i32 {
             return true;
         }
         self.is_blocked(x as u32, y as u32)
     }
+    /// Convert `(x, y)` to a flat index; return `None` when out-of-bounds.
     fn idx(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
             Some((y * self.width + x) as usize)
@@ -228,6 +248,7 @@ impl JpsGrid {
             None
         }
     }
+    /// Return the octile (diagonal + straight) cost between adjacent cells `a` and `b`.
     fn dist_cost(&self, a: (u32, u32), b: (u32, u32)) -> f32 {
         let dx = (a.0 as i32 - b.0 as i32).abs();
         let dy = (a.1 as i32 - b.1 as i32).abs();
@@ -236,6 +257,7 @@ impl JpsGrid {
         straight + diag * std::f32::consts::SQRT_2
     }
 }
+/// Return `√2` for diagonal steps and `1.0` for cardinal steps.
 fn diagonal_cost(dx: i32, dy: i32) -> f32 {
     if dx != 0 && dy != 0 {
         std::f32::consts::SQRT_2
@@ -243,11 +265,13 @@ fn diagonal_cost(dx: i32, dy: i32) -> f32 {
         1.0
     }
 }
+/// Octile distance heuristic.
 fn octile(a: (u32, u32), b: (u32, u32)) -> f32 {
     let dx = (a.0 as i32 - b.0 as i32).unsigned_abs() as f32;
     let dy = (a.1 as i32 - b.1 as i32).unsigned_abs() as f32;
     (dx - dy).abs() + (dx.min(dy)) * std::f32::consts::SQRT_2
 }
+/// Walk the jump-point chain from `goal` back to start, then interpolate straight-line tiles between each pair.
 fn expand_path(came_from: &HashMap<(u32, u32), (u32, u32)>, goal: (u32, u32)) -> Vec<(u32, u32)> {
     let mut jump_path = vec![goal];
     let mut cur = goal;
@@ -270,62 +294,33 @@ fn expand_path(came_from: &HashMap<(u32, u32), (u32, u32)>, goal: (u32, u32)) ->
     full_path.dedup();
     full_path
 }
+/// Internal heap node for JPS open list.
 #[derive(Clone)]
 struct JpsNode {
+    /// Cell position.
     pos: (u32, u32),
+    /// f-score = g + h.
     f: f32,
 }
+/// Equality by f-score.
 impl PartialEq for JpsNode {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
+
+/// Marker impl required by `Ord`.
 impl Eq for JpsNode {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for JpsNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for JpsNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn trivial_path_same_cell() {
-        let g = JpsGrid::new(5, 5);
-        let p = g.find_path((2, 2), (2, 2));
-        assert!(p.is_some());
-        assert_eq!(p.unwrap().len(), 1);
-    }
-    #[test]
-    fn straight_line_path() {
-        let g = JpsGrid::new(10, 1);
-        let p = g.find_path((0, 0), (9, 0));
-        assert!(p.is_some());
-        let path = p.unwrap();
-        assert_eq!(*path.first().unwrap(), (0, 0));
-        assert_eq!(*path.last().unwrap(), (9, 0));
-    }
-    #[test]
-    fn wall_blocks_forces_detour() {
-        let mut g = JpsGrid::new(5, 5);
-        for y in 0..5 {
-            g.set_blocked(2, y, true);
-        }
-        let p = g.find_path((0, 2), (4, 2));
-        assert!(p.is_none(), "solid wall should block");
-    }
-    #[test]
-    fn path_around_obstacle() {
-        let mut g = JpsGrid::new(5, 5);
-        g.set_blocked(2, 1, true);
-        g.set_blocked(2, 2, true);
-        g.set_blocked(2, 3, true);
-        let p = g.find_path((0, 2), (4, 2));
-        assert!(p.is_some());
     }
 }

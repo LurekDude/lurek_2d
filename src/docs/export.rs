@@ -1,8 +1,14 @@
+//! Build JSON payloads for editor docs features from normalized entry records.
+//! Keep transformation rules for completions, hover, and signatures centralized.
+//! Do not read source comments or compute documentation quality metrics here.
+//! Depend on serde JSON values and plain file output utilities.
+
 use crate::docs::entry::DocEntry;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
+/// Map an entry kind to a completion item kind and return the resulting label.
 fn completion_kind(kind: &str, include_enum: bool) -> &'static str {
     match kind {
         "function" | "method" => "Function",
@@ -11,6 +17,7 @@ fn completion_kind(kind: &str, include_enum: bool) -> &'static str {
         _ => "Variable",
     }
 }
+/// Build completion payload rows and return them as JSON values.
 fn build_completions(entries: &[DocEntry], include_enum: bool) -> Vec<serde_json::Value> {
     entries
         .iter()
@@ -24,6 +31,7 @@ fn build_completions(entries: &[DocEntry], include_enum: bool) -> Vec<serde_json
         })
         .collect()
 }
+    /// Build hover payload data keyed by qualified name and return the map.
 fn build_hover_map(entries: &[DocEntry], compact: bool) -> HashMap<String, serde_json::Value> {
     let mut hover: HashMap<String, serde_json::Value> = HashMap::new();
     for e in entries {
@@ -57,6 +65,7 @@ fn build_hover_map(entries: &[DocEntry], compact: bool) -> HashMap<String, serde
     }
     hover
 }
+/// Build signature payload data keyed by qualified name and return the map.
 fn build_signatures(entries: &[DocEntry], rich_labels: bool) -> HashMap<String, serde_json::Value> {
     let mut sigs: HashMap<String, serde_json::Value> = HashMap::new();
     for e in entries {
@@ -91,23 +100,28 @@ fn build_signatures(entries: &[DocEntry], rich_labels: bool) -> HashMap<String, 
     }
     sigs
 }
+/// Serialize one JSON value to a file path and return an error string on failure.
 fn write_json_file<T: serde::Serialize>(path: impl AsRef<Path>, value: &T) -> Result<(), String> {
     let file = File::create(path.as_ref()).map_err(|e| format!("write error: {e}"))?;
     let mut writer = BufWriter::new(file);
     serde_json::to_writer_pretty(&mut writer, value).map_err(|e| format!("write error: {e}"))
 }
+/// Export completion payloads and return an error when writing fails.
 pub fn export_completions(entries: &[DocEntry], path: &str) -> Result<(), String> {
     let completions = build_completions(entries, true);
     write_json_file(path, &completions)
 }
+/// Export hover payloads and return an error when writing fails.
 pub fn export_hover(entries: &[DocEntry], path: &str) -> Result<(), String> {
     let hover = build_hover_map(entries, false);
     write_json_file(path, &hover)
 }
+/// Export signature payloads and return an error when writing fails.
 pub fn export_signatures(entries: &[DocEntry], path: &str) -> Result<(), String> {
     let sigs = build_signatures(entries, true);
     write_json_file(path, &sigs)
 }
+/// Export all docs payload files into one directory and return an error on failure.
 pub fn export_all(entries: &[DocEntry], output_dir: &str) -> Result<(), String> {
     std::fs::create_dir_all(output_dir).map_err(|e| format!("mkdir error: {}", e))?;
     let completions = build_completions(entries, false);

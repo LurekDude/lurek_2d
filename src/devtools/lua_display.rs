@@ -1,3 +1,9 @@
+//! Convert Lua values into compact developer-facing text representations.
+//! Keep output intentionally short for logs, REPL, and inspection panels.
+//! Do not evaluate Lua code or mutate VM state in this module.
+//! Depend only on mlua value enums and basic string formatting.
+
+/// Convert one Lua value to display text and return a fallback for unknown kinds.
 pub fn value_to_string(v: &mlua::Value) -> String {
     match v {
         mlua::Value::Nil => "nil".to_string(),

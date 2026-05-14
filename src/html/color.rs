@@ -1,4 +1,7 @@
+//! CSS color parsing for HTML style values.
+
 use crate::math::Color;
+/// Parse a CSS color string and return normalized RGBA components, or `None` when unsupported.
 pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
     let value = raw.trim().to_ascii_lowercase();
     if value.is_empty() {
@@ -83,9 +86,11 @@ pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {
         _ => None,
     }
 }
+/// Split comma-separated color arguments and trim each segment.
 fn split_color_args(inner: &str) -> Vec<&str> {
     inner.split(',').map(str::trim).collect()
 }
+/// Parse an RGB component from bytes or percent and clamp it to the 0.0-1.0 range.
 fn parse_rgb_component(raw: &str) -> Option<f32> {
     if let Some(percent) = raw.strip_suffix('%') {
         let value = percent.trim().parse::<f32>().ok()?;
@@ -94,6 +99,7 @@ fn parse_rgb_component(raw: &str) -> Option<f32> {
     let value = raw.trim().parse::<f32>().ok()?;
     Some((value / 255.0).clamp(0.0, 1.0))
 }
+/// Parse an alpha component from bytes or percent and clamp it to the 0.0-1.0 range.
 fn parse_alpha_component(raw: &str) -> Option<f32> {
     if let Some(percent) = raw.strip_suffix('%') {
         let value = percent.trim().parse::<f32>().ok()?;
@@ -102,10 +108,12 @@ fn parse_alpha_component(raw: &str) -> Option<f32> {
     let value = raw.trim().parse::<f32>().ok()?;
     Some(value.clamp(0.0, 1.0))
 }
+/// Parse a percent component and clamp it to the 0.0-1.0 range.
 fn parse_percent_component(raw: &str) -> Option<f32> {
     let value = raw.trim().strip_suffix('%')?.trim().parse::<f32>().ok()?;
     Some((value / 100.0).clamp(0.0, 1.0))
 }
+/// Parse hue values in degrees, turns, radians, or bare degrees and normalize them.
 fn parse_hue_component(raw: &str) -> Option<f32> {
     let input = raw.trim();
     let hue_degrees = if let Some(value) = input.strip_suffix("deg") {
@@ -123,6 +131,7 @@ fn parse_hue_component(raw: &str) -> Option<f32> {
     }
     Some(normalized)
 }
+/// Convert HSL color components into normalized RGB values.
 fn hsl_to_rgb(h: f32, s: f32, l: f32) -> (f32, f32, f32) {
     if s <= f32::EPSILON {
         return (l, l, l);

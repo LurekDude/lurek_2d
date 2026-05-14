@@ -1,5 +1,11 @@
+//! Animation debug visualizations: frame-grid previews and playback timeline strips.
+//! Renders frames as labeled cell grids; highlights the active frame with a gold border.
+//! Does not own animation state — callers pass `&Animation` and a snapshot slice.
+//! Depends on `crate::animation::Animation` and `crate::image::ImageData`.
+
 use crate::animation::Animation;
 use crate::image::ImageData;
+/// Render an animation frame grid into an image.
 pub fn draw_animation_frame_grid_to_image(anim: &Animation, cell_w: u32, cell_h: u32) -> ImageData {
     let frame_count = anim.get_frame_count().max(1) as u32;
     let cols = frame_count.min(8);
@@ -39,6 +45,7 @@ pub fn draw_animation_frame_grid_to_image(anim: &Animation, cell_w: u32, cell_h:
     }
     img
 }
+/// Render a playback timeline preview into an image.
 pub fn draw_animation_playback_to_image(
     snapshots: &[usize],
     total_frames: usize,
@@ -74,6 +81,7 @@ pub fn draw_animation_playback_to_image(
     }
     img
 }
+/// Render playback control states into an image.
 pub fn animation_playback_control_to_image(
     run_frames: &[usize],
     idle_frames: &[usize],
@@ -134,6 +142,7 @@ pub fn animation_playback_control_to_image(
     );
     img
 }
+/// Render a frame grid using the default cell dimensions.
 pub fn draw_animation_to_image(anim: &Animation, width: u32, height: u32) -> ImageData {
     let frame_count = anim.get_frame_count().max(1) as u32;
     let cols = frame_count.min(8);

@@ -10,7 +10,7 @@ def strip_rust_comments(filepath):
     """Strip all // comments from a Rust file."""
     with open(filepath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-    
+
     new_lines = []
     for line in lines:
         # Check if line is a comment-only line (whitespace + comment)
@@ -18,12 +18,12 @@ def strip_rust_comments(filepath):
         if stripped.startswith('//'):
             # Skip comment-only lines entirely
             continue
-        
+
         # Remove inline comments from code lines
         # Match // /// //! but preserve string contents
         # Simple approach: find // and remove everything after unless in string
         code_part = line
-        
+
         # Remove // comments (but be careful with strings)
         # This is a simple regex that handles most cases
         in_string = False
@@ -42,11 +42,11 @@ def strip_rust_comments(filepath):
             else:
                 result.append(code_part[i])
                 i += 1
-        
+
         stripped_line = ''.join(result).rstrip()
         if stripped_line:  # Only add non-empty lines
             new_lines.append(stripped_line + '\n')
-    
+
     # Write back
     with open(filepath, 'w', encoding='utf-8') as f:
         f.writelines(new_lines)

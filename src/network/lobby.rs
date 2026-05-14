@@ -1,22 +1,36 @@
+//! LAN lobby discovery and in-process room registry for the network subsystem.
+//! Owns UDP broadcast announce/listen for local-network lobbies and a process-local `RoomRegistry`.
+//! Does not own peer connections; callers use the returned address/port to connect via `NetworkHost`.
+//! Key dependencies: standard `UdpSocket`, `OnceLock`+`Mutex` for the global room registry.
+
 use std::net::{Ipv4Addr, SocketAddr, UdpSocket};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
+/// UDP port used for LAN lobby broadcast and discovery.
 pub const LOBBY_PORT: u16 = 47_777;
+/// Lobby advertisement received via LAN UDP broadcast.
 #[derive(Debug, Clone, PartialEq)]
 pub struct LobbyInfo {
+    /// Human-readable lobby name set by the host.
     pub name: String,
+    /// IP address or hostname string of the hosting machine.
     pub host: String,
+    /// ENet port the host is listening on.
     pub port: u16,
+    /// Current number of connected players.
     pub player_count: u32,
+    /// Maximum players allowed before the lobby is full.
     pub max_players: u32,
 }
 impl LobbyInfo {
+    /// Encode this `LobbyInfo` as a `key=value;...` wire string for UDP broadcast.
     pub fn to_wire(&self) -> String {
         format!(
             "name={};host={};port={};players={};max={}",
             self.name, self.host, self.port, self.player_count, self.max_players
         )
     }
+    /// Parse a wire string back into a `LobbyInfo`; uses `sender` IP when `host` field is absent; returns `None` on malformed input.
     pub fn from_wire(s: &str, sender: SocketAddr) -> Option<Self> {
         let mut name = None;
         let mut host = None;
@@ -45,6 +59,7 @@ impl LobbyInfo {
         })
     }
 }
+/// Send a single UDP broadcast on the LAN announcing `info`; returns an error string on socket failure.
 pub fn broadcast_lobby(info: &LobbyInfo) -> Result<(), String> {
     let socket = UdpSocket::bind("0.0.0.0:0").map_err(|e| format!("lobby broadcast bind: {e}"))?;
     socket
@@ -57,6 +72,7 @@ pub fn broadcast_lobby(info: &LobbyInfo) -> Result<(), String> {
         .map_err(|e| format!("lobby broadcast send: {e}"))?;
     Ok(())
 }
+/// Listen on `LOBBY_PORT` for up to `timeout_ms` (capped at 5000) ms and return all unique lobbies found.
 pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
     let deadline = Duration::from_millis(timeout_ms.min(5_000));
     let Ok(socket) = UdpSocket::bind(SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), LOBBY_PORT))
@@ -95,22 +111,32 @@ pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
     }
     results
 }
+/// Room advertisement stored in the in-process registry; used when a relay server is not available.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RoomInfo {
+    /// Unique room identifier assigned at creation (e.g. `"room-1"`).
     pub id: String,
+    /// Human-readable room name.
     pub name: String,
+    /// IP or hostname of the room host.
     pub host: String,
+    /// Current number of players in the room.
     pub player_count: u32,
+    /// Maximum allowed players; at least 1.
     pub max_players: u32,
 }
+/// Process-global in-memory store for all announced rooms.
 #[derive(Debug, Default)]
 struct RoomRegistry {
+    /// Ordered list of all rooms created in this process.
     rooms: Vec<RoomInfo>,
 }
+/// Return the process-global `RoomRegistry` mutex, initialising it on first call.
 fn rooms() -> &'static Mutex<RoomRegistry> {
     static REGISTRY: OnceLock<Mutex<RoomRegistry>> = OnceLock::new();
     REGISTRY.get_or_init(|| Mutex::new(RoomRegistry::default()))
 }
+/// Create a room entry in the global registry and return a clone of the new `RoomInfo`.
 pub fn create_room(name: &str, host: &str, max_players: u32) -> RoomInfo {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let id = format!("room-{}", reg.rooms.len() + 1);
@@ -124,6 +150,7 @@ pub fn create_room(name: &str, host: &str, max_players: u32) -> RoomInfo {
     reg.rooms.push(room.clone());
     room
 }
+/// Return a snapshot of all rooms currently in the global registry.
 pub fn list_rooms() -> Vec<RoomInfo> {
     rooms()
         .lock()
@@ -131,6 +158,7 @@ pub fn list_rooms() -> Vec<RoomInfo> {
         .rooms
         .clone()
 }
+/// Increment the player count for the given room and return the updated `RoomInfo`; returns `None` when full or not found.
 pub fn join_room(id: &str) -> Option<RoomInfo> {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let room = reg.rooms.iter_mut().find(|r| r.id == id)?;
@@ -140,6 +168,7 @@ pub fn join_room(id: &str) -> Option<RoomInfo> {
     room.player_count += 1;
     Some(room.clone())
 }
+/// Decrement the player count for the given room and return the updated `RoomInfo`; returns `None` when not found.
 pub fn leave_room(id: &str) -> Option<RoomInfo> {
     let mut reg = rooms().lock().expect("room registry poisoned");
     let room = reg.rooms.iter_mut().find(|r| r.id == id)?;

@@ -1,50 +1,84 @@
+//! Background file request queue used for asynchronous reads and writes.
+//!
+//! Owns request dispatch, result caches, and the worker thread lifecycle.
+//! Path resolution happens before requests enter this queue.
+
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
+/// Opaque id used to poll an asynchronous file request.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct LoadHandle(pub u64);
+/// Result of an asynchronous read request.
 #[derive(Debug, Clone)]
 pub enum LoadResult {
+    /// Read succeeded and returned bytes.
     Ready(Vec<u8>),
+    /// Read failed with an error message.
     Error(String),
 }
+/// Read request status returned by polling a handle.
 #[derive(Debug, Clone)]
 pub enum LoadStatus {
+    /// Request is still in flight.
     Pending,
+    /// Request completed with a result.
     Done(LoadResult),
 }
+/// Result of an asynchronous write request.
 #[derive(Debug, Clone)]
 pub enum WriteResult {
+    /// Write succeeded and reports the number of bytes written.
     Written(u64),
+    /// Write failed with an error message.
     Error(String),
 }
+/// Write request status returned by polling a handle.
 #[derive(Debug, Clone)]
 pub enum WriteStatus {
+    /// Request is still in flight.
     Pending,
+    /// Request completed with a result.
     Done(WriteResult),
 }
+/// Internal worker request used by the async loader thread.
 enum AsyncRequest {
+    /// Read bytes from a resolved path.
     Read {
+        /// Request handle that receives the result.
         handle: LoadHandle,
+        /// Canonical path to read from.
         resolved_path: PathBuf,
     },
+    /// Write bytes to a resolved path.
     Write {
+        /// Request handle that receives the result.
         handle: LoadHandle,
+        /// Canonical path to write to.
         resolved_path: PathBuf,
+        /// Payload to write.
         bytes: Vec<u8>,
     },
 }
+/// Maximum number of queued async requests before new ones are dropped.
 const QUEUE_CAPACITY: usize = 64;
+/// Threaded loader that records asynchronous read and write results.
 pub struct AsyncLoader {
+    /// Monotonic request id source.
     next_id: AtomicU64,
+    /// Queue sender for worker requests.
     tx: Option<mpsc::SyncSender<AsyncRequest>>,
+    /// Completed read results keyed by request id.
     results: Arc<Mutex<HashMap<u64, LoadResult>>>,
+    /// Completed write results keyed by request id.
     write_results: Arc<Mutex<HashMap<u64, WriteResult>>>,
+    /// Background worker thread handle.
     worker: Option<thread::JoinHandle<()>>,
 }
 impl AsyncLoader {
+    /// Create a loader with a background worker thread.
     pub fn new() -> Self {
         let (tx, rx) = mpsc::sync_channel::<AsyncRequest>(QUEUE_CAPACITY);
         let results: Arc<Mutex<HashMap<u64, LoadResult>>> = Arc::new(Mutex::new(HashMap::new()));
@@ -66,6 +100,7 @@ impl AsyncLoader {
             worker: Some(worker),
         }
     }
+    /// Queue a read request and return its handle even when the queue is full.
     pub fn request_load(&self, resolved_path: PathBuf) -> LoadHandle {
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let handle = LoadHandle(id);
@@ -88,6 +123,7 @@ impl AsyncLoader {
         }
         handle
     }
+    /// Queue a write request and return its handle even when the queue is full.
     pub fn request_write(&self, resolved_path: PathBuf, bytes: Vec<u8>) -> LoadHandle {
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let handle = LoadHandle(id);
@@ -111,6 +147,7 @@ impl AsyncLoader {
         }
         handle
     }
+    /// Poll a read request and return its current status.
     pub fn poll(&self, handle: LoadHandle) -> LoadStatus {
         if let Ok(mut map) = self.results.lock() {
             if let Some(result) = map.remove(&handle.0) {
@@ -119,9 +156,11 @@ impl AsyncLoader {
         }
         LoadStatus::Pending
     }
+    /// Return the number of completed read results waiting to be consumed.
     pub fn pending_results(&self) -> usize {
         self.results.lock().map(|m| m.len()).unwrap_or(0)
     }
+    /// Poll a write request and return its current status.
     pub fn poll_write(&self, handle: LoadHandle) -> WriteStatus {
         if let Ok(mut map) = self.write_results.lock() {
             if let Some(result) = map.remove(&handle.0) {
@@ -130,6 +169,7 @@ impl AsyncLoader {
         }
         WriteStatus::Pending
     }
+    /// Run the worker loop until the request channel closes.
     fn worker_loop(
         rx: mpsc::Receiver<AsyncRequest>,
         results: Arc<Mutex<HashMap<u64, LoadResult>>>,
@@ -188,11 +228,13 @@ impl AsyncLoader {
         }
     }
 }
+/// Build a new async loader with the default worker setup.
 impl Default for AsyncLoader {
     fn default() -> Self {
         Self::new()
     }
 }
+/// Join the worker thread after dropping the request sender.
 impl Drop for AsyncLoader {
     fn drop(&mut self) {
         self.tx.take();

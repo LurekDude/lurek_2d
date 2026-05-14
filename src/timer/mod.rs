@@ -1,3 +1,7 @@
+//! Timer subsystem — fixed-step accumulator, frame clock, scheduled callbacks,
+//! and cross-platform sleep. Does not own rendering or physics stepping; those
+//! modules consume `Clock` and `Scheduler` directly. Key dependencies: `std::time`.
+
 pub(crate) mod accumulator;
 pub mod clock;
 pub mod scheduler;

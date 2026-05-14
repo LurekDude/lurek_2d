@@ -1,12 +1,22 @@
+//! ZIP archive overlay used to expose packaged files through virtual paths.
+//!
+//! Builds a name index once and reads entries on demand from the archive.
+//! Path normalization and traversal checks stay local to this module.
+
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+/// ZIP-backed virtual mount with a cached virtual-path index.
 pub struct ZipMount {
+    /// Archive file path on disk.
     pub archive_path: PathBuf,
+    /// Virtual path prefix applied to indexed entries.
     pub prefix: String,
+    /// Normalized virtual path to archive entry name mapping.
     index: HashMap<String, String>,
 }
 impl ZipMount {
+    /// Build a ZIP mount index or return an error on archive open or parse failure.
     pub fn new<P: AsRef<Path>>(archive_path: P, prefix: &str) -> Result<Self, String> {
         let path = archive_path.as_ref().to_path_buf();
         let file = std::fs::File::open(&path)
@@ -39,6 +49,7 @@ impl ZipMount {
             index,
         })
     }
+    /// Read a virtual file from the archive or return an error when missing or invalid.
     pub fn read_file(&self, virtual_path: &str) -> Result<Vec<u8>, String> {
         let norm = normalise(virtual_path);
         if is_traversal(&norm) {
@@ -65,21 +76,25 @@ impl ZipMount {
             .map_err(|e| format!("ZipMount: read error: {}", e))?;
         Ok(buf)
     }
+    /// Return true when the virtual path is indexed in the archive.
     pub fn contains(&self, virtual_path: &str) -> bool {
         let norm = normalise(virtual_path);
         self.index.contains_key(&norm)
     }
+    /// Return all indexed virtual paths in sorted order.
     pub fn list_files(&self) -> Vec<String> {
         let mut paths: Vec<String> = self.index.keys().cloned().collect();
         paths.sort();
         paths
     }
 }
+/// Normalize a path to forward slashes and remove empty segments.
 pub fn normalise(path: &str) -> String {
     let cleaned = path.replace('\\', "/");
     let parts: Vec<&str> = cleaned.split('/').filter(|s| !s.is_empty()).collect();
     parts.join("/")
 }
+/// Return true when a path contains traversal or absolute-path markers.
 pub fn is_traversal(path: &str) -> bool {
     path.contains("..") || path.starts_with('/') || (path.len() >= 2 && path.as_bytes()[1] == b':')
 }

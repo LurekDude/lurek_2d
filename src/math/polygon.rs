@@ -1,4 +1,11 @@
+//! Polygon utilities: ear-clipping triangulation, convexity check, signed area, Sutherland-Hodgman
+//! clipping, polygon intersection, union, and difference via convex hull approximation.
+//! Used by procgen, Lua geometry bindings, and the render debug overlay.
+//! Does not own physics collision shapes — those use rapier's own polygon type.
+
 use crate::math::vec2::Vec2;
+
+/// Triangulate a simple (non-self-intersecting) polygon using ear clipping; returns error on failure.
 pub fn triangulate(polygon: &[Vec2]) -> Result<Vec<[Vec2; 3]>, String> {
     let n = polygon.len();
     if n < 3 {
@@ -40,6 +47,8 @@ pub fn triangulate(polygon: &[Vec2]) -> Result<Vec<[Vec2; 3]>, String> {
     }
     Ok(triangles)
 }
+
+/// Return true when all cross products of consecutive edge pairs have the same sign.
 pub fn is_convex(polygon: &[Vec2]) -> bool {
     let n = polygon.len();
     if n < 3 {
@@ -67,6 +76,8 @@ pub fn is_convex(polygon: &[Vec2]) -> bool {
     }
     true
 }
+
+/// Return the signed area of a Vec2 polygon (positive = CCW, negative = CW).
 fn signed_area(polygon: &[Vec2]) -> f32 {
     let n = polygon.len();
     let mut area = 0.0;
@@ -77,6 +88,8 @@ fn signed_area(polygon: &[Vec2]) -> f32 {
     }
     area / 2.0
 }
+
+/// Return true when vertex `curr` forms a valid ear (convex, no other vertex inside the triangle).
 fn is_ear(polygon: &[Vec2], indices: &[usize], prev: usize, curr: usize, next: usize) -> bool {
     let a = polygon[prev];
     let b = polygon[curr];
@@ -95,6 +108,8 @@ fn is_ear(polygon: &[Vec2], indices: &[usize], prev: usize, curr: usize, next: u
     }
     true
 }
+
+/// Return true when point `p` lies inside or on triangle (a, b, c).
 fn point_in_triangle(p: Vec2, a: Vec2, b: Vec2, c: Vec2) -> bool {
     let d1 = cross_sign(p, a, b);
     let d2 = cross_sign(p, b, c);
@@ -103,9 +118,13 @@ fn point_in_triangle(p: Vec2, a: Vec2, b: Vec2, c: Vec2) -> bool {
     let has_pos = (d1 > 0.0) || (d2 > 0.0) || (d3 > 0.0);
     !(has_neg && has_pos)
 }
+
+/// Return the signed cross product magnitude used for triangle winding tests.
 fn cross_sign(p1: Vec2, p2: Vec2, p3: Vec2) -> f32 {
     (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
 }
+
+/// Clip a polygon against a half-plane defined by normal `(nx, ny)` and offset `d` (Sutherland-Hodgman step).
 pub fn polygon_clip(polygon: &[(f32, f32)], nx: f32, ny: f32, d: f32) -> Vec<(f32, f32)> {
     if polygon.is_empty() {
         return Vec::new();
@@ -139,6 +158,8 @@ pub fn polygon_clip(polygon: &[(f32, f32)], nx: f32, ny: f32, d: f32) -> Vec<(f3
     }
     out
 }
+
+/// Return the intersection of `subject` and convex `clip` polygon via Sutherland-Hodgman; returns empty on no overlap.
 pub fn polygon_intersection(subject: &[(f32, f32)], clip: &[(f32, f32)]) -> Vec<(f32, f32)> {
     if subject.is_empty() || clip.is_empty() {
         return Vec::new();
@@ -159,10 +180,14 @@ pub fn polygon_intersection(subject: &[(f32, f32)], clip: &[(f32, f32)]) -> Vec<
     }
     output
 }
+
+/// Return the convex hull of the union of `a` and `b` as an approximation.
 pub fn polygon_union(a: &[(f32, f32)], b: &[(f32, f32)]) -> Vec<(f32, f32)> {
     let mut pts: Vec<(f32, f32)> = a.iter().chain(b.iter()).copied().collect();
     convex_hull(&mut pts)
 }
+
+/// Return the approximate set difference `a − b` as a convex hull; returns `a` when `b` is empty.
 pub fn polygon_difference(a: &[(f32, f32)], b: &[(f32, f32)]) -> Vec<(f32, f32)> {
     if a.is_empty() {
         return Vec::new();
@@ -191,6 +216,8 @@ pub fn polygon_difference(a: &[(f32, f32)], b: &[(f32, f32)]) -> Vec<(f32, f32)>
         convex_hull(&mut all_pts)
     }
 }
+
+/// Return `polygon` in CCW winding order, reversing if necessary.
 fn ensure_ccw(polygon: &[(f32, f32)]) -> Vec<(f32, f32)> {
     let area = signed_area_tuples(polygon);
     if area >= 0.0 {
@@ -201,6 +228,8 @@ fn ensure_ccw(polygon: &[(f32, f32)]) -> Vec<(f32, f32)> {
         rev
     }
 }
+
+/// Return the signed area of a tuple polygon (positive = CCW).
 fn signed_area_tuples(polygon: &[(f32, f32)]) -> f32 {
     let n = polygon.len();
     let mut area = 0.0f32;
@@ -211,6 +240,8 @@ fn signed_area_tuples(polygon: &[(f32, f32)]) -> f32 {
     }
     area / 2.0
 }
+
+/// Compute the convex hull of `pts` using the Andrew monotone chain algorithm; deduplicates input.
 fn convex_hull(pts: &mut Vec<(f32, f32)>) -> Vec<(f32, f32)> {
     if pts.len() < 3 {
         return pts.clone();

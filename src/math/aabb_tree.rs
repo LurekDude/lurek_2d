@@ -1,34 +1,69 @@
+//! Dynamic AABB bounding-volume hierarchy for broad-phase spatial queries.
+//! Supports insert, remove, update, AABB, point, circle, and segment queries.
+//! Used by the physics broad phase and the spatial query Lua API.
+//! Does not own physics bodies or collision resolution — those belong in src/physics/.
+
 use std::collections::HashMap;
+
+/// Public leaf entry stored alongside a tree node, exposed for Lua query results.
 pub struct AabbEntry {
+    /// Unique numeric identifier for this entry, matching the Lua-side handle.
     pub id: u64,
+    /// Left boundary of the axis-aligned bounding box.
     pub min_x: f32,
+    /// Bottom boundary of the axis-aligned bounding box.
     pub min_y: f32,
+    /// Right boundary of the axis-aligned bounding box.
     pub max_x: f32,
+    /// Top boundary of the axis-aligned bounding box.
     pub max_y: f32,
 }
+
+/// Internal node payload classifying a node as leaf or branch.
 enum NodeKind {
+    /// Leaf holding the id of the entry it represents.
     Leaf { entry_id: u64 },
+    /// Branch holding indices of its two child nodes.
     Branch { left: usize, right: usize },
 }
+
+/// Internal BVH tree node with an AABB, parent link, and payload kind.
 struct Node {
+    /// Left boundary of this node's bounding box.
     min_x: f32,
+    /// Bottom boundary of this node's bounding box.
     min_y: f32,
+    /// Right boundary of this node's bounding box.
     max_x: f32,
+    /// Top boundary of this node's bounding box.
     max_y: f32,
+    /// Index of the parent node, or `None` for the root.
     parent: Option<usize>,
+    /// Leaf or branch classification with child indices or entry id.
     kind: NodeKind,
 }
+
+/// Dynamic AABB bounding-volume hierarchy; nodes pool supports free-list reuse.
 pub struct AabbTree {
+    /// Sparse node pool; `None` slots are freed and reusable.
     nodes: Vec<Option<Node>>,
+    /// Maps entry id to its leaf node index in `nodes`.
     leaves: HashMap<u64, usize>,
+    /// Maps entry id to its public `AabbEntry` for result data.
     entries: HashMap<u64, AabbEntry>,
+    /// Index of the root node, or `None` when the tree is empty.
     root: Option<usize>,
+    /// Indices of freed node slots available for reuse.
     free_list: Vec<usize>,
 }
+
+/// Return the area of an AABB; returns 0.0 for degenerate (negative-extent) boxes.
 #[inline]
 fn aabb_area(min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> f32 {
     (max_x - min_x).max(0.0) * (max_y - min_y).max(0.0)
 }
+
+/// Return the smallest AABB enclosing two axis-aligned boxes.
 #[inline]
 #[allow(clippy::too_many_arguments)]
 fn merged_bounds(
@@ -43,6 +78,8 @@ fn merged_bounds(
 ) -> (f32, f32, f32, f32) {
     (ax1.min(bx1), ay1.min(by1), ax2.max(bx2), ay2.max(by2))
 }
+
+/// Return true when two axis-aligned boxes overlap (touching edges count as overlap).
 #[inline]
 #[allow(clippy::too_many_arguments)]
 fn aabbs_overlap(
@@ -57,6 +94,8 @@ fn aabbs_overlap(
 ) -> bool {
     !(ax2 < bx1 || ax1 > bx2 || ay2 < by1 || ay1 > by2)
 }
+
+/// Return true when the box overlaps a circle using nearest-point clamping.
 #[inline]
 fn aabb_circle_overlap(
     min_x: f32,
@@ -73,6 +112,8 @@ fn aabb_circle_overlap(
     let dy = cy - nearest_y;
     dx * dx + dy * dy <= radius * radius
 }
+
+/// Return true when a segment (x1,y1)-(x2,y2) overlaps the box via parametric slab test.
 #[inline]
 #[allow(clippy::too_many_arguments)]
 fn aabb_segment_overlap(
@@ -122,6 +163,7 @@ fn aabb_segment_overlap(
     true
 }
 impl AabbTree {
+    /// Construct an empty AABB tree with no entries.
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
@@ -132,6 +174,7 @@ impl AabbTree {
             free_list: Vec::new(),
         }
     }
+    /// Insert or replace entry `id` with the given AABB, refitting the tree upward.
     pub fn insert(&mut self, id: u64, min_x: f32, min_y: f32, max_x: f32, max_y: f32) {
         if self.entries.contains_key(&id) {
             self.remove(id);
@@ -204,6 +247,7 @@ impl AabbTree {
         }
         self.refit_up(new_parent);
     }
+    /// Remove entry `id`; returns `true` when the entry existed.
     pub fn remove(&mut self, id: u64) -> bool {
         let leaf_idx = match self.leaves.remove(&id) {
             Some(idx) => idx,
@@ -259,6 +303,7 @@ impl AabbTree {
         }
         true
     }
+    /// Return ids of all entries whose AABB overlaps the given query box.
     pub fn query(&self, min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> Vec<u64> {
         let mut result = Vec::new();
         let root = match self.root {
@@ -286,9 +331,11 @@ impl AabbTree {
         }
         result
     }
+    /// Return ids of all entries whose AABB contains the point (x, y).
     pub fn query_point(&self, x: f32, y: f32) -> Vec<u64> {
         self.query(x, y, x, y)
     }
+    /// Return ids of all entries whose AABB overlaps the circle, verified with exact circle test.
     pub fn query_circle(&self, cx: f32, cy: f32, radius: f32) -> Vec<u64> {
         let broad = self.query(cx - radius, cy - radius, cx + radius, cy + radius);
         broad
@@ -302,6 +349,7 @@ impl AabbTree {
             })
             .collect()
     }
+    /// Return ids of all entries whose AABB overlaps the segment, verified with exact slab test.
     pub fn query_segment(&self, x1: f32, y1: f32, x2: f32, y2: f32) -> Vec<u64> {
         let (bmin_x, bmax_x) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
         let (bmin_y, bmax_y) = if y1 <= y2 { (y1, y2) } else { (y2, y1) };
@@ -317,6 +365,7 @@ impl AabbTree {
             })
             .collect()
     }
+    /// Remove and re-insert entry `id` with updated bounds; returns `false` when id is not present.
     pub fn update(&mut self, id: u64, min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> bool {
         if !self.remove(id) {
             return false;
@@ -324,15 +373,19 @@ impl AabbTree {
         self.insert(id, min_x, min_y, max_x, max_y);
         true
     }
+    /// Return true when entry `id` is currently stored in this tree.
     pub fn contains(&self, id: u64) -> bool {
         self.entries.contains_key(&id)
     }
+    /// Return the number of entries currently stored.
     pub fn len(&self) -> usize {
         self.entries.len()
     }
+    /// Return true when the tree contains no entries.
     pub fn is_empty(&self) -> bool {
         self.entries.is_empty()
     }
+    /// Remove all entries and reset the node pool.
     pub fn clear(&mut self) {
         self.nodes.clear();
         self.leaves.clear();
@@ -340,6 +393,7 @@ impl AabbTree {
         self.root = None;
         self.free_list.clear();
     }
+    /// Allocate a node from the free list or push a new slot; return its index.
     fn alloc_node(&mut self, node: Node) -> usize {
         if let Some(idx) = self.free_list.pop() {
             self.nodes[idx] = Some(node);
@@ -349,10 +403,12 @@ impl AabbTree {
             self.nodes.len() - 1
         }
     }
+    /// Return node `idx` to the free list by clearing its slot.
     fn free_node(&mut self, idx: usize) {
         self.nodes[idx] = None;
         self.free_list.push(idx);
     }
+    /// Find the best existing node to pair with a new leaf using surface-area heuristic descent.
     fn find_best_sibling(&self, start: usize, lx1: f32, ly1: f32, lx2: f32, ly2: f32) -> usize {
         let leaf_area = aabb_area(lx1, ly1, lx2, ly2);
         let mut best = start;
@@ -416,6 +472,7 @@ impl AabbTree {
         }
         best
     }
+    /// Walk from `idx` to the root refitting each branch AABB to enclose its children.
     fn refit_up(&mut self, mut idx: usize) {
         loop {
             let (left_opt, right_opt, parent_opt) = {

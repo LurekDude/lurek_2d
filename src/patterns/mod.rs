@@ -1,4 +1,4 @@
-pub mod behavior_tree;
+//! Reusable behavioural and structural patterns: behavior trees, state machines, event buses, caches, and more.\n//! Each submodule is a standalone composable utility; no Lua bindings live here.\n//! Consumed by game logic modules and Lua API bindings via `pub use` re-exports.\n\npub mod behavior_tree;
 pub mod bimap;
 pub mod blackboard;
 pub mod collections;

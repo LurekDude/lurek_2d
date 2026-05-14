@@ -1,14 +1,27 @@
+//! Falling-sand cellular automaton: sand, water, fire, gas, and rock simulation on a 2D grid.
+//! Stepping is CPU-only and frame-order-biased using `even_tick` for left/right fairness.
+//! Used by `lurek.cellular.*` bindings in `src/lua_api/cellular_api.rs`.
+
+/// Cell material type used in `CellularWorld`.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CellType {
+    /// Empty cell.
     Air = 0,
+    /// Granular solid that falls and displaces water.
     Sand = 1,
+    /// Liquid that flows sideways and falls.
     Water = 2,
+    /// Immovable solid.
     Rock = 3,
+    /// Burning cell that rises and spreads.
     Fire = 4,
+    /// Light gas that rises and disperses.
     Gas = 5,
 }
+/// Conversion from raw byte to `CellType`.
 impl CellType {
+    /// Map a raw `u8` to `CellType`; unmapped values return `Air`.
     pub fn from_u8(v: u8) -> Self {
         match v {
             1 => CellType::Sand,
@@ -20,15 +33,24 @@ impl CellType {
         }
     }
 }
+/// Fixed-size grid simulating material interactions each step.
 pub struct CellularWorld {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Flat row-major cell storage.
     cells: Vec<CellType>,
+    /// Per-cell fire lifetime counter.
     fire_life: Vec<u8>,
+    /// Alternates each step to reduce left/right bias.
     even_tick: bool,
+    /// Internal xorshift RNG state.
     rng_state: u32,
 }
+/// All methods for `CellularWorld`.
 impl CellularWorld {
+    /// Create an all-air grid of `width`×`height` cells.
     pub fn new(width: u32, height: u32) -> Self {
         let total = (width * height) as usize;
         Self {
@@ -40,6 +62,7 @@ impl CellularWorld {
             rng_state: 0xDEAD_BEEF,
         }
     }
+    /// Set the cell at `(cx,cy)` to `cell`; initializes fire lifetime when cell is Fire.
     pub fn set_cell(&mut self, cx: u32, cy: u32, cell: CellType) {
         if cx >= self.width || cy >= self.height {
             return;
@@ -52,12 +75,14 @@ impl CellularWorld {
             self.fire_life[idx] = 0;
         }
     }
+    /// Return the cell type at `(cx,cy)`; returns Air when out of bounds.
     pub fn get_cell(&self, cx: u32, cy: u32) -> CellType {
         if cx >= self.width || cy >= self.height {
             return CellType::Air;
         }
         self.cells[(cy * self.width + cx) as usize]
     }
+    /// Fill a rectangular region with `cell`; clips to grid bounds.
     pub fn fill_rect(&mut self, cx0: u32, cy0: u32, cw: u32, ch: u32, cell: CellType) {
         let x1 = (cx0 + cw).min(self.width);
         let y1 = (cy0 + ch).min(self.height);
@@ -67,6 +92,7 @@ impl CellularWorld {
             }
         }
     }
+    /// Fill a circular region of radius `r_cells` around `(cx_c,cy_c)` with `cell`.
     pub fn fill_circle(&mut self, cx_c: u32, cy_c: u32, r_cells: u32, cell: CellType) {
         let r = r_cells as i64;
         let r2 = r * r;
@@ -82,6 +108,7 @@ impl CellularWorld {
             }
         }
     }
+    /// Advance the simulation by one tick, applying material rules to every cell.
     pub fn step(&mut self) {
         self.even_tick = !self.even_tick;
         let mut next = self.cells.clone();
@@ -207,11 +234,13 @@ impl CellularWorld {
         self.cells = next;
         self.fire_life = next_fire;
     }
+    /// Run `n` simulation steps.
     pub fn step_n(&mut self, n: u32) {
         for _ in 0..n {
             self.step();
         }
     }
+    /// Encode the full grid as RGBA pixel data using `palette`.
     pub fn to_image_data<F: Fn(CellType) -> [u8; 4]>(&self, palette: F) -> Vec<u8> {
         let mut buf = Vec::with_capacity((self.width * self.height * 4) as usize);
         for &cell in &self.cells {
@@ -219,6 +248,7 @@ impl CellularWorld {
         }
         buf
     }
+    /// Encode a rectangular sub-region as RGBA pixel data using `palette`.
     pub fn to_image_data_region<F: Fn(CellType) -> [u8; 4]>(
         &self,
         cx0: u32,
@@ -238,6 +268,7 @@ impl CellularWorld {
         }
         buf
     }
+    /// Return all `(cx,cy)` positions containing `cell_type`.
     pub fn find_cells(&self, cell_type: CellType) -> Vec<(u32, u32)> {
         let mut out = Vec::new();
         for cy in 0..self.height {
@@ -249,9 +280,11 @@ impl CellularWorld {
         }
         out
     }
+    /// Return the count of cells matching `cell_type`.
     pub fn count_cells(&self, cell_type: CellType) -> u32 {
         self.cells.iter().filter(|&&c| c == cell_type).count() as u32
     }
+    /// Serialize the grid to a compact byte buffer (`width u32 LE` + `height u32 LE` + cell bytes).
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(8 + self.cells.len());
         buf.extend_from_slice(&self.width.to_le_bytes());
@@ -261,6 +294,7 @@ impl CellularWorld {
         }
         buf
     }
+    /// Deserialize a grid from a byte buffer produced by `to_bytes`; return `None` on malformed input.
     pub fn from_bytes(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 8 {
             return None;
@@ -285,6 +319,7 @@ impl CellularWorld {
             rng_state: 0xDEAD_BEEF,
         })
     }
+    /// Advance the internal xorshift RNG and return one byte.
     fn rng_u8(&mut self) -> u8 {
         let mut x = self.rng_state;
         x ^= x << 13;
@@ -294,6 +329,7 @@ impl CellularWorld {
         x as u8
     }
 }
+/// Default RGBA palette mapping each `CellType` to a recognizable colour.
 pub fn default_palette(cell: CellType) -> [u8; 4] {
     match cell {
         CellType::Air => [20, 20, 30, 255],

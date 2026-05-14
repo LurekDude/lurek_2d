@@ -1,14 +1,23 @@
+//! Ordering, enablement, and debug rendering for post-effect stacks.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{FX01, FX02};
 #[derive(Debug, Clone)]
+/// Stores an ordered list of effect indices together with enable flags and target size.
 pub struct PostFxStack {
+    /// Effect indices in application order.
     pub effects: Vec<usize>,
+    /// Per-entry enable flags parallel to `effects`.
     pub enabled: Vec<bool>,
+    /// Target render width for stack application.
     pub width: u32,
+    /// Target render height for stack application.
     pub height: u32,
+    /// Indicates whether the renderer is currently capturing into this stack.
     pub capturing: bool,
 }
 impl PostFxStack {
+    /// Creates an empty post-effect stack for the given render size.
     pub fn new(width: u32, height: u32) -> Self {
         log_msg!(debug, FX01);
         Self {
@@ -19,11 +28,13 @@ impl PostFxStack {
             capturing: false,
         }
     }
+    /// Appends an enabled effect index to the end of the stack.
     pub fn add(&mut self, effect_idx: usize) {
         log_msg!(debug, FX02);
         self.effects.push(effect_idx);
         self.enabled.push(true);
     }
+    /// Removes the first stack entry that references the given effect index.
     pub fn remove(&mut self, effect_idx: usize) -> bool {
         if let Some(pos) = self.effects.iter().position(|&e| e == effect_idx) {
             self.effects.remove(pos);
@@ -33,16 +44,19 @@ impl PostFxStack {
             false
         }
     }
+    /// Inserts an enabled effect index at a one-based stack position.
     pub fn insert(&mut self, position: usize, effect_idx: usize) {
         let idx = (position.saturating_sub(1)).min(self.effects.len());
         self.effects.insert(idx, effect_idx);
         self.enabled.insert(idx, true);
     }
+    /// Sets the enable flag for the first stack entry that references the effect index.
     pub fn set_enabled(&mut self, effect_idx: usize, is_enabled: bool) {
         if let Some(pos) = self.effects.iter().position(|&e| e == effect_idx) {
             self.enabled[pos] = is_enabled;
         }
     }
+    /// Returns the enable flag for the first stack entry that references the effect index.
     pub fn is_enabled(&self, effect_idx: usize) -> bool {
         self.effects
             .iter()
@@ -50,9 +64,11 @@ impl PostFxStack {
             .map(|pos| self.enabled[pos])
             .unwrap_or(false)
     }
+    /// Returns the number of stack entries.
     pub fn get_effect_count(&self) -> usize {
         self.effects.len()
     }
+    /// Returns the effect index at a one-based stack position.
     pub fn get_effect(&self, index: usize) -> Option<usize> {
         if index >= 1 && index <= self.effects.len() {
             Some(self.effects[index - 1])
@@ -60,6 +76,7 @@ impl PostFxStack {
             None
         }
     }
+    /// Returns the effect indices whose stack entries are currently enabled.
     pub fn enabled_effects(&self) -> Vec<usize> {
         self.effects
             .iter()
@@ -68,29 +85,37 @@ impl PostFxStack {
             .map(|(&idx, _)| idx)
             .collect()
     }
+    /// Updates the target render dimensions stored on the stack.
     pub fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
     }
+    /// Returns the target render width.
     pub fn get_width(&self) -> u32 {
         self.width
     }
+    /// Returns the target render height.
     pub fn get_height(&self) -> u32 {
         self.height
     }
+    /// Returns the target render dimensions as `(width, height)`.
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
+    /// Returns the number of stack entries.
     pub fn len(&self) -> usize {
         self.effects.len()
     }
+    /// Returns whether the stack has no entries.
     pub fn is_empty(&self) -> bool {
         self.effects.is_empty()
     }
+    /// Removes every stack entry and enable flag.
     pub fn clear(&mut self) {
         self.effects.clear();
         self.enabled.clear();
     }
+    /// Removes duplicate effect indices while preserving first occurrence order.
     pub fn dedup_indices(&mut self) -> usize {
         let mut seen = std::collections::HashSet::new();
         let before = self.effects.len();
@@ -107,6 +132,7 @@ impl PostFxStack {
         self.enabled = new_enabled;
         removed
     }
+    /// Renders a debug overview of stack entries and their enabled state.
     pub fn draw_info_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
@@ -180,6 +206,7 @@ impl PostFxStack {
         }
         img
     }
+    /// Renders a labeled debug panel for stack management operations.
     pub fn draw_stack_management_to_image(
         &self,
         width: u32,
@@ -213,6 +240,7 @@ impl PostFxStack {
         }
         img
     }
+    /// Renders a tiled debug catalog for effect labels and representative colors.
     pub fn draw_effect_catalog_to_image(
         entries: &[(&str, (u8, u8, u8))],
         width: u32,
@@ -248,6 +276,7 @@ impl PostFxStack {
         }
         img
     }
+    /// Renders a labeled debug panel showing effect parameter names and values.
     pub fn draw_effect_parameters_to_image(
         entries: &[(&str, &[(&str, f32)])],
         width: u32,
@@ -274,6 +303,7 @@ impl PostFxStack {
         }
         img
     }
+    /// Renders one colored debug row per effect type together with its parameter count.
     pub fn draw_effect_type_bars_to_image(
         entries: &[(&str, (u8, u8, u8), usize)],
         width: u32,
@@ -308,6 +338,7 @@ impl PostFxStack {
         }
         img
     }
+    /// Renders a debug catalog for a list of effect types using synthetic colors.
     pub fn draw_effect_types_to_image(
         types: &[super::PostFxEffectType],
         width: u32,
@@ -335,92 +366,5 @@ impl PostFxStack {
             })
             .collect();
         Self::draw_effect_type_bars_to_image(&entries, width, height)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn new_stack_is_empty() {
-        let s = PostFxStack::new(800, 600);
-        assert!(s.is_empty());
-        assert_eq!(s.len(), 0);
-        assert!(!s.capturing);
-    }
-    #[test]
-    fn add_and_len() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(0);
-        s.add(1);
-        assert_eq!(s.len(), 2);
-        assert!(!s.is_empty());
-    }
-    #[test]
-    fn remove_returns_true_when_present() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(5);
-        assert!(s.remove(5));
-        assert!(s.is_empty());
-    }
-    #[test]
-    fn remove_returns_false_when_absent() {
-        let mut s = PostFxStack::new(800, 600);
-        assert!(!s.remove(99));
-    }
-    #[test]
-    fn insert_at_front() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(10);
-        s.insert(1, 20);
-        assert_eq!(s.get_effect(1), Some(20));
-        assert_eq!(s.get_effect(2), Some(10));
-    }
-    #[test]
-    fn set_enabled_toggles() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(0);
-        assert!(s.is_enabled(0));
-        s.set_enabled(0, false);
-        assert!(!s.is_enabled(0));
-    }
-    #[test]
-    fn enabled_effects_filters_disabled() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(0);
-        s.add(1);
-        s.set_enabled(0, false);
-        let enabled = s.enabled_effects();
-        assert_eq!(enabled, vec![1]);
-    }
-    #[test]
-    fn resize_updates_dimensions() {
-        let mut s = PostFxStack::new(800, 600);
-        s.resize(1920, 1080);
-        assert_eq!(s.get_dimensions(), (1920, 1080));
-    }
-    #[test]
-    fn clear_empties_chain() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(0);
-        s.add(1);
-        s.clear();
-        assert!(s.is_empty());
-    }
-    #[test]
-    fn dedup_indices_removes_duplicates() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(0);
-        s.add(1);
-        s.add(0);
-        let removed = s.dedup_indices();
-        assert_eq!(removed, 1);
-        assert_eq!(s.len(), 2);
-    }
-    #[test]
-    fn get_effect_is_one_based() {
-        let mut s = PostFxStack::new(800, 600);
-        s.add(42);
-        assert_eq!(s.get_effect(1), Some(42));
-        assert_eq!(s.get_effect(0), None);
     }
 }

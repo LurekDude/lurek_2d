@@ -1,13 +1,28 @@
+//! Syntax-highlighting pass for terminal text. Owns `HighlightRule`, `ColoredSpan`,
+//! and the greedy first-match `highlight_spans` function. Does not own ANSI parsing
+//! or cell writing; callers map returned spans to `TCell` colors.
+
+/// A plain-string pattern with associated foreground and optional background colors.
 pub struct HighlightRule {
+    /// Literal string to match in the input text.
     pub pattern: String,
+    /// RGBA foreground color applied to matched text, components in 0.0–1.0.
     pub fg: [f32; 4],
+    /// Optional RGBA background color; `None` leaves background unchanged.
     pub bg: Option<[f32; 4]>,
 }
+
+/// A run of text with resolved foreground and optional background colors, ready for cell writing.
 pub struct ColoredSpan {
+    /// Decoded text content for this span.
     pub text: String,
+    /// RGBA foreground color, components in 0.0–1.0.
     pub fg: [f32; 4],
+    /// Optional RGBA background color; `None` means inherit default.
     pub bg: Option<[f32; 4]>,
 }
+
+/// Split `text` into `ColoredSpan`s by applying `rules` in leftmost-first order; unmatched runs use `default_fg`.
 pub fn highlight_spans(
     text: &str,
     rules: &[HighlightRule],

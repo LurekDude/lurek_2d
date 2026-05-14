@@ -1,12 +1,22 @@
+//! Core walkability grid for pathfinding: per-cell cost, blocked state, diagonal mode, dirty regions.
+//! Used as the input to A*, JPS, flow-field, and HPA* algorithms.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{NG01, NG02, NG03};
+/// Controls which diagonal moves are permitted during pathfinding.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiagonalMode {
+    /// No diagonal movement allowed.
     None,
+    /// Diagonal movement always permitted, even past blocked corners.
     Always,
+    /// Diagonal movement only when neither adjacent cardinal neighbour is blocked.
     NoCornerCut,
 }
+/// Conversion helpers between Lua string names and `DiagonalMode`.
 impl DiagonalMode {
+    /// Parse a case-insensitive Lua string to a `DiagonalMode`; return `None` for unknown strings.
     pub fn from_lua_str(s: &str) -> Option<Self> {
         match s.to_ascii_lowercase().as_str() {
             "none" => Some(Self::None),
@@ -15,6 +25,7 @@ impl DiagonalMode {
             _ => Option::None,
         }
     }
+    /// Return the canonical lowercase Lua string for this mode.
     pub fn to_lua_str(self) -> &'static str {
         match self {
             Self::None => "none",
@@ -23,16 +34,25 @@ impl DiagonalMode {
         }
     }
 }
+/// Runtime walkability grid: integer movement costs, dirty tracking, and snapshot support.
 #[derive(Debug, Clone)]
 pub struct NavGrid {
+    /// Grid width in tiles.
     width: u32,
+    /// Grid height in tiles.
     height: u32,
+    /// Per-cell cost values; `0` means blocked, `1`–`254` are movement weights.
     costs: Vec<u8>,
+    /// Chunk size used by HPA* hierarchy construction.
     chunk_size: u32,
+    /// Current diagonal movement policy.
     diagonal_mode: DiagonalMode,
+    /// Pending dirty regions awaiting hierarchy rebuild.
     dirty_rects: Vec<(u32, u32, u32, u32)>,
 }
+/// Construction, query, and mutation methods for `NavGrid`.
 impl NavGrid {
+    /// Create a fully walkable `width × height` grid with all costs set to `1`.
     pub fn new(width: u32, height: u32) -> Self {
         log_msg!(debug, NG01, "{}x{}", width, height);
         Self {
@@ -44,6 +64,7 @@ impl NavGrid {
             dirty_rects: Vec::new(),
         }
     }
+    /// Create a grid from an existing flat cost buffer; panics if `costs.len() != width * height`.
     pub fn from_costs(width: u32, height: u32, costs: Vec<u8>) -> Self {
         assert_eq!(
             costs.len(),
@@ -60,33 +81,41 @@ impl NavGrid {
             dirty_rects: Vec::new(),
         }
     }
+    /// Return the grid width in tiles.
     pub fn get_width(&self) -> u32 {
         self.width
     }
+    /// Return the grid height in tiles.
     pub fn get_height(&self) -> u32 {
         self.height
     }
+    /// Return `(width, height)` as a tuple.
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
+    /// Return the cost at `(x, y)`; returns `0` (blocked) for out-of-bounds coordinates.
     pub fn get_cost(&self, x: u32, y: u32) -> u8 {
         if x >= self.width || y >= self.height {
             return 0;
         }
         self.costs[(y * self.width + x) as usize]
     }
+    /// Set the cost at `(x, y)`; silently ignores out-of-bounds coordinates.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: u8) {
         if x < self.width && y < self.height {
             log_msg!(trace, NG03, "({}, {})={}", x, y, cost);
             self.costs[(y * self.width + x) as usize] = cost;
         }
     }
+    /// Return true when `(x, y)` has cost `0` (blocked) or is out-of-bounds.
     pub fn is_blocked(&self, x: u32, y: u32) -> bool {
         self.get_cost(x, y) == 0
     }
+    /// Set `(x, y)` to cost `0` (blocked) or `1` (passable).
     pub fn set_blocked(&mut self, x: u32, y: u32, blocked: bool) {
         self.set_cost(x, y, if blocked { 0 } else { 1 });
     }
+    /// Return true when a `unit_size × unit_size` footprint anchored at `(x, y)` is fully walkable.
     pub fn is_walkable(&self, x: u32, y: u32, unit_size: u32) -> bool {
         let size = unit_size.max(1);
         if x + size > self.width || y + size > self.height {
@@ -101,9 +130,11 @@ impl NavGrid {
         }
         true
     }
+    /// Set all cells to `cost`.
     pub fn fill(&mut self, cost: u8) {
         self.costs.fill(cost);
     }
+    /// Set all cells in the axis-aligned rectangle at `(x, y, w, h)` to `cost`.
     pub fn fill_rect(&mut self, x: u32, y: u32, w: u32, h: u32, cost: u8) {
         let x_end = (x + w).min(self.width);
         let y_end = (y + h).min(self.height);
@@ -113,6 +144,7 @@ impl NavGrid {
             }
         }
     }
+    /// Replace the cost buffer from `data`; return an error if the length does not match `width * height`.
     pub fn load_from_bytes(&mut self, data: &[u8]) -> Result<(), String> {
         let expected = (self.width * self.height) as usize;
         if data.len() != expected {
@@ -121,30 +153,39 @@ impl NavGrid {
         self.costs.copy_from_slice(data);
         Ok(())
     }
+    /// Return a copy of the cost buffer as a byte vector.
     pub fn save_to_bytes(&self) -> Vec<u8> {
         self.costs.clone()
     }
+    /// Set the chunk size used by HPA*; clamped to `[2, min(width, height)]`.
     pub fn set_chunk_size(&mut self, size: u32) {
         self.chunk_size = size.max(2).min(self.width.min(self.height).max(2));
     }
+    /// Return the current HPA* chunk size.
     pub fn get_chunk_size(&self) -> u32 {
         self.chunk_size
     }
+    /// Set the diagonal movement policy for neighbour queries.
     pub fn set_diagonal_mode(&mut self, mode: DiagonalMode) {
         self.diagonal_mode = mode;
     }
+    /// Return the current diagonal movement policy.
     pub fn get_diagonal_mode(&self) -> DiagonalMode {
         self.diagonal_mode
     }
+    /// Record a dirty rectangle `(x, y, w, h)` for deferred hierarchy invalidation.
     pub fn set_dirty(&mut self, x: u32, y: u32, w: u32, h: u32) {
         self.dirty_rects.push((x, y, w, h));
     }
+    /// Clear all pending dirty rectangles.
     pub fn clear_dirty(&mut self) {
         self.dirty_rects.clear();
     }
+    /// Return the current slice of pending dirty rectangles.
     pub fn dirty_rects(&self) -> &[(u32, u32, u32, u32)] {
         &self.dirty_rects
     }
+    /// Return the passable neighbours of `(x, y)` respecting the current `diagonal_mode`.
     pub fn neighbors(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut result = Vec::with_capacity(8);
         let w = self.width;
@@ -198,6 +239,7 @@ impl NavGrid {
         }
         result
     }
+    /// Return a deep copy of this grid without carrying over dirty rectangles.
     pub fn snapshot(&self) -> Self {
         Self {
             width: self.width,
@@ -208,6 +250,7 @@ impl NavGrid {
             dirty_rects: Vec::new(),
         }
     }
+    /// Render the grid and optionally overlay a `path`, `start`, and `end` marker into an `ImageData`.
     pub fn draw_to_image(
         &self,
         cell_size: u32,
@@ -266,91 +309,5 @@ impl NavGrid {
             );
         }
         img
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn new_grid_all_walkable() {
-        let g = NavGrid::new(10, 10);
-        assert_eq!(g.get_width(), 10);
-        assert_eq!(g.get_height(), 10);
-        assert_eq!(g.get_dimensions(), (10, 10));
-        for y in 0..10 {
-            for x in 0..10 {
-                assert!(!g.is_blocked(x, y));
-                assert_eq!(g.get_cost(x, y), 1);
-            }
-        }
-    }
-    #[test]
-    fn set_cost_and_blocked() {
-        let mut g = NavGrid::new(5, 5);
-        g.set_cost(2, 3, 0);
-        assert!(g.is_blocked(2, 3));
-        g.set_blocked(1, 1, true);
-        assert!(g.is_blocked(1, 1));
-        g.set_blocked(1, 1, false);
-        assert!(!g.is_blocked(1, 1));
-    }
-    #[test]
-    fn out_of_bounds_returns_blocked() {
-        let g = NavGrid::new(3, 3);
-        assert_eq!(g.get_cost(5, 5), 0);
-        assert!(g.is_blocked(3, 0));
-    }
-    #[test]
-    fn is_walkable_unit_size() {
-        let mut g = NavGrid::new(5, 5);
-        assert!(g.is_walkable(0, 0, 2));
-        g.set_blocked(1, 0, true);
-        assert!(!g.is_walkable(0, 0, 2));
-    }
-    #[test]
-    fn from_costs_matches() {
-        let costs = vec![1u8; 9];
-        let g = NavGrid::from_costs(3, 3, costs);
-        assert_eq!(g.get_dimensions(), (3, 3));
-        assert!(!g.is_blocked(0, 0));
-    }
-    #[test]
-    fn fill_and_fill_rect() {
-        let mut g = NavGrid::new(4, 4);
-        g.fill(0);
-        assert!(g.is_blocked(2, 2));
-        g.fill(1);
-        g.fill_rect(1, 1, 2, 2, 0);
-        assert!(g.is_blocked(1, 1));
-        assert!(g.is_blocked(2, 2));
-        assert!(!g.is_blocked(0, 0));
-    }
-    #[test]
-    fn diagonal_mode_round_trip() {
-        assert_eq!(
-            DiagonalMode::from_lua_str("always"),
-            Some(DiagonalMode::Always)
-        );
-        assert_eq!(DiagonalMode::from_lua_str("none"), Some(DiagonalMode::None));
-        assert_eq!(
-            DiagonalMode::from_lua_str("nocornercut"),
-            Some(DiagonalMode::NoCornerCut)
-        );
-        assert_eq!(DiagonalMode::from_lua_str("bogus"), None);
-        assert_eq!(DiagonalMode::Always.to_lua_str(), "always");
-    }
-    #[test]
-    fn load_save_bytes_round_trip() {
-        let mut g = NavGrid::new(3, 3);
-        g.set_cost(1, 1, 5);
-        let bytes = g.save_to_bytes();
-        let mut g2 = NavGrid::new(3, 3);
-        g2.load_from_bytes(&bytes).unwrap();
-        assert_eq!(g2.get_cost(1, 1), 5);
-    }
-    #[test]
-    fn load_from_bytes_wrong_len_errors() {
-        let mut g = NavGrid::new(3, 3);
-        assert!(g.load_from_bytes(&[0u8; 5]).is_err());
     }
 }

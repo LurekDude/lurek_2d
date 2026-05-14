@@ -1,3 +1,8 @@
+//! Light world accumulator: holds all `Light2D` and `Occluder` instances for a scene.
+//! Manages slotmap storage, ambient color, group operations, flicker advancement, and debug visualization.
+//! Does not run per-pixel rendering — it produces data structures and hints consumed by `src/render/`.
+//! Key dependencies: `slotmap`, `crate::runtime::resource_keys`, sibling `light2d` and `occluder` modules.
+
 use crate::light::light2d::Light2D;
 use crate::light::light_type::LightType;
 use crate::light::occluder::Occluder;
@@ -6,26 +11,45 @@ use crate::math::Color;
 use crate::runtime::log_messages::{LW01_LIGHT_WORLD_INIT, LW02_LIGHT_ADD};
 use crate::runtime::resource_keys::{LightKey, OccluderKey};
 use slotmap::SlotMap;
+
+/// Scene-level container for all `Light2D` instances and `Occluder` shapes.
 pub struct LightWorld {
+    /// Slotmap of all registered lights, keyed by `LightKey`.
     pub lights: SlotMap<LightKey, Light2D>,
+    /// Slotmap of all registered occluder shapes, keyed by `OccluderKey`.
     pub occluders: SlotMap<OccluderKey, Occluder>,
+    /// Scene ambient base color added to all illuminated pixels.
     pub ambient: Color,
+    /// Whether any light processing should run; set to `true` on first `add_light`.
     pub enabled: bool,
+    /// Maximum number of active lights evaluated per frame by the renderer.
     pub max_lights: u16,
+    /// Cached list of keys for lights that have flicker enabled; rebuilt when `flicker_index_dirty`.
     flicker_keys: Vec<LightKey>,
+    /// True when the flicker index is stale and must be rebuilt before next advance.
     flicker_index_dirty: bool,
 }
+
+/// Snapshot of a single light's normal-map binding used by the renderer for surface shading.
 #[derive(Debug, Clone)]
 pub struct NormalMapLightHint {
+    /// World-space X of the contributing light.
     pub x: f32,
+    /// World-space Y of the contributing light.
     pub y: f32,
+    /// Effective radius of the contributing light.
     pub radius: f32,
+    /// Intensity of the contributing light.
     pub intensity: f32,
+    /// Direction angle in radians for spot lights.
     pub direction: f32,
+    /// Path to the normal map texture asset.
     pub path: String,
+    /// Normal map contribution strength in [0.0, 1.0].
     pub strength: f32,
 }
 impl LightWorld {
+    /// Create an empty world with ambient=0.1, disabled, and max_lights=64.
     pub fn new() -> Self {
         log_msg!(trace, LW01_LIGHT_WORLD_INIT);
         Self {
@@ -38,6 +62,7 @@ impl LightWorld {
             flicker_index_dirty: true,
         }
     }
+    /// Insert a light, enable the world if it was disabled, and return its key.
     pub fn add_light(&mut self, light: Light2D) -> LightKey {
         log_msg!(debug, LW02_LIGHT_ADD);
         if !self.enabled {
@@ -47,34 +72,44 @@ impl LightWorld {
         self.flicker_index_dirty = true;
         key
     }
+    /// Insert an occluder and return its key.
     pub fn add_occluder(&mut self, occluder: Occluder) -> OccluderKey {
         self.occluders.insert(occluder)
     }
+    /// Remove a light by key and evict it from the flicker index; returns the removed light or `None`.
     pub fn remove_light(&mut self, key: LightKey) -> Option<Light2D> {
         self.flicker_keys.retain(|k| *k != key);
         self.lights.remove(key)
     }
+    /// Remove an occluder by key; returns the removed occluder or `None`.
     pub fn remove_occluder(&mut self, key: OccluderKey) -> Option<Occluder> {
         self.occluders.remove(key)
     }
+    /// Return a shared reference to the light at `key`, or `None` if not present.
     pub fn get_light(&self, key: LightKey) -> Option<&Light2D> {
         self.lights.get(key)
     }
+    /// Return a mutable reference to the light at `key`, or `None` if not present.
     pub fn get_light_mut(&mut self, key: LightKey) -> Option<&mut Light2D> {
         self.lights.get_mut(key)
     }
+    /// Return a shared reference to the occluder at `key`, or `None` if not present.
     pub fn get_occluder(&self, key: OccluderKey) -> Option<&Occluder> {
         self.occluders.get(key)
     }
+    /// Return a mutable reference to the occluder at `key`, or `None` if not present.
     pub fn get_occluder_mut(&mut self, key: OccluderKey) -> Option<&mut Occluder> {
         self.occluders.get_mut(key)
     }
+    /// Return the number of registered lights.
     pub fn light_count(&self) -> usize {
         self.lights.len()
     }
+    /// Return the number of registered occluders.
     pub fn occluder_count(&self) -> usize {
         self.occluders.len()
     }
+    /// Remove all lights and occluders and reset ambient to 0.1 gray.
     pub fn clear(&mut self) {
         self.lights.clear();
         self.occluders.clear();
@@ -82,9 +117,11 @@ impl LightWorld {
         self.flicker_keys.clear();
         self.flicker_index_dirty = false;
     }
+    /// Return `true` if any registered light has `enabled = true`.
     pub fn has_active_lights(&self) -> bool {
         self.lights.values().any(|l| l.enabled)
     }
+    /// Set `enabled` on all lights in `group_id`.
     pub fn set_group_enabled(&mut self, group_id: u16, enabled: bool) {
         for light in self.lights.values_mut() {
             if light.group_id == group_id {
@@ -92,6 +129,7 @@ impl LightWorld {
             }
         }
     }
+    /// Set `intensity` on all lights in `group_id`.
     pub fn set_group_intensity(&mut self, group_id: u16, intensity: f32) {
         for light in self.lights.values_mut() {
             if light.group_id == group_id {
@@ -99,6 +137,7 @@ impl LightWorld {
             }
         }
     }
+    /// Set `color` on all lights in `group_id`.
     pub fn set_group_color(&mut self, group_id: u16, color: Color) {
         for light in self.lights.values_mut() {
             if light.group_id == group_id {
@@ -106,12 +145,14 @@ impl LightWorld {
             }
         }
     }
+    /// Return the count of lights in `group_id`.
     pub fn group_count(&self, group_id: u16) -> usize {
         self.lights
             .values()
             .filter(|l| l.group_id == group_id)
             .count()
     }
+    /// Advance all flickering lights by `dt` seconds; rebuilds the flicker index if stale.
     pub fn advance_flickers(&mut self, dt: f32) {
         if self.flicker_index_dirty {
             self.reindex_flickers();
@@ -130,6 +171,7 @@ impl LightWorld {
             self.flicker_keys.retain(|k| self.lights.contains_key(*k));
         }
     }
+    /// Rebuild the flicker key index from all lights that have flicker enabled.
     pub fn reindex_flickers(&mut self) {
         self.flicker_keys.clear();
         for (key, light) in self.lights.iter() {
@@ -139,6 +181,7 @@ impl LightWorld {
         }
         self.flicker_index_dirty = false;
     }
+    /// Render an approximate light-map preview of this world into an `ImageData` debug image.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(10, 10, 15, 255);
@@ -202,6 +245,7 @@ impl LightWorld {
         }
         img
     }
+    /// Return ambient color as an RGBA `[f32; 4]` array for shader upload.
     pub fn ambient_color_hint(&self) -> [f32; 4] {
         [
             self.ambient.r,
@@ -210,6 +254,7 @@ impl LightWorld {
             self.ambient.a,
         ]
     }
+    /// Return `(x, y, direction)` tuples for all enabled directional lights.
     pub fn directional_light_hints(&self) -> Vec<(f32, f32, f32)> {
         self.lights
             .values()
@@ -217,6 +262,7 @@ impl LightWorld {
             .map(|l| (l.x, l.y, l.direction))
             .collect()
     }
+    /// Return `NormalMapLightHint` snapshots for all enabled lights that have a normal map path.
     pub fn normal_map_light_hints(&self) -> Vec<NormalMapLightHint> {
         self.lights
             .values()
@@ -235,6 +281,8 @@ impl LightWorld {
             .collect()
     }
 }
+
+/// Delegates to `LightWorld::new`.
 impl Default for LightWorld {
     fn default() -> Self {
         Self::new()

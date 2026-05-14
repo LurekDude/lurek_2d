@@ -1,6 +1,11 @@
+//! Debug and editor visualisation functions that render `ParticleSystem` state to `ImageData`.
+//! All functions are pure or accept borrowed mutable `ImageData`; no renderer or GPU state is needed.
+//! Intended for preview thumbnails, test output, and tool UIs — not for in-game rendering.
+
 use super::emitter::ParticleSystem;
 use super::math::{interpolate_alphas, interpolate_colors, interpolate_sizes};
 use crate::image::ImageData;
+/// Render live particles from `ps` onto a new dark `width x height` image using their config colour/size keyframes.
 pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);
@@ -52,6 +57,7 @@ pub fn draw_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData 
     );
     img
 }
+/// Render live particles from `ps` as a glowing explosion on a new `width x height` image.
 pub fn draw_explosion_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(10, 8, 15, 255);
@@ -66,6 +72,7 @@ pub fn draw_explosion_to_image(ps: &ParticleSystem, width: u32, height: u32) -> 
     img.draw_label("EXPLOSION", 4, 4, 255, 160, 60);
     img
 }
+/// Render live particles from `ps` as vertical rain streaks on a new `width x height` image.
 pub fn draw_rain_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(30, 35, 50, 255);
@@ -86,6 +93,7 @@ pub fn draw_rain_to_image(ps: &ParticleSystem, width: u32, height: u32) -> Image
     img.draw_label("RAIN", 4, 4, 140, 180, 255);
     img
 }
+/// Render live particles from `ps` as spark trails on a new `width x height` image.
 pub fn draw_spark_trail_to_image(ps: &ParticleSystem, width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(10, 8, 12, 255);
@@ -109,6 +117,7 @@ pub fn draw_spark_trail_to_image(ps: &ParticleSystem, width: u32, height: u32) -
     img.draw_label("SPARKS", 4, 4, 255, 200, 80);
     img
 }
+/// Composite live particles from `ps` as orange dots over an existing `bg` image and return the result.
 pub fn draw_over_image(ps: &ParticleSystem, mut bg: ImageData) -> ImageData {
     let w = bg.width() as i32;
     let h = bg.height() as i32;
@@ -152,6 +161,7 @@ pub fn draw_over_image(ps: &ParticleSystem, mut bg: ImageData) -> ImageData {
     );
     bg
 }
+/// Paint live particles from `ps` directly onto `img` in-place as single-pixel glowing dots.
 pub fn paint_onto(ps: &ParticleSystem, img: &mut ImageData) {
     let w = img.width() as i32;
     let h = img.height() as i32;
@@ -171,6 +181,7 @@ pub fn paint_onto(ps: &ParticleSystem, img: &mut ImageData) {
         img.set_pixel(px as u32, py as u32, r, g, b, 255);
     }
 }
+/// Render a bar-chart lifecycle diagram from `snapshots` of `(step, count)` pairs onto a new image.
 pub fn draw_lifecycle_to_image(
     snapshots: &[(u32, usize)],
     max_particles: usize,

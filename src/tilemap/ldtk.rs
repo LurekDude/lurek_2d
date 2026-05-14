@@ -1,5 +1,12 @@
+//! LDtk JSON level format import. Parses a single level from an LDtk project string
+//! and constructs a `TileMap` with one layer per tile or auto-layer.
+//! Does not own map storage or rendering after the import completes.
+//! Depends on `tilemap`, `tileset`, and `serde_json`.
+
 use super::tilemap::TileMap;
 use super::tileset::TileSet;
+
+/// Parse `json_str` as an LDtk project, import the level named `level_name` (or the first level when `None`), and return a `TileMap`.
 pub fn load_ldtk(json_str: &str, level_name: Option<&str>) -> Result<TileMap, String> {
     let root: serde_json::Value =
         serde_json::from_str(json_str).map_err(|e| format!("LDtk JSON parse error: {}", e))?;
@@ -93,6 +100,7 @@ pub fn load_ldtk(json_str: &str, level_name: Option<&str>) -> Result<TileMap, St
     }
     Ok(map)
 }
+/// Return `true` when `layer` is a `"Tiles"` or `"AutoLayer"` layer type.
 fn is_tile_layer(layer: &serde_json::Value) -> bool {
     matches!(
         layer.get("__type").and_then(|v| v.as_str()),

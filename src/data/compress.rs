@@ -123,6 +123,7 @@ impl<'a> ChunkReader<'a> {
 }
 /// Implement `Read` over a flattened view of borrowed byte slices for chunk compression.
 impl Read for ChunkReader<'_> {
+    /// Read bytes into output buffer and return number of copied bytes.
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         if buf.is_empty() {
             return Ok(0);

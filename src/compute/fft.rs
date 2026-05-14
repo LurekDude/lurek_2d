@@ -1,15 +1,26 @@
+//! Iterative radix-2 FFT helpers for real input and complex spectra.
+//! Owns in-place butterfly transform and zero-padding behavior.
+//! Keeps Fourier math localized and independent from array container types.
+//! Depends only on scalar math and internal complex helper structure.
+
 use std::f64::consts::PI;
+
 #[derive(Clone, Copy, Debug, Default)]
+/// Stores a complex scalar used by FFT intermediate computations.
 struct Complex {
+    /// Stores real component of the complex value.
     re: f64,
+    /// Stores imaginary component of the complex value.
     im: f64,
 }
 impl Complex {
     #[inline]
+    /// Create complex value and return it from real and imaginary parts.
     fn new(re: f64, im: f64) -> Self {
         Self { re, im }
     }
     #[inline]
+    /// Multiply two complex values and return the product.
     fn mul(self, rhs: Self) -> Self {
         Self {
             re: self.re * rhs.re - self.im * rhs.im,
@@ -17,6 +28,7 @@ impl Complex {
         }
     }
     #[inline]
+    /// Add two complex values and return the sum.
     fn add(self, rhs: Self) -> Self {
         Self {
             re: self.re + rhs.re,
@@ -24,6 +36,7 @@ impl Complex {
         }
     }
     #[inline]
+    /// Subtract two complex values and return the difference.
     fn sub(self, rhs: Self) -> Self {
         Self {
             re: self.re - rhs.re,
@@ -32,6 +45,7 @@ impl Complex {
     }
 }
 #[inline]
+/// Reverse lower bit count of an index and return bit-reversed value.
 fn bit_reverse(mut x: usize, bits: u32) -> usize {
     let mut y = 0usize;
     for _ in 0..bits {
@@ -40,6 +54,7 @@ fn bit_reverse(mut x: usize, bits: u32) -> usize {
     }
     y
 }
+/// Copy real data into padded complex buffer and return power-of-two length vector.
 fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     let n = next_power_of_two(data.len().max(1));
     let mut buf = vec![Complex::default(); n];
@@ -49,6 +64,7 @@ fn to_complex_padded(data: &[f64]) -> Vec<Complex> {
     buf
 }
 #[inline]
+/// Compute next power-of-two length and return unchanged value when already aligned.
 pub fn next_power_of_two(n: usize) -> usize {
     if n.is_power_of_two() {
         n
@@ -56,6 +72,7 @@ pub fn next_power_of_two(n: usize) -> usize {
         n.next_power_of_two()
     }
 }
+/// Run in-place radix-2 FFT pass and return after mutating the provided buffer.
 fn fft_inplace(buf: &mut [Complex], inverse: bool) {
     let n = buf.len();
     debug_assert!(
@@ -97,11 +114,13 @@ fn fft_inplace(buf: &mut [Complex], inverse: bool) {
         }
     }
 }
+/// Compute FFT for real input and return padded complex spectrum pairs.
 pub fn fft(data: &[f64]) -> Vec<(f64, f64)> {
     let mut buf = to_complex_padded(data);
     fft_inplace(&mut buf, false);
     buf.iter().map(|c| (c.re, c.im)).collect()
 }
+/// Compute inverse FFT from complex bins and return reconstructed real samples.
 pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     let n = next_power_of_two(freqs.len().max(1));
     let mut buf: Vec<Complex> = freqs.iter().map(|&(re, im)| Complex::new(re, im)).collect();
@@ -109,6 +128,7 @@ pub fn ifft(freqs: &[(f64, f64)]) -> Vec<f64> {
     fft_inplace(&mut buf, true);
     buf.iter().map(|c| c.re).collect()
 }
+/// Compute FFT magnitude spectrum and return absolute value per complex bin.
 pub fn fft_magnitude(data: &[f64]) -> Vec<f64> {
     fft(data)
         .iter()

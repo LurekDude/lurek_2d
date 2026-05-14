@@ -1,4 +1,14 @@
+//! Poisson disk sampling for `src/procgen`.
+//! Owns `poisson_disk` which produces well-spaced random point distributions
+//! using Bridson's algorithm. Does not own noise, dungeon layout, or voronoi
+//! generation — those live in `noise.rs`, `rooms.rs`, and `voronoi.rs`.
+
 use super::lcg::Lcg;
+
+/// Generate a Poisson disk sample set in a `width × height` rectangle with minimum distance `min_dist`.
+///
+/// Uses `max_attempts` candidate trials per active point and `seed` for reproducibility.
+/// Returns all accepted points as `(x, y)` pairs.
 pub fn poisson_disk(
     width: f32,
     height: f32,

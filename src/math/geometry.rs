@@ -1,17 +1,29 @@
+//! Geometric primitives and query functions: angle, point-in-shape, segment intersection,
+//! polygon area/centroid, Bresenham rasterisation, convex hull, and Bowyer-Watson Delaunay
+//! triangulation.  Used by physics debug, procgen, pathfinding, and Lua geometry bindings.
+//! Does not own 2D transform math (see transform.rs) or polygon clipping (see polygon.rs).
+
+/// Return the angle in radians from point (x1, y1) to point (x2, y2) via `atan2`.
 pub fn angle_between(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
     (y2 - y1).atan2(x2 - x1)
 }
+
+/// Return true when point (px, py) lies inside or on the boundary of circle (cx, cy, r).
 pub fn circle_contains_point(cx: f32, cy: f32, r: f32, px: f32, py: f32) -> bool {
     let dx = px - cx;
     let dy = py - cy;
     dx * dx + dy * dy <= r * r
 }
+
+/// Return true when two circles overlap (touching counts as intersection).
 pub fn circle_intersects_circle(x1: f32, y1: f32, r1: f32, x2: f32, y2: f32, r2: f32) -> bool {
     let dx = x2 - x1;
     let dy = y2 - y1;
     let sum_r = r1 + r2;
     dx * dx + dy * dy <= sum_r * sum_r
 }
+
+/// Return whether an infinite line intersects a circle and the up to two intersection points.
 #[allow(clippy::type_complexity)]
 pub fn circle_intersects_line(
     cx: f32,
@@ -47,6 +59,8 @@ pub fn circle_intersects_line(
     };
     (true, p1, p2)
 }
+
+/// Return whether a finite segment intersects a circle and the intersection points within `[0,1]` range.
 #[allow(clippy::type_complexity)]
 pub fn circle_intersects_segment(
     cx: f32,
@@ -87,6 +101,8 @@ pub fn circle_intersects_segment(
     let any_hit = p1.is_some() || p2.is_some();
     (any_hit, p1, p2)
 }
+
+/// Return the signed area of a flat vertex array `[x0, y0, x1, y1, ...]`; positive = CCW.
 pub fn polygon_area(vertices: &[f32]) -> f32 {
     let n = vertices.len() / 2;
     if n < 3 {
@@ -103,6 +119,8 @@ pub fn polygon_area(vertices: &[f32]) -> f32 {
     }
     area * 0.5
 }
+
+/// Return the centroid (cx, cy) of a flat vertex array; falls back to arithmetic mean for degenerate polygons.
 pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
     let n = vertices.len() / 2;
     if n == 0 {
@@ -135,6 +153,8 @@ pub fn polygon_centroid(vertices: &[f32]) -> (f32, f32) {
     let factor = 1.0 / (6.0 * signed_area);
     (cx * factor, cy * factor)
 }
+
+/// Return whether two line segments intersect and the intersection point when they do.
 #[allow(clippy::too_many_arguments)]
 pub fn segment_intersects_segment(
     x1: f32,
@@ -160,6 +180,8 @@ pub fn segment_intersects_segment(
         (false, None)
     }
 }
+
+/// Return the closest point on segment (x1,y1)-(x2,y2) to point (px, py), clamped to segment endpoints.
 pub fn closest_point_on_segment(
     px: f32,
     py: f32,
@@ -178,6 +200,8 @@ pub fn closest_point_on_segment(
     let t = t.clamp(0.0, 1.0);
     (x1 + t * dx, y1 + t * dy)
 }
+
+/// Return true when point (px, py) is inside the polygon described by flat vertex array using ray casting.
 pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
     let n = vertices.len() / 2;
     if n < 3 {
@@ -197,6 +221,8 @@ pub fn point_in_polygon(vertices: &[f32], px: f32, py: f32) -> bool {
     }
     inside
 }
+
+/// Return the intersection point of two infinite lines, or `None` when parallel.
 #[allow(clippy::too_many_arguments)]
 pub fn line_intersect(
     x1: f32,
@@ -215,6 +241,8 @@ pub fn line_intersect(
     let t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d;
     Some((x1 + t * (x2 - x1), y1 + t * (y2 - y1)))
 }
+
+/// Return all integer grid cells on the line from (x1, y1) to (x2, y2) using Bresenham's algorithm.
 pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
     let mut points = Vec::new();
     let mut x = x1;
@@ -241,6 +269,8 @@ pub fn bresenham(x1: i32, y1: i32, x2: i32, y2: i32) -> Vec<(i32, i32)> {
     }
     points
 }
+
+/// Return the convex hull of a flat vertex array `[x0, y0, ...]` as a flat CCW result using Andrew monotone chain.
 pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     let n = points.len() / 2;
     if n < 3 {
@@ -279,6 +309,8 @@ pub fn convex_hull(points: &[f32]) -> Vec<f32> {
     }
     result
 }
+
+/// Return Delaunay triangulation of `points` as flat `[x0,y0, x1,y1, x2,y2]` triangle arrays using Bowyer-Watson.
 pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
     if points.len() < 3 {
         return Vec::new();
@@ -364,6 +396,8 @@ pub fn delaunay_triangulate(points: &[(f64, f64)]) -> Vec<[f64; 6]> {
         })
         .collect()
 }
+
+/// Return true when point `p` lies inside the circumcircle of triangle (a, b, c).
 fn in_circumcircle(p: (f64, f64), a: (f64, f64), b: (f64, f64), c: (f64, f64)) -> bool {
     let ax = a.0 - p.0;
     let ay = a.1 - p.1;

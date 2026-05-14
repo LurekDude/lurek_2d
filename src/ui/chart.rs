@@ -1,24 +1,46 @@
+//! Chart rendering helpers for `lurek.ui` — rasterises line, bar, scatter, pie, and area
+//! charts into `ImageData` pixels. Does not own the UI layout tree or rendering pipeline;
+//! callers request a rendered `ImageData` and hand it to the sprite system.
+//! Feature-gated behind `ui-charts`; depends on `crate::image::ImageData` and `crate::math::color`.
+
 use crate::image::ImageData;
 use crate::math::color::Color;
+
+/// Global configuration shared by all chart types; controls dimensions, colours, title, and margins.
 #[derive(Debug, Clone)]
 pub struct ChartConfig {
+    /// Pixel width of the rendered image.
     pub width: u32,
+    /// Pixel height of the rendered image.
     pub height: u32,
+    /// Optional title string drawn at the top of the chart.
     pub title: Option<String>,
+    /// Background fill colour as (R, G, B).
     pub bg_color: (u8, u8, u8),
+    /// Axis line colour as (R, G, B).
     pub axis_color: (u8, u8, u8),
+    /// Grid line colour as (R, G, B).
     pub grid_color: (u8, u8, u8),
+    /// Axis label text colour as (R, G, B).
     pub label_color: (u8, u8, u8),
+    /// Whether to draw grid lines behind the chart data.
     pub show_grid: bool,
+    /// Pixel margins between the chart border and the drawable area.
     pub margin: ChartMargin,
 }
+/// Pixel margins inset from each edge of the image to the chart drawing area.
 #[derive(Debug, Clone, Copy)]
 pub struct ChartMargin {
+    /// Pixels reserved on the left edge for Y-axis labels.
     pub left: i32,
+    /// Pixels reserved on the right edge.
     pub right: i32,
+    /// Pixels reserved at the top for the chart title.
     pub top: i32,
+    /// Pixels reserved at the bottom for X-axis labels.
     pub bottom: i32,
 }
+/// Provide sensible default margins (left=40, right=20, top=30, bottom=40).
 impl Default for ChartMargin {
     fn default() -> Self {
         Self {
@@ -29,6 +51,7 @@ impl Default for ChartMargin {
         }
     }
 }
+/// Provide a 400×300 chart config with neutral colours and grid enabled.
 impl Default for ChartConfig {
     fn default() -> Self {
         Self {
@@ -44,12 +67,17 @@ impl Default for ChartConfig {
         }
     }
 }
+/// A named (x, y) data series with an associated colour for line/scatter charts.
 #[derive(Debug, Clone)]
 pub struct ChartSeries {
+    /// Display name used in the chart legend.
     pub name: String,
+    /// Series line/point colour.
     pub color: Color,
+    /// Ordered (x, y) data points.
     pub values: Vec<(f32, f32)>,
 }
+/// Draw grid lines and axis borders; return `(left, right, top, bottom)` pixel boundaries of the chart area.
 fn draw_grid_and_axes(
     img: &mut ImageData,
     cfg: &ChartConfig,
@@ -78,6 +106,7 @@ fn draw_grid_and_axes(
     img.draw_line(left, bottom, right, bottom, ar, ag, ab, 255);
     (left, right, top, bottom)
 }
+/// Convert a `Color` (float components [0,1]) to an `(R, G, B)` u8 tuple.
 fn to_rgb(color: Color) -> (u8, u8, u8) {
     (
         (color.r * 255.0) as u8,
@@ -85,6 +114,7 @@ fn to_rgb(color: Color) -> (u8, u8, u8) {
         (color.b * 255.0) as u8,
     )
 }
+/// Draw tick marks and numeric labels on both axes using the supplied value ranges.
 #[allow(clippy::too_many_arguments)]
 fn draw_numeric_axes(
     img: &mut ImageData,
@@ -120,6 +150,7 @@ fn draw_numeric_axes(
     img.draw_label("X", right + 6, bottom - 4, lr, lg, lb);
     img.draw_label("Y", left - 12, top - 14, lr, lg, lb);
 }
+/// Draw a floating colour-swatch legend box inside the chart area near the top-right corner.
 fn draw_series_legend(
     img: &mut ImageData,
     cfg: &ChartConfig,
@@ -174,15 +205,18 @@ fn draw_series_legend(
         img.draw_label(name, panel_x + 20, y + 1, lr, lg, lb);
     }
 }
+/// Draw the chart title string at pixel position `(x, y)` if one is set in `cfg`.
 fn draw_chart_title(img: &mut ImageData, cfg: &ChartConfig, x: i32, y: i32) {
     if let Some(ref title) = cfg.title {
         let (lr, lg, lb) = cfg.label_color;
         img.draw_label(title, x, y, lr, lg, lb);
     }
 }
+/// Build legend `(name, color)` pairs from a slice of `ChartSeries`.
 fn legend_entries_from_series(series: &[ChartSeries]) -> Vec<(&str, Color)> {
     series.iter().map(|s| (s.name.as_str(), s.color)).collect()
 }
+/// Build legend `(name, color)` pairs by zipping name strings and colour slices.
 fn legend_entries_from_names<'a>(names: &'a [String], colors: &[Color]) -> Vec<(&'a str, Color)> {
     names
         .iter()
@@ -190,15 +224,18 @@ fn legend_entries_from_names<'a>(names: &'a [String], colors: &[Color]) -> Vec<(
         .map(|(name, c)| (name.as_str(), c))
         .collect()
 }
+/// Build legend `(name, color)` pairs from a slice of `AreaLayer` entries.
 fn legend_entries_from_layers(layers: &[AreaLayer]) -> Vec<(&str, Color)> {
     layers.iter().map(|l| (l.name.as_str(), l.color)).collect()
 }
+/// Build legend `(label, color)` pairs from a slice of `PieSegment` entries.
 fn legend_entries_from_segments(segments: &[PieSegment]) -> Vec<(&str, Color)> {
     segments
         .iter()
         .map(|seg| (seg.label.as_str(), seg.color))
         .collect()
 }
+/// Draw a filled circle of radius `r` centred at `(cx, cy)`, clamped to image bounds.
 #[allow(clippy::too_many_arguments)]
 fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
     let w = img.width() as i32;
@@ -218,14 +255,20 @@ fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b:
         }
     }
 }
+/// Cartesian line chart that draws one or more `ChartSeries` as polylines with data-point dots.
 #[derive(Debug, Clone)]
 pub struct LineChart {
+    /// Shared configuration (dimensions, colours, title, margins).
     pub config: ChartConfig,
+    /// All data series to render.
     pub series: Vec<ChartSeries>,
+    /// Maximum Y value; used to normalise series values into the chart area.
     pub y_max: f32,
+    /// Maximum X value; used to normalise series values into the chart area.
     pub x_max: f32,
 }
 impl LineChart {
+    /// Create a new line chart with the given config and default Y/X range of 100.0/6.0.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -234,6 +277,7 @@ impl LineChart {
             x_max: 6.0,
         }
     }
+    /// Append a named data series of `(x, y)` points with the given colour.
     pub fn add_series(&mut self, name: &str, points: &[(f32, f32)], color: Color) {
         self.series.push(ChartSeries {
             name: name.to_string(),
@@ -241,6 +285,7 @@ impl LineChart {
             values: points.to_vec(),
         });
     }
+    /// Rasterise the line chart into `img`, overwriting its contents.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -284,20 +329,30 @@ impl LineChart {
         }
     }
 }
+/// One labelled category (group of bars) in a `BarChart`.
 #[derive(Debug, Clone)]
 pub struct BarCategory {
+    /// X-axis label displayed below this group.
     pub label: String,
+    /// One value per series in this category; parallel to `BarChart::series_colors`.
     pub values: Vec<f32>,
 }
+/// Grouped bar chart with named series and labelled categories.
 #[derive(Debug, Clone)]
 pub struct BarChart {
+    /// Shared configuration.
     pub config: ChartConfig,
+    /// All category groups, each containing one value per series.
     pub categories: Vec<BarCategory>,
+    /// Colours for each series; parallel to `series_names`.
     pub series_colors: Vec<Color>,
+    /// Display names for each series; parallel to `series_colors`.
     pub series_names: Vec<String>,
+    /// Maximum Y value used to normalise bar heights.
     pub y_max: f32,
 }
 impl BarChart {
+    /// Create an empty bar chart with the given config and default Y max of 100.0.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -307,16 +362,19 @@ impl BarChart {
             y_max: 100.0,
         }
     }
+    /// Register a named series with the given colour; call before `add_category`.
     pub fn add_series(&mut self, name: &str, color: Color) {
         self.series_names.push(name.to_string());
         self.series_colors.push(color);
     }
+    /// Add a labelled category group with one value per series.
     pub fn add_category(&mut self, label: &str, values: &[f32]) {
         self.categories.push(BarCategory {
             label: label.to_string(),
             values: values.to_vec(),
         });
     }
+    /// Rasterise the bar chart into `img`, overwriting its contents.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -367,14 +425,20 @@ impl BarChart {
         }
     }
 }
+/// Cartesian scatter plot that renders each data point as a filled circle.
 #[derive(Debug, Clone)]
 pub struct ScatterPlot {
+    /// Shared configuration.
     pub config: ChartConfig,
+    /// All data series to render.
     pub series: Vec<ChartSeries>,
+    /// Visible (min, max) range on the X axis.
     pub x_range: (f32, f32),
+    /// Visible (min, max) range on the Y axis.
     pub y_range: (f32, f32),
 }
 impl ScatterPlot {
+    /// Create an empty scatter plot with the given config and default axis ranges of (0.0, 1.0).
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -383,6 +447,7 @@ impl ScatterPlot {
             y_range: (0.0, 1.0),
         }
     }
+    /// Append a named series of `(x, y)` scatter points with the given colour.
     pub fn add_series(&mut self, name: &str, points: &[(f32, f32)], color: Color) {
         self.series.push(ChartSeries {
             name: name.to_string(),
@@ -390,6 +455,7 @@ impl ScatterPlot {
             values: points.to_vec(),
         });
     }
+    /// Rasterise the scatter plot into `img`, overwriting its contents.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -426,24 +492,33 @@ impl ScatterPlot {
         }
     }
 }
+/// One labelled segment of a `PieChart`.
 #[derive(Debug, Clone)]
 pub struct PieSegment {
+    /// Legend label for this segment.
     pub label: String,
+    /// Numerical value; the fraction rendered is `value / total`.
     pub value: f32,
+    /// Fill colour for this segment.
     pub color: Color,
 }
+/// Pie chart that rasterises coloured wedge segments into a pixel image.
 #[derive(Debug, Clone)]
 pub struct PieChart {
+    /// Shared configuration (dimensions, colours, title).
     pub config: ChartConfig,
+    /// Ordered segments; rendered clockwise starting from the top.
     pub segments: Vec<PieSegment>,
 }
 impl PieChart {
+    /// Create an empty pie chart with the given config.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
             segments: Vec::new(),
         }
     }
+    /// Append a labelled segment with the given value and fill colour.
     pub fn add_segment(&mut self, label: &str, value: f32, color: Color) {
         self.segments.push(PieSegment {
             label: label.to_string(),
@@ -451,6 +526,7 @@ impl PieChart {
             color,
         });
     }
+    /// Rasterise the pie chart into `img`, overwriting its contents; no-ops when total value <= 0.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let w = cfg.width;
@@ -530,19 +606,28 @@ impl PieChart {
         draw_chart_title(img, cfg, 10, 10);
     }
 }
+/// Stacked area chart where each layer fills from its own cumulative base upward.
 #[derive(Debug, Clone)]
 pub struct AreaChart {
+    /// Shared configuration.
     pub config: ChartConfig,
+    /// Ordered area layers drawn from bottom to top; stacked cumulatively.
     pub layers: Vec<AreaLayer>,
+    /// Total Y axis maximum used to normalise layer values.
     pub y_max: f32,
 }
+/// One named value series rendered as a filled area in an `AreaChart`.
 #[derive(Debug, Clone)]
 pub struct AreaLayer {
+    /// Display name used in the chart legend.
     pub name: String,
+    /// Y values sampled at uniform X intervals.
     pub values: Vec<f32>,
+    /// Fill colour for the area region.
     pub color: Color,
 }
 impl AreaChart {
+    /// Create an empty area chart with the given config and Y max of 100.0.
     pub fn new(config: ChartConfig) -> Self {
         Self {
             config,
@@ -550,6 +635,7 @@ impl AreaChart {
             y_max: 100.0,
         }
     }
+    /// Append a named area layer; `values` are sampled at uniform X intervals across the chart width.
     pub fn add_layer(&mut self, name: &str, values: &[f32], color: Color) {
         self.layers.push(AreaLayer {
             name: name.to_string(),
@@ -557,6 +643,7 @@ impl AreaChart {
             color,
         });
     }
+    /// Rasterise the stacked area chart into `img`, overwriting its contents.
     pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let (bgr, bgg, bgb) = cfg.bg_color;

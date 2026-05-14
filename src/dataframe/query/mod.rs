@@ -4,8 +4,12 @@
 //! `../sql.rs`. No serialization lives here; that is in `../serial.rs`.
 //! Business logic stays inside these files; bindings live in `src/lua_api/dataframe_api.rs`.
 
+/// Statistical and distribution-oriented query helpers.
 pub mod analytics;
+/// Row filtering, sorting, joins, and sampling helpers.
 pub mod filter;
+/// Grouped aggregation, pivoting, and correlation helpers.
 pub mod grouping;
+/// Rolling and ranking window computations.
 pub mod window;
 pub use analytics::percentile;

@@ -109,7 +109,7 @@
 	// Next Edit Suggestions
 	"github.copilot.nextEditSuggestions.enabled": true,
 	"github.copilot.nextEditSuggestions.extendedRange": true,
-	"github.copilot.nextEditSuggestions.eagerness": "auto",
+	"github.copilot.nextEditSuggestions.eagerness": "medium",
 	"github.copilot.nextEditSuggestions.fixes": true,
 	// Inline edits
 	"github.copilot.chat.inlineEdits.chatSessionContextProvider.enabled": true,
@@ -218,5 +218,7 @@
 		"rust-toolchain.toml": "toml"
 	},
 	"github.copilot.chat.otel.enabled": true,
-	"chat.editMode.hidden": false
+	"chat.editMode.hidden": false,
+	"chat.tools.compressOutput.enabled": true,
+	"markdown.preview.doubleClickToSwitchToEditor": true
 }

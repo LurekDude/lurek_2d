@@ -1,6 +1,15 @@
+//! Skeleton-level render assembly: adds RenderCommand generation to Skeleton.
+//! Converts posed bones and slot attachments to debug-draw circles and rectangles.
+//! Does not own bone pose accumulation or slot data \u2014 those live in skeleton.rs and slot.rs.
+//! Key dependencies: Skeleton, RenderCommand, DrawMode.
+
 use super::skeleton::Skeleton;
 use crate::render::renderer::{DrawMode, RenderCommand};
+
+/// Render methods added to Skeleton by this file.
 impl Skeleton {
+    /// Build a RenderCommand list for all bones (filled circles) and slot attachments (outline rectangles)
+    /// at world offset (x, y); returns empty vec when no bones exist.
     pub fn generate_render_commands(&self, x: f32, y: f32) -> Vec<RenderCommand> {
         let mut cmds = Vec::new();
         if self.bones.is_empty() {

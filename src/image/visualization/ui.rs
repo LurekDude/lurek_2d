@@ -1,4 +1,9 @@
+//! UI debug visualizations: settings panel layout and HUD bar strip previews.
+//! Renders hardcoded widget layouts (checkboxes, sliders, bars, labels) into `ImageData`.
+//! Does not own UI state or layout data — geometry is fixed for debug screenshot use.
+//! Depends on `crate::image::ImageData`.
 use crate::image::ImageData;
+/// Render a panel layout with borders, labels, and content areas into an image.
 pub fn panel_layout_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(35, 35, 45, 255);
@@ -91,6 +96,7 @@ pub fn panel_layout_to_image(width: u32, height: u32) -> ImageData {
     img.draw_label("CANCEL", px + pw - 144, btn_y + 8, 240, 220, 220);
     img
 }
+/// Render a HUD with labeled health, mana, and XP bars at various fill levels into an image.
 pub fn hud_bars_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(25, 25, 30, 255);

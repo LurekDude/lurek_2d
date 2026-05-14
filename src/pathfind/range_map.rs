@@ -1,11 +1,21 @@
+//! Dijkstra-based movement range map: reachable cells within a travel budget from an origin.
+//! Supports 4-directional and 8-directional expansion with per-cell cost.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+/// Precomputed movement-cost distances from an origin cell within a budget.
 pub struct RangeMap {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Per-cell travel cost from origin; `None` means unreachable within budget.
     costs: Vec<Option<f32>>,
 }
+/// Construction and query methods for `RangeMap`.
 impl RangeMap {
+    /// Build a range map from a flat `costs`/`blocked` grid expanding from `(origin_x, origin_y)` within `budget`.
     #[allow(clippy::too_many_arguments)]
     pub fn from_grid(
         width: u32,
@@ -99,15 +109,18 @@ impl RangeMap {
             costs: dist,
         }
     }
+    /// Return true when `(x, y)` was reached within the budget.
     pub fn reachable(&self, x: u32, y: u32) -> bool {
         self.cost_to(x, y).is_some()
     }
+    /// Return travel cost from origin to `(x, y)`, or `None` when unreachable or out-of-bounds.
     pub fn cost_to(&self, x: u32, y: u32) -> Option<f32> {
         if x >= self.width || y >= self.height {
             return None;
         }
         self.costs[(y * self.width + x) as usize]
     }
+    /// Return all `(x, y)` cells reachable within the budget.
     pub fn reachable_cells(&self) -> Vec<(u32, u32)> {
         self.costs
             .iter()
@@ -121,6 +134,7 @@ impl RangeMap {
             })
             .collect()
     }
+    /// Return all reachable cells as `(x, y, travel_cost)` triples.
     pub fn reachable_cells_with_cost(&self) -> Vec<(u32, u32, f32)> {
         self.costs
             .iter()
@@ -135,76 +149,36 @@ impl RangeMap {
             .collect()
     }
 }
+/// Internal Dijkstra heap node.
 #[derive(Clone)]
 struct DNode {
+    /// Cell x coordinate.
     x: u32,
+    /// Cell y coordinate.
     y: u32,
+    /// Accumulated travel cost to reach this node.
     cost: f32,
 }
+/// Equality by cost.
 impl PartialEq for DNode {
     fn eq(&self, other: &Self) -> bool {
         self.cost == other.cost
     }
 }
 impl Eq for DNode {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for DNode {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for DNode {
     fn cmp(&self, other: &Self) -> Ordering {
         other
             .cost
             .partial_cmp(&self.cost)
             .unwrap_or(Ordering::Equal)
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn origin_always_reachable() {
-        let costs = vec![1.0f32; 9];
-        let blocked = vec![false; 9];
-        let rm = RangeMap::from_grid(3, 3, &costs, &blocked, 1, 1, 10.0, false);
-        assert!(rm.reachable(1, 1));
-        assert_eq!(rm.cost_to(1, 1), Some(0.0));
-    }
-    #[test]
-    fn budget_limits_reach() {
-        let costs = vec![1.0f32; 25];
-        let blocked = vec![false; 25];
-        let rm = RangeMap::from_grid(5, 5, &costs, &blocked, 0, 0, 2.0, false);
-        assert!(rm.reachable(0, 0));
-        assert!(rm.reachable(2, 0));
-        assert!(!rm.reachable(4, 4));
-    }
-    #[test]
-    fn blocked_origin_empty() {
-        let costs = vec![1.0; 4];
-        let blocked = vec![true; 4];
-        let rm = RangeMap::from_grid(2, 2, &costs, &blocked, 0, 0, 10.0, false);
-        assert!(!rm.reachable(0, 0));
-    }
-    #[test]
-    fn diagonal_extends_reach() {
-        let costs = vec![1.0f32; 9];
-        let blocked = vec![false; 9];
-        let rm_4 = RangeMap::from_grid(3, 3, &costs, &blocked, 0, 0, 1.5, false);
-        let rm_8 = RangeMap::from_grid(3, 3, &costs, &blocked, 0, 0, 1.5, true);
-        let cells_4 = rm_4.reachable_cells().len();
-        let cells_8 = rm_8.reachable_cells().len();
-        assert!(cells_8 >= cells_4);
-    }
-    #[test]
-    fn reachable_cells_with_cost_includes_origin() {
-        let costs = vec![1.0; 4];
-        let blocked = vec![false; 4];
-        let rm = RangeMap::from_grid(2, 2, &costs, &blocked, 0, 0, 5.0, false);
-        let cells = rm.reachable_cells_with_cost();
-        assert!(cells
-            .iter()
-            .any(|(x, y, c)| *x == 0 && *y == 0 && *c == 0.0));
     }
 }

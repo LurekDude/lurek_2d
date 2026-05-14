@@ -1,7 +1,13 @@
+//! Supply and demand processing that spawns and routes items between nodes.
+//!
+//! Owns one demand-resolution pass over graph nodes.
+//! It does not update transit timers or decay.
+
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::simulation::GraphEvent;
 impl Graph {
+    /// Process node demands and return the resulting graph events.
     pub fn process_demand(&mut self) -> Vec<GraphEvent> {
         let mut events = Vec::new();
         let mut all_demands: Vec<(u64, String, i32, i32)> = Vec::new();

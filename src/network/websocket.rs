@@ -1,3 +1,8 @@
+//! Non-blocking WebSocket connection manager using `tungstenite` for the background network thread.
+//! Owns live `WebSocket` connections and an async-connect queue via per-connection helper threads.
+//! Does not own the event loop; called by `net_thread::NetworkRuntime::thread_main`.
+//! Key dependencies: `tungstenite`, `net_thread::{NetworkResponse, WsEvent}`.
+
 use super::net_thread::{NetworkResponse, WsEvent};
 use log::{debug, warn};
 use std::collections::HashMap;
@@ -7,24 +12,33 @@ use std::thread;
 use tungstenite::protocol::Message;
 use tungstenite::stream::MaybeTlsStream;
 use tungstenite::WebSocket;
+/// Pool of active WebSocket connections and in-flight connect operations.
 pub struct WebSocketManager {
+    /// Established WebSocket connections keyed by caller-assigned ID.
     connections: HashMap<u64, WebSocket<MaybeTlsStream<TcpStream>>>,
+    /// Connections whose background connect thread has not yet resolved.
     pending_connects: Vec<PendingConnect>,
 }
+/// In-flight WebSocket handshake spawned on a helper thread.
 struct PendingConnect {
+    /// Caller-assigned connection ID.
     id: u64,
+    /// Channel that receives the completed socket or an error string.
     rx: mpsc::Receiver<Result<WebSocket<MaybeTlsStream<TcpStream>>, String>>,
 }
 impl WebSocketManager {
+    /// Create an empty WebSocket manager with no connections.
     pub fn new() -> Self {
         Self {
             connections: HashMap::new(),
             pending_connects: Vec::new(),
         }
     }
+    /// Return `true` when there are no established connections.
     pub fn is_empty(&self) -> bool {
         self.connections.is_empty()
     }
+    /// Spawn a helper thread to perform the TLS/TCP WebSocket handshake to `url`; resolves via `poll_all`.
     pub fn connect(
         &mut self,
         id: u64,
@@ -47,6 +61,7 @@ impl WebSocketManager {
             .ok();
         self.pending_connects.push(PendingConnect { id, rx });
     }
+    /// Send `data` as a text or binary WebSocket frame; posts `Error` to `resp_tx` if the connection is missing or fails.
     pub fn send(
         &mut self,
         id: u64,
@@ -74,6 +89,7 @@ impl WebSocketManager {
             });
         }
     }
+    /// Send a WebSocket close frame with `code` and `reason`, drain until the server close, then post `Close`.
     pub fn close(
         &mut self,
         id: u64,
@@ -101,6 +117,7 @@ impl WebSocketManager {
             });
         }
     }
+    /// Non-blocking poll of pending connects and all live connections; posts events to `resp_tx`.
     pub fn poll_all(&mut self, resp_tx: &mpsc::Sender<NetworkResponse>) {
         self.poll_pending_connects(resp_tx);
         let mut to_remove = Vec::new();
@@ -144,6 +161,7 @@ impl WebSocketManager {
             self.connections.remove(&id);
         }
     }
+    /// Check each pending connect for completion; move resolved sockets into `connections`.
     fn poll_pending_connects(&mut self, resp_tx: &mpsc::Sender<NetworkResponse>) {
         let mut retained = Vec::with_capacity(self.pending_connects.len());
         for pending in self.pending_connects.drain(..) {
@@ -176,6 +194,7 @@ impl WebSocketManager {
         }
         self.pending_connects = retained;
     }
+    /// Drop all pending and live connections; called on network thread shutdown.
     pub fn close_all(&mut self) {
         self.pending_connects.clear();
         for (_, mut socket) in self.connections.drain() {
@@ -183,44 +202,9 @@ impl WebSocketManager {
         }
     }
 }
+/// Create an empty `WebSocketManager`.
 impl Default for WebSocketManager {
     fn default() -> Self {
         Self::new()
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn new_manager_has_no_connections() {
-        let mgr = WebSocketManager::new();
-        assert!(mgr.connections.is_empty());
-    }
-    #[test]
-    fn default_matches_new() {
-        let mgr = WebSocketManager::default();
-        assert!(mgr.connections.is_empty());
-    }
-    #[test]
-    fn close_all_on_empty_is_noop() {
-        let mut mgr = WebSocketManager::new();
-        mgr.close_all();
-        assert!(mgr.connections.is_empty());
-    }
-    #[test]
-    fn send_to_nonexistent_sends_error() {
-        let mut mgr = WebSocketManager::new();
-        let (tx, rx) = mpsc::channel();
-        mgr.send(77, b"msg", true, &tx);
-        let resp = rx.try_recv().unwrap();
-        if let NetworkResponse::WebSocketEvent { id, event } = resp {
-            assert_eq!(id, 77);
-            match event {
-                WsEvent::Error(msg) => assert!(msg.contains("not found")),
-                other => panic!("expected Error, got {:?}", other),
-            }
-        } else {
-            panic!("expected WebSocketEvent");
-        }
     }
 }

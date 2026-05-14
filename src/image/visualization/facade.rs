@@ -1,3 +1,8 @@
+//! Shared color helpers used by all visualization submodules.
+//! Currently owns `hsv_to_rgb_viz` for converting HSV to RGB tuples in debug renders.
+//! Does not own pixel buffers or visualization entry points — those live in their respective submodules.
+
+/// Convert HSV values to an RGB tuple for visualization images.
 pub(crate) fn hsv_to_rgb_viz(h: u16, s: f32, v: f32) -> (u8, u8, u8) {
     let h = (h % 360) as f32;
     let c = v * s;

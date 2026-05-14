@@ -1,16 +1,29 @@
+//! Widget primitives for the terminal UI layer. Owns `Widget`, `WidgetBase`,
+//! `WidgetKind`, and `BorderStyle`. Does not own input dispatch or rendering;
+//! those are handled by `terminal_state` and `render`. Depends on `cell` constants
+//! and the `MAX_COLS`/`MAX_ROWS` grid caps.
+
 use super::cell::DEFAULT_FG;
 use super::terminal_state::{MAX_COLS, MAX_ROWS};
+
+/// Return the display width in characters for `text`, always at least 1.
 fn text_width(text: &str) -> usize {
     text.chars().count().max(1)
 }
+
+/// Border drawing style used by `WidgetKind::Border`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum BorderStyle {
+    /// Box-drawing single lines: ┌─┐│└┘.
     #[default]
     Single,
+    /// Box-drawing double lines: ╔═╗║╚╝.
     Double,
+    /// ASCII fallback: +-|.
     Ascii,
 }
 impl BorderStyle {
+    /// Parse a lowercase style name and return the matching variant, or `None` for unknown names.
     pub fn from_str_name(s: &str) -> Option<Self> {
         match s {
             "single" => Some(Self::Single),
@@ -19,6 +32,7 @@ impl BorderStyle {
             _ => None,
         }
     }
+    /// Return the canonical lowercase string name for this style.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Single => "single",
@@ -27,17 +41,26 @@ impl BorderStyle {
         }
     }
 }
+/// Layout and shared state common to all widget kinds.
 #[derive(Debug, Clone)]
 pub struct WidgetBase {
+    /// Zero-based column of the widget's top-left corner.
     pub x: usize,
+    /// Zero-based row of the widget's top-left corner.
     pub y: usize,
+    /// Width of the widget in character cells.
     pub width: usize,
+    /// Height of the widget in character cells.
     pub height: usize,
+    /// When `false` the widget is not rendered.
     pub visible: bool,
+    /// When `false` the widget ignores input events.
     pub enabled: bool,
+    /// Caller-supplied tag string for `find_by_tag` lookup.
     pub tag: String,
 }
 impl WidgetBase {
+    /// Create a new `WidgetBase` at zero-based position derived from 1-based `(col, row)` with given pixel-grid size.
     pub fn new(x: usize, y: usize, width: usize, height: usize) -> Self {
         Self {
             x,
@@ -49,48 +72,75 @@ impl WidgetBase {
             tag: String::new(),
         }
     }
+    /// Return the widget position as 1-based `(col, row)`.
     pub fn position_1based(&self) -> (usize, usize) {
         (self.x + 1, self.y + 1)
     }
+
+    /// Move the widget to 1-based `(col, row)`.
     pub fn set_position_1based(&mut self, col: usize, row: usize) {
         self.x = col.saturating_sub(1);
         self.y = row.saturating_sub(1);
     }
 }
+/// The type-specific data for a `Widget`.
 #[derive(Debug, Clone)]
 pub enum WidgetKind {
+    /// Static text rendered with a given color.
     Label {
+        /// Display string.
         text: String,
+        /// RGBA foreground color.
         color: [f32; 4],
     },
+    /// Clickable button with centered label text.
     Button {
+        /// Label shown inside the button bounds.
         text: String,
     },
+    /// Single-line text input with optional length cap and cursor.
     TextBox {
+        /// Current text content.
         text: String,
+        /// Maximum character count; 0 means unlimited.
         max_length: usize,
+        /// Char-index cursor position within `text`.
         cursor_pos: usize,
     },
+    /// Scrollable item list with optional selection.
     List {
+        /// All list items in display order.
         items: Vec<String>,
+        /// Zero-based selected item index, or `None` when nothing is selected.
         selected: Option<usize>,
+        /// Zero-based index of the first visible item.
         scroll_offset: usize,
     },
+    /// Decorative border frame with optional title.
     Border {
+        /// Line-drawing style.
         style: BorderStyle,
+        /// Title string written in the top border row; empty means no title.
         title: String,
+        /// RGBA color for the border and title characters.
         color: [f32; 4],
     },
+    /// Invisible grouping widget that holds child widget indices.
     Panel {
+        /// Indices of child widgets owned by this panel.
         children: Vec<usize>,
     },
 }
+/// A positioned, typed UI widget rendered over the `Terminal` cell grid.
 #[derive(Debug, Clone)]
 pub struct Widget {
+    /// Shared layout and visibility state.
     pub base: WidgetBase,
+    /// Type-specific widget data.
     pub kind: WidgetKind,
 }
 impl Widget {
+    /// Create a `Label` widget at 1-based `(col, row)` with auto-sized width.
     pub fn new_label(col: usize, row: usize, text: impl Into<String>) -> Self {
         let text = text.into();
         Self {
@@ -106,6 +156,7 @@ impl Widget {
             },
         }
     }
+    /// Create a `Button` widget at 1-based `(col, row)` with explicit `width`/`height`.
     pub fn new_button(
         col: usize,
         row: usize,
@@ -123,6 +174,7 @@ impl Widget {
             kind: WidgetKind::Button { text: text.into() },
         }
     }
+    /// Create a single-row `TextBox` widget at 1-based `(col, row)` with given `width`.
     pub fn new_text_box(col: usize, row: usize, width: usize) -> Self {
         Self {
             base: WidgetBase::new(
@@ -138,6 +190,7 @@ impl Widget {
             },
         }
     }
+    /// Create a `List` widget at 1-based `(col, row)` with explicit `width`/`height`.
     pub fn new_list(col: usize, row: usize, width: usize, height: usize) -> Self {
         Self {
             base: WidgetBase::new(
@@ -153,6 +206,7 @@ impl Widget {
             },
         }
     }
+    /// Create a `Border` widget at 1-based `(col, row)` with explicit `width`/`height`.
     pub fn new_border(col: usize, row: usize, width: usize, height: usize) -> Self {
         Self {
             base: WidgetBase::new(
@@ -168,6 +222,7 @@ impl Widget {
             },
         }
     }
+    /// Create a `Panel` grouping widget at 1-based `(col, row)` with explicit `width`/`height`.
     pub fn new_panel(col: usize, row: usize, width: usize, height: usize) -> Self {
         Self {
             base: WidgetBase::new(
@@ -181,6 +236,7 @@ impl Widget {
             },
         }
     }
+    /// Set the display text for `Label`, `Button`, or `TextBox`; returns `Ok(true)` when the `TextBox` content changed.
     pub fn set_text(&mut self, new_text: String) -> Result<bool, &'static str> {
         match &mut self.kind {
             WidgetKind::Label { text, .. } => {
@@ -210,6 +266,7 @@ impl Widget {
             _ => Err("expected label, button, or text box"),
         }
     }
+    /// Return the display text for `Label`, `Button`, or `TextBox`; errors on other kinds.
     pub fn get_text(&self) -> Result<String, &'static str> {
         match &self.kind {
             WidgetKind::Label { text, .. }
@@ -218,6 +275,7 @@ impl Widget {
             _ => Err("expected label, button, or text box"),
         }
     }
+    /// Set the foreground color on `Label` or `Border`; errors on other kinds.
     pub fn set_color(&mut self, new_color: [f32; 4]) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::Label { color, .. } | WidgetKind::Border { color, .. } => {
@@ -227,12 +285,14 @@ impl Widget {
             _ => Err("expected label or border"),
         }
     }
+    /// Return the foreground color of `Label` or `Border`; errors on other kinds.
     pub fn get_color(&self) -> Result<[f32; 4], &'static str> {
         match &self.kind {
             WidgetKind::Label { color, .. } | WidgetKind::Border { color, .. } => Ok(*color),
             _ => Err("expected label or border"),
         }
     }
+    /// Set the character cap on a `TextBox` and truncate current text and cursor if needed; errors on other kinds.
     pub fn set_max_length(&mut self, max: usize) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::TextBox {
@@ -250,12 +310,14 @@ impl Widget {
             _ => Err("expected text box"),
         }
     }
+    /// Return the character cap for a `TextBox`; errors on other kinds.
     pub fn get_max_length(&self) -> Result<usize, &'static str> {
         match &self.kind {
             WidgetKind::TextBox { max_length, .. } => Ok(*max_length),
             _ => Err("expected text box"),
         }
     }
+    /// Append `item` to the `List`; errors on other kinds.
     pub fn add_item(&mut self, item: String) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::List { items, .. } => {
@@ -265,6 +327,7 @@ impl Widget {
             _ => Err("expected list"),
         }
     }
+    /// Remove the item at 1-based `index` from a `List`, adjusting selection and scroll; errors on other kinds.
     pub fn remove_item_1based(&mut self, index: usize) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::List {
@@ -290,6 +353,7 @@ impl Widget {
             _ => Err("expected list"),
         }
     }
+    /// Remove all items from a `List` and reset selection and scroll; errors on other kinds.
     pub fn clear_items(&mut self) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::List {
@@ -305,12 +369,14 @@ impl Widget {
             _ => Err("expected list"),
         }
     }
+    /// Return the item count for a `List`; errors on other kinds.
     pub fn get_item_count(&self) -> Result<usize, &'static str> {
         match &self.kind {
             WidgetKind::List { items, .. } => Ok(items.len()),
             _ => Err("expected list"),
         }
     }
+    /// Return the item text at 1-based `index` from a `List`; returns empty string when index is out of range; errors on other kinds.
     pub fn get_item_1based(&self, index: usize) -> Result<String, &'static str> {
         match &self.kind {
             WidgetKind::List { items, .. } => {
@@ -323,6 +389,7 @@ impl Widget {
             _ => Err("expected list"),
         }
     }
+    /// Set the 1-based selected index on a `List`, clamping scroll to keep it visible; returns `Ok(true)` when selection changed; errors on other kinds.
     pub fn set_selected_1based(&mut self, index: Option<usize>) -> Result<bool, &'static str> {
         match &mut self.kind {
             WidgetKind::List {
@@ -349,12 +416,14 @@ impl Widget {
             _ => Err("expected list"),
         }
     }
+    /// Return the 1-based selected index for a `List`, or `None`; errors on other kinds.
     pub fn get_selected_1based(&self) -> Result<Option<usize>, &'static str> {
         match &self.kind {
             WidgetKind::List { selected, .. } => Ok(selected.map(|v| v + 1)),
             _ => Err("expected list"),
         }
     }
+    /// Set the border line style on a `Border` widget; errors on other kinds.
     pub fn set_border_style(&mut self, new_style: BorderStyle) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::Border { style, .. } => {
@@ -364,12 +433,14 @@ impl Widget {
             _ => Err("expected border"),
         }
     }
+    /// Return the border line style of a `Border` widget; errors on other kinds.
     pub fn get_border_style(&self) -> Result<BorderStyle, &'static str> {
         match &self.kind {
             WidgetKind::Border { style, .. } => Ok(*style),
             _ => Err("expected border"),
         }
     }
+    /// Set the title string on a `Border` widget; errors on other kinds.
     pub fn set_title(&mut self, new_title: String) -> Result<(), &'static str> {
         match &mut self.kind {
             WidgetKind::Border { title, .. } => {
@@ -379,21 +450,29 @@ impl Widget {
             _ => Err("expected border"),
         }
     }
+    /// Return the title string of a `Border` widget; errors on other kinds.
     pub fn get_title(&self) -> Result<String, &'static str> {
         match &self.kind {
             WidgetKind::Border { title, .. } => Ok(title.clone()),
             _ => Err("expected border"),
         }
     }
+    /// Return `true` when this widget is a `Button`.
     pub fn is_button(&self) -> bool {
         matches!(self.kind, WidgetKind::Button { .. })
     }
+
+    /// Return `true` when this widget is a `TextBox`.
     pub fn is_textbox(&self) -> bool {
         matches!(self.kind, WidgetKind::TextBox { .. })
     }
+
+    /// Return `true` when this widget is a `List`.
     pub fn is_list(&self) -> bool {
         matches!(self.kind, WidgetKind::List { .. })
     }
+
+    /// Return `true` when this widget is a `Panel`.
     pub fn is_panel(&self) -> bool {
         matches!(self.kind, WidgetKind::Panel { .. })
     }

@@ -1,8 +1,14 @@
+//! Widget render emit functions for `lurek.ui` — converts live `GuiContext` widget state into
+//! `RenderCommand` streams and `ImageData` via `build_render_commands` and `draw_to_image`.
+//! All per-widget drawing is done by private `emit_*` helpers; no GPU calls are made here.
+//! Depends on `crate::render::renderer`, `crate::ui::context`, `crate::ui::theme`, and `crate::image`.
+
 use crate::render::renderer::{DrawMode, GradientDirection, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
 use crate::ui::context::{GuiContext, WidgetKind};
 use crate::ui::theme::WidgetStyle;
 use crate::ui::widget::WidgetBase;
+/// Return the primary display text of text-bearing widget variants, or `None` for all others.
 fn display_text(widget: &WidgetKind) -> Option<&str> {
     let text = match widget {
         WidgetKind::Button(w) => &w.text,
@@ -18,6 +24,7 @@ fn display_text(widget: &WidgetKind) -> Option<&str> {
         Some(text)
     }
 }
+/// Convert HSV in `[0.0, 1.0]` to 8-bit `(R, G, B)` using a six-sector conversion.
 fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
     let h6 = (h * 6.0).rem_euclid(6.0);
     let i = h6 as u32;
@@ -35,6 +42,7 @@ fn hsv_to_rgb(h: f32, s: f32, v: f32) -> (u8, u8, u8) {
     };
     ((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
 }
+/// Recursively draw tree node `idx` and its expanded children into `img` as labelled rows; return next Y.
 #[allow(clippy::too_many_arguments)]
 fn draw_tree_nodes_cpu(
     nodes: &[crate::ui::extras::TreeNode],
@@ -134,6 +142,7 @@ fn draw_tree_nodes_cpu(
     }
     next_y
 }
+/// Emit a filled and optionally bordered background box for `base` using `style`.
 fn emit_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let [br, bg, bb, ba] = style.bg_color;
     if let Some(color2) = style.gradient_end {
@@ -205,6 +214,7 @@ fn emit_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand
         }
     }
 }
+/// Emit a centred or aligned `Print` command for `text` inside `base`.
 fn emit_text(
     base: &WidgetBase,
     text: &str,
@@ -230,6 +240,7 @@ fn emit_text(
         scale,
     });
 }
+/// Emit a shadow rectangle behind `base` when `style.shadow_color` alpha is non-zero.
 fn emit_shadow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let [sr, sg, sb, sa] = style.shadow_color;
     if sa <= 0.0 {
@@ -257,6 +268,7 @@ fn emit_shadow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderComm
         });
     }
 }
+/// Emit a top-edge highlight strip when `style.highlight_alpha > 0`.
 fn emit_highlight(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     if style.highlight_alpha <= 0.0 {
         return;
@@ -272,6 +284,7 @@ fn emit_highlight(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderC
         h: strip_h,
     });
 }
+/// Emit a filled progress track and circular thumb for a slider widget.
 fn emit_slider(
     base: &WidgetBase,
     value: f64,
@@ -306,6 +319,7 @@ fn emit_slider(
         r: thumb_r,
     });
 }
+/// Emit a filled progress fill rectangle proportional to `value` in `[min, max]`.
 fn emit_progress_bar(
     base: &WidgetBase,
     value: f64,
@@ -331,6 +345,7 @@ fn emit_progress_bar(
         h: base.height,
     });
 }
+/// Emit a tick/check mark glyph inside the checkbox bounding box.
 fn emit_checkbox(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let box_size = base.height.min(base.height);
     let cx = base.x + box_size * 0.5;
@@ -352,6 +367,7 @@ fn emit_checkbox(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
         y2: cy - s,
     });
 }
+/// Emit a filled circle indicating a selected radio button.
 fn emit_radio_button(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let r = (base.height * 0.5 - 3.0).max(2.0);
     let cx = base.x + base.height * 0.5;
@@ -365,6 +381,7 @@ fn emit_radio_button(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<Rend
         r,
     });
 }
+/// Emit a downward-pointing triangle drop-arrow at the right edge of a combo box.
 fn emit_combo_box_arrow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let btn_w = base.height;
     let ax = base.x + base.width - btn_w * 0.5;
@@ -382,6 +399,7 @@ fn emit_combo_box_arrow(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<R
         y3: ay + s * 0.5,
     });
 }
+/// Emit a proportional rounded-rect scroll thumb inside the scroll bar track.
 fn emit_scroll_bar(
     base: &WidgetBase,
     position: f32,
@@ -424,6 +442,7 @@ fn emit_scroll_bar(
         });
     }
 }
+/// Emit up/down arrow triangles at the left and right edges of a spin box.
 fn emit_spin_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCommand>) {
     let btn_w = base.height;
     let mid_y = base.y + base.height * 0.5;
@@ -450,6 +469,7 @@ fn emit_spin_box(base: &WidgetBase, style: &WidgetStyle, cmds: &mut Vec<RenderCo
         y3: mid_y - s * 0.5,
     });
 }
+/// Emit a rounded track and interpolated thumb for a toggle switch; `thumb_t` is the thumb position in `[0.0, 1.0]`.
 fn emit_switch(
     base: &WidgetBase,
     on: bool,
@@ -484,6 +504,7 @@ fn emit_switch(
         r: thumb_r,
     });
 }
+/// Emit the display text of a badge centred inside its bounding box.
 fn emit_badge(
     base: &WidgetBase,
     text: &str,
@@ -504,6 +525,7 @@ fn emit_badge(
         scale,
     });
 }
+/// Emit a `Print` command at an explicit `(x, y)` position, bypassing widget padding.
 fn emit_text_at(
     text: &str,
     x: f32,
@@ -522,13 +544,20 @@ fn emit_text_at(
         scale: style.font_size / 14.0,
     });
 }
+/// Temporary borrowed context passed through recursive `emit_tree_nodes` calls.
 struct TreeCtx<'a> {
+    /// Flat node list owned by the `TreeView`.
     nodes: &'a [crate::ui::extras::TreeNode],
+    /// Currently selected node index, if any.
     selected: Option<usize>,
+    /// Font key used to print node labels.
     font_key: FontKey,
+    /// Active widget style for colour selection.
     style: &'a WidgetStyle,
+    /// Output command buffer.
     cmds: &'a mut Vec<RenderCommand>,
 }
+/// Recursively emit tree node `idx` and its expanded children as indented rows; return next Y position.
 fn emit_tree_nodes(
     ctx: &mut TreeCtx<'_>,
     idx: usize,
@@ -612,6 +641,7 @@ fn emit_tree_nodes(
     }
     y
 }
+/// Collect all child indices that should be rendered for `widget`, merging `children()` and type-specific slots.
 fn widget_render_children(widget: &WidgetKind) -> Vec<usize> {
     let mut children = widget.children().cloned().unwrap_or_default();
     match widget {
@@ -646,6 +676,7 @@ fn widget_render_children(widget: &WidgetKind) -> Vec<usize> {
     children.dedup();
     children
 }
+/// Look up `base`'s theme style, then scale all alpha channels by `base.alpha`.
 fn resolve_style_with_alpha(
     ctx: &GuiContext,
     base: &WidgetBase,
@@ -665,13 +696,19 @@ fn resolve_style_with_alpha(
     style_with_alpha.highlight_alpha *= alpha;
     style_with_alpha
 }
+/// Temporary borrow-carrier used to thread `ctx`, font, and output buffer through widget rendering.
 struct WidgetRenderer<'a> {
+    /// Shared GUI context providing widget list and theme.
     ctx: &'a GuiContext,
+    /// Font key passed to all text-emit helpers.
     font_key: FontKey,
+    /// Fallback widget style used when the theme has no entry for a widget type.
     default_style: &'a WidgetStyle,
+    /// Output command buffer accumulated during a render pass.
     cmds: &'a mut Vec<RenderCommand>,
 }
 impl<'a> WidgetRenderer<'a> {
+    /// Create a renderer borrowing `ctx`, `font_key`, `default_style`, and output `cmds`.
     fn new(
         ctx: &'a GuiContext,
         font_key: FontKey,
@@ -685,9 +722,11 @@ impl<'a> WidgetRenderer<'a> {
             cmds,
         }
     }
+    /// Render the widget at `idx` by delegating to the free `render_widget` function.
     fn render_widget(&mut self, idx: usize) {
         render_widget(self.ctx, idx, self.font_key, self.default_style, self.cmds);
     }
+    /// Render all immediate children of the root widget (index 0).
     fn render_root_children(&mut self) {
         if let Some(children) = self.ctx.widgets.first().and_then(|w| w.children()) {
             for &child_idx in children {
@@ -698,6 +737,7 @@ impl<'a> WidgetRenderer<'a> {
         }
     }
 }
+/// Emit all `RenderCommand`s for the widget at `idx` and its visible descendants, using `font_key` and `default_style`.
 fn render_widget(
     ctx: &GuiContext,
     idx: usize,
@@ -1380,6 +1420,7 @@ fn render_widget(
     }
 }
 impl GuiContext {
+    /// Run a layout pass then emit all render commands using `font_key`; return the command list.
     pub fn build_render_commands(&mut self, font_key: FontKey) -> Vec<RenderCommand> {
         self.run_layout_pass();
         let default_style = WidgetStyle::default();
@@ -1387,9 +1428,11 @@ impl GuiContext {
         WidgetRenderer::new(self, font_key, &default_style, &mut cmds).render_root_children();
         cmds
     }
+    /// Run a layout pass and emit render commands using the default font key.
     pub fn generate_render_commands(&mut self) -> Vec<RenderCommand> {
         self.build_render_commands(FontKey::default())
     }
+    /// Rasterise all visible widgets into a new `ImageData` of `width × height` pixels.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(24, 26, 34, 255);

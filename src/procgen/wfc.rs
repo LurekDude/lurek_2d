@@ -1,29 +1,56 @@
+//! Wave Function Collapse tile map generator for `src/procgen`.
+//! Owns `WfcTile`, `WfcRules`, `WfcOpts`, `WfcGrid`, and `wfc_generate`.
+//! Does not own dungeon room layout or noise maps — those live in `rooms.rs` and `noise.rs`.
+
 use crate::procgen::lcg::Lcg;
 use std::collections::HashMap;
+
+/// A tile variant with an identifier and a sampling weight.
 #[derive(Debug, Clone)]
 pub struct WfcTile {
+    /// Unique tile identifier referenced by `WfcRules` adjacency maps.
     pub id: u32,
+    /// Relative probability weight used when collapsing a superposition; must be > 0.
     pub weight: f32,
 }
+
+/// Adjacency constraints between tile IDs.
 #[derive(Debug, Clone, Default)]
 pub struct WfcRules {
+    /// Map from tile ID to the set of tile IDs that may appear in any neighbouring cell.
+    /// When a tile ID has no entry, all other tiles are considered valid neighbours.
     pub adjacencies: HashMap<u32, Vec<u32>>,
 }
+
+/// Configuration for a WFC generation run.
 #[derive(Debug, Clone)]
 pub struct WfcOpts {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Full set of available tile variants.
     pub tiles: Vec<WfcTile>,
+    /// Adjacency rules applied during constraint propagation.
     pub rules: WfcRules,
+    /// Base seed; each retry increments this to avoid repeating the same contradiction.
     pub seed: u64,
+    /// Number of generation attempts before returning an all-`None` grid.
     pub max_attempts: u32,
 }
+
+/// Completed WFC grid; cells with no valid assignment are `None` (contradiction).
 #[derive(Debug, Clone)]
 pub struct WfcGrid {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Flat row-major assignment results; `None` indicates unresolved contradiction.
     pub cells: Vec<Option<u32>>,
 }
+
+/// Run WFC on `opts`, retrying up to `max_attempts` times; returns a fully-assigned grid or all-`None` on failure.
 pub fn wfc_generate(opts: &WfcOpts) -> WfcGrid {
     let n = (opts.width * opts.height) as usize;
     if opts.tiles.is_empty() || n == 0 {

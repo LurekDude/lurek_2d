@@ -1,8 +1,14 @@
+//! Debug rendering helpers for `World`: `RenderCommand` list generation and CPU image rasterisation.
+//! These methods extend `World` for debug visualisation only; not used in release builds.
+
 use crate::image::ImageData;
 use crate::physics::body::{BodyShape, BodyType};
 use crate::physics::world::World;
 use crate::render::renderer::{DrawMode, RenderCommand};
+
+/// Debug render and image-rasterisation helpers added to `World`.
 impl World {
+    /// Build a list of `RenderCommand`s drawing outlines and velocity arrows for all bodies.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let ids = self.get_body_ids();
         if ids.is_empty() {
@@ -58,6 +64,7 @@ impl World {
         }
         cmds
     }
+    /// Rasterise all bodies onto a `width`×`height` `ImageData` centered at the origin.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {
         let mut img = ImageData::new(width, height);
         img.fill(20, 20, 30, 255);

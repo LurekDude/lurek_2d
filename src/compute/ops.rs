@@ -1,20 +1,32 @@
+//! Element-wise arithmetic, comparison, reduction, and reshape operations.
+//! Owns broadcast handling, scalar dispatch, axis reductions, and bitwise ops.
+//! Keeps generic compute operations separate from storage and linalg modules.
+//! Depends on NdArray accessors and optional rayon parallel execution.
+
 use crate::compute::array::{DataType, NdArray};
 use rayon::prelude::*;
 use std::sync::OnceLock;
 use std::sync::{Arc, Mutex};
+
+/// Stores lazily initialized parallel threshold configuration handle.
 static PAR_THRESHOLD_CONFIG: OnceLock<Arc<Mutex<usize>>> = OnceLock::new();
+
+/// Return shared threshold configuration handle, initializing default when needed.
 fn get_par_threshold_config() -> &'static Arc<Mutex<usize>> {
     PAR_THRESHOLD_CONFIG.get_or_init(|| Arc::new(Mutex::new(10_000)))
 }
+/// Read current parallel threshold and return minimum size for parallel dispatch.
 pub fn get_par_threshold() -> usize {
     *get_par_threshold_config().lock().unwrap()
 }
+/// Set parallel threshold and return previous threshold value.
 pub fn set_par_threshold(threshold: usize) -> usize {
     let mut config = get_par_threshold_config().lock().unwrap();
     let prev = *config;
     *config = threshold.max(1);
     prev
 }
+/// Dispatch element-wise closure and return collected values from serial or parallel path.
 fn dispatch_parallel(size: usize, op: impl Fn(usize) -> f64 + Sync + Send) -> Vec<f64> {
     if size > get_par_threshold() {
         (0..size).into_par_iter().map(op).collect()
@@ -22,6 +34,7 @@ fn dispatch_parallel(size: usize, op: impl Fn(usize) -> f64 + Sync + Send) -> Ve
         (0..size).map(op).collect()
     }
 }
+/// Validate equal shape and dtype and return success or mismatch error.
 fn check_same_shape_dtype(a: &NdArray, b: &NdArray) -> Result<(), String> {
     if a.shape() != b.shape() {
         return Err(format!(
@@ -39,6 +52,7 @@ fn check_same_shape_dtype(a: &NdArray, b: &NdArray) -> Result<(), String> {
     }
     Ok(())
 }
+/// Apply binary operation with broadcast support and return computed output array.
 fn elementwise_binary(
     a: &NdArray,
     b: &NdArray,
@@ -91,6 +105,7 @@ fn elementwise_binary(
         b.shape()
     ))
 }
+/// Apply unary operation element-wise and return computed output array.
 fn elementwise_unary(a: &NdArray, op: fn(f64) -> f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     let vals = dispatch_parallel(a.size(), |i| op(a.get_f64(i)));
@@ -99,6 +114,7 @@ fn elementwise_unary(a: &NdArray, op: fn(f64) -> f64) -> Result<NdArray, String>
     }
     Ok(out)
 }
+/// Apply scalar binary operation element-wise and return computed output array.
 fn elementwise_scalar(a: &NdArray, s: f64, op: fn(f64, f64) -> f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     let vals = dispatch_parallel(a.size(), |i| op(a.get_f64(i), s));
@@ -107,6 +123,7 @@ fn elementwise_scalar(a: &NdArray, s: f64, op: fn(f64, f64) -> f64) -> Result<Nd
     }
     Ok(out)
 }
+/// Apply binary operation in place and return success or broadcast mismatch error.
 fn elementwise_binary_inplace(
     a: &mut NdArray,
     b: &NdArray,
@@ -142,6 +159,7 @@ fn elementwise_binary_inplace(
         b.shape()
     ))
 }
+/// Validate axis index and return success or out-of-bounds error.
 fn check_axis(a: &NdArray, axis: usize) -> Result<(), String> {
     if axis >= a.ndim() {
         return Err(format!(
@@ -152,6 +170,7 @@ fn check_axis(a: &NdArray, axis: usize) -> Result<(), String> {
     }
     Ok(())
 }
+/// Validate int32 dtype and return success or dtype mismatch error.
 fn require_int32(a: &NdArray) -> Result<(), String> {
     if a.dtype() != DataType::Int32 {
         return Err(format!(
@@ -161,30 +180,39 @@ fn require_int32(a: &NdArray) -> Result<(), String> {
     }
     Ok(())
 }
+/// Add arrays element-wise and return result with broadcast support.
 pub fn add(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x + y)
 }
+/// Add scalar to array and return element-wise result.
 pub fn add_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x + y)
 }
+/// Subtract arrays element-wise and return result with broadcast support.
 pub fn sub(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x - y)
 }
+/// Subtract scalar from array and return element-wise result.
 pub fn sub_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x - y)
 }
+/// Multiply arrays element-wise and return result with broadcast support.
 pub fn mul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x * y)
 }
+/// Multiply array by scalar and return element-wise result.
 pub fn mul_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x * y)
 }
+/// Divide arrays element-wise and return result with broadcast support.
 pub fn div(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     elementwise_binary(a, b, |x, y| x / y)
 }
+/// Divide array by scalar and return element-wise result.
 pub fn div_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     elementwise_scalar(a, s, |x, y| x / y)
 }
+/// Raise each element to exponent and return transformed array.
 pub fn pow_scalar(a: &NdArray, exp: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     for i in 0..a.size() {
@@ -192,15 +220,19 @@ pub fn pow_scalar(a: &NdArray, exp: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute square root per element and return transformed array.
 pub fn sqrt(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, f64::sqrt)
 }
+/// Compute absolute value per element and return transformed array.
 pub fn abs(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, f64::abs)
 }
+/// Negate each element and return transformed array.
 pub fn neg(a: &NdArray) -> Result<NdArray, String> {
     elementwise_unary(a, |x| -x)
 }
+/// Clamp each element to range and return transformed array.
 pub fn clamp(a: &NdArray, min_val: f64, max_val: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
     for i in 0..a.size() {
@@ -208,6 +240,7 @@ pub fn clamp(a: &NdArray, min_val: f64, max_val: f64) -> Result<NdArray, String>
     }
     Ok(out)
 }
+/// Compare arrays for equality and return float mask array.
 pub fn eq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -221,6 +254,7 @@ pub fn eq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for equality and return float mask array.
 pub fn eq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -233,6 +267,7 @@ pub fn eq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare arrays for inequality and return float mask array.
 pub fn neq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -246,6 +281,7 @@ pub fn neq(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for inequality and return float mask array.
 pub fn neq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -258,6 +294,7 @@ pub fn neq_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare arrays for greater-than and return float mask array.
 pub fn gt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -273,6 +310,7 @@ pub fn gt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for greater-than and return float mask array.
 pub fn gt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -280,6 +318,7 @@ pub fn gt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare arrays for less-than and return float mask array.
 pub fn lt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -295,6 +334,7 @@ pub fn lt(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for less-than and return float mask array.
 pub fn lt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -302,6 +342,7 @@ pub fn lt_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare arrays for greater-or-equal and return float mask array.
 pub fn gte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -317,6 +358,7 @@ pub fn gte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for greater-or-equal and return float mask array.
 pub fn gte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -324,6 +366,7 @@ pub fn gte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare arrays for less-or-equal and return float mask array.
 pub fn lte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     check_same_shape_dtype(a, b)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
@@ -339,6 +382,7 @@ pub fn lte(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compare array to scalar for less-or-equal and return float mask array.
 pub fn lte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), DataType::Float32)?;
     for i in 0..a.size() {
@@ -346,9 +390,11 @@ pub fn lte_scalar(a: &NdArray, s: f64) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Build threshold mask and return elements greater-or-equal to threshold as ones.
 pub fn threshold(a: &NdArray, val: f64) -> Result<NdArray, String> {
     gte_scalar(a, val)
 }
+/// Select values by mask and return merged output array.
 pub fn where_mask(cond: &NdArray, a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if cond.shape() != a.shape() || a.shape() != b.shape() {
         return Err(format!(
@@ -372,6 +418,7 @@ pub fn where_mask(cond: &NdArray, a: &NdArray, b: &NdArray) -> Result<NdArray, S
     }
     Ok(out)
 }
+/// Count non-zero elements and return total count.
 pub fn count_nonzero(a: &NdArray) -> usize {
     let mut count = 0usize;
     for i in 0..a.size() {
@@ -381,6 +428,7 @@ pub fn count_nonzero(a: &NdArray) -> usize {
     }
     count
 }
+/// Return flat index of minimum element.
 pub fn argmin(a: &NdArray) -> usize {
     let mut best_idx = 0;
     let mut best_val = a.get_f64(0);
@@ -393,6 +441,7 @@ pub fn argmin(a: &NdArray) -> usize {
     }
     best_idx
 }
+/// Return flat index of maximum element.
 pub fn argmax(a: &NdArray) -> usize {
     let mut best_idx = 0;
     let mut best_val = a.get_f64(0);
@@ -405,6 +454,7 @@ pub fn argmax(a: &NdArray) -> usize {
     }
     best_idx
 }
+/// Return true when any element is non-zero.
 pub fn any(a: &NdArray) -> bool {
     for i in 0..a.size() {
         if a.get_f64(i) != 0.0 {
@@ -413,6 +463,7 @@ pub fn any(a: &NdArray) -> bool {
     }
     false
 }
+/// Return true when all elements are non-zero.
 pub fn all(a: &NdArray) -> bool {
     for i in 0..a.size() {
         if a.get_f64(i) == 0.0 {
@@ -421,6 +472,7 @@ pub fn all(a: &NdArray) -> bool {
     }
     true
 }
+/// Sum elements and return scalar total.
 pub fn sum(a: &NdArray) -> f64 {
     if a.size() > get_par_threshold() {
         (0..a.size()).into_par_iter().map(|i| a.get_f64(i)).sum()
@@ -432,9 +484,11 @@ pub fn sum(a: &NdArray) -> f64 {
         s
     }
 }
+/// Compute mean value and return scalar average.
 pub fn mean(a: &NdArray) -> f64 {
     sum(a) / a.size() as f64
 }
+/// Compute minimum element value and return scalar minimum.
 pub fn min_val(a: &NdArray) -> f64 {
     if a.size() > get_par_threshold() {
         (0..a.size())
@@ -453,6 +507,7 @@ pub fn min_val(a: &NdArray) -> f64 {
         m
     }
 }
+/// Compute maximum element value and return scalar maximum.
 pub fn max_val(a: &NdArray) -> f64 {
     if a.size() > get_par_threshold() {
         (0..a.size())
@@ -471,6 +526,7 @@ pub fn max_val(a: &NdArray) -> f64 {
         m
     }
 }
+/// Compute reduced shape after dropping axis and return new shape vector.
 fn reduced_shape(shape: &[usize], axis: usize) -> Vec<usize> {
     let mut out = Vec::with_capacity(shape.len() - 1);
     for (i, &dim) in shape.iter().enumerate() {
@@ -483,6 +539,7 @@ fn reduced_shape(shape: &[usize], axis: usize) -> Vec<usize> {
     }
     out
 }
+/// Iterate all flat indices for shape and invoke callback with multidimensional indices.
 fn for_each_index(shape: &[usize], mut f: impl FnMut(usize, &[usize])) {
     let ndim = shape.len();
     let total: usize = shape.iter().product();
@@ -500,6 +557,7 @@ fn for_each_index(shape: &[usize], mut f: impl FnMut(usize, &[usize])) {
         let _ = strides;
     }
 }
+/// Sum elements along axis and return reduced array.
 pub fn sum_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -519,6 +577,7 @@ pub fn sum_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     });
     Ok(out)
 }
+/// Compute mean along axis and return reduced array.
 pub fn mean_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let mut out = sum_axis(a, axis)?;
@@ -528,6 +587,7 @@ pub fn mean_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute minimum along axis and return reduced array.
 pub fn min_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -552,6 +612,7 @@ pub fn min_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     });
     Ok(out)
 }
+/// Compute maximum along axis and return reduced array.
 pub fn max_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     check_axis(a, axis)?;
     let out_shape = reduced_shape(a.shape(), axis);
@@ -576,6 +637,7 @@ pub fn max_axis(a: &NdArray, axis: usize) -> Result<NdArray, String> {
     });
     Ok(out)
 }
+/// Reshape array metadata and return cloned array with new shape.
 pub fn reshape(a: &NdArray, new_shape: &[usize]) -> Result<NdArray, String> {
     let new_total: usize = new_shape.iter().product();
     if new_total != a.size() {
@@ -594,6 +656,7 @@ pub fn reshape(a: &NdArray, new_shape: &[usize]) -> Result<NdArray, String> {
     out.set_shape(new_shape.to_vec(), strides);
     Ok(out)
 }
+/// Transpose 2D array and return array with swapped axes.
 pub fn transpose_2d(a: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 {
         return Err(format!(
@@ -613,24 +676,31 @@ pub fn transpose_2d(a: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Fill array in place and return after mutation.
 pub fn fill(a: &mut NdArray, val: f64) {
     a.fill(val);
 }
+/// Add second array into first array in place and return success status.
 pub fn add_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
     elementwise_binary_inplace(a, b, |x, y| x + y)
 }
+/// Subtract second array from first array in place and return success status.
 pub fn sub_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
     elementwise_binary_inplace(a, b, |x, y| x - y)
 }
+/// Multiply first array by second array in place and return success status.
 pub fn mul_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
     elementwise_binary_inplace(a, b, |x, y| x * y)
 }
+/// Divide first array by second array in place and return success status.
 pub fn div_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
     elementwise_binary_inplace(a, b, |x, y| x / y)
 }
+/// Clone array and return independent copy.
 pub fn clone_array(a: &NdArray) -> NdArray {
     a.clone()
 }
+/// Compute bitwise AND and return int32 output array.
 pub fn bitwise_and(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -641,6 +711,7 @@ pub fn bitwise_and(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute bitwise OR and return int32 output array.
 pub fn bitwise_or(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -651,6 +722,7 @@ pub fn bitwise_or(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute bitwise XOR and return int32 output array.
 pub fn bitwise_xor(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     require_int32(b)?;
@@ -661,6 +733,7 @@ pub fn bitwise_xor(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Compute bitwise NOT and return int32 output array.
 pub fn bitwise_not(a: &NdArray) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;
@@ -669,6 +742,7 @@ pub fn bitwise_not(a: &NdArray) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Shift int32 elements left and return shifted output array.
 pub fn bitwise_lshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;
@@ -677,6 +751,7 @@ pub fn bitwise_lshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
     }
     Ok(out)
 }
+/// Shift int32 elements right and return shifted output array.
 pub fn bitwise_rshift(a: &NdArray, amount: u32) -> Result<NdArray, String> {
     require_int32(a)?;
     let mut out = NdArray::zeros(a.shape(), DataType::Int32)?;

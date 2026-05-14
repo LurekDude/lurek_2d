@@ -1,21 +1,38 @@
+//! Particle trail system: a ribbon of `TrailPoint` values that fades over a configurable lifetime.
+//! Owns `Trail` (point buffer, width, colour gradient) and `TrailPoint` (position + age).
+//! Does not own the renderer; `build_render_commands` outputs `Triangle` pairs to the caller.
+
 use crate::math::Color;
 use crate::render::renderer::{DrawMode, RenderCommand};
+/// Single point on a trail ribbon with world-space position and accumulated age.
 #[derive(Debug, Clone)]
 pub struct TrailPoint {
+    /// World-space X position.
     pub x: f32,
+    /// World-space Y position.
     pub y: f32,
+    /// Time in seconds since this point was added.
     pub age: f32,
 }
+/// Ribbon trail composed of a deque of `TrailPoint` values that shrink from the tail over time.
 pub struct Trail {
+    /// Ordered list of trail points; index 0 is the newest (head).
     pub points: Vec<TrailPoint>,
+    /// Maximum age a point can reach before being removed in seconds.
     pub lifetime: f32,
+    /// Width at the head of the trail in pixels.
     pub start_width: f32,
+    /// Width at the tail of the trail in pixels; tapers toward zero by default.
     pub end_width: f32,
+    /// RGBA colour at the head of the trail.
     pub head_color: Color,
+    /// RGBA colour at the tail of the trail.
     pub tail_color: Color,
+    /// Minimum distance in pixels between consecutive points; suppresses duplicates.
     pub min_distance: f32,
 }
 impl Trail {
+    /// Create a trail with `lifetime` seconds per point and `start_width` pixels at the head.
     pub fn new(lifetime: f32, start_width: f32) -> Self {
         Self {
             points: Vec::new(),
@@ -27,6 +44,7 @@ impl Trail {
             min_distance: 1.0,
         }
     }
+    /// Append a point at `(x, y)` if it is at least `min_distance` from the current head.
     pub fn push_point(&mut self, x: f32, y: f32) {
         if let Some(last) = self.points.first() {
             let dx = x - last.x;
@@ -37,42 +55,53 @@ impl Trail {
         }
         self.points.insert(0, TrailPoint { x, y, age: 0.0 });
     }
+    /// Advance all point ages by `dt` seconds and retire points that exceed `lifetime`.
     pub fn update(&mut self, dt: f32) {
         for point in &mut self.points {
             point.age += dt;
         }
         self.points.retain(|p| p.age < self.lifetime);
     }
+    /// Set ribbon width; `start` is the head width and optional `end` sets the tail width.
     pub fn set_width(&mut self, start: f32, end: Option<f32>) {
         self.start_width = start;
         if let Some(e) = end {
             self.end_width = e;
         }
     }
+    /// Set the maximum point lifetime in seconds.
     pub fn set_lifetime(&mut self, lifetime: f32) {
         self.lifetime = lifetime;
     }
+    /// Return the current maximum point lifetime in seconds.
     pub fn get_lifetime(&self) -> f32 {
         self.lifetime
     }
+    /// Set the minimum distance between consecutive trail points.
     pub fn set_min_distance(&mut self, distance: f32) {
         self.min_distance = distance;
     }
+    /// Remove all points.
     pub fn clear(&mut self) {
         self.points.clear();
     }
+    /// Return the current number of live trail points.
     pub fn get_point_count(&self) -> usize {
         self.points.len()
     }
+    /// Return the current `(start_width, end_width)` pair.
     pub fn get_width(&self) -> (f32, f32) {
         (self.start_width, self.end_width)
     }
+    /// Set the RGBA colour at the head of the trail.
     pub fn set_head_color(&mut self, color: Color) {
         self.head_color = color;
     }
+    /// Set the RGBA colour at the tail of the trail.
     pub fn set_tail_color(&mut self, color: Color) {
         self.tail_color = color;
     }
+    /// Build a list of `SetColor` + `Triangle` commands forming the ribbon; returns empty when fewer than 2 points.
     pub fn build_render_commands(&self) -> Vec<RenderCommand> {
         if self.points.len() < 2 {
             return Vec::new();
@@ -128,6 +157,7 @@ impl Trail {
         }
         commands
     }
+    /// Render the trail to an `ImageData` of `width` x `height`; returns a dark-filled image when fewer than 2 points.
     pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(10, 8, 15, 255);

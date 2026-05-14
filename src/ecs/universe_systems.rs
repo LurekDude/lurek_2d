@@ -1,6 +1,9 @@
+//! System registration and dependency ordering helpers for the ECS universe.
+
 use super::Universe;
 use mlua::{Lua, Result as LuaResult, Table, Value as LuaValue};
 impl Universe {
+    /// Registers a system table together with its priority, phase, name, and dependencies.
     pub fn add_system(
         &mut self,
         lua: &Lua,
@@ -20,12 +23,14 @@ impl Universe {
         self.system_deps.push(deps);
         Ok(())
     }
+    /// Returns all registered system indices sorted by ascending priority.
     pub fn get_sorted_system_indices_all(&self) -> Vec<usize> {
         let count = self.system_priorities.len();
         let mut order: Vec<usize> = (1..=count).collect();
         order.sort_by_key(|&i| self.system_priorities[i - 1]);
         order
     }
+    /// Returns phase-matching system indices sorted by priority and dependency order.
     pub fn get_sorted_system_indices_for_phase(&self, phase: &str) -> Vec<usize> {
         let target = if phase.is_empty() { "update" } else { phase };
         let count = self.system_priorities.len();
@@ -42,6 +47,7 @@ impl Universe {
         candidates.sort_by_key(|&i| self.system_priorities[i - 1]);
         self.topo_sort_indices(candidates)
     }
+    /// Topologically sorts candidate systems by declared dependency names.
     fn topo_sort_indices(&self, candidates: Vec<usize>) -> Vec<usize> {
         let n = candidates.len();
         if n <= 1 {
@@ -86,6 +92,7 @@ impl Universe {
         }
         result
     }
+    /// Removes a previously registered system table and its metadata entry.
     pub fn remove_system(&mut self, lua: &Lua, system: Table) -> LuaResult<()> {
         self.ensure_stores(lua)?;
         let store = self.get_system_store(lua)?;
@@ -117,6 +124,7 @@ impl Universe {
         }
         Err(mlua::Error::runtime("System not registered"))
     }
+    /// Returns the number of registered systems currently stored in Lua.
     pub fn get_system_count(&self, lua: &Lua) -> LuaResult<usize> {
         if let Some(ref key) = self.system_store {
             let store: Table = lua.registry_value(key)?;

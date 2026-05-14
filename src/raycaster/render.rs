@@ -1,7 +1,12 @@
+//! Converts a `RaycasterScene` into `RenderCommand` draw calls for the GPU renderer.
+//! Emits textured and flat quads for ceilings, floors, walls, and billboard sprites
+//! in the correct draw order. Does not own scene construction or GPU state.
+
 use crate::raycaster::scene::RaycasterScene;
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::render::BlendMode;
 impl RaycasterScene {
+    /// Build a `Vec<RenderCommand>` for the full scene: ceilings, floors, walls, then sprites back-to-front.
     pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
         let mut cmds = Vec::with_capacity(self.quad_count() + 2);
         cmds.push(RenderCommand::SetBlendMode(BlendMode::Alpha));

@@ -1,3 +1,8 @@
+//! wgpu device/queue wrapper, pipeline builder, and frame draw-command processor.
+//! Owns all GPU-side state: vertex/index buffers, texture bind groups, shader cache,
+//! canvas render targets, light accumulation pass, and post-fx pipeline. Entry point
+//! for every draw call issued by `RenderCommand`. Does not own window or surface.
+
 use crate::log_msg;
 use crate::math::{Mat3, Vec2};
 use crate::render::mesh::Mesh;
@@ -19,151 +24,260 @@ use std::collections::{HashMap, HashSet};
 use std::f32::consts::PI;
 use std::sync::mpsc;
 use std::time::Instant;
+/// Flat-shaded vertex with `position` and per-vertex `color`.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct ColorVertex {
+    /// NDC/screen-space XY position.
     position: [f32; 2],
+    /// RGBA vertex color.
     color: [f32; 4],
 }
+/// Textured vertex with position, UV, RGBA tint, and homogeneous W depth for perspective correction.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct TexVertex {
+    /// NDC/screen-space XY position.
     position: [f32; 2],
+    /// Texture UV coordinates.
     uv: [f32; 2],
+    /// Per-vertex RGBA tint.
     color: [f32; 4],
+    /// Homogeneous W value for perspective-correct UV interpolation.
     w_depth: f32,
+    /// Padding to meet `Pod` alignment requirements.
     _pad: [f32; 3],
 }
+/// Light-pass vertex with position, UV, RGBA tint, shadow map value, and shadow parameters.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct LightVertex {
+    /// NDC/screen-space XY position.
     position: [f32; 2],
+    /// Light-quad UV coordinates.
     uv: [f32; 2],
+    /// Per-vertex RGBA tint.
     color: [f32; 4],
+    /// Normalised 0..1 shadow map value for this vertex.
     shadow_v: f32,
+    /// Shadow sampling parameters: `[radius, mode, texel_size, _pad]`.
     shadow_params: [f32; 4],
 }
+/// Horizontal resolution of the 1-D shadow map texture.
 const SHADOW_MAP_RES: usize = 256;
+/// Maximum number of shadow-casting point lights rendered per frame.
 const MAX_SHADOW_LIGHTS: usize = 128;
+/// Per-frame viewport uniform uploaded to the GPU: pixel dimensions, time, and camera transform.
 #[repr(C)]
 #[derive(Copy, Clone, Pod, Zeroable)]
 struct ViewportUniform {
+    /// Framebuffer pixel dimensions `[width, height]`.
     size: [f32; 2],
+    /// Engine time in seconds, passed to shaders.
     time: f32,
+    /// Alignment padding.
     _pad: f32,
+    /// Column 0 of the 3×3 view transform.
     view_col0: [f32; 4],
+    /// Column 1 of the 3×3 view transform.
     view_col1: [f32; 4],
+    /// Column 2 of the 3×3 view transform.
     view_col2: [f32; 4],
 }
+/// GPU texture with its bind group; held in slot-maps keyed by `TextureKey` / `CanvasKey` / `FontKey`.
 struct GpuTexture {
+    /// Owned wgpu texture object (prefixed with `_` to avoid unused-field warnings).
     _texture: wgpu::Texture,
+    /// View used as shader resource.
     view: wgpu::TextureView,
+    /// Bind group pairing `view` with its sampler.
     bind_group: wgpu::BindGroup,
+    /// Pixel width.
     width: u32,
+    /// Pixel height.
     height: u32,
 }
+/// Combined depth/stencil render attachment; created lazily per render target.
 struct DepthStencilTarget {
+    /// Owned texture (unused directly after view creation).
     _texture: wgpu::Texture,
+    /// View bound as depth/stencil attachment.
     view: wgpu::TextureView,
+    /// Pixel width matching its render target.
     width: u32,
+    /// Pixel height matching its render target.
     height: u32,
 }
+/// Mapped readback buffer pending async `device.poll` before screenshot bytes are copied.
 struct PendingSurfaceReadback {
+    /// Mappable output buffer.
     buffer: wgpu::Buffer,
+    /// Row stride in bytes including wgpu alignment padding.
     padded_bytes_per_row: u32,
+    /// Image width in pixels.
     width: u32,
+    /// Image height in pixels.
     height: u32,
 }
+/// Identifies a GPU texture source during draw batching.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum TexRef {
+    /// A sprite/image texture uploaded via `upload_texture`.
     Texture(TextureKey),
+    /// An off-screen canvas render target.
     Canvas(CanvasKey),
+    /// A bitmap font glyph atlas.
     FontAtlas(FontKey),
 }
+/// Maximum flat-color vertex count before the buffer must grow.
 const MAX_COLOR_VERTS: u64 = 1 << 19;
+/// Maximum flat-color index count before the buffer must grow.
 const MAX_COLOR_IDXS: u64 = 1 << 21;
+/// Maximum textured vertex count before the buffer must grow.
 const MAX_TEX_VERTS: u64 = 1 << 14;
+/// Maximum textured index count before the buffer must grow.
 const MAX_TEX_IDXS: u64 = 1 << 16;
+/// Maximum number of light quads batched per frame.
 const MAX_LIGHT_QUADS: usize = 128;
+/// Per-frame GPU draw statistics exposed to the Lua profiler API.
 #[derive(Debug, Default, Clone)]
 pub struct RenderStats {
+    /// Total number of GPU draw calls issued this frame.
     pub draw_calls: u32,
+    /// Number of texture bind-group switches this frame.
     pub texture_switches: u32,
+    /// Number of canvas render-target switches this frame.
     pub canvas_switches: u32,
+    /// Number of shader pipeline switches this frame.
     pub shader_switches: u32,
+    /// Number of draw calls merged into batches this frame.
     pub batched_draws: u32,
+    /// CPU time spent in `render_frame` this frame in milliseconds.
     pub cpu_render_ms: f32,
 }
 type ScissorRect = Option<(u32, u32, u32, u32)>;
+/// Identifies the active render target during a frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum RenderTargetId {
+    /// The main window surface.
     Screen,
+    /// An off-screen canvas texture.
     Canvas(CanvasKey),
 }
+/// Selects the GPU vertex layout for a draw call.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum GeometryKind {
+    /// Flat-color `ColorVertex` layout.
     Color,
+    /// Textured `TexVertex` layout with UV and W depth.
     Texture,
 }
+/// Stencil operation mode for a draw call; used as part of the pipeline cache key.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum StencilMode {
+    /// Stencil testing and writing are both disabled.
     Disabled,
+    /// Write the stencil reference value using the given action.
     Write(crate::render::renderer::StencilAction),
+    /// Discard fragments that fail the given compare test against the stencil buffer.
     Test(crate::render::renderer::CompareMode),
 }
+/// Composite key used to look up or create a cached `wgpu::RenderPipeline`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct PipelineKey {
+    /// Alpha/additive/multiply/etc. blend state.
     blend_mode: BlendMode,
+    /// Channel write-mask encoded as a bitmask (R=1, G=2, B=4, A=8).
     color_mask_bits: u32,
+    /// Stencil operation or test applied by this pipeline.
     stencil_mode: StencilMode,
 }
+/// Full pipeline selection key: default vs. custom shader, plus geometry kind and blend/stencil state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum PipelineSelectionKey {
+    /// Use the built-in color or texture shader.
     Default {
+        /// Vertex layout to use.
         geometry: GeometryKind,
+        /// Blend/stencil pipeline variant.
         pipeline: PipelineKey,
     },
+    /// Use a user-supplied WGSL shader.
     Custom {
+        /// Registered shader key.
         shader: ShaderKey,
+        /// Vertex layout to use.
         geometry: GeometryKind,
+        /// Blend/stencil pipeline variant.
         pipeline: PipelineKey,
     },
 }
+/// A fully resolved draw call ready to be encoded in the GPU render pass.
 #[derive(Debug, Clone, Copy)]
 struct PreparedDraw {
+    /// Render target this draw writes to.
     target: RenderTargetId,
+    /// Vertex layout (color or texture).
     geometry: GeometryKind,
+    /// Texture bound for this draw, or `None` for flat-color.
     texture_ref: Option<TexRef>,
+    /// First index in the shared index buffer.
     idx_start: u32,
+    /// Number of indices for this draw call.
     idx_count: u32,
+    /// Blend mode for this draw.
     blend_mode: BlendMode,
+    /// Optional scissor rectangle in pixels.
     scissor: ScissorRect,
+    /// Channel write-mask bitmask.
     color_mask_bits: u32,
+    /// User shader override, or `None` for the built-in shader.
     shader: Option<ShaderKey>,
+    /// Stencil operation mode.
     stencil_mode: StencilMode,
+    /// Stencil reference value used by `Write` and `Test` modes.
     stencil_reference: u32,
 }
+/// WGSL uniform value type tag; used to select the correct buffer layout.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum ShaderUniformKind {
+    /// 32-bit float scalar.
     Float,
+    /// Two-component float vector.
     Vec2,
+    /// Three-component float vector.
     Vec3,
+    /// Four-component float vector.
     Vec4,
+    /// 32-bit signed integer.
     Int,
+    /// Boolean mapped to u32.
     Bool,
 }
+/// Compiled user WGSL shader with cached render pipelines for each `PipelineKey`.
 struct GpuShader {
+    /// Original WGSL source string retained for hot-reload.
     source: String,
+    /// Ordered list of uniform names and their value types.
     uniform_signature: Vec<(String, ShaderUniformKind)>,
+    /// Per-uniform GPU buffers, one per `uniform_signature` entry.
     uniform_buffers: Vec<wgpu::Buffer>,
+    /// Bind group holding all uniform buffers for this shader.
     uniform_bind_group: Option<wgpu::BindGroup>,
+    /// Compiled shader module for the flat-color vertex path.
     color_module: wgpu::ShaderModule,
+    /// Compiled shader module for the textured vertex path.
     texture_module: wgpu::ShaderModule,
+    /// Pipeline layout for the color module.
     color_layout: wgpu::PipelineLayout,
+    /// Pipeline layout for the texture module.
     texture_layout: wgpu::PipelineLayout,
+    /// Cached color render pipelines keyed by blend/stencil state.
     color_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
+    /// Cached texture render pipelines keyed by blend/stencil state.
     texture_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
 }
+/// Return the wgpu `BlendState` for a given `BlendMode`.
 fn blend_state_for(mode: BlendMode) -> wgpu::BlendState {
     match mode {
         BlendMode::Alpha => wgpu::BlendState::ALPHA_BLENDING,
@@ -391,58 +505,107 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     return vec4<f32>(in.color.rgb * intensity * shadow, 1.0);
 }
 "#;
+/// GPU state for the additive light accumulation and shadow-atlas composite pass.
 struct LightGpuState {
     #[allow(dead_code)]
+    /// Light accumulation RGBA texture (kept alive for its view).
     accum_texture: wgpu::Texture,
+    /// View bound as the accumulation render-attachment.
     accum_view: wgpu::TextureView,
+    /// Bind group for sampling the accumulation texture in the composite pass.
     accum_bind_group: wgpu::BindGroup,
+    /// Additive light blending pipeline.
     additive_pipeline: wgpu::RenderPipeline,
+    /// Final composite (multiply) pipeline.
     composite_pipeline: wgpu::RenderPipeline,
+    /// Vertex buffer for light quads.
     vertex_buffer: wgpu::Buffer,
+    /// Index buffer for light quads.
     index_buffer: wgpu::Buffer,
+    /// Shadow atlas texture storing 1-D shadow maps for each light.
     shadow_atlas_texture: wgpu::Texture,
     #[allow(dead_code)]
+    /// View of the shadow atlas (kept alive; bind group holds a reference).
     shadow_atlas_view: wgpu::TextureView,
+    /// Bind group for sampling the shadow atlas in the light pass shader.
     shadow_atlas_bind_group: wgpu::BindGroup,
+    /// Pixel width of accumulation and shadow-atlas textures.
     width: u32,
+    /// Pixel height of the accumulation texture.
     height: u32,
 }
+/// Core wgpu renderer owning all GPU resources; used by the engine runtime each frame.
 pub struct GpuRenderer {
+    /// wgpu logical device handle.
     pub(crate) device: wgpu::Device,
+    /// wgpu submission queue.
     pub(crate) queue: wgpu::Queue,
+    /// Bind-group layout for the viewport uniform buffer.
     viewport_bind_group_layout: wgpu::BindGroupLayout,
+    /// Compiled WGSL module for the built-in flat-color shader.
     default_color_shader: wgpu::ShaderModule,
+    /// Compiled WGSL module for the built-in textured shader.
     default_texture_shader: wgpu::ShaderModule,
+    /// Pipeline layout for the built-in color shader.
     default_color_layout: wgpu::PipelineLayout,
+    /// Pipeline layout for the built-in texture shader.
     default_texture_layout: wgpu::PipelineLayout,
+    /// Cached default color pipelines keyed by blend/stencil state.
     default_color_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
+    /// Cached default texture pipelines keyed by blend/stencil state.
     default_texture_pipelines: HashMap<PipelineKey, wgpu::RenderPipeline>,
+    /// User-uploaded shader cache keyed by `ShaderKey`.
     shader_cache: SparseSecondaryMap<ShaderKey, GpuShader>,
+    /// GPU buffer holding the current-frame `ViewportUniform`.
     viewport_buffer: wgpu::Buffer,
+    /// Bind group binding `viewport_buffer` to binding 0.
     viewport_bind_group: wgpu::BindGroup,
+    /// Shared bind-group layout for all texture+sampler pairs.
     texture_bind_group_layout: wgpu::BindGroupLayout,
+    /// Pre-allocated flat-color vertex buffer.
     color_vertex_buffer: wgpu::Buffer,
+    /// Pre-allocated flat-color index buffer.
     color_index_buffer: wgpu::Buffer,
+    /// Pre-allocated textured vertex buffer.
     tex_vertex_buffer: wgpu::Buffer,
+    /// Pre-allocated textured index buffer.
     tex_index_buffer: wgpu::Buffer,
+    /// Current capacity of `color_vertex_buffer` in vertex units.
     color_vertex_capacity: u64,
+    /// Current capacity of `color_index_buffer` in index units.
     color_index_capacity: u64,
+    /// Current capacity of `tex_vertex_buffer` in vertex units.
     tex_vertex_capacity: u64,
+    /// Current capacity of `tex_index_buffer` in index units.
     tex_index_capacity: u64,
+    /// GPU textures keyed by `TextureKey`.
     gpu_textures: SparseSecondaryMap<TextureKey, GpuTexture>,
+    /// Font atlas GPU textures keyed by `FontKey`.
     font_atlas_textures: SparseSecondaryMap<FontKey, GpuTexture>,
+    /// Canvas render-target textures keyed by `CanvasKey`.
     canvas_gpu_textures: SparseSecondaryMap<CanvasKey, GpuTexture>,
+    /// Lazily created depth/stencil attachment for the main screen target.
     screen_stencil_target: Option<DepthStencilTarget>,
+    /// Per-canvas depth/stencil attachments created on first stencil use.
     canvas_stencil_targets: SparseSecondaryMap<CanvasKey, DepthStencilTarget>,
+    /// Tracks which canvases still need a clear at the start of the next frame.
     canvas_needs_clear: SparseSecondaryMap<CanvasKey, bool>,
+    /// Surface texture format negotiated at creation.
     surface_format: wgpu::TextureFormat,
+    /// Current framebuffer width in pixels.
     pub width: u32,
+    /// Current framebuffer height in pixels.
     pub height: u32,
+    /// Per-frame rendering statistics updated by `render_frame`.
     pub render_stats: RenderStats,
+    /// Optional light accumulation and shadow-atlas GPU state.
     light_gpu: Option<LightGpuState>,
+    /// Optional post-processing pipeline chain applied after the main pass.
     postfx_pipeline: Option<crate::render::postfx_pipeline::PostFxPipeline>,
+    /// Per-effect capture textures for multi-pass post-fx.
     postfx_capture: HashMap<u64, crate::render::postfx_pipeline::PostFxTexture>,
 }
+/// Compute the normalised 1-D shadow map for a point light at `(light_x, light_y)` with `light_radius`.
 fn compute_1d_shadow_map(
     light_x: f32,
     light_y: f32,
@@ -517,6 +680,7 @@ fn compute_1d_shadow_map(
     map
 }
 impl GpuRenderer {
+    /// Create a `GpuRenderer` from an already-acquired wgpu device/queue pair and surface format.
     pub fn new(
         device: wgpu::Device,
         queue: wgpu::Queue,
@@ -660,6 +824,7 @@ impl GpuRenderer {
             postfx_capture: HashMap::new(),
         }
     }
+    /// Update viewport dimensions after a window resize; recreates stencil targets and clears light GPU state.
     pub fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
@@ -838,6 +1003,7 @@ impl GpuRenderer {
             height,
         }
     }
+    /// Upload RGBA pixel data for `key` to the GPU, replacing any previously uploaded texture.
     pub fn upload_texture(
         &mut self,
         key: TextureKey,
@@ -870,6 +1036,7 @@ impl GpuRenderer {
         }
         self.font_atlas_textures.contains_key(font_key)
     }
+    /// Create an off-screen render-target canvas texture for `key` at `width`×`height`.
     pub fn create_canvas(
         &mut self,
         key: CanvasKey,
@@ -1234,6 +1401,7 @@ impl GpuRenderer {
         max_x >= -MARGIN && min_x <= vp_w + MARGIN && max_y >= -MARGIN && min_y <= vp_h + MARGIN
     }
     #[allow(clippy::too_many_arguments)]
+    /// Execute all queued `RenderCommand`s for one frame and present the frame.
     pub fn render_frame(
         &mut self,
         surface: &wgpu::Surface<'static>,
@@ -4986,6 +5154,7 @@ impl GpuRenderer {
         }
     }
 }
+/// Append a flat-color draw call — vertices and indices — to the frame-local draw list.
 #[allow(clippy::too_many_arguments)]
 fn append_color_draw(
     draws: &mut Vec<PreparedDraw>,
@@ -5022,6 +5191,7 @@ fn append_color_draw(
         stencil_reference: stencil_reference as u32,
     });
 }
+/// Append a textured draw call — vertices and indices — to the frame-local draw list.
 #[allow(clippy::too_many_arguments)]
 fn append_tex_draw(
     draws: &mut Vec<PreparedDraw>,
@@ -5059,6 +5229,7 @@ fn append_tex_draw(
         stencil_reference: stencil_reference as u32,
     });
 }
+/// Clamp and convert a float scissor rect to integer pixel bounds clamped to `[0, width/height]`.
 fn normalize_scissor(rect: Option<(f32, f32, f32, f32)>, width: u32, height: u32) -> ScissorRect {
     rect.and_then(|(x, y, w, h)| {
         let left = x.max(0.0).floor() as u32;
@@ -5084,6 +5255,7 @@ fn normalize_scissor(rect: Option<(f32, f32, f32, f32)>, width: u32, height: u32
         }
     })
 }
+/// Encode `(R, G, B, A)` bool channel mask as a wgpu `ColorWrites` bitmask.
 fn color_write_mask_bits(mask: (bool, bool, bool, bool)) -> u32 {
     let mut bits = 0;
     if mask.0 {
@@ -5100,9 +5272,11 @@ fn color_write_mask_bits(mask: (bool, bool, bool, bool)) -> u32 {
     }
     bits
 }
+/// Reconstruct a `wgpu::ColorWrites` from a bitmask stored in a `PipelineKey`.
 fn color_write_mask_from_bits(bits: u32) -> wgpu::ColorWrites {
     wgpu::ColorWrites::from_bits_truncate(bits)
 }
+/// Return the custom shader key for a draw call, suppressed to `None` during stencil writes.
 fn shader_for_draw(draw: PreparedDraw) -> Option<ShaderKey> {
     if matches!(draw.stencil_mode, StencilMode::Write(_)) {
         None
@@ -5110,12 +5284,14 @@ fn shader_for_draw(draw: PreparedDraw) -> Option<ShaderKey> {
         draw.shader
     }
 }
+/// Parse a filter-mode string `"linear"` or anything else → `Nearest`.
 fn parse_filter_mode(value: &str) -> wgpu::FilterMode {
     match value {
         "linear" => wgpu::FilterMode::Linear,
         _ => wgpu::FilterMode::Nearest,
     }
 }
+/// Map a `UniformValue` to its `ShaderUniformKind` type tag.
 fn uniform_kind(value: &UniformValue) -> ShaderUniformKind {
     match value {
         UniformValue::Float(_) => ShaderUniformKind::Float,
@@ -5126,7 +5302,7 @@ fn uniform_kind(value: &UniformValue) -> ShaderUniformKind {
         UniformValue::Bool(_) => ShaderUniformKind::Bool,
     }
 }
-fn uniform_bytes(value: &UniformValue) -> [u8; 16] {
+/// Serialize a `UniformValue` into a 16-byte std140-aligned buffer for a wgpu uniform upload.\nfn uniform_bytes(value: &UniformValue) -> [u8; 16] {
     let mut bytes = [0u8; 16];
     match value {
         UniformValue::Float(v) => {

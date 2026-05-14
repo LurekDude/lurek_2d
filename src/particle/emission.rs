@@ -1,5 +1,11 @@
+//! Spawn-position offset computation for particle emitters.
+//! Owns two public functions: area-distribution offset and emission-shape offset.
+//! Both return `(dx, dy)` relative to the emitter origin; callers add the emitter position.
+//! Does not modify any state; all randomness uses `fastrand` and `math::{rand_range, rand_normal}`.
+
 use super::config::{AreaDistribution, EmissionShape, ParticleConfig};
 use super::math::{rand_normal, rand_range};
+/// Return a random spawn offset `(dx, dy)` sampled from the `ParticleConfig` area distribution and rotated by `area_angle`.
 pub fn emission_offset(config: &ParticleConfig) -> (f32, f32) {
     let (dx, dy) = match config.area_distribution {
         AreaDistribution::None => (0.0, 0.0),
@@ -53,6 +59,7 @@ pub fn emission_offset(config: &ParticleConfig) -> (f32, f32) {
         (dx, dy)
     }
 }
+/// Return a random spawn offset `(dx, dy)` sampled from an `EmissionShape`; `Custom` always returns `(0, 0)`.
 pub fn emission_shape_offset(shape: &EmissionShape) -> (f32, f32) {
     match shape {
         EmissionShape::Point => (0.0, 0.0),

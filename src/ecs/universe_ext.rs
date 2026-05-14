@@ -1,7 +1,10 @@
+//! Extension queries and snapshot helpers layered onto the ECS universe.
+
 use super::Universe;
 use crate::ecs::lua_table::deep_copy_table;
 use mlua::{Function, Lua, Result as LuaResult, Table, Value as LuaValue};
 impl Universe {
+    /// Returns entities that contain all required components and none of the excluded ones.
     pub fn query_not(
         &self,
         lua: &Lua,
@@ -34,6 +37,7 @@ impl Universe {
         result.sort();
         Ok(result)
     }
+    /// Invokes a Lua callback with entity ids followed by multiple requested component values.
     pub fn query_multi(&self, lua: &Lua, names: &[String], callback: Function) -> LuaResult<()> {
         if names.is_empty() {
             return Ok(());
@@ -66,6 +70,7 @@ impl Universe {
         }
         Ok(())
     }
+    /// Spawns multiple entities from one blueprint, cloning the optional override table per spawn.
     pub fn spawn_bulk(
         &mut self,
         lua: &Lua,
@@ -84,6 +89,7 @@ impl Universe {
         }
         Ok(ids)
     }
+    /// Serializes live entities, components, tags, layers, and hierarchy into a Lua snapshot table.
     pub fn serialize_to_table<'lua>(&self, lua: &'lua Lua) -> LuaResult<Table<'lua>> {
         let snapshot = lua.create_table()?;
         let entities_arr = lua.create_table()?;
@@ -142,6 +148,7 @@ impl Universe {
         snapshot.set("bitmap_tags", btnames)?;
         Ok(snapshot)
     }
+    /// Rebuilds universe state from a previously serialized Lua snapshot table.
     pub fn deserialize_from_table(&mut self, lua: &Lua, snapshot: Table) -> LuaResult<()> {
         self.alive.clear();
         self.free_list.clear();

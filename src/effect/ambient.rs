@@ -1,10 +1,17 @@
+//! Ambient overlay state derived from configurable time-of-day lighting.
+
 #[derive(Debug, Clone)]
+/// Stores ambient tint settings applied across the whole screen.
 pub struct AmbientState {
+    /// Enables ambient color application during overlay updates.
     pub enabled: bool,
+    /// Current RGBA ambient tint used by the overlay renderer.
     pub color: [f32; 4],
+    /// Hour-of-day value used to derive the ambient tint curve.
     pub time_of_day: f32,
 }
 impl Default for AmbientState {
+    /// Builds the neutral midday ambient state.
     fn default() -> Self {
         Self {
             enabled: false,
@@ -14,6 +21,7 @@ impl Default for AmbientState {
     }
 }
 impl AmbientState {
+    /// Computes the ambient RGBA tint for the current time-of-day sample.
     pub fn compute_color_from_time(&self) -> [f32; 4] {
         let t = self.time_of_day.rem_euclid(24.0);
         let (r, g, b) = if t < 5.0 {

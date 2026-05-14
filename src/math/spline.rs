@@ -1,12 +1,20 @@
+//! Catmull-Rom and Hermite spline interpolation used by tween paths and camera rails.
+//! CatmullRomSpline handles dynamic multi-point chains; HermiteSpline handles single cubic segments.
+//! Does not own Bézier curves (bezier.rs) or UI animation scheduling (tween.rs).
+
+/// Multi-point Catmull-Rom spline with dynamic control-point list.
 pub struct CatmullRomSpline {
+    /// Ordered (x, y) control points; at least 2 are required for sampling.
     control_points: Vec<(f32, f32)>,
 }
 impl CatmullRomSpline {
+    /// Construct a spline from a Vec of `(x, y)` control points.
     pub fn new(points: Vec<(f32, f32)>) -> Self {
         Self {
             control_points: points,
         }
     }
+    /// Sample the full spline at normalized parameter `t` in `[0,1]`, mapping to the appropriate segment.
     pub fn sample(&self, t: f32) -> (f32, f32) {
         let n = self.control_points.len();
         if n < 2 {
@@ -18,6 +26,7 @@ impl CatmullRomSpline {
         let local_t = scaled - seg as f32;
         self.sample_segment(seg, local_t)
     }
+    /// Sample segment `seg` at local parameter `t` in `[0,1]` using 4-point Catmull-Rom weights.
     pub fn sample_segment(&self, seg: usize, t: f32) -> (f32, f32) {
         let n = self.control_points.len();
         if n == 0 {
@@ -40,15 +49,19 @@ impl CatmullRomSpline {
             h0 * p0.1 + h1 * p1.1 + h2 * p2.1 + h3 * p3.1,
         )
     }
+    /// Return the number of control points.
     pub fn len(&self) -> usize {
         self.control_points.len()
     }
+    /// Return true when the spline has no control points.
     pub fn is_empty(&self) -> bool {
         self.control_points.is_empty()
     }
+    /// Append a control point to the end of the spline.
     pub fn add_point(&mut self, point: (f32, f32)) {
         self.control_points.push(point);
     }
+    /// Remove and return the control point at `index`, or `None` when out of range.
     pub fn remove_point(&mut self, index: usize) -> Option<(f32, f32)> {
         if index < self.control_points.len() {
             Some(self.control_points.remove(index))
@@ -57,16 +70,24 @@ impl CatmullRomSpline {
         }
     }
 }
+
+/// Single Hermite cubic spline segment defined by two endpoints and their tangents.
 pub struct HermiteSpline {
+    /// Start point.
     p0: (f32, f32),
+    /// End point.
     p1: (f32, f32),
+    /// Start tangent.
     m0: (f32, f32),
+    /// End tangent.
     m1: (f32, f32),
 }
 impl HermiteSpline {
+    /// Construct a Hermite segment from endpoints `p0`, `p1` and tangents `m0`, `m1`.
     pub fn new(p0: (f32, f32), p1: (f32, f32), m0: (f32, f32), m1: (f32, f32)) -> Self {
         Self { p0, p1, m0, m1 }
     }
+    /// Sample the segment at `t` in `[0,1]` using Hermite basis polynomials.
     pub fn sample(&self, t: f32) -> (f32, f32) {
         let t2 = t * t;
         let t3 = t2 * t;

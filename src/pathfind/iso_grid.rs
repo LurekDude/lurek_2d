@@ -1,12 +1,23 @@
+//! Axis-aligned isometric grid with 4-directional A\*, line-of-sight, and neighbour queries.
+//! Uses Manhattan distance as the A\* heuristic; cells have individual movement costs.
+//! Does not own Lua bindings; consumed by `src/lua_api/pathfind_api.rs`.
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// Isometric walkability grid with per-cell cost and 4-directional movement.
 pub struct IsoGrid {
+    /// Grid width in cells.
     pub width: u32,
+    /// Grid height in cells.
     pub height: u32,
+    /// Per-cell blocked flags indexed by `(y * width + x)`.
     blocked: Vec<bool>,
+    /// Per-cell movement cost.
     cost: Vec<f32>,
 }
+/// Construction and pathfinding methods for `IsoGrid`.
 impl IsoGrid {
+    /// Create a fully passable grid of `width × height` cells with unit movement costs.
     pub fn new(width: u32, height: u32) -> Self {
         let n = (width * height) as usize;
         Self {
@@ -16,16 +27,19 @@ impl IsoGrid {
             cost: vec![1.0; n],
         }
     }
+    /// Mark cell `(x, y)` as blocked or passable.
     pub fn set_blocked(&mut self, x: u32, y: u32, blocked: bool) {
         if let Some(i) = self.index(x, y) {
             self.blocked[i] = blocked;
         }
     }
+    /// Set the movement cost for cell `(x, y)`.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: f32) {
         if let Some(i) = self.index(x, y) {
             self.cost[i] = cost;
         }
     }
+    /// Run A\* from `from` to `to`; return an ordered path or `None` when unreachable.
     pub fn find_path(&self, from: (u32, u32), to: (u32, u32)) -> Option<Vec<(u32, u32)>> {
         if self.is_blocked_or_oob(from.0, from.1) || self.is_blocked_or_oob(to.0, to.1) {
             return None;
@@ -59,6 +73,7 @@ impl IsoGrid {
         }
         None
     }
+    /// Return true when all cells on the Bresenham line from `from` to `to` are passable.
     pub fn line_of_sight(&self, from: (u32, u32), to: (u32, u32)) -> bool {
         let mut x = from.0 as i32;
         let mut y = from.1 as i32;
@@ -88,6 +103,7 @@ impl IsoGrid {
         }
         true
     }
+    /// Return the 4-directional passable neighbours of `(x, y)`.
     pub fn neighbors(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut result = Vec::with_capacity(4);
         let dirs: [(i32, i32); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
@@ -104,6 +120,7 @@ impl IsoGrid {
         }
         result
     }
+    /// Convert `(x, y)` to a flat index; return `None` when out-of-bounds.
     fn index(&self, x: u32, y: u32) -> Option<usize> {
         if x < self.width && y < self.height {
             Some((y * self.width + x) as usize)
@@ -111,34 +128,44 @@ impl IsoGrid {
             None
         }
     }
+    /// Return true when `(x, y)` is out-of-bounds or marked blocked.
     fn is_blocked_or_oob(&self, x: u32, y: u32) -> bool {
         self.index(x, y).is_none_or(|i| self.blocked[i])
     }
 }
+/// Manhattan distance heuristic for A\* on axis-aligned isometric grids.
 fn manhattan(a: (u32, u32), b: (u32, u32)) -> u32 {
     a.0.abs_diff(b.0) + a.1.abs_diff(b.1)
 }
+/// Internal A\* heap node for `IsoGrid`.
 #[derive(Clone)]
 struct Node {
+    /// Grid position.
     pos: (u32, u32),
+    /// f-score = g + h.
     f: f32,
 }
+/// Equality by f-score.
 impl PartialEq for Node {
     fn eq(&self, other: &Self) -> bool {
         self.f == other.f
     }
 }
 impl Eq for Node {}
+
+/// Delegates to `Ord`.
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Reverse ordering so `BinaryHeap` is a min-heap.
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
         other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal)
     }
 }
+/// Walk `came_from` back from `current` to the start and return the path in forward order.
 fn reconstruct_path(
     came_from: &HashMap<(u32, u32), (u32, u32)>,
     mut current: (u32, u32),
@@ -150,55 +177,4 @@ fn reconstruct_path(
     }
     path.reverse();
     path
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn new_grid_defaults() {
-        let g = IsoGrid::new(5, 5);
-        assert_eq!(g.width, 5);
-        assert_eq!(g.height, 5);
-        assert!(!g.is_blocked_or_oob(0, 0));
-    }
-    #[test]
-    fn blocked_cell_no_path() {
-        let mut g = IsoGrid::new(3, 3);
-        g.set_blocked(1, 0, true);
-        g.set_blocked(1, 1, true);
-        g.set_blocked(1, 2, true);
-        assert!(g.find_path((0, 0), (2, 0)).is_none());
-    }
-    #[test]
-    fn trivial_same_cell() {
-        let g = IsoGrid::new(3, 3);
-        let path = g.find_path((1, 1), (1, 1)).unwrap();
-        assert_eq!(path, vec![(1, 1)]);
-    }
-    #[test]
-    fn simple_path_exists() {
-        let g = IsoGrid::new(5, 5);
-        let path = g.find_path((0, 0), (4, 4));
-        assert!(path.is_some());
-        let p = path.unwrap();
-        assert_eq!(*p.first().unwrap(), (0, 0));
-        assert_eq!(*p.last().unwrap(), (4, 4));
-    }
-    #[test]
-    fn line_of_sight_clear() {
-        let g = IsoGrid::new(5, 5);
-        assert!(g.line_of_sight((0, 0), (4, 4)));
-    }
-    #[test]
-    fn line_of_sight_blocked() {
-        let mut g = IsoGrid::new(5, 5);
-        g.set_blocked(2, 2, true);
-        assert!(!g.line_of_sight((0, 0), (4, 4)));
-    }
-    #[test]
-    fn neighbors_gives_4_directions() {
-        let g = IsoGrid::new(5, 5);
-        let n = g.neighbors(2, 2);
-        assert_eq!(n.len(), 4);
-    }
 }

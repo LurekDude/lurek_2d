@@ -1,20 +1,38 @@
+//! Scene transition types, easing curves, and active transition state.
+//! Owns TransitionType, EasingType, and ActiveTransition; drives progress tracking used by SceneStack.
+//! Does not own stack push/pop logic or rendering — callers read progress() to apply visual effects.
+//! Key dependencies: easing::bounce_out for the Bounce curve.
+
 use super::easing::bounce_out;
 use crate::log_msg;
 use crate::runtime::log_messages::{TR01, TR02};
+/// Visual effect style applied during a scene switch.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TransitionType {
+    /// No transition effect; scene switches instantly.
     None,
+    /// Alpha fade between scenes.
     Fade,
+    /// Slide incoming scene in from the right, outgoing scene exits left.
     SlideLeft,
+    /// Slide incoming scene in from the left, outgoing scene exits right.
     SlideRight,
+    /// Slide incoming scene in from the bottom, outgoing scene exits up.
     SlideUp,
+    /// Slide incoming scene in from the top, outgoing scene exits down.
     SlideDown,
+    /// Horizontal wipe from left to right revealing the incoming scene.
     Wipe,
+    /// Circular iris-wipe centred on screen.
     Iris,
+    /// Scale-zoom transition expanding the incoming scene from the centre.
     Zoom,
+    /// Cross-dissolve alpha blend between outgoing and incoming scene.
     CrossFade,
 }
+/// Parse methods for TransitionType used by Lua API bindings.
 impl TransitionType {
+    /// Parse a Lua string to TransitionType; unrecognised values return None.
     pub fn from_lua_str(s: &str) -> Self {
         match s {
             "fade" => Self::Fade,
@@ -30,17 +48,26 @@ impl TransitionType {
         }
     }
 }
+/// Easing curve applied to the transition progress value.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum EasingType {
+    /// Linear interpolation — default.
     #[default]
     Linear,
+    /// Quadratic acceleration from zero.
     EaseIn,
+    /// Quadratic deceleration to zero.
     EaseOut,
+    /// Smooth cubic S-curve.
     EaseInOut,
+    /// Overshoot-bounce finishing at 1.0.
     Bounce,
+    /// Cubic back-overshoot that briefly exceeds 1.0 before settling.
     Back,
 }
+/// Parse and evaluation methods for EasingType.
 impl EasingType {
+    /// Parse a Lua string to EasingType; unrecognised values return Linear.
     pub fn from_lua_str(s: &str) -> Self {
         match s {
             "linear" => Self::Linear,
@@ -52,6 +79,7 @@ impl EasingType {
             _ => Self::Linear,
         }
     }
+    /// Evaluate this easing curve for t in [0, 1]; clamps input and returns value in approximately [0, 1].
     pub fn apply(self, t: f32) -> f32 {
         let t = t.clamp(0.0, 1.0);
         match self {
@@ -71,13 +99,20 @@ impl EasingType {
         }
     }
 }
+/// Running transition with elapsed time tracking, used by SceneStack to drive transition progress.
 pub struct ActiveTransition {
+    /// Visual effect type for this transition.
     pub transition_type: TransitionType,
+    /// Total transition duration in seconds.
     pub duration: f32,
+    /// Accumulated elapsed time in seconds since transition started.
     pub elapsed: f32,
+    /// Easing curve applied when computing progress_eased.
     pub easing: EasingType,
 }
+/// Constructor and progress tracking methods for ActiveTransition.
 impl ActiveTransition {
+    /// Create an ActiveTransition with Linear easing and elapsed=0.
     pub fn new(transition_type: TransitionType, duration: f32) -> Self {
         log_msg!(debug, TR01);
         Self {
@@ -87,6 +122,7 @@ impl ActiveTransition {
             easing: EasingType::Linear,
         }
     }
+    /// Create an ActiveTransition with explicit easing and elapsed=0.
     pub fn new_with_easing(
         transition_type: TransitionType,
         duration: f32,
@@ -100,12 +136,15 @@ impl ActiveTransition {
             easing,
         }
     }
+    /// Replace the easing curve without resetting elapsed.
     pub fn set_easing(&mut self, easing: EasingType) {
         self.easing = easing;
     }
+    /// Return the current easing curve.
     pub fn get_easing(&self) -> EasingType {
         self.easing
     }
+    /// Return linear progress in [0, 1]; returns 1.0 when duration <= 0.
     pub fn progress(&self) -> f32 {
         if self.duration <= 0.0 {
             1.0
@@ -113,9 +152,11 @@ impl ActiveTransition {
             (self.elapsed / self.duration).min(1.0)
         }
     }
+    /// Return eased progress by applying self.easing to linear progress.
     pub fn progress_eased(&self) -> f32 {
         self.easing.apply(self.progress())
     }
+    /// Return true when elapsed >= duration; logs TR02 on first completion check.
     pub fn is_complete(&self) -> bool {
         let done = self.elapsed >= self.duration;
         if done {
@@ -123,6 +164,7 @@ impl ActiveTransition {
         }
         done
     }
+    /// Advance elapsed by dt seconds; ignores non-positive dt.
     pub fn update(&mut self, dt: f32) {
         if dt <= 0.0 {
             return;

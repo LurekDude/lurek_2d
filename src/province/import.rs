@@ -1,20 +1,36 @@
+//! Province metadata import pipeline: reads colour-map PNGs and CSV/TOML to populate ProvinceRegistry.
+//! Also provides marker PNG sanitisation that replaces capital/label pixels with their surrounding colour.
+//! All file I/O uses std::fs; no GameFS dependency in this module.
 use crate::image::ImageData;
 use crate::province::registry::ProvinceRegistry;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
+
+/// Internal metadata extracted from the province TOML for a single province id.
 #[derive(Debug, Clone)]
 struct ProvinceInfo {
+    /// Optional display name; None if not present in TOML.
     name: Option<String>,
+    /// Optional terrain token (e.g. "sea", "plains"); None if not set.
     terrain: Option<String>,
 }
+
+/// Thresholds for detecting capital and label marker pixels in a marker PNG.
 #[derive(Debug, Clone)]
 pub struct MarkerSanitizeOptions {
+    /// Minimum R/G/B value to classify a pixel as a capital marker (near-white).
     pub capital_min: u8,
+    /// Minimum red channel for a label marker pixel.
     pub label_r_min: u8,
+    /// Maximum green channel for a label marker pixel.
     pub label_g_max: u8,
+    /// Minimum blue channel for a label marker pixel.
     pub label_b_min: u8,
+    /// Pixel ring search radius used by find_owner_rgb.
     pub search_radius: u32,
 }
+
+/// Default MarkerSanitizeOptions: capital_min=245, label r≥210/g≤80/b≥210, radius=6.
 impl Default for MarkerSanitizeOptions {
     fn default() -> Self {
         Self {
@@ -26,26 +42,46 @@ impl Default for MarkerSanitizeOptions {
         }
     }
 }
+
+/// Result counters returned by sanitize_marked_png.
 #[derive(Debug, Clone, Copy)]
 pub struct MarkerSanitizeSummary {
+    /// Number of marker pixels successfully replaced with a neighbour colour.
     pub replaced_pixels: u32,
+    /// Number of marker pixels with no resolvable neighbour; set to black.
     pub unresolved_pixels: u32,
 }
+
+/// Options for the full metadata import pipeline run by import_metadata_from_files.
 #[derive(Debug, Clone)]
 pub struct ProvinceMetadataImportOptions {
+    /// Path to the province colour-map PNG; required.
     pub color_map_png_path: String,
+    /// Optional path to the marker PNG; defaults to the colour map if None.
     pub marker_png_path: Option<String>,
+    /// Path to the RGB→game_id CSV file; required.
     pub color_csv_path: String,
+    /// Optional path to a TOML file mapping game_id to name and terrain fields.
     pub province_toml_path: Option<String>,
+    /// Terrain tokens classified as water (lower-cased before comparison).
     pub water_terrain_tokens: Vec<String>,
+    /// Terrain type index assigned to water provinces.
     pub water_terrain_type: u32,
+    /// Terrain type index assigned to land provinces.
     pub land_terrain_type: u32,
+    /// When true, set each province's political colour derived from its game_id.
     pub set_political_colors: bool,
+    /// When true, set label text from the TOML name field.
     pub set_label_text: bool,
+    /// When true, detect and store capital positions from the marker PNG.
     pub set_capitals: bool,
+    /// When true, store label anchor line endpoints from label marker clusters.
     pub set_label_lines: bool,
+    /// Pixel thresholds for capital and label marker detection.
     pub marker_options: MarkerSanitizeOptions,
 }
+
+/// Default ProvinceMetadataImportOptions: all paths empty, water tokens ["sea","river"], all flags true.
 impl Default for ProvinceMetadataImportOptions {
     fn default() -> Self {
         Self {
@@ -64,25 +100,41 @@ impl Default for ProvinceMetadataImportOptions {
         }
     }
 }
+
+/// Result counters returned by import_metadata_from_files.
 #[derive(Debug, Clone, Copy)]
 pub struct ProvinceMetadataImportSummary {
+    /// Number of provinces whose RGB colour matched a CSV entry.
     pub mapped_provinces: u32,
+    /// Number of provinces assigned a capital position.
     pub capitals_set: u32,
+    /// Number of provinces assigned a label line.
     pub label_lines_set: u32,
+    /// Number of provinces assigned a label text string.
     pub labels_set: u32,
 }
+
+/// Pack R, G, B bytes into a u32 key used for CSV lookup.
 fn pack_rgb(r: u8, g: u8, b: u8) -> u32 {
     ((r as u32) << 16) | ((g as u32) << 8) | (b as u32)
 }
+
+/// Return true if the pixel is bright enough in all channels to be a capital marker.
 fn is_capital_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     r >= opts.capital_min && g >= opts.capital_min && b >= opts.capital_min
 }
+
+/// Return true if the pixel matches the label marker colour range (high R, low G, high B).
 fn is_label_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     r >= opts.label_r_min && g <= opts.label_g_max && b >= opts.label_b_min
 }
+
+/// Return true if the pixel is either a capital or label marker.
 fn is_special_marker(r: u8, g: u8, b: u8, opts: &MarkerSanitizeOptions) -> bool {
     is_capital_marker(r, g, b, opts) || is_label_marker(r, g, b, opts)
 }
+
+/// Search expanding rings around (x,y) and return the first non-special neighbour RGB, or None.
 fn find_owner_rgb(
     img: &ImageData,
     x: u32,
@@ -114,6 +166,7 @@ fn find_owner_rgb(
     }
     None
 }
+/// Replace capital and label marker pixels with their nearest non-marker neighbour and write the result to output_png_path; return pixel counts or an error string.
 pub fn sanitize_marked_png(
     input_png_path: &str,
     output_png_path: &str,
@@ -165,6 +218,7 @@ pub fn sanitize_marked_png(
         unresolved_pixels,
     })
 }
+/// Parse a CSV file (game_id, r, g, b, ...) into a packed-RGB → game_id map; return error on I/O or parse failure.
 fn parse_rgb_id_map(csv_path: &str) -> Result<HashMap<u32, u32>, String> {
     let raw = std::fs::read_to_string(csv_path)
         .map_err(|e| format!("province metadata: failed to read '{}': {}", csv_path, e))?;
@@ -234,6 +288,7 @@ fn parse_rgb_id_map(csv_path: &str) -> Result<HashMap<u32, u32>, String> {
     }
     Ok(out)
 }
+/// Parse a TOML file mapping numeric province ids to name and terrain fields; return error on I/O or parse failure.
 fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String> {
     let raw = std::fs::read_to_string(path)
         .map_err(|e| format!("province metadata: failed to read '{}': {}", path, e))?;
@@ -262,6 +317,7 @@ fn parse_province_toml(path: &str) -> Result<HashMap<u32, ProvinceInfo>, String>
     }
     Ok(out)
 }
+/// Derive a deterministic RGBA colour from game_id; returns a fixed sea-blue when water is true.
 fn color_for_gameid(game_id: u32, water: bool) -> [f32; 4] {
     if water {
         return [45.0 / 255.0, 120.0 / 255.0, 215.0 / 255.0, 1.0];
@@ -272,6 +328,7 @@ fn color_for_gameid(game_id: u32, water: bool) -> [f32; 4] {
     let b = 70 + ((h * 7) % 90);
     [r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0]
 }
+/// Import province metadata from colour-map PNG, RGB CSV, and optional TOML/marker files into registry; return counts or an error string.
 pub fn import_metadata_from_files(
     registry: &mut ProvinceRegistry,
     opts: &ProvinceMetadataImportOptions,
