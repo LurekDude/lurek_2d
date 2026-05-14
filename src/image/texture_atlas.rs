@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 /// Nine-slice border distances used to preserve corners and edges.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

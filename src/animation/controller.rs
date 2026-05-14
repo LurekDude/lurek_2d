@@ -1,4 +1,10 @@
 
+//! - Owns the runtime animation player for frame-based clips.
+//! - Stores loaded frames, named clips, active playback state, pending animation events, and crossfade state.
+//! - Builds clip data from grids, explicit rectangles, and parsed Aseprite metadata.
+//! - Advances playback with forward, reverse, and ping-pong modes, including looping, stopping, pausing, and speed scaling.
+//! - Exposes the current quad, event drain, crossfade blend state, and simple preview images for the active frame set.
+
 use super::clip::{AnimClip, ClipPlaybackMode};
 use super::event::AnimEvent;
 use super::frame::AnimFrame;
@@ -550,8 +556,8 @@ impl Animation {
     }
 }
 /// `Default` delegates to `Animation::new`.
-/// `Default` delegates to `Animation::new`.
 impl Default for Animation {
+    /// Build an empty animation controller.
     fn default() -> Self {
         Self::new()
     }

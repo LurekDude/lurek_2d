@@ -1,4 +1,3 @@
-
 use crate::camera::viewport::ScaleMode;
 
 /// Stores runtime viewport scaling values for game and window surfaces.

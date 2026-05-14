@@ -1,6 +1,14 @@
 
+//! - Defines the utility-AI scoring model used by the AI module to store actions,
+//!   response curves, considerations, and the last evaluation result.
+//! - Owns the response-curve mapping rules and the action-side data that binds
+//!   Lua scorers, momentum weighting, and ordered consideration sets.
+//! - Keeps the evaluation flow that calls registered scorers, tracks per-action
+//!   weighted scores, and remembers the best action selected on the latest pass.
+
 use mlua::prelude::*;
 use mlua::RegistryKey;
+/// Response-curve variant used to transform raw consideration inputs.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ResponseCurve {
     /// Output = p1 * input + p2.
@@ -51,6 +59,7 @@ impl ResponseCurve {
         }
     }
 }
+/// One consideration that transforms a raw Lua score into a weighted utility value.
 pub struct Consideration {
     /// Unique name for this consideration, used for debug display.
     pub name: String,
@@ -67,6 +76,7 @@ pub struct Consideration {
     /// Multiplicative weight applied to the curve output before product scoring.
     pub weight: f64,
 }
+/// One candidate action scored by the utility-AI system.
 pub struct UAAction {
     /// Unique name identifying this action.
     pub name: String,
@@ -77,6 +87,7 @@ pub struct UAAction {
     /// Bonus multiplier added to the score when this action was selected last tick.
     pub momentum_bonus: f64,
 }
+/// Utility-AI runtime that stores actions and the latest evaluation results.
 pub struct UtilityAI {
     /// All registered actions evaluated each tick.
     pub actions: Vec<UAAction>,

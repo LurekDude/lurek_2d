@@ -1,4 +1,3 @@
-
 /// Priority queue and Lua payload conversion support for runtime events.
 pub mod event_queue;
 /// Name-based and wildcard signal subscription storage.

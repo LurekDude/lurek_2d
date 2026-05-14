@@ -1,6 +1,6 @@
-
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
+/// Render side-by-side labeled images into a composite image.
 pub fn draw_image_comparison_to_image(
     images: &[&ImageData],
     labels: &[&str],

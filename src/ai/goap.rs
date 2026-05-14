@@ -1,9 +1,17 @@
 
+//! - Defines the GOAP planning data used by the AI module to store actions,
+//!   goals, search nodes, and the planner state that evaluates them.
+//! - Owns the world-state planning model built from boolean preconditions and
+//!   effects, together with goal priorities and optional Lua execution callbacks.
+//! - Keeps the bounded A* search that picks a goal, expands reachable states,
+//!   estimates remaining work, and returns an ordered action list for execution.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{GP01, GP02, GP03};
 use mlua::RegistryKey;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+/// One GOAP action with planning metadata and world-state changes.
 pub struct GOAPAction {
     /// Unique name identifying this action.
     pub name: String,
@@ -16,6 +24,7 @@ pub struct GOAPAction {
     /// World-state changes applied after this action completes successfully.
     pub effects: HashMap<String, bool>,
 }
+/// One named goal with a priority and desired world state.
 pub struct GOAPGoal {
     /// Unique name identifying this goal.
     pub name: String,
@@ -25,6 +34,7 @@ pub struct GOAPGoal {
     pub state: HashMap<String, bool>,
 }
 #[derive(Clone)]
+/// One A* search node produced while planning toward a goal state.
 struct PlanNode {
     /// World state at this search node.
     state: HashMap<String, bool>,
@@ -63,6 +73,7 @@ impl PlanNode {
         self.cost + self.heuristic
     }
 }
+/// GOAP planner that stores actions, goals, and the bounded search configuration.
 pub struct GOAPPlanner {
     /// All registered actions available to the planner.
     pub actions: Vec<GOAPAction>,

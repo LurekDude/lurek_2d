@@ -1,4 +1,3 @@
-
 use crate::camera::types::{Camera, Camera2D};
 use crate::render::renderer::RenderCommand;
 impl Camera {

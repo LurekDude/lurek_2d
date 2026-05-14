@@ -1,4 +1,3 @@
-
 use super::script::MAX_STEPS;
 use super::{Action, Script, Step};
 use crate::event::{Event, EventArg, EventQueue};

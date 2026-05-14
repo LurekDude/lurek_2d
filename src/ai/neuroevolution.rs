@@ -1,4 +1,11 @@
 
+//! - Defines the neuroevolution wrapper that joins the genetic algorithm module
+//!   with the neural-network module for population-based weight search.
+//! - Owns the template layer specification used to rebuild networks from flat
+//!   chromosome genes across generations.
+//! - Keeps the orchestration logic that maps chromosomes to networks, records
+//!   fitness, advances evolution, and exposes the current population and best network.
+
 use crate::ai::{genetic::GeneticAlgorithm, neural_net::NeuralNet};
 /// GA-backed neural-network population manager.
 pub struct Neuroevolution {

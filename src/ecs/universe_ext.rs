@@ -1,5 +1,5 @@
-
 use super::Universe;
+use crate::ecs::lua_table::deep_copy_table;
 use mlua::{Function, Lua, Result as LuaResult, Table, Value as LuaValue};
 impl Universe {
     /// Returns entities that contain all required components and none of the excluded ones.

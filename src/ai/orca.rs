@@ -1,4 +1,11 @@
 
+//! - Defines the ORCA local-avoidance data used by the AI module to represent
+//!   moving agents, solver constraints, and safe output velocities.
+//! - Owns the per-agent motion inputs needed for avoidance, including current
+//!   motion, preferred motion, collision radius, and maximum speed.
+//! - Keeps the solver pass that builds pairwise half-plane constraints and
+//!   projects preferred motion into a collision-avoiding velocity for each agent.
+
 /// One agent used by the ORCA solver.
 #[derive(Clone)]
 pub struct ORCAAgent {

@@ -1,5 +1,5 @@
-
 use std::collections::HashMap;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 /// ZIP-backed virtual mount with a cached virtual-path index.
 pub struct ZipMount {

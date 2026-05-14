@@ -1,4 +1,3 @@
-
 use crate::globe::types::GlobeSpec;
 use crate::math::sphere::{lat_lon_to_unit, rot_y};
 use crate::math::Vec3;

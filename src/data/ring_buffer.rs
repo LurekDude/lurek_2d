@@ -1,4 +1,3 @@
-
 /// Hold circular queue storage with overwrite semantics.
 pub struct RingBuffer<T: Clone> {
     /// Store slots for buffered values.

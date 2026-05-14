@@ -1,4 +1,11 @@
 
+//! - Defines the personality-trait model used by the AI module to store base
+//!   values, temporary modifiers, and reusable archetype presets.
+//! - Owns the profile logic that resolves effective trait values, advances and
+//!   removes expiring modifiers, interpolates toward other profiles, and tracks origin archetypes.
+//! - Keeps the archetype registry and deterministic hash helper used to build
+//!   varied profiles from named presets with stable per-trait jitter.
+
 use std::collections::HashMap;
 
 /// Temporary additive change applied to one named trait.
@@ -154,6 +161,7 @@ impl TraitProfile {
 #[derive(Default)]
 /// Registry of named trait archetypes used to initialize agent profiles.
 pub struct TraitArchetypes {
+    /// Stored archetype trait maps keyed by archetype name.
     archetypes: HashMap<String, HashMap<String, f32>>,
 }
 impl TraitArchetypes {

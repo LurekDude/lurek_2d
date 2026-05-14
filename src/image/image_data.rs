@@ -1,4 +1,3 @@
-
 use crate::log_msg;
 use crate::runtime::log_messages::{IM01_IMAGE_LOADED, IM02_IMAGE_MISMATCH};
 /// Mutable RGBA image buffer used across rendering, serialization, and analysis.

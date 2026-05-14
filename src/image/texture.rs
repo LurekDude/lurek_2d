@@ -1,4 +1,3 @@
-
 use crate::log_msg;
 use crate::render::renderer::TextureData;
 use crate::runtime::error::{EngineError, EngineResult};

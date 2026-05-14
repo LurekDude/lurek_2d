@@ -1,4 +1,3 @@
-
 /// Globe composition helpers.
 pub mod composition;
 /// Globe drawing helpers.

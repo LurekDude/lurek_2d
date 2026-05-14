@@ -1,4 +1,3 @@
-
 use super::ambient::AmbientState;
 use super::atmosphere::{
     CloudState, FilmGrainState, FogState, HeatHazeState, LightningState, VignetteState,

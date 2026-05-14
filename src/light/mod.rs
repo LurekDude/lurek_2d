@@ -1,4 +1,3 @@
-
 /// Attenuation curve definitions for light intensity decay.
 pub mod attenuation;
 /// Additive, multiply, and screen blend mode variants for light accumulation.

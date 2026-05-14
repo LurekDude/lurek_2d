@@ -1,4 +1,3 @@
-
 use crate::compute::array::NdArray;
 
 /// Compute cumulative sum and return a 1D array with running totals.

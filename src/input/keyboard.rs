@@ -1,4 +1,3 @@
-
 use std::collections::HashSet;
 
 /// Bitmask flag for the Shift modifier.

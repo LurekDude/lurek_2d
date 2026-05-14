@@ -1,6 +1,6 @@
-
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
+/// Render a cellular automata grid with cell size and alive-cell color into an image.
 pub fn cellular_grid_to_image(
     grid: &[u8],
     grid_w: u32,

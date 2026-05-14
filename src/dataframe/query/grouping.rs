@@ -1,5 +1,5 @@
-
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
+impl DataFrame {
     #[allow(clippy::needless_range_loop)]
     /// Aggregate values by group key and return grouped result frame.
     pub fn group_agg(

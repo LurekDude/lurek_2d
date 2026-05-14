@@ -1,4 +1,11 @@
 
+//! - Defines the steering model used by the AI module to represent individual
+//!   movement behaviors, their blending rules, and optional waypoint following.
+//! - Owns the behavior variants for target seeking, fleeing, arrival, wandering,
+//!   flocking, pursuit, evasion, and custom callback-driven steering.
+//! - Keeps the manager logic that combines active behaviors, applies weighting or
+//!   priority selection, advances waypoint paths, and clamps the final steering force.
+
 /// Force vector used by steering systems.
 pub type Force = (f32, f32);
 /// How multiple steering behaviors are blended.
@@ -496,8 +503,8 @@ impl SteeringManager {
     }
 }
 /// `Default` delegates to `SteeringManager::new`.
-/// `Default` delegates to `SteeringManager::new`.
 impl Default for SteeringManager {
+    /// Build a steering manager with the default parameters.
     fn default() -> Self {
         Self::new()
     }

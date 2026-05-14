@@ -1,4 +1,3 @@
-
 /// Entity id packing and unpacking helpers.
 pub mod generational_id;
 /// Lua table cloning helpers for ECS snapshots and blueprints.

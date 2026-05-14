@@ -1,4 +1,3 @@
-
 /// Hold xorshift64 state used by dataframe-local random helpers.
 pub(crate) struct Xorshift64 {
     /// Store current PRNG state word.

@@ -1,4 +1,3 @@
-
 #[derive(Clone)]
 /// Stores waypoint interpolation state for camera positional movement.
 pub struct CameraPath {

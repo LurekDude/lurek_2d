@@ -1,4 +1,11 @@
 
+//! - Defines the pacing director used by the AI layer to translate accumulated
+//!   tension into high-level pressure phases and runtime pacing multipliers.
+//! - Owns the tunable thresholds and timers that move between buildup, peak,
+//!   sustain, and relief while events raise tension and time decays it.
+//! - Keeps the derived outputs that other systems can query for spawn pressure,
+//!   loot pressure, ambient intensity, and current pacing-state inspection.
+
 /// Director pacing phase.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectorPhase {
@@ -12,6 +19,7 @@ pub enum DirectorPhase {
     Relief,
 }
 impl DirectorPhase {
+    /// Return the canonical string tag for this pacing phase.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::BuildUp => "build_up",
@@ -40,6 +48,7 @@ pub struct DirectorConfig {
 }
 /// `Default` provides the tuned pacing config used by `AIDirector::new`.
 impl Default for DirectorConfig {
+    /// Build the default pacing configuration.
     fn default() -> Self {
         Self {
             tension_decay_rate: 0.05,
@@ -189,6 +198,7 @@ impl AIDirector {
 }
 /// `Default` delegates to `AIDirector::new`.
 impl Default for AIDirector {
+    /// Build a director with the default configuration.
     fn default() -> Self {
         Self::new()
     }

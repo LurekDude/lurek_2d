@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 #[derive(Debug, Clone, Default)]
 /// Hold one parameter description extracted for a callable entry.

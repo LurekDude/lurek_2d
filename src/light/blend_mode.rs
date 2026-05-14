@@ -1,4 +1,3 @@
-
 /// Blend mode for how a light's contribution is combined with the light accumulation buffer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LightBlendMode {

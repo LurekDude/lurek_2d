@@ -1,4 +1,3 @@
-
 use fastrand::Rng;
 
 /// Seedable RNG wrapping `fastrand::Rng` with stored seed for serialisation.

@@ -1,4 +1,3 @@
-
 use crate::globe::types::{GlobeSpec, LodTier, ProjectedProvince, Province};
 use crate::math::sphere::{axial_tilt_mat, lat_lon_to_unit, rot_x, rot_y, Mat3x3};
 use crate::math::{Vec2, Vec3};

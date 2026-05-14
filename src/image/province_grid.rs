@@ -1,4 +1,3 @@
-
 use crate::image::ImageData;
 use std::collections::{HashMap, HashSet};
 /// Adjacency summary for two provinces and the number of shared border pixels.

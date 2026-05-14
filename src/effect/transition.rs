@@ -1,4 +1,3 @@
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 /// Enumerates supported full-screen transition styles.
 pub enum TransitionKind {

@@ -1,4 +1,3 @@
-
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
 #[derive(Debug, Clone, PartialEq)]
 /// Store lexical tokens produced from SQL text.

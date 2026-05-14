@@ -1,8 +1,16 @@
 
+//! - Defines the queued command format that AI systems use to stage discrete actor
+//!   actions together with world targets, completion callbacks, and priority data.
+//! - Owns the FIFO command queue that holds pending work, exposes the current front
+//!   command view, and supports front insertion, replacement, cancellation, and advance.
+//! - Keeps the small raw-construction helpers that let higher layers enqueue new
+//!   commands without building the struct separately before queue insertion.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{CQ01, CQ02, CQ03};
 use mlua::RegistryKey;
 use std::collections::VecDeque;
+/// Pending AI action with target data and an optional completion callback.
 pub struct Command {
     /// String tag identifying the action type, e.g. `"move"` or `"attack"`.
     pub kind: String,
@@ -17,6 +25,7 @@ pub struct Command {
     /// Whether this command can be cancelled by `cancel_current`.
     pub interruptible: bool,
 }
+/// FIFO queue of pending AI commands for one actor.
 pub struct CommandQueue {
     /// FIFO storage of pending commands.
     pub(crate) commands: VecDeque<Command>,

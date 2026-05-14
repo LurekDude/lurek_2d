@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumerates the built-in post-processing effect implementations.

@@ -1,4 +1,3 @@
-
 /// Discriminant for the geometric illumination model used by a `Light2D`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LightType {

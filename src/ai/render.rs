@@ -1,4 +1,11 @@
 
+//! - Defines the AI debug rendering helpers that turn FSM and behavior-tree state
+//!   into renderer commands and image-backed debug views.
+//! - Owns the layout and traversal logic that walks state-machine and tree data,
+//!   assigns simple positions, and emits boxes, lines, and status markers.
+//! - Keeps the image drawing helpers that mirror the same structures into offline
+//!   `ImageData` outputs for inspection without the live renderer path.
+
 use crate::ai::behavior_tree::{BTNode, BTStatus, BehaviorTree};
 use crate::ai::fsm::StateMachine;
 use crate::image::ImageData;

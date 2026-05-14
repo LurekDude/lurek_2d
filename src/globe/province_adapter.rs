@@ -1,4 +1,3 @@
-
 use crate::globe::registry::Globe;
 use crate::province::registry::ProvinceRegistry;
 /// Copy political colors from the province registry into matching globe provinces.

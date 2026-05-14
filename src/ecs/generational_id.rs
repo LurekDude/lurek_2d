@@ -1,4 +1,3 @@
-
 /// Stateless namespace for encoding and decoding packed entity identifiers.
 pub struct GenerationalId;
 impl GenerationalId {

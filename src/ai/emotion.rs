@@ -1,4 +1,11 @@
 
+//! - Defines the per-agent emotion state used by the AI module to track named
+//!   feelings as clamped scalar values that move toward resting levels over time.
+//! - Owns the single-emotion rules for activation thresholds, direct setting,
+//!   triggering, and decay back toward each emotion's baseline.
+//! - Keeps the model-level operations that add or replace emotions, query current
+//!   and dominant states, list active names, update all tracked values, and reset them.
+
 /// One named emotion tracked by `EmotionModel`.
 pub struct Emotion {
     /// Emotion name.

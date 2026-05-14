@@ -1,4 +1,11 @@
 
+//! - Defines the perception model used by the AI module to store stimuli, sensor
+//!   configuration, detection results, and transient awareness state.
+//! - Owns the stimulus world for visual, auditory, and custom signals together
+//!   with insertion, decay, removal, and active-stimulus access.
+//! - Keeps the sensor-side logic that tests visibility and hearing, detects nearby
+//!   stimuli, updates awareness over time, and tracks custom detection ranges.
+
 use std::collections::HashMap;
 /// Stimulus classification used by the sensor world.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -184,6 +191,7 @@ impl StimulusWorld {
 /// `Default` delegates to `StimulusWorld::new`.
 /// `Default` delegates to `StimulusWorld::new`.
 impl Default for StimulusWorld {
+    /// Build an empty stimulus world.
     fn default() -> Self {
         Self::new()
     }
@@ -210,6 +218,7 @@ pub struct Sensor {
     pub custom_ranges: HashMap<String, f32>,
 }
 impl Sensor {
+    /// Create a sensor with default sight, hearing, and awareness settings.
     pub fn new() -> Self {
         Self {
             sight_range: 200.0,
@@ -223,6 +232,7 @@ impl Sensor {
             custom_ranges: HashMap::new(),
         }
     }
+    /// Return `true` when the target lies within sight range and the vision cone.
     pub fn can_see(&self, sensor_pos: (f32, f32), target_pos: (f32, f32)) -> bool {
         let dx = target_pos.0 - sensor_pos.0;
         let dy = target_pos.1 - sensor_pos.1;
@@ -238,6 +248,7 @@ impl Sensor {
         let diff = angle_diff(angle_to, self.facing);
         diff.abs() <= half_cone
     }
+    /// Return `true` when the auditory stimulus is within the effective hearing range.
     pub fn can_hear(&self, sensor_pos: (f32, f32), stimulus: &Stimulus) -> bool {
         if stimulus.stimulus_type != StimulusType::Auditory {
             return false;
@@ -247,6 +258,7 @@ impl Sensor {
         let dist = (dx * dx + dy * dy).sqrt();
         dist <= self.hearing_range.min(stimulus.radius)
     }
+    /// Return every stimulus currently detected from `sensor_pos`.
     pub fn detect(&self, sensor_pos: (f32, f32), world: &StimulusWorld) -> Vec<DetectedStimulus> {
         let mut out = Vec::new();
         for stim in world.stimuli() {
@@ -278,6 +290,7 @@ impl Sensor {
         }
         out
     }
+    /// Raise or decay awareness based on the current number of detections.
     pub fn update_awareness(&mut self, detected_count: usize, dt: f32) {
         if detected_count > 0 {
             self.awareness = (self.awareness + self.awareness_rise * dt).min(1.0);
@@ -285,19 +298,23 @@ impl Sensor {
             self.awareness = (self.awareness - self.awareness_decay * dt).max(0.0);
         }
     }
+    /// Return `true` when awareness reached the alert threshold.
     pub fn is_alert(&self) -> bool {
         self.awareness >= self.alert_threshold
     }
+    /// Register a detection range override for one custom stimulus label.
     pub fn add_custom_range(&mut self, type_label: &str, range: f32) {
         self.custom_ranges.insert(type_label.to_string(), range);
     }
 }
 /// `Default` delegates to `Sensor::new`.
 impl Default for Sensor {
+    /// Build a sensor with the default ranges and awareness settings.
     fn default() -> Self {
         Self::new()
     }
 }
+/// Return the wrapped angular difference between `a` and `b` in radians.
 fn angle_diff(a: f32, b: f32) -> f32 {
     let mut diff = a - b;
     while diff > std::f32::consts::PI {

@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 
 /// Public leaf entry stored alongside a tree node, exposed for Lua query results.

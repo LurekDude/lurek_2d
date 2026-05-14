@@ -1,4 +1,3 @@
-
 use crate::graph::core::Graph;
 use crate::render::renderer::{DrawMode, RenderCommand};
 impl Graph {

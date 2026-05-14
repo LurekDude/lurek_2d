@@ -1,3 +1,9 @@
+//! - Implements a compact multi-armed bandit that stores per-arm reward history,
+//!   posterior parameters, and the shared counters needed for online choice updates.
+//! - Owns the strategy switch for epsilon-greedy, UCB1, and Thompson sampling,
+//!   along with the local random and distribution helpers those policies require.
+//! - Keeps selection, reward ingestion, and reset behavior in one place so higher
+//!   AI systems can use adaptive arm choice without a larger planning framework.
 
 /// A single bandit arm with accumulated reward statistics.
 #[derive(Clone)]

@@ -1,5 +1,5 @@
-
 use crate::log_msg;
+use crate::runtime::log_messages::{RL01, RL02, RL03};
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 /// Declares a named relationship kind and the allowed level labels for it.

@@ -1,4 +1,3 @@
-
 /// Linearly interpolate from `a` to `b` by factor `t`; t=0 returns `a`, t=1 returns `b`.
 pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
     a + t * (b - a)

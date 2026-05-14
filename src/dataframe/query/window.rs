@@ -1,5 +1,7 @@
-
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
+impl DataFrame {
+    #[allow(clippy::needless_range_loop)]
+    /// Compute rolling mean and append output column.
     pub fn with_rolling_mean(
         &mut self,
         col: ColRef,

@@ -1,4 +1,3 @@
-
 /// Animation visualizations.
 pub mod animation;
 /// Audio visualizations.

@@ -1,4 +1,3 @@
-
 use crate::globe::registry::Globe;
 use crate::globe::types::ProvinceId;
 use std::collections::HashMap;

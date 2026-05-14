@@ -1,4 +1,3 @@
-
 use crate::effect::stack::PostFxStack;
 use crate::render::renderer::RenderCommand;
 impl PostFxStack {

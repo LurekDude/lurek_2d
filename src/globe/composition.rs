@@ -1,4 +1,3 @@
-
 use crate::globe::draw::emit_globe_frame;
 use crate::globe::registry::GlobeRegistry;
 use crate::render::renderer::RenderCommand;

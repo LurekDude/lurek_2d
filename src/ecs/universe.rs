@@ -1,4 +1,3 @@
-
 use super::relationships::RelationshipManager;
 use crate::ecs::generational_id::GenerationalId;
 use crate::ecs::lua_table::deep_copy_table;

@@ -1,5 +1,5 @@
-
 use crate::image::ImageData;
+/// Render a mono waveform preview into an image.
 pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height: u32) -> ImageData {
     let margin = 40u32;
     let plot_w = width - margin * 2;

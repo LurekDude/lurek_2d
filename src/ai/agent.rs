@@ -1,3 +1,9 @@
+//! - Defines the core runtime state for one AI-controlled actor, combining identity,
+//!   motion values, update priority, and the active decision mode in one record.
+//! - Owns the per-agent links into the AI subsystems that may be attached at runtime,
+//!   including blackboard storage, FSM or tree indices, steering, traits, and sensing.
+//! - Keeps optional emotion, needs, tags, and LOD data beside movement state so the
+//!   wider AI stack can address one actor through a single shared container.
 
 use crate::ai::blackboard::Blackboard;
 use crate::ai::emotion::EmotionModel;

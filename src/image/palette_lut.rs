@@ -1,4 +1,3 @@
-
 use crate::math::Color;
 use std::collections::HashMap;
 /// Source-to-target color mapping used to remap image pixels.

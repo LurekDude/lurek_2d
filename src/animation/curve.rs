@@ -1,4 +1,10 @@
 
+//! - Defines keyed numeric curves and sparse multi-property timelines for animation data.
+//! - Stores sorted keyframes for single values and named property tracks.
+//! - Supports step, linear, ease-in, ease-out, ease-in-out, and callback-backed easing modes.
+//! - Evaluates one curve, one property, or a full property snapshot at an arbitrary time.
+//! - Provides the interpolation layer used by higher animation systems for parameter driving over time.
+
 use crate::math::easing;
 use std::collections::HashMap;
 /// Easing function used when interpolating between keyframes.
@@ -210,15 +216,15 @@ impl AnimPropertyTimeline {
     }
 }
 /// `Default` delegates to `AnimCurve::new`.
-/// `Default` delegates to `AnimCurve::new`.
 impl Default for AnimCurve {
+    /// Build an empty curve with linear easing.
     fn default() -> Self {
         Self::new()
     }
 }
 /// `Default` delegates to `AnimPropertyTimeline::new`.
-/// `Default` delegates to `AnimPropertyTimeline::new`.
 impl Default for AnimPropertyTimeline {
+    /// Build an empty property timeline with linear easing.
     fn default() -> Self {
         Self::new()
     }

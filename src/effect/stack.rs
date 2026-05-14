@@ -1,5 +1,5 @@
-
 use crate::log_msg;
+use crate::runtime::log_messages::{FX01, FX02};
 #[derive(Debug, Clone)]
 /// Stores an ordered list of effect indices together with enable flags and target size.
 pub struct PostFxStack {

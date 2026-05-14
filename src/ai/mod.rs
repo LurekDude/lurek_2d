@@ -1,4 +1,11 @@
 
+//! - Defines the public AI module surface by grouping the planning, decision,
+//!   control, memory, movement, and support subsystems exposed to the rest of the engine.
+//! - Owns the module-level export map for agent state, planners, blackboard,
+//!   command flow, learning helpers, perception, steering, and squad coordination.
+//! - Keeps the AI entry surface compact by re-exporting the runtime types that
+//!   higher layers use without reaching into individual implementation files.
+
 /// Core agent type and decision model wiring.
 pub mod agent;
 /// Behavior tree nodes and execution runtime.

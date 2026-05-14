@@ -1,5 +1,5 @@
-
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
+/// Compute percentile by linear interpolation over sorted values.
 pub fn percentile(sorted: &[f64], pct: f64) -> f64 {
     if sorted.is_empty() {
         return 0.0;

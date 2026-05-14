@@ -1,5 +1,5 @@
-
 use crate::image::ImageData;
+#[allow(clippy::too_many_arguments)]
 /// Render a node-edge graph with labels and transfer-weight edges into an image.
 pub fn draw_graph_operations_to_image(
     positions: &[(f32, f32)],

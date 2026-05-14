@@ -1,4 +1,3 @@
-
 /// Expose frame-time history collection and aggregate snapshot helpers.
 pub mod frame_stats;
 /// Expose lightweight log storage and filtering helpers for developer output.

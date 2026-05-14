@@ -1,4 +1,11 @@
 
+//! - Defines the need-tracking model used by the AI module to keep normalized
+//!   internal drives, their urgency settings, and external advertisements that can satisfy them.
+//! - Owns the per-need decay, urgency scoring, satisfaction updates, and cooldown-aware
+//!   advertisement scoring tied to agent position.
+//! - Keeps the system-level operations that add named needs, update them over time,
+//!   pick the most urgent drive, and select the best currently available advertisement.
+
 /// One tracked need with a normalized value.
 pub struct Need {
     /// Need name.

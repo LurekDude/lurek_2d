@@ -1,4 +1,3 @@
-
 use crate::math::vec2::Vec2;
 
 /// Arbitrary-degree Bézier curve backed by a dynamic control-point list.

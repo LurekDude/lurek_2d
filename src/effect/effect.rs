@@ -1,4 +1,3 @@
-
 use super::effect_type::PostFxEffectType;
 use crate::log_msg;
 use crate::runtime::log_messages::{FE01, FE02, FE03};

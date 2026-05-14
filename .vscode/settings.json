@@ -220,5 +220,6 @@
 	"github.copilot.chat.otel.enabled": true,
 	"chat.editMode.hidden": false,
 	"chat.tools.compressOutput.enabled": true,
-	"markdown.preview.doubleClickToSwitchToEditor": true
+	"markdown.preview.doubleClickToSwitchToEditor": true,
+	"files.saveConflictResolution": "overwriteFileOnDisk"
 }

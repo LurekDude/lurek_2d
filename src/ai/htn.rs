@@ -1,4 +1,12 @@
 
+//! - Defines the HTN planning model used by the AI module to represent symbolic
+//!   world state, decomposable tasks, decomposition methods, and the task registry.
+//! - Owns the split between primitive tasks that mutate state directly and compound
+//!   tasks that expand into subtasks through applicable methods.
+//! - Keeps the planner logic that recursively decomposes a root task into a linear
+//!   primitive plan while checking preconditions, applying effects, and bounding
+//!   recursion depth for safe planning.
+
 use std::collections::HashMap;
 /// Symbolic world state keyed by string names.
 pub type WorldState = HashMap<String, f32>;
@@ -94,7 +102,7 @@ impl HTNMethod {
             .all(|k| state.get(k).copied().unwrap_or(0.0) >= 0.5)
     }
 }
-/// Task registry used by the planner.
+/// Task registry that stores the named HTN tasks available to planning.
 #[derive(Default)]
 pub struct HTNDomain {
     /// Registered tasks by name.
@@ -140,7 +148,7 @@ impl HTNDomain {
         self.tasks.len()
     }
 }
-/// HTN planner that decomposes a root task into a linear action list.
+/// HTN planner that expands a root task into a primitive task sequence.
 pub struct HTNPlanner;
 impl HTNPlanner {
     /// Plan from `root_task` and return a primitive task sequence, or `None` on failure.

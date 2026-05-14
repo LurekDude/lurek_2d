@@ -1,4 +1,3 @@
-
 use std::f64::consts::PI;
 
 #[derive(Clone, Copy, Debug, Default)]

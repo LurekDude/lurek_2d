@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 /// Replace `{name}` placeholders from a string map and keep unknown placeholders intact.
 pub fn interpolate(template: &str, vars: &HashMap<String, String>) -> String {

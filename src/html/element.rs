@@ -1,4 +1,3 @@
-
 use crate::html::style::parse_declarations;
 use std::collections::BTreeMap;
 /// Stable index type for elements stored in an HTML document.

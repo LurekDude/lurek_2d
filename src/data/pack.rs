@@ -1,5 +1,6 @@
-
 use crate::data::byte_data::ByteData;
+#[derive(Debug, Clone)]
+/// Hold value variants used by pack and unpack formats.
 pub enum PackValue {
     /// Store signed integer value.
     Int(i64),

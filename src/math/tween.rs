@@ -1,4 +1,3 @@
-
 use crate::math::easing;
 
 /// Start/target pair for a single channel managed by a `Tween`.

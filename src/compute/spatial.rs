@@ -1,4 +1,3 @@
-
 use crate::compute::array::{DataType, NdArray};
 use std::collections::VecDeque;
 

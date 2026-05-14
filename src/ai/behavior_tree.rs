@@ -1,5 +1,14 @@
 
+//! - Defines the behavior-tree structures that the AI layer uses to store node
+//!   hierarchy, local runtime progress, and the last resolved result of a tree.
+//! - Owns the control-flow node variants for selection, sequencing, parallel work,
+//!   result decorators, guard checks, and Lua-backed action or condition leaves.
+//! - Keeps the local helpers that reset subtree state, count nodes for inspection,
+//!   translate status and policy tags, and expose a compact debug snapshot of one
+//!   tree's current shape and last completed tick.
+
 use mlua::RegistryKey;
+/// Execution result produced by a behavior-tree node or whole tree.
 #[derive(Debug, Clone, PartialEq)]
 pub enum BTStatus {
     /// Node completed its task successfully.
@@ -27,6 +36,7 @@ impl BTStatus {
         }
     }
 }
+/// Success and failure rule used when a parallel node combines child results.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParallelPolicy {
     /// Parallel succeeds as soon as any one child succeeds.
@@ -50,6 +60,7 @@ impl ParallelPolicy {
         }
     }
 }
+/// Behavior-tree node with child links and any per-node progress it owns.
 pub enum BTNode {
     /// Tries children in order; succeeds on the first child success, fails when all fail.
     Selector {
@@ -162,6 +173,7 @@ impl BTNode {
         }
     }
 }
+/// Root node and last completed status for one behavior-tree instance.
 pub struct BehaviorTree {
     /// Top-level node; `None` if no tree has been built yet.
     pub root: Option<BTNode>,
@@ -197,6 +209,7 @@ fn count_bt_nodes(node: &BTNode) -> usize {
         BTNode::Action { .. } | BTNode::Condition { .. } => 0,
     }
 }
+/// Debug summary containing node count and the last resolved tree status.
 pub struct BtDebugState {
     /// Total node count in the associated tree.
     pub node_count: usize,

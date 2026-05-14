@@ -1,4 +1,11 @@
 
+//! - Defines the AI level-of-detail model that groups agents into distance-based
+//!   update tiers around a reference position.
+//! - Owns the tier data that controls maximum coverage, think distance, and frame
+//!   cadence for reduced AI work at longer ranges.
+//! - Keeps the logic that sorts tiers, assigns agents to a tier from positions,
+//!   and decides whether a tier should run on a given frame.
+
 /// One LOD bucket for AI work.
 #[derive(Clone)]
 pub struct LodTier {
@@ -74,9 +81,9 @@ impl AILod {
         }
     }
 }
-/// `Default` creates near, mid, and far tiers.
-/// `Default` builds the near, mid, and far tier set.
+/// `Default` builds the standard near, mid, and far tier set.
 impl Default for AILod {
+    /// Build the standard near, mid, and far tier set.
     fn default() -> Self {
         Self::new(vec![
             LodTier::new("near", 400.0, 1, 400.0),

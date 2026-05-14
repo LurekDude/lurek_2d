@@ -1,5 +1,5 @@
-
 use crate::devtools::time_anchor::TimeAnchor;
+use std::collections::VecDeque;
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 /// Represent ordered log severity levels used for filtering and display.
 pub enum LogLevel {

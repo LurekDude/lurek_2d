@@ -1,4 +1,11 @@
 
+//! - Defines the population-based genetic optimization data used by the AI module
+//!   to keep genomes, caller-provided fitness values, and generation bookkeeping.
+//! - Owns the evolution step that preserves elites, selects parents through
+//!   tournaments, breeds children gene by gene, and applies mutation in place.
+//! - Keeps the small deterministic random helpers that drive parent selection,
+//!   crossover choices, and Gaussian mutation for reproducible search behavior.
+
 /// Evolving genome with fitness and stable id.
 #[derive(Clone)]
 pub struct Chromosome {

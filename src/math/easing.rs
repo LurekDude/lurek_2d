@@ -1,4 +1,3 @@
-
 use std::f32::consts::PI;
 
 /// Return `t` unchanged (no-op easing).

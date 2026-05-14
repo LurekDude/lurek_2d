@@ -1,4 +1,3 @@
-
 use std::collections::{HashMap, HashSet};
 
 /// A single active touch contact point with its position and pressure.

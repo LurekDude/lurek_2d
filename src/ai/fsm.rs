@@ -1,8 +1,16 @@
 
+//! - Defines the finite-state-machine data used by the AI module to store named
+//!   states, callback hooks, transition rules, and current runtime state selection.
+//! - Owns the callback bundles for state entry, update, and exit together with the
+//!   transition records that route between states by priority and optional guards.
+//! - Keeps the mutable machine state that tracks the current state, initial state,
+//!   elapsed time in state, and raw registration helpers used by the Lua-facing layer.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{FN01, FN02};
 use mlua::RegistryKey;
 use std::collections::HashMap;
+/// Lua callback set attached to one FSM state.
 pub struct StateCallbacks {
     /// Registry key of the Lua callback invoked when entering this state.
     pub on_enter: Option<RegistryKey>,
@@ -11,6 +19,7 @@ pub struct StateCallbacks {
     /// Registry key of the Lua callback invoked when leaving this state.
     pub on_exit: Option<RegistryKey>,
 }
+/// One transition rule between FSM states.
 pub struct Transition {
     /// Source state name; `"*"` matches any state.
     pub from: String,
@@ -22,6 +31,7 @@ pub struct Transition {
     pub priority: i32,
 }
 #[allow(dead_code)]
+/// Finite-state-machine storage for states, transitions, and runtime selection.
 pub struct StateMachine {
     /// Map from state name to its enter/update/exit callbacks.
     pub(crate) states: HashMap<String, StateCallbacks>,

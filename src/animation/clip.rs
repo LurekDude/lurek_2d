@@ -1,4 +1,8 @@
 
+//! - Defines named animation clips as reusable frame-index ranges.
+//! - Stores playback direction, looping state, and fallback FPS for clips that do not rely on per-frame timing.
+//! - Gives higher animation systems a compact clip descriptor they can switch, reuse, and combine by name.
+
 /// Supported clip playback modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClipPlaybackMode {

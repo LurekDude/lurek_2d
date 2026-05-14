@@ -1,5 +1,5 @@
-
 use crate::image::ImageData;
+/// Render a panel layout with borders, labels, and content areas into an image.
 pub fn panel_layout_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(35, 35, 45, 255);

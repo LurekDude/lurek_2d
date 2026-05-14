@@ -1,4 +1,3 @@
-
 use crate::globe::types::{Layer, ProvinceId};
 use std::collections::HashMap;
 /// Named layer collection keyed by layer name.

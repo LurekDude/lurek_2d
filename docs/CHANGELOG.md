@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs/cag: added `workflow-audit-rust-src-docs.prompt.md` for manual, alphabetical Rust doc audits across `src/` excluding `src/lua_api`, with whole-file reads, one-file-at-a-time edits, feature-based `//!` headers, and immediate per-file validation.
+
 - docs/cag: removed optional `agent` field from prompt frontmatters and made `agent` field non-required in `cag_validate.py`; agents no longer need explicit routing—they work autonomously until Manager calls or task completes.
 
 - docs/cag: added explicit Git Hygiene rule in `.github/copilot-instructions.md` that agents must not stop work because of unrelated or pre-existing worktree changes; they should continue scoped task execution unless user asks otherwise.

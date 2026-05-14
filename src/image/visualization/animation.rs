@@ -1,4 +1,3 @@
-
 use crate::animation::Animation;
 use crate::image::ImageData;
 /// Render an animation frame grid into an image.

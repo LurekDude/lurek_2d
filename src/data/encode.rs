@@ -1,4 +1,3 @@
-
 use base64::Engine;
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Select textual encoding algorithm.

@@ -1,4 +1,3 @@
-
 /// `Script`: ordered, time-sorted step sequences with TOML parsing and repeat expansion.
 pub mod script;
 /// `Simulator`: drives script playback, macro inlining, condition evaluation, and visual asserts.

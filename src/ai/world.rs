@@ -1,4 +1,11 @@
 
+//! - Defines the shared AI world container that owns registered agents, the
+//!   name-to-index lookup map, and the global blackboard inherited by new agents.
+//! - Owns the lifecycle operations that add or remove named agents and keep the
+//!   lookup table synchronized with the stored agent list.
+//! - Keeps the small world update surface that exposes global blackboard access
+//!   and advances agent positions by integrating their current velocities.
+
 use crate::ai::agent::Agent;
 use crate::ai::blackboard::Blackboard;
 use std::collections::HashMap;
@@ -70,8 +77,8 @@ impl AIWorld {
     }
 }
 /// `Default` delegates to `AIWorld::new`.
-/// `Default` delegates to `AIWorld::new`.
 impl Default for AIWorld {
+    /// Build an empty AI world.
     fn default() -> Self {
         Self::new()
     }

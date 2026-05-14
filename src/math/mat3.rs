@@ -1,4 +1,3 @@
-
 use super::vec2::Vec2;
 
 /// Row-major 3×3 float matrix for 2D affine transforms; used by Transform and Camera.

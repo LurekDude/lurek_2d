@@ -1,4 +1,11 @@
 
+//! - Defines the high-level strategy selection model used by the AI module to
+//!   score named goals against the current tag context over time.
+//! - Owns the goal records that hold eligibility tags, priority scaling, enable
+//!   state, and the latest computed score.
+//! - Keeps the timed evaluation flow that asks an external scorer for values,
+//!   updates all eligible goals, and stores the currently active strategic choice.
+
 /// One strategic goal considered by the planner.
 #[derive(Clone)]
 pub struct StrategicGoal {

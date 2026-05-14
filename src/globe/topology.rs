@@ -1,4 +1,3 @@
-
 use crate::globe::types::{GlobeError, Province, ProvinceId, MAX_PROVINCES};
 use crate::pathfind::graph_path::{find_province_path, ProvinceCostFn, ProvincePath};
 use std::collections::{HashMap, HashSet};

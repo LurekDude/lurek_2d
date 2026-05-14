@@ -1,5 +1,5 @@
-
 use crate::log_msg;
+use crate::runtime::log_messages::{SG01, SG02};
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 #[allow(dead_code)]

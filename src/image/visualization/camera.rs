@@ -1,4 +1,3 @@
-
 use super::hsv_to_rgb_viz;
 use crate::camera::Camera2D;
 use crate::image::ImageData;

@@ -1,4 +1,3 @@
-
 use super::image_data::ImageData;
 use crate::render::renderer::RenderCommand;
 use crate::runtime::resource_keys::TextureKey;

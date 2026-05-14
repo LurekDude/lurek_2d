@@ -1,4 +1,10 @@
 
+//! - Loads Aseprite JSON exports into engine animation metadata.
+//! - Extracts sheet frame rectangles, per-frame durations, and sheet size.
+//! - Parses frame tags into named clip ranges with forward, reverse, or ping-pong playback.
+//! - Accepts both array and object `frames` layouts and normalizes object order into playback order.
+//! - Validates required metadata fields and returns explicit parse errors when the export is incomplete.
+
 use serde_json::Value;
 /// One frame rectangle parsed from an Aseprite sheet.
 #[derive(Debug, Clone)]

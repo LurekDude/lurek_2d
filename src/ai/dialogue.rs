@@ -1,4 +1,11 @@
 
+//! - Defines the dialogue selection data used by the AI layer to choose topics
+//!   and branches from weighted sets guarded by current FSM and BT state.
+//! - Owns the stored topic and branch records, including their optional gate keys
+//!   and utility-score references used during selection.
+//! - Keeps the scoring and matching logic that filters by current gates, folds in
+//!   utility values, and returns the highest-scoring topic or branch candidate.
+
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 /// Single branch inside a topic.
@@ -183,7 +190,9 @@ impl DialogueAI {
         true
     }
 }
+/// `Default` delegates to `DialogueAI::new`.
 impl Default for DialogueAI {
+    /// Build an empty dialogue selector.
     fn default() -> Self {
         Self::new()
     }

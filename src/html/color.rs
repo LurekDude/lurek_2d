@@ -1,4 +1,3 @@
-
 use crate::math::Color;
 /// Parse a CSS color string and return normalized RGBA components, or `None` when unsupported.
 pub fn parse_css_color_rgba(raw: &str) -> Option<[f32; 4]> {

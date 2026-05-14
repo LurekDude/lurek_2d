@@ -1,4 +1,3 @@
-
 /// Hold buffer and cursor for binary writes.
 pub struct DataWriter {
     /// Store written bytes.

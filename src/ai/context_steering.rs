@@ -1,3 +1,10 @@
+//! - Implements slot-based context steering for AI movement by accumulating
+//!   interest and danger contributions around a directional ring.
+//! - Owns the behavior variants that project targets, hazards, wandering intent,
+//!   fixed headings, and world-bound avoidance into those slot maps.
+//! - Keeps the evaluation pass that merges contributions, chooses the strongest
+//!   safe direction, records the last chosen heading and magnitude, and exposes
+//!   the ring data for inspection or debugging.
 
 use std::f32::consts::{PI, TAU};
 /// Behavior kind used by context steering slots.
@@ -269,15 +276,19 @@ impl ContextSteering {
         self.chosen_magnitude = best_val;
         (chosen_angle.cos(), chosen_angle.sin())
     }
+    /// Return the heading in radians chosen by the last evaluation.
     pub fn chosen_direction(&self) -> f32 {
         self.chosen_dir
     }
+    /// Return the magnitude chosen by the last evaluation.
     pub fn chosen_magnitude(&self) -> f32 {
         self.chosen_magnitude
     }
+    /// Return a copy of the last computed interest ring.
     pub fn interest_map(&self) -> Vec<f32> {
         self.interest.clone()
     }
+    /// Return a copy of the last computed danger ring.
     pub fn danger_map(&self) -> Vec<f32> {
         self.danger.clone()
     }

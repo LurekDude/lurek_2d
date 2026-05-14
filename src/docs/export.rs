@@ -1,5 +1,6 @@
-
 use crate::docs::entry::DocEntry;
+use std::collections::HashMap;
+use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 /// Map an entry kind to a completion item kind and return the resulting label.

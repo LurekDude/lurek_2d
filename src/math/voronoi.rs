@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 
 /// One Voronoi region around a seed site with its polygon vertices in CCW order.

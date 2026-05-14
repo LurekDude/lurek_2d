@@ -1,4 +1,11 @@
 
+//! - Defines the squad-level coordination state used by the AI module to group
+//!   named members under one leader and shared local memory.
+//! - Owns the selected formation mode, formation spacing, and ordered membership
+//!   data that determine relative placement around the leader.
+//! - Keeps the formation-position logic that turns squad order into concrete
+//!   target offsets for line, column, wedge, and circle movement patterns.
+
 use crate::ai::blackboard::Blackboard;
 /// Supported squad formation shapes.
 #[derive(Debug, Clone, PartialEq)]

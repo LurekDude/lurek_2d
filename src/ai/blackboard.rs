@@ -1,7 +1,15 @@
 
+//! - Defines the lightweight hierarchical blackboard used by the AI module to
+//!   store shared per-agent facts as keyed numbers, booleans, and strings.
+//! - Owns the local entry map, optional parent chain, and the read and write
+//!   operations that resolve values through that fallback hierarchy.
+//! - Keeps the small management surface for key removal, board clearing, key
+//!   listing, size reporting, and parent attachment used by higher AI systems.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{BB01, BB02, BB03};
 use std::collections::HashMap;
+/// Value stored inside a blackboard entry.
 #[derive(Debug, Clone)]
 pub enum BlackboardValue {
     /// 64-bit floating-point numeric value.
@@ -11,6 +19,7 @@ pub enum BlackboardValue {
     /// UTF-8 string value.
     Text(String),
 }
+/// Blackboard storage for one agent with optional parent fallback.
 #[derive(Clone)]
 pub struct Blackboard {
     /// Local key/value entries owned by this board.

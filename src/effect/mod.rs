@@ -1,4 +1,3 @@
-
 /// Ambient color state derived from time-of-day settings.
 pub mod ambient;
 /// Atmospheric overlay states such as clouds, fog, and lightning.
