@@ -1,3 +1,4 @@
+
 use crate::parallax::layer::{ParallaxDrawBatch, ParallaxLayer};
 use crate::render::renderer::RenderCommand;
 impl ParallaxLayer {

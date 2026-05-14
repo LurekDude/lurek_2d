@@ -1,9 +1,3 @@
-﻿//! Named audio routing channel that groups sources and applies shared processing.
-//!
-//! - Applies per-bus volume and pitch multipliers to all sources assigned to it
-//! - Carries a shared DSP effect chain so one filter configuration covers the whole group
-//! - Supports automatic volume ducking of another bus when this bus is active
-//! - Pause state suspends all sources on the bus without destroying them
 
 use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::log_msg;

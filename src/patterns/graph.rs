@@ -1,3 +1,4 @@
+
 /// A graph node with a debug label.
 #[derive(Debug, Clone)]
 pub struct GraphNode {

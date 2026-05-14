@@ -1,5 +1,5 @@
+
 use std::collections::HashMap;
-/// Metadata for a single event subscription.
 #[derive(Debug, Clone)]
 pub struct Subscription {
     /// Unique subscription identifier.

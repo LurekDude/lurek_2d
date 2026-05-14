@@ -1,3 +1,4 @@
+
 /// A single candidate with a weight and debug label.
 #[derive(Debug, Clone)]
 pub struct WeightedEntry {

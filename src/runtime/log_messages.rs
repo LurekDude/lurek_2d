@@ -1,5 +1,3 @@
-﻿//! Runtime log message ids and logging helpers used across engine modules.
-//! Defines stable id constants and a macro for message-aware logging calls.
 
 use std::sync::atomic::{AtomicU8, Ordering};
 static LOG_LEVEL_OVERRIDE: AtomicU8 = AtomicU8::new(0);

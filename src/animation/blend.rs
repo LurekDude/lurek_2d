@@ -1,3 +1,4 @@
+
 /// Bone mask for restricting a blend layer to selected bones.
 #[derive(Debug, Clone, Default)]
 pub struct BlendMask {

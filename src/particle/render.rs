@@ -1,3 +1,4 @@
+
 use super::emitter::ParticleSystem;
 use super::trail::Trail;
 use crate::render::renderer::RenderCommand;

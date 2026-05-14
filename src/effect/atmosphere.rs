@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone)]
 /// Configures animated cloud overlay generation.
 pub struct CloudState {

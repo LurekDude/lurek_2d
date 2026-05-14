@@ -1,3 +1,4 @@
+
 use super::noise_generator::{NoiseGenerator, NoiseKind};
 
 /// Return the Ken Perlin smooth-step polynomial `6t⁵ - 15t⁴ + 10t³`.

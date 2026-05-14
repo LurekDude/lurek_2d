@@ -1,6 +1,5 @@
+
 use std::collections::VecDeque;
-#[derive(Debug)]
-/// Store a bounded history of frame delta samples for aggregate stats.
 pub struct FrameStats {
     /// Hold recent frame delta values in seconds.
     pub history: VecDeque<f64>,

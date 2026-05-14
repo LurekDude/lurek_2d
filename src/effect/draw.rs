@@ -1,5 +1,5 @@
+
 use super::stack::PostFxStack;
-use crate::image::ImageData;
 impl PostFxStack {
     /// Renders a solid-color preview image that reflects whether any stack effects are enabled.
     pub fn draw_to_image(&self, width: u32, height: u32) -> ImageData {

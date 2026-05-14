@@ -1,3 +1,4 @@
+
 /// Token-based binary reader and writer for structured byte payloads.
 pub mod bin_pack;
 /// Mutable owned byte buffer with indexed access and conversion helpers.

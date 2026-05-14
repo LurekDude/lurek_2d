@@ -1,3 +1,4 @@
+
 /// Evolving genome with fitness and stable id.
 #[derive(Clone)]
 pub struct Chromosome {

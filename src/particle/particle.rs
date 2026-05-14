@@ -1,3 +1,4 @@
+
 /// Per-particle state owned by the `ParticleSystem` pool.
 #[derive(Clone, Debug)]
 pub struct Particle {

@@ -1,3 +1,4 @@
+
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// 2D float vector; backbone of all position and direction math in the engine.

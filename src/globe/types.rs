@@ -1,3 +1,4 @@
+
 use crate::math::Vec2;
 use std::collections::{HashMap, HashSet};
 /// Maximum province count supported by globe data structures.

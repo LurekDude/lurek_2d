@@ -1,3 +1,4 @@
+
 /// One required key press in a combo sequence with its maximum inter-step gap.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ComboStep {

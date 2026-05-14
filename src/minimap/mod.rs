@@ -1,3 +1,4 @@
+
 #[allow(clippy::module_inception)]
 /// Core minimap state and update logic.
 pub mod minimap;

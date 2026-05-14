@@ -1,3 +1,4 @@
+
 /// Activation function used by a layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Activation {

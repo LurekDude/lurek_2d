@@ -1,3 +1,4 @@
+
 /// A single entry in the queue with a stable tie-breaking sequence number.
 #[derive(Debug, Clone)]
 pub struct PriorityItem {

@@ -1,5 +1,5 @@
+
 /// Async file request queue and result tracking.
-pub mod async_loader;
 /// Cached file payload helper.
 pub mod file_data;
 /// Buffered file handle and file mode helpers.

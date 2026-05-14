@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 /// Single branch inside a topic.

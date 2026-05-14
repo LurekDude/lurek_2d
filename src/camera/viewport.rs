@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone, PartialEq)]
 /// Selects how the game surface scales into a window surface.
 pub enum ScaleMode {

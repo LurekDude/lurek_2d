@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone)]
 /// Hold owned raw bytes with convenience conversion helpers.
 pub struct ByteData {

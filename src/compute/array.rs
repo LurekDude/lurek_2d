@@ -1,3 +1,4 @@
+
 /// Defines maximum allowed number of elements for safe allocations.
 const MAX_ELEMENTS: usize = 268_435_456;
 

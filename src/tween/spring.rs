@@ -1,7 +1,3 @@
-﻿//! Spring-physics simulation for smooth damped animation, used by `lurek.tween`.
-//! Owns `SpringAxis` (single-axis spring) and `SpringSystem` (named multi-axis
-//! container). Does not own easing or sequence logic. Consumed by tween bindings
-//! and by `TweenEngine::active_springs`.
 
 use std::collections::HashMap;
 

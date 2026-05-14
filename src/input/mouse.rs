@@ -1,3 +1,4 @@
+
 /// OS-provided cursor shape variants available through `lurek.input.setCursor`.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum SystemCursor {

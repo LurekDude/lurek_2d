@@ -1,3 +1,4 @@
+
 use std::collections::HashSet;
 /// Registry of named constructable types with optional string aliases.
 #[derive(Debug, Default)]

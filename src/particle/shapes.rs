@@ -1,3 +1,4 @@
+
 /// Geometric primitive used to draw a single particle.
 #[derive(Clone, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum ParticleShape {

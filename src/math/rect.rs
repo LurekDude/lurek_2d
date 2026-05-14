@@ -1,3 +1,4 @@
+
 use super::vec2::Vec2;
 
 /// Axis-aligned rectangle with position and size; used for bounds, layout regions, and UV rects.

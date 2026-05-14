@@ -1,3 +1,4 @@
+
 /// Configuration for one MCTS search run.
 pub struct MCTSConfig {
     /// Number of iterations to execute.

@@ -1,3 +1,4 @@
+
 /// Particle emitter configuration: shape, rate, lifetime, and per-particle property ranges.
 pub mod config;
 /// Emission strategy: burst, continuous, and lifetime-gated emission logic.

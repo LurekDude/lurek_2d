@@ -1,3 +1,4 @@
+
 /// Expose catalog storage and query operations for documentation entries.
 pub mod catalog;
 /// Expose normalized entry types for parameters, returns, and metadata.

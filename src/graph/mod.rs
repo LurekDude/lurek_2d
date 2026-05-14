@@ -1,3 +1,4 @@
+
 /// Graph algorithm helpers.
 pub mod algorithms;
 /// Core graph container and stats.

@@ -1,8 +1,3 @@
-﻿//! Round-robin voice allocator that enables polyphonic playback of a single sound asset.
-//!
-//! - Preloads a fixed set of source keys for one audio file so concurrent triggers never share a voice
-//! - Returns the next available key in rotation on each trigger to spread load across voices
-//! - Carries a per-pool gain and optional bus routing applied when a voice is activated
 
 use crate::runtime::resource_keys::SoundKey;
 /// Round-robin pool of preloaded source keys representing voices for one sound asset.

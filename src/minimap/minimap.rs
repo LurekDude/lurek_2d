@@ -1,3 +1,4 @@
+
 use super::types::{
     ColorMode, FogLevel, LayerData, MarkerAnimation, MinimapMarker, MinimapObject,
     MinimapObjectType, MinimapPing, OverlayPath, OverlayShape,

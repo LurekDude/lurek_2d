@@ -1,3 +1,4 @@
+
 /// Q-learning agent with a flat `state × action` value table.
 pub struct QLearner {
     /// Total number of discrete states.

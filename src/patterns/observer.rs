@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 
-/// A single subscription entry for an observer.
+use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct ObserverEntry {
     /// Unique subscription id.

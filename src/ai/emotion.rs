@@ -1,3 +1,4 @@
+
 /// One named emotion tracked by `EmotionModel`.
 pub struct Emotion {
     /// Emotion name.

@@ -1,3 +1,4 @@
+
 use std::collections::VecDeque;
 
 /// Precomputed directional flow field driving units toward a single goal cell.

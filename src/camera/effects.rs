@@ -1,3 +1,4 @@
+
 use std::f32::consts::PI;
 
 /// Stores state for a temporary sinusoidal zoom pulse.

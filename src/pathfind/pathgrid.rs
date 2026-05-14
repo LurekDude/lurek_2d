@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
-/// Walkability and movement cost for a single grid cell.
 #[derive(Debug, Clone)]
 pub struct Cell {
     /// Whether agents may enter this cell.

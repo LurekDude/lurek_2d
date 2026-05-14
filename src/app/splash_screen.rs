@@ -1,8 +1,3 @@
-﻿//! Splash screen asset loader and render command composer for engine startup presentation.
-//!
-//! - Decodes embedded logo and banner images and uploads them to temporary texture slots
-//! - Builds draw commands for the idle splash state and the drag-to-open hover state
-//! - Scales assets with contain-fit to fill any window size without distortion
 
 use super::app::fit_contain_size;
 use crate::render::renderer::{DrawMode, RenderCommand, TextureData};

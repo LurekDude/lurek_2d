@@ -1,3 +1,4 @@
+
 use super::layer::ParallaxLayer;
 use crate::image::ImageData;
 impl ParallaxLayer {

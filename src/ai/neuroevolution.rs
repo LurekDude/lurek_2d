@@ -1,3 +1,4 @@
+
 use crate::ai::{genetic::GeneticAlgorithm, neural_net::NeuralNet};
 /// GA-backed neural-network population manager.
 pub struct Neuroevolution {

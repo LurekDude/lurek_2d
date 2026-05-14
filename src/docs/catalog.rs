@@ -1,5 +1,5 @@
+
 use crate::docs::entry::DocEntry;
-/// Hold the in-memory list of documentation entries collected from source data.
 pub struct Catalog {
     /// Preserve all collected entries in insertion order for export stages.
     entries: Vec<DocEntry>,

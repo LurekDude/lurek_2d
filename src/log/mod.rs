@@ -1,3 +1,4 @@
+
 /// Structured log facade: global level, enabled checks, and dispatch to sink registry.
 pub mod facade;
 /// Log sink types: rotating file sink, in-memory ring buffer, and sink registry.

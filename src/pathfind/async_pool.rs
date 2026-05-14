@@ -1,6 +1,5 @@
+
 use crate::pathfind::astar;
-use crate::pathfind::nav_grid::NavGrid;
-use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
 /// In-flight A\* job sent to a worker thread.

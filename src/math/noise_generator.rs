@@ -1,3 +1,4 @@
+
 /// Distance metric used by Worley cell noise.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DistType {

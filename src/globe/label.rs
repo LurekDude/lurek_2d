@@ -1,3 +1,4 @@
+
 use crate::globe::types::{Label, LabelStyle};
 use std::collections::HashMap;
 /// Label collection keyed by stable id.

@@ -1,6 +1,5 @@
-use std::collections::HashSet;
 
-/// Set of named states with an optional current selection.
+use std::collections::HashSet;
 pub struct SimpleState {
     /// All declared state names.
     states: HashSet<String>,

@@ -1,3 +1,4 @@
+
 /// Shadow filter quality preset controlling the soft-shadow sample kernel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ShadowFilter {

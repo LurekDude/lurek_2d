@@ -1,3 +1,4 @@
+
 /// Linear RGBA float color; all channels are in [0.0, 1.0] unless explicitly noted.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {

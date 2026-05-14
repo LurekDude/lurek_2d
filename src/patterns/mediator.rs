@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 
-/// Named-channel broker mapping channel names to registered handler ids.
+use std::collections::HashMap;
 #[derive(Debug, Default, Clone)]
 pub struct Mediator {
     /// Per-channel handler id lists.

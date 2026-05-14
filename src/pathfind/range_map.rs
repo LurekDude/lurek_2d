@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
-/// Precomputed movement-cost distances from an origin cell within a budget.
 pub struct RangeMap {
     /// Grid width in cells.
     pub width: u32,

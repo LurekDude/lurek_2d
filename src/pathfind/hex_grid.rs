@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
-/// Hex layout convention: column or row is the flat side.
+use std::collections::{BinaryHeap, HashMap}; column or row is the flat side.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HexLayout {
     /// Hexagons have flat sides on the left and right; columns are aligned vertically.

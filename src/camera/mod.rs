@@ -1,3 +1,4 @@
+
 /// Exposes camera effect primitives for sway, breathing, and pulse behavior.
 pub mod effects;
 /// Exposes multi-camera rig management for split and overlay layouts.

@@ -1,3 +1,4 @@
+
 /// Quadratic attenuation coefficients for distance-based light intensity falloff.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Attenuation {

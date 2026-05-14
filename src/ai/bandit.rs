@@ -1,3 +1,4 @@
+
 /// A single bandit arm with accumulated reward statistics.
 #[derive(Clone)]
 pub struct BanditArm {

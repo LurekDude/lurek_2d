@@ -1,8 +1,3 @@
-﻿//! Fatal error presentation layer that renders Lua and engine failures as a full-screen display.
-//!
-//! - Formats error messages and stack traces with line-wrapping for readability
-//! - Produces a complete set of render commands for a styled error screen with title, body, and footer
-//! - Accepts both engine-level and Lua-sourced errors through a common representation
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::error::EngineError;
@@ -49,7 +44,7 @@ impl ErrorScreen {
             let location = cleaned_msg[..colon2].trim();
             let description = cleaned_msg[colon2 + 1..].trim();
             (
-                format!("Lua Error  â€”  {}", location),
+                format!("Lua Error  —  {}", location),
                 description.to_string(),
             )
         } else {

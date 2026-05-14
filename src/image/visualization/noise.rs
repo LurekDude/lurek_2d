@@ -1,5 +1,5 @@
+
 use crate::image::ImageData;
-/// Render a noise function as a grayscale image, scaling range to full byte range.
 pub fn noise_to_image(
     noise_fn: impl Fn(f64, f64) -> f64,
     width: u32,

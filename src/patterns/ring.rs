@@ -1,3 +1,4 @@
+
 use std::collections::VecDeque;
 
 /// Fixed-capacity ring buffer of `RingEntry` values.

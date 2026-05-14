@@ -1,3 +1,4 @@
+
 use crate::math::Color;
 use crate::render::renderer::{DrawMode, RenderCommand};
 /// Single point on a trail ribbon with world-space position and accumulated age.

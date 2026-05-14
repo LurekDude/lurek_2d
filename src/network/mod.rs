@@ -1,3 +1,4 @@
+
 /// Shared numeric limits and protocol constants used across all network layers.
 pub mod constants;
 /// `NetworkError` type covering socket, protocol, and framing failures.

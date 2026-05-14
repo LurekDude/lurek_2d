@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumerates supported weather particle behaviors.
 pub enum WeatherType {

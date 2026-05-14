@@ -1,3 +1,4 @@
+
 /// Cached file bytes paired with the logical path they came from.
 pub struct FileData {
     /// Logical path used to load or label the payload.

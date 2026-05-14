@@ -1,6 +1,5 @@
+
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
-use std::time::SystemTime;
 /// Tracks a set of file paths and their last known modification times.
 pub struct FileWatcher {
     /// Watched path keyed by its string form and cached modification time.

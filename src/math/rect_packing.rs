@@ -1,3 +1,4 @@
+
 /// Placement result for a single packed rectangle.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackedRect {

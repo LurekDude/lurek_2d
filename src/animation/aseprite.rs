@@ -1,3 +1,4 @@
+
 use serde_json::Value;
 /// One frame rectangle parsed from an Aseprite sheet.
 #[derive(Debug, Clone)]

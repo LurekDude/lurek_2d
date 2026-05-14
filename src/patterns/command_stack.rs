@@ -1,3 +1,4 @@
+
 /// Metadata record for a single pushed command.
 #[derive(Debug, Clone)]
 pub struct CommandEntry {

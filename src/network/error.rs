@@ -1,3 +1,4 @@
+
 use thiserror::Error;
 
 /// All error conditions that can occur in the network subsystem.

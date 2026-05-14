@@ -1,3 +1,4 @@
+
 use crate::math::Vec3;
 
 /// Column-major 3×3 float matrix used for sphere rotation in globe view transforms.

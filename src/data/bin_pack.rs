@@ -1,6 +1,5 @@
+
 use crate::data::byte_data::ByteData;
-#[derive(Debug, Clone)]
-/// Hold typed values used by token-based binary packing.
 pub enum BinValue {
     /// Store u8 value.
     U8(u8),

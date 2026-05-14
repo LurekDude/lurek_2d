@@ -1,3 +1,4 @@
+
 /// Current location of an item in the graph.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ItemPosition {

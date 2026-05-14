@@ -1,3 +1,4 @@
+
 use crate::particle::{EmissionShape, ParticleConfig};
 /// Return a `ParticleConfig` producing an upward fire effect with turbulence and RGB fade.
 pub fn fire() -> ParticleConfig {

@@ -1,3 +1,4 @@
+
 use crate::ai::blackboard::Blackboard;
 /// Supported squad formation shapes.
 #[derive(Debug, Clone, PartialEq)]

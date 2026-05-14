@@ -1,5 +1,5 @@
+
 use crate::image::ImageData;
-/// Render a gallery of easing curves in a grid into an image.
 pub fn easing_gallery_to_image(
     curves: &[(&str, &dyn Fn(f32) -> f32)],
     chart_w: u32,

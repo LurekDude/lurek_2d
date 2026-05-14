@@ -1,3 +1,4 @@
+
 /// Whether minimap cells are coloured by terrain type or by political owner.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ColorMode {

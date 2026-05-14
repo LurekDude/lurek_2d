@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 
-/// A directed transition rule between two named states.
+use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct TransitionRule {
     /// Source state name.

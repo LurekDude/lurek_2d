@@ -1,6 +1,5 @@
+
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
-use crate::dataframe::rng::Xorshift64;
-impl DataFrame {
     /// Filter rows by column predicate and return matching frame.
     pub fn filter(&self, col: ColRef, op: &str, val: &CellValue) -> Result<DataFrame, String> {
         let ci = self.resolve_col(col)?;

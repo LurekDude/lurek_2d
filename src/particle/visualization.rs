@@ -1,3 +1,4 @@
+
 use super::emitter::ParticleSystem;
 use super::math::{interpolate_alphas, interpolate_colors, interpolate_sizes};
 use crate::image::ImageData;

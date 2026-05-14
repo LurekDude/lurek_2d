@@ -1,3 +1,4 @@
+
 /// Sine-based flicker config that modulates a light's intensity by a small oscillating factor.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FlickerConfig {

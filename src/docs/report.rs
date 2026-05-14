@@ -1,5 +1,5 @@
+
 use crate::docs::catalog::Catalog;
-use crate::docs::entry::DocEntry;
 use std::collections::HashMap;
 /// Compute one entry quality ratio and return a score in the 0.0..=1.0 range.
 pub fn quality_score(entry: &DocEntry) -> f64 {

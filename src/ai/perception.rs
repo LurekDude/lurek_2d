@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 /// Stimulus classification used by the sensor world.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

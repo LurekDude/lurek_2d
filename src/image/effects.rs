@@ -1,3 +1,4 @@
+
 use super::image_data::ImageData;
 /// Resize kernels supported by the image resampler.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

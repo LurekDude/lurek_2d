@@ -1,6 +1,5 @@
+
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
-#[derive(Clone)]
-/// Store one deferred lazy-query step applied during `collect`.
 enum Step {
     /// Keep rows that satisfy a column predicate.
     Filter {

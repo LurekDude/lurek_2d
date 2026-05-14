@@ -1,3 +1,4 @@
+
 /// Expose shared bridge state and pending request or response buffers.
 pub mod bridge;
 /// Expose TCP server loop and JSON-RPC message dispatch handlers.

@@ -1,3 +1,4 @@
+
 /// Plural categories used for translation lookup.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PluralForm {

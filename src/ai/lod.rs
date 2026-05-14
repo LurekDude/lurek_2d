@@ -1,3 +1,4 @@
+
 /// One LOD bucket for AI work.
 #[derive(Clone)]
 pub struct LodTier {

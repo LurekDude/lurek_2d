@@ -1,7 +1,3 @@
-﻿//! Per-frame timing formatter that converts profiling samples to compact diagnostic strings.
-//!
-//! - Renders tick, update, render, and callback phase durations as a single log line
-//! - Stateless helper; the profile sample is owned and collected by the runtime layer
 
 use crate::runtime::FrameProfile;
 /// Format one `FrameProfile` sample as a compact single-line timing string.

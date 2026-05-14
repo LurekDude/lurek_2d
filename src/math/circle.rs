@@ -1,3 +1,4 @@
+
 use super::vec2::Vec2;
 
 /// Axis-aligned circle defined by center position and non-negative radius.

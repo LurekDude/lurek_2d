@@ -1,3 +1,4 @@
+
 use super::shapes::ParticleShape;
 use crate::runtime::resource_keys::TextureKey;
 /// Controls how particles are distributed across the emitter's area when `area_width`/`area_height` > 0.

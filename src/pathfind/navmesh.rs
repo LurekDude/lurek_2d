@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
-/// Navigation mesh: a collection of polygons with explicit connectivity edges.
+use std::collections::{BinaryHeap, HashMap}; with explicit connectivity edges.
 #[derive(Debug, Clone, Default)]
 pub struct NavMesh {
     /// Vertex lists for each polygon region.

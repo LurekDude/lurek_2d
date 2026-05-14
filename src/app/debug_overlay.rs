@@ -1,8 +1,3 @@
-﻿//! Runtime debug HUD that overlays frame-rate and draw-call counters on screen.
-//!
-//! - Produces lightweight render commands for a top-corner diagnostic panel
-//! - Toggleable at runtime without restarting the game or reloading the Lua VM
-//! - Consumes pre-sampled metrics; sampling and aggregation belong to the frame profile layer
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;

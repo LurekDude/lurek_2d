@@ -1,3 +1,4 @@
+
 use crate::minimap::minimap::Minimap;
 use crate::minimap::types::FogLevel;
 use crate::province::registry::ProvinceRegistry;

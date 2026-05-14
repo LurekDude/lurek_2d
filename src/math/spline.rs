@@ -1,3 +1,4 @@
+
 /// Multi-point Catmull-Rom spline with dynamic control-point list.
 pub struct CatmullRomSpline {
     /// Ordered (x, y) control points; at least 2 are required for sampling.

@@ -1,3 +1,4 @@
+
 use log::{debug, warn};
 use std::time::Duration;
 /// Result of a completed HTTP request, including both success and error cases.

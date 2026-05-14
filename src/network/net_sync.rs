@@ -1,3 +1,4 @@
+
 use crate::network::message::NetValue;
 /// Point-in-time position and velocity snapshot for one networked entity.
 #[derive(Debug, Clone, PartialEq)]

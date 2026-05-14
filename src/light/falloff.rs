@@ -1,3 +1,4 @@
+
 /// Radial intensity falloff shape applied on top of attenuation distance decay.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum FalloffMode {

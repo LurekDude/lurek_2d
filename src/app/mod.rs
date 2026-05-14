@@ -1,3 +1,4 @@
+
 #[allow(clippy::module_inception)]
 /// Core application runtime: event loop bridge, frame lifecycle, and orchestration.
 pub mod app;

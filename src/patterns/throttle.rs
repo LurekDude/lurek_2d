@@ -1,3 +1,4 @@
+
 /// Timer that fires at most once per `interval` seconds.
 #[derive(Debug, Clone)]
 pub struct Throttle {

@@ -1,5 +1,5 @@
+
 use super::effect::PostFxEffect;
-use super::effect_type::PostFxEffectType;
 use super::stack::PostFxStack;
 #[derive(Debug, Clone)]
 /// Bundles a preset name, its effect list, and a prepared stack ordering.

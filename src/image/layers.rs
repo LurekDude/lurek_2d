@@ -1,3 +1,4 @@
+
 use super::image_data::ImageData;
 /// A single named image layer with opacity, visibility, and pixel data.
 #[derive(Debug, Clone)]

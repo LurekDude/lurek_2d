@@ -1,3 +1,4 @@
+
 use crate::globe::types::{Marker, MarkerStyle};
 use std::collections::HashMap;
 /// Marker collection keyed by stable id.

@@ -1,5 +1,5 @@
+
 use crate::dataframe::frame::{CellValue, DataFrame};
-use rayon::prelude::*;
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 /// Hold typed columnar storage with optional validity mask.

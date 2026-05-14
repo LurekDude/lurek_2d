@@ -1,3 +1,4 @@
+
 /// Relay session ticket identifying a room and the connecting peer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RelayTicket {

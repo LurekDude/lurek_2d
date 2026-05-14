@@ -1,3 +1,4 @@
+
 /// A single accumulated value pushed into a `Funnel`.
 #[derive(Debug, Clone)]
 pub struct FunnelEntry {

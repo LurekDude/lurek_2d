@@ -1,3 +1,4 @@
+
 /// Time-based linear tween that interpolates a light's color, intensity, and radius.
 #[derive(Clone)]
 pub struct LightTransition {

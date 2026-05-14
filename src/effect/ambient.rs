@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone)]
 /// Stores ambient tint settings applied across the whole screen.
 pub struct AmbientState {

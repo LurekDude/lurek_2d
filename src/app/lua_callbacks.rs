@@ -1,3 +1,4 @@
+
 use mlua::prelude::*;
 use mlua::HookTriggers;
 use std::time::{Duration, Instant};

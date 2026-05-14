@@ -1,3 +1,4 @@
+
 /// One strategic goal considered by the planner.
 #[derive(Clone)]
 pub struct StrategicGoal {

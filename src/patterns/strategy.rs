@@ -1,6 +1,5 @@
-use std::collections::HashMap;
 
-/// Registry of named strategies with a single active selection.
+use std::collections::HashMap;
 #[derive(Debug, Default, Clone)]
 pub struct Strategy {
     /// Registered strategy name → id map.

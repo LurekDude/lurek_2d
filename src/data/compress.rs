@@ -1,3 +1,4 @@
+
 use std::io::{Cursor, Read, Write};
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Select compression codec.

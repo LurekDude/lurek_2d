@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
-/// Uniform-cost 8-directional grid for Jump Point Search.
 pub struct JpsGrid {
     /// Grid width in cells.
     pub width: u32,

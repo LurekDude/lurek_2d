@@ -1,3 +1,4 @@
+
 /// Internal trie node holding child edges and end-of-word marker.
 #[derive(Debug, Default)]
 struct TrieNode {

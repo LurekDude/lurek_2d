@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 use std::fmt;
 /// Typed value stored in a `Blackboard` entry.

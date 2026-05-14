@@ -1,3 +1,4 @@
+
 pub use crate::math::lerp;
 /// Evaluate the particle size at normalised lifetime `t` with optional per-particle `variation` in `[0.0, 1.0]`.
 pub fn interpolate_sizes(sizes: &[f32], t: f32, variation: f32) -> f32 {

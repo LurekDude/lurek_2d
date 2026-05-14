@@ -1,3 +1,4 @@
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// Input event kind dispatched by a `Step` during automation playback.
 pub enum Action {

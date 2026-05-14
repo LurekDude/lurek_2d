@@ -1,3 +1,4 @@
+
 use crate::math::vec2::Vec2;
 
 /// Triangulate a simple (non-self-intersecting) polygon using ear clipping; returns error on failure.

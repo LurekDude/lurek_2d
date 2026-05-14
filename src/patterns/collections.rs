@@ -1,3 +1,4 @@
+
 /// Capacity metadata for a bounded stack.
 #[derive(Debug, Default, Clone)]
 pub struct StackMeta {

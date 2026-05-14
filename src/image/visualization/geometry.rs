@@ -1,6 +1,6 @@
+
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
-#[allow(clippy::type_complexity)]
 /// Render a gallery of regular polygons in varying sizes and colors into an image.
 pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);

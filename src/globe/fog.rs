@@ -1,3 +1,4 @@
+
 use crate::globe::types::{FogState, ProvinceId, MAX_PROVINCES};
 use base64::Engine;
 use std::collections::HashMap;

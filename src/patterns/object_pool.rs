@@ -1,3 +1,4 @@
+
 /// Capacity-bounded pool tracking idle and active object ids.
 #[derive(Debug)]
 pub struct ObjectPool {

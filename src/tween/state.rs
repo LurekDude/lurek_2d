@@ -1,6 +1,3 @@
-﻿//! Easing state and easing name resolver for the tween subsystem.
-//! Owns `TweenState`, `resolve_easing`, and `builtin_easing_names`.
-//! Does not own tween handles or spring logic. Depends on `crate::math::easing`.
 
 use crate::math::easing;
 
@@ -10,7 +7,7 @@ pub struct TweenState {
     pub duration: f64,
     /// Seconds elapsed since the tween started.
     pub elapsed: f64,
-    /// Resolved easing function `f(t: f32) -> f32` in [0,1] â†’ [0,1].
+    /// Resolved easing function `f(t: f32) -> f32` in [0,1] → [0,1].
     easing_fn: fn(f32) -> f32,
     /// True when `tick` should not advance `elapsed`.
     pub paused: bool,

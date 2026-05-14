@@ -1,3 +1,4 @@
+
 use std::collections::{HashMap, HashSet};
 
 /// A spatial item registered in the hash grid, describing its AABB.

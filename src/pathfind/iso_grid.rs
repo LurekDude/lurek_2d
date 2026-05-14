@@ -1,6 +1,6 @@
+
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
-/// Isometric walkability grid with per-cell cost and 4-directional movement.
+use std::collections::{BinaryHeap, HashMap}; with per-cell cost and 4-directional movement.
 pub struct IsoGrid {
     /// Grid width in cells.
     pub width: u32,

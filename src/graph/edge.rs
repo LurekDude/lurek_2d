@@ -1,3 +1,4 @@
+
 use std::collections::HashSet;
 /// Directed connection between two graph nodes.
 pub struct Edge {

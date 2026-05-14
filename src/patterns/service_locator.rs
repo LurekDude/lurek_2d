@@ -1,6 +1,5 @@
-use std::collections::HashSet;
 
-/// Registry of registered service names.
+use std::collections::HashSet;
 #[derive(Debug, Default)]
 pub struct ServiceLocator {
     /// Set of currently registered service names.

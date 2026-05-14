@@ -1,7 +1,3 @@
-﻿//! Lua-visible tween, sequence, and parallel handle types for `lurek.tween`.
-//! Owns `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, `SequenceStep`,
-//! and `ParallelEntry`. Business logic lives here; `TweenEngine` drives the
-//! per-frame calls. Depends on mlua registry and `tween::state::TweenState`.
 
 use crate::tween::TweenState;
 use mlua::prelude::*;

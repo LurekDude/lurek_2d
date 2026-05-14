@@ -1,3 +1,4 @@
+
 /// Exposes analytics helpers for cumulative and statistical operations.
 pub mod analytics;
 /// Exposes typed n-dimensional array container and constructors.
