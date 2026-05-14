@@ -1,9 +1,3 @@
-//! AI subsystem — agents, decision models, steering, planning, and perception.
-//! Owns FSM, behavior tree, GOAP, HTN, utility AI, Q-learning, MCTS, neural-net,
-//! neuroevolution, ORCA, context steering, squad formation, needs, emotion, traits,
-//! dialogue, and director systems. Does not own rendering or physics integration.
-//! Depends on `crate::runtime::log_messages` for structured log codes.
-
 /// Core agent type and decision model wiring.
 pub mod agent;
 /// Behavior tree nodes and execution runtime.

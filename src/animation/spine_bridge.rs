@@ -1,6 +1,3 @@
-//! Bridge that maps animation state-machine states to Spine skeleton clips.
-//! Owns `SpineAnimBridge` only.
-//! Does not own the state machine or the skeleton loader.
 use super::state_machine::AnimStateMachine;
 use crate::spine::skeleton::Skeleton;
 use std::collections::HashMap;

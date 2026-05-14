@@ -1,9 +1,3 @@
-//! Neuroevolution manager combining a genetic algorithm with a neural network population.
-//!
-//! - Maintains a population of chromosomes whose gene vectors encode the weights of a fixed-topology neural network
-//! - Builds live networks from chromosomes for evaluation, accepts per-individual fitness scores, and advances generations via the underlying GA
-//! - Exposes the best-fitness network and generation counter; all topology decisions are fixed at construction time
-
 use crate::ai::{genetic::GeneticAlgorithm, neural_net::NeuralNet};
 /// GA-backed neural-network population manager.
 pub struct Neuroevolution {

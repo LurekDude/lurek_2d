@@ -1,9 +1,3 @@
-//! Feed-forward neural network with dense layers, multiple activation functions, and flat weight serialisation.
-//!
-//! - Defines dense layers with row-major weight matrices and per-output biases; supports ReLU, sigmoid, tanh, linear, and softmax activations
-//! - Stacks layers into a network and runs sequential forward passes; flat weight vectors can be loaded and extracted for neuroevolution
-//! - Intended as the differentiable policy model consumed by neuroevolution and other learning systems
-
 /// Activation function used by a layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Activation {

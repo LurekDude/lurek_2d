@@ -1,7 +1,3 @@
-//! Offline WAV processing utilities for non-real-time audio workflows.
-//! Applies DSP effects with `ActiveEffect`, normalises peak level, and writes 16-bit PCM WAV.
-//! Used by tooling and batch pipelines; does not use `Mixer` or live playback sinks.
-
 use crate::audio::dsp::{ActiveEffect, AtomicParam, EffectParams, EffectType};
 use rodio::{Decoder, Source};
 use std::{

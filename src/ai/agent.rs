@@ -1,7 +1,3 @@
-//! AI agent state and the decision-model selector used by the AI subsystem.
-//! Owns `DecisionModel` (which AI branch drives the agent) and `Agent` (runtime state).
-//! Does not execute AI logic or callbacks; those live in the owner systems and Lua API.
-//! Depends on `Blackboard`, `EmotionModel`, `NeedSystem`, `Sensor`, and `TraitProfile`.
 use crate::ai::blackboard::Blackboard;
 use crate::ai::emotion::EmotionModel;
 use crate::ai::needs::NeedSystem;

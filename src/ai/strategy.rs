@@ -1,10 +1,3 @@
-//! High-level strategic goal selector that re-evaluates at a configurable interval.
-//!
-//! - Maintains a list of named goals, each with a priority multiplier, an enable flag, and a required active-tag precondition set
-//! - Advances a timer each frame and triggers re-evaluation when the interval elapses; force-evaluate resets the timer immediately
-//! - Calls a caller-supplied scorer closure per eligible goal and selects the highest-scoring result as the active goal
-//! - Tracks total evaluation count and exposes remaining time to the next scheduled evaluation
-
 /// One strategic goal considered by the planner.
 #[derive(Clone)]
 pub struct StrategicGoal {

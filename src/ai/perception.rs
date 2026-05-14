@@ -1,11 +1,3 @@
-//! Perception system providing stimulus detection and awareness tracking for AI agents.
-//!
-//! - Maintains a stimulus world with visual, auditory, and custom-labelled sources; stimuli carry intensity, radius, and optional decay
-//! - Sensor configuration defines sight range, cone angle, hearing range, facing direction, and per-label custom detection radii
-//! - Runs spatial detection queries against the stimulus world and returns lists of perceived stimuli with distances and tags
-//! - Tracks a continuous awareness value that rises when stimuli are detected and decays when the environment is clear
-//! - Stimulus world advances time each frame, fading decaying entries and removing exhausted ones
-
 use std::collections::HashMap;
 /// Stimulus classification used by the sensor world.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

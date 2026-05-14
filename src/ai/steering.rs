@@ -1,6 +1,3 @@
-//! Steering behaviors, force composition, and path-following helpers for AI agents.
-//! Owns `CombineMode`, `SteeringBase`, `SteeringBehaviorType`, and `SteeringManager`.
-//! Does not own animation or pathfinding; it only computes forces.
 /// Force vector used by steering systems.
 pub type Force = (f32, f32);
 /// How multiple steering behaviors are blended.

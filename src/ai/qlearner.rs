@@ -1,10 +1,3 @@
-//! Tabular Q-learning agent for discrete state-action reinforcement learning.
-//!
-//! - Maintains a flat Q-table indexed by state and action, initialised to zero
-//! - Selects actions with epsilon-greedy policy; epsilon decays multiplicatively at episode end
-//! - Updates Q-values with the Bellman temporal-difference rule after each transition
-//! - Serialises and deserialises the Q-table to compact JSON for persistence and Lua round-trips
-
 /// Q-learning agent with a flat `state × action` value table.
 pub struct QLearner {
     /// Total number of discrete states.

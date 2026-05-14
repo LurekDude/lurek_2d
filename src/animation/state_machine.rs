@@ -1,7 +1,3 @@
-//! Animation state machine over named clips and typed parameters.
-//! Owns `AnimParamValue`, `ConditionOp`, `ConditionValue`, `TransitionCondition`,
-//! `AnimTransition`, `AnimStateConfig`, and `AnimStateMachine`.
-//! Does not own rendering or asset loading; it only drives `Animation`.
 use super::controller::Animation;
 use std::collections::HashMap;
 /// Parameter value stored by the animation state machine.

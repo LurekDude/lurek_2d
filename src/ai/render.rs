@@ -1,9 +1,3 @@
-//! Debug visualisation for AI structures, generating render commands and image snapshots.
-//!
-//! - Adds FSM debug view: coloured state boxes with transition lines showing active vs inactive states
-//! - Adds behaviour tree debug view: depth-mapped node grid with colour-coded node types and status indicator
-//! - Both systems expose a render-command path for in-game overlay and an ImageData path for off-screen thumbnails
-
 use crate::ai::behavior_tree::{BTNode, BTStatus, BehaviorTree};
 use crate::ai::fsm::StateMachine;
 use crate::image::ImageData;

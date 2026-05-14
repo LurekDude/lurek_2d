@@ -1,10 +1,3 @@
-//! Context steering system that blends directional interest and danger signals into a single movement vector.
-//!
-//! - Maintains an angular ring of direction slots and accumulates seek, avoid, wander, bounds-avoidance, and fixed-direction contributions
-//! - Masks any danger-dominated slots out of the interest map before resolving the best movement direction
-//! - Multiple competing goals coexist through independent per-behaviour weight contributions rather than hard priority switching
-//! - Pure computation; callers apply the resulting direction and magnitude to physics or position updates
-
 use std::f32::consts::{PI, TAU};
 /// Behavior kind used by context steering slots.
 #[derive(Clone)]

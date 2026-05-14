@@ -1,7 +1,3 @@
-//! Audio visualisation helpers for exporting waveform and spectrogram PNG images.
-//! Decodes audio to mono f32 samples, then rasterises either amplitude columns or
-//! short-time spectrum heatmaps. Used by tooling and diagnostics, not real-time render paths.
-
 use image::{ImageBuffer, Rgba};
 use rodio::{Decoder, Source};
 use std::{fs::File, io::BufReader};

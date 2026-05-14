@@ -1,7 +1,3 @@
-//! Finite-state machine for AI agents: states, transitions, and Lua callbacks.
-//! Owns `StateCallbacks`, `Transition`, and `StateMachine`.
-//! Does not execute enter/update/exit callbacks; tick logic lives in `lua_api/ai_api.rs`.
-//! Depends on `mlua::RegistryKey` for Lua callbacks and log codes for tracing.
 use crate::log_msg;
 use crate::runtime::log_messages::{FN01, FN02};
 use mlua::RegistryKey;

@@ -1,8 +1,3 @@
-//! Animation subsystem — clips, frames, state machines, blending, and Aseprite import.
-//! Owns AnimClip, Animation controller, AnimStateMachine, BlendLayerSet, AnimCurve,
-//! AnimPropertyTimeline, AnimSyncGroup, SpineAnimBridge, and AnimRenderParams.
-//! Does not own texture loading or physics. Depends on `crate::math::Rect` and `crate::render`.
-
 /// Aseprite JSON parsing and tag extraction.
 pub mod aseprite;
 /// Blend layers and masks for layered animation output.

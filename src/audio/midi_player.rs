@@ -1,8 +1,3 @@
-//! MIDI playback state and control surface for the audio subsystem.
-//! Owns metadata (`MidiData`), runtime transport state (`MidiPlayer`), per-channel/track controls,
-//! and output format configuration. Current synthesis path is intentionally disabled in
-//! `load_data`/`render_to_pcm`, so this module mainly preserves API shape and transport state.
-
 use crate::audio::PlayState;
 use crate::log_msg;
 use crate::runtime::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};

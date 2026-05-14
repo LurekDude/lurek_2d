@@ -1,10 +1,3 @@
-//! Utility AI that selects the best action by scoring considerations through response curves.
-//!
-//! - Maintains a list of actions, each with a Lua scorer callback, a momentum bonus, and ordered consideration sub-scores
-//! - Considerations apply five curve types (linear, quadratic, logistic, logit, step, or Lua custom) with configurable shape parameters and weights
-//! - Calls scorers via Lua on each evaluate, multiplies per-consideration outputs, applies momentum, and selects the highest-scoring action
-//! - Caches the last selected action index and raw score vector for inspection and debugging
-
 use mlua::prelude::*;
 use mlua::RegistryKey;
 #[derive(Debug, Clone, PartialEq)]

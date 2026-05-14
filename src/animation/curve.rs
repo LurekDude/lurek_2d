@@ -1,6 +1,3 @@
-//! Keyframe curves for animation values and named property timelines.
-//! Owns `EasingKind`, `AnimCurve`, and `AnimPropertyTimeline`.
-//! Does not own playback; it only evaluates values over time.
 use crate::math::easing;
 use std::collections::HashMap;
 /// Easing function used when interpolating between keyframes.

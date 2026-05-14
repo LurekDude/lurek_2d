@@ -1,7 +1,3 @@
-//! Lua callback invocation wrappers with optional timeout safety guard.
-//! Centralizes lookup of `lurek.*` callbacks and applies an instruction-count hook
-//! to abort runaway callbacks when timeout is configured.
-
 use mlua::prelude::*;
 use mlua::HookTriggers;
 use std::time::{Duration, Instant};

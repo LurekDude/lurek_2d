@@ -1,10 +1,3 @@
-//! Behaviour tree graph: node types, tick status, and root container.
-//!
-//! - Defines all composite nodes (selector, sequence, parallel), decorator nodes (inverter, repeater, succeeder, guard), and leaf nodes (action, condition)
-//! - Tracks per-node running index across frames so multi-tick behaviours resume correctly without restarting
-//! - Anchors Lua callbacks at leaf nodes via registry keys — game scripts supply the actual action and condition logic
-//! - Provides debug snapshot with node count and last tick result; tick execution lives in the Lua API binding layer
-
 use mlua::RegistryKey;
 #[derive(Debug, Clone, PartialEq)]
 pub enum BTStatus {

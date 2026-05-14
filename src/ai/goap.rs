@@ -1,7 +1,3 @@
-//! Goal-Oriented Action Planning (GOAP): actions, goals, A* planner, and plan search.
-//! Owns `GOAPAction`, `GOAPGoal`, `PlanNode` (internal A* node), and `GOAPPlanner`.
-//! Does not execute actions; callback invocation lives in `lua_api/ai_api.rs`.
-//! Depends on `mlua::RegistryKey` for action callbacks and log codes GP01–GP03.
 use crate::log_msg;
 use crate::runtime::log_messages::{GP01, GP02, GP03};
 use mlua::RegistryKey;

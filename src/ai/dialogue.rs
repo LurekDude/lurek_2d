@@ -1,9 +1,3 @@
-//! AI-driven dialogue topic and branch selector with gate-based filtering.
-//!
-//! - Manages a set of topics and per-topic branches, each gated by optional FSM state or behaviour-tree status requirements
-//! - Selects the highest-scoring eligible topic and branch using base weight combined with external utility score contributions
-//! - Pure selection logic; content delivery, line playback, and Lua callbacks are owned by the calling system
-
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
 /// Single branch inside a topic.

@@ -1,10 +1,3 @@
-//! Hierarchical task network planner that decomposes compound tasks into ordered primitive sequences.
-//!
-//! - Defines compound tasks with alternative decomposition methods and primitive tasks with preconditions and world-state effects
-//! - Stores the task registry in a domain; the stateless planner searches depth-first using a stack-based decomposition loop
-//! - Returns a flat linear action list for execution; method selection is greedy on the first applicable precondition set
-//! - Pure planning; action execution and Lua wiring live in the calling system
-
 use std::collections::HashMap;
 /// Symbolic world state keyed by string names.
 pub type WorldState = HashMap<String, f32>;

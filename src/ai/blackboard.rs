@@ -1,7 +1,3 @@
-//! Blackboard key/value store shared between AI agents and their parent scope.
-//! Owns `BlackboardValue` (typed variants) and `Blackboard` (the store with optional parent).
-//! Does not own Lua callbacks; query/set wrappers live in `lua_api/ai_api.rs`.
-//! Depends on `crate::runtime::log_messages` for structured log codes.
 use crate::log_msg;
 use crate::runtime::log_messages::{BB01, BB02, BB03};
 use std::collections::HashMap;

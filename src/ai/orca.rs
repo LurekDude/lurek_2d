@@ -1,9 +1,3 @@
-//! ORCA-based local collision avoidance solver for multi-agent navigation.
-//!
-//! - Represents agents with position, velocity, preferred velocity, collision radius, and speed cap
-//! - Computes per-agent half-plane velocity obstacles and resolves collision-free safe velocities via a linear projection pass
-//! - Operates on a complete agent snapshot each frame; callers apply the resulting safe velocities to physics or positions
-
 /// One agent used by the ORCA solver.
 #[derive(Clone)]
 pub struct ORCAAgent {

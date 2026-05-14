@@ -1,7 +1,3 @@
-//! Application orchestration layer.
-//! Owns startup flow, frame/update lifecycle integration, Lua callback dispatch hooks,
-//! splash/debug/error presentation helpers, and runtime-facing app utilities.
-
 #[allow(clippy::module_inception)]
 /// Core application runtime: event loop bridge, frame lifecycle, and orchestration.
 pub mod app;

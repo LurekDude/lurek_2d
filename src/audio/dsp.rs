@@ -1,8 +1,3 @@
-//! DSP effect chain for real-time audio processing on rodio sources.
-//! Owns `EffectType` (15 variants), `EffectParams` (lock-free parameter storage), `AtomicParam`,
-//! `ActiveEffect` (per-instance biquad/delay/modulation state), `SharedEffectGraph` (Arc<RwLock>
-//! shared with `Bus`), and `DynamicEffectSource` (rodio `Source` wrapper that applies the chain).
-
 use crate::log_msg;
 use crate::runtime::log_messages::{DP01, DP02, DP03};
 use rodio::Source;

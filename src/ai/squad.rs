@@ -1,9 +1,3 @@
-//! Squad grouping with named membership, formation positioning, and shared blackboard.
-//!
-//! - Represents a named squad with an ordered member list, optional leader designation, and per-squad local blackboard
-//! - Computes per-member world-space formation positions relative to a leader position across five formation shapes: none, line, column, wedge, and circle
-//! - Pure data and computation; movement, orders, and Lua callbacks are owned by the calling system
-
 use crate::ai::blackboard::Blackboard;
 /// Supported squad formation shapes.
 #[derive(Debug, Clone, PartialEq)]

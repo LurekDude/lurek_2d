@@ -1,7 +1,3 @@
-//! Container for AI agents and the shared global blackboard.
-//! Owns `AIWorld` only and wires per-agent blackboards to the global scope.
-//! Does not own pathfinding, perception, or decision logic.
-//! Depends on `Agent` and `Blackboard`.
 use crate::ai::agent::Agent;
 use crate::ai::blackboard::Blackboard;
 use std::collections::HashMap;

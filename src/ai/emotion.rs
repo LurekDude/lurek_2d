@@ -1,9 +1,3 @@
-//! Emotion model that tracks per-agent named emotional states with autonomous decay.
-//!
-//! - Maintains a collection of named emotions, each with a current value, resting level, decay rate, and visibility threshold
-//! - Emotions decay toward their resting level each frame and can be triggered or set directly by game events
-//! - Exposes dominant emotion detection and active emotion listing for use by dialogue selectors and behaviour systems
-
 /// One named emotion tracked by `EmotionModel`.
 pub struct Emotion {
     /// Emotion name.

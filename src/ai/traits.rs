@@ -1,11 +1,3 @@
-//! Agent trait profile system with base values, time-limited modifiers, and named archetype templates.
-//!
-//! - Stores per-agent trait maps as clamped float values in `[0, 1]` keyed by trait name
-//! - Overlays temporary modifiers with optional duration and source tags; resolved trait values sum base with all active deltas
-//! - Supports building profiles from named archetypes with optional deterministic per-trait variance
-//! - Allows lerp-blending one profile toward another and bulk removal of modifiers by source tag
-//! - Archetype registry stores shared templates used to initialise new agent profiles
-
 use std::collections::HashMap;
 
 /// Temporary additive change applied to one named trait.

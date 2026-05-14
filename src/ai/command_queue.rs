@@ -1,7 +1,3 @@
-//! Ordered command queue for AI agents: enqueue, prioritise, and advance actions.
-//! Owns `Command` (a single ordered action) and `CommandQueue` (the FIFO container).
-//! Does not own execution logic; step/tick lives in `lua_api/ai_api.rs`.
-//! Depends on `mlua::RegistryKey` for completion callbacks and log codes for tracing.
 use crate::log_msg;
 use crate::runtime::log_messages::{CQ01, CQ02, CQ03};
 use mlua::RegistryKey;

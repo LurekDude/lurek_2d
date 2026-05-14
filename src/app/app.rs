@@ -1,8 +1,3 @@
-//! Main runtime application loop and platform orchestration.
-//! Bridges winit events, renderer surface lifecycle, Lua callbacks, input routing,
-//! hot-reload watchers, splash/error/debug overlays, and game loading handoff.
-//! Does not own feature subsystem logic; coordinates subsystem calls and state.
-
 use super::debug_overlay::DebugOverlay;
 use super::error_screen::ErrorScreen;
 use super::lua_callbacks::{

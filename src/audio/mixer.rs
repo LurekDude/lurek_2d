@@ -1,8 +1,3 @@
-//! Live audio mixing engine backed by rodio.
-//! Owns source registry, bus registry, playback sink lifecycle, queueable streaming buffers,
-//! listener spatial parameters, per-source DSP hookup, and runtime audio peak tracking.
-//! Does not parse Lua directly; called by audio APIs and app runtime.
-
 use crate::audio::bus::Bus;
 use crate::audio::dsp::{DynamicEffectSource, EffectParams};
 #[allow(unused_imports)]

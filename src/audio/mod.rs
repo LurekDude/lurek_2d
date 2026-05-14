@@ -1,8 +1,3 @@
-//! Audio subsystem: mixing, bus routing, decoding, DSP effects, MIDI, and spatial audio.
-//! Owns `Mixer` (slot-map of sources and buses), `Bus` (per-channel routing), `Decoder`
-//! (WAV/OGG/MP3/FLAC), DSP effect chain, `MidiPlayer`, `SoundPool`, and `SoundData`.
-//! Does not own event dispatch or rendering. Depends on rodio 0.17 and GameFS for file I/O.
-
 /// `Bus` struct: named per-channel volume/pitch routing with effect chain and duck target.
 pub mod bus;
 /// `Decoder` struct: seeks and decodes audio files (WAV/OGG/MP3/FLAC) into PCM samples.

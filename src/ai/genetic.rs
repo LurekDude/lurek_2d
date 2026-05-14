@@ -1,10 +1,3 @@
-//! Genetic algorithm for population-based optimisation of float gene vectors.
-//!
-//! - Maintains a fixed-size population of chromosomes, each carrying a gene vector and a fitness score assigned by the caller
-//! - Advances generations using elitism, tournament parent selection, uniform gene crossover, and per-gene Gaussian mutation
-//! - Exposes best-individual access and configurable mutation rate, standard deviation, tournament size, and elite count
-//! - Self-contained; fitness evaluation and application of gene values to game objects are owned by the caller
-
 /// Evolving genome with fitness and stable id.
 #[derive(Clone)]
 pub struct Chromosome {

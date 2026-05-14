@@ -1,7 +1,3 @@
-//! Animation playback controller for clip selection, timing, and debug previews.
-//! Owns `Animation` only.
-//! Does not own asset loading or rendering; it exposes frame/clip state to callers.
-//! Depends on `Rect`, `AnimClip`, `AnimEvent`, `AnimFrame`, and log message codes.
 use super::clip::{AnimClip, ClipPlaybackMode};
 use super::event::AnimEvent;
 use super::frame::AnimFrame;
