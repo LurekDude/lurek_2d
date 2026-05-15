@@ -371,6 +371,29 @@ describe("lurek.ai Agent", function()
         expect_near(0, x, 0.01)
         expect_near(0, y, 0.01)
     end)
+
+    -- @covers LAIWorld:addAgent
+    -- @covers LAgent:getVelocity
+    -- @covers lurek.ai.newWorld
+    it("default velocity is zero", function()
+        local w = lurek.ai.newWorld()
+        local a = w:addAgent("a_default_velocity")
+        local vx, vy = a:getVelocity()
+        expect_near(0, vx, 0.01)
+        expect_near(0, vy, 0.01)
+    end)
+
+    -- @covers LAIWorld:addAgent
+    -- @covers LAgent:getDecisionModel
+    -- @covers LAgent:setDecisionModel
+    -- @covers lurek.ai.newWorld
+    it("default decision model is fsm and invalid values are ignored", function()
+        local w = lurek.ai.newWorld()
+        local a = w:addAgent("a_default_model")
+        expect_equal("fsm", a:getDecisionModel())
+        a:setDecisionModel("bogus")
+        expect_equal("fsm", a:getDecisionModel())
+    end)
 end)
 
 -- =========================================================================

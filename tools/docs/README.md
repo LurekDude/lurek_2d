@@ -16,6 +16,7 @@ python tools/gen_all_docs.py
 |---|---|---|---|
 | `gen_rust_api_data.py` | `src/**/*.rs` | `logs/data/rust_api_data.json` | `--output` |
 | `gen_lua_api_data.py` | `src/lua_api/*.rs` | `logs/data/lua_api_data.json` | `--output`, `--verbose` |
+| `gen_lua_binding_reports.py` | `src/lua_api/*.rs` | `logs/data/lua_api_bindings_from_code.json`, `logs/data/lua_api_bindings_from_docstrings.json`, `logs/reports/lua_api_binding_validation.json` | `--mode`, `--code-output`, `--doc-output`, `--report-output` |
 | `gen_lua_docstring_skeletons.py` | `src/lua_api/*.rs` | `logs/data/lua_docstring_skeletons.json` or `logs/reports/lua_docstring_skeletons.md` | `--format json\|markdown`, `--output` |
 | `gen_extension_api.py` | `logs/data/lua_api_data.json` | `extensions/vscode/data/lurek-api.json` | `--input`, `--output`, `--verbose` |
 
@@ -57,6 +58,10 @@ python tools/docs/gen_lua_api.py --check
 # Regenerate JSON intermediates
 python tools/docs/gen_lua_api_data.py
 python tools/docs/gen_rust_api_data.py
+
+# Snapshot what Rust registers vs what /// documents
+python tools/docs/gen_lua_binding_reports.py
+python tools/docs/gen_lua_binding_reports.py --mode code
 
 # Rebuild fresh docstring skeletons from Rust definitions only
 python tools/docs/gen_lua_docstring_skeletons.py

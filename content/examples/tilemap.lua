@@ -33,7 +33,7 @@ end
 do -- LTileMap:findTilesByGid
   local map = lurek.tilemap.newTileMap(16, 16, 8)
   map:addLayer("ground", 4, 4)
-  map:setTile(1, 0, 0, 3)
+  map:setTile(1, 1, 1, 3)
   map:setTile(1, 3, 3, 3)
   local pos = map:findTilesByGid(1, 3)
   lurek.log.info("found gid=3 at " .. #pos .. " positions", "tilemap")

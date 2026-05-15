@@ -746,6 +746,18 @@ describe("newStateMachine()", function()
     end)
 
     -- @covers LAnimStateMachine:addState
+    -- @covers LAnimStateMachine:forceState
+    -- @covers LAnimStateMachine:getState
+    it("forceState returns false for unknown target and keeps state", function()
+        local a = make_anim()
+        local fsm = lurek.animation.newStateMachine(a, "idle")
+        fsm:addState("idle", "idle", true)
+        local ok = fsm:forceState("flying")
+        expect_equal(false, ok)
+        expect_equal("idle", fsm:getState())
+    end)
+
+    -- @covers LAnimStateMachine:addState
     -- @covers LAnimStateMachine:addTransition
     -- @covers LAnimStateMachine:getState
     -- @covers LAnimStateMachine:setParam
@@ -775,6 +787,22 @@ describe("newStateMachine()", function()
         fsm:setParam("speed", 6.0)
         fsm:update(0.016)
         expect_equal("run", fsm:getState())
+    end)
+
+    -- @covers LAnimStateMachine:addState
+    -- @covers LAnimStateMachine:addTransition
+    -- @covers LAnimStateMachine:getState
+    -- @covers LAnimStateMachine:setParam
+    -- @covers LAnimStateMachine:update
+    it("transition does not fire when float param stays below threshold", function()
+        local a = make_anim()
+        local fsm = lurek.animation.newStateMachine(a, "idle")
+        fsm:addState("idle", "idle", true)
+        fsm:addState("run", "run", true)
+        fsm:addTransition("idle", "run", "speed > 0.1")
+        fsm:setParam("speed", 0.05)
+        fsm:update(0.016)
+        expect_equal("idle", fsm:getState())
     end)
 
     -- @covers LAnimStateMachine:addState

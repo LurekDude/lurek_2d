@@ -4,6 +4,8 @@
 
 use log::{debug, warn};
 use std::time::Duration;
+use ureq::config::Config;
+use ureq::tls::{TlsConfig, TlsProvider};
 /// Result of a completed HTTP request, including both success and error cases.
 pub struct HttpResponse {
     /// HTTP status code; `0` when the request failed before receiving a response.
@@ -24,14 +26,15 @@ pub fn execute_request(
     timeout_secs: u64,
 ) -> HttpResponse {
     debug!("HTTP {} {}", method, url);
-    let agent = if timeout_secs > 0 {
-        ureq::Agent::config_builder()
-            .timeout_global(Some(Duration::from_secs(timeout_secs)))
-            .build()
-            .new_agent()
-    } else {
-        ureq::Agent::new_with_defaults()
-    };
+    let mut config = Config::builder().tls_config(
+        TlsConfig::builder()
+            .provider(TlsProvider::NativeTls)
+            .build(),
+    );
+    if timeout_secs > 0 {
+        config = config.timeout_global(Some(Duration::from_secs(timeout_secs)));
+    }
+    let agent: ureq::Agent = config.build().into();
     let result = execute_with_agent(&agent, method, url, headers, body);
     match result {
         Ok(resp) => resp,

@@ -1,72 +1,10 @@
-use lurek2d::animation::controller::Animation;
-use lurek2d::animation::state_machine::{
-    compare_nums, parse_condition, AnimStateMachine, ConditionOp,
-};
-use lurek2d::math::Rect;
+//! INTERNAL ONLY: public animation state-machine construction, force-state behavior, and transition
+//! evaluation are covered by the Lua-first suite in `tests/lua/unit/test_animation_core_unit.lua`.
+//!
+//! The remaining Rust coverage keeps pure helper parsing and relational comparison paths that are
+//! not exposed one-to-one through the Lua API surface.
 
-fn make_anim() -> Animation {
-    let mut anim = Animation::new();
-    anim.add_frame(Rect::new(0.0, 0.0, 32.0, 32.0));
-    anim.add_frame(Rect::new(32.0, 0.0, 32.0, 32.0));
-    anim.add_clip("idle", vec![0], 1.0, true);
-    anim.add_clip("walk", vec![0, 1], 10.0, true);
-    anim
-}
-
-#[test]
-fn test_initial_state_after_constructor() {
-    let sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    assert_eq!(sm.get_state(), "idle");
-}
-
-#[test]
-fn test_force_state_existing_target() {
-    let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    sm.add_state("idle", "idle", true);
-    sm.add_state("walk", "walk", true);
-    assert!(sm.force_state("walk"));
-    assert_eq!(sm.get_state(), "walk");
-}
-
-#[test]
-fn test_force_state_missing_target() {
-    let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    sm.add_state("idle", "idle", true);
-    assert!(!sm.force_state("flying"));
-}
-
-#[test]
-fn test_transition_speed_above_threshold() {
-    let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    sm.add_state("idle", "idle", true);
-    sm.add_state("walk", "walk", true);
-    sm.add_transition("idle", "walk", "speed > 0.1");
-    sm.set_param_float("speed", 0.5);
-    sm.update(0.016);
-    assert_eq!(sm.get_state(), "walk");
-}
-
-#[test]
-fn test_transition_speed_below_threshold() {
-    let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    sm.add_state("idle", "idle", true);
-    sm.add_state("walk", "walk", true);
-    sm.add_transition("idle", "walk", "speed > 0.1");
-    sm.set_param_float("speed", 0.05);
-    sm.update(0.016);
-    assert_eq!(sm.get_state(), "idle");
-}
-
-#[test]
-fn test_transition_boolean_condition_true() {
-    let mut sm = AnimStateMachine::new(make_anim(), "idle".to_string());
-    sm.add_state("idle", "idle", true);
-    sm.add_state("walk", "walk", true);
-    sm.add_transition("idle", "walk", "moving == true");
-    sm.set_param_bool("moving", true);
-    sm.update(0.016);
-    assert_eq!(sm.get_state(), "walk");
-}
+use lurek2d::animation::state_machine::{compare_nums, parse_condition, ConditionOp};
 
 #[test]
 fn test_parse_condition_gt_expression() {

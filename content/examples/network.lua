@@ -35,7 +35,7 @@ end
 -- Use this on the joining side; it both creates the local socket and initiates the connect handshake.
 do -- lurek.network.newClient
   pcall(function()
-    local client = lurek.network.newClient{ addr = "192.168.1.50:5555", channels = 2 }
+    local client = lurek.network.newClient{ addr = "127.0.0.1:5555", channels = 2 }
     lurek.log.info("dialling " .. client:getAddress(), "net")
     client:destroy()
   end)
@@ -46,7 +46,7 @@ end
 -- Spawn one runtime at startup and reuse it; it owns a worker thread, so creating many is wasteful.
 do -- lurek.network.newRuntime
   local rt = lurek.network.newRuntime()
-  rt:httpGet("https://api.example.com/version")
+  rt:httpGet("http://127.0.0.1:9/version")
   function lurek.quit() rt:shutdown() end
 end
 
@@ -388,9 +388,9 @@ end
 do -- NetworkRuntime:httpRequest
   local rt = lurek.network.newRuntime()
   local req_id = rt:httpRequest{
-    method = "POST", url = "https://api.example.com/scores",
+    method = "POST", url = "http://127.0.0.1:9/scores",
     headers = { ["Content-Type"] = "application/json" },
-    body = '{"name":"tom","score":4200}', timeout = 5000,
+    body = '{"name":"tom","score":4200}', timeout = 1,
   }
   lurek.log.info("submitted score request id=" .. req_id, "net")
 end
@@ -400,7 +400,7 @@ end
 -- Returns a connection id immediately; the actual socket open is signalled by a poll() event with event="connected".
 do -- NetworkRuntime:tcpConnect
   local rt = lurek.network.newRuntime()
-  local conn = rt:tcpConnect("game.example.com:7777")
+  local conn = rt:tcpConnect("127.0.0.1:9")
   lurek.log.info("dialling tcp conn=" .. conn, "net")
 end
 
@@ -409,7 +409,7 @@ end
 -- Frame your own messages (length prefix or newline) before calling; the runtime sends raw bytes.
 do -- NetworkRuntime:tcpSend
   local rt = lurek.network.newRuntime()
-  local conn = rt:tcpConnect("game.example.com:7777")
+  local conn = rt:tcpConnect("127.0.0.1:9")
   rt:tcpSend(conn, "LOGIN tom\n")
 end
 
@@ -418,7 +418,7 @@ end
 -- Close as soon as you receive your final response; leaving sockets open leaks file descriptors over long sessions.
 do -- NetworkRuntime:tcpClose
   local rt = lurek.network.newRuntime()
-  local conn = rt:tcpConnect("game.example.com:7777")
+  local conn = rt:tcpConnect("127.0.0.1:9")
   rt:tcpClose(conn)
 end
 
@@ -427,7 +427,7 @@ end
 -- Use ws:// for plaintext (LAN, dev) and wss:// for production; both return a connection id you correlate via poll().
 do -- NetworkRuntime:wsConnect
   local rt = lurek.network.newRuntime()
-  local ws = rt:wsConnect("wss://chat.example.com/lobby")
+  local ws = rt:wsConnect("ws://127.0.0.1:9/lobby")
   lurek.log.info("opening websocket id=" .. ws, "net")
 end
 
@@ -436,7 +436,7 @@ end
 -- Sends a single text frame; for binary frames serialise with lurek.network.pack and send via the binary channel.
 do -- NetworkRuntime:wsSend
   local rt = lurek.network.newRuntime()
-  local ws = rt:wsConnect("wss://chat.example.com/lobby")
+  local ws = rt:wsConnect("ws://127.0.0.1:9/lobby")
   rt:wsSend(ws, '{"chat":"hello"}')
 end
 
@@ -445,7 +445,7 @@ end
 -- Close cleanly when the player leaves the chat screen; the server will send a close frame back via poll().
 do -- NetworkRuntime:wsClose
   local rt = lurek.network.newRuntime()
-  local ws = rt:wsConnect("wss://chat.example.com/lobby")
+  local ws = rt:wsConnect("ws://127.0.0.1:9/lobby")
   rt:wsClose(ws)
 end
 
@@ -525,7 +525,7 @@ end
 -- poll() returns the response; subscribe to its result in the next frame.
 do -- NetworkRuntime:httpGet
   local rt = lurek.network.newRuntime()
-  local id = rt:httpGet("https://httpbin.org/get")
+  local id = rt:httpGet("http://127.0.0.1:9/get")
   lurek.log.info("GET id=" .. id, "network")
 end
 
@@ -534,7 +534,7 @@ end
 -- Pass headers table and body string; response arrives via the callback.
 do -- NetworkRuntime:httpPost
   local rt = lurek.network.newRuntime()
-  local id = rt:httpPost("https://httpbin.org/post", '{"key":"val"}')
+  local id = rt:httpPost("http://127.0.0.1:9/post", '{"key":"val"}')
   lurek.log.info("POST id=" .. id, "network")
 end
 

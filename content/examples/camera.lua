@@ -979,8 +979,10 @@ end
 do -- LCameraRig:splitScreen
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
-  local x, y, w, h = rig:getViewport("left")
-  lurek.log.info("left viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  local ok, x, y, w, h = rig:getViewport("left")
+  if ok then
+    lurek.log.info("left viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  end
 end
 
 --@api-stub: LCameraRig:minimap
@@ -988,8 +990,10 @@ end
 do -- LCameraRig:minimap
   local rig = lurek.camera.newRig()
   rig:minimap(1280, 720, 0.25)
-  local x, y, w, h = rig:getViewport("minimap")
-  lurek.log.info("minimap viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  local ok, x, y, w, h = rig:getViewport("minimap")
+  if ok then
+    lurek.log.info("minimap viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  end
 end
 
 --@api-stub: LCameraRig:pictureInPicture
@@ -997,8 +1001,10 @@ end
 do -- LCameraRig:pictureInPicture
   local rig = lurek.camera.newRig()
   rig:pictureInPicture(1280, 720, 320, 180)
-  local x, y, w, h = rig:getViewport("pip")
-  lurek.log.info("pip viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  local ok, x, y, w, h = rig:getViewport("pip")
+  if ok then
+    lurek.log.info("pip viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+  end
 end
 
 --@api-stub: LCamera:getBounds

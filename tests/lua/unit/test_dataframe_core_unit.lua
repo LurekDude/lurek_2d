@@ -185,6 +185,17 @@ describe("construction", function()
         end
     end)
 
+    -- @covers LDataFrame:getValue
+    -- @covers lurek.dataframe.random
+    it("random with seed 0 matches the omitted-seed path", function()
+        local defs = { {"val", "float"} }
+        local seeded_zero = lurek.dataframe.random(defs, 8, 0)
+        local implicit_seed = lurek.dataframe.random(defs, 8)
+        for i = 1, 8 do
+            expect_near(seeded_zero:getValue(i, "val"), implicit_seed:getValue(i, "val"), 1e-5)
+        end
+    end)
+
     -- @covers LDataFrame:ncols
     -- @covers LDataFrame:nrows
     -- @covers lurek.dataframe.fromCSV
@@ -3545,8 +3556,6 @@ describe("unit: migrated from integration/test_image_dataframe.lua", function()
         end)
 
 end)
-
-test_summary()
 
 -- @describe lazy evaluation pipeline
 describe("lazy evaluation pipeline", function()

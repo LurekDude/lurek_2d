@@ -19,10 +19,10 @@ go under `work/{session}/scripts/` and are archived at session end.
 
 | Folder                                  | Purpose                                                                    | Script Count |
 | --------------------------------------- | -------------------------------------------------------------------------- | ------------ |
-| [`tools/docs/`](docs/README.md)         | Documentation generators â€” produce `docs/reports/`, `logs/`, `wiki/` | 16           |
+| [`tools/docs/`](docs/README.md)         | Documentation generators â€” produce `docs/reports/`, `logs/`, `wiki/` | 17           |
 | [`tools/audit/`](audit/README.md)       | Quality auditing, coverage analytics, gap reports                          | 29           |
 | [`tools/fix/`](fix/README.md)           | Code fixers and docstring improvers                                        | 9            |
-| [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 8            |
+| [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure)                        | 9            |
 | [`tools/dist/`](dist/README.md)         | Build, package, and install scripts                                        | 7            |
 | [`tools/github/`](github/README.md)     | GitHub project management automation                                       | 1            |
 | [`tools/demos/`](demos/README.md)       | Demo folder management, screenshot generation, smoke testing               | 3            |
@@ -66,6 +66,7 @@ and `tools/audit/` in the correct dependency order. Produces:
 | ---------------------- | ------------------ | ------------------------------ | ----------------------- |
 | `gen_rust_api_data.py` | `src/**/*.rs`      | `logs/data/rust_api_data.json` | `--output`              |
 | `gen_lua_api_data.py`  | `src/lua_api/*.rs` | `logs/data/lua_api_data.json`  | `--output`, `--verbose` |
+| `gen_lua_binding_reports.py` | `src/lua_api/*.rs` | `logs/data/lua_api_bindings_from_code.json`, `logs/data/lua_api_bindings_from_docstrings.json`, `logs/reports/lua_api_binding_validation.json` | `--mode`, `--code-output`, `--doc-output`, `--report-output` |
 | `gen_lua_docstring_skeletons.py` | `src/lua_api/*.rs` | `logs/data/lua_docstring_skeletons.json` or `logs/reports/lua_docstring_skeletons.md` | `--format json\|markdown`, `--output` |
 | `gen_extension_api.py` | `lua_api_data.json` | `extensions/vscode/data/lurek-api.json` | `--input`, `--output`, `--verbose` |
 
@@ -146,6 +147,7 @@ All validators exit 0 on pass, 1 on failure.
 | ----------------------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
 | `cag_validate.py`             | Validate `.github/` CAG files (agents, skills, prompts)      | `--type agent\|skill\|prompt\|instruction`, `--file PATH` |
 | `validate_generated_lua_stubs.py` | Validate committed `lua_api_data.json`, `docs/api/lurek.lua`, and `docs/api/library.lua` against fresh generator output | `--format text\|json` |
+| `validate_lua_binding_reports.py` | Compare code-derived Lua binding snapshots against `///` binding docs and fail on drift | `--format text\|json`, `--source-dir`, `--code-output`, `--doc-output`, `--report-output` |
 | `validate_lua_api.py`         | Validate `src/lua_api/*_api.rs` against SKILL.md contract    | `FILE_OR_DIR`, `--errors-only`                            |
 | `validate_module_coverage.py` | Ensure every `src/` module has a spec and no legacy AGENT.md | `--fix-readme`                                            |
 | `validate_game.py`            | Validate game/demo directory structure                       | `PATH`, `--all-examples`, `--json`, `--output`            |

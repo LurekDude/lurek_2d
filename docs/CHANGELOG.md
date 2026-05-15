@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- test(ai,animation,effect): moved additional Lua-reachable agent defaults, ignored invalid decision-model input, animation state-machine edge cases, and postfx stack remove behavior into the existing Lua-first unit suites; narrowed `ai_agent_tests.rs`, `animation_state_machine_tests.rs`, and split effect Rust tests to the remaining parser and render-internal cases.
+
+- fix(examples,network): aligned camera and tilemap examples with the current Lua bindings, made network examples use fast loopback endpoints for offline-safe load tests, and configured the HTTP client to use `ureq`'s explicit `native-tls` provider so HTTPS requests no longer panic the background network thread.
+
+- tools/lua_api: moved the experimental Lua binding snapshot extractor out of `src/docs` and into standalone tool scripts under `tools/`; added `tools/docs/gen_lua_binding_reports.py` to emit `logs/data/lua_api_bindings_from_code.json` and `logs/data/lua_api_bindings_from_docstrings.json`, added `tools/validate/validate_lua_binding_reports.py` to diff code vs `///` signatures, generated the initial reports, and covered the tool with Python tests.
+
+- test(automation): moved Lua-reachable repeat timing, macro dispatch, visual assert, condition gating, parser-failure, and exact elapsed-time checks into `tests/lua/unit/test_automation_core_unit.lua`, and narrowed `tests/rust/unit/automation_tests.rs` to parser, sink, and perf internals.
+
+- test(dataframe): moved the Lua-reachable `random(seed = 0)` contract into `tests/lua/unit/test_dataframe_core_unit.lua`, and narrowed `tests/rust/unit/dataframe_tests.rs` to the remaining internal `iter_rows()` iterator behavior.
+
 - test(html): marked `tests/rust/unit/html_tests.rs` as `INTERNAL ONLY` because it covers the private CSS color parser helper behind `lurek.html` rather than a direct Lua-callable contract.
 
 - test(devtools): moved Lua-reachable logger file output, equal-sample frame stats, profiler negative-frame indexing, and real file-watcher mtime checks into `tests/lua/unit/test_devtools_core_unit.lua`, and narrowed `tests/rust/unit/devtools_tests.rs` to the remaining single-sample frame-stats case that the public singleton API cannot isolate.

@@ -3,6 +3,24 @@
 ---@type any
 local automation = lurek.automation
 
+local function poll_event_names()
+    local names = {}
+    for name in lurek.event.poll() do
+        table.insert(names, name)
+    end
+    return names
+end
+
+local function write_solid_png(path, width, height, r, g, b, a)
+    local img = lurek.image.newImageData(width, height)
+    for y = 0, height - 1 do
+        for x = 0, width - 1 do
+            img:setPixel(x, y, r, g, b, a)
+        end
+    end
+    lurek.image.savePNG(img, path)
+end
+
 -- @describe lurek.automation - namespace
 describe("lurek.automation - namespace", function()
     -- @covers lurek.automation
@@ -547,6 +565,30 @@ describe("lurek.automation - update and completion", function()
         lurek.automation.stop()
         lurek.automation.unload("empty")
     end)
+
+    -- @covers lurek.automation.getElapsedTime
+    -- @covers lurek.automation.isComplete
+    -- @covers lurek.automation.load
+    -- @covers lurek.automation.start
+    -- @covers lurek.automation.stop
+    -- @covers lurek.automation.unload
+    -- @covers lurek.automation.update
+    it("should reach exactly one second after ten 0.1 updates", function()
+        lurek.automation.load("timed_exact", {
+            steps = { { action = "wait", time = 1.0 } }
+        })
+
+        lurek.automation.start("timed_exact")
+        for _ = 1, 10 do
+            lurek.automation.update(0.1)
+        end
+
+        expect_equal(lurek.automation.isComplete(), true)
+        expect_near(lurek.automation.getElapsedTime(), 1.0, 0.0001)
+
+        lurek.automation.stop()
+        lurek.automation.unload("timed_exact")
+    end)
 end)
 
 -- @describe lurek.automation - error handling
@@ -1051,16 +1093,31 @@ describe("lurek.automation extended actions", function()
     it("repeat expands step execution", function()
         lurek.automation.load("repeat_steps", {
             steps = {
-                { action = "wait", time = 0.0, ["repeat"] = 2, repeatInterval = 0.1 },
+                { action = "wait", time = 0.5, ["repeat"] = 2, repeatInterval = 0.25 },
             }
         })
         lurek.automation.start("repeat_steps")
+
+        lurek.automation.update(0.49)
+        expect_equal(lurek.automation.getCurrentStep(), 0)
+
+        lurek.automation.update(0.01)
+        expect_equal(lurek.automation.getCurrentStep(), 1)
+
+        lurek.automation.update(0.24)
+        expect_equal(lurek.automation.getCurrentStep(), 1)
+
+        lurek.automation.update(0.01)
+        expect_equal(lurek.automation.getCurrentStep(), 2)
+
         lurek.automation.update(0.25)
         expect_equal(lurek.automation.getCurrentStep(), 3)
         lurek.automation.stop()
         lurek.automation.unload("repeat_steps")
     end)
 
+    -- @covers lurek.event.clear
+    -- @covers lurek.event.poll
     -- @covers lurek.automation.isRunning
     -- @covers lurek.automation.load
     -- @covers lurek.automation.playMacro
@@ -1070,6 +1127,7 @@ describe("lurek.automation extended actions", function()
     -- @covers lurek.automation.unload
     -- @covers lurek.automation.update
     it("callmacro action expands named macro", function()
+        lurek.event.clear()
         lurek.automation.load("macro_src_ext", {
             steps = { { action = "textinput", text = "hello", time = 0.0 } }
         })
@@ -1081,11 +1139,56 @@ describe("lurek.automation extended actions", function()
 
         lurek.automation.start("macro_call")
         lurek.automation.update(0.05)
+
+        local names = poll_event_names()
+        expect_equal(#names, 1)
+        expect_equal(names[1], "textinput")
         expect_equal(lurek.automation.isComplete(), true)
-        lurek.automation.update(0.05)
+
         lurek.automation.stop()
         lurek.automation.unload("macro_src_ext")
         lurek.automation.unload("macro_call")
+    end)
+
+    -- @covers LImageData:setPixel
+    -- @covers lurek.automation.getLastError
+    -- @covers lurek.automation.isComplete
+    -- @covers lurek.automation.isFailed
+    -- @covers lurek.automation.load
+    -- @covers lurek.automation.start
+    -- @covers lurek.automation.stop
+    -- @covers lurek.automation.unload
+    -- @covers lurek.automation.update
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.savePNG
+    it("visualassert accepts identical generated images", function()
+        local baseline_path = "save/_automation_visualassert_baseline.png"
+        local actual_path = "save/_automation_visualassert_actual.png"
+
+        write_solid_png(baseline_path, 2, 2, 255, 0, 0, 255)
+        write_solid_png(actual_path, 2, 2, 255, 0, 0, 255)
+
+        lurek.automation.load("visual_ok", {
+            steps = {
+                {
+                    action = "visualassert",
+                    baseline = baseline_path,
+                    actual = actual_path,
+                    maxDiff = 0,
+                    time = 0.0,
+                },
+            }
+        })
+
+        lurek.automation.start("visual_ok")
+        lurek.automation.update(0.05)
+
+        expect_equal(lurek.automation.isComplete(), true)
+        expect_equal(lurek.automation.isFailed(), false)
+        expect_nil(lurek.automation.getLastError())
+
+        lurek.automation.stop()
+        lurek.automation.unload("visual_ok")
     end)
 end)
 
@@ -1116,6 +1219,123 @@ describe("automation migrated from integration/automation_event", function()
 
         lurek.automation.stop()
         lurek.automation.unload("assert_fail")
+    end)
+end)
+
+-- @describe lurek.automation conditions and failures
+describe("lurek.automation conditions and failures", function()
+    -- @covers lurek.event.clear
+    -- @covers lurek.event.poll
+    -- @covers lurek.automation.load
+    -- @covers lurek.automation.setCondition
+    -- @covers lurek.automation.start
+    -- @covers lurek.automation.stop
+    -- @covers lurek.automation.unload
+    -- @covers lurek.automation.update
+    it("when expression gates textinput dispatch", function()
+        lurek.event.clear()
+        lurek.automation.load("expr_when_gate", {
+            steps = {
+                {
+                    action = "textinput",
+                    text = "expr",
+                    time = 0.0,
+                    when = "expr_when_ready && !expr_when_paused",
+                },
+            }
+        })
+
+        lurek.automation.setCondition("expr_when_ready", true)
+        lurek.automation.setCondition("expr_when_paused", true)
+        lurek.automation.start("expr_when_gate")
+        lurek.automation.update(0.016)
+        expect_equal(#poll_event_names(), 0)
+
+        lurek.automation.stop()
+        lurek.event.clear()
+
+        lurek.automation.setCondition("expr_when_paused", false)
+        lurek.automation.start("expr_when_gate")
+        lurek.automation.update(0.016)
+
+        local names = poll_event_names()
+        expect_equal(#names, 1)
+        expect_equal(names[1], "textinput")
+
+        lurek.automation.stop()
+        lurek.automation.unload("expr_when_gate")
+        lurek.automation.setCondition("expr_when_ready", false)
+        lurek.automation.setCondition("expr_when_paused", false)
+    end)
+
+    -- @covers lurek.automation.getLastError
+    -- @covers lurek.automation.isFailed
+    -- @covers lurek.automation.load
+    -- @covers lurek.automation.setCondition
+    -- @covers lurek.automation.start
+    -- @covers lurek.automation.stop
+    -- @covers lurek.automation.unload
+    -- @covers lurek.automation.update
+    it("complex assert failure exposes the full expression", function()
+        lurek.automation.load("expr_assert_fail", {
+            steps = {
+                {
+                    action = "assert",
+                    assert = "expr_ready && (expr_boss_dead || expr_phase2)",
+                    time = 0.0,
+                },
+            }
+        })
+
+        lurek.automation.setCondition("expr_ready", true)
+        lurek.automation.setCondition("expr_boss_dead", false)
+        lurek.automation.setCondition("expr_phase2", false)
+        lurek.automation.start("expr_assert_fail")
+        lurek.automation.update(0.016)
+
+        expect_equal(lurek.automation.isFailed(), true)
+        local err = lurek.automation.getLastError()
+        expect_type("string", err)
+        expect_contains(err, "expr_ready && (expr_boss_dead || expr_phase2)")
+
+        lurek.automation.stop()
+        lurek.automation.unload("expr_assert_fail")
+        lurek.automation.setCondition("expr_ready", false)
+        lurek.automation.setCondition("expr_boss_dead", false)
+        lurek.automation.setCondition("expr_phase2", false)
+    end)
+
+    -- @covers lurek.automation.getLastError
+    -- @covers lurek.automation.isFailed
+    -- @covers lurek.automation.load
+    -- @covers lurek.automation.setCondition
+    -- @covers lurek.automation.start
+    -- @covers lurek.automation.stop
+    -- @covers lurek.automation.unload
+    -- @covers lurek.automation.update
+    it("invalid assert expression reports parser errors", function()
+        lurek.automation.load("expr_invalid", {
+            steps = {
+                {
+                    action = "assert",
+                    assert = "expr_invalid_ready && (expr_invalid_phase2",
+                    time = 0.0,
+                },
+            }
+        })
+
+        lurek.automation.setCondition("expr_invalid_ready", true)
+        lurek.automation.start("expr_invalid")
+        lurek.automation.update(0.016)
+
+        expect_equal(lurek.automation.isFailed(), true)
+        local err = lurek.automation.getLastError()
+        expect_type("string", err)
+        expect_contains(err, "expected ')'")
+
+        lurek.automation.stop()
+        lurek.automation.unload("expr_invalid")
+        lurek.automation.setCondition("expr_invalid_ready", false)
     end)
 end)
 

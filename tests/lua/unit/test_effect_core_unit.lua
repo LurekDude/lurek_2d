@@ -428,6 +428,16 @@ describe("lurek.effect.newStack", function()
         expect_equal(0, stack:len())
     end)
 
+    -- @covers LPostFxStack:remove
+    -- @covers lurek.effect.newEffect
+    -- @covers lurek.effect.newStack
+    it("stack:remove returns false for an absent effect", function()
+        local stack = lurek.effect.newStack()
+        local eff = lurek.effect.newEffect("pixelate")
+        expect_equal(false, stack:remove(eff))
+        expect_equal(0, stack:len())
+    end)
+
     -- @covers LPostFxStack:add
     -- @covers LPostFxStack:clear
     -- @covers LPostFxStack:len
@@ -987,6 +997,8 @@ describe("PostFxStack insert", function()
         expect_equal(stack:getEffectCount(), 2)
         -- blur should be at position 1, bloom at position 2
         local e1 = stack:getEffect(1)
+        expect_not_nil(e1)
+        ---@cast e1 LPostFxEffect
         expect_equal(e1:getEffectType(), "blur")
     end)
 end)
