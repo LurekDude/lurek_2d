@@ -7678,9 +7678,10 @@ lurek.effect.newCustomEffect = function(shader_id) end
 lurek.effect.newEffect = function(type_name) end
 
 --- Creates an image effect chain from no arguments, a type name and optional parameters, or a chain table.
----@param args LuaValue Optional effect type string plus parameter table, or an array table of effect entries.
+---@param spec? LuaValue Optional effect type string, or an array table of effect entries, or nil for an empty chain.
+---@param params? table Optional parameter table used when `spec` is an effect type string.
 ---@return LImageEffect New image effect chain handle.
-lurek.effect.newImageEffect = function(args) end
+lurek.effect.newImageEffect = function(spec, params) end
 
 --- Creates an overlay controller for screen effects using optional dimensions.
 ---@param w? number Optional overlay width in pixels, defaulting to 800.
@@ -9277,8 +9278,8 @@ function LGraphNode:setCapacity(c) end
 --- Configures an item conversion rule on this node.
 ---@param in_type string Input item type.
 ---@param out_type string Output item type.
----@param in_count number Optional input count, defaulting to 1.
----@param out_count number Optional output count, defaulting to 1.
+---@param in_count? number Optional input count, defaulting to 1.
+---@param out_count? number Optional output count, defaulting to 1.
 ---@return nil No value is returned.
 function LGraphNode:setConversion(in_type, out_type, in_count, out_count) end
 
@@ -10761,8 +10762,8 @@ lurek.input.newCombo = function(steps_val, opts) end
 ---@param pixels table Cursor pixel bytes.
 ---@param width number Cursor width in pixels.
 ---@param height number Cursor height in pixels.
----@param hotx number Optional hotspot x coordinate.
----@param hoty number Optional hotspot y coordinate.
+---@param hotx? number Optional hotspot x coordinate.
+---@param hoty? number Optional hotspot y coordinate.
 ---@return LCursor New custom cursor handle.
 lurek.input.mouse.newCursor = function(pixels, width, height, hotx, hoty) end
 
@@ -12120,13 +12121,13 @@ function LTransform:scale(sx, sy) end
 --- Replaces this transform from position, rotation, scale, origin, and shear components.
 ---@param x number X translation.
 ---@param y number Y translation.
----@param angle number Optional rotation angle, defaulting to 0.
----@param sx number Optional X scale, defaulting to 1.
----@param sy number Optional Y scale, defaulting to `sx`.
----@param ox number Optional origin x, defaulting to 0.
----@param oy number Optional origin y, defaulting to 0.
----@param kx number Optional X shear, defaulting to 0.
----@param ky number Optional Y shear, defaulting to 0.
+---@param angle? number Optional rotation angle, defaulting to 0.
+---@param sx? number Optional X scale, defaulting to 1.
+---@param sy? number Optional Y scale, defaulting to `sx`.
+---@param ox? number Optional origin x, defaulting to 0.
+---@param oy? number Optional origin y, defaulting to 0.
+---@param kx? number Optional X shear, defaulting to 0.
+---@param ky? number Optional Y shear, defaulting to 0.
 ---@return nil No value is returned.
 function LTransform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
@@ -12568,10 +12569,10 @@ lurek.math.exp = function(x) end
 --- Samples stateless fractal Brownian motion noise.
 ---@param x number X coordinate.
 ---@param y number Y coordinate.
----@param seed number Optional seed value, defaulting to 0.
----@param octaves number Optional octave count, defaulting to 4.
----@param lac number Optional lacunarity, defaulting to 2.0.
----@param gain number Optional gain, defaulting to 0.5.
+---@param seed? number Optional seed value, defaulting to 0.
+---@param octaves? number Optional octave count, defaulting to 4.
+---@param lac? number Optional lacunarity, defaulting to 2.0.
+---@param gain? number Optional gain, defaulting to 0.5.
 ---@return number Noise value.
 lurek.math.fbm = function(x, y, seed, octaves, lac, gain) end
 
@@ -13071,9 +13072,13 @@ LMinimap = {}
 --- Adds a marker and returns its id. This method is available to Lua scripts.
 ---@param x number Marker x coordinate.
 ---@param y number Marker y coordinate.
----@param desc string Optional marker description.
+---@param desc? string Optional marker description.
+---@param r? number Optional red channel override (0..1, default 1).
+---@param g? number Optional green channel override (0..1, default 0).
+---@param b? number Optional blue channel override (0..1, default 0).
+---@param a? number Optional alpha channel override (0..1, default 1).
 ---@return number Marker id.
-function LMinimap:addMarker(x, y, desc) end
+function LMinimap:addMarker(x, y, desc, r, g, b, a) end
 
 --- Adds an object type and returns its one-based index.
 ---@param name string String value for `name`.
@@ -14148,8 +14153,8 @@ lurek.network.reconcileSnapshot = function(pred, auth, alpha) end
 ---@param host_ud LNetworkHost Network host handle.
 ---@param entity_id number Entity id.
 ---@param data_tbl table Entity field table.
----@param channel number Optional channel id, defaulting to 0.
----@param reliable boolean Optional reliable flag, defaulting to false.
+---@param channel? number Optional channel id, defaulting to 0.
+---@param reliable? boolean Optional reliable flag, defaulting to false.
 ---@return nil No value is returned.
 lurek.network.syncEntity = function(host_ud, entity_id, data_tbl, channel, reliable) end
 
@@ -15530,9 +15535,15 @@ function LUnitPathfinder:findPartialPath(x1, y1, x2, y2, max_nodes, unit_size) e
 function LUnitPathfinder:findPath(x1, y1, x2, y2, unit_size) end
 
 --- Finds a path using bidirectional A* and returns completion status.
+---@param x1 number One-based column of the start cell.
+---@param y1 number One-based row of the start cell.
+---@param x2 number One-based column of the goal cell.
+---@param y2 number One-based row of the goal cell.
+---@param unit_size? number Width or height of the unit in grid cells for clearance checks (default 1).
+---@param max_nodes? number Optional node-expansion budget; 0 uses the full search.
 ---@return table a Array table of waypoint tables, or nil when no path exists.
 ---@return boolean b True when the path is complete.
-function LUnitPathfinder:findPathBidirectional() end
+function LUnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unit_size, max_nodes) end
 
 --- Finds a smoothed path between one-based grid cells.
 ---@param x1 number Lua argument for `x1`.
@@ -15637,7 +15648,7 @@ lurek.pathfind.newNavGrid = function(width, height) end
 --- Creates a navigation grid from a tilemap layer and blocked gid table.
 ---@param tm_ud userdata Lua argument for `tm_ud`.
 ---@param layer_index number Lua argument for `layer_index`.
----@param blocked_table mlua::Table Lua argument for `blocked_table`.
+---@param blocked_table table Lua argument for `blocked_table`.
 ---@return LNavGrid New navigation grid handle.
 lurek.pathfind.newNavGridFromTileMap = function(tm_ud, layer_index, blocked_table) end
 
@@ -24165,7 +24176,7 @@ lurek.tween.cancelAll = function() end
 
 --- Creates a one-shot delay. After the specified seconds elapse, the optional callback is invoked.
 ---@param seconds number Duration to wait in seconds.
----@param cb? ?function Optional callback fired when the delay completes.
+---@param cb? function Optional callback fired when the delay completes.
 ---@return LTweenSequence A sequence handle representing the delay.
 lurek.tween.delay = function(seconds, cb) end
 
@@ -24179,7 +24190,7 @@ lurek.tween.getEasingNames = function() end
 
 --- Creates a standalone tween state for manual interpolation. Useful when you need eased progress without automatic property updates.
 ---@param duration number Duration in seconds.
----@param easing? ?string Easing function name (default `"linear"`).
+---@param easing? string Easing function name (default `"linear"`).
 ---@return LTweenState The new tween state handle.
 lurek.tween.newState = function(duration, easing) end
 
@@ -24200,7 +24211,7 @@ lurek.tween.sequence = function() end
 --- Creates a spring-physics animation that smoothly drives table fields toward target values with bounce and settle behavior.
 ---@param target table The table whose fields will be animated by the spring.
 ---@param fields table Key-value pairs mapping field names to their spring target values.
----@param opts? ?table Optional settings: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).
+---@param opts? table Optional settings: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).
 ---@return LSpring The active spring handle.
 lurek.tween.spring = function(target, fields, opts) end
 
@@ -24208,7 +24219,7 @@ lurek.tween.spring = function(target, fields, opts) end
 ---@param target table The table whose fields will be animated.
 ---@param fields table Key-value pairs mapping field names to their target end values.
 ---@param duration number Duration in seconds.
----@param easing ?string Easing function name (default `"linear"`).
+---@param easing? string Easing function name (default `"linear"`).
 ---@return LTween The active tween handle.
 lurek.tween.to = function(target, fields, duration, easing) end
 
@@ -24216,7 +24227,7 @@ lurek.tween.to = function(target, fields, duration, easing) end
 ---@param duration number Duration in seconds for the tween.
 ---@param target table The table whose fields will be animated.
 ---@param fields table Key-value pairs mapping field names to their target end values.
----@param easing ?string Easing function name (default `"linear"`).
+---@param easing? string Easing function name (default `"linear"`).
 ---@return LTween The active tween handle.
 lurek.tween.tween = function(duration, target, fields, easing) end
 
@@ -24229,7 +24240,7 @@ lurek.tween.tweenChain = function(steps) end
 ---@param duration number Duration in seconds.
 ---@param target table The table containing color fields (`r`, `g`, `b`, `a`).
 ---@param color table Target color values as `{r=, g=, b=, a=}`. Only present keys are tweened.
----@param easing ?string Easing function name (default `"linear"`).
+---@param easing? string Easing function name (default `"linear"`).
 ---@return LTween The active tween handle.
 lurek.tween.tweenColor = function(duration, target, color, easing) end
 

@@ -46,6 +46,26 @@ describe("lurek.devtools logger", function()
         lurek.devtools.setLogFile("")
     end)
 
+    -- @covers lurek.devtools.info
+    -- @covers lurek.devtools.setLogFile
+    it("writes log entries to the configured file", function()
+        local path = "save/_fs_tests/devtools_logger_output.log"
+        lurek.filesystem.createDirectory("save/_fs_tests")
+        if lurek.filesystem.exists(path) then
+            lurek.filesystem.remove(path)
+        end
+
+        lurek.devtools.setLogConsole(false)
+        lurek.devtools.setLogFile(path)
+        lurek.devtools.info("file-output-check")
+
+        local text = lurek.filesystem.read(path)
+        expect_match(text, "file%-output%-check")
+
+        lurek.devtools.setLogFile("")
+        lurek.devtools.setLogConsole(true)
+    end)
+
     -- @covers lurek.devtools.clearLog
     -- @covers lurek.devtools.getLogHistory
     -- @covers lurek.devtools.info
@@ -143,6 +163,26 @@ describe("lurek.devtools frame stats", function()
         expect_not_nil(stats.p99)
     end)
 
+    -- @covers lurek.devtools.getFrameStats
+    -- @covers lurek.devtools.recordFrameTime
+    it("equal samples produce exact summary values", function()
+        lurek.devtools.setFrameHistorySize(10)
+        for i = 1, 10 do
+            lurek.devtools.recordFrameTime(0.02)
+        end
+
+        local stats = lurek.devtools.getFrameStats()
+        expect_equal(10, stats.samples)
+        expect_near(0.02, stats.min, 1e-9)
+        expect_near(0.02, stats.max, 1e-9)
+        expect_near(0.02, stats.avg, 1e-9)
+        expect_near(0.02, stats.p50, 1e-9)
+        expect_near(0.02, stats.p95, 1e-9)
+        expect_near(0.02, stats.p99, 1e-9)
+
+        lurek.devtools.setFrameHistorySize(300)
+    end)
+
     -- @covers lurek.devtools.getFrameHistorySize
     -- @covers lurek.devtools.setFrameHistorySize
     it("can change frame history size", function()
@@ -223,6 +263,38 @@ describe("lurek.devtools profiler", function()
         lurek.devtools.profileFrame()
         lurek.devtools.resetProfile()
         expect_equal(0, lurek.devtools.getProfileFrameCount())
+        lurek.devtools.setProfilingEnabled(false)
+    end)
+
+    -- @covers lurek.devtools.getProfileData
+    -- @covers lurek.devtools.profileFrame
+    -- @covers lurek.devtools.profilePop
+    -- @covers lurek.devtools.profilePush
+    -- @covers lurek.devtools.resetProfile
+    -- @covers lurek.devtools.setProfilingEnabled
+    it("getProfileData accepts negative frame offsets", function()
+        lurek.devtools.resetProfile()
+        lurek.devtools.setProfilingEnabled(true)
+
+        lurek.devtools.profilePush("f0")
+        lurek.devtools.profilePop()
+        lurek.devtools.profileFrame()
+
+        lurek.devtools.profilePush("f1")
+        lurek.devtools.profilePop()
+        lurek.devtools.profileFrame()
+
+        lurek.devtools.profilePush("f2")
+        lurek.devtools.profilePop()
+        lurek.devtools.profileFrame()
+
+        local latest = lurek.devtools.getProfileData(0)
+        local previous = lurek.devtools.getProfileData(-1)
+
+        expect_equal("f2", latest[1].name)
+        expect_equal("f1", previous[1].name)
+
+        lurek.devtools.resetProfile()
         lurek.devtools.setProfilingEnabled(false)
     end)
 end)
@@ -596,6 +668,22 @@ describe("FileWatcher:check", function()
         local watcher = lurek.devtools.newFileWatcher(".")
         local result = watcher:check()
         expect_type("boolean", result)
+    end)
+
+    -- @covers LFileWatcher:check
+    -- @covers lurek.devtools.newFileWatcher
+    it("FileWatcher:check detects a real file mtime change", function()
+        local path = "save/_fs_tests/devtools_watch_mtime.txt"
+        lurek.filesystem.createDirectory("save/_fs_tests")
+        lurek.filesystem.write(path, "v1")
+
+        local watcher = lurek.devtools.newFileWatcher(path)
+        expect_false(watcher:check())
+
+        lurek.timer.sleep(0.02)
+        lurek.filesystem.write(path, "v2")
+
+        expect_true(watcher:check())
     end)
 end)
 

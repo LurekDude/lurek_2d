@@ -6148,10 +6148,16 @@
           "description": "Creates an image effect chain from no arguments, a type name and optional parameters, or a chain table.",
           "parameters": [
             {
-              "name": "args",
+              "name": "spec",
               "type": "LuaValue",
-              "description": "Optional effect type string plus parameter table, or an array table of effect entries.",
-              "optional": false
+              "description": "Optional effect type string, or an array table of effect entries, or nil for an empty chain.",
+              "optional": true
+            },
+            {
+              "name": "params",
+              "type": "table",
+              "description": "Optional parameter table used when `spec` is an effect type string.",
+              "optional": true
             }
           ],
           "returns": "LImageEffect",
@@ -9105,7 +9111,7 @@
         {
           "name": "newCursor",
           "fullPath": "lurek.input.mouse.newCursor",
-          "signature": "lurek.input.mouse.newCursor(pixels, width, height, hotx, hoty)",
+          "signature": "lurek.input.mouse.newCursor(pixels, width, height, [hotx], [hoty])",
           "description": "Creates a custom cursor handle from RGBA pixels and hotspot coordinates.",
           "parameters": [
             {
@@ -9130,13 +9136,13 @@
               "name": "hotx",
               "type": "integer",
               "description": "Optional hotspot x coordinate.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "hoty",
               "type": "integer",
               "description": "Optional hotspot y coordinate.",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "LCursor",
@@ -11192,7 +11198,7 @@
         {
           "name": "fbm",
           "fullPath": "lurek.math.fbm",
-          "signature": "lurek.math.fbm(x, y, seed, octaves, lac, gain)",
+          "signature": "lurek.math.fbm(x, y, [seed], [octaves], [lac], [gain])",
           "description": "Samples stateless fractal Brownian motion noise.",
           "parameters": [
             {
@@ -11211,25 +11217,25 @@
               "name": "seed",
               "type": "integer",
               "description": "Optional seed value, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "octaves",
               "type": "integer",
               "description": "Optional octave count, defaulting to 4.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "lac",
               "type": "number",
               "description": "Optional lacunarity, defaulting to 2.0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "gain",
               "type": "number",
               "description": "Optional gain, defaulting to 0.5.",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "number",
@@ -13926,7 +13932,7 @@
         {
           "name": "syncEntity",
           "fullPath": "lurek.network.syncEntity",
-          "signature": "lurek.network.syncEntity(host_ud, entity_id, data_tbl, channel, reliable)",
+          "signature": "lurek.network.syncEntity(host_ud, entity_id, data_tbl, [channel], [reliable])",
           "description": "Broadcasts a packed entity sync payload through a network host.",
           "parameters": [
             {
@@ -13951,13 +13957,13 @@
               "name": "channel",
               "type": "integer",
               "description": "Optional channel id, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "reliable",
               "type": "boolean",
               "description": "Optional reliable flag, defaulting to false.",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "nil",
@@ -14413,7 +14419,7 @@
             },
             {
               "name": "blocked_table",
-              "type": "mlua::Table",
+              "type": "table",
               "description": "Lua argument for `blocked_table`.",
               "optional": false
             }
@@ -23718,7 +23724,7 @@
         {
           "name": "tween",
           "fullPath": "lurek.tween.tween",
-          "signature": "lurek.tween.tween(duration, target, fields, easing)",
+          "signature": "lurek.tween.tween(duration, target, fields, [easing])",
           "description": "Creates and starts a property tween that smoothly interpolates numeric fields on the target table over the given duration.",
           "parameters": [
             {
@@ -23741,9 +23747,9 @@
             },
             {
               "name": "easing",
-              "type": "?string",
+              "type": "string",
               "description": "Easing function name (default `\"linear\"`).",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "LTween",
@@ -23787,7 +23793,7 @@
             },
             {
               "name": "cb",
-              "type": "?function",
+              "type": "function",
               "description": "Optional callback fired when the delay completes.",
               "optional": true
             }
@@ -23868,7 +23874,7 @@
             },
             {
               "name": "easing",
-              "type": "?string",
+              "type": "string",
               "description": "Easing function name (default `\"linear\"`).",
               "optional": true
             }
@@ -23881,7 +23887,7 @@
         {
           "name": "to",
           "fullPath": "lurek.tween.to",
-          "signature": "lurek.tween.to(target, fields, duration, easing)",
+          "signature": "lurek.tween.to(target, fields, duration, [easing])",
           "description": "Creates and starts a property tween with a different parameter order: target first, then fields, duration, easing.",
           "parameters": [
             {
@@ -23904,9 +23910,9 @@
             },
             {
               "name": "easing",
-              "type": "?string",
+              "type": "string",
               "description": "Easing function name (default `\"linear\"`).",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "LTween",
@@ -23935,7 +23941,7 @@
         {
           "name": "tweenColor",
           "fullPath": "lurek.tween.tweenColor",
-          "signature": "lurek.tween.tweenColor(duration, target, color, easing)",
+          "signature": "lurek.tween.tweenColor(duration, target, color, [easing])",
           "description": "Creates and starts a color tween that smoothly interpolates r, g, b, and/or a fields on the target table.",
           "parameters": [
             {
@@ -23958,9 +23964,9 @@
             },
             {
               "name": "easing",
-              "type": "?string",
+              "type": "string",
               "description": "Easing function name (default `\"linear\"`).",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "LTween",
@@ -23988,7 +23994,7 @@
             },
             {
               "name": "opts",
-              "type": "?table",
+              "type": "table",
               "description": "Optional settings: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).",
               "optional": true
             }
@@ -53145,7 +53151,7 @@
         {
           "name": "setConversion",
           "fullPath": "LGraphNode:setConversion",
-          "signature": "LGraphNode:setConversion(in_type, out_type, in_count, out_count)",
+          "signature": "LGraphNode:setConversion(in_type, out_type, [in_count], [out_count])",
           "description": "Configures an item conversion rule on this node.",
           "parameters": [
             {
@@ -53164,13 +53170,13 @@
               "name": "in_count",
               "type": "integer",
               "description": "Optional input count, defaulting to 1.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "out_count",
               "type": "integer",
               "description": "Optional output count, defaulting to 1.",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "nil",
@@ -72299,7 +72305,7 @@
         {
           "name": "addMarker",
           "fullPath": "LMinimap:addMarker",
-          "signature": "LMinimap:addMarker(x, y, desc)",
+          "signature": "LMinimap:addMarker(x, y, [desc], [r], [g], [b], [a])",
           "description": "Adds a marker and returns its id. This method is available to Lua scripts.",
           "parameters": [
             {
@@ -72318,7 +72324,31 @@
               "name": "desc",
               "type": "string",
               "description": "Optional marker description.",
-              "optional": false
+              "optional": true
+            },
+            {
+              "name": "r",
+              "type": "number",
+              "description": "Optional red channel override (0..1, default 1).",
+              "optional": true
+            },
+            {
+              "name": "g",
+              "type": "number",
+              "description": "Optional green channel override (0..1, default 0).",
+              "optional": true
+            },
+            {
+              "name": "b",
+              "type": "number",
+              "description": "Optional blue channel override (0..1, default 0).",
+              "optional": true
+            },
+            {
+              "name": "a",
+              "type": "number",
+              "description": "Optional alpha channel override (0..1, default 1).",
+              "optional": true
             }
           ],
           "returns": "integer",
@@ -115598,7 +115628,7 @@
         {
           "name": "setTransformation",
           "fullPath": "LTransform:setTransformation",
-          "signature": "LTransform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky)",
+          "signature": "LTransform:setTransformation(x, y, [angle], [sx], [sy], [ox], [oy], [kx], [ky])",
           "description": "Replaces this transform from position, rotation, scale, origin, and shear components.",
           "parameters": [
             {
@@ -115617,43 +115647,43 @@
               "name": "angle",
               "type": "number",
               "description": "Optional rotation angle, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "sx",
               "type": "number",
               "description": "Optional X scale, defaulting to 1.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "sy",
               "type": "number",
               "description": "Optional Y scale, defaulting to `sx`.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "ox",
               "type": "number",
               "description": "Optional origin x, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "oy",
               "type": "number",
               "description": "Optional origin y, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "kx",
               "type": "number",
               "description": "Optional X shear, defaulting to 0.",
-              "optional": false
+              "optional": true
             },
             {
               "name": "ky",
               "type": "number",
               "description": "Optional Y shear, defaulting to 0.",
-              "optional": false
+              "optional": true
             }
           ],
           "returns": "nil",
@@ -119090,9 +119120,46 @@
         {
           "name": "findPathBidirectional",
           "fullPath": "LUnitPathfinder:findPathBidirectional",
-          "signature": "LUnitPathfinder:findPathBidirectional()",
+          "signature": "LUnitPathfinder:findPathBidirectional(x1, y1, x2, y2, [unit_size], [max_nodes])",
           "description": "Finds a path using bidirectional A* and returns completion status.",
-          "parameters": [],
+          "parameters": [
+            {
+              "name": "x1",
+              "type": "integer",
+              "description": "One-based column of the start cell.",
+              "optional": false
+            },
+            {
+              "name": "y1",
+              "type": "integer",
+              "description": "One-based row of the start cell.",
+              "optional": false
+            },
+            {
+              "name": "x2",
+              "type": "integer",
+              "description": "One-based column of the goal cell.",
+              "optional": false
+            },
+            {
+              "name": "y2",
+              "type": "integer",
+              "description": "One-based row of the goal cell.",
+              "optional": false
+            },
+            {
+              "name": "unit_size",
+              "type": "integer",
+              "description": "Width or height of the unit in grid cells for clearance checks (default 1).",
+              "optional": true
+            },
+            {
+              "name": "max_nodes",
+              "type": "integer",
+              "description": "Optional node-expansion budget; 0 uses the full search.",
+              "optional": true
+            }
+          ],
           "returns": "table",
           "returnType": "table",
           "isMethod": true,
@@ -122300,7 +122367,7 @@
         {
           "name": "setVisible",
           "fullPath": "LWidget:setVisible",
-          "signature": "(visible)",
+          "signature": "(is_visible)",
           "description": "Controls whether the widget is drawn and receives input events.",
           "parameters": [
             {
@@ -122329,7 +122396,7 @@
         {
           "name": "setEnabled",
           "fullPath": "LWidget:setEnabled",
-          "signature": "(enabled)",
+          "signature": "(is_enabled)",
           "description": "Controls whether the widget accepts user interaction (clicks, typing).",
           "parameters": [
             {
@@ -122358,7 +122425,7 @@
         {
           "name": "setTag",
           "fullPath": "LWidget:setTag",
-          "signature": "(tag)",
+          "signature": "(new_tag)",
           "description": "Assigns an arbitrary string tag to the widget for identification or grouping.",
           "parameters": [
             {

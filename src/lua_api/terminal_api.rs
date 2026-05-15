@@ -737,9 +737,9 @@ impl LuaUserData for LuaWidget {
         /// Controls whether the widget is drawn and receives input events.
         /// @param | visible | boolean | True to show, false to hide.
         /// @return | nil | No value is returned.
-        methods.add_method("setVisible", |_, this, visible: bool| {
+        methods.add_method("setVisible", |_, this, is_visible: bool| {
             with_widget_mut(&this.binding, "Widget:setVisible", |widget| {
-                widget.base.visible = visible;
+                widget.base.visible = is_visible;
                 Ok(())
             })
         });
@@ -755,9 +755,9 @@ impl LuaUserData for LuaWidget {
         /// Controls whether the widget accepts user interaction (clicks, typing).
         /// @param | enabled | boolean | True to enable, false to disable.
         /// @return | nil | No value is returned.
-        methods.add_method("setEnabled", |_, this, enabled: bool| {
+        methods.add_method("setEnabled", |_, this, is_enabled: bool| {
             with_widget_mut(&this.binding, "Widget:setEnabled", |widget| {
-                widget.base.enabled = enabled;
+                widget.base.enabled = is_enabled;
                 Ok(())
             })
         });
@@ -773,9 +773,9 @@ impl LuaUserData for LuaWidget {
         /// Assigns an arbitrary string tag to the widget for identification or grouping.
         /// @param | tag | string | The tag value.
         /// @return | nil | No value is returned.
-        methods.add_method("setTag", |_, this, tag: String| {
+        methods.add_method("setTag", |_, this, new_tag: String| {
             with_widget_mut(&this.binding, "Widget:setTag", |widget| {
-                widget.base.tag = tag;
+                widget.base.tag = new_tag;
                 Ok(())
             })
         });

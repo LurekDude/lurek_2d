@@ -106,7 +106,7 @@ end
 local item_drops = {}
 
 -- ── Raycaster setup ───────────────────────────────────────────────────────
----@type Raycaster|nil
+---@type LRaycaster|nil
 local raycaster = nil
 local rc_floor_key = nil
 

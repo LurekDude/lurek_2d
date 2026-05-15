@@ -688,6 +688,30 @@ describe("Signal wildcard subscriptions", function()
   -- @covers LSignal:emit
   -- @covers LSignal:remove
   -- @covers lurek.event.newSignal
+  it("wildcard_multi_star_sequence_matches_mid_name_segments", function()
+        local sig = lurek.event.newSignal()
+        local fired = false
+        sig:connect("enemy**.hit", function() fired = true end)
+        sig:emit("enemy_boss.hit")
+        expect_true(fired, "callback should fire when '**' spans the inserted segment")
+    end)
+
+  -- @covers LSignal:connect
+  -- @covers LSignal:emit
+  -- @covers LSignal:remove
+  -- @covers lurek.event.newSignal
+  it("wildcard_adjacent_stars_match_suffixes", function()
+        local sig = lurek.event.newSignal()
+        local fired = false
+        sig:connect("damage**", function() fired = true end)
+        sig:emit("damage.fire")
+        expect_true(fired, "adjacent '*' characters should still match trailing suffixes")
+    end)
+
+  -- @covers LSignal:connect
+  -- @covers LSignal:emit
+  -- @covers LSignal:remove
+  -- @covers lurek.event.newSignal
   it("wildcard_star_matches_prefix", function()
         local sig = lurek.event.newSignal()
         local fired = false

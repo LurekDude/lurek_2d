@@ -929,8 +929,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | host_ud | LNetworkHost | Network host handle.
     /// @param | entity_id | integer | Entity id.
     /// @param | data_tbl | table | Entity field table.
-    /// @param | channel | integer | Optional channel id, defaulting to 0.
-    /// @param | reliable | boolean | Optional reliable flag, defaulting to false.
+    /// @param | channel | integer? | Optional channel id, defaulting to 0.
+    /// @param | reliable | boolean? | Optional reliable flag, defaulting to false.
     /// @return | nil | No value is returned.
     tbl.set(
         "syncEntity",

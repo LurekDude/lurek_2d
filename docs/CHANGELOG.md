@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- test(html): marked `tests/rust/unit/html_tests.rs` as `INTERNAL ONLY` because it covers the private CSS color parser helper behind `lurek.html` rather than a direct Lua-callable contract.
+
+- test(devtools): moved Lua-reachable logger file output, equal-sample frame stats, profiler negative-frame indexing, and real file-watcher mtime checks into `tests/lua/unit/test_devtools_core_unit.lua`, and narrowed `tests/rust/unit/devtools_tests.rs` to the remaining single-sample frame-stats case that the public singleton API cannot isolate.
+
+- test(event): moved Lua-reachable wildcard edge cases from `tests/rust/unit/event_tests.rs` into `tests/lua/unit/test_event_core_unit.lua`, added missing `@covers` coverage there, and narrowed the Rust file to the remaining wildcard helper path that is not reachable through `LSignal:connect`.
+
+- test(repl): moved Lua-reachable REPL file-load and completion coverage into `tests/lua/unit/test_repl_core_unit.lua`, added missing `@describe`/`@covers` markers there, and narrowed `tests/rust/unit/repl_tests.rs` to internal `ReplResult`/`ReplCommand` contracts.
+
+- docs/lua_api: fixed several stale Lua API source signatures so generated stubs now match runtime optional arguments for graph conversions, minimap markers, pathfinding helpers, image effects, input cursors, math helpers, network sync, and tween docs; also corrected the dungeon-eye raycaster type annotation.
+
 - docs/lua_api: added `tools/validate/validate_param_types.py` to cross-check `@param` type annotations in `src/lua_api/*_api.rs` against Rust closure type inference, and `tools/fix/fix_param_types.py` to auto-apply corrections; corrected 575 `number` → `integer` mismatches across 18 api files (all cases where Rust uses integer types `i32`/`u32`/`i64`/`u64`/`usize`); wired the new validator into the `Docs: Validate Source` task in `.vscode/tasks.json`.
 
 - fix(terminal,ui): added default shaded terminal widget rendering with background command emission, made terminal render/cell-size/window-fit paths use the same active cell metrics, fixed `LTerminal:getCellSize()` to return width and height numbers, and added a missing default `Layout` style to the GUI dark theme with Rust/Lua coverage and example/spec sync.

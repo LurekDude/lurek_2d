@@ -461,8 +461,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | pixels | table | Cursor pixel bytes.
     /// @param | width | integer | Cursor width in pixels.
     /// @param | height | integer | Cursor height in pixels.
-    /// @param | hotx | integer | Optional hotspot x coordinate.
-    /// @param | hoty | integer | Optional hotspot y coordinate.
+    /// @param | hotx | integer? | Optional hotspot x coordinate.
+    /// @param | hoty | integer? | Optional hotspot y coordinate.
     /// @return | LCursor | New custom cursor handle.
     mouse.set(
         "newCursor",

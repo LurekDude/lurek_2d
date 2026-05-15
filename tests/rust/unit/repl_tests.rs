@@ -1,18 +1,24 @@
+//! INTERNAL ONLY: public `lurek.repl.*` behavior is covered by the Lua-first
+//! suite in `tests/lua/unit/test_repl_core_unit.lua`.
+//!
+//! The remaining Rust tests keep internal `ReplResult` and `ReplCommand`
+//! variant contracts that are not directly observable through the Lua binding
+//! surface.
+
 use lurek2d::repl::{ReplCommand, ReplResult, ReplSession};
 
 #[test]
-fn eval_expression_returns_value() {
+fn eval_expression_returns_value_variant() {
     let lua = mlua::Lua::new();
     let mut session = ReplSession::new(8);
 
     let result = session.eval_line("2 + 3", &lua);
 
     assert_eq!(result, ReplResult::Value("5".to_string()));
-    assert_eq!(session.history(), &["2 + 3".to_string()]);
 }
 
 #[test]
-fn eval_statement_keeps_lua_state() {
+fn eval_statement_returns_ok_variant_and_keeps_lua_state() {
     let lua = mlua::Lua::new();
     let mut session = ReplSession::new(8);
 
@@ -24,19 +30,7 @@ fn eval_statement_keeps_lua_state() {
 }
 
 #[test]
-fn history_is_bounded() {
-    let lua = mlua::Lua::new();
-    let mut session = ReplSession::new(2);
-
-    session.eval_line("1", &lua);
-    session.eval_line("2", &lua);
-    session.eval_line("3", &lua);
-
-    assert_eq!(session.history(), &["2".to_string(), "3".to_string()]);
-}
-
-#[test]
-fn commands_return_command_results() {
+fn commands_return_internal_command_variants() {
     let lua = mlua::Lua::new();
     let mut session = ReplSession::new(8);
 
@@ -56,7 +50,7 @@ fn commands_return_command_results() {
 }
 
 #[test]
-fn load_command_executes_file() {
+fn load_command_returns_load_variant_for_valid_file() {
     let lua = mlua::Lua::new();
     let mut session = ReplSession::new(8);
     let dir = tempfile::tempdir().expect("tempdir");
@@ -65,25 +59,10 @@ fn load_command_executes_file() {
 
     let result = session.eval_line(&format!(":load {}", file_path.display()), &lua);
 
-    assert!(matches!(
-        result,
-        ReplResult::Command(ReplCommand::Load { .. })
-    ));
     assert_eq!(
-        session.eval_line("loaded_value", &lua),
-        ReplResult::Value("19".to_string())
+        result,
+        ReplResult::Command(ReplCommand::Load {
+            path: file_path.display().to_string(),
+        })
     );
-}
-
-#[test]
-fn completions_include_static_and_lua_table_items() {
-    let lua = mlua::Lua::new();
-    let session = ReplSession::new(8);
-    lua.load("lurek = { repl = { new = function() end } }")
-        .exec()
-        .expect("seed lua table");
-
-    let completions = session.completions_for("lurek.re", Some(&lua));
-
-    assert!(completions.iter().any(|item| item == "lurek.repl"));
 }

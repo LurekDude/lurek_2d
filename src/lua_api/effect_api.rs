@@ -1461,7 +1461,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newImageEffect --
     /// Creates an image effect chain from no arguments, a type name and optional parameters, or a chain table.
-    /// @param | args | LuaValue | Optional effect type string plus parameter table, or an array table of effect entries.
+    /// @param | spec | LuaValue? | Optional effect type string, or an array table of effect entries, or nil for an empty chain.
+    /// @param | params | table? | Optional parameter table used when `spec` is an effect type string.
     /// @return | LImageEffect | New image effect chain handle.
     tbl.set(
         "newImageEffect",

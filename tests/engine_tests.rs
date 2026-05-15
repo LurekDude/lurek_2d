@@ -29,6 +29,8 @@ mod data_tests;
 mod dataframe_tests;
 #[path = "rust/unit/debugbridge_tests.rs"]
 mod debugbridge_tests;
+#[path = "rust/unit/docs_tests.rs"]
+mod docs_tests;
 #[path = "rust/unit/ecs_tests.rs"]
 mod ecs_tests;
 #[path = "rust/unit/effect_tests.rs"]

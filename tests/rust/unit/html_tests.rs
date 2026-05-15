@@ -1,3 +1,10 @@
+//! INTERNAL ONLY: public `lurek.html.*` document, query, style, and layout
+//! behavior is covered by the Lua-first suite in
+//! `tests/lua/unit/test_html_core_unit.lua`.
+//!
+//! The remaining Rust coverage keeps the CSS color parser helper used inside
+//! the HTML pipeline, which is not exposed as a direct Lua-callable function.
+
 use lurek2d::html::parse_css_color_rgba;
 
 fn assert_rgba_near(actual: [f32; 4], expected: [f32; 4]) {

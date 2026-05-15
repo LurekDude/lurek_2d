@@ -779,8 +779,8 @@ impl LuaUserData for LuaNode {
         /// Configures an item conversion rule on this node.
         /// @param | in_type | string | Input item type.
         /// @param | out_type | string | Output item type.
-        /// @param | in_count | integer | Optional input count, defaulting to 1.
-        /// @param | out_count | integer | Optional output count, defaulting to 1.
+        /// @param | in_count | integer? | Optional input count, defaulting to 1.
+        /// @param | out_count | integer? | Optional output count, defaulting to 1.
         /// @return | nil | No value is returned.
         methods.add_method(
             "setConversion",

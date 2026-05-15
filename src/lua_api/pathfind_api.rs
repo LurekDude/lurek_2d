@@ -296,6 +296,12 @@ impl LuaUserData for LuaUnitPathfinder {
         );
         // -- findPathBidirectional --
         /// Finds a path using bidirectional A* and returns completion status.
+        /// @param | x1 | integer | One-based column of the start cell.
+        /// @param | y1 | integer | One-based row of the start cell.
+        /// @param | x2 | integer | One-based column of the goal cell.
+        /// @param | y2 | integer | One-based row of the goal cell.
+        /// @param | unit_size | integer? | Width or height of the unit in grid cells for clearance checks (default 1).
+        /// @param | max_nodes | integer? | Optional node-expansion budget; 0 uses the full search.
         /// @return | table | Array table of waypoint tables, or nil when no path exists.
         /// @return | boolean | True when the path is complete.
         methods.add_method(
@@ -1250,7 +1256,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a navigation grid from a tilemap layer and blocked gid table.
     /// @param | tm_ud | userdata | Lua argument for `tm_ud`.
     /// @param | layer_index | integer | Lua argument for `layer_index`.
-    /// @param | blocked_table | mlua::Table | Lua argument for `blocked_table`.
+    /// @param | blocked_table | table | Lua argument for `blocked_table`.
     /// @return | LNavGrid | New navigation grid handle.
     tbl.set(
         "newNavGridFromTileMap",

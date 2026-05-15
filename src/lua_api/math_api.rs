@@ -558,13 +558,13 @@ impl LuaUserData for LuaTransform {
         /// Replaces this transform from position, rotation, scale, origin, and shear components.
         /// @param | x | number | X translation.
         /// @param | y | number | Y translation.
-        /// @param | angle | number | Optional rotation angle, defaulting to 0.
-        /// @param | sx | number | Optional X scale, defaulting to 1.
-        /// @param | sy | number | Optional Y scale, defaulting to `sx`.
-        /// @param | ox | number | Optional origin x, defaulting to 0.
-        /// @param | oy | number | Optional origin y, defaulting to 0.
-        /// @param | kx | number | Optional X shear, defaulting to 0.
-        /// @param | ky | number | Optional Y shear, defaulting to 0.
+        /// @param | angle | number? | Optional rotation angle, defaulting to 0.
+        /// @param | sx | number? | Optional X scale, defaulting to 1.
+        /// @param | sy | number? | Optional Y scale, defaulting to `sx`.
+        /// @param | ox | number? | Optional origin x, defaulting to 0.
+        /// @param | oy | number? | Optional origin y, defaulting to 0.
+        /// @param | kx | number? | Optional X shear, defaulting to 0.
+        /// @param | ky | number? | Optional Y shear, defaulting to 0.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setTransformation",
@@ -1811,10 +1811,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless fractal Brownian motion noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed | integer | Optional seed value, defaulting to 0.
-    /// @param | octaves | integer | Optional octave count, defaulting to 4.
-    /// @param | lac | number | Optional lacunarity, defaulting to 2.0.
-    /// @param | gain | number | Optional gain, defaulting to 0.5.
+    /// @param | seed | integer? | Optional seed value, defaulting to 0.
+    /// @param | octaves | integer? | Optional octave count, defaulting to 4.
+    /// @param | lac | number? | Optional lacunarity, defaulting to 2.0.
+    /// @param | gain | number? | Optional gain, defaulting to 0.5.
     /// @return | number | Noise value.
     tbl.set(
         "fbm",

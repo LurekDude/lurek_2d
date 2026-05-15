@@ -144,7 +144,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | duration | number | Duration in seconds for the tween.
     /// @param | target | table | The table whose fields will be animated.
     /// @param | fields | table | Key-value pairs mapping field names to their target end values.
-    /// @param | easing | ?string | Easing function name (default `"linear"`).
+    /// @param | easing | string? | Easing function name (default `"linear"`).
     /// @return | LTween | The active tween handle.
     let s = engine.clone();
     tbl.set(
@@ -204,7 +204,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- delay --
     /// Creates a one-shot delay. After the specified seconds elapse, the optional callback is invoked.
     /// @param | seconds | number | Duration to wait in seconds.
-    /// @param | cb | ?function | Optional callback fired when the delay completes.
+    /// @param | cb | function? | Optional callback fired when the delay completes.
     /// @return | LTweenSequence | A sequence handle representing the delay.
     let s = engine.clone();
     tbl.set(
@@ -302,7 +302,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- newState --
     /// Creates a standalone tween state for manual interpolation. Useful when you need eased progress without automatic property updates.
     /// @param | duration | number | Duration in seconds.
-    /// @param | easing | ?string | Easing function name (default `"linear"`).
+    /// @param | easing | string? | Easing function name (default `"linear"`).
     /// @return | LTweenState | The new tween state handle.
     tbl.set(
         "newState",
@@ -317,7 +317,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | target | table | The table whose fields will be animated.
     /// @param | fields | table | Key-value pairs mapping field names to their target end values.
     /// @param | duration | number | Duration in seconds.
-    /// @param | easing | ?string | Easing function name (default `"linear"`).
+    /// @param | easing | string? | Easing function name (default `"linear"`).
     /// @return | LTween | The active tween handle.
     let s = engine.clone();
     tbl.set(
@@ -411,7 +411,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | duration | number | Duration in seconds.
     /// @param | target | table | The table containing color fields (`r`, `g`, `b`, `a`).
     /// @param | color | table | Target color values as `{r=, g=, b=, a=}`. Only present keys are tweened.
-    /// @param | easing | ?string | Easing function name (default `"linear"`).
+    /// @param | easing | string? | Easing function name (default `"linear"`).
     /// @return | LTween | The active tween handle.
     let s = engine.clone();
     tbl.set(
@@ -445,7 +445,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a spring-physics animation that smoothly drives table fields toward target values with bounce and settle behavior.
     /// @param | target | table | The table whose fields will be animated by the spring.
     /// @param | fields | table | Key-value pairs mapping field names to their spring target values.
-    /// @param | opts | ?table | Optional settings: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).
+    /// @param | opts | table? | Optional settings: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).
     /// @return | LSpring | The active spring handle.
     let s = engine.clone();
     tbl.set(

@@ -650,7 +650,11 @@ impl LuaUserData for LuaMinimap {
         /// Adds a marker and returns its id. This method is available to Lua scripts.
         /// @param | x | number | Marker x coordinate.
         /// @param | y | number | Marker y coordinate.
-        /// @param | desc | string | Optional marker description.
+        /// @param | desc | string? | Optional marker description.
+        /// @param | r | number? | Optional red channel override (0..1, default 1).
+        /// @param | g | number? | Optional green channel override (0..1, default 0).
+        /// @param | b | number? | Optional blue channel override (0..1, default 0).
+        /// @param | a | number? | Optional alpha channel override (0..1, default 1).
         /// @return | integer | Marker id.
         methods.add_method_mut(
             "addMarker",
