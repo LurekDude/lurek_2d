@@ -71,20 +71,20 @@ impl LuaUserData for LuaFileHandle {
                 .read_line()
                 .map_err(LuaError::external)
         });
-            // -- write --
-            /// Writes a string to this file handle.
-            /// @param | data | string | Text bytes to write.
-            /// @return | nil | No value is returned.
+        // -- write --
+        /// Writes a string to this file handle.
+        /// @param | data | string | Text bytes to write.
+        /// @return | nil | No value is returned.
         methods.add_method("write", |_, this, data: String| {
             this.inner
                 .borrow_mut()
                 .write(data.as_bytes())
                 .map_err(LuaError::external)
         });
-            // -- seek --
-            /// Moves the file cursor to an absolute byte position.
-            /// @param | pos | integer | Absolute byte offset.
-            /// @return | nil | No value is returned.
+        // -- seek --
+        /// Moves the file cursor to an absolute byte position.
+        /// @param | pos | integer | Absolute byte offset.
+        /// @return | nil | No value is returned.
         methods.add_method("seek", |_, this, pos: u64| {
             this.inner
                 .borrow_mut()
@@ -98,7 +98,7 @@ impl LuaUserData for LuaFileHandle {
             this.inner.borrow_mut().tell().map_err(LuaError::external)
         });
         // -- getSize --
-        /// Returns the size of the open file.
+        /// Returns the size of the open file. This method is available to Lua scripts.
         /// @return | integer | File size in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.borrow().get_size()));
         // -- getMode --
@@ -114,7 +114,7 @@ impl LuaUserData for LuaFileHandle {
             this.inner.borrow_mut().flush().map_err(LuaError::external)
         });
         // -- close --
-        /// Closes this file handle.
+        /// Closes this file handle. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method("close", |_, this, ()| {
             this.inner.borrow_mut().close().map_err(LuaError::external)
@@ -286,7 +286,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- writeJson --
-    /// Writes JSON text through GameFS.
+    /// Writes JSON text through GameFS. This function is exposed to Lua scripts.
     /// @param | path | string | GameFS path to write.
     /// @param | json | string | JSON text to store.
     /// @return | nil | No value is returned.
@@ -605,7 +605,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- unmount --
-    /// Removes a GameFS mount point.
+    /// Removes a GameFS mount point. This function is exposed to Lua scripts.
     /// @param | mp | string | Virtual mount point to remove.
     /// @return | boolean | True when a mount was removed.
     tbl.set(
@@ -679,7 +679,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- removeDir --
-    /// Removes a GameFS directory.
+    /// Removes a GameFS directory. This function is exposed to Lua scripts.
     /// @param | path | string | Directory path to remove.
     /// @return | nil | No value is returned.
     tbl.set(

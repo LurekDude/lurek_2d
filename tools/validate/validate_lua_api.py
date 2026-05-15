@@ -13,14 +13,32 @@ Exit codes:
     1  one or more errors found
 """
 
+import importlib.util
 import re
 import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+GEN_LUA_API_PATH = ROOT / "tools" / "docs" / "gen_lua_api.py"
+MIN_LUA_SUMMARY_VISIBLE_CHARS = 30
+MIN_LUA_OBJECT_VISIBLE_CHARS = 30
 
 # ─── per-file issue accumulators ──────────────────────────────────────────────
 
 _errors: list[tuple[int, str]] = []
 _warnings: list[tuple[int, str]] = []
+
+
+def _load_gen_lua_api():
+    spec = importlib.util.spec_from_file_location("gen_lua_api", GEN_LUA_API_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load {GEN_LUA_API_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+GEN_LUA_API = _load_gen_lua_api()
 
 
 def _err(line_no: int, msg: str) -> None:
@@ -29,6 +47,10 @@ def _err(line_no: int, msg: str) -> None:
 
 def _warn(line_no: int, msg: str) -> None:
     _warnings.append((line_no, msg))
+
+
+def _visible_len(text: str) -> int:
+    return len(re.sub(r'\s+', '', text))
 
 
 # ─── individual checks ────────────────────────────────────────────────────────
@@ -250,7 +272,7 @@ def _is_api_registration(lines: list[str], idx: int) -> bool:
 def check_docstring_coverage(lines: list[str]) -> None:
     """Every *.set / methods.add_method* must have @return in the docstring above it."""
     api_call_re = re.compile(
-        r'\b(\w+\.set|methods\.add_method(?:_mut)?)\s*\(\s*"(\w+)"'
+        r'\b(\w+\.set|methods\.add_(?:method|method_mut|function|function_mut))\s*\(\s*"(\w+)"'
     )
     for i, line in enumerate(lines):
         m = api_call_re.search(line)
@@ -295,7 +317,7 @@ def check_docstring_coverage(lines: list[str]) -> None:
 def check_section_headers(lines: list[str]) -> None:
     """Every *.set / methods.add_method should have a // ── name section header."""
     api_call_re = re.compile(
-        r'\b(\w+\.set|methods\.add_method(?:_mut)?)\s*\(\s*"(\w+)"'
+        r'\b(\w+\.set|methods\.add_(?:method|method_mut|function|function_mut))\s*\(\s*"(\w+)"'
     )
     # U+2500 ─ or plain - both accepted
     header_re_tmpl = r'//\s*[─\-]+\s+{name}\b'
@@ -344,6 +366,83 @@ def check_orphan_doc_in_closures(lines: list[str]) -> None:
               "inside a closure body; docstrings belong ABOVE the closure call, not inside it")
 
 
+def check_lua_entry_doc_completeness(path: Path) -> None:
+    """Enforce summary length, param coverage, and class description completeness."""
+    entries = [
+        entry
+        for entry in GEN_LUA_API.extract_lua_functions(path)
+        if not entry.name.startswith("__")
+    ]
+    class_descs = GEN_LUA_API.collect_class_descriptions(path)
+    first_method_line_by_owner: dict[str, int] = {}
+
+    for entry in entries:
+        entry_name = entry.lua_name or entry.name
+
+        if not entry.description:
+            _err(
+                entry.line,
+                f'`{entry_name}`: missing summary description above this Lua registration',
+            )
+        elif _visible_len(entry.description) < MIN_LUA_SUMMARY_VISIBLE_CHARS:
+            _err(
+                entry.line,
+                f'`{entry_name}`: summary description is too short -- '
+                f'{_visible_len(entry.description)} visible chars < {MIN_LUA_SUMMARY_VISIBLE_CHARS}',
+            )
+
+        explicit_params = GEN_LUA_API._parse_tagged_params(entry.full_doc)
+        inferred_params = GEN_LUA_API._parse_inferred_sig_tokens(entry.inferred_sig)
+        has_variadic_signature = any(name == "..." for name, _ in inferred_params)
+
+        if inferred_params and not has_variadic_signature and len(explicit_params) != len(inferred_params):
+            _err(
+                entry.line,
+                f'`{entry_name}`: expected {len(inferred_params)} `@param` line(s) from the Lua signature '
+                f'but found {len(explicit_params)}',
+            )
+        elif inferred_params and not has_variadic_signature:
+            for (_, _), (_, doc_type, _, doc_desc) in zip(inferred_params, explicit_params):
+                if not doc_type.strip() or not doc_desc.strip():
+                    _err(
+                        entry.line,
+                        f'`{entry_name}`: every `@param` must include a name, type, and description',
+                    )
+        else:
+            for _, doc_type, _, doc_desc in explicit_params:
+                if not doc_type.strip() or not doc_desc.strip():
+                    _err(
+                        entry.line,
+                        f'`{entry_name}`: every `@param` must include a name, type, and description',
+                    )
+
+        return_type, return_desc = GEN_LUA_API._parse_tagged_return(entry.full_doc)
+        if not return_type or not return_desc:
+            _err(
+                entry.line,
+                f'`{entry_name}`: every Lua registration must have `@return | type | description` data',
+            )
+
+        if entry.kind == "method" and entry.owner_type and entry.owner_type != "Unknown":
+            first_method_line_by_owner.setdefault(entry.owner_type, entry.line)
+
+    for owner_type, line_no in sorted(first_method_line_by_owner.items(), key=lambda item: item[1]):
+        description = (class_descs.get(owner_type) or "").strip()
+        if not description:
+            _err(
+                line_no,
+                f'`{owner_type}`: missing Lua-visible object/class description of at least '
+                f'{MIN_LUA_OBJECT_VISIBLE_CHARS} visible characters',
+            )
+            continue
+        if _visible_len(description) < MIN_LUA_OBJECT_VISIBLE_CHARS:
+            _err(
+                line_no,
+                f'`{owner_type}`: object/class description is too short -- '
+                f'{_visible_len(description)} visible chars < {MIN_LUA_OBJECT_VISIBLE_CHARS}',
+            )
+
+
 # ─── file-level runner ────────────────────────────────────────────────────────
 
 def check_file(path: Path) -> tuple[int, int]:
@@ -372,6 +471,7 @@ def check_file(path: Path) -> tuple[int, int]:
     check_docstring_coverage(lines)
     check_section_headers(lines)
     check_orphan_doc_in_closures(lines)
+    check_lua_entry_doc_completeness(path)
 
     return len(_errors), len(_warnings)
 
@@ -408,6 +508,8 @@ def main() -> None:
         sys.exit(1)
 
     target = Path(args[0])
+    if not target.is_absolute():
+        target = (ROOT / target).resolve()
     all_pass = True
     file_count = 0
 

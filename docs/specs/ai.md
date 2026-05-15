@@ -44,8 +44,8 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - `blackboard.rs`: Provides a hierarchical key-value blackboard for local and shared AI state.
 - `command_queue.rs`: Implements queued AI commands with priorities, interruptibility, and callback integration.
 - `context_steering.rs`: Context Steering — direction-based interest/danger evaluation for smooth movement.
-- `director.rs`: AI Director — dynamic difficulty and pacing controller.
 - `dialogue.rs`: Dialogue AI selector that combines FSM/BT/Utility context into topic and branch choices.
+- `director.rs`: AI Director — dynamic difficulty and pacing controller.
 - `emotion.rs`: AI Emotion Model — simulated affective state for expressive agents.
 - `fsm.rs`: Defines finite state machine structures, state callbacks, and guarded transitions.
 - `genetic.rs`: Genetic Algorithm (GA) for offline AI parameter optimisation.
@@ -87,6 +87,9 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - `ContextBehaviorKind` (`enum`, `context_steering.rs`): Variant of a context steering behavior defining how it fills the ring.
 - `ContextBehavior` (`struct`, `context_steering.rs`): A single context steering behavior with a weight and enabled flag.
 - `ContextSteering` (`struct`, `context_steering.rs`): Radial context steering evaluator producing a smooth, obstacle-aware movement direction.
+- `DialogueBranch` (`struct`, `dialogue.rs`): Single branch inside a topic.
+- `DialogueTopic` (`struct`, `dialogue.rs`): Top-level dialogue topic with an ordered set of branches.
+- `DialogueAI` (`struct`, `dialogue.rs`): Topic and branch selector with gate checks and utility scoring.
 - `DirectorPhase` (`enum`, `director.rs`): Current pacing phase of the AI Director state machine.
 - `DirectorConfig` (`struct`, `director.rs`): Configuration thresholds and decay rates for [`AIDirector`].
 - `AIDirector` (`struct`, `director.rs`): Dynamic pacing and difficulty director.
@@ -144,296 +147,310 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 
 ## Functions
 
-- `DecisionModel::parse_str` (`agent.rs`): Parses a Lua-side string identifier into the corresponding `DecisionModel`.
-- `DecisionModel::as_str` (`agent.rs`): Returns the canonical Lua string identifier for this decision model.
-- `Agent::new` (`agent.rs`): Creates a new agent with sensible default kinematic state.
-- `BanditArm::mean_reward` (`bandit.rs`): Returns the mean estimated reward (0.5 when unpulled).
-- `Bandit::new` (`bandit.rs`): Creates a new bandit with `arm_count` arms and the given strategy.
-- `Bandit::arm_count` (`bandit.rs`): Returns the number of arms.
-- `Bandit::select` (`bandit.rs`): Selects an arm index using the configured strategy.
-- `Bandit::update` (`bandit.rs`): Records the observed `reward` for arm `index` and updates arm statistics.
-- `Bandit::best_arm` (`bandit.rs`): Returns the index of the arm with the highest mean reward.
-- `Bandit::reset` (`bandit.rs`): Resets all arm statistics while keeping arm count and strategy.
-- `BTStatus::parse_str` (`behavior_tree.rs`): Converts a Lua status string into a `BTStatus`.
-- `BTStatus::as_str` (`behavior_tree.rs`): Returns the canonical Lua string for this status.
-- `ParallelPolicy::parse_str` (`behavior_tree.rs`): Parses a Lua string (`"requireOne"` or `"requireAll"`) into a policy.
-- `ParallelPolicy::as_str` (`behavior_tree.rs`): Returns the Lua string identifier for this policy.
-- `BTNode::reset` (`behavior_tree.rs`): Recursively resets all running-child memos and repeater counters.
-- `BTNode::child_count` (`behavior_tree.rs`): Returns the number of direct children this node has.
-- `BehaviorTree::new` (`behavior_tree.rs`): Creates a new behavior tree with no root node.
-- `BehaviorTree::debug_state` (`behavior_tree.rs`): Returns a diagnostic snapshot of this tree's current state.
-- `Blackboard::new` (`blackboard.rs`): Creates an empty Blackboard with no parent.
-- `Blackboard::set_number` (`blackboard.rs`): Sets a number value in the local store.
-- `Blackboard::get_number` (`blackboard.rs`): Gets a number value, walking the parent chain.
-- `Blackboard::set_bool` (`blackboard.rs`): Sets a boolean value in the local store.
-- `Blackboard::get_bool` (`blackboard.rs`): Gets a boolean value, walking the parent chain.
-- `Blackboard::set_string` (`blackboard.rs`): Sets a string value in the local store.
-- `Blackboard::get_string` (`blackboard.rs`): Gets a string value, walking the parent chain.
-- `Blackboard::has` (`blackboard.rs`): Checks if a key exists locally or in any ancestor.
-- `Blackboard::remove` (`blackboard.rs`): Removes a key from the local store only.
-- `Blackboard::clear` (`blackboard.rs`): Clears all local entries.
-- `Blackboard::keys` (`blackboard.rs`): Returns all local key names.
-- `Blackboard::size` (`blackboard.rs`): Returns the number of local entries.
-- `Blackboard::set_parent` (`blackboard.rs`): Sets the parent Blackboard for hierarchical lookup.
-- `Blackboard::parent` (`blackboard.rs`): Returns a reference to the parent Blackboard, if any.
-- `CommandQueue::new` (`command_queue.rs`): Creates a new empty command queue.
-- `CommandQueue::enqueue` (`command_queue.rs`): Appends a command to the back of the queue.
-- `CommandQueue::push_front` (`command_queue.rs`): Inserts a command at the front (interrupts current without clearing).
-- `CommandQueue::replace` (`command_queue.rs`): Clears the queue and enqueues one new command.
-- `CommandQueue::cancel_current` (`command_queue.rs`): Cancels the current (front) command if it's interruptible.
-- `CommandQueue::clear` (`command_queue.rs`): Clears all commands.
-- `CommandQueue::count` (`command_queue.rs`): Returns the number of queued commands.
-- `CommandQueue::is_empty` (`command_queue.rs`): Returns whether the queue is empty.
-- `CommandQueue::current_type` (`command_queue.rs`): Returns the type of the front command, if any.
-- `CommandQueue::current_target` (`command_queue.rs`): Returns the target coordinates of the front command.
-- `CommandQueue::advance` (`command_queue.rs`): Advances the queue by removing the front command.
-- `CommandQueue::enqueue_raw` (`command_queue.rs`): Appends a new command built from raw parameters.
-- `CommandQueue::push_front_raw` (`command_queue.rs`): Inserts at the front from raw parameters.
-- `CommandQueue::replace_raw` (`command_queue.rs`): Clears the queue and replaces with a single command from raw parameters.
-- `ContextSteering::new` (`context_steering.rs`): Creates a new context steering evaluator with `slot_count` direction slots.
-- `ContextSteering::slot_count` (`context_steering.rs`): Returns the number of direction slots.
-- `ContextSteering::add_interest` (`context_steering.rs`): Adds a behavior that fills the interest ring (where to go).
-- `ContextSteering::add_danger` (`context_steering.rs`): Adds a behavior that fills the danger ring (where NOT to go).
-- `ContextSteering::add_seek_target` (`context_steering.rs`): Adds a `SeekTarget` interest behavior pointing toward `(tx, ty)`.
-- `ContextSteering::add_wander` (`context_steering.rs`): Adds a `Wander` interest behavior.
-- `ContextSteering::add_avoid_point` (`context_steering.rs`): Adds an `AvoidPoint` danger behavior.
-- `ContextSteering::add_avoid_bounds` (`context_steering.rs`): Adds an `AvoidBounds` danger behavior.
-- `ContextSteering::clear_behaviors` (`context_steering.rs`): Clears all behaviors, resetting the evaluator to a blank state.
-- `ContextSteering::evaluate` (`context_steering.rs`): Evaluates interest and danger rings from the current agent position and velocity, then returns the chosen direction as a normalized `(dx, dy)` pair.
-- `ContextSteering::chosen_direction` (`context_steering.rs`): Returns the chosen direction angle from the last `evaluate` call (radians).
-- `ContextSteering::chosen_magnitude` (`context_steering.rs`): Returns the chosen magnitude (net interest score) from the last `evaluate` call.
-- `ContextSteering::interest_map` (`context_steering.rs`): Returns a copy of the current interest ring values.
-- `ContextSteering::danger_map` (`context_steering.rs`): Returns a copy of the current danger ring values.
-- `DirectorPhase::as_str` (`director.rs`): Returns the canonical string label for this phase.
-- `AIDirector::new` (`director.rs`): Creates a new director with default configuration starting in `Relief` phase.
-- `AIDirector::with_config` (`director.rs`): Creates a director with a custom configuration.
-- `AIDirector::tension` (`director.rs`): Returns the current tension level in `[0.0, 1.0]`.
-- `AIDirector::phase` (`director.rs`): Returns the current pacing phase.
-- `AIDirector::phase_str` (`director.rs`): Returns the current phase as a string label.
-- `AIDirector::elapsed` (`director.rs`): Returns the total elapsed time in seconds.
-- `AIDirector::total_events` (`director.rs`): Returns the total number of events pushed to this director.
-- `AIDirector::push_event` (`director.rs`): Pushes a stress event that raises tension.
-- `AIDirector::update` (`director.rs`): Advances the director by `dt` seconds.
-- `AIDirector::spawn_rate_factor` (`director.rs`): Returns a spawn rate multiplier for game systems.
-- `AIDirector::loot_factor` (`director.rs`): Returns a loot drop multiplier for game systems (highest during relief).
-- `AIDirector::ambient_intensity` (`director.rs`): Returns an ambient intensity value `[0.0, 1.0]` for music and atmosphere.
-- `AIDirector::set_tension` (`director.rs`): Manually overrides the tension to a specific value (for scripted sequences).
-- `AIDirector::reset` (`director.rs`): Resets tension to zero and transitions to Relief phase.
-- `Emotion::new` (`emotion.rs`): Creates a new emotion starting at its resting level.
-- `Emotion::is_active` (`emotion.rs`): Returns `true` when this emotion's value is at or above `min_visible`.
-- `Emotion::trigger` (`emotion.rs`): Bumps the emotion up by `amount`, clamped to `[0.0, 1.0]`.
-- `Emotion::set` (`emotion.rs`): Sets the emotion to an exact value, clamped to `[0.0, 1.0]`.
-- `Emotion::update` (`emotion.rs`): Advances decay by `dt` seconds, moving toward `resting_level`.
-- `EmotionModel::new` (`emotion.rs`): Creates an empty emotion model.
-- `EmotionModel::add` (`emotion.rs`): Adds or replaces an emotion by name.
-- `EmotionModel::get` (`emotion.rs`): Returns the current value of a named emotion, or `0.0` if not found.
-- `EmotionModel::trigger` (`emotion.rs`): Triggers a named emotion by adding `amount` to its current value.
-- `EmotionModel::set` (`emotion.rs`): Sets a named emotion to an exact value.
-- `EmotionModel::update` (`emotion.rs`): Advances all emotions' decay by `dt` seconds.
-- `EmotionModel::dominant` (`emotion.rs`): Returns the name of the dominant (highest active) emotion, or `None` if no emotion is above its `min_visible` threshold.
-- `EmotionModel::is_active` (`emotion.rs`): Returns `true` when a named emotion is at or above its `min_visible` threshold.
-- `EmotionModel::active_names` (`emotion.rs`): Returns the names of all emotions currently active (above `min_visible`).
-- `EmotionModel::count` (`emotion.rs`): Returns the number of emotions registered in this model.
-- `EmotionModel::reset` (`emotion.rs`): Resets all emotions to their resting levels.
-- `StateMachine::new` (`fsm.rs`): Creates a new empty state machine.
-- `StateMachine::add_transition` (`fsm.rs`): Adds a transition and re-sorts by descending priority.
-- `StateMachine::current_state` (`fsm.rs`): Returns the current state name, if any.
-- `StateMachine::time_in_state` (`fsm.rs`): Returns the time spent in the current state in seconds.
-- `StateMachine::add_state_raw` (`fsm.rs`): Adds a named state with optional lifecycle callbacks.
-- `StateMachine::add_transition_raw` (`fsm.rs`): Adds a transition with optional guard callback.
-- `StateMachine::set_initial_state` (`fsm.rs`): Sets the initial state name.
-- `Chromosome::new` (`genetic.rs`): Creates a zeroed chromosome.
-- `GeneticAlgorithm::new` (`genetic.rs`): Creates a new GA with a random initial population.
-- `GeneticAlgorithm::pop_size` (`genetic.rs`): Returns the population size.
-- `GeneticAlgorithm::best` (`genetic.rs`): Returns a reference to the chromosome with highest fitness.
-- `GeneticAlgorithm::evolve` (`genetic.rs`): Runs one generation: tournament selection, crossover, mutation, elitism.
-- `GOAPPlanner::new` (`goap.rs`): Creates a new empty GOAP planner.
-- `GOAPPlanner::plan` (`goap.rs`): Plans a sequence of actions to satisfy the highest-priority goal.
-- `GOAPPlanner::plan_for_goal_idx` (`goap.rs`): Plans for a specific goal index.
-- `GOAPPlanner::add_action` (`goap.rs`): Adds an action with the given cost and optional Lua callback.
-- `GOAPPlanner::add_precondition` (`goap.rs`): Adds a boolean precondition to the named action.
-- `GOAPPlanner::add_effect` (`goap.rs`): Adds a boolean effect to the named action.
-- `GOAPPlanner::add_goal` (`goap.rs`): Adds a goal with the given name and priority.
-- `GOAPPlanner::set_goal_state` (`goap.rs`): Sets a boolean condition on the named goal.
-- `GOAPPlanner::get_max_iterations` (`goap.rs`): Returns the maximum A* planning iterations.
-- `GOAPPlanner::set_max_iterations` (`goap.rs`): Sets the maximum A* planning iterations.
-- `HTNTask::name` (`htn.rs`): Returns the name of this task.
-- `HTNTask::is_primitive` (`htn.rs`): Returns `true` if this is a primitive task.
-- `HTNTask::preconditions_met` (`htn.rs`): Checks whether a primitive's preconditions are satisfied in the given state.
-- `HTNTask::apply_effects` (`htn.rs`): Applies this primitive's effects to a mutable world-state clone.
-- `HTNMethod::always` (`htn.rs`): Creates a method with no preconditions (always applicable).
-- `HTNMethod::with_preconditions` (`htn.rs`): Creates a method with preconditions.
-- `HTNMethod::is_applicable` (`htn.rs`): Returns `true` if this method's preconditions are satisfied in `state`.
-- `HTNDomain::new` (`htn.rs`): Creates an empty domain.
-- `HTNDomain::register` (`htn.rs`): Registers an `HTNTask` in the domain.
-- `HTNDomain::add_primitive` (`htn.rs`): Convenience: registers a primitive task with given preconditions and effects.
-- `HTNDomain::add_compound` (`htn.rs`): Convenience: registers a compound task with a list of methods.
-- `HTNDomain::get` (`htn.rs`): Looks up a task by name.
-- `HTNDomain::task_count` (`htn.rs`): Returns the number of registered tasks.
-- `HTNPlanner::plan` (`htn.rs`): Plans from `root_task` against `domain` and `initial_state`.
-- `LodTier::new` (`lod.rs`): Creates a new LOD tier.
-- `AILod::new` (`lod.rs`): Creates a LOD system from a custom tier list.
-- `AILod::tier` (`lod.rs`): Returns a reference to the tier at index `i`.
-- `AILod::tier_count` (`lod.rs`): Returns the number of tiers.
-- `AILod::tier_for` (`lod.rs`): Determines the LOD tier index for an agent at `agent_pos` from `ref_pos`.
-- `AILod::assign_tiers` (`lod.rs`): Computes tier indices for a batch of agent positions.
-- `AILod::should_update` (`lod.rs`): Returns `true` if an agent in `tier` should be updated on `frame_number`.
-- `MCTSEngine::new` (`mcts.rs`): Creates a new MCTS engine with the given configuration.
-- `MCTSEngine::config` (`mcts.rs`): Returns a reference to the current configuration.
-- `MCTSEngine::search` (`mcts.rs`): Runs MCTS from `root_state` and returns the best action index, or `None` if no actions are available from the root.
-- `Need::new` (`needs.rs`): Creates a new need with full satisfaction and the given parameters.
-- `Need::is_urgent` (`needs.rs`): Returns `true` when this need's value is below `urgency_threshold`.
-- `Need::urgency_score` (`needs.rs`): Returns the urgency score: `urgency_factor * (1.0 - value)`, or `0.0` when disabled.
-- `Need::satisfy` (`needs.rs`): Adds `amount` to the current need value, clamped to `[0.0, 1.0]`.
-- `Need::deprive` (`needs.rs`): Subtracts `amount` from the current need value (immediate deprivation).
-- `Need::update` (`needs.rs`): Advances the need decay by `dt` seconds.
-- `NeedAdvertisement::new` (`needs.rs`): Creates a new need advertisement with no cooldown.
-- `NeedAdvertisement::is_available` (`needs.rs`): Returns `true` if the advertisement is currently available (no cooldown remaining).
-- `NeedAdvertisement::use_it` (`needs.rs`): Marks the advertisement as used, starting the cooldown timer.
-- `NeedAdvertisement::update` (`needs.rs`): Advances the cooldown timer by `dt` seconds.
-- `NeedAdvertisement::score` (`needs.rs`): Scores this advertisement for an agent at `agent_pos` relative to `need_urgency`.
-- `NeedSystem::new` (`needs.rs`): Creates an empty need system.
-- `NeedSystem::add_need` (`needs.rs`): Adds a need to this system.
-- `NeedSystem::get` (`needs.rs`): Returns a reference to the need with the given name, or `None`.
-- `NeedSystem::get_mut` (`needs.rs`): Returns a mutable reference to the need with the given name, or `None`.
-- `NeedSystem::update` (`needs.rs`): Advances all needs by `dt` seconds.
-- `NeedSystem::most_urgent` (`needs.rs`): Returns the name of the most urgent need (highest `urgency_score`).
-- `NeedSystem::satisfy` (`needs.rs`): Satisfies a named need by `amount`.
-- `NeedSystem::need_names` (`needs.rs`): Returns a list of all need names in this system.
-- `NeedSystem::value_of` (`needs.rs`): Returns the satisfaction value for a named need, or `1.0` if not found.
-- `NeedSystem::best_advertisement` (`needs.rs`): Selects the best available advertisement from a slice, considering the urgency of all needs in this system.
-- `Activation::from_str` (`neural_net.rs`): Parses a string into an `Activation`.
-- `Activation::as_str` (`neural_net.rs`): Returns the canonical lowercase string name.
-- `Activation::apply` (`neural_net.rs`): Applies the activation in-place to a mutable slice.
-- `NeuralLayer::new` (`neural_net.rs`): Creates a new zeroed layer.
-- `NeuralLayer::param_count` (`neural_net.rs`): Returns the total number of weight parameters (weights + biases).
-- `NeuralLayer::forward` (`neural_net.rs`): Performs the forward pass: `output = activation(W * input + b)`.
-- `NeuralNet::new` (`neural_net.rs`): Creates a new empty neural network.
-- `NeuralNet::add_layer` (`neural_net.rs`): Appends a fully-connected layer to the network.
-- `NeuralNet::param_count` (`neural_net.rs`): Returns the total number of trainable parameters across all layers.
-- `NeuralNet::forward` (`neural_net.rs`): Runs the forward pass and returns output activations.
-- `NeuralNet::set_weights` (`neural_net.rs`): Copies all weights from a flat slice into the network's layers.
-- `NeuralNet::get_weights` (`neural_net.rs`): Flattens all layer weights and biases into a single `Vec<f32>`.
-- `NeuralNet::layer_count` (`neural_net.rs`): Returns the number of layers.
-- `Neuroevolution::new` (`neuroevolution.rs`): Creates a new neuroevolution trainer for the given network topology.
-- `Neuroevolution::pop_size` (`neuroevolution.rs`): Returns the population size.
-- `Neuroevolution::chromosome_to_net` (`neuroevolution.rs`): Builds a `NeuralNet` from the weight chromosome at index `i`.
-- `Neuroevolution::set_fitness` (`neuroevolution.rs`): Sets the fitness for chromosome at index `i`.
-- `Neuroevolution::evolve` (`neuroevolution.rs`): Advances one generation using the GA.
-- `Neuroevolution::best_network` (`neuroevolution.rs`): Returns a `NeuralNet` loaded with the weights of the best chromosome.
-- `Neuroevolution::best_fitness` (`neuroevolution.rs`): Returns the fitness of the best chromosome.
-- `Neuroevolution::population` (`neuroevolution.rs`): Returns a reference to the raw population chromosomes.
-- `ORCAAgent::new` (`orca.rs`): Creates an agent at the given position with zero velocity.
-- `ORCASolver::new` (`orca.rs`): Creates a new solver with a given time horizon in seconds.
-- `ORCASolver::add_agent` (`orca.rs`): Adds an agent to the solver and returns its index.
-- `ORCASolver::remove_agent` (`orca.rs`): Removes the agent at `index` by swapping with the last agent.
-- `ORCASolver::agent_count` (`orca.rs`): Returns the number of agents in the solver.
-- `ORCASolver::compute` (`orca.rs`): Runs one ORCA frame: for each agent, computes velocity-space half-planes from all neighbours, then finds the velocity closest to `preferred_velocity` that satisfies every half-plane.
-- `StimulusType::from_str` (`perception.rs`): Parses a string into a `StimulusType`.
-- `StimulusType::as_str` (`perception.rs`): Returns the canonical string name of this stimulus type.
-- `StimulusWorld::new` (`perception.rs`): Creates a new empty stimulus world.
-- `StimulusWorld::add` (`perception.rs`): Registers a new stimulus in the world.
-- `StimulusWorld::add_visual` (`perception.rs`): Convenience method: emits a visual stimulus.
-- `StimulusWorld::add_auditory` (`perception.rs`): Convenience method: emits an auditory stimulus.
-- `StimulusWorld::add_custom` (`perception.rs`): Convenience method: emits a custom-type stimulus.
-- `StimulusWorld::remove` (`perception.rs`): Removes a stimulus by ID.
-- `StimulusWorld::update` (`perception.rs`): Decays all stimuli by `dt` and removes those whose intensity has dropped to zero or below.
-- `StimulusWorld::stimuli` (`perception.rs`): Returns a reference to all currently active stimuli.
-- `StimulusWorld::count` (`perception.rs`): Returns the number of active stimuli.
-- `StimulusWorld::clear` (`perception.rs`): Removes all stimuli immediately.
-- `Sensor::new` (`perception.rs`): Creates a sensor with default parameters suitable for a typical guard agent.
-- `Sensor::can_see` (`perception.rs`): Returns `true` if a given world-space target position is inside this sensor's sight cone (range + angle check).
-- `Sensor::can_hear` (`perception.rs`): Returns `true` if an auditory stimulus can be heard from `sensor_pos`.
-- `Sensor::detect` (`perception.rs`): Queries the `StimulusWorld` for all stimuli detectable from `sensor_pos` with `facing` heading.
-- `Sensor::update_awareness` (`perception.rs`): Updates the awareness level based on the number of stimuli detected this frame.
-- `Sensor::is_alert` (`perception.rs`): Returns `true` when awareness has reached or exceeded `alert_threshold`.
-- `Sensor::add_custom_range` (`perception.rs`): Registers a detection range for a custom sense channel.
-- `QLearner::new` (`qlearner.rs`): Creates a new Q-learner with zero-initialized Q-values.
-- `QLearner::choose_action` (`qlearner.rs`): Selects an action using the epsilon-greedy policy.
-- `QLearner::best_action` (`qlearner.rs`): Returns the greedy-best action (highest Q-value) for the given state.
-- `QLearner::learn` (`qlearner.rs`): Performs one Bellman Q-learning update.
-- `QLearner::end_episode` (`qlearner.rs`): Ends the current episode: applies epsilon decay and increments episode count.
-- `QLearner::get_q` (`qlearner.rs`): Returns the Q-value for a (state, action) pair, or 0.0 if out of range.
-- `QLearner::set_q` (`qlearner.rs`): Overwrites the Q-value for a (state, action) pair.
-- `QLearner::serialize` (`qlearner.rs`): Serializes the Q-table to a JSON string (2D array of state rows).
-- `QLearner::deserialize` (`qlearner.rs`): Restores the Q-table from a JSON string produced by [`serialize`](Self::serialize).
-- `StateMachine::generate_render_commands` (`render.rs`): Generate debug render commands representing the finite state machine.
-- `StateMachine::draw_to_image` (`render.rs`): Render the FSM to a CPU image.
-- `BehaviorTree::generate_render_commands` (`render.rs`): Generate debug render commands that outline the behavior tree structure.
-- `BehaviorTree::draw_to_image` (`render.rs`): Render the behavior tree structure to a CPU image.
-- `FormationType::parse_str` (`squad.rs`): Parses a Lua string into a `FormationType`.
-- `FormationType::as_str` (`squad.rs`): Returns the canonical lowercase Lua string for this formation type.
-- `Squad::new` (`squad.rs`): Creates a new squad with no members, no leader, no formation, and a default spacing of 30 world units.
-- `Squad::get_formation_position` (`squad.rs`): Computes the ideal world-space position for the member at `member_idx` given the leader's current position.
-- `CombineMode::parse_str` (`steering.rs`): Parses from Lua string.
-- `CombineMode::as_str` (`steering.rs`): Returns the Lua string representation.
-- `SteeringBehaviorType::base` (`steering.rs`): Returns a reference to the common steering data.
-- `SteeringBehaviorType::base_mut` (`steering.rs`): Returns a mutable reference to the common steering data.
-- `SteeringBehaviorType::kind` (`steering.rs`): Returns the behavior kind as a Lua-friendly string.
-- `SteeringBehaviorType::calculate` (`steering.rs`): Computes the 2D steering force for this behavior given the agent's current kinematic state.
-- `SteeringManager::new` (`steering.rs`): Creates a new empty SteeringManager with weighted combination.
-- `SteeringManager::calculate` (`steering.rs`): Computes the combined steering force for the given agent state.
-- `SteeringManager::add_seek` (`steering.rs`): Adds a Seek behavior targeting `(tx, ty)` with the given weight.
-- `SteeringManager::add_flee` (`steering.rs`): Adds a Flee behavior away from `(tx, ty)` within `panic_dist`.
-- `SteeringManager::add_arrive` (`steering.rs`): Adds an Arrive behavior targeting `(tx, ty)` with deceleration inside `slowing_radius`.
-- `SteeringManager::add_wander` (`steering.rs`): Adds a Wander behavior with the given circle parameters.
-- `SteeringManager::add_pursue` (`steering.rs`): Adds a Pursue behavior targeting a named agent.
-- `SteeringManager::add_evade` (`steering.rs`): Adds an Evade behavior fleeing from a named threat agent.
-- `SteeringManager::add_flock` (`steering.rs`): Adds a Flock behavior for group movement among named neighbors.
-- `SteeringManager::set_combine_mode_str` (`steering.rs`): Sets the combination mode from a Lua string (`"weighted"` or `"priority"`).
-- `SteeringManager::last_force` (`steering.rs`): Returns the force vector computed during the last `calculate()` call.
-- `SteeringManager::set_cell_size` (`steering.rs`): Sets the cell size used by the spatial-hash neighbourhood search.
-- `SteeringManager::set_use_spatial_hash` (`steering.rs`): Enables or disables spatial-hash bucketing for neighbourhood queries.
-- `StrategicGoal::new` (`strategy.rs`): Creates a new goal with full priority and no preconditions.
-- `StrategicGoal::require_tag` (`strategy.rs`): Adds a precondition tag requirement.
-- `StrategicGoal::is_eligible` (`strategy.rs`): Returns `true` if all precondition tags are present in `active_tags`.
-- `StrategyAI::new` (`strategy.rs`): Creates a new strategy AI with the given evaluation interval in seconds.
-- `StrategyAI::add_goal` (`strategy.rs`): Adds a goal to the evaluator.
-- `StrategyAI::add_goal_named` (`strategy.rs`): Convenience: adds a named goal with default settings.
-- `StrategyAI::set_tags` (`strategy.rs`): Sets the active world-state tags used to filter goal eligibility.
-- `StrategyAI::add_tag` (`strategy.rs`): Adds a single active tag.
-- `StrategyAI::remove_tag` (`strategy.rs`): Removes a tag.
-- `StrategyAI::active_goal` (`strategy.rs`): Returns the name of the currently active goal, or `None` if no evaluation has run yet.
-- `StrategyAI::update` (`strategy.rs`): Advances the timer by `dt` and evaluates goals when the interval expires.
-- `StrategyAI::force_evaluate` (`strategy.rs`): Forces an immediate re-evaluation outside the normal interval.
-- `StrategyAI::goal_count` (`strategy.rs`): Returns the number of registered goals.
-- `StrategyAI::time_until_next` (`strategy.rs`): Returns seconds remaining until the next scheduled evaluation.
-- `TraitModifier::new` (`traits.rs`): Creates a new modifier.
-- `TraitModifier::is_expired` (`traits.rs`): Returns `true` if a timed modifier has expired (remaining ≤ 0).
-- `TraitModifier::tick` (`traits.rs`): Advances the modifier timer.
-- `TraitProfile::new` (`traits.rs`): Creates a new empty trait profile with no base traits and no modifiers.
-- `TraitProfile::from_archetype` (`traits.rs`): Creates a trait profile from a named archetype with optional variance jitter.
-- `TraitProfile::set` (`traits.rs`): Sets the base value for a trait, clamped to `[0.0, 1.0]`.
-- `TraitProfile::get` (`traits.rs`): Returns the effective trait value (base + all active modifier deltas), clamped to `[0.0, 1.0]`.
-- `TraitProfile::get_base` (`traits.rs`): Returns the raw base value for a trait without applying modifiers.
-- `TraitProfile::add_modifier` (`traits.rs`): Adds an additive modifier to a trait with optional duration.
-- `TraitProfile::remove_modifiers_by_source` (`traits.rs`): Removes all modifiers whose `source` field matches the given string.
-- `TraitProfile::update` (`traits.rs`): Advances modifier timers by `dt` seconds and removes expired timed modifiers.
-- `TraitProfile::trait_names` (`traits.rs`): Returns a `Vec` of all base trait names defined in this profile.
-- `TraitProfile::trait_count` (`traits.rs`): Returns the number of base traits defined in this profile.
-- `TraitProfile::has` (`traits.rs`): Returns `true` if a base value for `name` has been set.
-- `TraitProfile::lerp_toward` (`traits.rs`): Linearly interpolates all base trait values toward those of `other` by factor `t` (clamped to `[0.0, 1.0]`).
-- `TraitProfile::archetype` (`traits.rs`): Returns the archetype name this profile was created from, if any.
-- `TraitArchetypes::new` (`traits.rs`): Creates an empty archetype registry.
-- `TraitArchetypes::register` (`traits.rs`): Registers a named archetype with its trait values.
-- `TraitArchetypes::get` (`traits.rs`): Returns the trait map for a named archetype, or `None` if not found.
-- `TraitArchetypes::names` (`traits.rs`): Returns a list of all registered archetype names.
-- `TraitArchetypes::count` (`traits.rs`): Returns the number of registered archetypes.
-- `ResponseCurve::parse_str` (`utility_ai.rs`): Parses from Lua string.
-- `ResponseCurve::apply` (`utility_ai.rs`): Transforms a raw input value through this response curve using the given parameters.
-- `UtilityAI::new` (`utility_ai.rs`): Creates a new empty UtilityAI.
-- `UtilityAI::add_action` (`utility_ai.rs`): Adds an action with the given scorer callback and momentum bonus.
-- `UtilityAI::add_consideration` (`utility_ai.rs`): Adds a consideration to the named action.
-- `UtilityAI::last_action_name` (`utility_ai.rs`): Returns the name of the last chosen action, or `None` if no evaluation has occurred.
-- `UtilityAI::evaluate` (`utility_ai.rs`): Evaluates all actions using Lua scorer callbacks and returns the best action name.
-- `AIWorld::new` (`world.rs`): Creates a new empty AIWorld.
-- `AIWorld::add_agent` (`world.rs`): Adds a new agent with the given name.
-- `AIWorld::remove_agent` (`world.rs`): Removes an agent by name.
-- `AIWorld::get_agent_index` (`world.rs`): Returns the index of an agent by name.
-- `AIWorld::agent_count` (`world.rs`): Returns the number of agents.
-- `AIWorld::global_blackboard` (`world.rs`): Returns a reference to the global blackboard.
-- `AIWorld::global_blackboard_mut` (`world.rs`): Returns a mutable reference to the global blackboard.
-- `AIWorld::update` (`world.rs`): Advances all agents by `dt` seconds, integrating velocity into position.
+- `DecisionModel::parse_str` (`agent.rs`): Parse a string tag into a `DecisionModel`; returns `None` for unknown tags.
+- `DecisionModel::as_str` (`agent.rs`): Return the canonical string tag for this model.
+- `Agent::new` (`agent.rs`): Create a new agent with default movement, AI, and support systems.
+- `BanditArm::mean_reward` (`bandit.rs`): Return the empirical mean reward; returns 0.5 before the first pull.
+- `Bandit::new` (`bandit.rs`): Create a bandit with `arm_count` arms and a fixed RNG seed.
+- `Bandit::arm_count` (`bandit.rs`): Return the number of available arms.
+- `Bandit::select` (`bandit.rs`): Select an arm index according to the current strategy.
+- `Bandit::update` (`bandit.rs`): Update the chosen arm with an observed reward in the range `[0, 1]`.
+- `Bandit::best_arm` (`bandit.rs`): Return the greedy best arm by empirical mean reward.
+- `Bandit::reset` (`bandit.rs`): Reset all arm statistics and the total pull counter.
+- `BTStatus::parse_str` (`behavior_tree.rs`): Parse a string tag into `BTStatus`; unknown strings default to `Running`.
+- `BTStatus::as_str` (`behavior_tree.rs`): Return the canonical lowercase string tag for this status.
+- `ParallelPolicy::parse_str` (`behavior_tree.rs`): Parse a string tag; unknown strings default to `RequireOne`.
+- `ParallelPolicy::as_str` (`behavior_tree.rs`): Return the canonical string tag for this policy.
+- `BTNode::reset` (`behavior_tree.rs`): Reset all running indices and repetition counters in this subtree recursively.
+- `BTNode::child_count` (`behavior_tree.rs`): Return the number of direct children; leaf nodes return 0.
+- `BehaviorTree::new` (`behavior_tree.rs`): Create an empty tree with `last_status` initialised to `Success`.
+- `BehaviorTree::debug_state` (`behavior_tree.rs`): Build a `BtDebugState` snapshot from the current tree shape and status.
+- `Blackboard::new` (`blackboard.rs`): Create an empty blackboard with no parent.
+- `Blackboard::set_number` (`blackboard.rs`): Write a `Number` value under `key`, overwriting any existing entry.
+- `Blackboard::get_number` (`blackboard.rs`): Read a `Number` by key; walks the parent chain, returns `default` if absent.
+- `Blackboard::set_bool` (`blackboard.rs`): Write a `Bool` value under `key`, overwriting any existing entry.
+- `Blackboard::get_bool` (`blackboard.rs`): Read a `Bool` by key; walks the parent chain, returns `default` if absent.
+- `Blackboard::set_string` (`blackboard.rs`): Write a `Text` value under `key`, overwriting any existing entry.
+- `Blackboard::get_string` (`blackboard.rs`): Read a `Text` by key; walks the parent chain, returns `default` if absent.
+- `Blackboard::has` (`blackboard.rs`): Return `true` if `key` exists in this board or any ancestor.
+- `Blackboard::remove` (`blackboard.rs`): Remove `key` from the local entries only; parent is not affected.
+- `Blackboard::clear` (`blackboard.rs`): Remove all local entries; parent is not affected.
+- `Blackboard::keys` (`blackboard.rs`): Return all local key names as a new `Vec`; does not include parent keys.
+- `Blackboard::size` (`blackboard.rs`): Return the number of entries in the local board, excluding the parent.
+- `Blackboard::set_parent` (`blackboard.rs`): Attach a parent board; looked up when a local key is missing.
+- `Blackboard::parent` (`blackboard.rs`): Return a reference to the parent board, or `None` if none is set.
+- `CommandQueue::new` (`command_queue.rs`): Create an empty queue.
+- `CommandQueue::enqueue` (`command_queue.rs`): Append `cmd` to the back of the queue.
+- `CommandQueue::push_front` (`command_queue.rs`): Insert `cmd` at the front, making it the next command to execute.
+- `CommandQueue::replace` (`command_queue.rs`): Clear the entire queue and enqueue `cmd` as the sole pending command.
+- `CommandQueue::cancel_current` (`command_queue.rs`): Pop the front command if it is interruptible; return `true` on success.
+- `CommandQueue::clear` (`command_queue.rs`): Discard all queued commands.
+- `CommandQueue::count` (`command_queue.rs`): Return the number of pending commands.
+- `CommandQueue::is_empty` (`command_queue.rs`): Return `true` when the queue has no pending commands.
+- `CommandQueue::current_type` (`command_queue.rs`): Return the `kind` tag of the front command, or `None` if the queue is empty.
+- `CommandQueue::current_target` (`command_queue.rs`): Return the `(target_x, target_y)` of the front command; returns `(0, 0)` if empty.
+- `CommandQueue::advance` (`command_queue.rs`): Remove the front command as completed and expose the next one.
+- `CommandQueue::enqueue_raw` (`command_queue.rs`): Build a `Command` from raw parts and append it to the back of the queue.
+- `CommandQueue::push_front_raw` (`command_queue.rs`): Build a `Command` from raw parts and insert it at the front of the queue.
+- `CommandQueue::replace_raw` (`command_queue.rs`): Build a `Command` from raw parts, clear the queue, and set it as the only entry.
+- `ContextSteering::new` (`context_steering.rs`): Create a context-steering sampler with at least four slots.
+- `ContextSteering::slot_count` (`context_steering.rs`): Return the number of angular slots.
+- `ContextSteering::add_interest` (`context_steering.rs`): Add an interest behavior.
+- `ContextSteering::add_danger` (`context_steering.rs`): Add a danger behavior.
+- `ContextSteering::add_seek_target` (`context_steering.rs`): Add a seek-target interest behavior.
+- `ContextSteering::add_wander` (`context_steering.rs`): Add a wander interest behavior.
+- `ContextSteering::add_avoid_point` (`context_steering.rs`): Add a point-avoidance danger behavior.
+- `ContextSteering::add_avoid_bounds` (`context_steering.rs`): Add a world-bounds avoidance danger behavior.
+- `ContextSteering::clear_behaviors` (`context_steering.rs`): Remove all registered behaviors.
+- `ContextSteering::evaluate` (`context_steering.rs`): Evaluate all behaviors and return the chosen steering direction vector.
+- `ContextSteering::chosen_direction` (`context_steering.rs`): Return the heading in radians chosen by the last evaluation.
+- `ContextSteering::chosen_magnitude` (`context_steering.rs`): Return the magnitude chosen by the last evaluation.
+- `ContextSteering::interest_map` (`context_steering.rs`): Return a copy of the last computed interest ring.
+- `ContextSteering::danger_map` (`context_steering.rs`): Return a copy of the last computed danger ring.
+- `DialogueAI::new` (`dialogue.rs`): Create an empty dialogue selector.
+- `DialogueAI::set_fsm_state` (`dialogue.rs`): Set the FSM state gate used by topic and branch selection.
+- `DialogueAI::set_bt_status` (`dialogue.rs`): Set the behavior-tree status gate used by topic and branch selection.
+- `DialogueAI::set_utility_score` (`dialogue.rs`): Store a utility score under `key`.
+- `DialogueAI::clear_utility_scores` (`dialogue.rs`): Remove all cached utility scores.
+- `DialogueAI::add_topic` (`dialogue.rs`): Add a topic with optional gate requirements and utility key.
+- `DialogueAI::add_branch` (`dialogue.rs`): Add a branch to the named topic; returns `false` if the topic is missing.
+- `DialogueAI::select_topic` (`dialogue.rs`): Return the best matching topic id, or `None` when no topic matches.
+- `DialogueAI::select_branch` (`dialogue.rs`): Return the best matching branch id for `topic_id`, or `None` when none matches.
+- `DialogueAI::topic_count` (`dialogue.rs`): Return the number of registered topics.
+- `DirectorPhase::as_str` (`director.rs`): Return the canonical string tag for this pacing phase.
+- `AIDirector::new` (`director.rs`): Create a director with default config.
+- `AIDirector::with_config` (`director.rs`): Create a director with a custom config.
+- `AIDirector::tension` (`director.rs`): Return the current tension.
+- `AIDirector::phase` (`director.rs`): Return the current phase.
+- `AIDirector::phase_str` (`director.rs`): Return the current phase as a string tag.
+- `AIDirector::elapsed` (`director.rs`): Return elapsed seconds.
+- `AIDirector::total_events` (`director.rs`): Return total events received.
+- `AIDirector::push_event` (`director.rs`): Add one event and clamp the resulting tension to `[0, 1]`.
+- `AIDirector::update` (`director.rs`): Advance the director and update phase transitions.
+- `AIDirector::spawn_rate_factor` (`director.rs`): Return the current spawn rate multiplier.
+- `AIDirector::loot_factor` (`director.rs`): Return the current loot multiplier.
+- `AIDirector::ambient_intensity` (`director.rs`): Return the current ambient intensity scalar.
+- `AIDirector::set_tension` (`director.rs`): Set tension directly and clamp it to `[0, 1]`.
+- `AIDirector::reset` (`director.rs`): Reset tension, phase, and timers to their initial state.
+- `Emotion::new` (`emotion.rs`): Create a new emotion with clamped resting and visibility levels.
+- `Emotion::is_active` (`emotion.rs`): Return `true` when the emotion is above the visible threshold.
+- `Emotion::trigger` (`emotion.rs`): Increase the emotion value and clamp it to `[0, 1]`.
+- `Emotion::set` (`emotion.rs`): Set the emotion value directly and clamp it to `[0, 1]`.
+- `Emotion::update` (`emotion.rs`): Move the emotion toward its resting level over `dt` seconds.
+- `EmotionModel::new` (`emotion.rs`): Create an empty emotion model.
+- `EmotionModel::add` (`emotion.rs`): Add or replace an emotion by name.
+- `EmotionModel::get` (`emotion.rs`): Return the current value for `name`, or 0.0 if missing.
+- `EmotionModel::trigger` (`emotion.rs`): Increase the value of the named emotion when present.
+- `EmotionModel::set` (`emotion.rs`): Set the value of the named emotion when present.
+- `EmotionModel::update` (`emotion.rs`): Advance all emotions toward their resting levels.
+- `EmotionModel::dominant` (`emotion.rs`): Return the name of the highest active emotion, or `None` when none are active.
+- `EmotionModel::is_active` (`emotion.rs`): Return `true` when the named emotion exists and is active.
+- `EmotionModel::active_names` (`emotion.rs`): Return the names of all active emotions.
+- `EmotionModel::count` (`emotion.rs`): Return the number of tracked emotions.
+- `EmotionModel::reset` (`emotion.rs`): Reset all emotions to their resting levels.
+- `StateMachine::new` (`fsm.rs`): Create an empty state machine with no states or transitions.
+- `StateMachine::add_transition` (`fsm.rs`): Register a transition and re-sort the transition list by descending priority.
+- `StateMachine::current_state` (`fsm.rs`): Return the name of the currently active state, or `None` before the first tick.
+- `StateMachine::time_in_state` (`fsm.rs`): Return elapsed seconds since the current state was entered.
+- `StateMachine::add_state_raw` (`fsm.rs`): Register a state by name with optional enter, update, and exit registry keys.
+- `StateMachine::add_transition_raw` (`fsm.rs`): Build a `Transition` from raw parts and add it via `add_transition`.
+- `StateMachine::set_initial_state` (`fsm.rs`): Set the state name that will be activated on the first tick.
+- `Chromosome::new` (`genetic.rs`): Create a zeroed chromosome with `gene_count` genes.
+- `GeneticAlgorithm::new` (`genetic.rs`): Create a population with random initial genes.
+- `GeneticAlgorithm::pop_size` (`genetic.rs`): Return the current population size.
+- `GeneticAlgorithm::best` (`genetic.rs`): Return the chromosome with the highest fitness, or `None` if empty.
+- `GeneticAlgorithm::evolve` (`genetic.rs`): Build the next generation using elitism, tournament selection, crossover, and mutation.
+- `GOAPPlanner::new` (`goap.rs`): Create a planner with an empty action and goal lists and `max_iterations = 10 000`.
+- `GOAPPlanner::plan` (`goap.rs`): Plan for the highest-priority goal; return ordered action name list or empty on failure.
+- `GOAPPlanner::plan_for_goal_idx` (`goap.rs`): Plan for the goal at `goal_idx`; return ordered action name list or empty on failure.
+- `GOAPPlanner::add_action` (`goap.rs`): Register a new action with an empty precondition and effect set.
+- `GOAPPlanner::add_precondition` (`goap.rs`): Add a precondition entry to the named action; no-op if the action is not found.
+- `GOAPPlanner::add_effect` (`goap.rs`): Add an effect entry to the named action; no-op if the action is not found.
+- `GOAPPlanner::add_goal` (`goap.rs`): Register a new goal with an empty desired state map.
+- `GOAPPlanner::set_goal_state` (`goap.rs`): Add a desired world-state entry to the named goal; no-op if goal is not found.
+- `GOAPPlanner::get_max_iterations` (`goap.rs`): Return the current A* iteration cap.
+- `GOAPPlanner::set_max_iterations` (`goap.rs`): Set the A* iteration cap to `n`.
+- `HTNTask::name` (`htn.rs`): Return the task name.
+- `HTNTask::is_primitive` (`htn.rs`): Return `true` for primitive tasks.
+- `HTNTask::preconditions_met` (`htn.rs`): Return `true` when the task preconditions are satisfied.
+- `HTNTask::apply_effects` (`htn.rs`): Apply primitive effects to the world state.
+- `HTNMethod::always` (`htn.rs`): Create a method with no preconditions.
+- `HTNMethod::with_preconditions` (`htn.rs`): Create a method with explicit preconditions.
+- `HTNMethod::is_applicable` (`htn.rs`): Return `true` when the method preconditions are satisfied.
+- `HTNDomain::new` (`htn.rs`): Create an empty domain.
+- `HTNDomain::register` (`htn.rs`): Register a task by its name.
+- `HTNDomain::add_primitive` (`htn.rs`): Add a primitive task.
+- `HTNDomain::add_compound` (`htn.rs`): Add a compound task.
+- `HTNDomain::get` (`htn.rs`): Return a task by name.
+- `HTNDomain::task_count` (`htn.rs`): Return the number of tasks in the domain.
+- `HTNPlanner::plan` (`htn.rs`): Plan from `root_task` and return a primitive task sequence, or `None` on failure.
+- `LodTier::new` (`lod.rs`): Create a tier with the given parameters.
+- `AILod::new` (`lod.rs`): Sort tiers by distance and build an `AILod`.
+- `AILod::tier` (`lod.rs`): Return tier `i` if it exists.
+- `AILod::tier_count` (`lod.rs`): Return the number of tiers.
+- `AILod::tier_for` (`lod.rs`): Return the tier index for `agent_pos` relative to `ref_pos`.
+- `AILod::assign_tiers` (`lod.rs`): Return one tier index per agent position.
+- `AILod::should_update` (`lod.rs`): Return `true` when tier `tier` should update on `frame_number`.
+- `MCTSEngine::new` (`mcts.rs`): Create a search engine with the provided config.
+- `MCTSEngine::config` (`mcts.rs`): Return the active config.
+- `MCTSEngine::search` (`mcts.rs`): Search for the best action and return its id, or `None` when no actions exist.
+- `Need::new` (`needs.rs`): Create a need with value initialized to 1.0.
+- `Need::is_urgent` (`needs.rs`): Return `true` when the need is enabled and below its urgency threshold.
+- `Need::urgency_score` (`needs.rs`): Return a score used for prioritising needs.
+- `Need::satisfy` (`needs.rs`): Increase the need value and clamp it to `[0, 1]`.
+- `Need::deprive` (`needs.rs`): Decrease the need value and clamp it at 0.
+- `Need::update` (`needs.rs`): Apply passive decay over `dt` seconds.
+- `NeedAdvertisement::new` (`needs.rs`): Create a new advertisement at `(x, y)`.
+- `NeedAdvertisement::is_available` (`needs.rs`): Return `true` when the ad is off cooldown.
+- `NeedAdvertisement::use_it` (`needs.rs`): Start the cooldown timer when the ad has a positive cooldown.
+- `NeedAdvertisement::update` (`needs.rs`): Advance the cooldown timer.
+- `NeedAdvertisement::score` (`needs.rs`): Return a distance-weighted score for the ad.
+- `NeedSystem::new` (`needs.rs`): Create an empty need system.
+- `NeedSystem::add_need` (`needs.rs`): Add or replace a need by name.
+- `NeedSystem::get` (`needs.rs`): Return a need by name, or `None` if missing.
+- `NeedSystem::get_mut` (`needs.rs`): Return a mutable need by name, or `None` if missing.
+- `NeedSystem::update` (`needs.rs`): Advance all needs by `dt` seconds.
+- `NeedSystem::most_urgent` (`needs.rs`): Return the most urgent enabled need name, or `None` when none are enabled.
+- `NeedSystem::satisfy` (`needs.rs`): Increase the named need when present.
+- `NeedSystem::need_names` (`needs.rs`): Return all tracked need names.
+- `NeedSystem::value_of` (`needs.rs`): Return the current value of the named need, or 1.0 if missing.
+- `NeedSystem::best_advertisement` (`needs.rs`): Return the best-scoring available advertisement, or `None` if none score positive.
+- `Activation::from_str` (`neural_net.rs`): Parse a lowercase activation name; unknown strings map to `Linear`.
+- `Activation::as_str` (`neural_net.rs`): Return the canonical activation name.
+- `Activation::apply` (`neural_net.rs`): Apply the activation in place to `v`.
+- `NeuralLayer::new` (`neural_net.rs`): Create a zeroed dense layer.
+- `NeuralLayer::param_count` (`neural_net.rs`): Return the number of learnable parameters in the layer.
+- `NeuralLayer::forward` (`neural_net.rs`): Compute the layer output for `input`.
+- `NeuralNet::new` (`neural_net.rs`): Create an empty neural net.
+- `NeuralNet::add_layer` (`neural_net.rs`): Append a new dense layer.
+- `NeuralNet::param_count` (`neural_net.rs`): Return the total number of learnable parameters.
+- `NeuralNet::forward` (`neural_net.rs`): Run a forward pass through all layers.
+- `NeuralNet::set_weights` (`neural_net.rs`): Load flattened weights and biases; returns `false` when the shape mismatches.
+- `NeuralNet::get_weights` (`neural_net.rs`): Return the flattened weights and biases.
+- `NeuralNet::layer_count` (`neural_net.rs`): Return the number of layers.
+- `Neuroevolution::new` (`neuroevolution.rs`): Create a population for the provided layer spec.
+- `Neuroevolution::pop_size` (`neuroevolution.rs`): Return the population size.
+- `Neuroevolution::chromosome_to_net` (`neuroevolution.rs`): Build a neural net from chromosome `i`; returns `None` when the index is invalid.
+- `Neuroevolution::set_fitness` (`neuroevolution.rs`): Assign fitness to chromosome `i` when present.
+- `Neuroevolution::evolve` (`neuroevolution.rs`): Advance the underlying genetic algorithm and generation counter.
+- `Neuroevolution::best_network` (`neuroevolution.rs`): Build the network for the best chromosome, or `None` if the population is empty.
+- `Neuroevolution::best_fitness` (`neuroevolution.rs`): Return the best fitness in the current population, or 0.0 if empty.
+- `Neuroevolution::population` (`neuroevolution.rs`): Return the current chromosome slice.
+- `ORCAAgent::new` (`orca.rs`): Create a new agent at `(x, y)`.
+- `ORCASolver::new` (`orca.rs`): Create a solver with a minimum time horizon of 0.1 seconds.
+- `ORCASolver::add_agent` (`orca.rs`): Add an agent and return its index.
+- `ORCASolver::remove_agent` (`orca.rs`): Remove and return the agent at `index`, or `None` when out of bounds.
+- `ORCASolver::agent_count` (`orca.rs`): Return the number of registered agents.
+- `ORCASolver::compute` (`orca.rs`): Compute safe velocities for all agents.
+- `StimulusType::from_str` (`perception.rs`): Parse a stimulus type name; unknown strings become `Custom`.
+- `StimulusType::as_str` (`perception.rs`): Return a display string for the stimulus type.
+- `StimulusWorld::new` (`perception.rs`): Create an empty stimulus world.
+- `StimulusWorld::add` (`perception.rs`): Insert a stimulus and return its assigned id.
+- `StimulusWorld::add_visual` (`perception.rs`): Add a visual stimulus.
+- `StimulusWorld::add_auditory` (`perception.rs`): Add an auditory stimulus.
+- `StimulusWorld::add_custom` (`perception.rs`): Add a custom stimulus type.
+- `StimulusWorld::remove` (`perception.rs`): Remove a stimulus by id and return `true` when one was removed.
+- `StimulusWorld::update` (`perception.rs`): Decay all stimuli and drop exhausted entries.
+- `StimulusWorld::stimuli` (`perception.rs`): Return the active stimuli slice.
+- `StimulusWorld::count` (`perception.rs`): Return the number of active stimuli.
+- `StimulusWorld::clear` (`perception.rs`): Remove all stimuli.
+- `Sensor::new` (`perception.rs`): Create a sensor with default sight, hearing, and awareness settings.
+- `Sensor::can_see` (`perception.rs`): Return `true` when the target lies within sight range and the vision cone.
+- `Sensor::can_hear` (`perception.rs`): Return `true` when the auditory stimulus is within the effective hearing range.
+- `Sensor::detect` (`perception.rs`): Return every stimulus currently detected from `sensor_pos`.
+- `Sensor::update_awareness` (`perception.rs`): Raise or decay awareness based on the current number of detections.
+- `Sensor::is_alert` (`perception.rs`): Return `true` when awareness reached the alert threshold.
+- `Sensor::add_custom_range` (`perception.rs`): Register a detection range override for one custom stimulus label.
+- `QLearner::new` (`qlearner.rs`): Create a zeroed Q-table for `state_count` states and `action_count` actions.
+- `QLearner::choose_action` (`qlearner.rs`): Return a randomly chosen action (explore) or the greedy best action (exploit).
+- `QLearner::best_action` (`qlearner.rs`): Return the action with the highest Q-value for `state`; ties broken by index.
+- `QLearner::learn` (`qlearner.rs`): Apply a Bellman update: Q[s,a] ← Q[s,a] + α(r + γ·max Q[s'] − Q[s,a]).
+- `QLearner::end_episode` (`qlearner.rs`): Decay epsilon and increment `episode_count`; call once at the end of each episode.
+- `QLearner::get_q` (`qlearner.rs`): Return Q[state, action]; returns 0.0 if indices are out of bounds.
+- `QLearner::set_q` (`qlearner.rs`): Set Q[state, action] to `value`; no-op if indices are out of bounds.
+- `QLearner::serialize` (`qlearner.rs`): Serialize the Q-table to a compact JSON string `[[row0], [row1], ...]`.
+- `QLearner::deserialize` (`qlearner.rs`): Parse a JSON Q-table string and overwrite the current table; returns error on shape mismatch.
+- `StateMachine::generate_render_commands` (`render.rs`): Build line and box commands for the FSM debug view.
+- `StateMachine::draw_to_image` (`render.rs`): Draw the FSM debug view into an `ImageData` buffer.
+- `BehaviorTree::generate_render_commands` (`render.rs`): Build render commands for the BT debug view.
+- `BehaviorTree::draw_to_image` (`render.rs`): Draw the BT debug view into an `ImageData` buffer.
+- `FormationType::parse_str` (`squad.rs`): Parse a lowercase formation name; unknown strings map to `None`.
+- `FormationType::as_str` (`squad.rs`): Return the canonical lowercase formation name.
+- `Squad::new` (`squad.rs`): Create an empty squad with default spacing.
+- `Squad::get_formation_position` (`squad.rs`): Return the target position for one member relative to a leader position.
+- `CombineMode::parse_str` (`steering.rs`): Parse a string tag into `CombineMode`; unknown strings map to `Weighted`.
+- `CombineMode::as_str` (`steering.rs`): Return the canonical string tag for this mode.
+- `SteeringBehaviorType::base` (`steering.rs`): Return the shared base state for the behavior.
+- `SteeringBehaviorType::base_mut` (`steering.rs`): Return the mutable shared base state for the behavior.
+- `SteeringBehaviorType::kind` (`steering.rs`): Return the canonical behavior kind string.
+- `SteeringBehaviorType::calculate` (`steering.rs`): Compute the steering force for this behavior.
+- `SteeringManager::new` (`steering.rs`): Create a steering manager with default parameters.
+- `SteeringManager::calculate` (`steering.rs`): Combine all enabled behaviors and clamp the result to `max_force`.
+- `SteeringManager::add_seek` (`steering.rs`): Add a seek behavior.
+- `SteeringManager::add_flee` (`steering.rs`): Add a flee behavior.
+- `SteeringManager::add_arrive` (`steering.rs`): Add an arrive behavior.
+- `SteeringManager::add_wander` (`steering.rs`): Add a wander behavior.
+- `SteeringManager::add_pursue` (`steering.rs`): Add a pursue behavior.
+- `SteeringManager::add_evade` (`steering.rs`): Add an evade behavior.
+- `SteeringManager::add_flock` (`steering.rs`): Add a flock behavior.
+- `SteeringManager::set_combine_mode_str` (`steering.rs`): Set combine mode from a string tag.
+- `SteeringManager::last_force` (`steering.rs`): Return the last computed force.
+- `SteeringManager::set_cell_size` (`steering.rs`): Set the spatial-hash cell size.
+- `SteeringManager::set_use_spatial_hash` (`steering.rs`): Enable or disable spatial hashing.
+- `SteeringManager::set_path` (`steering.rs`): Replace the waypoint path and reset traversal state.
+- `SteeringManager::clear_path` (`steering.rs`): Clear all waypoints and reset path progress.
+- `SteeringManager::has_active_path` (`steering.rs`): Return `true` when there are remaining waypoints.
+- `SteeringManager::path_progress` (`steering.rs`): Return `(current_index, waypoint_count)`.
+- `StrategicGoal::new` (`strategy.rs`): Create an enabled goal with default priority.
+- `StrategicGoal::require_tag` (`strategy.rs`): Add a required tag.
+- `StrategicGoal::is_eligible` (`strategy.rs`): Return `true` when all required tags are present and the goal is enabled.
+- `StrategyAI::new` (`strategy.rs`): Create a strategy AI that evaluates every `update_interval` seconds.
+- `StrategyAI::add_goal` (`strategy.rs`): Add a goal to the evaluation set.
+- `StrategyAI::add_goal_named` (`strategy.rs`): Add a goal with the given name.
+- `StrategyAI::set_tags` (`strategy.rs`): Replace the active tag set.
+- `StrategyAI::add_tag` (`strategy.rs`): Add a tag if it is not already present.
+- `StrategyAI::remove_tag` (`strategy.rs`): Remove a tag if it exists.
+- `StrategyAI::active_goal` (`strategy.rs`): Return the name of the active goal, or `None` when nothing is selected.
+- `StrategyAI::update` (`strategy.rs`): Advance the timer and evaluate goals when the update interval elapses.
+- `StrategyAI::force_evaluate` (`strategy.rs`): Force immediate evaluation and reset the timer.
+- `StrategyAI::goal_count` (`strategy.rs`): Return the number of goals.
+- `StrategyAI::time_until_next` (`strategy.rs`): Return the remaining time until the next scheduled evaluation.
+- `TraitModifier::new` (`traits.rs`): Create a modifier for one trait.
+- `TraitModifier::is_expired` (`traits.rs`): Return `true` when this modifier has reached zero remaining lifetime.
+- `TraitModifier::tick` (`traits.rs`): Advance the modifier timer by `dt` seconds when it is time-limited.
+- `TraitProfile::new` (`traits.rs`): Create an empty trait profile.
+- `TraitProfile::from_archetype` (`traits.rs`): Build a profile from a registered archetype and optional deterministic variance.
+- `TraitProfile::set` (`traits.rs`): Set the base value for one trait and clamp it to `[0, 1]`.
+- `TraitProfile::get` (`traits.rs`): Return the resolved value for one trait after applying active modifiers.
+- `TraitProfile::get_base` (`traits.rs`): Return the unclamped base value for one trait without modifiers.
+- `TraitProfile::add_modifier` (`traits.rs`): Add a temporary modifier to one trait.
+- `TraitProfile::remove_modifiers_by_source` (`traits.rs`): Remove all modifiers that originated from the given source tag.
+- `TraitProfile::update` (`traits.rs`): Advance active modifier timers and discard expired entries.
+- `TraitProfile::trait_names` (`traits.rs`): Return all registered trait names.
+- `TraitProfile::trait_count` (`traits.rs`): Return the number of base traits stored in this profile.
+- `TraitProfile::has` (`traits.rs`): Return `true` when the profile has a base value for the named trait.
+- `TraitProfile::lerp_toward` (`traits.rs`): Move all shared trait values toward another profile by factor `t`.
+- `TraitProfile::archetype` (`traits.rs`): Return the archetype name used to initialize this profile, when present.
+- `TraitArchetypes::new` (`traits.rs`): Create an empty archetype registry.
+- `TraitArchetypes::register` (`traits.rs`): Register or replace one named archetype after clamping all values to `[0, 1]`.
+- `TraitArchetypes::get` (`traits.rs`): Return the trait map for one named archetype.
+- `TraitArchetypes::names` (`traits.rs`): Return all registered archetype names.
+- `TraitArchetypes::count` (`traits.rs`): Return the number of registered archetypes.
+- `ResponseCurve::parse_str` (`utility_ai.rs`): Parse a string tag into a `ResponseCurve`; unknown strings map to `Linear`.
+- `ResponseCurve::apply` (`utility_ai.rs`): Evaluate the curve at `input` using shape parameters p1, p2, p3.
+- `UtilityAI::new` (`utility_ai.rs`): Create a `UtilityAI` with no actions.
+- `UtilityAI::add_action` (`utility_ai.rs`): Register a new action with an empty consideration list.
+- `UtilityAI::add_consideration` (`utility_ai.rs`): Append a consideration to the named action; no-op if the action is not found.
+- `UtilityAI::last_action_name` (`utility_ai.rs`): Return the name of the action selected on the last `evaluate` call, or `None`.
+- `UtilityAI::evaluate` (`utility_ai.rs`): Call all action scorers, apply momentum, and return the best action name.
+- `AIWorld::new` (`world.rs`): Create an empty AI world.
+- `AIWorld::add_agent` (`world.rs`): Add a named agent and return its index; returns an error on duplicate names.
+- `AIWorld::remove_agent` (`world.rs`): Remove an agent by name and rebuild the index map.
+- `AIWorld::get_agent_index` (`world.rs`): Return the index of an agent by name.
+- `AIWorld::agent_count` (`world.rs`): Return the number of agents in the world.
+- `AIWorld::global_blackboard` (`world.rs`): Return the shared global blackboard.
+- `AIWorld::global_blackboard_mut` (`world.rs`): Return the shared global blackboard mutably.
+- `AIWorld::update` (`world.rs`): Advance all agents by integrating velocity over `dt`.
 
 ## Lua API Reference
 
@@ -441,384 +458,402 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - Namespace: `lurek.ai`
 
 ### Module Functions
-- `lurek.ai.newWorld`: Creates a new AI world container.
-- `lurek.ai.newBlackboard`: Creates a new standalone blackboard.
-- `lurek.ai.newStateMachine`: Creates a new finite state machine.
-- `lurek.ai.newBehaviorTree`: Creates a new behavior tree.
-- `lurek.ai.newSelector`: Creates a BT selector node.
-- `lurek.ai.newSequence`: Creates a BT sequence node.
-- `lurek.ai.newParallel`: Creates a BT parallel node with optional policies.
-- `lurek.ai.newInverter`: Creates a BT inverter decorator.
-- `lurek.ai.newRepeater`: Creates a BT repeater decorator.
-- `lurek.ai.newSucceeder`: Creates a BT succeeder decorator.
-- `lurek.ai.newAction`: Creates a BT action leaf with a Lua callback.
-- `lurek.ai.newCondition`: Creates a BT condition leaf with a Lua predicate.
-- `lurek.ai.newGuard`: Creates a BT guard decorator.
-- `lurek.ai.newSteeringManager`: Creates a new steering behavior manager.
-- `lurek.ai.newQLearner`: Creates a tabular Q-learner.
-- `lurek.ai.newUtilityAI`: Creates a new utility AI evaluator.
-- `lurek.ai.newGOAPPlanner`: Creates a new GOAP planning solver.
-- `lurek.ai.newInfluenceMap`: Creates a multi-layer influence map grid.
-- `lurek.ai.newSquad`: Creates a named squad for formation positioning.
-- `lurek.ai.newCommandQueue`: Creates an RTS-style command queue.
-- `lurek.ai.newTraitProfile`: Creates a new personality trait profile.
-- `lurek.ai.newStimulusWorld`: Creates a new stimulus perception world.
-- `lurek.ai.newContextSteering`: Creates a new context steering controller.
-- `lurek.ai.newNeedSystem`: Creates a new motivational need system.
-- `lurek.ai.newAIDirector`: Creates a new AI pacing director with default config.
-- `lurek.ai.newHTNDomain`: Creates a new Hierarchical Task Network domain.
-- `lurek.ai.newMCTSEngine`: Creates a new Monte Carlo Tree Search engine.
-- `lurek.ai.newEmotionModel`: Creates a new affective emotion model.
-- `lurek.ai.newORCASolver`: Creates a new ORCA crowd avoidance solver.
-- `lurek.ai.newNeuralNet`: Creates a new feedforward neural network (inference only).
-- `lurek.ai.newGeneticAlgorithm`: Creates a new genetic algorithm.
-- `lurek.ai.newBandit`: Creates a new multi-armed bandit.
-- `lurek.ai.newNeuroevolution`: Creates a neuroevolution trainer (GA for neural network weights).
-- `lurek.ai.newStrategyAI`: Creates a new throttled strategy AI.
-- `lurek.ai.newAILod`: Creates a new AI LOD controller with default 3-tier config.
+- `lurek.ai.newWorld`: Creates an isolated AI world for agents, blackboards, and custom decision callbacks.
+- `lurek.ai.newBlackboard`: Creates an empty AI blackboard for typed local facts.
+- `lurek.ai.newStateMachine`: Creates an empty finite state machine with Lua-backed states and transitions.
+- `lurek.ai.newBehaviorTree`: Creates an empty behavior tree that can receive a root node.
+- `lurek.ai.newSelector`: Creates a behavior tree selector node with no children.
+- `lurek.ai.newSequence`: Creates a behavior tree sequence node with no children.
+- `lurek.ai.newParallel`: Creates a behavior tree parallel node with optional success and failure policies.
+- `lurek.ai.newInverter`: Creates a behavior tree inverter decorator with an empty sequence child.
+- `lurek.ai.newRepeater`: Creates a behavior tree repeater decorator with an optional repeat count.
+- `lurek.ai.newSucceeder`: Creates a behavior tree succeeder decorator with an empty sequence child.
+- `lurek.ai.newAction`: Creates a behavior tree action leaf backed by a Lua callback.
+- `lurek.ai.newCondition`: Creates a behavior tree condition leaf backed by a Lua callback.
+- `lurek.ai.newGuard`: Creates a guard decorator that runs a predicate before ticking its child.
+- `lurek.ai.newSteeringManager`: Creates an empty steering manager with support for built-in and custom behaviors.
+- `lurek.ai.newQLearner`: Creates a Q-learner with fixed state and action counts.
+- `lurek.ai.newUtilityAI`: Creates an empty utility AI action scorer.
+- `lurek.ai.newDialogueAI`: Creates an empty dialogue selector for weighted topics and branches.
+- `lurek.ai.newGOAPPlanner`: Creates an empty GOAP planner for boolean world-state planning.
+- `lurek.ai.newInfluenceMap`: Creates a grid influence map with the supplied cell dimensions and world cell size.
+- `lurek.ai.newSquad`: Creates an empty named squad.
+- `lurek.ai.newCommandQueue`: Creates an empty command queue for callback-backed AI commands.
+- `lurek.ai.newTraitProfile`: Creates an empty trait profile with modifier support.
+- `lurek.ai.newStimulusWorld`: Creates an empty stimulus world for visual and auditory stimulus records.
+- `lurek.ai.newContextSteering`: Creates a context steering model with the requested directional slot count.
+- `lurek.ai.newNeedSystem`: Creates an empty need system for decaying named needs.
+- `lurek.ai.newAIDirector`: Creates an AI director for tension, phase, and pacing factor calculations.
+- `lurek.ai.newHTNDomain`: Creates an empty hierarchical task network domain.
+- `lurek.ai.newMCTSEngine`: Creates a Monte Carlo tree search engine with deterministic configuration.
+- `lurek.ai.newEmotionModel`: Creates an empty emotion model for named decaying emotion values.
+- `lurek.ai.newORCASolver`: Creates an ORCA avoidance solver with the supplied prediction horizon.
+- `lurek.ai.newNeuralNet`: Creates an empty feed-forward neural network.
+- `lurek.ai.newGeneticAlgorithm`: Creates a genetic algorithm population with fixed chromosome length.
+- `lurek.ai.newBandit`: Creates a multi-armed bandit with a named selection strategy.
+- `lurek.ai.newNeuroevolution`: Creates a neuroevolution population from a layer specification table.
+- `lurek.ai.newStrategyAI`: Creates a strategy AI that reevaluates goals on a fixed interval.
+- `lurek.ai.newAILod`: Creates a default AI level-of-detail tier selector.
 
 ### `LAIBlackboard` Methods
-- `LAIBlackboard:setNumber`: Stores a number under the given key.
-- `LAIBlackboard:getNumber`: Returns the number for the given key, or default.
-- `LAIBlackboard:setBool`: Stores a boolean under the given key.
-- `LAIBlackboard:getBool`: Returns the boolean for the given key, or default.
-- `LAIBlackboard:setString`: Stores a string under the given key.
-- `LAIBlackboard:getString`: Returns the string for the given key, or default.
-- `LAIBlackboard:has`: Returns true if a value exists under the key.
-- `LAIBlackboard:remove`: Removes the entry at key.
-- `LAIBlackboard:clear`: Removes all local entries.
-- `LAIBlackboard:getKeys`: Returns all local keys as a table.
-- `LAIBlackboard:getSize`: Returns the number of local entries.
-- `LAIBlackboard:type`: Returns the type name of this object.
-- `LAIBlackboard:typeOf`: Returns true if this object is of the given type.
+- `LAIBlackboard:setNumber`: Stores a numeric fact under the given blackboard key.
+- `LAIBlackboard:getNumber`: Returns a numeric blackboard fact or the provided fallback when the key is missing or not numeric.
+- `LAIBlackboard:setBool`: Stores a boolean fact under the given blackboard key.
+- `LAIBlackboard:getBool`: Returns a boolean blackboard fact or the provided fallback when the key is missing or not boolean.
+- `LAIBlackboard:setString`: Stores a string fact under the given blackboard key.
+- `LAIBlackboard:getString`: Returns a string blackboard fact or the provided fallback when the key is missing or not a string.
+- `LAIBlackboard:has`: Returns whether the blackboard contains any entry for the given key.
+- `LAIBlackboard:remove`: Removes the given key from the blackboard if it exists.
+- `LAIBlackboard:clear`: Removes every local entry from this blackboard.
+- `LAIBlackboard:getKeys`: Returns every local blackboard key in an array-style Lua table.
+- `LAIBlackboard:getSize`: Returns the number of entries currently stored in this blackboard.
+- `LAIBlackboard:type`: Returns the Lua-visible type name for this blackboard handle.
+- `LAIBlackboard:typeOf`: Returns whether this blackboard handle matches a supported type name.
 
 ### `LAIDirector` Methods
-- `LAIDirector:pushEvent`: Pushes a gameplay event with the given intensity to the director for awareness analysis.
-- `LAIDirector:update`: Advances the simulation by one time step.
+- `LAIDirector:pushEvent`: Adds an event intensity sample to the director tension model.
+- `LAIDirector:update`: Advances director tension decay and phase evaluation.
 - `LAIDirector:tension`: Returns the current director tension value.
-- `LAIDirector:phase`: Returns the current pacing phase name.
-- `LAIDirector:spawnRateFactor`: Returns the current spawn rate factor.
-- `LAIDirector:lootFactor`: Returns the current loot factor.
-- `LAIDirector:ambientIntensity`: Returns the current ambient intensity value.
-- `LAIDirector:setTension`: Sets the global narrative tension level (0-1 scale).
-- `LAIDirector:reset`: Resets the director state.
-- `LAIDirector:type`: Returns the type name of this object.
-- `LAIDirector:typeOf`: Returns true if this object is of the given type.
+- `LAIDirector:phase`: Returns the current director phase name.
+- `LAIDirector:spawnRateFactor`: Returns the spawn-rate multiplier derived from current tension and phase.
+- `LAIDirector:lootFactor`: Returns the loot multiplier derived from current tension and phase.
+- `LAIDirector:ambientIntensity`: Returns the ambient intensity derived from current tension and phase.
+- `LAIDirector:setTension`: Directly sets the director tension value.
+- `LAIDirector:reset`: Resets director tension and phase state to defaults.
+- `LAIDirector:type`: Returns the Lua-visible type name for this AI director handle.
+- `LAIDirector:typeOf`: Returns whether this AI director handle matches a supported type name.
 
 ### `LAILod` Methods
-- `LAILod:tierFor`: Returns the LOD tier for an agent relative to a reference position.
-- `LAILod:shouldUpdate`: Returns whether a tier should update on a frame.
-- `LAILod:tierCount`: Returns the number of LOD tiers.
-- `LAILod:tierName`: Returns the name of a tier.
-- `LAILod:type`: Returns the type name of this object.
-- `LAILod:typeOf`: Returns true if this object is of the given type.
+- `LAILod:tierFor`: Returns the LOD tier for an agent position relative to a reference position.
+- `LAILod:shouldUpdate`: Returns whether a tier should update on a given frame counter.
+- `LAILod:tierCount`: Returns the number of configured AI LOD tiers.
+- `LAILod:tierName`: Returns the name of an AI LOD tier when the index is valid.
+- `LAILod:type`: Returns the Lua-visible type name for this AI LOD handle.
+- `LAILod:typeOf`: Returns whether this AI LOD handle matches a supported type name.
 
 ### `LAIWorld` Methods
-- `LAIWorld:addAgent`: Registers a new named agent and returns its handle.
-- `LAIWorld:getAgent`: Returns the agent handle for the given name, or nil if it does not exist.
-- `LAIWorld:removeAgent`: Removes an agent by its userdata handle.
-- `LAIWorld:getAgentCount`: Returns the number of registered agents.
-- `LAIWorld:getGlobalBlackboard`: Returns a snapshot of the world-level blackboard.
-- `LAIWorld:update`: Advances all agents by dt seconds, then invokes any custom-model callbacks.
-- `LAIWorld:type`: Returns the type name of this object.
-- `LAIWorld:typeOf`: Returns true if this object is of the given type.
+- `LAIWorld:addAgent`: Creates a named agent in this world and returns a handle that can edit its movement and decision state.
+- `LAIWorld:getAgent`: Returns the named agent handle when it exists in this world.
+- `LAIWorld:removeAgent`: Removes an agent from this world by using an existing agent handle.
+- `LAIWorld:getAgentCount`: Returns the number of agents currently stored in this world.
+- `LAIWorld:getGlobalBlackboard`: Returns a blackboard snapshot containing the world's shared AI facts.
+- `LAIWorld:update`: Advances the world simulation and invokes custom decision callbacks for agents that use a custom model.
+- `LAIWorld:type`: Returns the Lua-visible type name for this AI world handle.
+- `LAIWorld:typeOf`: Returns whether this AI world handle matches a supported type name.
 
 ### `LAgent` Methods
-- `LAgent:getName`: Returns the agent's registered name.
-- `LAgent:setPosition`: Sets the agent's world-space position.
-- `LAgent:getPosition`: Returns the agent's current position.
-- `LAgent:setVelocity`: Sets the agent's velocity vector.
-- `LAgent:getVelocity`: Returns the agent's current velocity.
-- `LAgent:setMaxSpeed`: Sets the maximum speed cap.
-- `LAgent:getMaxSpeed`: Returns the maximum speed cap.
-- `LAgent:setMaxForce`: Sets the maximum steering force cap.
-- `LAgent:getMaxForce`: Returns the maximum steering force cap.
-- `LAgent:setPriority`: Sets the scheduling priority (higher = earlier).
-- `LAgent:getPriority`: Returns the agent's scheduling priority.
-- `LAgent:setDecisionModel`: Sets the active decision model.
-- `LAgent:getDecisionModel`: Returns the name of the current decision model.
-- `LAgent:setCustomModel`: Installs a Lua-driven decision model on this agent.
-- `LAgent:addTag`: Adds a tag to this agent.
-- `LAgent:removeTag`: Removes a tag from this agent.
-- `LAgent:hasTag`: Returns true if the agent has the given tag.
-- `LAgent:getBlackboard`: Returns the agent's local blackboard.
-- `LAgent:type`: Returns the type name of this object.
-- `LAgent:typeOf`: Returns true if this object is of the given type.
+- `LAgent:getName`: Returns this agent's stable world name.
+- `LAgent:setPosition`: Sets this agent's world position when the agent still exists in its world.
+- `LAgent:getPosition`: Returns this agent's world position or the origin when the agent has been removed.
+- `LAgent:setVelocity`: Sets this agent's velocity vector when the agent still exists in its world.
+- `LAgent:getVelocity`: Returns this agent's velocity vector or zero velocity when the agent has been removed.
+- `LAgent:setMaxSpeed`: Sets this agent's maximum movement speed when the agent still exists in its world.
+- `LAgent:getMaxSpeed`: Returns this agent's maximum movement speed or the default speed for a missing agent.
+- `LAgent:setMaxForce`: Sets this agent's maximum steering force when the agent still exists in its world.
+- `LAgent:getMaxForce`: Returns this agent's maximum steering force or the default force for a missing agent.
+- `LAgent:setPriority`: Sets this agent's integer priority when the agent still exists in its world.
+- `LAgent:getPriority`: Returns this agent's integer priority or zero when the agent has been removed.
+- `LAgent:setDecisionModel`: Sets this agent's built-in decision model from a string name when the name is recognized.
+- `LAgent:getDecisionModel`: Returns this agent's decision model name or the default model name for a missing agent.
+- `LAgent:setCustomModel`: Installs a Lua callback as this agent's decision model and stores it in the callback registry.
+- `LAgent:addTag`: Adds a tag string to this agent when the agent still exists in its world.
+- `LAgent:removeTag`: Removes a tag string from this agent when the agent still exists in its world.
+- `LAgent:hasTag`: Returns whether this agent currently has the given tag.
+- `LAgent:getBlackboard`: Returns a blackboard snapshot for this agent or an empty blackboard when the agent has been removed.
+- `LAgent:type`: Returns the Lua-visible type name for this agent handle.
+- `LAgent:typeOf`: Returns whether this agent handle matches a supported type name.
 
 ### `LBTNode` Methods
-- `LBTNode:addChild`: Adds a child node (Selector, Sequence, or Parallel only).
-- `LBTNode:getChildCount`: Returns the number of direct children.
-- `LBTNode:reset`: Resets all running-child memos and repeater counters.
-- `LBTNode:setChild`: Sets the single child of a decorator node.
-- `LBTNode:setCount`: Sets the repeat count for a Repeater node.
-- `LBTNode:getCount`: Returns the repeat count, or 0 if not a Repeater.
-- `LBTNode:setSuccessPolicy`: Sets the success policy for a Parallel node.
-- `LBTNode:setFailurePolicy`: Sets the failure policy for a Parallel node.
-- `LBTNode:getNodeType`: Returns the node type as a string.
-- `LBTNode:type`: Returns the type name of this object.
-- `LBTNode:typeOf`: Returns true if this object is of the given type.
+- `LBTNode:addChild`: Adds a child node to a composite selector, sequence, or parallel node.
+- `LBTNode:getChildCount`: Returns the number of children owned by this behavior tree node.
+- `LBTNode:reset`: Resets this behavior tree node's runtime state.
+- `LBTNode:setChild`: Sets the single child of a decorator node such as inverter, repeater, or succeeder.
+- `LBTNode:setCount`: Sets the repeat count when this node is a repeater.
+- `LBTNode:getCount`: Returns the repeat count for repeater nodes or zero for other node kinds.
+- `LBTNode:setSuccessPolicy`: Sets the success policy for a parallel node.
+- `LBTNode:setFailurePolicy`: Sets the failure policy for a parallel node.
+- `LBTNode:getNodeType`: Returns the behavior tree node kind as a lowercase string.
+- `LBTNode:type`: Returns the Lua-visible type name for this behavior tree node handle.
+- `LBTNode:typeOf`: Returns whether this behavior tree node handle matches a supported type name.
 
 ### `LBandit` Methods
-- `LBandit:select`: Selects an arm index using the current bandit strategy.
-- `LBandit:update`: Advances the simulation by one time step.
-- `LBandit:bestArm`: Returns the best arm index.
-- `LBandit:reset`: Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.
-- `LBandit:armCount`: Returns the number of arms.
-- `LBandit:totalPulls`: Returns the total number of pulls.
-- `LBandit:type`: Returns the type name of this object.
-- `LBandit:typeOf`: Returns true if this object is of the given type.
+- `LBandit:select`: Selects an arm using the configured bandit strategy.
+- `LBandit:update`: Updates one arm with a received reward.
+- `LBandit:bestArm`: Returns the arm with the best current estimate.
+- `LBandit:reset`: Resets all bandit arm statistics.
+- `LBandit:armCount`: Returns the number of arms in this bandit.
+- `LBandit:totalPulls`: Returns the total number of arm selections recorded by this bandit.
+- `LBandit:type`: Returns the Lua-visible type name for this bandit handle.
+- `LBandit:typeOf`: Returns whether this bandit handle matches a supported type name.
 
 ### `LBehaviorTree` Methods
-- `LBehaviorTree:setRoot`: Sets the root node of this behavior tree.
-- `LBehaviorTree:getLastStatus`: Returns the status from the last tick.
-- `LBehaviorTree:getDebugState`: Returns a diagnostic snapshot of this behavior tree.
-- `LBehaviorTree:type`: Returns the type name of this object.
-- `LBehaviorTree:typeOf`: Returns true if this object is of the given type.
+- `LBehaviorTree:setRoot`: Sets the behavior tree root by moving a node handle into the tree.
+- `LBehaviorTree:getLastStatus`: Returns the last behavior tree status string recorded by the tree.
+- `LBehaviorTree:getDebugState`: Returns behavior tree debug counters and status in a Lua table.
+- `LBehaviorTree:type`: Returns the Lua-visible type name for this behavior tree handle.
+- `LBehaviorTree:typeOf`: Returns whether this behavior tree handle matches a supported type name.
 
 ### `LCommandQueue` Methods
-- `LCommandQueue:enqueue`: Appends a command to the back of the queue.
-- `LCommandQueue:pushFront`: Inserts a command at the front, interrupting the current one.
-- `LCommandQueue:replace`: Clears the queue and enqueues one new command.
-- `LCommandQueue:cancelCurrent`: Cancels the front command if it is interruptible.
-- `LCommandQueue:clear`: Discards all queued commands.
-- `LCommandQueue:getCount`: Returns the number of queued commands.
-- `LCommandQueue:isEmpty`: Returns true if there are no queued commands.
-- `LCommandQueue:getCurrentType`: Returns the kind of the front command, or nil if the queue is empty.
-- `LCommandQueue:getCurrentTarget`: Returns the target coordinates of the front command.
-- `LCommandQueue:type`: Returns the type name of this object.
-- `LCommandQueue:typeOf`: Returns true if this object is of the given type.
+- `LCommandQueue:enqueue`: Adds a command callback to the back of the queue.
+- `LCommandQueue:pushFront`: Adds a command callback to the front of the queue.
+- `LCommandQueue:replace`: Replaces the queue contents with one command callback.
+- `LCommandQueue:cancelCurrent`: Cancels the currently active command when one exists.
+- `LCommandQueue:clear`: Removes every queued command.
+- `LCommandQueue:getCount`: Returns the number of commands currently queued.
+- `LCommandQueue:isEmpty`: Returns whether the command queue has no commands.
+- `LCommandQueue:getCurrentType`: Returns the type label of the current command when one exists.
+- `LCommandQueue:getCurrentTarget`: Returns the current command target coordinates.
+- `LCommandQueue:type`: Returns the Lua-visible type name for this command queue handle.
+- `LCommandQueue:typeOf`: Returns whether this command queue handle matches a supported type name.
 
 ### `LContextSteering` Methods
-- `LContextSteering:addSeekTarget`: Adds a world-space target that this agent steers towards.
-- `LContextSteering:addWander`: Adds a wander behavior with jitter and weight to the context steering evaluator.
-- `LContextSteering:addAvoidPoint`: Adds a world-space point that this agent steers away from.
-- `LContextSteering:addAvoidBounds`: Registers a rectangular region this agent must avoid.
-- `LContextSteering:clearBehaviors`: Clears all registered context steering behaviors.
-- `LContextSteering:evaluate`: Evaluates the steering context and returns the chosen direction.
-- `LContextSteering:chosenMagnitude`: Returns the magnitude of the last chosen steering direction.
-- `LContextSteering:slotCount`: Returns the number of steering slots.
-- `LContextSteering:type`: Returns the type name of this object.
-- `LContextSteering:typeOf`: Returns true if this object is of the given type.
+- `LContextSteering:addSeekTarget`: Adds a context steering target attraction.
+- `LContextSteering:addWander`: Adds wander noise to context steering.
+- `LContextSteering:addAvoidPoint`: Adds a point avoidance influence to context steering.
+- `LContextSteering:addAvoidBounds`: Adds rectangular bounds avoidance to context steering.
+- `LContextSteering:clearBehaviors`: Removes all context steering behaviors.
+- `LContextSteering:evaluate`: Evaluates context steering and returns the selected movement direction.
+- `LContextSteering:chosenMagnitude`: Returns the magnitude of the last selected context steering slot.
+- `LContextSteering:slotCount`: Returns the number of directional slots used by this context steering model.
+- `LContextSteering:type`: Returns the Lua-visible type name for this context steering handle.
+- `LContextSteering:typeOf`: Returns whether this context steering handle matches a supported type name.
+
+### `LDialogueAI` Methods
+- `LDialogueAI:setFSMState`: Sets the finite-state-machine state used as dialogue selection context.
+- `LDialogueAI:setBTStatus`: Sets the behavior-tree status used as dialogue selection context.
+- `LDialogueAI:setUtilityScore`: Stores a utility score used by topics and branches that reference the given key.
+- `LDialogueAI:clearUtilityScores`: Removes every stored utility score from this dialogue selector.
+- `LDialogueAI:addTopic`: Adds a selectable dialogue topic with optional context filters.
+- `LDialogueAI:addBranch`: Adds a selectable branch under an existing dialogue topic.
+- `LDialogueAI:selectTopic`: Selects the best currently valid topic using weights and context filters.
+- `LDialogueAI:selectBranch`: Selects the best currently valid branch for the given topic.
+- `LDialogueAI:getTopicCount`: Returns the number of topics registered in this dialogue selector.
+- `LDialogueAI:type`: Returns the Lua-visible type name for this dialogue AI handle.
+- `LDialogueAI:typeOf`: Returns whether this dialogue AI handle matches a supported type name.
 
 ### `LEmotionModel` Methods
-- `LEmotionModel:add`: Adds an emotion category with the given name and initial intensity to the model.
-- `LEmotionModel:trigger`: Triggers a named emotion by the given amount.
-- `LEmotionModel:get`: Returns the current float value of this emotion dimension.
-- `LEmotionModel:dominant`: Returns the dominant emotion name, or nil if there is none.
-- `LEmotionModel:isActive`: Returns `true` if the emotion dimension is currently active and above threshold.
-- `LEmotionModel:update`: Advances the simulation by one time step.
-- `LEmotionModel:reset`: Resets the emotion model state.
-- `LEmotionModel:type`: Returns the type name of this object.
-- `LEmotionModel:typeOf`: Returns true if this object is of the given type.
+- `LEmotionModel:add`: Adds an emotion definition with resting value, decay, and visibility threshold.
+- `LEmotionModel:trigger`: Adds an amount to a named emotion.
+- `LEmotionModel:get`: Returns the current value of a named emotion.
+- `LEmotionModel:dominant`: Returns the strongest active emotion name when one is available.
+- `LEmotionModel:isActive`: Returns whether a named emotion is currently active.
+- `LEmotionModel:update`: Advances emotion decay over elapsed time.
+- `LEmotionModel:reset`: Resets all emotions toward their default state.
+- `LEmotionModel:type`: Returns the Lua-visible type name for this emotion model handle.
+- `LEmotionModel:typeOf`: Returns whether this emotion model handle matches a supported type name.
 
 ### `LGOAPPlanner` Methods
-- `LGOAPPlanner:addAction`: Adds a GOAP action with optional cost and callback.
-- `LGOAPPlanner:setPrecondition`: Sets a boolean precondition on an action.
-- `LGOAPPlanner:setEffect`: Sets a boolean effect on an action.
-- `LGOAPPlanner:addGoal`: Adds a planning goal with optional priority.
-- `LGOAPPlanner:setGoalState`: Sets a boolean condition on a goal.
-- `LGOAPPlanner:plan`: Runs A* planning and returns an action sequence table.
-- `LGOAPPlanner:getActionCount`: Returns the number of registered actions.
-- `LGOAPPlanner:getGoalCount`: Returns the number of registered goals.
-- `LGOAPPlanner:getMaxIterations`: Returns the maximum A* planning iterations.
-- `LGOAPPlanner:setMaxIterations`: Sets the maximum A* planning iterations (0 = unlimited).
-- `LGOAPPlanner:type`: Returns the type name of this object.
-- `LGOAPPlanner:typeOf`: Returns true if this object is of the given type.
+- `LGOAPPlanner:addAction`: Adds a GOAP action with optional cost and completion callback.
+- `LGOAPPlanner:setPrecondition`: Sets one boolean precondition for an existing GOAP action.
+- `LGOAPPlanner:setEffect`: Sets one boolean effect produced by an existing GOAP action.
+- `LGOAPPlanner:addGoal`: Adds a GOAP goal with an optional priority weight.
+- `LGOAPPlanner:setGoalState`: Sets one desired world-state key for an existing GOAP goal.
+- `LGOAPPlanner:plan`: Builds a plan from the supplied boolean world state and returns action names in execution order.
+- `LGOAPPlanner:getActionCount`: Returns the number of GOAP actions registered in this planner.
+- `LGOAPPlanner:getGoalCount`: Returns the number of GOAP goals registered in this planner.
+- `LGOAPPlanner:getMaxIterations`: Returns the maximum number of planner iterations allowed during search.
+- `LGOAPPlanner:setMaxIterations`: Sets the maximum number of planner iterations allowed during search.
+- `LGOAPPlanner:type`: Returns the Lua-visible type name for this GOAP planner handle.
+- `LGOAPPlanner:typeOf`: Returns whether this GOAP planner handle matches a supported type name.
 
 ### `LGeneticAlgorithm` Methods
-- `LGeneticAlgorithm:evolve`: Runs one generation of the evolutionary algorithm.
-- `LGeneticAlgorithm:generation`: Returns the current generation number.
+- `LGeneticAlgorithm:evolve`: Advances the genetic algorithm by one generation.
+- `LGeneticAlgorithm:generation`: Returns the current generation index.
 - `LGeneticAlgorithm:popSize`: Returns the population size.
-- `LGeneticAlgorithm:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
-- `LGeneticAlgorithm:getGenes`: Returns the chromosome as an ordered table of gene values.
-- `LGeneticAlgorithm:bestGenes`: Returns the genes from the best chromosome.
-- `LGeneticAlgorithm:type`: Returns the type name of this object.
-- `LGeneticAlgorithm:typeOf`: Returns true if this object is of the given type.
+- `LGeneticAlgorithm:setFitness`: Sets the fitness value for a chromosome by zero-based index.
+- `LGeneticAlgorithm:getGenes`: Returns the genes for a chromosome by zero-based index.
+- `LGeneticAlgorithm:bestGenes`: Returns the genes for the best chromosome in the population.
+- `LGeneticAlgorithm:type`: Returns the Lua-visible type name for this genetic algorithm handle.
+- `LGeneticAlgorithm:typeOf`: Returns whether this genetic algorithm handle matches a supported type name.
 
 ### `LHTNDomain` Methods
-- `LHTNDomain:addPrimitive`: Registers a primitive HTN task with a direct operator function.
-- `LHTNDomain:addCompound`: Registers a compound HTN task that decomposes into sub-tasks.
-- `LHTNDomain:plan`: Runs planning and returns the resulting action sequence, or nil if no plan is found.
-- `LHTNDomain:taskCount`: Returns the number of registered tasks.
-- `LHTNDomain:type`: Returns the type name of this object.
-- `LHTNDomain:typeOf`: Returns true if this object is of the given type.
+- `LHTNDomain:addPrimitive`: Adds a primitive HTN task with preconditions, effects, and cleared facts.
+- `LHTNDomain:addCompound`: Adds a compound HTN task with one or more ordered method definitions.
+- `LHTNDomain:plan`: Plans from a root HTN task and numeric world state facts.
+- `LHTNDomain:taskCount`: Returns the number of tasks defined in this HTN domain.
+- `LHTNDomain:type`: Returns the Lua-visible type name for this HTN domain handle.
+- `LHTNDomain:typeOf`: Returns whether this HTN domain handle matches a supported type name.
 
 ### `LInfluenceMap` Methods
-- `LInfluenceMap:addLayer`: Adds a named influence layer.
-- `LInfluenceMap:hasLayer`: Returns true if the named layer exists.
-- `LInfluenceMap:setInfluence`: Sets the influence value at a cell (1-based).
-- `LInfluenceMap:getInfluence`: Returns the influence value at a cell (1-based).
-- `LInfluenceMap:stampInfluence`: Stamps influence in a radial area.
-- `LInfluenceMap:propagate`: Propagates influence values with momentum.
-- `LInfluenceMap:decay`: Multiplies all influences by a decay factor.
-- `LInfluenceMap:clearLayer`: Clears all influence in a layer.
-- `LInfluenceMap:clearAll`: Removes all influence values from every layer in the map.
-- `LInfluenceMap:getMaxPosition`: Returns the world-space position of the maximum value.
-- `LInfluenceMap:getMinPosition`: Returns the world-space position of the minimum value.
-- `LInfluenceMap:queryRect`: Returns the summed influence in a world-space rectangle.
-- `LInfluenceMap:blend`: Blends two layers into a destination layer.
-- `LInfluenceMap:getWidth`: Returns the influence map width in grid cells.
-- `LInfluenceMap:getHeight`: Returns the influence map height in grid cells.
-- `LInfluenceMap:getCellSize`: Returns the cell size in world units.
-- `LInfluenceMap:type`: Returns the type name of this object.
-- `LInfluenceMap:typeOf`: Returns true if this object is of the given type.
+- `LInfluenceMap:addLayer`: Adds an influence layer with the given name if it does not already exist.
+- `LInfluenceMap:hasLayer`: Returns whether an influence layer exists.
+- `LInfluenceMap:setInfluence`: Sets one cell value in a named influence layer using one-based cell coordinates.
+- `LInfluenceMap:getInfluence`: Returns one cell value from a named influence layer using one-based cell coordinates.
+- `LInfluenceMap:stampInfluence`: Applies a radial influence stamp to a named layer in world coordinates.
+- `LInfluenceMap:propagate`: Propagates influence values across neighboring cells on a named layer.
+- `LInfluenceMap:decay`: Multiplies a named layer by a decay factor.
+- `LInfluenceMap:clearLayer`: Clears every value in a named influence layer.
+- `LInfluenceMap:clearAll`: Clears every influence value in every layer.
+- `LInfluenceMap:getMaxPosition`: Returns the cell position with the highest value on a named layer.
+- `LInfluenceMap:getMinPosition`: Returns the cell position with the lowest value on a named layer.
+- `LInfluenceMap:queryRect`: Returns influence values inside a world-space rectangle on a named layer.
+- `LInfluenceMap:blend`: Blends two source layers into a destination layer using independent weights.
+- `LInfluenceMap:getWidth`: Returns the influence map width in cells.
+- `LInfluenceMap:getHeight`: Returns the influence map height in cells.
+- `LInfluenceMap:getCellSize`: Returns the world size represented by each influence map cell.
+- `LInfluenceMap:type`: Returns the Lua-visible type name for this influence map handle.
+- `LInfluenceMap:typeOf`: Returns whether this influence map handle matches a supported type name.
 
 ### `LMCTSEngine` Methods
-- `LMCTSEngine:search`: Uses Lua closures for game logic. All closures receive/return integer states.
-- `LMCTSEngine:type`: Returns the type name of this object.
-- `LMCTSEngine:typeOf`: Returns true if this object is of the given type.
+- `LMCTSEngine:search`: Runs MCTS from a root state using Lua callbacks for actions, transitions, and evaluation.
+- `LMCTSEngine:type`: Returns the Lua-visible type name for this MCTS engine handle.
+- `LMCTSEngine:typeOf`: Returns whether this MCTS engine handle matches a supported type name.
 
 ### `LNeedSystem` Methods
-- `LNeedSystem:addNeed`: Registers a new need with the specified name, urgency, and decay rate in the system.
-- `LNeedSystem:update`: Advances the simulation by one time step.
-- `LNeedSystem:mostUrgent`: Returns the most urgent need name, or nil if no need is urgent.
-- `LNeedSystem:satisfy`: Satisfies part of a named need.
+- `LNeedSystem:addNeed`: Adds a need with decay and urgency tuning values.
+- `LNeedSystem:update`: Advances need decay over elapsed time.
+- `LNeedSystem:mostUrgent`: Returns the name of the most urgent need when any need is active.
+- `LNeedSystem:satisfy`: Reduces or satisfies a named need by the supplied amount.
 - `LNeedSystem:valueOf`: Returns the current value of a named need.
-- `LNeedSystem:type`: Returns the type name of this object.
-- `LNeedSystem:typeOf`: Returns true if this object is of the given type.
+- `LNeedSystem:type`: Returns the Lua-visible type name for this need system handle.
+- `LNeedSystem:typeOf`: Returns whether this need system handle matches a supported type name.
 
 ### `LNeuralNet` Methods
-- `LNeuralNet:addLayer`: Adds a neural network layer with inputs, outputs, and an activation function.
-- `LNeuralNet:forward`: Runs a forward pass through the network.
-- `LNeuralNet:setWeights`: Overwrites all connection weights with values from a flat table.
-- `LNeuralNet:getWeights`: Returns a flat table of all connection weight values in the network.
-- `LNeuralNet:paramCount`: Returns the number of network parameters.
-- `LNeuralNet:layerCount`: Returns the number of network layers.
-- `LNeuralNet:type`: Returns the type name of this object.
-- `LNeuralNet:typeOf`: Returns true if this object is of the given type.
+- `LNeuralNet:addLayer`: Adds a neural network layer with an activation function.
+- `LNeuralNet:forward`: Runs a forward pass and returns output values.
+- `LNeuralNet:setWeights`: Replaces the network weights from a flat numeric array.
+- `LNeuralNet:getWeights`: Returns the network weights as a flat numeric array.
+- `LNeuralNet:paramCount`: Returns the total number of trainable parameters.
+- `LNeuralNet:layerCount`: Returns the number of layers in the network.
+- `LNeuralNet:type`: Returns the Lua-visible type name for this neural network handle.
+- `LNeuralNet:typeOf`: Returns whether this neural network handle matches a supported type name.
 
 ### `LNeuroevolution` Methods
-- `LNeuroevolution:evolve`: Runs one generation of the evolutionary algorithm.
-- `LNeuroevolution:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
-- `LNeuroevolution:chromosomeToNet`: Returns the neural network built from a chromosome, or nil if the index is invalid.
-- `LNeuroevolution:bestNetwork`: Returns the best neural network, or nil if no network is available.
-- `LNeuroevolution:bestFitness`: Returns the best fitness score.
+- `LNeuroevolution:evolve`: Advances the neuroevolution population by one generation.
+- `LNeuroevolution:setFitness`: Sets the fitness value for a chromosome by zero-based index.
+- `LNeuroevolution:chromosomeToNet`: Converts one chromosome into a neural network handle when the index is valid.
+- `LNeuroevolution:bestNetwork`: Converts the best chromosome into a neural network handle when one exists.
+- `LNeuroevolution:bestFitness`: Returns the best fitness value in the population.
 - `LNeuroevolution:popSize`: Returns the population size.
-- `LNeuroevolution:generation`: Returns the current generation number.
-- `LNeuroevolution:type`: Returns the type name of this object.
-- `LNeuroevolution:typeOf`: Returns true if this object is of the given type.
+- `LNeuroevolution:generation`: Returns the current generation index.
+- `LNeuroevolution:type`: Returns the Lua-visible type name for this neuroevolution handle.
+- `LNeuroevolution:typeOf`: Returns whether this neuroevolution handle matches a supported type name.
 
 ### `LORCASolver` Methods
-- `LORCASolver:addAgent`: Adds an ORCA agent at the given position with radius and max speed to the solver.
-- `LORCASolver:setPreferredVelocity`: Sets the preferred velocity.
-- `LORCASolver:setPosition`: Sets the agent's current world-space position for ORCA velocity computation.
-- `LORCASolver:compute`: Computes safe velocities for all registered agents.
-- `LORCASolver:getSafeVelocity`: Returns the safe velocity for an agent.
-- `LORCASolver:agentCount`: Returns the number of registered ORCA agents.
-- `LORCASolver:type`: Returns the type name of this object.
-- `LORCASolver:typeOf`: Returns true if this object is of the given type.
+- `LORCASolver:addAgent`: Adds an ORCA avoidance agent and returns its zero-based solver index.
+- `LORCASolver:setPreferredVelocity`: Sets the preferred velocity for an ORCA agent by zero-based index.
+- `LORCASolver:setPosition`: Sets the position for an ORCA agent by zero-based index.
+- `LORCASolver:compute`: Computes safe velocities for all ORCA agents.
+- `LORCASolver:getSafeVelocity`: Returns the computed safe velocity for an ORCA agent.
+- `LORCASolver:agentCount`: Returns the number of ORCA agents in this solver.
+- `LORCASolver:type`: Returns the Lua-visible type name for this ORCA solver handle.
+- `LORCASolver:typeOf`: Returns whether this ORCA solver handle matches a supported type name.
 
 ### `LQLearner` Methods
-- `LQLearner:chooseAction`: Selects an action using epsilon-greedy policy (1-based).
-- `LQLearner:bestAction`: Returns the greedy-best action for the state (1-based).
-- `LQLearner:learn`: Performs one Bellman Q-learning update (1-based indices).
-- `LQLearner:getQValue`: Returns the Q-value for a state-action pair (1-based).
-- `LQLearner:setQValue`: Overwrites the Q-value for a state-action pair (1-based).
-- `LQLearner:endEpisode`: Ends the current episode, applying epsilon decay.
-- `LQLearner:getEpisodeCount`: Returns the number of completed episodes.
-- `LQLearner:getStateCount`: Returns the number of discrete states.
-- `LQLearner:getActionCount`: Returns the number of discrete actions.
-- `LQLearner:setLearningRate`: Sets the learning rate alpha.
-- `LQLearner:getLearningRate`: Returns the current learning rate.
-- `LQLearner:setDiscountFactor`: Sets the discount factor gamma.
-- `LQLearner:getDiscountFactor`: Returns the current discount factor.
-- `LQLearner:setExplorationRate`: Sets the exploration rate epsilon.
-- `LQLearner:getExplorationRate`: Returns the current exploration rate.
-- `LQLearner:setExplorationDecay`: Sets the epsilon decay multiplier.
-- `LQLearner:getExplorationDecay`: Returns the epsilon decay multiplier.
-- `LQLearner:serialize`: Serializes the Q-table to a JSON string.
-- `LQLearner:deserialize`: Restores the Q-table from a JSON string.
-- `LQLearner:type`: Returns the type name of this object.
-- `LQLearner:typeOf`: Returns true if this object is of the given type.
+- `LQLearner:chooseAction`: Chooses an action for a one-based state index using the learner's exploration policy.
+- `LQLearner:bestAction`: Returns the highest-valued action for a one-based state index without exploration.
+- `LQLearner:learn`: Applies one Q-learning update from a transition and reward.
+- `LQLearner:getQValue`: Returns the stored Q-value for a one-based state and action pair.
+- `LQLearner:setQValue`: Sets the stored Q-value for a one-based state and action pair.
+- `LQLearner:endEpisode`: Ends the current learning episode and applies episode bookkeeping.
+- `LQLearner:getEpisodeCount`: Returns how many learning episodes have been completed.
+- `LQLearner:getStateCount`: Returns the number of states represented by this learner.
+- `LQLearner:getActionCount`: Returns the number of actions represented by this learner.
+- `LQLearner:setLearningRate`: Sets the Q-learning alpha learning rate.
+- `LQLearner:getLearningRate`: Returns the Q-learning alpha learning rate.
+- `LQLearner:setDiscountFactor`: Sets the Q-learning gamma discount factor.
+- `LQLearner:getDiscountFactor`: Returns the Q-learning gamma discount factor.
+- `LQLearner:setExplorationRate`: Sets the exploration rate used by action selection.
+- `LQLearner:getExplorationRate`: Returns the exploration rate used by action selection.
+- `LQLearner:setExplorationDecay`: Sets the exploration decay multiplier applied across episodes.
+- `LQLearner:getExplorationDecay`: Returns the exploration decay multiplier.
+- `LQLearner:serialize`: Serializes the Q-learner state to a JSON string.
+- `LQLearner:deserialize`: Replaces the Q-learner state from a JSON string.
+- `LQLearner:type`: Returns the Lua-visible type name for this Q-learner handle.
+- `LQLearner:typeOf`: Returns whether this Q-learner handle matches a supported type name.
 
 ### `LSquad` Methods
-- `LSquad:getName`: Returns the unique name string assigned to this squad.
-- `LSquad:addMember`: Adds an agent by name to this squad.
-- `LSquad:removeMember`: Removes an agent by name from this squad.
-- `LSquad:getMemberCount`: Returns the number of squad members.
-- `LSquad:getMembers`: Returns the member names as a table.
-- `LSquad:setLeader`: Sets the squad leader by name.
-- `LSquad:getLeader`: Returns the leader name, or nil if no leader is set.
-- `LSquad:setFormation`: Sets the formation type and optional spacing.
-- `LSquad:getFormation`: Returns the current formation type name.
-- `LSquad:getFormationSpacing`: Returns the formation spacing in world units.
-- `LSquad:getFormationPosition`: Computes the world-space position for a member index (1-based).
-- `LSquad:getBlackboard`: Returns the squad's shared blackboard.
-- `LSquad:type`: Returns the type name of this object.
-- `LSquad:typeOf`: Returns true if this object is of the given type.
+- `LSquad:getName`: Returns the squad name.
+- `LSquad:addMember`: Adds a member name to the squad member list.
+- `LSquad:removeMember`: Removes every member entry with the given name.
+- `LSquad:getMemberCount`: Returns the number of members in this squad.
+- `LSquad:getMembers`: Returns all squad members in an array-style Lua table.
+- `LSquad:setLeader`: Sets the squad leader name.
+- `LSquad:getLeader`: Returns the squad leader name when one is assigned.
+- `LSquad:setFormation`: Sets the squad formation type and optionally updates spacing.
+- `LSquad:getFormation`: Returns the current squad formation type name.
+- `LSquad:getFormationSpacing`: Returns the spacing used by squad formation positioning.
+- `LSquad:getFormationPosition`: Returns a member's target formation position relative to the leader position.
+- `LSquad:getBlackboard`: Returns a blackboard snapshot for this squad.
+- `LSquad:type`: Returns the Lua-visible type name for this squad handle.
+- `LSquad:typeOf`: Returns whether this squad handle matches a supported type name.
 
 ### `LStateMachine` Methods
-- `LStateMachine:addState`: Registers a named state with optional lifecycle callbacks.
-- `LStateMachine:addTransition`: Adds a guarded transition between states.
-- `LStateMachine:setInitialState`: Sets the FSM's initial state; must be called before the first update.
-- `LStateMachine:getCurrentState`: Returns the current state name, or nil if no state is active.
-- `LStateMachine:forceState`: Forces a transition to the named state.
-- `LStateMachine:getTimeInState`: Returns seconds spent in the current state.
-- `LStateMachine:type`: Returns the type name of this object.
-- `LStateMachine:typeOf`: Returns true if this object is of the given type.
+- `LStateMachine:addState`: Adds a state with optional Lua lifecycle callbacks.
+- `LStateMachine:addTransition`: Adds a transition between two states with an optional guard callback and priority.
+- `LStateMachine:setInitialState`: Sets the initial state and also enters it when the machine has no current state yet.
+- `LStateMachine:getCurrentState`: Returns the current state name when the state machine has entered a state.
+- `LStateMachine:forceState`: Immediately switches the current state and resets the time spent in state.
+- `LStateMachine:getTimeInState`: Returns how long the machine has spent in the current state.
+- `LStateMachine:type`: Returns the Lua-visible type name for this state machine handle.
+- `LStateMachine:typeOf`: Returns whether this state machine handle matches a supported type name.
 
 ### `LSteeringManager` Methods
-- `LSteeringManager:addSeek`: Adds a Seek behavior toward the target.
-- `LSteeringManager:addFlee`: Adds a Flee behavior away from the target.
-- `LSteeringManager:addArrive`: Adds an Arrive behavior with deceleration.
-- `LSteeringManager:addWander`: Adds a Wander behavior for random meandering.
-- `LSteeringManager:addPursue`: Adds a Pursue behavior targeting a named agent.
-- `LSteeringManager:addEvade`: Adds an Evade behavior fleeing from a named agent.
-- `LSteeringManager:addFlock`: Adds a Flock behavior for group movement.
-- `LSteeringManager:getBehaviorCount`: Returns the number of active behaviors.
-- `LSteeringManager:setCombineMode`: Sets the force combination mode.
-- `LSteeringManager:getCombineMode`: Returns the current combination mode.
-- `LSteeringManager:getLastSteering`: Returns the last computed steering force.
-- `LSteeringManager:calculate`: Computes the combined steering force for the given agent state.
-- `LSteeringManager:type`: Returns the type name of this object.
-- `LSteeringManager:typeOf`: Returns true if this object is of the given type.
-- `LSteeringManager:setSpatialHashCellSize`: Sets the cell size used by the spatial-hash neighborhood search.
-- `LSteeringManager:enableSpatialHash`: Enables or disables spatial-hash bucketing for neighbourhood queries.
-- `LSteeringManager:addCustomBehavior`: Registers a Lua callback as a custom steering behavior.
-- `LSteeringManager:applyCustomSteering`: Invokes all registered custom steering callbacks and returns the combined force.
+- `LSteeringManager:addSeek`: Adds a seek behavior that pulls the agent toward a target point.
+- `LSteeringManager:addFlee`: Adds a flee behavior that pushes the agent away from a target point inside a panic distance.
+- `LSteeringManager:addArrive`: Adds an arrive behavior that slows the agent as it approaches a target point.
+- `LSteeringManager:addWander`: Adds a wander behavior that produces jittered exploratory movement.
+- `LSteeringManager:addPursue`: Adds a pursue behavior that chases another named agent when a target name is supplied.
+- `LSteeringManager:addEvade`: Adds an evade behavior that moves away from another named agent when a threat name is supplied.
+- `LSteeringManager:addFlock`: Adds a flocking behavior with separation, alignment, and cohesion weights.
+- `LSteeringManager:getBehaviorCount`: Returns the number of steering behaviors configured on this manager.
+- `LSteeringManager:setCombineMode`: Sets how steering behavior forces are combined.
+- `LSteeringManager:getCombineMode`: Returns the current steering force combination mode.
+- `LSteeringManager:getLastSteering`: Returns the last steering force calculated by this manager.
+- `LSteeringManager:calculate`: Calculates a steering force for the supplied agent movement state.
+- `LSteeringManager:setPath`: Sets a waypoint path behavior from an array of `{x, y}` tables.
+- `LSteeringManager:clearPath`: Clears the active waypoint path behavior.
+- `LSteeringManager:hasPath`: Returns whether this manager currently has an active waypoint path.
+- `LSteeringManager:getPathProgress`: Returns the current one-based waypoint index and total waypoint count.
+- `LSteeringManager:type`: Returns the Lua-visible type name for this steering manager handle.
+- `LSteeringManager:typeOf`: Returns whether this steering manager handle matches a supported type name.
+- `LSteeringManager:setSpatialHashCellSize`: Sets the cell size used by the steering manager spatial hash.
+- `LSteeringManager:enableSpatialHash`: Enables or disables spatial hash acceleration for neighbor queries.
+- `LSteeringManager:addCustomBehavior`: Adds a custom steering behavior backed by a Lua callback.
+- `LSteeringManager:applyCustomSteering`: Runs enabled custom steering callbacks for an agent and returns the weighted combined force.
 
 ### `LStimulusWorld` Methods
-- `LStimulusWorld:addVisual`: Adds a visual stimulus at the specified world position with radius and intensity.
-- `LStimulusWorld:addAuditory`: Registers an auditory stimulus at a world-space position.
-- `LStimulusWorld:remove`: Removes the specified item.
-- `LStimulusWorld:update`: Advances the simulation by one time step.
+- `LStimulusWorld:addVisual`: Adds a visual stimulus and returns its identifier.
+- `LStimulusWorld:addAuditory`: Adds an auditory stimulus with decay and returns its identifier.
+- `LStimulusWorld:remove`: Removes a stimulus by identifier.
+- `LStimulusWorld:update`: Advances stimulus decay and lifetime state.
 - `LStimulusWorld:count`: Returns the number of active stimuli.
-- `LStimulusWorld:clear`: Clears all stimuli from the world.
-- `LStimulusWorld:type`: Returns the type name of this object.
-- `LStimulusWorld:typeOf`: Returns true if this object is of the given type.
+- `LStimulusWorld:clear`: Removes every active stimulus.
+- `LStimulusWorld:type`: Returns the Lua-visible type name for this stimulus world handle.
+- `LStimulusWorld:typeOf`: Returns whether this stimulus world handle matches a supported type name.
 
 ### `LStrategyAI` Methods
-- `LStrategyAI:addGoal`: Adds a strategic goal with priority score to the planner for future evaluation.
-- `LStrategyAI:addTag`: Adds a string tag to the strategy AI instance for goal filtering and categorization.
-- `LStrategyAI:removeTag`: Removes the specified tag.
-- `LStrategyAI:update`: Advances the simulation by one time step.
-- `LStrategyAI:forceEvaluate`: Forces an immediate strategy evaluation.
-- `LStrategyAI:activeGoal`: Returns the active goal name, or nil if no goal is active.
-- `LStrategyAI:timeUntilNext`: Returns the time until the next scheduled evaluation.
-- `LStrategyAI:type`: Returns the type name of this object.
-- `LStrategyAI:typeOf`: Returns true if this object is of the given type.
+- `LStrategyAI:addGoal`: Adds a named strategic goal.
+- `LStrategyAI:addTag`: Adds a context tag to this strategy AI.
+- `LStrategyAI:removeTag`: Removes a context tag from this strategy AI.
+- `LStrategyAI:update`: Advances strategy timing and scores goals when the update interval has elapsed.
+- `LStrategyAI:forceEvaluate`: Immediately scores all goals and updates the active goal.
+- `LStrategyAI:activeGoal`: Returns the currently active strategic goal when one is selected.
+- `LStrategyAI:timeUntilNext`: Returns time remaining until the next scheduled strategy evaluation.
+- `LStrategyAI:type`: Returns the Lua-visible type name for this strategy AI handle.
+- `LStrategyAI:typeOf`: Returns whether this strategy AI handle matches a supported type name.
 
 ### `LTraitProfile` Methods
-- `LTraitProfile:set`: Sets the base value of this trait, replacing any previous base.
-- `LTraitProfile:get`: Returns the current float value of this emotion dimension.
-- `LTraitProfile:getBase`: Returns the unmodified base value of this trait before modifiers.
-- `LTraitProfile:addModifier`: Adds a named modifier that adjusts the trait value by a delta.
-- `LTraitProfile:removeModifiers`: Removes the specified modifiers.
-- `LTraitProfile:update`: Advances the simulation by one time step.
-- `LTraitProfile:has`: Returns true if a item is present.
-- `LTraitProfile:traitCount`: Returns the number of tracked traits.
-- `LTraitProfile:archetype`: Returns the current archetype name, or nil if none is set.
-- `LTraitProfile:type`: Returns the type name of this object.
-- `LTraitProfile:typeOf`: Returns true if this object is of the given type.
+- `LTraitProfile:set`: Sets the base value for a named trait.
+- `LTraitProfile:get`: Returns the current value of a named trait including active modifiers.
+- `LTraitProfile:getBase`: Returns the base value of a named trait without temporary modifiers.
+- `LTraitProfile:addModifier`: Adds a temporary or permanent modifier to a named trait.
+- `LTraitProfile:removeModifiers`: Removes all trait modifiers that match a source label.
+- `LTraitProfile:update`: Advances modifier timers and removes expired modifiers.
+- `LTraitProfile:has`: Returns whether the profile has a named trait.
+- `LTraitProfile:traitCount`: Returns the number of traits stored in the profile.
+- `LTraitProfile:archetype`: Returns the best matching archetype name when the profile can classify one.
+- `LTraitProfile:type`: Returns the Lua-visible type name for this trait profile handle.
+- `LTraitProfile:typeOf`: Returns whether this trait profile handle matches a supported type name.
 
 ### `LUtilityAI` Methods
-- `LUtilityAI:addAction`: Adds a scored action with optional momentum weight.
-- `LUtilityAI:evaluate`: Evaluates all actions and returns the best action name, or nil if none is chosen.
-- `LUtilityAI:getActionCount`: Returns the number of registered actions.
-- `LUtilityAI:getLastAction`: Returns the name of the last chosen action, or nil if none has been chosen.
-- `LUtilityAI:addConsideration`: Adds a multi-axis consideration to a named action.
-- `LUtilityAI:type`: Returns the type name of this object.
-- `LUtilityAI:typeOf`: Returns true if this object is of the given type.
+- `LUtilityAI:addAction`: Adds an action scored by a Lua callback and optional momentum weight.
+- `LUtilityAI:evaluate`: Evaluates all actions and returns the winning action name when one is available.
+- `LUtilityAI:getActionCount`: Returns the number of actions registered in this utility AI.
+- `LUtilityAI:getLastAction`: Returns the last winning action name when evaluation has selected one.
+- `LUtilityAI:addConsideration`: Adds a consideration scorer and response curve to an existing utility action.
+- `LUtilityAI:type`: Returns the Lua-visible type name for this utility AI handle.
+- `LUtilityAI:typeOf`: Returns whether this utility AI handle matches a supported type name.
 
 ## References
 

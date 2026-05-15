@@ -20,11 +20,11 @@ impl DecalSurface {
     pub fn get_dimensions(&self) -> (u32, u32) {
         (self.width, self.height)
     }
-    /// Return the pixel width.
+    /// Return the pixel width. This function is part of the public API.
     pub fn get_width(&self) -> u32 {
         self.width
     }
-    /// Return the pixel height.
+    /// Return the pixel height. This function is part of the public API.
     pub fn get_height(&self) -> u32 {
         self.height
     }

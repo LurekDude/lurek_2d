@@ -48,7 +48,7 @@ impl LuaUserData for LuaPostFxEffect {
         /// @return | boolean | Current enabled flag stored on the effect.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.inner.borrow().enabled));
         // -- setEnabled --
-        /// Enables or disables this effect.
+        /// Enables or disables this effect. This method is available to Lua scripts.
         /// @param | enabled | boolean | New enabled flag.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setEnabled", |_, this, enabled: bool| {
@@ -329,11 +329,11 @@ impl LuaUserData for LuaPostFxStack {
             Ok(t)
         });
         // -- getWidth --
-        /// Returns the stack render width.
+        /// Returns the stack render width. This method is available to Lua scripts.
         /// @return | integer | Stack width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.get_width()));
         // -- getHeight --
-        /// Returns the stack render height.
+        /// Returns the stack render height. This method is available to Lua scripts.
         /// @return | integer | Stack height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.get_height()));
         // -- getDimensions --
@@ -635,7 +635,7 @@ impl LuaUserData for LuaOverlay {
             },
         );
         // -- triggerShake --
-        /// Starts a screen shake effect.
+        /// Starts a screen shake effect. This method is available to Lua scripts.
         /// @param | intensity | number | Shake intensity.
         /// @param | duration | number | Shake duration in seconds.
         /// @return | nil | No value is returned.
@@ -696,22 +696,22 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
         // -- getWidth --
-        /// Returns the overlay width.
+        /// Returns the overlay width. This method is available to Lua scripts.
         /// @return | integer | Overlay width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.get_width()));
         // -- getHeight --
-        /// Returns the overlay height.
+        /// Returns the overlay height. This method is available to Lua scripts.
         /// @return | integer | Overlay height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.get_height()));
         // -- getDimensions --
-        /// Returns the overlay dimensions.
+        /// Returns the overlay dimensions. This method is available to Lua scripts.
         /// @return | integer | Overlay width in pixels.
         /// @return | integer | Overlay height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.get_dimensions())
         });
         // -- getFlashAlpha --
-        /// Returns the current flash alpha.
+        /// Returns the current flash alpha. This method is available to Lua scripts.
         /// @return | number | Flash alpha value.
         methods.add_method("getFlashAlpha", |_, this, ()| {
             Ok(this.inner.get_flash_alpha())
@@ -737,7 +737,7 @@ impl LuaUserData for LuaOverlay {
             Ok(this.inner.ambient.enabled)
         });
         // -- setAmbientColor --
-        /// Sets overlay ambient RGBA color.
+        /// Sets overlay ambient RGBA color. This method is available to Lua scripts.
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
@@ -852,7 +852,7 @@ impl LuaUserData for LuaOverlay {
         /// @return | boolean | True when fog rendering is enabled.
         methods.add_method("isFogEnabled", |_, this, ()| Ok(this.inner.fog.enabled));
         // -- setFogDensity --
-        /// Sets overlay fog density.
+        /// Sets overlay fog density. This method is available to Lua scripts.
         /// @param | v | number | Fog density value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setFogDensity", |_, this, v: f32| {
@@ -860,11 +860,11 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
         // -- getFogDensity --
-        /// Returns overlay fog density.
+        /// Returns overlay fog density. This method is available to Lua scripts.
         /// @return | number | Current fog density.
         methods.add_method("getFogDensity", |_, this, ()| Ok(this.inner.fog.density));
         // -- setFogColor --
-        /// Sets overlay fog RGBA color.
+        /// Sets overlay fog RGBA color. This method is available to Lua scripts.
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
@@ -878,7 +878,7 @@ impl LuaUserData for LuaOverlay {
             },
         );
         // -- getFogColor --
-        /// Returns overlay fog RGBA color.
+        /// Returns overlay fog RGBA color. This method is available to Lua scripts.
         /// @return | number | Red channel.
         /// @return | number | Green channel.
         /// @return | number | Blue channel.
@@ -902,7 +902,7 @@ impl LuaUserData for LuaOverlay {
             Ok(this.inner.heat_haze.enabled)
         });
         // -- setHeatHazeIntensity --
-        /// Sets overlay heat haze intensity.
+        /// Sets overlay heat haze intensity. This method is available to Lua scripts.
         /// @param | v | number | Heat haze intensity value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setHeatHazeIntensity", |_, this, v: f32| {
@@ -930,7 +930,7 @@ impl LuaUserData for LuaOverlay {
             Ok(this.inner.vignette.enabled)
         });
         // -- setVignetteStrength --
-        /// Sets overlay vignette strength.
+        /// Sets overlay vignette strength. This method is available to Lua scripts.
         /// @param | v | number | Vignette strength value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setVignetteStrength", |_, this, v: f32| {
@@ -998,7 +998,7 @@ impl LuaUserData for LuaOverlay {
         /// @return | integer | Cloud shadow count.
         methods.add_method("getCloudCount", |_, this, ()| Ok(this.inner.clouds.count));
         // -- setCloudSpeed --
-        /// Sets cloud shadow movement speed.
+        /// Sets cloud shadow movement speed. This method is available to Lua scripts.
         /// @param | v | number | Cloud speed value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setCloudSpeed", |_, this, v: f32| {
@@ -1010,7 +1010,7 @@ impl LuaUserData for LuaOverlay {
         /// @return | number | Cloud speed value.
         methods.add_method("getCloudSpeed", |_, this, ()| Ok(this.inner.clouds.speed));
         // -- setCloudScale --
-        /// Sets cloud shadow scale.
+        /// Sets cloud shadow scale. This method is available to Lua scripts.
         /// @param | v | number | Cloud scale value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setCloudScale", |_, this, v: f32| {
@@ -1018,11 +1018,11 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
         // -- getCloudScale --
-        /// Returns cloud shadow scale.
+        /// Returns cloud shadow scale. This method is available to Lua scripts.
         /// @return | number | Cloud scale value.
         methods.add_method("getCloudScale", |_, this, ()| Ok(this.inner.clouds.scale));
         // -- setCloudOpacity --
-        /// Sets cloud shadow opacity.
+        /// Sets cloud shadow opacity. This method is available to Lua scripts.
         /// @param | v | number | Cloud opacity value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setCloudOpacity", |_, this, v: f32| {
@@ -1030,7 +1030,7 @@ impl LuaUserData for LuaOverlay {
             Ok(())
         });
         // -- getCloudOpacity --
-        /// Returns cloud shadow opacity.
+        /// Returns cloud shadow opacity. This method is available to Lua scripts.
         /// @return | number | Cloud opacity value.
         methods.add_method("getCloudOpacity", |_, this, ()| {
             Ok(this.inner.clouds.opacity)
@@ -1315,7 +1315,7 @@ impl mlua::UserData for LuaScreenTransition {
         /// @return | boolean | True when the transition is complete.
         methods.add_method("isDone", |_, this, ()| Ok(this.inner.is_done()));
         // -- kind --
-        /// Returns the transition kind name.
+        /// Returns the transition kind name. This method is available to Lua scripts.
         /// @return | string | Transition kind name.
         methods.add_method("kind", |_, this, ()| Ok(this.inner.kind.name()));
         // -- color --

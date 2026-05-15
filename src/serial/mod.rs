@@ -7,7 +7,7 @@
 pub mod codec;
 /// CSV parsing and generation with configurable options.
 pub mod csv;
-/// INI file parser.
+/// INI file parser. This module is publicly re-exported.
 pub mod ini;
 /// JSON serialization and deserialization.
 pub mod json;
@@ -17,9 +17,9 @@ pub mod lua_table;
 pub mod msgpack;
 /// Schema validation and default-value application.
 pub mod schema;
-/// TOML parsing and encoding.
+/// TOML parsing and encoding. This module is publicly re-exported.
 pub mod toml;
-/// XML decoding.
+/// XML decoding. This module is publicly re-exported.
 pub mod xml;
 pub use codec::{
     decode_bytes, decode_text, detect_format, encode, DecodeOptions, EncodeOptions, EncodedValue,

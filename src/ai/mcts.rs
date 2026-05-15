@@ -87,7 +87,7 @@ impl MCTSEngine {
             rng,
         }
     }
-    /// Return the active config.
+    /// Return the active config. This function is part of the public API.
     pub fn config(&self) -> &MCTSConfig {
         &self.config
     }

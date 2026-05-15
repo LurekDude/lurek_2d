@@ -72,6 +72,7 @@ impl LuaUserData for LuaBiomeClassifier {
     }
 }
 impl BiomeRules {
+    /// Builds biome classification rules from a Lua options table.
     pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut rules = Self::default();
         if let Ok(v) = t.get::<_, f32>("ocean_threshold") {
@@ -102,6 +103,7 @@ impl BiomeRules {
     }
 }
 impl BiomeType {
+    /// Parses a biome type name into its enum variant.
     pub fn from_name(s: &str) -> Self {
         match s {
             "ocean" => Self::Ocean,
@@ -1048,6 +1050,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 impl CellularOpts {
+    /// Builds cellular-generation options from a Lua options table.
     pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut opts = Self::default();
         if let Ok(v) = t.get::<_, f32>("fill") {
@@ -1069,6 +1072,7 @@ impl CellularOpts {
     }
 }
 impl VoronoiOpts {
+    /// Builds Voronoi-generation options from a Lua options table.
     pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut opts = Self::default();
         if let Ok(v) = t.get::<_, f32>("warp_scale") {

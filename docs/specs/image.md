@@ -70,129 +70,141 @@ The Lua-side `LProvinceGrid` userdata also exposes `drawShapes(view_x?, view_y?,
 
 - `CompressedFormat` (`enum`, `compressed.rs`): Identifies which GPU-compressed format a DDS asset uses and gives the Lua side a stable format name.
 - `CompressedImageData` (`struct`, `compressed.rs`): Holds DDS payloads and mip data in compressed form so the engine can defer expansion and upload decisions to the renderer.
+- `ResizeFilter` (`enum`, `effects.rs`): Resize kernels supported by the image resampler.
 - `ImageData` (`struct`, `image_data.rs`): The main CPU image container. It is the module's central type for pixel storage, file decode/encode, primitive drawing, and effect application.
 - `ImageLayer` (`struct`, `layers.rs`): Represents a single named layer with visibility, opacity, and its own `ImageData` backing store.
 - `LayeredImage` (`struct`, `layers.rs`): Owns an ordered stack of `ImageLayer` values and merges them into a flat image when callers need a composited result.
 - `PaletteLUT` (`struct`, `palette_lut.rs`): Describes palette remapping tables for effects that replace source colors with target colors.
 - `AdjacencyPair` (`struct`, `province_grid.rs`): Records that `province_a` and `province_b` share a border of `border_pixels` length (public fields).
 - `ProvinceGrid` (`struct`, `province_grid.rs`): Flat `Vec<u32>` spatial index for province-colour maps. Built from an `ImageData` in a single O(w×h) scan; each unique non-black RGB is assigned a sequential province ID (1..n).
+- `TextureColorSpace` (`enum`, `texture.rs`): Texture color space stored alongside decoded pixels.
 - `Texture` (`struct`, `texture.rs`): A lightweight texture handle and metadata wrapper used when CPU image data is inserted into renderer-owned texture storage.
+- `NineSliceInsets` (`struct`, `texture_atlas.rs`): Nine-slice border distances used to preserve corners and edges.
 - `AtlasRegion` (`struct`, `texture_atlas.rs`): Describes the packed rectangle for one atlas entry.# `image` — Agent Reference
 - `TextureAtlas` (`struct`, `texture_atlas.rs`): Owns atlas dimensions and packed regions for named sub-images that share one backing texture.
 
 ## Functions
 
-- `CompressedFormat::as_str` (`compressed.rs`): Return the Lua-facing format name string.
-- `CompressedImageData::from_dds` (`compressed.rs`): Load compressed texture data from DDS file bytes.
-- `CompressedImageData::get_dimensions` (`compressed.rs`): Return image dimensions as `(width, height)`.
-- `CompressedImageData::get_mipmap_count` (`compressed.rs`): Return the number of mipmap levels stored.
-- `CompressedImageData::get_format` (`compressed.rs`): Return the Lua-facing format name string.
-- `CompressedImageData::is_dds_magic` (`compressed.rs`): Check whether the given bytes start with the DDS magic number (`0x44 0x44 0x53 0x20`).
-- `CompressedImageData::from_file` (`compressed.rs`): Load compressed texture data from a DDS file on disk.
-- `CompressedImageData::is_dds_file` (`compressed.rs`): Check whether the file at `path` starts with the DDS magic number.
-- `ImageData::brightness` (`effects.rs`): Multiply every RGB channel by `factor`, leaving alpha unchanged.
-- `ImageData::contrast` (`effects.rs`): Adjust the contrast of every RGB channel, leaving alpha unchanged.
-- `ImageData::saturation` (`effects.rs`): Scale the colour saturation of every pixel, leaving alpha unchanged.
-- `ImageData::gamma` (`effects.rs`): Apply gamma correction to every RGB channel, leaving alpha unchanged.
-- `ImageData::tint` (`effects.rs`): Blend every RGB pixel toward a target tint colour, leaving alpha unchanged.
-- `ImageData::grayscale` (`effects.rs`): Convert every pixel to greyscale using perceptual luminance weights, leaving alpha unchanged.
-- `ImageData::sepia` (`effects.rs`): Apply a classic sepia-tone filter to every pixel, leaving alpha unchanged.
-- `ImageData::invert` (`effects.rs`): Invert every RGB channel (`new = 255 - ch`), leaving alpha unchanged.
-- `ImageData::threshold` (`effects.rs`): Convert each pixel to black or white based on its luminance, leaving alpha unchanged.
-- `ImageData::posterize` (`effects.rs`): Reduce the number of distinct colour levels per channel, leaving alpha unchanged.
-- `ImageData::fill` (`effects.rs`): Fill the entire image with a single solid colour.
-- `ImageData::noise` (`effects.rs`): Add pseudo-random noise to every RGB channel, leaving alpha unchanged.
-- `ImageData::alpha_mask` (`effects.rs`): Multiply the alpha channel of every pixel by `factor`, leaving RGB unchanged.
-- `ImageData::flip_horizontal` (`effects.rs`): Flip the image horizontally in-place (left ↔ right mirror).
-- `ImageData::flip_vertical` (`effects.rs`): Flip the image vertically in-place (top ↔ bottom mirror).
-- `ImageData::rotate_90_cw` (`effects.rs`): Rotate the image 90° clockwise and return the result as a new `ImageData`.
-- `ImageData::crop` (`effects.rs`): Extract a rectangular sub-region and return it as a new `ImageData`.
-- `ImageData::resize_nearest` (`effects.rs`): Scale the image to new dimensions using nearest-neighbour interpolation.
-- `ImageData::blur` (`effects.rs`): Apply a box blur with the given radius and return the result as a new `ImageData`.
-- `ImageData::sharpen` (`effects.rs`): Apply a 3×3 sharpen kernel and return the result as a new `ImageData`.
-- `ImageData::resize` (`effects.rs`): Scale the image to new dimensions using bilinear interpolation.
-- `ImageData::blit` (`effects.rs`): Blit (composite) `src` onto this image at `(dst_x, dst_y)` using Porter-Duff *over*.
-- `ImageData::get_region` (`effects.rs`): Extract a rectangular sub-region and return it as a new `ImageData`.
-- `ImageData::diff` (`effects.rs`): Compute the total absolute per-channel difference between two images.
-- `ImageData::convolve` (`effects.rs`): Apply an arbitrary NxN convolution kernel to the RGB channels and return a new `ImageData`.
-- `ImageData::new` (`image_data.rs`): Create a new blank (transparent black) image.
-- `ImageData::from_file` (`image_data.rs`): Load an image from a file path.
-- `ImageData::from_bytes` (`image_data.rs`): Create from raw RGBA bytes.
-- `ImageData::width` (`image_data.rs`): Get the width of the image.
-- `ImageData::height` (`image_data.rs`): Get the height of the image.
-- `ImageData::dimensions` (`image_data.rs`): Get both dimensions.
-- `ImageData::get_pixel` (`image_data.rs`): Get the RGBA values of a pixel at (x, y).
-- `ImageData::set_pixel` (`image_data.rs`): Set the RGBA values of a pixel at (x, y).
-- `ImageData::paste` (`image_data.rs`): Paste source image onto self at position (dx, dy).
-- `ImageData::map_pixel` (`image_data.rs`): Apply a function to every pixel, replacing each (r,g,b,a) with the return value.
-- `ImageData::draw_rect` (`image_data.rs`): Draw a filled rectangle onto the image.
-- `ImageData::draw_circle` (`image_data.rs`): Draw a filled circle onto the image.
-- `ImageData::draw_line` (`image_data.rs`): Draw a line using Bresenham's algorithm.
-- `ImageData::draw_label` (`image_data.rs`): Draw a text label using a built-in 3×5 pixel font.
-- `ImageData::encode_png` (`image_data.rs`): Encode the image as PNG bytes.
-- `ImageData::as_bytes` (`image_data.rs`): Get a reference to the raw pixel bytes.
-- `ImageData::get_string` (`image_data.rs`): Get the raw pixel bytes as a vector (for Lua getString() compatibility).
-- `ImageData::set_raw_data` (`image_data.rs`): Replace all pixel data from a raw RGBA byte slice.
-- `ImageData::map_pixel_par` (`image_data.rs`): Apply a per-pixel transform in parallel for large images.
-- `ImageLayer::new` (`layers.rs`): Create a new transparent layer with the given canvas dimensions.
-- `LayeredImage::new` (`layers.rs`): Create an empty layer stack with no layers.
-- `LayeredImage::width` (`layers.rs`): Canvas width shared by all layers.
-- `LayeredImage::height` (`layers.rs`): Canvas height shared by all layers.
-- `LayeredImage::layer_count` (`layers.rs`): Number of layers currently in the stack.
-- `LayeredImage::add_layer` (`layers.rs`): Append a new blank (transparent) layer on top of the stack and return its index.
-- `LayeredImage::remove_layer` (`layers.rs`): Remove the layer at the given index and return it.
-- `LayeredImage::get_layer` (`layers.rs`): Immutable access to a layer by index.
-- `LayeredImage::get_layer_mut` (`layers.rs`): Mutable access to a layer by index.
-- `LayeredImage::set_opacity` (`layers.rs`): Set the opacity of a layer.
-- `LayeredImage::set_visible` (`layers.rs`): Set the visibility of a layer.
-- `LayeredImage::set_name` (`layers.rs`): Rename a layer.
-- `LayeredImage::set_layer_image` (`layers.rs`): Replace a layer's pixel buffer with a clone of the given [`ImageData`].
-- `LayeredImage::swap_layers` (`layers.rs`): Swap two layers by index within the stack, changing their compositing order.
-- `LayeredImage::move_layer` (`layers.rs`): Move a layer from `from_index` to `to_index`, shifting all layers in between.
-- `LayeredImage::merge` (`layers.rs`): Flatten all visible layers into a single [`ImageData`] using Porter-Duff "over" compositing.
-- `PaletteLUT::new` (`palette_lut.rs`): Creates an empty palette lookup table.
-- `PaletteLUT::get_color_count` (`palette_lut.rs`): Returns the number of color mappings.
-- `PaletteLUT::set_color` (`palette_lut.rs`): Sets the color mapping at the given 0-based index.
-- `PaletteLUT::get_from_color` (`palette_lut.rs`): Returns the source color at the given 0-based index, if it exists.
-- `PaletteLUT::get_to_color` (`palette_lut.rs`): Returns the target color at the given 0-based index, if it exists.
-- `PaletteLUT::clear` (`palette_lut.rs`): Removes all color mappings.
-- `PaletteLUT::apply` (`palette_lut.rs`): Applies this palette lookup table to an image in place.
-- `ProvinceGrid::from_image` (`province_grid.rs`): Build a `ProvinceGrid` from an already-loaded [`ImageData`].
-- `ProvinceGrid::from_file` (`province_grid.rs`): Load a province map PNG from disk and build the grid.
-- `ProvinceGrid::width` (`province_grid.rs`): Returns the grid width in pixels.
-- `ProvinceGrid::height` (`province_grid.rs`): Returns the grid height in pixels.
-- `ProvinceGrid::get_at` (`province_grid.rs`): Returns the province ID at pixel coordinates `(x, y)`.
-- `ProvinceGrid::province_count` (`province_grid.rs`): Returns the number of unique non-zero province IDs in the grid.
-- `ProvinceGrid::adjacencies` (`province_grid.rs`): Returns a slice of `(province_a, province_b, border_pixel_count)` tuples, sorted by `(province_a, province_b)`.
-- `ProvinceGrid::province_spans` (`province_grid.rs`): Returns horizontal fill spans for all non-zero provinces.
-- `ProvinceGrid::border_segments` (`province_grid.rs`): Returns merged border segments between neighboring provinces.
-- `ProvinceGrid::province_polygons` (`province_grid.rs`): Returns province polygon loops built from border pixel corner points (top-left corner grid).
-- `ProvinceGrid::province_polygons_simplified` (`province_grid.rs`): Returns polygon loops simplified by removing collinear points and 45-degree staircase midpoints.
-- `ProvinceGrid::serialize_shape_data` (`province_grid.rs`): Serializes province geometry for shape-based rendering into a binary cache.
-- `ProvinceGrid::deserialize_shape_data` (`province_grid.rs`): Deserializes province geometry from shape cache binary.
-- `ImageData::generate_render_commands` (`render.rs`): Generate a single `DrawImage` render command for this image.
-- `ImageData::draw_to_image` (`render.rs`): Return a CPU copy of this image (identity draw-to-image).
+- `CompressedFormat::as_str` (`compressed.rs`): Return the lowercase format label string for this variant.
+- `CompressedImageData::from_dds` (`compressed.rs`): Decode DDS bytes into compressed image data or return a file-system error.
+- `CompressedImageData::get_dimensions` (`compressed.rs`): Return the base image dimensions.
+- `CompressedImageData::get_mipmap_count` (`compressed.rs`): Return the number of mipmap levels stored in this image.
+- `CompressedImageData::get_format` (`compressed.rs`): Return the detected compressed format string.
+- `CompressedImageData::is_dds_magic` (`compressed.rs`): Return whether the byte slice starts with the DDS magic header.
+- `CompressedImageData::from_file` (`compressed.rs`): Read a DDS file from disk and decode it into compressed image data.
+- `CompressedImageData::is_dds_file` (`compressed.rs`): Return whether a file on disk starts with the DDS magic header.
+- `ResizeFilter::parse` (`effects.rs`): Parse a resize filter name and return the selected filter when recognized.
+- `ImageData::brightness` (`effects.rs`): Scale RGB channels by a factor in place.
+- `ImageData::contrast` (`effects.rs`): Adjust contrast around the midpoint in place.
+- `ImageData::saturation` (`effects.rs`): Blend RGB channels toward luminance by the given factor.
+- `ImageData::gamma` (`effects.rs`): Apply gamma correction to RGB channels in place.
+- `ImageData::tint` (`effects.rs`): Blend RGB channels toward a tint color by the given factor.
+- `ImageData::grayscale` (`effects.rs`): Convert the image to grayscale in place.
+- `ImageData::sepia` (`effects.rs`): Apply a sepia tone in place.
+- `ImageData::invert` (`effects.rs`): Invert the RGB channels in place.
+- `ImageData::threshold` (`effects.rs`): Convert the image to a hard thresholded grayscale image.
+- `ImageData::posterize` (`effects.rs`): Reduce color depth to the requested number of levels.
+- `ImageData::fill` (`effects.rs`): Fill the whole image with a solid color.
+- `ImageData::noise` (`effects.rs`): Add repeatable random noise to RGB channels.
+- `ImageData::alpha_mask` (`effects.rs`): Scale the alpha channel by a factor in place.
+- `ImageData::flip_horizontal` (`effects.rs`): Flip the image horizontally in place.
+- `ImageData::flip_vertical` (`effects.rs`): Flip the image vertically in place.
+- `ImageData::rotate_90_cw` (`effects.rs`): Return a new image rotated 90 degrees clockwise.
+- `ImageData::crop` (`effects.rs`): Return a cropped copy of the image or `None` when the region is invalid.
+- `ImageData::resize_nearest` (`effects.rs`): Resize the image with nearest-neighbor sampling.
+- `ImageData::blur` (`effects.rs`): Blur the image with a separable box kernel and return a new image.
+- `ImageData::sharpen` (`effects.rs`): Sharpen the image with a 3x3 kernel and return a new image.
+- `ImageData::resize` (`effects.rs`): Resize the image with bilinear interpolation by default.
+- `ImageData::resize_with_filter` (`effects.rs`): Resize the image with the requested filter and return `None` for zero-sized output.
+- `ImageData::blit` (`effects.rs`): Blend another image into this image using alpha or overwrite when fully opaque.
+- `ImageData::draw_nine_slice` (`effects.rs`): Draw a nine-slice region from a source image into this image.
+- `ImageData::get_region` (`effects.rs`): Return a copied rectangular region or `None` when out of bounds.
+- `ImageData::diff` (`effects.rs`): Compute a bytewise difference score between two images.
+- `ImageData::convolve` (`effects.rs`): Convolve the image with a square kernel and return an error on invalid input.
+- `ImageData::new` (`image_data.rs`): Create a zero-filled RGBA image buffer of the given size.
+- `ImageData::from_file` (`image_data.rs`): Load an image from disk and return decoded RGBA bytes, or an error on failure.
+- `ImageData::from_encoded_bytes` (`image_data.rs`): Decode an image from memory and return RGBA bytes, or an error on failure.
+- `ImageData::from_bytes` (`image_data.rs`): Build an image from exact RGBA bytes, or return an error on length mismatch.
+- `ImageData::width` (`image_data.rs`): Return the image width in pixels.
+- `ImageData::height` (`image_data.rs`): Return the image height in pixels.
+- `ImageData::dimensions` (`image_data.rs`): Return the image dimensions as width and height.
+- `ImageData::get_pixel` (`image_data.rs`): Return the RGBA pixel at a coordinate, or `None` when out of bounds.
+- `ImageData::set_pixel` (`image_data.rs`): Set a pixel at a coordinate and return false when the point is out of bounds.
+- `ImageData::paste` (`image_data.rs`): Copy pixels from a source image into this image at the given offset.
+- `ImageData::map_pixel` (`image_data.rs`): Map every pixel through a callback in place.
+- `ImageData::draw_rect` (`image_data.rs`): Fill an axis-aligned rectangle with a solid color and alpha.
+- `ImageData::draw_circle` (`image_data.rs`): Fill a circle with a solid color and alpha.
+- `ImageData::draw_line` (`image_data.rs`): Draw a line with Bresenham's algorithm using a solid color and alpha.
+- `ImageData::draw_label` (`image_data.rs`): Draw a small bitmap label for digits, letters, and a few punctuation marks.
+- `ImageData::encode_png` (`image_data.rs`): Encode the image as PNG bytes and return an error on encode failure.
+- `ImageData::as_bytes` (`image_data.rs`): Return a slice of the raw RGBA pixel bytes.
+- `ImageData::get_string` (`image_data.rs`): Return a cloned copy of the raw RGBA pixel bytes.
+- `ImageData::set_raw_data` (`image_data.rs`): Replace pixel data with new raw bytes and return an error on length mismatch.
+- `ImageData::map_pixel_par` (`image_data.rs`): Map every pixel through a callback in place using parallel rows above the threshold.
+- `ImageLayer::new` (`layers.rs`): Create a visible opaque layer with a blank canvas of the given size.
+- `LayeredImage::new` (`layers.rs`): Create an empty layered image with the given canvas size.
+- `LayeredImage::width` (`layers.rs`): Return the canvas width in pixels.
+- `LayeredImage::height` (`layers.rs`): Return the canvas height in pixels.
+- `LayeredImage::layer_count` (`layers.rs`): Return the number of layers in the stack.
+- `LayeredImage::add_layer` (`layers.rs`): Append a new blank layer and return its index.
+- `LayeredImage::remove_layer` (`layers.rs`): Remove a layer by index and return it when present.
+- `LayeredImage::get_layer` (`layers.rs`): Return a layer by index.
+- `LayeredImage::get_layer_mut` (`layers.rs`): Return a mutable layer by index.
+- `LayeredImage::set_opacity` (`layers.rs`): Set a layer opacity and clamp it to the valid range.
+- `LayeredImage::set_visible` (`layers.rs`): Set a layer visibility flag and return whether the layer existed.
+- `LayeredImage::set_name` (`layers.rs`): Rename a layer and return whether the layer existed.
+- `LayeredImage::set_layer_image` (`layers.rs`): Replace a layer image with a copied source image or a pasted canvas copy.
+- `LayeredImage::swap_layers` (`layers.rs`): Swap two layers and return false when either index is invalid.
+- `LayeredImage::move_layer` (`layers.rs`): Move a layer to another position and return false when either index is invalid.
+- `LayeredImage::merge` (`layers.rs`): Merge visible layers front-to-back into a new image.
+- `PaletteLUT::new` (`palette_lut.rs`): Create an empty palette lookup table.
+- `PaletteLUT::get_color_count` (`palette_lut.rs`): Return the number of color pairs stored in the table.
+- `PaletteLUT::set_color` (`palette_lut.rs`): Set a color pair at an index and grow the table when needed.
+- `PaletteLUT::get_from_color` (`palette_lut.rs`): Return the source color at an index.
+- `PaletteLUT::get_to_color` (`palette_lut.rs`): Return the replacement color at an index.
+- `PaletteLUT::clear` (`palette_lut.rs`): Clear all stored color pairs.
+- `PaletteLUT::cycle_to_colors` (`palette_lut.rs`): Rotate replacement colors by the requested offset.
+- `PaletteLUT::apply` (`palette_lut.rs`): Apply the palette lookup to an image buffer in place.
+- `ProvinceGrid::from_image` (`province_grid.rs`): Build a province grid from an image where non-black pixels define province ids.
+- `ProvinceGrid::from_file` (`province_grid.rs`): Load an image from disk and derive province ids from it.
+- `ProvinceGrid::width` (`province_grid.rs`): Return the grid width in pixels.
+- `ProvinceGrid::height` (`province_grid.rs`): Return the grid height in pixels.
+- `ProvinceGrid::get_at` (`province_grid.rs`): Return the province id at a coordinate, or `0` when out of bounds.
+- `ProvinceGrid::province_count` (`province_grid.rs`): Return the highest province id present in the grid.
+- `ProvinceGrid::province_color` (`province_grid.rs`): Return the RGB color associated with a province id, or `None` for id 0.
+- `ProvinceGrid::adjacencies` (`province_grid.rs`): Return cached adjacency triples for the grid.
+- `ProvinceGrid::province_spans` (`province_grid.rs`): Return horizontal spans for each province row segment.
+- `ProvinceGrid::border_segments` (`province_grid.rs`): Return contiguous border segments between differing provinces.
+- `ProvinceGrid::province_polygons` (`province_grid.rs`): Trace province polygons as ordered point loops.
+- `ProvinceGrid::province_polygons_simplified` (`province_grid.rs`): Return simplified province polygons with redundant vertices removed.
+- `ProvinceGrid::serialize_shape_data` (`province_grid.rs`): Serialize spans and border segments into a compact binary blob.
+- `ProvinceGrid::deserialize_shape_data` (`province_grid.rs`): Decode serialized spans and border segments from a shape-data blob.
+- `ImageData::generate_render_commands` (`render.rs`): Generate draw commands for this image buffer at the given screen position.
+- `ImageData::draw_to_image` (`render.rs`): Clone the image buffer into a standalone image value.
 - `save_image` (`serial.rs`): Save a flat [`ImageData`] to a LIMG binary file at the given path.
 - `load_image` (`serial.rs`): Load a flat [`ImageData`] from a LIMG binary file.
+- `load_image_from_bytes` (`serial.rs`): Load a flat image from raw LIMG bytes and validate the type flag.
 - `save_layered` (`serial.rs`): Save a [`LayeredImage`] to a LIMG binary file at the given path.
 - `load_layered` (`serial.rs`): Load a [`LayeredImage`] from a LIMG binary file.
+- `load_layered_from_bytes` (`serial.rs`): Load a layered image from raw LIMG bytes and validate the type flag.
 - `encode_flat` (`serial.rs`): Encode a flat [`ImageData`] into a complete LIMG binary blob.
 - `decode_flat` (`serial.rs`): Decode the payload section of a flat LIMG blob.
 - `parse_header` (`serial.rs`): Validate the LIMG header and return `(type_flag, payload_slice)`.
-- `Texture::load` (`texture.rs`): Loads an image from `path`, premultiplies alpha, and appends it to `textures`.
-- `Texture::load_with_color_space` (`texture.rs`): Loads an image from `path` with explicit `srgb`/`linear` GPU format hint.
-- `Texture::from_rgba` (`texture.rs`): Creates a texture from raw RGBA pixel data (not premultiplied).
-- `Texture::from_rgba_with_color_space` (`texture.rs`): Creates a texture from raw RGBA pixel data with explicit `srgb`/`linear` hint.
 - `premultiply_alpha_rgba8_in_place` (`texture.rs`): Canonical CPU helper for premultiplying RGBA8 before texture upload.
-- `TextureAtlas::new` (`texture_atlas.rs`): Creates an empty atlas with the given pixel dimensions and inter-region padding.
-- `TextureAtlas::pack` (`texture_atlas.rs`): Packs a named region of size `w` x `h` into the atlas.
-- `TextureAtlas::pack_with_nine_slice` (`texture_atlas.rs`): Packs a named region with optional nine-slice insets.
-- `TextureAtlas::set_nine_slice` (`texture_atlas.rs`): Sets or clears nine-slice metadata for an existing region.
-- `TextureAtlas::get_region` (`texture_atlas.rs`): Looks up a previously packed region by name.
-- `TextureAtlas::get_region_count` (`texture_atlas.rs`): Returns the number of packed regions.
-- `TextureAtlas::get_dimensions` (`texture_atlas.rs`): Returns the atlas dimensions as `(width, height)`.
-- `TextureAtlas::get_regions` (`texture_atlas.rs`): Returns all packed regions in arbitrary order.
-- `TextureAtlas::clear` (`texture_atlas.rs`): Removes all packed regions and shelves.
+- `Texture::parse_color_space` (`texture.rs`): Parse a texture color-space label and return the matching enum value.
+- `Texture::load` (`texture.rs`): Load a texture with sRGB color space by default.
+- `Texture::load_with_color_space` (`texture.rs`): Load a texture from disk, premultiply alpha, and store it in the texture pool.
+- `Texture::from_rgba` (`texture.rs`): Create a texture from RGBA bytes using sRGB color space.
+- `Texture::from_rgba_with_color_space` (`texture.rs`): Create a texture from RGBA bytes and store it in the texture pool.
+- `TextureAtlas::new` (`texture_atlas.rs`): Create an empty atlas with the given dimensions and padding.
+- `TextureAtlas::pack` (`texture_atlas.rs`): Pack a region without nine-slice metadata and return whether it fit.
+- `TextureAtlas::pack_with_nine_slice` (`texture_atlas.rs`): Pack a region with optional nine-slice metadata and return whether it fit.
+- `TextureAtlas::set_nine_slice` (`texture_atlas.rs`): Update the nine-slice metadata for a packed region and return whether it fit.
+- `TextureAtlas::get_region` (`texture_atlas.rs`): Return a packed region by name.
+- `TextureAtlas::get_region_count` (`texture_atlas.rs`): Return the number of packed regions.
+- `TextureAtlas::get_dimensions` (`texture_atlas.rs`): Return the atlas dimensions.
+- `TextureAtlas::get_regions` (`texture_atlas.rs`): Return all packed regions as borrowed values.
+- `TextureAtlas::clear` (`texture_atlas.rs`): Remove all packed regions and shelves.
 - `draw_animation_frame_grid_to_image` (`visualization/animation.rs`): Render an animation's frame grid as a strip of numbered cells.
 - `draw_animation_playback_to_image` (`visualization/animation.rs`): Render an animation playback strip as snapshot columns.
 - `animation_playback_control_to_image` (`visualization/animation.rs`): Render an animation playback-control timeline diagram.
@@ -249,115 +261,118 @@ The Lua-side `LProvinceGrid` userdata also exposes `drawShapes(view_x?, view_y?,
 - Namespace: `lurek.image`
 
 ### Module Functions
-- `lurek.image.newImageData`: Creates a new blank ImageData or loads one from a file.
-- `lurek.image.newImageDataFromBytes`: Creates an ImageData from a raw RGBA8 byte string. Width Ă— height Ă— 4 bytes required.
-- `lurek.image.newCompressedData`: Loads compressed texture data from a DDS file.
-- `lurek.image.isCompressed`: Returns true if the file at the given path is a DDS file.
-- `lurek.image.newLayeredImage`: Creates a new empty LayeredImage canvas with no layers.
-- `lurek.image.saveImage`: Saves a flat ImageData to a LIMG binary file at the given path.
-- `lurek.image.savePNG`: Saves a flat ImageData as a PNG file at the given path.
-- `lurek.image.loadImage`: Loads an ImageData from a LIMG binary file.
-- `lurek.image.loadLayered`: Loads a LayeredImage from a LIMG binary file.
-- `lurek.image.newPaletteLut`: Creates a new empty `PaletteLUT` used to remap colours in an image.
-- `lurek.image.newProvinceGrid`: Loads a province map PNG and builds an O(1) spatial index with adjacency data.
-- `lurek.image.fromScreen`: Returns captured framebuffer `ImageData` when ready, or nil and queues capture for the next frame.
+- `lurek.image.newImageData`: Creates empty image data from dimensions or decodes image data from a GameFS filename.
+- `lurek.image.newImageDataFromBytes`: Creates image data from raw RGBA bytes and explicit dimensions.
+- `lurek.image.newCompressedData`: Loads DDS compressed image data from GameFS.
+- `lurek.image.isCompressed`: Returns whether a GameFS image file begins with DDS compressed image magic bytes.
+- `lurek.image.newLayeredImage`: Creates a layered image stack with one or more blank layers.
+- `lurek.image.saveImage`: Saves an image data object to a path under the current game directory.
+- `lurek.image.savePNG`: Encodes image data as PNG and writes it under the current game directory.
+- `lurek.image.loadImage`: Loads and decodes image data from GameFS.
+- `lurek.image.loadLayered`: Loads a serialized layered image stack from GameFS.
+- `lurek.image.newPaletteLut`: Creates an empty palette lookup table.
+- `lurek.image.newProvinceGrid`: Loads a province id grid from an image file under the current game directory.
+- `lurek.image.fromScreen`: Returns a completed screen capture image or requests one for a future call.
 
 ### `LCompressedImageData` Methods
-- `LCompressedImageData:getWidth`: Returns the width of the base mip level in pixels.
-- `LCompressedImageData:getHeight`: Returns the height of the base mip level in pixels.
-- `LCompressedImageData:getDimensions`: Returns the width and height of the base mip level.
-- `LCompressedImageData:getMipmapCount`: Returns the number of mipmap levels stored.
-- `LCompressedImageData:getFormat`: Returns the compressed format name string.
-- `LCompressedImageData:type`: Returns the type name of this object.
-- `LCompressedImageData:typeOf`: Returns true if this object is of the given type.
+- `LCompressedImageData:getWidth`: Returns compressed image width.
+- `LCompressedImageData:getHeight`: Returns compressed image height.
+- `LCompressedImageData:getDimensions`: Returns compressed image dimensions.
+- `LCompressedImageData:getMipmapCount`: Returns the number of mipmap levels in this compressed image.
+- `LCompressedImageData:getFormat`: Returns the compressed image format name.
+- `LCompressedImageData:type`: Returns the Lua-visible type name for this compressed image handle.
+- `LCompressedImageData:typeOf`: Returns whether this compressed image handle matches a supported type name.
 
 ### `LImageData` Methods
-- `LImageData:getWidth`: Returns the width of the image in pixels.
-- `LImageData:getHeight`: Returns the height of the image in pixels.
-- `LImageData:getDimensions`: Returns the width and height of the image as two integers.
-- `LImageData:getPixel`: Returns the RGBA colour components of the pixel at (x, y) as four integers (0-255).
-- `LImageData:setPixel`: Sets the RGBA colour of the pixel at (x, y); returns an error if coordinates are out of bounds.
-- `LImageData:encode`: Encodes the image into a byte string in the specified format (currently "png").
-- `LImageData:getString`: Returns the raw pixel bytes of the image as a Lua string.
-- `LImageData:mapPixel`: Calls func(x, y, r, g, b, a) for each pixel and writes the returned RGBA back.
-- `LImageData:brightness`: Adjusts the brightness of every pixel by the given factor (< 1.0 darkens, > 1.0 brightens).
-- `LImageData:contrast`: Adjusts the contrast of every pixel by the given factor (< 1.0 reduces, > 1.0 increases).
-- `LImageData:saturation`: Adjusts colour saturation; 0.0 produces grayscale, 1.0 is unchanged, > 1.0 boosts saturation.
-- `LImageData:gamma`: Applies gamma correction; values < 1.0 brighten shadows, > 1.0 darken them.
-- `LImageData:tint`: Blends an RGB tint colour into every pixel, controlled by factor (0.0 = no change, 1.0 = full tint).
-- `LImageData:grayscale`: Converts the image to grayscale using luminance weights (BT.601).
-- `LImageData:sepia`: Applies a warm sepia tone to the image using standard sepia matrix weights.
-- `LImageData:invert`: Inverts every colour channel (subtracts each R/G/B value from 255); alpha is preserved.
-- `LImageData:threshold`: Converts the image to black-and-white: pixels above value become white, at or below become black.
-- `LImageData:posterize`: Reduces each channel to `levels` discrete steps, creating a flat poster-paint look.
-- `LImageData:fill`: Fills every pixel with the given solid RGBA colour, overwriting all existing content.
-- `LImageData:noise`: Adds random noise to every pixel channel; amount controls the maximum per-channel perturbation.
-- `LImageData:alphaMask`: Scales every pixel's alpha channel by factor; use to fade an image in or out uniformly.
-- `LImageData:flipHorizontal`: Flips the image left-to-right (mirror across vertical axis), modifying in place.
-- `LImageData:flipVertical`: Flips the image top-to-bottom (mirror across horizontal axis), modifying in place.
-- `LImageData:rotate90cw`: Returns a new ImageData rotated 90 degrees clockwise; the original is not modified.
-- `LImageData:crop`: Returns a new ImageData containing the rectangular sub-region at (x, y) of the given width and height.
-- `LImageData:resizeNearest`: Returns a new ImageData scaled to (new_w, new_h) using nearest-neighbour interpolation.
-- `LImageData:blur`: Returns a new ImageData with a box blur applied using the given pixel radius.
-- `LImageData:sharpen`: Returns a new ImageData with a sharpening convolution kernel applied.
-- `LImageData:drawRect`: Draws a filled rectangle onto the image.
-- `LImageData:drawCircle`: Draws a filled circle onto the image.
-- `LImageData:drawLine`: Draws a line using Bresenham's algorithm.
-- `LImageData:resize`: Returns an interpolated copy of the image at the given dimensions (default `bilinear`, optional `lanczos3`).
-- `LImageData:blit`: Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff over.
-- `LImageData:getRegion`: Returns a copy of the rectangular sub-region as a new ImageData.
-- `LImageData:getRawBytes`: Returns the raw RGBA8 pixel data as a Lua string (width Ă— height Ă— 4 bytes).
-- `LImageData:diff`: Returns the sum of absolute per-channel pixel differences with another ImageData.
-- `LImageData:mapPixels`: Applies a function to every pixel in-place.
-- `LImageData:convolve`: Applies a custom NxN convolution kernel to the image and returns a new ImageData.
-- `LImageData:applyPaletteLut`: Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
-- `LImageData:drawNineSlice`: Draws a nine-slice patch from atlas/source image data into this image.
-- `LImageData:setRawData`: Replaces all pixel data from a raw RGBA byte string.
-- `LImageData:paste`: Copies pixels from `source` onto this image starting at (dx, dy).
-- `LImageData:type`: Returns the type name of this object.
-- `LImageData:typeOf`: Returns true if this object is of the given type name.
+- `LImageData:getWidth`: Returns image width.
+- `LImageData:getHeight`: Returns image height.
+- `LImageData:getDimensions`: Returns image dimensions.
+- `LImageData:getPixel`: Returns RGBA channels at a pixel coordinate.
+- `LImageData:setPixel`: Sets RGBA channels at a pixel coordinate.
+- `LImageData:encode`: Encodes image data in a supported format.
+- `LImageData:getString`: Returns raw image bytes as a Lua string.
+- `LImageData:mapPixel`: Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
+- `LImageData:brightness`: Applies a brightness factor to this image in place.
+- `LImageData:contrast`: Applies a contrast factor to this image in place.
+- `LImageData:saturation`: Applies a saturation factor to this image in place.
+- `LImageData:gamma`: Applies gamma correction to this image in place.
+- `LImageData:tint`: Blends this image toward a tint color in place.
+- `LImageData:grayscale`: Converts this image to grayscale in place.
+- `LImageData:sepia`: Applies a sepia filter to this image in place.
+- `LImageData:invert`: Inverts image color channels in place.
+- `LImageData:threshold`: Applies a threshold filter to this image in place.
+- `LImageData:posterize`: Reduces image colors to a fixed number of levels in place.
+- `LImageData:fill`: Fills the whole image with one RGBA color.
+- `LImageData:noise`: Adds noise to this image in place.
+- `LImageData:alphaMask`: Multiplies this image alpha channel by a factor in place.
+- `LImageData:flipHorizontal`: Flips this image horizontally in place.
+- `LImageData:flipVertical`: Flips this image vertically in place.
+- `LImageData:rotate90cw`: Returns a new image rotated ninety degrees clockwise.
+- `LImageData:crop`: Returns a cropped image region.
+- `LImageData:resizeNearest`: Returns a resized image using nearest-neighbor sampling.
+- `LImageData:blur`: Returns a blurred copy of this image.
+- `LImageData:sharpen`: Returns a sharpened copy of this image.
+- `LImageData:drawRect`: Draws a filled rectangle into this image.
+- `LImageData:drawCircle`: Draws a filled circle into this image.
+- `LImageData:drawLine`: Draws a line into this image.
+- `LImageData:resize`: Returns a resized image using an optional named filter.
+- `LImageData:blit`: Copies a source image into this image at a destination coordinate.
+- `LImageData:drawNineSlice`: Draws a nine-slice region from a source image into this image.
+- `LImageData:getRegion`: Returns an image region when the requested rectangle is inside bounds.
+- `LImageData:getRawBytes`: Returns raw image bytes as a Lua string.
+- `LImageData:diff`: Computes a difference metric against another image.
+- `LImageData:mapPixels`: Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
+- `LImageData:convolve`: Applies a convolution kernel and returns the filtered image.
+- `LImageData:applyPaletteLut`: Applies a palette lookup table to this image in place.
+- `LImageData:setRawData`: Replaces the image byte buffer with raw bytes.
+- `LImageData:paste`: Pastes a source image into this image at unsigned destination coordinates.
+- `LImageData:type`: Returns the Lua-visible type name for this image data handle.
+- `LImageData:typeOf`: Returns whether this image data handle matches the `ImageData` type name.
 
 ### `LLayeredImage` Methods
-- `LLayeredImage:getWidth`: Returns the canvas width shared by all layers.
-- `LLayeredImage:getHeight`: Returns the canvas height shared by all layers.
+- `LLayeredImage:getWidth`: Returns the layered image width.
+- `LLayeredImage:getHeight`: Returns the layered image height.
 - `LLayeredImage:layerCount`: Returns the number of layers in the stack.
-- `LLayeredImage:addLayer`: Appends a new blank transparent layer on top and returns its 1-based index.
-- `LLayeredImage:removeLayer`: Removes the layer at the given 1-based index. Returns true on success.
-- `LLayeredImage:getLayer`: Returns a copy of the layer's pixel buffer as an ImageData.
-- `LLayeredImage:setLayer`: Replaces a layer's pixel buffer with a copy of the given ImageData.
-- `LLayeredImage:getOpacity`: Returns the opacity of a layer in [0.0, 1.0].
-- `LLayeredImage:setOpacity`: Sets the opacity of a layer. Value is clamped to [0.0, 1.0].
-- `LLayeredImage:isVisible`: Returns whether a layer is visible.
-- `LLayeredImage:setVisible`: Shows or hides a layer during compositing.
-- `LLayeredImage:getName`: Returns the name of a layer.
-- `LLayeredImage:setName`: Renames the layer at the given index to the new name string.
-- `LLayeredImage:swapLayers`: Swaps two layers by their 1-based indices, changing their compositing order.
-- `LLayeredImage:moveLayer`: Moves a layer from one position to another, shifting layers in between.
-- `LLayeredImage:merge`: Flattens all visible layers into a single ImageData using Porter-Duff "over" compositing.
-- `LLayeredImage:save`: Saves the layered image to a LIMG binary file at the given path.
-- `LLayeredImage:type`: Returns the type name of this object.
-- `LLayeredImage:typeOf`: Returns true if this object is of the given type.
+- `LLayeredImage:addLayer`: Adds a blank layer with an optional name.
+- `LLayeredImage:removeLayer`: Removes a layer by one-based index.
+- `LLayeredImage:getLayer`: Returns image data for a layer by one-based index.
+- `LLayeredImage:setLayer`: Replaces a layer's image data by one-based index.
+- `LLayeredImage:getOpacity`: Returns a layer opacity by one-based index.
+- `LLayeredImage:setOpacity`: Sets a layer opacity by one-based index.
+- `LLayeredImage:isVisible`: Returns layer visibility by one-based index.
+- `LLayeredImage:setVisible`: Sets layer visibility by one-based index.
+- `LLayeredImage:getName`: Returns a layer name by one-based index.
+- `LLayeredImage:setName`: Sets a layer name by one-based index.
+- `LLayeredImage:swapLayers`: Swaps two layers by one-based indices.
+- `LLayeredImage:moveLayer`: Moves a layer from one one-based index to another.
+- `LLayeredImage:merge`: Merges visible layers into a single image data object.
+- `LLayeredImage:save`: Saves the layered image stack to a file.
+- `LLayeredImage:type`: Returns the Lua-visible type name for this layered image handle.
+- `LLayeredImage:typeOf`: Returns whether this layered image handle matches a supported type name.
 
 ### `LPaletteLUT` Methods
-- `LPaletteLUT:setColor`: Appends a colour mapping entry to the palette: when a pixel exactly matching
-- `LPaletteLUT:getColorCount`: Returns the number of colour mapping entries.
-- `LPaletteLUT:clear`: Removes all colour mapping entries.
-- `LPaletteLUT:cycle`: Rotates destination palette entries for palette-cycling animation.
-- `LPaletteLUT:type`: Returns the type name of this object.
-- `LPaletteLUT:typeOf`: Returns true if this object is of the given type.
+- `LPaletteLUT:setColor`: Adds a color mapping from source RGBA channels to destination RGBA channels.
+- `LPaletteLUT:getColorCount`: Returns the number of color mappings in this palette lookup table.
+- `LPaletteLUT:clear`: Removes every color mapping from this palette lookup table.
+- `LPaletteLUT:cycle`: Cycles palette mappings by an offset.
+- `LPaletteLUT:type`: Returns the Lua-visible type name for this palette lookup table handle.
+- `LPaletteLUT:typeOf`: Returns whether this palette lookup table handle matches a supported type name.
 
 ### `LProvinceGrid` Methods
-- `LProvinceGrid:getWidth`: Returns the grid width in pixels.
-- `LProvinceGrid:getHeight`: Returns the grid height in pixels.
-- `LProvinceGrid:getAt`: Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
-- `LProvinceGrid:provinceCount`: Returns the number of unique non-zero province IDs detected in the map.
-- `LProvinceGrid:adjacencies`: Returns an array of adjacency records. Each record is {province_a, province_b, border_pixels}.
-- `LProvinceGrid:provinceSpans`: Returns province fill spans as { province_id, y, x0, x1 } records (x1 exclusive).
-- `LProvinceGrid:borderSegments`: Returns merged border segments as
-- `LProvinceGrid:type`: Returns the type name of this object.
-- `LProvinceGrid:typeOf`: Returns true if this object is of the given type.
-- `LProvinceGrid:serializeShapeData`: Serializes province geometry (spans and borders) to raw bytes.
-- `LProvinceGrid:deserializeShapeData`: Deserializes province geometry from raw bytes produced by serializeShapeData.
+- `LProvinceGrid:getWidth`: Returns the province grid width.
+- `LProvinceGrid:getHeight`: Returns the province grid height.
+- `LProvinceGrid:getAt`: Returns the province id stored at grid coordinates.
+- `LProvinceGrid:provinceCount`: Returns the number of distinct provinces in the grid.
+- `LProvinceGrid:adjacencies`: Returns province adjacency records and shared border pixel counts.
+- `LProvinceGrid:provinceSpans`: Returns horizontal province spans by row.
+- `LProvinceGrid:borderSegments`: Returns border line segments between neighboring provinces.
+- `LProvinceGrid:getPolygons`: Returns polygon rings for every province.
+- `LProvinceGrid:getPolygonsSimplified`: Returns simplified polygon rings for every province.
+- `LProvinceGrid:drawShapes`: Queues filled polygon draw commands for province shapes, optionally culled to a viewport.
+- `LProvinceGrid:type`: Returns the Lua-visible type name for this province grid handle.
+- `LProvinceGrid:typeOf`: Returns whether this province grid handle matches a supported type name.
+- `LProvinceGrid:serializeShapeData`: Serializes province span and border shape data into a binary Lua string.
+- `LProvinceGrid:deserializeShapeData`: Decodes serialized province shape data into span and segment tables.
 
 ## References
 

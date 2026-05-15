@@ -158,12 +158,12 @@ impl MapBlock {
         }
     }
 
-    /// Set the block name.
+    /// Set the block name. This function is part of the public API.
     pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
 
-    /// Return the block name.
+    /// Return the block name. This function is part of the public API.
     pub fn get_name(&self) -> &str {
         &self.name
     }
@@ -240,12 +240,12 @@ impl MapGroup {
         self.scripts.len()
     }
 
-    /// Return the group name.
+    /// Return the group name. This function is part of the public API.
     pub fn get_name(&self) -> &str {
         &self.name
     }
 
-    /// Set the group name.
+    /// Set the group name. This function is part of the public API.
     pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
@@ -435,12 +435,12 @@ impl MapScript {
         self.steps.clear();
     }
 
-    /// Set the script name.
+    /// Set the script name. This function is part of the public API.
     pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
 
-    /// Return the script name.
+    /// Return the script name. This function is part of the public API.
     pub fn get_name(&self) -> &str {
         &self.name
     }
@@ -749,12 +749,12 @@ impl MapGen {
         self.zones.get(index)
     }
 
-    /// Remove all zones.
+    /// Remove all zones. This function is part of the public API.
     pub fn clear_zones(&mut self) {
         self.zones.clear();
     }
 
-    /// Set the layer mode.
+    /// Set the layer mode. This function is part of the public API.
     pub fn set_layer_mode(&mut self, mode: LayerMode) {
         self.layer_mode = mode;
     }

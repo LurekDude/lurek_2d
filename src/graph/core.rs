@@ -155,7 +155,7 @@ impl Graph {
     pub fn get_node_ids(&self) -> Vec<u64> {
         self.nodes.keys().copied().collect()
     }
-    /// Return the number of nodes.
+    /// Return the number of nodes. This function is part of the public API.
     pub fn get_node_count(&self) -> usize {
         self.nodes.len()
     }
@@ -198,7 +198,7 @@ impl Graph {
     pub fn get_edge_ids(&self) -> Vec<u64> {
         self.edges.keys().copied().collect()
     }
-    /// Return the number of edges.
+    /// Return the number of edges. This function is part of the public API.
     pub fn get_edge_count(&self) -> usize {
         self.edges.len()
     }
@@ -410,7 +410,7 @@ impl Graph {
     pub fn get_item_ids(&self) -> Vec<u64> {
         self.items.keys().copied().collect()
     }
-    /// Return the number of items.
+    /// Return the number of items. This function is part of the public API.
     pub fn get_item_count(&self) -> usize {
         self.items.len()
     }

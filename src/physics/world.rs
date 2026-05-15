@@ -1173,7 +1173,7 @@ impl World {
     pub fn get_body_mass(&self, id: usize) -> f32 {
         self.bodies.get(id).map_or(0.0, |b| b.mass)
     }
-    /// Override mass of body `id`.
+    /// Override mass of body `id`. This function is part of the public API.
     pub fn set_body_mass(&mut self, id: usize, mass: f32) {
         if let Some(body) = self.bodies.get_mut(id) {
             body.mass = mass;
@@ -1948,7 +1948,7 @@ impl World {
         }
         false
     }
-    /// Wake up body `id` from sleep.
+    /// Wake up body `id` from sleep. This function is part of the public API.
     pub fn wake_up_body(&mut self, id: usize) {
         if let Some(&handle) = self.body_handles.get(id) {
             if let Some(rb) = self.rbodies.get_mut(handle) {

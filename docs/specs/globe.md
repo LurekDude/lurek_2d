@@ -57,12 +57,13 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `projection.rs`: Orthographic sphere projection and orbit camera for the globe module.
 - `province_adapter.rs`: Globe ↔ province adapter (optional coupling layer).
 - `registry.rs`: Globe registry — per-named-globe container and multi-globe manager.
-- `topology.rs`: Province adjacency graph for the globe module.
 - `sync.rs`: Channel-based globe snapshot synchronization.
+- `topology.rs`: Province adjacency graph for the globe module.
 - `types.rs`: Core value types for the globe module.
 
 ## Types
 
+- `SplitViewport` (`struct`, `composition.rs`): Screen center override for one split viewport.
 - `FogMask` (`struct`, `fog.rs`): Per-faction visibility bit-vector.
 - `FogStore` (`struct`, `fog.rs`): Store of fog masks keyed by viewer ID.
 - `LabelStore` (`struct`, `label.rs`): Store and lifecycle manager for globe labels.
@@ -72,9 +73,13 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `OrbitCamera` (`struct`, `projection.rs`): Orbit camera controlling the viewpoint onto the globe.
 - `Globe` (`struct`, `registry.rs`): Owns all domain stores for one named globe simulation.
 - `GlobeRegistry` (`struct`, `registry.rs`): Named multi-globe manager.
+- `GlobeSyncSnapshot` (`struct`, `sync.rs`): Serializable globe state used for snapshot transfer.
+- `GlobeSyncChannel` (`struct`, `sync.rs`): Channel pair used to send and receive globe snapshots.
 - `ProvinceGraph` (`struct`, `topology.rs`): Complete province topology for one globe instance.
 - `ProvinceId` (`type`, `types.rs`): Unique identifier for a province within a single globe instance.
 - `Province` (`struct`, `types.rs`): A convex (or near-convex) polygon on the unit sphere, representing a province or region.
+- `FogState` (`enum`, `types.rs`): Fog-of-war state for a province.
+- `HeatLayer` (`struct`, `types.rs`): Heat overlay parameters used by globe color mapping.
 - `GlobeSpec` (`struct`, `types.rs`): Top-level configuration for one globe instance.
 - `Marker` (`struct`, `types.rs`): A point of interest placed on the globe at a specific latitude/longitude.
 - `MarkerStyle` (`struct`, `types.rs`): Visual style for a [`Marker`].
@@ -89,53 +94,68 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 
 ## Functions
 
+- `emit_split_frame` (`composition.rs`): Emit render commands for several globes with per-entry viewport centers.
 - `emit_globe_frame` (`draw.rs`): Emit all render commands for one globe frame.
 - `project_arc` (`draw.rs`): Pre-project a great-circle arc into a flat screenspace point list.
-- `FogMask::all_hidden` (`fog.rs`): Create a new fog mask with all provinces hidden.
-- `FogMask::all_visible` (`fog.rs`): Create a new fog mask with all provinces visible.
-- `FogMask::is_visible` (`fog.rs`): Return whether province `id` is visible.
-- `FogMask::reveal` (`fog.rs`): Mark province `id` as visible.
-- `FogMask::hide` (`fog.rs`): Hide province `id`.
-- `FogMask::toggle` (`fog.rs`): Toggle province `id`.
-- `FogMask::reveal_batch` (`fog.rs`): Reveal all provinces in the iterator.
-- `FogMask::visible_ids` (`fog.rs`): Return all currently-visible province IDs.
-- `FogMask::from_visible_ids` (`fog.rs`): Deserialize from a list of visible province IDs (for `lurek.save.*` integration).
-- `FogMask::count_visible` (`fog.rs`): Count visible provinces.
-- `FogStore::new` (`fog.rs`): Create an empty store.
-- `FogStore::get_or_insert` (`fog.rs`): Get or create the fog mask for a viewer.
-- `FogStore::get` (`fog.rs`): Get an immutable fog mask for a viewer.
-- `FogStore::is_visible` (`fog.rs`): Check if province `id` is visible to viewer `viewer`.
-- `FogStore::reveal` (`fog.rs`): Reveal province `id` for viewer.
-- `FogStore::hide` (`fog.rs`): Hide province `id` for viewer.
-- `FogStore::visible_ids` (`fog.rs`): Return visible province IDs for viewer, or `None` if viewer has no mask.
-- `FogStore::load` (`fog.rs`): Load visible IDs from save data.
-- `FogStore::remove` (`fog.rs`): Remove a viewer's fog mask.
-- `FogStore::viewers` (`fog.rs`): List all registered viewer IDs.
-- `LabelStore::new` (`label.rs`): Create an empty store.
-- `LabelStore::add` (`label.rs`): Add a label.
-- `LabelStore::remove` (`label.rs`): Remove a label by ID.
-- `LabelStore::get` (`label.rs`): Get an immutable reference.
-- `LabelStore::get_mut` (`label.rs`): Get a mutable reference.
-- `LabelStore::set_visible` (`label.rs`): Set label visibility.
-- `LabelStore::set_text` (`label.rs`): Update label text.
-- `LabelStore::move_to` (`label.rs`): Move label to a new position.
-- `LabelStore::iter` (`label.rs`): Iterate over all labels.
-- `LabelStore::iter_visible` (`label.rs`): Iterate over visible labels at or above the given LOD tier.
-- `LabelStore::len` (`label.rs`): Number of labels.
-- `LabelStore::is_empty` (`label.rs`): True if empty.
-- `LayerStore::new` (`layer.rs`): Create an empty store.
-- `LayerStore::add` (`layer.rs`): Add or replace a layer.
-- `LayerStore::remove` (`layer.rs`): Remove a layer by name.
-- `LayerStore::get` (`layer.rs`): Get an immutable reference to a layer.
-- `LayerStore::get_mut` (`layer.rs`): Get a mutable reference to a layer.
-- `LayerStore::set_province_color` (`layer.rs`): Set province color override in a layer.
+- `export_provinces_to_obj` (`export.rs`): Export province polygons as a flat OBJ string with one object per province.
+- `FogMask::all_hidden` (`fog.rs`): Create a mask with every province hidden.
+- `FogMask::all_visible` (`fog.rs`): Create a mask with every province visible.
+- `FogMask::is_visible` (`fog.rs`): Return true when the province is visible.
+- `FogMask::state` (`fog.rs`): Return the stored fog state for a province id.
+- `FogMask::set_state` (`fog.rs`): Set the fog state for a province id when it is in range.
+- `FogMask::reveal` (`fog.rs`): Mark a province as visible.
+- `FogMask::hide` (`fog.rs`): Mark a province as hidden.
+- `FogMask::explore` (`fog.rs`): Mark a province as explored.
+- `FogMask::toggle` (`fog.rs`): Toggle a province between visible and hidden.
+- `FogMask::reveal_batch` (`fog.rs`): Reveal every province in the supplied iterator.
+- `FogMask::visible_ids` (`fog.rs`): Return all visible province ids in ascending order.
+- `FogMask::explored_ids` (`fog.rs`): Return all explored province ids in ascending order.
+- `FogMask::from_visible_ids` (`fog.rs`): Build a mask that reveals the supplied province ids.
+- `FogMask::count_visible` (`fog.rs`): Count visible provinces in the mask.
+- `FogMask::count_explored` (`fog.rs`): Count explored provinces in the mask.
+- `FogMask::to_base64` (`fog.rs`): Encode the fog mask as base64 packed two-bit states.
+- `FogMask::from_base64` (`fog.rs`): Decode a base64 encoded fog mask or return an error on invalid input.
+- `FogStore::new` (`fog.rs`): Create an empty fog store.
+- `FogStore::get_or_insert` (`fog.rs`): Return the mask for a viewer, inserting a hidden mask when absent.
+- `FogStore::get` (`fog.rs`): Return the mask for a viewer when it exists.
+- `FogStore::is_visible` (`fog.rs`): Return true when the viewer can see the province.
+- `FogStore::reveal` (`fog.rs`): Reveal a province for a viewer.
+- `FogStore::explore` (`fog.rs`): Mark a province as explored for a viewer.
+- `FogStore::hide` (`fog.rs`): Hide a province for a viewer.
+- `FogStore::visible_ids` (`fog.rs`): Return the visible province ids for a viewer when the viewer exists.
+- `FogStore::explored_ids` (`fog.rs`): Return the explored province ids for a viewer when the viewer exists.
+- `FogStore::state` (`fog.rs`): Return the state for a viewer or visible when the viewer has no mask.
+- `FogStore::set_state` (`fog.rs`): Set the fog state for a viewer and province.
+- `FogStore::to_base64` (`fog.rs`): Serialize a viewer mask to base64 when it exists.
+- `FogStore::load_base64` (`fog.rs`): Load a viewer mask from base64 or return an error on invalid input.
+- `FogStore::load` (`fog.rs`): Replace a viewer mask with one built from visible province ids.
+- `FogStore::remove` (`fog.rs`): Remove the viewer mask if it exists.
+- `FogStore::viewers` (`fog.rs`): Return all viewer names in arbitrary order.
+- `LabelStore::new` (`label.rs`): Create an empty label store.
+- `LabelStore::add` (`label.rs`): Insert a label and return its assigned id.
+- `LabelStore::remove` (`label.rs`): Remove a label by id and return it when found.
+- `LabelStore::get` (`label.rs`): Return a shared label reference when the id exists.
+- `LabelStore::get_mut` (`label.rs`): Return a mutable label reference when the id exists.
+- `LabelStore::set_visible` (`label.rs`): Set label visibility and return true when the id exists.
+- `LabelStore::set_text` (`label.rs`): Replace label text and return true when the id exists.
+- `LabelStore::move_to` (`label.rs`): Move a label to a new latitude and longitude and return true when it exists.
+- `LabelStore::iter` (`label.rs`): Iterate over all stored labels.
+- `LabelStore::iter_visible` (`label.rs`): Iterate over visible labels whose minimum LOD fits the supplied tier.
+- `LabelStore::len` (`label.rs`): Return the number of stored labels.
+- `LabelStore::is_empty` (`label.rs`): Return true when no labels are stored.
+- `LayerStore::new` (`layer.rs`): Create an empty layer store.
+- `LayerStore::add` (`layer.rs`): Insert a layer and return true when a layer with the same name was replaced.
+- `LayerStore::remove` (`layer.rs`): Remove a layer by name and return it when found.
+- `LayerStore::get` (`layer.rs`): Return a shared layer reference when the name exists.
+- `LayerStore::get_mut` (`layer.rs`): Return a mutable layer reference when the name exists.
+- `LayerStore::set_province_color` (`layer.rs`): Set a province color override for a layer and return true when the layer exists.
 - `LayerStore::clear_province_colors` (`layer.rs`): Clear all province color overrides from a layer.
-- `LayerStore::set_visible` (`layer.rs`): Set layer visibility.
-- `LayerStore::set_alpha` (`layer.rs`): Set layer opacity.
-- `LayerStore::effective_color` (`layer.rs`): Get the effective color for a province across all visible layers.
-- `LayerStore::visible_sorted` (`layer.rs`): Return all visible layers sorted by z_order.
-- `LayerStore::len` (`layer.rs`): Number of layers.
-- `LayerStore::is_empty` (`layer.rs`): True if empty.
+- `LayerStore::set_visible` (`layer.rs`): Set layer visibility and return true when the layer exists.
+- `LayerStore::set_alpha` (`layer.rs`): Set layer alpha and clamp it to the 0..=1 range.
+- `LayerStore::effective_color` (`layer.rs`): Resolve the effective province color by applying visible layers in z-order.
+- `LayerStore::visible_sorted` (`layer.rs`): Return visible layers sorted by z-order.
+- `LayerStore::len` (`layer.rs`): Return the number of stored layers.
+- `LayerStore::is_empty` (`layer.rs`): Return true when no layers are stored.
 - `sun_direction` (`lighting.rs`): Compute the sun direction as a world-space unit vector.
 - `province_intensity` (`lighting.rs`): Compute the lighting intensity for a province centroid.
 - `compute_intensities` (`lighting.rs`): Batch-compute light intensities for all provinces.
@@ -143,25 +163,26 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `load_from_toml_str` (`loader.rs`): Parse a TOML province file from a string.
 - `load_from_toml_file` (`loader.rs`): Load province data from the filesystem (synchronous).
 - `load_from_png_file` (`loader.rs`): Load provinces from a color-indexed PNG.
-- `MarkerStore::new` (`marker.rs`): Create an empty store.
-- `MarkerStore::add` (`marker.rs`): Add a marker, assigning the next available ID.
-- `MarkerStore::remove` (`marker.rs`): Remove a marker by ID.
-- `MarkerStore::get` (`marker.rs`): Get an immutable reference to a marker.
-- `MarkerStore::get_mut` (`marker.rs`): Get a mutable reference to a marker.
-- `MarkerStore::move_to` (`marker.rs`): Move a marker to a new lat/lon.
-- `MarkerStore::set_visible` (`marker.rs`): Set marker visibility.
-- `MarkerStore::set_attr` (`marker.rs`): Set a user attribute on a marker.
-- `MarkerStore::get_attr` (`marker.rs`): Get a user attribute from a marker.
-- `MarkerStore::iter` (`marker.rs`): Iterate over all markers.
+- `generate_voronoi_provinces` (`loader.rs`): Generate approximate provinces from Voronoi input points.
+- `MarkerStore::new` (`marker.rs`): Create an empty marker store.
+- `MarkerStore::add` (`marker.rs`): Insert a marker and return its assigned id.
+- `MarkerStore::remove` (`marker.rs`): Remove a marker by id and return it when found.
+- `MarkerStore::get` (`marker.rs`): Return a shared marker reference when the id exists.
+- `MarkerStore::get_mut` (`marker.rs`): Return a mutable marker reference when the id exists.
+- `MarkerStore::move_to` (`marker.rs`): Move a marker and return true when the id exists.
+- `MarkerStore::set_visible` (`marker.rs`): Set marker visibility and return true when the id exists.
+- `MarkerStore::set_attr` (`marker.rs`): Set a string attribute and return true when the id exists.
+- `MarkerStore::get_attr` (`marker.rs`): Return a string attribute for a marker when it exists.
+- `MarkerStore::iter` (`marker.rs`): Iterate over all stored markers.
 - `MarkerStore::iter_visible` (`marker.rs`): Iterate over visible markers only.
-- `MarkerStore::by_type` (`marker.rs`): All markers of a given type.
-- `MarkerStore::len` (`marker.rs`): Number of markers.
-- `MarkerStore::is_empty` (`marker.rs`): True if no markers are stored.
+- `MarkerStore::by_type` (`marker.rs`): Return all markers whose type matches the supplied string.
+- `MarkerStore::len` (`marker.rs`): Return the number of stored markers.
+- `MarkerStore::is_empty` (`marker.rs`): Return true when no markers are stored.
 - `pick` (`picking.rs`): Pick the province at screen coordinate `(sx, sy)`.
-- `OrbitCamera::clamp` (`projection.rs`): Clamp and normalise camera angles.
-- `OrbitCamera::pan` (`projection.rs`): Pan by `delta_lat_deg` and `delta_lon_deg` (unscaled).
-- `OrbitCamera::zoom_by` (`projection.rs`): Zoom by `factor` (multiplicative).
-- `OrbitCamera::lod` (`projection.rs`): Select LOD tier based on zoom level.
+- `OrbitCamera::clamp` (`projection.rs`): Clamp camera latitude, longitude, and zoom into the supported range.
+- `OrbitCamera::pan` (`projection.rs`): Pan the camera by latitude and longitude deltas.
+- `OrbitCamera::zoom_by` (`projection.rs`): Multiply zoom by a factor and clamp the result.
+- `OrbitCamera::lod` (`projection.rs`): Return the current level-of-detail tier for the zoom level.
 - `build_view_matrix` (`projection.rs`): Build the composite rotation matrix for a frame.
 - `project_point` (`projection.rs`): Project a single unit-sphere point through the view matrix to screen space.
 - `project_province` (`projection.rs`): Project a province's boundary vertices.
@@ -170,44 +191,54 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `normalize_v3` (`projection.rs`): Normalize a `Vec3` (returns zero vector if near-zero length).
 - `apply_political_colors` (`province_adapter.rs`): Applies political colors from a province registry onto matching globe provinces.
 - `apply_visibility_to_viewer` (`province_adapter.rs`): Applies fog visibility from province registry to one globe viewer mask.
-- `Globe::new` (`registry.rs`): Create a new globe with the given name and spec.
-- `Globe::add_province` (`registry.rs`): Add a province.
-- `Globe::remove_province` (`registry.rs`): Remove a province by ID.
-- `Globe::get_province` (`registry.rs`): Get a shared reference to a province.
-- `Globe::get_province_mut` (`registry.rs`): Get a mutable reference to a province.
-- `Globe::province_count` (`registry.rs`): Number of provinces.
-- `Globe::add_arc` (`registry.rs`): Add an arc (great-circle route).
-- `Globe::remove_arc` (`registry.rs`): Remove an arc.
-- `Globe::update` (`registry.rs`): Advance globe simulation by `dt` seconds (rotates the planet).
-- `Globe::pick_screen` (`registry.rs`): Pick the province under a screen coordinate.
-- `Globe::emit_frame` (`registry.rs`): Emit all render commands for this globe frame.
-- `GlobeRegistry::new` (`registry.rs`): Create an empty registry.
-- `GlobeRegistry::create` (`registry.rs`): Create a new globe and store it.
-- `GlobeRegistry::get` (`registry.rs`): Get an immutable reference to a globe.
-- `GlobeRegistry::get_mut` (`registry.rs`): Get a mutable reference to a globe.
-- `GlobeRegistry::remove` (`registry.rs`): Remove and return a globe.
-- `GlobeRegistry::names` (`registry.rs`): List all globe names.
-- `GlobeRegistry::len` (`registry.rs`): Number of globes.
-- `GlobeRegistry::is_empty` (`registry.rs`): True if no globes are registered.
-- `ProvinceGraph::new` (`topology.rs`): Create an empty graph.
-- `ProvinceGraph::insert` (`topology.rs`): Insert a province.
-- `ProvinceGraph::remove` (`topology.rs`): Remove a province by ID.
-- `ProvinceGraph::get` (`topology.rs`): Get an immutable reference to a province.
-- `ProvinceGraph::get_mut` (`topology.rs`): Get a mutable reference to a province.
-- `ProvinceGraph::iter` (`topology.rs`): Iterate over all provinces.
-- `ProvinceGraph::len` (`topology.rs`): Number of provinces.
-- `ProvinceGraph::is_empty` (`topology.rs`): True if the graph is empty.
-- `ProvinceGraph::find_path` (`topology.rs`): Find the shortest path between two provinces.
-- `ProvinceGraph::reachable` (`topology.rs`): Find all provinces reachable from `start` within `max_cost`.
-- `ProvinceGraph::neighbors_of` (`topology.rs`): Return the direct neighbors of a province.
-- `ProvinceGraph::set_attr` (`topology.rs`): Set a user attribute on a province.
-- `ProvinceGraph::get_attr` (`topology.rs`): Get a user attribute from a province.
-- `ProvinceGraph::find_path_default` (`topology.rs`): Convenience: find path using the default cost function (uniform cost 1.0).
-- `ProvinceGraph::reachable_default` (`topology.rs`): Convenience: find reachable provinces using the default cost function.
-- `ProvinceGraph::rebuild_caches` (`topology.rs`): Rebuild the neighbor + centroid caches from the current province set.
-- `Province::new` (`types.rs`): Create a minimal province for unit tests.
-- `Province::with_data` (`types.rs`): Create a province with explicit centroid, neighbors, and base color.
-- `Layer::new` (`types.rs`): Construct a visible layer with full opacity.
+- `Globe::new` (`registry.rs`): Create a globe with the supplied name and spec.
+- `Globe::add_province` (`registry.rs`): Insert a province or return TooManyProvinces when the graph is full.
+- `Globe::remove_province` (`registry.rs`): Remove a province by id and return it when present.
+- `Globe::get_province` (`registry.rs`): Return a shared province reference when the id exists.
+- `Globe::get_province_mut` (`registry.rs`): Return a mutable province reference when the id exists.
+- `Globe::province_count` (`registry.rs`): Return the number of stored provinces.
+- `Globe::add_arc` (`registry.rs`): Insert an arc and return its assigned id.
+- `Globe::remove_arc` (`registry.rs`): Remove an arc by id and return true when it existed.
+- `Globe::update` (`registry.rs`): Advance simulation time and update the globe clock and rotation.
+- `Globe::pick_screen` (`registry.rs`): Pick a province at screen coordinates or return None when no province matches.
+- `Globe::emit_frame` (`registry.rs`): Emit render commands for the current globe state.
+- `Globe::set_heat_layer` (`registry.rs`): Add or replace a heat layer by name.
+- `Globe::remove_heat_layer` (`registry.rs`): Remove a heat layer by name and return true when one was removed.
+- `Globe::set_province_sector` (`registry.rs`): Assign a province to a named sector.
+- `Globe::province_sector` (`registry.rs`): Return the sector name that contains a province when one exists.
+- `Globe::sector_provinces` (`registry.rs`): Return all province ids for a named sector.
+- `Globe::cache_reachability_default` (`registry.rs`): Cache default reachability for a faction name.
+- `Globe::cached_reachability` (`registry.rs`): Return cached reachability for a faction when present.
+- `GlobeRegistry::new` (`registry.rs`): Create an empty globe registry.
+- `GlobeRegistry::create` (`registry.rs`): Create or replace a globe and return a mutable reference to it.
+- `GlobeRegistry::get` (`registry.rs`): Return a shared globe reference when the name exists.
+- `GlobeRegistry::get_mut` (`registry.rs`): Return a mutable globe reference when the name exists.
+- `GlobeRegistry::remove` (`registry.rs`): Remove a globe by name and return it when found.
+- `GlobeRegistry::names` (`registry.rs`): Return all globe names in arbitrary order.
+- `GlobeRegistry::len` (`registry.rs`): Return the number of stored globes.
+- `GlobeRegistry::is_empty` (`registry.rs`): Return true when no globes are stored.
+- `GlobeSyncChannel::new` (`sync.rs`): Create a new snapshot channel pair.
+- `build_snapshot` (`sync.rs`): Build a snapshot from the current globe state.
+- `apply_snapshot` (`sync.rs`): Apply a snapshot to a mutable globe instance.
+- `ProvinceGraph::new` (`topology.rs`): Create an empty province graph.
+- `ProvinceGraph::insert` (`topology.rs`): Insert a province and update the cached adjacency data.
+- `ProvinceGraph::remove` (`topology.rs`): Remove a province and its cached data, returning the removed province when present.
+- `ProvinceGraph::get` (`topology.rs`): Return a shared province reference when the id exists.
+- `ProvinceGraph::get_mut` (`topology.rs`): Return a mutable province reference when the id exists.
+- `ProvinceGraph::iter` (`topology.rs`): Iterate over all stored provinces.
+- `ProvinceGraph::len` (`topology.rs`): Return the number of stored provinces.
+- `ProvinceGraph::is_empty` (`topology.rs`): Return true when no provinces are stored.
+- `ProvinceGraph::find_path` (`topology.rs`): Find a province path or return NoPath when no route exists.
+- `ProvinceGraph::reachable` (`topology.rs`): Return provinces reachable within the supplied maximum cost.
+- `ProvinceGraph::neighbors_of` (`topology.rs`): Return the cached neighbor slice for a province or an empty slice when missing.
+- `ProvinceGraph::set_attr` (`topology.rs`): Set a province attribute or return ProvinceNotFound when the id is missing.
+- `ProvinceGraph::get_attr` (`topology.rs`): Return a province attribute as a string slice when it exists.
+- `ProvinceGraph::find_path_default` (`topology.rs`): Find a province path with the default cost function.
+- `ProvinceGraph::reachable_default` (`topology.rs`): Return reachable provinces with the default cost function.
+- `ProvinceGraph::rebuild_caches` (`topology.rs`): Rebuild all cached adjacency and edge-tag data from the stored provinces.
+- `Province::new` (`types.rs`): Create a province from vertices and derive a centroid from them.
+- `Province::with_data` (`types.rs`): Create a province from explicit cached data.
+- `Layer::new` (`types.rs`): Create a visible overlay layer with the supplied name, kind, and z-order.
 
 ## Lua API Reference
 
@@ -215,72 +246,91 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - Namespace: `lurek.globe`
 
 ### Module Functions
-- `lurek.globe.new`: Creates a new globe instance with default settings and empty collections.
-- `lurek.globe.get`: Get an existing globe by name, or nil.
-- `lurek.globe.loadFromTOML`: Load provinces from a TOML string and create a globe.
-- `lurek.globe.loadFromPNG`: Load provinces from a color-index PNG map and create a globe.
-- `lurek.globe.generateVoronoi`: Build procedural provinces from seed points and create a globe.
-- `lurek.globe.greatCircleDistance`: Great-circle distance between two lat/lon points (in unit-sphere radians).
-- `lurek.globe.greatCirclePath`: Great-circle path as a table of {lat, lon} pairs.
-- `lurek.globe.latLonToUnit`: Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
+- `lurek.globe.new`: Creates a named globe with optional specification fields in the module registry.
+- `lurek.globe.get`: Returns a globe from the module registry by name.
+- `lurek.globe.loadFromTOML`: Creates a globe and populates provinces from TOML source text.
+- `lurek.globe.loadFromPNG`: Creates a globe and populates provinces from a PNG file.
+- `lurek.globe.generateVoronoi`: Creates a globe and populates provinces from latitude-longitude seed points.
+- `lurek.globe.greatCircleDistance`: Computes great-circle distance between two latitude-longitude points.
+- `lurek.globe.greatCirclePath`: Computes sampled latitude-longitude points along a great-circle path.
+- `lurek.globe.latLonToUnit`: Converts latitude and longitude to a unit-sphere 3D vector table.
 
 ### `LGlobe` Methods
-- `LGlobe:addProvince`: Adds a province from a table with id, centroid, vertices, neighbors, and base_color fields.
-- `LGlobe:removeProvince`: Removes a province by ID. Returns true if it existed.
-- `LGlobe:provinceCount`: Returns the number of provinces.
-- `LGlobe:getNeighbors`: Returns the neighbor IDs of a province.
+- `LGlobe:addProvince`: Adds a province described by id, centroid, vertices, neighbors, and optional base color.
+- `LGlobe:removeProvince`: Removes a province by id.
+- `LGlobe:provinceCount`: Returns the number of provinces in this globe.
+- `LGlobe:getNeighbors`: Returns neighboring province ids for a province.
 - `LGlobe:setProvinceAttr`: Sets a string attribute on a province.
-- `LGlobe:getProvinceAttr`: Gets a string attribute from a province.
-- `LGlobe:pan`: Pan the orbit camera by delta-latitude and delta-longitude (degrees).
-- `LGlobe:zoom`: Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
-- `LGlobe:setCamera`: Set the camera position directly.
-- `LGlobe:getCamera`: Get the current camera (lat, lon, zoom).
-- `LGlobe:getLod`: Returns the current LOD tier as a string: "far", "mid", or "near".
-- `LGlobe:pick`: Returns the province ID under screen coordinates, or nil.
-- `LGlobe:pickLatLon`: Returns (lat, lon) of the screen point on the globe surface, or nil.
-- `LGlobe:setActiveViewer`: Set the faction/viewer whose fog mask filters rendering.
-- `LGlobe:revealProvince`: Reveal a province for a viewer.
-- `LGlobe:hideProvince`: Hide a province for a viewer.
-- `LGlobe:isVisible`: Returns true if the province is visible to the viewer.
-- `LGlobe:revealAll`: Reveal all provinces for a viewer.
-- `LGlobe:addMarker`: Add a marker. Returns marker ID.
-- `LGlobe:removeMarker`: Removes a marker from the globe map by its unique string identifier.
-- `LGlobe:moveMarker`: Move a marker to a new lat/lon.
-- `LGlobe:setMarkerVisible`: Sets whether this specific marker is visible on the globe.
-- `LGlobe:setMarkerAttr`: Set a string attribute on a marker.
-- `LGlobe:getMarkerAttr`: Get a string attribute from a marker.
-- `LGlobe:addLabel`: Add a text label. Returns label ID.
-- `LGlobe:setLabelText`: Updates the visible text content of an existing globe label.
-- `LGlobe:setLabelVisible`: Sets whether this specific label is visible on the globe.
-- `LGlobe:removeLabel`: Removes a text label from the globe map by its unique string identifier.
-- `LGlobe:addLayer`: Add or replace a named thematic layer.
-- `LGlobe:removeLayer`: Removes a texture layer from the globe map by its unique string identifier.
-- `LGlobe:setLayerColor`: Set a per-province color override on a layer.
-- `LGlobe:setLayerVisible`: Sets whether this specific texture layer is visible on the globe.
-- `LGlobe:setLayerAlpha`: Set layer opacity (0.0–1.0).
-- `LGlobe:setTimeOfDay`: Set time of day (0.0–24.0 hours).
-- `LGlobe:getTimeOfDay`: Gets the current simulated time of day for daylight computation.
-- `LGlobe:setRotation`: Set planet rotation (degrees).
-- `LGlobe:update`: Advance globe simulation by dt seconds.
-- `LGlobe:setBorders`: Enable or disable province border rendering.
-- `LGlobe:findPath`: Find the shortest province path from `from_id` to `to_id`.
-- `LGlobe:reachable`: Return all provinces reachable within `max_cost` steps from `start_id`.
-- `LGlobe:addArc`: Add an arc (great-circle path between two lat/lon points).
-- `LGlobe:removeArc`: Removes an arc from the globe map by its unique string identifier.
-- `LGlobe:getName`: Returns the string identifier name assigned to this globe instance.
-- `LGlobe:type`: Returns the type name of this object.
-- `LGlobe:typeOf`: Returns true if this object is of the given type.
+- `LGlobe:getProvinceAttr`: Reads a string attribute from a province.
+- `LGlobe:setProvinceTexture`: Assigns a raw texture handle and UV rectangle to a province.
+- `LGlobe:clearProvinceTexture`: Removes texture metadata from a province.
+- `LGlobe:setProvinceSector`: Assigns a province to a named sector.
+- `LGlobe:getProvinceSector`: Returns the sector name assigned to a province.
+- `LGlobe:getSectorProvinces`: Returns province ids assigned to a sector.
+- `LGlobe:setHeatLayer`: Creates or replaces a heat layer that maps province attributes into colors.
+- `LGlobe:removeHeatLayer`: Removes a heat layer by name.
+- `LGlobe:pan`: Pans the globe camera by latitude and longitude deltas.
+- `LGlobe:zoom`: Multiplies the globe camera zoom by a factor.
+- `LGlobe:setCamera`: Sets camera latitude, longitude, and zoom.
+- `LGlobe:getCamera`: Returns camera latitude, longitude, and zoom.
+- `LGlobe:getLod`: Returns the camera-derived level-of-detail tier name.
+- `LGlobe:pick`: Picks a province at screen coordinates.
+- `LGlobe:pickRaycast`: Samples along a screen ray from the camera center and returns the first hit province.
+- `LGlobe:pickLatLon`: Picks at screen coordinates and returns the hit province centroid screen coordinates.
+- `LGlobe:setActiveViewer`: Sets the active fog-of-war viewer name or clears it.
+- `LGlobe:setFogState`: Sets fog-of-war state for one viewer and province.
+- `LGlobe:getFogState`: Returns fog-of-war state for one viewer and province.
+- `LGlobe:encodeFogBase64`: Serializes one viewer's fog state to a base64 string.
+- `LGlobe:decodeFogBase64`: Loads one viewer's fog state from a base64 string.
+- `LGlobe:revealProvince`: Reveals a province for one fog-of-war viewer.
+- `LGlobe:hideProvince`: Hides a province for one fog-of-war viewer.
+- `LGlobe:isVisible`: Returns whether a province is visible for one fog-of-war viewer.
+- `LGlobe:revealAll`: Reveals every province for one fog-of-war viewer.
+- `LGlobe:addMarker`: Adds a marker at latitude and longitude with an optional label.
+- `LGlobe:removeMarker`: Removes a marker by id.
+- `LGlobe:moveMarker`: Moves a marker to latitude and longitude coordinates.
+- `LGlobe:setMarkerVisible`: Shows or hides a marker.
+- `LGlobe:setMarkerPulse`: Sets marker pulse frequency and amplitude.
+- `LGlobe:setMarkerRotation`: Sets marker rotation speed.
+- `LGlobe:setMarkerAttr`: Sets a string attribute on a marker.
+- `LGlobe:getMarkerAttr`: Reads a string attribute from a marker.
+- `LGlobe:addLabel`: Adds a text label at latitude and longitude.
+- `LGlobe:setLabelText`: Changes text for an existing label.
+- `LGlobe:setLabelVisible`: Shows or hides a label.
+- `LGlobe:removeLabel`: Removes a label by id.
+- `LGlobe:addLayer`: Adds a render layer with optional z-order.
+- `LGlobe:removeLayer`: Removes a render layer by name.
+- `LGlobe:setLayerColor`: Sets a province color override inside a render layer.
+- `LGlobe:setLayerVisible`: Shows or hides a render layer.
+- `LGlobe:setLayerAlpha`: Sets render layer alpha.
+- `LGlobe:setTimeOfDay`: Sets globe time of day modulo 24 hours.
+- `LGlobe:getTimeOfDay`: Returns globe time of day.
+- `LGlobe:setRotation`: Sets globe rotation angle.
+- `LGlobe:setAutoRotationSpeed`: Sets automatic globe rotation speed.
+- `LGlobe:update`: Advances globe simulation timers and animated state.
+- `LGlobe:setBorders`: Enables or disables province border rendering.
+- `LGlobe:findPath`: Finds a default-cost province path between two province ids.
+- `LGlobe:reachable`: Returns provinces reachable from a start province within a cost budget.
+- `LGlobe:cacheReachability`: Caches default-cost reachability for a named faction.
+- `LGlobe:getCachedReachability`: Returns cached reachability costs for a faction.
+- `LGlobe:exportProvinceMeshOBJ`: Exports province geometry as Wavefront OBJ text.
+- `LGlobe:addArc`: Adds a visible route arc between two latitude and longitude points.
+- `LGlobe:removeArc`: Removes an arc by id.
+- `LGlobe:getName`: Returns the registry name of this globe.
+- `LGlobe:type`: Returns the Lua-visible type name for this globe handle.
+- `LGlobe:typeOf`: Returns whether this globe handle matches a supported type name.
 
 ### `LGlobeRegistry` Methods
-- `LGlobeRegistry:new`: Create a globe with the given name and optional spec table.
-- `LGlobeRegistry:get`: Get an existing globe by name, or nil.
-- `LGlobeRegistry:remove`: Removes a globe from the central registry by its string name.
-- `LGlobeRegistry:names`: Returns a table of all globe names.
-- `LGlobeRegistry:type`: Returns the type name of this object.
-- `LGlobeRegistry:typeOf`: Returns true if this object is of the given type.
+- `LGlobeRegistry:new`: Creates a named globe with optional specification fields.
+- `LGlobeRegistry:get`: Returns a globe handle by registry name.
+- `LGlobeRegistry:remove`: Removes a globe from the registry by name.
+- `LGlobeRegistry:names`: Returns all globe names currently stored in this registry.
+- `LGlobeRegistry:type`: Returns the Lua-visible type name for this globe registry handle.
+- `LGlobeRegistry:typeOf`: Returns whether this registry handle matches a supported type name.
 
 ## References
 
+- `image`: Imports or references `src/image/`. Cross-group dependency from `Feature Systems` into `Platform Services`.
 - `math`: Imports or references `src/math/`. Cross-group dependency from `Edge/Integration` into `Foundations`.
 - `pathfind`: Imports or references `src/pathfind/`. Cross-group dependency from `Edge/Integration` into `Feature Systems`.
 - `province`: Imports or references `src/province/`. Cross-group dependency from `Feature Systems` into `Edge/Integration`.

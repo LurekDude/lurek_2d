@@ -48,7 +48,7 @@ pub struct WorldGraph {
 }
 
 impl WorldGraph {
-    /// Create an empty world graph.
+    /// Create an empty world graph. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

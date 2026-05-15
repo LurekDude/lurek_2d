@@ -44,11 +44,12 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 ## Files
 
 - `app.rs`: Defines the public App entry point and the internal runtime implementation that owns the window, event loop integration, renderer, Lua VM, and frame lifecycle. This is the main file for startup flow, event handling, splash mode, and run-state transitions.
-- `lua_callbacks.rs`: Contains timeout-aware callback wrappers used by the app loop to invoke `lurek.*` callbacks safely.
-- `frame_profile.rs`: Contains helper formatting utilities for exposing frame profile data in-engine.
 - `debug_overlay.rs`: Defines DebugOverlay, the lightweight in-engine overlay for frame and draw statistics. It exists so app-level runtime state can expose quick visual diagnostics without dragging in the full devtools stack.
 - `error_screen.rs`: Defines ErrorScreen, the structured presentation for runtime and Lua failures. This file owns how fatal problems become user-visible render commands instead of raw crashes or console output.
+- `frame_profile.rs`: Contains helper formatting utilities for exposing frame profile data in-engine.
+- `lua_callbacks.rs`: Contains timeout-aware callback wrappers used by the app loop to invoke `lurek.*` callbacks safely.
 - `mod.rs`: Module root that exposes the public app-facing types. It keeps the external surface small while hiding most of the runtime wiring details.
+- `splash_screen.rs`: - Decodes embedded splash icon and banner PNGs into temporary texture storage.
 
 ## Types
 
@@ -57,26 +58,35 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 - `App` (`struct`, `app.rs`): Public entry point used to launch the engine with loaded configuration and optional startup error context. It is the outward-facing runtime shell around the real application lifecycle.
 - `DebugOverlay` (`struct`, `debug_overlay.rs`): Small runtime overlay for FPS and draw-call visibility. It is useful when changes affect per-frame diagnostics rather than the full devtools subsystem.
 - `ErrorScreen` (`struct`, `error_screen.rs`): Structured error presentation model that converts failures into readable render commands. It is the module's user-facing failure surface.
+- `SplashTexture` (`struct`, `splash_screen.rs`): Handle and dimensions for one splash texture uploaded to render texture storage.
+- `SplashBranding` (`struct`, `splash_screen.rs`): Embedded splash-branding assets prepared for splash-screen rendering.
 
 ## Functions
 
 - `recompute_viewport` (`app.rs`): Recomputes viewport scale and offset based on game and window dimensions.
 - `splash_window_title` (`app.rs`): Returns the splash-mode window title with the engine version appended.
 - `fit_contain_size` (`app.rs`): Computes the largest size that fits `src` inside `max` while preserving aspect ratio.
-- `LurekApp::new` (`app.rs`): Creates a new [`LurekApp`] from the given configuration and game-folder path.
-- `LurekApp::resolve_present_mode` (`app.rs`): Selects the best available [`wgpu::PresentMode`] for the given `requested_mode` integer.
-- `LurekApp::init_lua` (`app.rs`): Re-initialises the Lua VM and per-game pipeline state for a new game session.
-- `App::new` (`app.rs`): Creates a new `App` with the given `Config` and an optional conf.toml error.
-- `App::run` (`app.rs`): Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.
-- `DebugOverlay::new` (`debug_overlay.rs`): Creates a new disabled debug overlay.
-- `DebugOverlay::build_render_commands` (`debug_overlay.rs`): Generates draw commands for the effect.
-- `ErrorScreen::from_error` (`error_screen.rs`): Creates an `ErrorScreen` from a plain error message string.
-- `ErrorScreen::from_lua_error` (`error_screen.rs`): Creates an `ErrorScreen` from an `mlua::Error`.
-- `ErrorScreen::from_engine_error` (`error_screen.rs`): Creates an `ErrorScreen` from an `EngineError`.
-- `ErrorScreen::build_render_commands` (`error_screen.rs`): Generates a sequence of `RenderCommand` values that render the error screen.
-- `ErrorScreen::as_text` (`error_screen.rs`): Returns the full error text as a plain string suitable for clipboard copy.
+- `LurekApp::new` (`app.rs`): Build app runtime state and initialize filesystem watchers from startup config.
+- `LurekApp::resolve_present_mode` (`app.rs`): Select supported present mode and normalized vsync flag from requested mode.
+- `LurekApp::init_lua` (`app.rs`): Create the Lua VM, load main.lua, and fire `lurek.init()`.
+- `App::new` (`app.rs`): Create bootstrap app wrapper with config and optional pre-start config error.
+- `App::run` (`app.rs`): Start the winit event loop and run the runtime for the selected game directory.
+- `DebugOverlay::new` (`debug_overlay.rs`): Create disabled debug overlay state.
+- `DebugOverlay::build_render_commands` (`debug_overlay.rs`): Build render commands for FPS and draw-call counters in a top-right panel.
+- `ErrorScreen::from_error` (`error_screen.rs`): Build error screen model from plain text where first line is title and remainder is body.
+- `ErrorScreen::from_lua_error` (`error_screen.rs`): Build error screen model from `mlua::Error`, splitting message and traceback sections.
+- `ErrorScreen::from_engine_error` (`error_screen.rs`): Build error screen model from `EngineError` display text.
+- `ErrorScreen::build_render_commands` (`error_screen.rs`): Build draw commands that render full-screen error background, text body, traceback, and footer hints.
+- `ErrorScreen::as_text` (`error_screen.rs`): Return formatted text representation used for clipboard export and logs.
 - `wrap_text` (`error_screen.rs`): Wraps a text string at word boundaries to fit within `max_chars` columns.
 - `format_traceback` (`error_screen.rs`): Cleans up a Lua traceback string for display.
+- `format_frame_profile_line` (`frame_profile.rs`): Format one `FrameProfile` sample as a compact single-line timing string.
+- `call_lua_callback` (`lua_callbacks.rs`): Call `lurek.<name>(...)` and log failures to `error!` without returning them.
+- `call_lua_callback_checked` (`lua_callbacks.rs`): Call `lurek.<name>(...)` and return any Lua error to the caller.
+- `call_lua_callback_with_timeout` (`lua_callbacks.rs`): Call `lurek.<name>(...)` with optional timeout and log failures.
+- `call_lua_callback_checked_with_timeout` (`lua_callbacks.rs`): Call `lurek.<name>(...)` and optionally abort execution when callback exceeds `timeout_ms`.
+- `load_splash_branding` (`splash_screen.rs`): Decode embedded icon/banner PNG assets and upload them into splash texture storage.
+- `make_splash_commands` (`splash_screen.rs`): Build render commands for splash screen branding and drag-and-drop hint text.
 
 ## Lua API Reference
 
@@ -85,15 +95,18 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 ## References
 
 - `event`: Imports or references `event` from `src/event/`.
+- `filesystem`: Imports or references `src/filesystem/`. Cross-group dependency from `Edge/Integration` into `Core Runtime`.
 - `image`: Imports or references `image` from `src/image/`.
 - `input`: Imports or references `input` from `src/input/`.
 - `light`: Imports or references `light` from `src/light/`.
 - `lua_api`: Imports or references `lua_api` from `src/lua_api/`.
 - `math`: Imports or references `math` from `src/math/`.
+- `parallax`: Imports or references `src/parallax/`. Cross-group dependency from `Edge/Integration` into `Feature Systems`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 - `sprite`: Imports or references `sprite` from `src/sprite/`.
-- `timer`: Imports or references `timer` from `src/timer/`.
+- `tilemap`: Imports or references `src/tilemap/`. Cross-group dependency from `Edge/Integration` into `Feature Systems`.
+- `window`: Imports or references `src/window/`. Cross-group dependency from `Edge/Integration` into `Platform Services`.
 
 ## Notes
 

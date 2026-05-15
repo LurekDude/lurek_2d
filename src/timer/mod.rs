@@ -2,6 +2,7 @@
 //! - Provides a high-resolution clock, scaled delta, and sleep utilities.
 //! - Exposes a tick-based scheduler for deferred and repeating callbacks.
 
+/// Exposes the accumulator module.
 pub(crate) mod accumulator;
 /// Game clock with delta time, elapsed time, and time-scale support.
 pub mod clock;

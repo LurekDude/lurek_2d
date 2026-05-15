@@ -237,7 +237,7 @@ impl CellularWorld {
         self.cells = next;
         self.fire_life = next_fire;
     }
-    /// Run `n` simulation steps.
+    /// Run `n` simulation steps. This function is part of the public API.
     pub fn step_n(&mut self, n: u32) {
         for _ in 0..n {
             self.step();

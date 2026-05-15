@@ -124,7 +124,7 @@ impl HtmlDocument {
     pub fn generation(&self) -> u64 {
         self.generation
     }
-    /// Return the root element id.
+    /// Return the root element id. This function is part of the public API.
     pub fn root(&self) -> HtmlElementId {
         self.root
     }

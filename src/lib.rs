@@ -1,60 +1,116 @@
 #![allow(unused_doc_comments)]
 #![allow(clippy::doc_lazy_continuation)]
+//! Core Lurek2D crate modules and the top-level runtime entry point.
+
+/// Exposes the AI subsystem module.
 pub mod ai;
+/// Exposes the animation subsystem module.
 pub mod animation;
+/// Exposes the application bootstrap and runtime loop module.
 pub mod app;
+/// Exposes the audio subsystem module.
 pub mod audio;
 #[cfg(feature = "automation-plugin")]
+/// Exposes the automation subsystem module when the plugin is enabled.
 pub mod automation;
+/// Exposes the camera subsystem module.
 pub mod camera;
+/// Exposes the compute subsystem module.
 pub mod compute;
+/// Exposes the data utilities subsystem module.
 pub mod data;
+/// Exposes the dataframe subsystem module.
 pub mod dataframe;
+/// Exposes the debug bridge subsystem module.
 pub mod debugbridge;
 #[cfg(feature = "devtools-plugin")]
+/// Exposes the developer tools subsystem module when the plugin is enabled.
 pub mod devtools;
+/// Exposes the runtime documentation subsystem module.
 pub mod docs;
+/// Exposes the ECS subsystem module.
 pub mod ecs;
+/// Exposes the visual effects subsystem module.
 pub mod effect;
+/// Exposes the event subsystem module.
 pub mod event;
+/// Exposes the filesystem subsystem module.
 pub mod filesystem;
+/// Exposes the globe subsystem module.
 pub mod globe;
 #[cfg(feature = "graph")]
+/// Exposes the graph subsystem module when the feature is enabled.
 pub mod graph;
+/// Exposes the HTML subsystem module.
 pub mod html;
+/// Exposes the internationalization subsystem module.
 pub mod i18n;
+/// Exposes the image subsystem module.
 pub mod image;
+/// Exposes the input subsystem module.
 pub mod input;
+/// Exposes the lighting subsystem module.
 pub mod light;
+/// Exposes the structured logging subsystem module.
 pub mod log;
+/// Exposes the Lua API bridge subsystem module.
 pub mod lua_api;
+/// Exposes the math subsystem module.
 pub mod math;
+/// Exposes the minimap subsystem module.
 pub mod minimap;
+/// Exposes the mod management subsystem module.
 pub mod mods;
+/// Exposes the networking subsystem module.
 pub mod network;
+/// Exposes the parallax subsystem module.
 pub mod parallax;
+/// Exposes the particle subsystem module.
 pub mod particle;
+/// Exposes the pathfinding subsystem module.
 pub mod pathfind;
+/// Exposes the reusable patterns subsystem module.
 pub mod patterns;
+/// Exposes the physics subsystem module.
 pub mod physics;
+/// Exposes the pipeline subsystem module.
 pub mod pipeline;
+/// Exposes the procedural generation subsystem module.
 pub mod procgen;
+/// Exposes the province subsystem module.
 pub mod province;
+/// Exposes the raycaster subsystem module.
 pub mod raycaster;
+/// Exposes the rendering subsystem module.
 pub mod render;
+/// Exposes the core runtime subsystem module.
 pub mod runtime;
+/// Exposes the save subsystem module.
 pub mod save;
+/// Exposes the scene subsystem module.
 pub mod scene;
+/// Exposes the serialization subsystem module.
 pub mod serial;
+/// Exposes the spine animation subsystem module.
 pub mod spine;
+/// Exposes the sprite subsystem module.
 pub mod sprite;
+/// Exposes the terminal subsystem module.
 pub mod terminal;
+/// Exposes the threading subsystem module.
 pub mod thread;
+/// Exposes the tilemap subsystem module.
 pub mod tilemap;
+/// Exposes the timer subsystem module.
 pub mod timer;
+/// Exposes the tween subsystem module.
 pub mod tween;
+/// Exposes the UI subsystem module.
 pub mod ui;
+/// Exposes the window subsystem module.
 pub mod window;
+
+/// Starts the Lurek2D runtime using the current CLI arguments and active game path.
 pub fn lurek_run() {
     use app::App;
     use runtime::Config;

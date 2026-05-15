@@ -18,35 +18,35 @@ pub struct Color {
 }
 
 impl Color {
-    /// Opaque white (1, 1, 1, 1).
+    /// Opaque white (1, 1, 1, 1). This item is part of the public API.
     pub const WHITE: Color = Color {
         r: 1.0,
         g: 1.0,
         b: 1.0,
         a: 1.0,
     };
-    /// Opaque black (0, 0, 0, 1).
+    /// Opaque black (0, 0, 0, 1). This item is part of the public API.
     pub const BLACK: Color = Color {
         r: 0.0,
         g: 0.0,
         b: 0.0,
         a: 1.0,
     };
-    /// Opaque red (1, 0, 0, 1).
+    /// Opaque red (1, 0, 0, 1). This item is part of the public API.
     pub const RED: Color = Color {
         r: 1.0,
         g: 0.0,
         b: 0.0,
         a: 1.0,
     };
-    /// Opaque green (0, 1, 0, 1).
+    /// Opaque green (0, 1, 0, 1). This item is part of the public API.
     pub const GREEN: Color = Color {
         r: 0.0,
         g: 1.0,
         b: 0.0,
         a: 1.0,
     };
-    /// Opaque blue (0, 0, 1, 1).
+    /// Opaque blue (0, 0, 1, 1). This item is part of the public API.
     pub const BLUE: Color = Color {
         r: 0.0,
         g: 0.0,

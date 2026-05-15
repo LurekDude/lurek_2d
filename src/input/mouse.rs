@@ -167,7 +167,7 @@ impl MouseState {
         (self.x, self.y)
     }
 
-    /// Show or hide the OS cursor.
+    /// Show or hide the OS cursor. This function is part of the public API.
     pub fn set_visible(&mut self, visible: bool) {
         self.visible = visible;
     }

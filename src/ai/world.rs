@@ -16,7 +16,7 @@ pub struct AIWorld {
     pub(crate) global_blackboard: Blackboard,
 }
 impl AIWorld {
-    /// Create an empty AI world.
+    /// Create an empty AI world. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             agents: Vec::new(),

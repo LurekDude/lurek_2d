@@ -8,7 +8,7 @@
 use super::core::Graph;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
-/// Result of a graph path query.
+/// Result of a graph path query. This item is part of the public API.
 #[derive(Debug, Clone)]
 pub struct PathResult {
     /// Node ids in path order.

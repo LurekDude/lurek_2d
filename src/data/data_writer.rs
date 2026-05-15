@@ -51,11 +51,11 @@ impl DataWriter {
     pub fn as_bytes(&self) -> &[u8] {
         &self.buffer
     }
-    /// Write one u8 value at cursor.
+    /// Write one u8 value at cursor. This function is part of the public API.
     pub fn write_u8(&mut self, value: u8) {
         self.write_raw(&[value]);
     }
-    /// Write one i8 value at cursor.
+    /// Write one i8 value at cursor. This function is part of the public API.
     pub fn write_i8(&mut self, value: i8) {
         self.write_raw(&[value as u8]);
     }
@@ -93,7 +93,7 @@ impl DataWriter {
         self.write_u32_le(bytes.len() as u32);
         self.write_raw(bytes);
     }
-    /// Write raw bytes at cursor.
+    /// Write raw bytes at cursor. This function is part of the public API.
     pub fn write_bytes(&mut self, bytes: &[u8]) {
         self.write_raw(bytes);
     }

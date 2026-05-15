@@ -133,7 +133,7 @@ pub enum TmxLayer {
     /// An object group layer.
     Object(TmxObjectLayer),
 }
-/// Top-level parsed TMX map.
+/// Top-level parsed TMX map. This item is part of the public API.
 #[derive(Debug, Clone)]
 pub struct TmxMap {
     /// Map width in tiles.

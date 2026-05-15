@@ -117,7 +117,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = shared.clone();
     // -- getLanguage --
-    /// Returns the active locale code.
+    /// Returns the active locale code. This function is exposed to Lua scripts.
     /// @return | LuaValue | Active locale string, or nil when no locale is active.
     loc.set(
         "getLanguage",

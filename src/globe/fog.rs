@@ -53,15 +53,15 @@ impl FogMask {
             self.states[id] = state as u8;
         }
     }
-    /// Mark a province as visible.
+    /// Mark a province as visible. This function is part of the public API.
     pub fn reveal(&mut self, id: ProvinceId) {
         self.set_state(id, FogState::Visible);
     }
-    /// Mark a province as hidden.
+    /// Mark a province as hidden. This function is part of the public API.
     pub fn hide(&mut self, id: ProvinceId) {
         self.set_state(id, FogState::Hidden);
     }
-    /// Mark a province as explored.
+    /// Mark a province as explored. This function is part of the public API.
     pub fn explore(&mut self, id: ProvinceId) {
         self.set_state(id, FogState::Explored);
     }
@@ -178,7 +178,7 @@ pub struct FogStore {
     masks: HashMap<String, FogMask>,
 }
 impl FogStore {
-    /// Create an empty fog store.
+    /// Create an empty fog store. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }
@@ -207,7 +207,7 @@ impl FogStore {
     pub fn explore(&mut self, viewer: &str, id: ProvinceId) {
         self.get_or_insert(viewer).explore(id);
     }
-    /// Hide a province for a viewer.
+    /// Hide a province for a viewer. This function is part of the public API.
     pub fn hide(&mut self, viewer: &str, id: ProvinceId) {
         self.get_or_insert(viewer).hide(id);
     }

@@ -35,7 +35,7 @@ impl DataView {
         }
         Ok(Self { data, offset, size })
     }
-    /// Return view size in bytes.
+    /// Return view size in bytes. This function is part of the public API.
     pub fn get_size(&self) -> usize {
         self.size
     }

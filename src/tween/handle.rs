@@ -87,7 +87,7 @@ impl LuaTween {
         })
     }
 
-    /// Advance the tween by `dt` seconds, write interpolated values to the target table,
+    /// Advance the tween by `dt` seconds, write interpolated values to the target table,.
     /// fire `on_update`, handle repeats and yoyo; return true when fully done.
     pub fn tick_with(&mut self, lua: &Lua, dt: f64) -> LuaResult<bool> {
         if !self.active || self.paused {

@@ -1,3 +1,5 @@
+//! Public types and helpers for the widget module.
+
 /// Interaction state of a widget used as a theme lookup key.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WidgetState {
@@ -153,6 +155,7 @@ impl WidgetType {
             Self::Custom => "custom",
         }
     }
+    /// Parse str. This function is part of the public API.
     pub fn parse_str(s: &str) -> Option<Self> {
         match s {
             "button" => Some(Self::Button),

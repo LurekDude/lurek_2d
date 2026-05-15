@@ -167,11 +167,11 @@ impl FlowField {
     pub fn get_targets(&self) -> Vec<(u32, u32)> {
         self.targets.clone()
     }
-    /// Return the grid width.
+    /// Return the grid width. This function is part of the public API.
     pub fn get_width(&self) -> u32 {
         self.width
     }
-    /// Return the grid height.
+    /// Return the grid height. This function is part of the public API.
     pub fn get_height(&self) -> u32 {
         self.height
     }

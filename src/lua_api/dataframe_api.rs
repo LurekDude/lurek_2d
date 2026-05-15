@@ -135,7 +135,7 @@ impl LuaUserData for LuaDataFrame {
         /// @return | integer | Column count.
         methods.add_method("ncols", |_, this, ()| Ok(this.inner.borrow().ncols()));
         // -- columns --
-        /// Returns all column names in order.
+        /// Returns all column names in order. This method is available to Lua scripts.
         /// @return | table | Array table of column names.
         methods.add_method("columns", |lua, this, ()| {
             let df = this.inner.borrow();
@@ -188,7 +188,7 @@ impl LuaUserData for LuaDataFrame {
                 .map_err(LuaError::RuntimeError)
         });
         // -- getColumn --
-        /// Returns a column as an array table.
+        /// Returns a column as an array table. This method is available to Lua scripts.
         /// @param | col | LuaValue | Column name string or one-based column index.
         /// @return | table | Array table of column values.
         methods.add_method("getColumn", |lua, this, col: LuaValue| {
@@ -220,7 +220,7 @@ impl LuaUserData for LuaDataFrame {
             Ok(row_0 + 1)
         });
         // -- removeRow --
-        /// Removes a row by one-based index.
+        /// Removes a row by one-based index. This method is available to Lua scripts.
         /// @param | row | integer | One-based row index to remove.
         /// @return | nil | No value is returned.
         methods.add_method("removeRow", |_, this, row: usize| {
@@ -291,7 +291,7 @@ impl LuaUserData for LuaDataFrame {
             },
         );
         // -- sort --
-        /// Returns rows sorted by a column.
+        /// Returns rows sorted by a column. This method is available to Lua scripts.
         /// @param | col | LuaValue | Column name string or one-based column index.
         /// @param | ascending | boolean? | True for ascending order; defaults to true.
         /// @return | LDataFrame | New sorted dataframe.
@@ -450,7 +450,7 @@ impl LuaUserData for LuaDataFrame {
             Ok(LuaDataFrame::new(result))
         });
         // -- sample --
-        /// Returns a sampled dataframe.
+        /// Returns a sampled dataframe. This method is available to Lua scripts.
         /// @param | n | integer | Number of rows to sample.
         /// @param | seed | integer? | Optional random seed.
         /// @return | LDataFrame | New sampled dataframe.
@@ -665,7 +665,7 @@ impl LuaUserData for LuaDataFrame {
             },
         );
         // -- withRollingSum --
-        /// Adds a rolling sum column in place.
+        /// Adds a rolling sum column in place. This method is available to Lua scripts.
         /// @param | col | LuaValue | Source column reference.
         /// @param | window | integer | Rolling window size.
         /// @param | name | string | Output column name.
@@ -713,7 +713,7 @@ impl LuaUserData for LuaDataFrame {
             },
         );
         // -- withRank --
-        /// Adds a rank column in place.
+        /// Adds a rank column in place. This method is available to Lua scripts.
         /// @param | col | LuaValue | Source column reference.
         /// @param | asc | boolean? | True for ascending rank; defaults to true.
         /// @param | name | string | Output column name.
@@ -862,7 +862,7 @@ impl LuaUserData for LuaDataFrame {
             },
         );
         // -- modeVal --
-        /// Returns the mode value of a column.
+        /// Returns the mode value of a column. This method is available to Lua scripts.
         /// @param | col | LuaValue | Column reference.
         /// @return | LuaValue | Most common cell value.
         methods.add_method("modeVal", |lua, this, col: LuaValue| {
@@ -875,7 +875,7 @@ impl LuaUserData for LuaDataFrame {
             cell_to_lua(lua, &val)
         });
         // -- entropy --
-        /// Returns entropy for a column.
+        /// Returns entropy for a column. This method is available to Lua scripts.
         /// @param | col | LuaValue | Column reference.
         /// @return | number | Entropy value.
         methods.add_method("entropy", |_, this, col: LuaValue| {
@@ -1083,7 +1083,7 @@ impl LuaUserData for LuaLazyQuery {
             },
         );
         // -- sort --
-        /// Adds a sort step to the lazy query.
+        /// Adds a sort step to the lazy query. This method is available to Lua scripts.
         /// @param | col | string | Column name to sort by.
         /// @param | ascending | boolean? | True for ascending order; defaults to true.
         /// @return | LLazyQuery | New lazy query handle with the sort step.
@@ -1392,7 +1392,7 @@ impl LuaUserData for LuaVecFrame {
                 .map_err(LuaError::RuntimeError)
         });
         // -- colNeg --
-        /// Negates a numeric column in place.
+        /// Negates a numeric column in place. This method is available to Lua scripts.
         /// @param | col | string | Column name.
         /// @return | nil | No value is returned.
         methods.add_method_mut("colNeg", |_, this, col: String| {
@@ -1402,7 +1402,7 @@ impl LuaUserData for LuaVecFrame {
                 .map_err(LuaError::RuntimeError)
         });
         // -- colClamp --
-        /// Clamps a numeric column in place.
+        /// Clamps a numeric column in place. This method is available to Lua scripts.
         /// @param | col | string | Column name.
         /// @param | min_val | number | Minimum allowed value.
         /// @param | max_val | number | Maximum allowed value.
@@ -1596,7 +1596,7 @@ impl LuaUserData for LuaVecFrame {
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     // -- newDataFrame --
-    /// Creates an empty dataframe.
+    /// Creates an empty dataframe. This function is exposed to Lua scripts.
     /// @return | LDataFrame | New empty dataframe handle.
     tbl.set(
         "newDataFrame",
@@ -1667,7 +1667,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- fromCSV --
-    /// Parses a dataframe from CSV text.
+    /// Parses a dataframe from CSV text. This function is exposed to Lua scripts.
     /// @param | s | string | CSV text.
     /// @return | LDataFrame | New dataframe handle.
     tbl.set(
@@ -1678,7 +1678,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- fromJSON --
-    /// Parses a dataframe from JSON text.
+    /// Parses a dataframe from JSON text. This function is exposed to Lua scripts.
     /// @param | s | string | JSON text.
     /// @return | LDataFrame | New dataframe handle.
     tbl.set(

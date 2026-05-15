@@ -167,7 +167,7 @@ impl TreeView {
             false
         }
     }
-    /// Return the total node count.
+    /// Return the total node count. This function is part of the public API.
     pub fn node_count(&self) -> usize {
         self.nodes.len()
     }
@@ -257,13 +257,13 @@ impl TreeView {
     pub fn is_node_expanded(&self, index: usize) -> Option<bool> {
         self.nodes.get(index).map(|n| n.expanded)
     }
-    /// Set all nodes expanded.
+    /// Set all nodes expanded. This function is part of the public API.
     pub fn expand_all(&mut self) {
         for node in &mut self.nodes {
             node.expanded = true;
         }
     }
-    /// Set all nodes collapsed.
+    /// Set all nodes collapsed. This function is part of the public API.
     pub fn collapse_all(&mut self) {
         for node in &mut self.nodes {
             node.expanded = false;
@@ -407,7 +407,7 @@ pub struct MenuBar {
     pub menus: Vec<usize>,
 }
 impl MenuBar {
-    /// Create an empty menu bar.
+    /// Create an empty menu bar. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             base: WidgetBase::new(WidgetType::MenuBar),
@@ -485,7 +485,7 @@ pub struct StatusBar {
     pub sections: Vec<(String, f32)>,
 }
 impl StatusBar {
-    /// Create an empty status bar.
+    /// Create an empty status bar. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             base: WidgetBase::new(WidgetType::StatusBar),
@@ -689,7 +689,7 @@ impl Badge {
             self.count.to_string()
         }
     }
-    /// Update the count value.
+    /// Update the count value. This function is part of the public API.
     pub fn set_count(&mut self, count: u32) {
         self.count = count;
     }

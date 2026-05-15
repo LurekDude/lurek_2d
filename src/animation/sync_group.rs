@@ -10,7 +10,7 @@ pub struct AnimSyncGroup {
     members: Vec<DefaultKey>,
 }
 impl AnimSyncGroup {
-    /// Create an empty sync group.
+    /// Create an empty sync group. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             members: Vec::new(),
@@ -22,11 +22,11 @@ impl AnimSyncGroup {
             self.members.push(key);
         }
     }
-    /// Remove `key` from the group.
+    /// Remove `key` from the group. This function is part of the public API.
     pub fn remove(&mut self, key: DefaultKey) {
         self.members.retain(|k| *k != key);
     }
-    /// Remove all members.
+    /// Remove all members. This function is part of the public API.
     pub fn clear(&mut self) {
         self.members.clear();
     }
@@ -34,7 +34,7 @@ impl AnimSyncGroup {
     pub fn member_count(&self) -> usize {
         self.members.len()
     }
-    /// Return the member slice.
+    /// Return the member slice. This function is part of the public API.
     pub fn members(&self) -> &[DefaultKey] {
         &self.members
     }

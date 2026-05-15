@@ -57,43 +57,45 @@ This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`
 - `ScreenshotRequest` (`struct`, `shared_state.rs`): Pending request to save the next rendered screen frame as a PNG.
 - `FrameProfile` (`struct`, `shared_state.rs`): Per-frame callback timing snapshot recorded by the app loop.
 - `ResourceMemoryStats` (`struct`, `shared_state.rs`): Resource-memory accounting snapshot with per-kind bytes and counts.
-- `SharedState` (`struct`, `shared_state.rs`): Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
 - `PhysicsRunConfig` (`struct`, `shared_state.rs`): Physics and fixed-update runtime configuration sub-domain (`fixed_dt`, `max_steps`, `debug_draw`, `fixed_update_dt`), held as `SharedState::physics_run`.
+- `SharedState` (`struct`, `shared_state.rs`): Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
 - `RendererStats` (`struct`, `shared_state.rs`): Snapshot of renderer statistics for a single frame.
 
 ## Functions
 
-- `ModulesConfig::validate_and_fix` (`config.rs`): Enforces dependency constraints so that a partially-disabled config is never internally inconsistent.
-- `Config::load` (`config.rs`): Loads engine configuration from the game directory.
-- `Config::load_from_conf_toml` (`config.rs`): Loads engine configuration from `conf.toml` in the game directory.
-- `ErrorCategory::as_str` (`error.rs`): Returns the category name as a lowercase string.
-- `EngineError::code` (`error.rs`): Returns the stable error code for this variant.
-- `EngineError::category` (`error.rs`): Returns the error category for this variant.
-- `EngineError::recovery_hint` (`error.rs`): Returns a human-readable recovery hint for this error variant.
-- `ErrorSnapshot::to_json` (`error.rs`): Serialises the snapshot to a compact JSON string.
-- `EngineError::snapshot` (`error.rs`): Creates an [`ErrorSnapshot`] capturing all diagnostic fields of this error.
+- `ModulesConfig::validate_and_fix` (`config.rs`): Disable modules whose dependencies are not enabled and emit warnings.
+- `Config::load` (`config.rs`): Load configuration, preferring `conf.toml` when it exists in `game_dir`.
+- `Config::load_from_conf_toml` (`config.rs`): Parse `conf.toml`, merge it over defaults, and return config with optional parse error.
+- `ErrorCategory::as_str` (`error.rs`): Map error category to stable lowercase identifier string.
+- `EngineError::code` (`error.rs`): Return stable machine-readable error code for this variant.
+- `EngineError::category` (`error.rs`): Return high-level category used for diagnostics grouping.
+- `EngineError::recovery_hint` (`error.rs`): Return operator hint describing likely remediation path.
+- `ErrorSnapshot::to_json` (`error.rs`): Encode snapshot as compact JSON for external consumers.
+- `EngineError::snapshot` (`error.rs`): Build snapshot payload from this error value.
 - `set_log_level` (`log_messages.rs`): Sets the global log level at runtime (called from `lurek.runtime.setLogLevel`).
 - `get_log_level` (`log_messages.rs`): Returns the current log level name.
-- `MessageCatalog::from_toml` (`messages.rs`): Parse the embedded TOML source and build a flat ID → text map.
-- `MessageCatalog::get` (`messages.rs`): Look up the human-readable text for a message ID.
-- `MessageCatalog::len` (`messages.rs`): Number of registered message entries.
-- `MessageCatalog::is_empty` (`messages.rs`): Returns `true` if the catalog contains no entries.
+- `MessageCatalog::from_toml` (`messages.rs`): Parse TOML and build a message catalog map; keep empty map on parse errors.
+- `MessageCatalog::get` (`messages.rs`): Fetch message text for one identifier if present.
+- `MessageCatalog::len` (`messages.rs`): Count entries currently loaded in the catalog.
+- `MessageCatalog::is_empty` (`messages.rs`): Check whether the catalog has zero loaded entries.
 - `init` (`messages.rs`): Initialise the global message catalog from the embedded TOML.
 - `get_message` (`messages.rs`): Resolve a stable message ID to its human-readable text.
 - `resolve_message` (`messages.rs`): Resolve an arbitrary message ID to its human-readable text.
 - `has_message` (`messages.rs`): Returns `true` if the global message catalog contains the given ID.
 - `message_count` (`messages.rs`): Number of entries currently registered in the global message catalog.
 - `catalog` (`messages.rs`): Returns a reference to the global [`MessageCatalog`], or `None` if [`init`] has not been called yet.
-- `SharedState::new` (`shared_state.rs`): Creates a new `SharedState` with the given window dimensions, title, and game directory.
-- `SharedState::step_timer` (`shared_state.rs`): Advances the clock by one tick and syncs `delta_time`, `total_time`, and `fps`.
-- `SharedState::touch_texture` (`shared_state.rs`): Records that a texture was used on the current frame.
-- `SharedState::touch_canvas` (`shared_state.rs`): Records that a canvas was used on the current frame (updates `canvas_last_used`).
-- `SharedState::evict_lru_resources` (`shared_state.rs`): Evicts least-recently-used textures until total resident resource size (textures + fonts + canvases + shaders) is within budget.
-- `SharedState::resource_memory_stats` (`shared_state.rs`): Returns a summary of resident resource memory usage.
-- `SharedState::request_async_load` (`shared_state.rs`): Submits a background file-read request, lazily creating the async loader.
-- `SharedState::load_default_fonts` (`shared_state.rs`): Loads all 6 embedded bitmap fonts into `fonts` and stores their keys in `default_fonts`.
-- `SharedState::poll_async_load` (`shared_state.rs`): Polls a pending async load and returns the status and optional data.
-- `SharedState::compute_stats` (`shared_state.rs`): Computes a snapshot of the current renderer statistics.
+- `SharedState::new` (`shared_state.rs`): Create a new shared state with initial window dimensions, title, and game directory.
+- `SharedState::step_timer` (`shared_state.rs`): Advance the frame clock and update delta time, FPS, and total time.
+- `SharedState::touch_texture` (`shared_state.rs`): Mark a texture as recently used for LRU eviction tracking.
+- `SharedState::touch_canvas` (`shared_state.rs`): Mark a canvas as recently used for LRU eviction tracking.
+- `SharedState::evict_lru_resources` (`shared_state.rs`): Evict least-recently-used textures until memory usage is within budget.
+- `SharedState::resource_memory_stats` (`shared_state.rs`): Compute current resource memory usage across all asset types.
+- `SharedState::request_async_load` (`shared_state.rs`): Submit an asynchronous file read and return a poll handle.
+- `SharedState::request_async_write` (`shared_state.rs`): Submit an asynchronous file write and return a poll handle.
+- `SharedState::load_default_fonts` (`shared_state.rs`): Load all built-in font sizes and set the default active font.
+- `SharedState::poll_async_load` (`shared_state.rs`): Check the status of a pending asynchronous read operation.
+- `SharedState::poll_async_write` (`shared_state.rs`): Check the status of a pending asynchronous write operation.
+- `SharedState::compute_stats` (`shared_state.rs`): Compute aggregate renderer statistics for the current frame.
 
 ## Lua API Reference
 
@@ -105,6 +107,7 @@ This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`
 - `camera`: Imports or references `camera` from `src/camera/`.
 - `event`: Imports or references `event` from `src/event/`.
 - `filesystem`: Imports or references `filesystem` from `src/filesystem/`.
+- `image`: Imports or references `src/image/`. Cross-group dependency from `Core Runtime` into `Platform Services`.
 - `input`: Imports or references `input` from `src/input/`.
 - `light`: Imports or references `light` from `src/light/`.
 - `parallax`: Imports or references `parallax` from `src/parallax/`.

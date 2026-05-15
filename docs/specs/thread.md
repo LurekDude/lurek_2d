@@ -26,6 +26,7 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 ## Types
 
 - `ChannelValue` (`enum`, `channel.rs`): Serializable values that can be sent between threads.
+- `OverflowPolicy` (`enum`, `channel.rs`): Policy applied when a bounded `Channel` is full and `push` is called.
 - `Channel` (`struct`, `channel.rs`): Thread-safe MPMC channel for Lua inter-thread communication.
 - `LuaChannel` (`struct`, `channel.rs`): Lua UserData wrapper for a thread-safe channel.
 - `ThreadPool` (`struct`, `pool.rs`): A pool of N persistent worker threads that accept tasks from a shared input channel and send results to a shared output channel.
@@ -36,32 +37,40 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 ## Functions
 
-- `Channel::new` (`channel.rs`): Create an unnamed channel.
-- `Channel::named` (`channel.rs`): Creates a named bidirectional channel pair, binding the channel name in the global registry.
-- `Channel::push` (`channel.rs`): Push a value to the back of the channel.
-- `Channel::pop` (`channel.rs`): Pop a value from the front of the channel (non-blocking).
-- `Channel::peek` (`channel.rs`): Peek at the front value without removing it.
-- `Channel::demand` (`channel.rs`): Wait for a value, blocking the calling thread.
-- `Channel::get_count` (`channel.rs`): Get the number of values currently in the channel.
-- `Channel::clear` (`channel.rs`): Remove all values from the channel.
-- `Channel::supply` (`channel.rs`): Push a value only if the channel is currently empty.
-- `Channel::name` (`channel.rs`): Get the channel name, if it is a named channel.
+- `Channel::new` (`channel.rs`): Create an unbounded, unnamed channel.
+- `Channel::bounded` (`channel.rs`): Create a bounded, unnamed channel with a capacity of at least 1.
+- `Channel::named` (`channel.rs`): Create an unbounded channel with a diagnostic `name`.
+- `Channel::named_bounded` (`channel.rs`): Create a bounded channel with a diagnostic `name` and capacity of at least 1.
+- `Channel::push` (`channel.rs`): Push `value` onto the queue, blocking when the channel is full; return the 1-based push sequence ID.
+- `Channel::try_push` (`channel.rs`): Push `value` without blocking; return `false` immediately when the channel is full.
+- `Channel::pop` (`channel.rs`): Remove and return the front value without blocking; return `None` when the queue is empty.
+- `Channel::peek` (`channel.rs`): Return a clone of the front value without removing it; return `None` when the queue is empty.
+- `Channel::demand` (`channel.rs`): Block until a value is available or `timeout` seconds elapse; return `None` on timeout.
+- `Channel::get_count` (`channel.rs`): Return the number of values currently in the queue.
+- `Channel::clear` (`channel.rs`): Drain the queue and wake all blocked senders.
+- `Channel::supply` (`channel.rs`): Push `value` only when the queue is empty and has capacity; return `true` when pushed.
+- `Channel::name` (`channel.rs`): Return the channel's diagnostic name, or `None` for anonymous channels.
+- `Channel::capacity` (`channel.rs`): Return the capacity limit, or `None` for unbounded channels.
+- `Channel::is_bounded` (`channel.rs`): Return `true` when the channel was created with a capacity limit.
 - `lua_to_channel_value` (`channel.rs`): Convert a Lua value into a `ChannelValue` for cross-thread transfer.
 - `channel_value_to_lua` (`channel.rs`): Convert a `ChannelValue` back into a Lua value.
-- `ThreadPool::new` (`pool.rs`): Create a pool of `size` workers, all executing `code`.
-- `ThreadPool::submit` (`pool.rs`): Submit a value to the pool input channel.
-- `ThreadPool::collect` (`pool.rs`): Collect a result from the pool output channel (non-blocking).
-- `ThreadPool::join` (`pool.rs`): Block until all workers have finished execution.
-- `ThreadPool::size` (`pool.rs`): Returns the number of workers in this pool.
-- `Promise::new` (`promise.rs`): Create and immediately start a promise executing `code`.
-- `Promise::is_done` (`promise.rs`): Check if the promise has a result ready, without blocking.
-- `Promise::result` (`promise.rs`): Retrieve the result value if ready.
-- `Promise::get_error` (`promise.rs`): Returns the error string if the worker thread failed, otherwise `None`.
-- `LuaThread::new` (`worker.rs`): Create a new thread that will execute the given Lua code.
-- `LuaThread::start` (`worker.rs`): Start the thread, spawning a new OS thread with its own Lua VM.
-- `LuaThread::wait` (`worker.rs`): Block until the thread finishes execution.
-- `LuaThread::is_running` (`worker.rs`): Check whether the thread is currently running.
-- `LuaThread::get_error` (`worker.rs`): Get the error message if the thread terminated with an error.
+- `ThreadPool::new` (`pool.rs`): Create a pool of `size` workers, each executing `code`, wired to shared input/output channels.
+- `ThreadPool::submit` (`pool.rs`): Push `value` onto the input channel for the next available worker.
+- `ThreadPool::collect` (`pool.rs`): Non-blocking pop from the output channel; return `None` when no result is ready.
+- `ThreadPool::join` (`pool.rs`): Block until all workers finish their current work items.
+- `ThreadPool::join_with_timeout` (`pool.rs`): Block until all workers finish or `timeout_secs` elapses; return `false` if any worker did not finish in time.
+- `ThreadPool::size` (`pool.rs`): Return the pool size (number of worker threads).
+- `Promise::new` (`promise.rs`): Spawn a `LuaThread` running `code` with `args` and return a pending `Promise`.
+- `Promise::is_done` (`promise.rs`): Poll whether the worker has finished; update `state` to `Done` or `Error` and return `true` when complete.
+- `Promise::result` (`promise.rs`): Pop and return the result value; returns `None` when not yet done.
+- `Promise::get_error` (`promise.rs`): Return the worker's error message if it terminated with an error, or `None`.
+- `LuaThread::new` (`worker.rs`): Create a `LuaThread` ready to run `code` with access to `channels`; does not start the OS thread.
+- `LuaThread::start` (`worker.rs`): Spawn the OS thread, inject `args` into the `arg` global, and begin executing `code`; returns an error when already running.
+- `LuaThread::wait` (`worker.rs`): Block the calling thread until the worker finishes; no-op when no handle is present.
+- `LuaThread::wait_timeout` (`worker.rs`): Poll every millisecond until the worker finishes or `timeout_secs` elapses; return `true` when finished in time.
+- `LuaThread::is_running` (`worker.rs`): Return `true` while the worker OS thread state is `Running`.
+- `LuaThread::get_error` (`worker.rs`): Return the error message when the worker terminated with `ThreadState::Error`, or `None`.
+- `worker_capabilities` (`worker.rs`): Return the `lurek.*` capabilities available inside worker VMs.
 
 ## Lua API Reference
 
@@ -69,51 +78,57 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - Namespace: `lurek.thread`
 
 ### Module Functions
-- `lurek.thread.newThread`: Creates a new background thread from a Lua code string.
-- `lurek.thread.newChannel`: Creates a new unnamed channel for inter-thread communication.
-- `lurek.thread.getChannel`: Gets or creates a named global channel shared across threads.
-- `lurek.thread.newPool`: Creates a thread pool whose workers all run the same Lua code.
-- `lurek.thread.async`: Starts a one-shot background computation and returns a promise.
+- `lurek.thread.newThread`: Creates a new worker thread that will execute the given Lua code string when started.
+- `lurek.thread.newChannel`: Creates a new unbounded channel for sending typed values between threads.
+- `lurek.thread.newBoundedChannel`: Creates a new bounded channel with a fixed capacity, blocking pushes when full.
+- `lurek.thread.getChannel`: Returns a named shared channel, creating it on first access. Repeated calls with the same name return the same channel.
+- `lurek.thread.newPool`: Creates a fixed-size thread pool where each worker runs the same Lua code and consumes items from a shared input channel.
+- `lurek.thread.async`: Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
+- `lurek.thread.getWorkerCapabilities`: Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
 
 ### `LChannel` Methods
 - `LChannel:type`: Returns the type name of this object.
-- `LChannel:typeOf`: Returns whether this object is of the given type.
-- `LChannel:push`: Pushes a value to the channel.
-- `LChannel:pop`: Retrieves and removes a value from the channel.
-- `LChannel:peek`: Retrieves the next value from the channel without removing it.
-- `LChannel:demand`: Waits for a value or until the timeout expires, then removes and returns it.
-- `LChannel:getCount`: Returns the number of items in the channel.
-- `LChannel:clear`: Clears all items from the channel.
-- `LChannel:supply`: Blocks until the channel has space, then adds the value.
-- `LChannel:pushTable`: Serializes a Lua table and pushes it to the channel.
-- `LChannel:popTable`: Pops a value from the channel expecting a table.
-- `LChannel:pushBytes`: Pushes raw binary data (a Lua string treated as a byte array) to the channel.
-- `LChannel:popBytes`: Pops a bytes value from the channel and returns it as a Lua string.
+- `LChannel:typeOf`: Checks whether this object matches the given type name.
+- `LChannel:push`: Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
+- `LChannel:pop`: Removes and returns the next value from the channel without blocking.
+- `LChannel:peek`: Returns the next value from the channel without removing it.
+- `LChannel:demand`: Blocks until a value is available on the channel or the optional timeout expires.
+- `LChannel:getCount`: Returns the number of values currently queued in the channel.
+- `LChannel:getCapacity`: Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
+- `LChannel:isBounded`: Checks whether this channel has a fixed capacity limit.
+- `LChannel:tryPush`: Attempts to push a value onto a bounded channel without blocking.
+- `LChannel:clear`: Removes all pending values from the channel.
+- `LChannel:supply`: Pushes a value and blocks until a consumer pops it (synchronous handoff).
+- `LChannel:pushTable`: Pushes a table value onto the channel, raising an error if the value is not a table.
+- `LChannel:popTable`: Pops the next value from the channel only if it is a table, discarding non-table values.
+- `LChannel:pushBytes`: Pushes raw binary data onto the channel as a byte blob.
+- `LChannel:popBytes`: Pops the next value from the channel only if it is a byte blob, discarding non-bytes values.
 
 ### `LPromise` Methods
 - `LPromise:type`: Returns the type name of this object.
-- `LPromise:typeOf`: Returns whether this object is of the given type.
-- `LPromise:isDone`: Returns whether the promise has completed.
-- `LPromise:result`: Pops and returns the promise result.
-- `LPromise:getError`: Returns the worker error string if the promise failed.
+- `LPromise:typeOf`: Checks whether this object matches the given type name.
+- `LPromise:isDone`: Checks whether the asynchronous computation has completed.
+- `LPromise:result`: Returns the result value of the completed promise.
+- `LPromise:getError`: Returns the error message from the promise, if it terminated with an error.
+- `LPromise:chain`: Creates a new promise that runs the given code with the parent promise's result as its first argument.
 
 ### `LThread` Methods
 - `LThread:type`: Returns the type name of this object.
-- `LThread:typeOf`: Returns whether this object is of the given type.
-- `LThread:start`: Launches the background thread, passing optional varargs.
-- `LThread:wait`: Blocks the calling thread until the background thread finishes.
-- `LThread:isRunning`: Returns whether the thread is currently executing.
-- `LThread:getError`: Returns the error message if the thread failed.
+- `LThread:typeOf`: Checks whether this object matches the given type name.
+- `LThread:start`: Launches the worker thread, executing the Lua code string supplied at creation time.
+- `LThread:wait`: Blocks the calling thread until the worker thread finishes execution.
+- `LThread:isRunning`: Checks whether the worker thread is still executing.
+- `LThread:getError`: Returns the error message from the worker thread, if it terminated with an error.
 
 ### `LThreadPool` Methods
 - `LThreadPool:type`: Returns the type name of this object.
-- `LThreadPool:typeOf`: Returns whether this object is of the given type.
-- `LThreadPool:submit`: Submits a value to the pool's input channel for processing by a worker.
-- `LThreadPool:collect`: Retrieves the next result from the pool's output channel.
-- `LThreadPool:size`: Returns the number of workers in this pool.
-- `LThreadPool:join`: Blocks until all workers in the pool have finished execution.
-- `LThreadPool:getInputChannel`: Returns the shared input channel.
-- `LThreadPool:getOutputChannel`: Returns the shared output channel.
+- `LThreadPool:typeOf`: Checks whether this object matches the given type name.
+- `LThreadPool:submit`: Pushes a value into the pool's input channel for processing by a worker thread.
+- `LThreadPool:collect`: Pops and returns the next result from the pool's output channel.
+- `LThreadPool:size`: Returns the number of worker threads in the pool.
+- `LThreadPool:join`: Blocks until all workers finish or the optional timeout elapses.
+- `LThreadPool:getInputChannel`: Returns the pool's shared input channel that feeds work items to worker threads.
+- `LThreadPool:getOutputChannel`: Returns the pool's shared output channel where worker threads place their results.
 
 ## References
 

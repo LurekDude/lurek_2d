@@ -309,18 +309,18 @@ pub struct VecFrame {
     columns: Vec<ColumnStore>,
 }
 impl VecFrame {
-    /// Create empty VecFrame.
+    /// Create empty VecFrame. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             column_names: Vec::new(),
             columns: Vec::new(),
         }
     }
-    /// Return number of rows.
+    /// Return number of rows. This function is part of the public API.
     pub fn nrows(&self) -> usize {
         self.columns.first().map(|c| c.len()).unwrap_or(0)
     }
-    /// Return number of columns.
+    /// Return number of columns. This function is part of the public API.
     pub fn ncols(&self) -> usize {
         self.column_names.len()
     }

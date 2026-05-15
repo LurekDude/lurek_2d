@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 
-/// Compute the pixel-weighted centroid (x, y) for each province id present in the span slice;
+/// Compute the pixel-weighted centroid (x, y) for each province id present in the span slice;.
 /// spans with id == 0 or x1 <= x0 are skipped; provinces with zero pixel area are omitted.
 pub fn centroids_from_spans(spans: &[(u32, u32, u32, u32)]) -> HashMap<u32, (f32, f32)> {
     let mut sum_x: HashMap<u32, f64> = HashMap::new();

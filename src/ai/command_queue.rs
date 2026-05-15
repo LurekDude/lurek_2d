@@ -29,7 +29,7 @@ pub struct CommandQueue {
     pub(crate) commands: VecDeque<Command>,
 }
 impl CommandQueue {
-    /// Create an empty queue.
+    /// Create an empty queue. This function is part of the public API.
     pub fn new() -> Self {
         log_msg!(debug, CQ01);
         Self {

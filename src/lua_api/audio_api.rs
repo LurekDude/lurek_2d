@@ -72,6 +72,8 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
             ))
         }
     };
+
+        /// Registers the `lurek.audio` module, Lua-visible audio constructors, controls, and userdata wrappers.
     let rate = match it.next() {
         Some(LuaValue::Integer(n)) => n as u32,
         Some(LuaValue::Number(n)) => n as u32,
@@ -365,7 +367,7 @@ pub struct LuaBus {
 impl LuaUserData for LuaBus {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getName --
-        /// Returns the name of this audio bus.
+        /// Returns the name of this audio bus. This method is available to Lua scripts.
         /// @return | string | Bus name as registered during creation.
         methods.add_method("getName", |_, this, ()| {
             let st = this.state.borrow();
@@ -517,7 +519,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- getFilePath --
         /// Returns the file path of the currently loaded MIDI file.
-        /// @return | string? | File path string or nil if no file is loaded.
+        /// @return | string | File path string or nil if no file is loaded.
         methods.add_method("getFilePath", |_, this, ()| {
             Ok(this.inner.borrow().file_path().map(|s| s.to_string()))
         });
@@ -531,7 +533,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- getSoundFontPath --
         /// Returns the path of the currently set SoundFont (stub, not yet implemented).
-        /// @return | string? | SoundFont path or nil.
+        /// @return | string | SoundFont path or nil.
         methods.add_method("getSoundFontPath", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:getSoundFontPath");
             Ok(Option::<String>::None)
@@ -643,7 +645,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- getBus --
         /// Returns the audio bus this MIDI player is routed through.
-        /// @return | LBus? | The assigned bus, or nil if using direct output.
+        /// @return | LBus | The assigned bus, or nil if using direct output.
         methods.add_method("getBus", |_, this, ()| {
             match this.inner.borrow().bus_key() {
                 Some(key) => Ok(Some(LuaBus {
@@ -800,7 +802,7 @@ impl LuaUserData for LuaMidiPlayer {
         // -- getTrackName --
         /// Returns the name of a MIDI track by 1-based index.
         /// @param | idx | integer | Track index (1-based).
-        /// @return | string? | Track name or nil if not available.
+        /// @return | string | Track name or nil if not available.
         methods.add_method("getTrackName", |_, this, idx: usize| {
             if idx >= 1 {
                 Ok(this
@@ -995,7 +997,7 @@ impl LuaUserData for LuaDecoder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- decode --
         /// Decodes the next chunk of audio data and returns it as a SoundData object.
-        /// @return | SoundData? | Decoded PCM data, or nil if end of stream reached.
+        /// @return | SoundData | Decoded PCM data, or nil if end of stream reached.
         methods.add_method_mut("decode", |lua, this, ()| match this.inner.decode() {
             Some(pcm_i16) => {
                 let samples: Vec<f32> = pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
@@ -1063,6 +1065,7 @@ impl LuaUserData for LuaDecoder {
         });
     }
 }
+/// Registers the `lurek.audio` Lua API table and userdata bindings.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     // -- newSource --
@@ -1436,7 +1439,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- resumeAll --
-    /// Resumes all paused audio sources.
+    /// Resumes all paused audio sources. This function is exposed to Lua scripts.
     /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
@@ -1509,7 +1512,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getSourceBus --
     /// Returns the bus a source is routed through.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | LBus? | The assigned bus, or nil if using direct output.
+    /// @return | LBus | The assigned bus, or nil if using direct output.
     let s = state.clone();
     tbl.set(
         "getSourceBus",
@@ -1924,6 +1927,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Sets the midi sound font for Lua scripts in this module.
+    /// @param | path | string | Path-like input used by this call.
+    /// @return | nil | No return value.
     tbl.set(
         "setMidiSoundFont",
         lua.create_function(move |_, path: String| {
@@ -1942,11 +1948,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Returns true if midi sound font for Lua scripts in this module.
+    /// @return | nil | No return value.
     tbl.set(
         "hasMidiSoundFont",
         lua.create_function(move |_, ()| Ok(s.borrow().midi_state.has_soundfont()))?,
     )?;
     let s = state.clone();
+    /// Clears midi sound font for Lua scripts in this module.
+    /// @return | nil | No return value.
     tbl.set(
         "clearMidiSoundFont",
         lua.create_function(move |_, ()| {
@@ -1955,6 +1965,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// New decoder for Lua scripts in this module.
+    /// @param | source | string | Path-like input used by this call.
+    /// @param | buffersize | integer? | Lua argument for `buffersize`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newDecoder",
         lua.create_function(move |_, (source, buffersize): (String, Option<usize>)| {
@@ -1970,6 +1984,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// New queueable source for Lua scripts in this module.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newQueueableSource",
         lua.create_function(
@@ -1990,6 +2006,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    /// Queue source for Lua scripts in this module.
+    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// @param | sd | mlua::AnyUserData | Lua argument for `sd`.
+    /// @return | nil | No return value.
     tbl.set(
         "queueSource",
         lua.create_function(move |_, (qsource_id, sd): (u64, mlua::AnyUserData)| {
@@ -2002,6 +2022,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Returns the free buffer count for Lua scripts in this module.
+    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "getFreeBufferCount",
         lua.create_function(move |_, qsource_id: u64| {
@@ -2010,6 +2033,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Play queueable for Lua scripts in this module.
+    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// @return | nil | No return value.
     tbl.set(
         "playQueueable",
         lua.create_function(move |_, qsource_id: u64| {
@@ -2019,6 +2045,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Stop queueable for Lua scripts in this module.
+    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// @return | nil | No return value.
     tbl.set(
         "stopQueueable",
         lua.create_function(move |_, qsource_id: u64| {
@@ -2027,6 +2056,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Returns the playback devices for Lua scripts in this module.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "getPlaybackDevices",
         lua.create_function(|lua, ()| {
@@ -2038,10 +2069,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(t)
         })?,
     )?;
+    /// Returns the playback device for Lua scripts in this module.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "getPlaybackDevice",
         lua.create_function(|_, ()| Ok(crate::audio::get_playback_device()))?,
     )?;
+    /// Sets the playback device for Lua scripts in this module.
+    /// @param | name | string | String value for `name`.
+    /// @return | nil | No return value.
     tbl.set(
         "setPlaybackDevice",
         lua.create_function(|_, name: String| {
@@ -2050,6 +2086,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Create_bus for Lua scripts in this module.
+    /// @param | name | string | String value for `name`.
+    /// @param | parent_name | string? | Lua argument for `parent_name`.
+    /// @return | nil | No return value.
     tbl.set(
         "create_bus",
         lua.create_function(move |_, (name, parent_name): (String, Option<String>)| {
@@ -2062,6 +2102,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+
+        // -- setSample --
+        /// Overwrites one normalized PCM sample value in this sound buffer.
+        /// @param | index | integer | Zero-based sample index.
+        /// @param | value | number | New sample value.
+        /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set(
         "set_bus_volume",
@@ -2077,6 +2123,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Add_effect for Lua scripts in this module.
+    /// @param | bus_name | string | Lua argument for `bus_name`.
+    /// @param | effect_type_str | string | Lua argument for `effect_type_str`.
+    /// @param | params | mlua::Table? | Lua argument for `params`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "add_effect",
         lua.create_function(
@@ -2102,6 +2153,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    /// Remove_effect for Lua scripts in this module.
+    /// @param | bus_name | string | Lua argument for `bus_name`.
+    /// @param | effect_id | integer | Lua argument for `effect_id`.
+    /// @return | nil | No return value.
     tbl.set(
         "remove_effect",
         lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
@@ -2120,6 +2175,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Set_effect_param for Lua scripts in this module.
+    /// @param | bus_name | string | Lua argument for `bus_name`.
+    /// @param | effect_id | integer | Lua argument for `effect_id`.
+    /// @param | param_name | string | Lua argument for `param_name`.
+    /// @param | value | number | Lua argument for `value`.
+    /// @return | nil | No return value.
     tbl.set(
         "set_effect_param",
         lua.create_function(
@@ -2146,6 +2207,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// New sine wave for Lua scripts in this module.
+    /// @param | freq | number | Lua argument for `freq`.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @param | sample_rate | integer | Lua argument for `sample_rate`.
+    /// @param | amplitude | number | Lua argument for `amplitude`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newSineWave",
         lua.create_function(
@@ -2154,6 +2221,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// New square wave for Lua scripts in this module.
+    /// @param | freq | number | Lua argument for `freq`.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @param | sample_rate | integer | Lua argument for `sample_rate`.
+    /// @param | amplitude | number | Lua argument for `amplitude`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newSquareWave",
         lua.create_function(
@@ -2167,6 +2240,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// New sawtooth wave for Lua scripts in this module.
+    /// @param | freq | number | Lua argument for `freq`.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @param | sample_rate | integer | Lua argument for `sample_rate`.
+    /// @param | amplitude | number | Lua argument for `amplitude`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newSawtoothWave",
         lua.create_function(
@@ -2180,6 +2259,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// New triangle wave for Lua scripts in this module.
+    /// @param | freq | number | Lua argument for `freq`.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @param | sample_rate | integer | Lua argument for `sample_rate`.
+    /// @param | amplitude | number | Lua argument for `amplitude`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newTriangleWave",
         lua.create_function(
@@ -2193,6 +2278,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// New white noise for Lua scripts in this module.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @param | sample_rate | integer | Lua argument for `sample_rate`.
+    /// @param | amplitude | number | Lua argument for `amplitude`.
+    /// @param | seed | integer | Lua argument for `seed`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newWhiteNoise",
         lua.create_function(
@@ -2206,6 +2297,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// Apply lowpass for Lua scripts in this module.
+    /// @param | sd_ud | userdata | Lua argument for `sd_ud`.
+    /// @param | cutoff_hz | number | Lua argument for `cutoff_hz`.
+    /// @return | nil | No return value.
     tbl.set(
         "applyLowpass",
         lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
@@ -2216,6 +2311,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Apply highpass for Lua scripts in this module.
+    /// @param | sd_ud | userdata | Lua argument for `sd_ud`.
+    /// @param | cutoff_hz | number | Lua argument for `cutoff_hz`.
+    /// @return | nil | No return value.
     tbl.set(
         "applyHighpass",
         lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
@@ -2226,6 +2325,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Apply bandpass for Lua scripts in this module.
+    /// @param | sd_ud | userdata | Lua argument for `sd_ud`.
+    /// @param | low_hz | number | Lua argument for `low_hz`.
+    /// @param | high_hz | number | Lua argument for `high_hz`.
+    /// @return | nil | No return value.
     tbl.set(
         "applyBandpass",
         lua.create_function(|_, (sd_ud, low_hz, high_hz): (LuaAnyUserData, f32, f32)| {
@@ -2236,6 +2340,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Apply gain for Lua scripts in this module.
+    /// @param | sd_ud | userdata | Lua argument for `sd_ud`.
+    /// @param | gain | number | Lua argument for `gain`.
+    /// @return | nil | No return value.
     tbl.set(
         "applyGain",
         lua.create_function(|_, (sd_ud, gain): (LuaAnyUserData, f32)| {
@@ -2246,6 +2354,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Mix into for Lua scripts in this module.
+    /// @param | dest_ud | userdata | Lua argument for `dest_ud`.
+    /// @param | src_ud | userdata | Lua argument for `src_ud`.
+    /// @return | nil | No return value.
     tbl.set(
         "mixInto",
         lua.create_function(|_, (dest_ud, src_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -2269,6 +2381,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Save wav for Lua scripts in this module.
+    /// @param | sd_ud | userdata | Lua argument for `sd_ud`.
+    /// @param | filename | string | Path-like input used by this call.
+    /// @return | nil | No return value.
     tbl.set(
         "saveWAV",
         lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
@@ -2284,6 +2400,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Sets the stereo width for Lua scripts in this module.
+    /// @param | src_ud | userdata | Lua argument for `src_ud`.
+    /// @param | width | number | Numeric `width` argument for this call.
+    /// @return | nil | No return value.
     tbl.set(
         "setStereoWidth",
         lua.create_function(move |_, (src_ud, width): (LuaAnyUserData, f32)| {
@@ -2298,6 +2418,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Returns the stereo width for Lua scripts in this module.
+    /// @param | src_ud | userdata | Lua argument for `src_ud`.
+    /// @return | nil | No return value.
     tbl.set(
         "getStereoWidth",
         lua.create_function(move |_, src_ud: LuaAnyUserData| {
@@ -2312,6 +2435,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Sets the random pitch for Lua scripts in this module.
+    /// @param | src_ud | userdata | Lua argument for `src_ud`.
+    /// @param | min | number | Lua argument for `min`.
+    /// @param | max | number | Lua argument for `max`.
+    /// @return | nil | No return value.
     tbl.set(
         "setRandomPitch",
         lua.create_function(move |_, (src_ud, min, max): (LuaAnyUserData, f32, f32)| {
@@ -2326,6 +2454,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Clears random pitch for Lua scripts in this module.
+    /// @param | src_ud | userdata | Lua argument for `src_ud`.
+    /// @return | nil | No return value.
     tbl.set(
         "clearRandomPitch",
         lua.create_function(move |_, src_ud: LuaAnyUserData| {
@@ -2338,6 +2469,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Crossfade for Lua scripts in this module.
+    /// @param | from_ud | userdata | Lua argument for `from_ud`.
+    /// @param | to_ud | userdata | Lua argument for `to_ud`.
+    /// @param | duration | number | Lua argument for `duration`.
+    /// @return | nil | No return value.
     tbl.set(
         "crossfade",
         lua.create_function(
@@ -2359,6 +2495,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    /// Returns the bus peak for Lua scripts in this module.
+    /// @param | bus_name | string | Lua argument for `bus_name`.
+    /// @return | nil | No return value.
     tbl.set(
         "getBusPeak",
         lua.create_function(move |_, bus_name: String| {
@@ -2369,6 +2508,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Returns the bus rms for Lua scripts in this module.
+    /// @param | bus_name | string | Lua argument for `bus_name`.
+    /// @return | nil | No return value.
     tbl.set(
         "getBusRms",
         lua.create_function(move |_, bus_name: String| {
@@ -2379,6 +2521,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// New pool for Lua scripts in this module.
+    /// @param | file_path | string | Lua argument for `file_path`.
+    /// @param | voice_count | integer | Lua argument for `voice_count`.
+    /// @return | table | Table result returned by this call.
     tbl.set(
         "newPool",
         lua.create_function(move |_, (file_path, voice_count): (String, usize)| {
@@ -2394,6 +2540,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Process offline for Lua scripts in this module.
+    /// @param | input | string | Lua argument for `input`.
+    /// @param | output | string | Lua argument for `output`.
+    /// @param | effects_tbl | mlua::Table | Lua argument for `effects_tbl`.
+    /// @return | nil | No return value.
     tbl.set(
         "processOffline",
         lua.create_function(
@@ -2443,6 +2594,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    /// Normalize file for Lua scripts in this module.
+    /// @param | input | string | Lua argument for `input`.
+    /// @param | output | string | Lua argument for `output`.
+    /// @param | target | number | Lua argument for `target`.
+    /// @return | nil | No return value.
     tbl.set(
         "normalizeFile",
         lua.create_function(move |_, (input, output, target): (String, String, f32)| {
@@ -2457,6 +2613,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    /// Waveform to png for Lua scripts in this module.
+    /// @param | input | string | Lua argument for `input`.
+    /// @param | output | string | Lua argument for `output`.
+    /// @param | width | integer | Numeric `width` argument for this call.
+    /// @param | height | integer | Numeric `height` argument for this call.
+    /// @return | nil | No return value.
     tbl.set(
         "waveformToPng",
         lua.create_function(
@@ -2473,6 +2635,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    /// Spectrogram to png for Lua scripts in this module.
+    /// @param | input | string | Lua argument for `input`.
+    /// @param | output | string | Lua argument for `output`.
+    /// @param | width | integer | Numeric `width` argument for this call.
+    /// @param | height | integer | Numeric `height` argument for this call.
+    /// @return | nil | No return value.
     tbl.set(
         "spectrogramToPng",
         lua.create_function(
@@ -2496,18 +2664,51 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     lurek.set("audio", tbl)?;
     Ok(())
 }
+/// Represents the Lua-visible LSoundData object exposed by this module.
 impl mlua::UserData for SoundData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getSampleCount --
+        /// Returns the total number of samples stored in this sound buffer.
+        /// @return | integer | Total sample count.
         methods.add_method("getSampleCount", |_, this, ()| Ok(this.sample_count()));
+        // -- getSampleRate --
+        /// Returns the playback sample rate of this sound buffer.
+        /// @return | integer | Sample rate in Hz.
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.sample_rate()));
+        // -- getChannelCount --
+        /// Returns the number of audio channels stored in this sound buffer.
+        /// @return | integer | Channel count.
         methods.add_method("getChannelCount", |_, this, ()| Ok(this.channel_count()));
+        // -- getDuration --
+        /// Returns the approximate playback duration of this sound buffer.
+        /// @return | number | Duration in seconds.
         methods.add_method("getDuration", |_, this, ()| Ok(this.duration()));
+        // -- getBitDepth --
+        /// Returns the sample bit depth of this sound buffer.
+        /// @return | integer | Bit depth per sample.
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.bit_depth()));
+        // -- getSample --
+        /// Returns the sample value at the given zero-based sample index.
+        /// @param | index | integer | Zero-based sample index.
+        /// @return | number | Sample value at the requested index.
         methods.add_method("getSample", |_, this, index: usize| {
             this.get_sample(index).ok_or_else(|| {
                 LuaError::RuntimeError(format!("Sample index {} out of bounds", index))
             })
         });
+
+        // -- drawWaveform --
+        /// Draws this sound buffer as a waveform into an image buffer.
+        /// @param | target | LImageData | Target image to draw into.
+        /// @param | x | integer | Left pixel coordinate.
+        /// @param | y | integer | Top pixel coordinate.
+        /// @param | w | integer | Waveform width in pixels.
+        /// @param | h | integer | Waveform height in pixels.
+        /// @param | r | integer | Red channel from 0 to 255.
+        /// @param | g | integer | Green channel from 0 to 255.
+        /// @param | b | integer | Blue channel from 0 to 255.
+        /// @param | a | integer | Alpha channel from 0 to 255.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "drawWaveform",
             |_,
@@ -2528,6 +2729,11 @@ impl mlua::UserData for SoundData {
                 Ok(())
             },
         );
+        // -- setSample --
+        /// Overwrites the sample value at the given zero-based sample index.
+        /// @param | index | integer | Zero-based sample index.
+        /// @param | value | number | New sample value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setSample", |_, this, (index, value): (usize, f32)| {
             if this.set_sample(index, value) {
                 Ok(())

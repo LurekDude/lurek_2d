@@ -83,7 +83,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- pause --
-    /// Pauses automation playback.
+    /// Pauses automation playback. This function is exposed to Lua scripts.
     /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
@@ -94,7 +94,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- resume --
-    /// Resumes automation playback.
+    /// Resumes automation playback. This function is exposed to Lua scripts.
     /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
@@ -288,7 +288,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- playMacro --
-    /// Starts playback of a saved macro.
+    /// Starts playback of a saved macro. This function is exposed to Lua scripts.
     /// @param | name | string | Macro name to play.
     /// @return | nil | No value is returned.
     let sim = simulator.clone();
@@ -301,7 +301,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- hasMacro --
-    /// Returns whether a macro is saved.
+    /// Returns whether a macro is saved. This function is exposed to Lua scripts.
     /// @param | name | string | Macro name to check.
     /// @return | boolean | True when the macro exists.
     let sim = simulator.clone();
@@ -310,7 +310,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |_, name: String| Ok(sim.borrow().has_macro(&name)))?,
     )?;
     // -- listMacros --
-    /// Returns the names of saved macros.
+    /// Returns the names of saved macros. This function is exposed to Lua scripts.
     /// @return | table | Array table of macro names.
     let sim = simulator.clone();
     tbl.set(

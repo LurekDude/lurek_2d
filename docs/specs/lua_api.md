@@ -87,11 +87,13 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `LuaDecoder` (`struct`, `audio_api.rs`): Lua-side wrapper for a streaming audio decoder.
 - `CallbackRegistry` (`struct`, `callback_registry.rs`): Opaque store mapping `u32` IDs to [`LuaRegistryKey`] values.
 - `LuaCamera2D` (`struct`, `camera_api.rs`): Lua-side wrapper around a [`Camera2D`] instance.
+- `LuaCameraRig` (`struct`, `camera_api.rs`): Lua-side camera rig that manages named cameras and viewport layouts.
 - `LuaArray` (`struct`, `compute_api.rs`): Lua-side wrapper around [`NdArray`].
 - `LuaRingBuffer` (`struct`, `data_api.rs`): Lua-side fixed-capacity ring buffer that holds any Lua value.
 - `LuaDataWriter` (`struct`, `data_api.rs`): Write-cursor wrapper for the `lurek.data` module.
 - `LuaGroupedFrame` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a grouped result from [`DataFrame::group_by`].
 - `LuaDataFrame` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`DataFrame`].
+- `LuaLazyQuery` (`struct`, `dataframe_api.rs`): Lua-side lazy dataframe query pipeline.
 - `LuaDatabase` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`Database`].
 - `LuaVecFrame` (`struct`, `dataframe_api.rs`): Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
 - `LuaReplConsole` (`struct`, `devtools_api.rs`): Lua-side wrapper around a [`ReplConsole`] interactive evaluator.
@@ -126,6 +128,7 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `LuaNoiseGenerator` (`struct`, `math_api.rs`): Lua-side wrapper around a [`NoiseGenerator`].
 - `LuaCircle` (`struct`, `math_api.rs`): Lua-side wrapper around a [`Circle`].
 - `LuaAabbTree` (`struct`, `math_api.rs`): Lua-side wrapper around an [`AabbTree`].
+- `LuaRectPacker` (`struct`, `math_api.rs`): Lua-side wrapper for a rectangle packer.
 - `LuaMinimap` (`struct`, `minimap_api.rs`): Lua-side wrapper around a [`Minimap`].
 - `LuaMod` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 - `LuaModManager` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModManager`].
@@ -143,6 +146,7 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `LuaAiFlowField` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a PathGrid-based [`AiFlowField`].
 - `LuaHexGrid` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`HexGrid`].
 - `LuaJpsGrid` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`JpsGrid`].
+- `LuaNavMesh` (`struct`, `pathfind_api.rs`): Lua-side wrapper for a navigation mesh.
 - `LuaWorld` (`struct`, `physics_api.rs`): Lua-side handle wrapping a physics World.
 - `LuaZone` (`struct`, `physics_api.rs`): Lua-side handle to a [`PhysicsZone`] living inside a [`World`].
 - `LuaTerrain` (`struct`, `physics_api.rs`): Lua-side handle to a destructible [`TerrainMap`].
@@ -151,6 +155,7 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `LuaPhysicsShape` (`struct`, `physics_api.rs`): Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 - `LuaStep` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 - `LuaPipeline` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
+- `LuaBiomeClassifier` (`struct`, `procgen_api.rs`): Lua-visible wrapper around the biome classification engine, used to assign biome types based on height, moisture, and temperature.
 - `LuaProvinceRegistry` (`struct`, `province_api.rs`): Lua handle referencing one named engine-side province registry.
 - `LuaDoorManager` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
 - `LuaHeightMap` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
@@ -203,20 +208,22 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `register` (`animation_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`audio_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`automation_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `Step::vec_from_lua_table` (`automation_api.rs`): Parses a Lua array of step tables into a `Vec<Step>`.
-- `CallbackRegistry::new` (`callback_registry.rs`): Creates an empty [`CallbackRegistry`].
-- `CallbackRegistry::register` (`callback_registry.rs`): Stores `key` in the registry and returns a new opaque ID.
-- `CallbackRegistry::get` (`callback_registry.rs`): Returns a reference to the registry key associated with `id`, or `None`.
-- `CallbackRegistry::remove` (`callback_registry.rs`): Removes and returns the registry key associated with `id`, or `None`.
-- `CallbackRegistry::contains` (`callback_registry.rs`): Returns `true` if `id` is currently stored in the registry.
-- `CallbackRegistry::clear` (`callback_registry.rs`): Removes all entries from the registry.
-- `CallbackRegistry::len` (`callback_registry.rs`): Returns the number of registered callbacks.
-- `CallbackRegistry::is_empty` (`callback_registry.rs`): Returns `true` if no callbacks are registered.
-- `CallbackRegistry::invoke` (`callback_registry.rs`): Looks up `id`, calls the stored Lua function with `args`, and returns the result.
+- `Step::vec_from_lua_table` (`automation_api.rs`): Converts a Lua array of step tables into automation steps.
+- `CallbackRegistry::new` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::register` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::get` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::remove` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::contains` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::clear` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::len` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::is_empty` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `CallbackRegistry::invoke` (`callback_registry.rs`): Public function or method declared in `callback_registry.rs`.
+- `LuaCamera2D::visible_area` (`camera_api.rs`): Returns the camera visible area tuple for engine-side helpers.
+- `LuaCamera2D::position` (`camera_api.rs`): Returns the camera position tuple for engine-side helpers.
 - `register` (`camera_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`compute_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`data_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaVecFrame::new` (`dataframe_api.rs`): Create from a [`VecFrame`].
+- `LuaVecFrame::new` (`dataframe_api.rs`): Wraps a vectorized frame in shared Lua userdata state.
 - `register` (`dataframe_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`debugbridge_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`devtools_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -237,35 +244,38 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `add_type_methods` (`lua_types.rs`): Adds the standard `type()`, `typeOf(typeName)`, and `__tostring` methods to any [`LuaUserData`] type that also implements [`LunaType`].
 - `register` (`math_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`minimap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaMod::new` (`mods_api.rs`): Creates a new [`LuaMod`] from a [`ModInfo`].
-- `LuaModManager::new` (`mods_api.rs`): Creates a new empty [`LuaModManager`].
-- `LuaContentRegistry::new` (`mods_api.rs`): Creates a new empty [`LuaContentRegistry`].
+- `LuaMod::new` (`mods_api.rs`): Creates a Lua mod wrapper from mod metadata.
+- `LuaModManager::new` (`mods_api.rs`): Creates an empty Lua mod manager wrapper.
+- `LuaContentRegistry::new` (`mods_api.rs`): Creates an empty content registry with no registered types or entries.
 - `register` (`mods_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`network_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`parallax_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`particle_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `ParticleConfig::from_lua_opts` (`particle_api.rs`): Parses an optional Lua config table into a concrete [`ParticleConfig`].
+- `ParticleConfig::from_lua_opts` (`particle_api.rs`): Builds a particle config from a Lua options table.
 - `register` (`pathfind_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`patterns_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `LuaWorld::world_handle` (`physics_api.rs`): Public function or method declared in `physics_api.rs`.
 - `register` (`physics_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaStep::new` (`pipeline_api.rs`): Auto-doc: public item.
-- `LuaStep::execute_sync` (`pipeline_api.rs`): Auto-doc: public item.
-- `LuaPipeline::new` (`pipeline_api.rs`): Auto-doc: public item.
-- `LuaPipeline::from_parts` (`pipeline_api.rs`): Creates a [`LuaPipeline`] from pre-built pipeline and wrapper maps (used by deserialisers).
+- `LuaStep::new` (`pipeline_api.rs`): Wraps an existing pipeline step in a Lua-visible userdata handle.
+- `LuaStep::execute_sync` (`pipeline_api.rs`): Public function or method declared in `pipeline_api.rs`.
+- `LuaPipeline::new` (`pipeline_api.rs`): Creates a new Lua-visible pipeline wrapper around a pipeline value.
+- `LuaPipeline::from_parts` (`pipeline_api.rs`): Rebuilds a Lua pipeline wrapper from shared pipeline and step-wrapper state.
 - `pipeline_result_to_lua` (`pipeline_api.rs`): Converts a `PipelineResult` to a Lua result table for the `run` return value.
 - `cancel_remaining_steps` (`pipeline_api.rs`): Cancels all steps in `order` that are still pending.
 - `fire_step_callbacks` (`pipeline_api.rs`): Fires the per-step pipeline callbacks based on the step's terminal status.
 - `finalize_pipeline_result` (`pipeline_api.rs`): Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table, and fires the `on_complete` callback if registered.
 - `register` (`pipeline_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `BiomeRules::from_lua_table` (`procgen_api.rs`): Builds biome classification rules from a Lua options table.
+- `BiomeType::from_name` (`procgen_api.rs`): Parses a biome type name into its enum variant.
 - `register` (`procgen_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `CellularOpts::from_lua_table` (`procgen_api.rs`): Parses a Lua options table into [`CellularOpts`].
-- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): Parses a Lua options table into [`VoronoiOpts`].
+- `CellularOpts::from_lua_table` (`procgen_api.rs`): Builds cellular-generation options from a Lua options table.
+- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): Builds Voronoi-generation options from a Lua options table.
 - `register` (`province_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`raycaster_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `create_lua_vm` (`register.rs`): Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the provided module flags, and returns the ready `Lua` instance.
 - `create_test_vm` (`register.rs`): Creates a test Lua VM with the BDD test framework loaded and all available API modules registered.
 - `register` (`render_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaSaveManager::new` (`save_api.rs`): Creates a new empty save manager wrapper.
+- `LuaSaveManager::new` (`save_api.rs`): Creates a new Lua-visible save manager bound to shared engine state.
 - `register` (`save_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`scene_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`serial_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -275,14 +285,14 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 - `get_memory_size` (`system_api.rs`): Returns total system RAM in MiB using the `sysinfo` crate.
 - `open_url` (`system_api.rs`): Opens a URL in the default browser/application.
 - `get_preferred_locales` (`system_api.rs`): Returns the user's preferred locale strings.
-- `PowerState::as_str` (`system_api.rs`): Returns the string representation used in Lua.
+- `PowerState::as_str` (`system_api.rs`): Returns the Lua-visible power state string.
 - `get_power_info` (`system_api.rs`): Returns power/battery information: (state, percent, seconds).
 - `register` (`system_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`terminal_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`thread_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`tilemap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`timer_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaSpring::tick_with` (`tween_api.rs`): Advances the spring by `dt` seconds and returns whether it settled.
+- `LuaSpring::tick_with` (`tween_api.rs`): Advances the spring simulation and writes updated axis values back into the target table.
 - `register` (`tween_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`ui_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`window_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -295,6 +305,7 @@ This module primarily collaborates with `ai`, `animation`, `audio`, `automation`
 
 - `ai`: Imports or references `ai` from `src/ai/`.
 - `animation`: Imports or references `animation` from `src/animation/`.
+- `app`: Imports or references `src/app/`. Dependency stays inside `Edge/Integration` and should remain acyclic.
 - `audio`: Imports or references `audio` from `src/audio/`.
 - `automation`: Imports or references `automation` from `src/automation/`.
 - `camera`: Imports or references `camera` from `src/camera/`.

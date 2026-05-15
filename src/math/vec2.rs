@@ -16,9 +16,9 @@ pub struct Vec2 {
 }
 
 impl Vec2 {
-    /// Zero vector (0, 0).
+    /// Zero vector (0, 0). This item is part of the public API.
     pub const ZERO: Vec2 = Vec2 { x: 0.0, y: 0.0 };
-    /// Unit vector (1, 1).
+    /// Unit vector (1, 1). This item is part of the public API.
     pub const ONE: Vec2 = Vec2 { x: 1.0, y: 1.0 };
     /// Screen-up direction (0, -1) in screen-space y-down convention.
     pub const UP: Vec2 = Vec2 { x: 0.0, y: -1.0 };

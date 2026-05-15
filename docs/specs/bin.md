@@ -48,6 +48,7 @@ propagate automatically to every binary variant without duplication.
 
 ## Files
 
+- `lurek_headless.rs`: - Headless CLI tool for game validation, packaging, and batch screenshot capture.
 - `lurekc.rs`: Minimal console-less launcher for Windows builds that applies the windows_subsystem attribute and then delegates straight to lurek2d::lurek_run(). This file should stay intentionally tiny because it is only a wrapper binary.
 
 ## Types

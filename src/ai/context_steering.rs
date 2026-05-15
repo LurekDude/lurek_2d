@@ -105,7 +105,7 @@ impl ContextSteering {
     pub fn slot_count(&self) -> usize {
         self.slot_count
     }
-    /// Add an interest behavior.
+    /// Add an interest behavior. This function is part of the public API.
     pub fn add_interest(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -114,7 +114,7 @@ impl ContextSteering {
             enabled: true,
         });
     }
-    /// Add a danger behavior.
+    /// Add a danger behavior. This function is part of the public API.
     pub fn add_danger(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,

@@ -53,13 +53,15 @@ Protocol access now includes a lightweight handshake: clients call `ping` to rec
 
 ## Functions
 
-- `BridgeShared::new` (`bridge.rs`): Creates a new `BridgeShared` with default capacities.
-- `BridgeShared::elapsed` (`bridge.rs`): Returns seconds elapsed since the bridge was created.
-- `BridgeShared::get_performance` (`bridge.rs`): Returns a JSON performance summary computed from recent frame-time data.
-- `BridgeShared::push_print` (`bridge.rs`): Appends a print entry to the history, evicting the oldest if the buffer is full.
-- `BridgeShared::record_frame` (`bridge.rs`): Appends a delta-time sample to the frame-time ring buffer.
-- `BridgeShared::set_max_print_history` (`bridge.rs`): Sets the maximum print-history capacity and trims excess entries.
-- `BridgeShared::capture_print_with_broadcast` (`bridge.rs`): Appends a print entry and queues a broadcast event for all connected clients.
+- `BridgeShared::new` (`bridge.rs`): Create initialized shared bridge state and return it.
+- `BridgeShared::elapsed` (`bridge.rs`): Return elapsed time in seconds from bridge epoch.
+- `BridgeShared::get_performance` (`bridge.rs`): Return current performance metrics as a JSON object.
+- `BridgeShared::push_print` (`bridge.rs`): Append a print row to history and enforce retention bounds.
+- `BridgeShared::record_frame` (`bridge.rs`): Record one frame delta and update rolling performance aggregates.
+- `BridgeShared::set_max_print_history` (`bridge.rs`): Set max print history and trim oldest rows beyond the new limit.
+- `BridgeShared::drain_responses` (`bridge.rs`): Drain all pending responses and return them as a vector.
+- `BridgeShared::queue_broadcast_json` (`bridge.rs`): Queue one broadcast event payload and return unit.
+- `BridgeShared::capture_print_with_broadcast` (`bridge.rs`): Capture print entry and queue matching broadcast payload.
 - `server_thread` (`server.rs`): Accept loop: runs on a background thread and handles all TCP I/O.
 - `handle_client_message` (`server.rs`): Parses a newline-terminated JSON message from a client and either responds immediately (background-safe methods) or queues a [`PendingRequest`] for the main thread.
 
@@ -69,22 +71,22 @@ Protocol access now includes a lightweight handshake: clients call `ping` to rec
 - Namespace: `lurek.debugbridge`
 
 ### Module Functions
-- `lurek.debugbridge.start`: Start the TCP debug server on 127.0.0.1:port.
-- `lurek.debugbridge.stop`: Stop the TCP debug server and close all connections.
-- `lurek.debugbridge.isRunning`: Returns whether the server is currently running.
-- `lurek.debugbridge.getPort`: Returns the server port (0 if not running).
-- `lurek.debugbridge.getClientCount`: Returns the number of connected TCP clients.
-- `lurek.debugbridge.poll`: Poll for pending Lua-dependent requests from TCP clients.
-- `lurek.debugbridge.capturePrint`: Captures a print message and broadcasts it to connected clients.
-- `lurek.debugbridge.getPrintHistory`: Returns the print history.
-- `lurek.debugbridge.clearPrintHistory`: Clears the print history.
-- `lurek.debugbridge.setMaxPrintHistory`: Sets the maximum print history size.
-- `lurek.debugbridge.getPerformance`: Returns performance statistics.
-- `lurek.debugbridge.requestScreenshot`: Flags a screenshot request for the next frame.
-- `lurek.debugbridge.isScreenshotRequested`: Returns whether a screenshot is currently requested.
-- `lurek.debugbridge.broadcast`: Broadcasts a JSON event to all connected clients.
-- `lurek.debugbridge.getProtocolInfo`: Returns bridge protocol metadata (version, capabilities, nonce).
-- `lurek.debugbridge.consumeHotReloadRequest`: Consumes and clears a pending remote hot-reload request.
+- `lurek.debugbridge.start`: Starts the localhost debug bridge server on a port.
+- `lurek.debugbridge.stop`: Returns whether the debug bridge server is running.
+- `lurek.debugbridge.isRunning`: Lua-facing function documented in the binding source.
+- `lurek.debugbridge.getPort`: Returns the debug bridge TCP port.
+- `lurek.debugbridge.getClientCount`: Returns the number of connected debug bridge clients.
+- `lurek.debugbridge.poll`: Polls pending debugger requests, evaluates supported methods, and queues responses.
+- `lurek.debugbridge.capturePrint`: Captures a print message and broadcasts it to debug bridge clients.
+- `lurek.debugbridge.getPrintHistory`: Returns captured print history entries.
+- `lurek.debugbridge.clearPrintHistory`: Clears captured print history.
+- `lurek.debugbridge.setMaxPrintHistory`: Sets the maximum retained print history entry count.
+- `lurek.debugbridge.getPerformance`: Returns debug bridge performance metrics.
+- `lurek.debugbridge.requestScreenshot`: Requests a screenshot from the runtime.
+- `lurek.debugbridge.isScreenshotRequested`: Returns whether a screenshot request is pending.
+- `lurek.debugbridge.broadcast`: Queues a JSON string payload broadcast for debug bridge clients.
+- `lurek.debugbridge.getProtocolInfo`: Returns debug bridge protocol version, capabilities, and handshake nonce.
+- `lurek.debugbridge.consumeHotReloadRequest`: Returns and clears the pending hot reload request flag.
 
 ## References
 

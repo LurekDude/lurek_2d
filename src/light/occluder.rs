@@ -53,7 +53,7 @@ impl Occluder {
         let verts: Vec<Vec2> = flat.chunks(2).map(|c| Vec2::new(c[0], c[1])).collect();
         Ok(Self::new(verts))
     }
-    /// Return the vertex slice.
+    /// Return the vertex slice. This function is part of the public API.
     pub fn get_vertices(&self) -> &[Vec2] {
         &self.vertices
     }
@@ -69,7 +69,7 @@ impl Occluder {
     pub fn set_opacity(&mut self, opacity: f32) {
         self.opacity = opacity;
     }
-    /// Return shadow opacity.
+    /// Return shadow opacity. This function is part of the public API.
     pub fn get_opacity(&self) -> f32 {
         self.opacity
     }

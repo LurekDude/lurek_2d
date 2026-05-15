@@ -94,7 +94,7 @@ impl NeedAdvertisement {
             self.remaining_cooldown = self.cooldown;
         }
     }
-    /// Advance the cooldown timer.
+    /// Advance the cooldown timer. This function is part of the public API.
     pub fn update(&mut self, dt: f32) {
         if self.remaining_cooldown > 0.0 {
             self.remaining_cooldown = (self.remaining_cooldown - dt).max(0.0);
@@ -118,11 +118,11 @@ pub struct NeedSystem {
     needs: Vec<Need>,
 }
 impl NeedSystem {
-    /// Create an empty need system.
+    /// Create an empty need system. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }
-    /// Add or replace a need by name.
+    /// Add or replace a need by name. This function is part of the public API.
     pub fn add_need(&mut self, need: Need) {
         if let Some(existing) = self.needs.iter_mut().find(|n| n.name == need.name) {
             *existing = need;

@@ -4,7 +4,7 @@
 //! - Slower tension decay during peak and sustain phases to hold pressure before relief.
 //! - Per-phase spawn, loot, and ambient multipliers scaling downstream gameplay intensity.
 
-/// Director pacing phase.
+/// Director pacing phase. This item is part of the public API.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectorPhase {
     /// Tension is rising toward a peak.
@@ -97,11 +97,11 @@ impl AIDirector {
             total_events: 0,
         }
     }
-    /// Return the current tension.
+    /// Return the current tension. This function is part of the public API.
     pub fn tension(&self) -> f32 {
         self.tension
     }
-    /// Return the current phase.
+    /// Return the current phase. This function is part of the public API.
     pub fn phase(&self) -> DirectorPhase {
         self.phase
     }
@@ -109,7 +109,7 @@ impl AIDirector {
     pub fn phase_str(&self) -> &'static str {
         self.phase.as_str()
     }
-    /// Return elapsed seconds.
+    /// Return elapsed seconds. This function is part of the public API.
     pub fn elapsed(&self) -> f32 {
         self.elapsed
     }

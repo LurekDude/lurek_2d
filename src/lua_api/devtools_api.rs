@@ -107,7 +107,7 @@ impl LuaUserData for LuaFileWatcher {
             Ok(false)
         });
         // -- getPath --
-        /// Returns the watched path.
+        /// Returns the watched path. This method is available to Lua scripts.
         /// @return | string | Watched path string.
         methods.add_method("getPath", |_, this, ()| Ok(this.path.clone()));
         // -- cancel --

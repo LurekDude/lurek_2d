@@ -146,7 +146,7 @@ impl LuaUserData for LuaAnimation {
             },
         );
         // -- play --
-        /// Starts playback of a named clip.
+        /// Starts playback of a named clip. This method is available to Lua scripts.
         /// @param | name | string | Clip name to play.
         /// @return | boolean | True when the clip exists and playback started.
         methods.add_method_mut("play", |_, this, name: String| Ok(this.inner.play(&name)));
@@ -249,7 +249,7 @@ impl LuaUserData for LuaAnimation {
             Ok(this.inner.get_clip_count())
         });
         // -- getCurrentFrame --
-        /// Returns the current frame index.
+        /// Returns the current frame index. This method is available to Lua scripts.
         /// @return | integer | Current frame index.
         methods.add_method("getCurrentFrame", |_, this, ()| {
             Ok(this.inner.current_frame())
@@ -474,7 +474,7 @@ impl LuaUserData for LuaBlendLayerSet {
             },
         );
         // -- removeLayer --
-        /// Removes a blend layer by name.
+        /// Removes a blend layer by name. This method is available to Lua scripts.
         /// @param | name | string | Layer name to remove.
         /// @return | boolean | True when the layer was removed.
         methods.add_method_mut("removeLayer", |_, this, name: String| {
@@ -599,7 +599,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- newCurve --
-    /// Creates an empty animation curve.
+    /// Creates an empty animation curve. This function is exposed to Lua scripts.
     /// @return | LAnimCurve | New animation curve handle.
     tbl.set(
         "newCurve",
@@ -726,7 +726,7 @@ pub struct LuaAnimCurve {
 impl LuaUserData for LuaAnimCurve {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addKeyframe --
-        /// Adds a keyframe to the curve.
+        /// Adds a keyframe to the curve. This method is available to Lua scripts.
         /// @param | t | number | Keyframe time or normalized position.
         /// @param | v | number | Keyframe value.
         /// @return | nil | No value is returned.

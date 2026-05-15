@@ -155,9 +155,9 @@
         // Clippy runs with -D warnings (strict). Format: Apply auto-fixes files.
         {
             "label": "Quality: Gate",
-            "detail": "✅ Full pre-push pipeline: format check → clippy (strict) → all tests. All three must pass before pushing.",
+            "detail": "✅ Full pre-push pipeline: format check → docs validation → clippy (strict) → all tests. Every stage must pass before pushing.",
             "dependsOrder": "sequence",
-            "dependsOn": ["Quality: Format Check", "Quality: Clippy", "Test: All"],
+            "dependsOn": ["Quality: Format Check", "Docs: Validate Source", "Quality: Clippy", "Test: All"],
             "group": "test",
             "problemMatcher": ["$rustc"]
         },
@@ -189,6 +189,32 @@
         // Rust Browser opens rustdoc HTML locally.
         // Library API regenerates LDoc output for content/library/.
         {
+            "label": "Docs: Validate Source",
+            "detail": "📖 Run the source-doc gate: Rust //! and /// coverage, Lua API doc completeness, generated Lua stub completeness, and module spec coverage.",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Docs: Validate Rust Source",
+                "Docs: Validate Lua Source",
+                "Docs: Validate Lua Stubs",
+                "Docs: Validate Module Coverage"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Validate Rust Source",
+            "detail": "📖 Enforce file-level //! headers and phase-1 public-item /// summaries across src/**/*.rs.",
+            "type": "shell",
+            "command": "python tools/validate/validate_rust_source_docs.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Validate Lua Source",
+            "detail": "📖 Enforce Lua API source doc completeness for summaries, @param tags, @return tags, and Lua-visible object descriptions.",
+            "type": "shell",
+            "command": "python tools/validate/validate_lua_api.py src/lua_api",
+            "problemMatcher": []
+        },
+        {
             "label": "Docs: Full Pipeline",
             "detail": "📖 Run tools/gen_all_docs.py — regenerates ALL docs: API references, test catalog, coverage analytics, wiki cheatsheet.",
             "type": "shell",
@@ -211,9 +237,16 @@
         },
         {
             "label": "Docs: Validate Lua Stubs",
-            "detail": "📖 Verify logs/data/lua_api_data.json plus docs/api/lurek.lua and docs/api/library.lua still match fresh generator output.",
+            "detail": "📖 Verify generated Lua API artifacts are fresh and that the generated data contains complete summary, param, return, and class documentation.",
             "type": "shell",
             "command": "python tools/validate/validate_generated_lua_stubs.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Validate Module Coverage",
+            "detail": "📖 Verify every top-level src/ module still has a matching docs/specs/<module>.md file.",
+            "type": "shell",
+            "command": "python tools/validate/validate_module_coverage.py",
             "problemMatcher": []
         },
 

@@ -51,7 +51,7 @@ pub struct Vec3 {
 }
 /// Arithmetic helpers for the local 3-D vector type.
 impl Vec3 {
-    /// Construct from components.
+    /// Construct from components. This function is part of the public API.
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
@@ -72,7 +72,7 @@ impl Vec3 {
             Vec3::new(self.x / l, self.y / l, self.z / l)
         }
     }
-    /// Return `self - o`.
+    /// Return `self - o`. This function is part of the public API.
     #[allow(clippy::should_implement_trait)]
     pub fn sub(self, o: Vec3) -> Vec3 {
         Vec3::new(self.x - o.x, self.y - o.y, self.z - o.z)
@@ -85,7 +85,7 @@ impl Vec3 {
             self.x * o.y - self.y * o.x,
         )
     }
-    /// Return `self + o`.
+    /// Return `self + o`. This function is part of the public API.
     #[allow(clippy::should_implement_trait)]
     pub fn add(self, o: Vec3) -> Vec3 {
         Vec3::new(self.x + o.x, self.y + o.y, self.z + o.z)

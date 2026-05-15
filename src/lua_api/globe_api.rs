@@ -37,7 +37,7 @@ impl LuaGlobe {
             .map(f)
             .ok_or_else(|| mlua::Error::RuntimeError(format!("globe '{}' not found", self.name)))
     }
-            /// Mutates the named globe in the registry and maps it to a Lua result.
+    /// Mutates the named globe in the registry and maps it to a Lua result.
     fn with_mut<R>(&self, f: impl FnOnce(&mut Globe) -> R) -> LuaResult<R> {
         let mut guard = self
             .reg
@@ -87,7 +87,7 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.add_province(province).map(|_| true).unwrap_or(false))
         });
         // -- removeProvince --
-        /// Removes a province by id.
+        /// Removes a province by id. This method is available to Lua scripts.
         /// @param | id | integer | Province id to remove.
         /// @return | boolean | True when a province was removed.
         methods.add_method_mut("removeProvince", |_, this, id: u32| {
@@ -238,7 +238,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- removeHeatLayer --
-        /// Removes a heat layer by name.
+        /// Removes a heat layer by name. This method is available to Lua scripts.
         /// @param | name | string | Heat layer name.
         /// @return | boolean | True when a layer was removed.
         methods.add_method_mut("removeHeatLayer", |_, this, name: String| {
@@ -454,7 +454,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- removeMarker --
-        /// Removes a marker by id.
+        /// Removes a marker by id. This method is available to Lua scripts.
         /// @param | id | integer | Marker id.
         /// @return | boolean | True when a marker was removed.
         methods.add_method_mut("removeMarker", |_, this, id: u32| {
@@ -470,7 +470,7 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.markers.move_to(id, lat, lon))
         });
         // -- setMarkerVisible --
-        /// Shows or hides a marker.
+        /// Shows or hides a marker. This method is available to Lua scripts.
         /// @param | id | integer | Marker id.
         /// @param | vis | boolean | New visibility flag.
         /// @return | boolean | True when the marker exists.
@@ -498,7 +498,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- setMarkerRotation --
-        /// Sets marker rotation speed.
+        /// Sets marker rotation speed. This method is available to Lua scripts.
         /// @param | id | integer | Marker id.
         /// @param | dps | number | Rotation speed in degrees per second.
         /// @return | boolean | True when the marker exists.
@@ -557,7 +557,7 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.labels.set_text(id, text))
         });
         // -- setLabelVisible --
-        /// Shows or hides a label.
+        /// Shows or hides a label. This method is available to Lua scripts.
         /// @param | id | integer | Label id.
         /// @param | vis | boolean | New visibility flag.
         /// @return | boolean | True when the label exists.
@@ -565,7 +565,7 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.labels.set_visible(id, vis))
         });
         // -- removeLabel --
-        /// Removes a label by id.
+        /// Removes a label by id. This method is available to Lua scripts.
         /// @param | id | integer | Label id.
         /// @return | boolean | True when a label was removed.
         methods.add_method_mut("removeLabel", |_, this, id: u32| {
@@ -592,7 +592,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- removeLayer --
-        /// Removes a render layer by name.
+        /// Removes a render layer by name. This method is available to Lua scripts.
         /// @param | name | string | Layer name.
         /// @return | boolean | True when a layer was removed.
         methods.add_method_mut("removeLayer", |_, this, name: String| {
@@ -614,7 +614,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- setLayerVisible --
-        /// Shows or hides a render layer.
+        /// Shows or hides a render layer. This method is available to Lua scripts.
         /// @param | name | string | Layer name.
         /// @param | vis | boolean | New visibility flag.
         /// @return | boolean | True when the layer exists.
@@ -622,7 +622,7 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.layers.set_visible(&name, vis))
         });
         // -- setLayerAlpha --
-        /// Sets render layer alpha.
+        /// Sets render layer alpha. This method is available to Lua scripts.
         /// @param | name | string | Layer name.
         /// @param | alpha | number | Layer alpha.
         /// @return | boolean | True when the layer exists.
@@ -637,13 +637,13 @@ impl LuaUserData for LuaGlobe {
             this.with_mut(|g| g.spec.time_of_day = t % 24.0)
         });
         // -- getTimeOfDay --
-        /// Returns globe time of day.
+        /// Returns globe time of day. This method is available to Lua scripts.
         /// @return | number | Time of day in hours.
         methods.add_method("getTimeOfDay", |_, this, ()| {
             this.with(|g| g.spec.time_of_day)
         });
         // -- setRotation --
-        /// Sets globe rotation angle.
+        /// Sets globe rotation angle. This method is available to Lua scripts.
         /// @param | deg | number | Rotation in degrees.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setRotation", |_, this, deg: f32| {
@@ -766,7 +766,7 @@ impl LuaUserData for LuaGlobe {
             },
         );
         // -- removeArc --
-        /// Removes an arc by id.
+        /// Removes an arc by id. This method is available to Lua scripts.
         /// @param | id | integer | Arc id.
         /// @return | boolean | True when an arc was removed.
         methods.add_method_mut("removeArc", |_, this, id: u32| {

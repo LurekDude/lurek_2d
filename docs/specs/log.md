@@ -37,27 +37,28 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `set_level` (`facade.rs`): Sets the active log level to the named value.
 - `get_level` (`facade.rs`): Returns the current log level name as a static string (e.g.
 - `enabled_for` (`facade.rs`): Returns `true` when messages at `level` would be emitted under the current filter.
-- `SinkLevel::from_str` (`sinks.rs`): Parses a level string (case-insensitive) via the standard `FromStr` trait.
-- `SinkLevel::as_str` (`sinks.rs`): Returns the canonical uppercase display string (`"DEBUG"`, `"TRACE"`, `"INFO"`, `"WARN"`, `"ERROR"`).
-- `RotatingFileSink::open` (`sinks.rs`): Opens or creates a rotating file sink at `path`.
-- `RotatingFileSink::write_with_rotation` (`sinks.rs`): Appends `message` to the active log file, rotating if the size threshold is exceeded.
-- `RotatingFileSink::flush` (`sinks.rs`): Flushes the underlying OS write buffer.
-- `Sink::file` (`sinks.rs`): Creates a file sink.
-- `Sink::memory` (`sinks.rs`): Creates a memory sink.
-- `Sink::rotating_file` (`sinks.rs`): Creates a rotating file sink that rotates at `max_bytes` and keeps `keep_files` backups.
-- `Sink::write` (`sinks.rs`): Dispatches a log entry to this sink (no-op when below `min_level`).
-- `Sink::write_structured` (`sinks.rs`): Dispatches a structured log entry with key-value `fields` to this sink.
-- `Sink::type_name` (`sinks.rs`): Returns the sink type name string.
-- `Sink::path` (`sinks.rs`): Returns the path for a file sink, or `None`.
-- `Sink::read_memory` (`sinks.rs`): Reads all entries from a memory sink and optionally drains them.
-- `Sink::flush` (`sinks.rs`): Flushes a file sink (no-op on memory sinks).
-- `SinkRegistry::new` (`sinks.rs`): Creates an empty registry.
-- `SinkRegistry::add` (`sinks.rs`): Adds a sink, returning its assigned id.
-- `SinkRegistry::remove` (`sinks.rs`): Removes a sink by id.
-- `SinkRegistry::clear` (`sinks.rs`): Removes all sinks.
-- `SinkRegistry::dispatch` (`sinks.rs`): Dispatches a log entry to all registered sinks.
-- `SinkRegistry::dispatch_structured` (`sinks.rs`): Dispatches a structured log entry to all registered sinks.
-- `SinkRegistry::get` (`sinks.rs`): Returns a sink by id.
+- `SinkLevel::as_str` (`sinks.rs`): Return the uppercase string label for this level.
+- `RotatingFileSink::open` (`sinks.rs`): Open or create the log file at `path`; returns error if the file cannot be opened.
+- `RotatingFileSink::write_with_rotation` (`sinks.rs`): Append `message` to the file, triggering rotation when `max_bytes` is exceeded.
+- `RotatingFileSink::flush` (`sinks.rs`): Flush pending OS buffers to disk for the active file.
+- `Sink::file` (`sinks.rs`): Create a plain append-only file sink; returns error if the file cannot be opened.
+- `Sink::memory` (`sinks.rs`): Create an in-memory ring-buffer sink with `capacity` entries.
+- `Sink::rotating_file` (`sinks.rs`): Create a rotating file sink; returns error if `RotatingFileSink::open` fails.
+- `Sink::callback` (`sinks.rs`): Create a callback sink that records `callback_id` for Lua dispatch; crate-internal.
+- `Sink::configure_output` (`sinks.rs`): Configure output format, timestamp inclusion, color, and tag filter list; crate-internal.
+- `Sink::write` (`sinks.rs`): Write an unstructured message if `level >= min_level` and tag is allowed.
+- `Sink::write_structured` (`sinks.rs`): Write a structured message with key-value `fields` if `level >= min_level` and tag is allowed.
+- `Sink::type_name` (`sinks.rs`): Return a static string naming the sink variant: "file", "memory", "rotating", or "callback".
+- `Sink::path` (`sinks.rs`): Return the file path for file and rotating sinks; returns `None` for memory and callback.
+- `Sink::read_memory` (`sinks.rs`): Return buffered memory entries; drains the ring buffer when `drain` is true.
+- `Sink::flush` (`sinks.rs`): Flush the coalescing buffer and OS buffers for file-backed sinks.
+- `SinkRegistry::new` (`sinks.rs`): Create an empty registry with `next_id` starting at 1.
+- `SinkRegistry::add` (`sinks.rs`): Add `sink` to the registry, assign a unique id, and return that id.
+- `SinkRegistry::remove` (`sinks.rs`): Remove the sink with `id`; returns `true` if a sink was removed.
+- `SinkRegistry::clear` (`sinks.rs`): Remove all registered sinks.
+- `SinkRegistry::dispatch` (`sinks.rs`): Dispatch an unstructured message to all sinks that accept `level` and `tag`.
+- `SinkRegistry::dispatch_structured` (`sinks.rs`): Dispatch a structured message with `fields` to all sinks that accept `level` and `tag`.
+- `SinkRegistry::get` (`sinks.rs`): Return a shared reference to the sink with `id`, or `None` if not found.
 
 ## Lua API Reference
 
@@ -65,37 +66,28 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - Namespace: `lurek.log`
 
 ### Module Functions
-- `lurek.log.debug`: Emits a message at debug severity to the engine log and all registered sinks.
-- `lurek.log.info`: Emits a message at info severity to the engine log and all registered sinks.
-- `lurek.log.warn`: Emits a message at warning severity to the engine log and all registered sinks.
-- `lurek.log.error`: Emits a message at error severity to the engine log and all registered sinks.
-- `lurek.log.print`: Emits a log message at an arbitrary severity level specified as a string.
-- `lurek.log.setLevel`: Sets the global minimum severity threshold for the engine log backend.
-- `lurek.log.getLevel`: Returns the name of the current global minimum severity threshold as a lowercase string (e.g.
-- `lurek.log.addSink`: Creates and registers a new log output sink from the given configuration table.
-- `lurek.log.removeSink`: Removes a previously registered log sink by its numeric identifier.
-- `lurek.log.clearSinks`: Removes every registered log sink, returning the logging system to its default state where messages go only to the engine log backend (stderr).
-- `lurek.log.listSinks`: Returns an array-like table where each entry is a table describing one registered sink.
-- `lurek.log.readMemory`: Reads log entries stored in a memory-type sink.
-- `lurek.log.flushFile`: Forces the operating system to write any buffered data for a file-type sink to disk.
-- `lurek.log.struct`: Emits a structured log message that includes arbitrary key-value metadata alongside the human-readable text.
-- `lurek.log.debug_fields`: Emits a structured log message at debug severity with key-value metadata.
-- `lurek.log.info_fields`: Emits a structured log message at info severity with key-value metadata.
-- `lurek.log.warn_fields`: Emits a structured log message at warning severity with key-value metadata.
-- `lurek.log.error_fields`: Emits a structured log message at error severity with key-value metadata.
-
-### `addSink` options
-
-- `type = "memory" | "file" | "rotating" | "callback"`
-- `level` accepts `debug`, `trace`, `info`, `warn` / `warning`, `error` / `err`.
-- `tags` can be a string tag or an array of string tags. When present, only matching tags are accepted.
-- `timestamp = true` enables a Unix-millisecond prefix on file-backed plain lines.
-- `ansi = true` or `color = true` enables ANSI colouring on file-backed plain lines.
-- `format = "plain" | "json" | "ndjson"` changes file-backed output formatting.
-- `callback` is required when `type = "callback"` and receives a table with `level`, `tag`, `message`, and optional `fields` / `timestamp_ms`.
+- `lurek.log.debug`: Logs a debug message with an optional tag.
+- `lurek.log.info`: Logs an info message with an optional tag.
+- `lurek.log.warn`: Logs a warning message with an optional tag.
+- `lurek.log.error`: Logs an error message with an optional tag.
+- `lurek.log.print`: Logs a message at a runtime-selected level with an optional tag.
+- `lurek.log.setLevel`: Sets the global log level.
+- `lurek.log.getLevel`: Returns the global log level string.
+- `lurek.log.addSink`: Adds a memory, file, rotating, or callback sink from a config table.
+- `lurek.log.removeSink`: Removes a sink by id and releases any callback registry key.
+- `lurek.log.clearSinks`: Removes all sinks and releases callback registry keys.
+- `lurek.log.listSinks`: Returns metadata for all registered sinks.
+- `lurek.log.readMemory`: Reads entries from a memory sink and optionally drains them.
+- `lurek.log.flushFile`: Flushes a file-backed sink by id when it exists.
+- `lurek.log.struct`: Logs a structured message at a runtime-selected level.
+- `lurek.log.debug_fields`: Logs a debug message with structured fields.
+- `lurek.log.info_fields`: Logs an info message with structured fields.
+- `lurek.log.warn_fields`: Logs a warning message with structured fields.
+- `lurek.log.error_fields`: Logs an error message with structured fields.
 
 ## References
 
+- `data`: Imports or references `src/data/`. Dependency stays inside `Foundations` and should remain acyclic.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
 ## Notes

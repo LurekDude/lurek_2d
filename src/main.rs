@@ -1,3 +1,5 @@
+//! Public types and helpers for the main module.
+
 #[cfg(target_os = "windows")]
 fn set_windows_timer_resolution() {
     unsafe {

@@ -26,17 +26,17 @@ impl Circle {
         }
     }
 
-    /// Return the center as a Vec2.
+    /// Return the center as a Vec2. This function is part of the public API.
     pub fn center(&self) -> Vec2 {
         Vec2::new(self.x, self.y)
     }
 
-    /// Return π × r².
+    /// Return π × r². This function is part of the public API.
     pub fn area(&self) -> f32 {
         std::f32::consts::PI * self.radius * self.radius
     }
 
-    /// Return 2 × π × r.
+    /// Return 2 × π × r. This function is part of the public API.
     pub fn perimeter(&self) -> f32 {
         2.0 * std::f32::consts::PI * self.radius
     }

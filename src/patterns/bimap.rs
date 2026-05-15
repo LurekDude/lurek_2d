@@ -15,7 +15,7 @@ pub struct BiMap<K, V> {
 }
 /// All methods for `BiMap`.
 impl<K: Clone + Hash + Eq, V: Clone + Hash + Eq> BiMap<K, V> {
-    /// Create an empty `BiMap`.
+    /// Create an empty `BiMap`. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             fwd: HashMap::new(),

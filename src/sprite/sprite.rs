@@ -42,7 +42,7 @@ impl Sprite {
     pub fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
     }
-    /// Replace the colour tint.
+    /// Replace the colour tint. This function is part of the public API.
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }

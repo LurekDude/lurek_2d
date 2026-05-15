@@ -19,7 +19,7 @@ pub struct Ring {
     /// Monotonically increasing count of all pushes including evicted entries.
     pub total_pushed: u64,
 }
-/// A single entry in a `Ring`.
+/// A single entry in a `Ring`. This item is part of the public API.
 #[derive(Debug, Clone)]
 pub struct RingEntry {
     /// Unique entry id.
@@ -91,7 +91,7 @@ impl Ring {
     pub fn is_full(&self) -> bool {
         self.entries.len() >= self.capacity
     }
-    /// Remove all entries.
+    /// Remove all entries. This function is part of the public API.
     pub fn clear(&mut self) {
         self.entries.clear();
     }

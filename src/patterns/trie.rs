@@ -20,7 +20,7 @@ pub struct Trie {
 }
 /// All methods for `Trie`.
 impl Trie {
-    /// Create an empty trie.
+    /// Create an empty trie. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

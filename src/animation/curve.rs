@@ -60,7 +60,7 @@ impl AnimCurve {
     pub fn keyframe_count(&self) -> usize {
         self.keyframes.len()
     }
-    /// Remove all keyframes.
+    /// Remove all keyframes. This function is part of the public API.
     pub fn clear(&mut self) {
         self.keyframes.clear();
     }

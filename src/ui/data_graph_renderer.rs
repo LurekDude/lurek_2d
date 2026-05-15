@@ -188,7 +188,7 @@ impl GraphRenderer {
     pub fn remove_series(&mut self, name: &str) -> bool {
         self.series.remove(name).is_some()
     }
-    /// Remove all series.
+    /// Remove all series. This function is part of the public API.
     pub fn clear_series(&mut self) {
         self.series.clear();
     }
@@ -212,11 +212,11 @@ impl GraphRenderer {
     pub fn set_show_labels(&mut self, b: bool) {
         self.show_labels = b;
     }
-    /// Set the grid line colour.
+    /// Set the grid line colour. This function is part of the public API.
     pub fn set_grid_color(&mut self, c: Color) {
         self.grid_color = c;
     }
-    /// Set the axis line colour.
+    /// Set the axis line colour. This function is part of the public API.
     pub fn set_axis_color(&mut self, c: Color) {
         self.axis_color = c;
     }
@@ -224,7 +224,7 @@ impl GraphRenderer {
     pub fn set_bg_color(&mut self, c: Color) {
         self.bg_color = c;
     }
-    /// Set the chart title text.
+    /// Set the chart title text. This function is part of the public API.
     pub fn set_title(&mut self, text: &str) {
         self.title = Some(text.to_string());
     }

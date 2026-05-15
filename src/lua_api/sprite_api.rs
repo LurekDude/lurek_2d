@@ -8,7 +8,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-/// Lua-visible wrapper around a SpriteSheet, providing grid-based frame access,
+/// Lua-visible wrapper around a SpriteSheet, providing grid-based frame access,.
 /// named animation groups, and row/column slicing for sprite sheet textures.
 pub struct LuaSpriteSheet {
     inner: SpriteSheet,
@@ -18,7 +18,7 @@ impl LuaUserData for LuaSpriteSheet {
         // -- getFrame --
         /// Returns the UV quad for a single frame by its 1-based index.
         /// @param | index | number | 1-based frame index in the sprite sheet.
-        /// @return | table? | Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if out of range.
+        /// @return | table | Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if out of range.
         methods.add_method("getFrame", |lua, this, index: usize| {
             match this.inner.get_frame(index) {
                 Some(r) => {
@@ -53,7 +53,7 @@ impl LuaUserData for LuaSpriteSheet {
         // -- getGroupFrames --
         /// Returns the frame quads for a named animation group.
         /// @param | name | string | Name of the animation group (e.g. "walk", "idle").
-        /// @return | table? | Array of quad tables for the group, or nil if the group does not exist.
+        /// @return | table | Array of quad tables for the group, or nil if the group does not exist.
         methods.add_method("getGroupFrames", |lua, this, name: String| {
             match this.inner.get_group(&name) {
                 Some(frames) => {
@@ -79,6 +79,7 @@ impl LuaUserData for LuaSpriteSheet {
         /// @param | name | string | Name for the group (e.g. "attack").
         /// @param | start | number | 1-based start frame index.
         /// @param | count | number | Number of frames in the group.
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "nameGroup",
             |_, this, (name, start, count): (String, usize, usize)| {
@@ -125,7 +126,7 @@ impl LuaUserData for LuaSpriteSheet {
     }
 }
 
-/// Lua-visible wrapper around a SpriteAtlas, providing named region lookups
+/// Lua-visible wrapper around a SpriteAtlas, providing named region lookups.
 /// for packed texture atlases exported from tools like TexturePacker or Aseprite.
 pub struct LuaSpriteAtlas {
     inner: SpriteAtlas,
@@ -135,7 +136,7 @@ impl LuaUserData for LuaSpriteAtlas {
         // -- getEntry --
         /// Looks up a named sprite region in the atlas by its original filename or tag.
         /// @param | name | string | Entry name (e.g. `"player_idle_0"`).
-        /// @return | table? | Entry table `{name, x, y, w, h, rotated}`, or nil if not found.
+        /// @return | table | Entry table `{name, x, y, w, h, rotated}`, or nil if not found.
         methods.add_method("getEntry", |lua, this, name: String| {
             match this.inner.get_entry(&name) {
                 Some(e) => {
@@ -154,7 +155,7 @@ impl LuaUserData for LuaSpriteAtlas {
         // -- getByIndex --
         /// Returns a sprite region by its 1-based index in the atlas.
         /// @param | index | number | 1-based entry index.
-        /// @return | table? | Entry table `{name, x, y, w, h, rotated}`, or nil if out of range.
+        /// @return | table | Entry table `{name, x, y, w, h, rotated}`, or nil if out of range.
         methods.add_method("getByIndex", |lua, this, index: usize| {
             match this.inner.get_by_index(index.saturating_sub(1)) {
                 Some(e) => {
@@ -190,7 +191,7 @@ impl LuaUserData for LuaSpriteAtlas {
         /// @param | name | string | Entry name to look up.
         /// @param | flip_x | boolean | Mirror horizontally.
         /// @param | flip_y | boolean | Mirror vertically.
-        /// @return | table? | Entry table with added `flip_x` and `flip_y` fields, or nil if not found.
+        /// @return | table | Entry table with added `flip_x` and `flip_y` fields, or nil if not found.
         methods.add_method(
             "getFlipped",
             |lua, this, (name, flip_x, flip_y): (String, bool, bool)| match this

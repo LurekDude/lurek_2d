@@ -128,11 +128,11 @@ impl Light2D {
     pub fn get_radius(&self) -> f32 {
         self.radius
     }
-    /// Set the RGBA tint color.
+    /// Set the RGBA tint color. This function is part of the public API.
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
-    /// Return the RGBA tint color.
+    /// Return the RGBA tint color. This function is part of the public API.
     pub fn get_color(&self) -> Color {
         self.color
     }
@@ -152,11 +152,11 @@ impl Light2D {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-    /// Set the energy scale.
+    /// Set the energy scale. This function is part of the public API.
     pub fn set_energy(&mut self, energy: f32) {
         self.energy = energy;
     }
-    /// Return the energy scale.
+    /// Return the energy scale. This function is part of the public API.
     pub fn get_energy(&self) -> f32 {
         self.energy
     }
@@ -184,7 +184,7 @@ impl Light2D {
     pub fn is_shadow_enabled(&self) -> bool {
         self.shadow_enabled
     }
-    /// Set the shadow tint color.
+    /// Set the shadow tint color. This function is part of the public API.
     pub fn set_shadow_color(&mut self, color: Color) {
         self.shadow_color = color;
     }
@@ -284,7 +284,7 @@ impl Light2D {
     pub fn set_group_id(&mut self, group_id: u16) {
         self.group_id = group_id;
     }
-    /// Return the group id.
+    /// Return the group id. This function is part of the public API.
     pub fn get_group_id(&self) -> u16 {
         self.group_id
     }

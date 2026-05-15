@@ -39,46 +39,47 @@ This module primarily collaborates with `image`, `math`, `runtime`. Its responsi
 
 ## Functions
 
-- `AtlasEntry::get_flipped` (`atlas.rs`): Returns a copy of this entry with the requested flip flags applied.
-- `SpriteAtlas::new` (`atlas.rs`): Creates an empty atlas.
-- `SpriteAtlas::add_entry` (`atlas.rs`): Adds a region to the atlas.
-- `SpriteAtlas::get_entry` (`atlas.rs`): Returns the region with the given name, or `None`.
-- `SpriteAtlas::get_by_index` (`atlas.rs`): Returns the region at the given index, or `None`.
-- `SpriteAtlas::entry_count` (`atlas.rs`): Returns the number of regions in the atlas.
-- `SpriteAtlas::entry_names` (`atlas.rs`): Returns all region names in insertion order.
+- `AtlasEntry::get_flipped` (`atlas.rs`): Clone this entry with the flip_x and flip_y flags replaced by the given values.
+- `SpriteAtlas::new` (`atlas.rs`): Create an empty atlas with no entries.
+- `SpriteAtlas::from_texture_atlas` (`atlas.rs`): Build a SpriteAtlas from an image::TextureAtlas, sorting regions by name.
+- `SpriteAtlas::add_entry` (`atlas.rs`): Insert or replace an entry by name; updates both the Vec and the name map.
+- `SpriteAtlas::get_entry` (`atlas.rs`): Look up a region by name; returns None when not present.
+- `SpriteAtlas::get_by_index` (`atlas.rs`): Return the entry at the given insertion-order index, or None when out of bounds.
+- `SpriteAtlas::entry_count` (`atlas.rs`): Return the total number of entries in this atlas.
+- `SpriteAtlas::entry_names` (`atlas.rs`): Return all entry names in insertion order.
 - `parse_texturepacker_json` (`atlas.rs`): Parses a TexturePacker JSON export string and returns a [`SpriteAtlas`].
 - `parse_aseprite_json` (`atlas.rs`): Parses an Aseprite JSON export and returns a [`SpriteAtlas`].
-- `NineSlice::new` (`nine_slice.rs`): Creates a new nine-slice definition.
-- `NineSlice::patches` (`nine_slice.rs`): Returns the 9 source and destination rectangles for rendering.
-- `Sprite::new` (`sprite.rs`): Creates a new `Sprite` at `position` using the texture identified by `texture_id`.
-- `Sprite::set_position` (`sprite.rs`): Sets the world-space position of the sprite.
-- `Sprite::set_scale` (`sprite.rs`): Sets the per-axis scale of the sprite.
-- `Sprite::set_rotation` (`sprite.rs`): Sets the rotation of the sprite in radians.
-- `Sprite::set_color` (`sprite.rs`): Sets the multiplicative tint color applied to the sprite.
-- `SpriteBatch::new` (`sprite_batch.rs`): Creates a new empty sprite batch for the given texture.
-- `SpriteBatch::add` (`sprite_batch.rs`): Adds a sprite entry to the batch.
-- `SpriteBatch::clear` (`sprite_batch.rs`): Removes all entries from the batch.
-- `SpriteBatch::texture_key` (`sprite_batch.rs`): Returns the texture key this batch draws from.
-- `SpriteBatch::entries` (`sprite_batch.rs`): Returns a slice of all batch entries.
-- `SpriteBatch::len` (`sprite_batch.rs`): Returns the number of entries in the batch.
-- `SpriteBatch::is_empty` (`sprite_batch.rs`): Returns true if the batch has no entries.
-- `SpriteBatch::buffer_size` (`sprite_batch.rs`): Returns the maximum number of entries (buffer size).
-- `SpriteSheet::new` (`sprite_sheet.rs`): Create a new sprite sheet by dividing a texture into a uniform grid.
-- `SpriteSheet::get_frame` (`sprite_sheet.rs`): Return the quad for a 0-based frame index.
-- `SpriteSheet::get_frame_count` (`sprite_sheet.rs`): Total number of frames in the sheet.
-- `SpriteSheet::get_frame_size` (`sprite_sheet.rs`): Dimensions of a single frame `(width, height)`.
-- `SpriteSheet::get_grid_size` (`sprite_sheet.rs`): Grid dimensions `(columns, rows)`.
-- `SpriteSheet::get_row` (`sprite_sheet.rs`): Return all frame quads in a 0-based row.
-- `SpriteSheet::get_column` (`sprite_sheet.rs`): Return all frame quads in a 0-based column.
-- `SpriteSheet::get_range` (`sprite_sheet.rs`): Return a contiguous range of frame quads starting at `start` (0-based).
-- `SpriteSheet::name_group` (`sprite_sheet.rs`): Store a named frame group.
-- `SpriteSheet::get_group` (`sprite_sheet.rs`): Return the frame quads for a named group.
-- `SpriteSheet::get_group_names` (`sprite_sheet.rs`): Return the names of all defined groups.
-- `SpriteSheet::set_directions` (`sprite_sheet.rs`): Set the directional mode (4 or 8 directions) and layout.
-- `SpriteSheet::get_direction_frames` (`sprite_sheet.rs`): Return the frame quads for a 0-based direction index.
-- `SpriteSheet::draw_to_image` (`sprite_sheet.rs`): Renders the sprite-sheet grid into a new `ImageData` as a colour-coded debug view.
-- `SpriteSheet::from_rpgmaker` (`sprite_sheet.rs`): Builds an RPGMaker VX/Ace-style 3-column × 4-row character sprite sheet.
-- `SpriteSheet::from_atlas` (`sprite_sheet.rs`): Builds a sprite sheet whose frame quads are sourced from named entries in a [`SpriteAtlas`].
+- `NineSlice::new` (`nine_slice.rs`): Create a NineSlice with explicit border insets and full texture dimensions.
+- `NineSlice::patches` (`nine_slice.rs`): Return the 9 Patch tuples for drawing a nine-slice box at (x, y) with target dimensions (w, h).
+- `Sprite::new` (`sprite.rs`): Create a sprite at position with identity scale, zero rotation, and white tint.
+- `Sprite::set_position` (`sprite.rs`): Set the world-space position to (x, y).
+- `Sprite::set_scale` (`sprite.rs`): Set the non-uniform scale to (sx, sy).
+- `Sprite::set_rotation` (`sprite.rs`): Set the rotation angle in radians.
+- `Sprite::set_color` (`sprite.rs`): Replace the colour tint.
+- `SpriteBatch::new` (`sprite_batch.rs`): Create a batch for texture_key with the given max_entries cap; 0 uses a default capacity of 256.
+- `SpriteBatch::add` (`sprite_batch.rs`): Append a BatchEntry and return its index; returns None when the max_entries limit is reached.
+- `SpriteBatch::clear` (`sprite_batch.rs`): Remove all entries without releasing the underlying allocation.
+- `SpriteBatch::texture_key` (`sprite_batch.rs`): Return the TextureKey this batch is bound to.
+- `SpriteBatch::entries` (`sprite_batch.rs`): Return the accumulated entry slice for this frame.
+- `SpriteBatch::len` (`sprite_batch.rs`): Return the current number of entries in the batch.
+- `SpriteBatch::is_empty` (`sprite_batch.rs`): Return true when the batch contains no entries.
+- `SpriteBatch::buffer_size` (`sprite_batch.rs`): Return the configured max_entries cap; 0 means unlimited.
+- `SpriteSheet::new` (`sprite_sheet.rs`): Create a SpriteSheet from texture dimensions and per-frame size; precomputes all frame Rects.
+- `SpriteSheet::get_frame` (`sprite_sheet.rs`): Return the Rect for frame at linear index, or None when out of bounds.
+- `SpriteSheet::get_frame_count` (`sprite_sheet.rs`): Return the total number of precomputed frames.
+- `SpriteSheet::get_frame_size` (`sprite_sheet.rs`): Return (frame_width, frame_height) in pixels.
+- `SpriteSheet::get_grid_size` (`sprite_sheet.rs`): Return (columns, rows) of the grid.
+- `SpriteSheet::get_row` (`sprite_sheet.rs`): Return all frame Rects on the given row index; empty vec when row >= rows.
+- `SpriteSheet::get_column` (`sprite_sheet.rs`): Return all frame Rects in the given column index; empty vec when col >= columns.
+- `SpriteSheet::get_range` (`sprite_sheet.rs`): Return up to count frames starting at start; empty vec when start >= frame count.
+- `SpriteSheet::name_group` (`sprite_sheet.rs`): Register a named frame group starting at start_frame for count consecutive frames.
+- `SpriteSheet::get_group` (`sprite_sheet.rs`): Return the Rects for the named group, or None when the name is not registered.
+- `SpriteSheet::get_group_names` (`sprite_sheet.rs`): Return all registered group names in unspecified order.
+- `SpriteSheet::set_directions` (`sprite_sheet.rs`): Configure the sheet for directional animation with count directions arranged by layout.
+- `SpriteSheet::get_direction_frames` (`sprite_sheet.rs`): Return all frame Rects for the given direction index; None when set_directions was not called or index out of range.
+- `SpriteSheet::draw_to_image` (`sprite_sheet.rs`): Rasterise the sheet grid (red borders, green for group starts) into a new ImageData of the given dimensions.
+- `SpriteSheet::from_rpgmaker` (`sprite_sheet.rs`): Create a SpriteSheet pre-configured for the RPGMaker 3×4 character sheet layout with named direction groups.
+- `SpriteSheet::from_atlas` (`sprite_sheet.rs`): Build a SpriteSheet from a SpriteAtlas using atlas entry Rects as frames; names each entry as a group.
 
 ## Lua API Reference
 
@@ -86,34 +87,34 @@ This module primarily collaborates with `image`, `math`, `runtime`. Its responsi
 - Namespace: `lurek.sprite`
 
 ### Module Functions
-- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w Ă- frame_h` frames.
-- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols Ă- 4 rows) with "down", "left", "right", "up" groups.
-- `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
-- `lurek.sprite.newAtlasSheet`: Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
-- `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON export string and returns a sprite atlas.
+- `lurek.sprite.newSheet`: Creates a new sprite sheet by dividing a texture of the given pixel size into a grid of equal-sized frames.
+- `lurek.sprite.newRPGMakerSheet`: Creates a sprite sheet using RPG Maker's standard character layout (4 columns × 4 rows per character block).
+- `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON atlas string and returns a sprite atlas object.
+- `lurek.sprite.newAtlasSheet`: Creates a sprite sheet from an existing atlas, treating each atlas entry as a frame within the given sheet dimensions.
+- `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON atlas string and returns a sprite atlas object.
 
 ### `LSpriteAtlas` Methods
-- `LSpriteAtlas:getEntry`: Returns the named region as a table.
-- `LSpriteAtlas:getByIndex`: Returns the region at the given 1-based insertion index.
-- `LSpriteAtlas:entryCount`: Returns the total number of named regions in the atlas.
-- `LSpriteAtlas:entryNames`: Returns a sequential table of all region names.
-- `LSpriteAtlas:getFlipped`: Returns a copy of the named region with flip flags set.
+- `LSpriteAtlas:getEntry`: Looks up a named sprite region in the atlas by its original filename or tag.
+- `LSpriteAtlas:getByIndex`: Returns a sprite region by its 1-based index in the atlas.
+- `LSpriteAtlas:entryCount`: Returns the total number of entries (sprite regions) in the atlas.
+- `LSpriteAtlas:entryNames`: Returns an array of all entry names in the atlas.
+- `LSpriteAtlas:getFlipped`: Returns a copy of a named atlas entry with the specified flip flags applied.
 - `LSpriteAtlas:type`: Returns the type name of this object.
-- `LSpriteAtlas:typeOf`: Returns whether this object is of the given type.
+- `LSpriteAtlas:typeOf`: Checks whether this object matches the given type name.
 
 ### `LSpriteSheet` Methods
-- `LSpriteSheet:getFrame`: Returns the quad for the 0-based frame index.
-- `LSpriteSheet:getFrameCount`: Returns the total number of frames in the sheet.
-- `LSpriteSheet:getRow`: Returns a sequential table of quad tables for every frame in the given row.
-- `LSpriteSheet:getColumn`: Returns a sequential table of quad tables for every frame in the given column.
-- `LSpriteSheet:getGroupFrames`: Returns a sequential table of quad tables for the named frame group.
-- `LSpriteSheet:getGroupNames`: Returns a sequential table of all defined group names.
-- `LSpriteSheet:nameGroup`: Registers a named frame group starting at `start_frame` with `count` frames.
-- `LSpriteSheet:getFrameSize`: Returns the width and height of a single frame cell in pixels.
-- `LSpriteSheet:getGridSize`: Returns the number of columns and rows in the grid.
-- `LSpriteSheet:drawToImage`: Renders the sheet grid as a debug view into a new ImageData.
+- `LSpriteSheet:getFrame`: Returns the UV quad for a single frame by its 1-based index.
+- `LSpriteSheet:getFrameCount`: Returns the total number of frames in this sprite sheet.
+- `LSpriteSheet:getRow`: Returns all frame quads in the given row of the sprite sheet grid.
+- `LSpriteSheet:getColumn`: Returns all frame quads in the given column of the sprite sheet grid.
+- `LSpriteSheet:getGroupFrames`: Returns the frame quads for a named animation group.
+- `LSpriteSheet:getGroupNames`: Returns an array of all named animation group names defined on this sheet.
+- `LSpriteSheet:nameGroup`: Defines a named animation group as a contiguous range of frames.
+- `LSpriteSheet:getFrameSize`: Returns the pixel dimensions of a single frame cell.
+- `LSpriteSheet:getGridSize`: Returns the number of columns and rows in the sprite sheet grid.
+- `LSpriteSheet:drawToImage`: Renders the sprite sheet grid into an LImage of the given size for debugging or previews.
 - `LSpriteSheet:type`: Returns the type name of this object.
-- `LSpriteSheet:typeOf`: Returns whether this object is of the given type.
+- `LSpriteSheet:typeOf`: Checks whether this object matches the given type name.
 
 ## References
 

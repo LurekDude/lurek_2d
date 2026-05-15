@@ -14,7 +14,7 @@ pub mod collision_helpers;
 pub mod render;
 /// Shape definitions for bodies and standalone queries.
 pub mod shape;
-/// Static terrain tile-map.
+/// Static terrain tile-map. This module is publicly re-exported.
 pub mod terrain;
 /// Physics world, stepping, bodies, and raycasting.
 pub mod world;

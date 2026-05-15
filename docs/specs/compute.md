@@ -57,32 +57,35 @@ The `compute` module is Lurek2D's dense N-dimensional numerical array library fo
 - `zscore` (`analytics.rs`): Standardise all elements to zero mean and unit variance (z-score).
 - `convolve1d` (`analytics.rs`): 1D convolution of `signal` with `kernel` (full output length).
 - `correlate1d` (`analytics.rs`): 1D cross-correlation: slide `template` over `signal` (valid output).
-- `DataType::parse` (`array.rs`): Parse a dtype from a string name (`"float32"`, `"float64"`, `"int32"`).
-- `DataType::byte_size` (`array.rs`): Number of bytes per element for this dtype.
-- `DataType::name` (`array.rs`): Human-readable name for this dtype.
-- `NdArray::new` (`array.rs`): Create a new zero-initialized NdArray with the given shape and dtype.
-- `NdArray::zeros` (`array.rs`): Create a zero-initialized NdArray.
-- `NdArray::ones` (`array.rs`): Create an NdArray filled with ones (1.0 for floats, 1 for int32).
-- `NdArray::range` (`array.rs`): Create a 1D NdArray with values from `start` to `stop` (exclusive) with given step.
-- `NdArray::from_slice` (`array.rs`): Create an NdArray from a slice of f64 values, converting to the target dtype.
-- `NdArray::get_f64` (`array.rs`): Read element at flat index as f64 (works for any dtype).
-- `NdArray::set_f64` (`array.rs`): Write a value (as f64) to the flat index, converting to the array's dtype.
-- `NdArray::get_i32` (`array.rs`): Read element at flat index as i32.
-- `NdArray::set_i32` (`array.rs`): Write an i32 value at the flat index.
-- `NdArray::flat_index` (`array.rs`): Convert a multi-dimensional index to a flat element offset.
-- `NdArray::shape` (`array.rs`): Returns the shape of this array as a slice.
-- `NdArray::dtype` (`array.rs`): Returns the element data type of this array.
-- `NdArray::size` (`array.rs`): Returns the total number of elements in this array.
-- `NdArray::ndim` (`array.rs`): Returns the number of dimensions (1, 2, or 3).
-- `NdArray::strides` (`array.rs`): Returns the row-major strides for this array.
-- `NdArray::data` (`array.rs`): Returns a reference to the underlying byte data.
-- `NdArray::data_mut` (`array.rs`): Returns a mutable reference to the underlying byte data.
-- `NdArray::set_shape` (`array.rs`): Sets the shape and strides directly.
-- `NdArray::compute_strides` (`array.rs`): Compute row-major strides for a given shape.
-- `NdArray::get_by_indices` (`array.rs`): Read element by multi-dimensional indices (0-based), combining flat_index + get_f64.
-- `NdArray::set_by_indices` (`array.rs`): Write a value by multi-dimensional indices (0-based), combining flat_index + set_f64.
-- `NdArray::to_f64_vec` (`array.rs`): Return all elements as a `Vec<f64>`.
-- `NdArray::display_string` (`array.rs`): Return a human-readable summary string for debugging.
+- `DataType::parse` (`array.rs`): Parse dtype string and return matching DataType or parse error.
+- `DataType::byte_size` (`array.rs`): Return byte width of dtype element representation.
+- `DataType::name` (`array.rs`): Return canonical dtype name string.
+- `NdArray::new` (`array.rs`): Create zero-initialized array and return it for shape and dtype.
+- `NdArray::zeros` (`array.rs`): Allocate zero-filled array and return it after validating shape limits.
+- `NdArray::ones` (`array.rs`): Allocate one-filled array and return initialized values.
+- `NdArray::range` (`array.rs`): Build 1D range array and return values from start to stop with step.
+- `NdArray::from_slice` (`array.rs`): Build array from f64 slice and return typed array with requested shape.
+- `NdArray::get_f64` (`array.rs`): Read element by flat index and return value converted to f64.
+- `NdArray::set_f64` (`array.rs`): Write f64 value by flat index and return after dtype conversion.
+- `NdArray::get_i32` (`array.rs`): Read element as i32 by flat index and return integer value.
+- `NdArray::set_i32` (`array.rs`): Write i32 value by flat index and return after byte update.
+- `NdArray::flat_index` (`array.rs`): Convert multidimensional indices to flat index and return offset.
+- `NdArray::shape` (`array.rs`): Read shape slice and return axis lengths.
+- `NdArray::dtype` (`array.rs`): Read scalar dtype and return DataType value.
+- `NdArray::size` (`array.rs`): Read element count and return total number of elements.
+- `NdArray::ndim` (`array.rs`): Read number of dimensions and return ndim value.
+- `NdArray::strides` (`array.rs`): Read stride slice and return per-axis element strides.
+- `NdArray::data` (`array.rs`): Read immutable byte buffer and return raw data slice.
+- `NdArray::data_mut` (`array.rs`): Read mutable byte buffer and return raw mutable data slice.
+- `NdArray::set_shape` (`array.rs`): Replace shape and stride metadata and return after metadata update.
+- `NdArray::compute_strides` (`array.rs`): Compute row-major strides and return stride vector for provided shape.
+- `NdArray::get_by_indices` (`array.rs`): Read element by multidimensional indices and return f64 value.
+- `NdArray::set_by_indices` (`array.rs`): Write element by multidimensional indices and return success status.
+- `NdArray::to_f64_vec` (`array.rs`): Convert all elements to f64 and return copied vector.
+- `NdArray::fill` (`array.rs`): Fill all elements with scalar value and return after mutation.
+- `NdArray::map` (`array.rs`): Map function over elements and return new array with mapped values.
+- `NdArray::iter_f64` (`array.rs`): Iterate elements as f64 values and return lazy iterator.
+- `NdArray::display_string` (`array.rs`): Format array summary and return short display string.
 - `next_power_of_two` (`fft.rs`): Returns the smallest power of two ≥ `n`.
 - `fft` (`fft.rs`): Computes the discrete Fourier transform (DFT) of `data`.
 - `ifft` (`fft.rs`): Computes the inverse discrete Fourier transform.
@@ -143,6 +146,10 @@ The `compute` module is Lurek2D's dense N-dimensional numerical array library fo
 - `reshape` (`ops.rs`): Reshape an array to a new shape with the same total element count.
 - `transpose_2d` (`ops.rs`): Transpose a 2D array (swap rows and columns).
 - `fill` (`ops.rs`): Fill all elements of an array with a value (in-place).
+- `add_inplace` (`ops.rs`): Add second array into first array in place and return success status.
+- `sub_inplace` (`ops.rs`): Subtract second array from first array in place and return success status.
+- `mul_inplace` (`ops.rs`): Multiply first array by second array in place and return success status.
+- `div_inplace` (`ops.rs`): Divide first array by second array in place and return success status.
 - `clone_array` (`ops.rs`): Clone an array (convenience wrapper).
 - `bitwise_and` (`ops.rs`): Bitwise AND of two Int32 arrays.
 - `bitwise_or` (`ops.rs`): Bitwise OR of two Int32 arrays.
@@ -165,101 +172,101 @@ The `compute` module is Lurek2D's dense N-dimensional numerical array library fo
 - Namespace: `lurek.compute`
 
 ### Module Functions
-- `lurek.compute.newArray`: Creates a zero-initialized array with the given shape and optional dtype.
-- `lurek.compute.zeros`: Creates a zero-filled array with the given shape and optional dtype.
-- `lurek.compute.ones`: Creates a one-filled array with the given shape and optional dtype.
-- `lurek.compute.range`: Creates a 1D array from start to stop with optional step and dtype.
-- `lurek.compute.fromTable`: Creates an array from a Lua table of numbers with optional shape and dtype.
-- `lurek.compute.gaussianKernel`: Creates a sizeĂ-size Gaussian kernel array.
-- `lurek.compute.rotate2dMatrix`: Creates a 2Ă-2 rotation matrix for the given angle in radians.
-- `lurek.compute.affine2d`: Creates a 3Ă-3 homogeneous affine matrix.
-- `lurek.compute.fft`: Computes the discrete Fourier transform of a 1D real-valued sample array.
-- `lurek.compute.ifft`: Computes the inverse discrete Fourier transform.
-- `lurek.compute.fftMagnitude`: Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
-- `lurek.compute.getParThreshold`: Returns the current parallelization threshold for element-wise and reduction operations.
-- `lurek.compute.setParThreshold`: Sets the parallelization threshold and returns the previous value.
+- `lurek.compute.newArray`: Creates a zero-filled array with the requested shape and data type.
+- `lurek.compute.zeros`: Creates a zero-filled array with the requested shape and data type.
+- `lurek.compute.ones`: Creates a one-filled array with the requested shape and data type.
+- `lurek.compute.range`: Creates a one-dimensional range array.
+- `lurek.compute.fromTable`: Creates an array from a flat Lua table and optional shape.
+- `lurek.compute.gaussianKernel`: Creates a square Gaussian kernel array.
+- `lurek.compute.rotate2dMatrix`: Creates a 2D rotation matrix.
+- `lurek.compute.affine2d`: Creates a 2D affine transform matrix.
+- `lurek.compute.fft`: Computes the FFT of real-valued samples.
+- `lurek.compute.ifft`: Computes the inverse FFT of complex frequency pairs.
+- `lurek.compute.fftMagnitude`: Computes FFT magnitudes for real-valued samples.
+- `lurek.compute.getParThreshold`: Returns the global compute parallelism threshold.
+- `lurek.compute.setParThreshold`: Sets the global compute parallelism threshold and returns the previous value.
 
 ### `LArray` Methods
-- `LArray:getShape`: Returns the shape as a table of dimension sizes.
-- `LArray:getDimensions`: Returns the number of dimensions.
-- `LArray:getSize`: Returns the total number of elements.
-- `LArray:getDataType`: Returns the element data type name.
-- `LArray:isOnGPU`: Returns false (CPU arrays only).
-- `LArray:get`: Returns the element at the given 1-based indices.
-- `LArray:set`: Sets the element at the given 1-based indices to a value.
-- `LArray:toTable`: Returns all elements as a flat table of numbers.
-- `LArray:reshape`: Returns a new array with the given shape and the same data.
-- `LArray:clone`: Returns a deep copy of this array.
-- `LArray:transpose`: Returns the transposed 2D array.
-- `LArray:fill`: Fills all elements with the given value in-place.
-- `LArray:add`: Element-wise addition with an Array or scalar.
-- `LArray:addInplace`: In-place element-wise addition with another Array.
-- `LArray:sub`: Element-wise subtraction with an Array or scalar.
-- `LArray:subInplace`: In-place element-wise subtraction with another Array.
-- `LArray:mul`: Element-wise multiplication with an Array or scalar.
-- `LArray:mulInplace`: In-place element-wise multiplication with another Array.
-- `LArray:div`: Element-wise division with an Array or scalar.
-- `LArray:divInplace`: In-place element-wise division with another Array.
-- `LArray:pow`: Raises each element to a scalar exponent.
-- `LArray:sqrt`: Element-wise square root.
-- `LArray:abs`: Element-wise absolute value.
-- `LArray:neg`: Returns a new Array with every element negated (multiplied by -1).
-- `LArray:clamp`: Clamps each element to the given range.
-- `LArray:eq`: Element-wise equality with an Array or scalar.
-- `LArray:neq`: Element-wise not-equal with an Array or scalar.
-- `LArray:gt`: Element-wise greater-than with an Array or scalar.
-- `LArray:lt`: Element-wise less-than with an Array or scalar.
-- `LArray:gte`: Element-wise greater-or-equal with an Array or scalar.
-- `LArray:lte`: Element-wise less-or-equal with an Array or scalar.
-- `LArray:threshold`: Returns a mask array with 1.0 where elements >= val, else 0.0.
-- `LArray:where`: Selects elements from this where mask is nonzero, else from other.
-- `LArray:countNonZero`: Returns the count of nonzero elements.
-- `LArray:argmin`: Returns the 1-based flat index of the minimum element.
-- `LArray:argmax`: Returns the 1-based flat index of the maximum element.
-- `LArray:any`: Returns true if any element is nonzero.
-- `LArray:all`: Returns true if all elements are nonzero.
-- `LArray:sum`: Sum of all elements, or along an axis (1-based).
-- `LArray:mean`: Mean of all elements, or along an axis (1-based).
-- `LArray:min`: Minimum of all elements, or along an axis (1-based).
-- `LArray:max`: Maximum of all elements, or along an axis (1-based).
-- `LArray:matmul`: Matrix multiplication of two 2D arrays.
-- `LArray:dot`: Dot product of two 1D arrays.
-- `LArray:bitwiseAnd`: Bitwise AND of two Int32 arrays.
-- `LArray:bitwiseOr`: Bitwise OR of two Int32 arrays.
-- `LArray:bitwiseXor`: Bitwise XOR of two Int32 arrays.
-- `LArray:bitwiseNot`: Bitwise NOT of an Int32 array.
-- `LArray:bitwiseLShift`: Bitwise left shift of an Int32 array.
-- `LArray:bitwiseRShift`: Bitwise right shift of an Int32 array.
-- `LArray:convolve2D`: 2D convolution with zero-padding.
-- `LArray:dilate`: Morphological dilation with a diamond structuring element.
-- `LArray:erode`: Morphological erosion with a diamond structuring element.
-- `LArray:floodFill`: Flood fill from a 1-based (row, col) with a new value.
-- `LArray:getRegion`: Extracts a rectangular sub-region (1-based row, col).
-- `LArray:setRegion`: Copies a source array into this array at the given 1-based position.
-- `LArray:cumsum`: Cumulative sum of all elements (flattened).
-- `LArray:diff`: Discrete difference applied `order` times.
-- `LArray:histogram`: Compute a histogram. Returns a table of {lo, hi, count} tables.
-- `LArray:percentile`: Compute the p-th percentile (0-100).
-- `LArray:covariance`: Population covariance with another 1D array.
-- `LArray:pearsonCorr`: Pearson correlation coefficient with another 1D array.
-- `LArray:normalizeRange`: Linearly rescale values to [out_min, out_max].
-- `LArray:zscore`: Standardise values to zero mean and unit variance.
-- `LArray:convolve1d`: 1D convolution with a kernel array (full output).
-- `LArray:correlate1d`: 1D cross-correlation with a template array (valid output).
-- `LArray:normalizeVec`: L2-normalise a 1D vector.
-- `LArray:outer`: Outer product of two 1D vectors -> 2D array [m, n].
-- `LArray:cross2d`: Signed 2D cross product with another length-2 array.
-- `LArray:transformPoints`: Apply this 2Ă-2 or 3Ă-3 matrix to an [N,2] points array.
-- `LArray:sobel`: Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
-- `LArray:linsolve`: Solve A*x = b where this array is A (square [n,n]) and b is a 1D vector.
-- `LArray:luDecompose`: Decomposes this square matrix into L and U factors with partial pivoting.
-- `LArray:eigenPower`: Computes the dominant eigenvalue and its eigenvector using power iteration.
-- `LArray:map`: Apply a Lua callback element-wise, returning a new Array of the same shape.
-- `LArray:eval`: Evaluate a Lua expression string element-wise, returning a new Array.
-- `LArray:reduce`: Fold the array left-to-right with an accumulator.
-- `LArray:scan`: Running accumulation - like reduce but returns every intermediate result.
-- `LArray:type`: Returns the type name "Array".
-- `LArray:typeOf`: Returns true when the given name matches "Array" or a parent type.
+- `LArray:getShape`: Returns the array shape as one-based dimension table.
+- `LArray:getDimensions`: Returns the number of array dimensions.
+- `LArray:getSize`: Returns the total number of array elements.
+- `LArray:getDataType`: Returns the array data type name.
+- `LArray:isOnGPU`: Returns whether this array is currently stored on the GPU.
+- `LArray:get`: Reads an array element using one-based indices.
+- `LArray:set`: Writes an array element using one-based indices followed by the value.
+- `LArray:toTable`: Returns array values flattened into a Lua table.
+- `LArray:reshape`: Returns a reshaped copy of this array.
+- `LArray:clone`: Returns a copy of this array.
+- `LArray:transpose`: Returns a transposed copy of a two-dimensional array.
+- `LArray:fill`: Fills this array in place with one value.
+- `LArray:addInplace`: Adds another array into this array in place.
+- `LArray:subInplace`: Subtracts another array from this array in place.
+- `LArray:mulInplace`: Multiplies this array by another array in place.
+- `LArray:divInplace`: Divides this array by another array in place.
+- `LArray:add`: Returns element-wise addition with an array or scalar.
+- `LArray:sub`: Returns element-wise subtraction with an array or scalar.
+- `LArray:mul`: Returns element-wise multiplication with an array or scalar.
+- `LArray:div`: Returns element-wise division with an array or scalar.
+- `LArray:pow`: Returns this array raised element-wise to a scalar exponent.
+- `LArray:sqrt`: Returns element-wise square roots.
+- `LArray:abs`: Returns element-wise absolute values.
+- `LArray:neg`: Returns element-wise negated values.
+- `LArray:clamp`: Returns values clamped between minimum and maximum bounds.
+- `LArray:eq`: Returns element-wise equality comparison with an array or scalar.
+- `LArray:neq`: Returns element-wise inequality comparison with an array or scalar.
+- `LArray:gt`: Returns element-wise greater-than comparison with an array or scalar.
+- `LArray:lt`: Returns element-wise less-than comparison with an array or scalar.
+- `LArray:gte`: Returns element-wise greater-or-equal comparison with an array or scalar.
+- `LArray:lte`: Returns element-wise less-or-equal comparison with an array or scalar.
+- `LArray:threshold`: Returns a mask array where values above a threshold are selected.
+- `LArray:where`: Selects values from this array or another array using a mask array.
+- `LArray:countNonZero`: Counts non-zero elements.
+- `LArray:argmin`: Returns the one-based flat index of the minimum value.
+- `LArray:argmax`: Returns the one-based flat index of the maximum value.
+- `LArray:any`: Returns whether any element is non-zero.
+- `LArray:all`: Returns whether all elements are non-zero.
+- `LArray:sum`: Returns total sum or a summed array along a one-based axis.
+- `LArray:mean`: Returns total mean or a mean array along a one-based axis.
+- `LArray:min`: Returns total minimum or a minimum array along a one-based axis.
+- `LArray:max`: Returns total maximum or a maximum array along a one-based axis.
+- `LArray:matmul`: Returns matrix multiplication of this array and another array.
+- `LArray:dot`: Returns dot product with another array.
+- `LArray:bitwiseAnd`: Returns element-wise bitwise AND with another array.
+- `LArray:bitwiseOr`: Returns element-wise bitwise OR with another array.
+- `LArray:bitwiseXor`: Returns element-wise bitwise XOR with another array.
+- `LArray:bitwiseNot`: Returns element-wise bitwise NOT.
+- `LArray:bitwiseLShift`: Returns element-wise left shift by a bit count.
+- `LArray:bitwiseRShift`: Returns element-wise right shift by a bit count.
+- `LArray:convolve2D`: Returns two-dimensional convolution with a kernel array.
+- `LArray:dilate`: Returns morphological dilation with a radius.
+- `LArray:erode`: Returns morphological erosion with a radius.
+- `LArray:floodFill`: Returns a flood-filled copy starting at a one-based row and column.
+- `LArray:getRegion`: Returns a rectangular region from this array.
+- `LArray:setRegion`: Writes a source array into this array at a one-based row and column.
+- `LArray:cumsum`: Returns cumulative sum over the flattened array.
+- `LArray:diff`: Returns finite differences over the flattened array.
+- `LArray:histogram`: Returns histogram bins for the array values.
+- `LArray:percentile`: Returns a percentile value from the array.
+- `LArray:covariance`: Returns covariance with another array.
+- `LArray:pearsonCorr`: Returns Pearson correlation with another array.
+- `LArray:normalizeRange`: Returns array values normalized into a target range.
+- `LArray:zscore`: Returns z-score normalized array values.
+- `LArray:convolve1d`: Returns one-dimensional convolution with a kernel array.
+- `LArray:correlate1d`: Returns one-dimensional correlation with a template array.
+- `LArray:normalizeVec`: Returns this vector normalized to unit length.
+- `LArray:outer`: Returns outer product with another vector array.
+- `LArray:cross2d`: Returns two-dimensional cross product with another vector.
+- `LArray:transformPoints`: Transforms a point array by this transform matrix.
+- `LArray:sobel`: Computes Sobel gradients for this array.
+- `LArray:linsolve`: Solves a linear system using this matrix and a right-hand side array.
+- `LArray:luDecompose`: Decomposes this matrix into LU data and permutation metadata.
+- `LArray:eigenPower`: Estimates dominant eigenvalue and eigenvector using power iteration.
+- `LArray:map`: Maps each element through a Lua function and returns a new array.
+- `LArray:eval`: Maps each element through a Lua expression compiled as `function(x) return expression end`.
+- `LArray:reduce`: Reduces array values with a Lua accumulator function.
+- `LArray:scan`: Produces prefix accumulator values with a Lua function.
+- `LArray:type`: Returns the Lua-visible type name for this array handle.
+- `LArray:typeOf`: Returns whether this array handle matches a supported type name.
 
 ## References
 

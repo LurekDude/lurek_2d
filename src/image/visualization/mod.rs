@@ -2,27 +2,27 @@
 //! - Wildcard re-exports providing a flat public API.
 //! - Shared facade helpers scoped to crate visibility.
 
-/// Animation visualizations.
+/// Animation visualizations. This module is publicly re-exported.
 pub mod animation;
-/// Audio visualizations.
+/// Audio visualizations. This module is publicly re-exported.
 pub mod audio;
-/// Camera visualizations.
+/// Camera visualizations. This module is publicly re-exported.
 pub mod camera;
-/// Easing visualizations.
+/// Easing visualizations. This module is publicly re-exported.
 pub mod easing;
 /// Shared visualization helpers.
 pub mod facade;
-/// Geometry visualizations.
+/// Geometry visualizations. This module is publicly re-exported.
 pub mod geometry;
-/// Graph visualizations.
+/// Graph visualizations. This module is publicly re-exported.
 pub mod graph;
 /// Image-operation visualizations.
 pub mod image_ops;
-/// Noise visualizations.
+/// Noise visualizations. This module is publicly re-exported.
 pub mod noise;
 /// Procedural-generation visualizations.
 pub mod procgen;
-/// UI visualizations.
+/// UI visualizations. This module is publicly re-exported.
 pub mod ui;
 /// Re-export animation visualization entry points.
 pub use animation::*;

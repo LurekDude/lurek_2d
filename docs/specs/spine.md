@@ -41,52 +41,55 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 
 ## Functions
 
-- `Bone::new` (`bone.rs`): Creates a new bone with identity local transform and no parent.
-- `Bone::with_parent` (`bone.rs`): Creates a bone with a parent index and local offset.
-- `IKConstraint::new` (`ik.rs`): Creates a new two-bone IK constraint.
-- `IKConstraint::set_target` (`ik.rs`): Sets the world-space target position for this constraint.
-- `IKConstraint::solve` (`ik.rs`): Solves the two-bone IK and writes the resulting local rotations into the bone array.
-- `Skeleton::generate_render_commands` (`render.rs`): Generate debug render commands for the skeleton at the given world position.
-- `Skeleton::new` (`skeleton.rs`): Creates a new empty skeleton.
-- `Skeleton::add_bone` (`skeleton.rs`): Adds a bone to the skeleton and returns its index.
-- `Skeleton::add_slot` (`skeleton.rs`): Adds a slot to the skeleton and returns its index.
-- `Skeleton::find_bone` (`skeleton.rs`): Finds a bone by name and returns its index.
-- `Skeleton::find_slot` (`skeleton.rs`): Finds a slot by name and returns its index.
-- `Skeleton::add_bone_full` (`skeleton.rs`): Creates and adds a bone with the given local transform in one call.
-- `Skeleton::add_slot_full` (`skeleton.rs`): Creates and adds a slot with an optional attachment name in one call.
-- `Skeleton::bone_world_transform` (`skeleton.rs`): Returns the world-space transform of the bone at the given index.
-- `Skeleton::set_root_position` (`skeleton.rs`): Sets the root bone's local position and propagates world transforms.
-- `Skeleton::bone_count` (`skeleton.rs`): Returns the number of bones in this skeleton.
-- `Skeleton::add_animation` (`skeleton.rs`): Adds a [`SkeletonAnimation`] to this skeleton's animation library.
-- `Skeleton::find_animation` (`skeleton.rs`): Returns the index of the animation with the given name.
-- `Skeleton::play_animation` (`skeleton.rs`): Starts playing the named animation.
-- `Skeleton::stop_animation` (`skeleton.rs`): Stops playback of the current animation.
-- `Skeleton::update_animation` (`skeleton.rs`): Advances the active animation by `dt` seconds, applies keyframes, and wraps or stops at the end.
-- `Skeleton::get_animation_time` (`skeleton.rs`): Returns the current playback time in seconds.
-- `Skeleton::add_ik_constraint` (`skeleton.rs`): Adds an IK constraint and returns its index.
-- `Skeleton::set_ik_target` (`skeleton.rs`): Sets the target position for the named IK constraint.
-- `Skeleton::apply_ik_constraints` (`skeleton.rs`): Evaluates all IK constraints and writes resulting rotations into the bone array.
-- `Skeleton::add_skin` (`skeleton.rs`): Registers a new empty skin by name.
-- `Skeleton::set_skin` (`skeleton.rs`): Sets the active skin, changing slot attachment lookups.
-- `Skeleton::get_skin` (`skeleton.rs`): Returns the name of the currently active skin.
-- `Skeleton::set_skin_mapping` (`skeleton.rs`): Registers a slot-to-attachment mapping within a named skin.
-- `Skeleton::get_slot_attachment` (`skeleton.rs`): Returns the effective attachment name for a slot, consulting the active skin first.
-- `Skeleton::slot_count` (`skeleton.rs`): Returns the number of slots in this skeleton.
-- `Skeleton::update_world_transforms` (`skeleton.rs`): Propagates local transforms down the bone hierarchy to compute world transforms.
-- `Skeleton::draw_to_image` (`skeleton.rs`): Renders the skeleton as a stick figure to an `ImageData`.
-- `Skeleton::draw_bones_to_image` (`skeleton.rs`): Draw skeleton with colour-coded joints and bone labels.
-- `Slot::new` (`slot.rs`): Creates a new slot bound to a bone with default white colour and no attachment.
-- `EasingType::apply` (`timeline.rs`): Applies the easing curve to a normalised time value `t â [0, 1]`.
-- `BoneTimeline::new` (`timeline.rs`): Creates a new empty timeline for the given bone and property.
-- `BoneTimeline::add_key` (`timeline.rs`): Appends a keyframe at `time` with `value` and the given easing.
-- `BoneTimeline::evaluate` (`timeline.rs`): Evaluates the timeline at `time`, interpolating between surrounding keyframes.
-- `EventKeyframe::new` (`timeline.rs`): Creates a new event keyframe.
-- `SkeletonAnimation::new` (`timeline.rs`): Creates a new empty skeleton animation clip.
-- `SkeletonAnimation::add_timeline` (`timeline.rs`): Appends a bone timeline.
-- `SkeletonAnimation::add_event_key` (`timeline.rs`): Adds an event keyframe to the clip.
-- `SkeletonAnimation::collect_events` (`timeline.rs`): Returns the names of all events whose timestamps fall in `(from, to]`.
-- `SkeletonAnimation::apply_to_skeleton` (`timeline.rs`): Evaluates all timelines at `time` and writes results into the skeleton's bones.
-- `SkeletonAnimation::apply_to_skeleton_blended` (`timeline.rs`): Evaluates all timelines at `time` and **blends** the results with the skeleton's current bone values using `blend_weight`.
+- `Bone::new` (`bone.rs`): Create a root bone at world origin with identity transform.
+- `Bone::with_parent` (`bone.rs`): Create a child bone with the given parent index and local (x, y) offset; rotation and scale default to identity.
+- `IKConstraint::new` (`ik.rs`): Create a new IKConstraint with the given chain indices and bend direction; target defaults to (0, 0).
+- `IKConstraint::set_target` (`ik.rs`): Update the world-space target position for this constraint.
+- `IKConstraint::solve` (`ik.rs`): Solve root and elbow local_rotation angles using law-of-cosines 2-bone IK; no-op when chain length < 2 or indices out of bounds.
+- `Skeleton::generate_render_commands` (`render.rs`): Build a RenderCommand list for all bones (filled circles) and slot attachments (outline rectangles) at world offset (x, y); returns empty vec when no bones exist.
+- `Skeleton::new` (`skeleton.rs`): Create an empty Skeleton with identity scale and no active animation.
+- `Skeleton::add_bone` (`skeleton.rs`): Append a Bone to the bone array and return its new index.
+- `Skeleton::add_slot` (`skeleton.rs`): Append a Slot to the slot array and return its new index.
+- `Skeleton::find_bone` (`skeleton.rs`): Return the index of the first bone whose name matches, or None.
+- `Skeleton::find_slot` (`skeleton.rs`): Return the index of the first slot whose name matches, or None.
+- `Skeleton::add_bone_full` (`skeleton.rs`): Add a bone using a BoneParams descriptor; sets all local transform fields and returns the new index.
+- `Skeleton::add_slot_full` (`skeleton.rs`): Add a slot with optional default attachment and return its new index.
+- `Skeleton::bone_world_transform` (`skeleton.rs`): Return (world_x, world_y, world_rotation, world_scale_x, world_scale_y) for bone at idx, or None when out of bounds.
+- `Skeleton::set_root_position` (`skeleton.rs`): Set the root bone local position and immediately recompute all world transforms.
+- `Skeleton::bone_count` (`skeleton.rs`): Return the total number of bones in this skeleton.
+- `Skeleton::add_animation` (`skeleton.rs`): Append an animation clip to the animations list.
+- `Skeleton::find_animation` (`skeleton.rs`): Return the index of the first animation whose name matches, or None.
+- `Skeleton::play_animation` (`skeleton.rs`): Start playing an animation by name with optional loop; returns false when the animation is not registered.
+- `Skeleton::stop_animation` (`skeleton.rs`): Stop the current animation without resetting anim_time.
+- `Skeleton::update_animation` (`skeleton.rs`): Advance anim_time by dt and apply the current animation to bone poses; loops or stops at duration.
+- `Skeleton::get_animation_time` (`skeleton.rs`): Return current animation time in seconds.
+- `Skeleton::add_ik_constraint` (`skeleton.rs`): Append an IK constraint and return its index.
+- `Skeleton::set_ik_target` (`skeleton.rs`): Set the target position for the IK constraint named name; returns false when not found.
+- `Skeleton::apply_ik_constraints` (`skeleton.rs`): Solve all registered IK constraints against the current bone poses in registration order.
+- `Skeleton::add_skin` (`skeleton.rs`): Register an empty skin by name; no-op when the skin already exists.
+- `Skeleton::set_skin` (`skeleton.rs`): Switch the active skin to name; returns false when the skin has not been registered.
+- `Skeleton::get_skin` (`skeleton.rs`): Return the active skin name, or None when no skin is set.
+- `Skeleton::set_skin_mapping` (`skeleton.rs`): Map an attachment name to a slot within a skin, creating the skin entry if absent.
+- `Skeleton::get_slot_attachment` (`skeleton.rs`): Return the resolved attachment name for slot_idx: checks active skin first, then slot default; None when no attachment.
+- `Skeleton::slot_count` (`skeleton.rs`): Return the number of slots in this skeleton.
+- `Skeleton::update_world_transforms` (`skeleton.rs`): Recompute all bone world transforms from local pose, traversing bones in index order (parent-before-child required).
+- `Skeleton::draw_to_image` (`skeleton.rs`): Rasterise skeleton bones and slot markers into a new ImageData of the given dimensions; fills background dark.
+- `Skeleton::draw_bones_to_image` (`skeleton.rs`): Rasterise bones with per-bone colour labels and a bone-count status string into a new ImageData.
+- `Slot::new` (`slot.rs`): Create a slot with white opaque tint, no attachment, and draw_order 0.
+- `EasingType::apply` (`timeline.rs`): Evaluate this easing curve for t in [0, 1]; clamps input; Step always returns 0.0 (caller uses prev value).
+- `BoneTimeline::new` (`timeline.rs`): Create an empty BoneTimeline targeting bone_idx and the given property.
+- `BoneTimeline::add_key` (`timeline.rs`): Insert a keyframe at the correct sorted position by time.
+- `BoneTimeline::evaluate` (`timeline.rs`): Return the interpolated bone property value at the given time; extrapolates from first or last key outside the range.
+- `EventKeyframe::new` (`timeline.rs`): Create an EventKeyframe with the given time, name, and numeric value.
+- `SkeletonAnimation::new` (`timeline.rs`): Create an empty animation clip with the given name and duration.
+- `SkeletonAnimation::add_timeline` (`timeline.rs`): Append a BoneTimeline to this animation.
+- `SkeletonAnimation::add_event_key` (`timeline.rs`): Insert an event at the given time; events are kept sorted by time.
+- `SkeletonAnimation::collect_events` (`timeline.rs`): Return all event (name, value) pairs whose time is in the half-open range (from, to].
+- `SkeletonAnimation::apply_to_skeleton` (`timeline.rs`): Apply all bone timelines at the given time to the target skeleton by setting local properties directly.
+- `SkeletonAnimation::apply_to_skeleton_blended` (`timeline.rs`): Apply all bone timelines blended with blend_weight in [0, 1]; weight=1 is full override, weight=0 is no-op.
+- `SkeletonAnimation::pose_at` (`timeline.rs`): Return the evaluated (bone_idx, property, value) pose snapshot for all timelines at the given time.
+- `SkeletonAnimation::reverse` (`timeline.rs`): Return a new animation with all keyframe times mirrored around the clip duration.
+- `SkeletonAnimation::from_json` (`timeline.rs`): Parse a SkeletonAnimation from a serde_json Value; returns None when required fields are missing or malformed.
 
 ## Lua API Reference
 
@@ -94,44 +97,47 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - Namespace: `lurek.spine`
 
 ### Module Functions
-- `lurek.spine.newSkeleton`: Creates a new empty skeleton with the given name.
-- `lurek.spine.newSkeletonAnimation`: Creates a new empty SkeletonAnimation clip with the given name and duration.
+- `lurek.spine.newSkeleton`: Creates a new empty skeleton with the given name. Add bones and slots to build the hierarchy.
+- `lurek.spine.newSkeletonAnimation`: Creates a new empty animation with the given name and duration. Add keyframes to define motion.
+- `lurek.spine.animationFromJson`: Parses a JSON string into a SkeletonAnimation. Returns nil if parsing fails or the format is invalid.
 
 ### `LSkeleton` Methods
-- `LSkeleton:addBone`: Adds a root bone with optional local transform and returns its index.
-- `LSkeleton:addChildBone`: Adds a child bone attached to a parent and returns its index.
-- `LSkeleton:addSlot`: Adds a slot bound to a bone and returns its index.
-- `LSkeleton:findBone`: Returns the index of the named bone.
-- `LSkeleton:findSlot`: Returns the index of the named slot.
-- `LSkeleton:updateWorldTransforms`: Propagates local transforms down the bone hierarchy to compute world positions.
-- `LSkeleton:getBoneWorld`: Returns the world-space transform of a bone as a table.
-- `LSkeleton:setPosition`: Sets the root bone position and propagates world transforms.
-- `LSkeleton:boneCount`: Returns the total number of bones.
-- `LSkeleton:slotCount`: Returns the total number of slots.
-- `LSkeleton:drawToImage`: Renders the skeleton as a stick-figure debug view into a new ImageData.
-- `LSkeleton:playAnimation`: Starts playback of the named skeletal animation clip.
-- `LSkeleton:stopAnimation`: Stops the current skeletal animation.
-- `LSkeleton:updateAnimation`: Advances the playing animation by `dt` seconds and applies keyframes.
-- `LSkeleton:getAnimationTime`: Returns the current playback time in seconds of the active animation.
-- `LSkeleton:addAnimation`: Adds a SkeletonAnimation to this skeleton's library.
-- `LSkeleton:addIKConstraint`: Adds a two-bone IK constraint and returns its index.
-- `LSkeleton:setIKTarget`: Sets the world-space target position for the named IK constraint.
-- `LSkeleton:addSkin`: Registers a new empty skin by name.
-- `LSkeleton:setSkin`: Activates the named skin for attachment lookups.
-- `LSkeleton:getSkin`: Returns the name of the currently active skin.
-- `LSkeleton:setSkinMapping`: Registers a slot-to-attachment mapping in the named skin.
-- `LSkeleton:blendAnimation`: Evaluates an animation at `time` and blends it into this skeleton.
-- `LSkeleton:type`: Returns the type name of this object.
-- `LSkeleton:typeOf`: Returns whether this object is of the given type.
+- `LSkeleton:addBone`: Adds a root-level bone to the skeleton with optional transform properties.
+- `LSkeleton:addChildBone`: Adds a bone as a child of an existing bone, inheriting its parent's world transform.
+- `LSkeleton:addSlot`: Adds a slot attached to a specific bone, optionally assigning a default attachment name.
+- `LSkeleton:findBone`: Searches for a bone by name and returns its zero-based index, or nil if not found.
+- `LSkeleton:findSlot`: Searches for a slot by name and returns its zero-based index, or nil if not found.
+- `LSkeleton:updateWorldTransforms`: Recomputes world transforms for all bones in hierarchy order. Call after modifying bone locals or IK targets.
+- `LSkeleton:getBoneWorld`: Returns the final world-space transform of a bone after hierarchy resolution.
+- `LSkeleton:setPosition`: Sets the root bone world position, shifting the entire skeleton.
+- `LSkeleton:boneCount`: Returns the total number of bones in the skeleton.
+- `LSkeleton:slotCount`: Returns the total number of slots in the skeleton.
+- `LSkeleton:drawToImage`: Renders the skeleton into an in-memory image of the given dimensions and returns it as LImage userdata.
+- `LSkeleton:playAnimation`: Starts playing a named animation on this skeleton. Optionally loops.
+- `LSkeleton:stopAnimation`: Stops the currently playing animation and resets playback state.
+- `LSkeleton:updateAnimation`: Advances the current animation by a delta time, applying bone transforms to the skeleton.
+- `LSkeleton:getAnimationTime`: Returns the current playback time of the active animation in seconds.
+- `LSkeleton:addAnimation`: Registers a SkeletonAnimation object with this skeleton so it can be played by name.
+- `LSkeleton:addIKConstraint`: Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
+- `LSkeleton:setIKTarget`: Sets the world-space target position for a named IK constraint. Call updateWorldTransforms after.
+- `LSkeleton:addSkin`: Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
+- `LSkeleton:setSkin`: Activates a named skin, applying its slot-attachment mappings to the skeleton.
+- `LSkeleton:getSkin`: Returns the name of the currently active skin, or nil if no skin is set.
+- `LSkeleton:setSkinMapping`: Maps a slot to a specific attachment name within a skin. When that skin is active, the slot shows this attachment.
+- `LSkeleton:blendAnimation`: Blends an animation pose onto the skeleton at a given time with a weight factor for smooth transitions.
+- `LSkeleton:type`: Returns the type name of this userdata object.
+- `LSkeleton:typeOf`: Checks whether this object is of the given type name. Supports "LSkeleton" and "Object".
 
 ### `LSkeletonAnimation` Methods
-- `LSkeletonAnimation:addKeyframe`: Adds a keyframe to a bone timeline for the given property.
-- `LSkeletonAnimation:getDuration`: Returns the total duration of the animation in seconds.
-- `LSkeletonAnimation:addEventKey`: Adds a named event marker at a time in the animation.
-- `LSkeletonAnimation:getEvents`: Returns event entries in the half-open interval `(from, to]`.
-- `LSkeletonAnimation:getTimelineCount`: Returns the number of bone timelines in this animation.
-- `LSkeletonAnimation:type`: Returns the type name of this object.
-- `LSkeletonAnimation:typeOf`: Returns whether this object is of the given type.
+- `LSkeletonAnimation:addKeyframe`: Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
+- `LSkeletonAnimation:getDuration`: Returns the total duration of this animation in seconds.
+- `LSkeletonAnimation:addEventKey`: Inserts an event trigger at a specific time within the animation timeline.
+- `LSkeletonAnimation:getEvents`: Collects all events that fire within a time range. Useful for triggering sound effects or gameplay actions.
+- `LSkeletonAnimation:getTimelineCount`: Returns the number of bone-property timelines in this animation.
+- `LSkeletonAnimation:poseAt`: Samples all timelines at a given time and returns the computed pose as an array of bone-property-value entries.
+- `LSkeletonAnimation:reverse`: Creates a new animation that plays this animation's keyframes in reverse order.
+- `LSkeletonAnimation:type`: Returns the type name of this userdata object.
+- `LSkeletonAnimation:typeOf`: Checks whether this object is of the given type name. Supports "LSkeletonAnimation" and "Object".
 
 ## References
 

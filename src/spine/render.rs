@@ -7,7 +7,7 @@ use crate::render::renderer::{DrawMode, RenderCommand};
 
 /// Render methods added to Skeleton by this file.
 impl Skeleton {
-    /// Build a RenderCommand list for all bones (filled circles) and slot attachments (outline rectangles)
+    /// Build a RenderCommand list for all bones (filled circles) and slot attachments (outline rectangles).
     /// at world offset (x, y); returns empty vec when no bones exist.
     pub fn generate_render_commands(&self, x: f32, y: f32) -> Vec<RenderCommand> {
         let mut cmds = Vec::new();

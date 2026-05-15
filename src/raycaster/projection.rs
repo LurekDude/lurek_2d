@@ -1,7 +1,7 @@
 //! - Wall-column projection from ray distance to screen-pixel height and vertical bounds.
 //! - Distance-based shading for depth fog attenuation.
 
-/// Project a wall column at `distance` using `fov` and `screen_height`;
+/// Project a wall column at `distance` using `fov` and `screen_height`;.
 /// return `(wall_height, draw_start_y, draw_end_y)` in screen pixels.
 pub fn project_column(distance: f32, fov: f32, screen_height: f32) -> (f32, f32, f32) {
     if distance <= 0.0 {

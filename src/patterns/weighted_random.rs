@@ -25,7 +25,7 @@ pub struct WeightedRandom {
 }
 /// All methods for `WeightedRandom`.
 impl WeightedRandom {
-    /// Create an empty selector.
+    /// Create an empty selector. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),

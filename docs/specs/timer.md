@@ -17,6 +17,7 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 ## Files
 
+- `accumulator.rs`: - Drift-free microsecond accumulation for scaled elapsed-time tracking.
 - `clock.rs`: `Clock` struct � frame delta, total time, FPS, and rolling average
 - `mod.rs`: Re-exports `Clock` and `Scheduler`; provides free function `sleep()`
 - `scheduler.rs`: `Scheduler` and `ScheduledEvent` � delayed and repeating events
@@ -31,42 +32,43 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 ## Functions
 
-- `Clock::new` (`clock.rs`): Creates a new `Clock`, recording the current instant as the start time.
-- `Clock::tick` (`clock.rs`): Advances the clock by one frame, updating delta time, total time, and rolling FPS.
-- `Clock::delta` (`clock.rs`): Returns the delta time for the most recently completed frame in seconds.
-- `Clock::total` (`clock.rs`): Returns the total elapsed time since the clock was created, in seconds.
-- `Clock::fps` (`clock.rs`): Returns the rolling frames-per-second measurement.
-- `Clock::frame_count` (`clock.rs`): Returns the total number of frames that have elapsed since the clock was created.
-- `Clock::elapsed` (`clock.rs`): Returns a live high-resolution elapsed time since the clock was created, in seconds.
-- `Clock::average_delta` (`clock.rs`): Returns the average delta time over the last N frames (up to 60).
-- `Scheduler::new` (`scheduler.rs`): Create a new empty Scheduler with time-scale 1.0.
-- `Scheduler::after` (`scheduler.rs`): Schedule a one-shot callback after `delay` seconds.
-- `Scheduler::after_named` (`scheduler.rs`): Schedule a one-shot callback with a `name` for cancel-by-name support.
-- `Scheduler::every` (`scheduler.rs`): Schedule a repeating callback at `interval` seconds.
-- `Scheduler::every_named` (`scheduler.rs`): Schedule a named repeating callback.
-- `Scheduler::after_frames` (`scheduler.rs`): Schedule a one-shot event that fires after `n` frames.
-- `Scheduler::every_frames` (`scheduler.rs`): Schedule a repeating event that fires every `n` frames.
-- `Scheduler::cancel` (`scheduler.rs`): Cancel a scheduled event by its ID.
-- `Scheduler::cancel_named` (`scheduler.rs`): Cancel a scheduled event by its name.
-- `Scheduler::cancel_all` (`scheduler.rs`): Cancel all scheduled events.
-- `Scheduler::pause` (`scheduler.rs`): Pause a single event by ID.
-- `Scheduler::resume` (`scheduler.rs`): Resume a previously paused event by ID.
-- `Scheduler::is_paused` (`scheduler.rs`): Returns `true` if the event with `id` is currently paused.
-- `Scheduler::pause_named` (`scheduler.rs`): Pauses a scheduled event by its string name.
-- `Scheduler::resume_named` (`scheduler.rs`): Resumes a previously paused event by its string name.
-- `Scheduler::is_paused_named` (`scheduler.rs`): Returns `true` if the named event is currently paused.
-- `Scheduler::get_remaining` (`scheduler.rs`): Returns the time remaining until the next fire for event `id`, or `None` if not found.
-- `Scheduler::get_interval` (`scheduler.rs`): Returns the base interval for event `id`, or `None` if not found.
-- `Scheduler::get_repeat_count` (`scheduler.rs`): Returns the repeat count remaining for event `id` (-1 = infinite), or `None` if not found.
-- `Scheduler::set_interval` (`scheduler.rs`): Change the interval of a repeating event.
-- `Scheduler::reset_event` (`scheduler.rs`): Reset an event's remaining time to its original interval.
-- `Scheduler::set_time_scale` (`scheduler.rs`): Set the global time-scale multiplier for this scheduler.
-- `Scheduler::get_time_scale` (`scheduler.rs`): Returns the current global time-scale.
-- `Scheduler::update` (`scheduler.rs`): Advance all non-paused timers by `dt * time_scale` seconds.
-- `Scheduler::update_frames` (`scheduler.rs`): Advance all non-paused frame-based events by one frame.
-- `Scheduler::count` (`scheduler.rs`): Get the number of active (non-expired) scheduled events.
-- `Scheduler::active_ids` (`scheduler.rs`): Get the IDs of all active events.
-- `Scheduler::is_empty` (`scheduler.rs`): Returns `true` if no events are scheduled.
+- `accumulate_scaled_micros` (`accumulator.rs`): Advance `elapsed_micros` by `dt_seconds * scale`, accumulating fractional microseconds in `carry_micros` to avoid drift; clamps negative inputs to zero.
+- `Clock::new` (`clock.rs`): Create a new clock with all counters zeroed and both `start_time` and `last_frame` set to now.
+- `Clock::tick` (`clock.rs`): Advance the clock by one frame: compute delta, update FPS every second, append to rolling buffer; return delta in seconds.
+- `Clock::delta` (`clock.rs`): Return seconds elapsed between the last two `tick` calls.
+- `Clock::total` (`clock.rs`): Return seconds elapsed since the clock was created, as of the last `tick`.
+- `Clock::fps` (`clock.rs`): Return the most recently computed frames-per-second value, updated once per second.
+- `Clock::frame_count` (`clock.rs`): Return the total number of `tick` calls since clock creation.
+- `Clock::elapsed` (`clock.rs`): Return live wall-clock seconds since the clock was created, measured at call time (not last tick).
+- `Clock::average_delta` (`clock.rs`): Return the mean delta over the last `AVERAGE_DELTA_WINDOW` frames, or 0.0 if no frames have been ticked.
+- `Scheduler::new` (`scheduler.rs`): Create an empty scheduler with `time_scale` 1.0 and log the creation event.
+- `Scheduler::after` (`scheduler.rs`): Schedule a one-shot event to fire after `delay` seconds; return its ID.
+- `Scheduler::after_named` (`scheduler.rs`): Schedule a named one-shot event after `delay` seconds, replacing any existing event with the same name; return its ID.
+- `Scheduler::every` (`scheduler.rs`): Schedule a repeating event with `interval` seconds between firings; `count` -1 means infinite; return its ID.
+- `Scheduler::every_named` (`scheduler.rs`): Schedule a named repeating event, replacing any existing event with the same name; return its ID.
+- `Scheduler::after_frames` (`scheduler.rs`): Schedule a one-shot frame event to fire after `n` frames; return its ID.
+- `Scheduler::every_frames` (`scheduler.rs`): Schedule a repeating frame event firing every `n` frames for `count` repetitions (-1 = infinite); return its ID.
+- `Scheduler::cancel` (`scheduler.rs`): Cancel the event with `id` from either list; return true if it was found and removed.
+- `Scheduler::cancel_named` (`scheduler.rs`): Cancel the first time-based event with `name`; return its ID if found.
+- `Scheduler::cancel_all` (`scheduler.rs`): Cancel all events in both lists; return the count removed.
+- `Scheduler::pause` (`scheduler.rs`): Pause the time-based event with `id` so `update` skips it; return true if found.
+- `Scheduler::resume` (`scheduler.rs`): Resume the time-based event with `id`; return true if found.
+- `Scheduler::is_paused` (`scheduler.rs`): Return true if the time-based event with `id` is paused; false if not found.
+- `Scheduler::pause_named` (`scheduler.rs`): Pause the first time-based event matching `name`; return true if found.
+- `Scheduler::resume_named` (`scheduler.rs`): Resume the first time-based event matching `name`; return true if found.
+- `Scheduler::is_paused_named` (`scheduler.rs`): Return true if the first time-based event matching `name` is paused; false if not found.
+- `Scheduler::get_remaining` (`scheduler.rs`): Return seconds remaining on the time-based event with `id`, or `None` if not found.
+- `Scheduler::get_interval` (`scheduler.rs`): Return the interval in seconds of the event with `id`, or `None` if not found.
+- `Scheduler::get_repeat_count` (`scheduler.rs`): Return the remaining repeat count of the event with `id`, or `None` if not found.
+- `Scheduler::set_interval` (`scheduler.rs`): Set a new interval on the event with `id` and reset `remaining` to `new_interval`; return true if found.
+- `Scheduler::reset_event` (`scheduler.rs`): Reset `remaining` of the event with `id` back to its `interval`; return true if found.
+- `Scheduler::set_time_scale` (`scheduler.rs`): Set the global time-scale applied to `dt` in `update`; clamped to [0.0, 100.0].
+- `Scheduler::get_time_scale` (`scheduler.rs`): Return the current time-scale multiplier.
+- `Scheduler::update` (`scheduler.rs`): Advance all non-paused time-based events by `dt * time_scale` seconds; return IDs of events that fired this frame.
+- `Scheduler::update_frames` (`scheduler.rs`): Advance all non-paused frame-based events by one frame; return IDs of events that fired this frame.
+- `Scheduler::count` (`scheduler.rs`): Return the total number of active time-based and frame-based events.
+- `Scheduler::active_ids` (`scheduler.rs`): Return a vec of IDs for all currently active events across both lists.
+- `Scheduler::is_empty` (`scheduler.rs`): Return true if there are no active events in either list.
 - `sleep` (`sleep.rs`): Suspends the current thread for the given number of seconds.
 
 ## Lua API Reference
@@ -75,57 +77,57 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - Namespace: `lurek.timer`
 
 ### Module Functions
-- `lurek.timer.getDelta`: Returns the time elapsed since the previous frame in seconds.
-- `lurek.timer.getFPS`: Returns the current instantaneous frames-per-second as measured by the engine clock.
-- `lurek.timer.getTime`: Returns the total wall-clock time that has elapsed since the engine was initialised, in seconds.
-- `lurek.timer.getAverageDelta`: Returns a rolling average of recent frame delta times in seconds.
-- `lurek.timer.getFrameCount`: Returns the total number of frames that have been rendered since the engine was initialised.
-- `lurek.timer.step`: Manually advances the engine timer by one frame tick and returns the resulting delta time.
-- `lurek.timer.getMicroTime`: Returns the high-resolution (microsecond-precision) elapsed time since engine start in seconds.
-- `lurek.timer.getPhysicsDelta`: Returns the fixed timestep interval used by the `process_physics` callback loop, in seconds.
-- `lurek.timer.setPhysicsDelta`: Sets the fixed timestep interval for the `process_physics` callback loop, in seconds.
-- `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics simulation sub-steps that the engine will perform in a single frame.
-- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics simulation sub-steps allowed per frame.
-- `lurek.timer.sleep`: Blocks the current thread for the specified number of seconds using an OS-level sleep.
-- `lurek.timer.newScheduler`: Creates and returns a new independent Scheduler userdata object for managing timed and frame-based callbacks.
-- `lurek.timer.chain`: Creates a new Scheduler pre-loaded with a sequence of one-shot callbacks that fire in order with cumulative delays.
-- `lurek.timer.afterReal`: Schedules a one-shot callback that fires after `delay` wall-clock seconds, completely unaffected by the engine's time scale or pause state.
-- `lurek.timer.tickRealTimers`: Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
-- `lurek.timer.setSmoothingFactor`: Sets the exponential moving-average smoothing factor (alpha) used by `getSmoothedDelta`.
-- `lurek.timer.getSmoothedDelta`: Returns the exponentially smoothed frame delta time in seconds.
-- `lurek.timer.waitSeconds`: Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
-- `lurek.timer.waitFrames`: Yields the current Lua coroutine until at least `frames` engine frames have elapsed.
-- `lurek.timer.tickWaits`: Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or frame target has been reached.
+- `lurek.timer.getDelta`: Returns the time in seconds elapsed since the last frame. Use this to make movement and animations frame-rate independent.
+- `lurek.timer.getFPS`: Returns the current frames-per-second count. Useful for performance monitoring overlays and debug HUDs.
+- `lurek.timer.getTime`: Returns the total elapsed game time in seconds since the engine started. Useful for time-based animations, effects, and shader uniforms.
+- `lurek.timer.getAverageDelta`: Returns the smoothed average delta time in seconds over a recent window of frames. More stable than getDelta for display or adaptive logic.
+- `lurek.timer.getFrameCount`: Returns the total number of frames rendered since the engine started.
+- `lurek.timer.step`: Advances the internal clock by one tick and returns the delta time for that tick. Typically called by the engine loop; game scripts rarely need this.
+- `lurek.timer.getMicroTime`: Returns high-resolution elapsed time in seconds since engine start. Useful for precise benchmarking and profiling.
+- `lurek.timer.getPhysicsDelta`: Returns the fixed timestep used for physics simulation in seconds. The default is typically 1/60.
+- `lurek.timer.setPhysicsDelta`: Sets the fixed timestep for physics simulation. Clamped between 1/240 and 1/10 seconds. Lower values increase accuracy but cost more CPU.
+- `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics steps allowed per frame. Prevents the spiral of death when the game runs slowly.
+- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics steps allowed per frame. Clamped between 1 and 64. Higher values improve accuracy under lag but cost more CPU.
+- `lurek.timer.sleep`: Blocks the current thread for the given number of seconds. Use sparingly — this halts the entire game loop. Intended for loading screens or synchronization.
+- `lurek.timer.newScheduler`: Creates a new LScheduler instance for managing timed and frame-based callbacks independently from the global timer. Each scheduler has its own time scale and event list.
+- `lurek.timer.chain`: Creates a scheduler pre-loaded with a sequence of delayed callbacks. Each step is a table with an optional `delay` (seconds) and optional `func` (callback). Delays accumulate so each step fires after the sum of all preceding delays. Returns the scheduler for manual update calls.
+- `lurek.timer.afterReal`: Schedules a one-shot callback based on real (wall-clock) time, unaffected by game pausing or time scaling. Use for UI fade-outs, notifications, or anything that should run on real time.
+- `lurek.timer.tickRealTimers`: Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that fired. Call this once per frame after afterReal scheduling.
+- `lurek.timer.setSmoothingFactor`: Sets the exponential smoothing factor used by getSmoothedDelta. Lower values produce smoother (more lagged) results; higher values track changes faster. Clamped to [0.01, 1.0].
+- `lurek.timer.getSmoothedDelta`: Returns an exponentially smoothed delta time in seconds, reducing frame-to-frame jitter. Call once per frame for consistent results. The smoothing factor is set via setSmoothingFactor.
+- `lurek.timer.waitSeconds`: Yields the current coroutine for the given number of real-time seconds. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the deadline has passed.
+- `lurek.timer.waitFrames`: Yields the current coroutine for the given number of frames. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the target frame count has been reached.
+- `lurek.timer.tickWaits`: Checks all pending waitSeconds and waitFrames coroutines, resumes any whose deadline or frame target has been reached, and cleans up completed entries. Returns the number of coroutines that were resumed. Call once per frame.
 
 ### `LScheduler` Methods
-- `LScheduler:after`: Schedules a callback to fire once after a delay.
-- `LScheduler:afterFrames`: Schedules a callback to fire once after `n` frames.
-- `LScheduler:afterNamed`: Schedules a named one-shot callback, replacing any existing event with the same name.
-- `LScheduler:every`: Schedules a callback to fire repeatedly at the given interval.
-- `LScheduler:everyFrames`: Schedules a callback to fire every `n` frames.
-- `LScheduler:everyNamed`: Schedules a named repeating callback, replacing any existing event with the same name.
-- `LScheduler:cancel`: Cancels a scheduled event by its numeric ID.
-- `LScheduler:cancelNamed`: Cancels and removes a previously scheduled event identified by its string name assigned via `afterNamed` or `everyNamed`.
-- `LScheduler:cancelAll`: Cancels all scheduled events and returns the count removed.
-- `LScheduler:pause`: Pauses a scheduled event by its ID.
-- `LScheduler:resume`: Resumes a paused event by its ID.
-- `LScheduler:isPaused`: Returns whether the given event is currently paused.
-- `LScheduler:pauseNamed`: Temporarily suspends the named scheduled event so it stops accumulating time.
-- `LScheduler:resumeNamed`: Resumes a previously paused named event so it continues accumulating time.
-- `LScheduler:isPausedNamed`: Checks whether the named scheduled event is currently in the paused state.
-- `LScheduler:getRemaining`: Returns whether the event exists and how many seconds remain until it fires next.
-- `LScheduler:getInterval`: Returns whether the event exists and its configured base interval in seconds.
-- `LScheduler:getRepeatCount`: Returns whether the event exists and its remaining repetition count.
-- `LScheduler:getCount`: Returns the total number of currently active (not yet completed or cancelled) events in this scheduler instance.
-- `LScheduler:isEmpty`: Returns true if this scheduler has zero active events.
-- `LScheduler:setInterval`: Modifies the repeat interval of an already-scheduled repeating event.
-- `LScheduler:resetEvent`: Resets the countdown for a scheduled event back to its full configured interval, as if it had just been created.
-- `LScheduler:setTimeScale`: Sets a time-scale multiplier that affects all events in this scheduler.
-- `LScheduler:getTimeScale`: Returns the current time-scale multiplier for this scheduler instance.
-- `LScheduler:update`: Advances all time-based events in this scheduler by `dt` seconds (scaled by the scheduler's time-scale multiplier).
-- `LScheduler:updateFrames`: Advances all frame-based events by one frame tick.
-- `LScheduler:type`: Returns the string type name of this userdata object.
-- `LScheduler:typeOf`: Checks whether this object matches the given type name.
+- `LScheduler:after`: Schedules a one-shot callback to fire after the given delay in seconds. Returns an event ID that can be used to cancel, pause, or query the event.
+- `LScheduler:afterFrames`: Schedules a one-shot callback to fire after the given number of frames. Returns an event ID for management.
+- `LScheduler:afterNamed`: Schedules a named one-shot callback after a delay in seconds. If a callback with the same name already exists, the old one is cancelled and replaced. Useful for debouncing or resettable delays.
+- `LScheduler:every`: Schedules a repeating callback that fires at a fixed interval in seconds. Pass a positive count to limit repetitions, or omit/pass -1 to repeat indefinitely.
+- `LScheduler:everyFrames`: Schedules a repeating callback that fires every N frames. Pass a positive count to limit repetitions, or omit/pass -1 to repeat indefinitely.
+- `LScheduler:everyNamed`: Schedules a named repeating callback at a fixed interval. If a callback with the same name already exists, the old one is cancelled and replaced. Useful for restartable periodic effects like health regeneration or status ticks.
+- `LScheduler:cancel`: Cancels a scheduled event by its ID. Returns true if the event was found and removed, false if it did not exist.
+- `LScheduler:cancelNamed`: Cancels a named scheduled event. Returns true if the named event was found and removed.
+- `LScheduler:cancelAll`: Cancels all scheduled events in this scheduler and frees their callbacks. Returns the number of events that were removed.
+- `LScheduler:pause`: Pauses a scheduled event so it stops accumulating time. Returns true if the event was found and paused.
+- `LScheduler:resume`: Resumes a previously paused event so it continues accumulating time. Returns true if the event was found and resumed.
+- `LScheduler:isPaused`: Checks whether a scheduled event is currently paused.
+- `LScheduler:pauseNamed`: Pauses a named scheduled event. Returns true if the named event was found and paused.
+- `LScheduler:resumeNamed`: Resumes a previously paused named event. Returns true if the named event was found and resumed.
+- `LScheduler:isPausedNamed`: Checks whether a named scheduled event is currently paused.
+- `LScheduler:getRemaining`: Returns the remaining time in seconds before the event fires. The first return value indicates whether the event was found; the second is the remaining time (0.0 if not found).
+- `LScheduler:getInterval`: Returns the interval duration in seconds for a repeating event. The first return value indicates whether the event was found; the second is the interval (0.0 if not found).
+- `LScheduler:getRepeatCount`: Returns the remaining repeat count for a repeating event. The first return value indicates whether the event was found; the second is the count (0 if not found). A value of -1 means infinite repeats.
+- `LScheduler:getCount`: Returns the total number of active scheduled events in this scheduler.
+- `LScheduler:isEmpty`: Returns true if the scheduler has no active events.
+- `LScheduler:setInterval`: Changes the interval duration in seconds for an existing repeating event. Returns true if the event was found and updated.
+- `LScheduler:resetEvent`: Resets the elapsed time of a scheduled event back to zero, restarting its delay or interval countdown. Returns true if the event was found and reset.
+- `LScheduler:setTimeScale`: Sets the time scale multiplier for this scheduler. A value of 2.0 makes events fire twice as fast; 0.5 makes them fire at half speed. Does not affect frame-based events.
+- `LScheduler:getTimeScale`: Returns the current time scale multiplier for this scheduler.
+- `LScheduler:update`: Advances all time-based events by dt seconds, fires any callbacks whose delay has elapsed, and cleans up completed one-shot events. Call this once per frame with delta time. Returns the number of callbacks that fired.
+- `LScheduler:updateFrames`: Advances all frame-based events by one frame, fires any callbacks whose frame count has been reached, and cleans up completed one-shot events. Call this once per frame. Returns the number of callbacks that fired.
+- `LScheduler:type`: Returns the type name of this object as a string.
+- `LScheduler:typeOf`: Checks whether this object matches the given type name. Accepts "LScheduler" or "Object".
 
 ## References
 

@@ -24,11 +24,19 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 ## Types
 
+- `DisplayInfo` (`struct`, `event_loop.rs`): Snapshot of one connected display returned by `get_displays`.
 - `ModeInfo` (`struct`, `management.rs`): A compact snapshot of fullscreen and vsync state returned by the window mode query helpers.
 - `ScaleInfo` (`struct`, `viewport.rs`): A read-only snapshot of current viewport scale, offsets, and logical game dimensions used by coordinate-conversion callers.
 
 ## Functions
 
+- `get_displays` (`event_loop.rs`): Returns structured metadata for connected displays.
+- `current_display_index` (`event_loop.rs`): Resolves which display currently contains the window.
+- `desktop_dimensions_for_display` (`event_loop.rs`): Returns desktop size for a selected display.
+- `display_name_for_display` (`event_loop.rs`): Returns display name for a selected display.
+- `move_window_to_display` (`event_loop.rs`): Centers and moves the window to a selected monitor.
+- `select_startup_monitor` (`event_loop.rs`): Chooses startup monitor with primary fallback.
+- `center_window_on_monitor` (`event_loop.rs`): Centers the window in monitor bounds.
 - `set_title` (`management.rs`): Schedules a window title change for the next frame.
 - `set_fullscreen` (`management.rs`): Schedules a fullscreen mode change.
 - `is_fullscreen` (`management.rs`): Returns whether the window is currently in fullscreen mode.
@@ -67,13 +75,6 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `from_pixels` (`viewport.rs`): Converts window pixel coordinates `(x, y)` back to game-space coordinates.
 - `get_scale_info` (`viewport.rs`): Returns the current viewport scale and offset information.
 - `set_scale_mode_validated` (`viewport.rs`): Validates and schedules a viewport scale mode change.
-- `get_displays` (`event_loop.rs`): Returns structured metadata for connected displays.
-- `current_display_index` (`event_loop.rs`): Resolves which display currently contains the window.
-- `desktop_dimensions_for_display` (`event_loop.rs`): Returns desktop size for a selected display.
-- `display_name_for_display` (`event_loop.rs`): Returns display name for a selected display.
-- `move_window_to_display` (`event_loop.rs`): Centers and moves the window to a selected monitor.
-- `select_startup_monitor` (`event_loop.rs`): Chooses startup monitor with primary fallback.
-- `center_window_on_monitor` (`event_loop.rs`): Centers the window in monitor bounds.
 
 ## Lua API Reference
 
@@ -81,65 +82,61 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - Namespace: `lurek.window`
 
 ### Module Functions
-- `lurek.window.setTitle`: Sets the text displayed in the window's title bar.
-- `lurek.window.getTitle`: Returns the current window title bar text as a string.
-- `lurek.window.getWidth`: Returns the current window width in logical pixels.
-- `lurek.window.getHeight`: Returns the current window height in logical pixels.
-- `lurek.window.getDimensions`: Returns the window dimensions as two values (width, height) in logical pixels.
-- `lurek.window.setFullscreen`: Enables or disables fullscreen mode.
-- `lurek.window.getFullscreen`: Returns the current fullscreen state as two values: a boolean indicating whether fullscreen is active, and a string describing the type ("desktop" or "exclusive").
-- `lurek.window.isOpen`: Returns whether the window is currently open and active.
-- `lurek.window.setVSync`: Sets the vertical synchronisation mode for the window's swap chain.
-- `lurek.window.getVSync`: Returns the current vertical synchronisation mode as an integer: 1 = VSync on, 0 = VSync off, -1 = adaptive VSync.
-- `lurek.window.hasFocus`: Returns whether the window currently has keyboard input focus from the operating system.
-- `lurek.window.hasMouseFocus`: Returns whether the mouse cursor is currently inside the window's client area.
-- `lurek.window.isMinimized`: Returns whether the window is currently minimised to the taskbar.
-- `lurek.window.isMaximized`: Returns whether the window is currently maximised to fill the entire desktop work area.
+- `lurek.window.setTitle`: Sets the window title bar text.
+- `lurek.window.getTitle`: Returns the current window title bar text.
+- `lurek.window.getWidth`: Returns the current window width in logical (DPI-independent) pixels.
+- `lurek.window.getHeight`: Returns the current window height in logical (DPI-independent) pixels.
+- `lurek.window.getDimensions`: Returns the current window width and height in logical pixels.
+- `lurek.window.setFullscreen`: Enables or disables fullscreen mode. Supports "desktop" (borderless) and "exclusive" types.
+- `lurek.window.getFullscreen`: Returns the current fullscreen state and type.
+- `lurek.window.isOpen`: Returns whether the window is currently open. Always returns true while the game is running.
+- `lurek.window.setVSync`: Sets the vertical sync mode. Controls how frame presentation is synchronized with the display.
+- `lurek.window.getVSync`: Returns the current VSync mode.
+- `lurek.window.hasFocus`: Returns whether the window currently has keyboard focus.
+- `lurek.window.hasMouseFocus`: Returns whether the mouse cursor is inside the window.
+- `lurek.window.isMinimized`: Returns whether the window is currently minimized to the taskbar.
+- `lurek.window.isMaximized`: Returns whether the window is currently maximized.
 - `lurek.window.isVisible`: Returns whether the window is currently visible on screen.
-- `lurek.window.minimize`: Minimises the window to the operating system taskbar or dock.
-- `lurek.window.maximize`: Maximises the window so it fills the entire desktop work area, excluding the taskbar.
-- `lurek.window.restore`: Restores the window to its previous size and position after a `minimize` or `maximize` call.
-- `lurek.window.getPosition`: Returns the top-left corner position of the window in screen coordinates as two values (x, y).
-- `lurek.window.setPosition`: Moves the top-left corner of the window to the given screen coordinates.
-- `lurek.window.getDisplayCount`: Returns the number of displays (monitors) currently connected to the system.
-- `lurek.window.getDisplays`: Returns array metadata for all connected displays.
-- `lurek.window.getCurrentDisplay`: Returns the index of the monitor the window is currently on.
-- `lurek.window.setDisplay`: Queues moving the window to the selected monitor index.
-- `lurek.window.getDesktopDimensions`: Returns desktop resolution for the selected monitor (or current monitor by default).
-- `lurek.window.getDPIScale`: Returns the current DPI scaling factor for the window as a number.
-- `lurek.window.toPixels`: Converts a device-independent (logical) coordinate value to its equivalent in physical pixels using the current DPI scale factor.
-- `lurek.window.fromPixels`: Converts a physical pixel value back to device-independent (logical) coordinates using the current DPI scale factor.
-- `lurek.window.setIcon`: Sets the window icon from an image file located in the game directory.
-- `lurek.window.setMode`: Resizes the window and optionally changes fullscreen and vsync settings in a single call.
-- `lurek.window.getMode`: Returns the current window dimensions and mode flags as three values: width, height, and a flags table.
-- `lurek.window.close`: Requests the window to close, which will end the game loop after the current frame finishes.
-- `lurek.window.requestAttention`: Flashes the window icon in the operating system taskbar or dock to attract the user's attention.
-- `lurek.window.flash`: Alias for `requestAttention`.
-- `lurek.window.getFullscreenModes`: Returns an array of all available fullscreen video modes supported by the current monitor.
-- `lurek.window.getDisplayName`: Returns the human-readable name of a connected display as reported by the operating system (for example "DELL U2723QE" or "Built-in Retina").
-- `lurek.window.getPixelDimensions`: Returns the window dimensions in physical (device) pixels as two values (width, height).
-- `lurek.window.showMessageBox`: Shows a platform-native message box dialog.
-- `lurek.window.focus`: Requests the window manager to bring the window to the foreground.
-- `lurek.window.getNativeDPIScale`: Returns the native DPI scale factor.
-- `lurek.window.getDisplayOrientation`: Returns the current display orientation.
-- `lurek.window.getSafeArea`: Returns the safe display area as x, y, w, h.
-- `lurek.window.getSystemTheme`: Returns the OS color theme preference.
-- `lurek.window.isHighDPIAllowed`: Returns whether high-DPI rendering is allowed.
-- `lurek.window.getScaleInfo`: Returns viewport scale and offset information as a table.
-- `lurek.window.getScaleMode`: Returns the current viewport scale mode string.
-- `lurek.window.setScaleMode`: Sets the viewport scale mode.
-- `lurek.window.getGameWidth`: Returns the logical game width in virtual pixels.
-- `lurek.window.getGameHeight`: Returns the logical game height in virtual pixels.
-- `lurek.window.isFullscreen`: Returns whether the window is in fullscreen mode.
+- `lurek.window.minimize`: Minimizes the window to the taskbar.
+- `lurek.window.maximize`: Maximizes the window to fill the screen.
+- `lurek.window.restore`: Restores the window from minimized or maximized state to its previous size and position.
+- `lurek.window.getPosition`: Returns the window position on screen in pixels.
+- `lurek.window.setPosition`: Moves the window to the specified screen position.
+- `lurek.window.getDisplayCount`: Returns the number of connected displays (monitors).
+- `lurek.window.getDisplays`: Returns a list of all connected displays with their properties. Each entry contains index, name, position (x, y), resolution (width, height), scale factor, refresh rate, and whether it is the primary monitor.
+- `lurek.window.getCurrentDisplay`: Returns the index of the display that currently contains the window.
+- `lurek.window.setDisplay`: Moves the window to the specified display. Throws an error if the index is negative.
+- `lurek.window.getDesktopDimensions`: Returns the desktop resolution of a specific display, or the current display if none is specified.
+- `lurek.window.getDPIScale`: Returns the current DPI scale factor of the window. A value of 2.0 means the display uses 2x scaling (e.g., Retina).
+- `lurek.window.toPixels`: Converts a value from logical (DPI-independent) units to physical pixel units using the current DPI scale.
+- `lurek.window.fromPixels`: Converts a value from physical pixel units to logical (DPI-independent) units using the current DPI scale.
+- `lurek.window.setIcon`: Sets the window icon from an image file. The file must exist in the game's filesystem. Supports PNG and other common image formats.
+- `lurek.window.setMode`: Sets the window display mode with a specific resolution and optional flags. Use this to resize the window and configure fullscreen or VSync at the same time.
+- `lurek.window.getMode`: Returns the current window display mode: width, height, and a flags table containing fullscreen state, fullscreen type, and VSync mode.
+- `lurek.window.windowConfig`: Applies multiple window settings at once from a configuration table. Supports title, width, height, fullscreen, fullscreentype, vsync, position (x, y), scaleMode, and display index.
+- `lurek.window.close`: Closes the window and signals the engine to shut down.
+- `lurek.window.requestAttention`: Requests user attention by flashing the taskbar icon. Useful for notifying the player when the window is in the background.
+- `lurek.window.flash`: Flashes the window briefly to attract the user's attention.
+- `lurek.window.getFullscreenModes`: Returns a list of all supported fullscreen video modes across all monitors. Each entry contains width, height, and refresh rate.
+- `lurek.window.getDisplayName`: Returns the human-readable name of a display. Returns "Unknown" if the display cannot be identified.
+- `lurek.window.getPixelDimensions`: Returns the window dimensions in actual physical pixels, accounting for DPI scaling.
+- `lurek.window.showMessageBox`: Displays a native OS message box dialog. Blocks execution until the user dismisses it.
+- `lurek.window.focus`: Requests keyboard focus for the window. No-op if already focused.
+- `lurek.window.getNativeDPIScale`: Returns the native DPI scale factor reported by the operating system.
+- `lurek.window.getDisplayOrientation`: Returns the display orientation based on the window's aspect ratio.
+- `lurek.window.getSafeArea`: Returns the safe drawing area of the window. On desktop this is the full window area. Useful for compatibility with mobile-style layout code.
+- `lurek.window.getSystemTheme`: Returns the operating system's current color theme. Desktop currently returns "unknown".
+- `lurek.window.isHighDPIAllowed`: Returns whether high-DPI rendering is allowed. Currently always returns false on desktop.
+- `lurek.window.getScaleInfo`: Returns detailed scaling information including scale factors, offsets, and logical game dimensions. Useful for coordinate conversion between screen space and game space.
+- `lurek.window.getScaleMode`: Returns the current content scale mode name (e.g., "stretch", "letterbox", "pixel-perfect").
+- `lurek.window.setScaleMode`: Sets the content scale mode. Controls how the game's logical resolution maps to the window size.
+- `lurek.window.getGameWidth`: Returns the logical game width as defined by the current scale mode and game configuration.
+- `lurek.window.getGameHeight`: Returns the logical game height as defined by the current scale mode and game configuration.
+- `lurek.window.isFullscreen`: Returns whether the window is currently in fullscreen mode.
 - `lurek.window.isResizable`: Returns whether the window can be resized by the user.
-- `lurek.window.onDpiChange`: Registers a callback invoked (with the new scale factor) when the display DPI changes.
-- `lurek.window.pollDpiChange`: Checks whether the DPI scale has changed since the last call and fires the onDpiChange callback if so.
-- `lurek.window.openFileDialog`: Opens a blocking native file-open dialog.
-
-### Grouped API Tables
-- `lurek.window.display`: Aliases display operations (`getCount`, `getName`, `getDesktopDimensions`, `getDisplays`, `getCurrent`, `setCurrent`).
-- `lurek.window.mode`: Aliases mode operations (`set`, `get`, `setFullscreen`, `getFullscreen`, `isFullscreen`, `setVSync`, `getVSync`, `minimize`, `maximize`, `restore`, `isMinimized`, `isMaximized`, `isVisible`, `requestAttention`, `flash`).
-- `lurek.window.cursor`: Cursor-focus grouping (`hasFocus`).
+- `lurek.window.onDpiChange`: Registers a callback function that is called whenever the DPI scale factor changes (e.g., when the window is moved to a different monitor). Only one callback can be active at a time; setting a new one replaces the previous.
+- `lurek.window.pollDpiChange`: Checks if the DPI scale has changed since the last poll and fires the onDpiChange callback if so. Call this once per frame in your update loop to detect monitor changes.
+- `lurek.window.openFileDialog`: Opens a native file picker dialog and returns the selected file paths. Blocks until the user picks file(s) or cancels.
 
 ## References
 

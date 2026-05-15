@@ -12,8 +12,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let tbl = lua.create_table()?;
     let s = state.clone();
     // -- setTitle --
-    /// Sets the window title bar text.
+    /// Sets the window title bar text. This function is exposed to Lua scripts.
     /// @param | title | string | The new window title to display.
+    /// @return | nil | No return value.
     tbl.set(
         "setTitle",
         lua.create_function(move |_, title: String| {
@@ -62,6 +63,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Enables or disables fullscreen mode. Supports "desktop" (borderless) and "exclusive" types.
     /// @param | enabled | boolean | Whether to enter fullscreen.
     /// @param | fstype | string? | Fullscreen type: "desktop" (default) or "exclusive".
+    /// @return | nil | No return value.
     tbl.set(
         "setFullscreen",
         lua.create_function(move |_, (enabled, fstype): (bool, Option<String>)| {
@@ -89,6 +91,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setVSync --
     /// Sets the vertical sync mode. Controls how frame presentation is synchronized with the display.
     /// @param | mode | number | VSync mode: 0 = off, 1 = on, -1 = adaptive.
+    /// @return | nil | No return value.
     tbl.set(
         "setVSync",
         lua.create_function(move |_, mode: i32| {
@@ -98,7 +101,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- getVSync --
-    /// Returns the current VSync mode.
+    /// Returns the current VSync mode. This function is exposed to Lua scripts.
     /// @return | number | The VSync mode: 0 = off, 1 = on, -1 = adaptive.
     tbl.set(
         "getVSync",
@@ -147,6 +150,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- minimize --
     /// Minimizes the window to the taskbar.
+    /// @return | nil | No return value.
     tbl.set(
         "minimize",
         lua.create_function(move |_, ()| {
@@ -157,6 +161,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- maximize --
     /// Maximizes the window to fill the screen.
+    /// @return | nil | No return value.
     tbl.set(
         "maximize",
         lua.create_function(move |_, ()| {
@@ -167,6 +172,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- restore --
     /// Restores the window from minimized or maximized state to its previous size and position.
+    /// @return | nil | No return value.
     tbl.set(
         "restore",
         lua.create_function(move |_, ()| {
@@ -188,6 +194,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Moves the window to the specified screen position.
     /// @param | x | number | The x-coordinate for the window's top-left corner.
     /// @param | y | number | The y-coordinate for the window's top-left corner.
+    /// @return | nil | No return value.
     tbl.set(
         "setPosition",
         lua.create_function(move |_, (x, y): (i32, i32)| {
@@ -269,6 +276,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setDisplay --
     /// Moves the window to the specified display. Throws an error if the index is negative.
     /// @param | display | number | Zero-based index of the target display.
+    /// @return | nil | No return value.
     tbl.set(
         "setDisplay",
         lua.create_function(move |_, display: i32| {
@@ -339,6 +347,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setIcon --
     /// Sets the window icon from an image file. The file must exist in the game's filesystem. Supports PNG and other common image formats.
     /// @param | path | string | Path to the icon image file.
+    /// @return | nil | No return value.
     tbl.set(
         "setIcon",
         lua.create_function(move |_, path: String| {
@@ -362,6 +371,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | w | number | The desired window width in pixels.
     /// @param | h | number | The desired window height in pixels.
     /// @param | flags | table? | Optional table with fields: fullscreen (boolean), fullscreentype (string), vsync (number).
+    /// @return | nil | No return value.
     tbl.set(
         "setMode",
         lua.create_function(move |_, (w, h, flags): (u32, u32, Option<LuaTable>)| {
@@ -405,6 +415,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- windowConfig --
     /// Applies multiple window settings at once from a configuration table. Supports title, width, height, fullscreen, fullscreentype, vsync, position (x, y), scaleMode, and display index.
     /// @param | opts | table | Configuration table with optional fields: title (string), width (number), height (number), fullscreen (boolean), fullscreentype (string), vsync (number), x (number), y (number), scaleMode (string), display (number).
+    /// @return | nil | No return value.
     tbl.set(
         "windowConfig",
         lua.create_function(move |_, opts: LuaTable| {
@@ -442,6 +453,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- close --
     /// Closes the window and signals the engine to shut down.
+    /// @return | nil | No return value.
     tbl.set(
         "close",
         lua.create_function(move |_, ()| {
@@ -452,6 +464,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- requestAttention --
     /// Requests user attention by flashing the taskbar icon. Useful for notifying the player when the window is in the background.
+    /// @return | nil | No return value.
     tbl.set(
         "requestAttention",
         lua.create_function(move |_, ()| {
@@ -462,6 +475,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- flash --
     /// Flashes the window briefly to attract the user's attention.
+    /// @return | nil | No return value.
     tbl.set(
         "flash",
         lua.create_function(move |_, ()| {
@@ -563,6 +577,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- focus --
     /// Requests keyboard focus for the window. No-op if already focused.
+    /// @return | nil | No value is returned.
     tbl.set("focus", lua.create_function(|_, ()| Ok(()))?)?;
     let s = state.clone();
     // -- getNativeDPIScale --
@@ -649,6 +664,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setScaleMode --
     /// Sets the content scale mode. Controls how the game's logical resolution maps to the window size.
     /// @param | mode | string | The scale mode name (e.g., "stretch", "letterbox", "pixel-perfect").
+    /// @return | nil | No return value.
     tbl.set(
         "setScaleMode",
         lua.create_function(move |_, mode: String| {
@@ -701,6 +717,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- onDpiChange --
     /// Registers a callback function that is called whenever the DPI scale factor changes (e.g., when the window is moved to a different monitor). Only one callback can be active at a time; setting a new one replaces the previous.
     /// @param | func | function | Callback receiving the new DPI scale as a number.
+    /// @return | nil | No return value.
     tbl.set(
         "onDpiChange",
         lua.create_function(move |lua, func: LuaFunction| {

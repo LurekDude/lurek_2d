@@ -76,7 +76,7 @@ impl TileSet {
     pub fn get_first_gid(&self) -> u32 {
         self.first_gid
     }
-    /// Return the total tile count.
+    /// Return the total tile count. This function is part of the public API.
     pub fn get_tile_count(&self) -> u32 {
         self.tile_count
     }
@@ -84,7 +84,7 @@ impl TileSet {
     pub fn get_columns(&self) -> u32 {
         self.columns
     }
-    /// Return tile width in pixels.
+    /// Return tile width in pixels. This function is part of the public API.
     pub fn get_tile_width(&self) -> u32 {
         self.tile_width
     }

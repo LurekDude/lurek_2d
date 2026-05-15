@@ -357,7 +357,7 @@ impl LuaUserData for LuaUniverse {
             this.inner.borrow_mut().clear(lua)
         });
         // -- addTag --
-        /// Adds a string tag to an entity.
+        /// Adds a string tag to an entity. This method is available to Lua scripts.
         /// @param | id | integer | Entity id to tag.
         /// @param | tag | string | Tag name to add.
         /// @return | nil | No value is returned.

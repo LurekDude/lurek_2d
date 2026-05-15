@@ -57,7 +57,7 @@ fn heuristic(x1: u32, y1: u32, x2: u32, y2: u32, diagonal: bool) -> f32 {
         dx + dy
     }
 }
-/// Run A\* on `grid` from `start` to `goal`; return `(path, reached_goal)`. Returns partial path
+/// Run A\* on `grid` from `start` to `goal`; return `(path, reached_goal)`. Returns partial path.
 /// to closest node when `max_nodes` is hit or goal is unreachable.
 pub fn astar(
     grid: &NavGrid,

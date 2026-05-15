@@ -155,7 +155,7 @@ pub struct ZoneTracker {
 }
 /// `ZoneTracker` construction and per-step update.
 impl ZoneTracker {
-    /// Create an empty tracker.
+    /// Create an empty tracker. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             body_zones: HashMap::new(),

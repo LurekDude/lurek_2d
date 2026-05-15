@@ -352,7 +352,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- mouse.setVisible --
-    /// Sets mouse cursor visibility.
+    /// Sets mouse cursor visibility. This function is exposed to Lua scripts.
     /// @param | visible | boolean | New cursor visibility flag.
     /// @return | nil | No value is returned.
     mouse.set(
@@ -392,7 +392,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- mouse.setRelativeMode --
-    /// Sets relative mouse mode.
+    /// Sets relative mouse mode. This function is exposed to Lua scripts.
     /// @param | relative | boolean | New relative mode flag.
     /// @return | nil | No value is returned.
     mouse.set(
@@ -571,7 +571,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- gamepad.getName --
-    /// Returns a gamepad display name.
+    /// Returns a gamepad display name. This function is exposed to Lua scripts.
     /// @param | id | integer | Gamepad id.
     /// @return | string | Gamepad name, or `Unknown` when missing.
     gamepad.set(
@@ -640,7 +640,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- gamepad.getAxis --
-    /// Returns a gamepad axis value.
+    /// Returns a gamepad axis value. This function is exposed to Lua scripts.
     /// @param | id | integer | Gamepad id.
     /// @param | axis | integer | Axis index.
     /// @return | number | Axis value, or zero when missing.
@@ -942,7 +942,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- touch.getPosition --
-    /// Returns the position of a touch id.
+    /// Returns the position of a touch id. This function is exposed to Lua scripts.
     /// @param | id | integer | Touch id.
     /// @return | number | Touch x coordinate, or 0 when missing.
     /// @return | number | Touch y coordinate, or 0 when missing.
@@ -956,7 +956,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- touch.getPressure --
-    /// Returns pressure for a touch id.
+    /// Returns pressure for a touch id. This function is exposed to Lua scripts.
     /// @param | id | integer | Touch id.
     /// @return | number | Touch pressure, or 0 when missing.
     touch.set(
@@ -1075,6 +1075,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let mapping = lua.create_table()?;
             mapping.set("name", name.clone())?;
             let action = name.clone();
+            /// Returns true if down for Lua scripts in this module.
+            /// @return | boolean | Boolean result returned by this call.
             let am_is_down = am.clone();
             let s_is_down = s.clone();
             mapping.set(
@@ -1089,6 +1091,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 })?,
             )?;
             let action = name.clone();
+            /// Was pressed for Lua scripts in this module.
+            /// @return | boolean | Boolean result returned by this call.
             let am_pressed = am.clone();
             let s_pressed = s.clone();
             mapping.set(
@@ -1103,6 +1107,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 })?,
             )?;
             let action = name.clone();
+            /// Was released for Lua scripts in this module.
+            /// @return | boolean | Boolean result returned by this call.
             let am_released = am.clone();
             let s_released = s.clone();
             mapping.set(
@@ -1132,7 +1138,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let am = action_map.clone();
     // -- clearBindings --
-    /// Removes all action bindings.
+    /// Removes all action bindings. This function is exposed to Lua scripts.
     /// @return | nil | No value is returned.
     input_tbl.set(
         "clearBindings",
@@ -1143,7 +1149,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let am = action_map.clone();
     // -- getBindings --
-    /// Returns all action bindings.
+    /// Returns all action bindings. This function is exposed to Lua scripts.
     /// @return | table | Map table from action names to arrays of binding strings.
     input_tbl.set(
         "getBindings",

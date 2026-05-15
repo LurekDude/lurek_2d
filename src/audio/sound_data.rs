@@ -93,11 +93,11 @@ impl SoundData {
         }
         self.samples.len() / self.channels as usize
     }
-    /// Return sample rate in Hz.
+    /// Return sample rate in Hz. This function is part of the public API.
     pub fn sample_rate(&self) -> u32 {
         self.sample_rate
     }
-    /// Return channel count.
+    /// Return channel count. This function is part of the public API.
     pub fn channel_count(&self) -> u16 {
         self.channels
     }
@@ -105,7 +105,7 @@ impl SoundData {
     pub fn bit_depth(&self) -> u16 {
         self.bit_depth
     }
-    /// Return duration in seconds.
+    /// Return duration in seconds. This function is part of the public API.
     pub fn duration(&self) -> f64 {
         if self.sample_rate == 0 {
             return 0.0;

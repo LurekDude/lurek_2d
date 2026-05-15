@@ -127,7 +127,7 @@ Rules:
 ### 2.5 Docstring Rules
 
 1. **One sentence only**: The first `///` line is a single sentence on a single line.
-2. **Order**: description → `@param` lines → one `@return` line.
+2. **Order**: description -> `@param` lines -> one `@return` line.
 3. **Pipe format only**: Use `@param | ... | ... | ...` and `@return | ... | ...`.
 4. **No legacy syntax**: Do not use `@param name type`, `@param name : type`, or `@return type`.
 5. **No `# Parameters` / `# Returns`**: Only `@param` / `@return` tags.
@@ -181,7 +181,7 @@ Used before every individual function or method docstring:
 For grouping related functions within a section:
 
 ```rust
-    // ── Timing ──────────────────────────────────────────────────────
+    // -- Timing ----------------------------------------------------
 ```
 
 - Prefer the major ASCII separator instead. Subsection headers are optional.
@@ -217,52 +217,30 @@ impl LuaUserData for LuaFoo {
         methods.add_method("methodName", |_, this, arg: T| {
             Ok(this.inner.method(arg))
         });
-
-        // -- type --
-        /// Returns the type name of this object.
-        /// @return | string | Lua-visible type name.
-        methods.add_method("type", |_, _, ()| Ok("FooDisplayName"));
-
-        // -- typeOf --
-        /// Returns whether this object matches the given type name.
-        /// @param | name | string | Type name to compare against.
-        /// @return | boolean | True when the type matches.
-        methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "FooDisplayName" || name == "Object")
-        });
     }
 }
 ```
 
 Rules:
-- `impl LuaUserData` — NEVER `impl mlua::UserData`.
-- Every UserData type MUST have `type()` and `typeOf()` methods.
-- The `type()` return value is the Lua-visible display name (e.g. `"Camera2D"`, `"LScheduler"`).
-- Use `add_method` (immutable) unless the wrapper struct itself is mutated.
-- Use `add_method_mut` only when the wrapper fields change (e.g. stored callbacks).
-- Use `add_function` for static/factory methods (no `self`).
-
-### 4.3 Method Selection Guide
-
-| Use | When |
-|-----|------|
-| `add_method` | `this: &Self` — read-only access to wrapper |
-| `add_method_mut` | `this: &mut Self` — must mutate wrapper fields (callbacks, caches) |
-| `add_function` | No `self` — static/factory/constructor |
-| `add_meta_method` | Metamethods: `__tostring`, `__eq`, `__index`, `__len` |
+- `type()` and `typeOf()` methods come last.
+- `type()` returns the canonical Lua-visible type string.
+- `typeOf()` checks `name == "ThisType" || name == "Object"` or equivalent parent alias set.
+- Do not embed business rules in `add_methods`; delegate to domain code.
 
 ---
 
 ## 5. Register Function
 
-### 5.1 Signature
+Standard shape:
 
 ```rust
-/// Registers the `lurek.module` API table with the Lua VM.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // ... function registrations ...
+    // -- functionName --
+    /// Description.
+    /// @return | nil | No value is returned.
+    tbl.set("functionName", lua.create_function(|_, ()| Ok(()))?)?;
 
     lurek.set("module", tbl)?;
     Ok(())
@@ -270,172 +248,40 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 ```
 
 Rules:
-- Parameter name is ALWAYS `lurek` (not `luna` or other names).
-- Table variable is ALWAYS `tbl`.
-- `state` parameter may be omitted if the module doesn't need shared state, but the first two params are always `lua: &Lua, lurek: &LuaTable`.
-- Last two lines: `lurek.set("module", tbl)?;` then `Ok(())`.
-- The docstring above `register` is `/// Registers the \`lurek.module\` API table with the Lua VM.`
-
-### 5.2 Function Entry Pattern
-
-Standard pattern with shared state:
-
-```rust
-    // -- funcName --
-    /// Description.
-    /// @param | arg | type | Description text.
-    /// @return | type | Description text.
-    let s = state.clone();
-    tbl.set("funcName", lua.create_function(move |_, arg: T| {
-        Ok(s.borrow().method(arg))
-    })?)?;
-```
-
-Standard pattern without shared state:
-
-```rust
-    // -- funcName --
-    /// Description.
-    /// @param | arg | type | Description text.
-    /// @return | type | Description text.
-    tbl.set("funcName", lua.create_function(|_, arg: T| {
-        Ok(domain::function(arg))
-    })?)?;
-```
-
-Rules:
-- `let s = state.clone();` goes AFTER the docstring block, BEFORE `tbl.set(...)`.
-- Flat body — NOT wrapped in `{ }` block expressions.
-- Each function entry: separator → docstring → optional state clone → `tbl.set(...)`.
-
-### 5.3 Local State Pattern
-
-When a module manages its own state (not `SharedState`):
-
-```rust
-pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
-    let tbl = lua.create_table()?;
-
-    let local_state: Rc<RefCell<MyState>> = Rc::new(RefCell::new(MyState::new()));
-
-    // -- funcName --
-    /// Description.
-    /// @return | type | Description text.
-    let s = local_state.clone();
-    tbl.set("funcName", lua.create_function(move |_, ()| {
-        Ok(s.borrow().value())
-    })?)?;
-
-    lurek.set("module", tbl)?;
-    Ok(())
-}
-```
+- Function name is always `register`.
+- Final line MUST be `lurek.set("module", tbl)?;` with exact module key.
+- No side effects during registration beyond table creation and callback/userdata setup.
 
 ---
 
 ## 6. Enum / Constant Registration
 
-For exposing named constants or enum values to Lua:
+Constants inside the module table should still follow the same nearby section style when they are grouped by helper functions or builders.
 
-```rust
-    // ── BlendMode constants ─────────────────────────────────────────
-    let blend = lua.create_table()?;
-    blend.set("alpha", "alpha")?;
-    blend.set("add", "add")?;
-    blend.set("multiply", "multiply")?;
-    tbl.set("BlendMode", blend)?;
-```
-
-No docstrings on individual constant entries. The subsection header serves as documentation.
+Rules:
+- Prefer plain `tbl.set("NAME", value)?;` for constants.
+- For enum-like string constants, document the function that consumes them rather than every constant unless the constant table is itself user-facing.
 
 ---
 
 ## 7. Naming Conventions
 
-### 7.1 Rust → Lua Function Names
-
-| Rust `snake_case` | Lua `camelCase` |
-|-------------------|-----------------|
-| `new_image` | `newImage` |
-| `get_width` | `getWidth` |
-| `set_volume` | `setVolume` |
-| `is_down` | `isDown` |
-
-### 7.2 Constructor Names
-
-| Pattern | Example |
-|---------|---------|
-| Simple factory | `"new"` — `tbl.set("new", ...)` |
-| Named factory | `"newFoo"` — `tbl.set("newScheduler", ...)` |
-| From-source | `"fromFile"`, `"fromTOML"`, `"fromAseprite"` |
-
-### 7.3 Module Names
-
-- Always lowercase: `"timer"`, `"render"`, `"input"`.
-- Dot-separated for sub-namespaces: `"input.keyboard"`, `"input.mouse"`.
-- Match the `//!` header backtick name.
+- File name: `<module>_api.rs`
+- Module namespace: `lurek.<module>`
+- UserData wrapper: `LuaTypeName`
+- Lua-exposed function names: camelCase.
+- Rust helper names: snake_case.
+- Type method order: constructor helpers first, state mutation next, queries after that, `type` / `typeOf` last.
 
 ---
 
 ## 8. Scanner Compatibility
 
-The documentation tools (`tools/docs/gen_lua_api.py`) parse these docstrings with specific regex patterns. Following this standard ensures zero parsing exceptions.
+The doc generators and validators depend on predictable local structure.
 
-### 8.1 @param Detection
-
-Regex: `r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*([^|]+?)\s*\|\s*(.+)"`
-
-- Only the pipe-delimited format is accepted.
-- Parameter types may end with `?` when the parameter itself is optional.
-
-### 8.2 @return Detection
-
-Regex: `r"@return\s*\|\s*([^|]+?)\s*\|\s*(.+)"`
-
-- Only the pipe-delimited format is accepted.
-- Return types must be fixed and may be comma-separated for multi-return.
-
-### 8.3 Function Name Detection
-
-The scanner detects bindings via:
-- `tbl.set("name", lua.create_function(...)` — module functions
-- `methods.add_method("name", ...)` — instance methods
-- `methods.add_method_mut("name", ...)` — mutable methods
-- `methods.add_function("name", ...)` — static/class functions
-
-### 8.4 Docstring Collection
-
-The scanner collects `///` lines by scanning UPWARD from the binding call. It skips:
-- Blank lines
-- `let s = state.clone();` lines
-- `//` non-doc comments
-- `#[...]` attributes
-
-**IMPORTANT**: Even though the scanner skips `let s =` lines, the docstring MUST be contiguous for readability. Place `let s = state.clone();` AFTER all `///` lines.
-
-### 8.5 Class Name Detection
-
-The scanner extracts class names from:
-- `pub struct LuaFoo` declarations
-- `impl LuaUserData for LuaFoo` blocks
-- `methods.add_method("type", |_,_,()| Ok("DisplayName"))` for the Lua-visible name
-- Widget factory functions `fn add_button_methods(...)`
-
----
-
-## Quick Checklist
-
-Before committing a `*_api.rs` file, verify:
-
-- [ ] `//!` header uses backticks and ASCII hyphen
-- [ ] `use mlua::prelude::*` (not individual items)
-- [ ] Every function/method has `// -- name --` separator
-- [ ] Every function/method has one description line plus one `@return`
-- [ ] All `@param` / `@return` lines use the pipe-delimited format
-- [ ] Docstring block is contiguous (no code between `///` lines)
-- [ ] `let s = state.clone()` is after docstring, before `tbl.set()`
-- [ ] Table variable is `tbl`, register param is `lurek`
-- [ ] UserData types have `type()` and `typeOf()` methods
-- [ ] Last two lines of `register()`: `lurek.set("module", tbl)?;` + `Ok(())`
-- [ ] No `# Parameters` / `# Returns` sections
-- [ ] No `@return any`, `?`, `|nil`, or union-style returns; use `unknown` for truly unconstrained dynamic values
+Rules:
+- Keep the `// -- name --` marker directly above the matching doc block.
+- Keep the doc block directly above the registration call or method registration call.
+- Do not insert unrelated comments between separator, doc block, and registered function.
+- Keep `@return` syntax fixed-width and free of optional-return markers.
+- If a method accepts optional Lua values, express that in `@param`, not `@return`.

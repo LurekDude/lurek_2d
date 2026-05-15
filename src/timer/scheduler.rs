@@ -47,7 +47,7 @@ pub struct FrameEvent {
     pub paused: bool,
 }
 
-/// Manages time-based and frame-based one-shot and repeating callbacks; exposes
+/// Manages time-based and frame-based one-shot and repeating callbacks; exposes.
 /// named and ID-based control; used by `lurek.timer` Lua bindings.
 #[derive(Debug, Clone)]
 pub struct Scheduler {

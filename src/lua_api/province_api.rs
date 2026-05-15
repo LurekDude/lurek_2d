@@ -152,7 +152,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | cam_y | number | Camera center y in map space.
         /// @param | zoom | number | Current zoom factor.
         /// @param | pixel_size | number? | Cell size in screen pixels (default 1.0).
-        /// @return | number? | Province ID under the cursor, or nil if none.
+        /// @return | number | Province ID under the cursor, or nil if none.
         methods.add_method(
             "screenToProvince",
             |_,
@@ -259,7 +259,7 @@ impl LuaUserData for LuaProvinceRegistry {
         // -- getProvince --
         /// Returns a snapshot table describing a single province: its ID, revision, style (political_color, terrain_type, border_style, fog_state, visibility_state), centroid, and custom attributes.
         /// @param | id | number | Province ID to query.
-        /// @return | table? | Province snapshot table, or nil if the ID does not exist.
+        /// @return | table | Province snapshot table, or nil if the ID does not exist.
         methods.add_method("getProvince", |lua, this, id: u32| {
             let snap = this.with_registry(|r| r.get_province(id))?;
             let Some(snap) = snap else {
@@ -311,7 +311,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Returns the border classification string between two adjacent provinces (e.g. "river", "mountain", "sea"), or nil if no class is set.
         /// @param | a | number | First province ID.
         /// @param | b | number | Second province ID.
-        /// @return | string? | Border class name, or nil.
+        /// @return | string | Border class name, or nil.
         methods.add_method("getBorderClass", |_, this, (a, b): (u32, u32)| {
             let class = this.with_registry(|r| r.get_border_class(a, b))?;
             Ok(class.map(|c| c.as_str().to_string()))
@@ -321,6 +321,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | a | number | First province ID.
         /// @param | b | number | Second province ID.
         /// @param | class | string | Border class name (e.g. "river", "mountain", "sea").
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setBorderClass",
             |_, this, (a, b, class): (u32, u32, String)| {
@@ -337,6 +338,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | g | number | Green component (0.0–1.0).
         /// @param | b | number | Blue component (0.0–1.0).
         /// @param | a | number? | Alpha component (default 1.0).
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setPoliticalColor",
             |_, this, (id, r, g, b, a): (u32, f32, f32, f32, Option<f32>)| {
@@ -349,6 +351,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the terrain type index for a province. Terrain type controls which fill color or texture is used in terrain map mode.
         /// @param | id | number | Province ID.
         /// @param | terrain_type | number | Terrain type index (game-defined meaning).
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setTerrainType",
             |_, this, (id, terrain_type): (u32, u32)| {
@@ -359,6 +362,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the border rendering style index for a province. Controls line thickness, color, or pattern when borders are drawn.
         /// @param | id | number | Province ID.
         /// @param | border_style | number | Border style index (game-defined meaning).
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setBorderStyle",
             |_, this, (id, border_style): (u32, u32)| {
@@ -369,6 +373,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the fog-of-war state for a province. Typically 0 = revealed, 1 = fogged, 2 = hidden. Controls rendering opacity or overlay.
         /// @param | id | number | Province ID.
         /// @param | fog_state | number | Fog state value (game-defined meaning).
+        /// @return | LuaValue | Returned Lua value.
         methods.add_method_mut("setFogState", |_, this, (id, fog_state): (u32, u8)| {
             this.with_registry_mut(|reg| reg.set_fog_state(id, fog_state))
         });
@@ -376,6 +381,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the visibility state for a province. Used for strategic visibility layers separate from fog (e.g. scouted vs. unscouted).
         /// @param | id | number | Province ID.
         /// @param | visibility_state | number | Visibility state value (game-defined meaning).
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setVisibilityState",
             |_, this, (id, visibility_state): (u32, u8)| {
@@ -387,6 +393,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | id | number | Province ID.
         /// @param | key | string | Attribute name.
         /// @param | value | string | Attribute value.
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setAttr",
             |_, this, (id, key, value): (u32, String, String)| {
@@ -398,6 +405,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | id | number | Province ID.
         /// @param | x | number | Capital x position in map space.
         /// @param | y | number | Capital y position in map space.
+        /// @return | LuaValue | Returned Lua value.
         methods.add_method_mut("setCapital", |_, this, (id, x, y): (u32, f32, f32)| {
             this.with_registry_mut(|reg| reg.set_capital(id, x, y))
         });
@@ -408,6 +416,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | ay | number | Start y of the label line in map space.
         /// @param | bx | number | End x of the label line in map space.
         /// @param | by | number | End y of the label line in map space.
+        /// @return | nil | No return value.
         methods.add_method_mut(
             "setLabelLine",
             |_, this, (id, ax, ay, bx, by): (u32, f32, f32, f32, f32)| {
@@ -418,6 +427,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the display name text for a province. Rendered on the map when `draw_labels` is enabled in `render` options.
         /// @param | id | number | Province ID.
         /// @param | text | string | Province display name.
+        /// @return | LuaValue | Returned Lua value.
         methods.add_method_mut("setLabelText", |_, this, (id, text): (u32, String)| {
             this.with_registry_mut(|reg| reg.set_label_text(id, text))
         });
@@ -496,6 +506,7 @@ impl LuaUserData for LuaProvinceRegistry {
         // -- render --
         /// Renders the province map to the screen using the current camera and style settings. Generates draw commands for fills, borders, labels, and capitals based on the provided options.
         /// @param | opts | table? | Render options: map_mode (string?), x/y/zoom/pixel_size/screen_w/screen_h (number?), draw_fills/draw_borders/draw_labels/draw_capitals (boolean?), border_width (number?), hovered_id/selected_id (number?).
+        /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, opts: Option<LuaTable>| {
             let opts = opts;
             let mode = if let Some(ref t) = opts {
@@ -703,7 +714,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- get --
     /// Retrieves an existing province registry by name. Returns nil if no registry with that name has been created.
     /// @param | name | string | Registry name to look up.
-    /// @return | LProvinceRegistry? | The registry handle, or nil if not found.
+    /// @return | LProvinceRegistry | The registry handle, or nil if not found.
     tbl.set(
         "get",
         lua.create_function(move |_, name: String| {
@@ -765,7 +776,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- getActive --
     /// Returns the currently active province registry, or nil if none is set.
-    /// @return | LProvinceRegistry? | The active registry handle, or nil.
+    /// @return | LProvinceRegistry | The active registry handle, or nil.
     tbl.set(
         "getActive",
         lua.create_function(move |_, ()| {

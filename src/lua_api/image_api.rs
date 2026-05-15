@@ -40,11 +40,11 @@ pub struct LuaProvinceGrid {
 impl LuaUserData for LuaProvinceGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getWidth --
-        /// Returns the province grid width.
+        /// Returns the province grid width. This method is available to Lua scripts.
         /// @return | integer | Grid width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
         // -- getHeight --
-        /// Returns the province grid height.
+        /// Returns the province grid height. This method is available to Lua scripts.
         /// @return | integer | Grid height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
         // -- getAt --
@@ -349,11 +349,11 @@ pub struct LuaLayeredImage {
 impl LuaUserData for LuaLayeredImage {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getWidth --
-        /// Returns the layered image width.
+        /// Returns the layered image width. This method is available to Lua scripts.
         /// @return | integer | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
         // -- getHeight --
-        /// Returns the layered image height.
+        /// Returns the layered image height. This method is available to Lua scripts.
         /// @return | integer | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
         // -- layerCount --
@@ -392,11 +392,11 @@ impl LuaUserData for LuaLayeredImage {
                 .map(|l| lua.create_userdata(l.data.clone()))
                 .ok_or_else(|| LuaError::RuntimeError(format!("layer {} does not exist", index)))?
         });
-            // -- setLayer --
-            /// Replaces a layer's image data by one-based index.
-            /// @param | index | integer | One-based layer index.
-            /// @param | img | LImageData | Image data assigned to the layer.
-            /// @return | boolean | True when the layer was replaced.
+        // -- setLayer --
+        /// Replaces a layer's image data by one-based index.
+        /// @param | index | integer | One-based layer index.
+        /// @param | img | LImageData | Image data assigned to the layer.
+        /// @return | boolean | True when the layer was replaced.
         methods.add_method_mut(
             "setLayer",
             |_, this, (index, img): (usize, LuaAnyUserData)| {
@@ -422,11 +422,11 @@ impl LuaUserData for LuaLayeredImage {
                 .map(|l| l.opacity)
                 .ok_or_else(|| LuaError::RuntimeError(format!("layer {} does not exist", index)))
         });
-            // -- setOpacity --
-            /// Sets a layer opacity by one-based index.
-            /// @param | index | integer | One-based layer index.
-            /// @param | opacity | number | New layer opacity.
-            /// @return | boolean | True when the layer exists.
+        // -- setOpacity --
+        /// Sets a layer opacity by one-based index.
+        /// @param | index | integer | One-based layer index.
+        /// @param | opacity | number | New layer opacity.
+        /// @return | boolean | True when the layer exists.
         methods.add_method_mut("setOpacity", |_, this, (index, opacity): (usize, f32)| {
             if index == 0 {
                 return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
@@ -446,11 +446,11 @@ impl LuaUserData for LuaLayeredImage {
                 .map(|l| l.visible)
                 .ok_or_else(|| LuaError::RuntimeError(format!("layer {} does not exist", index)))
         });
-            // -- setVisible --
-            /// Sets layer visibility by one-based index.
-            /// @param | index | integer | One-based layer index.
-            /// @param | visible | boolean | New visibility flag.
-            /// @return | boolean | True when the layer exists.
+        // -- setVisible --
+        /// Sets layer visibility by one-based index.
+        /// @param | index | integer | One-based layer index.
+        /// @param | visible | boolean | New visibility flag.
+        /// @return | boolean | True when the layer exists.
         methods.add_method_mut("setVisible", |_, this, (index, visible): (usize, bool)| {
             if index == 0 {
                 return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
@@ -470,11 +470,11 @@ impl LuaUserData for LuaLayeredImage {
                 .map(|l| l.name.clone())
                 .ok_or_else(|| LuaError::RuntimeError(format!("layer {} does not exist", index)))
         });
-            // -- setName --
-            /// Sets a layer name by one-based index.
-            /// @param | index | integer | One-based layer index.
-            /// @param | name | string | New layer name.
-            /// @return | boolean | True when the layer exists.
+        // -- setName --
+        /// Sets a layer name by one-based index.
+        /// @param | index | integer | One-based layer index.
+        /// @param | name | string | New layer name.
+        /// @return | boolean | True when the layer exists.
         methods.add_method_mut("setName", |_, this, (index, name): (usize, String)| {
             if index == 0 {
                 return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
@@ -541,11 +541,11 @@ pub struct LuaCompressedImageData {
 impl LuaUserData for LuaCompressedImageData {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getWidth --
-        /// Returns compressed image width.
+        /// Returns compressed image width. This method is available to Lua scripts.
         /// @return | integer | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width));
         // -- getHeight --
-        /// Returns compressed image height.
+        /// Returns compressed image height. This method is available to Lua scripts.
         /// @return | integer | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height));
         // -- getDimensions --
@@ -809,15 +809,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 impl mlua::UserData for ImageData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getWidth --
-        /// Returns image width.
+        /// Returns image width. This method is available to Lua scripts.
         /// @return | integer | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.width()));
         // -- getHeight --
-        /// Returns image height.
+        /// Returns image height. This method is available to Lua scripts.
         /// @return | integer | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.height()));
         // -- getDimensions --
-        /// Returns image dimensions.
+        /// Returns image dimensions. This method is available to Lua scripts.
         /// @return | integer | Width in pixels.
         /// @return | integer | Height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
@@ -998,7 +998,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- noise --
-        /// Adds noise to this image in place.
+        /// Adds noise to this image in place. This method is available to Lua scripts.
         /// @param | amount | integer | Noise amount.
         /// @return | nil | No value is returned.
         methods.add_method_mut("noise", |_, this, amount: u8| {
@@ -1034,7 +1034,7 @@ impl mlua::UserData for ImageData {
             lua.create_userdata(this.rotate_90_cw())
         });
         // -- crop --
-        /// Returns a cropped image region.
+        /// Returns a cropped image region. This method is available to Lua scripts.
         /// @param | x | integer | Source x coordinate.
         /// @param | y | integer | Source y coordinate.
         /// @param | w | integer | Crop width.
@@ -1112,7 +1112,7 @@ impl mlua::UserData for ImageData {
             },
         );
         // -- drawLine --
-        /// Draws a line into this image.
+        /// Draws a line into this image. This method is available to Lua scripts.
         /// @param | x0 | integer | Start x coordinate.
         /// @param | y0 | integer | Start y coordinate.
         /// @param | x1 | integer | End x coordinate.

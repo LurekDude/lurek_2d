@@ -132,7 +132,7 @@ impl LuaUserData for LuaDoorManager {
         // -- openDoor --
         /// Begins opening the door at the given index. The door animates over time via `update()`.
         /// @param | index | number | Zero-based index of the door to open.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("openDoor", |_, this, index: usize| {
             this.inner.borrow_mut().open_door(index);
             Ok(())
@@ -140,7 +140,7 @@ impl LuaUserData for LuaDoorManager {
         // -- closeDoor --
         /// Begins closing the door at the given index. The door animates over time via `update()`.
         /// @param | index | number | Zero-based index of the door to close.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("closeDoor", |_, this, index: usize| {
             this.inner.borrow_mut().close_door(index);
             Ok(())
@@ -148,7 +148,7 @@ impl LuaUserData for LuaDoorManager {
         // -- update --
         /// Advances all door animations by the given delta time. Call once per frame.
         /// @param | dt | number | Delta time in seconds since last frame.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
@@ -157,7 +157,7 @@ impl LuaUserData for LuaDoorManager {
         /// Returns a table describing the door at the given index, or nil if index is out of range.
         /// The table contains: x, y, openAmount (0.0..1.0), state ("closed"|"opening"|"open"|"closing").
         /// @param | index | number | Zero-based index of the door to query.
-        /// @return | table? | Door info table, or nil if not found.
+        /// @return | table | Door info table, or nil if not found.
         methods.add_method("getDoor", |lua, this, index: usize| {
             let mgr = this.inner.borrow();
             if let Some(door) = mgr.doors().get(index) {
@@ -181,7 +181,14 @@ impl LuaUserData for LuaDoorManager {
         /// Returns the total number of registered doors.
         /// @return | number | Door count.
         methods.add_method("count", |_, this, ()| Ok(this.inner.borrow().doors().len()));
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Always "LDoorManager".
         methods.add_method("type", |_, _, ()| Ok("LDoorManager"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check.
+        /// @return | boolean | True if the name matches this userdata type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LDoorManager" || name == "DoorManager" || name == "Object")
         });
@@ -198,7 +205,7 @@ impl LuaUserData for LuaHeightMap {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | h | number | Floor height offset (0.0 = default floor level).
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setFloor", |_, this, (x, y, h): (u32, u32, f32)| {
             this.inner.borrow_mut().set_floor(x, y, h);
             Ok(())
@@ -208,7 +215,7 @@ impl LuaUserData for LuaHeightMap {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | h | number | Ceiling height offset (0.0 = default ceiling level).
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setCeiling", |_, this, (x, y, h): (u32, u32, f32)| {
             this.inner.borrow_mut().set_ceiling(x, y, h);
             Ok(())
@@ -229,7 +236,14 @@ impl LuaUserData for LuaHeightMap {
         methods.add_method("ceilingAt", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().ceiling_at(x, y))
         });
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Always "LHeightMap".
         methods.add_method("type", |_, _, ()| Ok("LHeightMap"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check.
+        /// @return | boolean | True if the name matches this userdata type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LHeightMap" || name == "HeightMap" || name == "Object")
         });
@@ -277,7 +291,7 @@ impl LuaUserData for LuaPointLight {
         /// @param | b | number | Blue color channel (0.0..1.0).
         /// @param | radius | number | Falloff radius in world units.
         /// @param | intensity | number | Brightness multiplier.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "set",
             |_, this, (x, y, r, g, b, radius, intensity): (f32, f32, f32, f32, f32, f32, f32)| {
@@ -302,7 +316,7 @@ impl LuaUserData for LuaPointLight {
         });
     }
 }
-/// Lua-visible raycaster map that holds cell data, per-cell textures, and provides raycasting,
+/// Lua-visible raycaster map that holds cell data, per-cell textures, and provides raycasting,.
 /// collision, and scene-building operations for first-person dungeon-crawler rendering.
 pub struct LuaRaycaster {
     inner: Raycaster2D,
@@ -326,7 +340,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | val | number | Wall type (0 = empty, 1+ = wall texture index).
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setCell", |_, this, (x, y, val): (u32, u32, u32)| {
             this.inner.set_cell(x, y, val);
             Ok(())
@@ -342,7 +356,7 @@ impl LuaUserData for LuaRaycaster {
         // -- setCells --
         /// Replaces the entire map grid with a flat array of cell values (row-major order).
         /// @param | cells | table | Flat array of numbers with width*height elements.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setCells", |_, this, cells_tbl: LuaTable| {
             let cells: Vec<u32> = cells_tbl
                 .sequence_values::<u32>()
@@ -371,7 +385,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setFloorTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -390,7 +404,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the raw texture id assigned to this floor cell, or nil if none.
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
-        /// @return | number? | Raw texture id or nil.
+        /// @return | number | Raw texture id or nil.
         methods.add_method("getFloorTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.floor_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
@@ -399,7 +413,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setCeilingTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -418,7 +432,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the raw texture id assigned to this ceiling cell, or nil if none.
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
-        /// @return | number? | Raw texture id or nil.
+        /// @return | number | Raw texture id or nil.
         methods.add_method("getCeilingTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.ceiling_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
@@ -428,7 +442,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
         /// @param | opts | table? | Options table {texture, depth?, r?, g?, b?, blocked?} or nil to clear.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setLoweredFloorCell",
             |_, this, (x, y, opts): (u32, u32, LuaValue)| {
@@ -489,7 +503,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the lowered floor configuration at a cell, or nil if the cell is normal.
         /// @param | x | number | Grid column.
         /// @param | y | number | Grid row.
-        /// @return | table? | Table {texture, depth, r, g, b, blocked} or nil.
+        /// @return | table | Table {texture, depth, r, g, b, blocked} or nil.
         methods.add_method("getLoweredFloorCell", |lua, this, (x, y): (u32, u32)| {
             if let Some(cell) = this.lowered_floor_cells.get(&(x, y)) {
                 let tbl = lua.create_table()?;
@@ -583,7 +597,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | oy | number | Ray origin Y.
         /// @param | angle | number | Ray direction in radians.
         /// @param | maxDist | number | Maximum cast distance.
-        /// @return | table? | Hit table {distance, raw_distance, cell_value, alpha, side, tex_u, hit_x, hit_y, hit} or nil.
+        /// @return | table | Hit table {distance, raw_distance, cell_value, alpha, side, tex_u, hit_x, hit_y, hit} or nil.
         methods.add_method(
             "castRay",
             |lua, this, (ox, oy, angle, max_dist): (f32, f32, f32, f32)| match this
@@ -743,7 +757,7 @@ impl LuaUserData for LuaRaycaster {
         /// Sets the transparency for a specific wall tile type, enabling see-through walls.
         /// @param | tileType | number | The cell value (1..255) whose alpha to change.
         /// @param | alpha | number | Opacity (0.0 = fully transparent, 1.0 = fully opaque).
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setWallAlpha", |_, this, (tile_type, alpha): (u8, f32)| {
             this.inner.set_wall_alpha(tile_type, alpha);
             Ok(())
@@ -933,7 +947,7 @@ impl LuaUserData for LuaRaycaster {
             },
         );
         // -- buildScene --
-        /// Builds a complete textured raycaster scene for GPU rendering. Stores the output internally
+        /// Builds a complete textured raycaster scene for GPU rendering. Stores the output internally.
         /// for the renderer to consume on the next frame. Returns the number of quads generated.
         /// @param | params | table | Scene params {px, py, angle, fov, rays, max_dist, screen_w, screen_h, ambient?, shade_dist?, floor_r/g/b?, ceiling_r/g/b?, camera_height?, horizon_offset?}.
         /// @param | lights | table? | Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
@@ -1313,9 +1327,9 @@ impl LuaUserData for LuaSpriteManager {
             },
         );
         // -- remove --
-        /// Removes a sprite by its id.
+        /// Removes a sprite by its id. This method is available to Lua scripts.
         /// @param | id | number | Sprite id returned by add().
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("remove", |_, this, id: u32| {
             this.inner.remove(id);
             Ok(())
@@ -1325,7 +1339,7 @@ impl LuaUserData for LuaSpriteManager {
         /// @param | id | number | Sprite id.
         /// @param | x | number | New world X.
         /// @param | y | number | New world Y.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setPosition", |_, this, (id, x, y): (u32, f32, f32)| {
             this.inner.set_position(id, x, y);
             Ok(())
@@ -1334,14 +1348,14 @@ impl LuaUserData for LuaSpriteManager {
         /// Shows or hides a sprite without removing it.
         /// @param | id | number | Sprite id.
         /// @param | visible | boolean | Whether the sprite should be rendered.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setVisible", |_, this, (id, visible): (u32, bool)| {
             this.inner.set_visible(id, visible);
             Ok(())
         });
         // -- clear --
         /// Removes all sprites from the manager.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())

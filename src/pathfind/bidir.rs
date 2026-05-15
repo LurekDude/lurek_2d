@@ -137,7 +137,7 @@ fn reconstruct_half(
     path.reverse();
     path
 }
-/// Run bidirectional A\* on `grid`; return `(path, reached_goal)`. Falls back to a partial
+/// Run bidirectional A\* on `grid`; return `(path, reached_goal)`. Falls back to a partial.
 /// forward path when `max_nodes` is exhausted before the frontiers meet.
 pub fn bidirectional_astar(
     grid: &NavGrid,

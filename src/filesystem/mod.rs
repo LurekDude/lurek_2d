@@ -5,15 +5,15 @@
 
 /// Async file request queue and result tracking.
 pub mod async_loader;
-/// Cached file payload helper.
+/// Cached file payload helper. This module is publicly re-exported.
 pub mod file_data;
 /// Buffered file handle and file mode helpers.
 pub mod file_handle;
 /// Virtual filesystem and mount management.
 pub mod vfs;
-/// File modification watcher.
+/// File modification watcher. This module is publicly re-exported.
 pub mod watcher;
-/// ZIP archive overlay mount.
+/// ZIP archive overlay mount. This module is publicly re-exported.
 pub mod zip_mount;
 /// Async file request queue and result tracking.
 pub use async_loader::{AsyncLoader, LoadHandle, LoadResult, LoadStatus, WriteResult, WriteStatus};

@@ -157,7 +157,7 @@ pub struct BtRunState {
 }
 /// Methods for `BtRunState`.
 impl BtRunState {
-    /// Create an empty run state.
+    /// Create an empty run state. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

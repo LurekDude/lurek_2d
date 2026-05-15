@@ -244,7 +244,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     // -- setLevel --
-    /// Sets the global log level.
+    /// Sets the global log level. This function is exposed to Lua scripts.
     /// @param | level | string | Level `error`, `warn`, `info`, `debug`, `trace`, `off`, or `none`.
     /// @return | nil | No value is returned.
     tbl.set("setLevel", lua.create_function(|_, level: String| {

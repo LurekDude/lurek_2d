@@ -19,9 +19,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | port | integer? | TCP port to bind on `127.0.0.1`; defaults to 19740 and must be at least 1024.
     /// @return | boolean | True when the server was started, false when it was already running.
     let sh = shared.clone();
-    // -- stop --
-    /// Stops the debug bridge server and joins its server thread.
-    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
@@ -52,9 +49,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
-    // -- isRunning --
-    /// Returns whether the debug bridge server is running.
-    /// @return | boolean | True when the server thread is active.
+    // -- stop --
+    /// Stops the debug bridge server and joins its server thread.
+    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
@@ -69,13 +66,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- isRunning --
+    /// Returns whether the debug bridge server is currently running.
+    /// @return | boolean | True when the server thread is active.
     let run = running.clone();
     db.set(
         "isRunning",
         lua.create_function(move |_, ()| Ok(run.load(Ordering::Relaxed)))?,
     )?;
     // -- getPort --
-    /// Returns the debug bridge TCP port.
+    /// Returns the debug bridge TCP port. This function is exposed to Lua scripts.
     /// @return | integer | Active or configured port, or zero when unavailable.
     let sh = shared.clone();
     db.set(
@@ -313,7 +313,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- clearPrintHistory --
-    /// Clears captured print history.
+    /// Clears captured print history. This function is exposed to Lua scripts.
     /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(

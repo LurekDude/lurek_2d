@@ -57,11 +57,11 @@ impl Edge {
             items_in_transit: Vec::new(),
         }
     }
-    /// Return the edge type string.
+    /// Return the edge type string. This function is part of the public API.
     pub fn get_type(&self) -> &str {
         &self.edge_type
     }
-    /// Set the edge type string.
+    /// Set the edge type string. This function is part of the public API.
     pub fn set_type(&mut self, t: &str) {
         self.edge_type = t.to_string();
     }

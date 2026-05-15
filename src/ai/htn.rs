@@ -29,7 +29,7 @@ pub enum HTNTask {
     },
 }
 impl HTNTask {
-    /// Return the task name.
+    /// Return the task name. This function is part of the public API.
     pub fn name(&self) -> &str {
         match self {
             Self::Compound { name, .. } => name.as_str(),
@@ -106,15 +106,15 @@ pub struct HTNDomain {
     tasks: HashMap<String, HTNTask>,
 }
 impl HTNDomain {
-    /// Create an empty domain.
+    /// Create an empty domain. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }
-    /// Register a task by its name.
+    /// Register a task by its name. This function is part of the public API.
     pub fn register(&mut self, task: HTNTask) {
         self.tasks.insert(task.name().to_string(), task);
     }
-    /// Add a primitive task.
+    /// Add a primitive task. This function is part of the public API.
     pub fn add_primitive(
         &mut self,
         name: &str,
@@ -129,14 +129,14 @@ impl HTNDomain {
             effects_clear: effects_clear.into_iter().map(|s| s.to_string()).collect(),
         });
     }
-    /// Add a compound task.
+    /// Add a compound task. This function is part of the public API.
     pub fn add_compound(&mut self, name: &str, methods: Vec<HTNMethod>) {
         self.register(HTNTask::Compound {
             name: name.to_string(),
             methods,
         });
     }
-    /// Return a task by name.
+    /// Return a task by name. This function is part of the public API.
     pub fn get(&self, name: &str) -> Option<&HTNTask> {
         self.tasks.get(name)
     }

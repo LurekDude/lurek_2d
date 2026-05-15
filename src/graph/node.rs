@@ -182,19 +182,19 @@ impl Node {
             process_accumulator: 0.0,
         }
     }
-    /// Return the node type string.
+    /// Return the node type string. This function is part of the public API.
     pub fn get_type(&self) -> &str {
         &self.node_type
     }
-    /// Set the node type string.
+    /// Set the node type string. This function is part of the public API.
     pub fn set_type(&mut self, t: &str) {
         self.node_type = t.to_string();
     }
-    /// Return the node capacity.
+    /// Return the node capacity. This function is part of the public API.
     pub fn get_capacity(&self) -> i32 {
         self.capacity
     }
-    /// Set the node capacity.
+    /// Set the node capacity. This function is part of the public API.
     pub fn set_capacity(&mut self, c: i32) {
         self.capacity = c;
     }
@@ -210,7 +210,7 @@ impl Node {
     pub fn item_count(&self) -> usize {
         self.items.len()
     }
-    /// Add a tag to the node.
+    /// Add a tag to the node. This function is part of the public API.
     pub fn add_tag(&mut self, tag: &str) {
         self.tags.insert(tag.to_string());
     }
@@ -245,7 +245,7 @@ impl Node {
         self.supplies.retain(|s| s.item_type != item_type);
         self.supplies.len() < before
     }
-    /// Remove all supply records.
+    /// Remove all supply records. This function is part of the public API.
     pub fn clear_supplies(&mut self) {
         self.supplies.clear();
     }
@@ -275,7 +275,7 @@ impl Node {
         self.demands.retain(|d| d.item_type != item_type);
         self.demands.len() < before
     }
-    /// Remove all demand records.
+    /// Remove all demand records. This function is part of the public API.
     pub fn clear_demands(&mut self) {
         self.demands.clear();
     }

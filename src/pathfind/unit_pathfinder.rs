@@ -244,7 +244,7 @@ impl UnitPathfinder {
     pub fn is_cache_enabled(&self) -> bool {
         self.cache_enabled
     }
-    /// Remove all cached paths.
+    /// Remove all cached paths. This function is part of the public API.
     pub fn clear_cache(&mut self) {
         self.cache.clear();
         self.cache_order.clear();

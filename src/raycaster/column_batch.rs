@@ -123,11 +123,11 @@ impl ColumnBatch {
     pub fn get_depth_buffer(&self) -> Vec<f32> {
         self.columns.iter().map(|c| c.depth).collect()
     }
-    /// Set the flat floor color.
+    /// Set the flat floor color. This function is part of the public API.
     pub fn set_floor_color(&mut self, color: Color) {
         self.floor_color = color;
     }
-    /// Set the flat ceiling color.
+    /// Set the flat ceiling color. This function is part of the public API.
     pub fn set_ceiling_color(&mut self, color: Color) {
         self.ceiling_color = color;
     }

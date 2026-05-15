@@ -94,7 +94,7 @@ impl ImageData {
             (luma, luma, luma, a)
         });
     }
-    /// Apply a sepia tone in place.
+    /// Apply a sepia tone in place. This function is part of the public API.
     pub fn sepia(&mut self) {
         self.map_pixel_par(|_, _, r, g, b, a| {
             let rf = r as f32;

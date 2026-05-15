@@ -6,7 +6,7 @@
 
 use std::io::{Cursor, Read, Write};
 #[derive(Debug, Clone, Copy, PartialEq)]
-/// Select compression codec.
+/// Select compression codec. This item is part of the public API.
 pub enum CompressFormat {
     /// Use raw DEFLATE stream.
     Deflate,

@@ -262,6 +262,7 @@ impl LuaUserData for LuaScheduler {
         // -- setTimeScale --
         /// Sets the time scale multiplier for this scheduler. A value of 2.0 makes events fire twice as fast; 0.5 makes them fire at half speed. Does not affect frame-based events.
         /// @param | scale | number | Time scale multiplier (1.0 = normal speed).
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setTimeScale", |_, this, scale: f64| {
             this.scheduler.set_time_scale(scale);
             Ok(())
@@ -408,6 +409,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setPhysicsDelta --
     /// Sets the fixed timestep for physics simulation. Clamped between 1/240 and 1/10 seconds. Lower values increase accuracy but cost more CPU.
     /// @param | dt | number | Desired fixed delta time in seconds.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPhysicsDelta",
@@ -428,6 +430,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setPhysicsMaxSteps --
     /// Sets the maximum number of physics steps allowed per frame. Clamped between 1 and 64. Higher values improve accuracy under lag but cost more CPU.
     /// @param | n | number | Maximum physics steps per frame.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPhysicsMaxSteps",
@@ -439,6 +442,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- sleep --
     /// Blocks the current thread for the given number of seconds. Use sparingly — this halts the entire game loop. Intended for loading screens or synchronization.
     /// @param | seconds | number | Duration to sleep in seconds.
+    /// @return | nil | No return value.
     tbl.set(
         "sleep",
         lua.create_function(|_, seconds: f64| {
@@ -483,6 +487,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Schedules a one-shot callback based on real (wall-clock) time, unaffected by game pausing or time scaling. Use for UI fade-outs, notifications, or anything that should run on real time.
     /// @param | delay | number | Real-time delay in seconds before the callback fires.
     /// @param | func | function | Callback to invoke when the real-time deadline is reached.
+    /// @return | nil | No return value.
     let rt = real_timers.clone();
     tbl.set(
         "afterReal",
@@ -525,6 +530,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setSmoothingFactor --
     /// Sets the exponential smoothing factor used by getSmoothedDelta. Lower values produce smoother (more lagged) results; higher values track changes faster. Clamped to [0.01, 1.0].
     /// @param | alpha | number | Smoothing factor between 0.01 and 1.0.
+    /// @return | nil | No return value.
     let sa = smooth_alpha.clone();
     tbl.set(
         "setSmoothingFactor",
@@ -559,6 +565,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- waitSeconds --
     /// Yields the current coroutine for the given number of real-time seconds. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the deadline has passed.
     /// @param | seconds | number | Real-time seconds to wait.
+    /// @return | nil | No return value.
     let ws = wait_secs.clone();
     tbl.set(
         "waitSeconds",
@@ -583,6 +590,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- waitFrames --
     /// Yields the current coroutine for the given number of frames. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the target frame count has been reached.
     /// @param | frames | number | Number of frames to wait.
+    /// @return | nil | No return value.
     let wf = wait_frames.clone();
     let s_wf = state.clone();
     tbl.set(

@@ -108,7 +108,7 @@ impl Animation {
         }
         quads.len()
     }
-    /// Add a forward-playing clip.
+    /// Add a forward-playing clip. This function is part of the public API.
     pub fn add_clip(&mut self, name: &str, frame_indices: Vec<usize>, fps: f32, looping: bool) {
         self.add_clip_with_mode(name, frame_indices, fps, looping, ClipPlaybackMode::Forward);
     }
@@ -176,7 +176,7 @@ impl Animation {
     pub fn pause(&mut self) {
         self.playing = false;
     }
-    /// Resume playback.
+    /// Resume playback. This function is part of the public API.
     pub fn resume(&mut self) {
         self.playing = true;
     }
@@ -367,7 +367,7 @@ impl Animation {
     pub fn get_clip_count(&self) -> usize {
         self.clips.len()
     }
-    /// Return a clip by name.
+    /// Return a clip by name. This function is part of the public API.
     pub fn get_clip(&self, name: &str) -> Option<&AnimClip> {
         self.clips.get(name)
     }

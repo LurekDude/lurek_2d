@@ -23,7 +23,7 @@ pub mod lsystem;
 pub mod namegen;
 /// Perlin, Simplex, Worley, and fractal noise primitives.
 pub mod noise;
-/// Poisson disk point sampler.
+/// Poisson disk point sampler. This module is publicly re-exported.
 pub mod poisson;
 /// Noise-grid rendering helpers.
 pub mod render;

@@ -60,100 +60,103 @@ Core traversal now uses persistent incoming/outgoing adjacency indexes stored in
 
 ## Functions
 
-- `Graph::get_components` (`algorithms.rs`): Find weakly connected components (treating all edges as undirected).
-- `Graph::has_cycle` (`algorithms.rs`): Detect whether the directed graph contains a cycle (DFS-based).
-- `Graph::topological_sort` (`algorithms.rs`): Topological sort using Kahn's algorithm.
-- `Graph::mst_kruskal` (`algorithms.rs`): Kruskal's Minimum Spanning Tree.
-- `Graph::color_graph` (`algorithms.rs`): Greedy graph colouring (node-colouring, not edge-colouring).
-- `Graph::is_bipartite` (`algorithms.rs`): Bipartite check via 2-colouring BFS.
-- `Graph::astar_graph` (`algorithms.rs`): A* search from `from` to `to` using optional spatial positions for the heuristic.
-- `Graph::new` (`core.rs`): Create an empty graph.
-- `Graph::add_node` (`core.rs`): Add a node with the given type and capacity.
-- `Graph::remove_node` (`core.rs`): Remove a node and all connected edges.
-- `Graph::has_node` (`core.rs`): Whether a node with the given ID exists.
-- `Graph::get_node_ids` (`core.rs`): Get all node IDs.
-- `Graph::get_node_count` (`core.rs`): Get the number of nodes.
-- `Graph::add_edge` (`core.rs`): Add a directed edge between two existing nodes.
-- `Graph::remove_edge` (`core.rs`): Remove an edge.
-- `Graph::has_edge` (`core.rs`): Whether an edge with the given ID exists.
-- `Graph::get_edge_ids` (`core.rs`): Get all edge IDs.
-- `Graph::get_edge_count` (`core.rs`): Get the number of edges.
-- `Graph::get_edge_between` (`core.rs`): Find an edge from `from` to `to` (returns the first match).
-- `Graph::subgraph` (`core.rs`): Build an induced subgraph for selected nodes, retaining only valid edges/items.
-- `Graph::create_item` (`core.rs`): Create a new item (starts `Unplaced`).
-- `Graph::add_item_to_node` (`core.rs`): Try to add an existing item to a node, respecting capacity and overflow policy.
-- `Graph::remove_item` (`core.rs`): Remove an item from the graph entirely.
-- `Graph::has_item` (`core.rs`): Whether an item with the given ID exists.
-- `Graph::get_item_ids` (`core.rs`): Get all item IDs.
-- `Graph::get_item_count` (`core.rs`): Get the number of items.
-- `Graph::send_item` (`core.rs`): Send an item onto an edge (start transit).
-- `Graph::get_stats` (`core.rs`): Compute a statistics snapshot.
-- `Graph::get_outgoing_edges` (`core.rs`): Get IDs of edges leaving a node.
-- `Graph::get_incoming_edges` (`core.rs`): Get IDs of edges arriving at a node.
-- `Graph::get_edges_by_direction` (`core.rs`): Returns edge IDs for a node filtered by direction string.
-- `Graph::draw_to_image` (`core.rs`): Render the graph to an image with circular node layout.
-- `Graph::serialize` (`core.rs`): Serialize the graph to a JSON-compatible `serde_json::Value` map.
-- `Graph::deserialize` (`core.rs`): Deserialize a graph from a map produced by [`Graph::serialize`].
-- `Edge::new` (`edge.rs`): Create a new edge with defaults.
-- `Edge::get_type` (`edge.rs`): Get the edge type.
-- `Edge::set_type` (`edge.rs`): Set the edge type.
-- `Edge::is_on_cooldown` (`edge.rs`): Whether the edge is in cooldown.
-- `Edge::is_item_type_allowed` (`edge.rs`): Whether the given item type is allowed on this edge.
-- `Edge::add_allowed_type` (`edge.rs`): Add an allowed item type.
-- `Edge::remove_allowed_type` (`edge.rs`): Remove an allowed item type.
-- `Edge::clear_allowed_types` (`edge.rs`): Clear all allowed type restrictions (all types become allowed).
-- `Edge::is_transit_full` (`edge.rs`): Whether transit capacity is full.
-- `GraphItem::new` (`item.rs`): Create a new item with the given type and decay time.
-- `GraphItem::kill` (`item.rs`): Marks this item as dead; it will be removed from the graph on the next tick.
-- `GraphItem::is_alive` (`item.rs`): Whether the item is still alive.
-- `GraphItem::get_type` (`item.rs`): Get the item type.
-- `GraphItem::set_type` (`item.rs`): Set the item type.
-- `GraphItem::get_decay_time` (`item.rs`): Get the decay time (`-1.0` = no decay).
-- `GraphItem::set_decay_time` (`item.rs`): Set the decay time.
-- `GraphItem::get_remaining_life` (`item.rs`): Get remaining life in seconds.
-- `GraphItem::set_remaining_life` (`item.rs`): Set remaining life in seconds.
-- `GraphItem::get_priority` (`item.rs`): Get the priority value.
-- `GraphItem::set_priority` (`item.rs`): Set the priority value.
-- `GraphItem::get_position` (`item.rs`): Get the current position.
-- `GraphItem::set_position` (`item.rs`): Set the current position.
-- `OverflowPolicy::to_str` (`node.rs`): Canonical lowercase string representation.
-- `FlowMode::to_str` (`node.rs`): Canonical lowercase string representation.
-- `Node::new` (`node.rs`): Create a new node with defaults.
-- `Node::get_type` (`node.rs`): Get the node type.
-- `Node::set_type` (`node.rs`): Set the node type.
-- `Node::get_capacity` (`node.rs`): Get the capacity (`-1` = unlimited).
-- `Node::set_capacity` (`node.rs`): Set the capacity.
-- `Node::is_full` (`node.rs`): Whether the node is at capacity.
-- `Node::item_count` (`node.rs`): Returns the number of items currently sitting at this node.
-- `Node::add_tag` (`node.rs`): Add a tag.
-- `Node::remove_tag` (`node.rs`): Remove a tag.
-- `Node::has_tag` (`node.rs`): Check if a tag is present.
-- `Node::clear_tags` (`node.rs`): Remove all tags.
-- `Node::get_tags` (`node.rs`): Get all tags as a sorted vector.
-- `Node::add_supply` (`node.rs`): Add a supply declaration.
-- `Node::remove_supply` (`node.rs`): Remove supply declarations for the given item type.
-- `Node::clear_supplies` (`node.rs`): Remove all supply declarations.
-- `Node::get_supply` (`node.rs`): Get the supply for a given item type.
-- `Node::get_available_supply` (`node.rs`): Get the available supply quantity for a type (returns 0 if not found).
-- `Node::add_demand` (`node.rs`): Add a demand declaration.
-- `Node::remove_demand` (`node.rs`): Remove demand declarations for the given item type.
-- `Node::clear_demands` (`node.rs`): Remove all demand declarations.
-- `Node::get_demand` (`node.rs`): Get the demand for a given item type.
-- `Node::set_conversion` (`node.rs`): Set a conversion rule (keyed by input type).
-- `Node::clear_conversion` (`node.rs`): Remove a conversion rule by input type.
+- `Graph::get_components` (`algorithms.rs`): Return connected components as sorted node-id groups.
+- `Graph::has_cycle` (`algorithms.rs`): Return true when the directed graph contains a cycle.
+- `Graph::topological_sort` (`algorithms.rs`): Return a topological ordering or None when the graph has a cycle.
+- `Graph::mst_kruskal` (`algorithms.rs`): Return edge ids in a Kruskal minimum spanning forest.
+- `Graph::color_graph` (`algorithms.rs`): Assign greedy graph colors to node ids.
+- `Graph::is_bipartite` (`algorithms.rs`): Return true when the graph is bipartite.
+- `Graph::astar_graph` (`algorithms.rs`): Find an A* node path using supplied node positions as the heuristic source.
+- `Graph::new` (`core.rs`): Create an empty graph with fresh id counters.
+- `Graph::outgoing_edge_ids_slice` (`core.rs`): Return the indexed outgoing edge ids for a node.
+- `Graph::incoming_edge_ids_slice` (`core.rs`): Return the indexed incoming edge ids for a node.
+- `Graph::add_node` (`core.rs`): Add a node and return its assigned id.
+- `Graph::remove_node` (`core.rs`): Remove a node and all connected edges, returning true when it existed.
+- `Graph::has_node` (`core.rs`): Return true when the node id exists.
+- `Graph::get_node_ids` (`core.rs`): Return all node ids in arbitrary order.
+- `Graph::get_node_count` (`core.rs`): Return the number of nodes.
+- `Graph::add_edge` (`core.rs`): Add an edge and return its assigned id or an error when either endpoint is missing.
+- `Graph::remove_edge` (`core.rs`): Remove an edge and detach any items in transit, returning true when it existed.
+- `Graph::has_edge` (`core.rs`): Return true when the edge id exists.
+- `Graph::get_edge_ids` (`core.rs`): Return all edge ids in arbitrary order.
+- `Graph::get_edge_count` (`core.rs`): Return the number of edges.
+- `Graph::get_edge_between` (`core.rs`): Return the first outgoing edge id that connects the supplied nodes.
+- `Graph::subgraph` (`core.rs`): Build a new graph containing only the selected nodes and connected data.
+- `Graph::create_item` (`core.rs`): Create an item and return its assigned id.
+- `Graph::add_item_to_node` (`core.rs`): Add an item to a node and return whether the placement succeeded.
+- `Graph::remove_item` (`core.rs`): Remove an item from the graph and all node or edge containers.
+- `Graph::has_item` (`core.rs`): Return true when the item id exists.
+- `Graph::get_item_ids` (`core.rs`): Return all item ids in arbitrary order.
+- `Graph::get_item_count` (`core.rs`): Return the number of items.
+- `Graph::send_item` (`core.rs`): Send an item onto an edge and return whether the transfer succeeded.
+- `Graph::get_stats` (`core.rs`): Return aggregate counts derived from the current graph state.
+- `Graph::get_outgoing_edges` (`core.rs`): Return outgoing edge ids for a node.
+- `Graph::get_incoming_edges` (`core.rs`): Return incoming edge ids for a node.
+- `Graph::get_edges_by_direction` (`core.rs`): Return edge ids by requested direction or an error when the direction is invalid.
+- `Graph::draw_to_image` (`core.rs`): Draw a simple circular graph preview into an image buffer.
+- `Graph::serialize` (`core.rs`): Serialize nodes and edges into a JSON-like value map.
+- `Graph::deserialize` (`core.rs`): Deserialize a graph from the JSON-like value map or return a shape error.
+- `Edge::new` (`edge.rs`): Create an edge with default transit settings.
+- `Edge::get_type` (`edge.rs`): Return the edge type string.
+- `Edge::set_type` (`edge.rs`): Set the edge type string.
+- `Edge::is_on_cooldown` (`edge.rs`): Return true when the edge is still on cooldown.
+- `Edge::is_item_type_allowed` (`edge.rs`): Return true when the item type is allowed by the edge filter.
+- `Edge::add_allowed_type` (`edge.rs`): Allow an item type on the edge.
+- `Edge::remove_allowed_type` (`edge.rs`): Remove an allowed item type and return true when it existed.
+- `Edge::clear_allowed_types` (`edge.rs`): Remove all allowed item type filters.
+- `Edge::is_transit_full` (`edge.rs`): Return true when the transit buffer is at or above capacity.
+- `GraphItem::new` (`item.rs`): Create an item with the supplied id, type, and decay time.
+- `GraphItem::kill` (`item.rs`): Mark the item as dead.
+- `GraphItem::is_alive` (`item.rs`): Return true when the item is alive.
+- `GraphItem::get_type` (`item.rs`): Return the item type string.
+- `GraphItem::set_type` (`item.rs`): Set the item type string.
+- `GraphItem::get_decay_time` (`item.rs`): Return the configured decay time.
+- `GraphItem::set_decay_time` (`item.rs`): Set decay time and reset remaining life when the new time is positive.
+- `GraphItem::get_remaining_life` (`item.rs`): Return the remaining lifetime.
+- `GraphItem::set_remaining_life` (`item.rs`): Set the remaining lifetime.
+- `GraphItem::get_priority` (`item.rs`): Return the item priority.
+- `GraphItem::set_priority` (`item.rs`): Set the item priority.
+- `GraphItem::get_position` (`item.rs`): Return the current placement state.
+- `GraphItem::set_position` (`item.rs`): Set the current placement state.
+- `OverflowPolicy::to_str` (`node.rs`): Return the lowercase policy string.
+- `FlowMode::to_str` (`node.rs`): Return the lowercase flow mode string.
+- `Node::new` (`node.rs`): Create a node with default flow settings and the supplied id, type, and capacity.
+- `Node::get_type` (`node.rs`): Return the node type string.
+- `Node::set_type` (`node.rs`): Set the node type string.
+- `Node::get_capacity` (`node.rs`): Return the node capacity.
+- `Node::set_capacity` (`node.rs`): Set the node capacity.
+- `Node::is_full` (`node.rs`): Return true when the node is at or above capacity.
+- `Node::item_count` (`node.rs`): Return the number of items currently held on the node.
+- `Node::add_tag` (`node.rs`): Add a tag to the node.
+- `Node::remove_tag` (`node.rs`): Remove a tag and return true when it existed.
+- `Node::has_tag` (`node.rs`): Return true when the node has the supplied tag.
+- `Node::clear_tags` (`node.rs`): Remove all tags from the node.
+- `Node::get_tags` (`node.rs`): Return all tags sorted in ascending order.
+- `Node::add_supply` (`node.rs`): Add a supply record for an item type.
+- `Node::remove_supply` (`node.rs`): Remove all supplies for an item type and return true when any were removed.
+- `Node::clear_supplies` (`node.rs`): Remove all supply records.
+- `Node::get_supply` (`node.rs`): Return the first supply record for an item type.
+- `Node::get_available_supply` (`node.rs`): Sum all supply quantities for an item type.
+- `Node::add_demand` (`node.rs`): Add a demand record for an item type.
+- `Node::remove_demand` (`node.rs`): Remove all demands for an item type and return true when any were removed.
+- `Node::clear_demands` (`node.rs`): Remove all demand records.
+- `Node::get_demand` (`node.rs`): Return the first demand record for an item type.
+- `Node::set_conversion` (`node.rs`): Set or replace a conversion rule keyed by its input type.
+- `Node::clear_conversion` (`node.rs`): Remove a conversion rule and return true when it existed.
 - `Node::clear_all_conversions` (`node.rs`): Remove all conversion rules.
-- `Node::enqueue` (`node.rs`): Push an item ID onto the back of the queue.
-- `Node::dequeue` (`node.rs`): Pop an item ID from the front of the queue.
-- `Graph::find_path` (`pathfinding.rs`): Find the shortest path from `from` to `to` using Dijkstra's algorithm.
-- `Graph::find_path_for_item` (`pathfinding.rs`): Find a path that only uses edges the given item can traverse.
-- `Graph::get_distance` (`pathfinding.rs`): Get the shortest-path distance between two nodes, or `None` if unreachable.
-- `Graph::get_reachable` (`pathfinding.rs`): Get all nodes reachable from `from`, optionally limited by max distance.
-- `Graph::get_neighbors` (`pathfinding.rs`): Get direct outgoing neighbors of a node.
-- `Graph::generate_render_commands` (`render.rs`): Generate debug render commands for the graph using a circular node layout.
-- `Graph::update` (`simulation.rs`): Advance the simulation by `dt` seconds.
-- `Graph::step` (`simulation.rs`): One discrete simulation step (equivalent to `update(1.0)`).
-- `Graph::update_parallel` (`simulation.rs`): Advance the simulation by `dt` seconds with a parallelised decay phase.
-- `Graph::process_demand` (`supply_demand.rs`): Processes all demand/supply declarations, routing items from supply nodes to demand nodes.
+- `Node::enqueue` (`node.rs`): Enqueue an item id and return false when the queue is full.
+- `Node::dequeue` (`node.rs`): Dequeue the oldest queued item id when one exists.
+- `Graph::find_path` (`pathfinding.rs`): Find the cheapest active path between two nodes.
+- `Graph::find_path_for_item` (`pathfinding.rs`): Find the cheapest active path for an item type between two nodes.
+- `Graph::get_distance` (`pathfinding.rs`): Return the cheapest path cost between two nodes.
+- `Graph::get_reachable` (`pathfinding.rs`): Return nodes reachable from a source within an optional cost limit.
+- `Graph::get_neighbors` (`pathfinding.rs`): Return active neighboring node ids connected to the supplied node.
+- `Graph::generate_render_commands` (`render.rs`): Generate a simple circular graph preview as renderer commands.
+- `Graph::update` (`simulation.rs`): Run one simulation update and return the emitted events.
+- `Graph::step` (`simulation.rs`): Run one simulation update with dt set to 1.0.
+- `Graph::update_parallel` (`simulation.rs`): Run one simulation update using parallel decay processing when enabled.
+- `Graph::update_parallel` (`simulation.rs`): Run one simulation update when the parallel feature is disabled.
+- `Graph::process_demand` (`supply_demand.rs`): Process node demands and return the resulting graph events.
 
 ## Lua API Reference
 
@@ -161,141 +164,141 @@ Core traversal now uses persistent incoming/outgoing adjacency indexes stored in
 - Namespace: `lurek.graph`
 
 ### Module Functions
-- `lurek.graph.newGraph`: Creates a new empty directed graph for item flow simulation.
+- `lurek.graph.newGraph`: Creates an empty logistics graph with no nodes, edges, items, or callbacks.
 
 ### `LGraph` Methods
-- `LGraph:addNode`: Adds a node and returns its handle.
-- `LGraph:removeNode`: Removes a node from the graph.
-- `LGraph:hasNode`: Returns true if the node exists in the graph.
-- `LGraph:getNodes`: Returns a table of all Node handles.
-- `LGraph:getNodeCount`: Returns the number of nodes in the graph.
-- `LGraph:addEdge`: Adds a directed edge between two nodes and returns its handle.
-- `LGraph:removeEdge`: Removes an edge from the graph.
-- `LGraph:hasEdge`: Returns true if the edge exists in the graph.
-- `LGraph:getEdges`: Returns a table of all Edge handles.
-- `LGraph:getEdgeCount`: Returns the number of edges in the graph.
-- `LGraph:getEdgeBetween`: Returns the edge between two nodes, or nil if none exists.
-- `LGraph:createItem`: Creates a new unplaced item and returns its handle.
-- `LGraph:addItem`: Places an item at a node.
-- `LGraph:removeItem`: Removes an item from the graph entirely.
-- `LGraph:hasItem`: Returns true if the item exists in the graph.
-- `LGraph:getItems`: Returns a table of all GraphItem handles.
-- `LGraph:getItemCount`: Returns the number of items in the graph.
-- `LGraph:sendItem`: Sends an item onto an edge to begin transit.
-- `LGraph:update`: Advances simulation by dt seconds and fires event callbacks.
-- `LGraph:step`: Runs one discrete simulation step and fires event callbacks.
-- `LGraph:tickParallel`: Advances simulation by dt seconds using a parallelised decay phase.
-- `LGraph:findPath`: Finds the shortest path between two nodes using Dijkstra.
-- `LGraph:findPathForItem`: Finds the shortest path for a specific item, filtering by item type.
-- `LGraph:getDistance`: Returns the shortest path distance, or nil if unreachable.
-- `LGraph:getReachable`: Returns a table of Node handles reachable from the given node.
-- `LGraph:getNeighbors`: Returns a table of direct neighbor Node handles.
-- `LGraph:subgraph`: Returns a new graph containing only selected nodes and induced links.
-- `LGraph:getComponents`: Returns weakly connected components as a table of tables of Node handles.
-- `LGraph:hasCycle`: Returns true if the graph contains a directed cycle.
-- `LGraph:topologicalSort`: Returns a topologically sorted table of Node handles, or nil if a cycle exists.
-- `LGraph:mst`: Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
-- `LGraph:colorGraph`: Assigns each node the smallest non-negative integer colour not shared with any
-- `LGraph:isBipartite`: Returns `true` when the graph can be 2-coloured (bipartite check via BFS).
-- `LGraph:astar`: Finds the shortest path between two nodes using A*.
-- `LGraph:processDemand`: Processes all supply/demand declarations and fires event callbacks.
-- `LGraph:getStats`: Returns a statistics snapshot table.
-- `LGraph:on`: Registers a callback for a graph simulation event.
-- `LGraph:type`: Returns the type name of this object.
-- `LGraph:typeOf`: Returns true if this object is of the given type.
+- `LGraph:addNode`: Creates a node with optional type and capacity.
+- `LGraph:removeNode`: Removes a node and graph links associated with it.
+- `LGraph:hasNode`: Returns whether a node handle still exists in this graph.
+- `LGraph:getNodes`: Returns all nodes in this graph.
+- `LGraph:getNodeCount`: Returns the number of nodes in this graph.
+- `LGraph:addEdge`: Creates an edge between two nodes with an optional edge type.
+- `LGraph:removeEdge`: Removes an edge by handle.
+- `LGraph:hasEdge`: Returns whether an edge handle still exists in this graph.
+- `LGraph:getEdges`: Returns all edges in this graph.
+- `LGraph:getEdgeCount`: Returns the number of edges in this graph.
+- `LGraph:getEdgeBetween`: Returns the edge connecting two nodes when one exists.
+- `LGraph:createItem`: Creates an unplaced graph item with optional type and decay time.
+- `LGraph:addItem`: Places an item onto a node.
+- `LGraph:removeItem`: Removes an item from this graph.
+- `LGraph:hasItem`: Returns whether an item handle still exists in this graph.
+- `LGraph:getItems`: Returns all items in this graph.
+- `LGraph:getItemCount`: Returns the number of items in this graph.
+- `LGraph:sendItem`: Starts moving an item along an edge.
+- `LGraph:update`: Advances graph simulation by delta time and dispatches generated callbacks.
+- `LGraph:step`: Runs one discrete graph simulation step and dispatches generated callbacks.
+- `LGraph:tickParallel`: Advances graph simulation through the parallel update path and dispatches generated callbacks.
+- `LGraph:findPath`: Finds a path between two nodes.
+- `LGraph:findPathForItem`: Finds a path for a specific item between two nodes while respecting item constraints.
+- `LGraph:getDistance`: Returns graph distance between two nodes when reachable.
+- `LGraph:getReachable`: Returns nodes reachable from a start node within an optional maximum distance.
+- `LGraph:getNeighbors`: Returns neighbor nodes connected to a node.
+- `LGraph:getComponents`: Returns connected components as arrays of node handles.
+- `LGraph:subgraph`: Creates a new graph containing a subset of nodes.
+- `LGraph:hasCycle`: Returns whether this graph contains a cycle.
+- `LGraph:topologicalSort`: Returns nodes in topological order when the graph is acyclic.
+- `LGraph:mst`: Computes a minimum spanning tree using Kruskal and returns edge ids.
+- `LGraph:colorGraph`: Computes graph coloring and returns color indices by node id.
+- `LGraph:isBipartite`: Returns whether this graph is bipartite.
+- `LGraph:astar`: Runs A* pathfinding between two nodes.
+- `LGraph:processDemand`: Processes graph supply and demand once and dispatches generated callbacks.
+- `LGraph:getStats`: Returns graph counts and aggregate supply-demand statistics.
+- `LGraph:on`: Registers a callback for a named graph event generated during simulation.
+- `LGraph:type`: Returns the Lua-visible type name for this graph handle.
+- `LGraph:typeOf`: Returns whether this graph handle matches a supported type name.
 
 ### `LGraphEdge` Methods
-- `LGraphEdge:getType`: Returns the edge type string.
-- `LGraphEdge:setType`: Sets the edge type string.
-- `LGraphEdge:getFrom`: Returns the source node handle.
-- `LGraphEdge:getTo`: Returns the destination node handle.
-- `LGraphEdge:getCapacity`: Returns the edge capacity (-1 = unlimited).
-- `LGraphEdge:setCapacity`: Sets the edge capacity (-1 = unlimited).
-- `LGraphEdge:getThroughput`: Returns items per second this edge can transfer.
-- `LGraphEdge:setThroughput`: Sets items per second this edge can transfer.
-- `LGraphEdge:getTravelTime`: Returns the travel time in seconds for items on this edge.
-- `LGraphEdge:setTravelTime`: Sets the travel time in seconds for items on this edge.
-- `LGraphEdge:getWeight`: Returns the pathfinding weight of this edge.
-- `LGraphEdge:setWeight`: Sets the pathfinding weight of this edge.
-- `LGraphEdge:getSpeedModifier`: Returns the speed modifier applied to items in transit.
-- `LGraphEdge:setSpeedModifier`: Sets the speed modifier applied to items in transit.
-- `LGraphEdge:getCooldown`: Returns the cooldown duration in seconds.
-- `LGraphEdge:setCooldown`: Sets the cooldown duration in seconds.
-- `LGraphEdge:isOnCooldown`: Returns true if the edge is currently on cooldown.
-- `LGraphEdge:isBidirectional`: Returns true if items can travel the edge in either direction.
-- `LGraphEdge:setBidirectional`: Sets whether items can travel the edge in either direction.
-- `LGraphEdge:isActive`: Returns true if the edge is active.
-- `LGraphEdge:setActive`: Sets the active state of this edge.
-- `LGraphEdge:getItemsInTransit`: Returns a table of GraphItem handles currently in transit on this edge.
-- `LGraphEdge:addAllowedType`: Adds an item type to the edge allow-list.
-- `LGraphEdge:removeAllowedType`: Removes an item type from the edge allow-list.
-- `LGraphEdge:clearAllowedTypes`: Clears the edge allow-list so all item types are permitted.
-- `LGraphEdge:isItemTypeAllowed`: Returns true if the given item type is allowed on this edge.
-- `LGraphEdge:type`: Returns the type name "GraphEdge".
-- `LGraphEdge:typeOf`: Returns true when the given name matches "GraphEdge" or a parent type.
+- `LGraphEdge:getType`: Returns the edge type string used by routing and filters.
+- `LGraphEdge:setType`: Sets the edge type string used by routing and filters.
+- `LGraphEdge:getFrom`: Returns the source node for this edge.
+- `LGraphEdge:getTo`: Returns the destination node for this edge.
+- `LGraphEdge:getCapacity`: Returns this edge's maximum concurrent item capacity.
+- `LGraphEdge:setCapacity`: Sets this edge's maximum concurrent item capacity.
+- `LGraphEdge:getThroughput`: Returns this edge's throughput value.
+- `LGraphEdge:setThroughput`: Sets this edge's throughput value.
+- `LGraphEdge:getTravelTime`: Returns the travel time for items moving across this edge.
+- `LGraphEdge:setTravelTime`: Sets the travel time for items moving across this edge.
+- `LGraphEdge:getWeight`: Returns the pathfinding weight for this edge.
+- `LGraphEdge:setWeight`: Sets the pathfinding weight for this edge.
+- `LGraphEdge:getSpeedModifier`: Returns this edge's speed modifier.
+- `LGraphEdge:setSpeedModifier`: Sets this edge's speed modifier.
+- `LGraphEdge:getCooldown`: Returns this edge's cooldown timer value.
+- `LGraphEdge:setCooldown`: Sets this edge's cooldown timer value.
+- `LGraphEdge:isOnCooldown`: Returns whether this edge is currently on cooldown.
+- `LGraphEdge:isBidirectional`: Returns whether this edge allows travel in both directions.
+- `LGraphEdge:setBidirectional`: Sets whether this edge allows travel in both directions.
+- `LGraphEdge:isActive`: Returns whether this edge is active for routing and simulation.
+- `LGraphEdge:setActive`: Enables or disables this edge for routing and simulation.
+- `LGraphEdge:getItemsInTransit`: Returns graph items currently traveling along this edge.
+- `LGraphEdge:addAllowedType`: Allows an item type to traverse this edge.
+- `LGraphEdge:removeAllowedType`: Removes an item type from this edge's allow-list.
+- `LGraphEdge:clearAllowedTypes`: Clears this edge's item type allow-list.
+- `LGraphEdge:isItemTypeAllowed`: Returns whether an item type may traverse this edge.
+- `LGraphEdge:type`: Returns the Lua-visible type name for this graph edge handle.
+- `LGraphEdge:typeOf`: Returns whether this graph edge handle matches a supported type name.
 
 ### `LGraphItem` Methods
-- `LGraphItem:getType`: Returns the item type string.
-- `LGraphItem:setType`: Sets the item type string.
-- `LGraphItem:getDecayTime`: Returns the decay time in seconds (-1 = immortal).
-- `LGraphItem:setDecayTime`: Sets the decay time in seconds (-1 = immortal).
-- `LGraphItem:getRemainingLife`: Returns the remaining life in seconds.
-- `LGraphItem:isAlive`: Returns true if the item is alive.
-- `LGraphItem:kill`: Marks this graph item as dead so it is removed on the next cleanup pass.
-- `LGraphItem:getPriority`: Returns the item priority.
-- `LGraphItem:setPriority`: Sets the scheduling priority; higher values are processed before lower ones.
-- `LGraphItem:getPosition`: Returns the item position: node userdata if at a node, (edge, progress)
-- `LGraphItem:type`: Returns the type name of this object.
-- `LGraphItem:typeOf`: Returns true if this object is of the given type.
+- `LGraphItem:getType`: Returns the item type string used by filters, conversions, supplies, and demands.
+- `LGraphItem:setType`: Changes the item type string used by graph routing and processing rules.
+- `LGraphItem:getDecayTime`: Returns the total decay lifetime configured for this item.
+- `LGraphItem:setDecayTime`: Sets the total decay lifetime for this item.
+- `LGraphItem:getRemainingLife`: Returns this item's remaining lifetime before decay.
+- `LGraphItem:isAlive`: Returns whether this item is still alive in the graph simulation.
+- `LGraphItem:kill`: Marks this item as dead so graph processing can remove or ignore it.
+- `LGraphItem:getPriority`: Returns this item's routing or queue priority.
+- `LGraphItem:setPriority`: Sets this item's routing or queue priority.
+- `LGraphItem:getPosition`: Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
+- `LGraphItem:type`: Returns the Lua-visible type name for this graph item handle.
+- `LGraphItem:typeOf`: Returns whether this graph item handle matches a supported type name.
 
 ### `LGraphNode` Methods
-- `LGraphNode:getType`: Returns the node type string.
-- `LGraphNode:setType`: Sets the node type string.
-- `LGraphNode:getCapacity`: Returns the node capacity (-1 = unlimited).
-- `LGraphNode:setCapacity`: Sets the node capacity (-1 = unlimited).
-- `LGraphNode:getItemCount`: Returns the number of items currently at this node.
-- `LGraphNode:isFull`: Returns true if the node has reached its capacity.
-- `LGraphNode:isActive`: Returns true if the node is active.
-- `LGraphNode:setActive`: Sets the active state of this node.
-- `LGraphNode:getOverflowPolicy`: Returns the overflow policy as a string.
-- `LGraphNode:setOverflowPolicy`: Sets the overflow policy from a string.
-- `LGraphNode:getFlowMode`: Returns the flow mode as a string.
-- `LGraphNode:setFlowMode`: Sets the flow mode from a string.
-- `LGraphNode:getPushRate`: Returns items per second this node pushes.
-- `LGraphNode:setPushRate`: Sets items per second this node pushes.
-- `LGraphNode:getPullRate`: Returns items per second this node pulls.
-- `LGraphNode:setPullRate`: Sets items per second this node pulls.
-- `LGraphNode:getPushFilter`: Returns the push filter string, or nil if unset.
-- `LGraphNode:setPushFilter`: Sets the push filter string, or nil to clear.
-- `LGraphNode:getPullFilter`: Returns the pull filter string, or nil if unset.
-- `LGraphNode:setPullFilter`: Sets the pull filter string, or nil to clear.
-- `LGraphNode:getProcessTime`: Returns the processing time in seconds.
-- `LGraphNode:setProcessTime`: Sets the processing time in seconds.
-- `LGraphNode:isQueueEnabled`: Returns true if the node queue is enabled.
-- `LGraphNode:setQueueEnabled`: Enables or disables the node queue.
-- `LGraphNode:getQueueCapacity`: Returns the queue capacity (-1 = unlimited).
-- `LGraphNode:setQueueCapacity`: Sets the queue capacity (-1 = unlimited).
-- `LGraphNode:getQueueSize`: Returns the number of items currently in the queue.
-- `LGraphNode:getItems`: Returns a table of GraphItem handles at this node.
-- `LGraphNode:getEdges`: Returns a table of Edge handles connected to this node.
-- `LGraphNode:setConversion`: Adds or replaces a conversion rule on this node.
-- `LGraphNode:clearConversion`: Removes the conversion rule for the given input type.
-- `LGraphNode:clearAllConversions`: Removes all conversion rules from this node.
-- `LGraphNode:addTag`: Attaches a string tag to this node for fast group queries.
+- `LGraphNode:getType`: Returns this node's type string.
+- `LGraphNode:setType`: Sets this node's type string.
+- `LGraphNode:getCapacity`: Returns this node's item capacity.
+- `LGraphNode:setCapacity`: Sets this node's item capacity.
+- `LGraphNode:getItemCount`: Returns the number of items currently stored on this node.
+- `LGraphNode:isFull`: Returns whether this node has reached its item capacity.
+- `LGraphNode:isActive`: Returns whether this node is active for graph simulation.
+- `LGraphNode:setActive`: Enables or disables this node for graph simulation.
+- `LGraphNode:getOverflowPolicy`: Returns this node's overflow policy name.
+- `LGraphNode:setOverflowPolicy`: Sets this node's overflow policy from a policy name.
+- `LGraphNode:getFlowMode`: Returns this node's flow mode name.
+- `LGraphNode:setFlowMode`: Sets this node's flow mode from a mode name.
+- `LGraphNode:getPushRate`: Returns this node's push rate.
+- `LGraphNode:setPushRate`: Sets this node's push rate.
+- `LGraphNode:getPullRate`: Returns this node's pull rate.
+- `LGraphNode:setPullRate`: Sets this node's pull rate.
+- `LGraphNode:getPushFilter`: Returns this node's optional push item-type filter.
+- `LGraphNode:setPushFilter`: Sets or clears this node's push item-type filter.
+- `LGraphNode:getPullFilter`: Returns this node's optional pull item-type filter.
+- `LGraphNode:setPullFilter`: Sets or clears this node's pull item-type filter.
+- `LGraphNode:getProcessTime`: Returns the processing time used by this node's conversions.
+- `LGraphNode:setProcessTime`: Sets the processing time used by this node's conversions.
+- `LGraphNode:isQueueEnabled`: Returns whether this node's explicit queue is enabled.
+- `LGraphNode:setQueueEnabled`: Enables or disables this node's explicit queue.
+- `LGraphNode:getQueueCapacity`: Returns this node's queue capacity.
+- `LGraphNode:setQueueCapacity`: Sets this node's queue capacity.
+- `LGraphNode:getQueueSize`: Returns the number of item ids currently queued at this node.
+- `LGraphNode:getItems`: Returns item handles currently stored on this node.
+- `LGraphNode:getEdges`: Returns edge handles connected to this node in the requested direction.
+- `LGraphNode:setConversion`: Configures an item conversion rule on this node.
+- `LGraphNode:clearConversion`: Removes a conversion rule by input item type.
+- `LGraphNode:clearAllConversions`: Removes every conversion rule from this node.
+- `LGraphNode:addTag`: Adds a tag to this node.
 - `LGraphNode:removeTag`: Removes a tag from this node.
-- `LGraphNode:hasTag`: Returns true if this node has the given tag.
-- `LGraphNode:clearTags`: Removes all tags from this node.
-- `LGraphNode:getTags`: Returns a table of tag strings on this node.
-- `LGraphNode:addSupply`: Declares a supply of the given item type and quantity at this node.
-- `LGraphNode:removeSupply`: Removes the supply declaration for the given item type.
-- `LGraphNode:clearSupplies`: Removes all supply declarations from this node.
-- `LGraphNode:addDemand`: Declares a demand for the given item type, quantity, and priority.
-- `LGraphNode:removeDemand`: Removes the demand declaration for the given item type.
-- `LGraphNode:clearDemands`: Removes all demand declarations from this node.
-- `LGraphNode:enqueue`: Pushes an item into the node queue.
-- `LGraphNode:dequeue`: Pops the next item from the node queue, or nil if empty.
-- `LGraphNode:type`: Returns the type name "GraphNode".
-- `LGraphNode:typeOf`: Returns true when the given name matches "GraphNode" or a parent type.
+- `LGraphNode:hasTag`: Returns whether this node has a tag.
+- `LGraphNode:clearTags`: Removes every tag from this node.
+- `LGraphNode:getTags`: Returns all tags assigned to this node.
+- `LGraphNode:addSupply`: Adds supply quantity for an item type on this node.
+- `LGraphNode:removeSupply`: Removes supply entry for an item type from this node.
+- `LGraphNode:clearSupplies`: Removes every supply entry from this node.
+- `LGraphNode:addDemand`: Adds demand quantity and optional priority for an item type on this node.
+- `LGraphNode:removeDemand`: Removes demand entry for an item type from this node.
+- `LGraphNode:clearDemands`: Removes every demand entry from this node.
+- `LGraphNode:enqueue`: Adds an item handle to this node's explicit queue.
+- `LGraphNode:dequeue`: Removes and returns the next item from this node's explicit queue.
+- `LGraphNode:type`: Returns the Lua-visible type name for this graph node handle.
+- `LGraphNode:typeOf`: Returns whether this graph node handle matches a supported type name.
 
 ## References
 

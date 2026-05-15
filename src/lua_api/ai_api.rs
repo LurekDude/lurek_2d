@@ -1926,7 +1926,7 @@ struct LuaSquad {
 impl LuaUserData for LuaSquad {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getName --
-        /// Returns the squad name.
+        /// Returns the squad name. This method is available to Lua scripts.
         /// @return | string | Squad name supplied at construction.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().name.clone())
@@ -1965,7 +1965,7 @@ impl LuaUserData for LuaSquad {
             Ok(tbl)
         });
         // -- setLeader --
-        /// Sets the squad leader name.
+        /// Sets the squad leader name. This method is available to Lua scripts.
         /// @param | name | string | Member or agent name to store as leader.
         /// @return | nil | No value is returned.
         methods.add_method("setLeader", |_, this, name: String| {
@@ -2122,7 +2122,7 @@ impl LuaUserData for LuaCommandQueue {
             Ok(this.inner.borrow_mut().cancel_current())
         });
         // -- clear --
-        /// Removes every queued command.
+        /// Removes every queued command. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
@@ -2310,7 +2310,7 @@ impl LuaUserData for LuaStimulusWorld {
             },
         );
         // -- remove --
-        /// Removes a stimulus by identifier.
+        /// Removes a stimulus by identifier. This method is available to Lua scripts.
         /// @param | id | integer | Stimulus identifier returned by `addVisual` or `addAuditory`.
         /// @return | boolean | True when a stimulus was removed.
         methods.add_method_mut("remove", |_, this, id: u64| {
@@ -2332,7 +2332,7 @@ impl LuaUserData for LuaStimulusWorld {
             |_, this, ()| Ok(this.inner.borrow().count() as i64),
         );
         // -- clear --
-        /// Removes every active stimulus.
+        /// Removes every active stimulus. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
@@ -2775,7 +2775,7 @@ impl LuaUserData for LuaEmotionModel {
             },
         );
         // -- trigger --
-        /// Adds an amount to a named emotion.
+        /// Adds an amount to a named emotion. This method is available to Lua scripts.
         /// @param | name | string | Emotion name to trigger.
         /// @param | amount | number | Amount added to the current emotion value.
         /// @return | nil | No value is returned.
@@ -3021,7 +3021,7 @@ impl LuaUserData for LuaGeneticAlgorithm {
             Ok(this.inner.borrow().generation as i64)
         });
         // -- popSize --
-        /// Returns the population size.
+        /// Returns the population size. This method is available to Lua scripts.
         /// @return | integer | Current population size.
         methods.add_method("popSize", |_, this, ()| {
             Ok(this.inner.borrow().pop_size() as i64)
@@ -3107,7 +3107,7 @@ impl LuaUserData for LuaBandit {
             Ok(this.inner.borrow().best_arm() as i64)
         });
         // -- reset --
-        /// Resets all bandit arm statistics.
+        /// Resets all bandit arm statistics. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
@@ -3188,7 +3188,7 @@ impl LuaUserData for LuaNeuroevolution {
             Ok(this.inner.borrow().best_fitness())
         });
         // -- popSize --
-        /// Returns the population size.
+        /// Returns the population size. This method is available to Lua scripts.
         /// @return | integer | Current population size.
         methods.add_method("popSize", |_, this, ()| {
             Ok(this.inner.borrow().pop_size() as i64)
@@ -3221,7 +3221,7 @@ struct LuaStrategyAI {
 impl LuaUserData for LuaStrategyAI {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addGoal --
-        /// Adds a named strategic goal.
+        /// Adds a named strategic goal. This method is available to Lua scripts.
         /// @param | name | string | Goal name scored by update callbacks.
         /// @return | nil | No value is returned.
         methods.add_method_mut("addGoal", |_, this, name: String| {
@@ -3620,7 +3620,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- newSquad --
-    /// Creates an empty named squad.
+    /// Creates an empty named squad. This function is exposed to Lua scripts.
     /// @param | name | string | Squad name stored on the handle.
     /// @return | LSquad | New squad handle.
     tbl.set(

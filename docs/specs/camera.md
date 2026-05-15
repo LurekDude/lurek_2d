@@ -85,10 +85,12 @@ Rig: `newRig()`, `LCameraRig:splitScreen()`, `LCameraRig:minimap()`, `LCameraRig
 - `ZoomPulse` (`struct`, `effects.rs`): Zoom pulse effect — brief zoom-in that decays back to the original zoom via a sine envelope.
 - `CameraSway` (`struct`, `effects.rs`): Camera sway — sinusoidal x/y offset oscillation for rocking or underwater effects.
 - `CameraBreathing` (`struct`, `effects.rs`): Camera breathing — subtle periodic zoom oscillation for a "living camera" feel.
+- `CameraRig2D` (`struct`, `multi.rs`): Stores named camera instances used by multi-view rendering flows.
 - `CameraPath` (`struct`, `path.rs`): Animates a camera along a series of world-space waypoints over a fixed duration using linear interpolation between consecutive points.
 - `CameraTweenEasing` (`enum`, `path.rs`): Easing mode for camera-local tweening.
 - `CameraZoomTween` (`struct`, `path.rs`): Smoothly transitions a camera zoom level from a start value to a target value over a fixed duration.
 - `ZoomTween` (`type`, `path.rs`): Backward-compatible alias for `CameraZoomTween`.
+- `CameraFollowEasing` (`enum`, `types.rs`): Selects easing behavior used by target-follow interpolation.
 - `Camera` (`struct`, `types.rs`): Lightweight camera state with position, zoom, rotation, and view-matrix generation.
 - `Camera2D` (`struct`, `types.rs`): Gameplay-facing 2D camera with follow targets, dead zones, look-ahead, bounds clamping, shake, and coordinate helpers.
 - `ScaleMode` (`enum`, `viewport.rs`): Enum selecting letterbox, stretch, or pixel-perfect viewport behavior.
@@ -97,92 +99,125 @@ Rig: `newRig()`, `LCameraRig:splitScreen()`, `LCameraRig:minimap()`, `LCameraRig
 
 ## Functions
 
-- `ZoomPulse::new` (`effects.rs`): Creates a new, inactive `ZoomPulse`.
-- `ZoomPulse::trigger` (`effects.rs`): Triggers a new zoom pulse, replacing any active one.
-- `ZoomPulse::update` (`effects.rs`): Advances the pulse by `dt` seconds and returns the current zoom delta.
-- `ZoomPulse::current_delta` (`effects.rs`): Returns the current zoom delta without advancing time.
-- `ZoomPulse::is_active` (`effects.rs`): Returns `true` if the pulse is currently active.
-- `CameraSway::new` (`effects.rs`): Creates a new, inactive `CameraSway`.
-- `CameraSway::start` (`effects.rs`): Starts or restarts the sway effect.
-- `CameraSway::stop` (`effects.rs`): Stops the sway effect immediately.
-- `CameraSway::update` (`effects.rs`): Advances sway by `dt` seconds and returns the `(dx, dy)` world-space offset.
-- `CameraSway::current_offset` (`effects.rs`): Returns the current `(dx, dy)` sway offset without advancing time.
-- `CameraSway::is_active` (`effects.rs`): Returns `true` if sway is currently active.
-- `CameraBreathing::new` (`effects.rs`): Creates a new, inactive `CameraBreathing` with default parameters (`amplitude=0.005`, `rate=0.2`).
-- `CameraBreathing::start` (`effects.rs`): Starts or restarts the breathing effect.
-- `CameraBreathing::stop` (`effects.rs`): Stops the breathing effect.
-- `CameraBreathing::update` (`effects.rs`): Advances breathing by `dt` seconds and returns the current zoom delta.
-- `CameraBreathing::current_delta` (`effects.rs`): Returns the current zoom delta without advancing time.
-- `CameraBreathing::is_active` (`effects.rs`): Returns `true` if breathing is currently active.
-- `CameraPath::new` (`path.rs`): Creates a new `CameraPath`.
-- `CameraPath::update` (`path.rs`): Advances the path by `dt` seconds and returns the current position, or `None` when the path has completed.
-- `CameraPath::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the path.
-- `CameraPath::reset` (`path.rs`): Resets the path back to the beginning.
-- `CameraZoomTween::new` (`path.rs`): Creates a new `CameraZoomTween`.
-- `CameraZoomTween::new_with_easing` (`path.rs`): Creates a new `CameraZoomTween` with explicit easing.
-- `CameraZoomTween::update` (`path.rs`): Advances the tween by `dt` seconds and returns the current zoom, or `None` when the tween has completed.
-- `CameraZoomTween::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the tween.
-- `Camera::begin_render_commands` (`render.rs`): Produces transform-stack render commands for this camera.
-- `Camera::end_render_command` (`render.rs`): Returns the `PopTransform` command that closes the camera scope.
-- `Camera::generate_render_commands` (`render.rs`): Wrap `scene_commands` in the camera's transform scope.
-- `Camera2D::begin_render_commands` (`render.rs`): Produces transform-stack render commands for this camera.
-- `Camera2D::end_render_command` (`render.rs`): Returns the `PopTransform` command that closes the camera scope.
-- `Camera2D::generate_render_commands` (`render.rs`): Wrap `scene_commands` in the camera's transform scope.
-- `Camera::new` (`types.rs`): Creates a new `Camera` with the given position, zoom, and rotation.
-- `Camera::view_matrix` (`types.rs`): Computes the view transformation matrix for this camera.
-- `Camera::set_position` (`types.rs`): Moves the camera to `position` in world space.
-- `Camera::set_zoom` (`types.rs`): Sets the camera's zoom level.
-- `Camera::set_rotation` (`types.rs`): Sets the camera's rotation in radians.
-- `Camera2D::new` (`types.rs`): Creates a new `Camera2D` centred at the origin with the given viewport
-- `Camera2D::set_position` (`types.rs`): Sets the camera position in world space.
-- `Camera2D::get_position` (`types.rs`): Returns the camera position as `(x, y)`.
-- `Camera2D::set_zoom` (`types.rs`): Sets the uniform zoom factor.
-- `Camera2D::get_zoom` (`types.rs`): Returns the current zoom factor.
-- `Camera2D::set_rotation` (`types.rs`): Sets the rotation in radians.
-- `Camera2D::get_rotation` (`types.rs`): Returns the current rotation in radians.
-- `Camera2D::set_viewport` (`types.rs`): Sets the viewport rectangle in screen pixels.
-- `Camera2D::get_viewport` (`types.rs`): Returns the viewport as `(x, y, w, h)`.
-- `Camera2D::set_bounds` (`types.rs`): Sets world-space bounds for camera clamping.
-- `Camera2D::get_bounds` (`types.rs`): Returns the world-space bounds, if set.
-- `Camera2D::remove_bounds` (`types.rs`): Removes previously set bounds.
-- `Camera2D::has_bounds` (`types.rs`): Returns `true` if world-space bounds are set.
-- `Camera2D::move_by` (`types.rs`): Translates the camera by `(dx, dy)` in world space.
-- `Camera2D::look_at` (`types.rs`): Sets the camera position directly (shorthand for [`set_position`](Self::set_position)).
-- `Camera2D::to_world_coords` (`types.rs`): Converts screen coordinates to world coordinates.
-- `Camera2D::to_screen_coords` (`types.rs`): Converts world coordinates to screen coordinates.
-- `Camera2D::get_visible_area` (`types.rs`): Returns the world-space axis-aligned bounding box of the visible area
-- `Camera2D::set_dead_zone` (`types.rs`): Sets the dead zone half-extents.
-- `Camera2D::get_dead_zone` (`types.rs`): Returns the dead zone as `(width, height)` (full extents), if set.
-- `Camera2D::set_target` (`types.rs`): Sets the follow target position.
-- `Camera2D::get_target` (`types.rs`): Returns the current follow target, if any.
-- `Camera2D::clear_target` (`types.rs`): Clears the follow target so the camera stops tracking.
-- `Camera2D::set_follow_smooth` (`types.rs`): Sets the smooth follow interpolation speed.
-- `Camera2D::get_follow_smooth` (`types.rs`): Returns the smooth follow speed.
-- `Camera2D::set_look_ahead` (`types.rs`): Sets the look-ahead multiplier.
-- `Camera2D::get_look_ahead` (`types.rs`): Returns the look-ahead multiplier.
-- `Camera2D::shake` (`types.rs`): Starts a camera shake effect.
-- `Camera2D::update` (`types.rs`): Processes smooth follow, camera shake, and bounds clamping.
-- `Camera2D::effective_zoom` (`types.rs`): Returns the effective zoom level, combining the base zoom with active zoom pulse and breathing effect deltas.
-- `Camera2D::effect_offset` (`types.rs`): Returns the current world-space position offset contributed by the active sway effect as `(dx, dy)`.
-- `Camera2D::view_matrix` (`types.rs`): Computes the view matrix including the shake offset.
-- `Viewport::new` (`viewport.rs`): Create a viewport with the given game dimensions and scale mode.
-- `Viewport::resize` (`viewport.rs`): Recompute scale and offset based on the current window size.
-- `Viewport::get_scale` (`viewport.rs`): Current scale factors `(scale_x, scale_y)`.
-- `Viewport::get_offset` (`viewport.rs`): Current offset `(offset_x, offset_y)`.
-- `Viewport::get_game_dimensions` (`viewport.rs`): Game dimensions `(game_width, game_height)`.
-- `Viewport::get_scale_mode` (`viewport.rs`): Reference to the current scale mode.
-- `Viewport::set_scale_mode` (`viewport.rs`): Set the scale mode.
-- `Viewport::to_game` (`viewport.rs`): Convert screen coordinates to game coordinates.
-- `Viewport::to_screen` (`viewport.rs`): Convert game coordinates to screen coordinates.
-- `ViewportScale::new` (`viewport_scale.rs`): Create a viewport scale with the given game dimensions and mode.
-- `ViewportScale::resize` (`viewport_scale.rs`): Recompute all derived values from the current window size.
-- `ViewportScale::get_game_dimensions` (`viewport_scale.rs`): Game dimensions `(game_width, game_height)`.
-- `ViewportScale::get_scaled_dimensions` (`viewport_scale.rs`): Scaled content dimensions `(scaled_width, scaled_height)`.
-- `ViewportScale::get_offset` (`viewport_scale.rs`): Current offset `(offset_x, offset_y)`.
-- `ViewportScale::get_scale` (`viewport_scale.rs`): Current scale factors `(scale_x, scale_y)`.
-- `ViewportScale::get_mode` (`viewport_scale.rs`): Reference to the active scale mode.
-- `ViewportScale::to_game_coords` (`viewport_scale.rs`): Convert screen coordinates to game coordinates.
-- `ViewportScale::to_screen_coords` (`viewport_scale.rs`): Convert game coordinates to screen coordinates.
+- `ZoomPulse::new` (`effects.rs`): Create pulse state and return it with effect disabled.
+- `ZoomPulse::trigger` (`effects.rs`): Start a pulse and return once state is reset to frame zero.
+- `ZoomPulse::update` (`effects.rs`): Advance pulse time and return current zoom delta, returning zero when inactive.
+- `ZoomPulse::current_delta` (`effects.rs`): Read current pulse zoom delta and return zero when inactive.
+- `ZoomPulse::is_active` (`effects.rs`): Read active flag and return whether pulse contributes any offset.
+- `CameraSway::new` (`effects.rs`): Create sway state and return it with zero contribution.
+- `CameraSway::start` (`effects.rs`): Start sway motion and return after resetting phase and decay factor.
+- `CameraSway::stop` (`effects.rs`): Disable sway and return after clearing contribution factor.
+- `CameraSway::update` (`effects.rs`): Advance sway phase and return the current positional offset tuple.
+- `CameraSway::current_offset` (`effects.rs`): Read current sway offset and return zeros when inactive.
+- `CameraSway::is_active` (`effects.rs`): Read active flag and return whether sway contributes offset.
+- `CameraBreathing::new` (`effects.rs`): Create breathing state and return it with default tuning.
+- `CameraBreathing::start` (`effects.rs`): Start breathing and return after resetting phase.
+- `CameraBreathing::stop` (`effects.rs`): Disable breathing and return immediately.
+- `CameraBreathing::update` (`effects.rs`): Advance breathing phase and return current zoom delta.
+- `CameraBreathing::current_delta` (`effects.rs`): Read current breathing zoom delta and return zero when inactive.
+- `CameraBreathing::is_active` (`effects.rs`): Read active flag and return whether breathing contributes zoom.
+- `CameraRig2D::new` (`multi.rs`): Create an empty rig and return it with no registered cameras.
+- `CameraRig2D::has_camera` (`multi.rs`): Check camera presence by name and return true when it exists.
+- `CameraRig2D::remove_camera` (`multi.rs`): Remove camera by name and return true when an entry was removed.
+- `CameraRig2D::ensure_camera` (`multi.rs`): Return mutable camera by name, creating one with the provided viewport when missing.
+- `CameraRig2D::camera_mut` (`multi.rs`): Return mutable camera reference for a registered name, or none when absent.
+- `CameraRig2D::camera` (`multi.rs`): Return immutable camera reference for a registered name, or none when absent.
+- `CameraRig2D::apply_split_screen_layout` (`multi.rs`): Apply left-right split layout and return after updating both camera viewports.
+- `CameraRig2D::apply_minimap_layout` (`multi.rs`): Apply main-plus-minimap layout and return after updating camera viewports.
+- `CameraRig2D::apply_picture_in_picture_layout` (`multi.rs`): Apply picture-in-picture layout and return after clamping overlay viewport size.
+- `CameraRig2D::update_all` (`multi.rs`): Update every camera with delta time and return when all states are advanced.
+- `CameraRig2D::viewport_of` (`multi.rs`): Read viewport for named camera and return none when camera is missing.
+- `CameraRig2D::camera_names` (`multi.rs`): Return sorted camera names for deterministic iteration in callers.
+- `CameraPath::new` (`path.rs`): Create path state and return it with elapsed time reset to zero.
+- `CameraPath::update` (`path.rs`): Advance elapsed time and return interpolated waypoint coordinates while active.
+- `CameraPath::progress` (`path.rs`): Read normalized path progress and return value clamped to [0, 1].
+- `CameraPath::reset` (`path.rs`): Reset path timer and return after re-enabling active progression.
+- `CameraZoomTween::new` (`path.rs`): Create linear zoom tween and return initialized state.
+- `CameraZoomTween::new_with_easing` (`path.rs`): Create zoom tween with explicit easing and return initialized state.
+- `CameraZoomTween::update` (`path.rs`): Advance tween time and return current zoom value while active.
+- `CameraZoomTween::progress` (`path.rs`): Read normalized tween progress and return value clamped to [0, 1].
+- `Camera::append_begin_render_commands` (`render.rs`): Append camera begin-transform commands and return after extending output.
+- `Camera::begin_render_commands` (`render.rs`): Build begin-transform command list and return it for immediate submission.
+- `Camera::end_render_command` (`render.rs`): Return render command that restores transform stack after camera pass.
+- `Camera::generate_render_commands` (`render.rs`): Wrap scene commands with camera begin/end transforms and return combined list.
+- `Camera2D::append_begin_render_commands` (`render.rs`): Append 2D camera begin-transform commands and return after extending output.
+- `Camera2D::begin_render_commands` (`render.rs`): Build 2D begin-transform command list and return it for submission.
+- `Camera2D::end_render_command` (`render.rs`): Return render command that restores transform stack after 2D camera pass.
+- `Camera2D::generate_render_commands` (`render.rs`): Wrap scene commands with 2D camera transforms and return combined list.
+- `Camera::new` (`types.rs`): Create camera state and return it with provided transform values.
+- `Camera::view_matrix` (`types.rs`): Build camera view matrix and return world-to-view transform.
+- `Camera::set_position` (`types.rs`): Set camera position and return after replacing previous value.
+- `Camera::set_zoom` (`types.rs`): Set camera zoom and return after replacing previous value.
+- `Camera::set_rotation` (`types.rs`): Set camera rotation and return after replacing previous value.
+- `Camera2D::new` (`types.rs`): Create 2D camera state and return it for the provided viewport size.
+- `Camera2D::set_position` (`types.rs`): Set camera position from x/y values and return after update.
+- `Camera2D::get_position` (`types.rs`): Read camera position and return (x, y).
+- `Camera2D::set_zoom` (`types.rs`): Set zoom target and return after applying immediate mode when undamped.
+- `Camera2D::get_zoom` (`types.rs`): Read current zoom value and return scalar zoom.
+- `Camera2D::set_rotation` (`types.rs`): Set rotation target and return after applying immediate mode when undamped.
+- `Camera2D::get_rotation` (`types.rs`): Read current rotation value and return radians.
+- `Camera2D::set_follow_easing` (`types.rs`): Set follow easing mode and return after replacing previous mode.
+- `Camera2D::get_follow_easing` (`types.rs`): Read follow easing mode and return selected easing enum.
+- `Camera2D::set_zoom_constraints` (`types.rs`): Set zoom constraints and return after clamping current and target zoom.
+- `Camera2D::get_zoom_constraints` (`types.rs`): Read zoom constraints and return (min, max) options.
+- `Camera2D::set_zoom_damping` (`types.rs`): Set zoom damping coefficient and return after sync when damping is zero.
+- `Camera2D::get_zoom_damping` (`types.rs`): Read zoom damping coefficient and return normalized damping value.
+- `Camera2D::set_rotation_constraints` (`types.rs`): Set rotation constraints and return after clamping current and target rotation.
+- `Camera2D::get_rotation_constraints` (`types.rs`): Read rotation constraints and return (min, max) options.
+- `Camera2D::set_rotation_damping` (`types.rs`): Set rotation damping coefficient and return after sync when damping is zero.
+- `Camera2D::get_rotation_damping` (`types.rs`): Read rotation damping coefficient and return normalized damping value.
+- `Camera2D::preset_tight_follow` (`types.rs`): Apply tight-follow preset and return after updating follow parameters.
+- `Camera2D::preset_cinematic_follow` (`types.rs`): Apply cinematic-follow preset and return after updating follow parameters.
+- `Camera2D::preset_balanced_follow` (`types.rs`): Apply balanced-follow preset and return after updating follow parameters.
+- `Camera2D::preset_aggressive_follow` (`types.rs`): Apply aggressive-follow preset and return after updating follow parameters.
+- `Camera2D::on_window_resize` (`types.rs`): Resize viewport to window dimensions and return after clamping minimum size.
+- `Camera2D::on_window_resize_scaled` (`types.rs`): Resize viewport using scale mode and return after applying computed transform.
+- `Camera2D::set_viewport` (`types.rs`): Set viewport rectangle and return after replacing previous viewport.
+- `Camera2D::get_viewport` (`types.rs`): Read viewport rectangle and return (x, y, w, h).
+- `Camera2D::set_bounds` (`types.rs`): Set camera bounds rectangle and return after enabling bounds.
+- `Camera2D::get_bounds` (`types.rs`): Read camera bounds and return rectangle tuple when bounds exist.
+- `Camera2D::remove_bounds` (`types.rs`): Disable bounds constraint and return after clearing bounds.
+- `Camera2D::has_bounds` (`types.rs`): Check bounds presence and return true when bounds are enabled.
+- `Camera2D::move_by` (`types.rs`): Move camera by delta vector and return after updating position.
+- `Camera2D::look_at` (`types.rs`): Set camera position directly to target coordinates and return.
+- `Camera2D::to_world_coords` (`types.rs`): Convert screen coordinates to world coordinates and return mapped pair.
+- `Camera2D::to_screen_coords` (`types.rs`): Convert world coordinates to screen coordinates and return mapped pair.
+- `Camera2D::get_visible_area` (`types.rs`): Compute visible world rectangle and return (x, y, w, h).
+- `Camera2D::set_dead_zone` (`types.rs`): Set dead-zone size and return after storing half-extents.
+- `Camera2D::get_dead_zone` (`types.rs`): Read dead-zone size and return full extents when configured.
+- `Camera2D::set_target` (`types.rs`): Set follow target and return after enabling target tracking.
+- `Camera2D::get_target` (`types.rs`): Read follow target and return (x, y) when target exists.
+- `Camera2D::clear_target` (`types.rs`): Disable target tracking and return after clearing target state.
+- `Camera2D::set_follow_smooth` (`types.rs`): Set follow smoothing scalar and return after clamping to non-negative.
+- `Camera2D::get_follow_smooth` (`types.rs`): Read follow smoothing scalar and return configured value.
+- `Camera2D::set_look_ahead` (`types.rs`): Set look-ahead multiplier and return after replacing previous value.
+- `Camera2D::get_look_ahead` (`types.rs`): Read look-ahead multiplier and return configured value.
+- `Camera2D::shake` (`types.rs`): Start shake effect and return after configuring timer and intensity.
+- `Camera2D::get_shake_offset` (`types.rs`): Read current shake offset and return (x, y).
+- `Camera2D::update` (`types.rs`): Advance camera simulation and return after follow, bounds, shake, and damping updates.
+- `Camera2D::effective_zoom` (`types.rs`): Read zoom including active effects and return effective zoom value.
+- `Camera2D::effect_offset` (`types.rs`): Read active effect offset and return sway contribution tuple.
+- `Camera2D::render_offset` (`types.rs`): Read render offset and return sum of sway and shake offsets.
+- `Camera2D::view_matrix` (`types.rs`): Build view matrix from camera state and return world-to-view transform.
+- `ScaleMode::compute_transforms` (`viewport.rs`): Compute scale and offset transforms and return (sx, sy, ox, oy).
+- `Viewport::new` (`viewport.rs`): Create viewport state and return it with identity scaling.
+- `Viewport::resize` (`viewport.rs`): Recompute scale and offsets from window size and return after updating state.
+- `Viewport::get_scale` (`viewport.rs`): Read current scale factors and return (scale_x, scale_y).
+- `Viewport::get_offset` (`viewport.rs`): Read current screen offsets and return (offset_x, offset_y).
+- `Viewport::get_game_dimensions` (`viewport.rs`): Read configured game dimensions and return (width, height).
+- `Viewport::get_scale_mode` (`viewport.rs`): Read active scale mode and return immutable reference to mode.
+- `Viewport::set_scale_mode` (`viewport.rs`): Set active scale mode and return after replacing previous mode.
+- `Viewport::to_game` (`viewport.rs`): Convert screen coordinates to game coordinates and return mapped pair.
+- `Viewport::to_screen` (`viewport.rs`): Convert game coordinates to screen coordinates and return mapped pair.
+- `ViewportScale::new` (`viewport_scale.rs`): Create viewport scale state and return it with identity transforms.
+- `ViewportScale::resize` (`viewport_scale.rs`): Recompute transforms from window dimensions and return after updating fields.
+- `ViewportScale::get_game_dimensions` (`viewport_scale.rs`): Read logical game dimensions and return (width, height).
+- `ViewportScale::get_scaled_dimensions` (`viewport_scale.rs`): Read scaled dimensions and return (scaled_width, scaled_height).
+- `ViewportScale::get_offset` (`viewport_scale.rs`): Read viewport offset and return (offset_x, offset_y).
+- `ViewportScale::get_scale` (`viewport_scale.rs`): Read scale factors and return (scale_x, scale_y).
+- `ViewportScale::get_mode` (`viewport_scale.rs`): Read active scale mode and return immutable reference to it.
+- `ViewportScale::to_game_coords` (`viewport_scale.rs`): Convert screen coordinates into game-space coordinates and return mapped pair.
+- `ViewportScale::to_screen_coords` (`viewport_scale.rs`): Convert game coordinates into screen-space coordinates and return mapped pair.
 
 ## Lua API Reference
 
@@ -190,58 +225,98 @@ Rig: `newRig()`, `LCameraRig:splitScreen()`, `LCameraRig:minimap()`, `LCameraRig
 - Namespace: `lurek.camera`
 
 ### Module Functions
-- `lurek.camera.new`: Creates a new Camera2D with the given viewport dimensions.
-- `lurek.camera.newCamera`: Creates a new 2D camera with the given viewport dimensions.
-- `lurek.camera.newRig`: Creates a new multi-camera rig object.
+- `lurek.camera.new`: Creates a 2D camera with optional virtual viewport size.
+- `lurek.camera.newCamera`: Creates a 2D camera with optional virtual viewport size.
+- `lurek.camera.newRig`: Creates an empty named camera rig.
 
 ### `LCamera` Methods
-- `LCamera:setPosition`: Sets the camera's world-space position to the given coordinates.
-- `LCamera:getPosition`: Returns the camera's current world-space position as two values.
-- `LCamera:setZoom`: Sets the camera's uniform zoom factor.
-- `LCamera:getZoom`: Returns the camera's current base zoom factor (before any pulse or breathing effect is applied).
-- `LCamera:setRotation`: Sets the camera rotation angle in radians.
-- `LCamera:getRotation`: Returns the camera's current rotation angle in radians.
-- `LCamera:setViewport`: Sets the screen-space viewport rectangle in pixels.
-- `LCamera:getViewport`: Returns the current screen-space viewport rectangle as four values.
-- `LCamera:setBounds`: Sets world-space rectangular bounds that clamp the camera position.
-- `LCamera:removeBounds`: Removes previously set world-space bounds, allowing the camera to move freely in any direction without clamping.
-- `LCamera:setTarget`: Sets the follow target position in world space.
-- `LCamera:clearTarget`: Clears the follow target so the camera stops tracking any position.
-- `LCamera:setFollowSmooth`: Sets the follow interpolation speed for smooth camera tracking.
-- `LCamera:setDeadZone`: Sets the dead zone half-extents for camera follow.
-- `LCamera:setLookAhead`: Sets the look-ahead multiplier for predictive camera follow.
-- `LCamera:shake`: Starts a screen-shake effect with the given intensity and duration.
-- `LCamera:update`: Advances the camera simulation by `dt` seconds.
-- `LCamera:toWorld`: Converts screen-space pixel coordinates to world-space coordinates accounting for the camera's position, zoom, rotation, and viewport.
-- `LCamera:toScreen`: Converts world-space coordinates to screen-space pixel coordinates accounting for the camera's position, zoom, rotation, and viewport.
-- `LCamera:getVisibleArea`: Returns the axis-aligned bounding rectangle of the currently visible world area as four values.
-- `LCamera:lookAt`: Instantly snaps the camera to look at the given world-space position.
-- `LCamera:move`: Translates the camera by the given delta in world space.
-- `LCamera:followPath`: Animates the camera along a sequence of world-space waypoints over the given duration (seconds).
-- `LCamera:stopPath`: Cancels the active camera path animation immediately, leaving the camera at its current position along the path.
-- `LCamera:updatePath`: Advances the path animation by `dt` seconds and applies the resulting position to the camera.
-- `LCamera:pathProgress`: Returns the fractional progress `[0, 1]` of the active path, or `1` if no path is running.
-- `LCamera:zoomTo`: Smoothly tweens the camera zoom from its current level to `target_zoom` over `duration` seconds.
-- `LCamera:stopZoom`: Cancels the active smooth zoom tween immediately, leaving the camera at its current zoom level.
-- `LCamera:updateZoom`: Advances the zoom tween by `dt` seconds and applies the resulting zoom level to the camera.
-- `LCamera:setParallaxFactor`: Sets the parallax scroll factor for the named render layer.
-- `LCamera:getParallaxFactor`: Returns the parallax scroll factor for the named render layer.
-- `LCamera:clearParallaxFactors`: Removes all parallax factor overrides, resetting every layer to the default factor of 1.0 (no parallax).
-- `LCamera:apply`: Applies this camera's transform to the render stack.
-- `LCamera:reset`: Pops the camera transform from the render stack.
-- `LCamera:attach`: Alias for `apply()` that queues this camera's transform onto the render command stack.
-- `LCamera:detach`: Alias for `reset()` that removes this camera's transform from the render command stack.
-- `LCamera:zoomPulse`: Triggers a momentary zoom-in effect that decays back to the base zoom level via a sine envelope.
-- `LCamera:startSway`: Starts a sinusoidal x/y offset oscillation for ambient camera motion (e.g.
-- `LCamera:stopSway`: Stops the active sway oscillation effect immediately, resetting the camera's offset back to zero.
-- `LCamera:isSway`: Returns true if the sway oscillation effect is currently running.
-- `LCamera:startBreathing`: Starts a subtle periodic zoom oscillation that gives the camera a "living" feel, as if the viewport is gently breathing.
-- `LCamera:stopBreathing`: Stops the active breathing zoom oscillation effect immediately.
-- `LCamera:isBreathing`: Returns true if the breathing zoom oscillation is currently active.
-- `LCamera:getEffectiveZoom`: Returns the current zoom level including contributions from zoom pulse and breathing effects on top of the base zoom factor.
-- `LCamera:getEffectOffset`: Returns the current world-space x/y offset contributed by the sway and shake effects.
-- `LCamera:type`: Returns the string type name of this userdata object.
-- `LCamera:typeOf`: Checks whether this object matches the given type name.
+- `LCamera:setPosition`: Sets the camera world position.
+- `LCamera:getPosition`: Returns the camera world position.
+- `LCamera:setZoom`: Sets the camera zoom factor.
+- `LCamera:getZoom`: Returns the camera zoom factor.
+- `LCamera:setRotation`: Sets the camera rotation.
+- `LCamera:getRotation`: Returns the camera rotation.
+- `LCamera:setViewport`: Sets the camera viewport rectangle.
+- `LCamera:getViewport`: Returns the camera viewport rectangle.
+- `LCamera:getBounds`: Returns camera bounds with a leading availability flag.
+- `LCamera:hasBounds`: Returns whether camera bounds are active.
+- `LCamera:setBounds`: Sets camera world bounds.
+- `LCamera:removeBounds`: Removes active camera bounds.
+- `LCamera:setTarget`: Sets a world-space follow target.
+- `LCamera:getTarget`: Returns the follow target with a leading availability flag.
+- `LCamera:clearTarget`: Clears the follow target.
+- `LCamera:setFollowSmooth`: Sets follow smoothing speed.
+- `LCamera:getFollowSmooth`: Returns follow smoothing speed.
+- `LCamera:setFollowEasing`: Sets target follow easing mode.
+- `LCamera:getFollowEasing`: Returns target follow easing mode.
+- `LCamera:setDeadZone`: Sets follow dead-zone dimensions.
+- `LCamera:getDeadZone`: Returns follow dead-zone dimensions with a leading availability flag.
+- `LCamera:setLookAhead`: Sets follow look-ahead multiplier.
+- `LCamera:getLookAhead`: Returns follow look-ahead multiplier.
+- `LCamera:onWindowResize`: Updates camera viewport state after a window resize.
+- `LCamera:onWindowResizeScaled`: Updates camera viewport state using a virtual game size and scale mode.
+- `LCamera:shake`: Starts a camera shake effect.
+- `LCamera:update`: Advances camera follow, shake, and effect state.
+- `LCamera:toWorld`: Converts screen coordinates to world coordinates.
+- `LCamera:toScreen`: Converts world coordinates to screen coordinates.
+- `LCamera:getVisibleArea`: Returns the world-space area visible through this camera.
+- `LCamera:lookAt`: Centers the camera on a world position.
+- `LCamera:move`: Moves the camera by a delta.
+- `LCamera:followPath`: Starts camera movement along an array of waypoint tables.
+- `LCamera:stopPath`: Stops the active camera path.
+- `LCamera:updatePath`: Advances the active camera path and applies its position.
+- `LCamera:pathProgress`: Returns active path progress.
+- `LCamera:zoomTo`: Starts a zoom tween toward a target zoom factor.
+- `LCamera:stopZoom`: Stops the active zoom tween.
+- `LCamera:updateZoom`: Advances the active zoom tween and applies its zoom value.
+- `LCamera:setParallaxFactor`: Sets a parallax factor for a named layer.
+- `LCamera:getParallaxFactor`: Returns a parallax factor for a named layer.
+- `LCamera:clearParallaxFactors`: Clears all layer parallax factor overrides.
+- `LCamera:apply`: Appends render commands that apply this camera transform.
+- `LCamera:reset`: Appends a render command that removes the active camera transform.
+- `LCamera:attach`: Appends render commands that attach this camera transform.
+- `LCamera:detach`: Appends a render command that detaches the active camera transform.
+- `LCamera:zoomPulse`: Triggers a temporary zoom pulse effect.
+- `LCamera:startSway`: Starts camera sway offset animation.
+- `LCamera:stopSway`: Stops camera sway offset animation.
+- `LCamera:isSway`: Returns whether camera sway is active.
+- `LCamera:startBreathing`: Starts subtle breathing zoom animation.
+- `LCamera:stopBreathing`: Stops breathing zoom animation.
+- `LCamera:isBreathing`: Returns whether breathing zoom animation is active.
+- `LCamera:getEffectiveZoom`: Returns zoom after camera effects are applied.
+- `LCamera:getEffectOffset`: Returns combined camera effect offset.
+- `LCamera:getShakeOffset`: Returns current camera shake offset.
+- `LCamera:getRenderOffset`: Returns current render offset after camera effects.
+- `LCamera:setZoomConstraints`: Sets optional minimum and maximum zoom constraints.
+- `LCamera:getZoomConstraints`: Returns zoom constraints with availability flags.
+- `LCamera:setZoomDamping`: Sets zoom damping.
+- `LCamera:getZoomDamping`: Returns zoom damping.
+- `LCamera:setRotationConstraints`: Sets optional minimum and maximum rotation constraints.
+- `LCamera:getRotationConstraints`: Returns rotation constraints with availability flags.
+- `LCamera:setRotationDamping`: Sets rotation damping.
+- `LCamera:getRotationDamping`: Returns rotation damping.
+- `LCamera:presetTightFollow`: Applies the tight follow camera preset.
+- `LCamera:presetCinematicFollow`: Applies the cinematic follow camera preset.
+- `LCamera:presetBalancedFollow`: Applies the balanced follow camera preset.
+- `LCamera:presetAggressiveFollow`: Applies the aggressive follow camera preset.
+- `LCamera:type`: Returns the Lua-visible type name for this camera handle.
+- `LCamera:typeOf`: Returns whether this camera handle matches a supported type name.
+
+### `LCameraRig` Methods
+- `LCameraRig:splitScreen`: Applies a split-screen layout using the current window size.
+- `LCameraRig:minimap`: Applies a minimap layout using the current window size and optional ratio.
+- `LCameraRig:pictureInPicture`: Applies a picture-in-picture layout using optional inset size.
+- `LCameraRig:setPosition`: Sets the position of a named rig camera, creating it if needed.
+- `LCameraRig:setZoom`: Sets the zoom of a named rig camera, creating it if needed.
+- `LCameraRig:setTarget`: Sets the follow target of a named rig camera, creating it if needed.
+- `LCameraRig:updateAll`: Advances every camera in this rig.
+- `LCameraRig:apply`: Appends render commands for a named camera in this rig.
+- `LCameraRig:getViewport`: Returns a named rig camera viewport with a leading availability flag.
+- `LCameraRig:names`: Returns all camera names in this rig.
+- `LCameraRig:remove`: Removes a named camera from this rig.
+- `LCameraRig:has`: Returns whether this rig contains a named camera.
+- `LCameraRig:type`: Returns the Lua-visible type name for this camera rig handle.
+- `LCameraRig:typeOf`: Returns whether this camera rig handle matches a supported type name.
 
 ## References
 

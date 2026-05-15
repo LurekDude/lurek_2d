@@ -163,7 +163,7 @@ impl InputRecorder {
         }
     }
 
-    /// Stop playback immediately.
+    /// Stop playback immediately. This function is part of the public API.
     pub fn stop_playback(&mut self) {
         self.playing = false;
     }

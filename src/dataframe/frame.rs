@@ -26,7 +26,7 @@ pub enum CellValue {
     Bool(bool),
 }
 impl CellValue {
-    /// Return true when cell is nil.
+    /// Return true when cell is nil. This function is part of the public API.
     pub fn is_nil(&self) -> bool {
         matches!(self, CellValue::Nil)
     }
@@ -136,7 +136,7 @@ pub struct Database {
     tables: HashMap<String, DataFrame>,
 }
 impl DataFrame {
-    /// Create empty dataframe.
+    /// Create empty dataframe. This function is part of the public API.
     pub fn new() -> Self {
         log::debug!("dataframe: new empty DataFrame created");
         Self {
@@ -144,7 +144,7 @@ impl DataFrame {
             data: Vec::new(),
         }
     }
-    /// Return number of rows.
+    /// Return number of rows. This function is part of the public API.
     pub fn nrows(&self) -> usize {
         if self.data.is_empty() {
             0
@@ -152,7 +152,7 @@ impl DataFrame {
             self.data[0].len()
         }
     }
-    /// Return number of columns.
+    /// Return number of columns. This function is part of the public API.
     pub fn ncols(&self) -> usize {
         self.column_names.len()
     }
@@ -160,7 +160,7 @@ impl DataFrame {
     pub fn columns(&self) -> &[String] {
         &self.column_names
     }
-    /// Return row count alias.
+    /// Return row count alias. This function is part of the public API.
     pub fn count(&self) -> usize {
         self.nrows()
     }
@@ -194,14 +194,14 @@ impl DataFrame {
         self.data.push(vec![default; n]);
         Ok(())
     }
-    /// Remove selected column.
+    /// Remove selected column. This function is part of the public API.
     pub fn remove_column(&mut self, col: ColRef) -> Result<(), String> {
         let idx = self.resolve_col(col)?;
         self.column_names.remove(idx);
         self.data.remove(idx);
         Ok(())
     }
-    /// Rename selected column.
+    /// Rename selected column. This function is part of the public API.
     pub fn rename_column(&mut self, col: ColRef, new_name: &str) -> Result<(), String> {
         let idx = self.resolve_col(col)?;
         if self.column_names.contains(&new_name.to_string()) {
@@ -236,7 +236,7 @@ impl DataFrame {
         }
         row_idx
     }
-    /// Remove row by index.
+    /// Remove row by index. This function is part of the public API.
     pub fn remove_row(&mut self, row: usize) -> Result<(), String> {
         let n = self.nrows();
         if row >= n {
@@ -286,7 +286,7 @@ impl DataFrame {
         self.data[ci][row] = val;
         Ok(())
     }
-    /// Clone dataframe deeply.
+    /// Clone dataframe deeply. This function is part of the public API.
     pub fn clone_df(&self) -> DataFrame {
         DataFrame {
             column_names: self.column_names.clone(),
@@ -819,7 +819,7 @@ impl Default for DataFrame {
     }
 }
 impl Database {
-    /// Create empty database.
+    /// Create empty database. This function is part of the public API.
     pub fn new() -> Self {
         Self {
             tables: HashMap::new(),
@@ -837,7 +837,7 @@ impl Database {
     pub fn get_table_mut(&mut self, name: &str) -> Option<&mut DataFrame> {
         self.tables.get_mut(name)
     }
-    /// Remove table by name.
+    /// Remove table by name. This function is part of the public API.
     pub fn remove_table(&mut self, name: &str) -> Result<(), String> {
         if self.tables.remove(name).is_none() {
             return Err(format!("table not found: {name}"));
@@ -854,11 +854,11 @@ impl Database {
         names.sort();
         names
     }
-    /// Return number of tables.
+    /// Return number of tables. This function is part of the public API.
     pub fn table_count(&self) -> usize {
         self.tables.len()
     }
-    /// Remove all tables.
+    /// Remove all tables. This function is part of the public API.
     pub fn clear(&mut self) {
         self.tables.clear();
     }
@@ -868,7 +868,7 @@ impl Database {
             self.tables.insert(name, df);
         }
     }
-    /// Clone database deeply.
+    /// Clone database deeply. This function is part of the public API.
     pub fn clone_db(&self) -> Database {
         let mut db = Database::new();
         for (name, df) in &self.tables {

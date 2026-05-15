@@ -158,7 +158,7 @@ impl LuaUserData for LuaRingBuffer {
         /// @return | integer | Current buffer length.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len() as i64));
         // -- capacity --
-        /// Returns the ring buffer capacity.
+        /// Returns the ring buffer capacity. This method is available to Lua scripts.
         /// @return | integer | Maximum number of stored values.
         methods.add_method("capacity", |_, this, ()| Ok(this.capacity as i64));
         // -- isEmpty --
@@ -524,7 +524,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- encodeToml --
-    /// Encodes a Lua table into TOML text.
+    /// Encodes a Lua table into TOML text. This function is exposed to Lua scripts.
     /// @param | tbl | table | Lua table to encode as TOML.
     /// @return | string | TOML document text.
     tbl.set(
@@ -748,7 +748,7 @@ pub struct LuaDataWriter {
 impl LuaUserData for LuaDataWriter {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- writeU8 --
-        /// Writes an unsigned 8-bit integer.
+        /// Writes an unsigned 8-bit integer. This method is available to Lua scripts.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeU8", |_, this, v: u8| {
@@ -756,7 +756,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeI8 --
-        /// Writes a signed 8-bit integer.
+        /// Writes a signed 8-bit integer. This method is available to Lua scripts.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeI8", |_, this, v: i8| {
@@ -836,7 +836,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- seek --
-        /// Moves the writer cursor.
+        /// Moves the writer cursor. This method is available to Lua scripts.
         /// @param | pos | integer | New cursor position in bytes.
         /// @return | nil | No value is returned.
         methods.add_method_mut("seek", |_, this, pos: usize| {
@@ -848,7 +848,7 @@ impl LuaUserData for LuaDataWriter {
         /// @return | integer | Current cursor position in bytes.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.tell()));
         // -- len --
-        /// Returns the writer buffer length.
+        /// Returns the writer buffer length. This method is available to Lua scripts.
         /// @return | integer | Buffer length in bytes.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
         // -- toBytes --
@@ -874,7 +874,7 @@ impl LuaUserData for LuaDataWriter {
 impl mlua::UserData for ByteData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getSize --
-        /// Returns the byte buffer length.
+        /// Returns the byte buffer length. This method is available to Lua scripts.
         /// @return | integer | Buffer length in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.len()));
         // -- getString --
@@ -911,7 +911,7 @@ impl mlua::UserData for ByteData {
             }
         });
         // -- clone --
-        /// Returns a copy of this byte buffer.
+        /// Returns a copy of this byte buffer. This method is available to Lua scripts.
         /// @return | ByteData | New ByteData userdata containing copied bytes.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(this.clone_data())
@@ -949,7 +949,7 @@ impl mlua::UserData for ByteData {
             },
         );
         // -- getBit --
-        /// Reads one bit inside a byte.
+        /// Reads one bit inside a byte. This method is available to Lua scripts.
         /// @param | byte_offset | integer | Zero-based byte offset.
         /// @param | bit_offset | integer | Bit offset from 0 to 7 inside the byte.
         /// @return | boolean | True when the bit is set.

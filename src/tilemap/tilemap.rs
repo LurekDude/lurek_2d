@@ -320,7 +320,7 @@ impl TileMap {
             ty as f32 * self.tile_height as f32,
         )
     }
-    /// Return tile width in pixels.
+    /// Return tile width in pixels. This function is part of the public API.
     pub fn get_tile_width(&self) -> u32 {
         self.tile_width
     }
@@ -336,11 +336,11 @@ impl TileMap {
     pub fn get_chunk_size(&self) -> u32 {
         self.chunk_size
     }
-    /// Return the map orientation.
+    /// Return the map orientation. This function is part of the public API.
     pub fn get_orientation(&self) -> MapOrientation {
         self.orientation
     }
-    /// Set the map orientation.
+    /// Set the map orientation. This function is part of the public API.
     pub fn set_orientation(&mut self, orientation: MapOrientation) {
         self.orientation = orientation;
     }

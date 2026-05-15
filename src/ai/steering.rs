@@ -342,7 +342,7 @@ impl SteeringManager {
         self.last_force = combined;
         combined
     }
-    /// Add a seek behavior.
+    /// Add a seek behavior. This function is part of the public API.
     pub fn add_seek(&mut self, tx: f32, ty: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Seek {
             target: (tx, ty),
@@ -352,7 +352,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add a flee behavior.
+    /// Add a flee behavior. This function is part of the public API.
     pub fn add_flee(&mut self, tx: f32, ty: f32, panic_dist: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flee {
             target: (tx, ty),
@@ -363,7 +363,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add an arrive behavior.
+    /// Add an arrive behavior. This function is part of the public API.
     pub fn add_arrive(&mut self, tx: f32, ty: f32, slowing_radius: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Arrive {
             target: (tx, ty),
@@ -374,7 +374,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add a wander behavior.
+    /// Add a wander behavior. This function is part of the public API.
     pub fn add_wander(&mut self, radius: f32, distance: f32, jitter: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Wander {
             wander_radius: radius,
@@ -387,7 +387,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add a pursue behavior.
+    /// Add a pursue behavior. This function is part of the public API.
     pub fn add_pursue(&mut self, target_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Pursue {
             target_name,
@@ -397,7 +397,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add an evade behavior.
+    /// Add an evade behavior. This function is part of the public API.
     pub fn add_evade(&mut self, threat_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Evade {
             threat_name,
@@ -407,7 +407,7 @@ impl SteeringManager {
             },
         });
     }
-    /// Add a flock behavior.
+    /// Add a flock behavior. This function is part of the public API.
     pub fn add_flock(&mut self, neighbor_radius: f32, sep: f32, align: f32, coh: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flock {
             neighbor_radius,

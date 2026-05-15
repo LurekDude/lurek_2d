@@ -103,7 +103,7 @@ impl LuaUserData for LuaArray {
         /// @return | integer | Element count.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.size()));
         // -- getDataType --
-        /// Returns the array data type name.
+        /// Returns the array data type name. This method is available to Lua scripts.
         /// @return | string | Data type name such as `float32`.
         methods.add_method("getDataType", |_, this, ()| {
             Ok(this.inner.dtype().name().to_string())
@@ -168,7 +168,7 @@ impl LuaUserData for LuaArray {
             lua.create_userdata(LuaArray { inner: result })
         });
         // -- clone --
-        /// Returns a copy of this array.
+        /// Returns a copy of this array. This method is available to Lua scripts.
         /// @return | LArray | New array with copied data and shape.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(LuaArray {
@@ -376,7 +376,7 @@ impl LuaUserData for LuaArray {
             },
         );
         // -- countNonZero --
-        /// Counts non-zero elements.
+        /// Counts non-zero elements. This method is available to Lua scripts.
         /// @return | integer | Number of non-zero elements.
         methods.add_method("countNonZero", |_, this, ()| {
             Ok(ops::count_nonzero(&this.inner))
@@ -977,7 +977,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- rotate2dMatrix --
-    /// Creates a 2D rotation matrix.
+    /// Creates a 2D rotation matrix. This function is exposed to Lua scripts.
     /// @param | angle_rad | number | Rotation angle in radians.
     /// @return | LArray | New rotation matrix array.
     tbl.set(

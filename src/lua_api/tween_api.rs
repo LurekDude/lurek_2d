@@ -52,6 +52,7 @@ impl LuaUserData for LuaTweenState {
 
         // -- reset --
         /// Resets the tween state to the beginning so it can be replayed.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
             Ok(())
@@ -79,7 +80,9 @@ pub struct LuaSpring {
     pub field_names: Vec<String>,
     pub active: bool,
 }
+
 impl LuaSpring {
+    /// Advances the spring simulation and writes updated axis values back into the target table.
     pub fn tick_with(&mut self, lua: &Lua, dt: f64) -> LuaResult<bool> {
         self.system.update(dt as f32);
         if let Some(ref tgt_key) = self.target_table_key {
@@ -108,6 +111,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- update --
     /// Advances all active tweens, sequences, parallels, and springs by the given delta time. Call once per frame.
     /// @param | dt | number | Delta time in seconds since the last frame.
+    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "update",
@@ -227,6 +231,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- cancelAll --
     /// Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine.
+    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "cancelAll",
@@ -259,6 +264,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Registers a custom easing function by name. The function receives a progress value (0..1) and must return an eased value.
     /// @param | name | string | Unique name for the custom easing.
     /// @param | f | function | Easing function `f(t) -> number` where t is 0..1.
+    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "registerEasing",
@@ -488,6 +494,8 @@ impl LuaUserData for LuaTween {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- cancel --
         /// Cancels this tween immediately, fires the onCancel callback if set, and resumes any coroutines waiting on it.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @return | nil | No return value.
         methods.add_function("cancel", |lua, ud: LuaAnyUserData| {
             let mut tw = ud.borrow_mut::<LuaTween>()?;
             tw.active = false;
@@ -503,6 +511,7 @@ impl LuaUserData for LuaTween {
 
         // -- pause --
         /// Pauses this tween so it stops advancing until resumed.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("pause", |_, this, ()| {
             this.paused = true;
             Ok(())
@@ -510,6 +519,7 @@ impl LuaUserData for LuaTween {
 
         // -- resume --
         /// Resumes a paused tween so it continues advancing.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("resume", |_, this, ()| {
             this.paused = false;
             Ok(())
@@ -552,13 +562,15 @@ impl LuaUserData for LuaTween {
         // -- setRelative --
         /// Sets whether the tween end values are relative to the start values instead of absolute.
         /// @param | enabled | boolean | `true` for relative mode, `false` for absolute.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setRelative", |_, this, enabled: bool| {
             this.set_relative(enabled);
             Ok(())
         });
         // -- relative --
         /// Chainable version of `setRelative`. Returns the tween for fluent API usage.
-        /// @param | enabled | boolean | `true` for relative mode.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | enabled | boolean | Boolean flag that controls `enabled`.
         /// @return | LTween | The same tween handle for chaining.
         methods.add_function("relative", |_, (ud, enabled): (LuaAnyUserData, bool)| {
             ud.borrow_mut::<LuaTween>()?.set_relative(enabled);
@@ -567,6 +579,8 @@ impl LuaUserData for LuaTween {
 
         // -- await --
         /// Yields the current coroutine until this tween completes or is cancelled. Must be called from inside a coroutine.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @return | nil | No return value.
         methods.add_function("await", |lua, ud: LuaAnyUserData| {
             let co_tbl: LuaTable = lua.globals().get("coroutine")?;
             let running_fn: LuaFunction = co_tbl.get("running")?;
@@ -590,6 +604,7 @@ impl LuaUserData for LuaTween {
         // -- setRepeat --
         /// Sets how many times the tween should repeat after the first play. Use -1 for infinite repeat.
         /// @param | n | number | Number of additional repeats (0 = play once, -1 = infinite).
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setRepeat", |_, this, n: i32| {
             this.repeat_count = n;
             this.cycles_remaining = n;
@@ -598,10 +613,15 @@ impl LuaUserData for LuaTween {
         // -- setYoyo --
         /// Enables or disables yoyo mode, which reverses the tween direction on each repeat cycle.
         /// @param | enabled | boolean | `true` to enable yoyo, `false` to disable.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setYoyo", |_, this, enabled: bool| {
             this.yoyo = enabled;
             Ok(())
         });
+        /// On complete on this LTween object. This method is available to Lua scripts.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
+        /// @return | table | Table result returned by this call.
         methods.add_function(
             "onComplete",
             |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
@@ -618,7 +638,8 @@ impl LuaUserData for LuaTween {
 
         // -- onUpdate --
         /// Sets a callback to fire every frame while the tween is active. Returns the tween for chaining.
-        /// @param | f | function | Callback invoked each frame.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
         /// @return | LTween | The same tween handle for chaining.
         methods.add_function("onUpdate", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -633,7 +654,8 @@ impl LuaUserData for LuaTween {
 
         // -- onCancel --
         /// Sets a callback to fire when the tween is cancelled. Returns the tween for chaining.
-        /// @param | f | function | Callback invoked on cancellation.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
         /// @return | LTween | The same tween handle for chaining.
         methods.add_function("onCancel", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -705,8 +727,9 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- delay --
         /// Appends a delay step to this sequence. Optionally fires a callback when the delay elapses.
-        /// @param | seconds | number | Duration to wait in seconds.
-        /// @param | cb | ?function | Optional callback fired after the delay.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | seconds | number | Lua argument for `seconds`.
+        /// @param | cb | function? | Lua argument for `cb`.
         /// @return | LTweenSequence | This sequence for chaining.
         methods.add_function(
             "delay",
@@ -729,7 +752,8 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- callback --
         /// Appends a callback step to this sequence that fires when reached during playback.
-        /// @param | f | function | Callback to invoke.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
         /// @return | LTweenSequence | This sequence for chaining.
         methods.add_function("callback", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
@@ -741,6 +765,7 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- start --
         /// Starts playback of this sequence from the first step.
+        /// @param | ud | userdata | Lua argument for `ud`.
         /// @return | LTweenSequence | This sequence for chaining.
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenSequence>()?.active = true;
@@ -749,6 +774,7 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- cancel --
         /// Cancels this sequence immediately and resumes any coroutines waiting on it.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
             this.resume_waiters(lua)?;
@@ -767,6 +793,8 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- await --
         /// Yields the current coroutine until this sequence completes or is cancelled. Must be called from inside a coroutine.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @return | nil | No return value.
         methods.add_function("await", |lua, ud: LuaAnyUserData| {
             let co_tbl: LuaTable = lua.globals().get("coroutine")?;
             let running_fn: LuaFunction = co_tbl.get("running")?;
@@ -790,7 +818,8 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- onComplete --
         /// Sets a callback to fire when the sequence finishes all steps. Returns the sequence for chaining.
-        /// @param | f | function | Callback invoked on completion.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
         /// @return | LTweenSequence | This sequence for chaining.
         methods.add_function(
             "onComplete",
@@ -824,7 +853,9 @@ impl LuaUserData for LuaTweenParallel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Adds an existing tween handle to this parallel group. The tween becomes owned by the group.
-        /// @param | tween | LTween | An active tween to run in parallel.
+        /// @param | par_ud | userdata | Lua argument for `par_ud`.
+        /// @param | tw_ud | userdata | Lua argument for `tw_ud`.
+        /// @return | nil | No return value.
         methods.add_function(
             "add",
             |lua, (par_ud, tw_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -893,6 +924,7 @@ impl LuaUserData for LuaTweenParallel {
 
         // -- start --
         /// Starts all tweens in this parallel group simultaneously.
+        /// @param | ud | userdata | Lua argument for `ud`.
         /// @return | LTweenParallel | This parallel group for chaining.
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenParallel>()?.active = true;
@@ -901,6 +933,7 @@ impl LuaUserData for LuaTweenParallel {
 
         // -- cancel --
         /// Cancels all tweens in this parallel group immediately.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |_, this, ()| {
             this.active = false;
             Ok(())
@@ -913,7 +946,8 @@ impl LuaUserData for LuaTweenParallel {
 
         // -- onComplete --
         /// Sets a callback to fire when all tweens in this parallel group have finished. Returns the group for chaining.
-        /// @param | f | function | Callback invoked on completion.
+        /// @param | ud | userdata | Lua argument for `ud`.
+        /// @param | f | function | Lua argument for `f`.
         /// @return | LTweenParallel | This parallel group for chaining.
         methods.add_function(
             "onComplete",
@@ -969,6 +1003,7 @@ impl LuaUserData for LuaSpring {
         // -- setTarget --
         /// Changes the spring target values for one or more axes. Re-activates the spring if it was settled.
         /// @param | fields | table | Key-value pairs mapping axis names to new target values.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setTarget", |_, this, fields_tbl: LuaTable| {
             for pair in fields_tbl.pairs::<String, f64>() {
                 let (k, v) = pair?;
@@ -983,6 +1018,7 @@ impl LuaUserData for LuaSpring {
         // -- setStiffness --
         /// Sets the spring stiffness for all axes. Higher values make the spring snap faster.
         /// @param | value | number | Stiffness coefficient (default 100).
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setStiffness", |_, this, value: f32| {
             this.system.stiffness = value;
             for axis in this.system.axes.values_mut() {
@@ -994,6 +1030,7 @@ impl LuaUserData for LuaSpring {
         // -- setDamping --
         /// Sets the spring damping for all axes. Higher values reduce oscillation and overshoot.
         /// @param | value | number | Damping coefficient (default 10).
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setDamping", |_, this, value: f32| {
             this.system.damping = value;
             for axis in this.system.axes.values_mut() {
@@ -1004,6 +1041,7 @@ impl LuaUserData for LuaSpring {
 
         // -- cancel --
         /// Cancels this spring animation and cleans up the on-settle callback if one was registered.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
             if let Some(k) = this.on_settle_key.take() {
@@ -1015,7 +1053,7 @@ impl LuaUserData for LuaSpring {
         // -- getPosition --
         /// Returns the current position of the given spring axis, or `nil` if the axis does not exist.
         /// @param | field | string | Name of the axis to query.
-        /// @return | ?number | Current position value, or `nil`.
+        /// @return | LuaValue | Current position value, or nil when the axis does not exist.
         methods.add_method("getPosition", |_, this, field: String| {
             Ok(this.system.get_position(&field).map(|p| p as f64))
         });

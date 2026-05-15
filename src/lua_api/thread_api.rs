@@ -33,6 +33,7 @@ impl LuaUserData for LuaThreadHandle {
         // -- start --
         /// Launches the worker thread, executing the Lua code string supplied at creation time.
         /// @param | ... | any | Zero or more arguments forwarded to the worker as the `arg` table.
+        /// @return | nil | No value is returned.
         methods.add_method("start", |_, this, args: LuaMultiValue| {
             let channel_args: Vec<_> = args
                 .into_iter()
@@ -47,6 +48,7 @@ impl LuaUserData for LuaThreadHandle {
         });
         // -- wait --
         /// Blocks the calling thread until the worker thread finishes execution.
+        /// @return | nil | No value is returned.
         methods.add_method("wait", |_, this, ()| {
             this.inner.lock().unwrap().wait();
             Ok(())
@@ -59,7 +61,7 @@ impl LuaUserData for LuaThreadHandle {
         });
         // -- getError --
         /// Returns the error message from the worker thread, if it terminated with an error.
-        /// @return | string? | The error string, or `nil` if the thread completed successfully or is still running.
+        /// @return | string | The error string, or `nil` if the thread completed successfully or is still running.
         methods.add_method("getError", |_, this, ()| {
             Ok(this.inner.lock().unwrap().get_error())
         });
@@ -86,6 +88,7 @@ impl LuaUserData for LuaThreadPool {
         // -- submit --
         /// Pushes a value into the pool's input channel for processing by a worker thread.
         /// @param | value | any | The value to enqueue for processing.
+        /// @return | nil | No value is returned.
         methods.add_method("submit", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             this.inner.lock().unwrap().submit(cv);
@@ -93,7 +96,7 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- collect --
         /// Pops and returns the next result from the pool's output channel.
-        /// @return | any | The next result value, or `nil` if the output channel is empty.
+        /// @return | LuaValue | The next result value, or `nil` if the output channel is empty.
         methods.add_method("collect", |lua, this, ()| {
             match this.inner.lock().unwrap().collect() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -163,7 +166,7 @@ impl LuaUserData for LuaPromise {
         });
         // -- result --
         /// Returns the result value of the completed promise.
-        /// @return | any | The computed result, or `nil` if the promise is not yet done.
+        /// @return | LuaValue | The computed result, or `nil` if the promise is not yet done.
         methods.add_method("result", |lua, this, ()| {
             match this.inner.lock().unwrap().result() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -172,7 +175,7 @@ impl LuaUserData for LuaPromise {
         });
         // -- getError --
         /// Returns the error message from the promise, if it terminated with an error.
-        /// @return | string? | The error string, or `nil` if the promise succeeded or is still running.
+        /// @return | string | The error string, or `nil` if the promise succeeded or is still running.
         methods.add_method("getError", |_, this, ()| {
             Ok(this.inner.lock().unwrap().get_error())
         });
@@ -376,14 +379,14 @@ impl LuaUserData for LuaChannel {
         });
         // -- pop --
         /// Removes and returns the next value from the channel without blocking.
-        /// @return | any | The next value, or `nil` if the channel is empty.
+        /// @return | LuaValue | The next value, or `nil` if the channel is empty.
         methods.add_method("pop", |lua, this, ()| match this.inner.pop() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
         });
         // -- peek --
         /// Returns the next value from the channel without removing it.
-        /// @return | any | The front value, or `nil` if the channel is empty.
+        /// @return | LuaValue | The front value, or `nil` if the channel is empty.
         methods.add_method("peek", |lua, this, ()| match this.inner.peek() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
@@ -391,7 +394,7 @@ impl LuaUserData for LuaChannel {
         // -- demand --
         /// Blocks until a value is available on the channel or the optional timeout expires.
         /// @param | timeout | number? | Maximum seconds to wait. If omitted, waits indefinitely.
-        /// @return | any | The received value, or `nil` if the timeout expired.
+        /// @return | LuaValue | The received value, or `nil` if the timeout expired.
         methods.add_method("demand", |lua, this, timeout: Option<f64>| {
             match this.inner.demand(timeout) {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -404,7 +407,7 @@ impl LuaUserData for LuaChannel {
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.get_count()));
         // -- getCapacity --
         /// Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
-        /// @return | number? | The capacity limit, or `nil` if unbounded.
+        /// @return | number | The capacity limit, or `nil` if unbounded.
         methods.add_method("getCapacity", |_, this, ()| Ok(this.inner.capacity()));
         // -- isBounded --
         /// Checks whether this channel has a fixed capacity limit.
@@ -420,6 +423,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- clear --
         /// Removes all pending values from the channel.
+        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -450,7 +454,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- popTable --
         /// Pops the next value from the channel only if it is a table, discarding non-table values.
-        /// @return | table? | The table value, or `nil` if the channel is empty or the front value is not a table.
+        /// @return | table | The table value, or `nil` if the channel is empty or the front value is not a table.
         methods.add_method("popTable", |lua, this, ()| match this.inner.pop() {
             Some(cv @ ChannelValue::Table(_)) => channel_value_to_lua(lua, cv),
             Some(_) => Ok(LuaValue::Nil),
@@ -466,7 +470,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- popBytes --
         /// Pops the next value from the channel only if it is a byte blob, discarding non-bytes values.
-        /// @return | string? | The binary data as a Lua string, or `nil` if the channel is empty or the front value is not bytes.
+        /// @return | string | The binary data as a Lua string, or `nil` if the channel is empty or the front value is not bytes.
         methods.add_method("popBytes", |lua, this, ()| match this.inner.pop() {
             Some(ChannelValue::Bytes(b)) => Ok(LuaValue::String(lua.create_string(&b)?)),
             Some(_) => Ok(LuaValue::Nil),

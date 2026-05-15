@@ -39,7 +39,7 @@ impl Bus {
             duck_target: None,
         }
     }
-    /// Return the name of this bus.
+    /// Return the name of this bus. This function is part of the public API.
     pub fn name(&self) -> &str {
         &self.name
     }

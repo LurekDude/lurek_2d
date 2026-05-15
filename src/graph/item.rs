@@ -43,7 +43,7 @@ impl GraphItem {
             position: ItemPosition::Unplaced,
         }
     }
-    /// Mark the item as dead.
+    /// Mark the item as dead. This function is part of the public API.
     pub fn kill(&mut self) {
         self.alive = false;
     }
@@ -51,11 +51,11 @@ impl GraphItem {
     pub fn is_alive(&self) -> bool {
         self.alive
     }
-    /// Return the item type string.
+    /// Return the item type string. This function is part of the public API.
     pub fn get_type(&self) -> &str {
         &self.item_type
     }
-    /// Set the item type string.
+    /// Set the item type string. This function is part of the public API.
     pub fn set_type(&mut self, item_type: &str) {
         self.item_type = item_type.to_string();
     }
@@ -74,15 +74,15 @@ impl GraphItem {
     pub fn get_remaining_life(&self) -> f64 {
         self.remaining_life
     }
-    /// Set the remaining lifetime.
+    /// Set the remaining lifetime. This function is part of the public API.
     pub fn set_remaining_life(&mut self, t: f64) {
         self.remaining_life = t;
     }
-    /// Return the item priority.
+    /// Return the item priority. This function is part of the public API.
     pub fn get_priority(&self) -> i32 {
         self.priority
     }
-    /// Set the item priority.
+    /// Set the item priority. This function is part of the public API.
     pub fn set_priority(&mut self, p: i32) {
         self.priority = p;
     }

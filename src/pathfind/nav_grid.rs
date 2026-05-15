@@ -133,7 +133,7 @@ impl NavGrid {
         }
         true
     }
-    /// Set all cells to `cost`.
+    /// Set all cells to `cost`. This function is part of the public API.
     pub fn fill(&mut self, cost: u8) {
         self.costs.fill(cost);
     }

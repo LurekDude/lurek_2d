@@ -86,7 +86,7 @@ impl PriorityQueue {
     pub fn items(&self) -> &[PriorityItem] {
         &self.items
     }
-    /// Remove all items.
+    /// Remove all items. This function is part of the public API.
     pub fn clear(&mut self) {
         self.items.clear();
     }

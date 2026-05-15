@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 #[derive(Debug, Default, Clone)]
+/// Defines the public mediator data type used by this module.
 pub struct Mediator {
     /// Per-channel handler id lists.
     channels: HashMap<String, Vec<u64>>,
@@ -13,7 +14,7 @@ pub struct Mediator {
 }
 /// All methods for `Mediator`.
 impl Mediator {
-    /// Create an empty mediator.
+    /// Create an empty mediator. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

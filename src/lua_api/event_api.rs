@@ -343,7 +343,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- restart --
-    /// Requests an engine restart.
+    /// Requests an engine restart. This function is exposed to Lua scripts.
     /// @return | nil | No value is returned.
     tbl.set(
         "restart",

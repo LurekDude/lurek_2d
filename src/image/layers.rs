@@ -72,7 +72,7 @@ impl LayeredImage {
             None
         }
     }
-    /// Return a layer by index.
+    /// Return a layer by index. This function is part of the public API.
     pub fn get_layer(&self, index: usize) -> Option<&ImageLayer> {
         self.layers.get(index)
     }

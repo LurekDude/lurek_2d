@@ -6,8 +6,8 @@
 - Source path: `src/parallax/`
 - Lua API path(s): `src/lua_api/parallax_api.rs`
 - Primary Lua namespace: `lurek.parallax`
-- Rust test path(s): `tests/rust/unit/parallax_tests.rs`
-- Lua test path(s): `tests/lua/unit/test_parallax_core_unit.lua`, `tests/lua/integration/test_parallax_camera.lua`
+- Rust test path(s): tests/rust/unit/parallax_tests.rs
+- Lua test path(s): tests/lua/unit/test_parallax_core_unit.lua, tests/lua/integration/test_parallax_camera.lua
 
 ## Summary
 
@@ -31,22 +31,26 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 
 ## Functions
 
-- `ParallaxLayer::draw_to_image` (`draw.rs`): Render this parallax layer to a CPU image for headless testing.
-- `ParallaxLayer::new` (`layer.rs`): Creates a new `ParallaxLayer` with sensible defaults.
-- `ParallaxLayer::update` (`layer.rs`): Advances the autonomous scroll accumulator by `dt` seconds.
-- `ParallaxLayer::build_draw_calls` (`layer.rs`): Builds the draw tile batch for this layer.
-- `ParallaxLayer::reset_autoscroll` (`layer.rs`): Resets the autoscroll accumulator to zero.
-- `ParallaxLayer::set_tiling` (`layer.rs`): Enables or disables seamless infinite tiling on both axes.
-- `ParallaxLayer::get_tiling` (`layer.rs`): Returns `true` if seamless infinite tiling is enabled.
-- `ParallaxLayer::set_tile_size` (`layer.rs`): Sets an explicit tile size override, bypassing the scaled texture dimensions (with a safety minimum to avoid draw-call explosions).
-- `ParallaxLayer::set_depth` (`layer.rs`): Sets the floating-point draw depth for this layer.
-- `ParallaxLayer::get_depth` (`layer.rs`): Returns the floating-point draw depth.
-- `ParallaxLayer::set_effect_chain` (`layer.rs`): Replaces the per-layer shader pass chain.
-- `ParallaxLayer::clear_effect_chain` (`layer.rs`): Clears all per-layer shader passes.
-- `ParallaxLayer::effect_count` (`layer.rs`): Returns the number of per-layer shader passes.
-- `ParallaxLayer::set_motion_stretch` (`layer.rs`): Enables/disables velocity-based stretch and configures limits.
-- `ParallaxLayer::generate_render_commands` (`render.rs`): Produces render commands for this layer given the current camera and screen.
+- `ParallaxLayer::draw_to_image` (`draw.rs`): Rasterise this layer into a solid-colour `ImageData` sized `width × height`; returns transparent image when `visible` is `false`.
+- `ParallaxLayer::new` (`layer.rs`): Create a new layer for `texture_key` with the given texture dimensions and sensible defaults.
+- `ParallaxLayer::update` (`layer.rs`): Advance the autoscroll accumulator by `dt` seconds and wrap it to one tile width/height.
+- `ParallaxLayer::build_draw_calls` (`layer.rs`): Build a `ParallaxDrawBatch` for the current camera position; returns `None` when invisible or zero-size.
+- `ParallaxLayer::reset_autoscroll` (`layer.rs`): Reset the autoscroll accumulator to `[0.0, 0.0]`.
+- `ParallaxLayer::set_tiling` (`layer.rs`): Set whether tiling mode (forces repeat on both axes) is active.
+- `ParallaxLayer::get_tiling` (`layer.rs`): Return `true` when tiling mode is active.
+- `ParallaxLayer::set_tile_size` (`layer.rs`): Override tile size to `(w, h)` pixels; `0.0` or negative resets to texture-derived size.
+- `ParallaxLayer::set_depth` (`layer.rs`): Set the depth sort value for this layer.
+- `ParallaxLayer::get_depth` (`layer.rs`): Return the current depth sort value.
+- `ParallaxLayer::set_effect_chain` (`layer.rs`): Replace the shader effect chain; an empty `chain` clears the existing chain.
+- `ParallaxLayer::clear_effect_chain` (`layer.rs`): Remove all shader effects from this layer.
+- `ParallaxLayer::effect_count` (`layer.rs`): Return the number of shader passes currently in the effect chain.
+- `ParallaxLayer::set_motion_stretch` (`layer.rs`): Configure motion-stretch blur; `strength` controls pixels-per-sec sensitivity, `max_scale` caps the scale boost.
+- `far_background` (`presets.rs`): Create a slow far-background layer (scroll factor ~0.15 horizontal); horizontal repeat, Z = -200, opacity 0.8.
+- `mid_background` (`presets.rs`): Create a mid-speed background layer (scroll factor ~0.45 horizontal); horizontal repeat, Z = -100, opacity 0.9.
+- `foreground_fog` (`presets.rs`): Create a near-screen fog layer: fast scroll, tiled, Screen blend, 35% opacity, light motion-stretch blur, Z = 50.
+- `ParallaxLayer::generate_render_commands` (`render.rs`): Generate a `Vec<RenderCommand>` for this layer at the given camera position and screen size.
 - `batch_to_render_commands` (`render.rs`): Converts a pre-computed [`ParallaxDrawBatch`] into render commands.
+- `collect_tiled_positions` (`tile_iter.rs`): Return all `(x, y)` tile positions visible inside `screen_size` plus the cull margin; capped at `MAX_TILED_POSITIONS`.
 
 ## Lua API Reference
 
@@ -54,61 +58,61 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - Namespace: `lurek.parallax`
 
 ### Module Functions
-- `lurek.parallax.newLayer`: Creates a new parallax background layer from an options table.
-- `lurek.parallax.newSet`: Creates a new empty parallax set with the given name.
-- `lurek.parallax.newPresetLayer`: Creates a new parallax layer from built-in presets (`far`, `mid`, `fog`).
+- `lurek.parallax.newLayer`: Creates a parallax layer from an options table.
+- `lurek.parallax.newSet`: Creates an empty parallax layer set.
+- `lurek.parallax.newPresetLayer`: Creates a parallax layer from a named preset and texture image.
 
 ### `LParallaxLayer` Methods
-- `LParallaxLayer:type`: Returns the type name of this object.
-- `LParallaxLayer:update`: Advances the autonomous scroll accumulator by `dt` seconds.
-- `LParallaxLayer:render`: Draws the layer using an explicit camera world position.
-- `LParallaxLayer:renderAuto`: Draws the layer using the engine active camera position automatically.
-- `LParallaxLayer:resetAutoscroll`: Resets the autonomous scroll accumulator to zero.
-- `LParallaxLayer:setScrollFactor`: Sets the scroll factor relative to camera movement on each axis.
-- `LParallaxLayer:getScrollFactor`: Returns the scroll factor as `(x, y)`.
-- `LParallaxLayer:setOffset`: Sets the static world-pixel position bias added on top of camera scroll.
-- `LParallaxLayer:getOffset`: Returns the static offset as `(x, y)`.
-- `LParallaxLayer:setAutoscroll`: Sets the autonomous scroll velocity in world-pixels per second.
-- `LParallaxLayer:getAutoscroll`: Returns the autoscroll velocity as `(vx, vy)`.
-- `LParallaxLayer:setRepeat`: Sets whether the layer tiles on the X and Y axes.
-- `LParallaxLayer:setScale`: Sets the texture display scale factor on each axis.
-- `LParallaxLayer:setZ`: Sets the draw-order depth. Lower values render first (further back).
-- `LParallaxLayer:getZ`: Returns the draw-order depth.
-- `LParallaxLayer:setOpacity`: Sets the layer-wide opacity override in `[0.0, 1.0]`.
-- `LParallaxLayer:getOpacity`: Returns the current opacity.
-- `LParallaxLayer:setTint`: Sets the multiplicative RGBA tint applied to all pixels of this layer.
-- `LParallaxLayer:getTint`: Returns the current tint as `(r, g, b, a)`.
-- `LParallaxLayer:setBlendMode`: Sets the GPU blend mode for this layer.
-- `LParallaxLayer:getBlendMode`: Returns the current blend mode as a string.
-- `LParallaxLayer:setVisible`: Shows or hides this layer.
-- `LParallaxLayer:isVisible`: Returns `true` if the layer is currently visible.
-- `LParallaxLayer:setClamp`: Clamps the scroll offset to a world-pixel range on each axis.
-- `LParallaxLayer:clearClamp`: Removes scroll clamping so the layer scrolls freely.
-- `LParallaxLayer:setTiling`: Enables or disables seamless infinite tiling on both axes simultaneously.
-- `LParallaxLayer:getTiling`: Returns `true` if seamless infinite tiling is enabled.
-- `LParallaxLayer:setTileSize`: Sets explicit tile dimensions in logical pixels.
-- `LParallaxLayer:setDepth`: Sets the floating-point draw depth for fine-grained layer ordering.
-- `LParallaxLayer:getDepth`: Returns the current floating-point depth.
-- `LParallaxLayer:addEffectPass`: Appends one shader pass to this layer effect chain.
-- `LParallaxLayer:clearEffects`: Clears all per-layer effect passes.
-- `LParallaxLayer:effectCount`: Returns effect-pass count for this layer.
-- `LParallaxLayer:setMotionStretch`: Enables/disables velocity-based stretch and sets strength/limit.
-- `LParallaxLayer:getMotionStretch`: Returns current motion-stretch config.
+- `LParallaxLayer:type`: Returns the Lua-visible type name for this parallax layer handle.
+- `LParallaxLayer:update`: Advances parallax layer autoscroll by delta time.
+- `LParallaxLayer:render`: Enqueues render commands using explicit camera coordinates.
+- `LParallaxLayer:renderAuto`: Enqueues render commands using the runtime camera.
+- `LParallaxLayer:resetAutoscroll`: Resets layer autoscroll offset.
+- `LParallaxLayer:setScrollFactor`: Sets layer scroll factor.
+- `LParallaxLayer:getScrollFactor`: Returns layer scroll factor.
+- `LParallaxLayer:setOffset`: Sets layer offset.
+- `LParallaxLayer:getOffset`: Returns layer offset.
+- `LParallaxLayer:setAutoscroll`: Sets layer autoscroll velocity.
+- `LParallaxLayer:getAutoscroll`: Returns layer autoscroll velocity.
+- `LParallaxLayer:setRepeat`: Sets horizontal and vertical repeat flags.
+- `LParallaxLayer:setScale`: Sets layer scale.
+- `LParallaxLayer:setZ`: Sets layer z order.
+- `LParallaxLayer:getZ`: Returns layer z order.
+- `LParallaxLayer:setOpacity`: Sets layer opacity, clamped to 0..1.
+- `LParallaxLayer:getOpacity`: Returns layer opacity.
+- `LParallaxLayer:setTint`: Sets layer tint color.
+- `LParallaxLayer:getTint`: Returns layer tint color.
+- `LParallaxLayer:setBlendMode`: Sets layer blend mode by name.
+- `LParallaxLayer:getBlendMode`: Returns layer blend mode name.
+- `LParallaxLayer:setVisible`: Sets layer visibility.
+- `LParallaxLayer:isVisible`: Returns layer visibility.
+- `LParallaxLayer:setClamp`: Sets clamp bounds for layer movement.
+- `LParallaxLayer:clearClamp`: Clears layer clamp bounds.
+- `LParallaxLayer:setTiling`: Enables or disables layer tiling.
+- `LParallaxLayer:getTiling`: Returns whether layer tiling is enabled.
+- `LParallaxLayer:setTileSize`: Sets tile size for tiling.
+- `LParallaxLayer:setDepth`: Sets parallax depth.
+- `LParallaxLayer:getDepth`: Returns parallax depth.
+- `LParallaxLayer:addEffectPass`: Adds a shader effect pass to this layer.
+- `LParallaxLayer:clearEffects`: Clears shader effect passes from this layer.
+- `LParallaxLayer:effectCount`: Returns shader effect pass count.
+- `LParallaxLayer:setMotionStretch`: Sets motion stretch settings.
+- `LParallaxLayer:getMotionStretch`: Returns motion stretch settings.
 
 ### `LParallaxSet` Methods
-- `LParallaxSet:type`: Returns the type name of this object.
-- `LParallaxSet:addLayer`: Adds a layer to this set.
-- `LParallaxSet:removeLayerAt`: Removes the layer at the given 1-based index.
+- `LParallaxSet:type`: Returns the Lua-visible type name for this parallax set handle.
+- `LParallaxSet:addLayer`: Adds a parallax layer to this set.
+- `LParallaxSet:removeLayerAt`: Removes a layer by one-based index.
 - `LParallaxSet:layerCount`: Returns the number of layers in this set.
-- `LParallaxSet:getLayerZAt`: Returns the layer `z` value at a given 1-based sorted index, or `nil` when out of range.
-- `LParallaxSet:sortByZ`: Re-sorts all layers by ascending `z` value.
-- `LParallaxSet:setVisible`: Shows or hides all layers in this set.
-- `LParallaxSet:isVisible`: Returns `true` if the set is currently visible.
-- `LParallaxSet:update`: Advances the autoscroll accumulator of every layer by `dt` seconds.
-- `LParallaxSet:render`: Draws all visible layers in ascending `z` order using an explicit camera position.
-- `LParallaxSet:renderAuto`: Draws all visible layers using the engine active camera position.
-- `LParallaxSet:getName`: Returns the name of this set.
-- `LParallaxSet:setName`: Sets the name of this set.
+- `LParallaxSet:getLayerZAt`: Returns z order for a layer by one-based index.
+- `LParallaxSet:sortByZ`: Sorts layers by z order.
+- `LParallaxSet:setVisible`: Sets set visibility.
+- `LParallaxSet:isVisible`: Returns set visibility.
+- `LParallaxSet:update`: Updates all layers in this set.
+- `LParallaxSet:render`: Enqueues render commands for all visible set layers using explicit camera coordinates.
+- `LParallaxSet:renderAuto`: Enqueues render commands for all visible set layers using the runtime camera.
+- `LParallaxSet:getName`: Returns this set name.
+- `LParallaxSet:setName`: Sets this set name.
 
 ## References
 

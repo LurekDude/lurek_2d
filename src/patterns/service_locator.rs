@@ -35,7 +35,7 @@ impl ServiceLocator {
         names.sort();
         names
     }
-    /// Unregister all services.
+    /// Unregister all services. This function is part of the public API.
     pub fn clear(&mut self) {
         self.services.clear();
     }

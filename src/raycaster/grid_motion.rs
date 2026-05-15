@@ -43,7 +43,7 @@ pub fn dir4_delta(dir: u8, action: GridMoveAction, step: f32) -> (f32, f32) {
     };
     (fx * step, fy * step)
 }
-/// Attempt to move from `(px, py)` by `(dx, dy)` on a grid of `width × height`;
+/// Attempt to move from `(px, py)` by `(dx, dy)` on a grid of `width × height`;.
 /// return the new position and `true` on success, or the original position and `false` if blocked.
 pub fn try_move(
     width: u32,

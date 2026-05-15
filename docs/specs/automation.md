@@ -41,50 +41,56 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 ## Types
 
 - `Script` (`struct`, `script.rs`): Named automation script with optional human-readable metadata and an ordered Vec of Step values. It is the durable unit loaded into the simulator and reused across playback runs.
+- `StepEventSink` (`trait`, `simulator.rs`): Sink for events produced by the simulator during step dispatch.
 - `Simulator` (`struct`, `simulator.rs`): Playback engine that owns the script registry, current script selection, elapsed time, next-step index, and running or paused state. This is the type to inspect when behavior changes around script lifecycle, event dispatch timing, or completion rules.
 - `Action` (`enum`, `step.rs`): Enum of supported automation actions such as keypress, mousemove, mousepress, and wait. It is the boundary between script data and concrete EventQueue dispatch behavior.
 - `Step` (`struct`, `step.rs`): One timed automation record with optional fields for key names, scancodes, mouse coordinates, wheel deltas, button data, and text input. It is intentionally flexible so a single structure can represent all supported synthetic input events.
 
 ## Functions
 
-- `Script::new` (`script.rs`): Create a new script with the given name and steps.
-- `Script::with_description` (`script.rs`): Create a script with an explicit description string.
-- `Script::step_count` (`script.rs`): Return the number of steps in this script.
-- `Script::set_step_limit` (`script.rs`): Sets the maximum step count for this script (clamped to `1..=MAX_STEPS`).
-- `Script::get_step_limit` (`script.rs`): Returns the active step limit for this script.
-- `Script::from_toml` (`script.rs`): Parse a Script from a TOML string.
-- `Simulator::new` (`simulator.rs`): Create a new `Simulator` with an empty script registry.
-- `Simulator::load` (`simulator.rs`): Load a script into the simulator, replacing any script with the same name.
-- `Simulator::unload` (`simulator.rs`): Remove a loaded script by name.
-- `Simulator::has_script` (`simulator.rs`): Return `true` if a script with the given name is registered.
-- `Simulator::get_scripts` (`simulator.rs`): Return the names of all loaded scripts.
-- `Simulator::start` (`simulator.rs`): Start playback of the named script from the beginning.
-- `Simulator::stop` (`simulator.rs`): Stop playback and reset the simulator to `Idle`.
-- `Simulator::pause` (`simulator.rs`): Pause playback, freezing `elapsed` and the step index.
-- `Simulator::resume` (`simulator.rs`): Resume paused playback from the current position.
-- `Simulator::is_running` (`simulator.rs`): Return `true` if the simulator is in the `Running` state.
-- `Simulator::is_paused` (`simulator.rs`): Return `true` if the simulator is in the `Paused` state.
-- `Simulator::is_complete` (`simulator.rs`): Return `true` if all steps in the active script have been dispatched.
-- `Simulator::current_step` (`simulator.rs`): Return the index of the next step to be dispatched.
-- `Simulator::step_count` (`simulator.rs`): Return the total number of steps in the active script.
-- `Simulator::current_script` (`simulator.rs`): Return the name of the currently active script.
-- `Simulator::elapsed_time` (`simulator.rs`): Return the seconds elapsed since playback started.
-- `Simulator::get_script` (`simulator.rs`): Return a clone of the named script from the registry, if it is loaded.
-- `Simulator::get_script_step_limit` (`simulator.rs`): Return the step limit for the named script.
-- `Simulator::set_script_step_limit` (`simulator.rs`): Set the step limit for the named script (clamped to `1..=MAX_STEPS`).
-- `Simulator::save_macro` (`simulator.rs`): Save a [`Script`] under a named macro key for later replay.
-- `Simulator::play_macro` (`simulator.rs`): Play a saved macro by loading it into the script registry and starting playback.
-- `Simulator::has_macro` (`simulator.rs`): Return `true` if a macro with the given name has been saved.
-- `Simulator::list_macros` (`simulator.rs`): Return the names of all saved macros.
-- `Simulator::set_playback_speed` (`simulator.rs`): Set the playback speed multiplier applied to `dt` on each [`Simulator::update`].
+- `Script::new` (`script.rs`): Create a `Script` from a name and raw steps: expands repeats, sorts by time, caps to `MAX_STEPS`.
+- `Script::with_description` (`script.rs`): Create a `Script` identical to `new` but also sets the human-readable `description` field.
+- `Script::step_count` (`script.rs`): Return the total number of steps in this script.
+- `Script::set_step_limit` (`script.rs`): Clamp and apply a new step limit, truncating the step list if it exceeds `limit`; range 1..=MAX_STEPS.
+- `Script::get_step_limit` (`script.rs`): Return the current step limit for this script.
+- `Script::from_toml` (`script.rs`): Parse a TOML string and construct a `Script`; return an error string on invalid TOML or unknown action.
+- `Simulator::new` (`simulator.rs`): Create a new idle `Simulator` with no scripts, macros, or conditions loaded.
+- `Simulator::load` (`simulator.rs`): Register a `Script` by name; replaces any existing script with the same name.
+- `Simulator::unload` (`simulator.rs`): Remove the named script; stop playback if it is currently active.
+- `Simulator::has_script` (`simulator.rs`): Return `true` if a script with `name` is registered.
+- `Simulator::get_scripts` (`simulator.rs`): Return the names of all currently loaded scripts.
+- `Simulator::start` (`simulator.rs`): Begin playback of the named script from the start; error if the script is not loaded.
+- `Simulator::stop` (`simulator.rs`): Halt playback and reset all playback state to idle.
+- `Simulator::pause` (`simulator.rs`): Suspend playback; time stops advancing until `resume()` is called.
+- `Simulator::resume` (`simulator.rs`): Resume a paused script; no-op if not in `Paused` state.
+- `Simulator::is_running` (`simulator.rs`): Return `true` when the script is actively advancing time.
+- `Simulator::is_paused` (`simulator.rs`): Return `true` when the script is suspended.
+- `Simulator::is_complete` (`simulator.rs`): Return `true` when all steps have been dispatched without error.
+- `Simulator::is_failed` (`simulator.rs`): Return `true` when playback halted due to an assertion or macro error.
+- `Simulator::last_error` (`simulator.rs`): Return the error message from the most recent failure, or `None` if no failure.
+- `Simulator::current_step` (`simulator.rs`): Return the index of the next step that will be evaluated on the next `update()`.
+- `Simulator::step_count` (`simulator.rs`): Return the total step count of the active script, or 0 when none is active.
+- `Simulator::current_script` (`simulator.rs`): Return the name of the currently active script, or `None` when idle.
+- `Simulator::elapsed_time` (`simulator.rs`): Return elapsed playback time in seconds (scaled by `playback_speed`).
+- `Simulator::set_condition` (`simulator.rs`): Set a named boolean condition used by `when` and `assert` step expressions.
+- `Simulator::get_condition` (`simulator.rs`): Return the current value of a named condition, or `None` if not set.
+- `Simulator::get_script` (`simulator.rs`): Return a clone of the registered script with `name`, or `None` if not loaded.
+- `Simulator::get_script_step_limit` (`simulator.rs`): Return the step limit of the named script, or `None` if the script is not loaded.
+- `Simulator::set_script_step_limit` (`simulator.rs`): Apply a new step limit to the named script; return `true` if the script exists.
+- `Simulator::save_macro` (`simulator.rs`): Register a named macro `Script` that can be inlined by `CallMacro` steps.
+- `Simulator::play_macro` (`simulator.rs`): Load the named macro as a regular script and start it immediately.
+- `Simulator::has_macro` (`simulator.rs`): Return `true` if a macro named `name` is registered.
+- `Simulator::list_macros` (`simulator.rs`): Return the names of all registered macros.
+- `Simulator::set_playback_speed` (`simulator.rs`): Set the playback speed multiplier; clamped to >= 0.0.
 - `Simulator::get_playback_speed` (`simulator.rs`): Return the current playback speed multiplier.
-- `Simulator::set_highlight_mode` (`simulator.rs`): Enable or disable the visual highlight overlay hint.
-- `Simulator::is_highlight_mode` (`simulator.rs`): Return whether the highlight overlay hint is active.
-- `Simulator::update` (`simulator.rs`): Advance the playback clock by `dt` seconds and dispatch all due steps.
-- `Action::parse_action` (`step.rs`): Parse an action string into the corresponding variant.
-- `Action::as_str` (`step.rs`): Return the canonical lowercase string representation of this action.
-- `Step::new` (`step.rs`): Create a new Step with required fields set and all optional fields at defaults.
-- `Step::effective_scancode` (`step.rs`): Return the effective scancode for a key event.
+- `Simulator::set_highlight_mode` (`simulator.rs`): Enable or disable visual step-highlight mode used by debug tooling.
+- `Simulator::is_highlight_mode` (`simulator.rs`): Return `true` when visual step-highlight mode is active.
+- `Simulator::update` (`simulator.rs`): Advance the simulator by `dt` seconds and dispatch due steps into `event_queue`.
+- `Simulator::update_with_sink` (`simulator.rs`): Advance the simulator by `dt` seconds and dispatch due steps into the provided sink.
+- `Action::parse_action` (`step.rs`): Parse a lowercase action string (e.g.
+- `Action::as_str` (`step.rs`): Return the canonical lowercase string key for this variant; default to "wait" if not found.
+- `Step::new` (`step.rs`): Create a `Step` at `time` seconds with the given `action`; all optional fields default to `None`.
+- `Step::effective_scancode` (`step.rs`): Return `scancode` if set, otherwise fall back to `key`; `None` when both are absent.
 
 ## Lua API Reference
 
@@ -92,43 +98,45 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 - Namespace: `lurek.automation`
 
 ### Module Functions
-- `lurek.automation.load`: Loads a named script from a Lua data table containing a steps array.
-- `lurek.automation.unload`: Removes a loaded script by name, returning true if it existed.
-- `lurek.automation.hasScript`: Returns true if a script with the given name is registered.
-- `lurek.automation.getScripts`: Returns an array of all registered script names.
-- `lurek.automation.start`: Starts playback of the named script from the beginning.
-- `lurek.automation.stop`: Stops playback and resets the simulator to idle.
-- `lurek.automation.pause`: Pauses playback at the current step position.
-- `lurek.automation.resume`: Resumes playback from a paused position.
-- `lurek.automation.update`: Advances the playback clock by `dt` seconds.
-- `lurek.automation.isRunning`: Returns true if the simulator is actively playing a script.
-- `lurek.automation.isPaused`: Returns true if playback is currently paused.
-- `lurek.automation.isComplete`: Returns true if all steps in the active script have been dispatched.
-- `lurek.automation.isFailed`: Returns true if playback failed due to `assert` or `visualassert`.
-- `lurek.automation.getLastError`: Returns the last playback failure string.
-- `lurek.automation.getCurrentStep`: Returns the index of the next step to be dispatched.
-- `lurek.automation.getStepCount`: Returns the total number of steps in the active script.
-- `lurek.automation.getCurrentScript`: Returns the name of the active script.
-- `lurek.automation.getElapsedTime`: Returns seconds elapsed since playback started.
-- `lurek.automation.loadFromToml`: Parses a TOML string and registers it as a named script.
-- `lurek.automation.getStepLimit`: Returns the step limit for the named script.
-- `lurek.automation.setStepLimit`: Sets the step limit for the named script.
-- `lurek.automation.saveMacro`: Saves a loaded script under a macro name for fast replay.
-- `lurek.automation.playMacro`: Loads and starts playback of a previously saved macro.
-- `lurek.automation.hasMacro`: Returns true if a macro with the given name has been saved.
-- `lurek.automation.listMacros`: Returns an array of all saved macro names.
-- `lurek.automation.setCondition`: Sets a named boolean condition used by scripted `when`/`assert` expressions.
-- `lurek.automation.getCondition`: Returns a named condition value.
-- `lurek.automation.setPlaybackSpeed`: Sets the playback speed multiplier.
-- `lurek.automation.getPlaybackSpeed`: Returns the current playback speed multiplier (default 1.0).
-- `lurek.automation.setHighlightMode`: Enables or disables the highlight overlay hint.
-- `lurek.automation.isHighlightMode`: Returns whether the highlight overlay hint is active.
-- `lurek.automation.waitUntil`: Pauses playback advancement until a predicate returns true or a timeout expires.
+- `lurek.automation.load`: Loads an automation script from a Lua table of steps and optional metadata.
+- `lurek.automation.unload`: Unloads a named automation script.
+- `lurek.automation.hasScript`: Returns whether a script is loaded.
+- `lurek.automation.getScripts`: Returns the names of loaded automation scripts.
+- `lurek.automation.start`: Starts playback of a loaded automation script.
+- `lurek.automation.stop`: Stops the current automation script.
+- `lurek.automation.pause`: Pauses automation playback.
+- `lurek.automation.resume`: Resumes automation playback.
+- `lurek.automation.update`: Advances automation playback and dispatches generated input events.
+- `lurek.automation.isRunning`: Returns whether automation playback is running.
+- `lurek.automation.isPaused`: Returns whether automation playback is paused.
+- `lurek.automation.isComplete`: Returns whether the current automation script completed.
+- `lurek.automation.isFailed`: Returns whether the current automation script failed.
+- `lurek.automation.getLastError`: Returns the last automation error message when one exists.
+- `lurek.automation.setCondition`: Sets a named boolean condition used by automation steps.
+- `lurek.automation.getCondition`: Returns a named automation condition value.
+- `lurek.automation.getCurrentStep`: Returns the current step index of the active script.
+- `lurek.automation.getStepCount`: Returns the number of steps in the active script.
+- `lurek.automation.getCurrentScript`: Returns the current script name when a script is active.
+- `lurek.automation.getElapsedTime`: Returns elapsed playback time for the current script.
+- `lurek.automation.loadFromToml`: Loads an automation script from TOML text.
+- `lurek.automation.getStepLimit`: Returns the configured step limit for a loaded script.
+- `lurek.automation.setStepLimit`: Sets the maximum step count for a loaded script.
+- `lurek.automation.saveMacro`: Saves a loaded script as a named macro.
+- `lurek.automation.playMacro`: Starts playback of a saved macro.
+- `lurek.automation.hasMacro`: Returns whether a macro is saved.
+- `lurek.automation.listMacros`: Returns the names of saved macros.
+- `lurek.automation.setPlaybackSpeed`: Sets automation playback speed multiplier.
+- `lurek.automation.getPlaybackSpeed`: Returns automation playback speed multiplier.
+- `lurek.automation.setHighlightMode`: Enables or disables automation highlight mode.
+- `lurek.automation.isHighlightMode`: Returns whether automation highlight mode is enabled.
+- `lurek.automation.waitUntil`: Suspends automation updates until a predicate returns true or a timeout elapses.
 
 ## References
 
 - `event`: Imports or references `event` from `src/event/`.
+- `input`: Imports or references `src/input/`. Cross-group dependency from `Feature Systems` into `Platform Services`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
+- `timer`: Imports or references `src/timer/`. Cross-group dependency from `Feature Systems` into `Core Runtime`.
 
 ## Notes
 

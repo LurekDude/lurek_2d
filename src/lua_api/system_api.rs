@@ -84,7 +84,9 @@ pub enum PowerState {
     Charging,
     Charged,
 }
+
 impl PowerState {
+    /// Returns the Lua-visible power state string.
     pub fn as_str(&self) -> &'static str {
         match self {
             PowerState::Unknown => "unknown",
@@ -100,6 +102,7 @@ impl PowerState {
 pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
     (PowerState::Unknown, None, None)
 }
+
 /// Registers all `lurek.system` functions into the Lua runtime table.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
@@ -170,8 +173,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getPowerInfo --
     /// Returns the current power supply state, battery percentage, and estimated time remaining.
     /// @return | string | Power state: `"unknown"`, `"battery"`, `"nobattery"`, `"charging"`, or `"charged"`.
-    /// @return | number? | Battery charge percentage (0-100), or `nil` if unavailable.
-    /// @return | number? | Estimated seconds of battery life remaining, or `nil` if unavailable.
+    /// @return | integer | Battery charge percentage from 0 to 100. This value may be `nil` when the platform does not provide battery data.
+    /// @return | integer | Estimated battery life remaining in seconds. This value may be `nil` when the platform does not provide battery data.
     system.set(
         "getPowerInfo",
         lua.create_function(|_, ()| {
@@ -212,7 +215,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getMessage --
     /// Resolves a message string by its identifier from the engine message catalog.
     /// @param | id | string | The message identifier to look up.
-    /// @return | string? | The resolved message text, or `nil` if the identifier is not found.
+    /// @return | string | The resolved message text. Returns `nil` when the identifier is not found.
     system.set(
         "getMessage",
         lua.create_function(|_, id: String| Ok(messages::resolve_message(&id)))?,
@@ -238,6 +241,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setClipboardText --
     /// Copies a string to the system clipboard. Logs a warning if the clipboard is unavailable or the write fails.
     /// @param | text | string | The text to place on the clipboard.
+    /// @return | nil | No value is returned.
     system.set(
         "setClipboardText",
         lua.create_function(|_, text: String| {
@@ -279,6 +283,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- reloadConfig --
     /// Requests a reload of the engine configuration from `conf.lua`. The reload is deferred until the next frame.
+    /// @return | nil | No value is returned.
     system.set(
         "reloadConfig",
         lua.create_function(move |_, ()| {
@@ -328,6 +333,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setDebugOverlay --
     /// Enables or disables the on-screen debug overlay that shows FPS, draw calls, and other diagnostics.
     /// @param | enabled | boolean | `true` to show the debug overlay, `false` to hide it.
+    /// @return | nil | No value is returned.
     system.set(
         "setDebugOverlay",
         lua.create_function(move |_, enabled: bool| {
@@ -349,6 +355,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setLogLevel --
     /// Sets the engine-wide log verbosity level at runtime.
     /// @param | level | string | Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`.
+    /// @return | nil | No value is returned.
     #[allow(unused_doc_comments)]
     system.set(
         "setLogLevel",
@@ -371,6 +378,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Writes a message to the engine log at the specified severity level.
     /// @param | level | string | Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`. Defaults to `"info"` if unrecognized.
     /// @param | message | string | The message text to log.
+    /// @return | nil | No value is returned.
     #[allow(unused_doc_comments)]
     system.set(
         "log",
@@ -388,10 +396,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getLastError --
     /// Returns the most recent engine error as a table, or `nil` if no error has occurred.
-    /// @return | table? | Table with fields: `message` (string), `code` (string), `category` (string), `hint` (string?), or `nil` if no error.
+    /// @return | table | Table with fields: `message` (string), `code` (string), `category` (string), and optional `hint` (string). Returns `nil` when no error is recorded.
     #[allow(unused_doc_comments)]
     {
         let s = state_for_error.clone();
+        /// Returns the last error for Lua scripts in this module.
+        /// @return | table | Table result returned by this call.
         system.set(
             "getLastError",
             lua.create_function(move |lua, ()| {
@@ -436,7 +446,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getEnv --
     /// Reads an environment variable by name. Returns `nil` if the variable is not set.
     /// @param | name | string | The environment variable name.
-    /// @return | string? | The variable value, or `nil` if not found.
+    /// @return | string | The variable value. Returns `nil` when the variable is not set.
     system.set(
         "getEnv",
         lua.create_function(|_, name: String| match std::env::var(&name) {

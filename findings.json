@@ -1,0 +1,1609 @@
+﻿{
+  "ok": false,
+  "scanned_files": 563,
+  "finding_count": 267,
+  "findings": [
+    {
+      "file": "src/ai/command_queue.rs",
+      "line": 32,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/context_steering.rs",
+      "line": 108,
+      "kind": "short-item-doc",
+      "message": "fn add_interest summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/ai/context_steering.rs",
+      "line": 117,
+      "kind": "short-item-doc",
+      "message": "fn add_danger summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/director.rs",
+      "line": 7,
+      "kind": "short-item-doc",
+      "message": "enum DirectorPhase summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/ai/director.rs",
+      "line": 100,
+      "kind": "short-item-doc",
+      "message": "fn tension summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/director.rs",
+      "line": 104,
+      "kind": "short-item-doc",
+      "message": "fn phase summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/ai/director.rs",
+      "line": 112,
+      "kind": "short-item-doc",
+      "message": "fn elapsed summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 32,
+      "kind": "short-item-doc",
+      "message": "fn name summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 109,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 113,
+      "kind": "short-item-doc",
+      "message": "fn register summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 117,
+      "kind": "short-item-doc",
+      "message": "fn add_primitive summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 132,
+      "kind": "short-item-doc",
+      "message": "fn add_compound summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/ai/htn.rs",
+      "line": 139,
+      "kind": "short-item-doc",
+      "message": "fn get summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/ai/lod.rs",
+      "line": 7,
+      "kind": "short-item-doc",
+      "message": "struct LodTier summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/ai/lod.rs",
+      "line": 30,
+      "kind": "short-item-doc",
+      "message": "struct AILod summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/ai/lod.rs",
+      "line": 41,
+      "kind": "short-item-doc",
+      "message": "fn tier summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/lod.rs",
+      "line": 45,
+      "kind": "short-item-doc",
+      "message": "fn tier_count summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/mcts.rs",
+      "line": 90,
+      "kind": "short-item-doc",
+      "message": "fn config summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/ai/needs.rs",
+      "line": 97,
+      "kind": "short-item-doc",
+      "message": "fn update summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/needs.rs",
+      "line": 121,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/needs.rs",
+      "line": 125,
+      "kind": "short-item-doc",
+      "message": "fn add_need summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/neural_net.rs",
+      "line": 87,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/neural_net.rs",
+      "line": 123,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/neural_net.rs",
+      "line": 127,
+      "kind": "short-item-doc",
+      "message": "fn add_layer summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ai/neural_net.rs",
+      "line": 172,
+      "kind": "short-item-doc",
+      "message": "fn layer_count summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/neuroevolution.rs",
+      "line": 34,
+      "kind": "short-item-doc",
+      "message": "fn pop_size summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ai/perception.rs",
+      "line": 97,
+      "kind": "short-item-doc",
+      "message": "fn add_visual summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/perception.rs",
+      "line": 117,
+      "kind": "short-item-doc",
+      "message": "fn add_auditory summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/ai/perception.rs",
+      "line": 139,
+      "kind": "short-item-doc",
+      "message": "fn add_custom summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/perception.rs",
+      "line": 184,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 345,
+      "kind": "short-item-doc",
+      "message": "fn add_seek summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 355,
+      "kind": "short-item-doc",
+      "message": "fn add_flee summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 366,
+      "kind": "short-item-doc",
+      "message": "fn add_arrive summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 377,
+      "kind": "short-item-doc",
+      "message": "fn add_wander summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 390,
+      "kind": "short-item-doc",
+      "message": "fn add_pursue summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 400,
+      "kind": "short-item-doc",
+      "message": "fn add_evade summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/ai/steering.rs",
+      "line": 410,
+      "kind": "short-item-doc",
+      "message": "fn add_flock summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/ai/strategy.rs",
+      "line": 31,
+      "kind": "short-item-doc",
+      "message": "fn require_tag summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/ai/strategy.rs",
+      "line": 79,
+      "kind": "short-item-doc",
+      "message": "fn set_tags summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/strategy.rs",
+      "line": 89,
+      "kind": "short-item-doc",
+      "message": "fn remove_tag summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ai/strategy.rs",
+      "line": 138,
+      "kind": "short-item-doc",
+      "message": "fn goal_count summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ai/world.rs",
+      "line": 19,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 59,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 63,
+      "kind": "short-item-doc",
+      "message": "fn len summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 83,
+      "kind": "short-item-doc",
+      "message": "fn remove_layer summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 111,
+      "kind": "short-item-doc",
+      "message": "fn set_mask summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 121,
+      "kind": "short-item-doc",
+      "message": "fn layers summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/animation/blend.rs",
+      "line": 125,
+      "kind": "short-item-doc",
+      "message": "fn get_layer summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/animation/controller.rs",
+      "line": 111,
+      "kind": "short-item-doc",
+      "message": "fn add_clip summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/animation/controller.rs",
+      "line": 179,
+      "kind": "short-item-doc",
+      "message": "fn resume summary is too short: 15 visible chars < 25"
+    },
+    {
+      "file": "src/animation/controller.rs",
+      "line": 370,
+      "kind": "short-item-doc",
+      "message": "fn get_clip summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/animation/curve.rs",
+      "line": 63,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/animation/state_machine.rs",
+      "line": 124,
+      "kind": "short-item-doc",
+      "message": "fn set_param_float summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/animation/state_machine.rs",
+      "line": 129,
+      "kind": "short-item-doc",
+      "message": "fn set_param_bool summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/animation/state_machine.rs",
+      "line": 134,
+      "kind": "short-item-doc",
+      "message": "fn set_param_int summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/animation/state_machine.rs",
+      "line": 139,
+      "kind": "short-item-doc",
+      "message": "fn get_param summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/animation/sync_group.rs",
+      "line": 13,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/animation/sync_group.rs",
+      "line": 25,
+      "kind": "short-item-doc",
+      "message": "fn remove summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/animation/sync_group.rs",
+      "line": 29,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/animation/sync_group.rs",
+      "line": 37,
+      "kind": "short-item-doc",
+      "message": "fn members summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/audio/bus.rs",
+      "line": 42,
+      "kind": "short-item-doc",
+      "message": "fn name summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/audio/sound_data.rs",
+      "line": 96,
+      "kind": "short-item-doc",
+      "message": "fn sample_rate summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/audio/sound_data.rs",
+      "line": 100,
+      "kind": "short-item-doc",
+      "message": "fn channel_count summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/audio/sound_data.rs",
+      "line": 108,
+      "kind": "short-item-doc",
+      "message": "fn duration summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/data/compress.rs",
+      "line": 9,
+      "kind": "short-item-doc",
+      "message": "enum CompressFormat summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/data/data_writer.rs",
+      "line": 54,
+      "kind": "short-item-doc",
+      "message": "fn write_u8 summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/data/data_writer.rs",
+      "line": 58,
+      "kind": "short-item-doc",
+      "message": "fn write_i8 summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/data/data_writer.rs",
+      "line": 96,
+      "kind": "short-item-doc",
+      "message": "fn write_bytes summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/data/dataview.rs",
+      "line": 38,
+      "kind": "short-item-doc",
+      "message": "fn get_size summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 29,
+      "kind": "short-item-doc",
+      "message": "fn is_nil summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 139,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 147,
+      "kind": "short-item-doc",
+      "message": "fn nrows summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 155,
+      "kind": "short-item-doc",
+      "message": "fn ncols summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 163,
+      "kind": "short-item-doc",
+      "message": "fn count summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 197,
+      "kind": "short-item-doc",
+      "message": "fn remove_column summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 204,
+      "kind": "short-item-doc",
+      "message": "fn rename_column summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 239,
+      "kind": "short-item-doc",
+      "message": "fn remove_row summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 289,
+      "kind": "short-item-doc",
+      "message": "fn clone_df summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 822,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 840,
+      "kind": "short-item-doc",
+      "message": "fn remove_table summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 857,
+      "kind": "short-item-doc",
+      "message": "fn table_count summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 861,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/frame.rs",
+      "line": 871,
+      "kind": "short-item-doc",
+      "message": "fn clone_db summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/vectorized.rs",
+      "line": 312,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/vectorized.rs",
+      "line": 319,
+      "kind": "short-item-doc",
+      "message": "fn nrows summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/dataframe/vectorized.rs",
+      "line": 323,
+      "kind": "short-item-doc",
+      "message": "fn ncols summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/filesystem/mod.rs",
+      "line": 8,
+      "kind": "short-item-doc",
+      "message": "mod file_data summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/filesystem/mod.rs",
+      "line": 14,
+      "kind": "short-item-doc",
+      "message": "mod watcher summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/filesystem/mod.rs",
+      "line": 16,
+      "kind": "short-item-doc",
+      "message": "mod zip_mount summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/globe/fog.rs",
+      "line": 56,
+      "kind": "short-item-doc",
+      "message": "fn reveal summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/globe/fog.rs",
+      "line": 60,
+      "kind": "short-item-doc",
+      "message": "fn hide summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/globe/fog.rs",
+      "line": 64,
+      "kind": "short-item-doc",
+      "message": "fn explore summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/globe/fog.rs",
+      "line": 181,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/globe/fog.rs",
+      "line": 210,
+      "kind": "short-item-doc",
+      "message": "fn hide summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/globe/label.rs",
+      "line": 16,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/globe/layer.rs",
+      "line": 14,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 6,
+      "kind": "short-item-doc",
+      "message": "mod composition summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 8,
+      "kind": "short-item-doc",
+      "message": "mod draw summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 10,
+      "kind": "short-item-doc",
+      "message": "mod export summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 12,
+      "kind": "short-item-doc",
+      "message": "mod fog summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 14,
+      "kind": "short-item-doc",
+      "message": "mod label summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 16,
+      "kind": "short-item-doc",
+      "message": "mod layer summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 18,
+      "kind": "short-item-doc",
+      "message": "mod lighting summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 20,
+      "kind": "short-item-doc",
+      "message": "mod loader summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 22,
+      "kind": "short-item-doc",
+      "message": "mod marker summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 24,
+      "kind": "short-item-doc",
+      "message": "mod picking summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 28,
+      "kind": "short-item-doc",
+      "message": "mod province_adapter summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 30,
+      "kind": "short-item-doc",
+      "message": "mod registry summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 34,
+      "kind": "short-item-doc",
+      "message": "mod topology summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/globe/mod.rs",
+      "line": 36,
+      "kind": "short-item-doc",
+      "message": "mod types summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/graph/core.rs",
+      "line": 158,
+      "kind": "short-item-doc",
+      "message": "fn get_node_count summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/core.rs",
+      "line": 201,
+      "kind": "short-item-doc",
+      "message": "fn get_edge_count summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/core.rs",
+      "line": 413,
+      "kind": "short-item-doc",
+      "message": "fn get_item_count summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/edge.rs",
+      "line": 60,
+      "kind": "short-item-doc",
+      "message": "fn get_type summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/graph/edge.rs",
+      "line": 64,
+      "kind": "short-item-doc",
+      "message": "fn set_type summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 46,
+      "kind": "short-item-doc",
+      "message": "fn kill summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 54,
+      "kind": "short-item-doc",
+      "message": "fn get_type summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 58,
+      "kind": "short-item-doc",
+      "message": "fn set_type summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 77,
+      "kind": "short-item-doc",
+      "message": "fn set_remaining_life summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 81,
+      "kind": "short-item-doc",
+      "message": "fn get_priority summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/graph/item.rs",
+      "line": 85,
+      "kind": "short-item-doc",
+      "message": "fn set_priority summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/graph/mod.rs",
+      "line": 6,
+      "kind": "short-item-doc",
+      "message": "mod algorithms summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/graph/mod.rs",
+      "line": 12,
+      "kind": "short-item-doc",
+      "message": "mod item summary is too short: 14 visible chars < 25"
+    },
+    {
+      "file": "src/graph/mod.rs",
+      "line": 16,
+      "kind": "short-item-doc",
+      "message": "mod pathfinding summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/graph/mod.rs",
+      "line": 18,
+      "kind": "short-item-doc",
+      "message": "mod render summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/graph/mod.rs",
+      "line": 22,
+      "kind": "short-item-doc",
+      "message": "mod supply_demand summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 185,
+      "kind": "short-item-doc",
+      "message": "fn get_type summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 189,
+      "kind": "short-item-doc",
+      "message": "fn set_type summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 193,
+      "kind": "short-item-doc",
+      "message": "fn get_capacity summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 197,
+      "kind": "short-item-doc",
+      "message": "fn set_capacity summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 213,
+      "kind": "short-item-doc",
+      "message": "fn add_tag summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 248,
+      "kind": "short-item-doc",
+      "message": "fn clear_supplies summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/node.rs",
+      "line": 278,
+      "kind": "short-item-doc",
+      "message": "fn clear_demands summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/graph/pathfinding.rs",
+      "line": 11,
+      "kind": "short-item-doc",
+      "message": "struct PathResult summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/html/document.rs",
+      "line": 127,
+      "kind": "short-item-doc",
+      "message": "fn root summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/image/effects.rs",
+      "line": 97,
+      "kind": "short-item-doc",
+      "message": "fn sepia summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/image/layers.rs",
+      "line": 75,
+      "kind": "short-item-doc",
+      "message": "fn get_layer summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 5,
+      "kind": "short-item-doc",
+      "message": "mod animation summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 7,
+      "kind": "short-item-doc",
+      "message": "mod audio summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 9,
+      "kind": "short-item-doc",
+      "message": "mod camera summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 11,
+      "kind": "short-item-doc",
+      "message": "mod easing summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 15,
+      "kind": "short-item-doc",
+      "message": "mod geometry summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 17,
+      "kind": "short-item-doc",
+      "message": "mod graph summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 21,
+      "kind": "short-item-doc",
+      "message": "mod noise summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/image/visualization/mod.rs",
+      "line": 25,
+      "kind": "short-item-doc",
+      "message": "mod ui summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/input/mouse.rs",
+      "line": 170,
+      "kind": "short-item-doc",
+      "message": "fn set_visible summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/input/recorder.rs",
+      "line": 166,
+      "kind": "short-item-doc",
+      "message": "fn stop_playback summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 131,
+      "kind": "short-item-doc",
+      "message": "fn set_color summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 135,
+      "kind": "short-item-doc",
+      "message": "fn get_color summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 155,
+      "kind": "short-item-doc",
+      "message": "fn set_energy summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 159,
+      "kind": "short-item-doc",
+      "message": "fn get_energy summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 187,
+      "kind": "short-item-doc",
+      "message": "fn set_shadow_color summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/light/light2d.rs",
+      "line": 287,
+      "kind": "short-item-doc",
+      "message": "fn get_group_id summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/light/occluder.rs",
+      "line": 56,
+      "kind": "short-item-doc",
+      "message": "fn get_vertices summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/light/occluder.rs",
+      "line": 72,
+      "kind": "short-item-doc",
+      "message": "fn get_opacity summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 1,
+      "kind": "missing-file-doc",
+      "message": "missing file-level //! doc header before the first code item"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 3,
+      "kind": "missing-item-doc",
+      "message": "struct CallbackRegistry is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 8,
+      "kind": "missing-item-doc",
+      "message": "fn new is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 14,
+      "kind": "missing-item-doc",
+      "message": "fn register is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 20,
+      "kind": "missing-item-doc",
+      "message": "fn get is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 23,
+      "kind": "missing-item-doc",
+      "message": "fn remove is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 26,
+      "kind": "missing-item-doc",
+      "message": "fn contains is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 29,
+      "kind": "missing-item-doc",
+      "message": "fn clear is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 32,
+      "kind": "missing-item-doc",
+      "message": "fn len is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 35,
+      "kind": "missing-item-doc",
+      "message": "fn is_empty is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/callback_registry.rs",
+      "line": 38,
+      "kind": "missing-item-doc",
+      "message": "fn invoke is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/lua_types.rs",
+      "line": 1,
+      "kind": "missing-file-doc",
+      "message": "missing file-level //! doc header before the first code item"
+    },
+    {
+      "file": "src/lua_api/lua_types.rs",
+      "line": 2,
+      "kind": "missing-item-doc",
+      "message": "trait LurekType is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/lua_types.rs",
+      "line": 6,
+      "kind": "missing-item-doc",
+      "message": "fn add_type_methods is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/physics_api.rs",
+      "line": 81,
+      "kind": "missing-item-doc",
+      "message": "fn world_handle is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 31,
+      "kind": "missing-item-doc",
+      "message": "fn execute_sync is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 415,
+      "kind": "missing-item-doc",
+      "message": "fn pipeline_result_to_lua is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 452,
+      "kind": "missing-item-doc",
+      "message": "fn cancel_remaining_steps is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 461,
+      "kind": "missing-item-doc",
+      "message": "fn fire_step_callbacks is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/lua_api/pipeline_api.rs",
+      "line": 642,
+      "kind": "missing-item-doc",
+      "message": "fn finalize_pipeline_result is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/main.rs",
+      "line": 1,
+      "kind": "missing-file-doc",
+      "message": "missing file-level //! doc header before the first code item"
+    },
+    {
+      "file": "src/math/circle.rs",
+      "line": 29,
+      "kind": "short-item-doc",
+      "message": "fn center summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/math/circle.rs",
+      "line": 34,
+      "kind": "short-item-doc",
+      "message": "fn area summary is too short: 11 visible chars < 25"
+    },
+    {
+      "file": "src/math/circle.rs",
+      "line": 39,
+      "kind": "short-item-doc",
+      "message": "fn perimeter summary is too short: 12 visible chars < 25"
+    },
+    {
+      "file": "src/math/color.rs",
+      "line": 21,
+      "kind": "short-item-doc",
+      "message": "const WHITE summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/math/color.rs",
+      "line": 28,
+      "kind": "short-item-doc",
+      "message": "const BLACK summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/math/color.rs",
+      "line": 35,
+      "kind": "short-item-doc",
+      "message": "const RED summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/math/color.rs",
+      "line": 42,
+      "kind": "short-item-doc",
+      "message": "const GREEN summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/math/color.rs",
+      "line": 49,
+      "kind": "short-item-doc",
+      "message": "const BLUE summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/math/sphere.rs",
+      "line": 17,
+      "kind": "short-item-doc",
+      "message": "fn identity summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/math/vec2.rs",
+      "line": 19,
+      "kind": "short-item-doc",
+      "message": "const ZERO summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/math/vec2.rs",
+      "line": 21,
+      "kind": "short-item-doc",
+      "message": "const ONE summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/minimap/minimap.rs",
+      "line": 559,
+      "kind": "short-item-doc",
+      "message": "fn clear_overlay summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/particle/emitter.rs",
+      "line": 472,
+      "kind": "short-item-doc",
+      "message": "fn clear_attractors summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/particle/emitter.rs",
+      "line": 490,
+      "kind": "short-item-doc",
+      "message": "fn clear_bounds summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/particle/trail.rs",
+      "line": 87,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/flow_field.rs",
+      "line": 170,
+      "kind": "short-item-doc",
+      "message": "fn get_width summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/flow_field.rs",
+      "line": 174,
+      "kind": "short-item-doc",
+      "message": "fn get_height summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/influence_map.rs",
+      "line": 154,
+      "kind": "short-item-doc",
+      "message": "fn clear_layer summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/nav_grid.rs",
+      "line": 136,
+      "kind": "short-item-doc",
+      "message": "fn fill summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/navmesh.rs",
+      "line": 20,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/pathfind/unit_pathfinder.rs",
+      "line": 247,
+      "kind": "short-item-doc",
+      "message": "fn clear_cache summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/behavior_tree.rs",
+      "line": 160,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/bimap.rs",
+      "line": 18,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/factory.rs",
+      "line": 17,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/graph.rs",
+      "line": 91,
+      "kind": "short-item-doc",
+      "message": "fn node_ids summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/graph.rs",
+      "line": 201,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/mediator.rs",
+      "line": 8,
+      "kind": "missing-item-doc",
+      "message": "struct Mediator is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/patterns/mediator.rs",
+      "line": 16,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/observer.rs",
+      "line": 8,
+      "kind": "missing-item-doc",
+      "message": "struct ObserverEntry is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/patterns/observer.rs",
+      "line": 92,
+      "kind": "short-item-doc",
+      "message": "fn clear_all summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/priority_queue.rs",
+      "line": 89,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 15 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/ring.rs",
+      "line": 22,
+      "kind": "short-item-doc",
+      "message": "struct RingEntry summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/ring.rs",
+      "line": 94,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/service_locator.rs",
+      "line": 38,
+      "kind": "short-item-doc",
+      "message": "fn clear summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/trie.rs",
+      "line": 23,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/patterns/weighted_random.rs",
+      "line": 28,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/physics/cellular.rs",
+      "line": 240,
+      "kind": "short-item-doc",
+      "message": "fn step_n summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/physics/mod.rs",
+      "line": 17,
+      "kind": "short-item-doc",
+      "message": "mod terrain summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/physics/world.rs",
+      "line": 1176,
+      "kind": "short-item-doc",
+      "message": "fn set_body_mass summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/physics/world.rs",
+      "line": 1951,
+      "kind": "short-item-doc",
+      "message": "fn wake_up_body summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/physics/zone.rs",
+      "line": 158,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/procgen/mod.rs",
+      "line": 26,
+      "kind": "short-item-doc",
+      "message": "mod poisson summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/procgen/world_graph.rs",
+      "line": 51,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/province/topology.rs",
+      "line": 17,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/raycaster/column_batch.rs",
+      "line": 126,
+      "kind": "short-item-doc",
+      "message": "fn set_floor_color summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/raycaster/column_batch.rs",
+      "line": 130,
+      "kind": "short-item-doc",
+      "message": "fn set_ceiling_color summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/render/decal_surface.rs",
+      "line": 23,
+      "kind": "short-item-doc",
+      "message": "fn get_width summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/render/decal_surface.rs",
+      "line": 27,
+      "kind": "short-item-doc",
+      "message": "fn get_height summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/render/obj_loader.rs",
+      "line": 54,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/render/obj_loader.rs",
+      "line": 75,
+      "kind": "short-item-doc",
+      "message": "fn sub summary is too short: 15 visible chars < 25"
+    },
+    {
+      "file": "src/render/obj_loader.rs",
+      "line": 88,
+      "kind": "short-item-doc",
+      "message": "fn add summary is too short: 15 visible chars < 25"
+    },
+    {
+      "file": "src/serial/mod.rs",
+      "line": 10,
+      "kind": "short-item-doc",
+      "message": "mod ini summary is too short: 14 visible chars < 25"
+    },
+    {
+      "file": "src/serial/mod.rs",
+      "line": 20,
+      "kind": "short-item-doc",
+      "message": "mod toml summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/serial/mod.rs",
+      "line": 22,
+      "kind": "short-item-doc",
+      "message": "mod xml summary is too short: 12 visible chars < 25"
+    },
+    {
+      "file": "src/sprite/sprite.rs",
+      "line": 45,
+      "kind": "short-item-doc",
+      "message": "fn set_color summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/terminal/terminal_state.rs",
+      "line": 805,
+      "kind": "short-item-doc",
+      "message": "fn cols summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/terminal/terminal_state.rs",
+      "line": 810,
+      "kind": "short-item-doc",
+      "message": "fn rows summary is too short: 18 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 161,
+      "kind": "short-item-doc",
+      "message": "fn set_name summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 166,
+      "kind": "short-item-doc",
+      "message": "fn get_name summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 243,
+      "kind": "short-item-doc",
+      "message": "fn get_name summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 248,
+      "kind": "short-item-doc",
+      "message": "fn set_name summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 438,
+      "kind": "short-item-doc",
+      "message": "fn set_name summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 443,
+      "kind": "short-item-doc",
+      "message": "fn get_name summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 752,
+      "kind": "short-item-doc",
+      "message": "fn clear_zones summary is too short: 15 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mapgen.rs",
+      "line": 757,
+      "kind": "short-item-doc",
+      "message": "fn set_layer_mode summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/mod.rs",
+      "line": 31,
+      "kind": "short-item-doc",
+      "message": "mod tmx summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tile_walker.rs",
+      "line": 123,
+      "kind": "short-item-doc",
+      "message": "fn x summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tile_walker.rs",
+      "line": 127,
+      "kind": "short-item-doc",
+      "message": "fn y summary is too short: 19 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tile_walker.rs",
+      "line": 226,
+      "kind": "short-item-doc",
+      "message": "fn turn_around summary is too short: 17 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tilemap.rs",
+      "line": 323,
+      "kind": "short-item-doc",
+      "message": "fn get_tile_width summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tilemap.rs",
+      "line": 339,
+      "kind": "short-item-doc",
+      "message": "fn get_orientation summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tilemap.rs",
+      "line": 343,
+      "kind": "short-item-doc",
+      "message": "fn set_orientation summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tileset.rs",
+      "line": 79,
+      "kind": "short-item-doc",
+      "message": "fn get_tile_count summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tileset.rs",
+      "line": 87,
+      "kind": "short-item-doc",
+      "message": "fn get_tile_width summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/tilemap/tmx.rs",
+      "line": 136,
+      "kind": "short-item-doc",
+      "message": "struct TmxMap summary is too short: 22 visible chars < 25"
+    },
+    {
+      "file": "src/timer/mod.rs",
+      "line": 5,
+      "kind": "missing-item-doc",
+      "message": "mod accumulator is missing a preceding /// summary line with at least 25 visible characters"
+    },
+    {
+      "file": "src/tween/engine.rs",
+      "line": 1,
+      "kind": "missing-file-doc",
+      "message": "missing file-level //! doc header before the first code item"
+    },
+    {
+      "file": "src/ui/controls.rs",
+      "line": 436,
+      "kind": "short-item-doc",
+      "message": "fn increment summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ui/controls.rs",
+      "line": 440,
+      "kind": "short-item-doc",
+      "message": "fn decrement summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ui/data_graph_renderer.rs",
+      "line": 191,
+      "kind": "short-item-doc",
+      "message": "fn clear_series summary is too short: 16 visible chars < 25"
+    },
+    {
+      "file": "src/ui/data_graph_renderer.rs",
+      "line": 215,
+      "kind": "short-item-doc",
+      "message": "fn set_grid_color summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ui/data_graph_renderer.rs",
+      "line": 219,
+      "kind": "short-item-doc",
+      "message": "fn set_axis_color summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ui/data_graph_renderer.rs",
+      "line": 227,
+      "kind": "short-item-doc",
+      "message": "fn set_title summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 170,
+      "kind": "short-item-doc",
+      "message": "fn node_count summary is too short: 24 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 260,
+      "kind": "short-item-doc",
+      "message": "fn expand_all summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 266,
+      "kind": "short-item-doc",
+      "message": "fn collapse_all summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 410,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 21 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 488,
+      "kind": "short-item-doc",
+      "message": "fn new summary is too short: 23 visible chars < 25"
+    },
+    {
+      "file": "src/ui/extras.rs",
+      "line": 692,
+      "kind": "short-item-doc",
+      "message": "fn set_count summary is too short: 20 visible chars < 25"
+    },
+    {
+      "file": "src/ui/widget.rs",
+      "line": 1,
+      "kind": "missing-file-doc",
+      "message": "missing file-level //! doc header before the first code item"
+    },
+    {
+      "file": "src/ui/widget.rs",
+      "line": 156,
+      "kind": "missing-item-doc",
+      "message": "fn parse_str is missing a preceding /// summary line with at least 25 visible characters"
+    }
+  ]
+}

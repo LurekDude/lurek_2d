@@ -187,7 +187,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | value | table | The data to validate.
     /// @param | schema | table | A schema table defining the expected structure and constraints.
     /// @return | boolean | True if validation passes, false otherwise.
-    /// @return | string? | An error message describing the validation failure, or nil on success.
+    /// @return | string | An error message describing the validation failure, or nil on success.
     tbl.set(
         "validate",
         lua.create_function(|_, (value, schema): (LuaValue, LuaValue)| {
@@ -203,7 +203,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- detectFormat --
     /// Attempts to auto-detect the serialization format of a string by inspecting its content (e.g., leading `{` for JSON, `[section]` for INI, XML declaration for XML). Returns the format name or nil if detection fails. Useful for loading user-provided files where the format is unknown.
     /// @param | text | string | The raw text content to analyze.
-    /// @return | string? | The detected format name ("json", "toml", "csv", "xml", "ini") or nil if unrecognized.
+    /// @return | string | The detected format name ("json", "toml", "csv", "xml", "ini") or nil if unrecognized.
     tbl.set(
         "detectFormat",
         lua.create_function(|_, s: String| {

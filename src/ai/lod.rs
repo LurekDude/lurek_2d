@@ -4,7 +4,7 @@
 //! - Frame-cadence check so distant agents skip updates while near agents run every frame.
 //! - Default three-tier near/mid/far layout suitable for 2D worlds on integrated GPUs.
 
-/// One LOD bucket for AI work.
+/// One LOD bucket for AI work. This item is part of the public API.
 #[derive(Clone)]
 pub struct LodTier {
     /// Tier name used for debug and display.
@@ -27,7 +27,7 @@ impl LodTier {
         }
     }
 }
-/// Ordered LOD tier set.
+/// Ordered LOD tier set. This item is part of the public API.
 pub struct AILod {
     /// Sorted tiers from near to far.
     pub tiers: Vec<LodTier>,
@@ -38,11 +38,11 @@ impl AILod {
         tiers.sort_by(|a, b| a.max_distance.partial_cmp(&b.max_distance).unwrap());
         Self { tiers }
     }
-    /// Return tier `i` if it exists.
+    /// Return tier `i` if it exists. This function is part of the public API.
     pub fn tier(&self, i: usize) -> Option<&LodTier> {
         self.tiers.get(i)
     }
-    /// Return the number of tiers.
+    /// Return the number of tiers. This function is part of the public API.
     pub fn tier_count(&self) -> usize {
         self.tiers.len()
     }

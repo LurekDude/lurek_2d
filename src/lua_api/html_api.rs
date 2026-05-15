@@ -372,7 +372,7 @@ impl LuaUserData for LuaHtmlElement {
             })
         });
         // -- getTagName --
-        /// Returns this element's tag name.
+        /// Returns this element's tag name. This method is available to Lua scripts.
         /// @return | string | Tag name, or an empty string for missing elements.
         methods.add_method("getTagName", |_, this, ()| {
             check_html_element(this)?;
@@ -383,9 +383,9 @@ impl LuaUserData for LuaHtmlElement {
                 .map(|element| element.tag_name().to_string())
                 .unwrap_or_default())
         });
-            // -- getId --
-            /// Returns this element's id attribute.
-            /// @return | LuaValue | Id string, or nil when no id attribute exists.
+        // -- getId --
+        /// Returns this element's id attribute.
+        /// @return | LuaValue | Id string, or nil when no id attribute exists.
         methods.add_method("getId", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -394,10 +394,10 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .and_then(|element| element.id_attribute().map(str::to_string)))
         });
-            // -- setId --
-            /// Sets or clears this element's id attribute.
-            /// @param | id | string | Optional id attribute value.
-            /// @return | nil | No value is returned.
+        // -- setId --
+        /// Sets or clears this element's id attribute.
+        /// @param | id | string | Optional id attribute value.
+        /// @return | nil | No value is returned.
         methods.add_method("setId", |_, this, id: Option<String>| {
             check_html_element(this)?;
             this.document
@@ -416,18 +416,18 @@ impl LuaUserData for LuaHtmlElement {
                 .text(this.element_id)
                 .unwrap_or_default())
         });
-            // -- setText --
-            /// Replaces this element's text content.
-            /// @param | text | string | New text content.
-            /// @return | nil | No value is returned.
+        // -- setText --
+        /// Replaces this element's text content.
+        /// @param | text | string | New text content.
+        /// @return | nil | No value is returned.
         methods.add_method("setText", |_, this, text: String| {
             check_html_element(this)?;
             this.document.borrow_mut().set_text(this.element_id, text);
             Ok(())
         });
-            // -- getHtml --
-            /// Returns this element's inner HTML.
-            /// @return | string | Element inner HTML, or an empty string when unavailable.
+        // -- getHtml --
+        /// Returns this element's inner HTML.
+        /// @return | string | Element inner HTML, or an empty string when unavailable.
         methods.add_method("getHtml", |_, this, ()| {
             check_html_element(this)?;
             Ok(this
@@ -436,10 +436,10 @@ impl LuaUserData for LuaHtmlElement {
                 .element_html(this.element_id)
                 .unwrap_or_default())
         });
-            // -- setHtml --
-            /// Replaces this element's inner HTML and may invalidate descendant element handles.
-            /// @param | html | string | New inner HTML source.
-            /// @return | nil | No value is returned.
+        // -- setHtml --
+        /// Replaces this element's inner HTML and may invalidate descendant element handles.
+        /// @param | html | string | New inner HTML source.
+        /// @return | nil | No value is returned.
         methods.add_method("setHtml", |_, this, html: String| {
             check_html_element(this)?;
             this.document
@@ -478,11 +478,11 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .and_then(|element| element.attribute(&name).map(str::to_string)))
         });
-            // -- setAttribute --
-            /// Sets or clears an attribute on this element.
-            /// @param | name | string | Attribute name.
-            /// @param | value | string | Optional attribute value; nil removes the attribute.
-            /// @return | nil | No value is returned.
+        // -- setAttribute --
+        /// Sets or clears an attribute on this element.
+        /// @param | name | string | Attribute name.
+        /// @param | value | string | Optional attribute value; nil removes the attribute.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "setAttribute",
             |_, this, (name, value): (String, Option<String>)| {
@@ -516,10 +516,10 @@ impl LuaUserData for LuaHtmlElement {
                 .element(this.element_id)
                 .is_some_and(|element| element.has_class(&name)))
         });
-            // -- addClass --
-            /// Adds a CSS class to this element.
-            /// @param | name | string | Class name to add.
-            /// @return | nil | No value is returned.
+        // -- addClass --
+        /// Adds a CSS class to this element. This method is available to Lua scripts.
+        /// @param | name | string | Class name to add.
+        /// @return | nil | No value is returned.
         methods.add_method("addClass", |_, this, name: String| {
             check_html_element(this)?;
             this.document.borrow_mut().add_class(this.element_id, &name);
@@ -858,6 +858,8 @@ fn create_html_event_table<'lua>(
         table.set("value", value.clone())?;
     }
     let prevent_flags = flags.clone();
+    /// Prevent default for Lua scripts in this module.
+    /// @return | nil | No return value.
     table.set(
         "preventDefault",
         lua.create_function(move |_, ()| {
@@ -866,6 +868,8 @@ fn create_html_event_table<'lua>(
         })?,
     )?;
     let stop_flags = flags.clone();
+    /// Stop propagation for Lua scripts in this module.
+    /// @return | nil | No return value.
     table.set(
         "stopPropagation",
         lua.create_function(move |_, ()| {
@@ -873,6 +877,8 @@ fn create_html_event_table<'lua>(
             Ok(())
         })?,
     )?;
+    /// Returns true if default prevented for Lua scripts in this module.
+    /// @return | table | Table result returned by this call.
     table.set(
         "isDefaultPrevented",
         lua.create_function(move |_, ()| Ok(flags.borrow().default_prevented))?,

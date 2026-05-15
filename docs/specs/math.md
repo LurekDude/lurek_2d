@@ -53,6 +53,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `polygon.rs`: Provides polygon-specific helpers centered on convexity testing and ear-clipping triangulation.
 - `random.rs`: Wraps `fastrand` in a deterministic, serializable RNG API that matches engine and Lua expectations.
 - `rect.rs`: Provides axis-aligned rectangles for overlap, containment, and intersection queries used across gameplay and rendering code.
+- `rect_packing.rs`: - Shelf-first rectangle packing for texture atlas layout.
 - `spatial_hash.rs`: Implements a uniform-grid broad-phase index for fast rectangle, circle, and segment spatial queries.
 - `sphere.rs`: Spherical math helpers used by `src/globe/`.
 - `spline.rs`: Interpolating and approximating splines: Catmull-Rom and Hermite.
@@ -93,48 +94,48 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 
 ## Functions
 
-- `AabbTree::new` (`aabb_tree.rs`): Creates an empty AABB tree.
-- `AabbTree::insert` (`aabb_tree.rs`): Inserts an entry with the given AABB into the tree.
-- `AabbTree::remove` (`aabb_tree.rs`): Removes the entry with the given `id` from the tree.
-- `AabbTree::query` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the query rectangle.
-- `AabbTree::query_point` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs contain the point `(x, y)`.
-- `AabbTree::query_circle` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the given circle.
-- `AabbTree::query_segment` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the line segment from `(x1, y1)` to `(x2, y2)`.
-- `AabbTree::update` (`aabb_tree.rs`): - `min_x`, `min_y` — New minimum corner.
-- `AabbTree::contains` (`aabb_tree.rs`): Returns `true` if an entry with the given `id` exists in the tree.
-- `AabbTree::len` (`aabb_tree.rs`): Returns the number of entries currently in the tree.
-- `AabbTree::is_empty` (`aabb_tree.rs`): Returns `true` if the tree contains no entries.
-- `AabbTree::clear` (`aabb_tree.rs`): Removes all entries and resets the tree to the empty state.
-- `BezierCurve::new` (`bezier.rs`): Create a new Bezier curve from control points.
-- `BezierCurve::evaluate` (`bezier.rs`): Evaluate the curve at parameter `t` using De Casteljau's algorithm.
-- `BezierCurve::render` (`bezier.rs`): Render the curve as a polyline with the given number of segments.
-- `BezierCurve::render_segment` (`bezier.rs`): Render a portion of the curve between `t_start` and `t_end`.
-- `BezierCurve::get_derivative` (`bezier.rs`): Compute the derivative curve (one degree lower than the current curve).
-- `BezierCurve::get_control_point` (`bezier.rs`): Get a control point by 0-based index.
-- `BezierCurve::set_control_point` (`bezier.rs`): Set a control point by 0-based index.
-- `BezierCurve::insert_control_point` (`bezier.rs`): Insert a control point at a given index, or append if `index` is `None`.
-- `BezierCurve::remove_control_point` (`bezier.rs`): Remove a control point by 0-based index.
-- `BezierCurve::get_control_point_count` (`bezier.rs`): Get the number of control points.
+- `AabbTree::new` (`aabb_tree.rs`): Construct an empty AABB tree with no entries.
+- `AabbTree::insert` (`aabb_tree.rs`): Insert or replace entry `id` with the given AABB, refitting the tree upward.
+- `AabbTree::remove` (`aabb_tree.rs`): Remove entry `id`; returns `true` when the entry existed.
+- `AabbTree::query` (`aabb_tree.rs`): Return ids of all entries whose AABB overlaps the given query box.
+- `AabbTree::query_point` (`aabb_tree.rs`): Return ids of all entries whose AABB contains the point (x, y).
+- `AabbTree::query_circle` (`aabb_tree.rs`): Return ids of all entries whose AABB overlaps the circle, verified with exact circle test.
+- `AabbTree::query_segment` (`aabb_tree.rs`): Return ids of all entries whose AABB overlaps the segment, verified with exact slab test.
+- `AabbTree::update` (`aabb_tree.rs`): Remove and re-insert entry `id` with updated bounds; returns `false` when id is not present.
+- `AabbTree::contains` (`aabb_tree.rs`): Return true when entry `id` is currently stored in this tree.
+- `AabbTree::len` (`aabb_tree.rs`): Return the number of entries currently stored.
+- `AabbTree::is_empty` (`aabb_tree.rs`): Return true when the tree contains no entries.
+- `AabbTree::clear` (`aabb_tree.rs`): Remove all entries and reset the node pool.
+- `BezierCurve::new` (`bezier.rs`): Construct a Bézier curve from `points`; panics when fewer than 2 are supplied.
+- `BezierCurve::evaluate` (`bezier.rs`): Evaluate the curve at parameter `t` (clamped to `[0,1]`) using Bernstein basis.
+- `BezierCurve::render` (`bezier.rs`): Sample the full curve at `segments+1` evenly spaced parameter values.
+- `BezierCurve::render_segment` (`bezier.rs`): Sample the curve between `t_start` and `t_end` at `segments+1` evenly spaced values.
+- `BezierCurve::get_derivative` (`bezier.rs`): Return the first derivative curve as a new `BezierCurve` with degree reduced by one.
+- `BezierCurve::get_control_point` (`bezier.rs`): Return the control point at `index`, or `None` when out of range.
+- `BezierCurve::set_control_point` (`bezier.rs`): Set control point at `index`; returns `false` when out of range.
+- `BezierCurve::insert_control_point` (`bezier.rs`): Insert `point` at `index`, or append when `index` is `None` or out of range.
+- `BezierCurve::remove_control_point` (`bezier.rs`): Remove the control point at `index`; returns `false` when fewer than 3 points remain or index is out of range.
+- `BezierCurve::get_control_point_count` (`bezier.rs`): Return the number of control points.
 - `BezierCurve::translate` (`bezier.rs`): Translate all control points by `(dx, dy)`.
-- `BezierCurve::rotate` (`bezier.rs`): Rotate all control points around a pivot `(ox, oy)` by `angle` radians.
-- `BezierCurve::scale` (`bezier.rs`): Scale all control points around a pivot `(ox, oy)` by factor `s`.
-- `BezierCurve::length` (`bezier.rs`): Approximate the total arc length of the curve.
-- `BezierCurve::get_interpolated_position` (`bezier.rs`): Evaluate the curve position at parameter `t` and return it as an `(x, y)` tuple.
-- `BezierCurve::get_interpolated_angle` (`bezier.rs`): Return the angle of the curve tangent at parameter `t` in radians.
-- `BezierCurve::evaluate_at_distance` (`bezier.rs`): Evaluates a curve point by travelled arc-length for near-constant-speed sampling.
-- `Circle::new` (`circle.rs`): Creates a new `Circle` centred at `(x, y)` with the given `radius`.
-- `Circle::center` (`circle.rs`): Returns the centre as a `Vec2`.
-- `Circle::area` (`circle.rs`): Returns the area of the circle (`π r²`).
-- `Circle::perimeter` (`circle.rs`): Returns the perimeter (circumference) of the circle (`2 π r`).
-- `Circle::contains` (`circle.rs`): Returns `true` if the point `(px, py)` lies inside or on the boundary of this circle.
-- `Circle::intersects` (`circle.rs`): Returns `true` if this circle overlaps with `other`.
-- `Circle::aabb` (`circle.rs`): Returns the axis-aligned bounding box of this circle as `(min_x, min_y, max_x, max_y)`.
-- `Color::new` (`color.rs`): Creates a color from `f32` RGBA components in `[0.0, 1.0]`.
-- `Color::from_u8` (`color.rs`): Creates a color from `u8` RGBA components in `[0, 255]`, normalizing to `[0.0, 1.0]`.
-- `Color::to_u8` (`color.rs`): Converts the color to `u8` RGBA components, each in `[0, 255]`.
-- `Color::to_rgb_u32` (`color.rs`): Converts the color to a packed `u32` RGB value suitable for packed pixel buffers.
-- `Color::from_hex` (`color.rs`): Creates a color from a hex string such as `"#FF8000"`, `"#FF8000FF"`, or `"FF8000"`.
-- `Color::to_hsl` (`color.rs`): Converts the color to HSL (hue, saturation, lightness).
+- `BezierCurve::rotate` (`bezier.rs`): Rotate all control points by `angle` radians around origin `(ox, oy)`.
+- `BezierCurve::scale` (`bezier.rs`): Scale all control points by factor `s` relative to origin `(ox, oy)`.
+- `BezierCurve::length` (`bezier.rs`): Return the approximate arc length via 100-sample numeric integration.
+- `BezierCurve::get_interpolated_position` (`bezier.rs`): Return the evaluated point as `(x, y)` at parameter `t`.
+- `BezierCurve::evaluate_at_distance` (`bezier.rs`): Return the point at arc-length `distance` from t=0 via `samples`-step linear walk.
+- `BezierCurve::get_interpolated_angle` (`bezier.rs`): Return the tangent angle in radians at parameter `t` using the derivative curve.
+- `Circle::new` (`circle.rs`): Construct a Circle; radius is clamped to >= 0.
+- `Circle::center` (`circle.rs`): Return the center as a Vec2.
+- `Circle::area` (`circle.rs`): Return π × r².
+- `Circle::perimeter` (`circle.rs`): Return 2 × π × r.
+- `Circle::contains` (`circle.rs`): Return true when `(px, py)` lies inside or on the boundary of this circle.
+- `Circle::intersects` (`circle.rs`): Return true when this circle and `other` overlap (touching counts as intersection).
+- `Circle::aabb` (`circle.rs`): Return the axis-aligned bounding box as `(min_x, min_y, max_x, max_y)`.
+- `Color::new` (`color.rs`): Construct a Color from four f32 components.
+- `Color::from_u8` (`color.rs`): Construct a Color from four u8 components, normalising each to [0, 1].
+- `Color::to_u8` (`color.rs`): Return the four components as clamped u8 values (r, g, b, a).
+- `Color::to_rgb_u32` (`color.rs`): Return the color packed as a 24-bit RGB u32 (alpha discarded).
+- `Color::from_hex` (`color.rs`): Parse a hex color string (`#RRGGBB` or `#RRGGBBAA`); returns None on parse failure.
+- `Color::to_hsl` (`color.rs`): Return this color converted to `(hue_degrees, saturation, lightness)` tuple.
 - `hsv_to_rgb` (`color.rs`): Convert an HSV color to RGB byte components.
 - `gamma_to_linear` (`color.rs`): Convert a single sRGB gamma-space color component to linear space.
 - `linear_to_gamma` (`color.rs`): Convert a single linear-space color component to sRGB gamma space.
@@ -165,6 +166,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `ease_out_back` (`easing.rs`): Back ease-out — overshoots the target then settles back.
 - `ease_in_out_back` (`easing.rs`): Back ease-in-out — pulls back at start, overshoots at end.
 - `apply` (`easing.rs`): Looks up an easing function by name and applies it to progress value `t`.
+- `resolve_easing_fn` (`easing.rs`): Return the function pointer for a named easing function; returns None when unrecognised.
 - `lerp` (`facade.rs`): Linear interpolation between `a` and `b` by factor `t` in [0, 1].
 - `remap` (`facade.rs`): Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
 - `clamp` (`facade.rs`): Clamp `v` to the range `[min, max]`.
@@ -185,87 +187,86 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `bresenham` (`geometry.rs`): Bresenham line rasterization from (x1, y1) to (x2, y2).
 - `convex_hull` (`geometry.rs`): Computes the convex hull of a set of 2D points using Andrew's monotone chain algorithm.
 - `delaunay_triangulate` (`geometry.rs`): Delaunay triangulation using the Bowyer-Watson algorithm.
-- `Mat3::identity` (`mat3.rs`): Returns the 3×3 identity matrix.
-- `Mat3::from_row_major` (`mat3.rs`): Creates a `Mat3` from a flat 9-element array in row-major order.
-- `Mat3::from_translation` (`mat3.rs`): Creates a translation matrix that moves points by `(t.x, t.y)`.
-- `Mat3::from_rotation` (`mat3.rs`): Creates a rotation matrix for a counter-clockwise rotation of `angle` radians.
-- `Mat3::from_shear` (`mat3.rs`): Creates a shear (skew) matrix.
-- `Mat3::from_scale` (`mat3.rs`): Creates a non-uniform scale matrix with the given per-axis factors.
-- `Mat3::inverse` (`mat3.rs`): Compute the inverse of this 3×3 matrix.
-- `Mat3::transform_point` (`mat3.rs`): Applies the matrix transform to a 2D point using homogeneous coordinates.
-- `lerp` (`mod.rs`): Linear interpolation between `a` and `b` by factor `t` in [0, 1].
-- `remap` (`mod.rs`): Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
-- `clamp` (`mod.rs`): Clamp `v` to the range `[min, max]`.
-- `sign` (`mod.rs`): Returns the sign of `v`: `1.0` if positive, `-1.0` if negative, `0.0` if zero.
-- `smoothstep` (`mod.rs`): Hermite smooth interpolation between 0 and 1 when `x` is in `[edge0, edge1]`.
-- `inverse_lerp` (`mod.rs`): Inverse linear interpolation: returns the `t` factor such that `lerp(a, b, t) ≈ v`.
+- `Mat3::identity` (`mat3.rs`): Return the 3×3 identity matrix.
+- `Mat3::from_row_major` (`mat3.rs`): Construct from a flat row-major 9-element slice.
+- `Mat3::from_translation` (`mat3.rs`): Construct a pure translation matrix for offset `t`.
+- `Mat3::from_rotation` (`mat3.rs`): Construct a pure rotation matrix for the given `angle` in radians.
+- `Mat3::from_shear` (`mat3.rs`): Construct a shear matrix with horizontal factor `kx` and vertical factor `ky`.
+- `Mat3::from_scale` (`mat3.rs`): Construct a non-uniform scale matrix from `scale`.
+- `Mat3::inverse` (`mat3.rs`): Return the matrix inverse; returns identity when the determinant is near zero.
+- `Mat3::transform_point` (`mat3.rs`): Apply this affine transform to a 2D point `p` and return the transformed point.
+- `fade` (`noise_functions.rs`): Quintic fade curve for smooth interpolation: 6t^5 - 15t^4 + 10t^3.
 - `perlin2d` (`noise_functions.rs`): Generates 2D Perlin noise at the given coordinates.
+- `perlin3d` (`noise_functions.rs`): Generates 3D Perlin noise at the given coordinates.
+- `perlin4d` (`noise_functions.rs`): Generates 4D Perlin noise at the given coordinates.
 - `simplex2d` (`noise_functions.rs`): Generates 2D Simplex noise at the given coordinates.
 - `simplex_noise_2d` (`noise_functions.rs`): Returns 2D simplex noise for the given coordinates using seed 0.
 - `simplex_noise_3d` (`noise_functions.rs`): Returns 3D simplex noise for the given coordinates using seed 0.
 - `fbm` (`noise_functions.rs`): Generates fractal Brownian motion noise by layering multiple octaves of Perlin noise.
-- `fade` (`noise_functions.rs`): Quintic fade curve for smooth interpolation: 6t^5 - 15t^4 + 10t^3.
-- `perlin3d` (`noise_functions.rs`): Generates 3D Perlin noise at the given coordinates.
-- `perlin4d` (`noise_functions.rs`): Generates 4D Perlin noise at the given coordinates.
-- `NoiseGenerator::new` (`noise_generator.rs`): Creates a new generator with the given seed.
-- `NoiseGenerator::set_seed` (`noise_generator.rs`): Replaces the seed and rebuilds the permutation table.
-- `NoiseGenerator::seed` (`noise_generator.rs`): Returns the current seed.
-- `NoiseGenerator::generate_map_compute` (`noise_generator.rs`): Compute-backend entrypoint for map generation (currently CPU fallback compatible).
-- `NoiseGenerator::perlin_1d` (`noise_generator.rs`): 1D Perlin noise.
-- `NoiseGenerator::perlin_2d` (`noise_generator.rs`): 2D Perlin noise.
-- `NoiseGenerator::perlin_3d` (`noise_generator.rs`): 3D Perlin noise.
-- `NoiseGenerator::perlin_4d` (`noise_generator.rs`): 4D Perlin noise.
-- `NoiseGenerator::simplex_1d` (`noise_generator.rs`): 1D Simplex noise.
-- `NoiseGenerator::simplex_2d` (`noise_generator.rs`): 2D Simplex noise.
-- `NoiseGenerator::simplex_3d` (`noise_generator.rs`): 3D Simplex noise.
-- `NoiseGenerator::worley_2d` (`noise_generator.rs`): 2D Worley (cellular) noise.
-- `NoiseGenerator::worley_3d` (`noise_generator.rs`): 3D Worley (cellular) noise.
-- `NoiseGenerator::fbm` (`noise_generator.rs`): Fractal Brownian motion — sum of octaves with decreasing amplitude.
-- `NoiseGenerator::ridged` (`noise_generator.rs`): Ridged multi-fractal — sharp ridges from `1 - |noise|`.
-- `RectPacker::new` (`rect_packing.rs`): Creates a new fixed-size runtime rectangle packer.
-- `RectPacker::pack` (`rect_packing.rs`): Attempts to pack a rectangle and returns a placement when successful.
-- `NoiseGenerator::turbulence` (`noise_generator.rs`): Turbulence noise — sum of `|noise|` per octave.
-- `NoiseGenerator::warp_domain` (`noise_generator.rs`): Domain warping — offsets the input coordinates by noise, producing organic distortion.
-- `NoiseGenerator::generate_map` (`noise_generator.rs`): Generates a 2D noise map of `width * height` values using the given options.
+- `NoiseGenerator::new` (`noise_generator.rs`): Construct a generator from `seed`, immediately building its permutation table.
+- `NoiseGenerator::set_seed` (`noise_generator.rs`): Replace the current seed and rebuild the permutation table.
+- `NoiseGenerator::seed` (`noise_generator.rs`): Return the current seed value.
+- `NoiseGenerator::perlin_1d` (`noise_generator.rs`): Return 1-D Perlin noise in approximately `[-1, 1]`.
+- `NoiseGenerator::perlin_2d` (`noise_generator.rs`): Return 2-D Perlin noise in approximately `[-1, 1]`.
+- `NoiseGenerator::perlin_3d` (`noise_generator.rs`): Return 3-D Perlin noise in approximately `[-1, 1]`.
+- `NoiseGenerator::perlin_4d` (`noise_generator.rs`): Return 4-D Perlin noise in approximately `[-1, 1]` via 16-corner trilinear interpolation.
+- `NoiseGenerator::simplex_1d` (`noise_generator.rs`): Return 1-D Simplex noise in approximately `[-1, 1]`.
+- `NoiseGenerator::simplex_2d` (`noise_generator.rs`): Return 2-D Simplex noise in approximately `[-1, 1]`.
+- `NoiseGenerator::simplex_3d` (`noise_generator.rs`): Return 3-D Simplex noise in approximately `[-1, 1]`.
+- `NoiseGenerator::worley_2d` (`noise_generator.rs`): Return 2-D Worley (cell) noise using `dist` metric; returns F2-F1 when `f2` is true.
+- `NoiseGenerator::worley_3d` (`noise_generator.rs`): Return 3-D Worley (cell) noise using `dist` metric; returns F2-F1 when `f2` is true.
+- `NoiseGenerator::fbm` (`noise_generator.rs`): Return amplitude-normalised fBm noise summing `octaves` layers of `kind`.
+- `NoiseGenerator::ridged` (`noise_generator.rs`): Return amplitude-normalised ridged multifractal noise summing `octaves` inverted absolute layers.
+- `NoiseGenerator::turbulence` (`noise_generator.rs`): Return amplitude-normalised turbulence noise summing `octaves` absolute-value layers.
+- `NoiseGenerator::warp_domain` (`noise_generator.rs`): Apply domain warping using Perlin offsets, returning the displaced coordinate pair.
+- `NoiseGenerator::generate_map` (`noise_generator.rs`): Generate a `width × height` heightmap using `opts`; returns row-major `f64` values in `[-1, 1]`.
+- `NoiseGenerator::generate_map_compute` (`noise_generator.rs`): Alias for `generate_map`; future versions may dispatch to a compute shader.
 - `triangulate` (`polygon.rs`): Triangulate a simple polygon using the ear-clipping algorithm.
 - `is_convex` (`polygon.rs`): Check if a polygon is convex.
 - `polygon_clip` (`polygon.rs`): Clip a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
 - `polygon_intersection` (`polygon.rs`): Clips polygon `subject` against the convex polygon `clip` using the Sutherland-Hodgman algorithm and returns the intersection region.
 - `polygon_union` (`polygon.rs`): Returns an approximation of the union of two convex polygons by computing the convex hull of all their vertices.
 - `polygon_difference` (`polygon.rs`): Returns an approximation of the difference `A - B` by clipping `A` against the **reversed** edges of `B` (i.e.
-- `RandomGenerator::new` (`random.rs`): Create a new generator with a random seed.
-- `RandomGenerator::with_seed` (`random.rs`): Create with a specific seed for deterministic sequences.
-- `RandomGenerator::random` (`random.rs`): Sample a uniform random value in `[0.0, 1.0)`.
-- `RandomGenerator::random_int` (`random.rs`): Sample a uniform random integer in `[min, max]` (inclusive).
-- `RandomGenerator::random_float` (`random.rs`): Sample a uniform random float in `[min, max)`.
-- `RandomGenerator::random_normal` (`random.rs`): Random number from normal (Gaussian) distribution using Box-Muller transform.
-- `RandomGenerator::set_seed` (`random.rs`): Set the seed, fully resetting the generator state.
-- `RandomGenerator::get_seed` (`random.rs`): Get the seed that was used to initialise (or last reset) this generator.
-- `RandomGenerator::get_state` (`random.rs`): Serialise the generator state as a string for later restoration.
-- `RandomGenerator::set_state` (`random.rs`): Restore the generator state from a previously serialised string.
-- `Rect::new` (`rect.rs`): Creates a new `Rect` at `(x, y)` with the given `width` and `height`.
-- `Rect::center` (`rect.rs`): Returns the center point of the rectangle.
-- `Rect::area` (`rect.rs`): Returns the area of the rectangle.
-- `Rect::contains` (`rect.rs`): Returns `true` if the given point lies within or on the boundary of the rectangle.
-- `Rect::intersects` (`rect.rs`): Returns `true` if this rectangle overlaps with `other`.
-- `Rect::intersect` (`rect.rs`): Computes the rectangle intersection of `self` and `other`.
-- `Rect::union` (`rect.rs`): Returns the smallest rectangle that contains both `self` and `other`.
-- `Rect::from_center` (`rect.rs`): Creates a rectangle centered at `(cx, cy)` with the given width and height.
-- `Rect::from_points` (`rect.rs`): Creates the smallest axis-aligned bounding rectangle that contains all given points.
-- `SpatialHash::new` (`spatial_hash.rs`): Creates an empty spatial hash with the given cell size.
-- `SpatialHash::cell_size` (`spatial_hash.rs`): Returns the cell size.
-- `SpatialHash::item_count` (`spatial_hash.rs`): Returns the number of items in the hash.
-- `SpatialHash::insert` (`spatial_hash.rs`): Inserts an item with the given AABB.
-- `SpatialHash::remove` (`spatial_hash.rs`): Removes an item by its ID.
-- `SpatialHash::update` (`spatial_hash.rs`): Updates an existing item's AABB.
-- `SpatialHash::clear` (`spatial_hash.rs`): Removes all items and clears all buckets.
-- `SpatialHash::query_rect` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query rectangle.
-- `SpatialHash::query_circle` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query circle.
-- `SpatialHash::query_segment` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs are intersected by a line
-- `Mat3x3::identity` (`sphere.rs`): 3Ã—3 identity.
-- `Mat3x3::from_cols` (`sphere.rs`): Construct from three column vectors.
-- `Mat3x3::mul_vec` (`sphere.rs`): Apply this rotation to a `Vec3`: returns `M * v`.
-- `Mat3x3::mul_mat` (`sphere.rs`): Matrix product `self * other`.
+- `RandomGenerator::new` (`random.rs`): Construct a generator with an arbitrary unseeded initial state (seed stored as 0).
+- `RandomGenerator::with_seed` (`random.rs`): Construct a generator from an explicit `seed`.
+- `RandomGenerator::random` (`random.rs`): Return a uniform random `f64` in `[0.0, 1.0)`.
+- `RandomGenerator::random_int` (`random.rs`): Return a uniform random integer in the closed range `[min, max]`; returns `min` when `min >= max`.
+- `RandomGenerator::random_float` (`random.rs`): Return a uniform random `f64` in `[min, max)`.
+- `RandomGenerator::random_normal` (`random.rs`): Return a Gaussian-distributed `f64` with `mean` and `stddev` using Box-Muller transform.
+- `RandomGenerator::set_seed` (`random.rs`): Re-seed the generator, resetting both the stored seed and the RNG state.
+- `RandomGenerator::get_seed` (`random.rs`): Return the seed last set via `with_seed` or `set_seed`.
+- `RandomGenerator::get_state` (`random.rs`): Serialise the current seed to a string for save-file persistence.
+- `RandomGenerator::set_state` (`random.rs`): Restore the seed from a previously serialised state string; returns error on parse failure.
+- `Rect::new` (`rect.rs`): Construct a Rect from top-left position and size.
+- `Rect::center` (`rect.rs`): Return the center point of this rectangle.
+- `Rect::area` (`rect.rs`): Return the area (width × height).
+- `Rect::contains` (`rect.rs`): Return true when `(point_x, point_y)` lies inside or on the boundary of this rect.
+- `Rect::intersects` (`rect.rs`): Return true when this rect overlaps `other` (touching edges count as overlap).
+- `Rect::intersect` (`rect.rs`): Return the overlapping region of `self` and `other`; returns zero-size rect when disjoint.
+- `Rect::union` (`rect.rs`): Return the smallest rect that contains both `self` and `other`.
+- `Rect::from_center` (`rect.rs`): Construct a rect centered at `(cx, cy)` with given `w` and `h`.
+- `Rect::from_points` (`rect.rs`): Return the tight bounding rect around a slice of `(x, y)` points; returns zero rect for empty slice.
+- `RectPacker::new` (`rect_packing.rs`): Construct a packer with the given atlas `width × height` and uniform `padding`.
+- `RectPacker::pack` (`rect_packing.rs`): Place a `w × h` rectangle with optional `id` label; returns placement or `None` when no space remains.
+- `RectPacker::clear` (`rect_packing.rs`): Remove all placed rects and reset shelves, keeping atlas dimensions unchanged.
+- `RectPacker::packed_rects` (`rect_packing.rs`): Return a slice of all successfully placed rects in insertion order.
+- `RectPacker::occupancy` (`rect_packing.rs`): Return the fraction `[0,1]` of the atlas area covered by placed rects, excluding padding.
+- `RectPacker::size` (`rect_packing.rs`): Return the atlas dimensions as `(width, height)` in pixels.
+- `RectPacker::padding` (`rect_packing.rs`): Return the uniform padding value used during packing.
+- `SpatialHash::new` (`spatial_hash.rs`): Construct an empty hash with the given uniform `cell_size`.
+- `SpatialHash::cell_size` (`spatial_hash.rs`): Return the world-space cell size.
+- `SpatialHash::item_count` (`spatial_hash.rs`): Return the number of items currently registered.
+- `SpatialHash::insert` (`spatial_hash.rs`): Register or replace item `id` with AABB `(x, y, w, h)`, inserting it into all overlapping cells.
+- `SpatialHash::remove` (`spatial_hash.rs`): Remove item `id` from all grid cells and delete it.
+- `SpatialHash::update` (`spatial_hash.rs`): Replace item `id`'s AABB; equivalent to `insert` (re-registers in new cells).
+- `SpatialHash::clear` (`spatial_hash.rs`): Remove all items and clear all cell buckets.
+- `SpatialHash::query_rect` (`spatial_hash.rs`): Return ids of all items whose AABB overlaps the query rectangle, deduplicated.
+- `SpatialHash::query_circle` (`spatial_hash.rs`): Return ids of all items whose AABB overlaps the circle, verified by nearest-point distance.
+- `SpatialHash::query_segment` (`spatial_hash.rs`): Return ids of all items whose AABB the segment (x1,y1)-(x2,y2) passes through, using a slab test.
+- `Mat3x3::identity` (`sphere.rs`): Return the identity matrix.
+- `Mat3x3::from_cols` (`sphere.rs`): Construct a matrix from three column arrays.
+- `Mat3x3::mul_vec` (`sphere.rs`): Multiply this matrix by column vector `v`.
+- `Mat3x3::mul_mat` (`sphere.rs`): Return the product of this matrix and `other`.
 - `lat_lon_to_unit` (`sphere.rs`): Convert (latitude_deg, longitude_deg) on the unit sphere to a 3D unit vector.
 - `unit_to_lat_lon` (`sphere.rs`): Inverse of `lat_lon_to_unit`.
 - `great_circle_distance` (`sphere.rs`): Great-circle distance in radians between two lat/lon points on a unit sphere.
@@ -275,68 +276,68 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `rot_x` (`sphere.rs`): Rotation about the X axis by `angle_deg` degrees.
 - `rot_y` (`sphere.rs`): Rotation about the Y axis (longitude / orbit yaw) by `angle_deg` degrees.
 - `rot_z` (`sphere.rs`): Rotation about the Z axis by `angle_deg` degrees.
-- `CatmullRomSpline::new` (`spline.rs`): Create a spline from the given control points.
-- `CatmullRomSpline::sample` (`spline.rs`): Sample the spline at a global parameter `t` in [0, 1] spanning the whole curve.
-- `CatmullRomSpline::sample_segment` (`spline.rs`): Sample a specific segment by index at local parameter `t` in [0, 1].
-- `CatmullRomSpline::len` (`spline.rs`): Number of control points.
-- `CatmullRomSpline::is_empty` (`spline.rs`): Returns `true` if there are no control points.
-- `CatmullRomSpline::add_point` (`spline.rs`): Appends a control point to the end of the spline.
-- `CatmullRomSpline::remove_point` (`spline.rs`): Removes the control point at the given index.
-- `HermiteSpline::new` (`spline.rs`): Create a Hermite spline with explicit endpoints and tangents.
-- `HermiteSpline::sample` (`spline.rs`): Evaluate the spline at parameter `t` in [0, 1].
-- `Transform::new` (`transform.rs`): Create an identity transform (no translation, rotation, or scale).
-- `Transform::from_components` (`transform.rs`): Create from full transformation parameters (standard parameter order).
-- `Transform::translate` (`transform.rs`): Apply translation to the transform.
-- `Transform::rotate` (`transform.rs`): Apply a rotation to the transform.
-- `Transform::scale` (`transform.rs`): Apply non-uniform scaling to the transform.
-- `Transform::shear` (`transform.rs`): Apply shear to the transform (standard convention).
-- `Transform::reset` (`transform.rs`): Reset the transform to the identity matrix.
-- `Transform::set_transformation` (`transform.rs`): Replace the current state with full transformation parameters.
-- `Transform::transform_point` (`transform.rs`): Transform a point from local space to world space.
-- `Transform::inverse_transform_point` (`transform.rs`): Transform a point from world space back to local space.
-- `Transform::inverse` (`transform.rs`): Compute the inverse of this transform.
-- `Transform::matrix` (`transform.rs`): Get the internal matrix (for renderer integration).
-- `Transform::decompose` (`transform.rs`): Decomposes this transform's matrix into translation, rotation, and scale.
-- `Tween::new` (`tween.rs`): Creates a new tween with the given duration and easing name.
-- `Tween::add_value` (`tween.rs`): Adds a value to interpolate.
-- `Tween::update` (`tween.rs`): Advances the clock by `dt` seconds.
-- `Tween::get_value` (`tween.rs`): Returns the interpolated value at the given index.
-- `Tween::get_all_values` (`tween.rs`): Returns all interpolated values.
-- `Tween::reset` (`tween.rs`): Resets the clock to 0.
-- `Tween::set_time` (`tween.rs`): Sets the clock to a specific time, clamped to [0, duration].
-- `Tween::is_complete` (`tween.rs`): Returns true if the tween has completed.
-- `Tween::value_count` (`tween.rs`): Returns the number of values in this tween.
-- `Tween::easing_name` (`tween.rs`): Returns the easing name.
-- `Tween::duration` (`tween.rs`): Returns the duration.
-- `Tween::clock` (`tween.rs`): Returns the current clock time.
-- `Vec2::new` (`vec2.rs`): Creates a new vector from `x` and `y` components.
-- `Vec2::zero` (`vec2.rs`): Returns the zero vector `(0.0, 0.0)`.
-- `Vec2::splat` (`vec2.rs`): Creates a vector with both components set to `v`.
-- `Vec2::dot` (`vec2.rs`): Returns the dot product of this vector and `other`.
-- `Vec2::length` (`vec2.rs`): Returns the Euclidean length (magnitude) of the vector.
-- `Vec2::length_squared` (`vec2.rs`): Returns the squared Euclidean length of the vector.
-- `Vec2::normalize` (`vec2.rs`): Returns a unit vector in the same direction, or the original vector if its length is zero.
-- `Vec2::distance` (`vec2.rs`): Returns the Euclidean distance between this point and `other`.
-- `Vec2::lerp` (`vec2.rs`): Linearly interpolates between `self` and `other` by factor `t`.
-- `Vec2::angle` (`vec2.rs`): Returns the angle of the vector in radians, measured from the positive X axis.
-- `Vec2::rotate` (`vec2.rs`): Returns a copy of this vector rotated by `angle` radians around the origin.
-- `Vec2::perpendicular` (`vec2.rs`): Returns the perpendicular (normal) vector, rotated 90° counter-clockwise.
-- `Vec2::cross` (`vec2.rs`): Returns the 2D cross product (perpendicular dot product) with `other`.
-- `Vec2::from_angle` (`vec2.rs`): Creates a unit vector from an angle in radians, measured from the positive X axis.
-- `Vec2::reflect` (`vec2.rs`): Reflects this vector about a surface normal (normal must be unit length).
-- `Vec3::new` (`vec3.rs`): Create a new vector with the given components.
-- `Vec3::zero` (`vec3.rs`): The zero vector (0, 0, 0).
-- `Vec3::one` (`vec3.rs`): The unit vector (1, 1, 1).
-- `Vec3::splat` (`vec3.rs`): Creates a vector with all three components set to `v`.
-- `Vec3::dot` (`vec3.rs`): Dot product of this vector and `other`.
-- `Vec3::cross` (`vec3.rs`): Cross product of this vector and `other`.
-- `Vec3::length` (`vec3.rs`): Euclidean length (magnitude) of this vector.
-- `Vec3::length_squared` (`vec3.rs`): Squared Euclidean length.
-- `Vec3::normalize` (`vec3.rs`): Returns a unit-length version of this vector, or the zero vector if length is zero.
-- `Vec3::lerp` (`vec3.rs`): Linear interpolation between this vector and `other` by factor `t` in [0, 1].
-- `Vec3::distance` (`vec3.rs`): Euclidean distance to `other`.
-- `Vec3::project` (`vec3.rs`): Project this vector onto `onto`.
-- `Vec3::reflect` (`vec3.rs`): Reflect this vector about `normal` (normal must be unit length).
+- `CatmullRomSpline::new` (`spline.rs`): Construct a spline from a Vec of `(x, y)` control points.
+- `CatmullRomSpline::sample` (`spline.rs`): Sample the full spline at normalized parameter `t` in `[0,1]`, mapping to the appropriate segment.
+- `CatmullRomSpline::sample_segment` (`spline.rs`): Sample segment `seg` at local parameter `t` in `[0,1]` using 4-point Catmull-Rom weights.
+- `CatmullRomSpline::len` (`spline.rs`): Return the number of control points.
+- `CatmullRomSpline::is_empty` (`spline.rs`): Return true when the spline has no control points.
+- `CatmullRomSpline::add_point` (`spline.rs`): Append a control point to the end of the spline.
+- `CatmullRomSpline::remove_point` (`spline.rs`): Remove and return the control point at `index`, or `None` when out of range.
+- `HermiteSpline::new` (`spline.rs`): Construct a Hermite segment from endpoints `p0`, `p1` and tangents `m0`, `m1`.
+- `HermiteSpline::sample` (`spline.rs`): Sample the segment at `t` in `[0,1]` using Hermite basis polynomials.
+- `Transform::new` (`transform.rs`): Return an identity transform.
+- `Transform::from_components` (`transform.rs`): Construct a transform from position, rotation, scale, origin offset, and shear components.
+- `Transform::translate` (`transform.rs`): Post-multiply a translation by `(dx, dy)` and return `&mut self` for chaining.
+- `Transform::rotate` (`transform.rs`): Post-multiply a rotation by `angle` radians and return `&mut self` for chaining.
+- `Transform::scale` (`transform.rs`): Post-multiply a non-uniform scale by `(sx, sy)` and return `&mut self` for chaining.
+- `Transform::shear` (`transform.rs`): Post-multiply a shear by `(kx, ky)` and return `&mut self` for chaining.
+- `Transform::reset` (`transform.rs`): Reset to identity and return `&mut self` for chaining.
+- `Transform::set_transformation` (`transform.rs`): Replace this transform with a fresh one built from the given SRT+origin+shear components.
+- `Transform::transform_point` (`transform.rs`): Apply this transform to `(x, y)` and return the resulting point.
+- `Transform::inverse_transform_point` (`transform.rs`): Apply the inverse of this transform to `(x, y)` and return the resulting point.
+- `Transform::inverse` (`transform.rs`): Return a new transform that is the matrix inverse of this one.
+- `Transform::matrix` (`transform.rs`): Return a reference to the underlying Mat3.
+- `Transform::decompose` (`transform.rs`): Decompose into `(tx, ty, rotation_rad, sx, sy)`; shear is not separated.
+- `Tween::new` (`tween.rs`): Create a new Tween with the given `duration` (seconds) and named easing; falls back to linear when name is unknown.
+- `Tween::add_value` (`tween.rs`): Register a `(start, target)` channel and return its index.
+- `Tween::update` (`tween.rs`): Advance the clock by `dt` seconds; returns true when the tween has completed.
+- `Tween::get_value` (`tween.rs`): Return the interpolated value for channel `index`; returns 0.0 for out-of-range index.
+- `Tween::get_all_values` (`tween.rs`): Return interpolated values for all registered channels.
+- `Tween::reset` (`tween.rs`): Reset the clock to zero without clearing channels.
+- `Tween::set_time` (`tween.rs`): Set the clock to a specific time `t`, clamped to `[0, duration]`.
+- `Tween::is_complete` (`tween.rs`): Return true when the clock has reached or passed the duration.
+- `Tween::value_count` (`tween.rs`): Return the number of registered value channels.
+- `Tween::easing_name` (`tween.rs`): Return the easing name string this tween was constructed with.
+- `Tween::duration` (`tween.rs`): Return the total duration in seconds.
+- `Tween::clock` (`tween.rs`): Return the current elapsed clock time in seconds.
+- `Vec2::new` (`vec2.rs`): Construct a new Vec2 from `x` and `y` components.
+- `Vec2::zero` (`vec2.rs`): Return the zero vector; alias for `Vec2::ZERO`.
+- `Vec2::splat` (`vec2.rs`): Construct a Vec2 with both components set to `v`.
+- `Vec2::dot` (`vec2.rs`): Return the dot product of `self` and `other`.
+- `Vec2::length` (`vec2.rs`): Return the Euclidean length of this vector.
+- `Vec2::length_squared` (`vec2.rs`): Return the squared length; cheaper than `length()` when only comparison is needed.
+- `Vec2::normalize` (`vec2.rs`): Return a unit-length copy; returns self unchanged when length is zero.
+- `Vec2::distance` (`vec2.rs`): Return the Euclidean distance from `self` to `other`.
+- `Vec2::lerp` (`vec2.rs`): Linearly interpolate from `self` to `other` by scalar `t`.
+- `Vec2::angle` (`vec2.rs`): Return the angle of this vector in radians (atan2 of y over x).
+- `Vec2::rotate` (`vec2.rs`): Return this vector rotated by `angle` radians counter-clockwise.
+- `Vec2::perpendicular` (`vec2.rs`): Return the left-perpendicular vector (-y, x).
+- `Vec2::cross` (`vec2.rs`): Return the 2D cross product (scalar z-component of the 3D cross product).
+- `Vec2::from_angle` (`vec2.rs`): Return a unit direction vector for the given angle in radians.
+- `Vec2::reflect` (`vec2.rs`): Return this vector reflected across a surface with the given unit `normal`.
+- `Vec3::new` (`vec3.rs`): Construct a Vec3 from `x`, `y`, `z`.
+- `Vec3::zero` (`vec3.rs`): Return the zero vector (0, 0, 0).
+- `Vec3::one` (`vec3.rs`): Return the unit vector (1, 1, 1).
+- `Vec3::splat` (`vec3.rs`): Construct a Vec3 with all components set to `v`.
+- `Vec3::dot` (`vec3.rs`): Return the dot product of `self` and `other`.
+- `Vec3::cross` (`vec3.rs`): Return the cross product of `self` × `other`.
+- `Vec3::length` (`vec3.rs`): Return the Euclidean length of this vector.
+- `Vec3::length_squared` (`vec3.rs`): Return the squared length; avoids a sqrt when only comparison is needed.
+- `Vec3::normalize` (`vec3.rs`): Return a unit-length copy; returns zero vector when length is below 1e-7.
+- `Vec3::lerp` (`vec3.rs`): Linearly interpolate from `self` to `other` by factor `t`.
+- `Vec3::distance` (`vec3.rs`): Return the Euclidean distance from `self` to `other`.
+- `Vec3::project` (`vec3.rs`): Return the projection of `self` onto `onto`; returns zero vector when `onto` is near-zero.
+- `Vec3::reflect` (`vec3.rs`): Return this vector reflected across a surface with the given unit `normal`.
 - `voronoi_from_points` (`voronoi.rs`): Compute the Voronoi diagram for `points`.
 
 ## Lua API Reference
@@ -345,276 +346,285 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - Namespace: `lurek.math`
 
 ### Module Functions
-- `lurek.math.newRandomGenerator`: Creates a new random number generator with an optional seed.
-- `lurek.math.newTransform`: Creates a new Transform, optionally initialised from full parameters.
-- `lurek.math.newBezierCurve`: Creates a new BezierCurve from a flat table of coordinates {x1,y1, x2,y2, ...}.
-- `lurek.math.newTween`: Creates a new Tween with the given duration and easing name.
-- `lurek.math.newSpatialHash`: Creates a new SpatialHash with the given cell size.
-- `lurek.math.newNoiseGenerator`: Creates a new seeded noise generator.
-- `lurek.math.perlin2d`: Returns 2D Perlin noise at (x, y) with the given seed.
-- `lurek.math.perlin3d`: Returns 3D Perlin noise at (x, y, z) with the given seed.
-- `lurek.math.simplex2d`: Returns 2D Simplex noise at (x, y) with the given seed.
-- `lurek.math.fbm`: Returns fractal Brownian motion noise at (x, y).
-- `lurek.math.applyEasing`: Applies a named easing function to progress value t.
-- `lurek.math.linear`: Linear easing (identity).
-- `lurek.math.inQuad`: Quadratic ease-in — acceleration that starts at zero and increases.
-- `lurek.math.outQuad`: Quadratic ease-out — deceleration that starts fast and ends at zero.
-- `lurek.math.inOutQuad`: Quadratic ease-in-out — slow start, fast middle, slow end.
-- `lurek.math.inCubic`: Cubic ease-in — acceleration starts slowly then increases sharply.
-- `lurek.math.outCubic`: Cubic ease-out — rapid deceleration using a cubic power curve.
-- `lurek.math.inOutCubic`: Cubic ease-in-out — slow start and end with fast cubic middle.
-- `lurek.math.inQuart`: Quartic ease-in — strongly delayed acceleration using a power-of-4 curve.
-- `lurek.math.outQuart`: Quartic ease-out — rapid deceleration using a power-of-4 curve.
-- `lurek.math.inOutQuart`: Quartic ease-in-out — very slow start and end with a sharp middle peak.
-- `lurek.math.inSine`: Sinusoidal ease-in — gentle acceleration based on a sine curve.
-- `lurek.math.outSine`: Sinusoidal ease-out — gentle deceleration based on a cosine curve.
-- `lurek.math.inOutSine`: Sinusoidal ease-in-out — smooth S-curve based on cosine interpolation.
-- `lurek.math.inExpo`: Exponential ease-in — very slow start that accelerates sharply near the end.
-- `lurek.math.outExpo`: Exponential ease-out — sharp initial speed that decelerates exponentially.
-- `lurek.math.inOutExpo`: Exponential ease-in-out — very slow start and end with an exponential surge.
-- `lurek.math.inElastic`: Elastic ease-in — spring-like overshoot at the beginning of the motion.
-- `lurek.math.outElastic`: Elastic ease-out — spring-like oscillation that settles at the target.
-- `lurek.math.outBounce`: Bounce ease-out — simulates a ball bouncing against the target value.
-- `lurek.math.inBounce`: Bounce ease-in — reverse bounce effect that accelerates into the motion.
-- `lurek.math.inBack`: Back ease-in — overshoots slightly before settling at the target.
-- `lurek.math.outBack`: Back ease-out — overshoots the target then snaps back into place.
-- `lurek.math.inOutElastic`: Elastic ease-in-out — spring-like oscillation on both ends.
-- `lurek.math.inOutBounce`: Bounce ease-in-out — bouncing motion on both ends.
-- `lurek.math.inOutBack`: Back ease-in-out — overshoot on both ends.
-- `lurek.math.triangulate`: Triangulates a simple polygon given as a flat table {x1,y1, x2,y2, ...}.
-- `lurek.math.isConvex`: Returns true if the polygon (flat table {x1,y1,...}) is convex.
-- `lurek.math.gammaToLinear`: Converts a gamma-encoded sRGB value to linear space.
-- `lurek.math.linearToGamma`: Converts a linear-space value to gamma-encoded sRGB.
-- `lurek.math.angleBetween`: Returns the angle in radians from (x1, y1) to (x2, y2).
-- `lurek.math.circleContainsPoint`: Returns true if the point (px, py) lies inside the circle.
-- `lurek.math.circleIntersectsCircle`: Returns true if two circles overlap.
-- `lurek.math.circleIntersectsLine`: Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.
-- `lurek.math.circleIntersectsSegment`: Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
-- `lurek.math.closestPointOnSegment`: Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).
-- `lurek.math.convexHull`: Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.
-- `lurek.math.delaunayTriangulate`: Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.
-- `lurek.math.lineIntersect`: Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.
-- `lurek.math.pointInPolygon`: Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.
-- `lurek.math.polygonArea`: Returns the signed area of a polygon given as a flat {x1,y1,...} table.
-- `lurek.math.polygonCentroid`: Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
-- `lurek.math.segmentIntersectsSegment`: Tests if two line segments intersect. Returns (hit, ix?, iy?).
-- `lurek.math.bresenham`: Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.
+- `lurek.math.newRandomGenerator`: Creates a deterministic random generator with an optional seed.
+- `lurek.math.newTransform`: Creates an identity transform or a transform from optional components.
+- `lurek.math.newBezierCurve`: Creates a Bezier curve from a flat point table.
+- `lurek.math.newTween`: Creates a tween with a duration and optional easing name.
+- `lurek.math.newSpatialHash`: Creates a spatial hash index with a cell size.
+- `lurek.math.newNoiseGenerator`: Creates a procedural noise generator with an optional seed.
+- `lurek.math.newRectPacker`: Creates a rectangle packer.
+- `lurek.math.perlin2d`: Samples stateless 2D Perlin noise.
+- `lurek.math.perlin3d`: Samples stateless 3D Perlin noise.
+- `lurek.math.simplex2d`: Samples stateless 2D simplex noise.
+- `lurek.math.fbm`: Samples stateless fractal Brownian motion noise.
+- `lurek.math.applyEasing`: Applies a named easing function to a normalized value.
+- `lurek.math.linear`: Applies linear easing.
+- `lurek.math.inQuad`: Applies quadratic ease-in.
+- `lurek.math.outQuad`: Applies quadratic ease-out.
+- `lurek.math.inOutQuad`: Applies quadratic ease-in-out.
+- `lurek.math.inCubic`: Applies cubic ease-in.
+- `lurek.math.outCubic`: Applies cubic ease-out.
+- `lurek.math.inOutCubic`: Applies cubic ease-in-out.
+- `lurek.math.inQuart`: Applies quartic ease-in.
+- `lurek.math.outQuart`: Applies quartic ease-out.
+- `lurek.math.inOutQuart`: Applies quartic ease-in-out.
+- `lurek.math.inSine`: Applies sine ease-in.
+- `lurek.math.outSine`: Applies sine ease-out.
+- `lurek.math.inOutSine`: Applies sine ease-in-out.
+- `lurek.math.inExpo`: Applies exponential ease-in.
+- `lurek.math.outExpo`: Applies exponential ease-out.
+- `lurek.math.inOutExpo`: Applies exponential ease-in-out.
+- `lurek.math.inElastic`: Applies elastic ease-in.
+- `lurek.math.outElastic`: Applies elastic ease-out.
+- `lurek.math.outBounce`: Applies bounce ease-out.
+- `lurek.math.inBounce`: Applies bounce ease-in.
+- `lurek.math.inBack`: Applies back ease-in.
+- `lurek.math.outBack`: Applies back ease-out.
+- `lurek.math.inOutElastic`: Applies elastic ease-in-out.
+- `lurek.math.inOutBounce`: Applies bounce ease-in-out.
+- `lurek.math.inOutBack`: Applies back ease-in-out.
+- `lurek.math.triangulate`: Triangulates a flat polygon point table.
+- `lurek.math.isConvex`: Returns whether a flat polygon point table is convex.
+- `lurek.math.gammaToLinear`: Converts a gamma-space channel to linear space.
+- `lurek.math.linearToGamma`: Converts a linear-space channel to gamma space.
+- `lurek.math.angleBetween`: Returns the angle between two points.
+- `lurek.math.circleContainsPoint`: Returns whether a circle contains a point.
+- `lurek.math.circleIntersectsCircle`: Returns whether two circles intersect.
+- `lurek.math.circleIntersectsLine`: Returns circle-line intersection state and hit points when present.
+- `lurek.math.circleIntersectsSegment`: Returns circle-segment intersection state and hit points when present.
+- `lurek.math.closestPointOnSegment`: Returns the closest point on a segment to an input point.
+- `lurek.math.convexHull`: Computes the convex hull for a flat point table.
+- `lurek.math.delaunayTriangulate`: Computes Delaunay triangles for a flat point table.
+- `lurek.math.lineIntersect`: Returns intersection point for two infinite lines when present.
+- `lurek.math.pointInPolygon`: Returns whether a point lies inside a polygon.
+- `lurek.math.polygonArea`: Computes signed area for a flat polygon point table.
+- `lurek.math.polygonCentroid`: Computes the centroid for a flat polygon point table.
+- `lurek.math.segmentIntersectsSegment`: Returns whether two segments intersect and their intersection point when present.
+- `lurek.math.bresenham`: Returns integer grid points along a Bresenham line.
 - `lurek.math.rad`: Converts degrees to radians.
 - `lurek.math.deg`: Converts radians to degrees.
-- `lurek.math.sin`: Returns the sine of x (radians).
-- `lurek.math.cos`: Returns the cosine of x (radians).
-- `lurek.math.tan`: Returns the tangent of x (radians).
-- `lurek.math.asin`: Returns the arcsine of x, in radians.
-- `lurek.math.acos`: Returns the arccosine of x, in radians.
-- `lurek.math.atan`: Returns the arctangent of x (or atan2(y, x) when two args given).
-- `lurek.math.atan2`: Returns atan(y/x) using the signs of both args to determine the quadrant.
-- `lurek.math.sqrt`: Returns the square root of x.
-- `lurek.math.abs`: Returns the absolute value of x.
-- `lurek.math.floor`: Returns the largest integer ≤ x.
-- `lurek.math.ceil`: Returns the smallest integer ≥ x.
-- `lurek.math.round`: Returns x rounded to the nearest integer (half-up).
-- `lurek.math.exp`: Returns e raised to the power x.
-- `lurek.math.log`: Returns the natural log of x, or log base b if b is supplied.
-- `lurek.math.pow`: Returns x raised to the power y.
-- `lurek.math.min`: Returns the smallest of the supplied numbers.
-- `lurek.math.max`: Returns the largest of the supplied numbers.
-- `lurek.math.fmod`: Returns the remainder of x / y (fmod).
-- `lurek.math.distance`: Returns the Euclidean distance between (x1,y1) and (x2,y2).
-- `lurek.math.distanceSq`: Returns the squared Euclidean distance between (x1,y1) and (x2,y2) (avoids sqrt).
-- `lurek.math.random`: Returns a pseudo-random number using Lua's built-in `math.random` behavior.
-- `lurek.math.randomInt`: Returns a pseudo-random integer in [lo, hi] (inclusive).
-- `lurek.math.simplexNoise`: Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
-- `lurek.math.vec2`: Creates a 2D vector with x and y components.
-- `lurek.math.Vec2`: Compatibility alias for `vec2`.
-- `lurek.math.vec3`: Creates a 3D vector `{x, y, z}` table with numeric components.
-- `lurek.math.Vec3`: Compatibility alias for `vec3`.
-- `lurek.math.catmullRom`: Creates a Catmull-Rom spline through the given control points.
-- `lurek.math.hermite`: Creates a Hermite spline defined by two endpoints and tangents.
-- `lurek.math.lerp`: Linear interpolation between two numbers: a + (b - a) * t.
-- `lurek.math.remap`: Remaps `v` from [in_min, in_max] to [out_min, out_max].
-- `lurek.math.clamp`: Clamps `v` between `min` and `max`.
-- `lurek.math.sign`: Returns -1, 0, or 1 depending on the sign of `v`.
-- `lurek.math.smoothstep`: Hermite smoothstep between `edge0` and `edge1`.
-- `lurek.math.inverseLerp`: Returns the interpolation parameter t for `v` in [a, b].
-- `lurek.math.hslToRgb`: Converts HSL (h: 0-360, s: 0-1, l: 0-1) to RGBA (r, g, b, a) floats.
-- `lurek.math.fromHex`: Parses a hex color string (#RRGGBB or #RRGGBBAA) into (r, g, b, a) floats.
-- `lurek.math.rgbToHsl`: Converts RGBA floats to HSL (h: 0-360, s: 0-1, l: 0-1).
-- `lurek.math.rectUnion`: Returns the union (bounding box) of two rectangles.
-- `lurek.math.rectFromCenter`: Creates a rectangle centered at (cx, cy) with the given width and height.
-- `lurek.math.polygonClip`: Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
-- `lurek.math.aabbTree`: Creates a new empty AABB tree for efficient broad-phase overlap queries.
-- `lurek.math.newCircle`: Creates a new Circle value type with the given centre and radius.
-- `lurek.math.polygonIntersection`: Computes the intersection of two convex polygons.
-- `lurek.math.polygonUnion`: Computes the approximate union of two convex polygons as a convex hull.
-- `lurek.math.polygonDifference`: Computes the approximate difference `A - B` for convex polygon inputs.
-- `lurek.math.voronoi`: Computes the Voronoi diagram for a list of 2-D seed points.
+- `lurek.math.sin`: Returns sine of an angle.
+- `lurek.math.cos`: Returns cosine of an angle.
+- `lurek.math.tan`: Returns tangent of an angle.
+- `lurek.math.asin`: Returns arcsine of a value.
+- `lurek.math.acos`: Returns arccosine of a value.
+- `lurek.math.atan`: Returns arctangent or two-argument arctangent.
+- `lurek.math.atan2`: Returns two-argument arctangent.
+- `lurek.math.sqrt`: Returns square root of a value.
+- `lurek.math.abs`: Returns absolute value.
+- `lurek.math.floor`: Returns floor of a value.
+- `lurek.math.ceil`: Returns ceiling of a value.
+- `lurek.math.round`: Returns rounded value.
+- `lurek.math.exp`: Returns exponential of a value.
+- `lurek.math.log`: Returns natural logarithm or logarithm with a supplied base.
+- `lurek.math.pow`: Raises a value to a power.
+- `lurek.math.min`: Returns the smallest supplied value.
+- `lurek.math.max`: Returns the largest supplied value.
+- `lurek.math.fmod`: Returns floating-point remainder.
+- `lurek.math.distance`: Returns Euclidean distance between two points.
+- `lurek.math.distanceSq`: Returns squared Euclidean distance between two points.
+- `lurek.math.random`: Returns a Lua math random value, optionally scaled to one or two bounds.
+- `lurek.math.randomInt`: Returns a Lua math random integer in an inclusive range.
+- `lurek.math.simplexNoise`: Samples 2D or 3D simplex noise.
+- `lurek.math.vec2`: Creates a 2D vector.
+- `lurek.math.Vec2`: Creates a 2D vector.
+- `lurek.math.vec3`: Creates a 3D vector.
+- `lurek.math.Vec3`: Creates a 3D vector.
+- `lurek.math.catmullRom`: Creates a Catmull-Rom spline from point tables.
+- `lurek.math.hermite`: Creates a Hermite spline from endpoints and tangents.
+- `lurek.math.lerp`: Linearly interpolates between two values.
+- `lurek.math.remap`: Remaps a value from one range to another.
+- `lurek.math.clamp`: Clamps a value to a range.
+- `lurek.math.sign`: Returns the sign of a value.
+- `lurek.math.smoothstep`: Applies smoothstep interpolation between two edges.
+- `lurek.math.inverseLerp`: Returns the interpolation factor of a value between two bounds.
+- `lurek.math.hslToRgb`: Converts HSL color values to RGBA channels.
+- `lurek.math.fromHex`: Converts a hex color string to RGBA channels.
+- `lurek.math.rgbToHsl`: Converts RGB channels to HSL values.
+- `lurek.math.rectUnion`: Returns the union rectangle for two rectangles.
+- `lurek.math.rectFromCenter`: Creates a rectangle tuple from center coordinates and size.
+- `lurek.math.polygonClip`: Clips a flat polygon point table against a plane.
+- `lurek.math.aabbTree`: Creates an empty AABB tree.
+- `lurek.math.newCircle`: Creates a circle primitive.
+- `lurek.math.polygonIntersection`: Returns polygon intersection points for two polygon tables.
+- `lurek.math.polygonUnion`: Returns polygon union points for two polygon tables.
+- `lurek.math.polygonDifference`: Returns polygon difference points for two polygon tables.
+- `lurek.math.voronoi`: Builds Voronoi cells from a polygon-style point table.
 
 ### `LAabbTree` Methods
-- `LAabbTree:insert`: Inserts an entry with the given AABB into the tree.
-- `LAabbTree:remove`: Removes the entry with the given id.
-- `LAabbTree:query`: Returns the ids of all entries whose AABBs overlap the query rectangle.
-- `LAabbTree:queryPoint`: Returns the ids of all entries whose AABBs contain the given point.
-- `LAabbTree:update`: Updates the AABB for an existing entry.
-- `LAabbTree:contains`: Returns true if an entry with the given id exists in the tree.
-- `LAabbTree:len`: Returns the number of entries in the tree.
-- `LAabbTree:isEmpty`: Returns true if the tree contains no entries.
-- `LAabbTree:clear`: Removes all entries from the tree.
-- `LAabbTree:type`: Returns the type name of this object.
-- `LAabbTree:typeOf`: Returns true if this object is of the given type.
+- `LAabbTree:insert`: Inserts an AABB by id.
+- `LAabbTree:remove`: Removes an AABB by id.
+- `LAabbTree:query`: Queries ids intersecting an AABB.
+- `LAabbTree:queryPoint`: Queries ids containing a point.
+- `LAabbTree:update`: Updates an AABB by id.
+- `LAabbTree:contains`: Returns whether the tree contains an id.
+- `LAabbTree:len`: Returns the number of items in the tree.
+- `LAabbTree:isEmpty`: Returns whether the tree has no items.
+- `LAabbTree:clear`: Clears all items from the tree.
+- `LAabbTree:type`: Returns the Lua-visible type name for this AABB tree handle.
+- `LAabbTree:typeOf`: Returns whether this AABB tree handle matches a supported type name.
 
 ### `LBezierCurve` Methods
-- `LBezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
-- `LBezierCurve:render`: Renders the curve as a polyline with the given number of segments.
-- `LBezierCurve:getDerivative`: Returns a new BezierCurve representing the first derivative.
-- `LBezierCurve:getControlPoint`: Returns the control point at 1-based index as (x, y), or nil.
-- `LBezierCurve:setControlPoint`: Sets the control point at 1-based index.
-- `LBezierCurve:insertControlPoint`: Inserts a control point. If index is given (1-based), inserts at that position.
-- `LBezierCurve:removeControlPoint`: Removes a control point at 1-based index.
-- `LBezierCurve:getControlPointCount`: Returns the number of control points.
-- `LBezierCurve:length`: Returns the approximate arc length of the curve.
-- `LBezierCurve:translate`: Translates all control points by (dx, dy).
-- `LBezierCurve:rotate`: Rotates all control points around a pivot by angle radians.
-- `LBezierCurve:scale`: Scales all control points around a pivot by factor s.
-- `LBezierCurve:type`: Returns the type name of this object.
-- `LBezierCurve:typeOf`: Returns true if this object is of the given type.
+- `LBezierCurve:evaluate`: Evaluates this curve at normalized parameter `t`.
+- `LBezierCurve:render`: Returns sampled points along this curve.
+- `LBezierCurve:getDerivative`: Returns the derivative curve for this Bezier curve.
+- `LBezierCurve:getControlPoint`: Returns a control point by one-based index.
+- `LBezierCurve:setControlPoint`: Sets a control point by one-based index.
+- `LBezierCurve:insertControlPoint`: Inserts a control point, optionally before a one-based index.
+- `LBezierCurve:removeControlPoint`: Removes a control point by one-based index.
+- `LBezierCurve:getControlPointCount`: Returns the number of control points in this curve.
+- `LBezierCurve:length`: Returns the approximate curve length.
+- `LBezierCurve:evaluateAtDistance`: Evaluates this curve at an approximate distance along the curve.
+- `LBezierCurve:translate`: Translates all control points.
+- `LBezierCurve:rotate`: Rotates all control points around an origin.
+- `LBezierCurve:scale`: Scales all control points around an origin.
+- `LBezierCurve:type`: Returns the Lua-visible type name for this Bezier curve handle.
+- `LBezierCurve:typeOf`: Returns whether this Bezier curve handle matches a supported type name.
 
 ### `LCatmullRom` Methods
-- `LCatmullRom:sample`: Samples the spline at global parameter `t` in `[0, 1]`.
-- `LCatmullRom:sampleSegment`: Samples one segment at local parameter `t` in `[0, 1]`.
-- `LCatmullRom:len`: Number of control points.
-- `LCatmullRom:addPoint`: Appends a control point to the spline.
-- `LCatmullRom:removePoint`: Removes the control point at `index` (0-based) and returns it.
-- `LCatmullRom:type`: Returns the type name of this object.
-- `LCatmullRom:typeOf`: Returns true if this object is of the given type.
+- `LCatmullRom:sample`: Samples the spline at normalized parameter `t`.
+- `LCatmullRom:sampleSegment`: Samples one spline segment at local parameter `t`.
+- `LCatmullRom:len`: Returns the number of points in the spline.
+- `LCatmullRom:addPoint`: Adds a point to the spline.
+- `LCatmullRom:removePoint`: Removes a point by zero-based index and returns its coordinates.
+- `LCatmullRom:type`: Returns the Lua-visible type name for this spline handle.
+- `LCatmullRom:typeOf`: Returns whether this spline handle matches a supported type name.
 
 ### `LCircle` Methods
-- `LCircle:area`: Returns the area of the circle (π r²).
-- `LCircle:perimeter`: Returns the circumference of the circle (2 π r).
-- `LCircle:contains`: Returns true if the point (px, py) lies inside or on the boundary.
-- `LCircle:intersects`: Returns true if this circle overlaps another circle.
-- `LCircle:aabb`: Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
-- `LCircle:x`: Returns the circle centre X.
-- `LCircle:y`: Returns the circle centre Y.
-- `LCircle:radius`: Returns the circle radius.
-- `LCircle:type`: Returns the type name of this object.
-- `LCircle:typeOf`: Returns true if this object is of the given type.
+- `LCircle:area`: Returns this circle area.
+- `LCircle:perimeter`: Returns this circle perimeter.
+- `LCircle:contains`: Returns whether this circle contains a point.
+- `LCircle:intersects`: Returns whether this circle intersects another circle.
+- `LCircle:aabb`: Returns this circle axis-aligned bounding box.
+- `LCircle:x`: Returns this circle center x coordinate.
+- `LCircle:y`: Returns this circle center y coordinate.
+- `LCircle:radius`: Returns this circle radius.
+- `LCircle:type`: Returns the Lua-visible type name for this circle handle.
+- `LCircle:typeOf`: Returns whether this circle handle matches a supported type name.
 
 ### `LHermite` Methods
-- `LHermite:sample`: Samples the spline at parameter `t` in `[0, 1]`.
-- `LHermite:type`: Returns the type name of this object.
-- `LHermite:typeOf`: Returns true if this object is of the given type.
+- `LHermite:sample`: Samples the spline at normalized parameter `t`.
+- `LHermite:type`: Returns the Lua-visible type name for this spline handle.
+- `LHermite:typeOf`: Returns whether this spline handle matches a supported type name.
 
 ### `LNoiseGenerator` Methods
-- `LNoiseGenerator:perlin1d`: Returns 1D Perlin noise at x.
-- `LNoiseGenerator:perlin2d`: Returns 2D Perlin noise at (x, y).
-- `LNoiseGenerator:perlin3d`: Returns 3D Perlin noise at (x, y, z).
-- `LNoiseGenerator:perlin4d`: Returns 4D Perlin noise at (x, y, z, w).
-- `LNoiseGenerator:simplex1d`: Returns 1D Simplex noise at x.
-- `LNoiseGenerator:simplex2d`: Returns 2D Simplex noise at (x, y).
-- `LNoiseGenerator:simplex3d`: Returns 3D Simplex noise at (x, y, z).
-- `LNoiseGenerator:worley2d`: Returns 2D Worley (cellular) noise at (x, y).
-- `LNoiseGenerator:worley3d`: Returns 3D Worley (cellular) noise at (x, y, z).
-- `LNoiseGenerator:fbm`: Returns fractal Brownian motion noise at (x, y).
-- `LNoiseGenerator:ridged`: Returns ridged multi-fractal noise at (x, y).
-- `LNoiseGenerator:turbulence`: Returns turbulence noise at (x, y).
-- `LNoiseGenerator:warpDomain`: Applies domain warping, returning offset (x, y).
-- `LNoiseGenerator:generateMap`: Generates a 2D noise map as a flat table (row-major).
-- `LNoiseGenerator:getSeed`: Returns the current seed.
-- `LNoiseGenerator:setSeed`: Sets the seed and rebuilds the permutation table.
-- `LNoiseGenerator:type`: Returns the type name of this object.
-- `LNoiseGenerator:typeOf`: Returns true if this object is of the given type.
+- `LNoiseGenerator:perlin1d`: Samples 1D Perlin noise.
+- `LNoiseGenerator:perlin2d`: Samples 2D Perlin noise.
+- `LNoiseGenerator:perlin3d`: Samples 3D Perlin noise.
+- `LNoiseGenerator:perlin4d`: Samples 4D Perlin noise.
+- `LNoiseGenerator:simplex1d`: Samples 1D simplex noise.
+- `LNoiseGenerator:simplex2d`: Samples 2D simplex noise.
+- `LNoiseGenerator:simplex3d`: Samples 3D simplex noise.
+- `LNoiseGenerator:worley2d`: Samples 2D Worley noise.
+- `LNoiseGenerator:worley3d`: Samples 3D Worley noise.
+- `LNoiseGenerator:fbm`: Samples fractal Brownian motion noise.
+- `LNoiseGenerator:ridged`: Samples ridged fractal noise.
+- `LNoiseGenerator:turbulence`: Samples turbulence fractal noise.
+- `LNoiseGenerator:warpDomain`: Samples domain-warped noise coordinates.
+- `LNoiseGenerator:generateMap`: Generates a noise map and returns it as a flat array table.
+- `LNoiseGenerator:generateMapCompute`: Generates a noise map through the compute backend and returns it as a flat array table.
+- `LNoiseGenerator:getSeed`: Returns this noise generator seed.
+- `LNoiseGenerator:setSeed`: Sets this noise generator seed.
+- `LNoiseGenerator:type`: Returns the Lua-visible type name for this noise generator handle.
+- `LNoiseGenerator:typeOf`: Returns whether this noise generator handle matches a supported type name.
 
 ### `LRandomGenerator` Methods
-- `LRandomGenerator:random`: Returns a uniform random number in [0, 1).
-- `LRandomGenerator:randomFloat`: Returns a uniform random float in [min, max).
-- `LRandomGenerator:randomInt`: Returns a uniform random integer in [min, max].
-- `LRandomGenerator:randomNormal`: Returns a random number from a normal (Gaussian) distribution.
-- `LRandomGenerator:getSeed`: Returns the seed used to initialise this generator.
-- `LRandomGenerator:setSeed`: Sets the seed, fully resetting the generator state.
-- `LRandomGenerator:getState`: Serialises the generator state as a string for later restoration.
-- `LRandomGenerator:setState`: Restores the generator state from a previously serialised string.
-- `LRandomGenerator:type`: Returns the type name of this object.
-- `LRandomGenerator:typeOf`: Returns true if this object is of the given type.
+- `LRandomGenerator:random`: Returns a random floating-point value from the generator.
+- `LRandomGenerator:randomFloat`: Returns a random floating-point value in a range.
+- `LRandomGenerator:randomInt`: Returns a random integer in a range.
+- `LRandomGenerator:randomNormal`: Returns a normally distributed random value.
+- `LRandomGenerator:getSeed`: Returns this generator seed.
+- `LRandomGenerator:setSeed`: Resets this generator to a seed value.
+- `LRandomGenerator:getState`: Returns this generator serialized state string.
+- `LRandomGenerator:setState`: Restores this generator from a serialized state string.
+- `LRandomGenerator:type`: Returns the Lua-visible type name for this random generator handle.
+- `LRandomGenerator:typeOf`: Returns whether this random generator handle matches a supported type name.
+
+### `LRectPacker` Methods
+- `LRectPacker:pack`: Attempts to pack a rectangle and returns its placement coordinates.
+- `LRectPacker:clear`: Clears packed rectangles from this packer.
+- `LRectPacker:occupancy`: Returns occupied area ratio.
+- `LRectPacker:getPacked`: Returns packed rectangle records.
 
 ### `LSpatialHash` Methods
-- `LSpatialHash:insert`: Inserts an item with the given AABB.
-- `LSpatialHash:update`: Updates an existing item's AABB.
-- `LSpatialHash:remove`: Removes an item by its ID.
-- `LSpatialHash:clear`: Removes all registered items from this spatial hash, leaving it empty.
-- `LSpatialHash:queryRect`: Returns IDs of items overlapping the query rectangle.
-- `LSpatialHash:queryCircle`: Returns IDs of items overlapping the query circle.
-- `LSpatialHash:querySegment`: Returns IDs of items whose AABBs are intersected by the line segment.
-- `LSpatialHash:getCellSize`: Returns the cell size used to partition the spatial hash grid.
-- `LSpatialHash:getItemCount`: Returns the number of items in the hash.
-- `LSpatialHash:type`: Returns the type name of this object.
-- `LSpatialHash:typeOf`: Returns true if this object is of the given type.
+- `LSpatialHash:insert`: Inserts an item rectangle into the spatial hash.
+- `LSpatialHash:update`: Updates an item rectangle in the spatial hash.
+- `LSpatialHash:remove`: Removes an item from the spatial hash.
+- `LSpatialHash:clear`: Clears all items from the spatial hash.
+- `LSpatialHash:queryRect`: Returns ids intersecting a query rectangle.
+- `LSpatialHash:queryCircle`: Returns ids intersecting a query circle.
+- `LSpatialHash:querySegment`: Returns ids intersecting a query line segment.
+- `LSpatialHash:getCellSize`: Returns the spatial hash cell size.
+- `LSpatialHash:getItemCount`: Returns the number of items in the spatial hash.
+- `LSpatialHash:type`: Returns the Lua-visible type name for this spatial hash handle.
+- `LSpatialHash:typeOf`: Returns whether this spatial hash handle matches a supported type name.
 
 ### `LTransform` Methods
-- `LTransform:translate`: Applies translation to the transform.
-- `LTransform:rotate`: Applies a rotation in radians.
-- `LTransform:scale`: Applies non-uniform scaling.
-- `LTransform:shear`: Applies horizontal and vertical shear factors to this transform matrix.
-- `LTransform:reset`: Resets the transform to identity.
-- `LTransform:setTransformation`: Replaces the transform with full transformation parameters.
-- `LTransform:transformPoint`: Transforms a point from local space to world space.
-- `LTransform:inverseTransformPoint`: Transforms a point from world space back to local space.
-- `LTransform:inverse`: Returns a new Transform that undoes this transform.
+- `LTransform:translate`: Applies a translation to this transform.
+- `LTransform:rotate`: Applies a rotation to this transform.
+- `LTransform:scale`: Applies scale to this transform.
+- `LTransform:shear`: Applies shear to this transform.
+- `LTransform:reset`: Resets this transform to identity.
+- `LTransform:setTransformation`: Replaces this transform from position, rotation, scale, origin, and shear components.
+- `LTransform:transformPoint`: Transforms a point by this transform.
+- `LTransform:inverseTransformPoint`: Transforms a point by this transform's inverse.
+- `LTransform:inverse`: Returns this transform's inverse.
 - `LTransform:clone`: Returns a copy of this transform.
-- `LTransform:getMatrix`: Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
-- `LTransform:decompose`: Decomposes this transform into translation, rotation, and scale.
-- `LTransform:type`: Returns the type name of this object.
-- `LTransform:typeOf`: Returns true if this object is of the given type.
+- `LTransform:getMatrix`: Returns this transform matrix as a flat array table.
+- `LTransform:decompose`: Decomposes this transform into component values.
+- `LTransform:type`: Returns the Lua-visible type name for this transform handle.
+- `LTransform:typeOf`: Returns whether this transform handle matches a supported type name.
 
 ### `LTween` Methods
-- `LTween:update`: Advances the clock by dt seconds. Returns true when complete.
-- `LTween:reset`: Resets the tween elapsed time to zero, restarting the animation.
-- `LTween:getValue`: Returns the interpolated value at 1-based index, or all values when no index is given.
-- `LTween:getAllValues`: Returns all interpolated values as a table.
-- `LTween:isComplete`: Returns true if the tween has finished.
-- `LTween:getValueCount`: Returns the number of values in this tween.
-- `LTween:getEasingName`: Returns the easing function name.
-- `LTween:getDuration`: Returns the tween duration in seconds.
-- `LTween:getTime`: Returns the current clock time.
-- `LTween:getClock`: Alias for getTime(). Returns the current clock time.
-- `LTween:setTime`: Sets the clock to a specific time, clamped to [0, duration].
-- `LTween:set`: Alias for setTime(). Sets the clock to t, clamped to [0, duration].
-- `LTween:addValue`: Adds a start/target value pair. Returns the 1-based index.
-- `LTween:type`: Returns the type name of this object.
-- `LTween:typeOf`: Returns true if this object is of the given type.
+- `LTween:update`: Advances the tween clock and returns whether it is complete.
+- `LTween:reset`: Resets the tween clock to the beginning.
+- `LTween:getValue`: Returns one tween value by one-based index or all values when no index is provided.
+- `LTween:getAllValues`: Returns all current tween values.
+- `LTween:isComplete`: Returns whether this tween is complete.
+- `LTween:getValueCount`: Returns the number of values animated by this tween.
+- `LTween:getEasingName`: Returns this tween easing function name.
+- `LTween:getDuration`: Returns this tween duration.
+- `LTween:getTime`: Returns this tween clock time.
+- `LTween:getClock`: Returns this tween clock time.
+- `LTween:setTime`: Sets this tween clock time.
+- `LTween:set`: Sets this tween clock time.
+- `LTween:addValue`: Adds a value track to this tween.
+- `LTween:type`: Returns the Lua-visible type name for this tween handle.
+- `LTween:typeOf`: Returns whether this tween handle matches a supported type name.
 
 ### `LVec2` Methods
 - `LVec2:dot`: Returns the dot product with another vector.
-- `LVec2:length`: Returns the Euclidean length of the vector.
-- `LVec2:x`: Returns the horizontal component of the vector.
-- `LVec2:y`: Returns the vertical component of the vector.
-- `LVec2:lengthSquared`: Returns the squared length of the vector (faster than length).
-- `LVec2:normalize`: Returns a unit-length copy of this vector. Returns zero if length is zero.
-- `LVec2:normalized`: Compatibility alias for `normalize`.
-- `LVec2:lerp`: Returns a linearly interpolated vector between this and other at parameter t.
-- `LVec2:distance`: Returns the Euclidean distance from this vector to another.
-- `LVec2:angle`: Returns the angle of this vector in radians (atan2(y, x)).
-- `LVec2:rotate`: Returns a new vector rotated by the given angle in radians.
-- `LVec2:perpendicular`: Returns the perpendicular vector (-y, x).
-- `LVec2:cross`: Returns the 2D cross product (scalar) with another vector.
-- `LVec2:fromAngle`: Creates a unit vector from an angle in radians.
-- `LVec2:reflect`: Reflects this vector off a surface with the given normal.
-- `LVec2:type`: Returns the type name of this object.
-- `LVec2:typeOf`: Returns true if this object is of the given type.
+- `LVec2:length`: Returns this vector length.
+- `LVec2:x`: Returns this vector x component.
+- `LVec2:y`: Returns this vector y component.
+- `LVec2:lengthSquared`: Returns this vector squared length.
+- `LVec2:normalize`: Returns a normalized copy of this vector.
+- `LVec2:normalized`: Returns a normalized copy of this vector.
+- `LVec2:lerp`: Returns a vector interpolated toward another vector.
+- `LVec2:distance`: Returns distance to another vector.
+- `LVec2:angle`: Returns this vector angle.
+- `LVec2:rotate`: Returns this vector rotated by an angle.
+- `LVec2:perpendicular`: Returns a perpendicular vector.
+- `LVec2:cross`: Returns the scalar 2D cross product with another vector.
+- `LVec2:fromAngle`: Creates a unit vector from an angle.
+- `LVec2:reflect`: Returns this vector reflected around a normal vector.
+- `LVec2:type`: Returns the Lua-visible type name for this vector handle.
+- `LVec2:typeOf`: Returns whether this vector handle matches a supported type name.
 
 ### `LVec3` Methods
-- `LVec3:length`: Returns the Euclidean length of the vector.
-- `LVec3:lengthSquared`: Returns the squared Euclidean length (avoids sqrt).
-- `LVec3:normalize`: Returns a unit-length version of this vector.
-- `LVec3:dot`: Dot product with another Vec3.
-- `LVec3:cross`: Cross product with another Vec3.
-- `LVec3:lerp`: Linear interpolation towards another Vec3.
-- `LVec3:distance`: Euclidean distance to another Vec3.
-- `LVec3:add`: Add another Vec3 and return the result.
-- `LVec3:sub`: Subtract another Vec3 and return the result.
-- `LVec3:scale`: Scale this vector by a scalar and return the result.
-- `LVec3:splat`: Creates a Vec3 with all components set to `v`.
-- `LVec3:type`: Returns the type name of this object.
-- `LVec3:typeOf`: Returns true if this object is of the given type.
+- `LVec3:length`: Returns this vector length.
+- `LVec3:lengthSquared`: Returns this vector squared length.
+- `LVec3:normalize`: Returns a normalized copy of this vector.
+- `LVec3:dot`: Returns the dot product with another vector.
+- `LVec3:cross`: Returns the 3D cross product with another vector.
+- `LVec3:lerp`: Returns a vector interpolated toward another vector.
+- `LVec3:distance`: Returns distance to another vector.
+- `LVec3:add`: Returns the sum with another vector.
+- `LVec3:sub`: Returns the difference from another vector.
+- `LVec3:scale`: Returns this vector multiplied by a scalar.
+- `LVec3:splat`: Creates a vector with all components set to one value.
+- `LVec3:type`: Returns the Lua-visible type name for this vector handle.
+- `LVec3:typeOf`: Returns whether this vector handle matches a supported type name.
 
 ## References
 

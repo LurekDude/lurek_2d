@@ -13,7 +13,7 @@ pub struct LabelStore {
     next_id: u32,
 }
 impl LabelStore {
-    /// Create an empty label store.
+    /// Create an empty label store. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

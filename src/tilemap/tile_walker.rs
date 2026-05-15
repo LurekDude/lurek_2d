@@ -120,11 +120,11 @@ impl TileWalker {
             prev_facing: facing,
         }
     }
-    /// Return current grid X.
+    /// Return current grid X. This function is part of the public API.
     pub fn x(&self) -> i32 {
         self.x
     }
-    /// Return current grid Y.
+    /// Return current grid Y. This function is part of the public API.
     pub fn y(&self) -> i32 {
         self.y
     }
@@ -223,7 +223,7 @@ impl TileWalker {
     pub fn turn_right(&mut self) {
         self.facing = self.facing.turn_right();
     }
-    /// Rotate facing 180°.
+    /// Rotate facing 180°. This function is part of the public API.
     pub fn turn_around(&mut self) {
         self.facing = self.facing.opposite();
     }

@@ -42,6 +42,7 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - `frame.rs`: Defines AnimFrame plus the AnimationFrame compatibility alias.
 - `mod.rs`: Declares the animation submodules and re-exports the public frame, clip, controller, event, and render parameter types.
 - `render.rs`: Converts the current animation frame into renderer-facing DrawQuad command data.
+- `spine_bridge.rs`: - Bridges a Spine skeleton to an animation state machine via name mapping.
 - `state_machine.rs`: Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
 - `sync_group.rs`: Named animation synchronisation groups.
 
@@ -54,14 +55,17 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - `BlendMask` (`struct`, `blend.rs`): Restricts a [`BlendLayer`] to a named subset of bone or joint identifiers.
 - `BlendLayer` (`struct`, `blend.rs`): One layer in a [`BlendLayerSet`]: a named clip at a given blend weight.
 - `BlendLayerSet` (`struct`, `blend.rs`): Ordered set of blend layers for a single sprite's animation.
+- `ClipPlaybackMode` (`enum`, `clip.rs`): Supported clip playback modes.
 - `AnimClip` (`struct`, `clip.rs`): Named ordered frame sequence with clip-local FPS and looping configuration.
 - `Animation` (`struct`, `controller.rs`): Main playback controller that owns frames, clips, speed, timers, and pending events.
 - `EasingKind` (`enum`, `curve.rs`): Interpolation mode applied between each pair of consecutive keyframes.
 - `AnimCurve` (`struct`, `curve.rs`): A keyframe-based animation curve.
+- `AnimPropertyTimeline` (`struct`, `curve.rs`): Sparse multi-property timeline keyed by property name.
 - `AnimEvent` (`enum`, `event.rs`): Playback event enum used to report frame changes, loops, and finished clips.
 - `AnimFrame` (`struct`, `frame.rs`): One source rectangle plus an optional per-frame duration override.
 - `AnimationFrame` (`type`, `frame.rs`): Backward-compatible alias for [`AnimFrame`].
 - `AnimRenderParams` (`struct`, `render.rs`): Caller-supplied texture and transform bundle used when generating render commands.
+- `SpineAnimBridge` (`struct`, `spine_bridge.rs`): Maps FSM state names to Spine animation clips.
 - `AnimParamValue` (`enum`, `state_machine.rs`): Value held by an animation parameter.
 - `ConditionOp` (`enum`, `state_machine.rs`): Comparison operator for a transition condition.
 - `ConditionValue` (`enum`, `state_machine.rs`): Right-hand side value for a transition condition.
@@ -74,75 +78,96 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 ## Functions
 
 - `load_aseprite_json` (`aseprite.rs`): Parses an Aseprite JSON export string into an [`AsepriteParsed`] result.
-- `BlendMask::all` (`blend.rs`): Creates a mask that affects all bones (no filtering).
-- `BlendMask::from_bones` (`blend.rs`): Creates a mask restricted to the given bone names.
-- `BlendMask::includes` (`blend.rs`): Returns `true` if this mask applies to the given bone name.
-- `BlendLayer::new` (`blend.rs`): Creates a new blend layer.
-- `BlendLayerSet::new` (`blend.rs`): Creates an empty blend layer set.
-- `BlendLayerSet::len` (`blend.rs`): Returns the number of layers currently in the set.
-- `BlendLayerSet::is_empty` (`blend.rs`): Returns `true` if the set contains no layers.
-- `BlendLayerSet::add_layer` (`blend.rs`): Appends a new layer.
-- `BlendLayerSet::remove_layer` (`blend.rs`): Removes a layer by name.
-- `BlendLayerSet::set_weight` (`blend.rs`): Sets the blend weight of a layer.
-- `BlendLayerSet::get_weight` (`blend.rs`): Returns the current weight of a layer, or `None` if not found.
-- `BlendLayerSet::set_mask` (`blend.rs`): Replaces the bone mask of a layer.
-- `BlendLayerSet::layers` (`blend.rs`): Returns a reference to the ordered layer list.
-- `BlendLayerSet::get_layer` (`blend.rs`): Returns an immutable reference to a named layer, or `None`.
-- `Animation::new` (`controller.rs`): Creates a new, empty animation with no frames or clips.
-- `Animation::add_frame` (`controller.rs`): Adds a single frame and returns its 0-based index.
-- `Animation::add_frames_from_grid` (`controller.rs`): Slices a sprite-sheet grid into frames and appends them.
-- `Animation::add_clip` (`controller.rs`): Registers a named clip.
-- `Animation::add_clip_from_grid` (`controller.rs`): Convenience method: adds grid-sliced frames then creates a clip referencing them.
-- `Animation::play` (`controller.rs`): Starts playing a clip by name.
-- `Animation::stop` (`controller.rs`): Stops playback and resets to frame 0.
-- `Animation::pause` (`controller.rs`): Pauses playback at the current frame.
-- `Animation::resume` (`controller.rs`): Resumes playback from the current frame.
-- `Animation::update` (`controller.rs`): Advances the animation by `dt` seconds (scaled by [`speed`](Self::get_speed)).
-- `Animation::current_quad` (`controller.rs`): Returns the source rectangle of the current frame, or `None` if no clip is active or the frame pool is empty.
-- `Animation::current_frame` (`controller.rs`): Returns the current position within the active clip's frame list (0-based).
-- `Animation::get_current_clip` (`controller.rs`): Returns the name of the currently active clip, if any.
-- `Animation::is_playing` (`controller.rs`): Returns `true` if the animation is currently playing.
-- `Animation::is_looping` (`controller.rs`): Returns `true` if the current clip is set to loop.
-- `Animation::get_speed` (`controller.rs`): Returns the playback speed multiplier.
-- `Animation::set_speed` (`controller.rs`): Sets the playback speed multiplier.
-- `Animation::get_frame_count` (`controller.rs`): Returns the total number of frames in the animation's frame pool.
-- `Animation::get_clip_count` (`controller.rs`): Returns the number of registered clips.
-- `Animation::drain_events` (`controller.rs`): Returns and clears all pending animation events.
-- `Animation::set_frame` (`controller.rs`): Sets the playback position within the current clip.
-- `Animation::crossfade` (`controller.rs`): Starts a crossfade to another clip over the given duration in seconds.
-- `Animation::get_blend_state` (`controller.rs`): Returns the current crossfade state as `(from_quad, to_quad, blend_weight)`.
-- `Animation::draw_to_image` (`controller.rs`): Renders the current animation frame as a debug image.
-- `Animation::load_from_aseprite` (`controller.rs`): Creates an [`Animation`] from an [`AsepriteParsed`] result.
-- `AnimCurve::new` (`curve.rs`): Creates an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
-- `AnimCurve::with_easing` (`curve.rs`): Creates an empty `AnimCurve` with the given easing kind.
-- `AnimCurve::add_keyframe` (`curve.rs`): Adds a keyframe, keeping the internal list sorted by time.
-- `AnimCurve::keyframe_count` (`curve.rs`): Returns the number of keyframes.
-- `AnimCurve::clear` (`curve.rs`): Removes all keyframes.
-- `AnimCurve::eval` (`curve.rs`): Evaluates the curve at the given time.
-- `AnimEvent::type_name` (`event.rs`): Returns the event type as a Lua-friendly string.
-- `AnimEvent::frame_index` (`event.rs`): Returns the frame index for `FrameChanged` events, or `None`.
-- `Animation::generate_render_command` (`render.rs`): Produces a single `DrawQuad` render command for the current frame.
+- `BlendMask::all` (`blend.rs`): Create a mask that includes all bones.
+- `BlendMask::from_bones` (`blend.rs`): Create a mask from an explicit bone list.
+- `BlendMask::includes` (`blend.rs`): Return `true` when the mask includes `bone`.
+- `BlendLayer::new` (`blend.rs`): Create a blend layer with clamped weight.
+- `BlendLayerSet::new` (`blend.rs`): Create an empty layer set.
+- `BlendLayerSet::len` (`blend.rs`): Return the number of layers.
+- `BlendLayerSet::is_empty` (`blend.rs`): Return `true` when no layers are stored.
+- `BlendLayerSet::add_layer` (`blend.rs`): Add a layer; returns an error when the name already exists.
+- `BlendLayerSet::remove_layer` (`blend.rs`): Remove a layer by name.
+- `BlendLayerSet::set_weight` (`blend.rs`): Set a layer's weight and clamp it to `[0, 1]`.
+- `BlendLayerSet::get_weight` (`blend.rs`): Return a layer's weight, or `None` when missing.
+- `BlendLayerSet::set_mask` (`blend.rs`): Replace a layer's mask.
+- `BlendLayerSet::layers` (`blend.rs`): Return the stored layers.
+- `BlendLayerSet::get_layer` (`blend.rs`): Return a layer by name.
+- `Animation::new` (`controller.rs`): Create an empty animation controller.
+- `Animation::add_frame` (`controller.rs`): Append a frame and return its index.
+- `Animation::add_frames_from_grid` (`controller.rs`): Append frames from a texture grid and return the number added.
+- `Animation::add_frames_from_rects` (`controller.rs`): Append a list of frame rectangles and return the number added.
+- `Animation::add_clip` (`controller.rs`): Add a forward-playing clip.
+- `Animation::add_clip_with_mode` (`controller.rs`): Add a clip with an explicit playback mode.
+- `Animation::add_clip_from_grid` (`controller.rs`): Create frames from a grid and register a clip that references them.
+- `Animation::play` (`controller.rs`): Start playing a named clip; returns `false` when the clip is missing.
+- `Animation::stop` (`controller.rs`): Stop playback and reset the frame position.
+- `Animation::pause` (`controller.rs`): Pause playback without resetting the frame position.
+- `Animation::resume` (`controller.rs`): Resume playback.
+- `Animation::update` (`controller.rs`): Advance playback timers and emit frame events.
+- `Animation::current_quad` (`controller.rs`): Return the current frame quad, or `None` when playback is unset.
+- `Animation::current_frame` (`controller.rs`): Return the current frame index inside the clip.
+- `Animation::get_current_clip` (`controller.rs`): Return the current clip name.
+- `Animation::is_playing` (`controller.rs`): Return `true` when playback is active.
+- `Animation::is_looping` (`controller.rs`): Return `true` when the active clip loops.
+- `Animation::get_speed` (`controller.rs`): Return the playback speed multiplier.
+- `Animation::set_speed` (`controller.rs`): Set the playback speed multiplier.
+- `Animation::get_frame_count` (`controller.rs`): Return the number of loaded frames.
+- `Animation::get_frame_quad` (`controller.rs`): Return the quad for frame `index`.
+- `Animation::get_clip_count` (`controller.rs`): Return the number of registered clips.
+- `Animation::get_clip` (`controller.rs`): Return a clip by name.
+- `Animation::get_clip_mut` (`controller.rs`): Return a clip by name mutably.
+- `Animation::drain_events` (`controller.rs`): Drain and return the pending playback events.
+- `Animation::set_frame` (`controller.rs`): Force the current clip frame index.
+- `Animation::crossfade` (`controller.rs`): Start a crossfade to another clip; returns `false` if the clip is missing.
+- `Animation::get_blend_state` (`controller.rs`): Return the active crossfade state as `(from, to, blend)` when a blend is running.
+- `Animation::draw_to_image` (`controller.rs`): Draw a simple preview image for the current frame.
+- `Animation::draw_preview_grid` (`controller.rs`): Draw a grid preview of all loaded frames.
+- `Animation::load_from_aseprite` (`controller.rs`): Build an `Animation` from parsed Aseprite metadata.
+- `AnimCurve::new` (`curve.rs`): Create an empty curve with linear easing.
+- `AnimCurve::with_easing` (`curve.rs`): Create an empty curve with the given easing.
+- `AnimCurve::add_keyframe` (`curve.rs`): Insert or replace a keyframe while keeping the list sorted.
+- `AnimCurve::keyframe_count` (`curve.rs`): Return the number of keyframes.
+- `AnimCurve::clear` (`curve.rs`): Remove all keyframes.
+- `AnimCurve::eval` (`curve.rs`): Evaluate the curve at time `t`.
+- `AnimPropertyTimeline::new` (`curve.rs`): Create an empty timeline with linear easing.
+- `AnimPropertyTimeline::add_keyframe` (`curve.rs`): Insert a keyframe with one or more property values.
+- `AnimPropertyTimeline::property_names` (`curve.rs`): Return the list of property names.
+- `AnimPropertyTimeline::keyframe_count` (`curve.rs`): Return the number of timeline keyframes.
+- `AnimPropertyTimeline::eval_property` (`curve.rs`): Evaluate one property at time `t`.
+- `AnimPropertyTimeline::eval_all` (`curve.rs`): Evaluate all properties at time `t`.
+- `AnimEvent::type_name` (`event.rs`): Return the canonical event type name.
+- `AnimEvent::frame_index` (`event.rs`): Return the frame index for `FrameChanged`, or `None` for other events.
+- `AnimFrame::new` (`frame.rs`): Create a new animation frame.
+- `Animation::generate_render_command` (`render.rs`): Build a draw command for the current frame when the animation has an active quad.
 - `quad_to_draw_command` (`render.rs`): Converts a source quad and render parameters into a `DrawQuad` command.
-- `AnimStateMachine::new` (`state_machine.rs`): Creates a new state machine with an owned animation and a named initial state.
-- `AnimStateMachine::add_state` (`state_machine.rs`): Registers a named state mapping to a clip.
-- `AnimStateMachine::add_transition` (`state_machine.rs`): Adds a transition rule by parsing a condition string.
-- `AnimStateMachine::set_param_float` (`state_machine.rs`): Sets a float parameter.
-- `AnimStateMachine::set_param_bool` (`state_machine.rs`): Sets a boolean parameter.
-- `AnimStateMachine::set_param_int` (`state_machine.rs`): Sets an integer parameter.
-- `AnimStateMachine::get_param` (`state_machine.rs`): Returns a reference to the current value of a named parameter.
-- `AnimStateMachine::update` (`state_machine.rs`): Advances the animation by `dt` seconds and evaluates transitions.
-- `AnimStateMachine::get_state` (`state_machine.rs`): Returns the name of the currently active state.
-- `AnimStateMachine::force_state` (`state_machine.rs`): Forces a transition to the named state, playing the associated clip.
-- `AnimStateMachine::get_animation` (`state_machine.rs`): Returns an immutable reference to the owned animation.
-- `AnimStateMachine::get_animation_mut` (`state_machine.rs`): Returns a mutable reference to the owned animation.
+- `SpineAnimBridge::new` (`spine_bridge.rs`): Create a bridge for a skeleton.
+- `SpineAnimBridge::map` (`spine_bridge.rs`): Map a FSM state to a skeleton clip.
+- `SpineAnimBridge::map_looping` (`spine_bridge.rs`): Map a FSM state to a skeleton clip and set its looping override.
+- `SpineAnimBridge::update` (`spine_bridge.rs`): Advance the FSM and play the mapped Spine animation when the state changes.
+- `SpineAnimBridge::skeleton` (`spine_bridge.rs`): Return the current skeleton.
+- `SpineAnimBridge::skeleton_mut` (`spine_bridge.rs`): Return the skeleton mutably.
+- `SpineAnimBridge::last_applied_state` (`spine_bridge.rs`): Return the last applied FSM state.
+- `SpineAnimBridge::get_mapped_clip` (`spine_bridge.rs`): Return the mapped clip for a FSM state.
+- `AnimStateMachine::new` (`state_machine.rs`): Create a state machine with an initial state name.
+- `AnimStateMachine::add_state` (`state_machine.rs`): Register a state and its clip mapping.
+- `AnimStateMachine::add_transition` (`state_machine.rs`): Parse and register a transition condition.
+- `AnimStateMachine::set_param_float` (`state_machine.rs`): Set a float parameter.
+- `AnimStateMachine::set_param_bool` (`state_machine.rs`): Set a bool parameter.
+- `AnimStateMachine::set_param_int` (`state_machine.rs`): Set an integer parameter.
+- `AnimStateMachine::get_param` (`state_machine.rs`): Return a parameter by name.
+- `AnimStateMachine::update` (`state_machine.rs`): Advance the animation and process transition chains.
+- `AnimStateMachine::get_state` (`state_machine.rs`): Return the current state name.
+- `AnimStateMachine::force_state` (`state_machine.rs`): Force a transition to `name`; returns `false` when the state is unknown or clip play fails.
+- `AnimStateMachine::get_animation` (`state_machine.rs`): Return the owned animation controller.
+- `AnimStateMachine::get_animation_mut` (`state_machine.rs`): Return the owned animation controller mutably.
 - `compare_nums` (`state_machine.rs`): Applies a comparison operator to two `f32` values.
 - `parse_condition` (`state_machine.rs`): Parses a condition string such as `"speed > 0.1"` or `"jumping == true"`.
-- `AnimSyncGroup::new` (`sync_group.rs`): Creates an empty `AnimSyncGroup`.
-- `AnimSyncGroup::add` (`sync_group.rs`): Adds an animation key to the group.
-- `AnimSyncGroup::remove` (`sync_group.rs`): Removes an animation key from the group.
-- `AnimSyncGroup::clear` (`sync_group.rs`): Removes all members from the group.
-- `AnimSyncGroup::member_count` (`sync_group.rs`): Returns the number of animation keys currently in the group.
-- `AnimSyncGroup::members` (`sync_group.rs`): Returns a reference to the member key slice.
+- `AnimSyncGroup::new` (`sync_group.rs`): Create an empty sync group.
+- `AnimSyncGroup::add` (`sync_group.rs`): Add `key` when it is not already present.
+- `AnimSyncGroup::remove` (`sync_group.rs`): Remove `key` from the group.
+- `AnimSyncGroup::clear` (`sync_group.rs`): Remove all members.
+- `AnimSyncGroup::member_count` (`sync_group.rs`): Return the number of members.
+- `AnimSyncGroup::members` (`sync_group.rs`): Return the member slice.
 
 ## Lua API Reference
 
@@ -150,84 +175,84 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - Namespace: `lurek.animation`
 
 ### Module Functions
-- `lurek.animation.new`: Creates a new, empty Animation controller.
-- `lurek.animation.fromAseprite`: Parses an Aseprite JSON export string and builds an animation.
-- `lurek.animation.newStateMachine`: Creates an animation FSM from an Animation controller and an initial state name.
-- `lurek.animation.newCurve`: Creates a new empty animation curve with linear interpolation.
-- `lurek.animation.newSyncGroup`: Creates a new empty animation sync group.
-- `lurek.animation.newBlendLayerSet`: Creates a new empty blend layer set for compositing multiple animation clips.
-- `lurek.animation.buildCharacter`: Builds an `Animation` plus optional `AnimStateMachine` from one config table.
+- `lurek.animation.new`: Creates an empty animation with no frames or clips.
+- `lurek.animation.fromAseprite`: Loads an animation from an Aseprite JSON export string.
+- `lurek.animation.newStateMachine`: Creates an animation state machine by consuming an animation handle.
+- `lurek.animation.newCurve`: Creates an empty animation curve.
+- `lurek.animation.newSyncGroup`: Creates an empty animation synchronization group.
+- `lurek.animation.newBlendLayerSet`: Creates an empty blend layer set for layered animation playback.
+- `lurek.animation.buildCharacter`: Builds a character animation bundle from grid frame and clip configuration.
 
 ### `LAnimCurve` Methods
-- `LAnimCurve:addKeyframe`: Inserts or replaces a keyframe at the given time.
-- `LAnimCurve:eval`: Returns the interpolated curve value at the given time.
-- `LAnimCurve:setEasing`: Sets the easing kind applied between all keyframe segments.
-- `LAnimCurve:keyframeCount`: Returns the number of keyframes currently stored.
-- `LAnimCurve:setCustomEasing`: Sets or clears a custom Lua easing function for this curve.
-- `LAnimCurve:clear`: Removes all keyframes from this animation curve, resetting it to empty.
-- `LAnimCurve:type`: Returns the type name of this object.
-- `LAnimCurve:typeOf`: Returns true if this object is of the given type.
+- `LAnimCurve:addKeyframe`: Adds a keyframe to the curve.
+- `LAnimCurve:eval`: Evaluates the curve at a time or normalized position.
+- `LAnimCurve:setEasing`: Sets the built-in easing mode used between keyframes.
+- `LAnimCurve:keyframeCount`: Returns the number of keyframes stored in this curve.
+- `LAnimCurve:setCustomEasing`: Sets or clears a Lua callback used to evaluate custom easing.
+- `LAnimCurve:clear`: Removes all keyframes from this curve.
+- `LAnimCurve:type`: Returns the Lua-visible type name for this animation curve handle.
+- `LAnimCurve:typeOf`: Returns whether this animation curve handle matches a supported type name.
 
 ### `LAnimStateMachine` Methods
-- `LAnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
-- `LAnimStateMachine:getState`: Returns the name of the currently active state.
-- `LAnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
-- `LAnimStateMachine:addState`: Registers a new named state that plays a clip from the embedded animation.
-- `LAnimStateMachine:addTransition`: Adds a conditional transition between two states using a condition string like "speed > 0.5".
-- `LAnimStateMachine:setParam`: Sets an FSM parameter value (number, boolean, or integer supported).
-- `LAnimStateMachine:getQuad`: Returns the source quad for the current animation frame.
-- `LAnimStateMachine:type`: Returns the type name of this object.
-- `LAnimStateMachine:typeOf`: Returns true if this object is of the given type.
+- `LAnimStateMachine:update`: Advances the animation state machine and its owned animation playback.
+- `LAnimStateMachine:getState`: Returns the current animation state name.
+- `LAnimStateMachine:forceState`: Forces the state machine into a named state.
+- `LAnimStateMachine:addState`: Adds a state that plays a named animation clip.
+- `LAnimStateMachine:addTransition`: Adds a named-condition transition between two animation states.
+- `LAnimStateMachine:setParam`: Sets a boolean, integer, or numeric state machine parameter.
+- `LAnimStateMachine:getQuad`: Returns the current frame rectangle from the state machine's owned animation.
+- `LAnimStateMachine:type`: Returns the Lua-visible type name for this animation state machine handle.
+- `LAnimStateMachine:typeOf`: Returns whether this animation state machine handle matches a supported type name.
 
 ### `LAnimSyncGroup` Methods
-- `LAnimSyncGroup:add`: Adds an animation handle to the group.
-- `LAnimSyncGroup:remove`: Removes an animation handle from the group.
-- `LAnimSyncGroup:clear`: Removes all animation handles from the group.
-- `LAnimSyncGroup:memberCount`: Returns the number of animations currently in the group.
-- `LAnimSyncGroup:type`: Returns the type name of this object.
-- `LAnimSyncGroup:typeOf`: Returns true if this object is of the given type.
+- `LAnimSyncGroup:add`: Adds an animation-like handle to the sync group.
+- `LAnimSyncGroup:remove`: Removes an animation-like handle from the sync group.
+- `LAnimSyncGroup:clear`: Removes all members from the sync group.
+- `LAnimSyncGroup:memberCount`: Returns the number of handles tracked by the sync group.
+- `LAnimSyncGroup:type`: Returns the Lua-visible type name for this animation sync group handle.
+- `LAnimSyncGroup:typeOf`: Returns whether this animation sync group handle matches a supported type name.
 
 ### `LAnimation` Methods
-- `LAnimation:addFrame`: Adds a single frame to the frame pool by source rectangle.
-- `LAnimation:addFramesFromGrid`: Slices a sprite-sheet grid into frames and appends them.
-- `LAnimation:addFramesFromRects`: Appends frames from pre-computed source rectangles.
-- `LAnimation:addClip`: Adds a named clip from explicit frame indices, optionally including playback mode.
-- `LAnimation:addClipFromGrid`: Adds a named clip sliced from a sprite-sheet grid.
-- `LAnimation:setClipMode`: Sets playback mode for a named clip.
-- `LAnimation:getClipMode`: Returns playback mode for a named clip.
-- `LAnimation:play`: Starts playback of the named clip.
-- `LAnimation:stop`: Stops playback and resets to frame 0.
-- `LAnimation:pause`: Pauses playback at the current frame.
-- `LAnimation:resume`: Resumes playback from the current frame.
-- `LAnimation:update`: Advances the animation by dt seconds.
-- `LAnimation:getQuad`: Returns the source quad for the current frame.
-- `LAnimation:pollEvents`: Drains and returns all pending animation events as a table.
-- `LAnimation:isPlaying`: Returns true if a clip is currently playing.
-- `LAnimation:isLooping`: Returns true if the current clip is set to loop.
-- `LAnimation:getClip`: Returns the name of the currently playing clip.
-- `LAnimation:getSpeed`: Returns the playback speed multiplier.
-- `LAnimation:setSpeed`: Sets the playback speed multiplier.
-- `LAnimation:getFrameCount`: Returns the total number of frames in the frame pool.
-- `LAnimation:getClipCount`: Returns the number of registered clips.
-- `LAnimation:getCurrentFrame`: Returns the current position within the active clip (0-based).
-- `LAnimation:setFrame`: Sets the playback position within the current clip.
-- `LAnimation:crossfade`: Begins a smooth crossfade from the current clip to a new named clip.
-- `LAnimation:getBlendState`: Returns the active crossfade state.
-- `LAnimation:drawToImage`: Renders the current animation frame into a new ImageData (white bg, blue frame rect).
-- `LAnimation:drawPreviewGrid`: Renders all animation frames into a grid preview ImageData.
-- `LAnimation:type`: Returns the type name of this object.
-- `LAnimation:typeOf`: Returns true if this object is of the given type.
+- `LAnimation:addFrame`: Adds one frame rectangle to this animation.
+- `LAnimation:addFramesFromGrid`: Adds frames by slicing a texture grid.
+- `LAnimation:addFramesFromRects`: Adds frames from an array of rectangle tables.
+- `LAnimation:addClip`: Adds a named clip using existing frame indices.
+- `LAnimation:setClipMode`: Changes the playback mode for an existing clip.
+- `LAnimation:getClipMode`: Returns the playback mode name for a clip when it exists.
+- `LAnimation:addClipFromGrid`: Adds frames from a texture grid and creates a clip that references the new frames.
+- `LAnimation:play`: Starts playback of a named clip.
+- `LAnimation:stop`: Stops playback and resets animation playback state.
+- `LAnimation:pause`: Pauses animation playback without changing the current clip.
+- `LAnimation:resume`: Resumes playback of a paused animation.
+- `LAnimation:update`: Advances animation playback and records any frame or clip events.
+- `LAnimation:getQuad`: Returns the current frame rectangle as a table.
+- `LAnimation:pollEvents`: Drains animation events produced since the previous poll.
+- `LAnimation:isPlaying`: Returns whether this animation is currently playing.
+- `LAnimation:isLooping`: Returns whether the current clip loops.
+- `LAnimation:getClip`: Returns the current clip name when a clip is active.
+- `LAnimation:getSpeed`: Returns the animation playback speed multiplier.
+- `LAnimation:setSpeed`: Sets the animation playback speed multiplier.
+- `LAnimation:getFrameCount`: Returns the number of frame rectangles stored in this animation.
+- `LAnimation:getClipCount`: Returns the number of named clips stored in this animation.
+- `LAnimation:getCurrentFrame`: Returns the current frame index.
+- `LAnimation:setFrame`: Sets the current frame index directly.
+- `LAnimation:crossfade`: Starts a crossfade from the current clip to another clip.
+- `LAnimation:getBlendState`: Returns current crossfade rectangles and blend factor when a crossfade is active.
+- `LAnimation:drawToImage`: Rasterizes the current animation frame into an image userdata.
+- `LAnimation:drawPreviewGrid`: Rasterizes all animation frames into a preview grid image.
+- `LAnimation:type`: Returns the Lua-visible type name for this animation handle.
+- `LAnimation:typeOf`: Returns whether this animation handle matches a supported type name.
 
 ### `LBlendLayerSet` Methods
-- `LBlendLayerSet:addLayer`: Appends a new blend layer.
+- `LBlendLayerSet:addLayer`: Adds a weighted animation blend layer with an optional bone mask.
 - `LBlendLayerSet:removeLayer`: Removes a blend layer by name.
-- `LBlendLayerSet:setWeight`: Sets the blend weight of a named layer (clamped to [0, 1]).
-- `LBlendLayerSet:getWeight`: Returns the blend weight of a named layer.
-- `LBlendLayerSet:setMask`: Replaces the bone mask of a layer.
-- `LBlendLayerSet:listLayers`: Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
+- `LBlendLayerSet:setWeight`: Sets the blend weight for an existing layer.
+- `LBlendLayerSet:getWeight`: Returns the weight for a blend layer when it exists.
+- `LBlendLayerSet:setMask`: Replaces a layer bone mask from a table of bone names.
+- `LBlendLayerSet:listLayers`: Returns all blend layers with names, clip names, weights, and bone masks.
 - `LBlendLayerSet:len`: Returns the number of blend layers.
-- `LBlendLayerSet:type`: Returns the type name of this object.
-- `LBlendLayerSet:typeOf`: Returns true if this object is of the given type.
+- `LBlendLayerSet:type`: Returns the Lua-visible type name for this blend layer set handle.
+- `LBlendLayerSet:typeOf`: Returns whether this blend layer set handle matches a supported type name.
 
 ## References
 
@@ -235,6 +260,7 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - `math`: Imports or references `math` from `src/math/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
+- `spine`: Imports or references `src/spine/`. Dependency stays inside `Feature Systems` and should remain acyclic.
 
 ## Notes
 

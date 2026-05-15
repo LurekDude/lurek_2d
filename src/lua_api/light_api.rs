@@ -249,7 +249,7 @@ pub struct LuaLight {
 impl LuaUserData for LuaLight {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- setPosition --
-        /// Sets this light position.
+        /// Sets this light position. This method is available to Lua scripts.
         /// @param | x | number | Light x coordinate.
         /// @param | y | number | Light y coordinate.
         /// @return | nil | No value is returned.
@@ -263,7 +263,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getPosition --
-        /// Returns this light position.
+        /// Returns this light position. This method is available to Lua scripts.
         /// @return | number | Light x coordinate.
         /// @return | number | Light y coordinate.
         methods.add_method("getPosition", |_, this, ()| {
@@ -275,7 +275,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_position())
         });
         // -- setRadius --
-        /// Sets this light radius.
+        /// Sets this light radius. This method is available to Lua scripts.
         /// @param | r | number | Radius value.
         /// @return | nil | No value is returned.
         methods.add_method("setRadius", |_, this, r: f32| {
@@ -288,7 +288,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getRadius --
-        /// Returns this light radius.
+        /// Returns this light radius. This method is available to Lua scripts.
         /// @return | number | Radius value.
         methods.add_method("getRadius", |_, this, ()| {
             let st = this.state.borrow();
@@ -299,7 +299,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_radius())
         });
         // -- setColor --
-        /// Sets this light RGBA color.
+        /// Sets this light RGBA color. This method is available to Lua scripts.
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
@@ -318,7 +318,7 @@ impl LuaUserData for LuaLight {
             },
         );
         // -- getColor --
-        /// Returns this light RGBA color.
+        /// Returns this light RGBA color. This method is available to Lua scripts.
         /// @return | number | Red channel.
         /// @return | number | Green channel.
         /// @return | number | Blue channel.
@@ -333,7 +333,7 @@ impl LuaUserData for LuaLight {
             Ok((c.r, c.g, c.b, c.a))
         });
         // -- setIntensity --
-        /// Sets this light intensity.
+        /// Sets this light intensity. This method is available to Lua scripts.
         /// @param | i | number | Intensity value.
         /// @return | nil | No value is returned.
         methods.add_method("setIntensity", |_, this, i: f32| {
@@ -346,7 +346,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getIntensity --
-        /// Returns this light intensity.
+        /// Returns this light intensity. This method is available to Lua scripts.
         /// @return | number | Intensity value.
         methods.add_method("getIntensity", |_, this, ()| {
             let st = this.state.borrow();
@@ -357,7 +357,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_intensity())
         });
         // -- setEnergy --
-        /// Sets this light energy value.
+        /// Sets this light energy value. This method is available to Lua scripts.
         /// @param | e | number | Energy value.
         /// @return | nil | No value is returned.
         methods.add_method("setEnergy", |_, this, e: f32| {
@@ -370,7 +370,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getEnergy --
-        /// Returns this light energy value.
+        /// Returns this light energy value. This method is available to Lua scripts.
         /// @return | number | Energy value.
         methods.add_method("getEnergy", |_, this, ()| {
             let st = this.state.borrow();
@@ -381,7 +381,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_energy())
         });
         // -- setBlendMode --
-        /// Sets this light blend mode.
+        /// Sets this light blend mode. This method is available to Lua scripts.
         /// @param | mode | string | Blend mode `add`, `sub`, or `mix`.
         /// @return | nil | No value is returned.
         methods.add_method("setBlendMode", |_, this, mode: String| {
@@ -406,7 +406,7 @@ impl LuaUserData for LuaLight {
             Ok(blend_mode_to_str(light.get_blend_mode()).to_string())
         });
         // -- setFalloff --
-        /// Sets this light falloff mode.
+        /// Sets this light falloff mode. This method is available to Lua scripts.
         /// @param | mode | string | Falloff mode `linear`, `smooth`, or `constant`.
         /// @return | nil | No value is returned.
         methods.add_method("setFalloff", |_, this, mode: String| {
@@ -455,7 +455,7 @@ impl LuaUserData for LuaLight {
             Ok(light.is_shadow_enabled())
         });
         // -- setShadowColor --
-        /// Sets this light shadow RGBA color.
+        /// Sets this light shadow RGBA color. This method is available to Lua scripts.
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
@@ -489,7 +489,7 @@ impl LuaUserData for LuaLight {
             Ok((c.r, c.g, c.b, c.a))
         });
         // -- setShadowFilter --
-        /// Sets this light shadow filter.
+        /// Sets this light shadow filter. This method is available to Lua scripts.
         /// @param | filter | string | Shadow filter `none`, `pcf5`, or `pcf13`.
         /// @return | nil | No value is returned.
         methods.add_method("setShadowFilter", |_, this, filter: String| {
@@ -562,7 +562,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_shadow_softness())
         });
         // -- setLightMask --
-        /// Sets this light's inclusion mask.
+        /// Sets this light's inclusion mask. This method is available to Lua scripts.
         /// @param | mask | integer | Light mask bits.
         /// @return | nil | No value is returned.
         methods.add_method("setLightMask", |_, this, mask: u16| {
@@ -610,7 +610,7 @@ impl LuaUserData for LuaLight {
             Ok(light.get_shadow_mask())
         });
         // -- setEnabled --
-        /// Enables or disables this light.
+        /// Enables or disables this light. This method is available to Lua scripts.
         /// @param | b | boolean | New enabled flag.
         /// @return | nil | No value is returned.
         methods.add_method("setEnabled", |_, this, b: bool| {
@@ -634,7 +634,7 @@ impl LuaUserData for LuaLight {
             Ok(light.is_enabled())
         });
         // -- setLightType --
-        /// Sets this light type.
+        /// Sets this light type. This method is available to Lua scripts.
         /// @param | t | string | Light type `point`, `directional`, or `spot`.
         /// @return | nil | No value is returned.
         methods.add_method("setLightType", |_, this, t: String| {
@@ -648,7 +648,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getLightType --
-        /// Returns this light type string.
+        /// Returns this light type string. This method is available to Lua scripts.
         /// @return | string | Light type `point`, `directional`, or `spot`.
         methods.add_method("getLightType", |_, this, ()| {
             let st = this.state.borrow();
@@ -659,7 +659,7 @@ impl LuaUserData for LuaLight {
             Ok(light_type_to_str(light.get_light_type()).to_string())
         });
         // -- setDirection --
-        /// Sets this light direction angle.
+        /// Sets this light direction angle. This method is available to Lua scripts.
         /// @param | dir | number | Direction angle in radians or engine units.
         /// @return | nil | No value is returned.
         methods.add_method("setDirection", |_, this, dir: f32| {
@@ -817,7 +817,7 @@ impl LuaUserData for LuaLight {
             Ok(light.flicker().enabled)
         });
         // -- setGroupId --
-        /// Sets this light group id.
+        /// Sets this light group id. This method is available to Lua scripts.
         /// @param | id | integer | Group id.
         /// @return | nil | No value is returned.
         methods.add_method("setGroupId", |_, this, id: u16| {
@@ -830,7 +830,7 @@ impl LuaUserData for LuaLight {
             Ok(())
         });
         // -- getGroupId --
-        /// Returns this light group id.
+        /// Returns this light group id. This method is available to Lua scripts.
         /// @return | integer | Group id.
         methods.add_method("getGroupId", |_, this, ()| {
             let st = this.state.borrow();
@@ -993,10 +993,10 @@ impl LuaUserData for LuaLight {
                 .map(|t| t.progress())
                 .unwrap_or(1.0))
         });
-            // -- setCookie --
-            /// Stores a cookie texture path on this Lua light handle.
-            /// @param | path | string | Cookie texture path.
-            /// @return | nil | No value is returned.
+        // -- setCookie --
+        /// Stores a cookie texture path on this Lua light handle.
+        /// @param | path | string | Cookie texture path.
+        /// @return | nil | No value is returned.
         methods.add_method("setCookie", |_, this, path: String| {
             *this.cookie_path.borrow_mut() = Some(path);
             Ok(())
@@ -1157,7 +1157,7 @@ impl LuaUserData for LuaOccluder {
             Ok((pos.x, pos.y))
         });
         // -- setOpacity --
-        /// Sets this occluder opacity.
+        /// Sets this occluder opacity. This method is available to Lua scripts.
         /// @param | o | number | Opacity value.
         /// @return | nil | No value is returned.
         methods.add_method("setOpacity", |_, this, o: f32| {
@@ -1170,7 +1170,7 @@ impl LuaUserData for LuaOccluder {
             Ok(())
         });
         // -- getOpacity --
-        /// Returns this occluder opacity.
+        /// Returns this occluder opacity. This method is available to Lua scripts.
         /// @return | number | Opacity value.
         methods.add_method("getOpacity", |_, this, ()| {
             let st = this.state.borrow();
@@ -1181,7 +1181,7 @@ impl LuaUserData for LuaOccluder {
             Ok(occ.get_opacity())
         });
         // -- setLightMask --
-        /// Sets this occluder's light mask.
+        /// Sets this occluder's light mask. This method is available to Lua scripts.
         /// @param | mask | integer | Light mask bits.
         /// @return | nil | No value is returned.
         methods.add_method("setLightMask", |_, this, mask: u16| {
@@ -1323,7 +1323,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- setAmbient --
-    /// Sets global ambient light color.
+    /// Sets global ambient light color. This function is exposed to Lua scripts.
     /// @param | r | number | Red channel.
     /// @param | g | number | Green channel.
     /// @param | b | number | Blue channel.
@@ -1372,7 +1372,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- getLightCount --
-    /// Returns the number of live lights.
+    /// Returns the number of live lights. This function is exposed to Lua scripts.
     /// @return | integer | Light count.
     tbl.set(
         "getLightCount",

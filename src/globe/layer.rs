@@ -11,7 +11,7 @@ pub struct LayerStore {
     layers: HashMap<String, Layer>,
 }
 impl LayerStore {
-    /// Create an empty layer store.
+    /// Create an empty layer store. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

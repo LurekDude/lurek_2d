@@ -32,6 +32,7 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 - `jps.rs`: Jump Point Search (JPS) for uniform-cost orthogonal-diagonal grids.
 - `mod.rs`: Declares the pathfinding submodules and re-exports the main grids, algorithms, and support types.
 - `nav_grid.rs`: Defines the main navigation grid with walkability, costs, diagonal rules, and thread-friendly snapshots.
+- `navmesh.rs`: - Polygon-based navigation mesh for 2D pathfinding.
 - `pathgrid.rs`: Provides an alternate path grid with float costs and built-in path operations.
 - `range_map.rs`: Dijkstra-budget range-of-movement and threat-range maps on arbitrary grids.
 - `render.rs`: Generates debug render output for grids, flow fields, and influence maps.
@@ -57,6 +58,7 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 - `JpsGrid` (`struct`, `jps.rs`): A uniform-cost grid optimised for JPS pathfinding.
 - `DiagonalMode` (`enum`, `nav_grid.rs`): Controls how diagonal movement is handled during pathfinding.
 - `NavGrid` (`struct`, `nav_grid.rs`): The main navigation grid used by most search helpers, storing blocked cells, movement costs, and diagonal policy.
+- `NavMesh` (`struct`, `navmesh.rs`): Polygon-based 2D navigation mesh supporting A\* pathfinding.
 - `Cell` (`struct`, `pathgrid.rs`): Core cell representation used by one of the grid variants.
 - `PathGrid` (`struct`, `pathgrid.rs`): Alternate grid representation with float costs and built-in path utilities.
 - `RangeMap` (`struct`, `range_map.rs`): A precomputed range map: cheapest path costs from a single origin.
@@ -65,151 +67,156 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 
 ## Functions
 
-- `FlowField::new` (`ai_flow_field.rs`): Creates a new FlowField from a SimpleGrid's dimensions and walkability.
-- `FlowField::set_goal` (`ai_flow_field.rs`): Sets the goal cell and triggers BFS recomputation.
-- `FlowField::compute` (`ai_flow_field.rs`): Recomputes the flow field from the current goal.
-- `FlowField::get_direction` (`ai_flow_field.rs`): Gets the normalized direction toward the goal for a cell (0-based).
-- `FlowField::get_distance` (`ai_flow_field.rs`): Gets the BFS distance for a cell (0-based).
+- `FlowField::new` (`ai_flow_field.rs`): Create an uninitialised field of size `width × height` using the supplied walkability mask.
+- `FlowField::set_goal` (`ai_flow_field.rs`): Set the goal cell to `(gx, gy)` and recompute the full flow field.
+- `FlowField::compute` (`ai_flow_field.rs`): Run a BFS from the current goal cell to fill `distances` then derive `directions`.
+- `FlowField::get_direction` (`ai_flow_field.rs`): Return the normalised direction at `(x, y)`; returns `(0,0)` when out of bounds.
+- `FlowField::get_distance` (`ai_flow_field.rs`): Return the BFS distance at `(x, y)`; returns `INFINITY` when out of bounds or unreachable.
 - `astar` (`astar.rs`): Run A★ search on `grid` from `start` to `goal`.
 - `line_of_sight` (`astar.rs`): Check line-of-sight between two cells using Bresenham's algorithm,
 - `smooth_path` (`astar.rs`): Smooth a path by removing unnecessary waypoints via line-of-sight checks
-- `PathThreadPool::new` (`async_pool.rs`): Spawn `thread_count` workers ready to process path requests.
-- `PathThreadPool::submit` (`async_pool.rs`): Submit a pathfinding request.
-- `PathThreadPool::poll` (`async_pool.rs`): Collect all completed results without blocking.
-- `PathThreadPool::cancel` (`async_pool.rs`): Mark a request as cancelled (best-effort — may already be in progress).
-- `PathThreadPool::pending_count` (`async_pool.rs`): Number of requests submitted but not yet returned via [`poll`].
-- `PathThreadPool::set_thread_count` (`async_pool.rs`): Update the thread count.
-- `PathThreadPool::get_thread_count` (`async_pool.rs`): Current configured thread count.
+- `PathThreadPool::new` (`async_pool.rs`): Spawn `thread_count` workers (minimum 1) and connect them to shared channels.
+- `PathThreadPool::submit` (`async_pool.rs`): Submit an A\* job; caller must pass a cloned grid snapshot.
+- `PathThreadPool::poll` (`async_pool.rs`): Drain all available completed results without blocking.
+- `PathThreadPool::cancel` (`async_pool.rs`): Mark `id` as cancelled; workers skip it if still queued.
+- `PathThreadPool::pending_count` (`async_pool.rs`): Return the number of jobs submitted but not yet delivered.
+- `PathThreadPool::set_thread_count` (`async_pool.rs`): Update the recorded thread count; does not respawn existing workers.
+- `PathThreadPool::get_thread_count` (`async_pool.rs`): Return the configured worker thread count.
 - `bidirectional_astar` (`bidir.rs`): Run bidirectional A★ search on `grid` from `start` to `goal`.
-- `FlowField::new` (`flow_field.rs`): Create an empty flow field backed by `grid`.
-- `FlowField::calculate` (`flow_field.rs`): Compute the flow field toward a single target cell.
-- `FlowField::calculate_multi` (`flow_field.rs`): Compute the flow field toward multiple target cells simultaneously.
-- `FlowField::get_direction` (`flow_field.rs`): Get the normalised direction vector at cell `(x, y)`.
-- `FlowField::get_direction_angle` (`flow_field.rs`): Get the direction as an angle in radians (via `atan2`).
-- `FlowField::get_cost_to_target` (`flow_field.rs`): Get the integrated cost from cell `(x, y)` to the nearest target.
-- `FlowField::is_calculated` (`flow_field.rs`): Whether the flow field has been computed at least once.
-- `FlowField::get_targets` (`flow_field.rs`): Target cells from the most recent computation.
-- `FlowField::get_width` (`flow_field.rs`): Grid width in cells.
-- `FlowField::get_height` (`flow_field.rs`): Grid height in cells.
-- `FlowField::steer` (`flow_field.rs`): Convert a world-space position into a velocity vector.
-- `FlowField::draw_to_image` (`flow_field.rs`): Render the flow field to an image with direction arrows.
+- `FlowField::new` (`flow_field.rs`): Create an uninitialised flow field linked to `grid`; call `calculate` before querying.
+- `FlowField::calculate` (`flow_field.rs`): Seed the field with a single target cell and recompute.
+- `FlowField::calculate_multi` (`flow_field.rs`): Recompute the field seeded from all cells in `targets`.
+- `FlowField::get_direction` (`flow_field.rs`): Return the normalised flow direction at `(x, y)`; returns `(0,0)` when out of bounds.
+- `FlowField::get_direction_angle` (`flow_field.rs`): Return the flow direction at `(x, y)` as an angle in radians relative to the +x axis.
+- `FlowField::get_cost_to_target` (`flow_field.rs`): Return the Dijkstra cost from `(x, y)` to the nearest target; `INFINITY` when unreachable.
+- `FlowField::is_calculated` (`flow_field.rs`): Return true if `calculate` or `calculate_multi` has been called at least once.
+- `FlowField::get_targets` (`flow_field.rs`): Return a clone of the target cells used for the last computation.
+- `FlowField::get_width` (`flow_field.rs`): Return the grid width.
+- `FlowField::get_height` (`flow_field.rs`): Return the grid height.
+- `FlowField::steer` (`flow_field.rs`): Convert world position to tile, sample direction, and return a velocity scaled by `speed`.
+- `FlowField::draw_to_image` (`flow_field.rs`): Render the flow field to an `ImageData` with `cell_size` pixels per tile for debugging.
 - `graph_astar` (`graph_nav.rs`): Find the shortest path between two nodes using A* (or Dijkstra when no heuristic is supplied).
 - `graph_range` (`graph_nav.rs`): Find all nodes within `max_cost` from `start` using Dijkstra.
-- `ProvinceCostFn::new` (`graph_path.rs`): Create a cost function with default cost 1.0 and no overrides.
+- `ProvinceCostFn::new` (`graph_path.rs`): Create a default cost function with `default_cost = 1.0` and no blocked provinces.
 - `find_province_path` (`graph_path.rs`): Find a path between two provinces using A* with centroid distance heuristic.
 - `province_reachable` (`graph_path.rs`): Find all provinces reachable from `start` within a cost budget using Dijkstra.
-- `Grid::new` (`grid.rs`): Creates a new grid where every cell is walkable with the given movement cost.
-- `Grid::width` (`grid.rs`): Returns the grid width in cells.
-- `Grid::height` (`grid.rs`): Returns the grid height in cells.
-- `Grid::set_walkable` (`grid.rs`): Sets whether the cell at `(x, y)` is walkable.
-- `Grid::is_walkable` (`grid.rs`): Returns whether the cell at `(x, y)` is walkable.
-- `Grid::set_cost` (`grid.rs`): Sets the movement cost of the cell at `(x, y)`.
-- `Grid::get_cost` (`grid.rs`): Returns the movement cost of the cell at `(x, y)`.
-- `Grid::find_path_astar` (`grid.rs`): Finds a path from `(sx, sy)` to `(gx, gy)` using A*.
-- `Grid::find_path_dijkstra` (`grid.rs`): Finds a path from `(sx, sy)` to `(gx, gy)` using Dijkstra's algorithm.
-- `Grid::find_path_bfs` (`grid.rs`): Finds a shortest-hop path from `(sx, sy)` to `(gx, gy)` using BFS.
-- `Grid::build_flow_field` (`grid.rs`): Builds a flow field pointing toward `(gx, gy)`.
-- `HexGrid::new` (`hex_grid.rs`): Create a new hex grid of the given size and layout.
-- `HexGrid::set_blocked` (`hex_grid.rs`): Mark or unmark a cell as blocked.
-- `HexGrid::set_cost` (`hex_grid.rs`): Set the movement cost for a cell.
-- `HexGrid::is_blocked` (`hex_grid.rs`): Returns `true` if the cell is blocked or out of bounds.
-- `HexGrid::find_path` (`hex_grid.rs`): A* pathfinding on the hex grid.
-- `HexGrid::line_of_sight` (`hex_grid.rs`): Line-of-sight between two hex cells using hex linear interpolation.
-- `HexGrid::field_of_view` (`hex_grid.rs`): Field of view from `origin` out to `max_range`.
-- `HexGrid::range_of_movement` (`hex_grid.rs`): Range-of-movement: all cells reachable within `budget` using Dijkstra.
-- `HexGrid::neighbors` (`hex_grid.rs`): Returns grid-bounded neighbors for the given cell in offset coordinates.
-- `HexGrid::distance` (`hex_grid.rs`): Hex distance between two cells (cube coordinate distance).
+- `Grid::new` (`grid.rs`): Create a fully walkable `width × height` grid where every cell starts at `default_cost`.
+- `Grid::width` (`grid.rs`): Return the grid width in cells.
+- `Grid::height` (`grid.rs`): Return the grid height in cells.
+- `Grid::set_walkable` (`grid.rs`): Set the walkability of cell `(x, y)`; silently ignores out-of-bounds coordinates.
+- `Grid::is_walkable` (`grid.rs`): Return true when `(x, y)` is in bounds and walkable.
+- `Grid::set_cost` (`grid.rs`): Set the movement cost for cell `(x, y)`; silently ignores out-of-bounds coordinates.
+- `Grid::get_cost` (`grid.rs`): Return the movement cost at `(x, y)`; returns 1.0 when out of bounds.
+- `Grid::find_path_astar` (`grid.rs`): Run A\* from `(sx,sy)` to `(gx,gy)`; use diagonal neighbours when `diagonal` is true.
+- `Grid::find_path_dijkstra` (`grid.rs`): Run Dijkstra from `(sx,sy)` to `(gx,gy)`; respects movement costs, no heuristic.
+- `Grid::find_path_bfs` (`grid.rs`): Run BFS (unweighted) from `(sx,sy)` to `(gx,gy)`; ignores movement costs.
+- `Grid::build_flow_field` (`grid.rs`): Build a 4-directional Dijkstra flow field toward `(gx, gy)`; returns one `(dx,dy)` per cell.
+- `HexGrid::new` (`hex_grid.rs`): Create a fully unblocked hex grid of size `width × height` using `layout`.
+- `HexGrid::set_blocked` (`hex_grid.rs`): Mark cell `(col, row)` as blocked or passable.
+- `HexGrid::set_cost` (`hex_grid.rs`): Set movement cost for cell `(col, row)`.
+- `HexGrid::is_blocked` (`hex_grid.rs`): Return true when `(col, row)` is out-of-bounds or explicitly blocked.
+- `HexGrid::find_path` (`hex_grid.rs`): Run A\* from `from` to `to`; return ordered path or `None` when unreachable.
+- `HexGrid::line_of_sight` (`hex_grid.rs`): Return true when every hex on the straight line from `from` to `to` is passable.
+- `HexGrid::field_of_view` (`hex_grid.rs`): Return all cells visible from `origin` within `max_range` hex steps.
+- `HexGrid::range_of_movement` (`hex_grid.rs`): Return all cells reachable from `origin` with total movement cost ≤ `budget`.
+- `HexGrid::neighbors` (`hex_grid.rs`): Return the passable hex neighbours of `(col, row)` using layout-appropriate offsets.
+- `HexGrid::distance` (`hex_grid.rs`): Return the hex-grid distance between `a` and `b` in steps.
 - `build_abstract` (`hpa.rs`): Build the abstract graph from a `NavGrid`.
 - `hpa_star` (`hpa.rs`): Run HPA★ from `start` to `goal` on the abstract graph, then refine to tiles.
 - `is_reachable` (`hpa.rs`): Check if `goal` is reachable from `start` using the abstract graph.
-- `InfluenceMap::new` (`influence_map.rs`): Creates a new empty influence map with the given dimensions.
-- `InfluenceMap::add_layer` (`influence_map.rs`): Adds a new named layer initialized to zero.
-- `InfluenceMap::has_layer` (`influence_map.rs`): Returns whether a layer exists.
-- `InfluenceMap::set_influence` (`influence_map.rs`): Sets influence at a grid cell (0-based).
-- `InfluenceMap::get_influence` (`influence_map.rs`): Gets influence at a grid cell (0-based).
-- `InfluenceMap::get_width` (`influence_map.rs`): Number of cells along the X axis.
-- `InfluenceMap::get_height` (`influence_map.rs`): Number of cells along the Y axis.
-- `InfluenceMap::get_cell_size` (`influence_map.rs`): World-space size of each cell.
-- `InfluenceMap::get_layer_names` (`influence_map.rs`): Names of all registered layers (order not guaranteed).
-- `InfluenceMap::stamp_influence` (`influence_map.rs`): Stamps circular influence in world-space coordinates with linear falloff.
-- `InfluenceMap::propagate` (`influence_map.rs`): 3×3 averaging diffusion.
-- `InfluenceMap::decay` (`influence_map.rs`): Multiplies every cell in a layer by the decay factor.
-- `InfluenceMap::clear_layer` (`influence_map.rs`): Clears all cells in a layer to zero.
-- `InfluenceMap::clear_all` (`influence_map.rs`): Clears all layers to zero.
-- `InfluenceMap::max_position` (`influence_map.rs`): Returns the world-space position of the cell with the highest value.
-- `InfluenceMap::min_position` (`influence_map.rs`): Returns the world-space position of the cell with the lowest value.
-- `InfluenceMap::query_rect` (`influence_map.rs`): Sums influence within a world-space rectangle.
-- `InfluenceMap::blend` (`influence_map.rs`): Blends two layers into a destination: dest = wA * A + wB * B.
-- `InfluenceMap::draw_to_image` (`influence_map.rs`): Render the influence map to an image.
-- `IsoGrid::new` (`iso_grid.rs`): Create a new isometric grid of the given size.
-- `IsoGrid::set_blocked` (`iso_grid.rs`): Mark or unmark a cell as blocked.
-- `IsoGrid::set_cost` (`iso_grid.rs`): Set the movement cost for a cell.
-- `IsoGrid::find_path` (`iso_grid.rs`): A* pathfinding on the isometric grid.
-- `IsoGrid::line_of_sight` (`iso_grid.rs`): Bresenham line-of-sight check.
-- `IsoGrid::neighbors` (`iso_grid.rs`): 4-directional diamond neighbors, filtered to passable in-bounds cells.
-- `JpsGrid::new` (`jps.rs`): Create a new JPS grid.
-- `JpsGrid::set_blocked` (`jps.rs`): Mark or unmark a cell as blocked.
-- `JpsGrid::is_blocked` (`jps.rs`): Returns `true` if the cell is blocked or out of bounds.
-- `JpsGrid::find_path` (`jps.rs`): Find a path using Jump Point Search.
-- `DiagonalMode::from_lua_str` (`nav_grid.rs`): Parse a Lua string into a `DiagonalMode`.
-- `DiagonalMode::to_lua_str` (`nav_grid.rs`): Convert to the canonical Lua string representation.
-- `NavGrid::new` (`nav_grid.rs`): Create a new grid where every cell has cost 1 (fully walkable).
-- `NavGrid::from_costs` (`nav_grid.rs`): Create a grid from a pre-built cost array.
-- `NavGrid::get_width` (`nav_grid.rs`): Grid width in cells.
-- `NavGrid::get_height` (`nav_grid.rs`): Grid height in cells.
-- `NavGrid::get_dimensions` (`nav_grid.rs`): Returns `(width, height)`.
-- `NavGrid::get_cost` (`nav_grid.rs`): Get the traversal cost of cell `(x, y)`.
-- `NavGrid::set_cost` (`nav_grid.rs`): Set the traversal cost of cell `(x, y)`.
-- `NavGrid::is_blocked` (`nav_grid.rs`): Returns `true` if cell `(x, y)` is blocked (cost 0 or out-of-bounds).
-- `NavGrid::set_blocked` (`nav_grid.rs`): Mark cell `(x, y)` as blocked (cost 0) or unblocked (cost 1).
-- `NavGrid::is_walkable` (`nav_grid.rs`): Check whether an `NxN` unit footprint anchored at `(x, y)` is fully walkable.
-- `NavGrid::fill` (`nav_grid.rs`): Set every cell to `cost`.
-- `NavGrid::fill_rect` (`nav_grid.rs`): Set all cells in the rectangle `(x, y, w, h)` to `cost`, clamped to grid bounds.
-- `NavGrid::load_from_bytes` (`nav_grid.rs`): Overwrite the grid from a raw byte slice (row-major, one byte per cell).
-- `NavGrid::save_to_bytes` (`nav_grid.rs`): Export the cost grid as a byte vector (row-major, one byte per cell).
-- `NavGrid::set_chunk_size` (`nav_grid.rs`): Set the HPA* chunk size (clamped to `[2, min(width, height)]`).
-- `NavGrid::get_chunk_size` (`nav_grid.rs`): Current HPA* chunk size.
-- `NavGrid::set_diagonal_mode` (`nav_grid.rs`): Set the diagonal movement mode.
-- `NavGrid::get_diagonal_mode` (`nav_grid.rs`): Current diagonal movement mode.
-- `NavGrid::set_dirty` (`nav_grid.rs`): Record a dirty rectangle `(x, y, w, h)` for incremental HPA* updates.
+- `InfluenceMap::new` (`influence_map.rs`): Create an empty influence map with the given grid dimensions and world-space `cell_size`.
+- `InfluenceMap::add_layer` (`influence_map.rs`): Register a new zero-filled layer named `name`; replaces any existing layer with that name.
+- `InfluenceMap::has_layer` (`influence_map.rs`): Return true when a layer named `name` exists.
+- `InfluenceMap::set_influence` (`influence_map.rs`): Set the influence value at cell `(x, y)` on `layer`; no-op if out-of-bounds.
+- `InfluenceMap::get_influence` (`influence_map.rs`): Return the influence value at `(x, y)` on `layer`, or `0.0` if out-of-bounds or layer absent.
+- `InfluenceMap::get_width` (`influence_map.rs`): Return the grid width in cells.
+- `InfluenceMap::get_height` (`influence_map.rs`): Return the grid height in cells.
+- `InfluenceMap::get_cell_size` (`influence_map.rs`): Return the world-space cell size.
+- `InfluenceMap::get_layer_names` (`influence_map.rs`): Return the names of all registered layers.
+- `InfluenceMap::stamp_influence` (`influence_map.rs`): Add `value` (scaled by falloff and distance) to all cells within `radius` of world point `(wx, wy)` on `layer`.
+- `InfluenceMap::propagate` (`influence_map.rs`): Smooth `layer` by blending each cell with its 3×3 neighbourhood average, weighted by `momentum`.
+- `InfluenceMap::decay` (`influence_map.rs`): Multiply every cell in `layer` by `factor`.
+- `InfluenceMap::clear_layer` (`influence_map.rs`): Zero all cells in `layer`.
+- `InfluenceMap::clear_all` (`influence_map.rs`): Zero all cells in every layer.
+- `InfluenceMap::max_position` (`influence_map.rs`): Return the world-space position of the highest-value cell in `layer`, or `(0.0, 0.0)` if absent.
+- `InfluenceMap::min_position` (`influence_map.rs`): Return the world-space position of the lowest-value cell in `layer`, or `(0.0, 0.0)` if absent.
+- `InfluenceMap::query_rect` (`influence_map.rs`): Return the sum of all cell values in `layer` that fall within world-space rectangle `(wx, wy, ww, wh)`.
+- `InfluenceMap::blend` (`influence_map.rs`): Write `weight_a * layer_a + weight_b * layer_b` into `dest`; all three layers must exist.
+- `InfluenceMap::draw_to_image` (`influence_map.rs`): Render the "enemy" and "ally" layers into a color `ImageData` at `cell_size` pixels per cell.
+- `IsoGrid::new` (`iso_grid.rs`): Create a fully passable grid of `width × height` cells with unit movement costs.
+- `IsoGrid::set_blocked` (`iso_grid.rs`): Mark cell `(x, y)` as blocked or passable.
+- `IsoGrid::set_cost` (`iso_grid.rs`): Set the movement cost for cell `(x, y)`.
+- `IsoGrid::find_path` (`iso_grid.rs`): Run A\* from `from` to `to`; return an ordered path or `None` when unreachable.
+- `IsoGrid::line_of_sight` (`iso_grid.rs`): Return true when all cells on the Bresenham line from `from` to `to` are passable.
+- `IsoGrid::neighbors` (`iso_grid.rs`): Return the 4-directional passable neighbours of `(x, y)`.
+- `JpsGrid::new` (`jps.rs`): Create an unblocked `width × height` grid.
+- `JpsGrid::set_blocked` (`jps.rs`): Mark cell `(x, y)` as blocked or passable.
+- `JpsGrid::is_blocked` (`jps.rs`): Return true when `(x, y)` is out-of-bounds or marked blocked.
+- `JpsGrid::find_path` (`jps.rs`): Run JPS A\* from `from` to `to`; return a full tile-by-tile path or `None` when unreachable.
+- `DiagonalMode::from_lua_str` (`nav_grid.rs`): Parse a case-insensitive Lua string to a `DiagonalMode`; return `None` for unknown strings.
+- `DiagonalMode::to_lua_str` (`nav_grid.rs`): Return the canonical lowercase Lua string for this mode.
+- `NavGrid::new` (`nav_grid.rs`): Create a fully walkable `width × height` grid with all costs set to `1`.
+- `NavGrid::from_costs` (`nav_grid.rs`): Create a grid from an existing flat cost buffer; panics if `costs.len() != width * height`.
+- `NavGrid::get_width` (`nav_grid.rs`): Return the grid width in tiles.
+- `NavGrid::get_height` (`nav_grid.rs`): Return the grid height in tiles.
+- `NavGrid::get_dimensions` (`nav_grid.rs`): Return `(width, height)` as a tuple.
+- `NavGrid::get_cost` (`nav_grid.rs`): Return the cost at `(x, y)`; returns `0` (blocked) for out-of-bounds coordinates.
+- `NavGrid::set_cost` (`nav_grid.rs`): Set the cost at `(x, y)`; silently ignores out-of-bounds coordinates.
+- `NavGrid::is_blocked` (`nav_grid.rs`): Return true when `(x, y)` has cost `0` (blocked) or is out-of-bounds.
+- `NavGrid::set_blocked` (`nav_grid.rs`): Set `(x, y)` to cost `0` (blocked) or `1` (passable).
+- `NavGrid::is_walkable` (`nav_grid.rs`): Return true when a `unit_size × unit_size` footprint anchored at `(x, y)` is fully walkable.
+- `NavGrid::fill` (`nav_grid.rs`): Set all cells to `cost`.
+- `NavGrid::fill_rect` (`nav_grid.rs`): Set all cells in the axis-aligned rectangle at `(x, y, w, h)` to `cost`.
+- `NavGrid::load_from_bytes` (`nav_grid.rs`): Replace the cost buffer from `data`; return an error if the length does not match `width * height`.
+- `NavGrid::save_to_bytes` (`nav_grid.rs`): Return a copy of the cost buffer as a byte vector.
+- `NavGrid::set_chunk_size` (`nav_grid.rs`): Set the chunk size used by HPA*; clamped to `[2, min(width, height)]`.
+- `NavGrid::get_chunk_size` (`nav_grid.rs`): Return the current HPA* chunk size.
+- `NavGrid::set_diagonal_mode` (`nav_grid.rs`): Set the diagonal movement policy for neighbour queries.
+- `NavGrid::get_diagonal_mode` (`nav_grid.rs`): Return the current diagonal movement policy.
+- `NavGrid::set_dirty` (`nav_grid.rs`): Record a dirty rectangle `(x, y, w, h)` for deferred hierarchy invalidation.
 - `NavGrid::clear_dirty` (`nav_grid.rs`): Clear all pending dirty rectangles.
-- `NavGrid::dirty_rects` (`nav_grid.rs`): Returns the list of dirty rectangles recorded since the last clear.
-- `NavGrid::neighbors` (`nav_grid.rs`): Return walkable neighbours of `(x, y)` respecting the current diagonal mode.
-- `NavGrid::snapshot` (`nav_grid.rs`): Create a lightweight clone suitable for use on another thread.
-- `NavGrid::draw_to_image` (`nav_grid.rs`): Render the navigation grid to an image with optional path overlay.
-- `PathGrid::new` (`pathgrid.rs`): Creates a new PathGrid where all cells are walkable with cost 1.0.
-- `PathGrid::in_bounds` (`pathgrid.rs`): Returns true if (x, y) is within grid bounds.
-- `PathGrid::set_walkable` (`pathgrid.rs`): Sets walkability for a cell (0-based coords).
-- `PathGrid::is_walkable` (`pathgrid.rs`): Returns whether a cell is walkable (0-based coords).
-- `PathGrid::set_cost` (`pathgrid.rs`): Sets cost multiplier for a cell (0-based coords).
-- `PathGrid::get_cost` (`pathgrid.rs`): Gets cost multiplier for a cell (0-based coords).
-- `PathGrid::find_path` (`pathgrid.rs`): A★ search from (sx,sy) to (gx,gy) in 0-based grid coords.
-- `PathGrid::find_path_smoothed` (`pathgrid.rs`): A★ + string-pulling (greedy LOS post-processing).
-- `PathGrid::cell_center` (`pathgrid.rs`): Returns the world-space center of cell (x, y).
-- `RangeMap::from_grid` (`range_map.rs`): Compute range from `(origin_x, origin_y)` within `budget` on a flat cost grid.
-- `RangeMap::reachable` (`range_map.rs`): Returns `true` if the cell at `(x, y)` was reached within the budget.
-- `RangeMap::cost_to` (`range_map.rs`): Cheapest path cost to reach `(x, y)`, or `None` if unreachable.
-- `RangeMap::reachable_cells` (`range_map.rs`): All reachable cells as `(x, y)` tuples.
-- `RangeMap::reachable_cells_with_cost` (`range_map.rs`): All reachable cells with their movement cost as `(x, y, cost)` tuples.
-- `NavGrid::generate_render_commands` (`render.rs`): Generate debug render commands visualising the navigation grid.
-- `FlowField::generate_render_commands` (`render.rs`): Generate debug render commands visualising flow directions.
-- `InfluenceMap::generate_render_commands` (`render.rs`): Generate debug render commands visualising one influence layer as a heatmap.
-- `UnitPathfinder::new` (`unit_pathfinder.rs`): Create a new pathfinder backed by `grid`.
-- `UnitPathfinder::find_path` (`unit_pathfinder.rs`): Find a path from `(x1, y1)` to `(x2, y2)` for a `unit_size×unit_size` unit.
-- `UnitPathfinder::find_path_smooth` (`unit_pathfinder.rs`): Find a path and apply Theta★ line-of-sight smoothing.
-- `UnitPathfinder::get_path_length` (`unit_pathfinder.rs`): Sum of euclidean distances between consecutive waypoints.
-- `UnitPathfinder::get_path_cost` (`unit_pathfinder.rs`): Sum of grid traversal costs along a path.
-- `UnitPathfinder::find_partial_path` (`unit_pathfinder.rs`): Search with a node expansion limit; returns `(path, complete)`.
-- `UnitPathfinder::find_nearest_walkable` (`unit_pathfinder.rs`): Find the nearest walkable cell within `max_radius` of `(x, y)` using BFS.
-- `UnitPathfinder::is_reachable` (`unit_pathfinder.rs`): Quick connectivity check: can `(x2, y2)` be reached from `(x1, y1)`?
-- `UnitPathfinder::heuristic_distance` (`unit_pathfinder.rs`): Octile heuristic distance between two points.
-- `UnitPathfinder::line_of_sight` (`unit_pathfinder.rs`): Line-of-sight check between two cells, respecting unit footprint.
-- `UnitPathfinder::set_cache_enabled` (`unit_pathfinder.rs`): Enable or disable path caching.
-- `UnitPathfinder::is_cache_enabled` (`unit_pathfinder.rs`): Returns `true` if caching is enabled.
-- `UnitPathfinder::clear_cache` (`unit_pathfinder.rs`): Remove all cached path results.
-- `UnitPathfinder::get_cache_size` (`unit_pathfinder.rs`): Number of entries currently in the cache.
-- `UnitPathfinder::set_cache_max_size` (`unit_pathfinder.rs`): Set the maximum cache size.
-- `UnitPathfinder::nav_grid` (`unit_pathfinder.rs`): Returns a reference to the shared navigation grid.
+- `NavGrid::dirty_rects` (`nav_grid.rs`): Return the current slice of pending dirty rectangles.
+- `NavGrid::neighbors` (`nav_grid.rs`): Return the passable neighbours of `(x, y)` respecting the current `diagonal_mode`.
+- `NavGrid::snapshot` (`nav_grid.rs`): Return a deep copy of this grid without carrying over dirty rectangles.
+- `NavGrid::draw_to_image` (`nav_grid.rs`): Render the grid and optionally overlay a `path`, `start`, and `end` marker into an `ImageData`.
+- `NavMesh::new` (`navmesh.rs`): Create an empty mesh.
+- `NavMesh::add_polygon` (`navmesh.rs`): Add a polygon region with at least 3 vertices; return its index or `None` if fewer than 3 vertices.
+- `NavMesh::connect` (`navmesh.rs`): Add a directed edge from polygon `a` to `b`; if `bidirectional`, also add the reverse edge.
+- `NavMesh::polygon_count` (`navmesh.rs`): Return the total number of registered polygons.
+- `NavMesh::find_path` (`navmesh.rs`): Find a world-space path from `start` to `goal`; return centroid waypoints or `None` if either point is outside all polygons.
+- `PathGrid::new` (`pathgrid.rs`): Create a fully walkable `width × height` grid with given world-space `cell_size`.
+- `PathGrid::in_bounds` (`pathgrid.rs`): Return true when `(x, y)` is within the grid dimensions.
+- `PathGrid::set_walkable` (`pathgrid.rs`): Set walkability of cell `(x, y)`.
+- `PathGrid::is_walkable` (`pathgrid.rs`): Return true when `(x, y)` is in-bounds and walkable.
+- `PathGrid::set_cost` (`pathgrid.rs`): Set movement cost of cell `(x, y)`.
+- `PathGrid::get_cost` (`pathgrid.rs`): Return movement cost of cell `(x, y)`, or `f32::INFINITY` when out-of-bounds.
+- `PathGrid::find_path` (`pathgrid.rs`): Run 8-directional A\* from cell `(sx, sy)` to `(gx, gy)`; return world-space waypoints or `None`.
+- `PathGrid::find_path_smoothed` (`pathgrid.rs`): Run A\* then apply string-pull smoothing to reduce waypoint count.
+- `PathGrid::cell_center` (`pathgrid.rs`): Return the world-space centre of cell `(x, y)`.
+- `RangeMap::from_grid` (`range_map.rs`): Build a range map from a flat `costs`/`blocked` grid expanding from `(origin_x, origin_y)` within `budget`.
+- `RangeMap::reachable` (`range_map.rs`): Return true when `(x, y)` was reached within the budget.
+- `RangeMap::cost_to` (`range_map.rs`): Return travel cost from origin to `(x, y)`, or `None` when unreachable or out-of-bounds.
+- `RangeMap::reachable_cells` (`range_map.rs`): Return all `(x, y)` cells reachable within the budget.
+- `RangeMap::reachable_cells_with_cost` (`range_map.rs`): Return all reachable cells as `(x, y, travel_cost)` triples.
+- `NavGrid::generate_render_commands` (`render.rs`): Return `RenderCommand`s that draw each cell as a red (blocked) or dark-blue (walkable) tile.
+- `FlowField::generate_render_commands` (`render.rs`): Return `RenderCommand`s drawing flow arrows coloured by cost-to-target; dots for impassable cells.
+- `InfluenceMap::generate_render_commands` (`render.rs`): Return `RenderCommand`s drawing influence values as green (positive) or red (negative) tiles.
+- `UnitPathfinder::new` (`unit_pathfinder.rs`): Create a new pathfinder wrapping `grid` with caching enabled and a default max size of 1024.
+- `UnitPathfinder::find_path` (`unit_pathfinder.rs`): Find a path from `(x1, y1)` to `(x2, y2)` for a unit of `unit_size`; return waypoints or `None`.
+- `UnitPathfinder::find_path_smooth` (`unit_pathfinder.rs`): Find a path then apply A\* string-pull smoothing; return waypoints or `None`.
+- `UnitPathfinder::get_path_length` (`unit_pathfinder.rs`): Return the Euclidean length of `path` in cells.
+- `UnitPathfinder::get_path_cost` (`unit_pathfinder.rs`): Return the sum of `NavGrid` costs for all waypoints in `path`.
+- `UnitPathfinder::find_partial_path` (`unit_pathfinder.rs`): Run A\* limited to `max_nodes` expansions; return `(partial_path, reached_goal)`.
+- `UnitPathfinder::find_nearest_walkable` (`unit_pathfinder.rs`): BFS-search for the nearest `unit_size`-walkable cell within `max_radius` steps from `(x, y)`.
+- `UnitPathfinder::is_reachable` (`unit_pathfinder.rs`): Return true when `(x2, y2)` is reachable from `(x1, y1)` via BFS for a unit of `unit_size`.
+- `UnitPathfinder::heuristic_distance` (`unit_pathfinder.rs`): Return the octile distance heuristic between two cell coordinates.
+- `UnitPathfinder::line_of_sight` (`unit_pathfinder.rs`): Return true when the Bresenham line from `(x1, y1)` to `(x2, y2)` passes only walkable cells for `unit_size`.
+- `UnitPathfinder::set_cache_enabled` (`unit_pathfinder.rs`): Enable or disable path caching; clears existing cache when disabled.
+- `UnitPathfinder::is_cache_enabled` (`unit_pathfinder.rs`): Return true when path caching is currently enabled.
+- `UnitPathfinder::clear_cache` (`unit_pathfinder.rs`): Remove all cached paths.
+- `UnitPathfinder::get_cache_size` (`unit_pathfinder.rs`): Return the current number of cached entries.
+- `UnitPathfinder::set_cache_max_size` (`unit_pathfinder.rs`): Set the maximum cache size and evict old entries if needed.
+- `UnitPathfinder::nav_grid` (`unit_pathfinder.rs`): Return a reference to the shared `NavGrid`.
 
 ## Lua API Reference
 
@@ -217,114 +224,123 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 - Namespace: `lurek.pathfind`
 
 ### Module Functions
-- `lurek.pathfind.newNavGrid`: Creates a new NavGrid with all cells walkable.
-- `lurek.pathfind.newPathfinder`: Creates a new UnitPathfinder backed by a NavGrid.
-- `lurek.pathfind.newFlowField`: Creates a new FlowField backed by a NavGrid.
-- `lurek.pathfind.newPathGrid`: Creates a new PathGrid with per-cell cost and walkability.
-- `lurek.pathfind.newPathFlowField`: Creates a new BFS flow field from a PathGrid.
-- `lurek.pathfind.setThreadCount`: Sets the background pathfinding thread count (currently a no-op).
-- `lurek.pathfind.getThreadCount`: Returns the background pathfinding thread count (currently always 0).
-- `lurek.pathfind.newNavGridFromTileMap`: Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable).
-- `lurek.pathfind.newHexGrid`: Creates a hex grid for pathfinding, LOS, FOV, and range queries.
-- `lurek.pathfind.newJpsGrid`: Creates a uniform-cost grid optimised for Jump Point Search (orthogonal + diagonal).
-- `lurek.pathfind.rangeMap`: Computes a Dijkstra range-of-movement map from an origin within a movement budget.
+- `lurek.pathfind.newNavGrid`: Creates a navigation grid.
+- `lurek.pathfind.newPathfinder`: Creates a unit pathfinder for a navigation grid.
+- `lurek.pathfind.newFlowField`: Creates a flow field for a navigation grid.
+- `lurek.pathfind.newPathGrid`: Creates a cell-size path grid.
+- `lurek.pathfind.newPathFlowField`: Creates an AI flow field from a path grid.
+- `lurek.pathfind.setThreadCount`: Records a warning because pathfinding thread count is not implemented.
+- `lurek.pathfind.getThreadCount`: Returns the pathfinding thread count.
+- `lurek.pathfind.newNavGridFromTileMap`: Creates a navigation grid from a tilemap layer and blocked gid table.
+- `lurek.pathfind.newHexGrid`: Creates a hex grid.
+- `lurek.pathfind.newJpsGrid`: Creates a Jump Point Search grid.
+- `lurek.pathfind.newNavMesh`: Creates an empty navigation mesh.
+- `lurek.pathfind.rangeMap`: Computes reachable cells from range map options.
 
 ### `LAIFlowField` Methods
-- `LAIFlowField:getWidth`: Returns the flow field grid width in cells.
-- `LAIFlowField:getHeight`: Returns the flow field grid height in cells.
-- `LAIFlowField:hasGoal`: Returns true if a goal has been set.
-- `LAIFlowField:setGoal`: Sets the goal cell and triggers BFS recomputation (1-based coordinates).
-- `LAIFlowField:getGoal`: Returns the goal cell (1-based coordinates) or nil if unset.
-- `LAIFlowField:getDirection`: Returns the normalised direction toward the goal (1-based coordinates).
-- `LAIFlowField:getDistance`: Returns the BFS distance to the goal (1-based coordinates).
-- `LAIFlowField:type`: Returns the type name of this object.
-- `LAIFlowField:typeOf`: Returns true if this object is of the given type.
+- `LAIFlowField:getWidth`: Returns flow field width.
+- `LAIFlowField:getHeight`: Returns flow field height.
+- `LAIFlowField:hasGoal`: Returns whether a goal is set.
+- `LAIFlowField:setGoal`: Sets the one-based flow field goal.
+- `LAIFlowField:getGoal`: Returns the one-based flow field goal when set.
+- `LAIFlowField:getDirection`: Returns flow direction for a one-based cell.
+- `LAIFlowField:getDistance`: Returns distance to goal for a one-based cell.
+- `LAIFlowField:type`: Returns the Lua-visible type name for this AI flow field handle.
+- `LAIFlowField:typeOf`: Returns whether this AI flow field handle matches a supported type name.
 
 ### `LFlowField` Methods
-- `LFlowField:calculate`: Computes the flow field toward a single target (1-based coordinates).
-- `LFlowField:calculateMulti`: Computes the flow field toward multiple targets (1-based coordinates).
-- `LFlowField:getDirection`: Returns the normalised direction vector at a cell (1-based coordinates).
-- `LFlowField:getDirectionAngle`: Returns the flow direction as an angle in radians (1-based coordinates).
-- `LFlowField:getCostToTarget`: Returns the integrated cost to the nearest target (1-based coordinates).
-- `LFlowField:isCalculated`: Returns true if the flow field has been computed at least once.
-- `LFlowField:getTargets`: Returns the target cells from the most recent computation (1-based coordinates).
-- `LFlowField:steer`: Converts a world-space position into a velocity vector via the flow field.
-- `LFlowField:type`: Returns the type name of this object.
-- `LFlowField:typeOf`: Returns true if this object is of the given type.
+- `LFlowField:calculate`: Calculates a flow field toward one target cell.
+- `LFlowField:calculateMulti`: Calculates a flow field toward multiple target cells.
+- `LFlowField:getDirection`: Returns flow direction at a one-based grid cell.
+- `LFlowField:getDirectionAngle`: Returns flow direction angle at a one-based grid cell.
+- `LFlowField:getCostToTarget`: Returns flow field cost to target from a one-based grid cell.
+- `LFlowField:isCalculated`: Returns whether the flow field has been calculated.
+- `LFlowField:getTargets`: Returns target cells for this flow field.
+- `LFlowField:steer`: Returns steering data for a world position.
+- `LFlowField:type`: Returns the Lua-visible type name for this flow field handle.
+- `LFlowField:typeOf`: Returns whether this flow field handle matches a supported type name.
 
 ### `LHexGrid` Methods
-- `LHexGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
-- `LHexGrid:setCost`: Set movement cost for a cell (1-based coordinates).
-- `LHexGrid:isBlocked`: Returns true if a cell is blocked (1-based coordinates).
-- `LHexGrid:findPath`: Find A* path between two cells (1-based coordinates).
-- `LHexGrid:lineOfSight`: Returns true if there is an unobstructed line between two cells (1-based).
-- `LHexGrid:fieldOfView`: Returns all cells visible from origin within max_range (1-based coordinates).
-- `LHexGrid:rangeOfMovement`: Returns all cells reachable from origin within movement budget (1-based).
-- `LHexGrid:distance`: Hex-distance between two cells.
-- `LHexGrid:type`: Returns the type name of this object.
-- `LHexGrid:typeOf`: Returns true if this object is of the given type.
+- `LHexGrid:setBlocked`: Sets blocked state for a one-based hex cell.
+- `LHexGrid:setCost`: Sets movement cost for a one-based hex cell.
+- `LHexGrid:isBlocked`: Returns blocked state for a one-based hex cell.
+- `LHexGrid:findPath`: Finds a path between one-based hex cells.
+- `LHexGrid:lineOfSight`: Returns whether two one-based hex cells have line of sight.
+- `LHexGrid:fieldOfView`: Returns visible hex cells within range.
+- `LHexGrid:rangeOfMovement`: Returns reachable hex cells within movement budget.
+- `LHexGrid:distance`: Returns distance between two one-based hex cells.
+- `LHexGrid:type`: Returns the Lua-visible type name for this hex grid handle.
+- `LHexGrid:typeOf`: Returns whether this hex grid handle matches a supported type name.
 
 ### `LJpsGrid` Methods
-- `LJpsGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
-- `LJpsGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
-- `LJpsGrid:findPath`: Find a JPS path between two cells (1-based coordinates).
-- `LJpsGrid:type`: Returns the type name of this object.
-- `LJpsGrid:typeOf`: Returns true if this object is of the given type.
+- `LJpsGrid:setBlocked`: Sets blocked state for a one-based grid cell.
+- `LJpsGrid:isBlocked`: Returns blocked state for a one-based grid cell.
+- `LJpsGrid:findPath`: Finds a JPS path between one-based grid cells.
+- `LJpsGrid:type`: Returns the Lua-visible type name for this JPS grid handle.
+- `LJpsGrid:typeOf`: Returns whether this JPS grid handle matches a supported type name.
 
 ### `LNavGrid` Methods
-- `LNavGrid:getWidth`: Returns the grid width in cells.
-- `LNavGrid:getHeight`: Returns the grid height in cells.
-- `LNavGrid:getDimensions`: Returns the grid dimensions as width, height.
-- `LNavGrid:setCost`: Sets the traversal cost of a cell (1-based coordinates).
-- `LNavGrid:getCost`: Returns the traversal cost of a cell (1-based coordinates).
-- `LNavGrid:setBlocked`: Marks a cell as blocked or unblocked (1-based coordinates).
-- `LNavGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
-- `LNavGrid:isWalkable`: Returns true if a unit footprint is fully walkable (1-based coordinates).
-- `LNavGrid:fill`: Sets every cell to the given cost.
-- `LNavGrid:fillRect`: Sets all cells in a rectangle to the given cost (1-based coordinates).
-- `LNavGrid:loadFromString`: Overwrites the grid from a raw byte string (row-major, one byte per cell).
-- `LNavGrid:saveToString`: Exports the cost grid as a byte string (row-major, one byte per cell).
-- `LNavGrid:setChunkSize`: Sets the HPA★ chunk size.
-- `LNavGrid:getChunkSize`: Returns the current HPA★ chunk size.
-- `LNavGrid:rebuildAbstract`: Rebuilds the HPA★ abstract graph from the current grid state.
-- `LNavGrid:setDirty`: Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
-- `LNavGrid:clearDirty`: Clears all pending dirty rectangles.
-- `LNavGrid:setDiagonalMode`: Sets the diagonal movement mode.
-- `LNavGrid:getDiagonalMode`: Returns the current diagonal movement mode as a string.
-- `LNavGrid:type`: Returns the type name of this object.
-- `LNavGrid:typeOf`: Returns true if this object is of the given type.
+- `LNavGrid:getWidth`: Returns grid width.
+- `LNavGrid:getHeight`: Returns grid height.
+- `LNavGrid:getDimensions`: Returns grid dimensions.
+- `LNavGrid:setCost`: Sets movement cost at a one-based grid cell.
+- `LNavGrid:getCost`: Returns movement cost at a one-based grid cell.
+- `LNavGrid:setBlocked`: Sets blocked state at a one-based grid cell.
+- `LNavGrid:isBlocked`: Returns blocked state at a one-based grid cell.
+- `LNavGrid:isWalkable`: Returns whether a one-based grid cell is walkable for a unit size.
+- `LNavGrid:fill`: Fills the grid with a movement cost.
+- `LNavGrid:fillRect`: Fills a one-based rectangular area with a movement cost.
+- `LNavGrid:loadFromString`: Loads grid data from a binary string.
+- `LNavGrid:saveToString`: Saves grid data to a binary string.
+- `LNavGrid:setChunkSize`: Sets hierarchical chunk size.
+- `LNavGrid:getChunkSize`: Returns hierarchical chunk size.
+- `LNavGrid:rebuildAbstract`: Rebuilds the cached abstract graph for this grid.
+- `LNavGrid:setDirty`: Marks a one-based rectangular region dirty.
+- `LNavGrid:clearDirty`: Clears dirty regions.
+- `LNavGrid:setDiagonalMode`: Sets diagonal movement mode.
+- `LNavGrid:getDiagonalMode`: Returns diagonal movement mode.
+- `LNavGrid:type`: Returns the Lua-visible type name for this navigation grid handle.
+- `LNavGrid:typeOf`: Returns whether this navigation grid handle matches a supported type name.
+
+### `LNavMesh` Methods
+- `LNavMesh:addPolygon`: Adds a polygon from vertex tables and returns a one-based id.
+- `LNavMesh:connectPolygons`: Connects two polygons by one-based id.
+- `LNavMesh:findPath`: Finds a path through the navmesh between world points.
+- `LNavMesh:getPolygonCount`: Returns navmesh polygon count.
+- `LNavMesh:type`: Returns the Lua-visible type name for this navmesh handle.
+- `LNavMesh:typeOf`: Returns whether this navmesh handle matches a supported type name.
 
 ### `LPathGrid` Methods
-- `LPathGrid:getWidth`: Returns the grid width in cells.
-- `LPathGrid:getHeight`: Returns the grid height in cells.
-- `LPathGrid:getCellSize`: Returns the world-space size of each cell.
-- `LPathGrid:setWalkable`: Sets the walkability of a cell (1-based coordinates).
-- `LPathGrid:isWalkable`: Returns true if a cell is walkable (1-based coordinates).
-- `LPathGrid:setCost`: Sets the cost multiplier for a cell (1-based coordinates).
-- `LPathGrid:getCost`: Returns the cost multiplier for a cell (1-based coordinates).
-- `LPathGrid:findPath`: Finds an A★ path returning world-space waypoints (1-based coordinates).
-- `LPathGrid:findPathSmoothed`: Finds a smoothed A★ path with string-pulling (1-based coordinates).
-- `LPathGrid:type`: Returns the type name of this object.
-- `LPathGrid:typeOf`: Returns true if this object is of the given type.
+- `LPathGrid:getWidth`: Returns grid width.
+- `LPathGrid:getHeight`: Returns grid height.
+- `LPathGrid:getCellSize`: Returns path grid cell size.
+- `LPathGrid:setWalkable`: Sets walkability at a one-based cell.
+- `LPathGrid:isWalkable`: Returns walkability at a one-based cell.
+- `LPathGrid:setCost`: Sets movement cost at a one-based cell.
+- `LPathGrid:getCost`: Returns movement cost at a one-based cell.
+- `LPathGrid:findPath`: Finds a path between one-based path grid cells.
+- `LPathGrid:findPathSmoothed`: Finds a smoothed path between one-based path grid cells.
+- `LPathGrid:type`: Returns the Lua-visible type name for this path grid handle.
+- `LPathGrid:typeOf`: Returns whether this path grid handle matches a supported type name.
 
 ### `LUnitPathfinder` Methods
-- `LUnitPathfinder:findPath`: Finds an A★ path between two cells (1-based coordinates).
-- `LUnitPathfinder:findPathSmooth`: Finds a Theta★ smoothed path between two cells (1-based coordinates).
-- `LUnitPathfinder:findPathBidirectional`: Finds a path with bidirectional A★ between two cells.
-- `LUnitPathfinder:getPathLength`: Returns the euclidean length of a path table.
-- `LUnitPathfinder:getPathCost`: Returns the sum of grid traversal costs along a path.
-- `LUnitPathfinder:findPartialPath`: Finds a partial path with a node expansion limit (1-based coordinates).
-- `LUnitPathfinder:findNearestWalkable`: Finds the nearest walkable cell within a radius (1-based coordinates).
-- `LUnitPathfinder:isReachable`: Returns true if a path exists between two cells (1-based coordinates).
-- `LUnitPathfinder:heuristicDistance`: Returns the octile heuristic distance between two cells (1-based coordinates).
-- `LUnitPathfinder:lineOfSight`: Returns true if there is a clear line of sight between two cells (1-based coordinates).
-- `LUnitPathfinder:setCacheEnabled`: Enables or disables path result caching.
-- `LUnitPathfinder:isCacheEnabled`: Returns true if path result caching is enabled.
-- `LUnitPathfinder:clearCache`: Removes all cached path results.
-- `LUnitPathfinder:getCacheSize`: Returns the number of entries in the path cache.
-- `LUnitPathfinder:setCacheMaxSize`: Sets the maximum number of cached path entries.
-- `LUnitPathfinder:type`: Returns the type name of this object.
-- `LUnitPathfinder:typeOf`: Returns true if this object is of the given type.
+- `LUnitPathfinder:findPath`: Finds a path between one-based grid cells.
+- `LUnitPathfinder:findPathSmooth`: Finds a smoothed path between one-based grid cells.
+- `LUnitPathfinder:findPathBidirectional`: Finds a path using bidirectional A* and returns completion status.
+- `LUnitPathfinder:getPathLength`: Returns path length for a waypoint table.
+- `LUnitPathfinder:getPathCost`: Returns path cost for a waypoint table.
+- `LUnitPathfinder:findPartialPath`: Finds a partial path with a node limit.
+- `LUnitPathfinder:findNearestWalkable`: Finds nearest walkable one-based grid cell within a radius.
+- `LUnitPathfinder:isReachable`: Returns whether a target cell is reachable.
+- `LUnitPathfinder:heuristicDistance`: Returns heuristic distance between two one-based cells.
+- `LUnitPathfinder:lineOfSight`: Returns whether two one-based cells have line of sight.
+- `LUnitPathfinder:setCacheEnabled`: Enables or disables path cache.
+- `LUnitPathfinder:isCacheEnabled`: Returns whether path cache is enabled.
+- `LUnitPathfinder:clearCache`: Clears cached paths.
+- `LUnitPathfinder:getCacheSize`: Returns current path cache size.
+- `LUnitPathfinder:setCacheMaxSize`: Sets maximum path cache size.
+- `LUnitPathfinder:type`: Returns the Lua-visible type name for this pathfinder handle.
+- `LUnitPathfinder:typeOf`: Returns whether this pathfinder handle matches a supported type name.
 
 ## References
 
@@ -336,18 +352,3 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 ## Notes
 
 - Keep this module reference synchronized with `src/pathfind/` and any matching Lua bindings.
-
-## 2026-05 Backlog Closure
-
-- Added polygon NavMesh support for non-tile worlds in `src/pathfind/navmesh.rs`.
-- Added module export: `pathfind::NavMesh`.
-- Added Lua API constructor and userdata surface:
-	- `lurek.pathfind.newNavMesh()`
-	- `LNavMesh:addPolygon(vertices)`
-	- `LNavMesh:connectPolygons(a, b, bidirectional?)`
-	- `LNavMesh:findPath(start_x, start_y, goal_x, goal_y)`
-	- `LNavMesh:getPolygonCount()`
-- Added tests:
-	- Rust unit tests for navmesh polygon validation and connected-path retrieval.
-	- Lua unit tests for navmesh construction and path request flow.
-- Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.

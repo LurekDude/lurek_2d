@@ -44,6 +44,8 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 - `math.rs`: Defines interpolation and random-sampling helpers used during particle updates.
 - `mod.rs`: Declares the particle submodules and re-exports the public emitter, config, particle, trail, and helper types.
 - `particle.rs`: Defines Particle, the live per-particle state record used during simulation.
+- `physics_collision.rs`: - Bounce particles off rapier colliders using AABB overlap probes.
+- `presets.rs`: - Ready-made `ParticleConfig` constructors for common visual effects (fire, smoke, rain, snow, sparks).
 - `render.rs`: Provides standard `generate_render_commands` wrappers for particle systems and trails, plus `expand_particle_commands` which splits textured particles into individual `DrawQuad`/`DrawImageEx` commands.
 - `shapes.rs`: Defines ParticleShape, the geometric primitive enum for untextured particle rendering.
 - `trail.rs`: Defines Trail and TrailPoint for fading ribbon effects built from timestamped points.
@@ -67,58 +69,64 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 
 ## Functions
 
-- `ParticleConfig::from_toml_str` (`config.rs`): Parses a TOML string into a `ParticleConfig`.
+- `ParticleConfig::from_toml_str` (`config.rs`): Parse a `ParticleConfig` from a TOML string; returns the error string on failure.
 - `emission_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the config's area distribution.
 - `emission_shape_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the emission shape.
-- `ParticleSystem::new` (`emitter.rs`): Creates a new particle system with the given configuration positioned at `(0, 0)`.
-- `ParticleSystem::update` (`emitter.rs`): Updates the particle system by `dt` seconds.
-- `ParticleSystem::emit` (`emitter.rs`): Emits a burst of `count` particles immediately, respecting the max_particles cap.
-- `ParticleSystem::count` (`emitter.rs`): Returns the number of live particles.
-- `ParticleSystem::reset` (`emitter.rs`): Resets the system, killing all particles and zeroing the accumulator and emitter age.
-- `ParticleSystem::start` (`emitter.rs`): Activates the emitter, beginning particle emission.
-- `ParticleSystem::stop` (`emitter.rs`): Stops the emitter.
-- `ParticleSystem::pause` (`emitter.rs`): Pauses the emitter.
-- `ParticleSystem::resume` (`emitter.rs`): Resumes a paused emitter.
-- `ParticleSystem::move_to` (`emitter.rs`): Moves the emitter to a new position, updating previous position tracking.
-- `ParticleSystem::clone_config` (`emitter.rs`): Creates a new `ParticleSystem` with a clone of this system's config but no particles.
-- `ParticleSystem::is_active` (`emitter.rs`): Returns `true` if the emitter is actively emitting particles.
-- `ParticleSystem::is_paused` (`emitter.rs`): Returns `true` if the emitter is paused.
-- `ParticleSystem::is_stopped` (`emitter.rs`): Returns `true` if the emitter is stopped.
-- `ParticleSystem::is_empty` (`emitter.rs`): Returns `true` if there are no live particles.
-- `ParticleSystem::is_full` (`emitter.rs`): Returns `true` if the particle count has reached `max_particles`.
-- `ParticleSystem::build_render_commands` (`emitter.rs`): Generates `RenderCommand`s for rendering all live particles.
-- `ParticleSystem::warm_up` (`emitter.rs`): Runs the particle system forward by `seconds` in fixed 0.05 s steps to pre-populate particles.
-- `ParticleSystem::add_attractor` (`emitter.rs`): Adds a point attractor (or repeller) to this system.
-- `ParticleSystem::clear_attractors` (`emitter.rs`): Removes all attractors from this system.
-- `ParticleSystem::attractor_count` (`emitter.rs`): Returns the number of attractors currently attached to this system.
-- `ParticleSystem::set_bounds` (`emitter.rs`): Sets axis-aligned bounce boundaries with a restitution coefficient.
-- `ParticleSystem::clear_bounds` (`emitter.rs`): Removes the bounce boundaries from this system.
-- `ParticleSystem::add_sub_system` (`emitter.rs`): Adds a child emitter that updates and renders alongside this system.
-- `ParticleSystem::sub_system_count` (`emitter.rs`): Returns the number of direct child sub-systems.
-- `ParticleSystem::drain_pending_deaths` (`emitter.rs`): Takes and returns all entries from `pending_deaths`, leaving the vec empty.
-- `ParticleSystem::drain_custom_offsets` (`emitter.rs`): Takes and returns all entries from `pending_custom_offsets`, leaving the vec empty.
+- `ParticleSystem::new` (`emitter.rs`): Create a new system from `config`; allocates the particle pool upfront.
+- `ParticleSystem::update` (`emitter.rs`): Advance all particles by `dt` seconds: integrate physics, retire dead particles, and spawn new ones.
+- `ParticleSystem::emit` (`emitter.rs`): Burst-spawn up to `count` particles immediately, capped by `max_particles`.
+- `ParticleSystem::count` (`emitter.rs`): Return the number of live particles in the pool.
+- `ParticleSystem::reset` (`emitter.rs`): Clear all particles and reset the accumulator and age.
+- `ParticleSystem::start` (`emitter.rs`): Transition to `Active` and reset `emitter_age` to zero.
+- `ParticleSystem::stop` (`emitter.rs`): Transition to `Stopped`; existing particles continue to live but no new ones are emitted.
+- `ParticleSystem::pause` (`emitter.rs`): Transition to `Paused`; update loop stops advancing but particles freeze in place.
+- `ParticleSystem::resume` (`emitter.rs`): Resume from `Paused` or `Stopped`; transitions to `Active`.
+- `ParticleSystem::move_to` (`emitter.rs`): Update the emitter's world-space position, recording the previous position for motion blur.
+- `ParticleSystem::clone_config` (`emitter.rs`): Return a new `ParticleSystem` with the same config but no live particles.
+- `ParticleSystem::is_active` (`emitter.rs`): Return `true` when the emitter state is `Active`.
+- `ParticleSystem::is_paused` (`emitter.rs`): Return `true` when the emitter state is `Paused`.
+- `ParticleSystem::is_stopped` (`emitter.rs`): Return `true` when the emitter state is `Stopped`.
+- `ParticleSystem::is_empty` (`emitter.rs`): Return `true` when the particle pool is empty.
+- `ParticleSystem::is_full` (`emitter.rs`): Return `true` when the pool has reached `max_particles`.
+- `ParticleSystem::build_render_commands` (`emitter.rs`): Build `RenderCommand` values for all live particles at world offset `(ox, oy)`, including sub-systems.
+- `ParticleSystem::warm_up` (`emitter.rs`): Run the update loop for up to `seconds` in 50 ms steps to pre-populate the particle pool.
+- `ParticleSystem::add_attractor` (`emitter.rs`): Add a point attractor at `(x, y)` with given `strength` and influence `radius`.
+- `ParticleSystem::clear_attractors` (`emitter.rs`): Remove all attractors.
+- `ParticleSystem::attractor_count` (`emitter.rs`): Return the number of active attractors.
+- `ParticleSystem::set_bounds` (`emitter.rs`): Set the axis-aligned bounce boundary; particles reflect on crossing any edge.
+- `ParticleSystem::clear_bounds` (`emitter.rs`): Remove the bounce boundary.
+- `ParticleSystem::add_sub_system` (`emitter.rs`): Append a child sub-system; returns its index in `sub_systems`.
+- `ParticleSystem::sub_system_count` (`emitter.rs`): Return the number of active sub-systems.
+- `ParticleSystem::drain_pending_deaths` (`emitter.rs`): Drain and return all `(world_x, world_y, vx, vy)` death events accumulated since the last call.
+- `ParticleSystem::drain_custom_offsets` (`emitter.rs`): Drain and return particle pool indices that need a custom spawn-offset callback applied.
 - `interpolate_sizes` (`math.rs`): Interpolate a multi-stop size array at normalised time `t` (0 = birth, 1 = death).
 - `interpolate_colors` (`math.rs`): Interpolate a multi-stop color array at normalised time `t` (0 = birth, 1 = death).
 - `interpolate_alphas` (`math.rs`): Interpolate a multi-stop alpha array at normalised time `t` (0 = birth, 1 = death).
 - `rand_range` (`math.rs`): Sample a uniform random value in `[min, max]`.
 - `rand_normal` (`math.rs`): Approximate a standard-normal random value using Box-Muller transform.
-- `ParticleSystem::generate_render_commands` (`render.rs`): Generate render commands for all live particles at world origin.
-- `Trail::generate_render_commands` (`render.rs`): Generate render commands for the trail ribbon.
+- `collide_with_world` (`physics_collision.rs`): Reflect all particles in `system` that overlap a rapier collider in `world`; uses AABB probe of `probe_radius` and `restitution` coefficient.
+- `fire` (`presets.rs`): Return a `ParticleConfig` producing an upward fire effect with turbulence and RGB fade.
+- `smoke` (`presets.rs`): Return a `ParticleConfig` producing rising smoke with growing size and fading alpha.
+- `rain` (`presets.rs`): Return a `ParticleConfig` producing fast downward rain streaks.
+- `snow` (`presets.rs`): Return a `ParticleConfig` producing slow-drifting white snowflakes with turbulence.
+- `sparks` (`presets.rs`): Return a `ParticleConfig` for a burst-only spark explosion; set `emission_rate > 0` or call `emit` manually.
+- `ParticleSystem::generate_render_commands` (`render.rs`): Generate render commands for this system at world offset `(0, 0)`.
+- `Trail::generate_render_commands` (`render.rs`): Generate `RenderCommand` values for the trail ribbon.
 - `expand_particle_commands` (`render.rs`): Expand particle render commands for textured particles.
-- `Trail::new` (`trail.rs`): Creates a new trail with the given lifetime and starting width.
-- `Trail::push_point` (`trail.rs`): Pushes a new point at the head of the trail.
-- `Trail::update` (`trail.rs`): Advances point ages by `dt` seconds and removes expired points.
-- `Trail::set_width` (`trail.rs`): Sets the ribbon width.
-- `Trail::set_lifetime` (`trail.rs`): Sets the maximum point lifetime in seconds.
-- `Trail::get_lifetime` (`trail.rs`): Returns the maximum point lifetime in seconds.
-- `Trail::set_min_distance` (`trail.rs`): Sets the minimum distance a new point must be from the last one.
-- `Trail::clear` (`trail.rs`): Removes all trail points.
-- `Trail::get_point_count` (`trail.rs`): Returns the current number of trail points.
-- `Trail::get_width` (`trail.rs`): Returns the ribbon width as `(start_width, end_width)`.
-- `Trail::set_head_color` (`trail.rs`): Sets the color at the head (newest) end of the trail.
-- `Trail::set_tail_color` (`trail.rs`): Sets the color at the tail (oldest) end of the trail.
-- `Trail::build_render_commands` (`trail.rs`): Generates render commands to draw the trail as a tapered quad strip.
-- `Trail::draw_to_image` (`trail.rs`): Render the trail ribbon to an image with color interpolation.
+- `Trail::new` (`trail.rs`): Create a trail with `lifetime` seconds per point and `start_width` pixels at the head.
+- `Trail::push_point` (`trail.rs`): Append a point at `(x, y)` if it is at least `min_distance` from the current head.
+- `Trail::update` (`trail.rs`): Advance all point ages by `dt` seconds and retire points that exceed `lifetime`.
+- `Trail::set_width` (`trail.rs`): Set ribbon width; `start` is the head width and optional `end` sets the tail width.
+- `Trail::set_lifetime` (`trail.rs`): Set the maximum point lifetime in seconds.
+- `Trail::get_lifetime` (`trail.rs`): Return the current maximum point lifetime in seconds.
+- `Trail::set_min_distance` (`trail.rs`): Set the minimum distance between consecutive trail points.
+- `Trail::clear` (`trail.rs`): Remove all points.
+- `Trail::get_point_count` (`trail.rs`): Return the current number of live trail points.
+- `Trail::get_width` (`trail.rs`): Return the current `(start_width, end_width)` pair.
+- `Trail::set_head_color` (`trail.rs`): Set the RGBA colour at the head of the trail.
+- `Trail::set_tail_color` (`trail.rs`): Set the RGBA colour at the tail of the trail.
+- `Trail::build_render_commands` (`trail.rs`): Build a list of `SetColor` + `Triangle` commands forming the ribbon; returns empty when fewer than 2 points.
+- `Trail::draw_to_image` (`trail.rs`): Render the trail to an `ImageData` of `width` x `height`; returns a dark-filled image when fewer than 2 points.
 - `draw_to_image` (`visualization.rs`): Render all live particles to an `ImageData`.
 - `draw_explosion_to_image` (`visualization.rs`): Render an explosion burst: particles radiate from center with age-based red-to-yellow coloring.
 - `draw_rain_to_image` (`visualization.rs`): Render particles styled as falling rain streaks.
@@ -133,43 +141,44 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 - Namespace: `lurek.particle`
 
 ### Module Functions
-- `lurek.particle.newSystem`: Creates a new particle system and stores it in the engine pool.
-- `lurek.particle.newTrail`: Creates a new trail ribbon effect.
-- `lurek.particle.fromTOML`: Creates a new particle system from a TOML config file.
+- `lurek.particle.newSystem`: Creates a particle system from an optional config table.
+- `lurek.particle.newTrail`: Creates a trail effect.
+- `lurek.particle.fromTOML`: Creates a particle system from a TOML config file.
+- `lurek.particle.newPreset`: Creates a particle system from a named preset.
 
 ### `LParticleSystem` Methods
-- `LParticleSystem:update`: Advances the particle simulation by dt seconds.
-- `LParticleSystem:emit`: Emits a burst of the given number of particles.
-- `LParticleSystem:start`: Starts or restarts particle emission.
-- `LParticleSystem:stop`: Stops particle emission immediately.
-- `LParticleSystem:pause`: Pauses particle emission; existing particles continue to simulate.
-- `LParticleSystem:resume`: Resumes a paused emitter.
-- `LParticleSystem:reset`: Removes all particles and resets the emitter.
-- `LParticleSystem:moveTo`: Moves the emitter to the given world position.
-- `LParticleSystem:count`: Returns the number of living particles.
-- `LParticleSystem:isActive`: Returns true if the emitter is currently emitting or has live particles.
-- `LParticleSystem:isPaused`: Returns true if the emitter is paused.
-- `LParticleSystem:isStopped`: Returns true if the emitter is stopped.
-- `LParticleSystem:isEmpty`: Returns true if there are no live particles.
-- `LParticleSystem:isFull`: Returns true if the system has reached max_particles.
-- `LParticleSystem:release`: Removes the particle system from the engine, freeing its slot.
-- `LParticleSystem:getCount`: Returns the number of living particles (alias for count).
-- `LParticleSystem:type`: Returns the type name "ParticleSystem".
-- `LParticleSystem:typeOf`: Returns true if this matches the given type name.
-- `LParticleSystem:setPosition`: Sets the emitter world position.
-- `LParticleSystem:getPosition`: Returns the emitter world position.
-- `LParticleSystem:setEmissionRate`: Sets particles emitted per second.
-- `LParticleSystem:getEmissionRate`: Returns particles emitted per second.
-- `LParticleSystem:setParticleLifetime`: Sets min and max particle lifetime in seconds.
-- `LParticleSystem:getParticleLifetime`: Returns min and max particle lifetime.
-- `LParticleSystem:setEmitterLifetime`: Sets how long the emitter runs before auto-stopping. Negative = infinite.
-- `LParticleSystem:getEmitterLifetime`: Returns the emitter lifetime.
-- `LParticleSystem:setSpeed`: Sets min/max initial speed.
-- `LParticleSystem:getSpeed`: Returns min/max initial speed.
-- `LParticleSystem:setDirection`: Sets emission direction in radians.
-- `LParticleSystem:getDirection`: Returns emission direction in radians.
-- `LParticleSystem:setSpread`: Sets emission spread (half-angle cone) in radians.
-- `LParticleSystem:getSpread`: Returns the half-angle spread in radians for the emission cone.
+- `LParticleSystem:update`: Updates the particle system, applies optional physics collision, and invokes pending callbacks.
+- `LParticleSystem:emit`: Emits particles immediately.
+- `LParticleSystem:start`: Starts particle emission.
+- `LParticleSystem:stop`: Stops particle emission.
+- `LParticleSystem:pause`: Pauses particle emission and updates.
+- `LParticleSystem:resume`: Resumes a paused particle system.
+- `LParticleSystem:reset`: Resets particles and emitter state.
+- `LParticleSystem:moveTo`: Moves the particle emitter.
+- `LParticleSystem:count`: Returns the current particle count.
+- `LParticleSystem:isActive`: Returns whether the particle system is active.
+- `LParticleSystem:isPaused`: Returns whether the particle system is paused.
+- `LParticleSystem:isStopped`: Returns whether the particle system is stopped or missing.
+- `LParticleSystem:isEmpty`: Returns whether the particle system has no particles or is missing.
+- `LParticleSystem:isFull`: Returns whether the particle system has reached capacity.
+- `LParticleSystem:release`: Releases the particle system from shared storage.
+- `LParticleSystem:getCount`: Returns particle count and errors if the handle was released.
+- `LParticleSystem:type`: Returns the Lua-visible type name for this particle system handle.
+- `LParticleSystem:typeOf`: Returns whether this particle system handle matches a supported type name.
+- `LParticleSystem:setPosition`: Sets emitter position.
+- `LParticleSystem:getPosition`: Returns emitter position.
+- `LParticleSystem:setEmissionRate`: Sets emission rate.
+- `LParticleSystem:getEmissionRate`: Returns emission rate.
+- `LParticleSystem:setParticleLifetime`: Sets particle lifetime range.
+- `LParticleSystem:getParticleLifetime`: Returns particle lifetime range.
+- `LParticleSystem:setEmitterLifetime`: Sets emitter lifetime.
+- `LParticleSystem:getEmitterLifetime`: Returns emitter lifetime.
+- `LParticleSystem:setSpeed`: Sets particle speed range.
+- `LParticleSystem:getSpeed`: Returns particle speed range.
+- `LParticleSystem:setDirection`: Sets emission direction.
+- `LParticleSystem:getDirection`: Returns emission direction.
+- `LParticleSystem:setSpread`: Sets emission spread.
+- `LParticleSystem:getSpread`: Returns emission spread.
 - `LParticleSystem:setLinearAcceleration`: Sets linear acceleration range.
 - `LParticleSystem:getLinearAcceleration`: Returns linear acceleration range.
 - `LParticleSystem:setRadialAcceleration`: Sets radial acceleration range.
@@ -178,70 +187,74 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 - `LParticleSystem:getTangentialAcceleration`: Returns tangential acceleration range.
 - `LParticleSystem:setLinearDamping`: Sets linear damping range.
 - `LParticleSystem:getLinearDamping`: Returns linear damping range.
-- `LParticleSystem:setSizes`: Sets size keyframes (varargs: each number is one keyframe).
-- `LParticleSystem:getSizes`: Returns size keyframes as a Lua table.
-- `LParticleSystem:setSizeVariation`: Sets size variation (0-1).
-- `LParticleSystem:getSizeVariation`: Returns the maximum random size variation applied to newly emitted particles.
-- `LParticleSystem:setRotation`: Sets initial rotation range in radians.
-- `LParticleSystem:getRotation`: Returns initial rotation range.
-- `LParticleSystem:setSpin`: Sets angular velocity range.
-- `LParticleSystem:getSpin`: Returns angular velocity range.
-- `LParticleSystem:setSpinVariation`: Sets spin variation (0-1).
-- `LParticleSystem:getSpinVariation`: Returns the maximum random angular velocity variation for new particles.
-- `LParticleSystem:setRelativeRotation`: Sets whether particle rotation follows velocity direction.
+- `LParticleSystem:setSizes`: Sets particle size keyframes from numeric arguments.
+- `LParticleSystem:getSizes`: Returns particle size keyframes.
+- `LParticleSystem:setSizeVariation`: Sets size variation.
+- `LParticleSystem:getSizeVariation`: Returns size variation.
+- `LParticleSystem:setRotation`: Sets particle rotation range.
+- `LParticleSystem:getRotation`: Returns particle rotation range.
+- `LParticleSystem:setSpin`: Sets particle spin range.
+- `LParticleSystem:getSpin`: Returns particle spin range.
+- `LParticleSystem:setSpinVariation`: Sets spin variation.
+- `LParticleSystem:getSpinVariation`: Returns spin variation.
+- `LParticleSystem:setRelativeRotation`: Sets whether particle rotation is relative to movement.
 - `LParticleSystem:hasRelativeRotation`: Returns whether relative rotation is enabled.
-- `LParticleSystem:setColors`: Sets color keyframes. Each arg is a table {r, g, b, a}.
-- `LParticleSystem:getColors`: Returns color keyframes as a table of {r,g,b,a} tables.
-- `LParticleSystem:setOffset`: Sets the render origin offset.
-- `LParticleSystem:getOffset`: Returns the render origin offset.
-- `LParticleSystem:setInsertMode`: Sets the insert mode: "top", "bottom", or "random".
-- `LParticleSystem:getInsertMode`: Returns the insert mode as a string.
-- `LParticleSystem:setBufferSize`: Sets the maximum number of particles (resizes the pool).
-- `LParticleSystem:getBufferSize`: Returns the maximum particle count.
+- `LParticleSystem:setColors`: Sets particle color keyframes from RGBA tables.
+- `LParticleSystem:getColors`: Returns particle color keyframes.
+- `LParticleSystem:setOffset`: Sets particle spawn offset.
+- `LParticleSystem:getOffset`: Returns particle spawn offset.
+- `LParticleSystem:setInsertMode`: Sets particle insert mode.
+- `LParticleSystem:getInsertMode`: Returns particle insert mode.
+- `LParticleSystem:setBufferSize`: Sets maximum particle buffer size.
+- `LParticleSystem:getBufferSize`: Returns maximum particle buffer size.
 - `LParticleSystem:setEmissionArea`: Sets emission area distribution and size.
-- `LParticleSystem:getEmissionArea`: Returns emission area: dist-string, w, h.
-- `LParticleSystem:setShape`: Sets the particle draw shape.
-- `LParticleSystem:getShape`: Returns the particle draw shape as a string.
-- `LParticleSystem:getGravity`: Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
-- `LParticleSystem:setGravity`: Sets the gravity acceleration applied to all active particles each frame.
-- `LParticleSystem:render`: Renders all live particles to the GPU command queue.
-- `LParticleSystem:clone`: Creates a copy of this particle system (config only, no live particles).
-- `LParticleSystem:drawToImage`: Renders all live particles to a CPU ImageData.
-- `LParticleSystem:toImage`: Alias for `drawToImage`. Renders all live particles to a CPU ImageData.
-- `LParticleSystem:warmUp`: Pre-simulates the particle system for `seconds` so it appears fully
-- `LParticleSystem:addAttractor`: Adds a gravity well that pulls (positive strength) or repels
-- `LParticleSystem:clearAttractors`: Removes all attractors from this particle system.
-- `LParticleSystem:getAttractorCount`: Returns the number of attractors currently registered on this system.
-- `LParticleSystem:setBounds`: Constrains all particles to an axis-aligned bounding rectangle.
-- `LParticleSystem:clearBounds`: Removes the bounding rectangle so particles can move freely.
-- `LParticleSystem:addSubEmitter`: Attaches a sub-emitter that bursts when a particle dies.
-- `LParticleSystem:setFlipbook`: Configures sprite-sheet flipbook animation by dividing the texture into a grid.
-- `LParticleSystem:getFlipbook`: Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
-- `LParticleSystem:addSubSystem`: Adds a child emitter that updates and renders with this system.
-- `LParticleSystem:subSystemCount`: Returns the number of direct child sub-systems attached to this emitter.
-- `LParticleSystem:setCustomEmissionShape`: Sets a Lua function that returns (offset_x, offset_y) for each newly spawned
-- `LParticleSystem:setOnDeathBatch`: Sets a Lua function called after each update() with all particles that died
+- `LParticleSystem:getEmissionArea`: Returns emission area distribution and size.
+- `LParticleSystem:setShape`: Sets particle shape.
+- `LParticleSystem:getShape`: Returns particle shape.
+- `LParticleSystem:getGravity`: Returns particle gravity.
+- `LParticleSystem:setGravity`: Sets particle gravity.
+- `LParticleSystem:render`: Enqueues particle render commands with an optional offset.
+- `LParticleSystem:clone`: Clones this particle system configuration into a new system handle.
+- `LParticleSystem:drawToImage`: Draws particles to image data.
+- `LParticleSystem:toImage`: Draws particles to image data.
+- `LParticleSystem:warmUp`: Advances the system by a warm-up duration.
+- `LParticleSystem:addAttractor`: Adds an attractor to the particle system.
+- `LParticleSystem:clearAttractors`: Clears all attractors.
+- `LParticleSystem:getAttractorCount`: Returns attractor count.
+- `LParticleSystem:setBounds`: Sets collision bounds for particles.
+- `LParticleSystem:clearBounds`: Clears collision bounds.
+- `LParticleSystem:setCollidesWithPhysics`: Enables particle collision against a physics world.
+- `LParticleSystem:clearCollidesWithPhysics`: Disables particle collision against a physics world.
+- `LParticleSystem:hasCollidesWithPhysics`: Returns whether particle physics collision is enabled.
+- `LParticleSystem:addSubEmitter`: Configures a death sub-emitter from a config table.
+- `LParticleSystem:setFlipbook`: Sets flipbook grid and frame rate.
+- `LParticleSystem:getFlipbook`: Returns flipbook grid and frame rate when configured.
+- `LParticleSystem:addSubSystem`: Adds a particle sub-system from a config table.
+- `LParticleSystem:subSystemCount`: Returns particle sub-system count.
+- `LParticleSystem:setCustomEmissionShape`: Sets a Lua callback for custom emission positions.
+- `LParticleSystem:setOnDeathBatch`: Sets a Lua callback invoked with batched particle death records.
 
 ### `LTrail` Methods
-- `LTrail:pushPoint`: Appends a new point to the trail head.
-- `LTrail:update`: Ages trail points and removes expired ones.
-- `LTrail:setWidth`: Sets the start and end width of the trail ribbon.
-- `LTrail:getWidth`: Returns the start and end width.
-- `LTrail:setLifetime`: Sets how long each trail point persists in seconds.
-- `LTrail:getLifetime`: Returns the trail point lifetime in seconds.
-- `LTrail:setMinDistance`: Sets the minimum distance between trail points.
-- `LTrail:setHeadColor`: Sets the colour at the newest end of the trail.
-- `LTrail:setTailColor`: Sets the colour at the oldest end of the trail.
-- `LTrail:getPointCount`: Returns the number of active trail points.
-- `LTrail:clear`: Removes all trail points.
-- `LTrail:drawToImage`: Renders the trail ribbon to a CPU ImageData.
-- `LTrail:type`: Returns the type name of this object.
-- `LTrail:typeOf`: Returns true if this object is of the given type.
+- `LTrail:pushPoint`: Adds a point to the trail.
+- `LTrail:update`: Updates trail point lifetimes.
+- `LTrail:setWidth`: Sets trail start and optional end width.
+- `LTrail:getWidth`: Returns trail width settings.
+- `LTrail:setLifetime`: Sets trail point lifetime.
+- `LTrail:getLifetime`: Returns trail point lifetime.
+- `LTrail:setMinDistance`: Sets minimum distance between trail points.
+- `LTrail:setHeadColor`: Sets trail head color.
+- `LTrail:setTailColor`: Sets trail tail color.
+- `LTrail:getPointCount`: Returns trail point count.
+- `LTrail:clear`: Clears all trail points.
+- `LTrail:drawToImage`: Draws the trail to image data.
+- `LTrail:type`: Returns the Lua-visible type name for this trail handle.
+- `LTrail:typeOf`: Returns whether this trail handle matches a supported type name.
 
 ## References
 
 - `image`: Imports or references `image` from `src/image/`.
 - `math`: Imports or references `math` from `src/math/`.
+- `physics`: Imports or references `src/physics/`. Cross-group dependency from `Feature Systems` into `Platform Services`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
@@ -249,18 +262,3 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 
 - Keep this module reference synchronized with `src/particle/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
-
-## 2026-05 Backlog Closure
-
-- Added built-in preset package in `src/particle/presets.rs`:
-	- `fire()`, `smoke()`, `rain()`, `snow()`, `sparks()`.
-- Added optional particle-vs-physics collision helper in `src/particle/physics_collision.rs`.
-- Added Lua API methods on `LParticleSystem`:
-	- `setCollidesWithPhysics(world, probe_radius?, restitution?)`
-	- `clearCollidesWithPhysics()`
-	- `hasCollidesWithPhysics()`
-- Added module function:
-	- `lurek.particle.newPreset(name)`
-- Added tests:
-	- Rust: border-rectangle statistical test and fuzz-like update stability.
-	- Lua: preset creation and collision toggle API coverage.

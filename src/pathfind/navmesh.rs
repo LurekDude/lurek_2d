@@ -17,7 +17,7 @@ pub struct NavMesh {
 }
 /// Construction and pathfinding methods for `NavMesh`.
 impl NavMesh {
-    /// Create an empty mesh.
+    /// Create an empty mesh. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

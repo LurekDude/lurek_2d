@@ -433,11 +433,11 @@ impl SpinBox {
         };
         self.value = snapped.clamp(self.min, self.max);
     }
-    /// Increase value by one step.
+    /// Increase value by one step. This function is part of the public API.
     pub fn increment(&mut self) {
         self.set_value(self.value + self.step);
     }
-    /// Decrease value by one step.
+    /// Decrease value by one step. This function is part of the public API.
     pub fn decrement(&mut self) {
         self.set_value(self.value - self.step);
     }

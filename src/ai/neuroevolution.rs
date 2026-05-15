@@ -31,7 +31,7 @@ impl Neuroevolution {
     fn total_params(spec: &[(usize, usize, &str)]) -> usize {
         spec.iter().map(|(i, o, _)| i * o + o).sum()
     }
-    /// Return the population size.
+    /// Return the population size. This function is part of the public API.
     pub fn pop_size(&self) -> usize {
         self.ga.pop_size()
     }

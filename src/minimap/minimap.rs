@@ -556,7 +556,7 @@ impl Minimap {
         self.overlay_shapes
             .push(OverlayShape::Rect { x, y, w, h, color });
     }
-    /// Clear all overlay shapes.
+    /// Clear all overlay shapes. This function is part of the public API.
     pub fn clear_overlay(&mut self) {
         self.overlay_shapes.clear();
     }

@@ -802,12 +802,12 @@ impl Terminal {
             None
         }
     }
-    /// Return the column count.
+    /// Return the column count. This function is part of the public API.
     pub fn cols(&self) -> usize {
         self.cols
     }
 
-    /// Return the row count.
+    /// Return the row count. This function is part of the public API.
     pub fn rows(&self) -> usize {
         self.rows
     }

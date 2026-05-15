@@ -14,7 +14,7 @@ pub struct Factory {
 }
 /// Registration and lookup methods for `Factory`.
 impl Factory {
-    /// Create an empty factory.
+    /// Create an empty factory. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

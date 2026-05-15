@@ -121,22 +121,22 @@ impl AnimStateMachine {
             }
         }
     }
-    /// Set a float parameter.
+    /// Set a float parameter. This function is part of the public API.
     pub fn set_param_float(&mut self, name: &str, value: f32) {
         self.params
             .insert(name.to_string(), AnimParamValue::Float(value));
     }
-    /// Set a bool parameter.
+    /// Set a bool parameter. This function is part of the public API.
     pub fn set_param_bool(&mut self, name: &str, value: bool) {
         self.params
             .insert(name.to_string(), AnimParamValue::Bool(value));
     }
-    /// Set an integer parameter.
+    /// Set an integer parameter. This function is part of the public API.
     pub fn set_param_int(&mut self, name: &str, value: i32) {
         self.params
             .insert(name.to_string(), AnimParamValue::Int(value));
     }
-    /// Return a parameter by name.
+    /// Return a parameter by name. This function is part of the public API.
     pub fn get_param(&self, name: &str) -> Option<&AnimParamValue> {
         self.params.get(name)
     }

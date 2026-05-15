@@ -14,7 +14,7 @@ pub struct ProvinceGraph {
 }
 
 impl ProvinceGraph {
-    /// Return a new empty graph.
+    /// Return a new empty graph. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }

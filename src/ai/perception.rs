@@ -94,7 +94,7 @@ impl StimulusWorld {
         self.stimuli.push(s);
         id
     }
-    /// Add a visual stimulus.
+    /// Add a visual stimulus. This function is part of the public API.
     pub fn add_visual(
         &mut self,
         x: f32,
@@ -114,7 +114,7 @@ impl StimulusWorld {
             tag,
         })
     }
-    /// Add an auditory stimulus.
+    /// Add an auditory stimulus. This function is part of the public API.
     pub fn add_auditory(
         &mut self,
         x: f32,
@@ -136,7 +136,7 @@ impl StimulusWorld {
         })
     }
     #[allow(clippy::too_many_arguments)]
-    /// Add a custom stimulus type.
+    /// Add a custom stimulus type. This function is part of the public API.
     pub fn add_custom(
         &mut self,
         sense_type: &str,
@@ -181,7 +181,7 @@ impl StimulusWorld {
     pub fn count(&self) -> usize {
         self.stimuli.len()
     }
-    /// Remove all stimuli.
+    /// Remove all stimuli. This function is part of the public API.
     pub fn clear(&mut self) {
         self.stimuli.clear();
     }

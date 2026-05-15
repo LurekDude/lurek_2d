@@ -84,7 +84,7 @@ pub struct NeuralLayer {
     pub activation: Activation,
 }
 impl NeuralLayer {
-    /// Create a zeroed dense layer.
+    /// Create a zeroed dense layer. This function is part of the public API.
     pub fn new(inputs: usize, outputs: usize, activation: Activation) -> Self {
         Self {
             inputs,
@@ -120,11 +120,11 @@ pub struct NeuralNet {
     layers: Vec<NeuralLayer>,
 }
 impl NeuralNet {
-    /// Create an empty neural net.
+    /// Create an empty neural net. This function is part of the public API.
     pub fn new() -> Self {
         Self::default()
     }
-    /// Append a new dense layer.
+    /// Append a new dense layer. This function is part of the public API.
     pub fn add_layer(&mut self, inputs: usize, outputs: usize, activation: Activation) {
         self.layers
             .push(NeuralLayer::new(inputs, outputs, activation));
@@ -169,7 +169,7 @@ impl NeuralNet {
         }
         out
     }
-    /// Return the number of layers.
+    /// Return the number of layers. This function is part of the public API.
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }

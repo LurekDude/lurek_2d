@@ -90,20 +90,20 @@ impl LuaUserData for LuaSkeleton {
         // -- findBone --
         /// Searches for a bone by name and returns its zero-based index, or nil if not found.
         /// @param | name | string | Name of the bone to find.
-        /// @return | number? | Zero-based bone index, or nil if no bone with that name exists.
+        /// @return | number | Zero-based bone index, or nil if no bone with that name exists.
         methods.add_method("findBone", |_, this, name: String| {
             Ok(this.inner.find_bone(&name))
         });
         // -- findSlot --
         /// Searches for a slot by name and returns its zero-based index, or nil if not found.
         /// @param | name | string | Name of the slot to find.
-        /// @return | number? | Zero-based slot index, or nil if no slot with that name exists.
+        /// @return | number | Zero-based slot index, or nil if no slot with that name exists.
         methods.add_method("findSlot", |_, this, name: String| {
             Ok(this.inner.find_slot(&name))
         });
         // -- updateWorldTransforms --
         /// Recomputes world transforms for all bones in hierarchy order. Call after modifying bone locals or IK targets.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("updateWorldTransforms", |_, this, ()| {
             this.inner.update_world_transforms();
             Ok(())
@@ -111,7 +111,7 @@ impl LuaUserData for LuaSkeleton {
         // -- getBoneWorld --
         /// Returns the final world-space transform of a bone after hierarchy resolution.
         /// @param | idx | number | Zero-based bone index.
-        /// @return | table? | Table with keys x, y, rotation, scale_x, scale_y — or nil if the index is invalid.
+        /// @return | table | Table with keys x, y, rotation, scale_x, scale_y — or nil if the index is invalid.
         methods.add_method("getBoneWorld", |lua, this, idx: usize| {
             match this.inner.bone_world_transform(idx) {
                 None => Ok(LuaValue::Nil),
@@ -130,7 +130,7 @@ impl LuaUserData for LuaSkeleton {
         /// Sets the root bone world position, shifting the entire skeleton.
         /// @param | x | number | World X coordinate.
         /// @param | y | number | World Y coordinate.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.set_root_position(x, y);
             Ok(())
@@ -165,7 +165,7 @@ impl LuaUserData for LuaSkeleton {
         );
         // -- stopAnimation --
         /// Stops the currently playing animation and resets playback state.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("stopAnimation", |_, this, ()| {
             this.inner.stop_animation();
             Ok(())
@@ -173,7 +173,7 @@ impl LuaUserData for LuaSkeleton {
         // -- updateAnimation --
         /// Advances the current animation by a delta time, applying bone transforms to the skeleton.
         /// @param | dt | number | Time step in seconds (e.g. from lurek.timer.getDelta()).
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("updateAnimation", |_, this, dt: f32| {
             this.inner.update_animation(dt);
             Ok(())
@@ -187,7 +187,7 @@ impl LuaUserData for LuaSkeleton {
         // -- addAnimation --
         /// Registers a SkeletonAnimation object with this skeleton so it can be played by name.
         /// @param | anim | LSkeletonAnimation | The animation userdata to register. Consumed by this call.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("addAnimation", |_, this, anim_ud: LuaAnyUserData| {
             let anim = anim_ud.take::<LuaSkeletonAnimation>()?.inner;
             this.inner.add_animation(anim);
@@ -223,7 +223,7 @@ impl LuaUserData for LuaSkeleton {
         // -- addSkin --
         /// Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
         /// @param | name | string | Unique name for the skin.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut("addSkin", |_, this, name: String| {
             this.inner.add_skin(&name);
             Ok(())
@@ -237,7 +237,7 @@ impl LuaUserData for LuaSkeleton {
         });
         // -- getSkin --
         /// Returns the name of the currently active skin, or nil if no skin is set.
-        /// @return | string? | Active skin name or nil.
+        /// @return | string | Active skin name or nil.
         methods.add_method("getSkin", |_, this, ()| {
             Ok(this.inner.get_skin().map(|s| s.to_owned()))
         });
@@ -246,7 +246,7 @@ impl LuaUserData for LuaSkeleton {
         /// @param | skin | string | Name of the skin to add the mapping to.
         /// @param | slot | string | Name of the slot to remap.
         /// @param | attachment | string | Attachment name to display in that slot when the skin is active.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setSkinMapping",
             |_, this, (skin, slot, attachment): (String, String, String)| {
@@ -259,7 +259,7 @@ impl LuaUserData for LuaSkeleton {
         /// @param | anim | LSkeletonAnimation | The animation to sample and blend from.
         /// @param | time | number | The time position to sample within the animation.
         /// @param | blend_weight | number? | Blend factor from 0.0 (no effect) to 1.0 (full). Defaults to 1.0.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "blendAnimation",
             |_, this, (anim_ud, time, blend_weight): (mlua::AnyUserData, f32, Option<f32>)| {
@@ -299,7 +299,7 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @param | time | number | Time position in seconds for this keyframe.
         /// @param | value | number | Value of the property at this keyframe.
         /// @param | easing | string? | Easing type: "linear" (default), "ease_in", "ease_out", "ease_in_out", or "step".
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addKeyframe",
             |_,
@@ -368,7 +368,7 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @param | time | number | Time position in seconds when the event fires.
         /// @param | name | string | Name of the event (used to identify it when querying).
         /// @param | value | number? | Optional numeric payload for the event. Defaults to 0.
-        /// @return | nil |
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addEventKey",
             |_, this, (time, name, value): (f32, String, Option<f32>)| {
@@ -478,7 +478,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- animationFromJson --
     /// Parses a JSON string into a SkeletonAnimation. Returns nil if parsing fails or the format is invalid.
     /// @param | json | string | JSON string describing the animation (Spine-compatible format).
-    /// @return | LSkeletonAnimation? | Parsed animation userdata, or nil on failure.
+    /// @return | LSkeletonAnimation | Parsed animation userdata, or nil on failure.
     tbl.set(
         "animationFromJson",
         lua.create_function(|lua, json: String| {

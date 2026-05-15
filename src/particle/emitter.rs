@@ -469,7 +469,7 @@ impl ParticleSystem {
             radius,
         });
     }
-    /// Remove all attractors.
+    /// Remove all attractors. This function is part of the public API.
     pub fn clear_attractors(&mut self) {
         self.attractors.clear();
     }
@@ -487,7 +487,7 @@ impl ParticleSystem {
             restitution: restitution.clamp(0.0, 1.0),
         });
     }
-    /// Remove the bounce boundary.
+    /// Remove the bounce boundary. This function is part of the public API.
     pub fn clear_bounds(&mut self) {
         self.bounce_bounds = None;
     }

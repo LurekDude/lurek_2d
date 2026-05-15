@@ -88,7 +88,7 @@ impl Graph {
     pub fn has_node(&self, id: u32) -> bool {
         self.nodes.iter().any(|n| n.id == id)
     }
-    /// Return all node ids.
+    /// Return all node ids. This function is part of the public API.
     pub fn node_ids(&self) -> Vec<u32> {
         self.nodes.iter().map(|n| n.id).collect()
     }
@@ -198,7 +198,7 @@ impl Graph {
     pub fn is_connected(&self, from: u32, to: u32) -> bool {
         self.bfs(from).contains(&to)
     }
-    /// Remove all nodes and edges.
+    /// Remove all nodes and edges. This function is part of the public API.
     pub fn clear(&mut self) {
         self.nodes.clear();
         self.edges.clear();

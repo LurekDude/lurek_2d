@@ -36,6 +36,8 @@ LUREK_STUB_PATH = ROOT / "docs" / "api" / "lurek.lua"
 LIBRARY_STUB_PATH = ROOT / "docs" / "api" / "library.lua"
 EXTENSION_API_PATH = ROOT / "extensions" / "vscode" / "data" / "lurek-api.json"
 DOCS_TOOLS_DIR = ROOT / "tools" / "docs"
+MIN_LUA_SUMMARY_VISIBLE_CHARS = 30
+MIN_LUA_CLASS_VISIBLE_CHARS = 30
 
 if str(DOCS_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(DOCS_TOOLS_DIR))
@@ -222,6 +224,110 @@ def _extract_library_expectations(gen_lib_docs, library_modules: dict) -> tuple[
     return top_functions, methods
 
 
+def _visible_len(text: str) -> int:
+    return len(re.sub(r"\s+", "", text or ""))
+
+
+def _collect_lua_doc_completeness_issues(fresh_data: dict) -> list[dict[str, object]]:
+    issues: list[dict[str, object]] = []
+
+    for module_name, module_data in fresh_data["lua_api"]["modules"].items():
+        for fn in module_data.get("functions", []):
+            if _visible_len(fn.get("description", "")) < MIN_LUA_SUMMARY_VISIBLE_CHARS:
+                issues.append(
+                    {
+                        "kind": "short-function-summary",
+                        "file": fn["file"].replace("\\", "/"),
+                        "line": fn["line"],
+                        "name": fn.get("lua_name") or fn.get("name"),
+                        "message": (
+                            f"summary must contain at least {MIN_LUA_SUMMARY_VISIBLE_CHARS} visible characters"
+                        ),
+                    }
+                )
+
+            if not fn.get("returns_doc") or not fn.get("return_description"):
+                issues.append(
+                    {
+                        "kind": "missing-function-return-doc",
+                        "file": fn["file"].replace("\\", "/"),
+                        "line": fn["line"],
+                        "name": fn.get("lua_name") or fn.get("name"),
+                        "message": "generated API data is missing complete return type/description metadata",
+                    }
+                )
+
+            for param_name, param_type, _, param_desc in fn.get("typed_params", []):
+                if not param_name or not param_type or not param_desc:
+                    issues.append(
+                        {
+                            "kind": "incomplete-function-param-doc",
+                            "file": fn["file"].replace("\\", "/"),
+                            "line": fn["line"],
+                            "name": fn.get("lua_name") or fn.get("name"),
+                            "message": "generated API data contains a parameter without full name/type/description metadata",
+                        }
+                    )
+                    break
+
+        for class_name, class_data in module_data.get("classes", {}).items():
+            class_methods = class_data.get("methods", [])
+            class_file = class_methods[0]["file"].replace("\\", "/") if class_methods else module_data["source_file"]
+            class_line = class_methods[0]["line"] if class_methods else 1
+            if _visible_len(class_data.get("description", "")) < MIN_LUA_CLASS_VISIBLE_CHARS:
+                issues.append(
+                    {
+                        "kind": "short-class-description",
+                        "file": class_file,
+                        "line": class_line,
+                        "name": class_name,
+                        "message": (
+                            f"Lua-visible object/class description must contain at least {MIN_LUA_CLASS_VISIBLE_CHARS} visible characters"
+                        ),
+                    }
+                )
+
+            for method in class_methods:
+                if _visible_len(method.get("description", "")) < MIN_LUA_SUMMARY_VISIBLE_CHARS:
+                    issues.append(
+                        {
+                            "kind": "short-method-summary",
+                            "file": method["file"].replace("\\", "/"),
+                            "line": method["line"],
+                            "name": f"{class_name}.{method.get('name')}",
+                            "message": (
+                                f"summary must contain at least {MIN_LUA_SUMMARY_VISIBLE_CHARS} visible characters"
+                            ),
+                        }
+                    )
+
+                if not method.get("returns_doc") or not method.get("return_description"):
+                    issues.append(
+                        {
+                            "kind": "missing-method-return-doc",
+                            "file": method["file"].replace("\\", "/"),
+                            "line": method["line"],
+                            "name": f"{class_name}.{method.get('name')}",
+                            "message": "generated API data is missing complete return type/description metadata",
+                        }
+                    )
+
+                for param_name, param_type, _, param_desc in method.get("typed_params", []):
+                    if not param_name or not param_type or not param_desc:
+                        issues.append(
+                            {
+                                "kind": "incomplete-method-param-doc",
+                                "file": method["file"].replace("\\", "/"),
+                                "line": method["line"],
+                                "name": f"{class_name}.{method.get('name')}",
+                                "message": "generated API data contains a parameter without full name/type/description metadata",
+                            }
+                        )
+                        break
+
+    return issues
+
+
 def _generate_fresh_artifacts() -> tuple[dict, str, str, dict, dict]:
     gen_luadoc = _load_module("gen_luadoc", ROOT / "tools" / "docs" / "gen_luadoc.py")
     gen_lib_docs = _load_module("gen_lib_docs", ROOT / "tools" / "docs" / "gen_lib_docs.py")
@@ -256,6 +362,7 @@ def _generate_fresh_artifacts() -> tuple[dict, str, str, dict, dict]:
 
 def validate_generated_lua_stubs() -> dict:
     fresh_data, fresh_lurek_stub, fresh_library_stub, fresh_extension_api, library_modules = _generate_fresh_artifacts()
+    doc_completeness_issues = _collect_lua_doc_completeness_issues(fresh_data)
 
     current_data = json.loads(LUA_API_JSON_PATH.read_text(encoding="utf-8"))
     current_lurek_stub = LUREK_STUB_PATH.read_text(encoding="utf-8")
@@ -314,6 +421,10 @@ def validate_generated_lua_stubs() -> dict:
             "extension_api_identical_to_committed": current_extension_api == fresh_extension_api,
         },
         "advisory": {
+            "lua_doc_completeness": {
+                "issue_count": len(doc_completeness_issues),
+                "issue_sample": doc_completeness_issues[:20],
+            },
             "source_proof": {
                 "source_registration_count": len(source_entries),
                 "json_entry_count": len(json_entries),
@@ -368,12 +479,14 @@ def validate_generated_lua_stubs() -> dict:
     }
 
     source_proof = result["advisory"]["source_proof"]
+    lua_doc_completeness = result["advisory"]["lua_doc_completeness"]
     lurek_stub_proof = result["advisory"]["lurek_stub_proof"]
     extension_proof = result["advisory"]["extension_proof"]
     library_stub_proof = result["advisory"]["library_stub_proof"]
 
     result["ok"] = all(result["artifacts"].values()) and not any(
         (
+            lua_doc_completeness["issue_count"] > 0,
             source_proof["source_vs_json_missing_count"] > 0,
             source_proof["source_vs_json_extra_count"] > 0,
             lurek_stub_proof["missing_top_stub_count"] > 0,
@@ -408,6 +521,7 @@ def _print_text_report(result: dict) -> None:
     artifacts = result["artifacts"]
     advisory = result["advisory"]
     source_proof = advisory["source_proof"]
+    lua_doc_completeness = advisory["lua_doc_completeness"]
     lurek_stub_proof = advisory["lurek_stub_proof"]
     extension_proof = advisory["extension_proof"]
     library_stub_proof = advisory["library_stub_proof"]
@@ -448,9 +562,14 @@ def _print_text_report(result: dict) -> None:
         else "[FAIL]",
         "extensions/vscode/data/lurek-api.json contains every source JSON enum with matching values",
     )
+    print(
+        "[OK]" if lua_doc_completeness["issue_count"] == 0 else "[FAIL]",
+        "freshly generated Lua API data contains complete summary/param/return/class documentation",
+    )
 
     advisory_has_drift = any(
         (
+            lua_doc_completeness["issue_count"] > 0,
             source_proof["source_vs_json_missing_count"] > 0,
             source_proof["source_vs_json_extra_count"] > 0,
             lurek_stub_proof["missing_top_stub_count"] > 0,
@@ -470,6 +589,9 @@ def _print_text_report(result: dict) -> None:
             "[INFO] Source/artifact drift details are available with --format json; "
             "coverage mismatches now fail validation."
         )
+
+    if lua_doc_completeness["issue_count"] > 0:
+        _print_samples("Lua doc completeness sample", lua_doc_completeness["issue_sample"])
 
     print()
     print("PASS" if result["ok"] else "FAIL")

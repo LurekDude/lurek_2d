@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 #[derive(Debug, Clone)]
+/// Defines the public observer entry data type used by this module.
 pub struct ObserverEntry {
     /// Unique subscription id.
     pub id: u64,
@@ -89,7 +90,7 @@ impl Observer {
     pub fn clear_key(&mut self, key: &str) {
         self.subscriptions.remove(key);
     }
-    /// Remove all subscriptions.
+    /// Remove all subscriptions. This function is part of the public API.
     pub fn clear_all(&mut self) {
         self.subscriptions.clear();
     }

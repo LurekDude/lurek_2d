@@ -14,7 +14,7 @@ pub struct Mat3x3 {
 }
 /// Core rotation and projection operations for `Mat3x3`.
 impl Mat3x3 {
-    /// Return the identity matrix.
+    /// Return the identity matrix. This function is part of the public API.
     pub fn identity() -> Self {
         Self {
             cols: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],

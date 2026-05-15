@@ -28,7 +28,7 @@ impl StrategicGoal {
             priority: 1.0,
         }
     }
-    /// Add a required tag.
+    /// Add a required tag. This function is part of the public API.
     pub fn require_tag(&mut self, tag: &str) {
         self.precondition_tags.push(tag.to_string());
     }
@@ -76,7 +76,7 @@ impl StrategyAI {
     pub fn add_goal_named(&mut self, name: &str) {
         self.add_goal(StrategicGoal::new(name));
     }
-    /// Replace the active tag set.
+    /// Replace the active tag set. This function is part of the public API.
     pub fn set_tags(&mut self, tags: Vec<String>) {
         self.active_tags = tags;
     }
@@ -86,7 +86,7 @@ impl StrategyAI {
             self.active_tags.push(tag.to_string());
         }
     }
-    /// Remove a tag if it exists.
+    /// Remove a tag if it exists. This function is part of the public API.
     pub fn remove_tag(&mut self, tag: &str) {
         self.active_tags.retain(|t| t != tag);
     }
@@ -135,7 +135,7 @@ impl StrategyAI {
         self.active_goal = best_name;
         self.total_evaluations += 1;
     }
-    /// Return the number of goals.
+    /// Return the number of goals. This function is part of the public API.
     pub fn goal_count(&self) -> usize {
         self.goals.len()
     }

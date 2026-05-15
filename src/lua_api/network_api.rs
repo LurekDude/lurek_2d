@@ -168,7 +168,7 @@ impl LuaUserData for LuaNetworkHost {
             }
         });
         // -- connect --
-        /// Connects to a remote address.
+        /// Connects to a remote address. This method is available to Lua scripts.
         /// @param | addr_str | string | Remote socket address.
         /// @param | channels | integer | Optional channel count, defaulting to 1.
         /// @param | data | integer | Optional connection data, defaulting to 0.
@@ -186,7 +186,7 @@ impl LuaUserData for LuaNetworkHost {
             },
         );
         // -- send --
-        /// Sends bytes to a peer on a channel.
+        /// Sends bytes to a peer on a channel. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
         /// @param | channel_id | integer | Channel id.
         /// @param | data | string | Binary payload string.
@@ -235,7 +235,7 @@ impl LuaUserData for LuaNetworkHost {
             },
         );
         // -- disconnectNow --
-        /// Disconnects a peer immediately.
+        /// Disconnects a peer immediately. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
         /// @param | data | integer | Optional disconnect data.
         /// @return | nil | No value is returned.
@@ -263,7 +263,7 @@ impl LuaUserData for LuaNetworkHost {
             },
         );
         // -- resetPeer --
-        /// Resets a peer connection.
+        /// Resets a peer connection. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
         /// @return | nil | No value is returned.
         methods.add_method("resetPeer", |_, this, peer_id: usize| {
@@ -272,20 +272,20 @@ impl LuaUserData for LuaNetworkHost {
                 .reset_peer(PeerID(peer_id))
                 .map_err(LuaError::external)
         });
-            // -- ping --
-            /// Sends a ping to a peer.
-            /// @param | peer_id | integer | Peer id.
-            /// @return | nil | No value is returned.
+        // -- ping --
+        /// Sends a ping to a peer. This method is available to Lua scripts.
+        /// @param | peer_id | integer | Peer id.
+        /// @return | nil | No value is returned.
         methods.add_method("ping", |_, this, peer_id: usize| {
             this.inner
                 .borrow_mut()
                 .ping(PeerID(peer_id))
                 .map_err(LuaError::external)
         });
-            // -- getRoundTripTime --
-            /// Returns peer round trip time in milliseconds.
-            /// @param | peer_id | integer | Peer id.
-            /// @return | number | Round trip time in milliseconds.
+        // -- getRoundTripTime --
+        /// Returns peer round trip time in milliseconds.
+        /// @param | peer_id | integer | Peer id.
+        /// @return | number | Round trip time in milliseconds.
         methods.add_method("getRoundTripTime", |_, this, peer_id: usize| {
             let rtt = this
                 .inner
@@ -295,7 +295,7 @@ impl LuaUserData for LuaNetworkHost {
             Ok(rtt.as_millis() as f64)
         });
         // -- getPeerState --
-        /// Returns peer connection state.
+        /// Returns peer connection state. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
         /// @return | string | Peer state string.
         methods.add_method("getPeerState", |_, this, peer_id: usize| {
@@ -304,10 +304,10 @@ impl LuaUserData for LuaNetworkHost {
                 .peer_state(PeerID(peer_id))
                 .map_err(LuaError::external)
         });
-            // -- getPeerAddress --
-            /// Returns peer socket address when available.
-            /// @param | peer_id | integer | Peer id.
-            /// @return | string | Peer address, or nil when unavailable.
+        // -- getPeerAddress --
+        /// Returns peer socket address when available.
+        /// @param | peer_id | integer | Peer id.
+        /// @return | string | Peer address, or nil when unavailable.
         methods.add_method("getPeerAddress", |_, this, peer_id: usize| {
             let addr = this
                 .inner
@@ -323,7 +323,7 @@ impl LuaUserData for LuaNetworkHost {
             Ok(this.inner.borrow().local_address().to_string())
         });
         // -- getPeerLimit --
-        /// Returns configured peer limit.
+        /// Returns configured peer limit. This method is available to Lua scripts.
         /// @return | integer | Peer limit.
         methods.add_method("getPeerLimit", |_, this, ()| {
             this.inner.borrow().peer_limit().map_err(LuaError::external)
@@ -337,19 +337,19 @@ impl LuaUserData for LuaNetworkHost {
                 .channel_limit()
                 .map_err(LuaError::external)
         });
-            // -- setChannelLimit --
-            /// Sets channel limit.
-            /// @param | limit | integer | Channel limit.
-            /// @return | nil | No value is returned.
+        // -- setChannelLimit --
+        /// Sets channel limit. This method is available to Lua scripts.
+        /// @param | limit | integer | Channel limit.
+        /// @return | nil | No value is returned.
         methods.add_method("setChannelLimit", |_, this, limit: usize| {
             this.inner
                 .borrow_mut()
                 .set_channel_limit(limit)
                 .map_err(LuaError::external)
         });
-            // -- getBandwidthLimit --
-            /// Returns incoming and outgoing bandwidth limits.
-            /// @return | table | Table with `incoming` and `outgoing` fields.
+        // -- getBandwidthLimit --
+        /// Returns incoming and outgoing bandwidth limits.
+        /// @return | table | Table with `incoming` and `outgoing` fields.
         methods.add_method("getBandwidthLimit", |lua, this, ()| {
             let (inc, out) = this
                 .inner
@@ -376,7 +376,7 @@ impl LuaUserData for LuaNetworkHost {
             },
         );
         // -- getConnectedPeerCount --
-        /// Returns connected peer count.
+        /// Returns connected peer count. This method is available to Lua scripts.
         /// @return | integer | Connected peer count.
         methods.add_method("getConnectedPeerCount", |_, this, ()| {
             this.inner
@@ -384,9 +384,9 @@ impl LuaUserData for LuaNetworkHost {
                 .connected_peer_count()
                 .map_err(LuaError::external)
         });
-            // -- getConnectedPeerIds --
-            /// Returns ids for connected peers.
-            /// @return | table | Array table of peer ids.
+        // -- getConnectedPeerIds --
+        /// Returns ids for connected peers. This method is available to Lua scripts.
+        /// @return | table | Array table of peer ids.
         methods.add_method("getConnectedPeerIds", |_, this, ()| {
             let ids = this
                 .inner
@@ -397,7 +397,7 @@ impl LuaUserData for LuaNetworkHost {
             Ok(result)
         });
         // -- getPeerStats --
-        /// Returns statistics for a peer.
+        /// Returns statistics for a peer. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
         /// @return | table | Peer statistics table.
         methods.add_method("getPeerStats", |lua, this, peer_id: usize| {
@@ -409,7 +409,7 @@ impl LuaUserData for LuaNetworkHost {
             stats_to_table(lua, stats)
         });
         // -- destroy --
-        /// Destroys the network host.
+        /// Destroys the network host. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method("destroy", |_, this, ()| {
             this.inner.borrow_mut().destroy();
@@ -422,7 +422,7 @@ impl LuaUserData for LuaNetworkHost {
             Ok(this.inner.borrow().is_destroyed())
         });
         // -- getRole --
-        /// Returns host role string.
+        /// Returns host role string. This method is available to Lua scripts.
         /// @return | string | Role string.
         methods.add_method("getRole", |_, this, ()| {
             Ok(role_to_string(this.inner.borrow().role()))
@@ -493,7 +493,7 @@ impl LuaUserData for LuaNetworkRuntime {
             Ok(id)
         });
         // -- httpGet --
-        /// Starts an HTTP GET request.
+        /// Starts an HTTP GET request. This method is available to Lua scripts.
         /// @param | url | string | Request URL.
         /// @param | headers | table | Optional headers table.
         /// @return | integer | Request id.
@@ -514,7 +514,7 @@ impl LuaUserData for LuaNetworkRuntime {
             },
         );
         // -- httpPost --
-        /// Starts an HTTP POST request.
+        /// Starts an HTTP POST request. This method is available to Lua scripts.
         /// @param | url | string | Request URL.
         /// @param | body | string | Request body.
         /// @param | headers | table | Optional headers table.
@@ -536,7 +536,7 @@ impl LuaUserData for LuaNetworkRuntime {
             },
         );
         // -- tcpConnect --
-        /// Opens a TCP connection.
+        /// Opens a TCP connection. This method is available to Lua scripts.
         /// @param | addr | string | Remote address.
         /// @return | integer | Connection id.
         methods.add_method("tcpConnect", |_, this, addr: String| {
@@ -548,7 +548,7 @@ impl LuaUserData for LuaNetworkRuntime {
             Ok(id)
         });
         // -- tcpSend --
-        /// Sends bytes over a TCP connection.
+        /// Sends bytes over a TCP connection. This method is available to Lua scripts.
         /// @param | id | integer | Connection id.
         /// @param | data | string | Binary payload string.
         /// @return | nil | No value is returned.
@@ -558,20 +558,20 @@ impl LuaUserData for LuaNetworkRuntime {
                 .tcp_send(id, data.as_bytes())
                 .map_err(LuaError::external)
         });
-            // -- tcpClose --
-            /// Closes a TCP connection.
-            /// @param | id | integer | Connection id.
-            /// @return | nil | No value is returned.
+        // -- tcpClose --
+        /// Closes a TCP connection. This method is available to Lua scripts.
+        /// @param | id | integer | Connection id.
+        /// @return | nil | No value is returned.
         methods.add_method("tcpClose", |_, this, id: u64| {
             this.inner
                 .borrow_mut()
                 .tcp_close(id)
                 .map_err(LuaError::external)
         });
-            // -- wsConnect --
-            /// Opens a WebSocket connection.
-            /// @param | url | string | WebSocket URL.
-            /// @return | integer | Connection id.
+        // -- wsConnect --
+        /// Opens a WebSocket connection. This method is available to Lua scripts.
+        /// @param | url | string | WebSocket URL.
+        /// @return | integer | Connection id.
         methods.add_method("wsConnect", |_, this, url: String| {
             let id = this
                 .inner
@@ -591,19 +591,19 @@ impl LuaUserData for LuaNetworkRuntime {
                 .ws_send(id, &data)
                 .map_err(LuaError::external)
         });
-            // -- wsClose --
-            /// Closes a WebSocket connection.
-            /// @param | id | integer | Connection id.
-            /// @return | nil | No value is returned.
+        // -- wsClose --
+        /// Closes a WebSocket connection. This method is available to Lua scripts.
+        /// @param | id | integer | Connection id.
+        /// @return | nil | No value is returned.
         methods.add_method("wsClose", |_, this, id: u64| {
             this.inner
                 .borrow_mut()
                 .ws_close(id)
                 .map_err(LuaError::external)
         });
-            // -- poll --
-            /// Polls runtime responses for HTTP, TCP, and WebSocket operations.
-            /// @return | table | Array table of response/event tables.
+        // -- poll --
+        /// Polls runtime responses for HTTP, TCP, and WebSocket operations.
+        /// @return | table | Array table of response/event tables.
         methods.add_method("poll", |lua, this, ()| {
             let responses = this.inner.borrow_mut().poll();
             let results = lua.create_table()?;
@@ -687,7 +687,7 @@ impl LuaUserData for LuaNetworkRuntime {
             Ok(results)
         });
         // -- shutdown --
-        /// Shuts down the network runtime.
+        /// Shuts down the network runtime. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method("shutdown", |_, this, ()| {
             this.inner.borrow_mut().shutdown();
@@ -811,7 +811,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- unpack --
     /// Unpacks a binary network message string into Lua values.
     /// @param | data | string | Binary packed message.
-    /// @return | any | Unpacked Lua value.
+    /// @return | LuaValue | Unpacked Lua value.
     tbl.set(
         "unpack",
         lua.create_function(|lua, data: LuaString| {
@@ -848,7 +848,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     // -- discoverLobbies --
-    /// Discovers broadcast lobbies.
+    /// Discovers broadcast lobbies. This function is exposed to Lua scripts.
     /// @param | timeout_ms | integer | Optional timeout in milliseconds, defaulting to 500.
     /// @return | table | Array table of lobby info tables.
     tbl.set(
@@ -869,7 +869,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- createRoom --
-    /// Creates a local room record.
+    /// Creates a local room record. This function is exposed to Lua scripts.
     /// @param | name | string | Room name.
     /// @param | host | string | Host string.
     /// @param | max_players | integer | Optional maximum players, defaulting to 8.
@@ -885,7 +885,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     // -- listRooms --
-    /// Lists known local room records.
+    /// Lists known local room records. This function is exposed to Lua scripts.
     /// @return | table | Array table of room info tables.
     tbl.set(
         "listRooms",
@@ -899,7 +899,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- joinRoom --
-    /// Joins a room by id when available.
+    /// Joins a room by id when available. This function is exposed to Lua scripts.
     /// @param | id | string | Room id.
     /// @return | table | Room info table, or nil when missing.
     tbl.set(
@@ -912,7 +912,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     // -- leaveRoom --
-    /// Leaves a room by id when available.
+    /// Leaves a room by id when available. This function is exposed to Lua scripts.
     /// @param | id | string | Room id.
     /// @return | table | Room info table, or nil when missing.
     tbl.set(
@@ -969,7 +969,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     // -- newRelayTicket --
-    /// Creates an encoded relay ticket.
+    /// Creates an encoded relay ticket. This function is exposed to Lua scripts.
     /// @param | room_id | string | Room id.
     /// @param | peer_id | string | Peer id.
     /// @return | string | Encoded relay ticket.
@@ -981,7 +981,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- parseRelayTicket --
-    /// Parses an encoded relay ticket.
+    /// Parses an encoded relay ticket. This function is exposed to Lua scripts.
     /// @param | token | string | Encoded relay ticket.
     /// @return | table | Ticket table, or nil when invalid.
     tbl.set(

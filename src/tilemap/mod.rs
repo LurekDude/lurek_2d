@@ -28,7 +28,7 @@ pub mod tilemap;
 pub mod tileset;
 /// Tile-space walker/iterator over connected cells.
 pub mod tile_walker;
-/// Tiled TMX XML format import.
+/// Tiled TMX XML format import. This module is publicly re-exported.
 pub mod tmx;
 
 /// Re-export autotile layout and sheet types for callers.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- docs/validation: added `tools/validate/validate_rust_source_docs.py`, strengthened Lua API source and generated-stub validators to enforce summary/param/return/class completeness, wired a new docs gate into `.vscode/tasks.json`, updated `tools/validate/README.md`, and remediated `src/**/*.rs` plus `src/lua_api/*_api.rs` so the phase-1 source-doc validators pass.
+
+- docs/lua_api: audited all `src/lua_api/*_api.rs` bindings, filled missing Rust docstrings and `@return` markers, normalized misplaced doc comment indentation, and regenerated the Lua API stubs for docs and the VS Code extension.
+
 - docs/simulation: added Lurek2D-oriented rewrites of the block simulator idea documents under `ideas/simulation/out`, then consolidated the root architecture notes into a production `blocksim` design covering `src/blocksim`, `src/lua_api/blocksim_api.rs`, `library/blocksim`, TOML/Lua authoring split, monitor/anomaly rules, roadmap gates, and VS Code extension needs.
 
 - docs/cag: updated `workflow-audit-rust-src-docs.prompt.md` to require a strict read -> correct -> save -> next-file loop and to forbid subagents, cargo commands, and external validation tooling during the pass.

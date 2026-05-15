@@ -1,3 +1,5 @@
+//! Public types and helpers for the engine module.
+
 use crate::tween::handle::{LuaTween, LuaTweenParallel, LuaTweenSequence};
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -30,7 +32,7 @@ impl TweenEngine {
         }
     }
 
-    /// Advance all active tweens, sequences, and parallels by `dt` seconds;
+    /// Advance all active tweens, sequences, and parallels by `dt` seconds;.
     /// remove completed entries from the registry; return error on Lua fault.
     pub fn update(this_rc: &Rc<RefCell<Self>>, lua: &Lua, dt: f64) -> LuaResult<()> {
         let tween_keys = std::mem::take(&mut this_rc.borrow_mut().active_tweens);

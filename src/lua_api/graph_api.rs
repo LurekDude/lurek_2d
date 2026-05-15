@@ -383,7 +383,7 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.speed_modifier))
         });
         // -- setSpeedModifier --
-        /// Sets this edge's speed modifier.
+        /// Sets this edge's speed modifier. This method is available to Lua scripts.
         /// @param | m | number | Speed modifier.
         /// @return | nil | No value is returned.
         methods.add_method("setSpeedModifier", |_, this, m: f64| {
@@ -520,13 +520,13 @@ impl LuaUserData for LuaNode {
             Ok(format!("GraphNode({})", this.id))
         });
         // -- getType --
-        /// Returns this node's type string.
+        /// Returns this node's type string. This method is available to Lua scripts.
         /// @return | string | Current node type.
         methods.add_method("getType", |_, this, ()| {
             with_node!(this, g, node, Ok(node.get_type().to_string()))
         });
         // -- setType --
-        /// Sets this node's type string.
+        /// Sets this node's type string. This method is available to Lua scripts.
         /// @param | t | string | New node type.
         /// @return | nil | No value is returned.
         methods.add_method("setType", |_, this, t: String| {
@@ -542,7 +542,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.get_capacity()))
         });
         // -- setCapacity --
-        /// Sets this node's item capacity.
+        /// Sets this node's item capacity. This method is available to Lua scripts.
         /// @param | c | integer | New node capacity.
         /// @return | nil | No value is returned.
         methods.add_method("setCapacity", |_, this, c: i32| {
@@ -614,13 +614,13 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- getPushRate --
-        /// Returns this node's push rate.
+        /// Returns this node's push rate. This method is available to Lua scripts.
         /// @return | number | Push rate.
         methods.add_method("getPushRate", |_, this, ()| {
             with_node!(this, g, node, Ok(node.push_rate))
         });
         // -- setPushRate --
-        /// Sets this node's push rate.
+        /// Sets this node's push rate. This method is available to Lua scripts.
         /// @param | r | number | New push rate.
         /// @return | nil | No value is returned.
         methods.add_method("setPushRate", |_, this, r: f64| {
@@ -630,13 +630,13 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- getPullRate --
-        /// Returns this node's pull rate.
+        /// Returns this node's pull rate. This method is available to Lua scripts.
         /// @return | number | Pull rate.
         methods.add_method("getPullRate", |_, this, ()| {
             with_node!(this, g, node, Ok(node.pull_rate))
         });
         // -- setPullRate --
-        /// Sets this node's pull rate.
+        /// Sets this node's pull rate. This method is available to Lua scripts.
         /// @param | r | number | New pull rate.
         /// @return | nil | No value is returned.
         methods.add_method("setPullRate", |_, this, r: f64| {
@@ -716,7 +716,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.queue_capacity))
         });
         // -- setQueueCapacity --
-        /// Sets this node's queue capacity.
+        /// Sets this node's queue capacity. This method is available to Lua scripts.
         /// @param | c | integer | Queue capacity.
         /// @return | nil | No value is returned.
         methods.add_method("setQueueCapacity", |_, this, c: i32| {
@@ -821,7 +821,7 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- addTag --
-        /// Adds a tag to this node.
+        /// Adds a tag to this node. This method is available to Lua scripts.
         /// @param | tag | string | Tag to add.
         /// @return | nil | No value is returned.
         methods.add_method("addTag", |_, this, tag: String| {
@@ -831,7 +831,7 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- removeTag --
-        /// Removes a tag from this node.
+        /// Removes a tag from this node. This method is available to Lua scripts.
         /// @param | tag | string | Tag to remove.
         /// @return | boolean | True when the tag was present.
         methods.add_method("removeTag", |_, this, tag: String| {
@@ -845,7 +845,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.has_tag(&tag)))
         });
         // -- clearTags --
-        /// Removes every tag from this node.
+        /// Removes every tag from this node. This method is available to Lua scripts.
         /// @return | nil | No value is returned.
         methods.add_method("clearTags", |_, this, ()| {
             with_node_mut!(this, g, node, {
@@ -1021,7 +1021,7 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_node(node.id))
         });
         // -- getNodes --
-        /// Returns all nodes in this graph.
+        /// Returns all nodes in this graph. This method is available to Lua scripts.
         /// @return | table | Array table of `LGraphNode` handles.
         methods.add_method("getNodes", |lua, this, ()| {
             let graph = this.inner.borrow();
@@ -1065,7 +1065,7 @@ impl LuaUserData for LuaGraph {
             },
         );
         // -- removeEdge --
-        /// Removes an edge by handle.
+        /// Removes an edge by handle. This method is available to Lua scripts.
         /// @param | edge_ud | LGraphEdge | Edge handle to remove.
         /// @return | boolean | True when the edge was removed.
         methods.add_method("removeEdge", |_, this, edge_ud: LuaAnyUserData| {
@@ -1081,7 +1081,7 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_edge(edge.id))
         });
         // -- getEdges --
-        /// Returns all edges in this graph.
+        /// Returns all edges in this graph. This method is available to Lua scripts.
         /// @return | table | Array table of `LGraphEdge` handles.
         methods.add_method("getEdges", |lua, this, ()| {
             let graph = this.inner.borrow();
@@ -1142,7 +1142,7 @@ impl LuaUserData for LuaGraph {
             },
         );
         // -- addItem --
-        /// Places an item onto a node.
+        /// Places an item onto a node. This method is available to Lua scripts.
         /// @param | item_ud | LGraphItem | Item handle to place.
         /// @param | node_ud | LGraphNode | Destination node handle.
         /// @return | nil | No value is returned.
@@ -1158,7 +1158,7 @@ impl LuaUserData for LuaGraph {
             },
         );
         // -- removeItem --
-        /// Removes an item from this graph.
+        /// Removes an item from this graph. This method is available to Lua scripts.
         /// @param | item_ud | LGraphItem | Item handle to remove.
         /// @return | boolean | True when the item was removed.
         methods.add_method("removeItem", |_, this, item_ud: LuaAnyUserData| {
@@ -1174,7 +1174,7 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_item(item.id))
         });
         // -- getItems --
-        /// Returns all items in this graph.
+        /// Returns all items in this graph. This method is available to Lua scripts.
         /// @return | table | Array table of `LGraphItem` handles.
         methods.add_method("getItems", |lua, this, ()| {
             let graph = this.inner.borrow();
@@ -1240,7 +1240,7 @@ impl LuaUserData for LuaGraph {
             dispatch_events(lua, &this.inner, &cbs, events)
         });
         // -- findPath --
-        /// Finds a path between two nodes.
+        /// Finds a path between two nodes. This method is available to Lua scripts.
         /// @param | from_ud | LGraphNode | Start node handle.
         /// @param | to_ud | LGraphNode | Target node handle.
         /// @return | LuaValue | Path result table with nodes, edges, and cost, or nil when no path exists.

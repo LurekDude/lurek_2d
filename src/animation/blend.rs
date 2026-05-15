@@ -56,11 +56,11 @@ pub struct BlendLayerSet {
     layers: Vec<BlendLayer>,
 }
 impl BlendLayerSet {
-    /// Create an empty layer set.
+    /// Create an empty layer set. This function is part of the public API.
     pub fn new() -> Self {
         Self { layers: Vec::new() }
     }
-    /// Return the number of layers.
+    /// Return the number of layers. This function is part of the public API.
     pub fn len(&self) -> usize {
         self.layers.len()
     }
@@ -80,7 +80,7 @@ impl BlendLayerSet {
         );
         Ok(())
     }
-    /// Remove a layer by name.
+    /// Remove a layer by name. This function is part of the public API.
     pub fn remove_layer(&mut self, name: &str) -> Result<(), String> {
         let pos = self
             .layers
@@ -108,7 +108,7 @@ impl BlendLayerSet {
             .find(|l| l.name == name)
             .map(|l| l.weight)
     }
-    /// Replace a layer's mask.
+    /// Replace a layer's mask. This function is part of the public API.
     pub fn set_mask(&mut self, name: &str, mask: BlendMask) -> Result<(), String> {
         let layer = self
             .layers
@@ -118,11 +118,11 @@ impl BlendLayerSet {
         layer.mask = mask;
         Ok(())
     }
-    /// Return the stored layers.
+    /// Return the stored layers. This function is part of the public API.
     pub fn layers(&self) -> &[BlendLayer] {
         &self.layers
     }
-    /// Return a layer by name.
+    /// Return a layer by name. This function is part of the public API.
     pub fn get_layer(&self, name: &str) -> Option<&BlendLayer> {
         self.layers.iter().find(|l| l.name == name)
     }

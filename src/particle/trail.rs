@@ -84,7 +84,7 @@ impl Trail {
     pub fn set_min_distance(&mut self, distance: f32) {
         self.min_distance = distance;
     }
-    /// Remove all points.
+    /// Remove all points. This function is part of the public API.
     pub fn clear(&mut self) {
         self.points.clear();
     }

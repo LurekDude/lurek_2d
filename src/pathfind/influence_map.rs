@@ -151,7 +151,7 @@ impl InfluenceMap {
             }
         }
     }
-    /// Zero all cells in `layer`.
+    /// Zero all cells in `layer`. This function is part of the public API.
     pub fn clear_layer(&mut self, layer: &str) {
         if let Some(data) = self.layers.get_mut(layer) {
             log_msg!(debug, IF03, "{}", layer);

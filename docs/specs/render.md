@@ -84,84 +84,84 @@ This module primarily collaborates with `image`, `light`, `math`, `runtime`, `sp
 
 ## Functions
 
-- `Canvas::new` (`canvas.rs`): Creates a new `Canvas` descriptor with the given dimensions.
-- `DecalSurface::new` (`decal_surface.rs`): Creates a new decal surface with the given pixel dimensions.
-- `DecalSurface::get_dimensions` (`decal_surface.rs`): Returns the surface dimensions as `(width, height)`.
-- `DecalSurface::get_width` (`decal_surface.rs`): Returns the surface width in pixels.
-- `DecalSurface::get_height` (`decal_surface.rs`): Returns the surface height in pixels.
-- `DrawLayer::new` (`draw_layer.rs`): Creates an empty draw layer.
-- `DrawLayer::queue` (`draw_layer.rs`): Queues an entry with the given z-order.
-- `DrawLayer::flush` (`draw_layer.rs`): Sorts entries by z-order ascending and drains the queue.
-- `DrawLayer::clear` (`draw_layer.rs`): Discards all queued entries.
-- `DrawLayer::get_count` (`draw_layer.rs`): Returns the number of queued entries.
-- `Font::from_png_bytes` (`font.rs`): Creates a bitmap font from raw PNG bytes.
-- `Font::load_all_sizes` (`font.rs`): Loads all 6 built-in bitmap font sizes from embedded PNGs.
-- `Font::nearest_size` (`font.rs`): Returns the index into `AVAILABLE_HEIGHTS` for the nearest matching font size.
-- `Font::glyph` (`font.rs`): Returns glyph information for a character by computing its UV from the grid position.
-- `Font::text_width` (`font.rs`): Returns the total advance width of the given text string in pixels.
-- `Font::line_height` (`font.rs`): Returns the vertical line height in pixels (cell_height x line_height_mul).
-- `Font::set_line_height` (`font.rs`): Sets the line height multiplier.
-- `Font::ascent` (`font.rs`): Returns the font's ascent (cell_height as f32, for backwards compatibility).
-- `Font::descent` (`font.rs`): Returns the font's descent (0.0 for bitmap fonts, for backwards compatibility).
-- `Font::atlas_data` (`font.rs`): Returns the atlas RGBA pixel data and its dimensions.
-- `Font::is_dirty` (`font.rs`): Returns `true` if the atlas has been modified since the last `mark_clean()` call.
-- `Font::mark_clean` (`font.rs`): Marks the atlas as clean (no pending changes to upload).
-- `Font::size` (`font.rs`): Returns the font cell height as f32 (the effective "size" of this bitmap font).
-- `Font::cell_width` (`font.rs`): Returns the glyph cell width in pixels.
-- `Font::has_box_drawing` (`font.rs`): Returns whether this font includes box-drawing characters.
-- `Font::wrap_text` (`font.rs`): Breaks text into lines that fit within `limit` pixel width.
-- `GpuRenderer::new` (`gpu_renderer.rs`): Creates a new `GpuRenderer` from an already-created wgpu device and queue.
-- `GpuRenderer::resize` (`gpu_renderer.rs`): Updates the viewport uniform after a window resize.
-- `GpuRenderer::upload_texture` (`gpu_renderer.rs`): Uploads raw RGBA8 pixel data as a new GPU texture stored under the given key.
-- `GpuRenderer::create_canvas` (`gpu_renderer.rs`): Creates an off-screen GPU canvas texture stored under the given key.
-- `GpuRenderer::render_frame` (`gpu_renderer.rs`): Executes one complete GPU render pass, processing the full `RenderCommand` queue into the wgpu surface.
-- `ShaderPassDescriptor::new` (`image_effect.rs`): Creates a new enabled pass with the given effect name and an empty parameter map.
-- `Mesh::new` (`mesh.rs`): Creates a new empty mesh with the specified vertex count and draw mode.
-- `Mesh::from_vertices` (`mesh.rs`): Creates a mesh from a vector of vertices.
-- `Mesh::from_vertex_rows` (`mesh.rs`): Creates a mesh from raw per-vertex float rows (x, y, u, v, r, g, b, a).
-- `Mesh::set_vertex` (`mesh.rs`): Sets a single vertex at the given index.
-- `Mesh::get_vertex` (`mesh.rs`): Gets a vertex at the given index.
-- `Mesh::set_vertex_map` (`mesh.rs`): Sets the index buffer for indexed drawing.
-- `Mesh::vertex_count` (`mesh.rs`): Returns the number of vertices.
-- `Mesh::set_texture` (`mesh.rs`): Sets the texture for this mesh.
-- `Mesh::set_draw_mode` (`mesh.rs`): Sets the draw mode.
-- `Mesh::triangulate` (`mesh.rs`): Expands vertices into a list of triangle indices based on the draw mode.
-- `Vec3::new` (`obj_loader.rs`): Auto-doc: public item.
-- `Vec3::dot` (`obj_loader.rs`): Dot product.
-- `Vec3::len` (`obj_loader.rs`): Length.
-- `Vec3::normalise` (`obj_loader.rs`): Normalise (returns zero vector on zero length).
-- `Vec3::sub` (`obj_loader.rs`): Auto-doc: public item.
-- `Vec3::cross` (`obj_loader.rs`): Auto-doc: public item.
-- `Vec3::add` (`obj_loader.rs`): Auto-doc: public item.
-- `Vec3::mul` (`obj_loader.rs`): Auto-doc: public item.
-- `ObjModel::face_count` (`obj_loader.rs`): Number of triangles.
-- `ObjModel::vertex_count` (`obj_loader.rs`): Number of position vertices.
-- `ObjModel::uv_count` (`obj_loader.rs`): Number of UV coordinates.
-- `ObjModel::normal_count` (`obj_loader.rs`): Number of normal vectors.
-- `ObjModel::render_to_image` (`obj_loader.rs`): Software-renders the model into an RGBA image with a CPU z-buffer.
-- `ObjModel::project_to_mesh` (`obj_loader.rs`): Software-project the model to a flat 2-D [`Mesh`] for GPU rendering.
-- `ObjModel::project_instance_to_mesh` (`obj_loader.rs`): Project a model instance placed on world tile coordinates.
-- `ObjLoader::load_file` (`obj_loader.rs`): Parse an OBJ file (and its `.mtl` sidecars) from the filesystem.
-- `ObjLoader::parse_obj` (`obj_loader.rs`): Parse OBJ source given as a string (e.g.
-- `ObjCamera::new` (`obj_loader.rs`): Auto-doc: public item.
-- `ObjCamera::to_vecs` (`obj_loader.rs`): Auto-doc: public item.
+- `Canvas::new` (`canvas.rs`): Create a canvas of `width` × `height` pixels and log its dimensions at debug level.
+- `DecalSurface::new` (`decal_surface.rs`): Create a `DecalSurface` sized `width` × `height` pixels.
+- `DecalSurface::get_dimensions` (`decal_surface.rs`): Return `(width, height)` as a tuple.
+- `DecalSurface::get_width` (`decal_surface.rs`): Return the pixel width.
+- `DecalSurface::get_height` (`decal_surface.rs`): Return the pixel height.
+- `DrawLayer::new` (`draw_layer.rs`): Create an empty `DrawLayer` with ID counter starting at 0.
+- `DrawLayer::queue` (`draw_layer.rs`): Enqueue a callback at `z_order` depth and return its unique callback ID.
+- `DrawLayer::flush` (`draw_layer.rs`): Sort entries by `z_order`, drain, and return them; leaves the layer empty.
+- `DrawLayer::clear` (`draw_layer.rs`): Discard all pending entries without firing callbacks.
+- `DrawLayer::get_count` (`draw_layer.rs`): Return the number of pending entries.
+- `Font::from_png_bytes` (`font.rs`): Load and decode `data` as a PNG bitmap font atlas with `cell_w`×`cell_h` cells; return error on decode failure.
+- `Font::load_all_sizes` (`font.rs`): Load all six bundled bitmap font sizes; silently skip any that fail to decode.
+- `Font::nearest_size` (`font.rs`): Return the index into `AVAILABLE_HEIGHTS` whose cell height is closest to `pixel_height`.
+- `Font::glyph` (`font.rs`): Return `GlyphInfo` for `ch`, or `None` if the character is not in the atlas.
+- `Font::text_width` (`font.rs`): Return the pixel advance-width sum for all glyphs in `text`.
+- `Font::line_height` (`font.rs`): Return `cell_height * line_height_mul` as the vertical line spacing in pixels.
+- `Font::set_line_height` (`font.rs`): Set the line-height multiplier applied over `cell_height`.
+- `Font::ascent` (`font.rs`): Return `cell_height` as the ascent value in pixels.
+- `Font::descent` (`font.rs`): Return 0.0; bitmap fonts have no descender in this implementation.
+- `Font::atlas_data` (`font.rs`): Return `(pixel_data, width, height)` for the atlas texture upload.
+- `Font::is_dirty` (`font.rs`): Return true when the atlas pixel data has not yet been uploaded to the GPU.
+- `Font::mark_clean` (`font.rs`): Clear the dirty flag after a successful GPU texture upload.
+- `Font::size` (`font.rs`): Return the pixel height of one character cell.
+- `Font::cell_width` (`font.rs`): Return the pixel width of one character cell.
+- `Font::has_box_drawing` (`font.rs`): Return true when this font atlas contains Unicode box-drawing glyphs.
+- `Font::wrap_text` (`font.rs`): Break `text` into lines that each fit within `limit` pixels, honouring existing newlines.
+- `GpuRenderer::new` (`gpu_renderer.rs`): Create a `GpuRenderer` from an already-acquired wgpu device/queue pair and surface format.
+- `GpuRenderer::resize` (`gpu_renderer.rs`): Update viewport dimensions after a window resize; recreates stencil targets and clears light GPU state.
+- `GpuRenderer::upload_texture` (`gpu_renderer.rs`): Upload RGBA pixel data for `key` to the GPU, replacing any previously uploaded texture.
+- `GpuRenderer::create_canvas` (`gpu_renderer.rs`): Create an off-screen render-target canvas texture for `key` at `width`×`height`.
+- `GpuRenderer::render_frame` (`gpu_renderer.rs`): Execute all queued `RenderCommand`s for one frame and present the frame.
+- `ShaderPassDescriptor::new` (`image_effect.rs`): Create an enabled pass for `effect_name` with an empty parameter map.
+- `Mesh::new` (`mesh.rs`): Allocate a mesh of `vertex_count` default-white vertices in the given draw mode.
+- `Mesh::from_vertices` (`mesh.rs`): Create a mesh directly from an existing `Vec<MeshVertex>` without index reuse.
+- `Mesh::from_vertex_rows` (`mesh.rs`): Build a mesh from a slice of `[x, y, u, v, r, g, b, a]` row arrays.
+- `Mesh::set_vertex` (`mesh.rs`): Set the vertex at `index`; silently ignored when `index` is out of bounds.
+- `Mesh::get_vertex` (`mesh.rs`): Return a reference to the vertex at `index`, or `None` when out of bounds.
+- `Mesh::set_vertex_map` (`mesh.rs`): Replace the index buffer with `indices`.
+- `Mesh::vertex_count` (`mesh.rs`): Return the number of vertices in this mesh.
+- `Mesh::set_texture` (`mesh.rs`): Bind or unbind a texture for subsequent draw calls on this mesh.
+- `Mesh::set_draw_mode` (`mesh.rs`): Change the triangle topology for this mesh.
+- `Mesh::triangulate` (`mesh.rs`): Return a flat list of vertex indices expanding Fan/Strip and indexed modes into independent triangles.
+- `Vec3::new` (`obj_loader.rs`): Construct from components.
+- `Vec3::dot` (`obj_loader.rs`): Return the scalar dot product of `self` and `other`.
+- `Vec3::len` (`obj_loader.rs`): Return the Euclidean length of this vector.
+- `Vec3::normalise` (`obj_loader.rs`): Return a unit vector; returns zero vector when length < 1e-9.
+- `Vec3::sub` (`obj_loader.rs`): Return `self - o`.
+- `Vec3::cross` (`obj_loader.rs`): Return the cross product `self × o`.
+- `Vec3::add` (`obj_loader.rs`): Return `self + o`.
+- `Vec3::mul` (`obj_loader.rs`): Return `self * s` (scalar multiply).
+- `ObjModel::face_count` (`obj_loader.rs`): Return the number of triangles in this model.
+- `ObjModel::vertex_count` (`obj_loader.rs`): Return the number of vertex positions in this model.
+- `ObjModel::uv_count` (`obj_loader.rs`): Return the number of UV entries in this model.
+- `ObjModel::normal_count` (`obj_loader.rs`): Return the number of normal entries in this model.
+- `ObjModel::render_to_image` (`obj_loader.rs`): CPU-rasterize the model into an `ImageData` with a virtual camera, Y-rotation, and a key light.
+- `ObjModel::project_to_mesh` (`obj_loader.rs`): Project the model from `cam_pos`/`cam_target` into a `Mesh` sorted back-to-front.
+- `ObjModel::project_instance_to_mesh` (`obj_loader.rs`): Project a single world-space instance with Y-rotation and uniform scale; return `(Mesh, depth)`.
+- `ObjLoader::load_file` (`obj_loader.rs`): Load and triangulate an OBJ file from `path`, using `tobj`; return error on I/O or parse failure.
+- `ObjLoader::parse_obj` (`obj_loader.rs`): Parse OBJ + MTL text in memory, resolving `mtllib` paths relative to `base_dir`.
+- `ObjCamera::new` (`obj_loader.rs`): Construct a camera from position, target, and FOV.
+- `ObjCamera::to_vecs` (`obj_loader.rs`): Return `(cam_pos, cam_target, fov_y_rad)` unpacked as `Vec3` values.
 - `params_to_uniform` (`postfx_pipeline.rs`): Maps a `PostFxEffect` parameter dictionary to the 16-float packed buffer consumed by every WGSL shader's `PostFxParams` uniform.
-- `PostFxTexture::new` (`postfx_pipeline.rs`): Create a new `Rgba8UnormSrgb` render-target texture of the requested size.
-- `PostFxPipeline::new` (`postfx_pipeline.rs`): Instantiate the post-FX pipeline for `surface_format`.
-- `PostFxPipeline::register_custom` (`postfx_pipeline.rs`): Register a custom WGSL fragment shader under `name`.
-- `PostFxPipeline::apply` (`postfx_pipeline.rs`): Execute a sequence of post-FX passes then composite the result onto `target_view`.
-- `TextSpan::new` (`renderer.rs`): Creates a new span with the given text, RGBA colour, and scale.
-- `Shader::new` (`shader.rs`): Creates a new shader from WGSL source code.
-- `Shader::send` (`shader.rs`): Sets a uniform value by name.
-- `Shader::has_uniform` (`shader.rs`): Returns whether a uniform with the given name has been set.
-- `Shader::ordered_uniforms` (`shader.rs`): Returns the current uniforms sorted by name for stable GPU binding order.
-- `Shader::wrapper_source` (`shader.rs`): Returns the wrapper WGSL source that calls the user's fragment entry.
-- `Shader::fragment_entry_name` (`shader.rs`): Returns the name of the user's fragment entry point.
-- `Shader::fragment_inputs` (`shader.rs`): Returns the ordered list of inputs the fragment entry expects.
-- `CompoundShape::new` (`shape.rs`): Creates a new empty compound shape with default color (white) and line width (1.0).
-- `CompoundShape::push_command` (`shape.rs`): Appends a drawing command to the shape's command queue.
-- `CompoundShape::clear` (`shape.rs`): Empties the command queue and resets color and line-width state to defaults.
-- `CompoundShape::command_count` (`shape.rs`): Returns the number of commands currently in the queue.
+- `PostFxTexture::new` (`postfx_pipeline.rs`): Allocate a new `PostFxTexture` of `width`x`height` in `format` on `device`.
+- `PostFxPipeline::new` (`postfx_pipeline.rs`): Build all built-in effect pipelines and shared GPU resources for `surface_format`.
+- `PostFxPipeline::register_custom` (`postfx_pipeline.rs`): Compile and register a custom WGSL fragment shader under `name` for use in `PostFxPass`.
+- `PostFxPipeline::apply` (`postfx_pipeline.rs`): Execute all enabled `passes` in sequence using ping-pong textures; write final result to `target_view`.
+- `TextSpan::new` (`renderer.rs`): Construct a `TextSpan` from a string-like value and explicit RGBA and scale.
+- `Shader::new` (`shader.rs`): Parse, validate, and prepare `source`; return error string on WGSL validation failure.
+- `Shader::send` (`shader.rs`): Set or replace the named uniform value used on subsequent frames.
+- `Shader::has_uniform` (`shader.rs`): Return `true` when a uniform with `name` has been set.
+- `Shader::ordered_uniforms` (`shader.rs`): Return all set uniforms sorted alphabetically by name for deterministic GPU upload order.
+- `Shader::wrapper_source` (`shader.rs`): Return the rewritten wrapper source for injection into the GPU pipeline.
+- `Shader::fragment_entry_name` (`shader.rs`): Return the fragment helper function name within `wrapper_source`.
+- `Shader::fragment_inputs` (`shader.rs`): Return the ordered input slots accepted by the fragment entry.
+- `CompoundShape::new` (`shape.rs`): Create an empty shape with white color and 1 px line width.
+- `CompoundShape::push_command` (`shape.rs`): Append a drawing command to this shape.
+- `CompoundShape::clear` (`shape.rs`): Remove all commands and reset color and line-width to defaults.
+- `CompoundShape::command_count` (`shape.rs`): Return the number of commands in this shape.
 
 ## Lua API Reference
 
@@ -169,237 +169,237 @@ This module primarily collaborates with `image`, `light`, `math`, `runtime`, `sp
 - Namespace: `lurek.render`
 
 ### Module Functions
-- `lurek.render.setColor`: Sets the current drawing color.
+- `lurek.render.setColor`: Sets the active drawing color for all subsequent draw operations.
 - `lurek.render.getColor`: Returns the current drawing color.
-- `lurek.render.setBackgroundColor`: Sets the background clear color.
-- `lurek.render.getBackgroundColor`: Returns the current background color.
-- `lurek.render.rectangle`: Draws a filled or outlined axis-aligned rectangle at the given position.
-- `lurek.render.circle`: Draws a filled or outlined circle at the given world-space position.
-- `lurek.render.ellipse`: Draws a filled or outlined ellipse with independent x/y radii.
-- `lurek.render.triangle`: Draws a filled or outlined triangle connecting three world-space vertices.
-- `lurek.render.line`: Draws a line between two points.
-- `lurek.render.polygon`: Draws a polygon from a list of vertices.
-- `lurek.render.arc`: Draws a partial circle arc at the given position with specified radius and angle range.
-- `lurek.render.points`: Draws a batch of individual points at the specified world-space coordinates.
-- `lurek.render.draw`: Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
-- `lurek.render.drawq`: Draws a portion of an image defined by a Quad.
-- `lurek.render.drawMany`: Draws a list of images in a single call. Each entry is a table: {image, x, y} or
-- `lurek.render.printRotated`: Draws text at the given position with rotation. Rotates the entire string as a block
-- `lurek.render.print`: Draws text at the given position.
-- `lurek.render.printf`: Draws word-wrapped text within a given width.
-- `lurek.render.printRich`: Draws a sequence of styled text spans at the given position.
-- `lurek.render.clear`: Clears the draw command queue (resets the screen).
-- `lurek.render.setLineWidth`: Sets the line width for outline drawing.
+- `lurek.render.setBackgroundColor`: Sets the background clear color used at the start of each frame.
+- `lurek.render.getBackgroundColor`: Returns the current background clear color.
+- `lurek.render.rectangle`: Draws a rectangle. If rx is provided, draws a rounded rectangle.
+- `lurek.render.circle`: Draws a circle.
+- `lurek.render.ellipse`: Draws an ellipse.
+- `lurek.render.triangle`: Draws a triangle from three vertex positions.
+- `lurek.render.line`: Draws a line between two points, or a polyline through multiple points.
+- `lurek.render.polygon`: Draws a polygon from a flat list of x,y vertex coordinates.
+- `lurek.render.arc`: Draws a circular arc.
+- `lurek.render.points`: Draws one or more points. Accepts either a table of {x,y} pairs or flat x,y coordinate values.
+- `lurek.render.draw`: Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
+- `lurek.render.drawq`: Draws a sub-region of an image defined by a Quad, with optional transform.
+- `lurek.render.drawMany`: Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
+- `lurek.render.printRotated`: Draws text centered and rotated around its midpoint.
+- `lurek.render.print`: Draws text using the active font at the given position.
+- `lurek.render.printf`: Draws word-wrapped and aligned text within a pixel-width limit.
+- `lurek.render.printRich`: Draws rich text composed of individually styled spans at the given position.
+- `lurek.render.clear`: Clears all queued render commands for the current frame.
+- `lurek.render.setLineWidth`: Sets the line width for subsequent line-mode draw calls.
 - `lurek.render.getLineWidth`: Returns the current line width.
-- `lurek.render.setPointSize`: Sets the point diameter in pixels.
+- `lurek.render.setPointSize`: Sets the point size for subsequent point draw calls.
 - `lurek.render.getPointSize`: Returns the current point size.
-- `lurek.render.setBlendMode`: Sets the blend mode for drawing.
-- `lurek.render.getBlendMode`: Returns the current blend mode as a string.
-- `lurek.render.newFont`: Loads a bitmap font PNG from a file, or selects a built-in size by pixel height.
-- `lurek.render.setFont`: Sets the active font for print calls.
-- `lurek.render.getFont`: Returns the currently active font, or nil.
-- `lurek.render.getFontSizes`: Returns a table of available built-in font pixel heights.
-- `lurek.render.getDefaultFont`: Returns a built-in font by pixel height (snaps to nearest available size).
-- `lurek.render.getFontCellWidth`: Returns the cell width of the given font (for monospaced bitmap fonts).
-- `lurek.render.getFontWidth`: Returns the pixel width of text in the given font.
+- `lurek.render.setBlendMode`: Sets the blend mode for subsequent draw operations.
+- `lurek.render.getBlendMode`: Returns the current blend mode name.
+- `lurek.render.newFont`: Creates a new bitmap font from a PNG sprite sheet path or returns a built-in font by pixel height.
+- `lurek.render.setFont`: Sets the active font used by print, printf, and other text rendering calls.
+- `lurek.render.getFont`: Returns the currently active font, or nil if none is set.
+- `lurek.render.getFontSizes`: Returns all available built-in font pixel heights.
+- `lurek.render.getDefaultFont`: Returns a built-in default font at the nearest available pixel height.
+- `lurek.render.getFontCellWidth`: Returns the fixed cell width of a bitmap font.
+- `lurek.render.getFontWidth`: Measures the pixel width of text using the given font.
 - `lurek.render.getFontHeight`: Returns the line height of the given font.
-- `lurek.render.getFontLineHeight`: Returns the line height of the given font (alias for getFontHeight).
-- `lurek.render.setFontLineHeight`: Sets the line height of the given font (stub - returns nil; fonts are immutable in headless mode).
-- `lurek.render.getFontAscent`: Returns the ascent of the given font.
-- `lurek.render.getFontDescent`: Returns the descent of the given font.
-- `lurek.render.getFontWrap`: Returns wrapped lines and the maximum line width.
-- `lurek.render.newImage`: Loads an image from a file path or creates one from ImageData.
-- `lurek.render.newCanvas`: Creates an off-screen render canvas.
-- `lurek.render.setCanvas`: Sets the active render target to a Canvas, or back to the screen.
-- `lurek.render.getCanvas`: Returns the current canvas, or nil if drawing to screen.
-- `lurek.render.getCanvasSize`: Returns the dimensions of a canvas.
-- `lurek.render.newSpriteBatch`: Creates a new sprite batch for the given image.
-- `lurek.render.newMesh`: Creates a custom mesh from vertex data.
-- `lurek.render.newShader`: Compiles a custom WGSL shader and returns its handle.
-- `lurek.render.setShader`: Sets the active shader, or clears it.
-- `lurek.render.getShader`: Returns the active shader, or nil.
-- `lurek.render.newQuad`: Creates a new Quad viewport into a texture.
-- `lurek.render.push`: Pushes the current transform onto the stack.
-- `lurek.render.pop`: Pops the transform from the stack.
-- `lurek.render.translate`: Translates the coordinate system.
-- `lurek.render.rotate`: Rotates the coordinate system.
-- `lurek.render.scale`: Scales the coordinate system.
-- `lurek.render.shear`: Shears the coordinate system.
-- `lurek.render.origin`: Resets the transform to the identity.
-- `lurek.render.applyTransform`: Applies an affine transform matrix.
-- `lurek.render.setScissor`: Restricts drawing to a rectangle, or clears scissor if no args.
-- `lurek.render.getScissor`: Returns the active scissor rectangle, or nothing.
-- `lurek.render.intersectScissor`: Intersects the current scissor with a new rectangle.
-- `lurek.render.setColorMask`: Sets which RGBA channels are written. Reset with no args.
-- `lurek.render.getColorMask`: Returns the current color mask.
-- `lurek.render.setWireframe`: Enables or disables wireframe rendering.
-- `lurek.render.isWireframe`: Returns whether wireframe mode is active.
-- `lurek.render.stencil`: Begins stencil writing with the given action and value.
-- `lurek.render.setStencilTest`: Sets the stencil comparison test, or disables stencil testing.
-- `lurek.render.setStencilMode`: Sets the stencil buffer write/test mode.
-- `lurek.render.getStencilMode`: Returns the current stencil mode as (action, compare, value).
-- `lurek.render.clearStencil`: Resets the stencil mode to the default (keep / always / 0).
-- `lurek.render.setDepthMode`: Sets the depth test comparison and write enable.
-- `lurek.render.getDepthMode`: Returns the current depth mode as (mode, write).
-- `lurek.render.getWidth`: Returns the window width in pixels.
-- `lurek.render.getHeight`: Returns the window height in pixels.
-- `lurek.render.getDimensions`: Returns window width and height.
-- `lurek.render.setDefaultFilter`: Sets the default texture filter mode.
-- `lurek.render.getDefaultFilter`: Returns the default texture filter mode.
-- `lurek.render.getStats`: Returns a table of renderer statistics.
-- `lurek.render.saveScreenshot`: Queues a screenshot to be saved after the current frame.
-- `lurek.render.captureScreenshot`: Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
-- `lurek.render.newNineSlice`: Creates a 9-slice descriptor from a texture and inset values.
-- `lurek.render.drawNineSlice`: Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.
-- `lurek.render.newShape`: Creates a new empty shape resource.
-- `lurek.render.newDrawLayer`: Creates a new z-ordered draw-call queue.
-- `lurek.render.drawQuadBezier`: Queues a quadratic Bezier curve.
-- `lurek.render.drawCubicBezier`: Queues a cubic Bezier curve.
-- `lurek.render.drawPath`: Queues a multi-segment vector path.
-- `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle.
-- `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colors.
-- `lurek.render.drawIsoCubeTile`: Queues a three-face isometric cube tile.
-- `lurek.render.drawHexTile`: Queues a hexagonal tile at centre (cx, cy) with given circumradius.
-- `lurek.render.beginSortGroup`: Begins a Y/Z depth sort group. Draw commands until flushSortGroup are depth-sortable.
-- `lurek.render.pushSortKey`: Associates the previous draw command with a depth value within the active sort group.
-- `lurek.render.flushSortGroup`: Sorts and flushes all draw commands in the sort group.
-- `lurek.render.drawBevelRect`: Queues a beveled border rectangle with inner fill.
-- `lurek.render.pushLayer`: Begins a named compositing layer with optional alpha and blend mode.
-- `lurek.render.popLayer`: Ends and composites the named layer back to its parent.
-- `lurek.render.drawQuadBezier`: Queues a quadratic Bezier curve.
-- `lurek.render.drawCubicBezier`: Queues a cubic Bezier curve.
-- `lurek.render.drawPath`: Queues a multi-segment vector path.
-- `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle.
-- `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colors.
-- `lurek.render.drawIsoCubeTile`: Queues a three-face isometric cube tile.
-- `lurek.render.drawHexTile`: Queues a hexagonal tile at centre (cx, cy) with given circumradius.
-- `lurek.render.beginSortGroup`: Begins a Y/Z depth sort group.
-- `lurek.render.pushSortKey`: Associates the previous draw command with a depth value within the active sort group.
-- `lurek.render.flushSortGroup`: Sorts and flushes all draw commands in the sort group.
-- `lurek.render.drawBevelRect`: Queues a beveled border rectangle.
-- `lurek.render.pushLayer`: Begins a named compositing layer. Provides alpha and blend mode for composite.
-- `lurek.render.popLayer`: Ends and composites the named layer.
-- `lurek.render.newLayer`: Registers a named render layer.
-- `lurek.render.setLayer`: Sets the active named layer.
-- `lurek.render.currentLayer`: Returns the name of the currently active named layer.
-- `lurek.render.setLayerVisible`: Shows or hides the named layer.
-- `lurek.render.isLayerVisible`: Returns whether the named layer is visible.
-- `lurek.render.getLayerZOrder`: Returns the z order of the named layer.
-- `lurek.render.setLayerZOrder`: Updates the z order of the named layer.
-- `lurek.render.loadObj`: Loads a Wavefront OBJ file (relative to game dir) and returns an LObjModel.
-- `lurek.render.loadModel`: Lua-facing function documented in the binding source.
+- `lurek.render.getFontLineHeight`: Returns the line spacing of the given font.
+- `lurek.render.setFontLineHeight`: Sets the line height override for a font (currently a no-op stub).
+- `lurek.render.getFontAscent`: Returns the ascent (pixels above baseline) of the given font.
+- `lurek.render.getFontDescent`: Returns the descent (pixels below baseline) of the given font.
+- `lurek.render.getFontWrap`: Word-wraps text using the active font and returns the resulting lines and widest line width.
+- `lurek.render.newImage`: Loads a texture from a file path or creates one from an ImageData object.
+- `lurek.render.newCanvas`: Creates a new off-screen render target with the given dimensions.
+- `lurek.render.setCanvas`: Redirects all subsequent drawing to the given canvas. Pass nil to draw to the screen again.
+- `lurek.render.getCanvas`: Returns the currently active canvas, or nil if drawing to the screen.
+- `lurek.render.getCanvasSize`: Returns the pixel dimensions of a canvas.
+- `lurek.render.newSpriteBatch`: Creates a batched sprite renderer for efficiently drawing many copies of the same texture.
+- `lurek.render.newMesh`: Creates a custom vertex mesh from an array of vertex data tables.
+- `lurek.render.newShader`: Compiles a WGSL shader program from source code and returns a handle.
+- `lurek.render.setShader`: Activates a shader for subsequent draw calls. Pass nil to restore the default shader.
+- `lurek.render.getShader`: Returns the currently active shader, or nil if using the default.
+- `lurek.render.newQuad`: Creates a Quad defining a rectangular sub-region of a texture for sprite-sheet rendering.
+- `lurek.render.push`: Pushes the current transformation matrix onto the transform stack.
+- `lurek.render.pop`: Pops the top transformation matrix from the transform stack, restoring the previous one.
+- `lurek.render.translate`: Applies a translation to the current transformation matrix.
+- `lurek.render.rotate`: Applies a rotation to the current transformation matrix.
+- `lurek.render.scale`: Applies scaling to the current transformation matrix.
+- `lurek.render.shear`: Applies a shear (skew) to the current transformation matrix.
+- `lurek.render.origin`: Resets the current transformation matrix to the identity (no transform).
+- `lurek.render.applyTransform`: Multiplies the current transformation matrix by a 3x3 matrix (9 values in row-major order).
+- `lurek.render.setScissor`: Sets or clears the scissor rectangle. Only pixels inside this region are drawn. Call with no args to clear.
+- `lurek.render.getScissor`: Returns the current scissor rectangle, or nothing if no scissor is set.
+- `lurek.render.intersectScissor`: Intersects the given rectangle with the current scissor, narrowing the drawable region.
+- `lurek.render.setColorMask`: Sets which color channels are written during draw calls. Call with no args to enable all.
+- `lurek.render.getColorMask`: Returns the current color write mask.
+- `lurek.render.setWireframe`: Enables or disables wireframe rendering mode.
+- `lurek.render.isWireframe`: Returns whether wireframe rendering is currently active.
+- `lurek.render.stencil`: Begins a stencil write pass with the given action and reference value.
+- `lurek.render.setStencilTest`: Configures the stencil comparison test for subsequent draws. Pass nil to disable.
+- `lurek.render.setStencilMode`: Sets the stencil write action, compare function, and reference value at once.
+- `lurek.render.getStencilMode`: Returns the current stencil action, compare mode, and reference value.
+- `lurek.render.clearStencil`: Resets the stencil state to defaults (no stencil operations).
+- `lurek.render.setDepthMode`: Sets the depth comparison mode and whether depth writes are enabled.
+- `lurek.render.getDepthMode`: Returns the current depth comparison mode and write-enable flag.
+- `lurek.render.getWidth`: Returns the current window width in pixels.
+- `lurek.render.getHeight`: Returns the current window height in pixels.
+- `lurek.render.getDimensions`: Returns the current window width and height.
+- `lurek.render.setDefaultFilter`: Sets the default texture filtering mode for newly created images.
+- `lurek.render.getDefaultFilter`: Returns the current default texture filtering settings.
+- `lurek.render.getStats`: Returns a table of rendering statistics for the current frame.
+- `lurek.render.saveScreenshot`: Saves a screenshot of the current frame to a file under the save/ directory.
+- `lurek.render.captureScreenshot`: Captures a screenshot as ImageData and passes it to a callback (stub: returns 1x1 placeholder).
+- `lurek.render.newNineSlice`: Creates a 9-slice definition from an image and four border insets for scalable UI rendering.
+- `lurek.render.drawNineSlice`: Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
+- `lurek.render.newShape`: Creates a new retained compound shape for accumulating draw commands.
+- `lurek.render.newDrawLayer`: Creates a new z-ordered draw layer for sorting draw callbacks by depth.
+- `lurek.render.drawQuadBezier`: Draws a quadratic Bezier curve through start, control, and end points.
+- `lurek.render.drawCubicBezier`: Draws a cubic Bezier curve through start, two control points, and end.
+- `lurek.render.drawPath`: Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
+- `lurek.render.drawGradientRect`: Draws a rectangle with a two-color gradient fill.
+- `lurek.render.drawColoredPolygon`: Draws a polygon with per-vertex colors.
+- `lurek.render.drawIsoCubeTile`: Draws an isometric cube tile with configurable face colors and optional textures.
+- `lurek.render.drawHexTile`: Draws a regular hexagonal tile.
+- `lurek.render.beginSortGroup`: Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
+- `lurek.render.pushSortKey`: Sets the depth sort key for subsequent draw calls within the current sort group.
+- `lurek.render.flushSortGroup`: Ends a sort group and emits all accumulated draw calls in sorted order.
+- `lurek.render.drawBevelRect`: Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
+- `lurek.render.pushLayer`: Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
+- `lurek.render.popLayer`: Ends a compositing layer and composites it with the previous content.
+- `lurek.render.drawQuadBezier`: Draws a quadratic Bezier curve through start, control, and end points.
+- `lurek.render.drawCubicBezier`: Draws a cubic Bezier curve through start, two control points, and end.
+- `lurek.render.drawPath`: Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
+- `lurek.render.drawGradientRect`: Draws a rectangle with a two-color gradient fill.
+- `lurek.render.drawColoredPolygon`: Draws a polygon with per-vertex colors.
+- `lurek.render.drawIsoCubeTile`: Draws an isometric cube tile with configurable face colors and optional textures.
+- `lurek.render.drawHexTile`: Draws a regular hexagonal tile.
+- `lurek.render.beginSortGroup`: Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
+- `lurek.render.pushSortKey`: Sets the depth sort key for subsequent draw calls within the current sort group.
+- `lurek.render.flushSortGroup`: Ends a sort group and emits all accumulated draw calls in sorted order.
+- `lurek.render.drawBevelRect`: Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
+- `lurek.render.pushLayer`: Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
+- `lurek.render.popLayer`: Ends a compositing layer and composites it with the previous content.
+- `lurek.render.newLayer`: Creates a named rendering layer with an optional z-order for draw call organization.
+- `lurek.render.setLayer`: Sets the active rendering layer by name. Creates the layer if it does not exist.
+- `lurek.render.currentLayer`: Returns the name of the currently active rendering layer.
+- `lurek.render.setLayerVisible`: Sets whether a named rendering layer is visible.
+- `lurek.render.isLayerVisible`: Returns whether a named rendering layer is currently visible.
+- `lurek.render.getLayerZOrder`: Returns the z-order value of a named rendering layer.
+- `lurek.render.setLayerZOrder`: Sets the z-order value of a named rendering layer.
+- `lurek.render.loadObj`: Loads a Wavefront OBJ model file and returns a model handle for projection and rendering.
+- `lurek.render.loadModel`: Loads a 3D model file (OBJ format) and returns a handle for 2D projection and sprite rendering.
 
 ### `LCanvas` Methods
 - `LCanvas:getWidth`: Returns the width of this canvas in pixels.
 - `LCanvas:getHeight`: Returns the height of this canvas in pixels.
-- `LCanvas:getDimensions`: Returns width and height of this canvas.
-- `LCanvas:release`: Releases GPU framebuffer memory for this canvas.
-- `LCanvas:typeOf`: Returns the Lua type name for this canvas object.
-- `LCanvas:type`: Returns the Lua type name for this canvas handle.
+- `LCanvas:getDimensions`: Returns both width and height of this canvas.
+- `LCanvas:release`: Releases the canvas GPU resource. If this canvas is currently active, drawing reverts to the screen.
+- `LCanvas:typeOf`: Returns the type name of this object.
+- `LCanvas:type`: Returns the internal Lua type tag.
 
 ### `LDrawLayer` Methods
-- `LDrawLayer:queue`: Queues a draw callback at the given z-order.
-- `LDrawLayer:flush`: Sorts and calls all queued callbacks, then empties the queue.
-- `LDrawLayer:clear`: Removes all queued callbacks without calling them.
-- `LDrawLayer:getCount`: Returns the number of queued callbacks.
-- `LDrawLayer:type`: Returns the string type identifier of this draw layer (for example `LDrawLayer`).
-- `LDrawLayer:typeOf`: Returns true if this object is an instance of the given type name.
+- `LDrawLayer:queue`: Enqueues a draw callback at the given z-depth. Callbacks execute when flush() is called.
+- `LDrawLayer:flush`: Sorts all queued callbacks by z-depth and executes them in order, then empties the layer.
+- `LDrawLayer:clear`: Discards all queued callbacks without executing them.
+- `LDrawLayer:getCount`: Returns the number of callbacks currently queued.
+- `LDrawLayer:type`: Returns the internal Lua type tag.
+- `LDrawLayer:typeOf`: Checks whether this object matches the given type name.
 
 ### `LFont` Methods
-- `LFont:getWidth`: Returns the rendered width of the given text string.
-- `LFont:getHeight`: Returns the line height of this font.
-- `LFont:getLineHeight`: Returns the line height multiplier of this font.
-- `LFont:setLineHeight`: Sets the line height multiplier for this font.
-- `LFont:getAscent`: Returns the ascent of this font in pixels.
-- `LFont:getDescent`: Returns the descent of this font in pixels.
-- `LFont:getWrap`: Wraps text to the given width and returns the lines.
-- `LFont:release`: Releases this font and frees its atlas memory.
-- `LFont:typeOf`: Returns the Lua type name for this font object.
-- `LFont:type`: Returns the Lua type name for this font handle.
+- `LFont:getWidth`: Measures the pixel width of a string when rendered with this font.
+- `LFont:getHeight`: Returns the line height of this font in pixels.
+- `LFont:getLineHeight`: Returns the spacing between consecutive lines of text.
+- `LFont:setLineHeight`: Overrides the line height used for multi-line text rendering.
+- `LFont:getAscent`: Returns the ascent (pixels above the baseline) of this font.
+- `LFont:getDescent`: Returns the descent (pixels below the baseline) of this font.
+- `LFont:getWrap`: Word-wraps text to fit within a pixel width limit and returns the resulting lines.
+- `LFont:release`: Releases the font resource. The handle becomes invalid after this call.
+- `LFont:typeOf`: Returns the type name of this object.
+- `LFont:type`: Returns the internal Lua type tag.
 
 ### `LImage` Methods
-- `LImage:getId`: Returns the internal numeric texture handle used by low-level render systems.
+- `LImage:getId`: Returns the internal numeric handle ID for this image.
 - `LImage:getWidth`: Returns the width of this image in pixels.
 - `LImage:getHeight`: Returns the height of this image in pixels.
-- `LImage:getDimensions`: Returns width and height of this image.
-- `LImage:release`: Releases the GPU texture memory for this image.
-- `LImage:typeOf`: Returns the Lua type name for this image object.
-- `LImage:type`: Returns the Lua type name for this image handle.
+- `LImage:getDimensions`: Returns both width and height of this image.
+- `LImage:release`: Releases the GPU memory for this image. The handle becomes invalid after this call.
+- `LImage:typeOf`: Returns the type name of this object.
+- `LImage:type`: Returns the internal Lua type tag.
 
 ### `LImageData` Methods
-- `LImageData:getWidth`: Returns the pixel width of this image buffer.
-- `LImageData:getHeight`: Returns the pixel height of this image buffer.
-- `LImageData:resize`: Returns a resized copy of this image buffer.
-- `LImageData:blit`: Blits another image buffer onto this image at the destination position.
-- `LImageData:getRegion`: Returns a copy of a rectangular region from this image buffer.
-- `LImageData:diff`: Returns the summed per-channel difference between this image and another image.
-- `LImageData:mapPixels`: Applies a Lua callback to each pixel in this image buffer.
-- `LImageData:type`: Returns the Lua type name for this image data object.
-- `LImageData:typeOf`: Returns whether this object matches a requested type name.
-
-### `LLObjModel` Methods
-- `LLObjModel:getVertexCount`: Lua-facing function documented in the binding source.
-- `LLObjModel:getFaceCount`: Lua-facing function documented in the binding source.
-- `LLObjModel:getUvCount`: Lua-facing function documented in the binding source.
-- `LLObjModel:getNormalCount`: Lua-facing function documented in the binding source.
-- `LLObjModel:renderToImage`: Rasterizes the model into a cached sprite image using material colors from the MTL.
-- `LLObjModel:projectToMesh`: Projects the 3-D model to a flat 2-D vertex table.
+- `LImageData:getWidth`: Returns the width of this image data in pixels.
+- `LImageData:getHeight`: Returns the height of this image data in pixels.
+- `LImageData:resize`: Creates a new ImageData resized to the given dimensions using bilinear sampling.
+- `LImageData:blit`: Copies pixel data from another ImageData onto this one at the specified position.
+- `LImageData:getRegion`: Extracts a rectangular sub-region as a new ImageData.
+- `LImageData:diff`: Computes a numeric difference score between this image and another of the same size.
+- `LImageData:mapPixels`: Iterates over every pixel and replaces its color with the return value of the callback.
+- `LImageData:type`: Returns the type name of this object.
+- `LImageData:typeOf`: Checks whether this object matches the given type name.
 
 ### `LMesh` Methods
 - `LMesh:getVertexCount`: Returns the number of vertices in this mesh.
-- `LMesh:getVertex`: Returns vertex data at the given 1-based index.
-- `LMesh:setVertex`: Sets vertex data at the given 1-based index.
-- `LMesh:setTexture`: Assigns a texture to this mesh.
-- `LMesh:release`: Releases the GPU mesh resource, freeing VRAM immediately.
-- `LMesh:typeOf`: Returns the Lua type name for this mesh object.
-- `LMesh:type`: Returns the Lua type name for this mesh handle.
+- `LMesh:getVertex`: Returns the data for a single vertex by 1-based index.
+- `LMesh:setVertex`: Updates a single vertex by 1-based index. Table format: {x, y, u, v, r, g, b, a}.
+- `LMesh:setTexture`: Assigns or removes a texture for this mesh. Pass nil to clear the texture.
+- `LMesh:release`: Releases the mesh resource.
+- `LMesh:typeOf`: Returns the type name of this object.
+- `LMesh:type`: Returns the internal Lua type tag.
 
 ### `LNineSlice` Methods
-- `LNineSlice:getInsets`: Returns the four inset values as (top, right, bottom, left).
-- `LNineSlice:getTextureSize`: Returns the width and height of the source texture.
-- `LNineSlice:type`: Returns the Lua type name for this object.
-- `LNineSlice:typeOf`: Returns whether this object matches a requested type name.
+- `LNineSlice:getInsets`: Returns the border insets (top, right, bottom, left) that define the stretchable regions.
+- `LNineSlice:getTextureSize`: Returns the pixel dimensions of the underlying source texture.
+- `LNineSlice:type`: Returns the type name of this object.
+- `LNineSlice:typeOf`: Checks whether this object matches the given type name.
+
+### `LObjModel` Methods
+- `LObjModel:getVertexCount`: Returns the number of vertices in this OBJ model.
+- `LObjModel:getFaceCount`: Returns the number of faces (triangles) in this OBJ model.
+- `LObjModel:getUvCount`: Returns the number of UV texture coordinates in this OBJ model.
+- `LObjModel:getNormalCount`: Returns the number of vertex normals in this OBJ model.
+- `LObjModel:renderToImage`: Renders the OBJ model to a GPU texture at the given resolution with optional 90-degree rotation.
+- `LObjModel:projectToMesh`: Projects the OBJ model into 2D vertex data using a virtual camera, returning a table of vertex rows.
 
 ### `LQuad` Methods
-- `LQuad:getViewport`: Returns the quad viewport rectangle.
-- `LQuad:setViewport`: Sets the quad viewport rectangle.
-- `LQuad:getTextureDimensions`: Returns the reference texture dimensions.
-- `LQuad:typeOf`: Returns the Lua type name for this quad object.
-- `LQuad:type`: Returns the Lua type name for this quad handle.
+- `LQuad:getViewport`: Returns the quad's viewport rectangle within the source texture.
+- `LQuad:setViewport`: Updates the quad's viewport rectangle.
+- `LQuad:getTextureDimensions`: Returns the full dimensions of the source texture this quad references.
+- `LQuad:typeOf`: Returns the type name of this object.
+- `LQuad:type`: Returns the internal Lua type tag.
 
 ### `LShader` Methods
-- `LShader:send`: Sends a uniform value to this shader.
-- `LShader:hasUniform`: Returns whether this shader has a uniform with the given name.
-- `LShader:release`: Releases the compiled GPU shader, freeing VRAM and shader slots.
-- `LShader:typeOf`: Returns the Lua type name for this shader object.
-- `LShader:type`: Returns the Lua type name for this shader handle.
+- `LShader:send`: Sends a uniform value to this shader by name. Supported types: number, boolean, or table (vec2/vec3/vec4).
+- `LShader:hasUniform`: Checks whether this shader declares a uniform with the given name.
+- `LShader:release`: Releases the shader resource. If active, the default shader is restored.
+- `LShader:typeOf`: Returns the type name of this object.
+- `LShader:type`: Returns the internal Lua type tag.
 
 ### `LShape` Methods
-- `LShape:getCommandCount`: Returns the number of drawing commands currently stored.
-- `LShape:clear`: Removes all commands and resets the shape to empty.
-- `LShape:setColor`: Sets the drawing color for subsequent primitives.
-- `LShape:setLineWidth`: Sets the stroke width for subsequent outlined primitives.
-- `LShape:rectangle`: Queues a rectangle command.
-- `LShape:roundedRectangle`: Queues a rounded rectangle command.
-- `LShape:circle`: Queues a filled or outlined circle draw command onto this shape.
-- `LShape:ellipse`: Queues an ellipse command.
-- `LShape:triangle`: Queues a triangle command.
-- `LShape:polygon`: Queues a polygon command from variadic (x, y) coordinate pairs.
-- `LShape:line`: Queues a line segment command.
-- `LShape:polyline`: Queues a polyline command from variadic (x, y) coordinate pairs.
-- `LShape:arc`: Queues a filled or outlined arc draw command onto this shape.
-- `LShape:draw`: Queues this shape for drawing at the given position.
-- `LShape:typeOf`: Returns whether this object matches a requested type name.
-- `LShape:type`: Returns the Lua type name for this shape handle.
+- `LShape:getCommandCount`: Returns the number of drawing commands accumulated in this shape.
+- `LShape:clear`: Removes all drawing commands from this shape, making it empty.
+- `LShape:setColor`: Sets the drawing color for subsequent shape commands.
+- `LShape:setLineWidth`: Sets the line width for subsequent line-mode shape commands.
+- `LShape:rectangle`: Adds a rectangle command to the shape.
+- `LShape:roundedRectangle`: Adds a rounded rectangle command to the shape.
+- `LShape:circle`: Adds a circle command to the shape.
+- `LShape:ellipse`: Adds an ellipse command to the shape.
+- `LShape:triangle`: Adds a triangle command to the shape.
+- `LShape:polygon`: Adds a polygon command to the shape from a flat list of x,y coordinate pairs.
+- `LShape:line`: Adds a line segment command to the shape.
+- `LShape:polyline`: Adds a connected polyline command to the shape from a flat list of x,y coordinate pairs.
+- `LShape:arc`: Adds an arc command to the shape.
+- `LShape:draw`: Renders the accumulated shape commands to the screen with optional transform.
+- `LShape:typeOf`: Checks whether this object matches the given type name.
+- `LShape:type`: Returns the internal Lua type tag.
 
 ### `LSpriteBatch` Methods
-- `LSpriteBatch:add`: Adds a sprite entry to this batch.
-- `LSpriteBatch:clear`: Removes all sprites from this batch.
-- `LSpriteBatch:getCount`: Returns the number of sprites in this batch.
-- `LSpriteBatch:getBufferSize`: Returns the maximum capacity of this batch.
-- `LSpriteBatch:release`: Releases this sprite batch.
-- `LSpriteBatch:typeOf`: Returns the Lua type name for this sprite batch object.
-- `LSpriteBatch:type`: Returns the Lua type name for this sprite batch handle.
+- `LSpriteBatch:add`: Adds a sprite entry to the batch at the given position with optional transform.
+- `LSpriteBatch:clear`: Removes all entries from the sprite batch.
+- `LSpriteBatch:getCount`: Returns the number of sprite entries currently in the batch.
+- `LSpriteBatch:getBufferSize`: Returns the maximum number of entries this batch can hold.
+- `LSpriteBatch:release`: Releases the sprite batch resource.
+- `LSpriteBatch:typeOf`: Returns the type name of this object.
+- `LSpriteBatch:type`: Returns the internal Lua type tag.
 
 ## References
 
