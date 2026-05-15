@@ -1,4 +1,11 @@
+//! - Automation script container: named, time-sorted step sequences for deterministic replay.
+//! - Expands repeat markers into cloned steps at computed time offsets.
+//! - Parses TOML input with meta description and typed step fields.
+//! - Enforces a configurable step limit (default MAX_STEPS = 100,000).
+//! - Sorts steps by time after expansion for correct playback ordering.
+
 use super::{Action, Step};
+/// Maximum number of steps retained in a single automation script.
 pub(crate) const MAX_STEPS: usize = 100_000;
 #[derive(Debug, Clone)]
 /// A time-sorted sequence of `Step` values that `Simulator` plays back deterministically.
@@ -72,7 +79,7 @@ impl Script {
     pub fn get_step_limit(&self) -> usize {
         self.step_limit
     }
-    /// Parse a TOML string and construct a `Script`; returns an error string on invalid TOML or unknown action.
+    /// Parse a TOML string and construct a `Script`; return an error string on invalid TOML or unknown action.
     pub fn from_toml(name: impl Into<String>, toml_str: &str) -> Result<Self, String> {
         let doc: toml::Value =
             toml::from_str(toml_str).map_err(|e| format!("invalid TOML: {e}"))?;

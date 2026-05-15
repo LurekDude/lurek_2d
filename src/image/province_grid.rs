@@ -1,3 +1,13 @@
+//! - Province grid construction from color-mapped images, assigning unique ids per distinct RGB color.
+//! - Pixel-level province id lookup and reverse color retrieval by id.
+//! - Adjacency detection between neighboring provinces with shared-border-pixel counts.
+//! - Horizontal span extraction for contiguous province row segments.
+//! - Border segment detection returning line segments between differing province regions.
+//! - Polygon tracing from directed cell edges into closed point loops per province.
+//! - Polygon simplification removing collinear vertices and 45-degree staircase patterns.
+//! - Binary serialization and deserialization of span and border segment shape data.
+//! - Adjacency pair struct exposing province relationships for map graph queries.
+
 use crate::image::ImageData;
 use std::collections::{HashMap, HashSet};
 /// Adjacency summary for two provinces and the number of shared border pixels.

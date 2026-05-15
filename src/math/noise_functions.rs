@@ -1,3 +1,7 @@
+//! - Perlin noise helpers (2-D, 3-D, 4-D) with per-call seeding.
+//! - Simplex noise (2-D, 3-D) with optional fixed seed.
+//! - Fractional Brownian motion (fBm) layering multiple Perlin octaves.
+
 use super::noise_generator::{NoiseGenerator, NoiseKind};
 
 /// Return the Ken Perlin smooth-step polynomial `6t⁵ - 15t⁴ + 10t³`.

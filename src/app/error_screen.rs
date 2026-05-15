@@ -1,4 +1,9 @@
 
+//! - Formats fatal Lua and engine errors into a user-facing screen.
+//! - Splits message text and traceback, word-wraps long lines, and cleans Lua string markers.
+//! - Builds full-screen render commands showing error title, body, traceback, and hint footer.
+//! - Provides clipboard export text for quick copy of error details.
+
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::error::EngineError;
 use crate::runtime::resource_keys::FontKey;

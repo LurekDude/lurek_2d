@@ -1,3 +1,9 @@
+//! - Node-edge graph rendering with labels and colored vertices.
+//! - Removed-edge overlay with dimmed styling.
+//! - Item-flow graph with directional arrows and node items.
+//! - Stats text and title label placement.
+//! - Circle node rendering with adjacency-list edges.
+
 use crate::image::ImageData;
 #[allow(clippy::too_many_arguments)]
 /// Render a node-edge graph with labels and transfer-weight edges into an image.

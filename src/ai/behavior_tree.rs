@@ -1,11 +1,9 @@
-
-//! - Defines the behavior-tree structures that the AI layer uses to store node
-//!   hierarchy, local runtime progress, and the last resolved result of a tree.
-//! - Owns the control-flow node variants for selection, sequencing, parallel work,
-//!   result decorators, guard checks, and Lua-backed action or condition leaves.
-//! - Keeps the local helpers that reset subtree state, count nodes for inspection,
-//!   translate status and policy tags, and expose a compact debug snapshot of one
-//!   tree's current shape and last completed tick.
+//! - Behavior-tree node hierarchy with local runtime progress and last tick result.
+//! - Control-flow variants: selector, sequence, parallel, decorator, guard, and Lua leaves.
+//! - Subtree reset, node counting, status translation, and compact debug snapshots.
+//! - Running state per composite node enabling cross-tick resume from last active child.
+//! - Parallel policy configuration with independent success and failure thresholds.
+//! - Root node container used as the single-instance tree by the per-agent AI runtime.
 
 use mlua::RegistryKey;
 /// Execution result produced by a behavior-tree node or whole tree.

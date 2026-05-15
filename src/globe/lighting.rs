@@ -1,3 +1,8 @@
+//! - Globe day/night lighting: sun direction from rotation and time-of-day.
+//! - Per-province diffuse intensity with ambient floor.
+//! - Batch intensity computation for province centroid sequences.
+//! - Terminator-band alpha for smooth day/night transition rendering.
+
 use crate::globe::types::GlobeSpec;
 use crate::math::sphere::{lat_lon_to_unit, rot_y};
 use crate::math::Vec3;
@@ -33,7 +38,7 @@ pub fn compute_intensities<'a>(
         .map(|(lat, lon)| province_intensity(lat, lon, sun_dir, ambient))
         .collect()
 }
-    /// Convert sun alignment into an alpha value around the terminator band.
+/// Convert sun alignment into an alpha value around the terminator band.
 pub fn terminator_alpha(
     centroid_lat_deg: f32,
     centroid_lon_deg: f32,

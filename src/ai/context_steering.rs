@@ -1,10 +1,13 @@
-//! - Implements slot-based context steering for AI movement by accumulating
-//!   interest and danger contributions around a directional ring.
-//! - Owns the behavior variants that project targets, hazards, wandering intent,
-//!   fixed headings, and world-bound avoidance into those slot maps.
-//! - Keeps the evaluation pass that merges contributions, chooses the strongest
-//!   safe direction, records the last chosen heading and magnitude, and exposes
-//!   the ring data for inspection or debugging.
+//! - Slot-based context steering accumulating interest and danger around a directional ring.
+//! - Behavior variants projecting targets, hazards, wander, fixed headings, and world-bound avoidance.
+//! - Evaluation pass merging contributions and choosing the strongest safe direction.
+//! - Seek-target interest projection using an angle cone toward the target position.
+//! - Hash-based wander jitter biasing direction over time without explicit random state.
+//! - Per-slot danger subtraction so agents steer around hazards while maintaining progress.
+//! - Last chosen heading and magnitude recording for downstream movement application.
+//! - Inspection accessors for interest and danger maps useful for debug visualization.
+//! - Uses cosine-attenuated cone fill to smoothly distribute weights across
+//!   neighboring slots near a target angle.
 
 use std::f32::consts::{PI, TAU};
 /// Behavior kind used by context steering slots.
@@ -293,6 +296,7 @@ impl ContextSteering {
         self.danger.clone()
     }
 }
+/// Fill nearby ring slots around `target_angle` with a cosine-attenuated weight.
 #[allow(clippy::needless_range_loop)]
 fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, n: usize) {
     for i in 0..n {
@@ -304,6 +308,7 @@ fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, 
         }
     }
 }
+/// Return the signed angular difference between two angles, wrapped to `(-PI, PI]`.
 fn angle_diff_f32(a: f32, b: f32) -> f32 {
     let mut d = a - b;
     while d > PI {

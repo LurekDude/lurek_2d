@@ -1,3 +1,6 @@
+//! - Define blend modes controlling how each light merges into the accumulation buffer.
+//! - Support additive, subtractive, and alpha-mix compositing strategies.
+
 /// Blend mode for how a light's contribution is combined with the light accumulation buffer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LightBlendMode {

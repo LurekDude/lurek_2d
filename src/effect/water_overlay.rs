@@ -1,3 +1,7 @@
+//! - Animated water distortion overlay with configurable amplitude, frequency, and speed.
+//! - Shallow-water tint and depth-based color shift with independent blend strengths.
+//! - Time-accumulating update loop that advances the wave pattern each frame.
+
 #[derive(Debug, Clone)]
 /// Stores parameters for animated water distortion and tint overlays.
 pub struct WaterOverlayState {
@@ -28,8 +32,9 @@ pub struct WaterOverlayState {
     /// Accumulated animation time used by the distortion function.
     pub time: f32,
 }
+/// Provide sensible starting values with the overlay disabled.
 impl Default for WaterOverlayState {
-    /// Builds the default disabled water overlay state.
+    /// Build the default disabled water overlay state.
     fn default() -> Self {
         Self {
             enabled: false,

@@ -1,3 +1,9 @@
+//! - Cellular automata grid rendering with alive and dead colors.
+//! - Voronoi region visualization from seed partitions.
+//! - Point sample rendering as colored dots or circles.
+//! - Dungeon grid display with wall and floor tile scaling.
+//! - Delaunay triangulation overlay with triangle edges and vertices.
+
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
 /// Render a cellular automata grid with cell size and alive-cell color into an image.

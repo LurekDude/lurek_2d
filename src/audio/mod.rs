@@ -1,4 +1,8 @@
 
+//! - Audio subsystem module: mixer, buses, DSP effects, decoders, MIDI, pools, and visualisation.
+//! - Re-exports primary types: `Mixer`, `Bus`, `Decoder`, `SoundData`, `MidiPlayer`, `SoundPool`.
+//! - Submodule organisation separating playback, offline processing, and device enumeration.
+
 /// `Bus` struct: named per-channel volume/pitch routing with effect chain and duck target.
 pub mod bus;
 /// `Decoder` struct: seeks and decodes audio files (WAV/OGG/MP3/FLAC) into PCM samples.

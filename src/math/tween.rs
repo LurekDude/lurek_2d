@@ -1,3 +1,9 @@
+//! - Multi-channel tween interpolator that drives values from start to target over a fixed duration.
+//! - Easing resolution accepts both short names and `easeIn*`/`easeOut*` prefixed forms.
+//! - Each tween holds an independent clock, supports reset, seek, and completion query.
+//! - Channels are registered dynamically and interpolated per-frame via the resolved easing curve.
+//! - Falls back to linear when an unknown easing name is provided.
+
 use crate::math::easing;
 
 /// Start/target pair for a single channel managed by a `Tween`.
@@ -51,6 +57,7 @@ fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
     })
 }
 
+/// Multi-channel tween lifecycle: creation, channel registration, clock advancement, and value sampling.
 impl Tween {
     /// Create a new Tween with the given `duration` (seconds) and named easing; falls back to linear when name is unknown.
     pub fn new(duration: f64, easing_name: &str) -> Self {

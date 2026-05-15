@@ -1,3 +1,12 @@
+//! - Polygon gallery with regular shapes of varying side counts.
+//! - Archimedes spiral rendering with HSV ring colors.
+//! - Filled primitive samples: rectangles, circles, brightness grid.
+//! - Convex hull computation and overlay drawing.
+//! - Point-in-polygon, centroid, and area visualization.
+//! - Bresenham line rasterization proof.
+//! - Segment-segment and circle-line intersection tests.
+//! - Circle-segment and line intersection proof rendering.
+
 use super::hsv_to_rgb_viz;
 use crate::image::ImageData;
 #[allow(clippy::type_complexity)]

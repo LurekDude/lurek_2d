@@ -1,3 +1,7 @@
+//! - Screen-space province picking via ray-polygon intersection.
+//! - Projects province polygons from 3D globe to 2D screen for hit testing.
+//! - Selects the front-most visible province under a pointer position.
+
 use crate::globe::projection::{build_view_matrix, OrbitCamera};
 use crate::globe::topology::ProvinceGraph;
 use crate::globe::types::{GlobeSpec, ProvinceId};

@@ -1,10 +1,8 @@
-
-//! - Defines the population-based genetic optimization data used by the AI module
-//!   to keep genomes, caller-provided fitness values, and generation bookkeeping.
-//! - Owns the evolution step that preserves elites, selects parents through
-//!   tournaments, breeds children gene by gene, and applies mutation in place.
-//! - Keeps the small deterministic random helpers that drive parent selection,
-//!   crossover choices, and Gaussian mutation for reproducible search behavior.
+//! - Population-based genetic optimization storing genomes, fitness values, and generation bookkeeping.
+//! - Evolution step preserving elites, tournament selection, crossover, and in-place mutation.
+//! - Deterministic random helpers driving parent selection, crossover, and Gaussian mutation.
+//! - Stable per-chromosome identifiers persisting across generations for lineage tracking.
+//! - Seeded xorshift64 RNG with Box-Muller normal sampling for reproducible evolution.
 
 /// Evolving genome with fitness and stable id.
 #[derive(Clone)]

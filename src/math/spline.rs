@@ -1,8 +1,13 @@
+//! - Catmull-Rom multi-segment spline with dynamic control-point management.
+//! - Hermite cubic segment defined by endpoints and tangents.
+//! - Normalized parameter sampling across full spline or individual segments.
+
 /// Multi-point Catmull-Rom spline with dynamic control-point list.
 pub struct CatmullRomSpline {
     /// Ordered (x, y) control points; at least 2 are required for sampling.
     control_points: Vec<(f32, f32)>,
 }
+/// Methods for building, sampling, and modifying the Catmull-Rom spline.
 impl CatmullRomSpline {
     /// Construct a spline from a Vec of `(x, y)` control points.
     pub fn new(points: Vec<(f32, f32)>) -> Self {
@@ -78,6 +83,7 @@ pub struct HermiteSpline {
     /// End tangent.
     m1: (f32, f32),
 }
+/// Methods for constructing and sampling the Hermite segment.
 impl HermiteSpline {
     /// Construct a Hermite segment from endpoints `p0`, `p1` and tangents `m0`, `m1`.
     pub fn new(p0: (f32, f32), p1: (f32, f32), m0: (f32, f32), m1: (f32, f32)) -> Self {

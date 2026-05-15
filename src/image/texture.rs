@@ -1,3 +1,9 @@
+//! - CPU-side texture loading, decoding, and storage into the SlotMap pool.
+//! - Premultiplied-alpha conversion for correct blending on the GPU.
+//! - Color-space tagging (sRGB vs linear) carried alongside pixel data.
+//! - Construction from file paths or raw RGBA byte buffers.
+//! - Dimension validation for caller-supplied pixel buffers.
+
 use crate::log_msg;
 use crate::render::renderer::TextureData;
 use crate::runtime::error::{EngineError, EngineResult};

@@ -1,3 +1,7 @@
+//! - Base64 and hexadecimal encoding and decoding for opaque byte payloads
+//! - Format selection via enum variant parsed from user-facing labels
+//! - Consistent error wrapping for malformed input
+
 use base64::Engine;
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Select textual encoding algorithm.

@@ -1,4 +1,12 @@
 
+//! - `SoundData` in-memory interleaved f32 PCM buffer with per-sample get/set and metadata.
+//! - File decode via rodio, silent-buffer allocation, and Lua argument factory.
+//! - WAV encoding to byte vector for save/export.
+//! - Waveform generators: sine, square, sawtooth, triangle, and deterministic white noise.
+//! - In-place DSP transforms: low-pass, high-pass, band-pass, gain, and mix-into.
+//! - Waveform drawing into `ImageData` for visual feedback.
+//! - Duration, sample count, and channel count queries.
+
 use rodio::Source;
 #[derive(Debug, Clone)]
 /// In-memory interleaved f32 PCM data with metadata and utility transforms.
@@ -69,7 +77,7 @@ impl SoundData {
     pub fn samples(&self) -> &[f32] {
         &self.samples
     }
-    /// Set sample at `index` to `value` (clamped to [-1,1]); returns `false` if index is invalid.
+    /// Set sample at `index` to `value` (clamped to [-1,1]); return `false` if index is invalid.
     pub fn set_sample(&mut self, index: usize, value: f32) -> bool {
         if index < self.samples.len() {
             self.samples[index] = value.clamp(-1.0, 1.0);

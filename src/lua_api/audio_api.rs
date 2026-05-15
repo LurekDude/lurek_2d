@@ -1,3 +1,4 @@
+//! `lurek.audio` - Audio playback, mixing, spatial sound, MIDI, and DSP processing for 2D games.
 use super::SharedState;
 use crate::audio::sound_data::SoundData;
 use crate::audio::{Decoder, MidiPlayer, SourceType};
@@ -87,6 +88,7 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
     };
     Ok((path, count, rate, channels))
 }
+/// Lua-side wrapper around a loaded audio source (sound effect or music stream).
 #[derive(Clone)]
 pub struct LuaSource {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -94,6 +96,9 @@ pub struct LuaSource {
 }
 impl LuaUserData for LuaSource {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- play --
+        /// Starts playback of this audio source from the current position.
+        /// @return | nil | No return value.
         methods.add_method("play", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:play")?;
@@ -101,83 +106,132 @@ impl LuaUserData for LuaSource {
             st.mixer.play(key, &game_dir);
             Ok(())
         });
+        // -- stop --
+        /// Stops playback and resets the source position to the beginning.
+        /// @return | nil | No return value.
         methods.add_method("stop", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:stop")?;
             st.mixer.stop(key);
             Ok(())
         });
+        // -- pause --
+        /// Pauses playback at the current position, allowing later resumption.
+        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:pause")?;
             st.mixer.pause(key);
             Ok(())
         });
+        // -- resume --
+        /// Resumes playback from the position where the source was paused.
+        /// @return | nil | No return value.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:resume")?;
             st.mixer.resume(key);
             Ok(())
         });
+        // -- setVolume --
+        /// Sets the volume level of this source where 0.0 is silent and 1.0 is full volume.
+        /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal, >1.0 = amplified).
+        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setVolume")?;
             st.mixer.set_volume(key, vol);
             Ok(())
         });
+        // -- getVolume --
+        /// Returns the current volume level of this audio source.
+        /// @return | number | Current volume multiplier.
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getVolume")?;
             Ok(st.mixer.get_volume(key))
         });
+        // -- setPitch --
+        /// Sets the playback speed multiplier, affecting both pitch and duration.
+        /// @param | pitch | number | Pitch multiplier (1.0 = normal, 2.0 = double speed/octave up).
+        /// @return | nil | No return value.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPitch")?;
             st.mixer.set_pitch(key, pitch);
             Ok(())
         });
+        // -- getPitch --
+        /// Returns the current pitch multiplier of this audio source.
+        /// @return | number | Current pitch multiplier.
         methods.add_method("getPitch", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getPitch")?;
             Ok(st.mixer.get_pitch(key))
         });
+        // -- setLooping --
+        /// Enables or disables looping so the source restarts automatically after finishing.
+        /// @param | looping | boolean | True to loop continuously, false to play once.
+        /// @return | nil | No return value.
         methods.add_method("setLooping", |_, this, looping: bool| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLooping")?;
             st.mixer.set_looping(key, looping);
             Ok(())
         });
+        // -- isLooping --
+        /// Returns whether this source is set to loop continuously.
+        /// @return | boolean | True if looping is enabled.
         methods.add_method("isLooping", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isLooping")?;
             Ok(st.mixer.is_looping(key))
         });
+        // -- isPlaying --
+        /// Returns whether this source is currently playing audio.
+        /// @return | boolean | True if the source is actively playing.
         methods.add_method("isPlaying", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPlaying")?;
             Ok(st.mixer.is_playing(key))
         });
+        // -- isPaused --
+        /// Returns whether this source is currently paused.
+        /// @return | boolean | True if the source is paused.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPaused")?;
             Ok(st.mixer.is_paused(key))
         });
+        // -- isStopped --
+        /// Returns whether this source is currently stopped (not playing or paused).
+        /// @return | boolean | True if the source is stopped.
         methods.add_method("isStopped", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isStopped")?;
             Ok(st.mixer.is_stopped(key))
         });
+        // -- setPan --
+        /// Sets the stereo panning position of this source.
+        /// @param | pan | number | Pan value from -1.0 (full left) to 1.0 (full right), 0.0 is center.
+        /// @return | nil | No return value.
         methods.add_method("setPan", |_, this, pan: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPan")?;
             st.mixer.set_pan(key, pan);
             Ok(())
         });
+        // -- getPan --
+        /// Returns the current stereo panning position of this source.
+        /// @return | number | Pan value from -1.0 (left) to 1.0 (right).
         methods.add_method("getPan", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getPan")?;
             Ok(st.mixer.get_pan(key))
         });
+        // -- clone --
+        /// Creates an independent copy of this source sharing the same audio data.
+        /// @return | LSource | A new source instance with identical settings.
         methods.add_method("clone", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             match st.mixer.clone_source(this.key) {
@@ -188,6 +242,9 @@ impl LuaUserData for LuaSource {
                 None => Err(invalid_source_handle("Source:clone")),
             }
         });
+        // -- getType --
+        /// Returns whether this source was loaded as static (fully in memory) or streaming.
+        /// @return | string | Either "static" or "stream".
         methods.add_method("getType", |_, this, ()| {
             let st = this.state.borrow();
             match st.mixer.get_source_type(this.key) {
@@ -196,16 +253,26 @@ impl LuaUserData for LuaSource {
                 None => Err(invalid_source_handle("Source:getType")),
             }
         });
+        // -- getDuration --
+        /// Returns the total duration of this audio source in seconds.
+        /// @return | number | Duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getDuration")?;
             Ok(st.mixer.get_duration(key))
         });
+        // -- tell --
+        /// Returns the current playback position of this source in seconds.
+        /// @return | number | Current position in seconds from the start.
         methods.add_method("tell", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:tell")?;
             Ok(st.mixer.get_tell(key))
         });
+        // -- seek --
+        /// Seeks to a specific position in seconds within this audio source.
+        /// @param | pos | number | Target position in seconds.
+        /// @return | nil | No return value.
         methods.add_method("seek", |_, this, pos: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:seek")?;
@@ -213,51 +280,83 @@ impl LuaUserData for LuaSource {
             st.mixer.seek(key, pos, &game_dir);
             Ok(())
         });
+        // -- setLowpass --
+        /// Applies a lowpass filter that attenuates frequencies above the cutoff.
+        /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
+        /// @return | nil | No return value.
         methods.add_method("setLowpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLowpass")?;
             st.mixer.set_lowpass(key, cutoff_hz);
             Ok(())
         });
+        // -- setHighpass --
+        /// Applies a highpass filter that attenuates frequencies below the cutoff.
+        /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
+        /// @return | nil | No return value.
         methods.add_method("setHighpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setHighpass")?;
             st.mixer.set_highpass(key, cutoff_hz);
             Ok(())
         });
+        // -- getLowpass --
+        /// Returns the current lowpass filter cutoff frequency in Hertz.
+        /// @return | integer | Cutoff frequency in Hz, or 0 if no lowpass is set.
         methods.add_method("getLowpass", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getLowpass")?;
             Ok(st.mixer.get_lowpass(key))
         });
+        // -- getHighpass --
+        /// Returns the current highpass filter cutoff frequency in Hertz.
+        /// @return | integer | Cutoff frequency in Hz, or 0 if no highpass is set.
         methods.add_method("getHighpass", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getHighpass")?;
             Ok(st.mixer.get_highpass(key))
         });
+        // -- clearFilter --
+        /// Removes all frequency filters (lowpass and highpass) from this source.
+        /// @return | nil | No return value.
         methods.add_method("clearFilter", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:clearFilter")?;
             st.mixer.clear_filter(key);
             Ok(())
         });
+        // -- fadeIn --
+        /// Sets the fade-in duration so the source ramps from silence to full volume on play.
+        /// @param | dur | number | Fade-in duration in seconds.
+        /// @return | nil | No return value.
         methods.add_method("fadeIn", |_, this, dur: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:fadeIn")?;
             st.mixer.set_fade_in(key, dur);
             Ok(())
         });
+        // -- getFadeIn --
+        /// Returns the configured fade-in duration for this source.
+        /// @return | number | Fade-in duration in seconds.
         methods.add_method("getFadeIn", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getFadeIn")?;
             Ok(st.mixer.get_fade_in(key))
         });
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LSource".
         methods.add_method("type", |_, _, ()| Ok("LSource"));
+        // -- typeOf --
+        /// Checks whether this object is of the given type name or a parent type.
+        /// @param | name | string | Type name to check (e.g. "LSource" or "Object").
+        /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSource" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper around an audio mixing bus for grouped volume and effect control.
 #[derive(Clone)]
 pub struct LuaBus {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -265,6 +364,9 @@ pub struct LuaBus {
 }
 impl LuaUserData for LuaBus {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getName --
+        /// Returns the name of this audio bus.
+        /// @return | string | Bus name as registered during creation.
         methods.add_method("getName", |_, this, ()| {
             let st = this.state.borrow();
             match st.mixer.get_bus(this.key) {
@@ -274,6 +376,10 @@ impl LuaUserData for LuaBus {
                 )),
             }
         });
+        // -- setVolume --
+        /// Sets the volume multiplier for all sources routed through this bus.
+        /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
+        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -281,10 +387,17 @@ impl LuaUserData for LuaBus {
             }
             Ok(())
         });
+        // -- getVolume --
+        /// Returns the current volume multiplier of this bus.
+        /// @return | number | Volume multiplier (defaults to 1.0).
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).map_or(1.0, |b| b.volume()))
         });
+        // -- setPitch --
+        /// Sets the pitch multiplier applied to all sources routed through this bus.
+        /// @param | pitch | number | Pitch multiplier (1.0 = normal speed).
+        /// @return | nil | No return value.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -292,10 +405,16 @@ impl LuaUserData for LuaBus {
             }
             Ok(())
         });
+        // -- getPitch --
+        /// Returns the current pitch multiplier of this bus.
+        /// @return | number | Current pitch multiplier (defaults to 1.0).
         methods.add_method("getPitch", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).map_or(1.0, |b| b.pitch()))
         });
+        // -- pause --
+        /// Pauses all sources routed through this bus.
+        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -303,6 +422,9 @@ impl LuaUserData for LuaBus {
             }
             Ok(())
         });
+        // -- resume --
+        /// Resumes all sources routed through this bus that were paused.
+        /// @return | nil | No return value.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -310,14 +432,29 @@ impl LuaUserData for LuaBus {
             }
             Ok(())
         });
+        // -- isPaused --
+        /// Returns whether this bus is currently paused.
+        /// @return | boolean | True if the bus is paused.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).is_some_and(|b| b.is_paused()))
         });
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LBus".
         methods.add_method("type", |_, _, ()| Ok("LBus"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "LBus", "Bus", or "Object").
+        /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LBus" || name == "Bus" || name == "Object")
         });
+        // -- setDuckTarget --
+        /// Configures ducking so this bus lowers the volume of a target bus when active.
+        /// @param | target_name | string | Name of the bus to duck.
+        /// @param | duck_vol | number | Volume multiplier applied to the target when ducking (0.0-1.0).
+        /// @return | nil | No return value.
         methods.add_method(
             "setDuckTarget",
             |_, this, (target_name, duck_vol): (String, f32)| {
@@ -328,6 +465,9 @@ impl LuaUserData for LuaBus {
                 Ok(())
             },
         );
+        // -- clearDuck --
+        /// Removes the ducking configuration from this bus.
+        /// @return | nil | No return value.
         methods.add_method("clearDuck", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -335,12 +475,16 @@ impl LuaUserData for LuaBus {
             }
             Ok(())
         });
+        // -- getPeak --
+        /// Returns the current peak amplitude level of this bus for VU-meter displays.
+        /// @return | number | Peak level from 0.0 to 1.0.
         methods.add_method("getPeak", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.bus_peak(this.key))
         });
     }
 }
+/// Lua-side wrapper around a MIDI file player with per-channel control and tempo scaling.
 #[derive(Clone)]
 pub struct LuaMidiPlayer {
     pub(crate) inner: Rc<RefCell<MidiPlayer>>,
@@ -348,33 +492,60 @@ pub struct LuaMidiPlayer {
 }
 impl LuaUserData for LuaMidiPlayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- load --
+        /// Loads a MIDI file from the given path relative to the game directory.
+        /// @param | path | string | Relative path to the .mid file.
+        /// @return | boolean | True if the file was loaded successfully.
         methods.add_method("load", |_, this, path: String| {
             let st = this.state.borrow();
             let full_path = st.game_dir.join(&path);
             Ok(this.inner.borrow_mut().load(&full_path))
         });
+        // -- loadData --
+        /// Loads MIDI data from a raw byte string in memory.
+        /// @param | data | string | Raw MIDI binary data.
+        /// @return | boolean | True if the data was parsed successfully.
         methods.add_method("loadData", |_, this, data: mlua::String| {
             let bytes = data.as_bytes().to_vec();
             Ok(this.inner.borrow_mut().load_data(bytes))
         });
+        // -- isLoaded --
+        /// Returns whether a MIDI file is currently loaded and ready to play.
+        /// @return | boolean | True if a MIDI file is loaded.
         methods.add_method("isLoaded", |_, this, ()| {
             Ok(this.inner.borrow().is_loaded())
         });
+        // -- getFilePath --
+        /// Returns the file path of the currently loaded MIDI file.
+        /// @return | string? | File path string or nil if no file is loaded.
         methods.add_method("getFilePath", |_, this, ()| {
             Ok(this.inner.borrow().file_path().map(|s| s.to_string()))
         });
+        // -- setSoundFont --
+        /// Sets a custom SoundFont file for MIDI synthesis (stub, not yet implemented).
+        /// @param | path | string | Relative path to the .sf2 file.
+        /// @return | nil | No return value.
         methods.add_method("setSoundFont", |_, _this, _path: String| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setSoundFont");
             Ok(())
         });
+        // -- getSoundFontPath --
+        /// Returns the path of the currently set SoundFont (stub, not yet implemented).
+        /// @return | string? | SoundFont path or nil.
         methods.add_method("getSoundFontPath", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:getSoundFontPath");
             Ok(Option::<String>::None)
         });
+        // -- useDefaultSoundFont --
+        /// Reverts to the built-in default SoundFont (stub, not yet implemented).
+        /// @return | nil | No return value.
         methods.add_method("useDefaultSoundFont", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:useDefaultSoundFont");
             Ok(())
         });
+        // -- play --
+        /// Starts MIDI playback from the current position using the audio output stream.
+        /// @return | nil | No return value.
         methods.add_method("play", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(handle) = st.mixer.stream_handle() {
@@ -382,40 +553,80 @@ impl LuaUserData for LuaMidiPlayer {
             }
             Ok(())
         });
+        // -- pause --
+        /// Pauses MIDI playback at the current position.
+        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             this.inner.borrow_mut().pause();
             Ok(())
         });
+        // -- stop --
+        /// Stops MIDI playback and resets position to the beginning.
+        /// @return | nil | No return value.
         methods.add_method("stop", |_, this, ()| {
             this.inner.borrow_mut().stop();
             Ok(())
         });
+        // -- isPlaying --
+        /// Returns whether the MIDI player is currently playing.
+        /// @return | boolean | True if playing.
         methods.add_method("isPlaying", |_, this, ()| {
             Ok(this.inner.borrow().is_playing())
         });
+        // -- isPaused --
+        /// Returns whether the MIDI player is currently paused.
+        /// @return | boolean | True if paused.
         methods.add_method("isPaused", |_, this, ()| {
             Ok(this.inner.borrow().is_paused())
         });
+        // -- seek --
+        /// Seeks to a specific position in the MIDI file.
+        /// @param | secs | number | Target position in seconds.
+        /// @return | nil | No return value.
         methods.add_method("seek", |_, this, secs: f64| {
             this.inner.borrow_mut().seek(secs);
             Ok(())
         });
+        // -- tell --
+        /// Returns the current playback position of the MIDI player in seconds.
+        /// @return | number | Current position in seconds.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.borrow().tell()));
+        // -- getDuration --
+        /// Returns the total duration of the loaded MIDI file in seconds.
+        /// @return | number | Duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             Ok(this.inner.borrow().duration())
         });
+        // -- setLooping --
+        /// Enables or disables looping for MIDI playback.
+        /// @param | looping | boolean | True to loop, false to play once.
+        /// @return | nil | No return value.
         methods.add_method("setLooping", |_, this, looping: bool| {
             this.inner.borrow_mut().set_looping(looping);
             Ok(())
         });
+        // -- isLooping --
+        /// Returns whether MIDI looping is enabled.
+        /// @return | boolean | True if looping.
         methods.add_method("isLooping", |_, this, ()| {
             Ok(this.inner.borrow().is_looping())
         });
+        // -- setVolume --
+        /// Sets the master volume for MIDI playback.
+        /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
+        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             this.inner.borrow_mut().set_volume(vol);
             Ok(())
         });
+        // -- getVolume --
+        /// Returns the current master volume of the MIDI player.
+        /// @return | number | Volume multiplier.
         methods.add_method("getVolume", |_, this, ()| Ok(this.inner.borrow().volume()));
+        // -- setBus --
+        /// Routes this MIDI player's output through the specified audio bus.
+        /// @param | bus | LBus? | Bus to route through, or nil for direct output.
+        /// @return | nil | No return value.
         methods.add_method("setBus", |_, this, bus_val: LuaValue| match &bus_val {
             LuaValue::UserData(ud) => {
                 let bus = ud.borrow::<LuaBus>()?;
@@ -430,6 +641,9 @@ impl LuaUserData for LuaMidiPlayer {
                 "MidiPlayer:setBus(): expected Bus or nil".into(),
             )),
         });
+        // -- getBus --
+        /// Returns the audio bus this MIDI player is routed through.
+        /// @return | LBus? | The assigned bus, or nil if using direct output.
         methods.add_method("getBus", |_, this, ()| {
             match this.inner.borrow().bus_key() {
                 Some(key) => Ok(Some(LuaBus {
@@ -439,6 +653,10 @@ impl LuaUserData for LuaMidiPlayer {
                 None => Ok(None),
             }
         });
+        // -- setTempo --
+        /// Sets the playback tempo in beats per minute.
+        /// @param | bpm | number | Desired tempo in BPM.
+        /// @return | nil | No return value.
         methods.add_method("setTempo", |_, this, bpm: f64| {
             let original = this.inner.borrow().original_tempo();
             if original > 0.0 {
@@ -448,29 +666,54 @@ impl LuaUserData for LuaMidiPlayer {
             }
             Ok(())
         });
+        // -- getTempo --
+        /// Returns the current effective tempo in beats per minute.
+        /// @return | number | Current tempo in BPM.
         methods.add_method("getTempo", |_, this, ()| {
             let mp = this.inner.borrow();
             Ok(mp.original_tempo() * mp.tempo_scale() as f64)
         });
+        // -- getOriginalTempo --
+        /// Returns the original tempo of the MIDI file as authored.
+        /// @return | number | Original tempo in BPM.
         methods.add_method("getOriginalTempo", |_, this, ()| {
             Ok(this.inner.borrow().original_tempo())
         });
+        // -- setTempoScale --
+        /// Sets a tempo multiplier relative to the original speed.
+        /// @param | scale | number | Tempo scale (1.0 = original, 2.0 = double speed).
+        /// @return | nil | No return value.
         methods.add_method("setTempoScale", |_, this, scale: f32| {
             this.inner.borrow_mut().set_tempo_scale(scale);
             Ok(())
         });
+        // -- getTempoScale --
+        /// Returns the current tempo scale multiplier.
+        /// @return | number | Tempo scale factor.
         methods.add_method("getTempoScale", |_, this, ()| {
             Ok(this.inner.borrow().tempo_scale())
         });
+        // -- getTicksPerBeat --
+        /// Returns the MIDI file's resolution in ticks per beat (PPQN).
+        /// @return | integer | Ticks per quarter note.
         methods.add_method("getTicksPerBeat", |_, this, ()| {
             Ok(this.inner.borrow().ticks_per_beat())
         });
+        // -- setChannelVolume --
+        /// Sets the volume for a specific MIDI channel (1-16).
+        /// @param | ch | integer | Channel number (1-16).
+        /// @param | vol | number | Volume multiplier (0.0-1.0).
+        /// @return | nil | No return value.
         methods.add_method("setChannelVolume", |_, this, (ch, vol): (usize, f32)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_volume(ch - 1, vol);
             }
             Ok(())
         });
+        // -- getChannelVolume --
+        /// Returns the volume of a specific MIDI channel.
+        /// @param | ch | integer | Channel number (1-16).
+        /// @return | number | Channel volume (0.0-1.0).
         methods.add_method("getChannelVolume", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().channel_volume(ch - 1))
@@ -478,12 +721,21 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(0.0)
             }
         });
+        // -- setChannelMuted --
+        /// Mutes or unmutes a specific MIDI channel.
+        /// @param | ch | integer | Channel number (1-16).
+        /// @param | muted | boolean | True to mute, false to unmute.
+        /// @return | nil | No return value.
         methods.add_method("setChannelMuted", |_, this, (ch, muted): (usize, bool)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_muted(ch - 1, muted);
             }
             Ok(())
         });
+        // -- isChannelMuted --
+        /// Returns whether a specific MIDI channel is muted.
+        /// @param | ch | integer | Channel number (1-16).
+        /// @return | boolean | True if the channel is muted.
         methods.add_method("isChannelMuted", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().is_channel_muted(ch - 1))
@@ -491,6 +743,11 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(false)
             }
         });
+        // -- setChannelInstrument --
+        /// Sets the General MIDI instrument program for a channel.
+        /// @param | ch | integer | Channel number (1-16).
+        /// @param | inst | integer | GM instrument program number (0-127).
+        /// @return | nil | No return value.
         methods.add_method(
             "setChannelInstrument",
             |_, this, (ch, inst): (usize, u8)| {
@@ -500,6 +757,10 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(())
             },
         );
+        // -- getChannelInstrument --
+        /// Returns the current GM instrument program for a channel.
+        /// @param | ch | integer | Channel number (1-16).
+        /// @return | integer | GM instrument program number (0-127).
         methods.add_method("getChannelInstrument", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().channel_instrument(ch - 1))
@@ -507,22 +768,39 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(0u8)
             }
         });
+        // -- getChannelCount --
+        /// Returns the number of active MIDI channels in the loaded file.
+        /// @return | integer | Number of active channels.
         methods.add_method("getChannelCount", |_, this, ()| {
             Ok(this.inner.borrow().channel_count())
         });
+        // -- soloChannel --
+        /// Solos a specific MIDI channel, muting all others.
+        /// @param | ch | integer | Channel number (1-16) to solo.
+        /// @return | nil | No return value.
         methods.add_method("soloChannel", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().solo_channel(ch - 1);
             }
             Ok(())
         });
+        // -- unsoloAll --
+        /// Removes solo from all channels, restoring normal playback.
+        /// @return | nil | No return value.
         methods.add_method("unsoloAll", |_, this, ()| {
             this.inner.borrow_mut().unsolo_all();
             Ok(())
         });
+        // -- getTrackCount --
+        /// Returns the number of tracks in the loaded MIDI file.
+        /// @return | integer | Number of MIDI tracks.
         methods.add_method("getTrackCount", |_, this, ()| {
             Ok(this.inner.borrow().track_count())
         });
+        // -- getTrackName --
+        /// Returns the name of a MIDI track by 1-based index.
+        /// @param | idx | integer | Track index (1-based).
+        /// @return | string? | Track name or nil if not available.
         methods.add_method("getTrackName", |_, this, idx: usize| {
             if idx >= 1 {
                 Ok(this
@@ -534,12 +812,21 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(None)
             }
         });
+        // -- setTrackMuted --
+        /// Mutes or unmutes a specific MIDI track.
+        /// @param | idx | integer | Track index (1-based).
+        /// @param | muted | boolean | True to mute, false to unmute.
+        /// @return | nil | No return value.
         methods.add_method("setTrackMuted", |_, this, (idx, muted): (usize, bool)| {
             if idx >= 1 {
                 this.inner.borrow_mut().set_track_muted(idx - 1, muted);
             }
             Ok(())
         });
+        // -- isTrackMuted --
+        /// Returns whether a specific MIDI track is muted.
+        /// @param | idx | integer | Track index (1-based).
+        /// @return | boolean | True if the track is muted.
         methods.add_method("isTrackMuted", |_, this, idx: usize| {
             if idx >= 1 {
                 Ok(this.inner.borrow().is_track_muted(idx - 1))
@@ -547,53 +834,96 @@ impl LuaUserData for LuaMidiPlayer {
                 Ok(false)
             }
         });
+        // -- getNoteCount --
+        /// Returns the total number of note events in the loaded MIDI file.
+        /// @return | integer | Total note count.
         methods.add_method("getNoteCount", |_, this, ()| {
             Ok(this.inner.borrow().note_count())
         });
+        // -- setOnNoteOn --
+        /// Registers a callback for MIDI note-on events (stub, not yet implemented).
+        /// @param | cb | function? | Callback function or nil to clear.
+        /// @return | nil | No return value.
         methods.add_method("setOnNoteOn", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOn");
             Ok(())
         });
+        // -- setOnNoteOff --
+        /// Registers a callback for MIDI note-off events (stub, not yet implemented).
+        /// @param | cb | function? | Callback function or nil to clear.
+        /// @return | nil | No return value.
         methods.add_method("setOnNoteOff", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOff");
             Ok(())
         });
+        // -- setOnEnd --
+        /// Registers a callback invoked when MIDI playback finishes (stub, not yet implemented).
+        /// @param | cb | function? | Callback function or nil to clear.
+        /// @return | nil | No return value.
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
             Ok(())
         });
+        // -- getSampleRate --
+        /// Returns the output sample rate used for MIDI synthesis.
+        /// @return | integer | Sample rate in Hz (e.g. 44100).
         methods.add_method("getSampleRate", |_, this, ()| {
             Ok(this.inner.borrow().get_output_sample_rate())
         });
+        // -- setSampleRate --
+        /// Sets the output sample rate for MIDI synthesis.
+        /// @param | rate | integer | Sample rate in Hz (e.g. 44100, 48000).
+        /// @return | nil | No return value.
         methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
             this.inner.borrow_mut().set_output_sample_rate(rate);
             Ok(())
         });
+        // -- getChannels --
+        /// Returns the number of output audio channels for MIDI synthesis.
+        /// @return | integer | Channel count (1 = mono, 2 = stereo).
         methods.add_method("getChannels", |_, this, ()| {
             Ok(this.inner.borrow().get_output_channels() as u32)
         });
+        // -- setChannels --
+        /// Sets the number of output audio channels for MIDI synthesis.
+        /// @param | channels | integer | Channel count (1 = mono, 2 = stereo).
+        /// @return | nil | No return value.
         methods.add_method_mut("setChannels", |_, this, channels: u32| {
             this.inner.borrow_mut().set_output_channels(channels as u16);
             Ok(())
         });
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LMidiPlayer".
         methods.add_method("type", |_, _, ()| Ok("LMidiPlayer"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "LMidiPlayer", "MidiPlayer", or "Object").
+        /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LMidiPlayer" || name == "MidiPlayer" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper around a pre-allocated pool of identical sound voices for rapid fire effects.
 pub(crate) struct LuaSoundPool {
     pub(crate) pool: crate::audio::pool::SoundPool,
     pub(crate) state: Rc<RefCell<SharedState>>,
 }
 impl LuaUserData for LuaSoundPool {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- play --
+        /// Plays the next available voice from the pool in round-robin order.
+        /// @return | integer | Numeric source ID of the voice that started playing.
         methods.add_method_mut("play", |_, this, ()| {
             let key = this.pool.next_voice();
             let game_dir = this.state.borrow().game_dir.clone();
             this.state.borrow_mut().mixer.play(key, &game_dir);
             Ok(slotmap::Key::data(&key).as_ffi() as i64)
         });
+        // -- stopAll --
+        /// Stops all voices in this sound pool immediately.
+        /// @return | nil | No return value.
         methods.add_method_mut("stopAll", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -602,6 +932,10 @@ impl LuaUserData for LuaSoundPool {
             }
             Ok(())
         });
+        // -- setVolume --
+        /// Sets the volume for all voices in this pool.
+        /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
+        /// @return | nil | No return value.
         methods.add_method_mut("setVolume", |_, this, vol: f32| {
             this.pool.set_volume(vol);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -611,6 +945,10 @@ impl LuaUserData for LuaSoundPool {
             }
             Ok(())
         });
+        // -- setBus --
+        /// Routes all voices in this pool through the named audio bus.
+        /// @param | name | string | Name of the target bus.
+        /// @return | nil | No return value.
         methods.add_method_mut("setBus", |_, this, name: String| {
             this.pool.set_bus(&name);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -621,6 +959,9 @@ impl LuaUserData for LuaSoundPool {
             }
             Ok(())
         });
+        // -- release --
+        /// Releases all voices and frees audio resources held by this pool.
+        /// @return | nil | No return value.
         methods.add_method_mut("release", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -629,18 +970,32 @@ impl LuaUserData for LuaSoundPool {
             }
             Ok(())
         });
+        // -- getVoiceCount --
+        /// Returns the number of pre-allocated voices in this pool.
+        /// @return | integer | Voice count.
         methods.add_method("getVoiceCount", |_, this, ()| Ok(this.pool.voice_count()));
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LSoundPool".
         methods.add_method("type", |_, _this, ()| Ok("LSoundPool"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "SoundPool" or "Object").
+        /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "SoundPool" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper around a streaming audio decoder for incremental PCM extraction.
 pub struct LuaDecoder {
     inner: Decoder,
 }
 impl LuaUserData for LuaDecoder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- decode --
+        /// Decodes the next chunk of audio data and returns it as a SoundData object.
+        /// @return | SoundData? | Decoded PCM data, or nil if end of stream reached.
         methods.add_method_mut("decode", |lua, this, ()| match this.inner.decode() {
             Some(pcm_i16) => {
                 let samples: Vec<f32> = pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
@@ -650,24 +1005,59 @@ impl LuaUserData for LuaDecoder {
             }
             None => Ok(LuaValue::Nil),
         });
+        // -- getChannelCount --
+        /// Returns the number of audio channels in the source file.
+        /// @return | integer | Channel count (1 = mono, 2 = stereo).
         methods.add_method("getChannelCount", |_, this, ()| {
             Ok(this.inner.channels as u32)
         });
+        // -- getBitDepth --
+        /// Returns the bit depth of the source audio file.
+        /// @return | integer | Bits per sample (e.g. 16, 24).
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.inner.bit_depth as u32));
+        // -- getSampleRate --
+        /// Returns the sample rate of the source audio file.
+        /// @return | integer | Sample rate in Hz.
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.inner.sample_rate));
+        // -- getDuration --
+        /// Returns the total duration of the source audio file in seconds.
+        /// @return | number | Duration in seconds.
         methods.add_method("getDuration", |_, this, ()| Ok(this.inner.get_duration()));
+        // -- seek --
+        /// Seeks to a specific position in the audio stream.
+        /// @param | offset | number | Target position in seconds.
+        /// @return | nil | No return value.
         methods.add_method_mut("seek", |_, this, offset: f64| {
             this.inner.seek(offset);
             Ok(())
         });
+        // -- rewind --
+        /// Rewinds the decoder back to the beginning of the audio stream.
+        /// @return | nil | No return value.
         methods.add_method_mut("rewind", |_, this, ()| {
             this.inner.rewind();
             Ok(())
         });
+        // -- tell --
+        /// Returns the current read position in the audio stream in seconds.
+        /// @return | number | Current position in seconds.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.tell()));
+        // -- isSeekable --
+        /// Returns whether this decoder supports seeking.
+        /// @return | boolean | True if seek operations are supported.
         methods.add_method("isSeekable", |_, this, ()| Ok(this.inner.is_seekable()));
+        // -- release --
+        /// Releases decoder resources (no-op, kept for API symmetry).
+        /// @return | nil | No return value.
         methods.add_method("release", |_, _, ()| Ok(()));
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LDecoder".
         methods.add_method("type", |_, _, ()| Ok("LDecoder"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "LDecoder" or "Object").
+        /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LDecoder" || name == "Object")
         });
@@ -675,6 +1065,11 @@ impl LuaUserData for LuaDecoder {
 }
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+    // -- newSource --
+    /// Creates a new audio source from a file path, either fully loaded or streaming.
+    /// @param | path | string | Relative path to the audio file (WAV, OGG, MP3, FLAC).
+    /// @param | sourceType | string? | "static" to load fully into memory, or "stream" (default) for streaming.
+    /// @return | LSource | A new audio source ready for playback.
     let s = state.clone();
     tbl.set(
         "newSource",
@@ -707,6 +1102,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- play --
+    /// Starts playback of a source by handle, optionally routing through a named bus.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | options | table? | Optional table with "bus" field for bus routing.
+    /// @return | integer | Numeric source ID of the playing source.
     let s = state.clone();
     tbl.set(
         "play",
@@ -729,6 +1129,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- stop --
+    /// Stops playback of a source and resets its position to the beginning.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "stop",
@@ -739,6 +1143,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- setVolume --
+    /// Sets the volume of a source by handle.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setVolume",
@@ -749,6 +1158,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getVolume --
+    /// Returns the current volume of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Current volume multiplier.
     let s = state.clone();
     tbl.set(
         "getVolume",
@@ -758,6 +1171,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_volume(key))
         })?,
     )?;
+    // -- pause --
+    /// Pauses playback of a source at its current position.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "pause",
@@ -768,6 +1185,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- resume --
+    /// Resumes playback of a paused source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "resume",
@@ -778,6 +1199,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- setPitch --
+    /// Sets the pitch multiplier of a source, affecting playback speed and tone.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | pitch | number | Pitch multiplier (1.0 = normal, 2.0 = octave up).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPitch",
@@ -788,6 +1214,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getPitch --
+    /// Returns the current pitch multiplier of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Current pitch multiplier.
     let s = state.clone();
     tbl.set(
         "getPitch",
@@ -797,6 +1227,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_pitch(key))
         })?,
     )?;
+    // -- isPlaying --
+    /// Returns whether a source is currently playing.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | boolean | True if the source is playing.
     let s = state.clone();
     tbl.set(
         "isPlaying",
@@ -806,6 +1240,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.is_playing(key))
         })?,
     )?;
+    // -- isPaused --
+    /// Returns whether a source is currently paused.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | boolean | True if the source is paused.
     let s = state.clone();
     tbl.set(
         "isPaused",
@@ -815,6 +1253,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.is_paused(key))
         })?,
     )?;
+    // -- isStopped --
+    /// Returns whether a source is currently stopped.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | boolean | True if the source is stopped.
     let s = state.clone();
     tbl.set(
         "isStopped",
@@ -824,6 +1266,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.is_stopped(key))
         })?,
     )?;
+    // -- setLooping --
+    /// Enables or disables looping for a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | looping | boolean | True to loop, false to play once.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setLooping",
@@ -834,6 +1281,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- isLooping --
+    /// Returns whether a source has looping enabled.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | boolean | True if looping is enabled.
     let s = state.clone();
     tbl.set(
         "isLooping",
@@ -843,6 +1294,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.is_looping(key))
         })?,
     )?;
+    // -- playLooping --
+    /// Starts playback of a source with looping enabled in one call.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "playLooping",
@@ -854,6 +1309,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- setPan --
+    /// Sets the stereo panning of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | pan | number | Pan from -1.0 (left) to 1.0 (right), 0.0 is center.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPan",
@@ -864,6 +1324,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getPan --
+    /// Returns the current stereo pan position of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Pan value from -1.0 (left) to 1.0 (right).
     let s = state.clone();
     tbl.set(
         "getPan",
@@ -873,6 +1337,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_pan(key))
         })?,
     )?;
+    // -- setMasterVolume --
+    /// Sets the global master volume affecting all audio output.
+    /// @param | vol | number | Master volume multiplier (0.0 = silent, 1.0 = normal).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setMasterVolume",
@@ -881,21 +1349,34 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getMasterVolume --
+    /// Returns the current global master volume level.
+    /// @return | number | Master volume multiplier.
     let s = state.clone();
     tbl.set(
         "getMasterVolume",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_master_volume()))?,
     )?;
+    // -- getActiveSourceCount --
+    /// Returns the number of sources currently playing audio.
+    /// @return | integer | Count of active (playing) sources.
     let s = state.clone();
     tbl.set(
         "getActiveSourceCount",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_active_source_count()))?,
     )?;
+    // -- getSourceCount --
+    /// Returns the total number of loaded audio sources (playing or idle).
+    /// @return | integer | Total source count.
     let s = state.clone();
     tbl.set(
         "getSourceCount",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_source_count()))?,
     )?;
+    // -- getSourceType --
+    /// Returns whether a source is static or streaming.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | string | Either "static" or "stream".
     let s = state.clone();
     tbl.set(
         "getSourceType",
@@ -911,6 +1392,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    // -- clone --
+    /// Creates an independent copy of a source sharing the same audio data.
+    /// @param | source | LSource|integer | Audio source or numeric source ID to clone.
+    /// @return | LSource | A new source instance with identical settings.
     let s = state.clone();
     tbl.set(
         "clone",
@@ -928,6 +1413,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    // -- pauseAll --
+    /// Pauses all currently playing audio sources.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "pauseAll",
@@ -936,6 +1424,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- stopAll --
+    /// Stops all audio sources and resets their positions.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "stopAll",
@@ -944,6 +1435,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- resumeAll --
+    /// Resumes all paused audio sources.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "resumeAll",
@@ -952,6 +1446,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- release --
+    /// Releases an audio source, freeing its memory and stopping playback.
+    /// @param | source | LSource|integer | Audio source or numeric source ID to release.
+    /// @return | boolean | True if the source was successfully released.
     let s = state.clone();
     tbl.set(
         "release",
@@ -967,6 +1465,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    // -- newBus --
+    /// Creates a new audio mixing bus for grouping and controlling sources.
+    /// @param | name | string | Unique name for the bus (e.g. "music", "sfx").
+    /// @return | LBus | The new audio bus handle.
     let s = state.clone();
     tbl.set(
         "newBus",
@@ -979,6 +1481,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- setSourceBus --
+    /// Routes a source through a specific audio bus for grouped mixing.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | bus | LBus | The bus to route through.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setSourceBus",
@@ -999,6 +1506,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getSourceBus --
+    /// Returns the bus a source is routed through.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | LBus? | The assigned bus, or nil if using direct output.
     let s = state.clone();
     tbl.set(
         "getSourceBus",
@@ -1014,7 +1525,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    // -- getMaxSources --
+    /// Returns the maximum number of simultaneous audio sources supported.
+    /// @return | integer | Maximum source count (64).
     tbl.set("getMaxSources", lua.create_function(|_, ()| Ok(64))?)?;
+    // -- getDuration --
+    /// Returns the total duration of a source in seconds.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Duration in seconds.
     let s = state.clone();
     tbl.set(
         "getDuration",
@@ -1024,6 +1542,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_duration(key))
         })?,
     )?;
+    // -- tell --
+    /// Returns the current playback position of a source in seconds.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Current position in seconds.
     let s = state.clone();
     tbl.set(
         "tell",
@@ -1033,6 +1555,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_tell(key))
         })?,
     )?;
+    // -- seek --
+    /// Seeks a source to a specific position in seconds.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | pos | number | Target position in seconds.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "seek",
@@ -1044,6 +1571,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- setLowpass --
+    /// Applies a lowpass filter to a source, attenuating high frequencies.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setLowpass",
@@ -1054,6 +1586,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- setHighpass --
+    /// Applies a highpass filter to a source, attenuating low frequencies.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setHighpass",
@@ -1064,6 +1601,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getLowpass --
+    /// Returns the current lowpass filter cutoff of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | integer | Cutoff frequency in Hz, or 0 if not set.
     let s = state.clone();
     tbl.set(
         "getLowpass",
@@ -1073,6 +1614,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_lowpass(key))
         })?,
     )?;
+    // -- getHighpass --
+    /// Returns the current highpass filter cutoff of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | integer | Cutoff frequency in Hz, or 0 if not set.
     let s = state.clone();
     tbl.set(
         "getHighpass",
@@ -1082,6 +1627,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_highpass(key))
         })?,
     )?;
+    // -- clearFilter --
+    /// Removes all frequency filters from a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "clearFilter",
@@ -1092,6 +1641,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- fadeIn --
+    /// Sets the fade-in duration for a source so it ramps from silence on play.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | dur | number | Fade-in duration in seconds.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "fadeIn",
@@ -1102,6 +1656,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getFadeIn --
+    /// Returns the configured fade-in duration of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number | Fade-in duration in seconds.
     let s = state.clone();
     tbl.set(
         "getFadeIn",
@@ -1111,6 +1669,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(st.mixer.get_fade_in(key))
         })?,
     )?;
+    // -- setListener2D --
+    /// Sets the 2D listener position for spatial audio calculations.
+    /// @param | x | number | Listener X position in world units.
+    /// @param | y | number | Listener Y position in world units.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setListener2D",
@@ -1119,6 +1682,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getListener2D --
+    /// Returns the current 2D listener position.
+    /// @return | number, number | X and Y position of the listener.
     let s = state.clone();
     tbl.set(
         "getListener2D",
@@ -1127,6 +1693,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((pos[0], pos[1]))
         })?,
     )?;
+    // -- setListener --
+    /// Sets the 3D listener position for spatial audio (Z defaults to 0 for 2D games).
+    /// @param | x | number | Listener X position.
+    /// @param | y | number | Listener Y position.
+    /// @param | z | number? | Listener Z position (defaults to 0).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setListener",
@@ -1137,6 +1709,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getListener --
+    /// Returns the current 3D listener position.
+    /// @return | number, number, number | X, Y, and Z position of the listener.
     let s = state.clone();
     tbl.set(
         "getListener",
@@ -1145,6 +1720,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((pos[0], pos[1], pos[2]))
         })?,
     )?;
+    // -- setPosition --
+    /// Sets the 3D position of a source for spatial audio panning and attenuation.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | x | number | X position in world units.
+    /// @param | y | number | Y position in world units.
+    /// @param | z | number? | Z position (defaults to 0).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPosition",
@@ -1158,6 +1740,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- getPosition --
+    /// Returns the 3D position of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number, number, number | X, Y, and Z position.
     let s = state.clone();
     tbl.set(
         "getPosition",
@@ -1167,6 +1753,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((pos[0], pos[1], pos[2]))
         })?,
     )?;
+    // -- setVelocity --
+    /// Sets the velocity of a source for Doppler effect calculations.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | x | number | X velocity component.
+    /// @param | y | number | Y velocity component.
+    /// @param | z | number? | Z velocity component (defaults to 0).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setVelocity",
@@ -1180,6 +1773,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- getVelocity --
+    /// Returns the velocity vector of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number, number, number | X, Y, and Z velocity components.
     let s = state.clone();
     tbl.set(
         "getVelocity",
@@ -1189,6 +1786,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((vel[0], vel[1], vel[2]))
         })?,
     )?;
+    // -- setOrientation --
+    /// Sets the orientation of a source using forward and up vectors.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @param | fx | number | Forward vector X.
+    /// @param | fy | number | Forward vector Y.
+    /// @param | fz | number | Forward vector Z.
+    /// @param | ux | number | Up vector X.
+    /// @param | uy | number | Up vector Y.
+    /// @param | uz | number | Up vector Z.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setOrientation",
@@ -1202,6 +1809,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- getOrientation --
+    /// Returns the orientation vectors of a source.
+    /// @param | source | LSource|integer | Audio source or numeric source ID.
+    /// @return | number, number, number, number, number, number | Forward (fx,fy,fz) and up (ux,uy,uz) vectors.
     let s = state.clone();
     tbl.set(
         "getOrientation",
@@ -1211,6 +1822,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((o[0], o[1], o[2], o[3], o[4], o[5]))
         })?,
     )?;
+    // -- setDopplerScale --
+    /// Sets the global Doppler effect intensity multiplier.
+    /// @param | scale | number | Doppler scale (0 = disabled, 1.0 = realistic).
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setDopplerScale",
@@ -1219,11 +1834,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getDopplerScale --
+    /// Returns the current global Doppler effect scale.
+    /// @return | number | Doppler scale factor.
     let s = state.clone();
     tbl.set(
         "getDopplerScale",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_doppler_scale()))?,
     )?;
+    // -- setDistanceModel --
+    /// Sets the distance attenuation model for spatial audio.
+    /// @param | model | string | Model name (e.g. "inverse", "linear", "exponent", "none").
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setDistanceModel",
@@ -1232,11 +1854,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getDistanceModel --
+    /// Returns the current distance attenuation model name.
+    /// @return | string | Distance model name.
     let s = state.clone();
     tbl.set(
         "getDistanceModel",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_distance_model().to_string()))?,
     )?;
+    // -- setMeter --
+    /// Sets the master peak level for metering purposes.
+    /// @param | level | number | Peak level clamped to 0.0-1.0.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setMeter",
@@ -1245,11 +1874,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- getMeter --
+    /// Returns the current master peak level for VU-meter displays.
+    /// @return | number | Peak level from 0.0 to 1.0.
     let s = state.clone();
     tbl.set(
         "getMeter",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.master_peak))?,
     )?;
+    // -- newMidiPlayer --
+    /// Creates a new MIDI player instance, optionally loading a file immediately.
+    /// @param | path | string? | Optional relative path to a .mid file to load.
+    /// @return | LMidiPlayer | A new MIDI player ready for playback.
     let s = state.clone();
     tbl.set(
         "newMidiPlayer",
@@ -1269,6 +1905,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(result)
         })?,
     )?;
+    // -- newSoundData --
+    /// Creates a new SoundData object from a file path or blank buffer for procedural audio.
+    /// @param | pathOrCount | string|integer | File path to decode, or sample count for blank buffer.
+    /// @param | sampleRate | integer | Sample rate in Hz (e.g. 44100, 48000).
+    /// @param | channels | integer? | Channel count (1 = mono, 2 = stereo), defaults to 1.
+    /// @return | SoundData | Raw PCM sample data for manipulation or playback.
     let s = state.clone();
     tbl.set(
         "newSoundData",

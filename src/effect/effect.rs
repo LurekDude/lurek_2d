@@ -1,3 +1,7 @@
+//! - Post-processing effect instance holding type, parameters, and enabled state.
+//! - Built-in effects carry default params; custom effects bind to an explicit shader id.
+//! - Parameter accessors for reading, writing, and listing scalar uniforms.
+
 use super::effect_type::PostFxEffectType;
 use crate::log_msg;
 use crate::runtime::log_messages::{FE01, FE02, FE03};

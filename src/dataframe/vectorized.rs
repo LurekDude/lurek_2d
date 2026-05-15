@@ -1,3 +1,13 @@
+//! - Typed columnar storage (Float64, Int64, Bool, Text) with optional validity masks
+//! - Element-wise scalar operations: add, sub, mul, div, abs, sqrt, floor, ceil, neg
+//! - Element-wise binary operations between two numeric columns
+//! - Column reduction: sum, mean, min, max, std, var, count
+//! - Comparison mask generation for filter predicates
+//! - VecFrame ↔ DataFrame bidirectional conversion with type inference
+//! - Parallel multi-column reduce and scalar operations via rayon
+//! - Column type casting between float64, int64, and text
+//! - Boolean mask filtering across all column types
+
 use crate::dataframe::frame::{CellValue, DataFrame};
 use rayon::prelude::*;
 use std::collections::HashMap;

@@ -1,10 +1,8 @@
-
-//! - Defines the dialogue selection data used by the AI layer to choose topics
-//!   and branches from weighted sets guarded by current FSM and BT state.
-//! - Owns the stored topic and branch records, including their optional gate keys
-//!   and utility-score references used during selection.
-//! - Keeps the scoring and matching logic that filters by current gates, folds in
-//!   utility values, and returns the highest-scoring topic or branch candidate.
+//! - Dialogue selection choosing topics and branches from weighted sets guarded by FSM and BT state.
+//! - Topic and branch records with optional gate keys and utility-score references.
+//! - Scoring and matching logic filtering by gates, folding utility, and returning best candidates.
+//! - Independent gating against FSM state and behavior-tree status for adaptive selection.
+//! - Base weight combined with optional utility scores for flexible priority ranking.
 
 use std::collections::HashMap;
 #[derive(Debug, Clone)]

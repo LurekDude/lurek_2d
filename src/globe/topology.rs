@@ -1,3 +1,9 @@
+//! - Province graph structure with adjacency caching, centroid lookup, and edge tags.
+//! - Pathfinding integration via cost functions and reachability queries.
+//! - Province attribute storage and neighbor-list access.
+//! - Cache rebuild for bulk topology mutations.
+//! - Default-cost convenience wrappers for quick path and range checks.
+
 use crate::globe::types::{GlobeError, Province, ProvinceId, MAX_PROVINCES};
 use crate::pathfind::graph_path::{find_province_path, ProvinceCostFn, ProvincePath};
 use std::collections::{HashMap, HashSet};
@@ -13,6 +19,7 @@ pub struct ProvinceGraph {
     /// Cached edge tags keyed by ordered province id pairs.
     edge_tags: HashMap<(u32, u32), HashSet<String>>,
 }
+/// Province graph operations: insert, remove, query, pathfind, and cache management.
 impl ProvinceGraph {
     /// Create an empty province graph.
     pub fn new() -> Self {

@@ -1,3 +1,9 @@
+//! - Compact per-province fog mask storing hidden, explored, and visible states.
+//! - Bit-packed base64 serialization for save/load round-trips.
+//! - Per-viewer fog store keyed by viewer name with automatic mask creation.
+//! - Reveal, hide, explore, and toggle operations on individual or batched provinces.
+//! - Query helpers for visible/explored id lists and province counts.
+
 use crate::globe::types::{FogState, ProvinceId, MAX_PROVINCES};
 use base64::Engine;
 use std::collections::HashMap;

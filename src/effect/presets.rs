@@ -1,8 +1,13 @@
+//! - Built-in post-processing effect presets (retro TV, horror, dream, neon, sepia).
+//! - Preset construction with viewport-sized stack initialization.
+//! - Static name lookup for canonical preset identifiers.
+
 use super::effect::PostFxEffect;
 use super::effect_type::PostFxEffectType;
 use super::stack::PostFxStack;
+
+/// Bundle a preset name, its effect list, and a prepared stack ordering.
 #[derive(Debug, Clone)]
-/// Bundles a preset name, its effect list, and a prepared stack ordering.
 pub struct EffectPreset {
     /// Stable preset identifier exposed to callers.
     pub name: &'static str,

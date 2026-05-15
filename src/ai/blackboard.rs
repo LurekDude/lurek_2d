@@ -1,10 +1,8 @@
-
-//! - Defines the lightweight hierarchical blackboard used by the AI module to
-//!   store shared per-agent facts as keyed numbers, booleans, and strings.
-//! - Owns the local entry map, optional parent chain, and the read and write
-//!   operations that resolve values through that fallback hierarchy.
-//! - Keeps the small management surface for key removal, board clearing, key
-//!   listing, size reporting, and parent attachment used by higher AI systems.
+//! - Lightweight hierarchical blackboard storing per-agent facts as numbers, booleans, and strings.
+//! - Local entry map with optional parent chain and read/write resolution through fallback hierarchy.
+//! - Key removal, board clearing, key listing, size reporting, and parent attachment operations.
+//! - Parent-chain walk for reads giving child boards transparent access to shared data.
+//! - Structured runtime logging for creation, removal, and clear events.
 
 use crate::log_msg;
 use crate::runtime::log_messages::{BB01, BB02, BB03};

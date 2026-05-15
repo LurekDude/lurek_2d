@@ -1,3 +1,9 @@
+//! - Orbit camera with latitude, longitude, zoom, and level-of-detail selection.
+//! - View-matrix construction from globe rotation, axial tilt, and camera angles.
+//! - Single-point and polygon projection from lat/lon to screen space.
+//! - Back-face culling via z-depth test for hidden-hemisphere rejection.
+//! - Screen-drag-to-pan conversion and vector normalization helpers.
+
 use crate::globe::types::{GlobeSpec, LodTier, ProjectedProvince, Province};
 use crate::math::sphere::{axial_tilt_mat, lat_lon_to_unit, rot_x, rot_y, Mat3x3};
 use crate::math::{Vec2, Vec3};
@@ -27,6 +33,7 @@ impl Default for OrbitCamera {
         }
     }
 }
+/// Camera manipulation: pan, zoom, LOD, and clamping.
 impl OrbitCamera {
     /// Clamp camera latitude, longitude, and zoom into the supported range.
     pub fn clamp(&mut self) {

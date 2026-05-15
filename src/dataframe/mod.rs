@@ -1,3 +1,10 @@
+//! - Columnar DataFrame type and Database container
+//! - Lazy query builder and deferred execution pipeline
+//! - Query-time transforms: filtering, grouping, analytics, and window functions
+//! - CSV, JSON, and binary serialization and parsing
+//! - SQL-like SELECT executor with tokenizer and recursive-descent parser
+//! - Typed vectorized column storage with parallel reduce and scalar operations
+
 /// Core table types and base dataframe operations.
 pub mod frame;
 /// Deferred query builder and lazy execution pipeline.

@@ -1,3 +1,8 @@
+//! - Directed graph container with typed nodes, edges, and item flow.
+//! - Supply/demand modeling, conversion rules, and overflow policies.
+//! - Pathfinding, simulation stepping, and event emission.
+//! - Render helpers for visual graph output.
+
 /// Graph algorithm helpers.
 pub mod algorithms;
 /// Core graph container and stats.

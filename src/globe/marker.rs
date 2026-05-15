@@ -1,3 +1,7 @@
+//! - Stable-id marker collection for globe pin management.
+//! - Insert, remove, move, and query markers by id or type.
+//! - Per-marker visibility toggle and arbitrary string attributes.
+
 use crate::globe::types::{Marker, MarkerStyle};
 use std::collections::HashMap;
 /// Marker collection keyed by stable id.

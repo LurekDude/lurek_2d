@@ -1,4 +1,15 @@
 
+//! - Lock-free `AtomicParam` for sharing f32 parameters between the audio thread and Lua API.
+//! - `EffectType` enum covering biquad filters, reverbs, chorus, flanger, phaser, distortion, limiter, and compressor.
+//! - `EffectParams` shared parameter block with named `set_param` dispatch per effect type.
+//! - `ActiveEffect` per-source instantiation holding biquad delay elements, circular comb buffer, LFO phase, and envelope state.
+//! - Sample-by-sample `process` implementing each algorithm variant with clamped parameter reads.
+//! - `SharedEffectGraph` Arc-wrapped effect list shared between `Bus` (writer) and `DynamicEffectSource` (reader).
+//! - `DynamicEffectSource<I>` rodio `Source` wrapper applying the full effect chain per sample with per-frame sync.
+//! - Comb-buffer sizing derived from sample rate and effect type at construction time.
+//! - Biquad coefficient computation for lowpass, highpass, bandpass, notch, low-shelf, high-shelf, and bell EQ.
+//! - LFO-driven modulated delay for flanger and phaser with depth and rate controls.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{DP01, DP02, DP03};
 use rodio::Source;
@@ -601,6 +612,7 @@ impl<I: Source<Item = f32>> DynamicEffectSource<I> {
         }
     }
 }
+/// `Iterator` impl: process one sample through the full effect chain per call.
 impl<I: Source<Item = f32>> Iterator for DynamicEffectSource<I> {
     type Item = I::Item;
     /// Advance the upstream source, apply the full effect chain per sample, and return the result.
@@ -621,6 +633,7 @@ impl<I: Source<Item = f32>> Iterator for DynamicEffectSource<I> {
         }
     }
 }
+/// `Source` impl: delegate metadata queries to the upstream source unchanged.
 impl<I: Source<Item = f32>> Source for DynamicEffectSource<I> {
     /// Delegate `current_frame_len` to the upstream source.
     fn current_frame_len(&self) -> Option<usize> {

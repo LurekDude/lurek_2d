@@ -1,3 +1,8 @@
+//! - Post-processing effect stack: bloom, blur, CRT, vignette, film grain, and custom shaders.
+//! - Screen overlays: weather particles, fog, heat haze, water distortion, flashes, and fades.
+//! - Atmosphere and ambient color derived from time-of-day.
+//! - Named presets and per-image effect ordering.
+
 /// Ambient color state derived from time-of-day settings.
 pub mod ambient;
 /// Atmospheric overlay states such as clouds, fog, and lightning.

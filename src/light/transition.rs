@@ -1,3 +1,7 @@
+//! - Time-based linear interpolation of light color, intensity, and radius.
+//! - Clamps duration to a safe minimum and tracks elapsed progress.
+//! - Returns interpolated values each frame until the transition completes.
+
 /// Time-based linear tween that interpolates a light's color, intensity, and radius.
 #[derive(Clone)]
 pub struct LightTransition {

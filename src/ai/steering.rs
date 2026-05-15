@@ -1,10 +1,8 @@
 
-//! - Defines the steering model used by the AI module to represent individual
-//!   movement behaviors, their blending rules, and optional waypoint following.
-//! - Owns the behavior variants for target seeking, fleeing, arrival, wandering,
-//!   flocking, pursuit, evasion, and custom callback-driven steering.
-//! - Keeps the manager logic that combines active behaviors, applies weighting or
-//!   priority selection, advances waypoint paths, and clamps the final steering force.
+//! - Steering model representing individual movement behaviors, blending rules, and waypoint following.
+//! - Behavior variants: seek, flee, arrive, wander, flock, pursue, evade, and custom callbacks.
+//! - Manager logic combining active behaviors with weighting or priority selection.
+//! - Waypoint path advancement and final steering force clamping.
 
 /// Force vector used by steering systems.
 pub type Force = (f32, f32);
@@ -42,6 +40,7 @@ pub struct SteeringBase {
 }
 /// `Default` provides a weight of 1.0 and enabled=true.
 impl Default for SteeringBase {
+    /// Return a base with weight 1.0 and enabled.
     fn default() -> Self {
         Self {
             weight: 1.0,

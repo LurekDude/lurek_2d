@@ -1,3 +1,13 @@
+//! - Row filtering by column predicate with comparison and contains operators
+//! - Column sorting in ascending or descending order
+//! - Head, tail, and inclusive slice row selection
+//! - Column projection and unique value extraction
+//! - Group-by partitioning and inner/left join merging
+//! - Frame merge, count-by, drop-nil, and deterministic sampling
+//! - Aggregate statistics: sum, mean, min, max, median, stddev, variance
+//! - Descriptive statistics frame generation
+//! - Nil fill, batch row append, and column f64 import/export
+
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 use crate::dataframe::rng::Xorshift64;
 impl DataFrame {

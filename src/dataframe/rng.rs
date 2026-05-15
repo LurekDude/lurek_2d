@@ -1,3 +1,7 @@
+//! - Xorshift64 pseudo-random number generator for deterministic dataframe sampling
+//! - Float, integer, and index generation from 64-bit state
+//! - Zero-seed remap to avoid degenerate all-zero output
+
 /// Hold xorshift64 state used by dataframe-local random helpers.
 pub(crate) struct Xorshift64 {
     /// Store current PRNG state word.

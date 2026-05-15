@@ -1,3 +1,12 @@
+//! - Automation simulator: drives script playback by advancing time and dispatching events.
+//! - Manages a registry of named scripts and macros with load/unload lifecycle.
+//! - Evaluates condition expressions (&&, ||, !, parentheses) against named boolean flags.
+//! - Supports pause, resume, speed control, and visual highlight mode for debug tools.
+//! - CallMacro steps inline macro scripts at the current playback position.
+//! - VisualAssert steps compare baseline and actual images with pixel-diff tolerance.
+//! - Assert steps halt playback when condition expressions evaluate to false.
+//! - StepEventSink trait decouples event dispatch from EventQueue for testing.
+
 use super::script::MAX_STEPS;
 use super::{Action, Script, Step};
 use crate::event::{Event, EventArg, EventQueue};
@@ -85,7 +94,7 @@ impl Simulator {
         log_msg!(debug, AT02_SCRIPT_LOAD, "{}", script.name);
         self.scripts.insert(script.name.clone(), script);
     }
-    /// Remove the named script; stops playback if it is currently active. Returns `true` if the script existed.
+    /// Remove the named script; stop playback if it is currently active. Return `true` if the script existed.
     pub fn unload(&mut self, name: &str) -> bool {
         if self.active_script.as_deref() == Some(name) {
             self.stop();
@@ -188,7 +197,7 @@ impl Simulator {
     pub fn get_script_step_limit(&self, name: &str) -> Option<usize> {
         self.scripts.get(name).map(|s| s.get_step_limit())
     }
-    /// Apply a new step limit to the named script; returns `true` if the script exists.
+    /// Apply a new step limit to the named script; return `true` if the script exists.
     pub fn set_script_step_limit(&mut self, name: &str, limit: usize) -> bool {
         if let Some(script) = self.scripts.get_mut(name) {
             script.set_step_limit(limit);
@@ -240,6 +249,7 @@ impl Simulator {
     pub fn update(&mut self, dt: f32, event_queue: &mut EventQueue) {
         self.update_with_sink(dt, event_queue);
     }
+    /// Advance the simulator by `dt` seconds and dispatch due steps into the provided sink.
     pub fn update_with_sink<S: StepEventSink>(&mut self, dt: f32, event_sink: &mut S) {
         if self.state != PlaybackState::Running {
             return;
@@ -282,6 +292,7 @@ impl Simulator {
             self.state = PlaybackState::Complete;
         }
     }
+    /// Evaluate one step: check conditions, run asserts, and dispatch or inline macro.
     fn execute_step<S: StepEventSink>(
         &mut self,
         script_name: &str,
@@ -377,6 +388,7 @@ impl Simulator {
             Ok(())
         }
     }
+    /// Convert a step into engine events and push them into the provided sink.
     fn dispatch_step<S: StepEventSink>(step: &Step, event_queue: &mut S) {
         match step.action {
             Action::KeyPress => {
@@ -605,7 +617,7 @@ impl<'a> ConditionParser<'a> {
         }
     }
 }
-/// Load and compare two RGBA images, returning total per-channel absolute pixel diff.
+/// Load and compare two RGBA images and return total per-channel absolute pixel diff.
 fn diff_images(baseline: &Path, actual: &Path) -> Result<u32, String> {
     let base = ::image::open(baseline)
         .map_err(|e| {

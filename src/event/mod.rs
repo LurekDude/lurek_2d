@@ -1,3 +1,6 @@
+//! - Priority queue with ordered dispatch and Lua payload conversion for runtime events.
+//! - Name-based and wildcard signal subscriptions for decoupled communication.
+
 /// Priority queue and Lua payload conversion support for runtime events.
 pub mod event_queue;
 /// Name-based and wildcard signal subscription storage.

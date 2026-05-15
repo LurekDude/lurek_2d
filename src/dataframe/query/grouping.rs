@@ -1,3 +1,8 @@
+//! - Grouped aggregation by key column with mean, sum, min, max, count, first, last
+//! - Pivot transformation from row/column/value keys into cross-tabulated frame
+//! - Pearson correlation between two numeric columns
+//! - Full numeric-column correlation matrix generation
+
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
 impl DataFrame {
     #[allow(clippy::needless_range_loop)]

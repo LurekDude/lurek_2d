@@ -1,3 +1,9 @@
+//! - Binary packing, unpacking, and struct-style format-string serialization
+//! - Owned byte buffers, shared data views, and sequential writers
+//! - Compression codecs (deflate, gzip, zlib, lz4) with stream and chunk APIs
+//! - Encoding helpers (base64, hex) and hash digests (MD5, SHA, CRC32)
+//! - Fixed-capacity ring buffer with overwrite-on-full FIFO semantics
+
 /// Token-based binary reader and writer for structured byte payloads.
 pub mod bin_pack;
 /// Mutable owned byte buffer with indexed access and conversion helpers.

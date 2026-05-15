@@ -1,3 +1,5 @@
+//! Lua VM creation and `lurek.*` module registration entry point.
+
 #[cfg(feature = "automation-plugin")]
 use super::automation_api;
 #[cfg(feature = "devtools-plugin")]
@@ -18,6 +20,7 @@ use crate::runtime::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+/// Creates a Lua VM, locks down unsafe standard-library entry points, installs the `lurek` table, and registers enabled modules.
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
     {
@@ -184,6 +187,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     }
     Ok(lua)
 }
+/// Creates a default test Lua VM with default module configuration.
 pub fn create_test_vm() -> LuaResult<Lua> {
     use crate::runtime::config::Config;
     use std::path::PathBuf;

@@ -1,10 +1,7 @@
 
-//! - Defines the high-level strategy selection model used by the AI module to
-//!   score named goals against the current tag context over time.
-//! - Owns the goal records that hold eligibility tags, priority scaling, enable
-//!   state, and the latest computed score.
-//! - Keeps the timed evaluation flow that asks an external scorer for values,
-//!   updates all eligible goals, and stores the currently active strategic choice.
+//! - High-level strategy selection scoring named goals against current tag context over time.
+//! - Goal records with eligibility tags, priority scaling, enable state, and computed scores.
+//! - Timed evaluation flow querying external scorers and storing the active strategic choice.
 
 /// One strategic goal considered by the planner.
 #[derive(Clone)]

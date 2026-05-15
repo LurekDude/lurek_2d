@@ -1,3 +1,7 @@
+//! - Keyboard, mouse, gamepad, and touch input state aggregation.
+//! - Event constants for Lua callbacks (keypressed, mousemoved, etc.).
+//! - Combo gesture detection and input recording for replays.
+
 /// Combo gesture detection and multi-step input sequences.
 pub mod combo;
 /// Gamepad device state, axis/button mapping, and vibration requests via gilrs.

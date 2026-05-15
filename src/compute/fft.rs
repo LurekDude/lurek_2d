@@ -1,3 +1,8 @@
+//! - Radix-2 in-place FFT and inverse FFT for power-of-two length buffers
+//! - Real-to-complex forward transform with automatic zero-padding
+//! - Complex-to-real inverse transform for spectrum reconstruction
+//! - Magnitude spectrum extraction from complex bin pairs
+
 use std::f64::consts::PI;
 
 #[derive(Clone, Copy, Debug, Default)]

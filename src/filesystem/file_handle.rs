@@ -1,3 +1,9 @@
+//! - Buffered file handle abstraction for GameFS read, write, and append streams.
+//! - Mode-based state machine: Read, Write, Append, or Closed.
+//! - Resolves logical game paths through GameFS before opening OS files.
+//! - Provides line-oriented and byte-oriented read APIs with EOF detection.
+//! - Seek, tell, flush, and auto-close on drop for safe resource cleanup.
+
 use crate::filesystem::GameFS;
 use crate::runtime::error::{EngineError, EngineResult};
 use std::io::{BufRead, BufReader, BufWriter, Read, Seek, SeekFrom, Write};
@@ -66,7 +72,6 @@ impl FileHandle {
                     ))
                 })?;
                 let size = file.metadata().map(|m| m.len()).unwrap_or(0);
-            /// Read bytes from the open reader or error if the handle is not readable.
                 Ok(Self {
                     mode,
                     path: resolved,
@@ -130,6 +135,7 @@ impl FileHandle {
             )),
         }
     }
+    /// Read bytes from the open reader or error if the handle is not readable.
     pub fn read(&mut self, count: Option<usize>) -> EngineResult<Vec<u8>> {
         let reader = self
             .reader
@@ -260,6 +266,7 @@ impl FileHandle {
 }
 /// Closes the file handle on scope exit.
 impl Drop for FileHandle {
+    /// Flush and release all streams when the handle leaves scope.
     fn drop(&mut self) {
         let _ = self.close();
     }

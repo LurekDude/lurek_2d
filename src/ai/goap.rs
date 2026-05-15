@@ -1,10 +1,11 @@
-
-//! - Defines the GOAP planning data used by the AI module to store actions,
-//!   goals, search nodes, and the planner state that evaluates them.
-//! - Owns the world-state planning model built from boolean preconditions and
-//!   effects, together with goal priorities and optional Lua execution callbacks.
-//! - Keeps the bounded A* search that picks a goal, expands reachable states,
-//!   estimates remaining work, and returns an ordered action list for execution.
+//! - GOAP planning data storing actions, goals, search nodes, and planner state.
+//! - World-state model built from boolean preconditions, effects, and goal priorities.
+//! - Optional Lua execution callbacks attached to actions for runtime behavior.
+//! - Bounded A* search expanding reachable states and returning ordered action plans.
+//! - Unsatisfied-condition count heuristic guiding A* toward goals with minimal expansion.
+//! - Automatic highest-priority goal selection or targeted planning by goal index.
+//! - Iteration cap preventing runaway planning on large or unsolvable state spaces.
+//! - Search node tracking with parent links for plan reconstruction after goal reach.
 
 use crate::log_msg;
 use crate::runtime::log_messages::{GP01, GP02, GP03};
@@ -45,19 +46,23 @@ struct PlanNode {
     /// Estimated remaining cost to goal; counts unsatisfied goal conditions.
     heuristic: f64,
 }
+/// Equality by f-score for min-heap ordering.
 impl PartialEq for PlanNode {
     /// Equal when `total()` values are equal (used for heap ordering only).
     fn eq(&self, other: &Self) -> bool {
         self.total() == other.total()
     }
 }
+/// Marker trait for total-equality semantics used by the binary heap.
 impl Eq for PlanNode {}
+/// Partial ordering delegates to the total `Ord` implementation.
 impl PartialOrd for PlanNode {
     /// Delegate to `Ord::cmp`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
+/// Total ordering for min-heap: lower f-score wins.
 impl Ord for PlanNode {
     /// Min-heap ordering: lower `total()` wins, ties resolved as `Equal`.
     fn cmp(&self, other: &Self) -> Ordering {

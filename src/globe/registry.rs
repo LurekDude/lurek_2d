@@ -1,3 +1,11 @@
+//! - Mutable globe state combining topology, fog, markers, labels, layers, and arcs.
+//! - Province add/remove/get and sector grouping operations.
+//! - Heat-layer and arc overlay management with add/replace/remove.
+//! - Orbit camera integration and screen-space province picking.
+//! - Frame emission producing render commands for the full globe state.
+//! - Named globe registry for storing and retrieving multiple globes by name.
+//! - Reachability caching per faction for path-cost queries.
+
 use crate::globe::draw::emit_globe_frame;
 use crate::globe::fog::FogStore;
 use crate::globe::label::LabelStore;

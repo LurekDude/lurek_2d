@@ -1,10 +1,8 @@
-
-//! - Defines the pacing director used by the AI layer to translate accumulated
-//!   tension into high-level pressure phases and runtime pacing multipliers.
-//! - Owns the tunable thresholds and timers that move between buildup, peak,
-//!   sustain, and relief while events raise tension and time decays it.
-//! - Keeps the derived outputs that other systems can query for spawn pressure,
-//!   loot pressure, ambient intensity, and current pacing-state inspection.
+//! - Pacing director translating accumulated tension into pressure phases and runtime multipliers.
+//! - Tunable thresholds and timers moving between buildup, peak, sustain, and relief phases.
+//! - Derived outputs for spawn pressure, loot pressure, ambient intensity, and state inspection.
+//! - Slower tension decay during peak and sustain phases to hold pressure before relief.
+//! - Per-phase spawn, loot, and ambient multipliers scaling downstream gameplay intensity.
 
 /// Director pacing phase.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

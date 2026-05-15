@@ -1,3 +1,9 @@
+//! - Define ordered severity levels with case-insensitive parsing
+//! - Store bounded in-memory log history with timestamped entries
+//! - Filter log output by minimum severity and optional category prefix
+//! - Mirror accepted entries to stderr and optional append-only file
+//! - Provide tail and category query access over retained entries
+
 use crate::devtools::time_anchor::TimeAnchor;
 use std::collections::VecDeque;
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

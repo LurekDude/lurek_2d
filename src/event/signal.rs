@@ -1,3 +1,7 @@
+//! - Named signal subscription registry with exact-name and wildcard pattern matching.
+//! - Handle-based subscribe/remove lifecycle with monotonic id allocation.
+//! - Glob-style wildcard matching (`*`, `?`) for pattern subscriptions.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{SG01, SG02};
 use std::collections::HashMap;
@@ -113,6 +117,7 @@ impl Signal {
         pattern.contains('*') || pattern.contains('?')
     }
 }
+/// Provide a default empty signal registry.
 impl Default for Signal {
     /// Creates an empty signal registry.
     fn default() -> Self {

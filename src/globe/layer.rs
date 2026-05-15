@@ -1,3 +1,7 @@
+//! - Named layer storage keyed by string, with insert, remove, and lookup.
+//! - Per-province color overrides, visibility toggling, and alpha clamping.
+//! - Z-order–aware color resolution across all visible layers.
+
 use crate::globe::types::{Layer, ProvinceId};
 use std::collections::HashMap;
 /// Named layer collection keyed by layer name.

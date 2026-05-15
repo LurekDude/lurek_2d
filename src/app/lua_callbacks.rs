@@ -1,3 +1,6 @@
+//! - Invokes named `lurek.*` Lua callbacks with error logging and optional timeout.
+//! - Installs an instruction-count hook to abort runaway callbacks after a deadline.
+//! - Provides checked and unchecked variants for both timed and untimed invocation.
 
 use mlua::prelude::*;
 use mlua::HookTriggers;

@@ -1,8 +1,9 @@
+//! Lua API binding modules and shared runtime re-exports for building Lurek2D Lua VMs.
+
 pub use crate::runtime::{ErrorInfo, FullscreenType, SharedState, WindowState};
 pub mod ai_api;
 pub mod animation_api;
 pub mod audio_api;
-#[cfg(feature = "automation-plugin")]
 pub mod automation_api;
 pub mod callback_registry;
 pub mod camera_api;
@@ -10,7 +11,6 @@ pub mod compute_api;
 pub mod data_api;
 pub mod dataframe_api;
 pub mod debugbridge_api;
-#[cfg(feature = "devtools-plugin")]
 pub mod devtools_api;
 pub mod docs_api;
 pub mod ecs_api;
@@ -19,7 +19,6 @@ pub mod engine_api;
 pub mod event_api;
 pub mod filesystem_api;
 pub mod globe_api;
-#[cfg(feature = "graph")]
 pub mod graph_api;
 pub mod html_api;
 pub mod i18n_api;

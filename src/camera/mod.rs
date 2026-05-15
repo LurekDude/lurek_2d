@@ -1,3 +1,7 @@
+//! - Camera subsystem module root: effects, multi-view, path, render, types, and viewport.
+//! - Re-exports all primary types for ergonomic access from engine code.
+//! - Submodules own distinct concerns: transform state, viewport scaling, render commands.
+
 /// Exposes camera effect primitives for sway, breathing, and pulse behavior.
 pub mod effects;
 /// Exposes multi-camera rig management for split and overlay layouts.

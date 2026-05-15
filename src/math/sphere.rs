@@ -1,3 +1,9 @@
+//! - Sphere-surface coordinate helpers: latitude/longitude ↔ unit-sphere Vec3 conversion.
+//! - Great-circle distance (Haversine) and arc interpolation between two geo-points.
+//! - Ray-sphere intersection returning the nearest positive hit distance.
+//! - Column-major 3×3 rotation matrices (axis-aligned X/Y/Z plus axial-tilt convenience).
+//! - Matrix-vector and matrix-matrix multiplication for globe-view transforms.
+
 use crate::math::Vec3;
 
 /// Column-major 3×3 float matrix used for sphere rotation in globe view transforms.
@@ -6,6 +12,7 @@ pub struct Mat3x3 {
     /// Three column vectors stored as `cols[column][row]`.
     pub cols: [[f32; 3]; 3],
 }
+/// Core rotation and projection operations for `Mat3x3`.
 impl Mat3x3 {
     /// Return the identity matrix.
     pub fn identity() -> Self {

@@ -1,3 +1,9 @@
+//! - Build JSON payloads for IDE completion, hover, and signature help from doc entries.
+//! - Support compact and rich output modes for different consumer needs.
+//! - Write individual or bundled JSON files to an output directory.
+//! - Serialize via buffered writers with human-readable pretty formatting.
+//! - Separate public export entry points from internal payload builders.
+
 use crate::docs::entry::DocEntry;
 use std::collections::HashMap;
 use std::fs::File;

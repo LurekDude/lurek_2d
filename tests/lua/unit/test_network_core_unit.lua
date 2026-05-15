@@ -152,7 +152,7 @@ describe("lurek.network host methods", function()
   end)
 end)
 
-  ---@type { MAX_PEERS: integer, DEFAULT_PEERS: integer, MAX_CHANNELS: integer, DEFAULT_CHANNELS: integer }
+  ---@type { MAX_PEERS: number, DEFAULT_PEERS: number, MAX_CHANNELS: number, DEFAULT_CHANNELS: number }
   local network_consts = lurek.network
 
 -- @describe lurek.network constants

@@ -1,3 +1,9 @@
+//! - Linear RGBA float color type with f32 channels in [0, 1].
+//! - Named constants for common colors and Lurek2D brand palette.
+//! - Construction from u8 components and `#RRGGBB` / `#RRGGBBAA` hex strings.
+//! - Conversion to packed u32 RGB and u8 tuples.
+//! - Color-space transforms: RGB↔HSL, HSV→RGB, sRGB gamma↔linear.
+
 /// Linear RGBA float color; all channels are in [0.0, 1.0] unless explicitly noted.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Color {

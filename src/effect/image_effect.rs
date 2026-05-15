@@ -1,3 +1,7 @@
+//! - Image-scoped post-processing effect pipeline that groups and orders shader passes.
+//! - Provides add, remove, lookup-by-index/name, and clear operations on owned or shared effects.
+//! - Converts the active pipeline into renderer-ready `ShaderPassDescriptor` sequences.
+
 use super::effect::PostFxEffect;
 use crate::log_msg;
 use crate::render::ShaderPassDescriptor;

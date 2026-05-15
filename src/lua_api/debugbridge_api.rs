@@ -1,3 +1,5 @@
+//! `lurek.debugbridge` -- Debug bridge bindings for starting the local TCP bridge, polling debugger requests, print capture, performance data, screenshots, protocol metadata, and hot reload flags.
+
 use super::SharedState;
 use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingResponse};
 use mlua::prelude::*;
@@ -6,12 +8,20 @@ use std::net::TcpListener;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
+/// Registers the `lurek.debugbridge` API table with the Lua VM.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let db = lua.create_table()?;
     let shared: Arc<Mutex<BridgeShared>> = Arc::new(Mutex::new(BridgeShared::new()));
     let running: Arc<AtomicBool> = Arc::new(AtomicBool::new(false));
     let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> = Arc::new(Mutex::new(None));
+    // -- start --
+    /// Starts the localhost debug bridge server on a port.
+    /// @param | port | integer? | TCP port to bind on `127.0.0.1`; defaults to 19740 and must be at least 1024.
+    /// @return | boolean | True when the server was started, false when it was already running.
     let sh = shared.clone();
+    // -- stop --
+    /// Stops the debug bridge server and joins its server thread.
+    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
@@ -42,6 +52,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
+    // -- isRunning --
+    /// Returns whether the debug bridge server is running.
+    /// @return | boolean | True when the server thread is active.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
@@ -61,16 +74,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "isRunning",
         lua.create_function(move |_, ()| Ok(run.load(Ordering::Relaxed)))?,
     )?;
+    // -- getPort --
+    /// Returns the debug bridge TCP port.
+    /// @return | integer | Active or configured port, or zero when unavailable.
     let sh = shared.clone();
     db.set(
         "getPort",
         lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.port).unwrap_or(0)))?,
     )?;
+    // -- getClientCount --
+    /// Returns the number of connected debug bridge clients.
+    /// @return | integer | Connected client count.
     let sh = shared.clone();
     db.set(
         "getClientCount",
         lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.client_count).unwrap_or(0)))?,
     )?;
+    // -- poll --
+    /// Polls pending debugger requests, evaluates supported methods, and queues responses.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set("poll", lua.create_function(move |lua, ()| {
             if let Ok(lurek_tbl) = lua.globals().get::<_, LuaTable>("lurek") {
@@ -99,6 +121,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                             .get("code")
                             .and_then(|v| v.as_str())
                             .unwrap_or("");
+                        // LUA-EVAL-JUSTIFIED: debugbridge.poll implements debugger-requested Lua eval.
                         match lua.load(code).eval::<LuaMultiValue>() {
                             Ok(vals) => {
                                 let values: Vec<serde_json::Value> = vals
@@ -114,6 +137,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     }
                     "getCallStack" => {
                         let stack_result: LuaResult<LuaTable> = lua
+                            // LUA-EVAL-JUSTIFIED: debugbridge.poll queries Lua debug stack metadata.
                             .load(concat!(
                                 "local frames = {}\n",
                                 "if not debug or not debug.getinfo then return frames end\n",
@@ -158,6 +182,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                             .and_then(|v| v.as_i64())
                             .unwrap_or(1);
                         let locals_result: LuaResult<LuaTable> = lua
+                            // LUA-EVAL-JUSTIFIED: debugbridge.poll queries Lua debug locals metadata.
                             .load(format!(
                                 concat!(
                                     "local locals = {{}}\n",
@@ -193,6 +218,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     }
                     "getGlobals" => {
                         let globals_result: LuaResult<LuaTable> = lua
+                            // LUA-EVAL-JUSTIFIED: debugbridge.poll queries simple Lua globals for debugger inspection.
                             .load(concat!(
                                 "local result = {}\n",
                                 "local count = 0\n",
@@ -231,6 +257,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- capturePrint --
+    /// Captures a print message and broadcasts it to debug bridge clients.
+    /// @param | msg | string | Printed message text.
+    /// @param | source | string? | Optional source label; defaults to `?`.
+    /// @param | line | integer? | Optional source line; defaults to zero.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "capturePrint",
@@ -246,6 +278,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
+    // -- getPrintHistory --
+    /// Returns captured print history entries.
+    /// @param | count | integer? | Optional number of newest entries; nil or zero returns all entries.
+    /// @return | table | Array table of entries with `timestamp`, `message`, `source`, and `line` fields.
     let sh = shared.clone();
     db.set(
         "getPrintHistory",
@@ -276,6 +312,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+    // -- clearPrintHistory --
+    /// Clears captured print history.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "clearPrintHistory",
@@ -287,6 +326,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- setMaxPrintHistory --
+    /// Sets the maximum retained print history entry count.
+    /// @param | max | integer | Maximum retained print entries.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "setMaxPrintHistory",
@@ -298,6 +341,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- getPerformance --
+    /// Returns debug bridge performance metrics.
+    /// @return | table | Table of numeric performance metrics.
     let sh = shared.clone();
     db.set(
         "getPerformance",
@@ -317,6 +363,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+    // -- requestScreenshot --
+    /// Requests a screenshot from the runtime.
+    /// @param | scale | integer? | Screenshot scale clamped from 1 to 8; defaults to 1.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "requestScreenshot",
@@ -329,6 +379,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- isScreenshotRequested --
+    /// Returns whether a screenshot request is pending.
+    /// @return | boolean | True when a screenshot request is pending.
     let sh = shared.clone();
     db.set(
         "isScreenshotRequested",
@@ -336,6 +389,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(sh.lock().map(|s| s.screenshot_requested).unwrap_or(false))
         })?,
     )?;
+    // -- broadcast --
+    /// Queues a JSON string payload broadcast for debug bridge clients.
+    /// @param | event | string | Event name sent to clients.
+    /// @param | json_data | string | Payload string wrapped as JSON for clients.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "broadcast",
@@ -347,6 +405,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- getProtocolInfo --
+    /// Returns debug bridge protocol version, capabilities, and handshake nonce.
+    /// @return | table | Protocol info table with `version`, `capabilities`, and `nonce` fields.
     let sh = shared.clone();
     db.set(
         "getProtocolInfo",
@@ -365,6 +426,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(t)
         })?,
     )?;
+    // -- consumeHotReloadRequest --
+    /// Returns and clears the pending hot reload request flag.
+    /// @return | boolean | True when a hot reload request was pending.
     let sh = shared.clone();
     db.set(
         "consumeHotReloadRequest",
@@ -380,6 +444,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     lurek.set("debugbridge", db)?;
     Ok(())
 }
+/// Converts a Lua value into JSON for debug bridge responses.
 fn lua_value_to_json(val: &LuaValue) -> serde_json::Value {
     match val {
         LuaValue::Nil => serde_json::Value::Null,

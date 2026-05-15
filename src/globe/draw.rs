@@ -1,3 +1,10 @@
+//! - Emit a complete globe frame as a list of render commands.
+//! - Draw provinces with fog-of-war, lighting, heat-layer blending, and texture mapping.
+//! - Render borders with optional polyline smoothing passes.
+//! - Project and draw great-circle arcs between coordinate pairs.
+//! - Display animated markers with pulse, rotation, and labels.
+//! - Emit atmosphere halo circles and LOD-gated text labels.
+
 use crate::globe::fog::FogStore;
 use crate::globe::label::LabelStore;
 use crate::globe::layer::LayerStore;

@@ -1,3 +1,9 @@
+//! - Load provinces from TOML strings or files using a lightweight inline parser.
+//! - Load provinces from PNG province-grid images with bounding-box extraction and adjacency detection.
+//! - Generate approximate province geometry from Voronoi seed points.
+//! - Convert between internal builder representations and the shared `Province` type.
+//! - Parse TOML primitives: u32 literals, float pairs, float-4 arrays, string key-value lines.
+
 use crate::globe::types::{Province, ProvinceId};
 use crate::image::province_grid::ProvinceGrid;
 use crate::math::voronoi::voronoi_from_points;

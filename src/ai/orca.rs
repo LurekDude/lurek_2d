@@ -1,10 +1,7 @@
 
-//! - Defines the ORCA local-avoidance data used by the AI module to represent
-//!   moving agents, solver constraints, and safe output velocities.
-//! - Owns the per-agent motion inputs needed for avoidance, including current
-//!   motion, preferred motion, collision radius, and maximum speed.
-//! - Keeps the solver pass that builds pairwise half-plane constraints and
-//!   projects preferred motion into a collision-avoiding velocity for each agent.
+//! - ORCA local-avoidance data representing moving agents, solver constraints, and safe output velocities.
+//! - Per-agent motion inputs: current velocity, preferred velocity, collision radius, and max speed.
+//! - Solver pass building pairwise half-plane constraints and projecting collision-free velocities.
 
 /// One agent used by the ORCA solver.
 #[derive(Clone)]

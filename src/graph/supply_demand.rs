@@ -1,3 +1,7 @@
+//! - Priority-ordered demand matching against available supply nodes.
+//! - Pathfinding-based item routing from supplier to consumer.
+//! - Event emission on supply depletion and demand fulfillment.
+
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::simulation::GraphEvent;

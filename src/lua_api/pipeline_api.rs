@@ -1,3 +1,5 @@
+//! `lurek.pipeline` — Declarative task pipelines with dependency ordering, retry logic, branching, and async coroutine execution.
+
 use super::SharedState;
 use crate::log_msg;
 use crate::pipeline::{ErrorMode, Pipeline, PipelineScheduler, PipelineStep, StepStatus};
@@ -7,6 +9,8 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::time::Instant;
+
+/// A single executable step within a pipeline, wrapping callback, condition, retry, and error hooks.
 #[derive(Clone)]
 pub struct LuaStep {
     pub(crate) inner: Rc<RefCell<PipelineStep>>,
@@ -111,13 +115,24 @@ impl LuaStep {
 }
 impl LuaUserData for LuaStep {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getName --
+        /// Returns the unique name of this pipeline step.
+        /// @return | string | The step name.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().name.clone())
         });
+
+        // -- setCallback --
+        /// Sets the main execution function for this step. Called when the step runs.
+        /// @param | callback | function | A function receiving the pipeline context table and optionally returning a result value.
         methods.add_method("setCallback", |lua, this, cb: LuaFunction| {
             *this.callback_key.borrow_mut() = Some(lua.create_registry_value(cb)?);
             Ok(())
         });
+
+        // -- setCondition --
+        /// Sets a predicate function that determines whether this step should execute. If the predicate returns false, the step is skipped.
+        /// @param | condition | function? | A function receiving the context table and returning a boolean. Pass nil to remove the condition.
         methods.add_method("setCondition", |lua, this, cond: Option<LuaFunction>| {
             *this.condition_key.borrow_mut() = match cond {
                 Some(f) => Some(lua.create_registry_value(f)?),
@@ -125,11 +140,23 @@ impl LuaUserData for LuaStep {
             };
             Ok(())
         });
+
+        // -- setDelay --
+        /// Sets a delay in seconds before this step begins execution after its dependencies are satisfied.
+        /// @param | seconds | number | Delay duration in seconds.
         methods.add_method("setDelay", |_, this, seconds: f32| {
             this.inner.borrow_mut().delay = seconds;
             Ok(())
         });
+
+        // -- getDelay --
+        /// Returns the configured delay for this step.
+        /// @return | number | Delay in seconds.
         methods.add_method("getDelay", |_, this, ()| Ok(this.inner.borrow().delay));
+
+        // -- setTimeout --
+        /// Sets a maximum execution time for this step. If exceeded in async mode, the step may be considered failed.
+        /// @param | seconds | number | Timeout duration in seconds.
         methods.add_method("setTimeout", |_, this, seconds: f32| {
             this.inner
                 .borrow_mut()
@@ -137,6 +164,10 @@ impl LuaUserData for LuaStep {
                 .insert("timeout".to_string(), seconds.to_string());
             Ok(())
         });
+
+        // -- getTimeout --
+        /// Returns the configured timeout for this step, or 0 if none is set.
+        /// @return | number | Timeout in seconds.
         methods.add_method("getTimeout", |_, this, ()| {
             let v = this
                 .inner
@@ -147,27 +178,58 @@ impl LuaUserData for LuaStep {
                 .unwrap_or(0.0);
             Ok(v)
         });
+
+        // -- setRetryCount --
+        /// Sets how many times this step should be retried after a failure before being marked as failed.
+        /// @param | count | number | Number of retry attempts (0 means no retries).
         methods.add_method("setRetryCount", |_, this, count: u32| {
             this.inner.borrow_mut().retry_count = count;
             Ok(())
         });
+
+        // -- getRetryCount --
+        /// Returns the configured retry count for this step.
+        /// @return | number | Number of retry attempts.
         methods.add_method("getRetryCount", |_, this, ()| {
             Ok(this.inner.borrow().retry_count)
         });
+
+        // -- setRetryDelay --
+        /// Sets the delay in seconds between retry attempts for this step.
+        /// @param | seconds | number | Delay between retries.
         methods.add_method("setRetryDelay", |_, this, seconds: f32| {
             this.inner.borrow_mut().retry_delay = seconds;
             Ok(())
         });
+
+        // -- setAsync --
+        /// Marks this step as asynchronous. Async steps run as coroutines and can yield between frames.
+        /// @param | enabled | boolean | True to enable coroutine-based async execution.
         methods.add_method("setAsync", |_, this, enabled: bool| {
             this.set_async_enabled(enabled);
             Ok(())
         });
+
+        // -- isAsync --
+        /// Returns whether this step is configured for asynchronous coroutine execution.
+        /// @return | boolean | True if the step runs as a coroutine.
         methods.add_method("isAsync", |_, this, ()| Ok(this.is_async_enabled()));
+
+        // -- setOptional --
+        /// Marks this step as optional. Optional steps do not cause pipeline failure if they fail.
+        /// @param | optional | boolean | True to mark the step as optional.
         methods.add_method("setOptional", |_, this, optional: bool| {
             this.inner.borrow_mut().optional = optional;
             Ok(())
         });
+
+        // -- isOptional --
+        /// Returns whether this step is marked as optional.
+        /// @return | boolean | True if the step is optional.
         methods.add_method("isOptional", |_, this, ()| Ok(this.inner.borrow().optional));
+        // -- setOnError --
+        /// Sets an error handler callback invoked when this step fails after all retries are exhausted.
+        /// @param | callback | function? | A function receiving (stepName, errorMessage). Pass nil to remove.
         methods.add_method("setOnError", |lua, this, cb: Option<LuaFunction>| {
             *this.on_error_key.borrow_mut() = match cb {
                 Some(f) => Some(lua.create_registry_value(f)?),
@@ -175,18 +237,40 @@ impl LuaUserData for LuaStep {
             };
             Ok(())
         });
+
+        // -- setData --
+        /// Stores a key-value metadata pair on this step. Useful for passing configuration between steps.
+        /// @param | key | string | Metadata key.
+        /// @param | value | string | Metadata value.
         methods.add_method("setData", |_, this, (key, value): (String, String)| {
             this.inner.borrow_mut().metadata.insert(key, value);
             Ok(())
         });
+
+        // -- getData --
+        /// Retrieves a metadata value previously stored with setData.
+        /// @param | key | string | Metadata key to look up.
+        /// @return | string? | The stored value, or nil if not found.
         methods.add_method("getData", |_, this, key: String| {
             Ok(this.inner.borrow().metadata.get(&key).cloned())
         });
+
+        // -- setTag --
+        /// Assigns a tag string to this step for grouping and filtering purposes.
+        /// @param | tag | string | A category tag for this step.
         methods.add_method("setTag", |_, this, tag: String| {
             this.inner.borrow_mut().tag = Some(tag);
             Ok(())
         });
+
+        // -- getTag --
+        /// Returns the tag assigned to this step, or nil if none is set.
+        /// @return | string? | The step tag.
         methods.add_method("getTag", |_, this, ()| Ok(this.inner.borrow().tag.clone()));
+        // -- dependsOn --
+        /// Declares that this step depends on another step (by name or reference). The dependency must complete before this step runs.
+        /// @param | dep | string|LPipelineStep | The dependency step name or step object.
+        /// @return | LPipelineStep | Returns self for method chaining.
         methods.add_method("dependsOn", |_, this, dep: LuaValue| {
             let dep_name = match dep {
                 LuaValue::String(s) => s.to_str()?.to_owned(),
@@ -200,32 +284,67 @@ impl LuaUserData for LuaStep {
             this.inner.borrow_mut().deps.push(dep_name);
             Ok(this.clone())
         });
+
+        // -- getDependencies --
+        /// Returns a list of step names that this step depends on.
+        /// @return | table | Array of dependency step name strings.
         methods.add_method("getDependencies", |_, this, ()| {
             Ok(this.inner.borrow().deps.clone())
         });
+
+        // -- getDependencyCount --
+        /// Returns the number of dependencies this step has.
+        /// @return | number | Dependency count.
         methods.add_method("getDependencyCount", |_, this, ()| {
             Ok(this.inner.borrow().deps.len())
         });
+
+        // -- getStatus --
+        /// Returns the current execution status of this step as a string ("pending", "waiting", "running", "completed", "failed", "skipped", "cancelled").
+        /// @return | string | Current step status.
         methods.add_method("getStatus", |_, this, ()| {
             Ok(this.inner.borrow().status.as_str().to_string())
         });
+
+        // -- getError --
+        /// Returns the error message if this step failed, or nil if it has not failed.
+        /// @return | string? | Error message or nil.
         methods.add_method("getError", |_, this, ()| {
             Ok(this.inner.borrow().error_msg.clone())
         });
+
+        // -- getDuration --
+        /// Returns how long this step took to execute in seconds (measured from start to completion or failure).
+        /// @return | number | Duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             Ok(this.inner.borrow().duration)
         });
+
+        // -- getAttempt --
+        /// Returns the current attempt number (1-based). Increases with each retry.
+        /// @return | number | Attempt number.
         methods.add_method("getAttempt", |_, this, ()| Ok(this.inner.borrow().attempt));
+
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             let inner = this.inner.borrow();
             Ok(format!("PipelineStep(\"{}\")", inner.name))
         });
+
+        // -- type --
+        /// Returns the type name of this object ("LPipelineStep").
+        /// @return | string | Type identifier.
         methods.add_method("type", |_, _, ()| Ok("LPipelineStep"));
+
+        // -- typeOf --
+        /// Checks whether this object is of a given type name. Accepts "LPipelineStep", "PipelineStep", or "Object".
+        /// @param | name | string | Type name to check against.
+        /// @return | boolean | True if the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LPipelineStep" || name == "PipelineStep" || name == "Object")
         });
     }
 }
+/// A full pipeline that orchestrates multiple steps with dependency resolution, error modes, and async scheduling.
 #[derive(Clone)]
 pub struct LuaPipeline {
     pub(crate) inner: Rc<RefCell<Pipeline>>,
@@ -531,6 +650,10 @@ pub(crate) fn finalize_pipeline_result<'lua>(
 }
 impl LuaUserData for LuaPipeline {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- addStep --
+        /// Adds an existing step object to this pipeline. The step will be scheduled according to its declared dependencies.
+        /// @param | step | LPipelineStep | The step to add.
+        /// @return | LPipeline | Returns self for method chaining.
         methods.add_method("addStep", |_, this, step_ud: LuaAnyUserData| {
             let step = step_ud.borrow::<LuaStep>()?.clone();
             let step_def = step.inner.borrow().clone();
@@ -542,14 +665,27 @@ impl LuaUserData for LuaPipeline {
             this.step_wrappers.borrow_mut().insert(name, step);
             Ok(this.clone())
         });
+
+        // -- removeStep --
+        /// Removes a step from the pipeline by name. Any other steps that depend on it may fail or be skipped.
+        /// @param | name | string | Name of the step to remove.
         methods.add_method("removeStep", |_, this, name: String| {
             this.inner.borrow_mut().remove_step(&name);
             this.step_wrappers.borrow_mut().remove(&name);
             Ok(())
         });
+
+        // -- getStep --
+        /// Retrieves a step object by name, or nil if no step with that name exists in this pipeline.
+        /// @param | name | string | Name of the step to find.
+        /// @return | LPipelineStep? | The step object or nil.
         methods.add_method("getStep", |_, this, name: String| {
             Ok(this.step_wrappers.borrow().get(&name).cloned())
         });
+
+        // -- getSteps --
+        /// Returns a table containing all step objects currently in this pipeline.
+        /// @return | table | Array of LPipelineStep objects.
         methods.add_method("getSteps", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, wrapper) in this.step_wrappers.borrow().values().enumerate() {
@@ -557,9 +693,18 @@ impl LuaUserData for LuaPipeline {
             }
             Ok(t)
         });
+
+        // -- getStepCount --
+        /// Returns the total number of steps in this pipeline.
+        /// @return | number | Step count.
         methods.add_method("getStepCount", |_, this, ()| {
             Ok(this.inner.borrow().get_step_count())
         });
+
+        // -- getStepsByTag --
+        /// Returns all steps that have the specified tag assigned.
+        /// @param | tag | string | The tag to filter by.
+        /// @return | table | Array of matching LPipelineStep objects.
         methods.add_method("getStepsByTag", |lua, this, tag: String| {
             let t = lua.create_table()?;
             let mut i = 1usize;
@@ -571,11 +716,19 @@ impl LuaUserData for LuaPipeline {
             }
             Ok(t)
         });
+
+        // -- clear --
+        /// Removes all steps from the pipeline, resetting it to an empty state.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             this.step_wrappers.borrow_mut().clear();
             Ok(())
         });
+
+        // -- validate --
+        /// Validates the pipeline structure, checking for missing dependencies and circular references.
+        /// @return | boolean | True if the pipeline is valid.
+        /// @return | table | Array of error message strings (empty if valid).
         methods.add_method("validate", |lua, this, ()| {
             let (ok, errs) = this.inner.borrow().validate();
             let t = lua.create_table()?;
@@ -584,6 +737,11 @@ impl LuaUserData for LuaPipeline {
             }
             Ok((ok, t))
         });
+
+        // -- getExecutionOrder --
+        /// Computes the topologically sorted execution order of all steps, respecting dependencies.
+        /// @return | table? | Array of step name strings in execution order, or nil on error.
+        /// @return | string? | Error message if ordering failed (e.g., circular dependency), or nil on success.
         methods.add_method("getExecutionOrder", |lua, this, ()| {
             match this.inner.borrow().get_execution_order() {
                 Ok(order) => {
@@ -596,6 +754,11 @@ impl LuaUserData for LuaPipeline {
                 Err(e) => Ok((None, Some(e))),
             }
         });
+
+        // -- getParallelGroups --
+        /// Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can run concurrently.
+        /// @return | table? | Array of arrays, each inner array is a group of step names. Nil on error.
+        /// @return | string? | Error message if grouping failed, or nil on success.
         methods.add_method("getParallelGroups", |lua, this, ()| {
             match this.inner.borrow().get_parallel_groups() {
                 Ok(groups) => {
@@ -612,6 +775,11 @@ impl LuaUserData for LuaPipeline {
                 Err(e) => Ok((None, Some(e))),
             }
         });
+
+        // -- run --
+        /// Executes all pipeline steps synchronously in dependency order. Blocks until all steps complete, fail, or are cancelled.
+        /// @param | context | table? | An optional shared context table passed to every step callback. A fresh table is created if omitted.
+        /// @return | table | A result table with fields: success (boolean), completed, failed, skipped, cancelled (arrays of names), totalDuration (number), errors (array of {name, msg}).
         methods.add_method("run", |lua, this, context: Option<LuaTable>| {
             let order = this
                 .inner
@@ -672,6 +840,10 @@ impl LuaUserData for LuaPipeline {
             }
             finalize_pipeline_result(lua, this, start.elapsed().as_secs_f32())
         });
+
+        // -- runAsync --
+        /// Starts asynchronous (coroutine-based) execution of the pipeline. Call update(dt) each frame to advance steps.
+        /// @param | context | table? | An optional shared context table. A fresh table is created if omitted.
         methods.add_method("runAsync", |lua, this, context: Option<LuaTable>| {
             this.inner.borrow_mut().reset();
             for wrapper in this.step_wrappers.borrow().values() {
@@ -704,6 +876,11 @@ impl LuaUserData for LuaPipeline {
             }
             Ok(())
         });
+
+        // -- update --
+        /// Advances an async pipeline by one frame tick. Resumes coroutines, checks dependencies, and fires callbacks. Call every frame after runAsync().
+        /// @param | dt | number | Delta time in seconds since last frame.
+        /// @return | boolean | True when the entire pipeline has finished (all steps done); false if still running.
         methods.add_method("update", |lua, this, dt: f32| {
             if !*this.is_async.borrow() {
                 return Ok(false);
@@ -823,6 +1000,9 @@ impl LuaUserData for LuaPipeline {
                 Ok(false)
             }
         });
+
+        // -- cancel --
+        /// Cancels all pending and waiting steps. Steps already running or completed are unaffected.
         methods.add_method("cancel", |_, this, ()| {
             let wrappers = this.step_wrappers.borrow();
             for w in wrappers.values() {
@@ -835,6 +1015,9 @@ impl LuaUserData for LuaPipeline {
             this.started_at.borrow_mut().clear();
             Ok(())
         });
+
+        // -- reset --
+        /// Resets the pipeline and all steps back to their initial pending state, clearing context and async state.
         methods.add_method("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             for w in this.step_wrappers.borrow().values() {
@@ -847,7 +1030,15 @@ impl LuaUserData for LuaPipeline {
             this.started_at.borrow_mut().clear();
             Ok(())
         });
+
+        // -- isRunning --
+        /// Returns whether the pipeline is currently in async execution mode (started via runAsync and not yet finished).
+        /// @return | boolean | True if the pipeline is actively running.
         methods.add_method("isRunning", |_, this, ()| Ok(*this.is_async.borrow()));
+
+        // -- isComplete --
+        /// Returns whether all steps have reached a terminal state (completed, failed, skipped, or cancelled).
+        /// @return | boolean | True if no steps are still pending or running.
         methods.add_method("isComplete", |_, this, ()| {
             let wrappers = this.step_wrappers.borrow();
             let all_done = wrappers.values().all(|w| {
@@ -861,14 +1052,26 @@ impl LuaUserData for LuaPipeline {
             });
             Ok(all_done)
         });
+
+        // -- setErrorMode --
+        /// Sets how the pipeline handles step failures. "abort" stops on first failure; "continue" runs remaining steps.
+        /// @param | mode | string | Either "abort" or "continue".
         methods.add_method("setErrorMode", |_, this, mode: String| {
             let em = ErrorMode::from_str_lua(&mode).map_err(LuaError::runtime)?;
             this.inner.borrow_mut().error_mode = em;
             Ok(())
         });
+
+        // -- getErrorMode --
+        /// Returns the current error mode of the pipeline as a string.
+        /// @return | string | "abort" or "continue".
         methods.add_method("getErrorMode", |_, this, ()| {
             Ok(this.inner.borrow().error_mode.as_str().to_string())
         });
+
+        // -- getResult --
+        /// Returns the current pipeline result summary table, or nil if no steps exist. Useful for inspecting state after run or during async execution.
+        /// @return | table? | Result table with success, completed, failed, skipped, cancelled, totalDuration, errors fields.
         methods.add_method("getResult", |lua, this, ()| {
             if this.step_wrappers.borrow().is_empty() {
                 return Ok(None);
@@ -886,6 +1089,10 @@ impl LuaUserData for LuaPipeline {
             let result = this.inner.borrow().collect_result(&step_statuses, elapsed);
             Ok(Some(pipeline_result_to_lua(lua, &result)?))
         });
+
+        // -- getContext --
+        /// Returns the shared context table used by the current or most recent pipeline execution, or nil if none exists.
+        /// @return | table? | The pipeline context table.
         methods.add_method("getContext", |lua, this, ()| {
             let key_opt = this.context_key.borrow();
             match key_opt.as_ref() {
@@ -896,6 +1103,10 @@ impl LuaUserData for LuaPipeline {
                 None => Ok(None),
             }
         });
+
+        // -- setOnComplete --
+        /// Registers a callback invoked when the entire pipeline finishes execution. Receives the result table.
+        /// @param | callback | function? | A function receiving the result table. Pass nil to remove.
         methods.add_method("setOnComplete", |lua, this, cb: Option<LuaFunction>| {
             *this.on_complete_key.borrow_mut() = match cb {
                 Some(f) => Some(lua.create_registry_value(f)?),
@@ -903,6 +1114,10 @@ impl LuaUserData for LuaPipeline {
             };
             Ok(())
         });
+
+        // -- setOnStepComplete --
+        /// Registers a callback invoked each time any step completes successfully. Receives (stepName, context).
+        /// @param | callback | function? | A function receiving (stepName, context). Pass nil to remove.
         methods.add_method("setOnStepComplete", |lua, this, cb: Option<LuaFunction>| {
             *this.on_step_complete_key.borrow_mut() = match cb {
                 Some(f) => Some(lua.create_registry_value(f)?),
@@ -910,6 +1125,10 @@ impl LuaUserData for LuaPipeline {
             };
             Ok(())
         });
+
+        // -- setOnStepError --
+        /// Registers a callback invoked each time any step fails. Receives (stepName, errorMessage).
+        /// @param | callback | function? | A function receiving (stepName, errorMessage). Pass nil to remove.
         methods.add_method("setOnStepError", |lua, this, cb: Option<LuaFunction>| {
             *this.on_step_error_key.borrow_mut() = match cb {
                 Some(f) => Some(lua.create_registry_value(f)?),
@@ -917,13 +1136,25 @@ impl LuaUserData for LuaPipeline {
             };
             Ok(())
         });
+
+        // -- getName --
+        /// Returns the name of this pipeline.
+        /// @return | string | Pipeline name.
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().name.clone())
         });
+
+        // -- setName --
+        /// Changes the name of this pipeline.
+        /// @param | name | string | New pipeline name.
         methods.add_method("setName", |_, this, name: String| {
             this.inner.borrow_mut().name = name;
             Ok(())
         });
+
+        // -- toTable --
+        /// Serializes the pipeline configuration into a plain Lua table for inspection or persistence.
+        /// @return | table | A table with name, errorMode, and steps array fields.
         methods.add_method("toTable", |lua, this, ()| {
             let t = lua.create_table()?;
             let pipeline = this.inner.borrow();
@@ -955,6 +1186,7 @@ impl LuaUserData for LuaPipeline {
             t.set("steps", steps_t)?;
             Ok(t)
         });
+
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             let inner = this.inner.borrow();
             Ok(format!(
@@ -963,7 +1195,19 @@ impl LuaUserData for LuaPipeline {
                 inner.get_step_count()
             ))
         });
+
+        // -- type --
+        /// Returns the type name of this object ("LPipeline").
+        /// @return | string | Type identifier.
         methods.add_method("type", |_, _, ()| Ok("LPipeline"));
+
+        // -- addConditional --
+        /// Convenience method to create and add a step with dependencies and a condition in one call.
+        /// @param | name | string | Unique step name.
+        /// @param | deps | table | Array of dependency step names.
+        /// @param | callback | function | The step callback function.
+        /// @param | condition | function | Predicate function; step runs only if it returns true.
+        /// @return | LPipeline | Returns self for method chaining.
         methods.add_method(
             "addConditional",
             |lua,
@@ -985,6 +1229,15 @@ impl LuaUserData for LuaPipeline {
                 Ok(this.clone())
             },
         );
+
+        // -- addBranch --
+        /// Adds a branching construct: evaluates a predicate, then runs either the "then" or "else" callback based on the result.
+        /// @param | name | string | Base name for the branch (generates internal guard/then/else sub-steps).
+        /// @param | deps | table | Array of dependency step names that must complete before the branch evaluates.
+        /// @param | when | function | Predicate function receiving context; returns true for the "then" path.
+        /// @param | thenFn | function | Callback executed if the predicate returns true.
+        /// @param | elseFn | function? | Callback executed if the predicate returns false. Defaults to a no-op.
+        /// @return | LPipeline | Returns self for method chaining.
         methods.add_method(
             "addBranch",
             |lua,
@@ -1092,17 +1345,35 @@ impl LuaUserData for LuaPipeline {
                 Ok(this.clone())
             },
         );
+
+        // -- onProgress --
+        /// Registers a progress callback invoked after each step finishes (regardless of outcome). Receives (stepName, statusString).
+        /// @param | callback | function | A function receiving (stepName, status).
         methods.add_method("onProgress", |lua, this, cb: LuaFunction| {
             *this.on_progress_key.borrow_mut() = Some(lua.create_registry_value(cb)?);
             Ok(())
         });
+
+        // -- onEvent --
+        /// Registers a low-level event callback for all pipeline lifecycle events. Receives (eventName, stepName, status, detail).
+        /// @param | callback | function | A function receiving (eventName, stepName, status, detail).
         methods.add_method("onEvent", |lua, this, cb: LuaFunction| {
             *this.on_event_key.borrow_mut() = Some(lua.create_registry_value(cb)?);
             Ok(())
         });
+
+        // -- toAscii --
+        /// Returns an ASCII art diagram of the pipeline's dependency graph for debugging and visualization.
+        /// @return | string | Multi-line ASCII diagram.
         methods.add_method("toAscii", |_, this, ()| {
             Ok(this.inner.borrow().to_ascii_diagram())
         });
+
+        // -- addSubPipeline --
+        /// Embeds another pipeline's steps into this pipeline under an alias prefix, with optional outer dependencies.
+        /// @param | subPipeline | LPipeline | The pipeline whose steps will be merged in.
+        /// @param | alias | string | A prefix applied to all merged step names to avoid collisions.
+        /// @param | deps | table? | Optional array of step names that all merged steps depend on.
         methods.add_method("addSubPipeline", |_, this, (sub_ud, alias, deps_tbl): (mlua::AnyUserData, String, Option<mlua::Table>)| {
                 let sub_ref = sub_ud.borrow::<LuaPipeline>().map_err(mlua::Error::external)?;
                 let sub_clone = sub_ref.inner.borrow().clone();
@@ -1120,13 +1391,25 @@ impl LuaUserData for LuaPipeline {
                 Ok(())
             },
         );
+
+        // -- typeOf --
+        /// Checks whether this object is of a given type name. Accepts "LPipeline", "Pipeline", or "Object".
+        /// @param | name | string | Type name to check against.
+        /// @return | boolean | True if the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LPipeline" || name == "Pipeline" || name == "Object")
         });
     }
 }
+/// Registers the `lurek.pipeline` module into the Lua runtime.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+
+    // -- newStep --
+    /// Creates a new pipeline step with the given name and an optional callback function.
+    /// @param | name | string | Unique step name.
+    /// @param | callback | function? | Optional callback executed when this step runs.
+    /// @return | LPipelineStep | The new step object.
     tbl.set(
         "newStep",
         lua.create_function(|lua, (name, callback): (String, Option<LuaFunction>)| {
@@ -1138,6 +1421,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(wrapper)
         })?,
     )?;
+
+    // -- newPipeline --
+    /// Creates a new empty pipeline with an optional name. Add steps via addStep() or addConditional().
+    /// @param | name | string? | Pipeline name (defaults to "pipeline").
+    /// @return | LPipeline | The new pipeline object.
     tbl.set(
         "newPipeline",
         lua.create_function(|_, name: Option<String>| {
@@ -1145,6 +1433,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(LuaPipeline::new(pipeline))
         })?,
     )?;
+
+    // -- fromTable --
+    /// Creates a pipeline pre-populated with steps from a declarative table definition. Each step entry can specify name, deps, delay, optional, retryCount, retryDelay, async, tag, and fn.
+    /// @param | definition | table | A table with optional name, errorMode, and a steps array.
+    /// @return | LPipeline | The constructed pipeline.
     tbl.set(
         "fromTable",
         lua.create_function(|lua, def: LuaTable| {

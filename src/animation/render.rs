@@ -1,3 +1,6 @@
+//! - Converts the current animation frame quad into a textured draw command.
+//! - Stores atlas reference, position, rotation, and scale in `AnimRenderParams`.
+//! - Provides a standalone `quad_to_draw_command` helper reusable outside the controller.
 
 use crate::animation::controller::Animation;
 use crate::math::Rect;
@@ -30,14 +33,14 @@ pub struct AnimRenderParams {
 }
 
 impl Animation {
-    /// Builds a draw command for the current frame when the animation has an active quad.
+    /// Build a draw command for the current frame when the animation has an active quad.
     pub fn generate_render_command(&self, params: &AnimRenderParams) -> Option<RenderCommand> {
         let quad = self.current_quad()?;
         Some(quad_to_draw_command(&quad, params))
     }
 }
 
-/// Converts a texture quad plus render parameters into a renderer draw command.
+/// Convert a texture quad plus render parameters into a renderer draw command.
 pub fn quad_to_draw_command(quad: &Rect, params: &AnimRenderParams) -> RenderCommand {
     RenderCommand::DrawQuad {
         texture_key: params.texture_key,

@@ -1,3 +1,14 @@
+//! - Seeded permutation-table noise generator supporting Perlin gradient noise in 1-D through 4-D dimensions.
+//! - Simplex noise variants in 1-D, 2-D, and 3-D using skewed simplex grids for faster evaluation.
+//! - Worley (cell/Voronoi) noise in 2-D and 3-D with selectable distance metrics: Euclidean, Manhattan, Chebyshev.
+//! - Fractal layering strategies: fractional Brownian motion (fBm), ridged multifractal, and turbulence.
+//! - Configurable heightmap generation producing row-major f64 arrays from combined multi-octave passes.
+//! - Gradient contribution helpers mapping hash bytes to directional dot products in 1-D through 4-D.
+//! - Smoothstep fade curve and linear interpolation primitives used across all Perlin evaluations.
+//! - Deterministic cell hashing for reproducible procedural feature point placement from any u64 seed.
+//! - Domain warping via Perlin displacement fields for organic terrain and texture distortion.
+//! - MapGenOptions controlling scale, octaves, lacunarity, persistence, offset, algorithm, and fractal type.
+
 /// Distance metric used by Worley cell noise.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DistType {

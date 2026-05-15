@@ -1,3 +1,11 @@
+//! - Core data types for the globe subsystem: provinces, markers, labels, arcs, and layers.
+//! - Province geometry with polygon vertices, centroids, adjacency, and per-edge tags.
+//! - Render parameters via GlobeSpec: lighting, atmosphere, borders, rotation.
+//! - Overlay and heat-map layers with per-province color overrides.
+//! - Marker and label types with style, LOD gating, and pulse animation.
+//! - Projection output types for screen-space rendering of provinces and arcs.
+//! - Globe-level error enum for load, lookup, and pathfinding failures.
+
 use crate::math::Vec2;
 use std::collections::{HashMap, HashSet};
 /// Maximum province count supported by globe data structures.

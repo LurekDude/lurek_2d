@@ -1,3 +1,7 @@
+//! - Pair raw file bytes with the logical path they were loaded from.
+//! - Provide length, emptiness, and UTF-8 decode helpers on the cached payload.
+//! - Serve as the common return type for GameFS load operations.
+
 /// Cached file bytes paired with the logical path they came from.
 pub struct FileData {
     /// Logical path used to load or label the payload.
@@ -5,6 +9,8 @@ pub struct FileData {
     /// Raw file contents in load order.
     pub bytes: Vec<u8>,
 }
+
+/// Core constructors and accessors for `FileData`.
 impl FileData {
     /// Create a file payload from a path and raw bytes.
     pub fn new(path: String, bytes: Vec<u8>) -> Self {

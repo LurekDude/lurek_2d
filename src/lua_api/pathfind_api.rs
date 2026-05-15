@@ -1,3 +1,5 @@
+﻿//! `lurek.pathfind` -- Lua bindings for navigation grids, unit pathfinding, flow fields, path grids, hex grids, JPS grids, nav meshes, range maps, and tilemap-derived path data.
+
 use super::tilemap_api::LuaTileMap;
 use super::SharedState;
 use crate::log_msg;
@@ -12,6 +14,7 @@ use crate::runtime::log_messages::LA08_PATHFINDING_THREAD_UNIMPL;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+/// Converts zero-based Rust waypoints into one-based Lua point tables.
 fn waypoints_to_lua<'a>(lua: &'a Lua, path: &[Waypoint]) -> LuaResult<LuaTable<'a>> {
     let tbl = lua.create_table()?;
     for (i, wp) in path.iter().enumerate() {
@@ -22,6 +25,7 @@ fn waypoints_to_lua<'a>(lua: &'a Lua, path: &[Waypoint]) -> LuaResult<LuaTable<'
     }
     Ok(tbl)
 }
+/// Converts one-based Lua point tables into zero-based Rust waypoints.
 fn lua_to_waypoints(tbl: &LuaTable) -> LuaResult<Vec<Waypoint>> {
     let mut waypoints = Vec::new();
     for pair in tbl.clone().sequence_values::<LuaTable>() {
@@ -32,28 +36,51 @@ fn lua_to_waypoints(tbl: &LuaTable) -> LuaResult<Vec<Waypoint>> {
     }
     Ok(waypoints)
 }
+/// Lua-side wrapper for a navigation grid and optional abstract graph cache.
 pub struct LuaNavGrid {
+    /// Shared navigation grid data.
     inner: Rc<RefCell<NavGrid>>,
+    /// Optional abstract graph built for hierarchical pathfinding.
     abstract_graph: Rc<RefCell<Option<AbstractGraph>>>,
 }
+/// Provides Lua methods for navigation grid dimensions, costs, blocking, serialization, dirty regions, and diagonal mode.
 impl LuaUserData for LuaNavGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns grid width.
+        /// @return | integer | Grid width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().get_width())
         });
+        // -- getHeight --
+        /// Returns grid height.
+        /// @return | integer | Grid height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().get_height())
         });
+        // -- getDimensions --
+        /// Returns grid dimensions.
+        /// @return | integer | Grid width.
+        /// @return | integer | Grid height.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
+        // -- setCost --
+        /// Sets movement cost at a one-based grid cell.
+        /// @return | nil | No value is returned.
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, u8)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
         });
+        // -- getCost --
+        /// Returns movement cost at a one-based grid cell.
+        /// @return | integer | Movement cost.
         methods.add_method("getCost", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
         });
+        // -- setBlocked --
+        /// Sets blocked state at a one-based grid cell.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "setBlocked",
             |_, this, (x, y, blocked): (u32, u32, bool)| {
@@ -61,9 +88,15 @@ impl LuaUserData for LuaNavGrid {
                 Ok(())
             },
         );
+        // -- isBlocked --
+        /// Returns blocked state at a one-based grid cell.
+        /// @return | boolean | True when blocked.
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
         });
+        // -- isWalkable --
+        /// Returns whether a one-based grid cell is walkable for a unit size.
+        /// @return | boolean | True when walkable.
         methods.add_method(
             "isWalkable",
             |_, this, (x, y, unit_size): (u32, u32, Option<u32>)| {
@@ -73,10 +106,17 @@ impl LuaUserData for LuaNavGrid {
                     .is_walkable(x - 1, y - 1, unit_size.unwrap_or(1)))
             },
         );
+        // -- fill --
+        /// Fills the grid with a movement cost.
+        /// @param | cost | integer | Movement cost.
+        /// @return | nil | No value is returned.
         methods.add_method("fill", |_, this, cost: u8| {
             this.inner.borrow_mut().fill(cost);
             Ok(())
         });
+        // -- fillRect --
+        /// Fills a one-based rectangular area with a movement cost.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "fillRect",
             |_, this, (x, y, w, h, cost): (u32, u32, u32, u32, u8)| {
@@ -84,22 +124,38 @@ impl LuaUserData for LuaNavGrid {
                 Ok(())
             },
         );
+        // -- loadFromString --
+        /// Loads grid data from a binary string.
+        /// @param | data | string | Serialized grid bytes.
+        /// @return | nil | No value is returned.
         methods.add_method("loadFromString", |_, this, data: LuaString| {
             this.inner
                 .borrow_mut()
                 .load_from_bytes(data.as_bytes())
                 .map_err(LuaError::external)
         });
+            // -- saveToString --
+            /// Saves grid data to a binary string.
+            /// @return | string | Serialized grid bytes.
         methods.add_method("saveToString", |lua, this, ()| {
             lua.create_string(this.inner.borrow().save_to_bytes())
         });
+            // -- setChunkSize --
+            /// Sets hierarchical chunk size.
+            /// @return | nil | No value is returned.
         methods.add_method("setChunkSize", |_, this, size: u32| {
             this.inner.borrow_mut().set_chunk_size(size);
             Ok(())
         });
+        // -- getChunkSize --
+        /// Returns hierarchical chunk size.
+        /// @return | integer | Chunk size.
         methods.add_method("getChunkSize", |_, this, ()| {
             Ok(this.inner.borrow().get_chunk_size())
         });
+        // -- rebuildAbstract --
+        /// Rebuilds the cached abstract graph for this grid.
+        /// @return | nil | No value is returned.
         methods.add_method("rebuildAbstract", |_, this, ()| {
             let grid = this.inner.borrow();
             let chunk_size = grid.get_chunk_size();
@@ -107,14 +163,24 @@ impl LuaUserData for LuaNavGrid {
             *this.abstract_graph.borrow_mut() = Some(graph);
             Ok(())
         });
+        // -- setDirty --
+        /// Marks a one-based rectangular region dirty.
+        /// @return | nil | No value is returned.
         methods.add_method("setDirty", |_, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.inner.borrow_mut().set_dirty(x - 1, y - 1, w, h);
             Ok(())
         });
+        // -- clearDirty --
+        /// Clears dirty regions.
+        /// @return | nil | No value is returned.
         methods.add_method("clearDirty", |_, this, ()| {
             this.inner.borrow_mut().clear_dirty();
             Ok(())
         });
+        // -- setDiagonalMode --
+        /// Sets diagonal movement mode.
+        /// @param | mode | string | Mode name: `none`, `always`, or `nocornercut`.
+        /// @return | nil | No value is returned.
         methods.add_method("setDiagonalMode", |_, this, mode: String| {
             let dm = DiagonalMode::from_lua_str(&mode).ok_or_else(|| {
                 LuaError::external(format!(
@@ -125,6 +191,9 @@ impl LuaUserData for LuaNavGrid {
             this.inner.borrow_mut().set_diagonal_mode(dm);
             Ok(())
         });
+        // -- getDiagonalMode --
+        /// Returns diagonal movement mode.
+        /// @return | string | Mode name.
         methods.add_method("getDiagonalMode", |_, this, ()| {
             Ok(this
                 .inner
@@ -133,17 +202,29 @@ impl LuaUserData for LuaNavGrid {
                 .to_lua_str()
                 .to_string())
         });
+            // -- type --
+            /// Returns the Lua-visible type name for this navigation grid handle.
+            /// @return | string | The string `LNavGrid`.
         methods.add_method("type", |_, _, ()| Ok("LNavGrid"));
+            // -- typeOf --
+            /// Returns whether this navigation grid handle matches a supported type name.
+            /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LNavGrid" || name == "NavGrid" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a unit pathfinder over a navigation grid.
 pub struct LuaUnitPathfinder {
+    /// Shared pathfinder data.
     inner: Rc<RefCell<UnitPathfinder>>,
 }
+/// Provides Lua methods for path queries, reachability, line of sight, and cache settings.
 impl LuaUserData for LuaUnitPathfinder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- findPath --
+        /// Finds a path between one-based grid cells.
+        /// @return | table | Array table of waypoint tables, or nil when no path exists.
         methods.add_method(
             "findPath",
             |lua, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -160,6 +241,9 @@ impl LuaUserData for LuaUnitPathfinder {
                 }
             },
         );
+        // -- findPathSmooth --
+        /// Finds a smoothed path between one-based grid cells.
+        /// @return | table | Array table of waypoint tables, or nil when no path exists.
         methods.add_method(
             "findPathSmooth",
             |lua, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -176,6 +260,10 @@ impl LuaUserData for LuaUnitPathfinder {
                 }
             },
         );
+        // -- findPathBidirectional --
+        /// Finds a path using bidirectional A* and returns completion status.
+        /// @return | table | Array table of waypoint tables, or nil when no path exists.
+        /// @return | boolean | True when the path is complete.
         methods.add_method(
             "findPathBidirectional",
             |lua,
@@ -212,14 +300,24 @@ impl LuaUserData for LuaUnitPathfinder {
                 }
             },
         );
+        // -- getPathLength --
+        /// Returns path length for a waypoint table.
+        /// @return | number | Path length.
         methods.add_method("getPathLength", |_, _this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
             Ok(UnitPathfinder::get_path_length(&waypoints))
         });
+        // -- getPathCost --
+        /// Returns path cost for a waypoint table.
+        /// @return | number | Path cost.
         methods.add_method("getPathCost", |_, this, path: LuaTable| {
             let waypoints = lua_to_waypoints(&path)?;
             Ok(this.inner.borrow().get_path_cost(&waypoints))
         });
+        // -- findPartialPath --
+        /// Finds a partial path with a node limit.
+        /// @return | table | Array table of waypoint tables.
+        /// @return | boolean | True when the path is complete.
         methods.add_method("findPartialPath", |lua,
              this,
              (x1, y1, x2, y2, max_nodes, unit_size): (
@@ -241,6 +339,10 @@ impl LuaUserData for LuaUnitPathfinder {
                 Ok((waypoints_to_lua(lua, &path)?, complete))
             },
         );
+        // -- findNearestWalkable --
+        /// Finds nearest walkable one-based grid cell within a radius.
+        /// @return | integer | Result x coordinate, or nil.
+        /// @return | integer | Result y coordinate, or nil.
         methods.add_method(
             "findNearestWalkable",
             |_, this, (x, y, max_radius, unit_size): (u32, u32, u32, Option<u32>)| match this
@@ -255,6 +357,9 @@ impl LuaUserData for LuaUnitPathfinder {
                 None => Ok((LuaValue::Nil, LuaValue::Nil)),
             },
         );
+        // -- isReachable --
+        /// Returns whether a target cell is reachable.
+        /// @return | boolean | True when reachable.
         methods.add_method(
             "isReachable",
             |_, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -267,6 +372,9 @@ impl LuaUserData for LuaUnitPathfinder {
                 ))
             },
         );
+        // -- heuristicDistance --
+        /// Returns heuristic distance between two one-based cells.
+        /// @return | number | Heuristic distance.
         methods.add_method(
             "heuristicDistance",
             |_, _this, (x1, y1, x2, y2): (u32, u32, u32, u32)| {
@@ -278,6 +386,9 @@ impl LuaUserData for LuaUnitPathfinder {
                 ))
             },
         );
+        // -- lineOfSight --
+        /// Returns whether two one-based cells have line of sight.
+        /// @return | boolean | True when line of sight is clear.
         methods.add_method(
             "lineOfSight",
             |_, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -290,35 +401,62 @@ impl LuaUserData for LuaUnitPathfinder {
                 ))
             },
         );
+        // -- setCacheEnabled --
+        /// Enables or disables path cache.
+        /// @return | nil | No value is returned.
         methods.add_method("setCacheEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_cache_enabled(enabled);
             Ok(())
         });
+        // -- isCacheEnabled --
+        /// Returns whether path cache is enabled.
+        /// @return | boolean | True when enabled.
         methods.add_method("isCacheEnabled", |_, this, ()| {
             Ok(this.inner.borrow().is_cache_enabled())
         });
+        // -- clearCache --
+        /// Clears cached paths.
+        /// @return | nil | No value is returned.
         methods.add_method("clearCache", |_, this, ()| {
             this.inner.borrow_mut().clear_cache();
             Ok(())
         });
+        // -- getCacheSize --
+        /// Returns current path cache size.
+        /// @return | integer | Cache size.
         methods.add_method("getCacheSize", |_, this, ()| {
             Ok(this.inner.borrow().get_cache_size())
         });
+        // -- setCacheMaxSize --
+        /// Sets maximum path cache size.
+        /// @return | nil | No value is returned.
         methods.add_method("setCacheMaxSize", |_, this, n: usize| {
             this.inner.borrow_mut().set_cache_max_size(n);
             Ok(())
         });
+        // -- type --
+        /// Returns the Lua-visible type name for this pathfinder handle.
+        /// @return | string | The string `LUnitPathfinder`.
         methods.add_method("type", |_, _, ()| Ok("LUnitPathfinder"));
+        // -- typeOf --
+        /// Returns whether this pathfinder handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LUnitPathfinder" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a flow field over a navigation grid.
 pub struct LuaFlowField {
+    /// Shared flow field data.
     inner: Rc<RefCell<FlowField>>,
 }
+/// Provides Lua methods for flow field calculation, direction lookup, and steering.
 impl LuaUserData for LuaFlowField {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- calculate --
+        /// Calculates a flow field toward one target cell.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "calculate",
             |_, this, (tx, ty, unit_size): (u32, u32, Option<u32>)| {
@@ -328,6 +466,9 @@ impl LuaUserData for LuaFlowField {
                 Ok(())
             },
         );
+        // -- calculateMulti --
+        /// Calculates a flow field toward multiple target cells.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "calculateMulti",
             |_, this, (targets, unit_size): (LuaTable, Option<u32>)| {
@@ -344,18 +485,33 @@ impl LuaUserData for LuaFlowField {
                 Ok(())
             },
         );
+        // -- getDirection --
+        /// Returns flow direction at a one-based grid cell.
+        /// @return | LuaValue | Direction value from the pathfinding module.
         methods.add_method("getDirection", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
         });
+        // -- getDirectionAngle --
+        /// Returns flow direction angle at a one-based grid cell.
+        /// @return | number | Direction angle.
         methods.add_method("getDirectionAngle", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction_angle(x - 1, y - 1))
         });
+        // -- getCostToTarget --
+        /// Returns flow field cost to target from a one-based grid cell.
+        /// @return | LuaValue | Cost value from the pathfinding module.
         methods.add_method("getCostToTarget", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_cost_to_target(x - 1, y - 1))
         });
+        // -- isCalculated --
+        /// Returns whether the flow field has been calculated.
+        /// @return | boolean | True when calculated.
         methods.add_method("isCalculated", |_, this, ()| {
             Ok(this.inner.borrow().is_calculated())
         });
+        // -- getTargets --
+        /// Returns target cells for this flow field.
+        /// @return | table | Array table of target point tables.
         methods.add_method("getTargets", |lua, this, ()| {
             let targets = this.inner.borrow().get_targets();
             let tbl = lua.create_table()?;
@@ -367,46 +523,82 @@ impl LuaUserData for LuaFlowField {
             }
             Ok(tbl)
         });
+        // -- steer --
+        /// Returns steering data for a world position.
+        /// @return | LuaValue | Steering tuple from the pathfinding module.
         methods.add_method(
             "steer",
             |_, this, (wx, wy, speed, tw, th): (f32, f32, f32, f32, f32)| {
                 Ok(this.inner.borrow().steer(wx, wy, speed, tw, th))
             },
         );
+        // -- type --
+        /// Returns the Lua-visible type name for this flow field handle.
+        /// @return | string | The string `LFlowField`.
         methods.add_method("type", |_, _, ()| Ok("LFlowField"));
+        // -- typeOf --
+        /// Returns whether this flow field handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LFlowField" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a cell-size path grid.
 pub struct LuaPathGrid {
+    /// Shared path grid data.
     inner: Rc<RefCell<PathGrid>>,
 }
+/// Provides Lua methods for walkability, costs, and path queries on a path grid.
 impl LuaUserData for LuaPathGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns grid width.
+        /// @return | integer | Grid width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().width as u32)
         });
+        // -- getHeight --
+        /// Returns grid height.
+        /// @return | integer | Grid height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().height as u32)
         });
+        // -- getCellSize --
+        /// Returns path grid cell size.
+        /// @return | number | Cell size.
         methods.add_method("getCellSize", |_, this, ()| {
             Ok(this.inner.borrow().cell_size)
         });
+        // -- setWalkable --
+        /// Sets walkability at a one-based cell.
+        /// @return | nil | No value is returned.
         methods.add_method("setWalkable", |_, this, (x, y, w): (usize, usize, bool)| {
             this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
             Ok(())
         });
+        // -- isWalkable --
+        /// Returns walkability at a one-based cell.
+        /// @return | boolean | True when walkable.
         methods.add_method("isWalkable", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().is_walkable(x - 1, y - 1))
         });
+        // -- setCost --
+        /// Sets movement cost at a one-based cell.
+        /// @return | nil | No value is returned.
         methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
         });
+        // -- getCost --
+        /// Returns movement cost at a one-based cell.
+        /// @return | number | Movement cost.
         methods.add_method("getCost", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_cost(x - 1, y - 1))
         });
+        // -- findPath --
+        /// Finds a path between one-based path grid cells.
+        /// @return | table | Array table of point tables, or nil when no path exists.
         methods.add_method(
             "findPath",
             |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
@@ -429,6 +621,9 @@ impl LuaUserData for LuaPathGrid {
                 }
             },
         );
+        // -- findPathSmoothed --
+        /// Finds a smoothed path between one-based path grid cells.
+        /// @return | table | Array table of point tables, or nil when no path exists.
         methods.add_method(
             "findPathSmoothed",
             |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
@@ -451,30 +646,55 @@ impl LuaUserData for LuaPathGrid {
                 }
             },
         );
+        // -- type --
+        /// Returns the Lua-visible type name for this path grid handle.
+        /// @return | string | The string `LPathGrid`.
         methods.add_method("type", |_, _, ()| Ok("LPathGrid"));
+        // -- typeOf --
+        /// Returns whether this path grid handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LPathGrid" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for an AI flow field over a path grid.
 pub struct LuaAiFlowField {
+    /// Shared AI flow field data.
     inner: Rc<RefCell<AiFlowField>>,
 }
+/// Provides Lua methods for AI flow field dimensions, goal, direction, and distance.
 impl LuaUserData for LuaAiFlowField {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns flow field width.
+        /// @return | integer | Width.
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().width as u32)
         });
+        // -- getHeight --
+        /// Returns flow field height.
+        /// @return | integer | Height.
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().height as u32)
         });
+        // -- hasGoal --
+        /// Returns whether a goal is set.
+        /// @return | boolean | True when a goal exists.
         methods.add_method("hasGoal", |_, this, ()| {
             Ok(this.inner.borrow().goal.is_some())
         });
+        // -- setGoal --
+        /// Sets the one-based flow field goal.
+        /// @return | nil | No value is returned.
         methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
             this.inner.borrow_mut().set_goal(x - 1, y - 1);
             Ok(())
         });
+        // -- getGoal --
+        /// Returns the one-based flow field goal when set.
+        /// @return | integer | Goal x coordinate, or nil.
+        /// @return | integer | Goal y coordinate, or nil.
         methods.add_method(
             "getGoal",
             |_, this, ()| -> LuaResult<(LuaValue, LuaValue)> {
@@ -487,23 +707,41 @@ impl LuaUserData for LuaAiFlowField {
                 }
             },
         );
+        // -- getDirection --
+        /// Returns flow direction for a one-based cell.
+        /// @return | LuaValue | Direction value.
         methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
         });
+        // -- getDistance --
+        /// Returns distance to goal for a one-based cell.
+        /// @return | LuaValue | Distance value.
         methods.add_method("getDistance", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_distance(x - 1, y - 1))
         });
+        // -- type --
+        /// Returns the Lua-visible type name for this AI flow field handle.
+        /// @return | string | The string `LAIFlowField`.
         methods.add_method("type", |_, _, ()| Ok("LAIFlowField"));
+        // -- typeOf --
+        /// Returns whether this AI flow field handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LAIFlowField" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a hexagonal grid.
 pub struct LuaHexGrid {
+    /// Shared hex grid data.
     inner: Rc<RefCell<HexGrid>>,
 }
+/// Provides Lua methods for hex grid blocking, costs, pathing, visibility, movement range, and distance.
 impl LuaUserData for LuaHexGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setBlocked --
+        /// Sets blocked state for a one-based hex cell.
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setBlocked",
             |_, this, (col, row, blocked): (u32, u32, bool)| {
@@ -513,13 +751,22 @@ impl LuaUserData for LuaHexGrid {
                 Ok(())
             },
         );
+        // -- setCost --
+        /// Sets movement cost for a one-based hex cell.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setCost", |_, this, (col, row, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(col - 1, row - 1, cost);
             Ok(())
         });
+        // -- isBlocked --
+        /// Returns blocked state for a one-based hex cell.
+        /// @return | boolean | True when blocked.
         methods.add_method("isBlocked", |_, this, (col, row): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(col - 1, row - 1))
         });
+        // -- findPath --
+        /// Finds a path between one-based hex cells.
+        /// @return | table | Array table of hex cell tables, or nil when no path exists.
         methods.add_method(
             "findPath",
             |lua, this, (fc, fr, tc, tr): (u32, u32, u32, u32)| match this
@@ -540,6 +787,9 @@ impl LuaUserData for LuaHexGrid {
                 }
             },
         );
+        // -- lineOfSight --
+        /// Returns whether two one-based hex cells have line of sight.
+        /// @return | boolean | True when line of sight is clear.
         methods.add_method(
             "lineOfSight",
             |_, this, (fc, fr, tc, tr): (u32, u32, u32, u32)| {
@@ -549,6 +799,9 @@ impl LuaUserData for LuaHexGrid {
                     .line_of_sight((fc - 1, fr - 1), (tc - 1, tr - 1)))
             },
         );
+        // -- fieldOfView --
+        /// Returns visible hex cells within range.
+        /// @return | table | Array table of hex cell tables.
         methods.add_method(
             "fieldOfView",
             |lua, this, (col, row, max_range): (u32, u32, u32)| {
@@ -566,6 +819,9 @@ impl LuaUserData for LuaHexGrid {
                 Ok(t)
             },
         );
+        // -- rangeOfMovement --
+        /// Returns reachable hex cells within movement budget.
+        /// @return | table | Array table of hex cell tables.
         methods.add_method(
             "rangeOfMovement",
             |lua, this, (col, row, budget): (u32, u32, f32)| {
@@ -583,6 +839,9 @@ impl LuaUserData for LuaHexGrid {
                 Ok(t)
             },
         );
+        // -- distance --
+        /// Returns distance between two one-based hex cells.
+        /// @return | number | Hex distance.
         methods.add_method(
             "distance",
             |_, this, (c1, r1, c2, r2): (u32, u32, u32, u32)| {
@@ -592,17 +851,29 @@ impl LuaUserData for LuaHexGrid {
                     .distance((c1 - 1, r1 - 1), (c2 - 1, r2 - 1)))
             },
         );
+        // -- type --
+        /// Returns the Lua-visible type name for this hex grid handle.
+        /// @return | string | The string `LHexGrid`.
         methods.add_method("type", |_, _, ()| Ok("LHexGrid"));
+        // -- typeOf --
+        /// Returns whether this hex grid handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LHexGrid" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a Jump Point Search grid.
 pub struct LuaJpsGrid {
+    /// Shared JPS grid data.
     inner: Rc<RefCell<JpsGrid>>,
 }
+/// Provides Lua methods for JPS blocking and path queries.
 impl LuaUserData for LuaJpsGrid {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setBlocked --
+        /// Sets blocked state for a one-based grid cell.
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setBlocked",
             |_, this, (x, y, blocked): (u32, u32, bool)| {
@@ -610,9 +881,15 @@ impl LuaUserData for LuaJpsGrid {
                 Ok(())
             },
         );
+        // -- isBlocked --
+        /// Returns blocked state for a one-based grid cell.
+        /// @return | boolean | True when blocked.
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().is_blocked(x - 1, y - 1))
         });
+        // -- findPath --
+        /// Finds a JPS path between one-based grid cells.
+        /// @return | table | Array table of point tables, or nil when no path exists.
         methods.add_method(
             "findPath",
             |lua, this, (fx, fy, tx, ty): (u32, u32, u32, u32)| match this
@@ -633,17 +910,29 @@ impl LuaUserData for LuaJpsGrid {
                 }
             },
         );
+        // -- type --
+        /// Returns the Lua-visible type name for this JPS grid handle.
+        /// @return | string | The string `LJpsGrid`.
         methods.add_method("type", |_, _, ()| Ok("LJpsGrid"));
+        // -- typeOf --
+        /// Returns whether this JPS grid handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LJpsGrid" || name == "Object")
         });
     }
 }
+/// Lua-side wrapper for a navigation mesh.
 pub struct LuaNavMesh {
+    /// Shared navmesh data.
     inner: Rc<RefCell<NavMesh>>,
 }
+/// Provides Lua methods for navmesh polygons, links, and path queries.
 impl LuaUserData for LuaNavMesh {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- addPolygon --
+        /// Adds a polygon from vertex tables and returns a one-based id.
+        /// @return | integer | One-based polygon id.
         methods.add_method_mut("addPolygon", |_, this, vertices: LuaTable| {
             let mut points = Vec::new();
             for entry in vertices.sequence_values::<LuaTable>() {
@@ -659,6 +948,9 @@ impl LuaUserData for LuaNavMesh {
                 .ok_or_else(|| LuaError::runtime("addPolygon requires at least 3 vertices"))?;
             Ok((id + 1) as u32)
         });
+        // -- connectPolygons --
+        /// Connects two polygons by one-based id.
+        /// @return | boolean | True when the connection was added.
         methods.add_method_mut(
             "connectPolygons",
             |_, this, (a, b, bidirectional): (u32, u32, Option<bool>)| {
@@ -669,6 +961,9 @@ impl LuaUserData for LuaNavMesh {
                 ))
             },
         );
+        // -- findPath --
+        /// Finds a path through the navmesh between world points.
+        /// @return | table | Array table of point tables, or nil when no path exists.
         methods.add_method(
             "findPath",
             |lua, this, (sx, sy, gx, gy): (f32, f32, f32, f32)| {
@@ -688,17 +983,30 @@ impl LuaUserData for LuaNavMesh {
                 }
             },
         );
+        // -- getPolygonCount --
+        /// Returns navmesh polygon count.
+        /// @return | integer | Polygon count.
         methods.add_method("getPolygonCount", |_, this, ()| {
             Ok(this.inner.borrow().polygon_count() as u32)
         });
+        // -- type --
+        /// Returns the Lua-visible type name for this navmesh handle.
+        /// @return | string | The string `LNavMesh`.
         methods.add_method("type", |_, _, ()| Ok("LNavMesh"));
+        // -- typeOf --
+        /// Returns whether this navmesh handle matches a supported type name.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LNavMesh" || name == "Object")
         });
     }
 }
+/// Registers the `lurek.pathfind` module.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+    // -- newNavGrid --
+    /// Creates a navigation grid.
+    /// @return | LNavGrid | New navigation grid handle.
     tbl.set(
         "newNavGrid",
         lua.create_function(|_, (width, height): (u32, u32)| {
@@ -708,6 +1016,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- newPathfinder --
+    /// Creates a unit pathfinder for a navigation grid.
+    /// @return | LUnitPathfinder | New pathfinder handle.
     tbl.set(
         "newPathfinder",
         lua.create_function(|_, grid_ud: LuaAnyUserData| {
@@ -717,6 +1028,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- newFlowField --
+    /// Creates a flow field for a navigation grid.
+    /// @return | LFlowField | New flow field handle.
     tbl.set(
         "newFlowField",
         lua.create_function(|_, grid_ud: LuaAnyUserData| {
@@ -726,6 +1040,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- newPathGrid --
+    /// Creates a cell-size path grid.
+    /// @return | LPathGrid | New path grid handle.
     tbl.set(
         "newPathGrid",
         lua.create_function(|_, (w, h, cell_size): (usize, usize, f32)| {
@@ -734,6 +1051,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- newPathFlowField --
+    /// Creates an AI flow field from a path grid.
+    /// @return | LAIFlowField | New AI flow field handle.
     tbl.set(
         "newPathFlowField",
         lua.create_function(|_, grid_ud: LuaAnyUserData| {
@@ -748,6 +1068,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- setThreadCount --
+    /// Records a warning because pathfinding thread count is not implemented.
+    /// @return | nil | No value is returned.
     tbl.set(
         "setThreadCount",
         lua.create_function(|_, _count: u32| {
@@ -755,10 +1078,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- getThreadCount --
+    /// Returns the pathfinding thread count.
+    /// @return | integer | Thread count, currently 0.
     tbl.set(
         "getThreadCount",
         lua.create_function(|_, ()| -> LuaResult<u32> { Ok(0) })?,
     )?;
+    // -- newNavGridFromTileMap --
+    /// Creates a navigation grid from a tilemap layer and blocked gid table.
+    /// @return | LNavGrid | New navigation grid handle.
     tbl.set(
         "newNavGridFromTileMap",
         lua.create_function(
@@ -789,6 +1118,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
+    // -- newHexGrid --
+    /// Creates a hex grid.
+    /// @return | LHexGrid | New hex grid handle.
     tbl.set(
         "newHexGrid",
         lua.create_function(
@@ -803,6 +1135,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
+    // -- newJpsGrid --
+    /// Creates a Jump Point Search grid.
+    /// @return | LJpsGrid | New JPS grid handle.
     tbl.set(
         "newJpsGrid",
         lua.create_function(|_, (width, height): (u32, u32)| {
@@ -811,6 +1146,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- newNavMesh --
+    /// Creates an empty navigation mesh.
+    /// @return | LNavMesh | New navmesh handle.
     tbl.set(
         "newNavMesh",
         lua.create_function(|_, ()| {
@@ -819,6 +1157,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    // -- rangeMap --
+    /// Computes reachable cells from range map options.
+    /// @param | opts | table | Options with dimensions, origin, budget, optional diagonal flag, costs, and blocked cells.
+    /// @return | table | Range map result with `cells`, `width`, and `height` fields.
     tbl.set(
         "rangeMap",
         lua.create_function(|lua, opts: LuaTable| {

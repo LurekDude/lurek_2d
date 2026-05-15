@@ -1,3 +1,9 @@
+//! - Headless CLI tool for game validation, packaging, and batch screenshot capture.
+//! - `validate` subcommand invokes the Python game validator script.
+//! - `pack` subcommand compresses a game directory into a .lurek ZIP archive.
+//! - `screenshot-batch` subcommand runs each game for N frames and captures a PNG.
+//! - No GPU or window required for validate/pack; screenshot-batch spawns engine instances.
+
 use std::env;
 use std::fs::{self, File};
 use std::io::{Seek, Write};

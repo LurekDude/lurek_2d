@@ -1,4 +1,9 @@
 
+//! - `SoundPool` round-robin polyphonic voice pool for one-shot playback of a single sound asset.
+//! - Preloaded `SoundKey` voices cycled via `next_voice` for low-latency triggering.
+//! - Per-pool volume multiplier and optional bus routing assignment.
+//! - Validity check ensuring at least one voice is available.
+
 use crate::runtime::resource_keys::SoundKey;
 /// Round-robin pool of preloaded source keys representing voices for one sound asset.
 pub struct SoundPool {

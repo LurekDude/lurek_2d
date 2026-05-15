@@ -1,3 +1,5 @@
+//! `lurek.log` -- Logging bindings for severity helpers, global level control, memory/file/rotating/callback sinks, sink listing and flushing, memory reads, structured field logs, tag filters, and Lua callback dispatch.
+
 use super::SharedState;
 use crate::log as log_domain;
 use crate::log::sinks::{Sink, SinkKind, SinkLevel, SinkRegistry};
@@ -5,6 +7,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::rc::Rc;
+/// Dispatches a plain log record to registered sinks and Lua callback sinks.
 fn dispatch(
     lua: &Lua,
     sinks: &Rc<RefCell<SinkRegistry>>,
@@ -32,6 +35,7 @@ fn dispatch(
         }
     }
 }
+/// Dispatches a structured log record with fields to registered sinks and Lua callback sinks.
 fn dispatch_structured(
     lua: &Lua,
     sinks: &Rc<RefCell<SinkRegistry>>,
@@ -68,6 +72,7 @@ fn dispatch_structured(
         }
     }
 }
+/// Converts a Lua table of scalar fields into string field values.
 fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
     let mut fields = BTreeMap::new();
     for pair in tbl.pairs::<String, LuaValue>() {
@@ -84,6 +89,7 @@ fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
     }
     Ok(fields)
 }
+/// Converts nil, string, or array table tag config into optional tag filters.
 fn lua_table_to_tags(value: LuaValue) -> LuaResult<Option<Vec<String>>> {
     match value {
         LuaValue::Nil => Ok(None),
@@ -110,6 +116,7 @@ fn lua_table_to_tags(value: LuaValue) -> LuaResult<Option<Vec<String>>> {
         ))),
     }
 }
+/// Reads a boolean config field with a default value.
 fn config_bool(config: &LuaTable, key: &str, default: bool) -> bool {
     config
         .get::<_, Option<bool>>(key)
@@ -117,6 +124,7 @@ fn config_bool(config: &LuaTable, key: &str, default: bool) -> bool {
         .flatten()
         .unwrap_or(default)
 }
+/// Reads a string config field with a default value.
 fn config_string(config: &LuaTable, key: &str, default: &str) -> String {
     config
         .get::<_, Option<String>>(key)
@@ -124,6 +132,7 @@ fn config_string(config: &LuaTable, key: &str, default: &str) -> String {
         .flatten()
         .unwrap_or_else(|| default.to_string())
 }
+    /// Registers `lurek.log` severity helpers, sink management, and structured logging functions.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let sinks: Rc<RefCell<SinkRegistry>> = Rc::new(RefCell::new(SinkRegistry::new()));
@@ -132,6 +141,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let callback_keys_all = callback_keys.clone();
     let s = sinks.clone();
     let callback_keys_print = callback_keys_all.clone();
+    // -- debug --
+    /// Logs a debug message with an optional tag.
+    /// @param | message | string | Message text.
+    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @return | nil | No value is returned.
     tbl.set(
         "debug",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -143,6 +157,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- info --
+    /// Logs an info message with an optional tag.
+    /// @param | message | string | Message text.
+    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @return | nil | No value is returned.
     tbl.set(
         "info",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -154,6 +173,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- warn --
+    /// Logs a warning message with an optional tag.
+    /// @param | message | string | Message text.
+    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @return | nil | No value is returned.
     tbl.set(
         "warn",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -165,6 +189,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- error --
+    /// Logs an error message with an optional tag.
+    /// @param | message | string | Message text.
+    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @return | nil | No value is returned.
     tbl.set(
         "error",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -176,6 +205,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- print --
+    /// Logs a message at a runtime-selected level with an optional tag.
+    /// @param | level | string | Log level string.
+    /// @param | message | string | Message text.
+    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @return | nil | No value is returned.
     tbl.set(
         "print",
         lua.create_function(
@@ -208,6 +243,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
+    // -- setLevel --
+    /// Sets the global log level.
+    /// @param | level | string | Level `error`, `warn`, `info`, `debug`, `trace`, `off`, or `none`.
+    /// @return | nil | No value is returned.
     tbl.set("setLevel", lua.create_function(|_, level: String| {
         match level.to_lowercase().as_str() {
             "error" | "warn" | "warning" | "info" | "debug" | "trace" | "off" | "none" => {
@@ -219,12 +258,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             ))),
         }
     })?)?;
+    // -- getLevel --
+    /// Returns the global log level string.
+    /// @return | string | Current global log level.
     tbl.set(
         "getLevel",
         lua.create_function(|_, ()| Ok(log_domain::get_level()))?,
     )?;
     let s = sinks.clone();
     let callback_keys_for_add = callback_keys_all.clone();
+    // -- addSink --
+    /// Adds a memory, file, rotating, or callback sink from a config table.
+    /// @param | config | table | Sink config with `type`, `level`, format, tag, path, capacity, or callback fields.
+    /// @return | integer | Sink id.
     tbl.set(
         "addSink",
         lua.create_function(move |lua, config: LuaTable| {
@@ -289,6 +335,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys_for_remove = callback_keys.clone();
+    // -- removeSink --
+    /// Removes a sink by id and releases any callback registry key.
+    /// @param | id | integer | Sink id.
+    /// @return | boolean | True when a sink was removed.
     tbl.set(
         "removeSink",
         lua.create_function(move |lua, id: u64| {
@@ -303,6 +353,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys_for_clear = callback_keys.clone();
+    // -- clearSinks --
+    /// Removes all sinks and releases callback registry keys.
+    /// @return | nil | No value is returned.
     tbl.set(
         "clearSinks",
         lua.create_function(move |lua, ()| {
@@ -314,6 +367,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = sinks.clone();
+    // -- listSinks --
+    /// Returns metadata for all registered sinks.
+    /// @return | table | Array table of sink records with id, type, level, and optional path.
     tbl.set(
         "listSinks",
         lua.create_function(move |lua, ()| {
@@ -332,6 +388,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = sinks.clone();
+    // -- readMemory --
+    /// Reads entries from a memory sink and optionally drains them.
+    /// @param | id | integer | Memory sink id.
+    /// @param | drain | boolean | Optional drain flag, defaulting to false.
+    /// @return | table | Array table of memory log entries.
     tbl.set(
         "readMemory",
         lua.create_function(move |lua, (id, drain): (u64, Option<bool>)| {
@@ -369,6 +430,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = sinks.clone();
+    // -- flushFile --
+    /// Flushes a file-backed sink by id when it exists.
+    /// @param | id | integer | Sink id.
+    /// @return | nil | No value is returned.
     tbl.set(
         "flushFile",
         lua.create_function(move |_lua, id: u64| {
@@ -380,6 +445,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- struct --
+    /// Logs a structured message at a runtime-selected level.
+    /// @param | level_str | string | Log level string.
+    /// @param | message | string | Message text.
+    /// @param | fields_tbl | table | Scalar field table converted to strings.
+    /// @return | nil | No value is returned.
     tbl.set(
         "struct",
         lua.create_function(
@@ -402,6 +473,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- debug_fields --
+    /// Logs a debug message with structured fields.
+    /// @param | message | string | Message text.
+    /// @param | fields_tbl | table | Scalar field table converted to strings.
+    /// @return | nil | No value is returned.
     tbl.set(
         "debug_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -422,6 +498,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- info_fields --
+    /// Logs an info message with structured fields.
+    /// @param | message | string | Message text.
+    /// @param | fields_tbl | table | Scalar field table converted to strings.
+    /// @return | nil | No value is returned.
     tbl.set(
         "info_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -442,6 +523,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- warn_fields --
+    /// Logs a warning message with structured fields.
+    /// @param | message | string | Message text.
+    /// @param | fields_tbl | table | Scalar field table converted to strings.
+    /// @return | nil | No value is returned.
     tbl.set(
         "warn_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -462,6 +548,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = sinks.clone();
     let callback_keys = callback_keys_all.clone();
+    // -- error_fields --
+    /// Logs an error message with structured fields.
+    /// @param | message | string | Message text.
+    /// @param | fields_tbl | table | Scalar field table converted to strings.
+    /// @return | nil | No value is returned.
     tbl.set(
         "error_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {

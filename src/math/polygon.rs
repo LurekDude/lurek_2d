@@ -1,3 +1,9 @@
+//! - Ear-clipping triangulation for simple polygons and convexity testing.
+//! - Sutherland-Hodgman polygon clipping against arbitrary half-planes.
+//! - Boolean-style polygon operations: intersection, union, and difference.
+//! - Andrew monotone-chain convex hull and winding-order normalization.
+//! - Internal helpers for signed area, point-in-triangle, and cross-product sign tests.
+
 use crate::math::vec2::Vec2;
 
 /// Triangulate a simple (non-self-intersecting) polygon using ear clipping; returns error on failure.

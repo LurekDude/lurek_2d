@@ -1,3 +1,7 @@
+//! - Distance-based light intensity falloff using quadratic attenuation coefficients.
+//! - Computes attenuation factor from constant, linear, and quadratic terms.
+//! - Debug visualization of attenuation curves rendered to an image buffer.
+
 /// Quadratic attenuation coefficients for distance-based light intensity falloff.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Attenuation {
@@ -8,6 +12,7 @@ pub struct Attenuation {
     /// Quadratic coefficient in the denominator; controls rapid long-range decay.
     pub quadratic: f32,
 }
+/// Core methods for constructing and evaluating attenuation.
 impl Attenuation {
     /// Create a new attenuation with explicit constant, linear, and quadratic coefficients.
     pub fn new(constant: f32, linear: f32, quadratic: f32) -> Self {

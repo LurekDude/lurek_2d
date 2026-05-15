@@ -1,3 +1,7 @@
+//! - HSV to RGB conversion for visualization color mapping.
+//! - Hue-based palette generation for chart and graph elements.
+//! - Shared color utility used across all visualization submodules.
+
 /// Convert HSV values to an RGB tuple for visualization images.
 pub(crate) fn hsv_to_rgb_viz(h: u16, s: f32, v: f32) -> (u8, u8, u8) {
     let h = (h % 360) as f32;

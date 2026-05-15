@@ -1,3 +1,12 @@
+//! - Token-based binary packing and unpacking using whitespace-separated format strings
+//! - Endian-aware serialization of integers, floats, booleans, strings, and raw bytes
+//! - Coercion helpers that convert between BinValue variants at write time
+//! - Length-prefixed and null-terminated string support for wire protocols
+//! - Padding tokens for alignment and fixed-layout binary structures
+//! - Bounds-checked reads with descriptive underflow error messages
+//! - Static size measurement for formats without variable-width tokens
+//! - ByteData output for zero-copy integration with the data module pipeline
+
 use crate::data::byte_data::ByteData;
 #[derive(Debug, Clone)]
 /// Hold typed values used by token-based binary packing.

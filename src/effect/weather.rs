@@ -1,3 +1,7 @@
+//! - Weather particle simulation types and state management.
+//! - Supports rain, snow, hail, dust, leaves, ash, and pollen behaviors.
+//! - Tracks particle pool, wind parameters, and internal PRNG.
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumerates supported weather particle behaviors.
 pub enum WeatherType {
@@ -95,8 +99,9 @@ impl WeatherState {
         ((out >> 40) as u32) as f32 / (1u32 << 24) as f32
     }
 }
+/// Provide default disabled weather state with seeded PRNG.
 impl Default for WeatherState {
-    /// Builds the default disabled weather simulation state.
+    /// Build the default disabled weather simulation state.
     fn default() -> Self {
         Self {
             enabled: false,

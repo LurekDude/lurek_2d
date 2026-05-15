@@ -1,3 +1,9 @@
+//! - Mutable RGBA pixel buffer for creation, loading, and manipulation of 2D images.
+//! - Constructors from file path, encoded memory bytes, or raw RGBA byte vectors.
+//! - Per-pixel read/write, paste composition, and bulk map transforms (serial and parallel).
+//! - Primitive drawing: filled rectangles, circles, Bresenham lines, and bitmap text labels.
+//! - PNG encoding for serialization and export.
+
 use crate::log_msg;
 use crate::runtime::log_messages::{IM01_IMAGE_LOADED, IM02_IMAGE_MISMATCH};
 /// Mutable RGBA image buffer used across rendering, serialization, and analysis.
@@ -10,6 +16,7 @@ pub struct ImageData {
     /// Packed RGBA bytes in row-major order.
     pub(super) pixels: Vec<u8>,
 }
+/// Methods for constructing, querying, mutating, drawing on, and encoding image buffers.
 impl ImageData {
     /// Create a zero-filled RGBA image buffer of the given size.
     pub fn new(width: u32, height: u32) -> Self {

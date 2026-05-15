@@ -2229,7 +2229,7 @@ end)
 --  ImageEffect chain API (merged from test_image_effect.lua)
 
 ---@param fx LImageEffect
----@param key integer|string
+---@param key number|string
 ---@return LPostFxEffect
 local function require_effect(fx, key)
     local effect = fx:getEffect(key)

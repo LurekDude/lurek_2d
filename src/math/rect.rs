@@ -1,3 +1,7 @@
+//! - Axis-aligned rectangle defined by top-left corner and size (y-down convention).
+//! - Containment, intersection, union, and bounding-box construction from point sets.
+//! - Center-based and corner-based constructors for layout and collision use cases.
+
 use super::vec2::Vec2;
 
 /// Axis-aligned rectangle with position and size; used for bounds, layout regions, and UV rects.

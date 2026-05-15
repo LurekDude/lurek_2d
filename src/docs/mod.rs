@@ -1,3 +1,7 @@
+//! - Aggregate documentation infrastructure: catalog, entry models, export, reporting, and schema.
+//! - Re-export primary types so callers can import from the top-level docs module.
+//! - Support the doc generation pipeline and IDE tooling data flow.
+
 /// Expose catalog storage and query operations for documentation entries.
 pub mod catalog;
 /// Expose normalized entry types for parameters, returns, and metadata.

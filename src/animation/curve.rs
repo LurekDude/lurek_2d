@@ -215,14 +215,14 @@ impl AnimPropertyTimeline {
         out
     }
 }
-/// `Default` delegates to `AnimCurve::new`.
+/// `Default`: delegate to `AnimCurve::new`.
 impl Default for AnimCurve {
     /// Build an empty curve with linear easing.
     fn default() -> Self {
         Self::new()
     }
 }
-/// `Default` delegates to `AnimPropertyTimeline::new`.
+/// `Default`: delegate to `AnimPropertyTimeline::new`.
 impl Default for AnimPropertyTimeline {
     /// Build an empty property timeline with linear easing.
     fn default() -> Self {

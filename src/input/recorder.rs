@@ -1,3 +1,9 @@
+//! - Record and replay input sessions as sparse frame sequences.
+//! - Capture key/mouse events per frame; skip silent frames to save space.
+//! - Serialise recordings to versioned JSON envelopes for deterministic replay.
+//! - Provide stateful recorder with start/stop/load/playback cursor lifecycle.
+//! - Support both live recording and loaded-file playback in one struct.
+
 /// A single input event with a kind tag and a key/button name.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct InputEvent {
@@ -43,6 +49,7 @@ struct RecordingEnvelope {
     total_frames: u64,
 }
 
+/// Serialisation and deserialisation of input recordings.
 impl InputRecording {
     /// Serialise to JSON, wrapping in a versioned envelope; return error string on failure.
     pub fn to_json(&self) -> Result<String, String> {
@@ -89,6 +96,7 @@ pub struct InputRecorder {
     playing: bool,
 }
 
+/// Recording and playback lifecycle methods.
 impl InputRecorder {
     /// Create a new recorder with no active recording or playback.
     pub fn new() -> Self {

@@ -1,3 +1,10 @@
+//! - Dijkstra shortest-path search over weighted directed graphs.
+//! - Item-type-aware pathfinding respecting edge filters and cooldowns.
+//! - Distance queries and bounded reachability flood-fill.
+//! - Neighbor discovery across active edges and bidirectional links.
+//! - Path reconstruction from predecessor maps into ordered node/edge lists.
+//! - Priority-queue state with min-cost ordering for traversal.
+
 use super::core::Graph;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
@@ -37,6 +44,7 @@ impl Ord for DijkstraState {
             .then_with(|| self.node_id.cmp(&other.node_id))
     }
 }
+/// Pathfinding and reachability queries for the graph.
 impl Graph {
     /// Find the cheapest active path between two nodes.
     pub fn find_path(&self, from: u64, to: u64) -> Option<PathResult> {

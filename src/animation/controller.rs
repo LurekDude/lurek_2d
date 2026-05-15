@@ -555,7 +555,7 @@ impl Animation {
         anim
     }
 }
-/// `Default` delegates to `Animation::new`.
+/// `Default`: delegate to `Animation::new`.
 impl Default for Animation {
     /// Build an empty animation controller.
     fn default() -> Self {

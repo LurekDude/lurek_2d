@@ -1,3 +1,5 @@
+//! - Formats per-frame timing data into compact single-line strings for logging.
+//! - Reads tick, update, render, and callback timings from `FrameProfile`.
 
 use crate::runtime::FrameProfile;
 /// Format one `FrameProfile` sample as a compact single-line timing string.

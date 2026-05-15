@@ -1,3 +1,12 @@
+//! - Connected-component discovery via undirected BFS traversal.
+//! - Directed cycle detection using a three-color DFS walk.
+//! - Kahn-style topological sort with deterministic tie-breaking.
+//! - Kruskal minimum spanning forest using a union-find structure.
+//! - Greedy graph coloring with sorted node-id processing order.
+//! - Bipartiteness test through BFS two-coloring.
+//! - A* shortest-path search using Euclidean node-position heuristics.
+//! - All algorithms operate on the shared `Graph` adjacency representation.
+
 use super::core::Graph;
 use std::collections::{HashMap, HashSet, VecDeque};
 impl Graph {

@@ -1,3 +1,9 @@
+//! - Uniform-grid spatial hashing for broad-phase 2D collision and proximity queries.
+//! - AABB insert/remove/update with automatic cell-bucket management.
+//! - Rectangle, circle, and segment query shapes with deduplication.
+//! - Parametric slab-based segment-vs-AABB intersection test.
+//! - O(1) cell lookup per query tile; scales with world density, not total item count.
+
 use std::collections::{HashMap, HashSet};
 
 /// A spatial item registered in the hash grid, describing its AABB.
@@ -24,6 +30,7 @@ pub struct SpatialHash {
     /// Cell buckets mapping grid coordinates to sets of overlapping item ids.
     buckets: HashMap<(i32, i32), HashSet<String>>,
 }
+/// Core operations for inserting, removing, querying, and maintaining spatial items.
 impl SpatialHash {
     /// Construct an empty hash with the given uniform `cell_size`.
     pub fn new(cell_size: f32) -> Self {

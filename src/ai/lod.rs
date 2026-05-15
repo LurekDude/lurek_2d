@@ -1,10 +1,8 @@
-
-//! - Defines the AI level-of-detail model that groups agents into distance-based
-//!   update tiers around a reference position.
-//! - Owns the tier data that controls maximum coverage, think distance, and frame
-//!   cadence for reduced AI work at longer ranges.
-//! - Keeps the logic that sorts tiers, assigns agents to a tier from positions,
-//!   and decides whether a tier should run on a given frame.
+//! - AI level-of-detail model grouping agents into distance-based update tiers.
+//! - Tier data controlling maximum coverage, think distance, and frame cadence.
+//! - Tier sorting, agent assignment from positions, and per-frame run decisions.
+//! - Frame-cadence check so distant agents skip updates while near agents run every frame.
+//! - Default three-tier near/mid/far layout suitable for 2D worlds on integrated GPUs.
 
 /// One LOD bucket for AI work.
 #[derive(Clone)]

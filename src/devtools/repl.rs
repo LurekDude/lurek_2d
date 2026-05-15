@@ -1,3 +1,7 @@
+//! - Evaluate Lua expressions and statements in an interactive console
+//! - Maintain bounded command history with oldest-eviction policy
+//! - Return expression results, success markers, or formatted error text
+
 use crate::devtools::lua_display::value_to_string;
 #[derive(Debug, Clone)]
 /// Store REPL command history and capacity limits for local dev sessions.

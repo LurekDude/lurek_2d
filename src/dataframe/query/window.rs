@@ -1,3 +1,8 @@
+//! - Rolling mean, sum, min, and max over configurable window size
+//! - Dense rank computation with average-rank tie-breaking
+//! - Row-to-row percent change calculation
+//! - Cumulative sum across ordered rows
+
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 impl DataFrame {
     #[allow(clippy::needless_range_loop)]

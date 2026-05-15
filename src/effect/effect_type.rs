@@ -1,3 +1,9 @@
+//! - Post-processing effect type enumeration and name registry.
+//! - Canonical lowercase name mapping for Lua-facing effect lookup.
+//! - Debug label generation for renderer diagnostics.
+//! - Default parameter tables for each built-in effect.
+//! - Built-in effect catalog excluding the custom shader pass.
+
 use std::collections::HashMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumerates the built-in post-processing effect implementations.
@@ -51,7 +57,9 @@ pub enum PostFxEffectType {
     /// Outline extraction and compositing.
     Outline,
 }
+/// Name resolution, parameter defaults, and debug utilities for effect types.
 impl PostFxEffectType {
+    /// Bidirectional mapping from effect variant to its canonical lowercase string.
     const NAME_MAP: &'static [(Self, &'static str)] = &[
         (Self::Bloom, "bloom"),
         (Self::Blur, "blur"),
@@ -78,6 +86,7 @@ impl PostFxEffectType {
         (Self::Dither, "dither"),
         (Self::Outline, "outline"),
     ];
+    /// Ordered list of all non-custom built-in effect types.
     const BUILT_IN_TYPES: &'static [Self] = &[
         Self::Bloom,
         Self::Blur,

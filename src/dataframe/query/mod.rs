@@ -1,3 +1,8 @@
+//! - Statistical and distribution-oriented analytics helpers
+//! - Row filtering, sorting, joins, and sampling operations
+//! - Grouped aggregation, pivoting, and correlation computations
+//! - Rolling and ranking window functions
+
 /// Statistical and distribution-oriented query helpers.
 pub mod analytics;
 /// Row filtering, sorting, joins, and sampling helpers.

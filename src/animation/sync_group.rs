@@ -1,3 +1,6 @@
+//! - Groups animation slot-map keys that should stay synchronised during playback.
+//! - Stores a deduplicated member list with add, remove, clear, and query operations.
+//! - Provides the membership data higher systems use to align animation timers.
 
 use slotmap::DefaultKey;
 /// Set of animation keys that should stay in sync.

@@ -1,4 +1,14 @@
 
+//! - `MidiPlayer` stateful transport controller for MIDI file playback via rendered PCM.
+//! - File loading with parsed metadata: duration, BPM, ticks-per-beat, track names, note count.
+//! - Transport controls: play, stop, pause, resume, seek, tell, and duration queries.
+//! - Per-channel volume, mute, instrument, and solo/unsolo operations across 16 MIDI channels.
+//! - Per-track mute support keyed by track index.
+//! - Configurable tempo scaling, looping, and output sample rate / channel count.
+//! - Mixer bus assignment via `BusKey` for routed playback.
+//! - `MidiData` metadata struct storing parsed song-level attributes.
+//! - Helper functions for MIDI note-to-frequency conversion and sine-wave note rendering.
+
 use crate::audio::PlayState;
 use crate::log_msg;
 use crate::runtime::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};
@@ -60,7 +70,7 @@ pub struct MidiPlayer {
     /// Output channel count for rendered MIDI PCM.
     output_channels: u16,
 }
-/// `Default` impl: returns `MidiPlayer::new()`.
+/// `Default` impl: return `MidiPlayer::new()`.
 impl Default for MidiPlayer {
     /// Create default MIDI player state.
     fn default() -> Self {
@@ -90,7 +100,7 @@ impl MidiPlayer {
             output_channels: 2,
         }
     }
-    /// Load MIDI bytes from `path` and pass them to `load_data`; returns `false` on read or parse failure.
+    /// Load MIDI bytes from `path` and pass them to `load_data`; return `false` on read or parse failure.
     pub fn load(&mut self, path: &Path) -> bool {
         let bytes = match std::fs::read(path) {
             Ok(b) => b,
@@ -107,7 +117,7 @@ impl MidiPlayer {
             false
         }
     }
-    /// Parse and prepare raw MIDI bytes for playback; currently disabled and always returns `false`.
+    /// Parse and prepare raw MIDI bytes for playback; currently disabled and always return `false`.
     pub fn load_data(&mut self, _data: Vec<u8>) -> bool {
         log_msg!(warn, A002_MIDI_DISABLED);
         false
@@ -329,7 +339,7 @@ impl MidiPlayer {
     pub fn set_output_channels(&mut self, channels: u16) {
         self.output_channels = channels.clamp(1, 2);
     }
-    /// Render loaded MIDI to interleaved i16 PCM; currently returns an empty buffer.
+    /// Render loaded MIDI to interleaved i16 PCM; currently return an empty buffer.
     fn render_to_pcm(&self) -> Vec<i16> {
         Vec::new()
     }

@@ -1,3 +1,7 @@
+//! - Source-to-target color remapping via indexed palette lookup tables.
+//! - Hash-accelerated pixel matching for large palettes, linear scan for small ones.
+//! - In-place image rewrite and cyclic rotation of replacement colors.
+
 use crate::math::Color;
 use std::collections::HashMap;
 /// Source-to-target color mapping used to remap image pixels.

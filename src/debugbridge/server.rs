@@ -1,3 +1,9 @@
+//! - Run a non-blocking TCP server loop accepting debug bridge client connections.
+//! - Parse JSON-RPC messages and dispatch to built-in handlers or runtime queue.
+//! - Deliver pending responses and broadcast events to connected clients.
+//! - Handle protocol handshake, nonce authentication, and version negotiation.
+//! - Support ping, hello, eval, performance, print history, and screenshot requests.
+
 use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;

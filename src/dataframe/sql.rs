@@ -1,3 +1,12 @@
+//! - SQL text tokenizer producing typed token stream
+//! - Recursive-descent parser for SELECT statements
+//! - WHERE clause expression tree with AND, OR, NOT, LIKE, and IN
+//! - Aggregate function support: COUNT, SUM, AVG, MIN, MAX
+//! - GROUP BY with HAVING filter and ORDER BY with LIMIT/OFFSET
+//! - JOIN clause parsing and inner-join execution
+//! - SQL LIKE pattern matching with `%` and `_` wildcards
+//! - Single-frame and multi-table Database query entry points
+
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
 #[derive(Debug, Clone, PartialEq)]
 /// Store lexical tokens produced from SQL text.

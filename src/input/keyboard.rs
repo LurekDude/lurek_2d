@@ -1,3 +1,12 @@
+//! - Per-frame keyboard state machine tracking logical keys, physical scan-codes, and frame deltas.
+//! - Modifier bitmask flags (Shift, Ctrl, Alt, Meta) updated each event.
+//! - OS key-repeat and text-input (IME) buffer toggling.
+//! - Bidirectional mapping between logical key names and physical scan-code names.
+//! - Winit-to-Lurek translation for both logical `Key` and physical `KeyCode` enums.
+//! - Frame lifecycle: `begin_frame` clears deltas, events accumulate, queries read snapshot.
+//! - Scan-code layer allows layout-independent bindings for WASD-style controls.
+//! - Text-input buffer collects composed characters for chat and text fields.
+
 use std::collections::HashSet;
 
 /// Bitmask flag for the Shift modifier.
@@ -40,6 +49,7 @@ impl Default for KeyboardState {
     }
 }
 
+/// Core keyboard query and mutation methods.
 impl KeyboardState {
     /// Create a keyboard state with all keys up and all buffers empty.
     pub fn new() -> Self {

@@ -1,3 +1,14 @@
+//! - Graph simulation tick loop: `update`, `step`, and parallel variant.
+//! - Item decay processing: reduce remaining life, kill expired items, purge from all containers.
+//! - Edge transit progression: advance items along edges and resolve arrivals with overflow policy.
+//! - Push-flow mechanics: rate-limited emission of items from push-capable nodes onto outgoing edges.
+//! - Pull-flow mechanics: rate-limited demand of items into pull-capable nodes from source inventories.
+//! - Node conversion rules: consume matching inputs and produce typed outputs per recipe.
+//! - Queue processing: timed dequeue of waiting items into node inventories when capacity allows.
+//! - Overflow handling: reject, destroy, or queue items that arrive at full nodes.
+//! - Parallel simulation via rayon feature gate for large-graph workloads.
+//! - GraphEvent emission for every state transition observable by Lua scripts.
+
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::node::FlowMode;

@@ -1,3 +1,5 @@
+//! `lurek.raycaster` - Provides a pseudo-3D raycasting engine for first-person dungeon crawlers with textured walls, floors, and ceilings.
+
 use super::SharedState;
 use crate::lua_api::render_api::{LObjModel, LuaImage};
 use crate::math::Color;
@@ -103,11 +105,20 @@ fn parse_point_lights(value: LuaValue, api_name: &str) -> LuaResult<Vec<PointLig
         ))),
     }
 }
+/// Lua-visible door manager that controls sliding doors within a raycaster map.
+/// Doors can be opened, closed, and animated over time at configurable speeds.
 pub struct LuaDoorManager {
     inner: Rc<RefCell<DoorManager>>,
 }
 impl LuaUserData for LuaDoorManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- addDoor --
+        /// Registers a new sliding door at the given grid cell.
+        /// @param | x | number | Grid column of the door cell.
+        /// @param | y | number | Grid row of the door cell.
+        /// @param | direction | string | Slide axis: "horizontal" or "vertical".
+        /// @param | speed | number | How fast the door opens/closes (units per second).
+        /// @return | number | Zero-based index of the newly added door.
         methods.add_method_mut(
             "addDoor",
             |_, this, (x, y, dir_str, speed): (u32, u32, String, f32)| {
@@ -118,18 +129,35 @@ impl LuaUserData for LuaDoorManager {
                 Ok(this.inner.borrow_mut().add_door(x, y, dir, speed))
             },
         );
+        // -- openDoor --
+        /// Begins opening the door at the given index. The door animates over time via `update()`.
+        /// @param | index | number | Zero-based index of the door to open.
+        /// @return | nil |
         methods.add_method_mut("openDoor", |_, this, index: usize| {
             this.inner.borrow_mut().open_door(index);
             Ok(())
         });
+        // -- closeDoor --
+        /// Begins closing the door at the given index. The door animates over time via `update()`.
+        /// @param | index | number | Zero-based index of the door to close.
+        /// @return | nil |
         methods.add_method_mut("closeDoor", |_, this, index: usize| {
             this.inner.borrow_mut().close_door(index);
             Ok(())
         });
+        // -- update --
+        /// Advances all door animations by the given delta time. Call once per frame.
+        /// @param | dt | number | Delta time in seconds since last frame.
+        /// @return | nil |
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
         });
+        // -- getDoor --
+        /// Returns a table describing the door at the given index, or nil if index is out of range.
+        /// The table contains: x, y, openAmount (0.0..1.0), state ("closed"|"opening"|"open"|"closing").
+        /// @param | index | number | Zero-based index of the door to query.
+        /// @return | table? | Door info table, or nil if not found.
         methods.add_method("getDoor", |lua, this, index: usize| {
             let mgr = this.inner.borrow();
             if let Some(door) = mgr.doors().get(index) {
@@ -149,6 +177,9 @@ impl LuaUserData for LuaDoorManager {
                 Ok(LuaValue::Nil)
             }
         });
+        // -- count --
+        /// Returns the total number of registered doors.
+        /// @return | number | Door count.
         methods.add_method("count", |_, this, ()| Ok(this.inner.borrow().doors().len()));
         methods.add_method("type", |_, _, ()| Ok("LDoorManager"));
         methods.add_method("typeOf", |_, _, name: String| {
@@ -156,22 +187,45 @@ impl LuaUserData for LuaDoorManager {
         });
     }
 }
+/// Lua-visible height map that stores per-cell floor and ceiling offsets for variable-height raycaster levels.
 pub struct LuaHeightMap {
     inner: Rc<RefCell<HeightMap>>,
 }
 impl LuaUserData for LuaHeightMap {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setFloor --
+        /// Sets the floor height offset at a specific grid cell.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | h | number | Floor height offset (0.0 = default floor level).
+        /// @return | nil |
         methods.add_method_mut("setFloor", |_, this, (x, y, h): (u32, u32, f32)| {
             this.inner.borrow_mut().set_floor(x, y, h);
             Ok(())
         });
+        // -- setCeiling --
+        /// Sets the ceiling height offset at a specific grid cell.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | h | number | Ceiling height offset (0.0 = default ceiling level).
+        /// @return | nil |
         methods.add_method_mut("setCeiling", |_, this, (x, y, h): (u32, u32, f32)| {
             this.inner.borrow_mut().set_ceiling(x, y, h);
             Ok(())
         });
+        // -- floorAt --
+        /// Returns the floor height offset at a given grid cell.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | number | Floor height offset at that cell.
         methods.add_method("floorAt", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().floor_at(x, y))
         });
+        // -- ceilingAt --
+        /// Returns the ceiling height offset at a given grid cell.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | number | Ceiling height offset at that cell.
         methods.add_method("ceilingAt", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().ceiling_at(x, y))
         });
@@ -181,16 +235,32 @@ impl LuaUserData for LuaHeightMap {
         });
     }
 }
+/// Lua-visible point light that illuminates nearby raycaster tiles and sprites with colored light and falloff.
 #[derive(Clone)]
 pub struct LuaPointLight {
     inner: PointLight,
 }
 impl LuaUserData for LuaPointLight {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- x --
+        /// Returns the X world position of this light.
+        /// @return | number | X coordinate.
         methods.add_method("x", |_, this, ()| Ok(this.inner.x));
+        // -- y --
+        /// Returns the Y world position of this light.
+        /// @return | number | Y coordinate.
         methods.add_method("y", |_, this, ()| Ok(this.inner.y));
+        // -- radius --
+        /// Returns the light's falloff radius in world units.
+        /// @return | number | Radius.
         methods.add_method("radius", |_, this, ()| Ok(this.inner.radius));
+        // -- intensity --
+        /// Returns the brightness multiplier of this light.
+        /// @return | number | Intensity.
         methods.add_method("intensity", |_, this, ()| Ok(this.inner.intensity));
+        // -- color --
+        /// Returns the RGB color components of this light.
+        /// @return | number, number, number | Red, green, blue channels (0.0..1.0).
         methods.add_method("color", |_, this, ()| {
             Ok((
                 this.inner.color[0],
@@ -198,6 +268,16 @@ impl LuaUserData for LuaPointLight {
                 this.inner.color[2],
             ))
         });
+        // -- set --
+        /// Overwrites all properties of this point light in a single call.
+        /// @param | x | number | New X world position.
+        /// @param | y | number | New Y world position.
+        /// @param | r | number | Red color channel (0.0..1.0).
+        /// @param | g | number | Green color channel (0.0..1.0).
+        /// @param | b | number | Blue color channel (0.0..1.0).
+        /// @param | radius | number | Falloff radius in world units.
+        /// @param | intensity | number | Brightness multiplier.
+        /// @return | nil |
         methods.add_method_mut(
             "set",
             |_, this, (x, y, r, g, b, radius, intensity): (f32, f32, f32, f32, f32, f32, f32)| {
@@ -209,12 +289,21 @@ impl LuaUserData for LuaPointLight {
                 Ok(())
             },
         );
+        // -- type --
+        /// Returns the type name of this object ("LPointLight").
+        /// @return | string | Type name string.
         methods.add_method("type", |_, _, ()| Ok("LPointLight"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to test against.
+        /// @return | boolean | True if this object is of the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LPointLight" || name == "PointLight" || name == "Object")
         });
     }
 }
+/// Lua-visible raycaster map that holds cell data, per-cell textures, and provides raycasting,
+/// collision, and scene-building operations for first-person dungeon-crawler rendering.
 pub struct LuaRaycaster {
     inner: Raycaster2D,
     state: Rc<RefCell<SharedState>>,
@@ -232,13 +321,28 @@ struct LuaLoweredFloorCell {
 }
 impl LuaUserData for LuaRaycaster {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setCell --
+        /// Sets the wall type value at a grid cell. Non-zero values are solid walls.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | val | number | Wall type (0 = empty, 1+ = wall texture index).
+        /// @return | nil |
         methods.add_method_mut("setCell", |_, this, (x, y, val): (u32, u32, u32)| {
             this.inner.set_cell(x, y, val);
             Ok(())
         });
+        // -- getCell --
+        /// Returns the wall type value at a grid cell.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | number | Cell value (0 = empty, 1+ = wall type).
         methods.add_method("getCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.get_cell(x, y))
         });
+        // -- setCells --
+        /// Replaces the entire map grid with a flat array of cell values (row-major order).
+        /// @param | cells | table | Flat array of numbers with width*height elements.
+        /// @return | nil |
         methods.add_method_mut("setCells", |_, this, cells_tbl: LuaTable| {
             let cells: Vec<u32> = cells_tbl
                 .sequence_values::<u32>()
@@ -246,11 +350,28 @@ impl LuaUserData for LuaRaycaster {
             this.inner.set_cells(cells);
             Ok(())
         });
+        // -- isBlocked --
+        /// Returns true if the grid cell is a solid wall (non-zero value).
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | boolean | True if cell blocks movement and rays.
         methods.add_method("isBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.is_blocked(x, y))
         });
+        // -- width --
+        /// Returns the map width in grid cells.
+        /// @return | number | Map width.
         methods.add_method("width", |_, this, ()| Ok(this.inner.width()));
+        // -- height --
+        /// Returns the map height in grid cells.
+        /// @return | number | Map height.
         methods.add_method("height", |_, this, ()| Ok(this.inner.height()));
+        // -- setFloorTextureCell --
+        /// Assigns a per-cell floor texture override. Pass nil to remove the override.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
+        /// @return | nil |
         methods.add_method_mut(
             "setFloorTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -265,9 +386,20 @@ impl LuaUserData for LuaRaycaster {
                 Ok(())
             },
         );
+        // -- getFloorTextureCell --
+        /// Returns the raw texture id assigned to this floor cell, or nil if none.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | number? | Raw texture id or nil.
         methods.add_method("getFloorTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.floor_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
+        // -- setCeilingTextureCell --
+        /// Assigns a per-cell ceiling texture override. Pass nil to remove the override.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
+        /// @return | nil |
         methods.add_method_mut(
             "setCeilingTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -282,9 +414,21 @@ impl LuaUserData for LuaRaycaster {
                 Ok(())
             },
         );
+        // -- getCeilingTextureCell --
+        /// Returns the raw texture id assigned to this ceiling cell, or nil if none.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | number? | Raw texture id or nil.
         methods.add_method("getCeilingTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.ceiling_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
+        // -- setLoweredFloorCell --
+        /// Marks a cell as a lowered floor (pit) with its own texture, depth, tint, and blocking flag.
+        /// Pass nil to remove the lowered floor designation.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @param | opts | table? | Options table {texture, depth?, r?, g?, b?, blocked?} or nil to clear.
+        /// @return | nil |
         methods.add_method_mut(
             "setLoweredFloorCell",
             |_, this, (x, y, opts): (u32, u32, LuaValue)| {
@@ -341,6 +485,11 @@ impl LuaUserData for LuaRaycaster {
                 Ok(())
             },
         );
+        // -- getLoweredFloorCell --
+        /// Returns the lowered floor configuration at a cell, or nil if the cell is normal.
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | table? | Table {texture, depth, r, g, b, blocked} or nil.
         methods.add_method("getLoweredFloorCell", |lua, this, (x, y): (u32, u32)| {
             if let Some(cell) = this.lowered_floor_cells.get(&(x, y)) {
                 let tbl = lua.create_table()?;
@@ -355,6 +504,11 @@ impl LuaUserData for LuaRaycaster {
                 Ok(LuaValue::Nil)
             }
         });
+        // -- isWalkBlocked --
+        /// Returns true if the cell blocks walking (solid wall OR blocked lowered-floor cell).
+        /// @param | x | number | Grid column.
+        /// @param | y | number | Grid row.
+        /// @return | boolean | True if the cell cannot be walked through.
         methods.add_method("isWalkBlocked", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.is_blocked(x, y)
                 || this
@@ -363,6 +517,13 @@ impl LuaUserData for LuaRaycaster {
                     .map(|cell| cell.blocked)
                     .unwrap_or(false))
         });
+        // -- tryMove --
+        /// Attempts to move from (px,py) by (dx,dy) with wall-slide collision. Returns the final position.
+        /// @param | px | number | Current X position in world space.
+        /// @param | py | number | Current Y position in world space.
+        /// @param | dx | number | Desired X movement delta.
+        /// @param | dy | number | Desired Y movement delta.
+        /// @return | number, number, boolean | Final X, final Y, and whether any movement occurred.
         methods.add_method(
             "tryMove",
             |_, this, (px, py, dx, dy): (f32, f32, f32, f32)| {
@@ -379,6 +540,15 @@ impl LuaUserData for LuaRaycaster {
                 Ok((nx, ny, moved))
             },
         );
+        // -- gridMove --
+        /// Performs a discrete grid-step movement in one of 4 cardinal directions with collision.
+        /// Used for tile-by-tile dungeon crawlers.
+        /// @param | px | number | Current X position.
+        /// @param | py | number | Current Y position.
+        /// @param | dir | number | Facing direction 1..4 (1=N, 2=E, 3=S, 4=W).
+        /// @param | action | string | Movement action: "forward", "back", "left", or "right".
+        /// @param | step | number | Step distance in world units (typically 1.0).
+        /// @return | number, number, boolean | Final X, final Y, whether move succeeded.
         methods.add_method(
             "gridMove",
             |_, this, (px, py, dir, action, step): (f32, f32, u8, String, f32)| {
@@ -407,6 +577,13 @@ impl LuaUserData for LuaRaycaster {
                 Ok((nx, ny, moved))
             },
         );
+        // -- castRay --
+        /// Casts a single ray from (ox,oy) at the given angle and returns hit info or nil.
+        /// @param | ox | number | Ray origin X.
+        /// @param | oy | number | Ray origin Y.
+        /// @param | angle | number | Ray direction in radians.
+        /// @param | maxDist | number | Maximum cast distance.
+        /// @return | table? | Hit table {distance, raw_distance, cell_value, alpha, side, tex_u, hit_x, hit_y, hit} or nil.
         methods.add_method(
             "castRay",
             |lua, this, (ox, oy, angle, max_dist): (f32, f32, f32, f32)| match this
@@ -417,6 +594,15 @@ impl LuaUserData for LuaRaycaster {
                 None => Ok(LuaValue::Nil),
             },
         );
+        // -- castRays --
+        /// Casts multiple rays across a field of view and returns an array of hit tables.
+        /// @param | ox | number | Ray origin X.
+        /// @param | oy | number | Ray origin Y.
+        /// @param | angle | number | Center angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | count | number | Number of rays to cast.
+        /// @param | maxDist | number | Maximum cast distance per ray.
+        /// @return | table | Array of hit tables (same fields as castRay).
         methods.add_method(
             "castRays",
             |lua, this, (ox, oy, angle, fov, count, max_dist): (f32, f32, f32, f32, u32, f32)| {
@@ -428,6 +614,16 @@ impl LuaUserData for LuaRaycaster {
                 Ok(tbl)
             },
         );
+        // -- castRaysFlat --
+        /// Casts multiple rays and returns only the corrected distances as a flat array.
+        /// More efficient than castRays when only distances are needed.
+        /// @param | ox | number | Ray origin X.
+        /// @param | oy | number | Ray origin Y.
+        /// @param | angle | number | Center angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | count | number | Number of rays to cast.
+        /// @param | maxDist | number | Maximum cast distance per ray.
+        /// @return | table | Flat array of corrected distance values.
         methods.add_method(
             "castRaysFlat",
             |lua, this, (ox, oy, angle, fov, count, max_dist): (f32, f32, f32, f32, u32, f32)| {
@@ -437,12 +633,29 @@ impl LuaUserData for LuaRaycaster {
                 lua.create_sequence_from(flat)
             },
         );
+        // -- lineOfSight --
+        /// Tests whether there is a clear line of sight between two world points (no walls in between).
+        /// @param | x1 | number | Start X.
+        /// @param | y1 | number | Start Y.
+        /// @param | x2 | number | End X.
+        /// @param | y2 | number | End Y.
+        /// @return | boolean | True if the path is unobstructed.
         methods.add_method(
             "lineOfSight",
             |_, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
                 Ok(this.inner.line_of_sight(x1, y1, x2, y2))
             },
         );
+        // -- revealCellsFromRays --
+        /// Casts rays across the FOV and returns a list of grid cells that are visible (for fog-of-war).
+        /// @param | ox | number | Ray origin X.
+        /// @param | oy | number | Ray origin Y.
+        /// @param | angle | number | Center angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | count | number | Number of rays.
+        /// @param | maxDist | number | Maximum ray distance.
+        /// @param | step | number? | Walk step along each ray (default 0.2).
+        /// @return | table | Array of {x, y} tables representing revealed grid cells.
         methods.add_method(
             "revealCellsFromRays",
             |lua,
@@ -476,6 +689,13 @@ impl LuaUserData for LuaRaycaster {
                 Ok(out)
             },
         );
+        // -- computeTileLight --
+        /// Computes the combined lighting color at a tile from ambient and point lights, accounting for walls.
+        /// @param | x | number | Tile grid column.
+        /// @param | y | number | Tile grid row.
+        /// @param | ambient | number | Base ambient light level (0.0..1.0).
+        /// @param | lights | table? | Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
+        /// @return | number, number, number, number | Red, green, blue channels and average luminance.
         methods.add_method(
             "computeTileLight",
             |_, this, (x, y, ambient, lights_tbl): (u32, u32, f32, LuaValue)| {
@@ -485,6 +705,15 @@ impl LuaUserData for LuaRaycaster {
                 Ok((rgb[0], rgb[1], rgb[2], luma))
             },
         );
+        // -- buildMinimapWindow --
+        /// Generates a grid of minimap tile samples around a center point with lighting info.
+        /// Useful for rendering a lit minimap overlay.
+        /// @param | centerX | number | Center X in world coordinates.
+        /// @param | centerY | number | Center Y in world coordinates.
+        /// @param | radius | number | Tile radius around the center to sample.
+        /// @param | ambient | number | Ambient light level (0.0..1.0).
+        /// @param | lights | table? | Array of point-light tables.
+        /// @return | table | Array of {x, y, blocked, visible, r, g, b, luma} tables.
         methods.add_method(
             "buildMinimapWindow",
             |lua,
@@ -510,13 +739,30 @@ impl LuaUserData for LuaRaycaster {
                 Ok(out)
             },
         );
+        // -- setWallAlpha --
+        /// Sets the transparency for a specific wall tile type, enabling see-through walls.
+        /// @param | tileType | number | The cell value (1..255) whose alpha to change.
+        /// @param | alpha | number | Opacity (0.0 = fully transparent, 1.0 = fully opaque).
+        /// @return | nil |
         methods.add_method_mut("setWallAlpha", |_, this, (tile_type, alpha): (u8, f32)| {
             this.inner.set_wall_alpha(tile_type, alpha);
             Ok(())
         });
+        // -- getWallAlpha --
+        /// Returns the current transparency value for a wall tile type.
+        /// @param | tileType | number | The cell value to query.
+        /// @return | number | Alpha value (0.0..1.0).
         methods.add_method("getWallAlpha", |_, this, tile_type: u8| {
             Ok(this.inner.get_wall_alpha(tile_type))
         });
+        // -- castRayMulti --
+        /// Casts a single ray that passes through transparent walls, returning multiple hits.
+        /// @param | ox | number | Ray origin X.
+        /// @param | oy | number | Ray origin Y.
+        /// @param | angle | number | Ray direction in radians.
+        /// @param | maxDist | number | Maximum cast distance.
+        /// @param | maxHits | number? | Maximum number of hits to collect (default 4, max 8).
+        /// @return | table | Array of hit tables in distance order.
         methods.add_method(
             "castRayMulti",
             |lua, this, (ox, oy, angle, max_dist, max_hits): (f32, f32, f32, f32, Option<u32>)| {
@@ -529,6 +775,17 @@ impl LuaUserData for LuaRaycaster {
                 Ok(tbl)
             },
         );
+        // -- castFloorRow --
+        /// Computes floor/ceiling texture UV coordinates for a single scanline row.
+        /// Used for software-rendered textured floors.
+        /// @param | camX | number | Camera X position.
+        /// @param | camY | number | Camera Y position.
+        /// @param | dirX | number | Camera forward direction X.
+        /// @param | dirY | number | Camera forward direction Y.
+        /// @param | planeX | number | Camera plane X (half-width of FOV).
+        /// @param | planeY | number | Camera plane Y (half-width of FOV).
+        /// @param | row | number | Scanline row offset from screen center.
+        /// @return | table | Array of {u, v} tables for each pixel in the row.
         methods.add_method(
             "castFloorRow",
             |lua,
@@ -555,6 +812,16 @@ impl LuaUserData for LuaRaycaster {
                 Ok(tbl)
             },
         );
+        // -- projectSprite --
+        /// Projects a world-space sprite to screen coordinates for billboard rendering.
+        /// @param | sx | number | Sprite world X.
+        /// @param | sy | number | Sprite world Y.
+        /// @param | px | number | Player X position.
+        /// @param | py | number | Player Y position.
+        /// @param | pa | number | Player angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | screenW | number | Screen width in pixels.
+        /// @return | table | Projection info {screen_x, scale, distance, visible}.
         methods.add_method(
             "projectSprite",
             |lua,
@@ -569,6 +836,13 @@ impl LuaUserData for LuaRaycaster {
                 Ok(t)
             },
         );
+        // -- drawTopDown --
+        /// Renders a top-down debug view of the map with the player's position and direction.
+        /// @param | px | number | Player X position.
+        /// @param | py | number | Player Y position.
+        /// @param | angle | number | Player facing angle in radians.
+        /// @param | scale | number | Pixels per grid cell.
+        /// @return | table | Raw image data.
         methods.add_method(
             "drawTopDown",
             |_, this, (px, py, angle, scale): (f32, f32, f32, u32)| {
@@ -576,6 +850,16 @@ impl LuaUserData for LuaRaycaster {
                 Ok(img)
             },
         );
+        // -- drawView --
+        /// Renders a first-person raycaster view to a raw image buffer (no textures, flat-shaded).
+        /// @param | px | number | Player X position.
+        /// @param | py | number | Player Y position.
+        /// @param | angle | number | Player facing angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | w | number | Output image width in pixels.
+        /// @param | h | number | Output image height in pixels.
+        /// @param | maxDist | number | Maximum render distance.
+        /// @return | table | Raw image data.
         methods.add_method(
             "drawView",
             |_, this, (px, py, angle, fov, w, h, max_dist): (f32, f32, f32, f32, u32, u32, f32)| {
@@ -585,6 +869,17 @@ impl LuaUserData for LuaRaycaster {
                 Ok(img)
             },
         );
+        // -- drawDepthMap --
+        /// Renders a grayscale depth map showing distance-to-wall for each column.
+        /// @param | px | number | Player X position.
+        /// @param | py | number | Player Y position.
+        /// @param | angle | number | Player facing angle in radians.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | numRays | number | Number of rays (columns) to cast.
+        /// @param | w | number | Output image width in pixels.
+        /// @param | h | number | Output image height in pixels.
+        /// @param | maxDist | number | Maximum render distance.
+        /// @return | table | Raw depth-map image data.
         methods.add_method(
             "drawDepthMap",
             |_,
@@ -605,6 +900,14 @@ impl LuaUserData for LuaRaycaster {
                 Ok(img)
             },
         );
+        // -- drawLineOfSight --
+        /// Renders a debug image showing the line-of-sight ray between two world points.
+        /// @param | ax | number | Start X.
+        /// @param | ay | number | Start Y.
+        /// @param | bx | number | End X.
+        /// @param | by | number | End Y.
+        /// @param | scale | number | Pixels per grid cell.
+        /// @return | table | Raw image data.
         methods.add_method(
             "drawLineOfSight",
             |_, this, (ax, ay, bx, by, scale): (f32, f32, f32, f32, u32)| {
@@ -614,11 +917,29 @@ impl LuaUserData for LuaRaycaster {
                 Ok(img)
             },
         );
+        // -- drawCameraSweep --
+        /// Renders multiple frames of a rotating camera sweep as a single combined image.
+        /// @param | x | number | Camera X position.
+        /// @param | y | number | Camera Y position.
+        /// @param | fov | number | Field of view in radians.
+        /// @param | maxDist | number | Maximum render distance.
+        /// @param | numFrames | number | Number of rotation steps.
+        /// @param | fw | number | Frame width in pixels.
+        /// @param | fh | number | Frame height in pixels.
+        /// @return | table | Raw image data for all frames.
         methods.add_method("drawCameraSweep", |_, this, (x, y, fov, max_dist, num_frames, fw, fh): (f32, f32, f32, f32, u32, u32, u32)| {
                 let img = this.inner.draw_camera_sweep_to_image(x, y, fov, max_dist, num_frames, fw, fh);
                 Ok(img)
             },
         );
+        // -- buildScene --
+        /// Builds a complete textured raycaster scene for GPU rendering. Stores the output internally
+        /// for the renderer to consume on the next frame. Returns the number of quads generated.
+        /// @param | params | table | Scene params {px, py, angle, fov, rays, max_dist, screen_w, screen_h, ambient?, shade_dist?, floor_r/g/b?, ceiling_r/g/b?, camera_height?, horizon_offset?}.
+        /// @param | lights | table? | Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
+        /// @param | sprites | table? | Array of sprite tables {x, y, texture, size?}.
+        /// @param | wallTextures | table? | Map of cell_value -> texture for wall surfaces.
+        /// @return | number | Total number of quads in the built scene.
         methods.add_method(
             "buildScene",
             |_,
@@ -760,6 +1081,15 @@ impl LuaUserData for LuaRaycaster {
                 Ok(quad_count)
             },
         );
+        // -- buildSceneWithModels --
+        /// Builds a textured raycaster scene with additional 3D .obj model instances projected into the view.
+        /// Extends buildScene with a models array for placing 3D props in the dungeon.
+        /// @param | params | table | Scene params (same as buildScene).
+        /// @param | lights | table? | Array of point-light tables.
+        /// @param | sprites | table? | Array of sprite tables.
+        /// @param | wallTextures | table? | Map of cell_value -> texture.
+        /// @param | models | table? | Array of model instance tables {model, x, y, rotation?, scale?}.
+        /// @return | number | Total number of quads in the built scene.
         methods.add_method(
             "buildSceneWithModels",
             |_,
@@ -950,39 +1280,78 @@ impl LuaUserData for LuaRaycaster {
                 Ok(quad_count)
             },
         );
+        // -- type --
+        /// Returns the type name of this object ("LRaycaster").
+        /// @return | string | Type name string.
         methods.add_method("type", |_, _, ()| Ok("LRaycaster"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to test against.
+        /// @return | boolean | True if this object is of the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LRaycaster" || name == "Object")
         });
     }
 }
+/// Lua-visible sprite manager that tracks world-space billboard sprites for sorting and projection.
 pub struct LuaSpriteManager {
     inner: SpriteManager,
 }
 impl LuaUserData for LuaSpriteManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- add --
+        /// Adds a new sprite to the manager at a world position with a texture name and optional scale.
+        /// @param | x | number | World X position.
+        /// @param | y | number | World Y position.
+        /// @param | texture | string | Texture asset name.
+        /// @param | scale | number? | Sprite size multiplier (default 1.0).
+        /// @return | number | Unique sprite id for later manipulation.
         methods.add_method_mut(
             "add",
             |_, this, (x, y, texture, scale): (f32, f32, String, Option<f32>)| {
                 Ok(this.inner.add(x, y, &texture, scale.unwrap_or(1.0)))
             },
         );
+        // -- remove --
+        /// Removes a sprite by its id.
+        /// @param | id | number | Sprite id returned by add().
+        /// @return | nil |
         methods.add_method_mut("remove", |_, this, id: u32| {
             this.inner.remove(id);
             Ok(())
         });
+        // -- setPosition --
+        /// Updates the world position of an existing sprite.
+        /// @param | id | number | Sprite id.
+        /// @param | x | number | New world X.
+        /// @param | y | number | New world Y.
+        /// @return | nil |
         methods.add_method_mut("setPosition", |_, this, (id, x, y): (u32, f32, f32)| {
             this.inner.set_position(id, x, y);
             Ok(())
         });
+        // -- setVisible --
+        /// Shows or hides a sprite without removing it.
+        /// @param | id | number | Sprite id.
+        /// @param | visible | boolean | Whether the sprite should be rendered.
+        /// @return | nil |
         methods.add_method_mut("setVisible", |_, this, (id, visible): (u32, bool)| {
             this.inner.set_visible(id, visible);
             Ok(())
         });
+        // -- clear --
+        /// Removes all sprites from the manager.
+        /// @return | nil |
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
         });
+        // -- sortAndProject --
+        /// Sorts all visible sprites by distance from the camera and returns projection data.
+        /// @param | camX | number | Camera X position.
+        /// @param | camY | number | Camera Y position.
+        /// @param | camAngle | number | Camera facing angle (unused, reserved).
+        /// @return | table | Array of {id, x, y, texture, scale, distance} sorted back-to-front.
         methods.add_method(
             "sortAndProject",
             |lua, this, (cam_x, cam_y, _cam_angle): (f32, f32, f32)| {
@@ -1004,14 +1373,28 @@ impl LuaUserData for LuaSpriteManager {
                 Ok(tbl)
             },
         );
+        // -- type --
+        /// Returns the type name of this object ("LSpriteManager").
+        /// @return | string | Type name string.
         methods.add_method("type", |_, _, ()| Ok("LSpriteManager"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to test against.
+        /// @return | boolean | True if this object is of the given type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSpriteManager" || name == "SpriteManager" || name == "Object")
         });
     }
 }
+/// Registers the `lurek.raycaster` module table and all its factory functions into Lua.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+
+    // -- new --
+    /// Creates a new raycaster map with the given grid dimensions.
+    /// @param | w | number | Map width in cells.
+    /// @param | h | number | Map height in cells.
+    /// @return | LRaycaster | A new raycaster map instance.
     let s = state.clone();
     tbl.set(
         "new",
@@ -1025,6 +1408,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- newMap --
+    /// Creates a new raycaster map (alias for `new`).
+    /// @param | w | number | Map width in cells.
+    /// @param | h | number | Map height in cells.
+    /// @return | LRaycaster | A new raycaster map instance.
     let s = state.clone();
     tbl.set(
         "newMap",
@@ -1038,18 +1426,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- projectColumn --
+    /// Computes the projected wall-column height for a given distance, FOV, and screen height.
+    /// @param | distance | number | Perpendicular distance to the wall.
+    /// @param | fov | number | Field of view in radians.
+    /// @param | screenHeight | number | Screen height in pixels.
+    /// @return | number | Projected column height in pixels.
     tbl.set(
         "projectColumn",
         lua.create_function(|_, (distance, fov, screen_height): (f32, f32, f32)| {
             Ok(project_column(distance, fov, screen_height))
         })?,
     )?;
+    // -- distanceShade --
+    /// Returns a brightness multiplier (0.0..1.0) based on distance for fog/darkness falloff.
+    /// @param | distance | number | Distance to shade.
+    /// @param | maxDistance | number | Distance at which shade reaches zero.
+    /// @return | number | Shade factor (1.0 at distance 0, approaching 0.0 at maxDistance).
     tbl.set(
         "distanceShade",
         lua.create_function(|_, (distance, max_distance): (f32, f32)| {
             Ok(distance_shade(distance, max_distance))
         })?,
     )?;
+    // -- newDoorManager --
+    /// Creates a new door manager for tracking and animating sliding doors.
+    /// @return | LDoorManager | A new empty door manager.
     tbl.set(
         "newDoorManager",
         lua.create_function(|_, ()| {
@@ -1058,6 +1460,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- newHeightMap --
+    /// Creates a new height map for variable floor/ceiling heights across the grid.
+    /// @param | w | number | Width in cells.
+    /// @param | h | number | Height in cells.
+    /// @return | LHeightMap | A new height map initialized to zero.
     tbl.set(
         "newHeightMap",
         lua.create_function(|_, (w, h): (u32, u32)| {
@@ -1066,6 +1473,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- newPointLight --
+    /// Creates a new point light with position, color, radius, and intensity.
+    /// @param | x | number | World X position.
+    /// @param | y | number | World Y position.
+    /// @param | r | number | Red channel (0.0..1.0).
+    /// @param | g | number | Green channel (0.0..1.0).
+    /// @param | b | number | Blue channel (0.0..1.0).
+    /// @param | radius | number | Light falloff radius in world units.
+    /// @param | intensity | number | Brightness multiplier.
+    /// @return | LPointLight | A new point light instance.
     tbl.set(
         "newPointLight",
         lua.create_function(
@@ -1082,6 +1499,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- newSpriteManager --
+    /// Creates a new sprite manager for tracking and projecting billboard sprites.
+    /// @return | LSpriteManager | A new empty sprite manager.
     tbl.set(
         "newSpriteManager",
         lua.create_function(|_, ()| {

@@ -1,3 +1,9 @@
+//! - Easing curve gallery rendered in a labeled grid layout.
+//! - Overlaid easing comparison chart with colored traces.
+//! - Bézier curve rendering with control-point markers.
+//! - Advanced Bézier demo with derivatives, segments, and edit operations.
+//! - Grid background and axis rendering for chart context.
+
 use crate::image::ImageData;
 /// Render a gallery of easing curves in a grid into an image.
 pub fn easing_gallery_to_image(

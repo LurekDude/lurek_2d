@@ -1,3 +1,7 @@
+//! - System registration, removal, and count queries on a Universe.
+//! - Priority-based and dependency-aware topological sorting of systems per phase.
+//! - Phase filtering with fallback semantics for empty-phase systems.
+
 use super::Universe;
 use mlua::{Lua, Result as LuaResult, Table, Value as LuaValue};
 impl Universe {

@@ -1,3 +1,9 @@
+//! - DOM element model: tag, attributes, children, parent linkage, and text content.
+//! - Inline style handling with bidirectional sync to the `style` attribute.
+//! - Class list manipulation: add, remove, toggle, and membership queries.
+//! - Axis-aligned layout rectangle for hit testing and position queries.
+//! - Attribute normalization and void-tag classification helpers.
+
 use crate::html::style::parse_declarations;
 use std::collections::BTreeMap;
 /// Stable index type for elements stored in an HTML document.
@@ -14,6 +20,7 @@ pub struct HtmlRect {
     /// Height in pixels.
     pub h: f32,
 }
+/// Methods for point-in-rect hit testing.
 impl HtmlRect {
     /// Return whether the point lies inside the rectangle bounds.
     pub fn contains(self, x: f32, y: f32) -> bool {
@@ -42,6 +49,7 @@ pub struct HtmlElement {
     /// Removal flag used to hide detached subtrees without reindexing.
     pub(crate) removed: bool,
 }
+/// Construction, attribute access, class manipulation, inline style, and query helpers.
 impl HtmlElement {
     /// Create a new element with empty attributes, children, text, and layout.
     pub(crate) fn new(

@@ -27,7 +27,7 @@ INPUT_FILE = os.path.join(WORKSPACE_ROOT, "logs", "data", "lua_api_data.json")
 OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "api", "lurek.lua")
 
 BUILTIN_TYPES = {
-    "any", "nil", "boolean", "number", "integer", "string", "table",
+    "any", "nil", "boolean", "number", "string", "table",
     "function", "userdata", "thread", "unknown", "self", "LuaValue",
 }
 
@@ -37,17 +37,18 @@ DYNAMIC_LUA_TYPE = "LuaValue"
 TYPE_NORMALIZATIONS = {
     "any": DYNAMIC_LUA_TYPE,
     "bool": "boolean",
-    "int": "integer",
-    "u8": "integer",
-    "u16": "integer",
-    "u32": "integer",
-    "u64": "integer",
-    "usize": "integer",
-    "isize": "integer",
+    "int": "number",
+    "u8": "number",
+    "u16": "number",
+    "u32": "number",
+    "u64": "number",
+    "usize": "number",
+    "isize": "number",
     "f32": "number",
     "f64": "number",
-    "index": "integer",
-    "count": "integer",
+    "index": "number",
+    "count": "number",
+    "integer": "number",
     "Thread": "ThreadHandle",
     "unknown": DYNAMIC_LUA_TYPE,
     "void": "nil",
@@ -622,10 +623,18 @@ def write_function_doc(out, fn, name):
             param_names.append(safe_k)
 
     ret_entries, has_explicit_return_entries = get_return_entries(fn)
-    for ret_type, ret_desc in ret_entries:
+    for i, (ret_type, ret_desc) in enumerate(ret_entries):
         raw_ret_desc = ret_desc.strip()
         if raw_ret_desc:
-            out.append(f"---@return {ret_type} {raw_ret_desc}")
+            if len(ret_entries) > 1:
+                # For multi-return functions, insert a positional single-letter name
+                # so that commas in the description are not misinterpreted by LuaLS as
+                # additional return type entries (e.g. "X, Y, and Z" would be parsed as
+                # types X, Y, Z without an explicit name token separating type from desc).
+                pos_name = chr(ord("a") + i) if i < 26 else f"ret{i + 1}"
+                out.append(f"---@return {ret_type} {pos_name} {raw_ret_desc}")
+            else:
+                out.append(f"---@return {ret_type} {raw_ret_desc}")
         else:
             out.append(f"---@return {ret_type}")
 
@@ -707,8 +716,8 @@ def main():
     _OPAQUE_ALIASES: dict[str, str] = {
         "MultiValue":   DYNAMIC_LUA_TYPE,   # mlua multi-return carrier
         "Environment":  DYNAMIC_LUA_TYPE,   # OS/Lua environment table
-        "GID":          "integer",  # tilemap global tile ID â€” integer alias
-        "ID":           "integer",  # generic ID â€” integer alias
+        "GID":          "number",  # tilemap global tile ID â€” integer alias
+        "ID":           "number",  # generic ID â€” integer alias
         "Radius":       "number",   # plain numeric radius â€” not a userdata type
         "TextureKey":   DYNAMIC_LUA_TYPE,   # internal render key â€” not exposed as userdata
         "Tint":         DYNAMIC_LUA_TYPE,   # plain color tint â€” not a userdata type
@@ -763,25 +772,25 @@ def main():
     # Module-level constants that the Rust parser cannot auto-discover.
     _MODULE_CONSTANTS = {
         "physics": [
-            ("CELL_AIR",   "integer", "empty air cell (0)"),
-            ("CELL_SAND",  "integer", "sand cell (1)"),
-            ("CELL_WATER", "integer", "water cell (2)"),
-            ("CELL_ROCK",  "integer", "rock cell (3)"),
-            ("CELL_FIRE",  "integer", "fire cell (4)"),
-            ("CELL_GAS",   "integer", "gas cell (5)"),
+            ("CELL_AIR",   "number", "empty air cell (0)"),
+            ("CELL_SAND",  "number", "sand cell (1)"),
+            ("CELL_WATER", "number", "water cell (2)"),
+            ("CELL_ROCK",  "number", "rock cell (3)"),
+            ("CELL_FIRE",  "number", "fire cell (4)"),
+            ("CELL_GAS",   "number", "gas cell (5)"),
         ],
         "math": [
             ("pi",  "number", "\u03c0 \u2248 3.14159265358979"),
             ("tau", "number", "\u03c4 = 2\u03c0 \u2248 6.28318530717959"),
         ],
         "tilemap": [
-            ("FLOOR",      "integer", "solid floor tile type (1)"),
-            ("NORTH_WALL", "integer", "north-facing wall tile type (2)"),
-            ("WEST_WALL",  "integer", "west-facing wall tile type (3)"),
-            ("OBJECT",     "integer", "object tile type (4)"),
+            ("FLOOR",      "number", "solid floor tile type (1)"),
+            ("NORTH_WALL", "number", "north-facing wall tile type (2)"),
+            ("WEST_WALL",  "number", "west-facing wall tile type (3)"),
+            ("OBJECT",     "number", "object tile type (4)"),
         ],
         "globe": [
-            ("MAX_PROVINCES", "integer", "Maximum number of provinces the globe supports."),
+            ("MAX_PROVINCES", "number", "Maximum number of provinces the globe supports."),
             ("LOD_FAR",       "string",  'LOD tier constant "far" â€” zoomed-out view (zoom < 1.5).'),
             ("LOD_MID",       "string",  'LOD tier constant "mid" â€” medium zoom (1.5 \u2264 zoom < 4.0).'),
             ("LOD_NEAR",      "string",  'LOD tier constant "near" â€” close-zoom view (zoom \u2265 4.0).'),
@@ -811,7 +820,7 @@ def main():
         mod_data = lua_api[mod_name]
         out.append(f"---@class lurek.{lua_ns}")
         for const_name, const_type, const_desc in _MODULE_CONSTANTS.get(mod_name, []):
-            out.append(f"---@field {const_name} {const_type}  {const_desc}")
+            out.append(f"---@field {const_name} {normalize_type(const_type)}  {const_desc}")
         out.append(f"lurek.{lua_ns} = {{}}")
         out.append("")
         # Emit declarations for nested sub-namespaces (e.g. lurek.input.keyboard).

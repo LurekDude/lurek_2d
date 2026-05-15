@@ -1,3 +1,7 @@
+//! - Full-screen effect state machines: flash, shake, and fade.
+//! - Each state tracks active flag, timing, and per-frame parameters.
+//! - Deterministic PRNG for shake offsets without external RNG dependency.
+
 #[derive(Debug, Clone)]
 /// Tracks a time-limited full-screen flash overlay.
 pub struct FlashState {

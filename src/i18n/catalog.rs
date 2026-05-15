@@ -1,3 +1,9 @@
+//! - Locale-indexed translation catalog with active locale and ordered fallback chain.
+//! - Key lookup, category grouping, value search, and word-index caching.
+//! - Coverage-gap analysis comparing locales against a reference table.
+//! - TOML and JSON flattening into dot-separated translation tables.
+//! - Locale validation, RTL detection, and system-locale auto-detection.
+
 use serde_json;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -34,6 +40,7 @@ pub struct Catalog {
     /// Cached word index for the active locale.
     index_cache: RefCell<Option<(String, HashMap<String, Vec<String>>)>>,
 }
+/// Locale lookup, category queries, coverage analysis, and cache management.
 impl Catalog {
     /// Create an empty catalog with default state.
     pub fn new() -> Self {

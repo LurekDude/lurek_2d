@@ -1,3 +1,8 @@
+//! - RGBA image storage, pixel manipulation, and CPU-side drawing helpers.
+//! - Compressed format decoding (PNG, QOI, BMP, TGA, WebP) and texture upload.
+//! - Layered compositing, palette remapping, and image-space effects.
+//! - Texture atlas packing, nine-slice metadata, and province-grid extraction.
+
 /// Core RGBA image storage and drawing helpers.
 pub mod image_data;
 /// Core RGBA image buffer type.

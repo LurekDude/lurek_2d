@@ -1,3 +1,12 @@
+//! - CSV parsing with quote escaping and type auto-detection
+//! - CSV serialization with field escaping rules
+//! - JSON array-of-objects parsing into DataFrame
+//! - JSON serialization with proper string escaping
+//! - Compact binary LVDF format encoding and decoding
+//! - Padded string-table rendering for debug and display
+//! - Database-level JSON serialization across all tables
+//! - Nested JSON value and array handling during parse
+
 use crate::dataframe::frame::{CellValue, DataFrame};
 /// Parse CSV text and return DataFrame or validation error.
 pub fn from_csv(s: &str) -> Result<DataFrame, String> {

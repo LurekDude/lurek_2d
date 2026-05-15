@@ -1,3 +1,8 @@
+//! - Full-screen transition effects: fade, wipe, iris wipe, and dissolve.
+//! - String-based kind parsing with canonical name round-tripping.
+//! - Time-based playback lifecycle with forward and reverse modes.
+//! - Normalized progress query for renderer consumption.
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 /// Enumerates supported full-screen transition styles.
 pub enum TransitionKind {

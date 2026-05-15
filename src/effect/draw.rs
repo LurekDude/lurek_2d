@@ -1,3 +1,6 @@
+//! - Render a preview image summarizing the current post-FX stack state.
+//! - Produce a solid-color thumbnail indicating whether any effects are active.
+
 use super::stack::PostFxStack;
 use crate::image::ImageData;
 impl PostFxStack {

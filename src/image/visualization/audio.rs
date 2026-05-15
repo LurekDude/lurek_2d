@@ -1,3 +1,9 @@
+//! - Mono waveform preview with axis grid and peak normalization.
+//! - Stereo waveform rendering with channel separation.
+//! - Zoomed waveform with interpolated sample detail.
+//! - Labeled waveform strip with custom color mapping.
+//! - Shared peak normalization and column-based rendering.
+
 use crate::image::ImageData;
 /// Render a mono waveform preview into an image.
 pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height: u32) -> ImageData {

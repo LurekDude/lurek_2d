@@ -1,3 +1,8 @@
+//! - Globe rendering with orbit camera projection and LOD tiers.
+//! - Province registry, fog-of-war masks, and picking queries.
+//! - Label, marker, and layer management for map overlays.
+//! - Synchronization channels for background globe updates.
+
 /// Globe composition helpers.
 pub mod composition;
 /// Globe drawing helpers.

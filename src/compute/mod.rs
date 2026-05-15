@@ -1,3 +1,7 @@
+//! - N-dimensional array container, element-wise and reduction operations
+//! - FFT, linear algebra, spatial filtering, and statistical analytics
+//! - Configurable parallel dispatch threshold for large arrays
+
 /// Exposes analytics helpers for cumulative and statistical operations.
 pub mod analytics;
 /// Exposes typed n-dimensional array container and constructors.

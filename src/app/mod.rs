@@ -1,3 +1,7 @@
+//! - Orchestrates the Lurek2D application lifecycle from window creation through frame rendering.
+//! - Bridges winit events to Lua callbacks, GPU rendering, input polling, and hot-reload.
+//! - Houses the error screen, debug overlay, splash screen, and frame profiling submodules.
+//! - Provides Lua callback timeout wrappers used across the frame update path.
 
 #[allow(clippy::module_inception)]
 /// Core application runtime: event loop bridge, frame lifecycle, and orchestration.

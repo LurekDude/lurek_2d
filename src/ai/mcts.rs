@@ -1,10 +1,8 @@
-
-//! - Defines the Monte Carlo Tree Search data used by the AI module to configure
-//!   search, store arena-backed tree nodes, and track rollout statistics.
-//! - Owns the selection, expansion, rollout, and backpropagation flow that scores
-//!   actions from a root state through repeated bounded simulations.
-//! - Keeps the small internal random helper and UCT scoring logic that drive node
-//!   choice, untried-action expansion, and rollout action sampling.
+//! - Monte Carlo Tree Search configuring search parameters, arena-backed nodes, and rollout statistics.
+//! - Selection, expansion, rollout, and backpropagation flow scoring actions through bounded simulations.
+//! - Internal random helper and UCT scoring logic driving node choice and action sampling.
+//! - Arena-backed tree structure avoiding per-node heap allocations during iterative search.
+//! - Generic state, action-enumeration, transition, and evaluation closures for domain-independent search.
 
 /// Configuration for one MCTS search run.
 pub struct MCTSConfig {

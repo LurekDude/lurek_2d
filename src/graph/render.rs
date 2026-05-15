@@ -1,5 +1,11 @@
+//! - Render a graph as a circular node-and-edge diagram via `RenderCommand` output.
+//! - Layout nodes evenly on a circle, draw edges as lines, color nodes by type.
+//! - Produce a self-contained command list suitable for the engine renderer.
+
 use crate::graph::core::Graph;
 use crate::render::renderer::{DrawMode, RenderCommand};
+
+/// Rendering support for the graph data structure.
 impl Graph {
     /// Generate a simple circular graph preview as renderer commands.
     pub fn generate_render_commands(&self, width: f32, height: f32) -> Vec<RenderCommand> {

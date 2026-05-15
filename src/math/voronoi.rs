@@ -1,3 +1,9 @@
+//! - Voronoi diagram generation from 2D point sets via Bowyer-Watson Delaunay triangulation.
+//! - Circumcenter and circumcircle predicates for incremental insertion.
+//! - Boundary-edge extraction and super-triangle cleanup.
+//! - CCW vertex sorting and deduplication to produce closed polygonal cells.
+//! - Input deduplication to handle coincident sites gracefully.
+
 use std::collections::HashMap;
 
 /// One Voronoi region around a seed site with its polygon vertices in CCW order.
@@ -43,6 +49,8 @@ fn in_circumcircle(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, px: f32
 /// Index triple representing one Delaunay triangle by vertex indices into `pts`.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 struct Tri(usize, usize, usize);
+
+/// Methods for querying edges and super-triangle membership of a Delaunay triangle.
 impl Tri {
     /// Return the three directed edges of this triangle.
     fn edges(self) -> [(usize, usize); 3] {

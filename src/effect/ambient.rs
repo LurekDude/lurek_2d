@@ -1,3 +1,7 @@
+//! - Global ambient tint state driven by a time-of-day curve.
+//! - Maps hour values (0–24) to RGBA color through piecewise dawn/day/dusk/night segments.
+//! - Consumed by the overlay renderer when the ambient effect is enabled.
+
 #[derive(Debug, Clone)]
 /// Stores ambient tint settings applied across the whole screen.
 pub struct AmbientState {
@@ -8,6 +12,7 @@ pub struct AmbientState {
     /// Hour-of-day value used to derive the ambient tint curve.
     pub time_of_day: f32,
 }
+/// Provide a neutral midday default for AmbientState.
 impl Default for AmbientState {
     /// Builds the neutral midday ambient state.
     fn default() -> Self {
@@ -18,6 +23,7 @@ impl Default for AmbientState {
         }
     }
 }
+/// Time-of-day ambient color computation.
 impl AmbientState {
     /// Computes the ambient RGBA tint for the current time-of-day sample.
     pub fn compute_color_from_time(&self) -> [f32; 4] {

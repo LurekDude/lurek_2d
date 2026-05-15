@@ -1,26 +1,44 @@
+//! `lurek.devtools` -- Developer tooling bindings for logs, profiling, frame stats, file watching, console state, watch expressions, snapshots, REPL, and debugger-style eval helpers.
+
 use crate::devtools::{FileWatcher, FrameStats, Logger, ProfileZone, Profiler, ReplConsole};
 use crate::runtime::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+/// Stored devtools watch expression with display metadata.
 struct WatchEntry {
+    /// Watch display name.
     name: String,
+    /// Lua callback that returns the current watch value.
     getter: LuaRegistryKey,
+    /// Optional category label used by inspector UIs.
     category: String,
 }
+/// Shared devtools state captured by module closures.
 struct DevtoolsShared {
+    /// In-memory logger and log settings.
     logger: Logger,
+    /// CPU profiler state and recorded frames.
     profiler: Profiler,
+    /// CPU frame timing history.
     frame_stats: FrameStats,
+    /// GPU frame timing history.
     gpu_frame_stats: FrameStats,
+    /// File watcher state for module-level watch calls.
     watcher: FileWatcher,
+    /// Console visibility flag.
     console_open: bool,
+    /// Entity inspector visibility flag.
     entity_inspector_open: bool,
+    /// Poll interval used by watch UIs.
     watch_interval: f32,
+    /// Registered watch callbacks.
     watches: Vec<WatchEntry>,
+    /// Next watch id assigned by `exposeWatch`.
     next_watch_id: u64,
 }
 impl DevtoolsShared {
+    /// Creates default devtools shared state.
     fn new() -> Self {
         Self {
             logger: Logger::new(),
@@ -36,6 +54,7 @@ impl DevtoolsShared {
         }
     }
 }
+/// Converts a profiler zone tree into a Lua table.
 fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>> {
     let tbl = lua.create_table()?;
     tbl.set("name", zone.name.clone())?;
@@ -49,13 +68,22 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
     tbl.set("children", children)?;
     Ok(tbl)
 }
+/// Lua-side file watcher with an optional change callback.
 struct LuaFileWatcher {
+    /// File watcher tracking the configured path.
     watcher: FileWatcher,
+    /// Watched path string returned to Lua.
     path: String,
+    /// Optional registry key for the change callback.
     callback: Rc<RefCell<Option<LuaRegistryKey>>>,
 }
+/// Provides Lua methods for polling, cancelling, and identifying file watcher handles.
 impl LuaUserData for LuaFileWatcher {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- onChanged --
+        /// Sets the callback invoked when this watcher observes a change.
+        /// @param | func | function | Callback called with no arguments after a change is detected.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("onChanged", |lua, this, func: LuaFunction| {
             let key = lua.create_registry_value(func)?;
             if let Some(old) = this.callback.borrow_mut().replace(key) {
@@ -63,6 +91,9 @@ impl LuaUserData for LuaFileWatcher {
             }
             Ok(())
         });
+        // -- check --
+        /// Polls the watcher and invokes the change callback when a change is found.
+        /// @return | boolean | True when at least one change was detected.
         methods.add_method_mut("check", |lua, this, ()| {
             let changed = this.watcher.poll();
             if !changed.is_empty() {
@@ -75,7 +106,13 @@ impl LuaUserData for LuaFileWatcher {
             }
             Ok(false)
         });
+        // -- getPath --
+        /// Returns the watched path.
+        /// @return | string | Watched path string.
         methods.add_method("getPath", |_, this, ()| Ok(this.path.clone()));
+        // -- cancel --
+        /// Cancels this watcher and removes its callback.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.watcher.clear();
             if let Some(key) = this.callback.borrow_mut().take() {
@@ -83,15 +120,29 @@ impl LuaUserData for LuaFileWatcher {
             }
             Ok(())
         });
+        // -- type --
+        /// Returns the Lua-visible type name for this file watcher handle.
+        /// @return | string | The string `LFileWatcher`.
         methods.add_method("type", |_, _, ()| Ok("LFileWatcher"));
+        // -- typeOf --
+        /// Returns whether this file watcher handle matches a supported type name.
+        /// @param | name | string | Type name to compare against `LFileWatcher` and `Object`.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LFileWatcher" || name == "Object")
         });
     }
 }
+/// Registers the `lurek.devtools` API table with the Lua VM.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let shared = Rc::new(RefCell::new(DevtoolsShared::new()));
+
+    // -- log --
+    /// Adds a message to the devtools log using an explicit severity level.
+    /// @param | level | string | Log level name such as `trace`, `debug`, `info`, `warn`, `error`, or `fatal`.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "log",
@@ -100,6 +151,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- trace --
+    /// Adds a trace-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "trace",
@@ -108,6 +164,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- debug --
+    /// Adds a debug-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "debug",
@@ -116,6 +177,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- info --
+    /// Adds an info-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "info",
@@ -124,6 +190,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- warn --
+    /// Adds a warning-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "warn",
@@ -132,6 +203,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- error --
+    /// Adds an error-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "error",
@@ -140,6 +216,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- fatal --
+    /// Adds a fatal-level diagnostic message to the devtools log.
+    /// @param | message | string | Message text stored in the in-memory log history.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "fatal",
@@ -148,6 +229,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- setLogLevel --
+    /// Sets the minimum severity that remains visible in devtools log output.
+    /// @param | level | string | Log level name parsed by the devtools logger; unknown names are ignored.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogLevel",
@@ -159,11 +245,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getLogLevel --
+    /// Returns the minimum severity currently used by devtools log output.
+    /// @return | string | Current minimum log level name.
     let s = shared.clone();
     dt.set(
         "getLogLevel",
         lua.create_function(move |_, ()| Ok(s.borrow().logger.min_level.as_str().to_string()))?,
     )?;
+
+    // -- setLogConsole --
+    /// Enables or disables mirroring devtools log entries to the console.
+    /// @param | enabled | boolean | True to emit future log entries to console output.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogConsole",
@@ -172,11 +267,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getLogConsole --
+    /// Returns whether devtools log entries are mirrored to the console.
+    /// @return | boolean | True when console logging is enabled.
     let s = shared.clone();
     dt.set(
         "getLogConsole",
         lua.create_function(move |_, ()| Ok(s.borrow().logger.console_enabled))?,
     )?;
+
+    // -- setLogFile --
+    /// Sets the file path used by devtools file logging state.
+    /// @param | path | string | File path recorded as the active devtools log target.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogFile",
@@ -185,11 +289,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getLogFile --
+    /// Returns the file path currently stored as the devtools log target.
+    /// @return | string | Current log file path.
     let s = shared.clone();
     dt.set(
         "getLogFile",
         lua.create_function(move |_, ()| Ok(s.borrow().logger.log_file.clone()))?,
     )?;
+
+    // -- getLogHistory --
+    /// Returns recent devtools log entries as structured tables.
+    /// @param | count | integer | Optional number of newest entries to return; omitted returns the logger default.
+    /// @return | table | Array table containing level, timestamp, message, source, line, and optional category fields.
     let s = shared.clone();
     dt.set(
         "getLogHistory",
@@ -212,6 +325,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- clearLog --
+    /// Clears all in-memory devtools log entries.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "clearLog",
@@ -220,6 +337,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- setProfilingEnabled --
+    /// Enables or disables collection of CPU profiling zones.
+    /// @param | enabled | boolean | True to record profiling zones into future profiler frames.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setProfilingEnabled",
@@ -228,11 +350,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- isProfilingEnabled --
+    /// Returns whether CPU profiling zone collection is currently enabled.
+    /// @return | boolean | True when profiler recording is enabled.
     let s = shared.clone();
     dt.set(
         "isProfilingEnabled",
         lua.create_function(move |_, ()| Ok(s.borrow().profiler.enabled))?,
     )?;
+
+    // -- profilePush --
+    /// Starts a named profiling zone on the current profiler stack.
+    /// @param | name | string | Profiling zone name shown in reports and snapshots.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profilePush",
@@ -241,6 +372,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- profilePop --
+    /// Ends the current profiling zone on the profiler stack.
+    /// @param | name | string | Optional zone name accepted for API compatibility and ignored by the profiler.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profilePop",
@@ -249,6 +385,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- profileFrame --
+    /// Closes the current profiling frame and stores its zone tree for later inspection.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profileFrame",
@@ -257,11 +397,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getProfileFrameCount --
+    /// Returns how many profiling frames are currently stored.
+    /// @return | integer | Number of retained profiler frames.
     let s = shared.clone();
     dt.set(
         "getProfileFrameCount",
         lua.create_function(move |_, ()| Ok(s.borrow().profiler.frames.len()))?,
     )?;
+
+    // -- getProfileData --
+    /// Returns the profiler zone tree for a retained frame.
+    /// @param | frame | integer | Optional frame index understood by the profiler; omitted reads the newest frame alias used by the backend.
+    /// @return | table | Array table of profiler zones with name, time, selfTime, startTime, and children fields.
     let s = shared.clone();
     dt.set(
         "getProfileData",
@@ -277,6 +426,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- resetProfile --
+    /// Clears profiler state, active zones, and retained profiling frames.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "resetProfile",
@@ -285,6 +438,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- recordFrameTime --
+    /// Records one CPU frame duration sample for devtools frame statistics.
+    /// @param | dt_val | number | Frame duration in seconds.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "recordFrameTime",
@@ -293,6 +451,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getFrameStats --
+    /// Returns aggregate CPU frame timing statistics from recorded samples.
+    /// @return | table | Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
     let s = shared.clone();
     dt.set(
         "getFrameStats",
@@ -311,6 +473,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- recordGpuFrameTime --
+    /// Records one GPU frame duration sample for devtools frame statistics.
+    /// @param | dt_val | number | GPU frame duration in seconds.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "recordGpuFrameTime",
@@ -319,6 +486,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getGpuFrameStats --
+    /// Returns aggregate GPU frame timing statistics from recorded samples.
+    /// @return | table | Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
     let s = shared.clone();
     dt.set(
         "getGpuFrameStats",
@@ -337,6 +508,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- getFrameHistory --
+    /// Returns retained CPU frame duration samples in insertion order.
+    /// @return | table | Array table of CPU frame durations in seconds.
     let s = shared.clone();
     dt.set(
         "getFrameHistory",
@@ -349,6 +524,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- setFrameHistorySize --
+    /// Sets the maximum number of CPU frame duration samples retained by devtools.
+    /// @param | size | integer | Maximum number of frame samples to keep.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setFrameHistorySize",
@@ -357,11 +537,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getFrameHistorySize --
+    /// Returns the current CPU frame history capacity.
+    /// @return | integer | Maximum number of retained CPU frame duration samples.
     let s = shared.clone();
     dt.set(
         "getFrameHistorySize",
         lua.create_function(move |_, ()| Ok(s.borrow().frame_stats.capacity))?,
     )?;
+
+    // -- watch --
+    /// Adds a path to the module-level devtools file watcher.
+    /// @param | path | string | File or directory path to poll for changes.
+    /// @return | boolean | True when the path was newly added; false when it was already watched.
     let s = shared.clone();
     dt.set(
         "watch",
@@ -374,11 +563,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
+
+    // -- unwatch --
+    /// Removes a path from the module-level devtools file watcher.
+    /// @param | path | string | Previously watched file or directory path.
+    /// @return | boolean | True when the path was removed.
     let s = shared.clone();
     dt.set(
         "unwatch",
         lua.create_function(move |_, path: String| Ok(s.borrow_mut().watcher.unwatch(&path)))?,
     )?;
+
+    // -- getWatchedPaths --
+    /// Returns all paths currently watched by the module-level file watcher.
+    /// @return | table | Sorted array table of watched path strings.
     let s = shared.clone();
     dt.set(
         "getWatchedPaths",
@@ -393,6 +591,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- scan --
+    /// Polls module-level file watches and returns paths that changed since the previous scan.
+    /// @return | table | Array table of changed path strings.
     let s = shared.clone();
     dt.set(
         "scan",
@@ -406,6 +608,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- clearWatches --
+    /// Removes every path from the module-level file watcher.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "clearWatches",
@@ -414,11 +620,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getWatchInterval --
+    /// Returns the polling interval hint used by devtools watch UIs.
+    /// @return | number | Watch interval in seconds.
     let s = shared.clone();
     dt.set(
         "getWatchInterval",
         lua.create_function(move |_, ()| Ok(s.borrow().watch_interval))?,
     )?;
+
+    // -- setWatchInterval --
+    /// Sets the polling interval hint used by devtools watch UIs.
+    /// @param | interval | number | Watch interval in seconds, clamped to at least 0.01.
+    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setWatchInterval",
@@ -427,6 +642,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+
+    // -- getCallStack --
+    /// Returns Lua call stack frames using the Lua debug library.
+    /// @param | max_depth | integer | Optional maximum number of frames to return; defaults to 20 and is capped at 100.
+    /// @return | table | Array table of frames with source, line, name, and what fields.
     dt.set(
         "getCallStack",
         lua.create_function(|lua, max_depth: Option<usize>| {
@@ -445,26 +665,39 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
               }\n\
             end\n\
             return frames";
+            // LUA-EVAL-JUSTIFIED: devtools.getCallStack runs a fixed debug introspection script.
             let frames: LuaTable = lua.load(code).call(max)?;
             Ok(frames)
         })?,
     )?;
+
+    // -- eval --
+    /// Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
+    /// @param | code | string | Lua source code evaluated through the current Lua VM.
+    /// @return | LuaValue | Multi-return where the first value is a boolean success flag followed by result values or an error string.
     dt.set(
         "eval",
         lua.create_function(
-            |lua, code: String| match lua.load(&code).eval::<LuaMultiValue>() {
-                Ok(vals) => {
-                    let mut result = vec![LuaValue::Boolean(true)];
-                    result.extend(vals.into_iter());
-                    Ok(LuaMultiValue::from_vec(result))
+            |lua, code: String| {
+                // LUA-EVAL-JUSTIFIED: devtools.eval is an explicit REPL/debug eval API.
+                match lua.load(&code).eval::<LuaMultiValue>() {
+                    Ok(vals) => {
+                        let mut result = vec![LuaValue::Boolean(true)];
+                        result.extend(vals.into_iter());
+                        Ok(LuaMultiValue::from_vec(result))
+                    }
+                    Err(e) => Ok(LuaMultiValue::from_vec(vec![
+                        LuaValue::Boolean(false),
+                        LuaValue::String(lua.create_string(e.to_string().as_bytes())?),
+                    ])),
                 }
-                Err(e) => Ok(LuaMultiValue::from_vec(vec![
-                    LuaValue::Boolean(false),
-                    LuaValue::String(lua.create_string(e.to_string().as_bytes())?),
-                ])),
             },
         )?,
     )?;
+
+    // -- openConsole --
+    /// Marks the devtools console as open for UI state tracking.
+    /// @return | boolean | Always returns true after setting the console-open flag.
     let s = shared.clone();
     dt.set(
         "openConsole",
@@ -473,11 +706,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
+
+    // -- isConsoleOpen --
+    /// Returns whether the devtools console is marked open.
+    /// @return | boolean | True when the console-open flag is set.
     let s = shared.clone();
     dt.set(
         "isConsoleOpen",
         lua.create_function(move |_, ()| Ok(s.borrow().console_open))?,
     )?;
+
+    // -- openEntityInspector --
+    /// Marks the devtools entity inspector as open for UI state tracking.
+    /// @return | boolean | Always returns true after setting the entity-inspector flag.
     let s = shared.clone();
     dt.set(
         "openEntityInspector",
@@ -486,11 +727,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(true)
         })?,
     )?;
+
+    // -- isEntityInspectorOpen --
+    /// Returns whether the devtools entity inspector is marked open.
+    /// @return | boolean | True when the entity-inspector-open flag is set.
     let s = shared.clone();
     dt.set(
         "isEntityInspectorOpen",
         lua.create_function(move |_, ()| Ok(s.borrow().entity_inspector_open))?,
     )?;
+
+    // -- exposeWatch --
+    /// Registers a watch expression callback for snapshots and watch panels.
+    /// @param | name | string | Display name for the watch entry.
+    /// @param | getter | function | Callback invoked with no arguments when watch values are collected.
+    /// @param | category | string | Optional category label used by devtools UIs.
+    /// @return | integer | Numeric watch id that can be passed to `removeWatch`.
     let s = shared.clone();
     dt.set(
         "exposeWatch",
@@ -509,6 +761,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             },
         )?,
     )?;
+
+    // -- removeWatch --
+    /// Removes a previously exposed watch expression by id.
+    /// @param | id | integer | Watch id returned by `exposeWatch`.
+    /// @return | boolean | True when a watch entry was removed.
     let s = shared.clone();
     dt.set(
         "removeWatch",
@@ -525,6 +782,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(false)
         })?,
     )?;
+
+    // -- getWatches --
+    /// Evaluates exposed watch callbacks and returns their current values.
+    /// @return | table | Array table of watch rows with name, category, and value fields.
     let s = shared.clone();
     dt.set(
         "getWatches",
@@ -549,6 +810,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+
+    // -- snapshot --
+    /// Captures a combined devtools snapshot containing frame stats, watch values, profile data, and recent logs.
+    /// @return | table | Snapshot table with frameStats, watches, profile, log, and watchCount fields.
     let s = shared.clone();
     dt.set(
         "snapshot",
@@ -600,6 +865,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(snap)
         })?,
     )?;
+
+    // -- profilerReport --
+    /// Aggregates retained profiler frames into per-zone timing rows.
+    /// @return | table | Array table with zone name, call count, total_ms, avg_ms, min_ms, max_ms, and self_ms fields.
     let s = shared.clone();
     dt.set(
         "profilerReport",
@@ -649,6 +918,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(out)
         })?,
     )?;
+
+    // -- newFileWatcher --
+    /// Creates a dedicated file watcher userdata for one path.
+    /// @param | path | string | File or directory path watched by the returned handle.
+    /// @return | LFileWatcher | File watcher handle with polling and callback methods.
     dt.set(
         "newFileWatcher",
         lua.create_function(|lua, path: String| {
@@ -661,6 +935,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             lua.create_userdata(fw)
         })?,
     )?;
+
+    // -- newRepl --
+    /// Creates a REPL console userdata with bounded command history.
+    /// @param | max_history | integer | Optional maximum number of history entries; defaults to 200.
+    /// @return | LReplConsole | REPL console handle for eval and history management.
     dt.set(
         "newRepl",
         lua.create_function(|lua, max_history: Option<usize>| {
@@ -672,14 +951,24 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     lurek.set("devtools", dt)?;
     Ok(())
 }
+/// Lua-side REPL console handle with bounded history.
 pub struct LuaReplConsole {
+    /// Console implementation that evaluates code and stores command history.
     inner: ReplConsole,
 }
+/// Provides Lua methods for evaluating code, reading history, and identifying REPL handles.
 impl LuaUserData for LuaReplConsole {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- eval --
+        /// Evaluates Lua code through this REPL console and records it in history.
+        /// @param | code | string | Lua source code evaluated in the active Lua VM.
+        /// @return | LuaValue | Evaluation result shape produced by the devtools REPL backend.
         methods.add_method_mut("eval", |lua, this, code: String| {
             Ok(this.inner.eval(&code, lua))
         });
+        // -- history --
+        /// Returns this REPL console's recorded command history.
+        /// @return | table | Array table of history entry strings.
         methods.add_method("history", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, entry) in this.inner.history().iter().enumerate() {
@@ -687,12 +976,25 @@ impl LuaUserData for LuaReplConsole {
             }
             Ok(t)
         });
+        // -- clear --
+        /// Clears this REPL console's command history.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
         });
+        // -- len --
+        /// Returns the number of entries stored in this REPL console history.
+        /// @return | integer | History entry count.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
+        // -- type --
+        /// Returns the Lua-visible type name for this REPL console handle.
+        /// @return | string | The string `LReplConsole`.
         methods.add_method("type", |_, _, ()| Ok("LReplConsole"));
+        // -- typeOf --
+        /// Returns whether this REPL console handle matches a supported type name.
+        /// @param | name | string | Type name to compare against `LReplConsole` and `Object`.
+        /// @return | boolean | True when the supplied type name matches this handle.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LReplConsole" || name == "Object")
         });

@@ -1,3 +1,7 @@
+//! - Provide in-memory catalog storage for documentation entries collected from Rust source.
+//! - Support insertion-order preservation, module grouping, and text search.
+//! - Offer merge, filter, and deduplication for multi-source doc aggregation.
+
 use crate::docs::entry::DocEntry;
 /// Hold the in-memory list of documentation entries collected from source data.
 pub struct Catalog {

@@ -1,10 +1,8 @@
-
-//! - Defines the queued command format that AI systems use to stage discrete actor
-//!   actions together with world targets, completion callbacks, and priority data.
-//! - Owns the FIFO command queue that holds pending work, exposes the current front
-//!   command view, and supports front insertion, replacement, cancellation, and advance.
-//! - Keeps the small raw-construction helpers that let higher layers enqueue new
-//!   commands without building the struct separately before queue insertion.
+//! - Queued command format staging discrete actor actions with targets, callbacks, and priority.
+//! - FIFO command queue with front insertion, replacement, cancellation, and advance operations.
+//! - Raw-construction helpers for enqueuing commands without separate struct building.
+//! - Interruptible commands that can be cancelled individually without clearing the queue.
+//! - Structured runtime logging for queue creation and bulk-clear events.
 
 use crate::log_msg;
 use crate::runtime::log_messages::{CQ01, CQ02, CQ03};

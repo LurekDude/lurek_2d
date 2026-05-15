@@ -1,3 +1,7 @@
+//! - Decodes embedded splash icon and banner PNGs into temporary texture storage.
+//! - Builds render commands for the splash screen layout with centred branding.
+//! - Shows a drag-and-drop hint that changes colour when a folder is hovered.
+//! - Provides the `SplashBranding` struct used by the app loop until a game loads.
 
 use super::app::fit_contain_size;
 use crate::render::renderer::{DrawMode, RenderCommand, TextureData};

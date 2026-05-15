@@ -1,3 +1,7 @@
+//! - Snapshot serialization of globe state for cross-thread transfer.
+//! - Channel pair for sending and receiving globe snapshots.
+//! - Build and apply helpers to capture or restore globe state.
+
 use crate::globe::registry::Globe;
 use crate::globe::types::ProvinceId;
 use std::collections::HashMap;
@@ -33,6 +37,7 @@ impl GlobeSyncChannel {
 }
 /// Create a default snapshot channel pair.
 impl Default for GlobeSyncChannel {
+    /// Delegate to `GlobeSyncChannel::new`.
     fn default() -> Self {
         Self::new()
     }

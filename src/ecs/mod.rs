@@ -1,3 +1,7 @@
+//! - Lightweight ECS: entities with generational IDs, Lua-table components, tags, and blueprints.
+//! - Relationship graph for parent/child, ownership, and custom link types between entities.
+//! - Deep-copy and snapshot utilities for cloning Lua component tables.
+
 /// Entity id packing and unpacking helpers.
 pub mod generational_id;
 /// Lua table cloning helpers for ECS snapshots and blueprints.

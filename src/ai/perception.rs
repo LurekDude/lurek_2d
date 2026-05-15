@@ -1,10 +1,8 @@
 
-//! - Defines the perception model used by the AI module to store stimuli, sensor
-//!   configuration, detection results, and transient awareness state.
-//! - Owns the stimulus world for visual, auditory, and custom signals together
-//!   with insertion, decay, removal, and active-stimulus access.
-//! - Keeps the sensor-side logic that tests visibility and hearing, detects nearby
-//!   stimuli, updates awareness over time, and tracks custom detection ranges.
+//! - Perception model storing stimuli, sensor configuration, detection results, and awareness state.
+//! - Stimulus world for visual, auditory, and custom signals with insertion, decay, and removal.
+//! - Sensor-side logic testing visibility, hearing, detecting nearby stimuli, and updating awareness.
+//! - Custom detection range tracking and time-based stimulus expiration.
 
 use std::collections::HashMap;
 /// Stimulus classification used by the sensor world.
@@ -188,7 +186,6 @@ impl StimulusWorld {
         self.stimuli.clear();
     }
 }
-/// `Default` delegates to `StimulusWorld::new`.
 /// `Default` delegates to `StimulusWorld::new`.
 impl Default for StimulusWorld {
     /// Build an empty stimulus world.

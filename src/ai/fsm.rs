@@ -1,10 +1,8 @@
-
-//! - Defines the finite-state-machine data used by the AI module to store named
-//!   states, callback hooks, transition rules, and current runtime state selection.
-//! - Owns the callback bundles for state entry, update, and exit together with the
-//!   transition records that route between states by priority and optional guards.
-//! - Keeps the mutable machine state that tracks the current state, initial state,
-//!   elapsed time in state, and raw registration helpers used by the Lua-facing layer.
+//! - Finite-state-machine storing named states, callback hooks, transition rules, and active state.
+//! - Callback bundles for state entry, update, and exit with priority-sorted transition records.
+//! - Mutable machine state tracking current state, initial state, elapsed time, and registration helpers.
+//! - Descending-priority transition sorting so the tick evaluator tests highest-priority guards first.
+//! - Elapsed time tracking in the current state for time-based guards and Lua update callbacks.
 
 use crate::log_msg;
 use crate::runtime::log_messages::{FN01, FN02};

@@ -1,3 +1,7 @@
+//! - Circle primitive defined by center + radius, clamped non-negative on construction.
+//! - Point-containment, circle-circle intersection, and AABB queries.
+//! - Area and perimeter helpers using `std::f32::consts::PI`.
+
 use super::vec2::Vec2;
 
 /// Axis-aligned circle defined by center position and non-negative radius.
@@ -11,6 +15,7 @@ pub struct Circle {
     pub radius: f32,
 }
 
+/// Core geometry methods for `Circle`.
 impl Circle {
     /// Construct a Circle; radius is clamped to >= 0.
     pub fn new(x: f32, y: f32, radius: f32) -> Self {

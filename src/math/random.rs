@@ -1,3 +1,7 @@
+//! - Seedable pseudo-random number generator wrapping `fastrand` with save/restore support.
+//! - Uniform integer, float, and Gaussian sampling primitives.
+//! - Seed persistence via string serialisation for deterministic replay.
+
 use fastrand::Rng;
 
 /// Seedable RNG wrapping `fastrand::Rng` with stored seed for serialisation.

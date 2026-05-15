@@ -1,3 +1,14 @@
+//! - Graph container managing nodes, edges, and items with id-based lookup.
+//! - Adjacency indexes for fast outgoing and incoming edge queries.
+//! - Node CRUD with cascade removal of connected edges and displaced items.
+//! - Edge CRUD with transit capacity, cooldown, and type filtering.
+//! - Item lifecycle: creation, node placement (with overflow policy), transit, and removal.
+//! - Subgraph extraction preserving topology and item positions.
+//! - Aggregate stats computation across nodes and edges.
+//! - Direction-based edge queries (in, out, both).
+//! - Simple circular-layout image rendering for debug preview.
+//! - JSON-like serialize and deserialize for persistence.
+
 use super::edge::Edge;
 use super::item::{GraphItem, ItemPosition};
 use super::node::{Node, OverflowPolicy};
@@ -53,6 +64,7 @@ impl Default for Graph {
         Self::new()
     }
 }
+/// Core operations for building, querying, and mutating the graph.
 impl Graph {
     /// Create an empty graph with fresh id counters.
     pub fn new() -> Self {

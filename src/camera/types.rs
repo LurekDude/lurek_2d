@@ -1,3 +1,12 @@
+//! - Core camera state containers: Camera (minimal) and Camera2D (full runtime).
+//! - Camera2D drives follow-target tracking with dead-zone, smoothing, and look-ahead.
+//! - Integrates shake, zoom pulse, sway, and breathing effects into effective transforms.
+//! - Viewport, bounds, and coordinate conversion for world/screen mapping.
+//! - Zoom and rotation damping with configurable constraint ranges.
+//! - Easing selection for follow interpolation: linear, smooth-step, ease-out-cubic.
+//! - View matrix generation composing position, rotation, zoom, and all active effects.
+//! - Presets for common follow behaviors: tight, cinematic, balanced, aggressive.
+
 use crate::camera::effects::{CameraBreathing, CameraSway, ZoomPulse};
 use crate::math::{Mat3, Rect, Vec2};
 

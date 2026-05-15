@@ -1,3 +1,10 @@
+//! - Arbitrary-degree Bézier curve with dynamic control-point list.
+//! - Evaluation via Bernstein basis, clamped to [0,1].
+//! - Sampling helpers for full curves, sub-segments, and arc-length walks.
+//! - First-derivative computation and tangent-angle extraction.
+//! - Geometric transforms: translate, rotate, scale relative to an origin.
+//! - Control-point CRUD with minimum-count safety.
+
 use crate::math::vec2::Vec2;
 
 /// Arbitrary-degree Bézier curve backed by a dynamic control-point list.
@@ -5,6 +12,7 @@ pub struct BezierCurve {
     /// Ordered control points defining the curve; at least 2 are required.
     control_points: Vec<Vec2>,
 }
+/// Core methods for construction, evaluation, sampling, transforms, and control-point access.
 impl BezierCurve {
     /// Construct a Bézier curve from `points`; panics when fewer than 2 are supplied.
     pub fn new(points: Vec<Vec2>) -> Self {
@@ -194,6 +202,7 @@ impl BezierCurve {
 }
 /// Clone the curve by duplicating its control-point list.
 impl Clone for BezierCurve {
+    /// Return a deep copy of this curve with cloned control points.
     fn clone(&self) -> Self {
         Self {
             control_points: self.control_points.clone(),

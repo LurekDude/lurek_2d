@@ -1,3 +1,8 @@
+//! - Virtual filesystem with layered mounts (directory, ZIP archive).
+//! - Async file loading queue with handle-based status polling.
+//! - Buffered file I/O with read, write, and append modes.
+//! - File modification watcher for hot-reload workflows.
+
 /// Async file request queue and result tracking.
 pub mod async_loader;
 /// Cached file payload helper.

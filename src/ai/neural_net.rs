@@ -1,10 +1,7 @@
 
-//! - Defines the lightweight feed-forward neural-network model used by the AI
-//!   module to store dense layers, activation modes, and flattened parameters.
-//! - Owns layer-local forward evaluation, activation application, and parameter
-//!   counting for each dense stage in the network.
-//! - Keeps the network-level operations that append layers, run full forward
-//!   passes, and load or export the flat weight and bias buffer used by higher-level AI code.
+//! - Lightweight feed-forward neural-network with dense layers, activation modes, and flat parameters.
+//! - Layer-local forward evaluation, activation application, and parameter counting.
+//! - Network-level operations: append layers, run forward passes, load/export weight buffers.
 
 /// Activation function used by a layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

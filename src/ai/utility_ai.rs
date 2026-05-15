@@ -1,10 +1,7 @@
 
-//! - Defines the utility-AI scoring model used by the AI module to store actions,
-//!   response curves, considerations, and the last evaluation result.
-//! - Owns the response-curve mapping rules and the action-side data that binds
-//!   Lua scorers, momentum weighting, and ordered consideration sets.
-//! - Keeps the evaluation flow that calls registered scorers, tracks per-action
-//!   weighted scores, and remembers the best action selected on the latest pass.
+//! - Utility-AI scoring model storing actions, response curves, considerations, and evaluation results.
+//! - Response-curve mapping rules and action-side data binding Lua scorers with momentum weighting.
+//! - Evaluation flow calling registered scorers, tracking per-action scores, and selecting best action.
 
 use mlua::prelude::*;
 use mlua::RegistryKey;

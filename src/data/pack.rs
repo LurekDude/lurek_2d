@@ -1,3 +1,12 @@
+//! - Python struct-style format-string packing and unpacking
+//! - Single-character format tokens for integers, floats, strings, and padding
+//! - Endian switching via '<' (little) and '>' (big) prefix characters
+//! - Length-prefixed ('s') and null-terminated ('z') string support
+//! - Coercion helpers that widen numeric PackValue variants at write time
+//! - Bounds-checked reads with per-token underflow error messages
+//! - Static and dynamic packed-size calculation for buffer pre-allocation
+//! - ByteData output for integration with the data module pipeline
+
 use crate::data::byte_data::ByteData;
 #[derive(Debug, Clone)]
 /// Hold value variants used by pack and unpack formats.

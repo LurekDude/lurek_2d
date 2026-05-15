@@ -1,3 +1,12 @@
+//! - Circle queries: containment, circle-circle overlap, circle-line and circle-segment intersection with hit points.
+//! - Polygon operations: signed area (shoelace), centroid, point-in-polygon (ray cast), convex hull (Andrew monotone chain).
+//! - Segment and line utilities: segment-segment intersection, closest point on segment, infinite-line intersection.
+//! - Grid rasterization: Bresenham line for integer cell traversal.
+//! - Triangulation: Delaunay via Bowyer-Watson with super-triangle removal.
+//! - Angle computation: atan2-based bearing between two points.
+//! - All routines are standalone free functions operating on flat coordinate scalars or flat vertex arrays.
+//! - f32 used for game-facing geometry; f64 used for Delaunay where precision matters.
+
 /// Return the angle in radians from point (x1, y1) to point (x2, y2) via `atan2`.
 pub fn angle_between(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
     (y2 - y1).atan2(x2 - x1)

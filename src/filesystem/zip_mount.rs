@@ -1,3 +1,7 @@
+//! - ZIP-backed virtual filesystem mount with path-indexed entry lookup.
+//! - Reads individual files from a ZIP archive on demand without full extraction.
+//! - Normalizes virtual paths and rejects directory-traversal attempts.
+
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -10,6 +14,7 @@ pub struct ZipMount {
     /// Normalized virtual path to archive entry name mapping.
     index: HashMap<String, String>,
 }
+/// Methods for building, querying, and reading files from a ZIP mount.
 impl ZipMount {
     /// Build a ZIP mount index or return an error on archive open or parse failure.
     pub fn new<P: AsRef<Path>>(archive_path: P, prefix: &str) -> Result<Self, String> {

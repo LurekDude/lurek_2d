@@ -1,3 +1,7 @@
+//! - Submodule declarations for all visualization categories.
+//! - Wildcard re-exports providing a flat public API.
+//! - Shared facade helpers scoped to crate visibility.
+
 /// Animation visualizations.
 pub mod animation;
 /// Audio visualizations.

@@ -1,3 +1,9 @@
+//! - Cumulative and differential operations (cumsum, diff, convolve1d, correlate1d)
+//! - Histogram binning with configurable range and bin count
+//! - Percentile extraction with linear interpolation
+//! - Pairwise statistical measures (covariance, Pearson correlation)
+//! - Value normalization helpers (range scaling, z-score standardization)
+
 use crate::compute::array::NdArray;
 
 /// Compute cumulative sum and return a 1D array with running totals.

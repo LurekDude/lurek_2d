@@ -1,3 +1,9 @@
+//! - Noise function rendering as scaled grayscale.
+//! - Raw noise mapping without range normalization.
+//! - Terrain biome coloring from noise elevation bands.
+//! - Heightmap slice visualization with elevation gradient.
+//! - Noise comparison strip with multiple tiles side by side.
+
 use crate::image::ImageData;
 /// Render a noise function as a grayscale image, scaling range to full byte range.
 pub fn noise_to_image(

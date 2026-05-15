@@ -1,3 +1,15 @@
+//! - Core dataframe cell type and typed value representation
+//! - Columnar storage with named columns and row-major access
+//! - Column resolution by name or one-based index
+//! - Row and column CRUD operations including add, remove, and rename
+//! - DataFrame cloning, slicing, and row iteration
+//! - Database container for named table collections
+//! - Random data generation from typed column definitions
+//! - Arithmetic expression evaluation per row via `with_eval`
+//! - Pivot table construction with configurable aggregation
+//! - Rolling mean, rolling sum, and rank computations
+//! - Aggregation function enumeration and parsing
+
 use crate::dataframe::rng::Xorshift64;
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -98,6 +110,7 @@ pub struct DataFrameRowIter<'a> {
     /// Store next row index to emit.
     next_row: usize,
 }
+/// Implement `Iterator` for `DataFrameRowIter` yielding row views.
 impl<'a> Iterator for DataFrameRowIter<'a> {
     type Item = Vec<(&'a str, &'a CellValue)>;
     /// Return next row view or `None` when iteration ends.

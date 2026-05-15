@@ -1,3 +1,4 @@
+//! `lurek.render` - Provides 2D drawing primitives, texture rendering, text output, blend modes, and render state management.
 use super::SharedState;
 use crate::image::ImageData;
 use crate::image::Texture;
@@ -17,13 +18,25 @@ use mlua::prelude::*;
 use slotmap::Key;
 use std::cell::RefCell;
 use std::rc::Rc;
+/// Raw pixel buffer for CPU-side image manipulation before uploading to a GPU texture.
 pub struct LuaImageData {
     pub(crate) inner: ImageData,
 }
 impl LuaUserData for LuaImageData {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns the width of this image data in pixels.
+        /// @return | number | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
+        // -- getHeight --
+        /// Returns the height of this image data in pixels.
+        /// @return | number | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
+        // -- resize --
+        /// Creates a new ImageData resized to the given dimensions using bilinear sampling.
+        /// @param | w | number | Target width in pixels.
+        /// @param | h | number | Target height in pixels.
+        /// @return | LImageData? | A new resized ImageData, or nil if the operation failed.
         methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
             match this.inner.resize(w, h) {
                 Some(img) => Ok(LuaValue::UserData(
@@ -32,6 +45,11 @@ impl LuaUserData for LuaImageData {
                 None => Ok(LuaValue::Nil),
             }
         });
+        // -- blit --
+        /// Copies pixel data from another ImageData onto this one at the specified position.
+        /// @param | source | LImageData | The source image data to copy from.
+        /// @param | dstX | number | Destination X offset in pixels.
+        /// @param | dstY | number | Destination Y offset in pixels.
         methods.add_method_mut(
             "blit",
             |_, this, (src_ud, dst_x, dst_y): (LuaAnyUserData, i32, i32)| {
@@ -40,6 +58,13 @@ impl LuaUserData for LuaImageData {
                 Ok(())
             },
         );
+        // -- getRegion --
+        /// Extracts a rectangular sub-region as a new ImageData.
+        /// @param | x | number | Top-left X coordinate of the region.
+        /// @param | y | number | Top-left Y coordinate of the region.
+        /// @param | w | number | Width of the region in pixels.
+        /// @param | h | number | Height of the region in pixels.
+        /// @return | LImageData? | A new ImageData for the region, or nil if out of bounds.
         methods.add_method(
             "getRegion",
             |lua, this, (x, y, w, h): (u32, u32, u32, u32)| match this.inner.get_region(x, y, w, h)
@@ -50,10 +75,17 @@ impl LuaUserData for LuaImageData {
                 None => Ok(LuaValue::Nil),
             },
         );
+        // -- diff --
+        /// Computes a numeric difference score between this image and another of the same size.
+        /// @param | other | LImageData | The image data to compare against.
+        /// @return | number | Sum of per-pixel absolute color differences (0 = identical).
         methods.add_method("diff", |_, this, other_ud: LuaAnyUserData| {
             let other_ref = other_ud.borrow::<LuaImageData>()?;
             Ok(this.inner.diff(&other_ref.inner))
         });
+        // -- mapPixels --
+        /// Iterates over every pixel and replaces its color with the return value of the callback.
+        /// @param | callback | function | Called as callback(x, y, r, g, b, a) → (r, g, b, a) for each pixel.
         methods.add_method_mut("mapPixels", |_lua, this, callback: LuaFunction| {
             let w = this.inner.width();
             let h = this.inner.height();
@@ -68,17 +100,26 @@ impl LuaUserData for LuaImageData {
             }
             Ok(())
         });
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Always "LImageData".
         methods.add_method("type", |_, _, ()| Ok("LImageData"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check ("ImageData" or "Object").
+        /// @return | boolean | True if the name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ImageData" || name == "Object")
         });
     }
 }
+/// GPU-backed texture handle used for drawing images to screen.
 #[derive(Clone)]
 pub struct LuaImage {
     pub(crate) state: Rc<RefCell<SharedState>>,
     pub(crate) key: TextureKey,
 }
+/// Texture with defined border insets for scalable 9-slice rendering (e.g., UI panels, buttons).
 #[derive(Clone)]
 pub struct LuaNineSlice {
     key: TextureKey,
@@ -91,11 +132,24 @@ pub struct LuaNineSlice {
 }
 impl LuaUserData for LuaNineSlice {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getInsets --
+        /// Returns the border insets (top, right, bottom, left) that define the stretchable regions.
+        /// @return | number, number, number, number | Top, right, bottom, left inset values.
         methods.add_method("getInsets", |_, this, ()| {
             Ok((this.top, this.right, this.bottom, this.left))
         });
+        // -- getTextureSize --
+        /// Returns the pixel dimensions of the underlying source texture.
+        /// @return | number, number | Width and height in pixels.
         methods.add_method("getTextureSize", |_, this, ()| Ok((this.tex_w, this.tex_h)));
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Always "LNineSlice".
         methods.add_method("type", |_, _, ()| Ok("LNineSlice"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check ("NineSlice" or "Object").
+        /// @return | boolean | True if the name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "NineSlice" || name == "Object")
         });
@@ -103,7 +157,13 @@ impl LuaUserData for LuaNineSlice {
 }
 impl LuaUserData for LuaImage {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getId --
+        /// Returns the internal numeric handle ID for this image.
+        /// @return | number | Opaque image handle identifier.
         methods.add_method("getId", |_, this, ()| Ok(this.key.data().as_ffi()));
+        // -- getWidth --
+        /// Returns the width of this image in pixels.
+        /// @return | number | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             let td = st.textures.get(this.key).ok_or_else(|| {
@@ -111,6 +171,9 @@ impl LuaUserData for LuaImage {
             })?;
             Ok(td.width)
         });
+        // -- getHeight --
+        /// Returns the height of this image in pixels.
+        /// @return | number | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             let td = st.textures.get(this.key).ok_or_else(|| {
@@ -118,6 +181,9 @@ impl LuaUserData for LuaImage {
             })?;
             Ok(td.height)
         });
+        // -- getDimensions --
+        /// Returns both width and height of this image.
+        /// @return | number, number | Width and height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             let td = st.textures.get(this.key).ok_or_else(|| {
@@ -125,6 +191,9 @@ impl LuaUserData for LuaImage {
             })?;
             Ok((td.width, td.height))
         });
+        // -- release --
+        /// Releases the GPU memory for this image. The handle becomes invalid after this call.
+        /// @return | boolean | True if the image was still valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if st.textures.remove(this.key).is_some() {
@@ -134,10 +203,17 @@ impl LuaUserData for LuaImage {
                 Ok(false)
             }
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Image".
         methods.add_method("typeOf", |_, _, ()| Ok("Image"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LImage".
         methods.add_method("type", |_, _, ()| Ok("LImage"));
     }
 }
+/// Bitmap font handle for measuring and rendering text.
 #[derive(Clone)]
 pub struct LuaFont {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -145,6 +221,10 @@ pub struct LuaFont {
 }
 impl LuaUserData for LuaFont {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Measures the pixel width of a string when rendered with this font.
+        /// @param | text | string | The text to measure.
+        /// @return | number | Width in pixels.
         methods.add_method("getWidth", |_, this, text: String| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -152,6 +232,9 @@ impl LuaUserData for LuaFont {
             })?;
             Ok(font.text_width(&text))
         });
+        // -- getHeight --
+        /// Returns the line height of this font in pixels.
+        /// @return | number | Line height in pixels.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -159,6 +242,9 @@ impl LuaUserData for LuaFont {
             })?;
             Ok(font.line_height())
         });
+        // -- getLineHeight --
+        /// Returns the spacing between consecutive lines of text.
+        /// @return | number | Line height in pixels.
         methods.add_method("getLineHeight", |_, this, ()| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -166,6 +252,9 @@ impl LuaUserData for LuaFont {
             })?;
             Ok(font.line_height())
         });
+        // -- setLineHeight --
+        /// Overrides the line height used for multi-line text rendering.
+        /// @param | height | number | New line height in pixels.
         methods.add_method("setLineHeight", |_, this, height: f32| {
             let mut st = this.state.borrow_mut();
             let font = st.fonts.get_mut(this.key).ok_or_else(|| {
@@ -174,6 +263,9 @@ impl LuaUserData for LuaFont {
             font.set_line_height(height);
             Ok(())
         });
+        // -- getAscent --
+        /// Returns the ascent (pixels above the baseline) of this font.
+        /// @return | number | Ascent in pixels.
         methods.add_method("getAscent", |_, this, ()| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -181,6 +273,9 @@ impl LuaUserData for LuaFont {
             })?;
             Ok(font.ascent())
         });
+        // -- getDescent --
+        /// Returns the descent (pixels below the baseline) of this font.
+        /// @return | number | Descent in pixels (positive value extending downward).
         methods.add_method("getDescent", |_, this, ()| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -188,6 +283,11 @@ impl LuaUserData for LuaFont {
             })?;
             Ok(font.descent())
         });
+        // -- getWrap --
+        /// Word-wraps text to fit within a pixel width limit and returns the resulting lines.
+        /// @param | text | string | The text to wrap.
+        /// @param | limit | number | Maximum line width in pixels.
+        /// @return | table, number | Array of wrapped line strings, and the widest line width.
         methods.add_method("getWrap", |lua, this, (text, limit): (String, f32)| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -207,6 +307,9 @@ impl LuaUserData for LuaFont {
             }
             Ok((tbl, max_w))
         });
+        // -- release --
+        /// Releases the font resource. The handle becomes invalid after this call.
+        /// @return | boolean | True if the font was still valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if st.fonts.remove(this.key).is_some() {
@@ -218,10 +321,17 @@ impl LuaUserData for LuaFont {
                 Ok(false)
             }
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Font".
         methods.add_method("typeOf", |_, _, ()| Ok("Font"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LFont".
         methods.add_method("type", |_, _, ()| Ok("LFont"));
     }
 }
+/// Off-screen render target that can be drawn to and then composited onto the screen.
 #[derive(Clone)]
 pub struct LuaCanvas {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -229,6 +339,9 @@ pub struct LuaCanvas {
 }
 impl LuaUserData for LuaCanvas {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns the width of this canvas in pixels.
+        /// @return | number | Width in pixels.
         methods.add_method("getWidth", |_, this, ()| {
             let st = this.state.borrow();
             let c = st.canvases.get(this.key).ok_or_else(|| {
@@ -236,6 +349,9 @@ impl LuaUserData for LuaCanvas {
             })?;
             Ok(c.width)
         });
+        // -- getHeight --
+        /// Returns the height of this canvas in pixels.
+        /// @return | number | Height in pixels.
         methods.add_method("getHeight", |_, this, ()| {
             let st = this.state.borrow();
             let c = st.canvases.get(this.key).ok_or_else(|| {
@@ -243,6 +359,9 @@ impl LuaUserData for LuaCanvas {
             })?;
             Ok(c.height)
         });
+        // -- getDimensions --
+        /// Returns both width and height of this canvas.
+        /// @return | number, number | Width and height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             let c = st.canvases.get(this.key).ok_or_else(|| {
@@ -250,6 +369,9 @@ impl LuaUserData for LuaCanvas {
             })?;
             Ok((c.width, c.height))
         });
+        // -- release --
+        /// Releases the canvas GPU resource. If this canvas is currently active, drawing reverts to the screen.
+        /// @return | boolean | True if the canvas was still valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if st.canvases.remove(this.key).is_some() {
@@ -262,10 +384,17 @@ impl LuaUserData for LuaCanvas {
                 Ok(false)
             }
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Canvas".
         methods.add_method("typeOf", |_, _, ()| Ok("Canvas"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LCanvas".
         methods.add_method("type", |_, _, ()| Ok("LCanvas"));
     }
 }
+/// Batched sprite renderer for efficiently drawing many copies of the same texture.
 #[derive(Clone)]
 pub struct LuaSpriteBatch {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -274,6 +403,16 @@ pub struct LuaSpriteBatch {
 impl LuaUserData for LuaSpriteBatch {
     #[allow(clippy::type_complexity)]
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- add --
+        /// Adds a sprite entry to the batch at the given position with optional transform.
+        /// @param | x | number | X position.
+        /// @param | y | number | Y position.
+        /// @param | r | number? | Rotation in radians.
+        /// @param | sx | number? | Scale X (default 1).
+        /// @param | sy | number? | Scale Y (default 1).
+        /// @param | ox | number? | Origin offset X.
+        /// @param | oy | number? | Origin offset Y.
+        /// @return | number | Index of the added entry.
         methods.add_method(
             "add",
             |_,
@@ -307,6 +446,8 @@ impl LuaUserData for LuaSpriteBatch {
                 Ok(batch.add(entry))
             },
         );
+        // -- clear --
+        /// Removes all entries from the sprite batch.
         methods.add_method("clear", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(batch) = st.sprite_batches.get_mut(this.key) {
@@ -314,6 +455,9 @@ impl LuaUserData for LuaSpriteBatch {
             }
             Ok(())
         });
+        // -- getCount --
+        /// Returns the number of sprite entries currently in the batch.
+        /// @return | number | Entry count.
         methods.add_method("getCount", |_, this, ()| {
             let st = this.state.borrow();
             let batch = st.sprite_batches.get(this.key).ok_or_else(|| {
@@ -321,6 +465,9 @@ impl LuaUserData for LuaSpriteBatch {
             })?;
             Ok(batch.len())
         });
+        // -- getBufferSize --
+        /// Returns the maximum number of entries this batch can hold.
+        /// @return | number | Buffer capacity.
         methods.add_method("getBufferSize", |_, this, ()| {
             let st = this.state.borrow();
             let batch = st.sprite_batches.get(this.key).ok_or_else(|| {
@@ -328,14 +475,24 @@ impl LuaUserData for LuaSpriteBatch {
             })?;
             Ok(batch.buffer_size())
         });
+        // -- release --
+        /// Releases the sprite batch resource.
+        /// @return | boolean | True if the batch was valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             Ok(st.sprite_batches.remove(this.key).is_some())
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "SpriteBatch".
         methods.add_method("typeOf", |_, _, ()| Ok("SpriteBatch"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LSpriteBatch".
         methods.add_method("type", |_, _, ()| Ok("LSpriteBatch"));
     }
 }
+/// Custom vertex mesh for advanced 2D geometry rendering with per-vertex color and UV data.
 #[derive(Clone)]
 pub struct LuaMesh {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -343,6 +500,9 @@ pub struct LuaMesh {
 }
 impl LuaUserData for LuaMesh {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getVertexCount --
+        /// Returns the number of vertices in this mesh.
+        /// @return | number | Vertex count.
         methods.add_method("getVertexCount", |_, this, ()| {
             let st = this.state.borrow();
             let mesh = st.meshes.get(this.key).ok_or_else(|| {
@@ -350,6 +510,10 @@ impl LuaUserData for LuaMesh {
             })?;
             Ok(mesh.vertex_count())
         });
+        // -- getVertex --
+        /// Returns the data for a single vertex by 1-based index.
+        /// @param | index | number | 1-based vertex index.
+        /// @return | number, number, number, number, number, number, number, number | x, y, u, v, r, g, b, a.
         methods.add_method("getVertex", |_, this, index: usize| {
             let st = this.state.borrow();
             let mesh = st.meshes.get(this.key).ok_or_else(|| {
@@ -360,6 +524,10 @@ impl LuaUserData for LuaMesh {
                 .ok_or_else(|| LuaError::RuntimeError("Mesh vertex index out of bounds".into()))?;
             Ok((v.x, v.y, v.u, v.v, v.r, v.g, v.b, v.a))
         });
+        // -- setVertex --
+        /// Updates a single vertex by 1-based index. Table format: {x, y, u, v, r, g, b, a}.
+        /// @param | index | number | 1-based vertex index.
+        /// @param | data | table | Vertex data: {x, y, u, v, r, g, b, a}.
         methods.add_method("setVertex", |_, this, (index, data): (usize, LuaTable)| {
             let mut st = this.state.borrow_mut();
             let mesh = st.meshes.get_mut(this.key).ok_or_else(|| {
@@ -383,6 +551,9 @@ impl LuaUserData for LuaMesh {
             });
             Ok(())
         });
+        // -- setTexture --
+        /// Assigns or removes a texture for this mesh. Pass nil to clear the texture.
+        /// @param | image | LImage? | Image to use as the mesh texture, or nil to remove.
         methods.add_method("setTexture", |_, this, ud: Option<LuaAnyUserData>| {
             let tex_key = match &ud {
                 Some(u) => {
@@ -398,14 +569,24 @@ impl LuaUserData for LuaMesh {
             mesh.set_texture(tex_key);
             Ok(())
         });
+        // -- release --
+        /// Releases the mesh resource.
+        /// @return | boolean | True if the mesh was valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             Ok(st.meshes.remove(this.key).is_some())
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Mesh".
         methods.add_method("typeOf", |_, _, ()| Ok("Mesh"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LMesh".
         methods.add_method("type", |_, _, ()| Ok("LMesh"));
     }
 }
+/// GPU shader program for custom rendering effects (post-processing, distortion, etc.).
 #[derive(Clone)]
 pub struct LuaShader {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -413,6 +594,10 @@ pub struct LuaShader {
 }
 impl LuaUserData for LuaShader {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- send --
+        /// Sends a uniform value to this shader by name. Supported types: number, boolean, or table (vec2/vec3/vec4).
+        /// @param | name | string | Uniform variable name declared in the shader.
+        /// @param | value | number|boolean|table | The value to send.
         methods.add_method("send", |_, this, (name, value): (String, LuaValue)| {
             let mut st = this.state.borrow_mut();
             let shader = st.shaders.get_mut(this.key).ok_or_else(|| {
@@ -422,6 +607,10 @@ impl LuaUserData for LuaShader {
             shader.send(name, uv);
             Ok(())
         });
+        // -- hasUniform --
+        /// Checks whether this shader declares a uniform with the given name.
+        /// @param | name | string | Uniform name to check.
+        /// @return | boolean | True if the uniform exists.
         methods.add_method("hasUniform", |_, this, name: String| {
             let st = this.state.borrow();
             let shader = st.shaders.get(this.key).ok_or_else(|| {
@@ -429,6 +618,9 @@ impl LuaUserData for LuaShader {
             })?;
             Ok(shader.has_uniform(&name))
         });
+        // -- release --
+        /// Releases the shader resource. If active, the default shader is restored.
+        /// @return | boolean | True if the shader was valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if st.shaders.remove(this.key).is_some() {
@@ -440,10 +632,17 @@ impl LuaUserData for LuaShader {
                 Ok(false)
             }
         });
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Shader".
         methods.add_method("typeOf", |_, _, ()| Ok("Shader"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LShader".
         methods.add_method("type", |_, _, ()| Ok("LShader"));
     }
 }
+/// Rectangular sub-region of a texture, used for sprite sheets and atlas-based rendering.
 #[derive(Clone)]
 pub struct LuaQuad {
     pub x: f32,
@@ -455,9 +654,18 @@ pub struct LuaQuad {
 }
 impl LuaUserData for LuaQuad {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getViewport --
+        /// Returns the quad's viewport rectangle within the source texture.
+        /// @return | number, number, number, number | x, y, width, height in texture pixels.
         methods.add_method("getViewport", |_, this, ()| {
             Ok((this.x, this.y, this.w, this.h))
         });
+        // -- setViewport --
+        /// Updates the quad's viewport rectangle.
+        /// @param | x | number | Left edge in texture pixels.
+        /// @param | y | number | Top edge in texture pixels.
+        /// @param | w | number | Width in texture pixels.
+        /// @param | h | number | Height in texture pixels.
         methods.add_method_mut(
             "setViewport",
             |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -468,8 +676,17 @@ impl LuaUserData for LuaQuad {
                 Ok(())
             },
         );
+        // -- getTextureDimensions --
+        /// Returns the full dimensions of the source texture this quad references.
+        /// @return | number, number | Source texture width and height.
         methods.add_method("getTextureDimensions", |_, this, ()| Ok((this.sw, this.sh)));
+        // -- typeOf --
+        /// Returns the type name of this object.
+        /// @return | string | Always "Quad".
         methods.add_method("typeOf", |_, _, ()| Ok("Quad"));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LQuad".
         methods.add_method("type", |_, _, ()| Ok("LQuad"));
     }
 }
@@ -530,6 +747,7 @@ fn parse_blend_mode(s: &str) -> Result<BlendMode, LuaError> {
         ))),
     }
 }
+/// Retained compound shape that accumulates drawing commands and can be rendered in one call.
 #[derive(Clone)]
 pub struct LuaShape {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -538,6 +756,9 @@ pub struct LuaShape {
 impl LuaUserData for LuaShape {
     #[allow(clippy::type_complexity)]
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getCommandCount --
+        /// Returns the number of drawing commands accumulated in this shape.
+        /// @return | number | Command count.
         methods.add_method("getCommandCount", |_, this, ()| {
             let st = this.state.borrow();
             let shape = st.shapes.get(this.key).ok_or_else(|| {
@@ -545,6 +766,8 @@ impl LuaUserData for LuaShape {
             })?;
             Ok(shape.command_count() as i64)
         });
+        // -- clear --
+        /// Removes all drawing commands from this shape, making it empty.
         methods.add_method("clear", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -553,6 +776,12 @@ impl LuaUserData for LuaShape {
             shape.clear();
             Ok(())
         });
+        // -- setColor --
+        /// Sets the drawing color for subsequent shape commands.
+        /// @param | r | number | Red channel (0–1).
+        /// @param | g | number | Green channel (0–1).
+        /// @param | b | number | Blue channel (0–1).
+        /// @param | a | number? | Alpha channel (0–1, default 1).
         methods.add_method(
             "setColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -564,6 +793,9 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- setLineWidth --
+        /// Sets the line width for subsequent line-mode shape commands.
+        /// @param | w | number | Line width in pixels.
         methods.add_method("setLineWidth", |_, this, w: f32| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -572,6 +804,13 @@ impl LuaUserData for LuaShape {
             shape.push_command(ShapeCommand::SetLineWidth(w));
             Ok(())
         });
+        // -- rectangle --
+        /// Adds a rectangle command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x | number | Left edge X.
+        /// @param | y | number | Top edge Y.
+        /// @param | w | number | Width.
+        /// @param | h | number | Height.
         methods.add_method(
             "rectangle",
             |_, this, (mode, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -594,6 +833,15 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- roundedRectangle --
+        /// Adds a rounded rectangle command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x | number | Left edge X.
+        /// @param | y | number | Top edge Y.
+        /// @param | w | number | Width.
+        /// @param | h | number | Height.
+        /// @param | rx | number | Horizontal corner radius.
+        /// @param | ry | number? | Vertical corner radius (defaults to rx).
         methods.add_method("roundedRectangle", |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, f32, Option<f32>)| {
                 let dm = if mode == "line" { DrawMode::Line } else { DrawMode::Fill };
                 let ry = ry.unwrap_or(rx);
@@ -605,6 +853,12 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- circle --
+        /// Adds a circle command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x | number | Center X.
+        /// @param | y | number | Center Y.
+        /// @param | r | number | Radius.
         methods.add_method(
             "circle",
             |_, this, (mode, x, y, r): (String, f32, f32, f32)| {
@@ -621,6 +875,13 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- ellipse --
+        /// Adds an ellipse command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x | number | Center X.
+        /// @param | y | number | Center Y.
+        /// @param | rx | number | Horizontal radius.
+        /// @param | ry | number | Vertical radius.
         methods.add_method(
             "ellipse",
             |_, this, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
@@ -643,6 +904,15 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- triangle --
+        /// Adds a triangle command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x1 | number | First vertex X.
+        /// @param | y1 | number | First vertex Y.
+        /// @param | x2 | number | Second vertex X.
+        /// @param | y2 | number | Second vertex Y.
+        /// @param | x3 | number | Third vertex X.
+        /// @param | y3 | number | Third vertex Y.
         methods.add_method(
             "triangle",
             |_, this, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
@@ -667,6 +937,10 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- polygon --
+        /// Adds a polygon command to the shape from a flat list of x,y coordinate pairs.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | ... | number | Flat coordinate values: x1, y1, x2, y2, ... (minimum 3 vertices / 6 values).
         methods.add_method(
             "polygon",
             |_, this, (mode, coords): (String, mlua::Variadic<f32>)| {
@@ -689,6 +963,12 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- line --
+        /// Adds a line segment command to the shape.
+        /// @param | x1 | number | Start X.
+        /// @param | y1 | number | Start Y.
+        /// @param | x2 | number | End X.
+        /// @param | y2 | number | End Y.
         methods.add_method("line", |_, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -697,6 +977,9 @@ impl LuaUserData for LuaShape {
             shape.push_command(ShapeCommand::Line { x1, y1, x2, y2 });
             Ok(())
         });
+        // -- polyline --
+        /// Adds a connected polyline command to the shape from a flat list of x,y coordinate pairs.
+        /// @param | ... | number | Flat coordinate values: x1, y1, x2, y2, ... (minimum 2 points / 4 values).
         methods.add_method("polyline", |_, this, coords: mlua::Variadic<f32>| {
             let points: Vec<f32> = coords.into_iter().collect();
             if points.len() < 4 {
@@ -711,6 +994,15 @@ impl LuaUserData for LuaShape {
             shape.push_command(ShapeCommand::Polyline { points });
             Ok(())
         });
+        // -- arc --
+        /// Adds an arc command to the shape.
+        /// @param | mode | string | "fill" or "line".
+        /// @param | x | number | Center X.
+        /// @param | y | number | Center Y.
+        /// @param | r | number | Radius.
+        /// @param | astart | number | Start angle in radians.
+        /// @param | aend | number | End angle in radians.
+        /// @param | segments | number? | Number of arc segments (default 32).
         methods.add_method(
             "arc",
             |_,
@@ -745,6 +1037,15 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- draw --
+        /// Renders the accumulated shape commands to the screen with optional transform.
+        /// @param | x | number | X position.
+        /// @param | y | number | Y position.
+        /// @param | rotation | number? | Rotation in radians (default 0).
+        /// @param | sx | number? | Scale X (default 1).
+        /// @param | sy | number? | Scale Y (default 1).
+        /// @param | ox | number? | Origin offset X (default 0).
+        /// @param | oy | number? | Origin offset Y (default 0).
         methods.add_method(
             "draw",
             |_,
@@ -774,22 +1075,36 @@ impl LuaUserData for LuaShape {
                 Ok(())
             },
         );
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check ("Shape" or "Object").
+        /// @return | boolean | True if the name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "Shape" || name == "Object")
         });
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LShape".
         methods.add_method("type", |_, _, ()| Ok("LShape"));
     }
 }
+/// Z-ordered draw callback layer for sorting draw calls by depth before flushing.
 struct LuaDrawLayer {
-    entries: Vec<(f64, LuaRegistryKey)>,
+    entries: Vec<(f64, mlua::RegistryKey)>,
 }
 impl LuaUserData for LuaDrawLayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- queue --
+        /// Enqueues a draw callback at the given z-depth. Callbacks execute when flush() is called.
+        /// @param | z | number | Z-depth value used for sorting (lower draws first).
+        /// @param | f | function | Callback to invoke during flush.
         methods.add_method_mut("queue", |lua, this, (z, f): (f64, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             this.entries.push((z, key));
             Ok(())
         });
+        // -- flush --
+        /// Sorts all queued callbacks by z-depth and executes them in order, then empties the layer.
         methods.add_method_mut("flush", |lua, this, ()| {
             this.entries
                 .sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
@@ -801,22 +1116,41 @@ impl LuaUserData for LuaDrawLayer {
             }
             Ok(())
         });
+        // -- clear --
+        /// Discards all queued callbacks without executing them.
         methods.add_method_mut("clear", |lua, this, ()| {
             for (_, key) in this.entries.drain(..) {
                 lua.remove_registry_value(key)?;
             }
             Ok(())
         });
+        // -- getCount --
+        /// Returns the number of callbacks currently queued.
+        /// @return | number | Queue length.
         methods.add_method("getCount", |_, this, ()| Ok(this.entries.len() as i64));
+        // -- type --
+        /// Returns the internal Lua type tag.
+        /// @return | string | Always "LDrawLayer".
         methods.add_method("type", |_, _, ()| Ok("LDrawLayer"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check ("LDrawLayer", "DrawLayer", or "Object").
+        /// @return | boolean | True if the name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LDrawLayer" || name == "DrawLayer" || name == "Object")
         });
     }
 }
+/// Registers the `lurek.render` module and all its functions and types into the Lua state.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let graphics = lua.create_table()?;
     let s = state.clone();
+    // -- setColor --
+    /// Sets the active drawing color for all subsequent draw operations.
+    /// @param | r | number | Red channel (0–1).
+    /// @param | g | number | Green channel (0–1).
+    /// @param | b | number | Blue channel (0–1).
+    /// @param | a | number? | Alpha channel (0–1, default 1).
     graphics.set(
         "setColor",
         lua.create_function(move |_, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -828,19 +1162,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getColor --
+    /// Returns the current drawing color.
+    /// @return | number, number, number, number | Red, green, blue, alpha channels (0–1).
     graphics.set(
         "getColor",
         lua.create_function(move |_, ()| {
-            let st = s.borrow();
-            Ok((
-                st.current_color[0],
-                st.current_color[1],
-                st.current_color[2],
-                st.current_color[3],
-            ))
+            let c = s.borrow().current_color;
+            Ok((c[0], c[1], c[2], c[3]))
         })?,
     )?;
     let s = state.clone();
+    // -- setBackgroundColor --
+    /// Sets the background clear color used at the start of each frame.
+    /// @param | r | number | Red channel (0–1).
+    /// @param | g | number | Green channel (0–1).
+    /// @param | b | number | Blue channel (0–1).
     graphics.set(
         "setBackgroundColor",
         lua.create_function(move |_, (r, g, b): (f32, f32, f32)| {
@@ -849,6 +1186,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getBackgroundColor --
+    /// Returns the current background clear color.
+    /// @return | number, number, number, number | Red, green, blue, alpha channels (0–1).
     graphics.set(
         "getBackgroundColor",
         lua.create_function(move |_, ()| {
@@ -862,6 +1202,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- rectangle --
+    /// Draws a rectangle. If rx is provided, draws a rounded rectangle.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Width.
+    /// @param | h | number | Height.
+    /// @param | rx | number? | Horizontal corner radius for rounded rectangle.
+    /// @param | ry | number? | Vertical corner radius (defaults to rx).
     graphics.set(
         "rectangle",
         lua.create_function(
@@ -908,6 +1257,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- circle --
+    /// Draws a circle.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | x | number | Center X.
+    /// @param | y | number | Center Y.
+    /// @param | radius | number | Circle radius in pixels.
     graphics.set(
         "circle",
         lua.create_function(move |_, (mode, x, y, radius): (String, f32, f32, f32)| {
@@ -921,6 +1276,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- ellipse --
+    /// Draws an ellipse.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | x | number | Center X.
+    /// @param | y | number | Center Y.
+    /// @param | rx | number | Horizontal radius.
+    /// @param | ry | number | Vertical radius.
     graphics.set(
         "ellipse",
         lua.create_function(
@@ -938,6 +1300,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     #[allow(clippy::type_complexity)]
+    // -- triangle --
+    /// Draws a triangle from three vertex positions.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | x1 | number | First vertex X.
+    /// @param | y1 | number | First vertex Y.
+    /// @param | x2 | number | Second vertex X.
+    /// @param | y2 | number | Second vertex Y.
+    /// @param | x3 | number | Third vertex X.
+    /// @param | y3 | number | Third vertex Y.
     graphics.set(
         "triangle",
         lua.create_function(
@@ -958,6 +1329,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- line --
+    /// Draws a line between two points, or a polyline through multiple points.
+    /// @param | ... | number | Coordinate values: x1, y1, x2, y2 for a line, or more for a polyline.
     graphics.set(
         "line",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -985,6 +1359,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- polygon --
+    /// Draws a polygon from a flat list of x,y vertex coordinates.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | ... | number | Flat vertex coordinates: x1, y1, x2, y2, ... (minimum 3 vertices).
     graphics.set(
         "polygon",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1015,6 +1393,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     #[allow(clippy::type_complexity)]
+    // -- arc --
+    /// Draws a circular arc.
+    /// @param | mode | string | "fill" or "line".
+    /// @param | x | number | Center X.
+    /// @param | y | number | Center Y.
+    /// @param | radius | number | Arc radius.
+    /// @param | angle1 | number | Start angle in radians.
+    /// @param | angle2 | number | End angle in radians.
+    /// @param | segments | number? | Number of arc segments (default 32).
     graphics.set(
         "arc",
         lua.create_function(
@@ -1042,6 +1429,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- points --
+    /// Draws one or more points. Accepts either a table of {x,y} pairs or flat x,y coordinate values.
+    /// @param | ... | table|number | Point data as a table of {x,y} sub-tables, or flat x1,y1,x2,y2,... values.
     graphics.set(
         "points",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1078,6 +1468,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     #[allow(clippy::type_complexity)]
+    // -- draw --
+    /// Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
+    /// @param | drawable | LImage|LCanvas|LSpriteBatch|LMesh | The drawable object to render.
+    /// @param | x | number? | X position (default 0).
+    /// @param | y | number? | Y position (default 0).
+    /// @param | r | number? | Rotation in radians (default 0).
+    /// @param | sx | number? | Scale X (default 1).
+    /// @param | sy | number? | Scale Y (default 1).
+    /// @param | ox | number? | Origin offset X (default 0).
+    /// @param | oy | number? | Origin offset Y (default 0).
     graphics.set(
         "draw",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1198,6 +1598,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     #[allow(clippy::type_complexity)]
+    // -- drawq --
+    /// Draws a sub-region of an image defined by a Quad, with optional transform.
+    /// @param | image | LImage | Source image to draw from.
+    /// @param | quad | LQuad | Quad defining the source rectangle within the image.
+    /// @param | x | number? | X position (default 0).
+    /// @param | y | number? | Y position (default 0).
+    /// @param | r | number? | Rotation in radians (default 0).
+    /// @param | sx | number? | Scale X (default 1).
+    /// @param | sy | number? | Scale Y (default 1).
+    /// @param | ox | number? | Origin offset X (default 0).
+    /// @param | oy | number? | Origin offset Y (default 0).
     graphics.set(
         "drawq",
         lua.create_function(
@@ -1255,6 +1666,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawMany --
+    /// Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
+    /// @param | list | table | Array of draw entry tables.
     graphics.set(
         "drawMany",
         lua.create_function(move |_, list: LuaTable| {
@@ -1330,6 +1744,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- printRotated --
+    /// Draws text centered and rotated around its midpoint.
+    /// @param | text | string | Text to render.
+    /// @param | x | number | Center X position.
+    /// @param | y | number | Center Y position.
+    /// @param | angle | number | Rotation angle in radians.
+    /// @param | scale | number? | Text scale factor (default 1).
     graphics.set(
         "printRotated",
         lua.create_function(
@@ -1365,6 +1786,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- print --
+    /// Draws text using the active font at the given position.
+    /// @param | text | string | Text to render.
+    /// @param | x | number? | X position (default 0).
+    /// @param | y | number? | Y position (default 0).
+    /// @param | scale | number? | Text scale factor (default 1).
     graphics.set(
         "print",
         lua.create_function(
@@ -1392,6 +1819,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- printf --
+    /// Draws word-wrapped and aligned text within a pixel-width limit.
+    /// @param | text | string | Text to render.
+    /// @param | x | number | X position.
+    /// @param | y | number | Y position.
+    /// @param | limit | number | Maximum line width in pixels for wrapping.
+    /// @param | align | string? | Alignment: "left" (default), "center", "right", or "justify".
     graphics.set(
         "printf",
         lua.create_function(
@@ -1424,6 +1858,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- printRich --
+    /// Draws rich text composed of individually styled spans at the given position.
+    /// @param | spans | table | Array of span tables, each with fields: text, r, g, b, a, scale.
+    /// @param | x | number | X position.
+    /// @param | y | number | Y position.
     graphics.set(
         "printRich",
         lua.create_function(move |_, (spans_table, x, y): (mlua::Table, f32, f32)| {
@@ -1458,6 +1897,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- clear --
+    /// Clears all queued render commands for the current frame.
+    /// @param | r | number? | Unused (reserved for future clear-color override).
+    /// @param | g | number? | Unused.
+    /// @param | b | number? | Unused.
     graphics.set(
         "clear",
         lua.create_function(
@@ -1468,6 +1912,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- setLineWidth --
+    /// Sets the line width for subsequent line-mode draw calls.
+    /// @param | w | number | Line width in pixels.
     graphics.set(
         "setLineWidth",
         lua.create_function(move |_, w: f32| {
@@ -1478,11 +1925,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getLineWidth --
+    /// Returns the current line width.
+    /// @return | number | Line width in pixels.
     graphics.set(
         "getLineWidth",
         lua.create_function(move |_, ()| Ok(s.borrow().line_width))?,
     )?;
     let s = state.clone();
+    // -- setPointSize --
+    /// Sets the point size for subsequent point draw calls.
+    /// @param | size | number | Point diameter in pixels.
     graphics.set(
         "setPointSize",
         lua.create_function(move |_, size: f32| {
@@ -1493,11 +1946,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getPointSize --
+    /// Returns the current point size.
+    /// @return | number | Point diameter in pixels.
     graphics.set(
         "getPointSize",
         lua.create_function(move |_, ()| Ok(s.borrow().point_size))?,
     )?;
     let s = state.clone();
+    // -- setBlendMode --
+    /// Sets the blend mode for subsequent draw operations.
+    /// @param | mode | string | One of: "alpha", "add", "multiply", "replace", "screen".
     graphics.set(
         "setBlendMode",
         lua.create_function(move |_, mode: String| {
@@ -1515,6 +1974,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getBlendMode --
+    /// Returns the current blend mode name.
+    /// @return | string | Current blend mode: "alpha", "add", "multiply", "replace", or "screen".
     graphics.set(
         "getBlendMode",
         lua.create_function(move |_, ()| {
@@ -1530,6 +1992,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newFont --
+    /// Creates a new bitmap font from a PNG sprite sheet path or returns a built-in font by pixel height.
+    /// @param | pathOrSize | string|number | File path to a PNG font sheet, or a pixel height for a built-in font.
+    /// @param | size | number? | Cell height in pixels when loading from a file (default 14).
+    /// @return | LFont | The created font handle.
     graphics.set(
         "newFont",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1609,6 +2076,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setFont --
+    /// Sets the active font used by print, printf, and other text rendering calls.
+    /// @param | font | LFont | Font handle to make active.
     graphics.set(
         "setFont",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1626,6 +2096,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFont --
+    /// Returns the currently active font, or nil if none is set.
+    /// @return | LFont? | The active font handle.
     graphics.set(
         "getFont",
         lua.create_function(move |_, ()| {
@@ -1639,6 +2112,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    // -- getFontSizes --
+    /// Returns all available built-in font pixel heights.
+    /// @return | table | Array of available font height values.
     graphics.set(
         "getFontSizes",
         lua.create_function(|lua, ()| {
@@ -1650,6 +2126,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getDefaultFont --
+    /// Returns a built-in default font at the nearest available pixel height.
+    /// @param | pixelHeight | number? | Desired pixel height (default 14).
+    /// @return | LFont | The built-in font handle.
     graphics.set(
         "getDefaultFont",
         lua.create_function(move |_, pixel_height: Option<u32>| {
@@ -1669,6 +2149,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontCellWidth --
+    /// Returns the fixed cell width of a bitmap font.
+    /// @param | font | LFont | Font handle to query.
+    /// @return | number | Cell width in pixels.
     graphics.set(
         "getFontCellWidth",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1685,6 +2169,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontWidth --
+    /// Measures the pixel width of text using the given font.
+    /// @param | font | LFont | Font handle to measure with.
+    /// @param | text | string | Text to measure.
+    /// @return | number | Width in pixels.
     graphics.set(
         "getFontWidth",
         lua.create_function(move |_, (ud, text): (LuaAnyUserData, String)| {
@@ -1701,6 +2190,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontHeight --
+    /// Returns the line height of the given font.
+    /// @param | font | LFont | Font handle to query.
+    /// @return | number | Line height in pixels.
     graphics.set(
         "getFontHeight",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1717,6 +2210,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontLineHeight --
+    /// Returns the line spacing of the given font.
+    /// @param | font | LFont | Font handle to query.
+    /// @return | number | Line height in pixels.
     graphics.set(
         "getFontLineHeight",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1732,11 +2229,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(f.line_height())
         })?,
     )?;
+    // -- setFontLineHeight --
+    /// Sets the line height override for a font (currently a no-op stub).
+    /// @param | font | LFont | Font handle.
+    /// @param | lh | number | Line height value.
     graphics.set(
         "setFontLineHeight",
         lua.create_function(|_, (_font, _lh): (LuaAnyUserData, f32)| Ok(()))?,
     )?;
     let s = state.clone();
+    // -- getFontAscent --
+    /// Returns the ascent (pixels above baseline) of the given font.
+    /// @param | font | LFont | Font handle to query.
+    /// @return | number | Ascent in pixels.
     graphics.set(
         "getFontAscent",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1753,6 +2258,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontDescent --
+    /// Returns the descent (pixels below baseline) of the given font.
+    /// @param | font | LFont | Font handle to query.
+    /// @return | number | Descent in pixels.
     graphics.set(
         "getFontDescent",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1769,6 +2278,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getFontWrap --
+    /// Word-wraps text using the active font and returns the resulting lines and widest line width.
+    /// @param | text | string | Text to wrap.
+    /// @param | limit | number | Maximum line width in pixels.
+    /// @return | table?, number | Array of wrapped lines (or nil if no font), and the widest line width.
     graphics.set(
         "getFontWrap",
         lua.create_function(move |lua, (text, limit): (String, f32)| {
@@ -1794,6 +2308,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newImage --
+    /// Loads a texture from a file path or creates one from an ImageData object.
+    /// @param | pathOrData | string|LImageData | File path to an image, or an ImageData object.
+    /// @param | colorSpace | string? | Color space: "srgb" (default) or "linear".
+    /// @return | LImage | The loaded image handle.
     graphics.set(
         "newImage",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1879,6 +2398,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newCanvas --
+    /// Creates a new off-screen render target with the given dimensions.
+    /// @param | width | number | Canvas width in pixels (must be > 0).
+    /// @param | height | number | Canvas height in pixels (must be > 0).
+    /// @return | LCanvas | The created canvas handle.
     graphics.set(
         "newCanvas",
         lua.create_function(move |_, (width, height): (u32, u32)| {
@@ -1901,6 +2425,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setCanvas --
+    /// Redirects all subsequent drawing to the given canvas. Pass nil to draw to the screen again.
+    /// @param | canvas | LCanvas? | Canvas to draw to, or nil for the main screen.
     graphics.set(
         "setCanvas",
         lua.create_function(move |_, ud: Option<LuaAnyUserData>| {
@@ -1927,11 +2454,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getCanvas --
+    /// Returns the currently active canvas, or nil if drawing to the screen.
+    /// @return | LCanvas? | The active canvas handle.
     graphics.set(
         "getCanvas",
         lua.create_function(move |_, ()| {
-            let st = s.borrow();
-            match st.active_canvas {
+            match s.borrow().active_canvas {
                 Some(key) => Ok(Some(LuaCanvas {
                     state: s.clone(),
                     key,
@@ -1941,6 +2470,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getCanvasSize --
+    /// Returns the pixel dimensions of a canvas.
+    /// @param | canvas | LCanvas | Canvas handle to query.
+    /// @return | number, number | Width and height in pixels.
     graphics.set(
         "getCanvasSize",
         lua.create_function(move |_, ud: LuaAnyUserData| {
@@ -1957,6 +2490,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newSpriteBatch --
+    /// Creates a batched sprite renderer for efficiently drawing many copies of the same texture.
+    /// @param | image | LImage | Source texture for all sprites in the batch.
+    /// @param | max | number? | Maximum number of entries (default 1000).
+    /// @return | LSpriteBatch | The created sprite batch handle.
     graphics.set(
         "newSpriteBatch",
         lua.create_function(move |_, (ud, max): (LuaAnyUserData, Option<usize>)| {
@@ -1979,6 +2517,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newMesh --
+    /// Creates a custom vertex mesh from an array of vertex data tables.
+    /// @param | verts | table | Array of vertex tables: {{x, y, u, v, r, g, b, a}, ...}.
+    /// @param | mode | string? | Draw mode: "triangles" (default), "fan", or "strip".
+    /// @return | LMesh | The created mesh handle.
     graphics.set(
         "newMesh",
         lua.create_function(move |_, (verts, mode): (LuaTable, Option<String>)| {
@@ -2018,6 +2561,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- newShader --
+    /// Compiles a WGSL shader program from source code and returns a handle.
+    /// @param | code | string | WGSL shader source code.
+    /// @return | LShader | The compiled shader handle.
     graphics.set(
         "newShader",
         lua.create_function(move |_, code: String| {
@@ -2041,6 +2588,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setShader --
+    /// Activates a shader for subsequent draw calls. Pass nil to restore the default shader.
+    /// @param | shader | LShader? | Shader handle to activate, or nil for default.
     graphics.set(
         "setShader",
         lua.create_function(move |_, ud: Option<LuaAnyUserData>| {
@@ -2067,6 +2617,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getShader --
+    /// Returns the currently active shader, or nil if using the default.
+    /// @return | LShader? | The active shader handle.
     graphics.set(
         "getShader",
         lua.create_function(move |_, ()| {
@@ -2081,6 +2634,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     #[allow(clippy::type_complexity)]
+    // -- newQuad --
+    /// Creates a Quad defining a rectangular sub-region of a texture for sprite-sheet rendering.
+    /// @param | x | number | Left edge in texture pixels.
+    /// @param | y | number | Top edge in texture pixels.
+    /// @param | w | number | Width in texture pixels.
+    /// @param | h | number | Height in texture pixels.
+    /// @param | sw | number | Full source texture width.
+    /// @param | sh | number | Full source texture height.
+    /// @return | LQuad | The created quad.
     graphics.set(
         "newQuad",
         lua.create_function(
@@ -2090,6 +2652,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- push --
+    /// Pushes the current transformation matrix onto the transform stack.
     graphics.set(
         "push",
         lua.create_function(move |_, ()| {
@@ -2100,6 +2664,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- pop --
+    /// Pops the top transformation matrix from the transform stack, restoring the previous one.
     graphics.set(
         "pop",
         lua.create_function(move |_, ()| {
@@ -2110,6 +2676,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- translate --
+    /// Applies a translation to the current transformation matrix.
+    /// @param | x | number | Horizontal translation in pixels.
+    /// @param | y | number | Vertical translation in pixels.
     graphics.set(
         "translate",
         lua.create_function(move |_, (x, y): (f32, f32)| {
@@ -2120,6 +2690,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- rotate --
+    /// Applies a rotation to the current transformation matrix.
+    /// @param | angle | number | Rotation angle in radians.
     graphics.set(
         "rotate",
         lua.create_function(move |_, angle: f32| {
@@ -2130,6 +2703,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- scale --
+    /// Applies scaling to the current transformation matrix.
+    /// @param | sx | number | Horizontal scale factor.
+    /// @param | sy | number? | Vertical scale factor (defaults to sx for uniform scaling).
     graphics.set(
         "scale",
         lua.create_function(move |_, (sx, sy): (f32, Option<f32>)| {
@@ -2141,6 +2718,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- shear --
+    /// Applies a shear (skew) to the current transformation matrix.
+    /// @param | kx | number | Horizontal shear factor.
+    /// @param | ky | number | Vertical shear factor.
     graphics.set(
         "shear",
         lua.create_function(move |_, (kx, ky): (f32, f32)| {
@@ -2151,6 +2732,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- origin --
+    /// Resets the current transformation matrix to the identity (no transform).
     graphics.set(
         "origin",
         lua.create_function(move |_, ()| {
@@ -2159,6 +2742,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- applyTransform --
+    /// Multiplies the current transformation matrix by a 3x3 matrix (9 values in row-major order).
+    /// @param | mat | table | Flat table of 9 numbers representing a 3x3 transform matrix.
     graphics.set(
         "applyTransform",
         lua.create_function(move |_, mat: LuaTable| {
@@ -2175,6 +2761,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setScissor --
+    /// Sets or clears the scissor rectangle. Only pixels inside this region are drawn. Call with no args to clear.
+    /// @param | x | number? | Left edge of the scissor rectangle.
+    /// @param | y | number? | Top edge.
+    /// @param | w | number? | Width.
+    /// @param | h | number? | Height.
     graphics.set(
         "setScissor",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -2200,6 +2792,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getScissor --
+    /// Returns the current scissor rectangle, or nothing if no scissor is set.
+    /// @return | number?, number?, number?, number? | x, y, w, h of the scissor rect (empty if none).
     graphics.set(
         "getScissor",
         lua.create_function(move |_, ()| {
@@ -2216,6 +2811,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- intersectScissor --
+    /// Intersects the given rectangle with the current scissor, narrowing the drawable region.
+    /// @param | x | number | Left edge.
+    /// @param | y | number | Top edge.
+    /// @param | w | number | Width.
+    /// @param | h | number | Height.
     graphics.set(
         "intersectScissor",
         lua.create_function(move |_, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -2233,6 +2834,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setColorMask --
+    /// Sets which color channels are written during draw calls. Call with no args to enable all.
+    /// @param | r | boolean? | Enable red channel.
+    /// @param | g | boolean? | Enable green channel.
+    /// @param | b | boolean? | Enable blue channel.
+    /// @param | a | boolean? | Enable alpha channel.
     graphics.set(
         "setColorMask",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -2255,11 +2862,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getColorMask --
+    /// Returns the current color write mask.
+    /// @return | boolean, boolean, boolean, boolean | Red, green, blue, alpha channel write states.
     graphics.set(
         "getColorMask",
         lua.create_function(move |_, ()| Ok(s.borrow().color_mask))?,
     )?;
     let s = state.clone();
+    // -- setWireframe --
+    /// Enables or disables wireframe rendering mode.
+    /// @param | enabled | boolean | True for wireframe, false for solid.
     graphics.set(
         "setWireframe",
         lua.create_function(move |_, enabled: bool| {
@@ -2271,11 +2884,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- isWireframe --
+    /// Returns whether wireframe rendering is currently active.
+    /// @return | boolean | True if wireframe mode is on.
     graphics.set(
         "isWireframe",
         lua.create_function(move |_, ()| Ok(s.borrow().wireframe))?,
     )?;
     let s = state.clone();
+    // -- stencil --
+    /// Begins a stencil write pass with the given action and reference value.
+    /// @param | action | string? | Stencil action: "replace" (default), "zero", "increment", "decrement", etc.
+    /// @param | value | number? | Stencil reference value (default 1).
     graphics.set(
         "stencil",
         lua.create_function(move |_, (action, value): (Option<String>, Option<u8>)| {
@@ -2299,6 +2919,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setStencilTest --
+    /// Configures the stencil comparison test for subsequent draws. Pass nil to disable.
+    /// @param | compare | string? | Compare function: "equal", "notequal", "less", "greater", etc. Nil disables.
+    /// @param | value | number? | Reference value to compare against (default 1).
     graphics.set(
         "setStencilTest",
         lua.create_function(move |_, (compare, value): (Option<String>, Option<u8>)| {
@@ -2329,6 +2953,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setStencilMode --
+    /// Sets the stencil write action, compare function, and reference value at once.
+    /// @param | action | string | Stencil action: "keep", "zero", "replace", "increment", "decrement", etc.
+    /// @param | compare | string? | Compare function (default "always").
+    /// @param | value | number? | Reference value (default 0).
     graphics.set(
         "setStencilMode",
         lua.create_function(
@@ -2369,6 +2998,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- getStencilMode --
+    /// Returns the current stencil action, compare mode, and reference value.
+    /// @return | string, string, number | Action name, compare mode name, and reference value.
     graphics.set(
         "getStencilMode",
         lua.create_function(move |_, ()| {
@@ -2398,6 +3030,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- clearStencil --
+    /// Resets the stencil state to defaults (no stencil operations).
     graphics.set(
         "clearStencil",
         lua.create_function(move |_, ()| {
@@ -2406,6 +3040,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setDepthMode --
+    /// Sets the depth comparison mode and whether depth writes are enabled.
+    /// @param | mode | string | Compare mode: "always", "never", "less", "lequal", "equal", "notequal", "greater", "gequal".
+    /// @param | write | boolean? | Enable depth buffer writes (default false).
     graphics.set(
         "setDepthMode",
         lua.create_function(move |_, (mode, write): (String, Option<bool>)| {
@@ -2429,6 +3067,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getDepthMode --
+    /// Returns the current depth comparison mode and write-enable flag.
+    /// @return | string, boolean | Depth mode name and whether depth writes are enabled.
     graphics.set(
         "getDepthMode",
         lua.create_function(move |_, ()| {
@@ -2448,16 +3089,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getWidth --
+    /// Returns the current window width in pixels.
+    /// @return | number | Window width.
     graphics.set(
         "getWidth",
         lua.create_function(move |_, ()| Ok(s.borrow().window_width))?,
     )?;
     let s = state.clone();
+    // -- getHeight --
+    /// Returns the current window height in pixels.
+    /// @return | number | Window height.
     graphics.set(
         "getHeight",
         lua.create_function(move |_, ()| Ok(s.borrow().window_height))?,
     )?;
     let s = state.clone();
+    // -- getDimensions --
+    /// Returns the current window width and height.
+    /// @return | number, number | Width and height in pixels.
     graphics.set(
         "getDimensions",
         lua.create_function(move |_, ()| {
@@ -2466,6 +3116,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- setDefaultFilter --
+    /// Sets the default texture filtering mode for newly created images.
+    /// @param | min | string | Minification filter: "nearest" or "linear".
+    /// @param | mag | string | Magnification filter: "nearest" or "linear".
+    /// @param | anisotropy | number? | Anisotropy level (default 1).
     graphics.set(
         "setDefaultFilter",
         lua.create_function(
@@ -2476,6 +3131,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- getDefaultFilter --
+    /// Returns the current default texture filtering settings.
+    /// @return | string, string, number | Min filter, mag filter, anisotropy level.
     graphics.set(
         "getDefaultFilter",
         lua.create_function(move |_, ()| {
@@ -2488,6 +3146,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- getStats --
+    /// Returns a table of rendering statistics for the current frame.
+    /// @return | table | Stats table with fields: drawcalls, textures, fonts, canvases, texture_memory, gpu_draw_calls, batched_draws, texture_switches, canvas_switches, shader_switches, cpu_render_ms.
     graphics.set(
         "getStats",
         lua.create_function(move |lua, ()| {
@@ -2509,6 +3170,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- saveScreenshot --
+    /// Saves a screenshot of the current frame to a file under the save/ directory.
+    /// @param | path | string | Output path (must start with "save/").
     graphics.set(
         "saveScreenshot",
         lua.create_function(move |_, path: String| {
@@ -2522,6 +3186,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- captureScreenshot --
+    /// Captures a screenshot as ImageData and passes it to a callback (stub: returns 1x1 placeholder).
+    /// @param | callback | function | Called with an LImageData argument.
     graphics.set(
         "captureScreenshot",
         lua.create_function(|lua, callback: LuaFunction| {
@@ -2531,6 +3198,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- newNineSlice --
+    /// Creates a 9-slice definition from an image and four border insets for scalable UI rendering.
+    /// @param | image | LImage | Source texture.
+    /// @param | top | number | Top border inset in pixels.
+    /// @param | right | number | Right border inset.
+    /// @param | bottom | number | Bottom border inset.
+    /// @param | left | number | Left border inset.
+    /// @return | LNineSlice | The 9-slice handle.
     graphics.set(
         "newNineSlice",
         lua.create_function(
@@ -2560,6 +3235,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawNineSlice --
+    /// Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
+    /// @param | slice | LNineSlice | The 9-slice handle to draw.
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Target width.
+    /// @param | h | number | Target height.
     graphics.set(
         "drawNineSlice",
         lua.create_function(
@@ -2592,6 +3274,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- newShape --
+    /// Creates a new retained compound shape for accumulating draw commands.
+    /// @return | LShape | The created shape handle.
     graphics.set(
         "newShape",
         lua.create_function(move |_, ()| {
@@ -2602,6 +3287,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    // -- newDrawLayer --
+    /// Creates a new z-ordered draw layer for sorting draw callbacks by depth.
+    /// @return | LDrawLayer | The created draw layer.
     graphics.set(
         "newDrawLayer",
         lua.create_function(|_, ()| {
@@ -2611,6 +3299,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- drawQuadBezier --
+    /// Draws a quadratic Bezier curve through start, control, and end points.
+    /// @param | x1 | number | Start X.
+    /// @param | y1 | number | Start Y.
+    /// @param | cx | number | Control point X.
+    /// @param | cy | number | Control point Y.
+    /// @param | x2 | number | End X.
+    /// @param | y2 | number | End Y.
+    /// @param | segs | number? | Number of line segments (default 16).
     graphics.set("drawQuadBezier", lua.create_function(
             move |_,
                   (x1, y1, cx, cy, x2, y2, segs): (
@@ -2628,6 +3325,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawCubicBezier --
+    /// Draws a cubic Bezier curve through start, two control points, and end.
+    /// @param | x1 | number | Start X.
+    /// @param | y1 | number | Start Y.
+    /// @param | cx1 | number | First control point X.
+    /// @param | cy1 | number | First control point Y.
+    /// @param | cx2 | number | Second control point X.
+    /// @param | cy2 | number | Second control point Y.
+    /// @param | x2 | number | End X.
+    /// @param | y2 | number | End Y.
+    /// @param | segs | number? | Number of line segments (default 16).
     graphics.set(
         "drawCubicBezier",
         lua.create_function(
@@ -2658,6 +3366,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawPath --
+    /// Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
+    /// @param | path | table | Array of segment tables, each with a "type" field and coordinates.
+    /// @param | mode | string? | "line" (default) or "fill".
+    /// @param | close | boolean? | Close the path back to start (default false).
     graphics.set(
         "drawPath",
         lua.create_function(
@@ -2718,6 +3431,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawGradientRect --
+    /// Draws a rectangle with a two-color gradient fill.
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Width (must be positive).
+    /// @param | h | number | Height (must be positive).
+    /// @param | c1 | table | Start color {r, g, b [, a]}.
+    /// @param | c2 | table | End color {r, g, b [, a]}.
+    /// @param | dir | string? | Direction: "vertical" (default), "horizontal", "diagDown", "diagUp", "radial".
     graphics.set(
         "drawGradientRect",
         lua.create_function(
@@ -2776,6 +3498,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawColoredPolygon --
+    /// Draws a polygon with per-vertex colors.
+    /// @param | vertices | table | Flat array of x,y coordinates: {x1, y1, x2, y2, ...}.
+    /// @param | colors | table | Array of color tables: {{r, g, b, a}, ...}, one per vertex.
+    /// @param | mode | string? | "fill" (default) or "line".
     graphics.set("drawColoredPolygon", lua.create_function(
             move |_, (vertices, colors, mode): (LuaTable, LuaTable, Option<String>)| {
                 let draw_mode = match mode.as_deref().unwrap_or("fill") {
@@ -2823,6 +3550,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawIsoCubeTile --
+    /// Draws an isometric cube tile with configurable face colors and optional textures.
+    /// @param | sx | number | Screen X position of the tile center.
+    /// @param | sy | number | Screen Y position of the tile center.
+    /// @param | halfW | number | Half-width of the tile diamond.
+    /// @param | halfH | number | Half-height of the tile diamond.
+    /// @param | opts | table? | Options: depth, topColor, leftColor, rightColor, topTexture, leftTexture, rightTexture.
     graphics.set(
         "drawIsoCubeTile",
         lua.create_function(
@@ -2909,6 +3643,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawHexTile --
+    /// Draws a regular hexagonal tile.
+    /// @param | cx | number | Center X.
+    /// @param | cy | number | Center Y.
+    /// @param | size | number | Hex radius (must be positive).
+    /// @param | orientation | string? | "pointyTop" (default) or "flatTop".
+    /// @param | mode | string? | "line" (default) or "fill".
     graphics.set(
         "drawHexTile",
         lua.create_function(
@@ -2957,6 +3698,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- beginSortGroup --
+    /// Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
+    /// @param | id | number | Group identifier.
     graphics.set(
         "beginSortGroup",
         lua.create_function(move |_, id: u64| {
@@ -2967,6 +3711,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- pushSortKey --
+    /// Sets the depth sort key for subsequent draw calls within the current sort group.
+    /// @param | depth | number | Sort depth value (lower draws first).
     graphics.set(
         "pushSortKey",
         lua.create_function(move |_, depth: f32| {
@@ -2977,6 +3724,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- flushSortGroup --
+    /// Ends a sort group and emits all accumulated draw calls in sorted order.
+    /// @param | id | number | Group identifier matching the beginSortGroup call.
     graphics.set(
         "flushSortGroup",
         lua.create_function(move |_, id: u64| {
@@ -2987,6 +3737,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- drawBevelRect --
+    /// Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Width (must be positive).
+    /// @param | h | number | Height (must be positive).
+    /// @param | bevelW | number? | Bevel border width (default 2).
+    /// @param | style | string? | Bevel style: "raised" (default), "sunken", "ridge", "groove", "flat".
+    /// @param | opts | table? | Options: highlight, shadow, fillColor (each a {r,g,b,a} table).
     graphics.set(
         "drawBevelRect",
         lua.create_function(
@@ -3052,6 +3811,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- pushLayer --
+    /// Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
+    /// @param | id | number | Layer identifier (must match the popLayer call).
+    /// @param | alpha | number? | Layer opacity (0–1, default 1).
+    /// @param | blendMode | string? | Blend mode: "alpha" (default), "add", "multiply", "replace", "screen".
     graphics.set(
         "pushLayer",
         lua.create_function(
@@ -3077,6 +3841,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- popLayer --
+    /// Ends a compositing layer and composites it with the previous content.
+    /// @param | id | number | Layer identifier matching the pushLayer call.
     graphics.set(
         "popLayer",
         lua.create_function(move |_, id: u64| {
@@ -3087,6 +3854,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- drawQuadBezier --
+    /// Draws a quadratic Bezier curve through start, control, and end points.
+    /// @param | x1 | number | Start X.
+    /// @param | y1 | number | Start Y.
+    /// @param | cx | number | Control point X.
+    /// @param | cy | number | Control point Y.
+    /// @param | x2 | number | End X.
+    /// @param | y2 | number | End Y.
+    /// @param | segments | number? | Number of line segments (default 16).
     graphics.set(
         "drawQuadBezier",
         lua.create_function(
@@ -3113,6 +3889,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawCubicBezier --
+    /// Draws a cubic Bezier curve through start, two control points, and end.
+    /// @param | x1 | number | Start X.
+    /// @param | y1 | number | Start Y.
+    /// @param | cx1 | number | First control point X.
+    /// @param | cy1 | number | First control point Y.
+    /// @param | cx2 | number | Second control point X.
+    /// @param | cy2 | number | Second control point Y.
+    /// @param | x2 | number | End X.
+    /// @param | y2 | number | End Y.
+    /// @param | segments | number? | Number of line segments (default 16).
     graphics.set(
         "drawCubicBezier",
         lua.create_function(
@@ -3142,6 +3929,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawPath --
+    /// Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
+    /// @param | path | table | Array of segment tables, each with a "type" field and coordinates.
+    /// @param | mode | string? | "line" (default) or "fill".
+    /// @param | close | boolean? | Close the path back to start (default false).
     graphics.set(
         "drawPath",
         lua.create_function(
@@ -3194,6 +3986,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawGradientRect --
+    /// Draws a rectangle with a two-color gradient fill.
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Width (must be positive).
+    /// @param | h | number | Height (must be positive).
+    /// @param | c1 | table | Start color {r, g, b [, a]}.
+    /// @param | c2 | table | End color {r, g, b [, a]}.
+    /// @param | dir | string? | Direction: "vertical" (default), "horizontal", "diagDown", "diagUp", "radial".
     graphics.set(
         "drawGradientRect",
         lua.create_function(
@@ -3252,6 +4053,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawColoredPolygon --
+    /// Draws a polygon with per-vertex colors.
+    /// @param | vertices | table | Flat array of x,y coordinates: {x1, y1, x2, y2, ...}.
+    /// @param | colors | table | Array of color tables: {{r, g, b, a}, ...}, one per vertex.
+    /// @param | mode | string? | "fill" (default) or "line".
     graphics.set("drawColoredPolygon", lua.create_function(
             move |_, (vertices, colors, mode): (LuaTable, LuaTable, Option<String>)| {
                 let draw_mode = parse_draw_mode(mode.as_deref().unwrap_or("fill"))?;
@@ -3291,6 +4097,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawIsoCubeTile --
+    /// Draws an isometric cube tile with configurable face colors and optional textures.
+    /// @param | sx | number | Screen X position of the tile center.
+    /// @param | sy | number | Screen Y position of the tile center.
+    /// @param | halfW | number | Half-width of the tile diamond.
+    /// @param | halfH | number | Half-height of the tile diamond.
+    /// @param | opts | table? | Options: depth, topColor, leftColor, rightColor, topTexture, leftTexture, rightTexture.
     graphics.set(
         "drawIsoCubeTile",
         lua.create_function(
@@ -3377,6 +4190,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- drawHexTile --
+    /// Draws a regular hexagonal tile.
+    /// @param | cx | number | Center X.
+    /// @param | cy | number | Center Y.
+    /// @param | size | number | Hex radius (must be positive).
+    /// @param | orientation | string? | "pointyTop" (default) or "flatTop".
+    /// @param | mode | string? | "line" (default) or "fill".
     graphics.set(
         "drawHexTile",
         lua.create_function(
@@ -3417,6 +4237,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- beginSortGroup --
+    /// Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
+    /// @param | id | number | Group identifier.
     graphics.set(
         "beginSortGroup",
         lua.create_function(move |_, id: u64| {
@@ -3427,6 +4250,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- pushSortKey --
+    /// Sets the depth sort key for subsequent draw calls within the current sort group.
+    /// @param | depth | number | Sort depth value (lower draws first).
     graphics.set(
         "pushSortKey",
         lua.create_function(move |_, depth: f32| {
@@ -3437,6 +4263,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- flushSortGroup --
+    /// Ends a sort group and emits all accumulated draw calls in sorted order.
+    /// @param | id | number | Group identifier matching the beginSortGroup call.
     graphics.set(
         "flushSortGroup",
         lua.create_function(move |_, id: u64| {
@@ -3448,6 +4277,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     #[allow(clippy::type_complexity)]
     let s = state.clone();
+    // -- drawBevelRect --
+    /// Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
+    /// @param | x | number | Left edge X.
+    /// @param | y | number | Top edge Y.
+    /// @param | w | number | Width (must be positive).
+    /// @param | h | number | Height (must be positive).
+    /// @param | bevelW | number? | Bevel border width (default 2).
+    /// @param | style | string? | Bevel style: "raised" (default), "sunken", "ridge", "groove", "flat".
+    /// @param | opts | table? | Options: highlight, shadow, fillColor (each a {r,g,b,a} table).
     graphics.set(
         "drawBevelRect",
         lua.create_function(
@@ -3513,6 +4351,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- pushLayer --
+    /// Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
+    /// @param | id | number | Layer identifier (must match the popLayer call).
+    /// @param | alpha | number? | Layer opacity (0–1, default 1).
+    /// @param | blendMode | string? | Blend mode: "alpha" (default), "add", "multiply", "replace", "screen".
     graphics.set(
         "pushLayer",
         lua.create_function(
@@ -3531,6 +4374,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
+    // -- popLayer --
+    /// Ends a compositing layer and composites it with the previous content.
+    /// @param | id | number | Layer identifier matching the pushLayer call.
     graphics.set(
         "popLayer",
         lua.create_function(move |_, id: u64| {
@@ -3547,6 +4393,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let current_layer: Rc<RefCell<String>> = Rc::new(RefCell::new("default".to_string()));
     let lz = layer_zorders.clone();
     let lv = layer_visible.clone();
+    // -- newLayer --
+    /// Creates a named rendering layer with an optional z-order for draw call organization.
+    /// @param | name | string | Layer name.
+    /// @param | zOrder | number? | Z-order for layer sorting (default 0).
     graphics.set(
         "newLayer",
         lua.create_function(move |_, (name, z_order): (String, Option<i32>)| {
@@ -3558,6 +4408,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let cl = current_layer.clone();
     let lz2 = layer_zorders.clone();
     let lv2 = layer_visible.clone();
+    // -- setLayer --
+    /// Sets the active rendering layer by name. Creates the layer if it does not exist.
+    /// @param | name | string | Layer name to activate.
     graphics.set(
         "setLayer",
         lua.create_function(move |_, name: String| {
@@ -3568,11 +4421,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let cl2 = current_layer.clone();
+    // -- currentLayer --
+    /// Returns the name of the currently active rendering layer.
+    /// @return | string | Active layer name.
     graphics.set(
         "currentLayer",
         lua.create_function(move |_, ()| Ok(cl2.borrow().clone()))?,
     )?;
     let lv3 = layer_visible.clone();
+    // -- setLayerVisible --
+    /// Sets whether a named rendering layer is visible.
+    /// @param | name | string | Layer name.
+    /// @param | visible | boolean | True to show, false to hide.
     graphics.set(
         "setLayerVisible",
         lua.create_function(move |_, (name, visible): (String, bool)| {
@@ -3581,16 +4441,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let lv4 = layer_visible.clone();
+    // -- isLayerVisible --
+    /// Returns whether a named rendering layer is currently visible.
+    /// @param | name | string | Layer name.
+    /// @return | boolean | True if the layer is visible.
     graphics.set(
         "isLayerVisible",
         lua.create_function(move |_, name: String| Ok(*lv4.borrow().get(&name).unwrap_or(&true)))?,
     )?;
     let lz3 = layer_zorders.clone();
+    // -- getLayerZOrder --
+    /// Returns the z-order value of a named rendering layer.
+    /// @param | name | string | Layer name.
+    /// @return | number | Z-order value (default 0 if unset).
     graphics.set(
         "getLayerZOrder",
         lua.create_function(move |_, name: String| Ok(*lz3.borrow().get(&name).unwrap_or(&0)))?,
     )?;
     let lz4 = layer_zorders.clone();
+    // -- setLayerZOrder --
+    /// Sets the z-order value of a named rendering layer.
+    /// @param | name | string | Layer name.
+    /// @param | z | number | New z-order value.
     graphics.set(
         "setLayerZOrder",
         lua.create_function(move |_, (name, z): (String, i32)| {
@@ -3599,6 +4471,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let state_for_obj = state.clone();
+    // -- loadObj --
+    /// Loads a Wavefront OBJ model file and returns a model handle for projection and rendering.
+    /// @param | path | string | File path to the .obj file relative to the game directory.
+    /// @return | LObjModel | The loaded OBJ model handle.
     graphics.set(
         "loadObj",
         lua.create_function(move |_, path: String| {
@@ -3616,6 +4492,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let state_for_model = state.clone();
+    // -- loadModel --
+    /// Loads a 3D model file (OBJ format) and returns a handle for 2D projection and sprite rendering.
+    /// @param | path | string | File path to the model file relative to the game directory.
+    /// @return | LObjModel | The loaded model handle.
     graphics.set(
         "loadModel",
         lua.create_function(move |_, path: String| {
@@ -3636,6 +4516,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 use crate::render::obj_loader::{ObjCamera, ObjModel};
+/// Loaded OBJ 3D model handle for CPU-side projection to 2D meshes and sprite rendering.
 pub struct LObjModel {
     pub(crate) state: Rc<RefCell<SharedState>>,
     pub(crate) model: ObjModel,
@@ -3643,14 +4524,32 @@ pub struct LObjModel {
 }
 impl LuaUserData for LObjModel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getVertexCount --
+        /// Returns the number of vertices in this OBJ model.
+        /// @return | number | Vertex count.
         methods.add_method("getVertexCount", |_, this, ()| {
             Ok(this.model.vertex_count())
         });
+        // -- getFaceCount --
+        /// Returns the number of faces (triangles) in this OBJ model.
+        /// @return | number | Face count.
         methods.add_method("getFaceCount", |_, this, ()| Ok(this.model.face_count()));
+        // -- getUvCount --
+        /// Returns the number of UV texture coordinates in this OBJ model.
+        /// @return | number | UV coordinate count.
         methods.add_method("getUvCount", |_, this, ()| Ok(this.model.uv_count()));
+        // -- getNormalCount --
+        /// Returns the number of vertex normals in this OBJ model.
+        /// @return | number | Normal count.
         methods.add_method("getNormalCount", |_, this, ()| {
             Ok(this.model.normal_count())
         });
+        // -- renderToImage --
+        /// Renders the OBJ model to a GPU texture at the given resolution with optional 90-degree rotation.
+        /// @param | width | number | Output image width in pixels.
+        /// @param | height | number | Output image height in pixels.
+        /// @param | rotation | number? | Rotation step (0–3, each step = 90 degrees, default 0).
+        /// @return | LImage | The rendered image handle.
         methods.add_method_mut(
             "renderToImage",
             |_, this, (width, height, rotation): (u32, u32, Option<u8>)| {
@@ -3679,6 +4578,12 @@ impl LuaUserData for LObjModel {
                 })
             },
         );
+        // -- projectToMesh --
+        /// Projects the OBJ model into 2D vertex data using a virtual camera, returning a table of vertex rows.
+        /// @param | camera | table | Camera parameters: {x, y, z, tx, ty, tz, fov}.
+        /// @param | screenW | number | Screen width for projection.
+        /// @param | screenH | number | Screen height for projection.
+        /// @return | table | Array of vertex tables: {{x, y, u, v, r, g, b, a}, ...}.
         methods.add_method(
             "projectToMesh",
             |lua, this, (cam_tbl, screen_w, screen_h): (LuaTable, f32, f32)| {

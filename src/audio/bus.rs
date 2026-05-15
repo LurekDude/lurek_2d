@@ -1,4 +1,10 @@
 
+//! - Named audio routing bus with per-bus volume, pitch, pause, and duck-target controls.
+//! - Shared DSP effect chain stored as `Arc<RwLock<Vec<Arc<EffectParams>>>>` for lock-free audio-thread reads.
+//! - Dynamic add/remove of typed effects (lowpass, reverb, chorus, compressor, etc.) with runtime IDs.
+//! - Duck-target assignment enabling automatic cross-bus volume suppression.
+//! - Boundary clamping on volume, pitch, and duck volume values.
+
 use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::log_msg;
 use crate::runtime::log_messages::{BU01, BU02, BU03};

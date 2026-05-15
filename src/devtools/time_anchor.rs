@@ -1,3 +1,7 @@
+//! - Capture a monotonic instant at construction time
+//! - Compute elapsed seconds from that anchor on demand
+//! - Provide a shared timing primitive for logger and profiler
+
 use std::time::Instant;
 #[derive(Debug, Clone)]
 /// Hold a monotonic start instant used to measure elapsed seconds.

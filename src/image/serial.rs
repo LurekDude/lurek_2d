@@ -1,12 +1,22 @@
+//! - Serialize and deserialize flat and layered images in the LIMG binary format.
+//! - Provide zlib compression and decompression for pixel payloads.
+//! - Validate headers, version tags, and type flags on load.
+//! - Encode layer metadata (name, opacity, visibility) alongside pixel data.
+//! - Expose both file-path and raw-byte entry points for flexible I/O.
+
 use super::image_data::ImageData;
 use super::layers::LayeredImage;
 use flate2::read::ZlibDecoder;
 use flate2::write::ZlibEncoder;
 use flate2::Compression;
 use std::io::{Read, Write};
+/// Four-byte magic identifier for the LIMG binary format.
 const MAGIC: &[u8; 4] = b"LIMG";
+/// Current LIMG format version number.
 const VERSION: u8 = 1;
+/// Type flag indicating a single flat image payload.
 const TYPE_FLAT: u8 = 0;
+/// Type flag indicating a multi-layer image payload.
 const TYPE_LAYERED: u8 = 1;
 /// Save a flat image as LIMG bytes on disk.
 pub fn save_image(img: &ImageData, path: &str) -> Result<(), String> {

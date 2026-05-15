@@ -1,3 +1,5 @@
+//! `lurek.i18n` -- Localization bindings for in-memory catalogs, locale selection, fallback lists, translation lookup, interpolation, plural and gender variants, search indexes, formatting helpers, locale validation, and coverage gap reports.
+
 use crate::i18n::format::{format_date, format_number, locale_separators};
 use crate::i18n::{
     detect_system_locale, flat_table_from_json, flat_table_from_toml, interpolate, is_rtl,
@@ -8,12 +10,17 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+/// Shared localization state held by all `lurek.i18n` functions.
 struct LocalizationShared {
+    /// Translation catalog with active locale and fallback list.
     catalog: Catalog,
+    /// Lua callbacks invoked when the active language changes.
     on_change: Vec<LuaRegistryKey>,
+    /// Optional base locale string used by tooling and game code.
     base: String,
 }
 impl LocalizationShared {
+    /// Creates empty localization state with no base locale.
     fn new() -> Self {
         Self {
             catalog: Catalog::new(),
@@ -22,6 +29,7 @@ impl LocalizationShared {
         }
     }
 }
+/// Flattens nested Lua translation tables into dot-separated string entries.
 fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, String>) {
     for pair in tbl.clone().pairs::<LuaValue, LuaValue>() {
         let Ok((k, v)) = pair else { continue };
@@ -53,10 +61,16 @@ fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, Str
         }
     }
 }
+/// Registers `lurek.i18n` localization catalog, lookup, formatting, and coverage helpers.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let loc = lua.create_table()?;
     let shared = Rc::new(RefCell::new(LocalizationShared::new()));
     let s = shared.clone();
+    // -- loadTable --
+    /// Loads translations for a locale from a nested Lua table flattened with dot-separated keys.
+    /// @param | locale | string | Locale code to load.
+    /// @param | tbl | table | Translation table containing strings, numbers, booleans, or nested tables.
+    /// @return | nil | No value is returned.
     loc.set(
         "loadTable",
         lua.create_function(move |_lua, (locale, tbl): (String, LuaTable)| {
@@ -67,11 +81,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- unloadTable --
+    /// Removes all translations for a locale from the catalog.
+    /// @param | locale | string | Locale code to unload.
+    /// @return | boolean | True when a locale table was removed.
     loc.set(
         "unloadTable",
         lua.create_function(move |_, locale: String| Ok(s.borrow_mut().catalog.unload(&locale)))?,
     )?;
     let s = shared.clone();
+    // -- setLanguage --
+    /// Sets the active locale and invokes registered change callbacks with new and old locale values.
+    /// @param | locale | string | Locale code to activate.
+    /// @return | nil | No value is returned.
     loc.set(
         "setLanguage",
         lua.create_function(move |lua, locale: String| {
@@ -94,6 +116,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- getLanguage --
+    /// Returns the active locale code.
+    /// @return | LuaValue | Active locale string, or nil when no locale is active.
     loc.set(
         "getLanguage",
         lua.create_function(move |lua, ()| {
@@ -106,6 +131,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- getLanguages --
+    /// Returns sorted locale codes currently loaded in the catalog.
+    /// @return | table | Array table of locale codes.
     loc.set(
         "getLanguages",
         lua.create_function(move |lua, ()| {
@@ -120,6 +148,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- setFallbacks --
+    /// Replaces the fallback locale list used for missing translations.
+    /// @param | locales | table | Array table of locale codes in fallback order.
+    /// @return | nil | No value is returned.
     loc.set(
         "setFallbacks",
         lua.create_function(move |_, locales: LuaTable| {
@@ -132,6 +164,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- getFallbacks --
+    /// Returns fallback locale codes in lookup order.
+    /// @return | table | Array table of fallback locale codes.
     loc.set(
         "getFallbacks",
         lua.create_function(move |lua, ()| {
@@ -144,6 +179,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- t --
+    /// Translates a key using the active locale, optional variables, and optional English plural selection.
+    /// @param | key | string | Translation key.
+    /// @param | vars | table | Optional interpolation variables.
+    /// @param | count | number | Optional plural count, also inserted as `{count}` when variables are used.
+    /// @return | string | Translated and interpolated text, or the catalog fallback for the key.
     loc.set(
         "t",
         lua.create_function(
@@ -182,11 +223,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     let s = shared.clone();
+    // -- hasKey --
+    /// Returns whether the catalog contains a translation key in active or fallback locales.
+    /// @param | key | string | Translation key to check.
+    /// @return | boolean | True when the key is available.
     loc.set(
         "hasKey",
         lua.create_function(move |_, key: String| Ok(s.borrow().catalog.has_key(&key)))?,
     )?;
     let s = shared.clone();
+    // -- getKeys --
+    /// Returns sorted translation keys known to the catalog.
+    /// @return | table | Array table of translation keys.
     loc.set(
         "getKeys",
         lua.create_function(move |lua, ()| {
@@ -201,6 +249,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- setKey --
+    /// Sets one translation value for one locale and key.
+    /// @param | locale | string | Locale code to update.
+    /// @param | key | string | Translation key.
+    /// @param | value | string | Translation text.
+    /// @return | nil | No value is returned.
     loc.set(
         "setKey",
         lua.create_function(move |_, (locale, key, value): (String, String, String)| {
@@ -208,6 +262,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    // -- interpolate --
+    /// Replaces `{name}` placeholders in a template using string variables.
+    /// @param | template | string | Template text containing placeholders.
+    /// @param | vars | table | Map table from placeholder names to replacement strings.
+    /// @return | string | Interpolated text.
     loc.set(
         "interpolate",
         lua.create_function(|_, (template, vars): (String, LuaTable)| {
@@ -218,11 +277,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(interpolate(&template, &map))
         })?,
     )?;
+    // -- pluralFor --
+    /// Returns the English plural category key for a number.
+    /// @param | n | number | Count used for plural selection.
+    /// @return | string | Plural category, usually `one` or `other`.
     loc.set(
         "pluralFor",
         lua.create_function(|_, n: f64| Ok(PluralForm::english(n).key().to_string()))?,
     )?;
     let s = shared.clone();
+    // -- onLanguageChange --
+    /// Registers a callback invoked when the active locale changes.
+    /// @param | cb | function | Callback receiving `(new_locale, old_locale)`.
+    /// @return | nil | No value is returned.
     loc.set(
         "onLanguageChange",
         lua.create_function(move |lua, cb: LuaFunction| {
@@ -232,11 +299,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- hasLanguage --
+    /// Returns whether a locale has translations loaded.
+    /// @param | locale | string | Locale code to check.
+    /// @return | boolean | True when the locale exists in the catalog.
     loc.set(
         "hasLanguage",
         lua.create_function(move |_, locale: String| Ok(s.borrow().catalog.has_locale(&locale)))?,
     )?;
     let s = shared.clone();
+    // -- getAvailableLanguages --
+    /// Returns sorted locale codes currently loaded in the catalog.
+    /// @return | table | Array table of locale codes.
     loc.set(
         "getAvailableLanguages",
         lua.create_function(move |lua, ()| {
@@ -251,6 +325,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- setBase --
+    /// Sets the base locale string stored by the localization module.
+    /// @param | locale | string | Base locale code.
+    /// @return | nil | No value is returned.
     loc.set(
         "setBase",
         lua.create_function(move |_, locale: String| {
@@ -259,11 +337,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- getBase --
+    /// Returns the base locale string stored by the localization module.
+    /// @return | string | Base locale code, or an empty string when unset.
     loc.set(
         "getBase",
         lua.create_function(move |_, ()| Ok(s.borrow().base.clone()))?,
     )?;
     let s = shared.clone();
+    // -- onChange --
+    /// Registers a locale-change callback using the shorter alias name.
+    /// @param | cb | function | Callback receiving `(new_locale, old_locale)`.
+    /// @return | nil | No value is returned.
     loc.set(
         "onChange",
         lua.create_function(move |lua, cb: LuaFunction| {
@@ -273,6 +358,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- offChange --
+    /// Removes every registered locale-change callback.
+    /// @return | nil | No value is returned.
     loc.set(
         "offChange",
         lua.create_function(move |lua, ()| {
@@ -284,11 +372,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- keyCount --
+    /// Returns the number of translation keys known to the catalog.
+    /// @return | integer | Translation key count.
     loc.set(
         "keyCount",
         lua.create_function(move |_, ()| Ok(s.borrow().catalog.key_count()))?,
     )?;
     let s = shared.clone();
+    // -- categories --
+    /// Returns top-level translation key categories.
+    /// @return | table | Array table of category names.
     loc.set(
         "categories",
         lua.create_function(move |lua, ()| {
@@ -301,6 +395,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- keysInCategory --
+    /// Returns translation keys belonging to one category prefix.
+    /// @param | category | string | Category prefix.
+    /// @return | table | Array table of translation keys.
     loc.set(
         "keysInCategory",
         lua.create_function(move |lua, category: String| {
@@ -319,6 +417,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- search --
+    /// Searches translation keys and values for a query string.
+    /// @param | query | string | Search query.
+    /// @param | limit | integer | Optional maximum result count; zero or nil means no truncation.
+    /// @return | table | Array table of rows with `key` and `value` fields.
     loc.set(
         "search",
         lua.create_function(move |lua, (query, limit): (String, Option<usize>)| {
@@ -340,6 +443,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- buildIndex --
+    /// Builds a word-to-keys search index from the catalog.
+    /// @return | table | Map table from normalized words to arrays of translation keys.
     loc.set(
         "buildIndex",
         lua.create_function(move |lua, ()| {
@@ -355,6 +461,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(tbl)
         })?,
     )?;
+    // -- searchIndexed --
+    /// Searches a prebuilt word index and returns matching keys.
+    /// @param | index | table | Index table returned by `buildIndex`.
+    /// @param | query | string | Search query.
+    /// @param | limit | integer | Optional maximum key count; zero or nil means no truncation.
+    /// @return | table | Array table of matching translation keys.
     loc.set(
         "searchIndexed",
         lua.create_function(
@@ -401,6 +513,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     let s = shared.clone();
+    // -- mergeLocale --
+    /// Merges flat translation entries into an existing locale.
+    /// @param | locale | string | Locale code to merge into.
+    /// @param | entries | table | Map table from translation keys to strings.
+    /// @return | nil | No value is returned.
     loc.set(
         "mergeLocale",
         lua.create_function(move |_, (locale, entries): (String, LuaTable)| {
@@ -414,6 +531,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- formatNumber --
+    /// Formats a number with locale-aware separators and optional decimal precision.
+    /// @param | n | number | Number to format.
+    /// @param | opts | table | Optional table with `decimals` field, defaulting to 2.
+    /// @return | string | Formatted number string.
     loc.set(
         "formatNumber",
         lua.create_function(move |_, (n, opts): (f64, Option<LuaTable>)| {
@@ -426,6 +548,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- formatDate --
+    /// Formats a timestamp with the active locale and a named format.
+    /// @param | timestamp | integer | Unix timestamp value.
+    /// @param | fmt | string | Optional format name, defaulting to `short`.
+    /// @return | string | Formatted date string.
     loc.set(
         "formatDate",
         lua.create_function(move |_, (timestamp, fmt): (i64, Option<String>)| {
@@ -435,6 +562,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- tGender --
+    /// Translates a gender-specific key variant when present, then falls back to the base key.
+    /// @param | key | string | Base translation key.
+    /// @param | gender | string | Gender suffix appended to the key.
+    /// @param | vars | table | Optional interpolation variables.
+    /// @return | string | Gender-specific or fallback translated text.
     loc.set(
         "tGender",
         lua.create_function(
@@ -461,6 +594,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     let s = shared.clone();
+    // -- getLoadedLocales --
+    /// Returns locale codes currently loaded in the catalog.
+    /// @return | table | Array table of loaded locale codes.
     loc.set(
         "getLoadedLocales",
         lua.create_function(move |lua, ()| {
@@ -474,6 +610,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- isRTL --
+    /// Returns whether a locale is written right-to-left.
+    /// @param | locale | string | Optional locale code; defaults to the active locale.
+    /// @return | boolean | True for right-to-left locales.
     loc.set(
         "isRTL",
         lua.create_function(move |_, locale: Option<String>| {
@@ -481,10 +621,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(is_rtl(&code))
         })?,
     )?;
+    // -- validateLocale --
+    /// Returns whether a locale code has a valid syntax.
+    /// @param | locale | string | Locale code to validate.
+    /// @return | boolean | True when the code is valid.
     loc.set(
         "validateLocale",
         lua.create_function(|_, locale: String| Ok(is_valid_locale_code(&locale)))?,
     )?;
+    // -- detectLocale --
+    /// Detects the system locale when available.
+    /// @return | LuaValue | Locale string, or nil when detection fails.
     loc.set(
         "detectLocale",
         lua.create_function(|lua, ()| match detect_system_locale() {
@@ -493,6 +640,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     let s = shared.clone();
+    // -- loadString --
+    /// Loads translations for a locale from TOML or JSON source text.
+    /// @param | locale | string | Locale code to load.
+    /// @param | content | string | TOML or JSON translation source.
+    /// @param | format | string | Source format, either `toml` or `json`.
+    /// @return | nil | No value is returned.
     loc.set(
         "loadString",
         lua.create_function(
@@ -513,6 +666,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     let s = shared.clone();
+    // -- localeCoverage --
+    /// Returns missing translation keys for all locales compared to a reference locale.
+    /// @param | reference | string | Locale code used as the coverage reference.
+    /// @return | table | Array table of gap rows with `key` and `missing_in` fields.
     loc.set(
         "localeCoverage",
         lua.create_function(move |lua, reference: String| {

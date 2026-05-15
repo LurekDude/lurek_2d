@@ -30,7 +30,7 @@ SpriteAnimator.__index = SpriteAnimator
 ---@field private _clips    table
 ---@field private _clip     string|nil
 ---@field private _def      table|nil
----@field private _frame    integer
+---@field private _frame    number
 ---@field private _elapsed  number
 ---@field private _playing  boolean
 ---@field private _onFrame  function|nil
@@ -107,7 +107,7 @@ end
 
 --- Returns the current (row, col) frame to draw.
 --- Row is the clip's row; col is the current frame index within the clip.
---- @return integer row, integer col
+--- @return number row, number col
 function SpriteAnimator:currentFrame()
     if not self._def then
         return 1, 1

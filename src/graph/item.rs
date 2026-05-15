@@ -1,3 +1,7 @@
+//! - Define `GraphItem` as the data carrier moved through graph nodes and edges.
+//! - Track item position (at node, in transit, or unplaced) via `ItemPosition`.
+//! - Provide decay-time lifetime, priority, and alive/dead state per item.
+
 /// Current location of an item in the graph.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ItemPosition {

@@ -1,10 +1,7 @@
 
-//! - Defines the tabular Q-learning model used by the AI module to store a flat
-//!   state-action value table and its training parameters.
-//! - Owns epsilon-greedy action selection, Bellman updates, episode bookkeeping,
-//!   and direct read or write access to individual Q values.
-//! - Keeps the lightweight persistence helpers that serialize and reload the
-//!   table shape and values for simple learned policy storage.
+//! - Tabular Q-learning model with flat state-action value table and training parameters.
+//! - Epsilon-greedy action selection, Bellman updates, and episode bookkeeping.
+//! - Lightweight persistence helpers for serializing and reloading learned policies.
 
 /// Q-learning agent with a flat `state × action` value table.
 pub struct QLearner {

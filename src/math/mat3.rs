@@ -1,3 +1,8 @@
+//! - Row-major 3×3 matrix type for 2D affine transformations.
+//! - Factory constructors for identity, translation, rotation, scale, and shear.
+//! - Inverse computation with degenerate-determinant fallback.
+//! - Point transformation and matrix multiplication via `std::ops::Mul`.
+
 use super::vec2::Vec2;
 
 /// Row-major 3×3 float matrix for 2D affine transforms; used by Transform and Camera.
@@ -7,6 +12,7 @@ pub struct Mat3 {
     pub m: [[f32; 3]; 3],
 }
 
+/// Core constructors and operations for 2D affine transforms.
 impl Mat3 {
     /// Return the 3×3 identity matrix.
     pub fn identity() -> Self {
@@ -99,6 +105,7 @@ impl Mat3 {
 /// Multiply two Mat3 matrices via standard row×column product.
 impl std::ops::Mul for Mat3 {
     type Output = Mat3;
+    /// Compute the row×column product of `self` and `rhs`.
     fn mul(self, rhs: Mat3) -> Mat3 {
         let mut result = Mat3 { m: [[0.0; 3]; 3] };
         for i in 0..3 {

@@ -1,3 +1,13 @@
+//! - Pixel-level color adjustments: brightness, contrast, saturation, gamma, tint, grayscale, sepia, invert, threshold, and posterize applied via parallel pixel mapping.
+//! - Alpha channel masking and deterministic per-pixel noise injection with repeatable seed.
+//! - Geometric transforms: horizontal and vertical flip, 90-degree clockwise rotation, and rectangular crop with bounds validation.
+//! - Resize operations using nearest-neighbor sampling, bilinear interpolation, and Lanczos3 windowed-sinc filtering.
+//! - Separable box blur with configurable radius and 3x3 unsharp-mask sharpening kernel.
+//! - General-purpose NxN kernel convolution with clamped-edge boundary handling and validation of odd kernel dimensions.
+//! - Compositing via alpha-blended blit with fast-path for fully opaque sources and nine-slice stretch drawing.
+//! - Bytewise image difference scoring across same-sized and differently-sized images for test comparison.
+//! - `ResizeFilter` enum for selecting resampling kernels via string parsing at the Lua boundary.
+
 use super::image_data::ImageData;
 /// Resize kernels supported by the image resampler.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

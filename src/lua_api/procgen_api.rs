@@ -1,3 +1,5 @@
+//! `lurek.procgen` — Procedural generation tools: noise, dungeon generators, wave function collapse, heightmaps, L-systems, name generation, voronoi, biomes, and world graphs.
+
 use super::SharedState;
 use crate::procgen::biome::{BiomeClassifier, BiomeRules, BiomeType};
 use crate::procgen::heightmap::Heightmap;
@@ -15,12 +17,28 @@ use crate::procgen::{
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+/// Lua-visible wrapper around the biome classification engine, used to assign biome types based on height, moisture, and temperature.
 pub struct LuaBiomeClassifier(BiomeClassifier);
 impl LuaUserData for LuaBiomeClassifier {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- classify --
+        /// Classify a single point into a biome type based on its environmental parameters.
+        /// @param | height | number | Elevation value (0.0–1.0) of the terrain point.
+        /// @param | moisture | number | Moisture level (0.0–1.0) at the point.
+        /// @param | temperature | number | Temperature value (0.0–1.0) at the point.
+        /// @return | string | Biome name such as "ocean", "desert", "grassland", "taiga", etc.
         methods.add_method("classify", |_, this, (h, m, t): (f32, f32, f32)| {
             Ok(this.0.classify(h, m, t).as_str())
         });
+        // -- classifyMap --
+        /// Classify an entire grid of points into biome types in bulk.
+        /// @param | width | number | Grid width in cells.
+        /// @param | height | number | Grid height in cells.
+        /// @param | heights | table | Flat array of height values (length = width*height).
+        /// @param | moisture | table | Flat array of moisture values (length = width*height).
+        /// @param | temperature | table? | Optional flat array of temperature values. If omitted, temperature is ignored.
+        /// @return | table | Flat array of biome name strings (length = width*height).
         methods.add_method(
             "classifyMap",
             |lua, this, (width, height, ht, mt, tt): (u32, u32, LuaTable, LuaTable, Option<LuaTable>)| {
@@ -40,7 +58,14 @@ impl LuaUserData for LuaBiomeClassifier {
                 Ok(out)
             },
         );
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Always returns "BiomeClassifier".
         methods.add_method("type", |_, _, ()| Ok("BiomeClassifier"));
+        // -- typeOf --
+        /// Check whether this object matches a given type name.
+        /// @param | name | string | Type name to test (e.g. "BiomeClassifier" or "Object").
+        /// @return | boolean | True if the object is of the specified type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "BiomeClassifier" || name == "Object")
         });
@@ -97,8 +122,15 @@ impl BiomeType {
         }
     }
 }
+/// Registers the `lurek.procgen` module and all its functions on the given Lua table.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+    // -- cellularAutomata --
+    /// Generate a cave or organic map using cellular automata rules.
+    /// @param | width | number | Grid width in cells.
+    /// @param | height | number | Grid height in cells.
+    /// @param | opts | table? | Options: fill (0.0–1.0 initial fill ratio), iterations, birth threshold, survive threshold, seed.
+    /// @return | table | Flat array of u8 values (0=empty, 1=wall) with length width*height.
     tbl.set(
         "cellularAutomata",
         lua.create_function(|lua, (w, h, opts): (u32, u32, Option<LuaTable>)| {
@@ -114,6 +146,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- floodFill --
+    /// Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
+    /// @param | data | table | Flat array of u8 cell values (length = width*height).
+    /// @param | width | number | Grid width.
+    /// @param | height | number | Grid height.
+    /// @param | startX | number | Start column (0-based).
+    /// @param | startY | number | Start row (0-based).
+    /// @param | threshold | number? | Value threshold (default 128).
+    /// @param | above | boolean? | If true, fill cells >= threshold; if false (default), fill cells < threshold.
+    /// @return | table | Flat array of u8 (1=filled, 0=not filled) with length width*height.
     tbl.set(
         "floodFill",
         lua.create_function(
@@ -148,12 +190,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- perlinNoise --
+    /// Sample periodic 2D Perlin noise at a given coordinate.
+    /// @param | x | number | X coordinate to sample.
+    /// @param | y | number | Y coordinate to sample.
+    /// @param | periodX | number | Horizontal period for tiling.
+    /// @param | periodY | number | Vertical period for tiling.
+    /// @return | number | Noise value in the range [-1, 1].
     tbl.set(
         "perlinNoise",
         lua.create_function(|_, (x, y, px, py): (f64, f64, f64, f64)| {
             Ok(perlin_noise_periodic(x, y, px, py))
         })?,
     )?;
+    // -- poissonDisk --
+    /// Generate evenly-spaced random points using Poisson disk sampling. Useful for placing trees, NPCs, or loot without clustering.
+    /// @param | width | number | Area width.
+    /// @param | height | number | Area height.
+    /// @param | minDist | number | Minimum distance between any two points.
+    /// @param | maxAttempts | number? | Rejection attempts per active point (default 30). Higher = denser fill.
+    /// @param | seed | number? | RNG seed (default 0).
+    /// @return | table | Array of {x, y} tables representing generated points.
     tbl.set("poissonDisk", lua.create_function(
             |lua, (w, h, min_dist, max_attempts, seed): (f32, f32, f32, Option<u32>, Option<u64>)| {
                 let points = poisson_disk(w, h, min_dist, max_attempts.unwrap_or(30), seed.unwrap_or(0));
@@ -168,6 +225,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- voronoi --
+    /// Compute a Voronoi diagram from a set of seed points. Returns region ownership, distance-to-nearest, and distance-to-second-nearest for each cell.
+    /// @param | width | number | Grid width.
+    /// @param | height | number | Grid height.
+    /// @param | points | table | Array of {x, y} seed points.
+    /// @param | opts | table? | Options: warp_scale, warp_strength, seed for domain warping.
+    /// @return | table | Flat array of 1-based region indices (length = width*height).
+    /// @return | table | Flat array of distances to nearest seed.
+    /// @return | table | Flat array of distances to second-nearest seed.
     tbl.set(
         "voronoi",
         lua.create_function(
@@ -201,6 +267,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- bspDungeon --
+    /// Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapping rooms connected by corridors.
+    /// @param | opts | table? | Options: width, height, min_size (minimum leaf size), max_depth (BSP tree depth), seed, padding.
+    /// @return | table | Table with .rooms (array of {x,y,w,h}) and .corridors (array of {x1,y1,x2,y2}).
     tbl.set(
         "bspDungeon",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -250,6 +320,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- bspDungeonWithPrefabs --
+    /// Generate a BSP dungeon and stamp named prefab rooms into suitable leaves. Returns dungeon layout plus prefab placement info.
+    /// @param | opts | table? | BSP options: width, height, min_size, max_depth, seed, padding.
+    /// @param | prefabs | table | Array of prefab definitions: {name, width, height}.
+    /// @return | table | Dungeon table with .rooms and .corridors.
+    /// @return | table | Array of placed prefabs: {name, x, y, width, height}.
     tbl.set(
         "bspDungeonWithPrefabs",
         lua.create_function(|lua, (opts, prefabs_tbl): (Option<LuaTable>, LuaTable)| {
@@ -321,6 +397,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok((out, p_tbl))
         })?,
     )?;
+    // -- roomsDungeon --
+    /// Generate a dungeon by placing random non-overlapping rooms and connecting them with corridors. Also returns a full tile grid.
+    /// @param | opts | table? | Options: width, height, max_rooms, min_room_size, max_room_size, seed.
+    /// @return | table | Table with .rooms ({x,y,w,h}[]), .corridors ({x1,y1,x2,y2}[]), .grid (flat u8[]), .width, .height.
     tbl.set(
         "roomsDungeon",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -377,6 +457,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- roomsDungeonWithPrefabs --
+    /// Generate a rooms-based dungeon and place named prefabs into qualifying rooms. Prefabs can have custom shape masks.
+    /// @param | opts | table? | Room generation options: width, height, max_rooms, min_room_size, max_room_size, seed.
+    /// @param | prefabs | table | Array of prefab definitions: {name, width, height, mask (optional flat u8[])}.
+    /// @param | stampValue | number? | Tile value written for prefab cells in the grid (default 3).
+    /// @return | table | Dungeon table with .rooms, .corridors, .grid, .width, .height.
+    /// @return | table | Array of placed prefabs: {name, x, y, width, height}.
     tbl.set(
         "roomsDungeonWithPrefabs",
         lua.create_function(
@@ -465,6 +552,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- heightmap --
+    /// Generate a fractal heightmap using multi-octave noise with optional hydraulic erosion.
+    /// @param | opts | table? | Options: width, height, scale, octaves, lacunarity, persistence, seed, erosion_passes.
+    /// @return | table | Table with .cells (flat f32 array 0.0–1.0), .width, .height.
     tbl.set(
         "heightmap",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -507,6 +598,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(res)
         })?,
     )?;
+    // -- heightmapFromCellular --
+    /// Convert a cellular automata grid into a heightmap by distance-transforming the floor cells.
+    /// @param | width | number | Grid width.
+    /// @param | height | number | Grid height.
+    /// @param | cells | table | Flat u8 array from cellularAutomata.
+    /// @param | floorValue | number? | Cell value treated as open floor (default 0).
+    /// @return | table | Table with .cells (flat f32 array), .width, .height.
     tbl.set(
         "heightmapFromCellular",
         lua.create_function(
@@ -528,6 +626,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- wfcGenerate --
+    /// Run Wave Function Collapse to generate a grid of tile IDs satisfying adjacency constraints.
+    /// @param | opts | table | Options: width, height, seed, max_attempts, tiles (array of {id, weight}), adjacencies (map of tile_id -> allowed neighbor IDs[]).
+    /// @return | table | Table with .cells (flat array of tile IDs, 0 if unsolved), .width, .height.
     tbl.set(
         "wfcGenerate",
         lua.create_function(|lua, opts: LuaTable| {
@@ -581,6 +683,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(res)
         })?,
     )?;
+    // -- lsystem --
+    /// Expand an L-system grammar and return the resulting string. Useful for generating branching structures like trees, rivers, or cave networks.
+    /// @param | opts | table | Options: axiom (starting string), iterations (expansion count), rules (table mapping single-char keys to replacement strings).
+    /// @return | string | The fully expanded L-system string.
     tbl.set(
         "lsystem",
         lua.create_function(|_, opts: LuaTable| {
@@ -607,6 +713,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(sys.generate())
         })?,
     )?;
+    // -- lsystemSegments --
+    /// Expand an L-system and interpret the result as turtle-graphics commands, returning line segments.
+    /// @param | opts | table | L-system options: axiom, iterations, rules.
+    /// @param | angle | number? | Turn angle in degrees (default 25).
+    /// @param | step | number? | Forward step length (default 1.0).
+    /// @return | table | Array of segment tables {x1, y1, x2, y2}.
     tbl.set(
         "lsystemSegments",
         lua.create_function(
@@ -643,6 +755,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- generateName --
+    /// Generate a single random name based on a Markov chain trained from sample names. Great for NPC names, place names, or item names.
+    /// @param | samples | table | Array of example name strings to learn from.
+    /// @param | minLen | number? | Minimum output length in characters (default 3).
+    /// @param | maxLen | number? | Maximum output length in characters (default 10).
+    /// @param | seed | number? | RNG seed (default 0).
+    /// @return | string | A generated name.
     tbl.set(
         "generateName",
         lua.create_function(
@@ -663,6 +782,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- generateNames --
+    /// Generate multiple random names in one call using Markov chains trained from sample data.
+    /// @param | samples | table | Array of example name strings to learn from.
+    /// @param | count | number | Number of names to generate.
+    /// @param | minLen | number? | Minimum output length (default 3).
+    /// @param | maxLen | number? | Maximum output length (default 10).
+    /// @param | seed | number? | RNG seed (default 0).
+    /// @return | table | Array of generated name strings.
     tbl.set(
         "generateNames",
         lua.create_function(
@@ -689,6 +816,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- worldGraph --
+    /// Generate a connected world graph with named regions and weighted edges. Useful for overworld maps, trade routes, or quest connectivity.
+    /// @param | width | number | World area width.
+    /// @param | height | number | World area height.
+    /// @param | regionCount | number | Number of regions to place.
+    /// @param | seed | number? | RNG seed (default 0).
+    /// @return | table | Table with .regions (array of {id, name, x, y, tags[]}) and .edges (array of {from, to, cost, bidirectional}).
     tbl.set(
         "worldGraph",
         lua.create_function(
@@ -724,6 +858,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    // -- noiseMap --
+    /// Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
+    /// @param | width | number | Map width in cells.
+    /// @param | height | number | Map height in cells.
+    /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
+    /// @return | table | Flat array of f64 noise values (length = width*height).
     tbl.set(
         "noiseMap",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -769,6 +909,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- noiseMapParallel --
+    /// Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
+    /// @param | width | number | Map width in cells.
+    /// @param | height | number | Map height in cells.
+    /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y.
+    /// @return | table | Flat array of f64 noise values (length = width*height).
     tbl.set(
         "noiseMapParallel",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -804,6 +950,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- noiseMapParallelSeeded --
+    /// Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
+    /// @param | width | number | Map width in cells.
+    /// @param | height | number | Map height in cells.
+    /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
+    /// @return | table | Flat array of f64 noise values (length = width*height).
     tbl.set(
         "noiseMapParallelSeeded",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -844,14 +996,29 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(out)
         })?,
     )?;
+    // -- simplex2d --
+    /// Sample 2D simplex noise at a point. Returns a value roughly in [-1, 1].
+    /// @param | x | number | X coordinate.
+    /// @param | y | number | Y coordinate.
+    /// @return | number | Simplex noise value.
     tbl.set(
         "simplex2d",
         lua.create_function(|_, (x, y): (f32, f32)| Ok(simplex_noise_2d(x, y)))?,
     )?;
+    // -- simplex3d --
+    /// Sample 3D simplex noise at a point. The third axis can be used for animation or layering.
+    /// @param | x | number | X coordinate.
+    /// @param | y | number | Y coordinate.
+    /// @param | z | number | Z coordinate (often time or layer index).
+    /// @return | number | Simplex noise value.
     tbl.set(
         "simplex3d",
         lua.create_function(|_, (x, y, z): (f32, f32, f32)| Ok(simplex_noise_3d(x, y, z)))?,
     )?;
+    // -- newBiomeClassifier --
+    /// Create a BiomeClassifier object with custom threshold rules for mapping height/moisture/temperature to biome types.
+    /// @param | opts | table? | Optional rules: ocean_threshold, coast_threshold, mountain_threshold, ice_cap_threshold, cold_temperature, warm_temperature, dry_moisture, wet_moisture.
+    /// @return | LBiomeClassifier | A classifier object with :classify() and :classifyMap() methods.
     tbl.set(
         "newBiomeClassifier",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -862,6 +1029,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             lua.create_userdata(LuaBiomeClassifier(BiomeClassifier::new(rules)))
         })?,
     )?;
+    // -- biomeColor --
+    /// Get the default RGBA display color for a biome type name. Useful for minimap or debug visualization.
+    /// @param | name | string | Biome name (e.g. "ocean", "desert", "taiga").
+    /// @return | number | Red component (0–255).
+    /// @return | number | Green component (0–255).
+    /// @return | number | Blue component (0–255).
+    /// @return | number | Alpha component (0–255).
     tbl.set(
         "biomeColor",
         lua.create_function(|_, name: String| {
