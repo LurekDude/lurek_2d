@@ -112,13 +112,53 @@ The module provides `AnimCurve` for easing-driven value interpolation along keyf
 Module example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
-  local hero = lurek.animation.new()
-  hero:addFrame(0, 0, 32, 32)
-  hero:addFrame(32, 0, 32, 32)
-  hero:addClip("idle", {0, 1}, 4, true)
-  hero:play("idle")
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("walk", {0}, 8, true)
+  anim:play("walk")
+  function lurek.process(dt) anim:update(dt) end
 end
+
+--@api-stub: Animation:getQuad
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 4, true)
+  anim:play("idle")
+  local q = anim:getQuad()
+  if q then lurek.log.debug("frame quad w=" .. q.w .. " h=" .. q.h, "anim") end
+end
+
+--@api-stub: Animation:pollEvents
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("attack", {0}, 8, false)
+  anim:play("attack")
+  function lurek.process(dt)
+    anim:update(dt)
+    for _, ev in ipairs(anim:pollEvents()) do
+      if ev.type == "clip_finished" then lurek.log.info("attack done", "anim") end
+    end
+  end
+end
+
+--@api-stub: Animation:isPlaying
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("swing", {0}, 6, false)
+  anim:play("swing")
+  if anim:isPlaying() then lurek.log.debug("swing in progress, ignoring input", "combat") end
+end
+
+--@api-stub: Animation:isLooping
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 2, true)
+  anim:play("idle")
 ```
 
 ## Key Types
@@ -195,7 +235,7 @@ Loads an animation from an Aseprite JSON export string.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.fromAseprite
+do
   local json = '{"frames":[],"meta":{"size":{"w":32,"h":32},"frameTags":[]}}'
   local hero = lurek.animation.fromAseprite(json)
   hero:play("walk")
@@ -213,7 +253,7 @@ Creates an empty animation with no frames or clips.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
+do
   local hero = lurek.animation.new()
   hero:addFrame(0, 0, 32, 32)
   hero:addFrame(32, 0, 32, 32)
@@ -233,7 +273,7 @@ Creates an empty blend layer set for layered animation playback.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newBlendLayerSet
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "run", 1.0)
   bls:addLayer("upper", "aim", 0.8, {"spine", "arm_r"})
@@ -251,7 +291,7 @@ Creates an empty animation curve. This function is exposed to Lua scripts.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newCurve
+do
   local zoom = lurek.animation.newCurve()
   zoom:addKeyframe(0.0, 1.0)
   zoom:addKeyframe(1.5, 2.0)
@@ -276,7 +316,7 @@ Creates an animation state machine by consuming an animation handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newStateMachine
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 1, true)
@@ -296,7 +336,7 @@ Creates an empty animation synchronization group.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newSyncGroup
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1)
   squad:add(2)
@@ -316,7 +356,7 @@ Lua-side animation object containing frame rectangles, named clips, playback sta
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
+do
   local hero = lurek.animation.new()
   hero:addFrame(0, 0, 32, 32)
   hero:addFrame(32, 0, 32, 32)
@@ -342,7 +382,7 @@ Adds a named clip using existing frame indices.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:addClip
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addFrame(32, 0, 32, 32)
@@ -373,7 +413,7 @@ Adds frames from a texture grid and creates a clip that references the new frame
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:addClipFromGrid
+do
   local anim = lurek.animation.new()
   anim:addFramesFromGrid(128, 128, 32, 32, 0, 16)
   anim:addClipFromGrid("run", 128, 128, 32, 32, 0, 4, 8, true)
@@ -400,7 +440,7 @@ Adds one frame rectangle to this animation.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:addFrame
+do
   local anim = lurek.animation.new()
   local idx = anim:addFrame(0, 0, 48, 64)
   anim:addFrame(48, 0, 48, 64)
@@ -428,7 +468,7 @@ Adds frames by slicing a texture grid.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:addFramesFromGrid
+do
   local anim = lurek.animation.new()
   local n = anim:addFramesFromGrid(64, 64, 32, 32, 0, 8)
   lurek.log.info("frames added: " .. n, "anim")
@@ -450,7 +490,7 @@ Adds frames from an array of rectangle tables.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:addFramesFromRects
+do
   local anim = lurek.animation.new()
   local added = anim:addFramesFromRects({
     { x = 0, y = 0, w = 32, h = 32 },
@@ -476,7 +516,7 @@ Starts a crossfade from the current clip to another clip.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:crossfade
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 4, true)
@@ -503,13 +543,53 @@ Rasterizes all animation frames into a preview grid image.
 Module-level example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
-  local hero = lurek.animation.new()
-  hero:addFrame(0, 0, 32, 32)
-  hero:addFrame(32, 0, 32, 32)
-  hero:addClip("idle", {0, 1}, 4, true)
-  hero:play("idle")
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("walk", {0}, 8, true)
+  anim:play("walk")
+  function lurek.process(dt) anim:update(dt) end
 end
+
+--@api-stub: Animation:getQuad
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 4, true)
+  anim:play("idle")
+  local q = anim:getQuad()
+  if q then lurek.log.debug("frame quad w=" .. q.w .. " h=" .. q.h, "anim") end
+end
+
+--@api-stub: Animation:pollEvents
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("attack", {0}, 8, false)
+  anim:play("attack")
+  function lurek.process(dt)
+    anim:update(dt)
+    for _, ev in ipairs(anim:pollEvents()) do
+      if ev.type == "clip_finished" then lurek.log.info("attack done", "anim") end
+    end
+  end
+end
+
+--@api-stub: Animation:isPlaying
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("swing", {0}, 6, false)
+  anim:play("swing")
+  if anim:isPlaying() then lurek.log.debug("swing in progress, ignoring input", "combat") end
+end
+
+--@api-stub: Animation:isLooping
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 2, true)
+  anim:play("idle")
 ```
 
 ### `LAnimation:drawToImage(w: integer, h: integer) -> ImageData`
@@ -528,7 +608,7 @@ Rasterizes the current animation frame into an image userdata.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:drawToImage
+do
   pcall(function()
     local anim = lurek.animation.new()
     anim:addFrame(0, 0, 32, 32)
@@ -551,7 +631,7 @@ Returns current crossfade rectangles and blend factor when a crossfade is active
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getBlendState
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 4, true)
@@ -572,7 +652,7 @@ Returns the current clip name when a clip is active.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getClip
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("run", {0}, 12, true)
@@ -593,7 +673,7 @@ Returns the number of named clips stored in this animation.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getClipCount
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 4, true)
@@ -616,13 +696,53 @@ Returns the playback mode name for a clip when it exists.
 Module-level example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
-  local hero = lurek.animation.new()
-  hero:addFrame(0, 0, 32, 32)
-  hero:addFrame(32, 0, 32, 32)
-  hero:addClip("idle", {0, 1}, 4, true)
-  hero:play("idle")
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("walk", {0}, 8, true)
+  anim:play("walk")
+  function lurek.process(dt) anim:update(dt) end
 end
+
+--@api-stub: Animation:getQuad
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 4, true)
+  anim:play("idle")
+  local q = anim:getQuad()
+  if q then lurek.log.debug("frame quad w=" .. q.w .. " h=" .. q.h, "anim") end
+end
+
+--@api-stub: Animation:pollEvents
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("attack", {0}, 8, false)
+  anim:play("attack")
+  function lurek.process(dt)
+    anim:update(dt)
+    for _, ev in ipairs(anim:pollEvents()) do
+      if ev.type == "clip_finished" then lurek.log.info("attack done", "anim") end
+    end
+  end
+end
+
+--@api-stub: Animation:isPlaying
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("swing", {0}, 6, false)
+  anim:play("swing")
+  if anim:isPlaying() then lurek.log.debug("swing in progress, ignoring input", "combat") end
+end
+
+--@api-stub: Animation:isLooping
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 2, true)
+  anim:play("idle")
 ```
 
 ### `LAnimation:getCurrentFrame() -> integer`
@@ -636,7 +756,7 @@ Returns the current frame index. This method is available to Lua scripts.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getCurrentFrame
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -656,7 +776,7 @@ Returns the number of frame rectangles stored in this animation.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getFrameCount
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addFrame(32, 0, 32, 32)
@@ -675,7 +795,7 @@ Returns the current frame rectangle as a table.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getQuad
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 4, true)
@@ -696,7 +816,7 @@ Returns the animation playback speed multiplier.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:getSpeed
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("run", {0}, 12, true)
@@ -716,7 +836,7 @@ Returns whether the current clip loops.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:isLooping
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 2, true)
@@ -736,7 +856,7 @@ Returns whether this animation is currently playing.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:isPlaying
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("swing", {0}, 6, false)
@@ -754,7 +874,7 @@ Pauses animation playback without changing the current clip.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:pause
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -778,7 +898,7 @@ Starts playback of a named clip. This method is available to Lua scripts.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:play
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -799,7 +919,7 @@ Drains animation events produced since the previous poll.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:pollEvents
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("attack", {0}, 8, false)
@@ -822,7 +942,7 @@ Resumes playback of a paused animation.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:resume
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -848,13 +968,53 @@ Changes the playback mode for an existing clip.
 Module-level example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.new
-  local hero = lurek.animation.new()
-  hero:addFrame(0, 0, 32, 32)
-  hero:addFrame(32, 0, 32, 32)
-  hero:addClip("idle", {0, 1}, 4, true)
-  hero:play("idle")
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("walk", {0}, 8, true)
+  anim:play("walk")
+  function lurek.process(dt) anim:update(dt) end
 end
+
+--@api-stub: Animation:getQuad
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 4, true)
+  anim:play("idle")
+  local q = anim:getQuad()
+  if q then lurek.log.debug("frame quad w=" .. q.w .. " h=" .. q.h, "anim") end
+end
+
+--@api-stub: Animation:pollEvents
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("attack", {0}, 8, false)
+  anim:play("attack")
+  function lurek.process(dt)
+    anim:update(dt)
+    for _, ev in ipairs(anim:pollEvents()) do
+      if ev.type == "clip_finished" then lurek.log.info("attack done", "anim") end
+    end
+  end
+end
+
+--@api-stub: Animation:isPlaying
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("swing", {0}, 6, false)
+  anim:play("swing")
+  if anim:isPlaying() then lurek.log.debug("swing in progress, ignoring input", "combat") end
+end
+
+--@api-stub: Animation:isLooping
+do
+  local anim = lurek.animation.new()
+  anim:addFrame(0, 0, 32, 32)
+  anim:addClip("idle", {0}, 2, true)
+  anim:play("idle")
 ```
 
 ### `LAnimation:setFrame(index: integer)`
@@ -870,7 +1030,7 @@ Sets the current frame index directly.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:setFrame
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -892,7 +1052,7 @@ Sets the animation playback speed multiplier.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:setSpeed
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("run", {0}, 12, true)
@@ -910,7 +1070,7 @@ Stops playback and resets animation playback state.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:stop
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -930,7 +1090,7 @@ Returns the Lua-visible type name for this animation handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimation:type
+do
   local animation_obj = lurek.animation.new()
   local t = animation_obj:type()
   lurek.log.info("LAnimation:type = " .. t, "animation")
@@ -952,7 +1112,7 @@ Returns whether this animation handle matches a supported type name.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimation:typeOf
+do
   local animation_obj = lurek.animation.new()
   lurek.log.info("is LAnimation: " .. tostring(animation_obj:typeOf("LAnimation")), "animation")
   lurek.log.info("is wrong: " .. tostring(animation_obj:typeOf("Unknown")), "animation")
@@ -972,7 +1132,7 @@ Advances animation playback and records any frame or clip events.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- Animation:update
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("walk", {0}, 8, true)
@@ -990,7 +1150,7 @@ Lua-side animation curve with keyframes and optional custom easing callback.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newCurve
+do
   local zoom = lurek.animation.newCurve()
   zoom:addKeyframe(0.0, 1.0)
   zoom:addKeyframe(1.5, 2.0)
@@ -1013,7 +1173,7 @@ Adds a keyframe to the curve. This method is available to Lua scripts.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:addKeyframe
+do
   local fade = lurek.animation.newCurve()
   fade:addKeyframe(0.0, 0.0)
   fade:addKeyframe(0.5, 1.0)
@@ -1030,7 +1190,7 @@ Removes all keyframes from this curve.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:clear
+do
   local curve = lurek.animation.newCurve()
   curve:addKeyframe(0.0, 0.5); curve:addKeyframe(1.0, 1.0)
   curve:clear()
@@ -1052,7 +1212,7 @@ Evaluates the curve at a time or normalized position.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:eval
+do
   local fade = lurek.animation.newCurve()
   fade:addKeyframe(0.0, 0.0); fade:addKeyframe(1.0, 1.0)
   local alpha = fade:eval(0.25)
@@ -1071,7 +1231,7 @@ Returns the number of keyframes stored in this curve.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:keyframeCount
+do
   local curve = lurek.animation.newCurve()
   curve:addKeyframe(0.0, 0.0)
   if curve:keyframeCount() < 2 then lurek.log.warn("curve needs at least two keyframes", "anim") end
@@ -1091,7 +1251,7 @@ Sets or clears a Lua callback used to evaluate custom easing.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:setCustomEasing
+do
   if lurek.animation.newCurve then
     local c = lurek.animation.newCurve()
     c:setCustomEasing(function(t)
@@ -1116,7 +1276,7 @@ Sets the built-in easing mode used between keyframes.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimCurve:setEasing
+do
   local curve = lurek.animation.newCurve()
   curve:addKeyframe(0.0, 0.0); curve:addKeyframe(1.0, 1.0)
   curve:setEasing("ease_in_out")
@@ -1134,7 +1294,7 @@ Returns the Lua-visible type name for this animation curve handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimCurve:type
+do
   local anim_curve_obj = lurek.animation.newCurve()
   local t = anim_curve_obj:type()
   lurek.log.info("LAnimCurve:type = " .. t, "animation")
@@ -1156,7 +1316,7 @@ Returns whether this animation curve handle matches a supported type name.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimCurve:typeOf
+do
   local anim_curve_obj = lurek.animation.newCurve()
   lurek.log.info("is LAnimCurve: " .. tostring(anim_curve_obj:typeOf("LAnimCurve")), "animation")
   lurek.log.info("is wrong: " .. tostring(anim_curve_obj:typeOf("Unknown")), "animation")
@@ -1172,7 +1332,7 @@ Lua-side animation state machine that switches clips from named states and param
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newStateMachine
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 1, true)
@@ -1196,7 +1356,7 @@ Adds a state that plays a named animation clip.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:addState
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 1, true)
@@ -1223,7 +1383,7 @@ Adds a named-condition transition between two animation states.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:addTransition
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addClip("idle", {0}, 1, true)
@@ -1251,7 +1411,7 @@ Forces the state machine into a named state.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:forceState
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true); anim:addClip("dead", {0}, 1, false)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
@@ -1271,7 +1431,7 @@ Returns the current frame rectangle from the state machine's owned animation.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:getQuad
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
@@ -1291,7 +1451,7 @@ Returns the current animation state name.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:getState
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
@@ -1314,7 +1474,7 @@ Sets a boolean, integer, or numeric state machine parameter.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:setParam
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true); anim:addClip("run", {0}, 8, true)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
@@ -1335,7 +1495,7 @@ Returns the Lua-visible type name for this animation state machine handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimStateMachine:type
+do
   local anim_state_machine_obj = lurek.animation.newStateMachine(lurek.animation.new(), "idle")
   local t = anim_state_machine_obj:type()
   lurek.log.info("LAnimStateMachine:type = " .. t, "animation")
@@ -1357,7 +1517,7 @@ Returns whether this animation state machine handle matches a supported type nam
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimStateMachine:typeOf
+do
   local anim_state_machine_obj = lurek.animation.newStateMachine(lurek.animation.new(), "idle")
   lurek.log.info("is LAnimStateMachine: " .. tostring(anim_state_machine_obj:typeOf("LAnimStateMachine")), "animation")
   lurek.log.info("is wrong: " .. tostring(anim_state_machine_obj:typeOf("Unknown")), "animation")
@@ -1377,7 +1537,7 @@ Advances the animation state machine and its owned animation playback.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimStateMachine:update
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32); anim:addClip("idle", {0}, 4, true)
   local fsm = lurek.animation.newStateMachine(anim, "idle")
@@ -1395,7 +1555,7 @@ Lua-side animation synchronization group for coordinating multiple animation han
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newSyncGroup
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1)
   squad:add(2)
@@ -1416,7 +1576,7 @@ Adds an animation-like handle to the sync group.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimSyncGroup:add
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1)
   squad:add(2)
@@ -1433,7 +1593,7 @@ Removes all members from the sync group.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimSyncGroup:clear
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1); squad:add(2); squad:add(3)
   squad:clear()
@@ -1451,7 +1611,7 @@ Returns the number of handles tracked by the sync group.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimSyncGroup:memberCount
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1); squad:add(2)
   if squad:memberCount() > 0 then lurek.log.info("squad alive: " .. squad:memberCount(), "anim") end
@@ -1471,7 +1631,7 @@ Removes an animation-like handle from the sync group.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- AnimSyncGroup:remove
+do
   local squad = lurek.animation.newSyncGroup()
   squad:add(1); squad:add(2)
   squad:remove(1)
@@ -1489,7 +1649,7 @@ Returns the Lua-visible type name for this animation sync group handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimSyncGroup:type
+do
   local anim_sync_group_obj = lurek.animation.newSyncGroup()
   local t = anim_sync_group_obj:type()
   lurek.log.info("LAnimSyncGroup:type = " .. t, "animation")
@@ -1511,7 +1671,7 @@ Returns whether this animation sync group handle matches a supported type name.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LAnimSyncGroup:typeOf
+do
   local anim_sync_group_obj = lurek.animation.newSyncGroup()
   lurek.log.info("is LAnimSyncGroup: " .. tostring(anim_sync_group_obj:typeOf("LAnimSyncGroup")), "animation")
   lurek.log.info("is wrong: " .. tostring(anim_sync_group_obj:typeOf("Unknown")), "animation")
@@ -1527,7 +1687,7 @@ Lua-side blend layer set used to combine animation clips with weights and bone m
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- lurek.animation.newBlendLayerSet
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "run", 1.0)
   bls:addLayer("upper", "aim", 0.8, {"spine", "arm_r"})
@@ -1552,7 +1712,7 @@ Adds a weighted animation blend layer with an optional bone mask.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:addLayer
+do
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 64, 64)
   anim:addClip("run", {0}, 8, true)
@@ -1578,7 +1738,7 @@ Returns the weight for a blend layer when it exists.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:getWeight
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("aim", "aim", 0.5, {"spine"})
   local w = bls:getWeight("aim")
@@ -1597,7 +1757,7 @@ Returns the number of blend layers.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:len
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "idle", 1.0)
   if bls:len() == 0 then lurek.log.warn("blend set has no layers", "anim") end
@@ -1615,7 +1775,7 @@ Returns all blend layers with names, clip names, weights, and bone masks.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:listLayers
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "idle", 1.0)
   bls:addLayer("aim", "aim", 0.6, {"arm_r"})
@@ -1640,7 +1800,7 @@ Removes a blend layer by name. This method is available to Lua scripts.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:removeLayer
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "idle", 1.0)
   bls:addLayer("upper", "aim", 0.5, {"spine"})
@@ -1664,7 +1824,7 @@ Replaces a layer bone mask from a table of bone names.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:setMask
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("aim", "aim_pistol", 1.0, {"arm_r"})
   bls:setMask("aim", {"spine", "arm_l", "arm_r"})
@@ -1687,7 +1847,7 @@ Sets the blend weight for an existing layer.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- BlendLayerSet:setWeight
+do
   local bls = lurek.animation.newBlendLayerSet()
   bls:addLayer("base", "idle", 1.0)
   bls:addLayer("aim", "aim", 0.0, {"spine", "arm_r"})
@@ -1707,7 +1867,7 @@ Returns the Lua-visible type name for this blend layer set handle.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LBlendLayerSet:type
+do
   local blend_layer_set_obj = lurek.animation.newBlendLayerSet()
   local t = blend_layer_set_obj:type()
   lurek.log.info("LBlendLayerSet:type = " .. t, "animation")
@@ -1729,7 +1889,7 @@ Returns whether this blend layer set handle matches a supported type name.
 Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
-do -- LBlendLayerSet:typeOf
+do
   local blend_layer_set_obj = lurek.animation.newBlendLayerSet()
   lurek.log.info("is LBlendLayerSet: " .. tostring(blend_layer_set_obj:typeOf("LBlendLayerSet")), "animation")
   lurek.log.info("is wrong: " .. tostring(blend_layer_set_obj:typeOf("Unknown")), "animation")

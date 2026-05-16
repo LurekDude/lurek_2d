@@ -2,8 +2,9 @@
 -- lurek.html API examples.
 -- Run: cargo run -- content/examples/html.lua
 
---@api-stub: lurek.html.newDocument -- Creates an HTML document from optional source and layout/style options
-do -- lurek.html.newDocument
+--@api-stub: lurek.html.newDocument
+-- Creates an HTML document from optional source and layout/style options
+do
   local hud = lurek.html.newDocument([[
 <body>
   <div id="score" class="hud-item">Score: 0</div>
@@ -17,8 +18,9 @@ do -- lurek.html.newDocument
   lurek.log.info("newDocument created, dirty=" .. tostring(hud:isDirty()), "html")
 end
 
---@api-stub: lurek.html.loadDocument -- Loads an HTML document from GameFS and optionally loads CSS from options or companion file
-do -- lurek.html.loadDocument
+--@api-stub: lurek.html.loadDocument
+-- Loads an HTML document from GameFS and optionally loads CSS from options or companion file
+do
   local ok, doc = pcall(lurek.html.loadDocument, "ui/main_menu.html")
   if ok and doc then
     lurek.log.info("loadDocument succeeded", "html")
@@ -27,15 +29,17 @@ do -- lurek.html.loadDocument
   end
 end
 
---@api-stub: lurek.html.supports -- Returns whether the HTML engine supports a named feature
-do -- lurek.html.supports
+--@api-stub: lurek.html.supports
+-- Returns whether the HTML engine supports a named feature
+do
   local has_flex = lurek.html.supports("css-flex")
   local has_grid = lurek.html.supports("css-grid")
   lurek.log.info("flex=" .. tostring(has_flex) .. " grid=" .. tostring(has_grid), "html")
 end
 
---@api-stub: lurek.html.preventDefault -- Prevent default for Lua scripts in this module
-do -- lurek.html.preventDefault
+--@api-stub: lurek.html.preventDefault
+-- Prevent default for Lua scripts in this module
+do
   local doc = lurek.html.newDocument("<body><a id='link'>Click</a></body>")
   doc:on("click", function()
     lurek.html.preventDefault()
@@ -44,8 +48,9 @@ do -- lurek.html.preventDefault
   lurek.log.info("preventDefault called in handler", "html")
 end
 
---@api-stub: lurek.html.stopPropagation -- Stop propagation for Lua scripts in this module
-do -- lurek.html.stopPropagation
+--@api-stub: lurek.html.stopPropagation
+-- Stop propagation for Lua scripts in this module
+do
   local doc = lurek.html.newDocument("<body><div id='inner'>Nested</div></body>")
   doc:on("click", function()
     lurek.html.stopPropagation()
@@ -54,8 +59,9 @@ do -- lurek.html.stopPropagation
   lurek.log.info("stopPropagation called", "html")
 end
 
---@api-stub: lurek.html.isDefaultPrevented -- Returns true if default prevented for Lua scripts in this module
-do -- lurek.html.isDefaultPrevented
+--@api-stub: lurek.html.isDefaultPrevented
+-- Returns true if default prevented for Lua scripts in this module
+do
   local doc = lurek.html.newDocument("<body><button>OK</button></body>")
   doc:on("click", function()
     lurek.html.preventDefault()
@@ -65,96 +71,105 @@ do -- lurek.html.isDefaultPrevented
   pcall(function() doc:mousepressed(20, 20, 1) end)
 end
 
--- ============================================================================
--- HtmlDocument methods
--- ============================================================================
-
---@api-stub: LHtmlDocument:setHtml -- Replaces the document markup and invalidates existing element handles
-do -- LHtmlDocument:setHtml
+--@api-stub: LHtmlDocument:setHtml
+-- Replaces the document markup and invalidates existing element handles
+do
   local doc = lurek.html.newDocument("<body><p>old</p></body>")
   doc:setHtml([[<body><div id="score">Score: 100</div></body>]])
   lurek.log.info("setHtml replaced markup", "html")
 end
 
---@api-stub: LHtmlDocument:getHtml -- Returns the current document markup string
-do -- LHtmlDocument:getHtml
+--@api-stub: LHtmlDocument:getHtml
+-- Returns the current document markup string
+do
   local doc = lurek.html.newDocument("<body><p>hello</p></body>")
   local markup = doc:getHtml()
   lurek.log.info("getHtml len=" .. #markup, "html")
 end
 
---@api-stub: LHtmlDocument:setCss -- Replaces the document stylesheet text
-do -- LHtmlDocument:setCss
+--@api-stub: LHtmlDocument:setCss
+-- Replaces the document stylesheet text
+do
   local doc = lurek.html.newDocument("<body><p>styled</p></body>")
   doc:setCss("body { margin: 0; } p { font-size: 20px; }")
   lurek.log.info("setCss applied", "html")
 end
 
---@api-stub: LHtmlDocument:addCss -- Appends CSS source text to the document stylesheet
-do -- LHtmlDocument:addCss
+--@api-stub: LHtmlDocument:addCss
+-- Appends CSS source text to the document stylesheet
+do
   local doc = lurek.html.newDocument("<body><div id='score'>0</div></body>")
   doc:addCss("#score { color: yellow; }")
   lurek.log.info("addCss appended rule", "html")
 end
 
---@api-stub: LHtmlDocument:clearCss -- Clears all CSS source text from the document
-do -- LHtmlDocument:clearCss
+--@api-stub: LHtmlDocument:clearCss
+-- Clears all CSS source text from the document
+do
   local doc = lurek.html.newDocument("<body><p>text</p></body>", { css = "p { color: red; }" })
   doc:clearCss()
   lurek.log.info("clearCss removed all styles", "html")
 end
 
---@api-stub: LHtmlDocument:setViewport -- Sets the document layout viewport size
-do -- LHtmlDocument:setViewport
+--@api-stub: LHtmlDocument:setViewport
+-- Sets the document layout viewport size
+do
   local doc = lurek.html.newDocument("<body>viewport test</body>")
   doc:setViewport(1920, 1080)
   lurek.log.info("setViewport 1920x1080", "html")
 end
 
---@api-stub: LHtmlDocument:getViewport -- Returns the document layout viewport size
-do -- LHtmlDocument:getViewport
+--@api-stub: LHtmlDocument:getViewport
+-- Returns the document layout viewport size
+do
   local doc = lurek.html.newDocument("<body>vp</body>", { width = 800, height = 600 })
   local w, h = doc:getViewport()
   lurek.log.info("getViewport: " .. tostring(w) .. "x" .. tostring(h), "html")
 end
 
---@api-stub: LHtmlDocument:update -- Advances document timers and animated state
-do -- LHtmlDocument:update
+--@api-stub: LHtmlDocument:update
+-- Advances document timers and animated state
+do
   local doc = lurek.html.newDocument("<body><p>tick</p></body>")
   doc:update(1 / 60)
   lurek.log.info("update(dt) called", "html")
 end
 
---@api-stub: LHtmlDocument:draw -- Queues render commands for this document at an optional offset
-do -- LHtmlDocument:draw
+--@api-stub: LHtmlDocument:draw
+-- Queues render commands for this document at an optional offset
+do
   local doc = lurek.html.newDocument("<body><p>draw</p></body>")
   pcall(function() doc:draw(0, 0) end)
   lurek.log.info("draw attempted (needs graphics ctx)", "html")
 end
 
---@api-stub: LHtmlDocument:render -- Queues render commands for this document at an optional offset
-do -- LHtmlDocument:render
+--@api-stub: LHtmlDocument:render
+-- Queues render commands for this document at an optional offset
+do
   local doc = lurek.html.newDocument("<body><p>render</p></body>")
   pcall(function() doc:render(0, 0) end)
   lurek.log.info("render attempted", "html")
 end
 
---@api-stub: LHtmlDocument:relayout -- Rebuilds document layout immediately
-do -- LHtmlDocument:relayout
+--@api-stub: LHtmlDocument:relayout
+-- Rebuilds document layout immediately
+do
   local doc = lurek.html.newDocument("<body><p>layout</p></body>")
   doc:relayout()
   lurek.log.info("relayout forced", "html")
 end
 
---@api-stub: LHtmlDocument:isDirty -- Returns whether the document layout is dirty
-do -- LHtmlDocument:isDirty
+--@api-stub: LHtmlDocument:isDirty
+-- Returns whether the document layout is dirty
+do
   local doc = lurek.html.newDocument("<body><p>dirty?</p></body>")
   local dirty = doc:isDirty()
   lurek.log.info("isDirty=" .. tostring(dirty), "html")
 end
 
---@api-stub: LHtmlDocument:getRoot -- Returns the root DOM element handle
-do -- LHtmlDocument:getRoot
+--@api-stub: LHtmlDocument:getRoot
+-- Returns the root DOM element handle
+do
   local doc = lurek.html.newDocument("<body><div>root test</div></body>")
   local root = doc:getRoot()
   if root then
@@ -162,8 +177,9 @@ do -- LHtmlDocument:getRoot
   end
 end
 
---@api-stub: LHtmlDocument:getElementById -- Looks up the first element with a matching id attribute
-do -- LHtmlDocument:getElementById
+--@api-stub: LHtmlDocument:getElementById
+-- Looks up the first element with a matching id attribute
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>Hi</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")
@@ -172,8 +188,9 @@ do -- LHtmlDocument:getElementById
   end
 end
 
---@api-stub: LHtmlDocument:query -- Looks up the first element matching a selector
-do -- LHtmlDocument:query
+--@api-stub: LHtmlDocument:query
+-- Looks up the first element matching a selector
+do
   local doc = lurek.html.newDocument("<body><p class='info'>msg</p></body>")
   doc:update(0)
   local el = doc:query(".info")
@@ -182,16 +199,18 @@ do -- LHtmlDocument:query
   end
 end
 
---@api-stub: LHtmlDocument:queryAll -- Returns all elements matching a selector
-do -- LHtmlDocument:queryAll
+--@api-stub: LHtmlDocument:queryAll
+-- Returns all elements matching a selector
+do
   local doc = lurek.html.newDocument("<body><li>a</li><li>b</li><li>c</li></body>")
   doc:update(0)
   local items = doc:queryAll("li")
   lurek.log.info("queryAll(li) count=" .. #items, "html")
 end
 
---@api-stub: LHtmlDocument:on -- Registers a document-level event listener
-do -- LHtmlDocument:on
+--@api-stub: LHtmlDocument:on
+-- Registers a document-level event listener
+do
   local doc = lurek.html.newDocument("<body><p>click me</p></body>")
   local handle = doc:on("click", function(ev)
     lurek.log.info("doc click event fired", "html")
@@ -199,77 +218,83 @@ do -- LHtmlDocument:on
   lurek.log.info("on() returned handle=" .. tostring(handle ~= nil), "html")
 end
 
---@api-stub: LHtmlDocument:off -- Removes a document-level event listener by handle
-do -- LHtmlDocument:off
+--@api-stub: LHtmlDocument:off
+-- Removes a document-level event listener by handle
+do
   local doc = lurek.html.newDocument("<body><p>off test</p></body>")
   local handle = doc:on("click", function() end)
   doc:off(handle)
   lurek.log.info("off() removed listener", "html")
 end
 
---@api-stub: LHtmlDocument:mousepressed -- Forwards a mouse press to the document and dispatches a click event when an element is hit
-do -- LHtmlDocument:mousepressed
+--@api-stub: LHtmlDocument:mousepressed
+-- Forwards a mouse press to the document and dispatches a click event when an element is hit
+do
   local doc = lurek.html.newDocument("<body><button>btn</button></body>")
   local consumed = doc:mousepressed(100, 200, 1)
   lurek.log.info("mousepressed consumed=" .. tostring(consumed), "html")
 end
 
---@api-stub: LHtmlDocument:mousereleased -- Forwards a mouse release to the document
-do -- LHtmlDocument:mousereleased
+--@api-stub: LHtmlDocument:mousereleased
+-- Forwards a mouse release to the document
+do
   local doc = lurek.html.newDocument("<body><button>btn</button></body>")
   doc:mousepressed(100, 200, 1)
   doc:mousereleased(100, 200, 1)
   lurek.log.info("mousereleased sent", "html")
 end
 
---@api-stub: LHtmlDocument:mousemoved -- Forwards mouse movement to the document
-do -- LHtmlDocument:mousemoved
+--@api-stub: LHtmlDocument:mousemoved
+-- Forwards mouse movement to the document
+do
   local doc = lurek.html.newDocument("<body><div>hover</div></body>")
   doc:mousemoved(110, 205)
   lurek.log.info("mousemoved sent", "html")
 end
 
---@api-stub: LHtmlDocument:wheelmoved -- Forwards mouse wheel movement to the document
-do -- LHtmlDocument:wheelmoved
+--@api-stub: LHtmlDocument:wheelmoved
+-- Forwards mouse wheel movement to the document
+do
   local doc = lurek.html.newDocument("<body><div>scroll</div></body>")
   doc:wheelmoved(0, -3)
   lurek.log.info("wheelmoved sent", "html")
 end
 
---@api-stub: LHtmlDocument:keypressed -- Forwards a key press to the focused document element and dispatches `keydown`
-do -- LHtmlDocument:keypressed
+--@api-stub: LHtmlDocument:keypressed
+-- Forwards a key press to the focused document element and dispatches `keydown`
+do
   local doc = lurek.html.newDocument("<body><input/></body>")
   doc:keypressed("return")
   lurek.log.info("keypressed(return) sent", "html")
 end
 
---@api-stub: LHtmlDocument:textinput -- Forwards text input to the focused document element and dispatches `input`
-do -- LHtmlDocument:textinput
+--@api-stub: LHtmlDocument:textinput
+-- Forwards text input to the focused document element and dispatches `input`
+do
   local doc = lurek.html.newDocument("<body><input/></body>")
   doc:textinput("a")
   lurek.log.info("textinput('a') sent", "html")
 end
 
---@api-stub: LHtmlDocument:type -- Returns the Lua-visible type name for this HTML document handle
-do -- LHtmlDocument:type
+--@api-stub: LHtmlDocument:type
+-- Returns the Lua-visible type name for this HTML document handle
+do
   local doc = lurek.html.newDocument("<body>type test</body>")
   local t = doc:type()
   lurek.log.info("LHtmlDocument:type = " .. t, "html")
 end
 
---@api-stub: LHtmlDocument:typeOf -- Returns whether this document handle matches a supported type name
-do -- LHtmlDocument:typeOf
+--@api-stub: LHtmlDocument:typeOf
+-- Returns whether this document handle matches a supported type name
+do
   local doc = lurek.html.newDocument("<body>typeOf test</body>")
   lurek.log.info("is LHtmlDocument: " .. tostring(doc:typeOf("LHtmlDocument")), "html")
   lurek.log.info("is wrong: " .. tostring(doc:typeOf("Unknown")), "html")
 end
 
--- ============================================================================
--- HtmlElement methods
--- ============================================================================
-
---@api-stub: LHtmlElement:getDocument -- Returns the document handle that owns this element
-do -- LHtmlElement:getDocument
+--@api-stub: LHtmlElement:getDocument
+-- Returns the document handle that owns this element
+do
   local doc = lurek.html.newDocument("<body><div id='box'>hi</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -279,8 +304,9 @@ do -- LHtmlElement:getDocument
   end
 end
 
---@api-stub: LHtmlElement:getTagName -- Returns this element's tag name
-do -- LHtmlElement:getTagName
+--@api-stub: LHtmlElement:getTagName
+-- Returns this element's tag name
+do
   local doc = lurek.html.newDocument("<body><div id='hdr'>title</div></body>")
   doc:update(0)
   local el = doc:getElementById("hdr")
@@ -289,8 +315,9 @@ do -- LHtmlElement:getTagName
   end
 end
 
---@api-stub: LHtmlElement:getId -- Returns this element's id attribute
-do -- LHtmlElement:getId
+--@api-stub: LHtmlElement:getId
+-- Returns this element's id attribute
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>x</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")
@@ -299,8 +326,9 @@ do -- LHtmlElement:getId
   end
 end
 
---@api-stub: LHtmlElement:setId -- Sets or clears this element's id attribute
-do -- LHtmlElement:setId
+--@api-stub: LHtmlElement:setId
+-- Sets or clears this element's id attribute
+do
   local doc = lurek.html.newDocument("<body><div id='old'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("old")
@@ -310,8 +338,9 @@ do -- LHtmlElement:setId
   end
 end
 
---@api-stub: LHtmlElement:getText -- Returns this element's text content
-do -- LHtmlElement:getText
+--@api-stub: LHtmlElement:getText
+-- Returns this element's text content
+do
   local doc = lurek.html.newDocument("<body><p id='msg'>Hello World</p></body>")
   doc:update(0)
   local el = doc:getElementById("msg")
@@ -320,8 +349,9 @@ do -- LHtmlElement:getText
   end
 end
 
---@api-stub: LHtmlElement:setText -- Replaces this element's text content
-do -- LHtmlElement:setText
+--@api-stub: LHtmlElement:setText
+-- Replaces this element's text content
+do
   local doc = lurek.html.newDocument("<body><p id='msg'>old</p></body>")
   doc:update(0)
   local el = doc:getElementById("msg")
@@ -331,8 +361,9 @@ do -- LHtmlElement:setText
   end
 end
 
---@api-stub: LHtmlElement:getHtml -- Returns this element's inner HTML
-do -- LHtmlElement:getHtml
+--@api-stub: LHtmlElement:getHtml
+-- Returns this element's inner HTML
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'><b>bold</b></div></body>")
   doc:update(0)
   local el = doc:getElementById("wrap")
@@ -341,8 +372,9 @@ do -- LHtmlElement:getHtml
   end
 end
 
---@api-stub: LHtmlElement:setHtml -- Replaces this element's inner HTML and may invalidate descendant element handles
-do -- LHtmlElement:setHtml
+--@api-stub: LHtmlElement:setHtml
+-- Replaces this element's inner HTML and may invalidate descendant element handles
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'>old</div></body>")
   doc:update(0)
   local el = doc:getElementById("wrap")
@@ -352,8 +384,9 @@ do -- LHtmlElement:setHtml
   end
 end
 
---@api-stub: LHtmlElement:appendHtml -- Appends HTML source to this element's inner HTML
-do -- LHtmlElement:appendHtml
+--@api-stub: LHtmlElement:appendHtml
+-- Appends HTML source to this element's inner HTML
+do
   local doc = lurek.html.newDocument("<body><div id='list'><p>A</p></div></body>")
   doc:update(0)
   local el = doc:getElementById("list")
@@ -363,8 +396,9 @@ do -- LHtmlElement:appendHtml
   end
 end
 
---@api-stub: LHtmlElement:remove -- Removes this element from the document
-do -- LHtmlElement:remove
+--@api-stub: LHtmlElement:remove
+-- Removes this element from the document
+do
   local doc = lurek.html.newDocument("<body><div id='temp'>remove me</div><p>keep</p></body>")
   doc:update(0)
   local el = doc:getElementById("temp")
@@ -374,8 +408,9 @@ do -- LHtmlElement:remove
   end
 end
 
---@api-stub: LHtmlElement:getAttribute -- Returns an attribute value from this element
-do -- LHtmlElement:getAttribute
+--@api-stub: LHtmlElement:getAttribute
+-- Returns an attribute value from this element
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -385,8 +420,9 @@ do -- LHtmlElement:getAttribute
   end
 end
 
---@api-stub: LHtmlElement:setAttribute -- Sets or clears an attribute on this element
-do -- LHtmlElement:setAttribute
+--@api-stub: LHtmlElement:setAttribute
+-- Sets or clears an attribute on this element
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -396,8 +432,9 @@ do -- LHtmlElement:setAttribute
   end
 end
 
---@api-stub: LHtmlElement:removeAttribute -- Removes an attribute from this element
-do -- LHtmlElement:removeAttribute
+--@api-stub: LHtmlElement:removeAttribute
+-- Removes an attribute from this element
+do
   local doc = lurek.html.newDocument("<body><div id='box' data-temp='1'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -407,8 +444,9 @@ do -- LHtmlElement:removeAttribute
   end
 end
 
---@api-stub: LHtmlElement:hasClass -- Returns whether this element has a CSS class
-do -- LHtmlElement:hasClass
+--@api-stub: LHtmlElement:hasClass
+-- Returns whether this element has a CSS class
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary large'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -417,8 +455,9 @@ do -- LHtmlElement:hasClass
   end
 end
 
---@api-stub: LHtmlElement:addClass -- Adds a CSS class to this element
-do -- LHtmlElement:addClass
+--@api-stub: LHtmlElement:addClass
+-- Adds a CSS class to this element
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -428,8 +467,9 @@ do -- LHtmlElement:addClass
   end
 end
 
---@api-stub: LHtmlElement:removeClass -- Removes a CSS class from this element
-do -- LHtmlElement:removeClass
+--@api-stub: LHtmlElement:removeClass
+-- Removes a CSS class from this element
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary large'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -439,8 +479,9 @@ do -- LHtmlElement:removeClass
   end
 end
 
---@api-stub: LHtmlElement:toggleClass -- Toggles a CSS class on this element, optionally forcing the final state
-do -- LHtmlElement:toggleClass
+--@api-stub: LHtmlElement:toggleClass
+-- Toggles a CSS class on this element, optionally forcing the final state
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -450,8 +491,9 @@ do -- LHtmlElement:toggleClass
   end
 end
 
---@api-stub: LHtmlElement:getStyle -- Returns an inline or computed style value for this element
-do -- LHtmlElement:getStyle
+--@api-stub: LHtmlElement:getStyle
+-- Returns an inline or computed style value for this element
+do
   local doc = lurek.html.newDocument("<body><div id='box' style='color:red'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -461,8 +503,9 @@ do -- LHtmlElement:getStyle
   end
 end
 
---@api-stub: LHtmlElement:setStyle -- Sets or clears a style property on this element
-do -- LHtmlElement:setStyle
+--@api-stub: LHtmlElement:setStyle
+-- Sets or clears a style property on this element
+do
   local doc = lurek.html.newDocument("<body><div id='box'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -472,8 +515,9 @@ do -- LHtmlElement:setStyle
   end
 end
 
---@api-stub: LHtmlElement:getRect -- Returns this element's layout rectangle after relayout if needed
-do -- LHtmlElement:getRect
+--@api-stub: LHtmlElement:getRect
+-- Returns this element's layout rectangle after relayout if needed
+do
   local doc = lurek.html.newDocument("<body><div id='box'>rect</div></body>", { width = 400, height = 300 })
   doc:update(0)
   doc:relayout()
@@ -484,8 +528,9 @@ do -- LHtmlElement:getRect
   end
 end
 
---@api-stub: LHtmlElement:focus -- Gives keyboard focus to this element
-do -- LHtmlElement:focus
+--@api-stub: LHtmlElement:focus
+-- Gives keyboard focus to this element
+do
   local doc = lurek.html.newDocument("<body><input id='inp'/></body>")
   doc:update(0)
   local el = doc:getElementById("inp")
@@ -495,8 +540,9 @@ do -- LHtmlElement:focus
   end
 end
 
---@api-stub: LHtmlElement:blur -- Removes keyboard focus from this element when it is focused
-do -- LHtmlElement:blur
+--@api-stub: LHtmlElement:blur
+-- Removes keyboard focus from this element when it is focused
+do
   local doc = lurek.html.newDocument("<body><input id='inp'/></body>")
   doc:update(0)
   local el = doc:getElementById("inp")
@@ -507,8 +553,9 @@ do -- LHtmlElement:blur
   end
 end
 
---@api-stub: LHtmlElement:query -- Looks up the first descendant element matching a selector
-do -- LHtmlElement:query
+--@api-stub: LHtmlElement:query
+-- Looks up the first descendant element matching a selector
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'><span class='tag'>A</span></div></body>")
   doc:update(0)
   local wrap = doc:getElementById("wrap")
@@ -518,8 +565,9 @@ do -- LHtmlElement:query
   end
 end
 
---@api-stub: LHtmlElement:queryAll -- Returns all descendant elements matching a selector
-do -- LHtmlElement:queryAll
+--@api-stub: LHtmlElement:queryAll
+-- Returns all descendant elements matching a selector
+do
   local doc = lurek.html.newDocument("<body><ul id='list'><li>1</li><li>2</li><li>3</li></ul></body>")
   doc:update(0)
   local list = doc:getElementById("list")
@@ -529,8 +577,9 @@ do -- LHtmlElement:queryAll
   end
 end
 
---@api-stub: LHtmlElement:on -- Registers an element-level event listener
-do -- LHtmlElement:on
+--@api-stub: LHtmlElement:on
+-- Registers an element-level event listener
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>click</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -540,8 +589,9 @@ do -- LHtmlElement:on
   end
 end
 
---@api-stub: LHtmlElement:off -- Removes an element-level event listener by handle
-do -- LHtmlElement:off
+--@api-stub: LHtmlElement:off
+-- Removes an element-level event listener by handle
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>click</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -552,8 +602,9 @@ do -- LHtmlElement:off
   end
 end
 
---@api-stub: LHtmlElement:type -- Returns the Lua-visible type name for this HTML element handle
-do -- LHtmlElement:type
+--@api-stub: LHtmlElement:type
+-- Returns the Lua-visible type name for this HTML element handle
+do
   local doc = lurek.html.newDocument("<body><div id='box'>Hello</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -562,8 +613,9 @@ do -- LHtmlElement:type
   end
 end
 
---@api-stub: LHtmlElement:typeOf -- Returns whether this element handle matches a supported type name
-do -- LHtmlElement:typeOf
+--@api-stub: LHtmlElement:typeOf
+-- Returns whether this element handle matches a supported type name
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>text</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")

@@ -93,11 +93,53 @@ Multi-monitor enumeration provides `DisplayInfo` snapshots with resolution, DPI 
 Module example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setTitle
+--@api-stub: lurek.window.setTitle
+-- Sets the window title bar text
+do
   function lurek.init()
     lurek.window.setTitle("My Game - Forest Level")
   end
 end
+
+--@api-stub: lurek.window.getTitle
+-- Returns the current window title bar text
+do
+  local base = lurek.window.getTitle()
+  local paused = true
+  if paused then
+    lurek.window.setTitle(base .. " [PAUSED]")
+  end
+end
+
+--@api-stub: lurek.window.getWidth
+-- Returns the current window width in logical (DPI-independent) pixels
+do
+  local w = lurek.window.getWidth()
+  local centre_x = w * 0.5
+  lurek.log.info("hud centre x=" .. centre_x .. " (window width " .. w .. "px)", "ui")
+end
+
+--@api-stub: lurek.window.getHeight
+-- Returns the current window height in logical (DPI-independent) pixels
+do
+  local h = lurek.window.getHeight()
+  local hud_y = h - 48
+  lurek.log.info("hud anchored at y=" .. hud_y, "ui")
+end
+
+--@api-stub: lurek.window.getDimensions
+-- Returns the current window width and height in logical pixels
+do
+  local w, h = lurek.window.getDimensions()
+  local aspect = w / h
+  lurek.log.info("window " .. w .. "x" .. h .. " aspect=" .. aspect, "boot")
+end
+
+--@api-stub: lurek.window.setFullscreen
+-- Enables or disables fullscreen mode
+do
+  function lurek.init()
+    lurek.window.setFullscreen(true, "desktop")
 ```
 
 ## Key Types
@@ -141,7 +183,7 @@ Closes the window and signals the engine to shut down.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.close
+do
   function lurek.process(dt)
     if lurek.input.keyboard.isDown("escape") then
       lurek.window.close()
@@ -159,7 +201,7 @@ Flashes the window briefly to attract the user's attention.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.flash
+do
   if not lurek.window.hasFocus() then
     lurek.window.flash()
   end
@@ -175,7 +217,7 @@ Requests keyboard focus for the window. No-op if already focused.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.focus
+do
   function lurek.init()
     lurek.window.focus()
   end
@@ -197,7 +239,7 @@ Converts a value from physical pixel units to logical (DPI-independent) units us
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.fromPixels
+do
   local mouse_dx_pixels = 24
   local logical_dx = lurek.window.fromPixels(mouse_dx_pixels)
   lurek.log.info("mouse dx=" .. logical_dx .. " logical units", "input")
@@ -215,7 +257,7 @@ Returns the index of the display that currently contains the window.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getCurrentDisplay
+do
   local idx = lurek.window.getCurrentDisplay()
   lurek.log.info("current monitor index: " .. idx, "video")
 end
@@ -236,7 +278,7 @@ Returns the desktop resolution of a specific display, or the current display if 
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDesktopDimensions
+do
   local dw, dh = lurek.window.getDesktopDimensions()
   local want_w, want_h = math.min(1280, dw), math.min(720, dh)
   lurek.window.setMode(want_w, want_h)
@@ -254,7 +296,7 @@ Returns the current window width and height in logical pixels.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDimensions
+do
   local w, h = lurek.window.getDimensions()
   local aspect = w / h
   lurek.log.info("window " .. w .. "x" .. h .. " aspect=" .. aspect, "boot")
@@ -272,7 +314,7 @@ Returns the number of connected displays (monitors).
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDisplayCount
+do
   local n = lurek.window.getDisplayCount()
   if n > 1 then
     lurek.log.info("multi-monitor setup detected (" .. n .. " displays)", "video")
@@ -295,7 +337,7 @@ Returns the human-readable name of a display. Returns "Unknown" if the display c
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDisplayName
+do
   local name = lurek.window.getDisplayName()
   lurek.log.info("running on display: " .. name, "video")
 end
@@ -312,7 +354,7 @@ Returns the display orientation based on the window's aspect ratio.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDisplayOrientation
+do
   local orient = lurek.window.getDisplayOrientation()
   lurek.log.info("layout mode: " .. orient, "ui")
 end
@@ -329,7 +371,7 @@ Returns a list of all connected displays with their properties. Each entry conta
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDisplays
+do
   local displays = lurek.window.getDisplays()
   for _, d in ipairs(displays) do
     lurek.log.info("display " .. d.index .. ": " .. d.name .. " " .. d.width .. "x" .. d.height, "video")
@@ -348,7 +390,7 @@ Returns the current DPI scale factor of the window. A value of 2.0 means the dis
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getDPIScale
+do
   local s = lurek.window.getDPIScale()
   local font_px = math.floor(16 * s + 0.5)
   lurek.log.info("font size scaled to " .. font_px .. "px (dpi=" .. s .. ")", "ui")
@@ -366,7 +408,7 @@ Returns the current fullscreen state and type.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getFullscreen
+do
   local enabled, fstype = lurek.window.getFullscreen()
   if enabled then
     lurek.log.info("fullscreen on (" .. fstype .. ")", "video")
@@ -387,7 +429,7 @@ Returns a list of all supported fullscreen video modes across all monitors. Each
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getFullscreenModes
+do
   local modes = lurek.window.getFullscreenModes()
   for i, m in ipairs(modes) do
     lurek.log.info("mode " .. i .. ": " .. m.width .. "x" .. m.height .. " @ " .. m.refreshRate .. "Hz", "video")
@@ -407,7 +449,7 @@ Returns the logical game height as defined by the current scale mode and game co
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getGameHeight
+do
   local gh = lurek.window.getGameHeight()
   local hud_y = gh - 32
   lurek.log.info("hud baseline at game-y=" .. hud_y, "ui")
@@ -425,7 +467,7 @@ Returns the logical game width as defined by the current scale mode and game con
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getGameWidth
+do
   local gw = lurek.window.getGameWidth()
   local centre = gw * 0.5
   lurek.log.info("game width " .. gw .. " centre=" .. centre, "ui")
@@ -443,7 +485,7 @@ Returns the current window height in logical (DPI-independent) pixels.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getHeight
+do
   local h = lurek.window.getHeight()
   local hud_y = h - 48
   lurek.log.info("hud anchored at y=" .. hud_y, "ui")
@@ -461,7 +503,7 @@ Returns the current window display mode: width, height, and a flags table contai
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getMode
+do
   local w, h, flags = lurek.window.getMode()
   lurek.log.info("mode " .. w .. "x" .. h .. " fullscreen=" .. tostring(flags.fullscreen) ..
     " vsync=" .. flags.vsync, "video")
@@ -479,7 +521,7 @@ Returns the native DPI scale factor reported by the operating system.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getNativeDPIScale
+do
   local native = lurek.window.getNativeDPIScale()
   if native > 1.5 then
     lurek.log.info("HiDPI screen detected (scale " .. native .. ")", "video")
@@ -498,7 +540,7 @@ Returns the window dimensions in actual physical pixels, accounting for DPI scal
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getPixelDimensions
+do
   local pw, ph = lurek.window.getPixelDimensions()
   lurek.log.info("backbuffer " .. pw .. "x" .. ph .. " physical pixels", "video")
 end
@@ -515,7 +557,7 @@ Returns the window position on screen in pixels.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getPosition
+do
   function lurek.quit()
     local x, y = lurek.window.getPosition()
     lurek.log.info("saving window position " .. x .. "," .. y, "shutdown")
@@ -534,7 +576,7 @@ Returns the safe drawing area of the window. On desktop this is the full window 
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getSafeArea
+do
   local x, y, w, h = lurek.window.getSafeArea()
   lurek.log.info("safe area " .. w .. "x" .. h .. " at (" .. x .. "," .. y .. ")", "ui")
 end
@@ -551,7 +593,7 @@ Returns detailed scaling information including scale factors, offsets, and logic
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getScaleInfo
+do
   local info = lurek.window.getScaleInfo()
   lurek.log.info("scale " .. info.scale_x .. "x" .. info.scale_y ..
     " offset (" .. info.offset_x .. "," .. info.offset_y .. ")" ..
@@ -570,7 +612,7 @@ Returns the current content scale mode name (e.g., "stretch", "letterbox", "pixe
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getScaleMode
+do
   local mode = lurek.window.getScaleMode()
   lurek.log.info("viewport scale mode: " .. mode, "video")
 end
@@ -587,7 +629,7 @@ Returns the operating system's current color theme. Desktop currently returns "u
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getSystemTheme
+do
   local theme = lurek.window.getSystemTheme()
   local bg = (theme == "dark") and { 0.1, 0.1, 0.12, 1 } or { 0.95, 0.95, 0.96, 1 }
   lurek.log.info("ui theme=" .. theme .. " bg=" .. bg[1], "ui")
@@ -605,7 +647,7 @@ Returns the current window title bar text.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getTitle
+do
   local base = lurek.window.getTitle()
   local paused = true
   if paused then
@@ -625,7 +667,7 @@ Returns the current VSync mode. This function is exposed to Lua scripts.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getVSync
+do
   local mode = lurek.window.getVSync()
   local label = ({ [-1] = "adaptive", [0] = "off", [1] = "on" })[mode] or "unknown"
   lurek.log.info("vsync=" .. label, "video")
@@ -643,7 +685,7 @@ Returns the current window width in logical (DPI-independent) pixels.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.getWidth
+do
   local w = lurek.window.getWidth()
   local centre_x = w * 0.5
   lurek.log.info("hud centre x=" .. centre_x .. " (window width " .. w .. "px)", "ui")
@@ -661,7 +703,7 @@ Returns whether the window currently has keyboard focus.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.hasFocus
+do
   function lurek.process(dt)
     if not lurek.window.hasFocus() then
       return
@@ -681,7 +723,7 @@ Returns whether the mouse cursor is inside the window.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.hasMouseFocus
+do
   function lurek.process(dt)
     if lurek.window.hasMouseFocus() then
       lurek.log.debug("mouse inside window", "input")
@@ -701,7 +743,7 @@ Returns whether the window is currently in fullscreen mode.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isFullscreen
+do
   if lurek.window.isFullscreen() then
     lurek.log.info("fullscreen mode active", "video")
   end
@@ -719,7 +761,7 @@ Returns whether high-DPI rendering is allowed. Currently always returns false on
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isHighDPIAllowed
+do
   if lurek.window.isHighDPIAllowed() then
     lurek.log.info("HiDPI rendering enabled", "video")
   end
@@ -737,7 +779,7 @@ Returns whether the window is currently maximized.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isMaximized
+do
   if lurek.window.isMaximized() then
     lurek.log.info("window starts maximized", "boot")
   end
@@ -755,7 +797,7 @@ Returns whether the window is currently minimized to the taskbar.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isMinimized
+do
   function lurek.draw()
     if lurek.window.isMinimized() then
       return
@@ -775,7 +817,7 @@ Returns whether the window is currently open. Always returns true while the game
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isOpen
+do
   if lurek.window.isOpen() then
     lurek.log.info("window is live, starting subsystems", "boot")
   end
@@ -793,7 +835,7 @@ Returns whether the window can be resized by the user.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isResizable
+do
   if not lurek.window.isResizable() then
     lurek.log.info("custom resolution UI disabled (window non-resizable)", "ui")
   end
@@ -811,7 +853,7 @@ Returns whether the window is currently visible on screen.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.isVisible
+do
   function lurek.draw()
     if not lurek.window.isVisible() then
       return
@@ -829,7 +871,7 @@ Maximizes the window to fill the screen.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.maximize
+do
   function lurek.init()
     lurek.window.maximize()
   end
@@ -845,7 +887,7 @@ Minimizes the window to the taskbar.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.minimize
+do
   function lurek.process(dt)
     if lurek.input.keyboard.isDown("f11") then
       lurek.window.minimize()
@@ -867,7 +909,7 @@ Registers a callback function that is called whenever the DPI scale factor chang
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.onDpiChange
+do
   function lurek.init()
     lurek.window.onDpiChange(function(new_scale)
       lurek.log.info("dpi changed -> " .. new_scale .. ", rebuilding font atlas", "video")
@@ -891,7 +933,7 @@ Opens a native file picker dialog and returns the selected file paths. Blocks un
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.openFileDialog
+do
   local paths = lurek.window.openFileDialog({
     title = "My Game - Load save",
     defaultPath = "save",
@@ -914,7 +956,7 @@ Checks if the DPI scale has changed since the last poll and fires the onDpiChang
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.pollDpiChange
+do
   function lurek.process(dt)
     local current = lurek.window.pollDpiChange()
     if current and current > 2.0 then
@@ -933,7 +975,7 @@ Requests user attention by flashing the taskbar icon. Useful for notifying the p
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.requestAttention
+do
   local load_done = true
   if load_done and not lurek.window.hasFocus() then
     lurek.window.requestAttention()
@@ -950,7 +992,7 @@ Restores the window from minimized or maximized state to its previous size and p
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.restore
+do
   function lurek.init()
     lurek.window.restore()
     lurek.window.setMode(1280, 720)
@@ -971,7 +1013,7 @@ Moves the window to the specified display. Throws an error if the index is negat
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setDisplay
+do
   function lurek.init()
     lurek.window.setDisplay(0)
   end
@@ -992,7 +1034,7 @@ Enables or disables fullscreen mode. Supports "desktop" (borderless) and "exclus
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setFullscreen
+do
   function lurek.init()
     lurek.window.setFullscreen(true, "desktop")
   end
@@ -1012,7 +1054,7 @@ Sets the window icon from an image file. The file must exist in the game's files
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setIcon
+do
   function lurek.init()
     lurek.window.setIcon("assets/icon.png")
   end
@@ -1034,7 +1076,7 @@ Sets the window display mode with a specific resolution and optional flags. Use 
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setMode
+do
   function lurek.init()
     lurek.window.setMode(1280, 720, { fullscreen = false, fullscreentype = "desktop", vsync = 1 })
   end
@@ -1055,7 +1097,7 @@ Moves the window to the specified screen position.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setPosition
+do
   function lurek.init()
     local saved_x, saved_y = 100, 100
     lurek.window.setPosition(saved_x, saved_y)
@@ -1076,7 +1118,7 @@ Sets the content scale mode. Controls how the game's logical resolution maps to 
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setScaleMode
+do
   function lurek.init()
     lurek.window.setScaleMode("pixel")
   end
@@ -1096,7 +1138,7 @@ Sets the window title bar text. This function is exposed to Lua scripts.
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setTitle
+do
   function lurek.init()
     lurek.window.setTitle("My Game - Forest Level")
   end
@@ -1116,7 +1158,7 @@ Sets the vertical sync mode. Controls how frame presentation is synchronized wit
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setVSync
+do
   local benchmark = false
   lurek.window.setVSync(benchmark and 0 or 1)
 end
@@ -1140,11 +1182,53 @@ Displays a native OS message box dialog. Blocks execution until the user dismiss
 Module-level example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.setTitle
+--@api-stub: lurek.window.setTitle
+-- Sets the window title bar text
+do
   function lurek.init()
     lurek.window.setTitle("My Game - Forest Level")
   end
 end
+
+--@api-stub: lurek.window.getTitle
+-- Returns the current window title bar text
+do
+  local base = lurek.window.getTitle()
+  local paused = true
+  if paused then
+    lurek.window.setTitle(base .. " [PAUSED]")
+  end
+end
+
+--@api-stub: lurek.window.getWidth
+-- Returns the current window width in logical (DPI-independent) pixels
+do
+  local w = lurek.window.getWidth()
+  local centre_x = w * 0.5
+  lurek.log.info("hud centre x=" .. centre_x .. " (window width " .. w .. "px)", "ui")
+end
+
+--@api-stub: lurek.window.getHeight
+-- Returns the current window height in logical (DPI-independent) pixels
+do
+  local h = lurek.window.getHeight()
+  local hud_y = h - 48
+  lurek.log.info("hud anchored at y=" .. hud_y, "ui")
+end
+
+--@api-stub: lurek.window.getDimensions
+-- Returns the current window width and height in logical pixels
+do
+  local w, h = lurek.window.getDimensions()
+  local aspect = w / h
+  lurek.log.info("window " .. w .. "x" .. h .. " aspect=" .. aspect, "boot")
+end
+
+--@api-stub: lurek.window.setFullscreen
+-- Enables or disables fullscreen mode
+do
+  function lurek.init()
+    lurek.window.setFullscreen(true, "desktop")
 ```
 
 ### `lurek.window.toPixels(value: number) -> number`
@@ -1162,7 +1246,7 @@ Converts a value from logical (DPI-independent) units to physical pixel units us
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.toPixels
+do
   local logical_size = 64
   local pixel_size = lurek.window.toPixels(logical_size)
   lurek.log.info("64dp icon = " .. pixel_size .. " physical pixels", "ui")
@@ -1182,7 +1266,7 @@ Applies multiple window settings at once from a configuration table. Supports ti
 Exact example from [window.lua](../blob/main/content/examples/window.lua):
 
 ```lua
-do -- lurek.window.windowConfig
+do
   lurek.window["windowConfig"]({
     title = "My Game - Config Applied",
     width = 1280,

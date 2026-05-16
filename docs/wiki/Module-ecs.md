@@ -109,12 +109,54 @@ Supports parent-child relationships with recursive kill propagation, string and 
 Module example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- lurek.ecs.newUniverse
-  local world = lurek.ecs.newUniverse()
-  local hero = world:spawn()
-  world:set(hero, "position", { x = 0, y = 0 })
-  lurek.log.info("universe ready, first id=" .. hero, "ecs")
+        local p, v = w:get(id, "position"), w:get(id, "velocity")
+        p.x, p.y = p.x + v.x * dt, p.y + v.y * dt
+      end
+    end
+  }
+  world:addSystem(move_system, { priority = 10 })
+  function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: Universe:render
+do
+  local world = lurek.ecs.newUniverse()
+  local draw_system = {
+    render = function(_, w)
+      for _, id in ipairs(w:query("position", "sprite")) do
+        local p = w:get(id, "position")
+        lurek.render.rectangle("fill", p.x, p.y, 16, 16)
+      end
+    end
+  }
+  world:addSystem(draw_system, { priority = 100 })
+  function lurek.draw() world:render() end
+end
+
+--@api-stub: Universe:emit
+do
+  local world = lurek.ecs.newUniverse()
+  local hp_system = {
+    damage = function(_, w, id, amount)
+      local h = w:get(id, "health"); h.hp = h.hp - amount
+    end
+  }
+  world:addSystem(hp_system)
+  local target = world:spawn(); world:set(target, "health", { hp = 10, max = 10 })
+  world:emit("damage", target, 3)
+end
+
+--@api-stub: Universe:getSystemCount
+do
+  local world = lurek.ecs.newUniverse()
+  world:addSystem({ update = function() end })
+  world:addSystem({ render = function() end })
+  lurek.log.info("systems registered=" .. world:getSystemCount(), "ecs")
+end
+
+--@api-stub: Universe:clear
+do
+  local world = lurek.ecs.newUniverse()
 ```
 
 ## Key Types
@@ -142,7 +184,7 @@ Creates an empty ECS universe for entity, component, system, and relationship ma
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- lurek.ecs.newUniverse
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "position", { x = 0, y = 0 })
@@ -162,7 +204,7 @@ Lua-side handle for one ECS universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- lurek.ecs.newUniverse
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "position", { x = 0, y = 0 })
@@ -185,7 +227,7 @@ Adds a named directed relation from one entity to another.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:addRelation
+do
   local u = lurek.ecs.newUniverse()
   local parent = u:spawn()
   local child  = u:spawn()
@@ -208,7 +250,7 @@ Registers a Lua system table with optional phase, priority, name, and dependency
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:addSystem
+do
   local u = lurek.ecs.newUniverse()
   u:addSystem({
     query = {"Position", "Velocity"},
@@ -234,7 +276,7 @@ Adds a string tag to an entity. This method is available to Lua scripts.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:addTag
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:addTag(hero, "player")
@@ -255,7 +297,7 @@ Replaces this universe state from a Lua table snapshot.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:applySnapshot
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:set(e, "score", 99)
   local snap = world:snapshot()
@@ -282,7 +324,7 @@ Adds a bitmap tag to an entity, defining the tag if needed.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:bitmapTag
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
   local block = world:spawn()
@@ -304,7 +346,7 @@ Removes a bitmap tag from an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:bitmapUntag
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("invincible")
   local hero = world:spawn(); world:bitmapTag(hero, "invincible")
@@ -321,7 +363,7 @@ Clears all entities, components, systems, and ECS state from this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:clear
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
   world:clear()
@@ -343,7 +385,7 @@ Removes every target for one named relation from an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:clearRelations
+do
   local world = lurek.ecs.newUniverse()
   local boss = world:spawn()
   for _ = 1, 3 do local m = world:spawn(); world:addRelation(boss, "minions", m) end
@@ -365,7 +407,7 @@ Defines a named entity blueprint from a component table.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:defineBlueprint
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("enemy", {Health={max=100}, Position={x=0,y=0}})
   lurek.log.info("blueprint defined", "ecs")
@@ -387,7 +429,7 @@ Defines a bitmap tag name and assigns it a bit slot.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:defineTag
+do
   local world = lurek.ecs.newUniverse()
   local bit_player = world:defineTag("player")
   local bit_enemy  = world:defineTag("enemy")
@@ -408,7 +450,7 @@ Replaces this universe state from a serialized Lua snapshot.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:deserialize
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:set(e, "position", { x = 1, y = 2 })
   local snap = world:serialize()
@@ -431,7 +473,7 @@ Iterates entities with one component and calls a Lua callback for each match.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:each
+do
   local u = lurek.ecs.newUniverse()
   local e = u:spawn()
   u:set(e, "Tag", {})
@@ -455,7 +497,7 @@ Calls matching event-named functions on registered systems.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:emit
+do
   local world = lurek.ecs.newUniverse()
   local hp_system = {
     damage = function(_, w, id, amount)
@@ -483,7 +525,7 @@ Defines a blueprint that inherits from a parent blueprint and applies overrides.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:extendBlueprint
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("unit", {Health={max=100}, Position={x=0,y=0}})
   u:extendBlueprint("boss", "unit", {Health={max=500}})
@@ -500,7 +542,7 @@ Delivers queued component add and remove events to registered observer callbacks
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:flushObservers
+do
   local world = lurek.ecs.newUniverse()
   world:onComponentAdded("health", function(id) lurek.log.info("hp added to " .. id, "ecs") end)
   local e = world:spawn(); world:set(e, "health", { hp = 10, max = 10 })
@@ -524,7 +566,7 @@ Returns a component value from an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:get
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 10, y = 20 })
@@ -548,7 +590,7 @@ Returns the bit index assigned to a bitmap tag name.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getBitmapTagBit
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("player")
   local bit = world:getBitmapTagBit("player")
@@ -571,7 +613,7 @@ Returns the component table stored for a blueprint.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getBlueprintComponents
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   local comps = world:getBlueprintComponents("goblin")
@@ -594,7 +636,7 @@ Returns child entity ids for a parent entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getChildren
+do
   local world = lurek.ecs.newUniverse()
   local root = world:spawn()
   for _ = 1, 3 do local c = world:spawn(); world:setParent(c, root) end
@@ -617,7 +659,7 @@ Returns component names currently stored on an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getComponents
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 0, y = 0 })
@@ -637,7 +679,7 @@ Returns entities marked dirty by recent ECS mutations.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getDirtyEntities
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "hp", 50)
@@ -659,7 +701,7 @@ Returns all live entity ids in this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getEntities
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
   local all = world:getEntities()
@@ -682,7 +724,7 @@ Returns entities assigned to a numeric layer.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getEntitiesByLayer
+do
   local world = lurek.ecs.newUniverse()
   for i = 1, 4 do local id = world:spawn(); world:setLayer(id, i % 2) end
   local fg = world:getEntitiesByLayer(1)
@@ -705,7 +747,7 @@ Returns entities that have a string tag.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getEntitiesByTag
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 3 do local id = world:spawn(); world:addTag(id, "enemy") end
   local enemies = world:getEntitiesByTag("enemy")
@@ -724,7 +766,7 @@ Returns live entities sorted by ECS layer and stable entity ordering.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getEntitiesSorted
+do
   local world = lurek.ecs.newUniverse()
   local a = world:spawn(); world:setLayer(a, 2)
   local b = world:spawn(); world:setLayer(b, 0)
@@ -744,7 +786,7 @@ Returns the number of live entities in this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getEntityCount
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 12 do world:spawn() end
   if world:getEntityCount() > 1000 then lurek.log.warn("entity budget exceeded", "ecs") end
@@ -766,7 +808,7 @@ Returns the numeric layer assigned to an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getLayer
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:setLayer(e, 5)
   if world:getLayer(e) >= 5 then lurek.log.debug("foreground", "ecs") end
@@ -788,7 +830,7 @@ Returns the parent entity id for a child entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getParent
+do
   local world = lurek.ecs.newUniverse()
   local parent = world:spawn()
   local child  = world:spawn()
@@ -813,7 +855,7 @@ Returns targets linked from an entity by a named relation.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getRelated
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   local sword = world:spawn(); world:addRelation(hero, "wields", sword)
@@ -832,7 +874,7 @@ Returns the number of registered systems.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getSystemCount
+do
   local world = lurek.ecs.newUniverse()
   world:addSystem({ update = function() end })
   world:addSystem({ render = function() end })
@@ -855,7 +897,7 @@ Returns string tags assigned to an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:getTags
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "player"); world:addTag(e, "invincible")
@@ -879,7 +921,7 @@ Returns whether an entity has a named component.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:has
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "stunned", { ticks = 30 })
@@ -903,7 +945,7 @@ Returns whether an entity has a bitmap tag.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:hasBitmapTag
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
   local block = world:spawn(); world:bitmapTag(block, "solid")
@@ -926,7 +968,7 @@ Returns whether a named blueprint exists.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:hasBlueprint
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   if world:hasBlueprint("goblin") then lurek.log.info("goblin ready", "ecs") end
@@ -950,7 +992,7 @@ Returns whether a named directed relation exists between two entities.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:hasRelation
+do
   local u = lurek.ecs.newUniverse()
   local a = u:spawn(); local b = u:spawn()
   u:addRelation(a, "ally", b)
@@ -974,7 +1016,7 @@ Returns whether an entity has a string tag.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:hasTag
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "player")
@@ -997,7 +1039,7 @@ Returns whether an entity id currently exists in this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:isAlive
+do
   local world = lurek.ecs.newUniverse()
   local id = world:spawn()
   world:kill(id)
@@ -1018,7 +1060,7 @@ Deletes an entity and removes its components from this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:kill
+do
   local world = lurek.ecs.newUniverse()
   local bullet = world:spawn()
   world:set(bullet, "position", { x = 100, y = 100 })
@@ -1039,7 +1081,7 @@ Deletes an entity and all descendant entities in its hierarchy.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:killRecursive
+do
   local world = lurek.ecs.newUniverse()
   local wagon = world:spawn()
   local driver = world:spawn(); world:setParent(driver, wagon)
@@ -1058,7 +1100,7 @@ Returns names of all registered blueprints.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:listBlueprints
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   world:defineBlueprint("orc",    { health = { hp = 7, max = 7 } })
@@ -1080,7 +1122,7 @@ Registers a callback for queued component-add events with a given component name
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:onComponentAdded
+do
   local u = lurek.ecs.newUniverse()
   u:onComponentAdded("Health", function(eid, comp)
     lurek.log.info("health added to " .. eid, "ecs")
@@ -1104,7 +1146,7 @@ Registers a callback for queued component-remove events with a given component n
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:onComponentRemoved
+do
   local u = lurek.ecs.newUniverse()
   u:onComponentRemoved("Sprite", function(eid)
     lurek.log.info("sprite removed from " .. eid, "ecs")
@@ -1130,7 +1172,7 @@ Returns entities that have all component names passed as varargs.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:query
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 0, y = 0 })
@@ -1157,7 +1199,7 @@ Returns entities that have every bitmap tag from a list.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:queryBitmapAll
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid"); world:defineTag("visible")
   local b = world:spawn(); world:bitmapTag(b, "solid"); world:bitmapTag(b, "visible")
@@ -1182,7 +1224,7 @@ Returns entities with at least one bitmap tag from a list.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:queryBitmapAny
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("enemy"); world:defineTag("hazard")
   local a = world:spawn(); world:bitmapTag(a, "enemy")
@@ -1207,7 +1249,7 @@ Returns entities with one bitmap tag.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:queryBitmapTag
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("enemy")
   for _ = 1, 4 do local id = world:spawn(); world:bitmapTag(id, "enemy") end
@@ -1229,7 +1271,7 @@ Iterates entities that have all component names from a table.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:queryMulti
+do
   local world = lurek.ecs.newUniverse()
   local a = world:spawn()
   world:set(a, "pos", { x = 1, y = 2 })
@@ -1257,7 +1299,7 @@ Returns entities that include one component set and exclude another component se
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:queryNot
+do
   local u = lurek.ecs.newUniverse()
   local e1 = u:spawn(); u:set(e1, "Health", {hp=100})
   local e2 = u:spawn()
@@ -1275,7 +1317,7 @@ Releases universe contents by clearing all ECS state.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:release
+do
   local world = lurek.ecs.newUniverse()
   world:spawn()
   world:release()
@@ -1296,7 +1338,7 @@ Removes a named component from an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:remove
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "burning", { ticks = 60 })
@@ -1319,7 +1361,7 @@ Removes a named blueprint from this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:removeBlueprint
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   world:removeBlueprint("goblin")
@@ -1341,7 +1383,7 @@ Removes a named directed relation between two entities.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:removeRelation
+do
   local u = lurek.ecs.newUniverse()
   local a = u:spawn(); local b = u:spawn()
   u:addRelation(a, "ally", b)
@@ -1363,7 +1405,7 @@ Removes a previously registered Lua system table.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:removeSystem
+do
   local world = lurek.ecs.newUniverse()
   local ai_system = { update = function() end }
   world:addSystem(ai_system, { priority = 50 })
@@ -1385,7 +1427,7 @@ Removes a string tag from an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:removeTag
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "alive")
@@ -1402,7 +1444,7 @@ Runs registered render-phase systems using their render or draw callbacks.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:render
+do
   local world = lurek.ecs.newUniverse()
   local draw_system = {
     render = function(_, w)
@@ -1428,7 +1470,7 @@ Serializes this universe into a Lua table snapshot.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:serialize
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn(); world:set(hero, "position", { x = 5, y = 7 })
   local snapshot = world:serialize()
@@ -1451,7 +1493,7 @@ Stores or replaces a component value on an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:set
+do
   local u = lurek.ecs.newUniverse()
   local e = u:spawn()
   u:set(e, "Position", {x=100, y=200})
@@ -1474,7 +1516,7 @@ Assigns a numeric layer to an entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:setLayer
+do
   local world = lurek.ecs.newUniverse()
   local floor = world:spawn(); world:setLayer(floor, 0)
   local actor = world:spawn(); world:setLayer(actor, 10)
@@ -1495,7 +1537,7 @@ Sets or clears the parent entity for a child entity.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:setParent
+do
   local u = lurek.ecs.newUniverse()
   local parent = u:spawn()
   local child  = u:spawn()
@@ -1515,7 +1557,7 @@ Serializes this universe into a Lua table snapshot.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:snapshot
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "hp", 42)
@@ -1537,7 +1579,7 @@ Creates a new entity in this universe.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:spawn
+do
   local world = lurek.ecs.newUniverse()
   local enemy = world:spawn()
   world:set(enemy, "position", { x = 320, y = 240 })
@@ -1561,7 +1603,7 @@ Spawns an entity from a named blueprint with optional component overrides.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:spawnBlueprint
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("goblin", {Health={max=40}, Position={x=0,y=0}})
   local e = u:spawnBlueprint("goblin", {Position={x=300,y=200}})
@@ -1586,7 +1628,7 @@ Spawns multiple entities from a blueprint using shared optional overrides.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:spawnBulk
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("bulk_unit", {Health={max=100}, Position={x=0,y=0}})
   local ids = u:spawnBulk("bulk_unit", 50, {})
@@ -1605,7 +1647,7 @@ Returns and clears accumulated ECS snapshot diff data.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- LUniverse:takeSnapshotDiff
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "hp", 10)
@@ -1632,7 +1674,7 @@ Returns the Lua-visible type name for this universe handle.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- LUniverse:type
+do
   local u = lurek.ecs.newUniverse()
   local t = u:type()
 end
@@ -1653,7 +1695,7 @@ Returns whether this universe handle matches a supported type name.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- LUniverse:typeOf
+do
   local u = lurek.ecs.newUniverse()
   local ok = u:typeOf("LUniverse")
 end
@@ -1672,7 +1714,7 @@ Runs registered update-phase systems with a frame delta.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:update
+do
   local world = lurek.ecs.newUniverse()
   local move_system = {
     update = function(_, w, dt)
@@ -1701,7 +1743,7 @@ Runs registered systems assigned to a named phase.
 Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-do -- Universe:updatePhase
+do
   local world = lurek.ecs.newUniverse()
   local InputSys = { update = function(self, w, dt) lurek.log.debug("input", "ecs") end }
   local LogicSys = { update = function(self, w, dt) lurek.log.debug("logic", "ecs") end }

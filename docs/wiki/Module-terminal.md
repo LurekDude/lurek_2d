@@ -129,10 +129,52 @@ Widgets provide pre-built terminal UI components with default shaded cell backgr
 Module example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newTerminal
-  local console = lurek.terminal.newTerminal(100, 30)
-  local cols, rows = console:getDimensions()
-  lurek.log.info("console grid is " .. cols .. "x" .. rows, "term")
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:addWidget(lurek.terminal.newLabel(2, 2, "HUD"))
+  function lurek.draw() term:render(0, 0) end
+end
+
+--@api-stub: Terminal:print
+do
+  ---@type LTerminal
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:print(1, 1, "lurek> print(10)")
+  term:print(1, 2, "10")
+end
+
+--@api-stub: Terminal:setFont
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:setFont(24)
+end
+
+--@api-stub: Terminal:setCellSize
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:setCellSize(16, 16)
+end
+
+--@api-stub: Terminal:resetCellSize
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:setCellSize(20, 20)
+  term:resetCellSize()
+end
+
+--@api-stub: Terminal:getCellSize
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:setCellSize(18, 18)
+  local cw, ch = term:getCellSize()
+  lurek.log.debug("cell size " .. cw .. "x" .. ch, "term")
+end
+
+--@api-stub: Terminal:autoResize
+do
+  local term = lurek.terminal.newTerminal(80, 25)
+  term:setFont(20)
+  term:autoResize()
 end
 ```
 
@@ -182,7 +224,7 @@ Registers a candidate string for tab-completion in the shared completion engine.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.addCompletion
+do
   lurek.terminal.addCompletion("spawn")
   lurek.terminal.addCompletion("teleport")
   lurek.terminal.addCompletion("give")
@@ -203,7 +245,7 @@ Applies a named color theme to the terminal, setting default foreground and back
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.applyTheme
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.applyTheme(term, "dracula")
 end
@@ -222,7 +264,7 @@ Removes all entries from the terminal command history.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.clearCmdHistory
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "spawn enemy 50 50")
   lurek.terminal.clearCmdHistory(term)
@@ -238,7 +280,7 @@ Removes all registered completion candidates from the shared completion engine.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.clearCompletions
+do
   lurek.terminal.addCompletion("noclip")
   lurek.terminal.clearCompletions()
 end
@@ -259,7 +301,7 @@ Returns the number of commands currently stored in the terminal command history.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.cmdHistoryLen
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "kill all")
   local n = lurek.terminal.cmdHistoryLen(term)
@@ -282,7 +324,7 @@ Returns all completion candidates matching the given prefix string.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.getCompletions
+do
   lurek.terminal.addCompletion("spawn_enemy")
   lurek.terminal.addCompletion("spawn_item")
   local hits = lurek.terminal.getCompletions("spawn")
@@ -301,7 +343,7 @@ Returns the engine-defined maximum number of columns a terminal grid can have.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.getMaxCols
+do
   local max_cols = lurek.terminal.getMaxCols()
   local desired = math.min(120, max_cols)
   lurek.log.info("using " .. desired .. " cols (cap " .. max_cols .. ")", "term")
@@ -319,7 +361,7 @@ Returns the engine-defined maximum number of rows a terminal grid can have.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.getMaxRows
+do
   local max_rows = lurek.terminal.getMaxRows()
   local desired = math.min(60, max_rows)
   lurek.log.info("using " .. desired .. " rows (cap " .. max_rows .. ")", "term")
@@ -343,7 +385,7 @@ Retrieves a range of lines from the terminal scrollback buffer.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.getScrollback
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushScrollback(term, "build complete")
   local recent = lurek.terminal.getScrollback(term, 0, 10)
@@ -369,7 +411,7 @@ Creates a new decorative border widget drawn using box-drawing characters.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newBorder
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local frame = lurek.terminal.newBorder(1, 1, 80, 25)
   frame:setStyle("double")
@@ -397,7 +439,7 @@ Creates a new clickable button widget with the given position, size, and label t
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newButton
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local quit_btn = lurek.terminal.newButton(60, 21, 14, 3, "Quit")
   quit_btn:setOnClick(function() lurek.log.info("quit pressed", "menu") end)
@@ -422,7 +464,7 @@ Creates a new label widget that displays static text at the given cell position.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newLabel
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local title = lurek.terminal.newLabel(2, 1, "== Inventory ==")
   term:addWidget(title)
@@ -447,7 +489,7 @@ Creates a new scrollable list widget for displaying and selecting items.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newList
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local saves = lurek.terminal.newList(2, 3, 30, 10)
   saves:addItem("Slot 1 - Forest")
@@ -474,7 +516,7 @@ Creates a new panel widget that can contain child widgets for grouped layout.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newPanel
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local pause_panel = lurek.terminal.newPanel(20, 8, 40, 10)
   pause_panel:addChild(lurek.terminal.newLabel(1, 1, "PAUSED"))
@@ -498,7 +540,7 @@ Creates a new terminal emulator grid and stages a window size that fits its acti
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newTerminal
+do
   local console = lurek.terminal.newTerminal(100, 30)
   local cols, rows = console:getDimensions()
   lurek.log.info("console grid is " .. cols .. "x" .. rows, "term")
@@ -522,7 +564,7 @@ Creates a new single-line text input widget at the given position with a fixed w
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newTextBox
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 70)
   input:setMaxLength(64)
@@ -546,7 +588,7 @@ Navigates forward in the terminal command history, returning the next command or
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.nextCmd
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "tp 0 0")
   lurek.terminal.prevCmd(term)
@@ -570,7 +612,7 @@ Cycles to the next matching completion candidate for the given prefix, wrapping 
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.nextCompletion
+do
   lurek.terminal.addCompletion("give_gold")
   lurek.terminal.addCompletion("give_xp")
   local first = lurek.terminal.nextCompletion("give")
@@ -593,7 +635,7 @@ Parses ANSI escape sequences in a string into an array of span tables with text,
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.parseAnsi
+do
   local spans = lurek.terminal.parseAnsi("\27[1;32mOK\27[0m loaded")
   for _, s in ipairs(spans) do
     lurek.log.debug("span '" .. s.text .. "' bold=" .. tostring(s.bold), "term")
@@ -616,7 +658,7 @@ Navigates backward in the terminal command history, returning the previous comma
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.prevCmd
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "noclip on")
   local recalled = lurek.terminal.prevCmd(term)
@@ -640,7 +682,7 @@ Renders ANSI-colored text directly onto the terminal grid at the given cell posi
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.printAnsi
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local line = "\27[33mWARN:\27[0m low ammo"
   lurek.terminal.printAnsi(term, 2, 3, line)
@@ -664,7 +706,7 @@ Renders syntax-highlighted text onto the terminal grid using a table of highligh
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.printHighlighted
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local rules = {
     { pattern = "ERROR", fg = { 255, 80, 80 } },
@@ -688,7 +730,7 @@ Appends a command string to the terminal command history for up/down arrow recal
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.pushCmdHistory
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local submitted = "give gold 500"
   lurek.terminal.pushCmdHistory(term, submitted)
@@ -709,7 +751,7 @@ Appends a line of text to the terminal scrollback buffer for later retrieval.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.pushScrollback
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushScrollback(term, "> spawn enemy 100 200")
   lurek.terminal.pushScrollback(term, "spawned goblin#7 at (100, 200)")
@@ -729,7 +771,7 @@ Removes a previously registered completion candidate from the shared completion 
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.removeCompletion
+do
   lurek.terminal.addCompletion("debug_crash")
   lurek.terminal.removeCompletion("debug_crash")
 end
@@ -744,7 +786,7 @@ Resets the completion cycling state so the next call to nextCompletion starts fr
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.resetCompletion
+do
   lurek.terminal.addCompletion("kill_all")
   lurek.terminal.nextCompletion("kill")
   lurek.terminal.resetCompletion()
@@ -766,7 +808,7 @@ Returns the number of lines currently stored in the terminal scrollback buffer.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.scrollbackLen
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushScrollback(term, "hello")
   if lurek.terminal.scrollbackLen(term) > 500 then
@@ -789,7 +831,7 @@ Sets the maximum number of lines retained in the terminal scrollback buffer. Old
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.setScrollbackCap
+do
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.setScrollbackCap(term, 2000)
   lurek.terminal.pushScrollback(term, "cap set to 2000 lines")
@@ -811,7 +853,7 @@ Removes all ANSI escape sequences from a string, returning plain text.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.stripAnsi
+do
   local raw = "\27[31mERROR:\27[0m boss spawn failed"
   local plain = lurek.terminal.stripAnsi(raw)
   lurek.log.warn("clean message: " .. plain, "term")
@@ -830,7 +872,7 @@ Lua-side userdata wrapping a terminal emulator grid with cell access, widgets, i
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newTerminal
+do
   local console = lurek.terminal.newTerminal(100, 30)
   local cols, rows = console:getDimensions()
   lurek.log.info("console grid is " .. cols .. "x" .. rows, "term")
@@ -850,7 +892,7 @@ Attaches a widget to this terminal so it is rendered and receives input events.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:addWidget
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local hp_label = lurek.terminal.newLabel(2, 2, "HP: 100/100")
   term:addWidget(hp_label)
@@ -866,7 +908,7 @@ Requests the window to resize so it exactly fits the terminal grid at the curren
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:autoResize
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:setFont(20)
   term:autoResize()
@@ -882,7 +924,7 @@ Clears all cells in the terminal grid, resetting characters and colors to defaul
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:clear
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:set(1, 1, "#", 1, 1, 1, 1)
   term:clear()
@@ -898,7 +940,7 @@ Removes all attached widgets from this terminal at once.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:clearWidgets
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:addWidget(lurek.terminal.newLabel(1, 1, "old screen"))
   term:clearWidgets()
@@ -921,7 +963,7 @@ Reads the character and colors at a specific cell in the terminal grid.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:get
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:set(3, 3, "X", 1, 0, 0, 1)
   local ch, r, g, b = term:get(3, 3)
@@ -940,7 +982,7 @@ Returns the active terminal cell width and height in pixels, using custom overri
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:getCellSize
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:setCellSize(18, 18)
   local cw, ch = term:getCellSize()
@@ -959,7 +1001,7 @@ Returns the number of columns and rows in the terminal grid.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:getDimensions
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local cols, rows = term:getDimensions()
   local centre = lurek.terminal.newLabel(math.floor(cols / 2) - 3, math.floor(rows / 2), "HELLO")
@@ -978,7 +1020,7 @@ Returns the widget that currently has keyboard focus, or nil if no widget is foc
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:getFocused
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 60)
   term:addWidget(input)
@@ -1000,7 +1042,7 @@ Returns the number of widgets currently attached to this terminal.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:getWidgetCount
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:addWidget(lurek.terminal.newLabel(1, 1, "a"))
   if term:getWidgetCount() == 0 then
@@ -1024,7 +1066,7 @@ Forwards a key press event to the terminal for widget input processing.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:keypressed
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "OK")
   btn:setOnClick(function() lurek.log.info("ok clicked", "ui") end)
@@ -1050,7 +1092,7 @@ Forwards a mouse press event to the terminal, converting pixel coordinates to ce
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:mousepressed
+do
   local term = lurek.terminal.newTerminal(80, 24)
   term:mousepressed(10, 5, 1)
   lurek.log.info("mouse event forwarded", "terminal")
@@ -1072,7 +1114,7 @@ Writes text to the terminal grid starting at a specific cell.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:print
+do
   ---@type LTerminal
   local term = lurek.terminal.newTerminal(80, 25)
   term:print(1, 1, "lurek> print(10)")
@@ -1093,7 +1135,7 @@ Detaches a widget from this terminal, removing it from rendering and input handl
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:removeWidget
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local toast = lurek.terminal.newLabel(20, 1, "Item picked up!")
   term:addWidget(toast)
@@ -1115,7 +1157,7 @@ Renders the terminal grid and widgets and stages a window size matching the grid
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:render
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:addWidget(lurek.terminal.newLabel(2, 2, "HUD"))
   function lurek.draw() term:render(0, 0) end
@@ -1131,7 +1173,7 @@ Removes any custom cell size override, reverting to the active font metrics and 
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:resetCellSize
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:setCellSize(20, 20)
   term:resetCellSize()
@@ -1161,7 +1203,7 @@ Writes a character with foreground and background color to a specific cell in th
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:set
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:set(10, 5, "@", 1, 1, 0, 1, 0, 0, 0, 0)
   term:set(11, 5, "!", 1, 0.4, 0.4, 1)
@@ -1182,7 +1224,7 @@ Overrides the cell width and height used for rendering this terminal grid and re
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:setCellSize
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:setCellSize(16, 16)
 end
@@ -1201,7 +1243,7 @@ Sets which widget currently has keyboard focus, or clears focus when nil is pass
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:setFocus
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 60)
   term:addWidget(input)
@@ -1222,7 +1264,7 @@ Selects the nearest built-in bitmap font by pixel height and refits the window t
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:setFont
+do
   local term = lurek.terminal.newTerminal(80, 25)
   term:setFont(24)
 end
@@ -1243,7 +1285,7 @@ Forwards a text input event to the terminal for character entry into focused wid
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Terminal:textinput
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 60)
   term:addWidget(input)
@@ -1264,7 +1306,7 @@ Returns the type name string "LTerminal".
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- LTerminal:type
+do
   local terminal_obj = lurek.terminal.newTerminal(80, 24)
   local t = terminal_obj:type()
   lurek.log.info("LTerminal:type = " .. t, "terminal")
@@ -1286,7 +1328,7 @@ Checks whether this object matches a given type name. Accepts "LTerminal" or "Ob
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- LTerminal:typeOf
+do
   local terminal_obj2 = lurek.terminal.newTerminal(80, 24)
   lurek.log.info("is LTerminal: " .. tostring(terminal_obj2 and terminal_obj2:typeOf("LTerminal") or false), "terminal")
   lurek.log.info("is wrong: " .. tostring(terminal_obj2 and terminal_obj2:typeOf("Unknown") or false), "terminal")
@@ -1302,7 +1344,7 @@ Lua-side userdata wrapping a terminal widget (label, button, text box, list, bor
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- lurek.terminal.newBorder
+do
   local term = lurek.terminal.newTerminal(80, 25)
   local frame = lurek.terminal.newBorder(1, 1, 80, 25)
   frame:setStyle("double")
@@ -1324,7 +1366,7 @@ Adds a child widget to a panel widget. The child becomes part of the panel layou
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:addChild
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   panel:addChild(lurek.terminal.newLabel(1, 1, "PAUSED"))
   panel:addChild(lurek.terminal.newButton(1, 3, 10, 1, "Resume"))
@@ -1346,7 +1388,7 @@ Appends a text item to a list widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:addItem
+do
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Healing Potion x3")
   inv:addItem("Iron Sword")
@@ -1363,7 +1405,7 @@ Removes all child widgets from a panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:clearChildren
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   panel:addChild(lurek.terminal.newLabel(1, 1, "old"))
   panel:clearChildren()
@@ -1381,7 +1423,7 @@ Removes all items from a list widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:clearItems
+do
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("stale")
   inv:clearItems()
@@ -1404,7 +1446,7 @@ Returns a child widget from a panel by its 1-based index, or nil if the index is
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getChild
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   panel:addChild(lurek.terminal.newLabel(1, 1, "first"))
   local first = panel:getChild(1)
@@ -1423,7 +1465,7 @@ Returns the number of child widgets in a panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getChildCount
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   panel:addChild(lurek.terminal.newLabel(1, 1, "a"))
   local n = panel:getChildCount()
@@ -1442,7 +1484,7 @@ Returns the current RGBA color assigned to this widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getColor
+do
   local label = lurek.terminal.newLabel(2, 2, "Hello")
   local r, g, b, a = label:getColor()
   lurek.log.debug("colour rgba " .. r .. "," .. g .. "," .. b .. "," .. a, "term")
@@ -1464,7 +1506,7 @@ Returns the text of a list item by its 1-based index.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getItem
+do
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Iron Sword")
   inv:addItem("Bow")
@@ -1484,7 +1526,7 @@ Returns the number of items in a list widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getItemCount
+do
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   if inv:getItemCount() == 0 then
     inv:addItem("(empty)")
@@ -1503,7 +1545,7 @@ Returns the maximum character limit of a text box widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getMaxLength
+do
   local name_box = lurek.terminal.newTextBox(2, 5, 24)
   name_box:setMaxLength(16)
   local cap = name_box:getMaxLength()
@@ -1522,7 +1564,7 @@ Returns the widget position as 1-based column and row.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getPosition
+do
   local label = lurek.terminal.newLabel(10, 5, "anchor")
   local col, row = label:getPosition()
   local arrow = lurek.terminal.newLabel(col + 8, row, "->")
@@ -1541,7 +1583,7 @@ Returns the 1-based index of the currently selected list item, or nil if nothing
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getSelected
+do
   local saves = lurek.terminal.newList(2, 3, 30, 8)
   saves:addItem("Slot 1")
   saves:setSelected(1)
@@ -1561,7 +1603,7 @@ Returns the widget dimensions as width and height in cell units.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getSize
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 12)
   local w, h = panel:getSize()
   lurek.log.info("panel " .. w .. "x" .. h, "term")
@@ -1579,7 +1621,7 @@ Returns the current border style name of a border or panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getStyle
+do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setStyle("double")
   local style = frame:getStyle()
@@ -1598,7 +1640,7 @@ Returns the current tag string assigned to the widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getTag
+do
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Quit")
   btn:setTag("menu.quit")
   if btn:getTag() == "menu.quit" then
@@ -1618,7 +1660,7 @@ Returns the current text content of a label, button, or text box widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getText
+do
   local input = lurek.terminal.newTextBox(2, 24, 40)
   input:setText("noclip on")
   local typed = input:getText()
@@ -1637,7 +1679,7 @@ Returns the current title text of a border or panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:getTitle
+do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setTitle(" Status ")
   local title = frame:getTitle()
@@ -1656,7 +1698,7 @@ Returns whether the widget is currently enabled for user interaction.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:isEnabled
+do
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Go")
   btn:setEnabled(false)
   if not btn:isEnabled() then
@@ -1676,7 +1718,7 @@ Returns whether the widget is currently visible.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:isVisible
+do
   local hint = lurek.terminal.newLabel(2, 2, "[E] interact")
   hint:setVisible(false)
   if not hint:isVisible() then
@@ -1698,7 +1740,7 @@ Removes a child widget from a panel, detaching it from the panel layout.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:removeChild
+do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   local hint = lurek.terminal.newLabel(1, 1, "tip")
   panel:addChild(hint)
@@ -1721,7 +1763,7 @@ Removes a list item by its 1-based index.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:removeItem
+do
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Healing Potion")
   inv:addItem("Bomb")
@@ -1745,7 +1787,7 @@ Sets the foreground color of the widget as RGBA components (0-1 range).
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setColor
+do
   local lbl = lurek.terminal.newLabel(1, 1, "OK")
   lbl:setColor(0.2, 0.9, 0.3)
   lurek.log.info("widget colour set", "terminal")
@@ -1765,7 +1807,7 @@ Controls whether the widget accepts user interaction (clicks, typing).
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setEnabled
+do
   local save_btn = lurek.terminal.newButton(2, 2, 10, 1, "Save")
   save_btn:setEnabled(false)
 end
@@ -1786,7 +1828,7 @@ Sets the maximum number of characters allowed in a text box widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setMaxLength
+do
   local name_box = lurek.terminal.newTextBox(2, 5, 24)
   name_box:setMaxLength(16)
 end
@@ -1805,7 +1847,7 @@ Registers a callback function invoked when the text content of a text box widget
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setOnChange
+do
   local search = lurek.terminal.newTextBox(2, 1, 30)
   search:setOnChange(function(text)
     lurek.log.debug("filter: " .. text, "ui")
@@ -1826,7 +1868,7 @@ Registers a callback function invoked when a button widget is clicked. Only vali
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setOnClick
+do
   local btn = lurek.terminal.newButton(2, 2, 12, 1, "[ Start ]")
   btn:setOnClick(function() lurek.log.info("starting game", "menu") end)
 end
@@ -1845,7 +1887,7 @@ Registers a callback function invoked when the selected item in a list widget ch
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setOnSelect
+do
   local saves = lurek.terminal.newList(2, 3, 30, 8)
   saves:addItem("Slot 1")
   saves:setOnSelect(function(idx)
@@ -1868,7 +1910,7 @@ Sets the widget position in 1-based cell coordinates within the terminal grid.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setPosition
+do
   local label = lurek.terminal.newLabel(1, 1, "tooltip")
   label:setPosition(40, 12)
 end
@@ -1887,7 +1929,7 @@ Sets the currently selected item in a list widget by 1-based index, or clears th
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setSelected
+do
   local saves = lurek.terminal.newList(2, 3, 30, 8)
   saves:addItem("Slot 1")
   saves:addItem("Slot 2")
@@ -1909,7 +1951,7 @@ Sets the widget dimensions in cell units, clamped to a minimum of 1x1.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setSize
+do
   local list = lurek.terminal.newList(2, 3, 20, 4)
   list:addItem("sword")
   list:addItem("shield")
@@ -1932,7 +1974,7 @@ Sets the border drawing style for a border or panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setStyle
+do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setStyle("single")
 end
@@ -1951,7 +1993,7 @@ Assigns an arbitrary string tag to the widget for identification or grouping.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setTag
+do
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Quit")
   btn:setTag("menu.quit")
 end
@@ -1970,7 +2012,7 @@ Sets the display text of a label, button, or text box widget. Fires the onChange
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setText
+do
   local fps_label = lurek.terminal.newLabel(2, 1, "FPS: --")
   fps_label:setText("FPS: 60")
 end
@@ -1991,7 +2033,7 @@ Sets the title text displayed in the border of a border or panel widget.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setTitle
+do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setTitle(" Inventory ")
 end
@@ -2010,7 +2052,7 @@ Controls whether the widget is drawn and receives input events.
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- Widget:setVisible
+do
   local hint = lurek.terminal.newLabel(2, 2, "[E] interact")
   hint:setVisible(false)
 end
@@ -2027,7 +2069,7 @@ Returns the type name string "LWidget".
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- LWidget:type
+do
   local widget_obj = lurek.terminal.newLabel(0, 0, "hello")
   local t = widget_obj:type()
   lurek.log.info("LWidget:type = " .. t, "terminal")
@@ -2049,7 +2091,7 @@ Checks whether this object matches a given type name. Accepts "LWidget" or "Obje
 Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
-do -- LWidget:typeOf
+do
   local widget_obj2 = lurek.terminal.newLabel(0, 0, "hello")
   lurek.log.info("is LWidget: " .. tostring(widget_obj2 and widget_obj2:typeOf("LWidget") or false), "terminal")
   lurek.log.info("is wrong: " .. tostring(widget_obj2 and widget_obj2:typeOf("Unknown") or false), "terminal")

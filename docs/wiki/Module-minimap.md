@@ -127,10 +127,52 @@ Markers are persistent or timed icons at fixed world positions (quest markers, p
 Module example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- lurek.minimap.newMinimap
-  local mm = lurek.minimap.newMinimap(64, 48, 256, 192)
+do
+  local mm = lurek.minimap.newMinimap(32, 32)
+  mm:addPing(8, 8, 0.5)
+  function lurek.process(dt) mm:update(dt) end
+end
+
+--@api-stub: Minimap:type
+do
+  local mm = lurek.minimap.newMinimap(16, 16)
+  if mm:type() == "Minimap" then lurek.log.info("widget is a minimap", "ui") end
+end
+
+--@api-stub: Minimap:typeOf
+do
+  local mm = lurek.minimap.newMinimap(16, 16)
+  if mm:typeOf("Object") then lurek.log.info("widget responds to Object api", "ui") end
+end
+
+--@api-stub: Minimap:render
+do
+  local mm
+  function lurek.init() mm = lurek.minimap.newMinimap(48, 32, 200, 140) end
+  function lurek.draw() mm:render(20, 20) end
+end
+
+--@api-stub: Minimap:drawToImage
+do
+  local mm = lurek.minimap.newMinimap(16, 16)
   mm:setTerrain(1, 1, 1)
-  lurek.log.info("minimap grid " .. mm:getGridWidth() .. "x" .. mm:getGridHeight(), "minimap")
+  local img = mm:drawToImage(8)
+  lurek.log.info("snapshot: " .. img:getWidth() .. "x" .. img:getHeight(), "minimap")
+end
+
+--@api-stub: Minimap:addMarker
+do
+  local mm = lurek.minimap.newMinimap(64, 64, 4)
+  local id = mm:addMarker(20, 30, "quest_marker", 1, 1, 0, 1)
+  lurek.log.info("marker id: " .. id, "minimap")
+end
+
+--@api-stub: Minimap:addObjectType
+do
+  local mm = lurek.minimap.newMinimap(32, 32, 4)
+  local enemy_idx = mm:addObjectType("enemy", 1, 0, 0, 1)
+  local ally_idx = mm:addObjectType("ally",  0, 0.5, 1, 1)
+  lurek.log.info("object types: " .. mm:getObjectTypeCount(), "minimap")
 end
 ```
 
@@ -166,7 +208,7 @@ Creates a minimap with grid dimensions and optional display size.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- lurek.minimap.newMinimap
+do
   local mm = lurek.minimap.newMinimap(64, 48, 256, 192)
   mm:setTerrain(1, 1, 1)
   lurek.log.info("minimap grid " .. mm:getGridWidth() .. "x" .. mm:getGridHeight(), "minimap")
@@ -185,7 +227,7 @@ Lua-side wrapper for a minimap instance and access to render command state.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- lurek.minimap.newMinimap
+do
   local mm = lurek.minimap.newMinimap(64, 48, 256, 192)
   mm:setTerrain(1, 1, 1)
   lurek.log.info("minimap grid " .. mm:getGridWidth() .. "x" .. mm:getGridHeight(), "minimap")
@@ -213,7 +255,7 @@ Adds a marker and returns its id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:addMarker
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   local id = mm:addMarker(20, 30, "quest_marker", 1, 1, 0, 1)
   lurek.log.info("marker id: " .. id, "minimap")
@@ -239,7 +281,7 @@ Adds an object type and returns its one-based index.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:addObjectType
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local enemy_idx = mm:addObjectType("enemy", 1, 0, 0, 1)
   local ally_idx = mm:addObjectType("ally",  0, 0.5, 1, 1)
@@ -266,7 +308,7 @@ Adds a timed ping effect at a minimap world position. The ping fades out over it
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:addPing
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   mm:addPing(32, 32, 2.0, 0, 1, 1, 1)
   lurek.log.info("ping added; count: " .. mm:getPingCount(), "minimap")
@@ -286,7 +328,7 @@ Clears marker animation by id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearMarkerAnimation
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   local id = mm:addMarker(4, 4, "Boss")
   mm:setMarkerAnimation(id, "blink", 4.0)
@@ -307,7 +349,7 @@ Clears image texture from a marker.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearMarkerTexture
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   local tex = lurek.render.newImage("assets/icon.png")
   local id = mm:addMarker(10, 12, "poi")
@@ -325,7 +367,7 @@ Clears all objects from the minimap.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearObjects
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   local t = mm:addObjectType("npc", 0, 1, 0, 1)
   mm:setObject(1, 4, 4, t); mm:setObject(2, 9, 9, t)
@@ -347,7 +389,7 @@ Clears image texture for an object type.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearObjectTypeTexture
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   local tex = lurek.render.newImage("assets/icon.png")
   local idx = mm:addObjectType("unit", 1, 1, 1, 1)
@@ -365,7 +407,7 @@ Clears overlay shapes. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearOverlay
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   mm:drawLine(0, 0, 40, 30, { 255, 255, 0, 255 })
   mm:drawRect(5, 5, 10, 8, { 0, 200, 255, 180 })
@@ -386,7 +428,7 @@ Clears one path by id or all paths when no id is provided.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearPath
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   local id = mm:showPath({ {2,2}, {6,4}, {10,8} }, { 0, 255, 0, 200 })
   mm:clearPath(id)
@@ -402,7 +444,7 @@ Clears the viewport rectangle. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:clearViewportRect
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   mm:setViewportRect(10, 10, 20, 15)
   mm:clearViewportRect()
@@ -428,7 +470,7 @@ Adds an overlay line. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:drawLine
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:drawLine(0, 0, 31, 31, {1, 1, 0, 1})
   lurek.log.info("overlay line drawn", "minimap")
@@ -452,7 +494,7 @@ Adds an overlay rectangle. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:drawRect
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:drawRect(5, 5, 20, 20, {0, 1, 0, 0.5})
   lurek.log.info("overlay rect drawn", "minimap")
@@ -474,7 +516,7 @@ Draws the minimap into image data at a pixel size.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:drawToImage
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setTerrain(1, 1, 1)
   local img = mm:drawToImage(8)
@@ -493,7 +535,7 @@ Returns the total number of grid cells.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getCellCount
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   lurek.log.info("cell count: " .. mm:getCellCount(), "minimap")
 end
@@ -510,7 +552,7 @@ Returns minimap world center. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getCenter
+do
   local mm = lurek.minimap.newMinimap(64, 64)
   mm:setCenter(20.5, 35.0)
   local cx, cy = mm:getCenter()
@@ -529,7 +571,7 @@ Returns minimap world center x coordinate.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getCenterX
+do
   local mm = lurek.minimap.newMinimap(64, 64)
   mm:setCenter(40, 20)
   if mm:getCenterX() > 32 then mm:setCenter(32, mm:getCenterY()) end
@@ -547,7 +589,7 @@ Returns minimap world center y coordinate.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getCenterY
+do
   local mm = lurek.minimap.newMinimap(64, 48)
   mm:setCenter(10, 50)
   local cy = math.min(mm:getCenterY(), 40)
@@ -566,7 +608,7 @@ Returns the current minimap color mode.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getColorMode
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setColorMode("terrain")
   if mm:getColorMode() == "terrain" then mm:setTerrainColor(1, 0.3, 0.5, 0.2, 1) end
@@ -584,7 +626,7 @@ Returns the minimap display height.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getDisplayHeight
+do
   local mm = lurek.minimap.newMinimap(32, 32, 240, 180)
   local py = mm:getDisplayHeight()
   lurek.log.info("minimap occupies " .. py .. " px tall", "ui")
@@ -602,7 +644,7 @@ Returns the minimap display size. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getDisplaySize
+do
   local mm = lurek.minimap.newMinimap(40, 30, 200, 150)
   local dw, dh = mm:getDisplaySize()
   local cx, cy = dw * 0.5, dh * 0.5
@@ -621,7 +663,7 @@ Returns the minimap display width.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getDisplayWidth
+do
   local mm = lurek.minimap.newMinimap(32, 32, 240, 180)
   local px = mm:getDisplayWidth()
   local hud_x = 16 + px + 8
@@ -640,7 +682,7 @@ Returns the fog overlay color. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getFogColor
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setFogColor(0.05, 0.05, 0.1, 0.85)
   local r, g, b, a = mm:getFogColor()
@@ -664,7 +706,7 @@ Returns fog level for a one-based grid cell.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getFogLevel
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setFogEnabled(true)
   mm:setFogLevel(8, 8, 2)
@@ -683,7 +725,7 @@ Returns the minimap grid height. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getGridHeight
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   local h = mm:getGridHeight()
   for y = 1, h do mm:setTerrain(1, y, 3) end
@@ -701,7 +743,7 @@ Returns the minimap grid size. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getGridSize
+do
   local mm = lurek.minimap.newMinimap(48, 32)
   local gw, gh = mm:getGridSize()
   lurek.log.info("grid cells: " .. (gw * gh), "minimap")
@@ -719,7 +761,7 @@ Returns the minimap grid width. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getGridWidth
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   local w = mm:getGridWidth()
   for x = 1, w do mm:setTerrain(x, 1, 2) end
@@ -744,7 +786,7 @@ Returns hover text for a screen position when available.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getHoverInfo
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   mm:setTerrain(10, 10, 1)
   local info = mm:getHoverInfo(40, 40, 0, 0)
@@ -763,7 +805,7 @@ Returns active minimap layer. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getLayer
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setLayer(2)
   lurek.log.info("active layer: " .. mm:getLayer(), "minimap")
@@ -781,7 +823,7 @@ Returns the number of minimap layers.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getLayerCount
+do
   local mm = lurek.minimap.newMinimap(4, 4)
   mm:setLayerData(1, {0,1,0,1, 1,0,1,0, 0,1,0,1, 1,0,1,0})
   lurek.log.info("layer count: " .. mm:getLayerCount(), "minimap")
@@ -803,7 +845,7 @@ Returns raw cell data for a layer. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getLayerData
+do
   local mm = lurek.minimap.newMinimap(4, 4)
   mm:setLayerData(0, {1,2,3,4, 4,3,2,1, 1,2,3,4, 4,3,2,1})
   local data = mm:getLayerData(0)
@@ -822,7 +864,7 @@ Returns the number of markers. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getMarkerCount
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:addMarker(2, 2, "A"); mm:addMarker(8, 4, "B"); mm:addMarker(14, 7, "C")
   lurek.log.info("markers placed: " .. mm:getMarkerCount(), "minimap")
@@ -844,7 +886,7 @@ Returns a marker description by id.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getMarkerDescription
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   local id = mm:addMarker(12, 9, "Hidden cache")
   local desc = mm:getMarkerDescription(id)
@@ -863,7 +905,7 @@ Returns the number of objects on the minimap.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getObjectCount
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   local t = mm:addObjectType("rat", 0.6, 0.4, 0.2, 1)
   for i = 1, 5 do mm:setObject(i, i, i, t) end
@@ -882,7 +924,7 @@ Returns the number of object types.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getObjectTypeCount
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   mm:addObjectType("ally", 0.2, 0.6, 1, 1)
   mm:addObjectType("enemy", 1, 0.2, 0.2, 1)
@@ -901,7 +943,7 @@ Returns the number of overlay shapes.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getOverlayShapeCount
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:drawLine(0, 0, 8, 8, {255, 0, 0, 255})
   mm:drawRect(4, 4, 6, 6, {0, 255, 0, 180})
@@ -924,7 +966,7 @@ Returns RGBA color for an owner id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getOwnerColor
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setOwnerColor(2, 0.1, 0.4, 0.9, 1)
   local r, g, b, a = mm:getOwnerColor(2)
@@ -943,7 +985,7 @@ Returns the number of paths. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getPathCount
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:showPath({ {2,2}, {3,4}, {5,6} }, {255, 200, 0, 255})
   lurek.log.info("path count: " .. mm:getPathCount(), "minimap")
@@ -961,7 +1003,7 @@ Returns the number of active pings.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getPingCount
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   mm:addPing(10, 10, 1.5)
   mm:addPing(20, 15, 1.5, 0.2, 1, 0.4, 1)
@@ -985,7 +1027,7 @@ Returns terrain type for a one-based grid cell.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getTerrain
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setTerrain(4, 4, 7)
   local t = mm:getTerrain(4, 4)
@@ -1008,7 +1050,7 @@ Returns RGBA color for a terrain type.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getTerrainColor
+do
   local mm = lurek.minimap.newMinimap(8, 8)
   mm:setTerrainColor(2, 0.2, 0.6, 0.1, 1.0)
   local r, g, b, a = mm:getTerrainColor(2)
@@ -1031,7 +1073,7 @@ Returns text description for a tile type.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getTileDescription
+do
   local mm = lurek.minimap.newMinimap(8, 8)
   mm:setTileDescription(3, "Dense forest, slows movement")
   local desc = mm:getTileDescription(3)
@@ -1050,7 +1092,7 @@ Returns the viewport rectangle color.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getViewportColor
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   mm:setViewportColor(1, 1, 1, 0.6)
   local r, g, b, a = mm:getViewportColor()
@@ -1069,7 +1111,7 @@ Returns the viewport rectangle when one is set.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getViewportRect
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   mm:setViewportRect(5, 8, 16, 12)
   local x, y, w, h = mm:getViewportRect()
@@ -1088,7 +1130,7 @@ Returns minimap zoom. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:getZoom
+do
   local mm = lurek.minimap.newMinimap(48, 48, 240, 240)
   mm:setZoom(1.5)
   local cell_px = (mm:getDisplayWidth() / mm:getGridWidth()) * mm:getZoom()
@@ -1114,7 +1156,7 @@ Converts grid coordinates to screen coordinates.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:gridToScreen
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local sx, sy = mm:gridToScreen(16, 16, 0, 0)
   lurek.log.info("grid 16,16 -> screen " .. sx .. "," .. sy, "minimap")
@@ -1136,7 +1178,7 @@ Returns whether a marker id exists.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:hasMarker
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   local id = mm:addMarker(8, 6, "Ally HQ")
   if mm:hasMarker(id) then mm:setMarkerAnimation(id, "pulse", 1.5) end
@@ -1154,7 +1196,7 @@ Returns whether anti-aliasing is enabled.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:isAntiAlias
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:setAntiAlias(true)
   local opts = { aa = mm:isAntiAlias() }
@@ -1173,7 +1215,7 @@ Returns whether minimap click handling is enabled.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:isClickable
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   mm:setClickable(true)
   if mm:isClickable() then mm:addMarker(20, 15, "click target") end
@@ -1191,7 +1233,7 @@ Returns whether fog display is enabled.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:isFogEnabled
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:setFogEnabled(false)
   if not mm:isFogEnabled() then mm:setTerrain(1, 1, 9) end
@@ -1213,7 +1255,7 @@ Returns visibility for an object type by one-based index.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:isObjectTypeVisible
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   local enemy = mm:addObjectType("enemy", 1, 0.1, 0.1, 1)
   if mm:isObjectTypeVisible(enemy) then lurek.log.info("enemies shown", "minimap") end
@@ -1231,7 +1273,7 @@ Returns whether the viewport rectangle is visible.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:isViewportVisible
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   mm:setViewportRect(0, 0, 16, 12)
   if mm:isViewportVisible() then lurek.log.info("viewport overlay on", "minimap") end
@@ -1253,7 +1295,7 @@ Removes a marker by id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:removeMarker
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   local id = mm:addMarker(5, 5, "Quest goal")
   if mm:removeMarker(id) then lurek.log.info("marker " .. id .. " cleared", "minimap") end
@@ -1275,7 +1317,7 @@ Removes an object by id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:removeObject
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   local t = mm:addObjectType("loot", 1, 1, 0, 1)
   mm:setObject(101, 5, 5, t)
@@ -1297,7 +1339,7 @@ Enqueues minimap render commands at an optional screen position.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:render
+do
   local mm
   function lurek.init() mm = lurek.minimap.newMinimap(48, 32, 200, 140) end
   function lurek.draw() mm:render(20, 20) end
@@ -1319,7 +1361,7 @@ Reveals fog inside a world-space radius.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:revealRadius
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   mm:setFogEnabled(true)
   mm:revealRadius(8, 8, 3)
@@ -1345,7 +1387,7 @@ Converts a screen position to grid coordinates.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:screenToGrid
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local gx, gy = mm:screenToGrid(64, 64, 0, 0)
   lurek.log.info("screen -> grid: " .. gx .. "," .. gy, "minimap")
@@ -1365,7 +1407,7 @@ Enables or disables minimap anti-aliasing.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setAntiAlias
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:setAntiAlias(false)
   if not mm:isAntiAlias() then lurek.log.info("pixel-perfect minimap", "render") end
@@ -1386,7 +1428,7 @@ Sets minimap world center. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setCenter
+do
   local mm = lurek.minimap.newMinimap(128, 128, 200, 200)
   local player = { x = 64, y = 32 }
   mm:setCenter(player.x, player.y)
@@ -1406,7 +1448,7 @@ Enables or disables minimap click handling.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setClickable
+do
   local mm = lurek.minimap.newMinimap(40, 30)
   mm:setClickable(false)
   if not mm:isClickable() then lurek.log.info("minimap input disabled", "ui") end
@@ -1426,7 +1468,7 @@ Sets the minimap color mode. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setColorMode
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   mm:setColorMode("political")
   lurek.log.info("mode now " .. mm:getColorMode(), "minimap")
@@ -1447,7 +1489,7 @@ Sets the minimap display size. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setDisplaySize
+do
   local mm = lurek.minimap.newMinimap(64, 64)
   mm:setDisplaySize(320, 240)
   local w, h = mm:getDisplaySize()
@@ -1471,7 +1513,7 @@ Sets the fog overlay color. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setFogColor
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   mm:setFogEnabled(true)
   mm:setFogColor(0.0, 0.0, 0.1, 0.7)
@@ -1492,7 +1534,7 @@ Replaces fog data from a flat array table.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setFogData
+do
   local mm = lurek.minimap.newMinimap(4, 3)
   mm:setFogEnabled(true)
   local fog = { 2,2,1,0, 2,2,1,0, 1,1,1,0 }
@@ -1513,7 +1555,7 @@ Enables or disables fog display. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setFogEnabled
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:setFogEnabled(true)
   if mm:isFogEnabled() then lurek.log.info("fog on", "minimap") end
@@ -1535,7 +1577,7 @@ Sets fog level for a one-based grid cell.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setFogLevel
+do
   local mm = lurek.minimap.newMinimap(20, 20)
   mm:setFogEnabled(true)
   for x = 4, 8 do mm:setFogLevel(x, 5, 2) end
@@ -1556,7 +1598,7 @@ Sets active minimap layer. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setLayer
+do
   local mm = lurek.minimap.newMinimap(8, 4)
   mm:setLayerData(1, { 1,1,2,2,1,1,2,2, 0,1,1,2,0,1,1,2, 0,0,1,1,0,0,1,1, 0,0,0,1,0,0,0,1 })
   mm:setLayer(1)
@@ -1577,7 +1619,7 @@ Sets raw cell data for a layer. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setLayerData
+do
   local mm = lurek.minimap.newMinimap(8, 8, 8)
   local data = {}
   for i = 1, 64 do data[i] = (i % 2 == 0) and 1 or 0 end
@@ -1601,7 +1643,7 @@ Sets marker animation by type name.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setMarkerAnimation
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local marker_id = mm:addMarker(16, 16, "quest_marker", 1, 1, 0, 1)
   mm:setMarkerAnimation(marker_id, "pulse", 4)
@@ -1625,7 +1667,7 @@ Assigns an image texture to a marker.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setMarkerTexture
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   local tex = lurek.render.newImage("assets/icon.png")
   local id = mm:addMarker(10, 12, "poi")
@@ -1650,7 +1692,7 @@ Adds or updates an object on the minimap.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setObject
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local unit_idx = mm:addObjectType("unit", 0, 0.7, 1, 1)
   mm:setObject(1, 16, 16, unit_idx)
@@ -1674,7 +1716,7 @@ Assigns an image texture to an object type.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setObjectTypeTexture
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   local tex = lurek.render.newImage("assets/icon.png")
   local idx = mm:addObjectType("unit", 1, 1, 1, 1)
@@ -1696,7 +1738,7 @@ Sets visibility for an object type by one-based index.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setObjectTypeVisible
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local enemy_idx = mm:addObjectType("enemy", 1, 0, 0, 1)
   mm:setObjectTypeVisible(enemy_idx, false)
@@ -1721,7 +1763,7 @@ Sets RGBA color for an owner id. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setOwnerColor
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:setOwnerColor(1, 0.9, 0.1, 0.1, 1)
   mm:setOwnerColor(2, 0.1, 0.2, 0.9, 1)
@@ -1744,7 +1786,7 @@ Sets terrain type for a one-based grid cell.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setTerrain
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:setTerrainColor(1, 0.2, 0.4, 0.9, 1)
   mm:setTerrain(5, 10, 1)
@@ -1769,7 +1811,7 @@ Sets RGBA color for a terrain type. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setTerrainColor
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:setTerrainColor(1, 0.1, 0.6, 0.1, 1)
   mm:setTerrainColor(2, 0.9, 0.8, 0.4, 1)
@@ -1790,7 +1832,7 @@ Replaces terrain data from a flat array table.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setTerrainData
+do
   local mm = lurek.minimap.newMinimap(4, 3)
   local data = { 1,1,2,2, 1,3,3,2, 0,3,3,0 }
   mm:setTerrainData(data)
@@ -1812,7 +1854,7 @@ Sets text description for a tile type.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setTileDescription
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   mm:setTerrainColor(1, 0.5, 0.5, 0.5, 1)
   mm:setTileDescription(1, "Impassable rock face")
@@ -1836,7 +1878,7 @@ Sets the viewport rectangle color.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setViewportColor
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   mm:setViewportColor(1, 1, 0, 0.8)
   lurek.log.info("viewport colour set", "minimap")
@@ -1859,7 +1901,7 @@ Sets the visible viewport rectangle shown on the minimap.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setViewportRect
+do
   local mm = lurek.minimap.newMinimap(64, 64, 4)
   mm:setViewportRect(100, 100, 800, 600)
   lurek.log.info("viewport rect set", "minimap")
@@ -1879,7 +1921,7 @@ Sets whether the viewport rectangle is visible.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setViewportVisible
+do
   local mm = lurek.minimap.newMinimap(80, 60)
   mm:setViewportRect(0, 0, 24, 18)
   mm:setViewportVisible(false)
@@ -1899,7 +1941,7 @@ Sets minimap zoom. This method is available to Lua scripts.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:setZoom
+do
   local mm = lurek.minimap.newMinimap(64, 64)
   mm:setZoom(2.5)
   lurek.log.info("zoom " .. mm:getZoom(), "minimap")
@@ -1922,7 +1964,7 @@ Adds a colored path overlay and returns its id.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:showPath
+do
   local mm = lurek.minimap.newMinimap(32, 32, 4)
   local path = {{5,5},{10,10},{20,15}}
   mm:showPath(path, {1, 0.5, 0, 1})
@@ -1943,7 +1985,7 @@ Centers the minimap and viewport rectangle from a camera handle.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:trackCamera
+do
   local mm = lurek.minimap.newMinimap(64, 64, 200, 200)
   local cam = lurek.camera.new(20, 10)
   cam:setPosition(12, 18)
@@ -1965,7 +2007,7 @@ Returns the Lua-visible type name for this minimap handle.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:type
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   if mm:type() == "Minimap" then lurek.log.info("widget is a minimap", "ui") end
 end
@@ -1986,7 +2028,7 @@ Returns whether this minimap handle matches a supported type name.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:typeOf
+do
   local mm = lurek.minimap.newMinimap(16, 16)
   if mm:typeOf("Object") then lurek.log.info("widget responds to Object api", "ui") end
 end
@@ -2005,7 +2047,7 @@ Advances minimap animations and timers.
 Exact example from [minimap.lua](../blob/main/content/examples/minimap.lua):
 
 ```lua
-do -- Minimap:update
+do
   local mm = lurek.minimap.newMinimap(32, 32)
   mm:addPing(8, 8, 0.5)
   function lurek.process(dt) mm:update(dt) end

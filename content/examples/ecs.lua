@@ -2,18 +2,20 @@
 -- lurek.ecs API examples.
 -- Run: cargo run -- content/examples/ecs.lua
 
---@api-stub: lurek.ecs.newUniverse -- Creates an empty ECS universe for entity, component, system, and relationship management
-do -- lurek.ecs.newUniverse
+--@api-stub: lurek.ecs.newUniverse
+-- Creates an empty ECS universe for entity, component, system, and relationship management
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "position", { x = 0, y = 0 })
   lurek.log.info("universe ready, first id=" .. hero, "ecs")
 end
 
--- â”€â”€ Universe methods â”€â”€
+-- Universe methods
 
 --@api-stub: Universe:spawn
-do -- Universe:spawn
+-- Performs the spawn operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local enemy = world:spawn()
   world:set(enemy, "position", { x = 320, y = 240 })
@@ -21,7 +23,8 @@ do -- Universe:spawn
 end
 
 --@api-stub: Universe:kill
-do -- Universe:kill
+-- Performs the kill operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local bullet = world:spawn()
   world:set(bullet, "position", { x = 100, y = 100 })
@@ -29,7 +32,8 @@ do -- Universe:kill
 end
 
 --@api-stub: Universe:isAlive
-do -- Universe:isAlive
+-- Returns true if this universe alive.
+do
   local world = lurek.ecs.newUniverse()
   local id = world:spawn()
   world:kill(id)
@@ -37,7 +41,8 @@ do -- Universe:isAlive
 end
 
 --@api-stub: Universe:get
-do -- Universe:get
+-- Returns the  of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 10, y = 20 })
@@ -46,7 +51,8 @@ do -- Universe:get
 end
 
 --@api-stub: Universe:has
-do -- Universe:has
+-- Returns true if this universe has a .
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "stunned", { ticks = 30 })
@@ -54,7 +60,8 @@ do -- Universe:has
 end
 
 --@api-stub: Universe:remove
-do -- Universe:remove
+-- Removes a  from this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "burning", { ticks = 60 })
@@ -62,7 +69,8 @@ do -- Universe:remove
 end
 
 --@api-stub: Universe:getComponents
-do -- Universe:getComponents
+-- Returns the components of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 0, y = 0 })
@@ -71,7 +79,8 @@ do -- Universe:getComponents
 end
 
 --@api-stub: Universe:query
-do -- Universe:query
+-- Performs the query operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 0, y = 0 })
@@ -83,7 +92,8 @@ do -- Universe:query
 end
 
 --@api-stub: Universe:getEntities
-do -- Universe:getEntities
+-- Returns the entities of this universe.
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
   local all = world:getEntities()
@@ -91,14 +101,16 @@ do -- Universe:getEntities
 end
 
 --@api-stub: Universe:getEntityCount
-do -- Universe:getEntityCount
+-- Returns the number of entity items in this universe.
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 12 do world:spawn() end
   if world:getEntityCount() > 1000 then lurek.log.warn("entity budget exceeded", "ecs") end
 end
 
 --@api-stub: Universe:removeSystem
-do -- Universe:removeSystem
+-- Removes a system from this universe.
+do
   local world = lurek.ecs.newUniverse()
   local ai_system = { update = function() end }
   world:addSystem(ai_system, { priority = 50 })
@@ -106,7 +118,8 @@ do -- Universe:removeSystem
 end
 
 --@api-stub: Universe:update
-do -- Universe:update
+-- Advances this universe by the given delta time.
+do
   local world = lurek.ecs.newUniverse()
   local move_system = {
     update = function(_, w, dt)
@@ -121,7 +134,8 @@ do -- Universe:update
 end
 
 --@api-stub: Universe:render
-do -- Universe:render
+-- Draws or renders this universe to the current render target.
+do
   local world = lurek.ecs.newUniverse()
   local draw_system = {
     render = function(_, w)
@@ -136,7 +150,8 @@ do -- Universe:render
 end
 
 --@api-stub: Universe:emit
-do -- Universe:emit
+-- Performs the emit operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local hp_system = {
     damage = function(_, w, id, amount)
@@ -149,7 +164,8 @@ do -- Universe:emit
 end
 
 --@api-stub: Universe:getSystemCount
-do -- Universe:getSystemCount
+-- Returns the number of system items in this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:addSystem({ update = function() end })
   world:addSystem({ render = function() end })
@@ -157,7 +173,8 @@ do -- Universe:getSystemCount
 end
 
 --@api-stub: Universe:clear
-do -- Universe:clear
+-- Clears all items from this universe.
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
   world:clear()
@@ -165,14 +182,16 @@ do -- Universe:clear
 end
 
 --@api-stub: Universe:release
-do -- Universe:release
+-- Performs the release operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:spawn()
   world:release()
 end
 
 --@api-stub: Universe:addTag
-do -- Universe:addTag
+-- Adds a tag to this universe.
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:addTag(hero, "player")
@@ -180,7 +199,8 @@ do -- Universe:addTag
 end
 
 --@api-stub: Universe:removeTag
-do -- Universe:removeTag
+-- Removes a tag from this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "alive")
@@ -188,7 +208,8 @@ do -- Universe:removeTag
 end
 
 --@api-stub: Universe:hasTag
-do -- Universe:hasTag
+-- Returns true if this universe has a tag.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "player")
@@ -196,7 +217,8 @@ do -- Universe:hasTag
 end
 
 --@api-stub: Universe:getTags
-do -- Universe:getTags
+-- Returns the tags of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "player"); world:addTag(e, "invincible")
@@ -204,7 +226,8 @@ do -- Universe:getTags
 end
 
 --@api-stub: Universe:getEntitiesByTag
-do -- Universe:getEntitiesByTag
+-- Returns the entities by tag of this universe.
+do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 3 do local id = world:spawn(); world:addTag(id, "enemy") end
   local enemies = world:getEntitiesByTag("enemy")
@@ -212,21 +235,24 @@ do -- Universe:getEntitiesByTag
 end
 
 --@api-stub: Universe:setLayer
-do -- Universe:setLayer
+-- Sets the layer of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local floor = world:spawn(); world:setLayer(floor, 0)
   local actor = world:spawn(); world:setLayer(actor, 10)
 end
 
 --@api-stub: Universe:getLayer
-do -- Universe:getLayer
+-- Returns the layer of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:setLayer(e, 5)
   if world:getLayer(e) >= 5 then lurek.log.debug("foreground", "ecs") end
 end
 
 --@api-stub: Universe:getEntitiesByLayer
-do -- Universe:getEntitiesByLayer
+-- Returns the entities by layer of this universe.
+do
   local world = lurek.ecs.newUniverse()
   for i = 1, 4 do local id = world:spawn(); world:setLayer(id, i % 2) end
   local fg = world:getEntitiesByLayer(1)
@@ -234,7 +260,8 @@ do -- Universe:getEntitiesByLayer
 end
 
 --@api-stub: Universe:getEntitiesSorted
-do -- Universe:getEntitiesSorted
+-- Returns the entities sorted of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local a = world:spawn(); world:setLayer(a, 2)
   local b = world:spawn(); world:setLayer(b, 0)
@@ -243,7 +270,8 @@ do -- Universe:getEntitiesSorted
 end
 
 --@api-stub: Universe:defineTag
-do -- Universe:defineTag
+-- Performs the define tag operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local bit_player = world:defineTag("player")
   local bit_enemy  = world:defineTag("enemy")
@@ -251,7 +279,8 @@ do -- Universe:defineTag
 end
 
 --@api-stub: Universe:bitmapTag
-do -- Universe:bitmapTag
+-- Performs the bitmap tag operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
   local block = world:spawn()
@@ -259,7 +288,8 @@ do -- Universe:bitmapTag
 end
 
 --@api-stub: Universe:bitmapUntag
-do -- Universe:bitmapUntag
+-- Performs the bitmap untag operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("invincible")
   local hero = world:spawn(); world:bitmapTag(hero, "invincible")
@@ -267,7 +297,8 @@ do -- Universe:bitmapUntag
 end
 
 --@api-stub: Universe:hasBitmapTag
-do -- Universe:hasBitmapTag
+-- Returns true if this universe has a bitmap tag.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
   local block = world:spawn(); world:bitmapTag(block, "solid")
@@ -275,7 +306,8 @@ do -- Universe:hasBitmapTag
 end
 
 --@api-stub: Universe:queryBitmapTag
-do -- Universe:queryBitmapTag
+-- Performs the query bitmap tag operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("enemy")
   for _ = 1, 4 do local id = world:spawn(); world:bitmapTag(id, "enemy") end
@@ -283,7 +315,8 @@ do -- Universe:queryBitmapTag
 end
 
 --@api-stub: Universe:queryBitmapAny
-do -- Universe:queryBitmapAny
+-- Performs the query bitmap any operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("enemy"); world:defineTag("hazard")
   local a = world:spawn(); world:bitmapTag(a, "enemy")
@@ -293,7 +326,8 @@ do -- Universe:queryBitmapAny
 end
 
 --@api-stub: Universe:queryBitmapAll
-do -- Universe:queryBitmapAll
+-- Performs the query bitmap all operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid"); world:defineTag("visible")
   local b = world:spawn(); world:bitmapTag(b, "solid"); world:bitmapTag(b, "visible")
@@ -303,7 +337,8 @@ do -- Universe:queryBitmapAll
 end
 
 --@api-stub: Universe:getBitmapTagBit
-do -- Universe:getBitmapTagBit
+-- Returns the bitmap tag bit of this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineTag("player")
   local bit = world:getBitmapTagBit("player")
@@ -311,21 +346,24 @@ do -- Universe:getBitmapTagBit
 end
 
 --@api-stub: Universe:hasBlueprint
-do -- Universe:hasBlueprint
+-- Returns true if this universe has a blueprint.
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   if world:hasBlueprint("goblin") then lurek.log.info("goblin ready", "ecs") end
 end
 
 --@api-stub: Universe:removeBlueprint
-do -- Universe:removeBlueprint
+-- Removes a blueprint from this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   world:removeBlueprint("goblin")
 end
 
 --@api-stub: Universe:listBlueprints
-do -- Universe:listBlueprints
+-- Performs the list blueprints operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   world:defineBlueprint("orc",    { health = { hp = 7, max = 7 } })
@@ -333,7 +371,8 @@ do -- Universe:listBlueprints
 end
 
 --@api-stub: Universe:getBlueprintComponents
-do -- Universe:getBlueprintComponents
+-- Returns the blueprint components of this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   local comps = world:getBlueprintComponents("goblin")
@@ -341,7 +380,8 @@ do -- Universe:getBlueprintComponents
 end
 
 --@api-stub: Universe:getParent
-do -- Universe:getParent
+-- Returns the parent of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local parent = world:spawn()
   local child  = world:spawn()
@@ -350,7 +390,8 @@ do -- Universe:getParent
 end
 
 --@api-stub: Universe:getChildren
-do -- Universe:getChildren
+-- Returns the children of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local root = world:spawn()
   for _ = 1, 3 do local c = world:spawn(); world:setParent(c, root) end
@@ -358,7 +399,8 @@ do -- Universe:getChildren
 end
 
 --@api-stub: Universe:killRecursive
-do -- Universe:killRecursive
+-- Performs the kill recursive operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local wagon = world:spawn()
   local driver = world:spawn(); world:setParent(driver, wagon)
@@ -366,7 +408,8 @@ do -- Universe:killRecursive
 end
 
 --@api-stub: Universe:serialize
-do -- Universe:serialize
+-- Performs the serialize operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn(); world:set(hero, "position", { x = 5, y = 7 })
   local snapshot = world:serialize()
@@ -374,7 +417,8 @@ do -- Universe:serialize
 end
 
 --@api-stub: Universe:deserialize
-do -- Universe:deserialize
+-- Performs the deserialize operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:set(e, "position", { x = 1, y = 2 })
   local snap = world:serialize()
@@ -383,7 +427,8 @@ do -- Universe:deserialize
 end
 
 --@api-stub: Universe:flushObservers
-do -- Universe:flushObservers
+-- Performs the flush observers operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   world:onComponentAdded("health", function(id) lurek.log.info("hp added to " .. id, "ecs") end)
   local e = world:spawn(); world:set(e, "health", { hp = 10, max = 10 })
@@ -391,7 +436,8 @@ do -- Universe:flushObservers
 end
 
 --@api-stub: Universe:getRelated
-do -- Universe:getRelated
+-- Returns the related of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   local sword = world:spawn(); world:addRelation(hero, "wields", sword)
@@ -399,7 +445,8 @@ do -- Universe:getRelated
 end
 
 --@api-stub: Universe:clearRelations
-do -- Universe:clearRelations
+-- Clears all relations items from this universe.
+do
   local world = lurek.ecs.newUniverse()
   local boss = world:spawn()
   for _ = 1, 3 do local m = world:spawn(); world:addRelation(boss, "minions", m) end
@@ -407,7 +454,8 @@ do -- Universe:clearRelations
 end
 
 --@api-stub: Universe:addRelation
-do -- Universe:addRelation
+-- Adds a relation to this universe.
+do
   local u = lurek.ecs.newUniverse()
   local parent = u:spawn()
   local child  = u:spawn()
@@ -416,7 +464,8 @@ do -- Universe:addRelation
 end
 
 --@api-stub: Universe:addSystem
-do -- Universe:addSystem
+-- Adds a system to this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:addSystem({
     query = {"Position", "Velocity"},
@@ -428,14 +477,16 @@ do -- Universe:addSystem
 end
 
 --@api-stub: Universe:defineBlueprint
-do -- Universe:defineBlueprint
+-- Performs the define blueprint operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("enemy", {Health={max=100}, Position={x=0,y=0}})
   lurek.log.info("blueprint defined", "ecs")
 end
 
 --@api-stub: Universe:each
-do -- Universe:each
+-- Performs the each operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   local e = u:spawn()
   u:set(e, "Tag", {})
@@ -445,7 +496,8 @@ do -- Universe:each
 end
 
 --@api-stub: Universe:extendBlueprint
-do -- Universe:extendBlueprint
+-- Performs the extend blueprint operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("unit", {Health={max=100}, Position={x=0,y=0}})
   u:extendBlueprint("boss", "unit", {Health={max=500}})
@@ -453,7 +505,8 @@ do -- Universe:extendBlueprint
 end
 
 --@api-stub: Universe:hasRelation
-do -- Universe:hasRelation
+-- Returns true if this universe has a relation.
+do
   local u = lurek.ecs.newUniverse()
   local a = u:spawn(); local b = u:spawn()
   u:addRelation(a, "ally", b)
@@ -461,7 +514,8 @@ do -- Universe:hasRelation
 end
 
 --@api-stub: Universe:onComponentAdded
-do -- Universe:onComponentAdded
+-- Fires the callback registered for the component added event on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:onComponentAdded("Health", function(eid, comp)
     lurek.log.info("health added to " .. eid, "ecs")
@@ -471,7 +525,8 @@ do -- Universe:onComponentAdded
 end
 
 --@api-stub: Universe:onComponentRemoved
-do -- Universe:onComponentRemoved
+-- Fires the callback registered for the component removed event on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:onComponentRemoved("Sprite", function(eid)
     lurek.log.info("sprite removed from " .. eid, "ecs")
@@ -482,7 +537,8 @@ do -- Universe:onComponentRemoved
 end
 
 --@api-stub: Universe:queryNot
-do -- Universe:queryNot
+-- Performs the query not operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   local e1 = u:spawn(); u:set(e1, "Health", {hp=100})
   local e2 = u:spawn()
@@ -491,7 +547,8 @@ do -- Universe:queryNot
 end
 
 --@api-stub: Universe:removeRelation
-do -- Universe:removeRelation
+-- Removes a relation from this universe.
+do
   local u = lurek.ecs.newUniverse()
   local a = u:spawn(); local b = u:spawn()
   u:addRelation(a, "ally", b)
@@ -500,7 +557,8 @@ do -- Universe:removeRelation
 end
 
 --@api-stub: Universe:set
-do -- Universe:set
+-- Sets the  of this universe.
+do
   local u = lurek.ecs.newUniverse()
   local e = u:spawn()
   u:set(e, "Position", {x=100, y=200})
@@ -509,7 +567,8 @@ do -- Universe:set
 end
 
 --@api-stub: Universe:setParent
-do -- Universe:setParent
+-- Sets the parent of this universe.
+do
   local u = lurek.ecs.newUniverse()
   local parent = u:spawn()
   local child  = u:spawn()
@@ -518,7 +577,8 @@ do -- Universe:setParent
 end
 
 --@api-stub: Universe:spawnBlueprint
-do -- Universe:spawnBlueprint
+-- Performs the spawn blueprint operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("goblin", {Health={max=40}, Position={x=0,y=0}})
   local e = u:spawnBlueprint("goblin", {Position={x=300,y=200}})
@@ -526,32 +586,17 @@ do -- Universe:spawnBlueprint
 end
 
 --@api-stub: Universe:spawnBulk
-do -- Universe:spawnBulk
+-- Performs the spawn bulk operation on this universe.
+do
   local u = lurek.ecs.newUniverse()
   u:defineBlueprint("bulk_unit", {Health={max=100}, Position={x=0,y=0}})
   local ids = u:spawnBulk("bulk_unit", 50, {})
   lurek.log.info("bulk spawned: " .. #ids, "ecs")
 end
 
--- =============================================================================
--- COVERAGE: 2 uncovered lurek.ecs API item(s)
--- Generated by tools/audit/example_add_missing.py
--- REQUIRED: replace every --@api-stub: block below with a real scenario.
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- The final committed file must contain ZERO --@api-stub: lines.
--- =============================================================================
-
 -- -----------------------------------------------------------------------------
 -- Universe methods
 -- -----------------------------------------------------------------------------
-
--- =============================================================================
--- COVERAGE: 2 uncovered lurek.ecs API item(s)
--- Generated by tools/audit/example_add_missing.py
--- REQUIRED: replace every --@api-stub: block below with a real scenario.
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- The final committed file must contain ZERO --@api-stub: lines.
--- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- LUniverse methods
@@ -560,14 +605,16 @@ end
 -- LUniverse:type / LUniverse:typeOf
 -- Inspect the runtime type name and confirm object type at runtime.
 --@api-stub: Universe:type
-do -- Universe:type typeOf
+-- Returns the Lua-visible type name string for this universe handle.
+do
   local world = lurek.ecs.newUniverse()
   lurek.log.info("type=" .. world:type(), "ecs")
   lurek.log.info("typeOf Universe: " .. tostring(world:typeOf("Universe")), "ecs")
 end
 
 --@api-stub: Universe:queryMulti
-do -- Universe:queryMulti
+-- Performs the query multi operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local a = world:spawn()
   world:set(a, "pos", { x = 1, y = 2 })
@@ -579,7 +626,8 @@ do -- Universe:queryMulti
 end
 
 --@api-stub: Universe:getDirtyEntities
-do -- Universe:getDirtyEntities
+-- Returns the dirty entities of this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "hp", 50)
@@ -590,7 +638,8 @@ do -- Universe:getDirtyEntities
 end
 
 --@api-stub: Universe:updatePhase
-do -- Universe:updatePhase
+-- Advances phase this universe by the given delta time.
+do
   local world = lurek.ecs.newUniverse()
   local InputSys = { update = function(self, w, dt) lurek.log.debug("input", "ecs") end }
   local LogicSys = { update = function(self, w, dt) lurek.log.debug("logic", "ecs") end }
@@ -603,7 +652,8 @@ do -- Universe:updatePhase
 end
 
 --@api-stub: Universe:snapshot
-do -- Universe:snapshot
+-- Performs the snapshot operation on this universe.
+do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "hp", 42)
@@ -614,7 +664,8 @@ do -- Universe:snapshot
 end
 
 --@api-stub: Universe:applySnapshot
-do -- Universe:applySnapshot
+-- Applies snapshot to this universe.
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn(); world:set(e, "score", 99)
   local snap = world:snapshot()
@@ -625,20 +676,23 @@ do -- Universe:applySnapshot
 end
 
 
---@api-stub: LUniverse:type -- Returns the Lua-visible type name for this universe handle
-do -- LUniverse:type
+--@api-stub: LUniverse:type
+-- Returns the Lua-visible type name for this universe handle
+do
   local u = lurek.ecs.newUniverse()
   local t = u:type()
 end
 
---@api-stub: LUniverse:typeOf -- Returns whether this universe handle matches a supported type name
-do -- LUniverse:typeOf
+--@api-stub: LUniverse:typeOf
+-- Returns whether this universe handle matches a supported type name
+do
   local u = lurek.ecs.newUniverse()
   local ok = u:typeOf("LUniverse")
 end
 
---@api-stub: LUniverse:takeSnapshotDiff -- Returns and clears accumulated ECS snapshot diff data
-do -- LUniverse:takeSnapshotDiff
+--@api-stub: LUniverse:takeSnapshotDiff
+-- Returns and clears accumulated ECS snapshot diff data
+do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "hp", 10)

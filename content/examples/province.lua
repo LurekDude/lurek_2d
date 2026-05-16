@@ -2,43 +2,49 @@
 -- lurek.province API examples.
 -- Run: cargo run -- content/examples/province.lua
 
---@api-stub: lurek.province.newFromPng -- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
-do -- lurek.province.newFromPng
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
 
---@api-stub: lurek.province.get -- Retrieves an existing province registry by name
-do -- lurek.province.get
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
   local reg = lurek.province.get("world")
   if reg then
     lurek.log.info("got registry width=" .. reg:getWidth(), "province")
   end
 end
 
---@api-stub: lurek.province.exists -- Checks whether a province registry with the given name exists
-do -- lurek.province.exists
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
   local found = lurek.province.exists("world")
   lurek.log.info("exists=" .. tostring(found), "province")
 end
 
---@api-stub: lurek.province.remove -- Removes a province registry by name and clears the active registry if it was the one removed
-do -- lurek.province.remove
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
   pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
   local removed = lurek.province.remove("temp_map")
   lurek.log.info("removed=" .. tostring(removed), "province")
 end
 
---@api-stub: lurek.province.setActive -- Sets the named registry as the active province registry
-do -- lurek.province.setActive
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
   lurek.province.setActive("world")
   lurek.log.info("active registry set to world", "province")
 end
 
---@api-stub: lurek.province.getActive -- Returns the currently active province registry, or nil if none is set
-do -- lurek.province.getActive
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
   local active = lurek.province.getActive()
   if active then
     lurek.log.info("active=" .. active:getName(), "province")
@@ -49,8 +55,9 @@ end
 -- LProvinceRegistry methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LProvinceRegistry:getName -- Returns the string name used to identify this registry in the province system
-do -- LProvinceRegistry:getName
+--@api-stub: LProvinceRegistry:getName
+-- Returns the string name used to identify this registry in the province system
+do
   local reg = lurek.province.get("world")
   if reg then
     local name = reg:getName()
@@ -58,8 +65,9 @@ do -- LProvinceRegistry:getName
   end
 end
 
---@api-stub: LProvinceRegistry:getWidth -- Returns the width of the province grid in cells (pixels of the source PNG)
-do -- LProvinceRegistry:getWidth
+--@api-stub: LProvinceRegistry:getWidth
+-- Returns the width of the province grid in cells (pixels of the source PNG)
+do
   local reg = lurek.province.get("world")
   if reg then
     local w = reg:getWidth()
@@ -67,8 +75,9 @@ do -- LProvinceRegistry:getWidth
   end
 end
 
---@api-stub: LProvinceRegistry:getHeight -- Returns the height of the province grid in cells (pixels of the source PNG)
-do -- LProvinceRegistry:getHeight
+--@api-stub: LProvinceRegistry:getHeight
+-- Returns the height of the province grid in cells (pixels of the source PNG)
+do
   local reg = lurek.province.get("world")
   if reg then
     local h = reg:getHeight()
@@ -76,8 +85,9 @@ do -- LProvinceRegistry:getHeight
   end
 end
 
---@api-stub: LProvinceRegistry:getAt -- Returns the province ID at the given grid cell coordinates
-do -- LProvinceRegistry:getAt
+--@api-stub: LProvinceRegistry:getAt
+-- Returns the province ID at the given grid cell coordinates
+do
   local reg = lurek.province.get("world")
   if reg then
     local pid = reg:getAt(0.0, 0.0)
@@ -85,8 +95,9 @@ do -- LProvinceRegistry:getAt
   end
 end
 
---@api-stub: LProvinceRegistry:provinceCount -- Returns the total number of distinct provinces in this registry (excluding ID 0)
-do -- LProvinceRegistry:provinceCount
+--@api-stub: LProvinceRegistry:provinceCount
+-- Returns the total number of distinct provinces in this registry (excluding ID 0)
+do
   local reg = lurek.province.get("world")
   if reg then
     local count = reg:provinceCount()
@@ -94,8 +105,9 @@ do -- LProvinceRegistry:provinceCount
   end
 end
 
---@api-stub: LProvinceRegistry:provinceIds -- Returns a sequential table of all province IDs in this registry
-do -- LProvinceRegistry:provinceIds
+--@api-stub: LProvinceRegistry:provinceIds
+-- Returns a sequential table of all province IDs in this registry
+do
   local reg = lurek.province.get("world")
   if reg then
     local ids = reg:provinceIds()
@@ -103,8 +115,9 @@ do -- LProvinceRegistry:provinceIds
   end
 end
 
---@api-stub: LProvinceRegistry:adjacencies -- Returns all adjacency pairs in the registry
-do -- LProvinceRegistry:adjacencies
+--@api-stub: LProvinceRegistry:adjacencies
+-- Returns all adjacency pairs in the registry
+do
   local reg = lurek.province.get("world")
   if reg then
     local adj = reg:adjacencies()
@@ -112,8 +125,9 @@ do -- LProvinceRegistry:adjacencies
   end
 end
 
---@api-stub: LProvinceRegistry:provinceSpans -- Returns the raw span data for all provinces
-do -- LProvinceRegistry:provinceSpans
+--@api-stub: LProvinceRegistry:provinceSpans
+-- Returns the raw span data for all provinces
+do
   local reg = lurek.province.get("world")
   if reg then
     local spans = reg:provinceSpans()
@@ -121,8 +135,9 @@ do -- LProvinceRegistry:provinceSpans
   end
 end
 
---@api-stub: LProvinceRegistry:borderSegments -- Returns all border line segments between adjacent provinces
-do -- LProvinceRegistry:borderSegments
+--@api-stub: LProvinceRegistry:borderSegments
+-- Returns all border line segments between adjacent provinces
+do
   local reg = lurek.province.get("world")
   if reg then
     local segs = reg:borderSegments()
@@ -130,8 +145,9 @@ do -- LProvinceRegistry:borderSegments
   end
 end
 
---@api-stub: LProvinceRegistry:getRevision -- Returns the current change revision counter
-do -- LProvinceRegistry:getRevision
+--@api-stub: LProvinceRegistry:getRevision
+-- Returns the current change revision counter
+do
   local reg = lurek.province.get("world")
   if reg then
     local rev = reg:getRevision()
@@ -139,8 +155,9 @@ do -- LProvinceRegistry:getRevision
   end
 end
 
---@api-stub: LProvinceRegistry:getProvince -- Returns a snapshot table describing a single province: its ID, revision, style (political_color, terrain_type, border_style, fog_state, visibility_state), centroid, and custom attributes
-do -- LProvinceRegistry:getProvince
+--@api-stub: LProvinceRegistry:getProvince
+-- Returns a snapshot table describing a single province: its ID, revision, style (political_color, terrain_type, border_style, fog_state, visibility_state), centroid, and custom attributes
+do
   local reg = lurek.province.get("world")
   if reg then
     local snap = reg:getProvince(1)
@@ -148,8 +165,9 @@ do -- LProvinceRegistry:getProvince
   end
 end
 
---@api-stub: LProvinceRegistry:getNeighbors -- Returns a table of province IDs that share a border with the given province
-do -- LProvinceRegistry:getNeighbors
+--@api-stub: LProvinceRegistry:getNeighbors
+-- Returns a table of province IDs that share a border with the given province
+do
   local reg = lurek.province.get("world")
   if reg then
     local neighbors = reg:getNeighbors(1)
@@ -157,8 +175,9 @@ do -- LProvinceRegistry:getNeighbors
   end
 end
 
---@api-stub: LProvinceRegistry:getBorderClass -- Returns the border classification string between two adjacent provinces (e
-do -- LProvinceRegistry:getBorderClass
+--@api-stub: LProvinceRegistry:getBorderClass
+-- Returns the border classification string between two adjacent provinces (e
+do
   local reg = lurek.province.get("world")
   if reg then
     local cls = reg:getBorderClass(1, 2)
@@ -166,8 +185,9 @@ do -- LProvinceRegistry:getBorderClass
   end
 end
 
---@api-stub: LProvinceRegistry:setBorderClass -- Sets the border classification between two adjacent provinces
-do -- LProvinceRegistry:setBorderClass
+--@api-stub: LProvinceRegistry:setBorderClass
+-- Sets the border classification between two adjacent provinces
+do
   local reg = lurek.province.get("world")
   if reg then
     reg:setBorderClass(1, 2, "coast")
@@ -175,8 +195,9 @@ do -- LProvinceRegistry:setBorderClass
   end
 end
 
---@api-stub: LProvinceRegistry:setPoliticalColor -- Sets the political map color for a province
-do -- LProvinceRegistry:setPoliticalColor
+--@api-stub: LProvinceRegistry:setPoliticalColor
+-- Sets the political map color for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setPoliticalColor(1, 1.0, 0.8, 0.2, 1.0)
@@ -184,8 +205,9 @@ do -- LProvinceRegistry:setPoliticalColor
   end
 end
 
---@api-stub: LProvinceRegistry:setTerrainType -- Sets the terrain type index for a province
-do -- LProvinceRegistry:setTerrainType
+--@api-stub: LProvinceRegistry:setTerrainType
+-- Sets the terrain type index for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setTerrainType(1, 2)
@@ -193,8 +215,9 @@ do -- LProvinceRegistry:setTerrainType
   end
 end
 
---@api-stub: LProvinceRegistry:setBorderStyle -- Sets the border rendering style index for a province
-do -- LProvinceRegistry:setBorderStyle
+--@api-stub: LProvinceRegistry:setBorderStyle
+-- Sets the border rendering style index for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setBorderStyle(1, 1)
@@ -202,8 +225,9 @@ do -- LProvinceRegistry:setBorderStyle
   end
 end
 
---@api-stub: LProvinceRegistry:setFogState -- Sets the fog-of-war state for a province
-do -- LProvinceRegistry:setFogState
+--@api-stub: LProvinceRegistry:setFogState
+-- Sets the fog-of-war state for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setFogState(1, 0)
@@ -211,8 +235,9 @@ do -- LProvinceRegistry:setFogState
   end
 end
 
---@api-stub: LProvinceRegistry:setVisibilityState -- Sets the visibility state for a province
-do -- LProvinceRegistry:setVisibilityState
+--@api-stub: LProvinceRegistry:setVisibilityState
+-- Sets the visibility state for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setVisibilityState(1, 1)
@@ -220,8 +245,9 @@ do -- LProvinceRegistry:setVisibilityState
   end
 end
 
---@api-stub: LProvinceRegistry:setAttr -- Sets a custom string attribute on a province
-do -- LProvinceRegistry:setAttr
+--@api-stub: LProvinceRegistry:setAttr
+-- Sets a custom string attribute on a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setAttr(1, "player_score", "42")
@@ -229,8 +255,9 @@ do -- LProvinceRegistry:setAttr
   end
 end
 
---@api-stub: LProvinceRegistry:getChangesSince -- Returns all province changes that occurred after the given revision
-do -- LProvinceRegistry:getChangesSince
+--@api-stub: LProvinceRegistry:getChangesSince
+-- Returns all province changes that occurred after the given revision
+do
   local reg = lurek.province.get("world")
   if reg then
     local changes = reg:getChangesSince(0)
@@ -238,8 +265,9 @@ do -- LProvinceRegistry:getChangesSince
   end
 end
 
---@api-stub: LProvinceRegistry:type -- Returns the type name string for this userdata object
-do -- LProvinceRegistry:type
+--@api-stub: LProvinceRegistry:type
+-- Returns the type name string for this userdata object
+do
   local reg = lurek.province.get("world")
   if reg then
     local t = reg:type()
@@ -247,8 +275,9 @@ do -- LProvinceRegistry:type
   end
 end
 
---@api-stub: LProvinceRegistry:typeOf -- Checks whether this object matches the given type name
-do -- LProvinceRegistry:typeOf
+--@api-stub: LProvinceRegistry:typeOf
+-- Checks whether this object matches the given type name
+do
   local reg = lurek.province.get("world")
   if reg then
     local is_reg = reg:typeOf("LProvinceRegistry")
@@ -256,15 +285,17 @@ do -- LProvinceRegistry:typeOf
   end
 end
 
---@api-stub: lurek.province.zoomCameraAt -- Computes new camera position after zooming centered on an anchor point
-do -- lurek.province.zoomCameraAt
+--@api-stub: lurek.province.zoomCameraAt
+-- Computes new camera position after zooming centered on an anchor point
+do
   local cam_x, cam_y = 0.0, 0.0
   local new_x, new_y = lurek.province.zoomCameraAt(320.0, 240.0, cam_x, cam_y, 1.0, 1.2)
   lurek.log.debug("zoom anchor camera: " .. tostring(new_x) .. "," .. tostring(new_y), "province")
 end
 
 --@api-stub: LProvinceRegistry:fitCamera,
-do -- LProvinceRegistry:fitCamera, screenToMap, screenToProvince
+-- Performs the fit camera, operation on this province registry.
+do
 	local ok, reg = pcall(lurek.province.newFromPng, "example-province-view", "content/games/strategy/eu2/map.png")
 	if ok and reg then
 		local cam_x, cam_y, zoom = reg:fitCamera(1280, 720, 1.0)
@@ -277,8 +308,9 @@ do -- LProvinceRegistry:fitCamera, screenToMap, screenToProvince
 	end
 end
 
---@api-stub: LProvinceRegistry:setCapital -- Sets the capital marker position for a province
-do -- LProvinceRegistry:setCapital
+--@api-stub: LProvinceRegistry:setCapital
+-- Sets the capital marker position for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setCapital(1, 50.0, 30.0)
@@ -286,8 +318,9 @@ do -- LProvinceRegistry:setCapital
   end
 end
 
---@api-stub: LProvinceRegistry:setLabelLine -- Sets the label baseline for a province
-do -- LProvinceRegistry:setLabelLine
+--@api-stub: LProvinceRegistry:setLabelLine
+-- Sets the label baseline for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setLabelLine(1, 10.0, 20.0, 80.0, 20.0)
@@ -295,8 +328,9 @@ do -- LProvinceRegistry:setLabelLine
   end
 end
 
---@api-stub: LProvinceRegistry:setLabelText -- Sets the display name text for a province
-do -- LProvinceRegistry:setLabelText
+--@api-stub: LProvinceRegistry:setLabelText
+-- Sets the display name text for a province
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setLabelText(1, "Heartland")
@@ -304,8 +338,9 @@ do -- LProvinceRegistry:setLabelText
   end
 end
 
---@api-stub: LProvinceRegistry:render -- Renders the province map to the screen using the current camera and style settings
-do -- LProvinceRegistry:render
+--@api-stub: LProvinceRegistry:render
+-- Renders the province map to the screen using the current camera and style settings
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok, err = pcall(function() reg:render() end)
@@ -341,3 +376,64 @@ do
 end
 
 
+--@api-stub: LProvinceGrid:borderSegments
+-- Returns a list of line segment tables representing the borders of a province cell.
+do
+  local grid = lurek.province.newGrid(800, 600, 64)
+  local segs = grid:borderSegments(1)
+  lurek.log.debug("border segs=" .. #segs, "province")
+end
+
+--@api-stub: LProvinceGrid:deserializeShapeData
+-- Restores province shape data from a previously serialized byte string.
+do
+  local grid = lurek.province.newGrid(800, 600, 64)
+  local data = grid:serializeShapeData()
+  grid:deserializeShapeData(data)
+end
+
+--@api-stub: LProvinceGrid:provinceSpans
+-- Returns row-span data for a province as a list of {y, x_start, x_end} tables.
+do
+  local grid = lurek.province.newGrid(800, 600, 64)
+  local spans = grid:provinceSpans(1)
+  lurek.log.debug("spans=" .. #spans, "province")
+end
+
+--@api-stub: LProvinceGrid:serializeShapeData
+-- Serializes all province shape pixel data to a byte string for storage or transfer.
+do
+  local grid = lurek.province.newGrid(800, 600, 64)
+  local data = grid:serializeShapeData()
+  lurek.log.debug("serialized bytes=" .. #data, "province")
+end
+
+--@api-stub: LProvinceRegistry:fitCamera
+-- Adjusts the active camera to frame a specific province in the viewport.
+do
+  local reg = lurek.province.newRegistry()
+  reg:fitCamera(1)
+end
+
+--@api-stub: LProvinceRegistry:importMetadataFromFiles
+-- Loads province metadata from a list of JSON files and merges them into this registry.
+do
+  local reg = lurek.province.newRegistry()
+  reg:importMetadataFromFiles({"save/example_province/meta.json"})
+end
+
+--@api-stub: LProvinceRegistry:screenToMap
+-- Converts a screen pixel coordinate to map space coordinates using this registry.
+do
+  local reg = lurek.province.newRegistry()
+  local mx, my = reg:screenToMap(400, 300)
+  lurek.log.debug("map=" .. mx .. "," .. my, "province")
+end
+
+--@api-stub: LProvinceRegistry:screenToProvince
+-- Returns the province id under a given screen pixel coordinate, or nil if none.
+do
+  local reg = lurek.province.newRegistry()
+  local id = reg:screenToProvince(400, 300)
+  lurek.log.debug("province=" .. tostring(id), "province")
+end

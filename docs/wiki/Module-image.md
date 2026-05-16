@@ -146,12 +146,54 @@ Province grid detection segments pixel regions into numbered provinces via flood
 Module example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ## Key Types
@@ -194,7 +236,7 @@ Returns a completed screen capture image or requests one for a future call.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.fromScreen
+do
   local first = lurek.image.fromScreen()
   if first == nil then
     local later = lurek.image.fromScreen()
@@ -220,7 +262,7 @@ Returns whether a GameFS image file begins with DDS compressed image magic bytes
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.isCompressed
+do
   -- Returns true for .dds files, false for .png / .jpg.
   local is_dds = lurek.image.isCompressed("assets/terrain_bc1.dds")
   local is_png = lurek.image.isCompressed("assets/hero.png")
@@ -243,7 +285,7 @@ Loads and decodes image data from GameFS.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.loadImage
+do
   local restored = lurek.image.loadImage("save/orange64.limg")
   local w, h = restored:getDimensions()
   lurek.log.info("restored " .. w .. "x" .. h, "image")
@@ -265,7 +307,7 @@ Loads a serialized layered image stack from GameFS.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.loadLayered
+do
   pcall(function()
     local doc = lurek.image.loadLayered("save/painting.limg")
     local count = doc:layerCount()
@@ -289,7 +331,7 @@ Loads DDS compressed image data from GameFS.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newCompressedData
+do
   -- DDS files are optional assets; guard with pcall so the example is headless-safe.
   local ok, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if ok and cd then
@@ -314,7 +356,7 @@ Creates empty image data from dimensions or decodes image data from a GameFS fil
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
@@ -339,7 +381,7 @@ Creates image data from raw RGBA bytes and explicit dimensions.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageDataFromBytes
+do
   local pixels = string.rep(string.char(0, 128, 255, 255), 16) -- 4x4 blue RGBA8
   local img = lurek.image.newImageDataFromBytes(4, 4, pixels)
   lurek.log.info("fromBytes " .. img:getWidth() .. "x" .. img:getHeight(), "image")
@@ -362,7 +404,7 @@ Creates a layered image stack with one or more blank layers.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newLayeredImage
+do
   local doc = lurek.image.newLayeredImage(256, 256)
   local bg = doc:addLayer("background")
   local fg = doc:addLayer("foreground")
@@ -381,7 +423,7 @@ Creates an empty palette lookup table.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newPaletteLut
+do
   local lut = lurek.image.newPaletteLut()
   local before = lut:getColorCount()
   lurek.log.info("new lut entries=" .. before, "image")
@@ -403,7 +445,7 @@ Loads a province id grid from an image file under the current game directory.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newProvinceGrid
+do
   local ok, grid = pcall(lurek.image.newProvinceGrid, "assets/provinces.png")
   if ok and grid then
     lurek.log.info("province grid loaded", "image")
@@ -425,7 +467,7 @@ Saves an image data object to a path under the current game directory.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.saveImage
+do
   local img = lurek.image.newImageData(64, 64)
   img:fill(255, 128, 0, 255)
   lurek.image.saveImage(img, "save/orange64.limg")
@@ -446,7 +488,7 @@ Encodes image data as PNG and writes it under the current game directory.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.savePNG
+do
   local shot = lurek.image.newImageData(128, 64)
   shot:fill(20, 30, 40, 255)
   shot:drawCircle(64, 32, 24, 255, 200, 0, 255)
@@ -466,7 +508,7 @@ Lua-side handle for compressed DDS image metadata and mipmap data.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newCompressedData
+do
   -- DDS files are optional assets; guard with pcall so the example is headless-safe.
   local ok, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if ok and cd then
@@ -486,7 +528,7 @@ Returns compressed image dimensions.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- CompressedImageData:getDimensions
+do
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if not ok_cd then return end
   local w = cd and cd:getWidth() or 0
@@ -506,7 +548,7 @@ Returns the compressed image format name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- CompressedImageData:getFormat
+do
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if not ok_cd then return end
   local fmt = (cd and cd:getFormat() or "unknown")
@@ -525,7 +567,7 @@ Returns compressed image height. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- CompressedImageData:getHeight
+do
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if not ok_cd then return end
   local h = (cd and cd:getHeight() or 0)
@@ -544,7 +586,7 @@ Returns the number of mipmap levels in this compressed image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- CompressedImageData:getMipmapCount
+do
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if not ok_cd then return end
   local mips = (cd and cd:getMipmapCount() or 0)
@@ -565,7 +607,7 @@ Returns compressed image width. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- CompressedImageData:getWidth
+do
   local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if not ok_cd then return end
   local w = (cd and cd:getWidth() or 0)
@@ -584,7 +626,7 @@ Returns the Lua-visible type name for this compressed image handle.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LCompressedImageData:type
+do
   local ok, compressed_image_data_obj = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if ok and compressed_image_data_obj then
     local t = compressed_image_data_obj:type()
@@ -608,7 +650,7 @@ Returns whether this compressed image handle matches a supported type name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LCompressedImageData:typeOf
+do
   local ok, compressed_image_data_obj = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
   if ok and compressed_image_data_obj then
     lurek.log.info("is LCompressedImageData: " .. tostring(compressed_image_data_obj:typeOf("LCompressedImageData")), "image")
@@ -626,7 +668,7 @@ Provides Lua methods for reading, editing, filtering, drawing, and encoding imag
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.loadImage
+do
   local restored = lurek.image.loadImage("save/orange64.limg")
   local w, h = restored:getDimensions()
   lurek.log.info("restored " .. w .. "x" .. h, "image")
@@ -646,7 +688,7 @@ Multiplies this image alpha channel by a factor in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:alphaMask
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(255, 255, 255, 255)
   img:alphaMask(0.5)   -- 50% transparent
@@ -668,7 +710,7 @@ Applies a palette lookup table to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:applyPaletteLut
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(255, 0, 0, 255)   -- red
   local lut = lurek.image.newPaletteLut()
@@ -694,7 +736,7 @@ Copies a source image into this image at a destination coordinate.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:blit
+do
   local dst = lurek.image.newImageData(64, 64)
   lurek.log.info("ImageData blit available", "render")
 end
@@ -715,7 +757,7 @@ Returns a blurred copy of this image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:blur
+do
   local img = lurek.image.newImageData(32, 32)
   img:fill(255, 255, 255, 255)
   img:setPixel(16, 16, 0, 0, 0, 255)   -- single black pixel
@@ -737,7 +779,7 @@ Applies a brightness factor to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:brightness
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(200, 200, 200, 255)
   img:brightness(0.5)   -- darken by half
@@ -759,7 +801,7 @@ Applies a contrast factor to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:contrast
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(128, 128, 128, 255)
   img:contrast(2.0)   -- high contrast
@@ -784,7 +826,7 @@ Applies a convolution kernel and returns the filtered image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:convolve
+do
   local img = lurek.image.newImageData(16, 16)
   img:fill(180, 180, 180, 255)
   local kernel = {0, -1, 0, -1, 5, -1, 0, -1, 0}   -- sharpen kernel
@@ -811,7 +853,7 @@ Returns a cropped image region. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:crop
+do
   local sheet = lurek.image.newImageData(64, 64)
   sheet:fill(80, 160, 240, 255)
   local sprite = sheet:crop(0, 0, 16, 16)
@@ -834,7 +876,7 @@ Computes a difference metric against another image.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:diff
+do
   local a = screenshot()
   local b = screenshot()
   if a and b then lurek.log.debug('diff=' .. tostring(a:diff(b))) end
@@ -860,7 +902,7 @@ Draws a filled circle into this image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:drawCircle
+do
   local img = lurek.image.newImageData(32, 32)
   img:fill(0, 0, 0, 255)
   img:drawCircle(16, 16, 10, 255, 255, 0, 255)   -- yellow circle
@@ -889,7 +931,7 @@ Draws a line into this image. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:drawLine
+do
   local img = lurek.image.newImageData(32, 32)
   img:fill(0, 0, 0, 255)
   img:drawLine(0, 0, 31, 31, 255, 255, 255, 255)   -- white diagonal
@@ -923,7 +965,7 @@ Draws a nine-slice region from a source image into this image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:drawNineSlice
+do
   local atlas = lurek.image.newImageData(8, 8)
   atlas:fill(20, 20, 20, 255)
   atlas:drawRect(2, 2, 4, 4, 220, 50, 50, 255)
@@ -955,7 +997,7 @@ Draws a filled rectangle into this image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:drawRect
+do
   local img = lurek.image.newImageData(32, 32)
   img:fill(0, 0, 0, 255)
   img:drawRect(4, 4, 24, 12, 255, 100, 0, 255)   -- orange bar
@@ -979,7 +1021,7 @@ Encodes image data in a supported format.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:encode
+do
   local img = lurek.image.newImageData(16, 16)
   img:fill(200, 100, 50, 255)
   local bytes = img:encode("png")
@@ -1003,7 +1045,7 @@ Fills the whole image with one RGBA color.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:fill
+do
   local img = lurek.image.newImageData(16, 16)
   img:fill(64, 128, 192, 255)   -- fill solid blue-grey
   local r, g, b, a = img:getPixel(8, 8)
@@ -1020,7 +1062,7 @@ Flips this image horizontally in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:flipHorizontal
+do
   local img = lurek.image.newImageData(4, 4)
   img:setPixel(0, 0, 255, 0, 0, 255)   -- red at top-left
   img:flipHorizontal()
@@ -1038,7 +1080,7 @@ Flips this image vertically in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:flipVertical
+do
   local img = lurek.image.newImageData(4, 4)
   img:setPixel(0, 0, 0, 255, 0, 255)   -- green at top-left
   img:flipVertical()
@@ -1060,7 +1102,7 @@ Applies gamma correction to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:gamma
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(100, 100, 100, 255)
   img:gamma(2.2)   -- apply sRGB gamma
@@ -1080,7 +1122,7 @@ Returns image dimensions. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:getDimensions
+do
   local img = lurek.image.newImageData(128, 64)
   local w, h = img:getDimensions()
   lurek.log.info("dimensions=" .. w .. "x" .. h, "image")
@@ -1098,7 +1140,7 @@ Returns image height. This method is available to Lua scripts.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:getHeight
+do
   local data = screenshot() or { getHeight = function() return 0 end }
   lurek.log.debug('height=' .. tostring(data:getHeight()))
 end
@@ -1120,7 +1162,7 @@ Returns RGBA channels at a pixel coordinate.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:getPixel
+do
   local img = lurek.image.newImageData(8, 8)
   img:setPixel(2, 3, 255, 128, 0, 255)   -- set orange pixel
   local r, g, b, a = img:getPixel(2, 3)
@@ -1139,12 +1181,54 @@ Returns raw image bytes as a Lua string.
 Module-level example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ### `LImageData:getRegion(x: integer, y: integer, w: integer, h: integer) -> LuaValue`
@@ -1165,7 +1249,7 @@ Returns an image region when the requested rectangle is inside bounds.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:getRegion
+do
   lurek.log.info("ImageData:getRegion available for atlas slicing", "render")
 end
 ```
@@ -1181,7 +1265,7 @@ Returns raw image bytes as a Lua string.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:getString
+do
   local img = lurek.image.newImageData(4, 4)
   local s = img:getString()
   lurek.log.info("raw bytes length=" .. #s, "image")
@@ -1199,7 +1283,7 @@ Returns image width. This method is available to Lua scripts.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:getWidth
+do
   local data = screenshot() or { getWidth = function() return 0 end, getHeight = function() return 0 end }
   lurek.log.debug('width=' .. tostring(data:getWidth()))
 end
@@ -1214,7 +1298,7 @@ Converts this image to grayscale in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:grayscale
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(255, 128, 64, 255)
   img:grayscale()
@@ -1232,7 +1316,7 @@ Inverts image color channels in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:invert
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(100, 150, 200, 255)
   img:invert()
@@ -1254,7 +1338,7 @@ Applies a Lua callback to every pixel and replaces each pixel with returned RGBA
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:mapPixel
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(100, 150, 200, 255)
   img:mapPixel(function(x, y, r, g, b, a)
@@ -1278,7 +1362,7 @@ Applies a Lua callback to every pixel and replaces each pixel with returned RGBA
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:mapPixels
+do
   local data = screenshot()
   if data then data:mapPixels(function(x, y, r, g, b, a) return 1 - r, 1 - g, 1 - b, a end) end
 end
@@ -1297,7 +1381,7 @@ Adds noise to this image in place. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:noise
+do
   local img = lurek.image.newImageData(16, 16)
   img:fill(128, 128, 128, 255)
   img:noise(20)   -- Â±20 per channel
@@ -1320,7 +1404,7 @@ Pastes a source image into this image at unsigned destination coordinates.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:paste
+do
   local canvas = lurek.image.newImageData(32, 32)
   canvas:fill(30, 30, 60, 255)
   local icon = lurek.image.newImageData(8, 8)
@@ -1344,7 +1428,7 @@ Reduces image colors to a fixed number of levels in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:posterize
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(180, 120, 60, 255)
   img:posterize(3)   -- 3 levels per channel
@@ -1370,7 +1454,7 @@ Returns a resized image using an optional named filter.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:resize
+do
   local data = screenshot()
   if data then data:resize(64, 64); lurek.log.info('resized to 64x64') end
 end
@@ -1392,7 +1476,7 @@ Returns a resized image using nearest-neighbor sampling.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:resizeNearest
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(200, 50, 100, 255)
   local big = img:resizeNearest(64, 64)   -- 8Ă— upscale
@@ -1411,7 +1495,7 @@ Returns a new image rotated ninety degrees clockwise.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:rotate90cw
+do
   local img = lurek.image.newImageData(4, 8)   -- 4Ă—8 original
   local rot = img:rotate90cw()               -- becomes 8Ă—4
   lurek.log.info("rotated w=" .. rot:getWidth() .. " h=" .. rot:getHeight(), "image")
@@ -1431,7 +1515,7 @@ Applies a saturation factor to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:saturation
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(255, 100, 50, 255)
   img:saturation(0.0)   -- full desaturate
@@ -1449,7 +1533,7 @@ Applies a sepia filter to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:sepia
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(200, 180, 160, 255)
   img:sepia()
@@ -1476,7 +1560,7 @@ Sets RGBA channels at a pixel coordinate.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:setPixel
+do
   local img = lurek.image.newImageData(16, 16)
   img:setPixel(0, 0, 255, 0, 0, 255)   -- red at top-left
   img:setPixel(7, 7, 0, 255, 0, 255)   -- green at center
@@ -1498,7 +1582,7 @@ Replaces the image byte buffer with raw bytes.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:setRawData
+do
   local img = lurek.image.newImageData(2, 2)
   -- 4 pixels Ă— 4 bytes (RGBA), all red
   local raw = string.rep("Ăż  Ăż", 4)
@@ -1519,7 +1603,7 @@ Returns a sharpened copy of this image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:sharpen
+do
   local img = lurek.image.newImageData(16, 16)
   img:fill(180, 180, 180, 255)
   local sharp = img:sharpen()
@@ -1540,7 +1624,7 @@ Applies a threshold filter to this image in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:threshold
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(200, 200, 200, 255)
   img:threshold(128)   -- pixels > 128 â†’ white
@@ -1565,7 +1649,7 @@ Blends this image toward a tint color in place.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LImageData:tint
+do
   local img = lurek.image.newImageData(8, 8)
   img:fill(200, 200, 200, 255)
   img:tint(255, 0, 0, 0.5)   -- 50% red tint
@@ -1585,7 +1669,7 @@ Returns the Lua-visible type name for this image data handle.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:type
+do
   local data = screenshot()
   if data then lurek.log.debug(data:type()) end
 end
@@ -1606,7 +1690,7 @@ Returns whether this image data handle matches the `ImageData` type name.
 Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
-do -- ImageData:typeOf
+do
   local data = screenshot()
   if data and data:typeOf('ImageData') then lurek.log.debug('confirmed ImageData') end
 end
@@ -1621,7 +1705,7 @@ Lua-side handle for multiple image layers with visibility, opacity, and ordering
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.loadLayered
+do
   pcall(function()
     local doc = lurek.image.loadLayered("save/painting.limg")
     local count = doc:layerCount()
@@ -1645,7 +1729,7 @@ Adds a blank layer with an optional name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:addLayer
+do
   local li = lurek.image.newLayeredImage(64, 64)
   local idx = li:addLayer()
   lurek.log.info("added layer idx=" .. idx .. " total=" .. li:layerCount(), "image")
@@ -1663,7 +1747,7 @@ Returns the layered image height. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:getHeight
+do
   local li = lurek.image.newLayeredImage(128, 64)
   lurek.log.info("height=" .. li:getHeight(), "image")
 end
@@ -1684,7 +1768,7 @@ Returns image data for a layer by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:getLayer
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   local layer = li:getLayer(idx)
@@ -1707,7 +1791,7 @@ Returns a layer name by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:getName
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   li:setName(idx, "body")
@@ -1730,7 +1814,7 @@ Returns a layer opacity by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:getOpacity
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   li:setOpacity(idx, 0.75)
@@ -1749,7 +1833,7 @@ Returns the layered image width. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:getWidth
+do
   local li = lurek.image.newLayeredImage(128, 64)
   lurek.log.info("width=" .. li:getWidth(), "image")
 end
@@ -1770,7 +1854,7 @@ Returns layer visibility by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:isVisible
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   lurek.log.info("visible by default: " .. tostring(li:isVisible(idx)), "image")
@@ -1790,7 +1874,7 @@ Returns the number of layers in the stack.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:layerCount
+do
   local li = lurek.image.newLayeredImage(64, 64)
   li:addLayer()
   li:addLayer()
@@ -1809,7 +1893,7 @@ Merges visible layers into a single image data object.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:merge
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local bg_idx = li:addLayer()
   local fg_idx = li:addLayer()
@@ -1837,7 +1921,7 @@ Moves a layer from one one-based index to another.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:moveLayer
+do
   local li = lurek.image.newLayeredImage(32, 32)
   for i = 1, 3 do li:addLayer(); li:setName(i, "layer_" .. i) end
   li:moveLayer(3, 1)   -- bring layer 3 to the front
@@ -1860,7 +1944,7 @@ Removes a layer by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:removeLayer
+do
   local li = lurek.image.newLayeredImage(64, 64)
   li:addLayer()
   li:addLayer()
@@ -1882,7 +1966,7 @@ Saves the layered image stack to a file.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:save
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   local layer_data = lurek.image.newImageData(32, 32)
@@ -1909,7 +1993,7 @@ Replaces a layer's image data by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:setLayer
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   local src = lurek.image.newImageData(32, 32)
@@ -1937,7 +2021,7 @@ Sets a layer name by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:setName
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   li:setName(idx, "helmet")
@@ -1961,7 +2045,7 @@ Sets a layer opacity by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:setOpacity
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   li:setOpacity(idx, 0.5)
@@ -1985,7 +2069,7 @@ Sets layer visibility by one-based index.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:setVisible
+do
   local li = lurek.image.newLayeredImage(32, 32)
   local idx = li:addLayer()
   li:setVisible(idx, false)
@@ -2011,7 +2095,7 @@ Swaps two layers by one-based indices.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:swapLayers
+do
   local li = lurek.image.newLayeredImage(32, 32)
   li:addLayer(); li:addLayer()
   li:setName(1, "layer_a"); li:setName(2, "layer_b")
@@ -2031,7 +2115,7 @@ Returns the Lua-visible type name for this layered image handle.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:type
+do
   local layered_image_obj = lurek.image.newLayeredImage(32, 32)
   local t = layered_image_obj:type()
   lurek.log.info("LLayeredImage:type = " .. t, "image")
@@ -2053,7 +2137,7 @@ Returns whether this layered image handle matches a supported type name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LLayeredImage:typeOf
+do
   local layered_image_obj = lurek.image.newLayeredImage(32, 32)
   lurek.log.info("is LLayeredImage: " .. tostring(layered_image_obj:typeOf("LLayeredImage")), "image")
   lurek.log.info("is wrong: " .. tostring(layered_image_obj:typeOf("Unknown")), "image")
@@ -2069,7 +2153,7 @@ Lua-side handle for palette color remapping.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newPaletteLut
+do
   local lut = lurek.image.newPaletteLut()
   local before = lut:getColorCount()
   lurek.log.info("new lut entries=" .. before, "image")
@@ -2085,7 +2169,7 @@ Removes every color mapping from this palette lookup table.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- PaletteLUT:clear
+do
   local lut = lurek.image.newPaletteLut()
   lut:clear()
   lurek.log.info("lut reset, count=" .. lut:getColorCount(), "image")
@@ -2105,7 +2189,7 @@ Cycles palette mappings by an offset.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- PaletteLUT:cycle
+do
   local lut = lurek.image.newPaletteLut()
   lut:setColor(255, 0, 0, 255, 0, 255, 0, 255)
   lut:setColor(0, 255, 0, 255, 0, 0, 255, 255)
@@ -2124,7 +2208,7 @@ Returns the number of color mappings in this palette lookup table.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- PaletteLUT:getColorCount
+do
   local lut = lurek.image.newPaletteLut()
   local n = lut:getColorCount()
   if n == 0 then
@@ -2153,7 +2237,7 @@ Adds a color mapping from source RGBA channels to destination RGBA channels.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- PaletteLUT:setColor
+do
   local lut = lurek.image.newPaletteLut()
   lut:setColor(1, 0, 0, 1, 0, 1, 0, 1)
   lurek.log.info("lut entries: " .. lut:getColorCount(), "image")
@@ -2171,7 +2255,7 @@ Returns the Lua-visible type name for this palette lookup table handle.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LPaletteLUT:type
+do
   local palette_l_u_t_obj = lurek.image.newPaletteLut()
   local t = palette_l_u_t_obj:type()
   lurek.log.info("LPaletteLUT:type = " .. t, "image")
@@ -2193,7 +2277,7 @@ Returns whether this palette lookup table handle matches a supported type name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LPaletteLUT:typeOf
+do
   local palette_l_u_t_obj = lurek.image.newPaletteLut()
   lurek.log.info("is LPaletteLUT: " .. tostring(palette_l_u_t_obj:typeOf("LPaletteLUT")), "image")
   lurek.log.info("is wrong: " .. tostring(palette_l_u_t_obj:typeOf("Unknown")), "image")
@@ -2209,7 +2293,7 @@ Lua-side handle for a province id grid decoded from an image.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newProvinceGrid
+do
   local ok, grid = pcall(lurek.image.newProvinceGrid, "assets/provinces.png")
   if ok and grid then
     lurek.log.info("province grid loaded", "image")
@@ -2228,7 +2312,7 @@ Returns province adjacency records and shared border pixel counts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:adjacencies
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local edges = (grid and grid:adjacencies() or {})
@@ -2247,12 +2331,54 @@ Returns border line segments between neighboring provinces.
 Module-level example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ### `LProvinceGrid:deserializeShapeData(bytes: string) -> LuaValue`
@@ -2270,12 +2396,54 @@ Decodes serialized province shape data into span and segment tables.
 Module-level example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ### `LProvinceGrid:drawShapes([x]: number, [y]: number, [w]: number, [h]: number) -> integer`
@@ -2296,7 +2464,7 @@ Queues filled polygon draw commands for province shapes, optionally culled to a 
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LProvinceGrid:drawShapes
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   pcall(function()
@@ -2321,7 +2489,7 @@ Returns the province id stored at grid coordinates.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:getAt
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local id = (grid and grid:getAt(128, 96) or 0)
@@ -2342,7 +2510,7 @@ Returns the province grid height. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:getHeight
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local h = (grid and grid:getHeight() or 0)
@@ -2361,7 +2529,7 @@ Returns polygon rings for every province.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:getPolygons
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local polys = (grid and grid:getPolygons() or {})
@@ -2384,7 +2552,7 @@ Returns simplified polygon rings for every province.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:getPolygonsSimplified
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local polys = (grid and grid:getPolygonsSimplified() or {})
@@ -2407,7 +2575,7 @@ Returns the province grid width. This method is available to Lua scripts.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:getWidth
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local w = (grid and grid:getWidth() or 0)
@@ -2428,7 +2596,7 @@ Returns the number of distinct provinces in the grid.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- ProvinceGrid:provinceCount
+do
   local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if not ok_grid then return end
   local count = (grid and grid:provinceCount() or 0)
@@ -2449,12 +2617,54 @@ Returns horizontal province spans by row.
 Module-level example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ### `LProvinceGrid:serializeShapeData() -> string`
@@ -2468,12 +2678,54 @@ Serializes province span and border shape data into a binary Lua string.
 Module-level example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- lurek.image.newImageData
+-- content/examples/image.lua
+-- lurek.image API examples.
+-- Run: cargo run -- content/examples/image.lua
+
+--@api-stub: lurek.image.newImageData
+-- Creates empty image data from dimensions or decodes image data from a GameFS filename
+do
   local hero = lurek.image.newImageData(64, 64)
   local scratch = lurek.image.newImageData(64, 64)
   scratch:fill(0, 0, 0, 0)
   lurek.log.info("loaded hero " .. hero:getWidth() .. "x" .. hero:getHeight(), "image")
 end
+
+--@api-stub: lurek.image.newCompressedData
+-- Loads DDS compressed image data from GameFS
+do
+  local ok_cd, cd = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if not ok_cd then return end
+  local mips = (cd and cd:getMipmapCount() or 0)
+  lurek.log.info("dds " .. (cd and cd:getFormat() or "unknown") .. " mips=" .. mips, "image")
+end
+
+--@api-stub: lurek.image.isCompressed
+-- Returns whether a GameFS image file begins with DDS compressed image magic bytes
+do
+  local path = "assets/terrain_bc1.dds"
+  local _ok_ic, _is_c = pcall(lurek.image.isCompressed, path)
+  if _ok_ic and _is_c then
+    pcall(lurek.image.newCompressedData, path)
+  else
+    lurek.image.newImageData(64, 64)
+  end
+end
+
+--@api-stub: lurek.image.newLayeredImage
+-- Creates a layered image stack with one or more blank layers
+do
+  local doc = lurek.image.newLayeredImage(256, 256)
+  local bg = doc:addLayer("background")
+  local fg = doc:addLayer("foreground")
+  lurek.log.info("layers bg=" .. bg .. " fg=" .. fg, "image")
+end
+
+--@api-stub: lurek.image.saveImage
+-- Saves an image data object to a path under the current game directory
+do
+  local img = lurek.image.newImageData(64, 64)
+  img:fill(255, 128, 0, 255)
 ```
 
 ### `LProvinceGrid:type() -> string`
@@ -2487,7 +2739,7 @@ Returns the Lua-visible type name for this province grid handle.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LProvinceGrid:type
+do
   local ok, province_grid_obj = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if ok and province_grid_obj then
     local t = province_grid_obj:type()
@@ -2511,7 +2763,7 @@ Returns whether this province grid handle matches a supported type name.
 Exact example from [image.lua](../blob/main/content/examples/image.lua):
 
 ```lua
-do -- LProvinceGrid:typeOf
+do
   local ok, province_grid_obj = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
   if ok and province_grid_obj then
     lurek.log.info("is LProvinceGrid: " .. tostring(province_grid_obj:typeOf("LProvinceGrid")), "image")

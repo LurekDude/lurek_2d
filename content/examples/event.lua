@@ -2,8 +2,9 @@
 -- lurek.event API examples.
 -- Run: cargo run -- content/examples/event.lua
 
---@api-stub: lurek.event.exit -- Requests engine shutdown with an optional process exit code
-do -- lurek.event.exit
+--@api-stub: lurek.event.exit
+-- Requests engine shutdown with an optional process exit code
+do
   local fatal = false
   if fatal then
     lurek.event.exit(1)
@@ -12,8 +13,9 @@ do -- lurek.event.exit
   end
 end
 
---@api-stub: lurek.event.poll -- Creates a polling function that returns the next queued event each time it is called
-do -- lurek.event.poll
+--@api-stub: lurek.event.poll
+-- Creates a polling function that returns the next queued event each time it is called
+do
   function lurek.process(dt)
     for name, a, b in lurek.event.poll() do
       if name == "keypressed" and a == "escape" then
@@ -23,8 +25,9 @@ do -- lurek.event.poll
   end
 end
 
---@api-stub: lurek.event.clear -- Clears all pending events from the shared event queue
-do -- lurek.event.clear
+--@api-stub: lurek.event.clear
+-- Clears all pending events from the shared event queue
+do
   local function load_level(name)
     lurek.event.clear()
     lurek.log.info("loaded " .. name .. "; input queue flushed", "scene")
@@ -32,8 +35,9 @@ do -- lurek.event.clear
   load_level("forest_01")
 end
 
---@api-stub: lurek.event.newSignal -- Creates an isolated signal dispatcher for Lua callbacks
-do -- lurek.event.newSignal
+--@api-stub: lurek.event.newSignal
+-- Creates an isolated signal dispatcher for Lua callbacks
+do
   local combat = lurek.event.newSignal()
   combat:register("damage", function(target, amount)
     lurek.log.info(target .. " took " .. amount .. " hp", "combat")
@@ -41,8 +45,9 @@ do -- lurek.event.newSignal
   combat:emit("damage", "goblin", 12)
 end
 
---@api-stub: lurek.event.pump -- Pumps the shared event queue without removing events for Lua
-do -- lurek.event.pump
+--@api-stub: lurek.event.pump
+-- Pumps the shared event queue without removing events for Lua
+do
   function lurek.process(dt)
     lurek.event.pump()
     for name in lurek.event.poll() do
@@ -51,8 +56,9 @@ do -- lurek.event.pump
   end
 end
 
---@api-stub: lurek.event.wait -- Waits for the next queued event and returns success, name, and argument table
-do -- lurek.event.wait
+--@api-stub: lurek.event.wait
+-- Waits for the next queued event and returns success, name, and argument table
+do
   local ok, name, args = lurek.event.wait(0.5)
   if ok then
     lurek.log.info("got event '" .. name .. "' within timeout", "tool")
@@ -61,8 +67,9 @@ do -- lurek.event.wait
   end
 end
 
---@api-stub: lurek.event.restart -- Requests an engine restart
-do -- lurek.event.restart
+--@api-stub: lurek.event.restart
+-- Requests an engine restart
+do
   local function apply_graphics_preset(preset)
     lurek.log.info("applied preset '" .. preset .. "', restarting", "boot")
     lurek.event.restart()
@@ -70,8 +77,9 @@ do -- lurek.event.restart
   apply_graphics_preset("high")
 end
 
---@api-stub: lurek.event.quit -- Requests engine shutdown with exit code zero
-do -- lurek.event.quit
+--@api-stub: lurek.event.quit
+-- Requests engine shutdown with exit code zero
+do
   local function on_quit_button()
     lurek.log.info("user requested quit", "ui")
     lurek.event.quit()
@@ -79,38 +87,43 @@ do -- lurek.event.quit
   on_quit_button()
 end
 
---@api-stub: lurek.event.pushDeferred -- Adds a normal-priority event to the deferred buffer instead of the live queue
-do -- lurek.event.pushDeferred
+--@api-stub: lurek.event.pushDeferred
+-- Adds a normal-priority event to the deferred buffer instead of the live queue
+do
   for i = 1, 3 do
     lurek.event.pushDeferred("spawn", "enemy", i * 64, 0)
   end
   lurek.event.flushDeferred()
 end
 
---@api-stub: lurek.event.pushDeferredPriority -- Adds an event with explicit priority to the deferred buffer
-do -- lurek.event.pushDeferredPriority
+--@api-stub: lurek.event.pushDeferredPriority
+-- Adds an event with explicit priority to the deferred buffer
+do
   lurek.event.pushDeferredPriority("ui.toast", "normal", "hello")
   lurek.event.pushDeferredPriority("shutdown", "high")
   lurek.event.flushDeferred()
 end
 
---@api-stub: lurek.event.flushDeferred -- Moves all deferred events into the shared event queue and clears the deferred buffer
-do -- lurek.event.flushDeferred
+--@api-stub: lurek.event.flushDeferred
+-- Moves all deferred events into the shared event queue and clears the deferred buffer
+do
   lurek.event.pushDeferred("save", "slot1")
   lurek.event.pushDeferred("save", "slot2")
   local moved = lurek.event.flushDeferred()
   lurek.log.info("flushed " .. moved .. " deferred events", "event")
 end
 
---@api-stub: lurek.event.enableHistory -- Enables event push history with a maximum retained capacity
-do -- lurek.event.enableHistory
+--@api-stub: lurek.event.enableHistory
+-- Enables event push history with a maximum retained capacity
+do
   lurek.event.enableHistory(64)
   lurek.event.push("checkpoint", "boss_arena")
   lurek.event.push("achievement", "first_blood")
 end
 
---@api-stub: lurek.event.getHistory -- Returns retained pushed event history entries
-do -- lurek.event.getHistory
+--@api-stub: lurek.event.getHistory
+-- Returns retained pushed event history entries
+do
   lurek.event.enableHistory(32)
   lurek.event.push("damage", "player", 5)
   for _, entry in ipairs(lurek.event.getHistory()) do
@@ -118,16 +131,18 @@ do -- lurek.event.getHistory
   end
 end
 
---@api-stub: lurek.event.clearHistory -- Clears retained pushed event history
-do -- lurek.event.clearHistory
+--@api-stub: lurek.event.clearHistory
+-- Clears retained pushed event history
+do
   lurek.event.enableHistory(16)
   lurek.event.push("temp_event")
   lurek.event.clearHistory()
   lurek.log.info("history cleared, entries=" .. #lurek.event.getHistory(), "event")
 end
 
---@api-stub: lurek.event.push -- Pushes a normal-priority event into the shared event queue and optional history
-do -- lurek.event.push
+--@api-stub: lurek.event.push
+-- Pushes a normal-priority event into the shared event queue and optional history
+do
   lurek.event.push("damage", "player", 12)
   for name, target, amount in lurek.event.poll() do
     if name == "damage" then
@@ -136,8 +151,9 @@ do -- lurek.event.push
   end
 end
 
---@api-stub: lurek.event.pushPriority -- Pushes an event with explicit priority into the shared event queue and optional history
-do -- lurek.event.pushPriority
+--@api-stub: lurek.event.pushPriority
+-- Pushes an event with explicit priority into the shared event queue and optional history
+do
   lurek.event.push("normal_notice", "late")
   lurek.event.pushPriority("urgent_notice", "high", {source="system"})
   for name, payload in lurek.event.poll() do
@@ -148,7 +164,8 @@ end
 -- -- Signal methods --
 
 --@api-stub: Signal:emit
-do -- Signal:emit
+-- Performs the emit operation on this signal.
+do
   local sig = lurek.event.newSignal()
   sig:register("level_up", function(actor, new_level)
     lurek.log.info(actor .. " reached level " .. new_level, "rpg")
@@ -157,7 +174,8 @@ do -- Signal:emit
 end
 
 --@api-stub: Signal:remove
-do -- Signal:remove
+-- Removes a  from this signal.
+do
   local sig = lurek.event.newSignal()
   local handle = sig:register("tick", function() end)
   local removed = sig:remove(handle)
@@ -165,7 +183,8 @@ do -- Signal:remove
 end
 
 --@api-stub: Signal:clear
-do -- Signal:clear
+-- Clears all items from this signal.
+do
   local sig = lurek.event.newSignal()
   sig:register("damage", function() end)
   sig:register("damage", function() end)
@@ -174,7 +193,8 @@ do -- Signal:clear
 end
 
 --@api-stub: Signal:clearAll
-do -- Signal:clearAll
+-- Clears all all items from this signal.
+do
   local sig = lurek.event.newSignal()
   sig:register("a", function() end)
   sig:register("b", function() end)
@@ -183,7 +203,8 @@ do -- Signal:clearAll
 end
 
 --@api-stub: Signal:getCount
-do -- Signal:getCount
+-- Returns the total count of items held by this signal.
+do
   local sig = lurek.event.newSignal()
   sig:register("frame", function() end)
   if sig:getCount("frame") > 0 then
@@ -192,7 +213,8 @@ do -- Signal:getCount
 end
 
 --@api-stub: Signal:getTotalCount
-do -- Signal:getTotalCount
+-- Returns the number of total items in this signal.
+do
   local sig = lurek.event.newSignal()
   sig:register("a", function() end)
   sig:register("b", function() end)
@@ -200,14 +222,16 @@ do -- Signal:getTotalCount
 end
 
 --@api-stub: Signal:type
-do -- Signal:type
+-- Returns the Lua-visible type name string for this signal handle.
+do
   local sig = lurek.event.newSignal()
   local kind = sig:type()
   lurek.log.info("created object of type=" .. kind, "diag")
 end
 
 --@api-stub: Signal:typeOf
-do -- Signal:typeOf
+-- Returns true if this signal handle matches the given type name string.
+do
   local sig = lurek.event.newSignal()
   if sig:typeOf("Signal") and sig:typeOf("Object") then
     lurek.log.info("dispatcher passes Signal+Object guard", "diag")
@@ -215,7 +239,8 @@ do -- Signal:typeOf
 end
 
 --@api-stub: Signal:connect
-do -- Signal:connect
+-- Initiates a connection from this signal to the target address.
+do
   local sig = lurek.event.newSignal()
   local id = sig:connect("*", function(data)
     lurek.log.info("received: " .. tostring(data), "event")
@@ -225,7 +250,8 @@ do -- Signal:connect
 end
 
 --@api-stub: Signal:once
-do -- Signal:once
+-- Fires the callback registered for the ce event on this signal.
+do
   local sig = lurek.event.newSignal()
   sig:once("*", function(val)
     lurek.log.info("once fired: " .. tostring(val), "event")
@@ -236,7 +262,8 @@ do -- Signal:once
 end
 
 --@api-stub: Signal:register
-do -- Signal:register
+-- Performs the register operation on this signal.
+do
   local sig = lurek.event.newSignal()
   local id = sig:register("*", function(payload)
     lurek.log.info("payload: " .. tostring(payload), "event")
@@ -246,7 +273,8 @@ do -- Signal:register
 end
 
 --@api-stub: Signal:registerWithFilter
-do -- Signal:registerWithFilter
+-- Performs the register with filter operation on this signal.
+do
   local sig = lurek.event.newSignal()
   sig:registerWithFilter(
     "combat.event",

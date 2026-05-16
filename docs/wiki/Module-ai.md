@@ -406,11 +406,53 @@ All subsystems are pure CPU, headless-testable, and exposed through `lurek.ai.*`
 Module example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ## Key Types
@@ -475,7 +517,7 @@ Creates a behavior tree action leaf backed by a Lua callback.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAction
+do
   local act = lurek.ai.newAction(function(dt)
       return "success"
   end)
@@ -493,7 +535,7 @@ Creates an AI director for tension, phase, and pacing factor calculations.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAIDirector
+do
   local dir = lurek.ai.newAIDirector()
   dir:setTension(0.4)
   function lurek.process(dt) dir:update(dt) end
@@ -511,7 +553,7 @@ Creates a default AI level-of-detail tier selector.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAILod
+do
   local lod = lurek.ai.newAILod()
   if lod:shouldUpdate(1, 60) then lurek.log.debug("tier 1 update", "ai") end
 end
@@ -535,7 +577,7 @@ Creates a multi-armed bandit with a named selection strategy.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newBandit
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   local arm = b:select()
   b:update(arm, 1.0)
@@ -553,7 +595,7 @@ Creates an empty behavior tree that can receive a root node.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newBehaviorTree
+do
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSequence()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -572,7 +614,7 @@ Creates an empty AI blackboard for typed local facts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newBlackboard
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("alert_level", 0.3)
   bb:setBool("player_seen", false)
@@ -590,7 +632,7 @@ Creates an empty command queue for callback-backed AI commands.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newCommandQueue
+do
   local q = lurek.ai.newCommandQueue()
   q:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   q:enqueue("attack", function() end, { priority = 5 })
@@ -612,7 +654,7 @@ Creates a behavior tree condition leaf backed by a Lua callback.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newCondition
+do
   local hp_low = lurek.ai.newCondition(function() return true end)
   local seq = lurek.ai.newSequence()
   seq:addChild(hp_low)
@@ -634,7 +676,7 @@ Creates a context steering model with the requested directional slot count.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newContextSteering
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addAvoidPoint(250, 200, 64, 1.0)
@@ -652,7 +694,7 @@ Creates an empty dialogue selector for weighted topics and branches.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newDialogueAI
+do
   local d = lurek.ai.newDialogueAI()
   local t = d:type()
   local _is_dialogue = d:typeOf("DialogueAI")
@@ -690,7 +732,7 @@ Creates an empty emotion model for named decaying emotion values.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newEmotionModel
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:add("anger", 0.0, 0.05, 0.15)
@@ -714,7 +756,7 @@ Creates a genetic algorithm population with fixed chromosome length.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newGeneticAlgorithm
+do
   local ga = lurek.ai.newGeneticAlgorithm(50, 16, 42)
   ga:setFitness(1, 0.7)
   function lurek.process(dt) ga:evolve() end
@@ -732,7 +774,7 @@ Creates an empty GOAP planner for boolean world-state planning.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newGOAPPlanner
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("eat", 1.0, function() lurek.log.info("eating", "ai") end)
   planner:addGoal("not_hungry", 1.0)
@@ -755,7 +797,7 @@ Creates a guard decorator that runs a predicate before ticking its child.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newGuard
+do
   local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
   local guard = lurek.ai.newGuard(
     function(ag, bb) return bb:getNumber("health", 1.0) > 0.0 end,
@@ -777,7 +819,7 @@ Creates an empty hierarchical task network domain.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newHTNDomain
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("attack", { "has_weapon" }, { "enemy_dead" }, {})
 end
@@ -800,7 +842,7 @@ Creates a grid influence map with the supplied cell dimensions and world cell si
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newInfluenceMap
+do
   local infl = lurek.ai.newInfluenceMap(64, 64, 16)
   infl:addLayer("threat")
   infl:stampInfluence("threat", 320, 240, 80, 1.0, 1.0)
@@ -818,7 +860,7 @@ Creates a behavior tree inverter decorator with an empty sequence child.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newInverter
+do
   local inv = lurek.ai.newInverter()
   inv:setChild(lurek.ai.newCondition(function() return false end))
   local bt = lurek.ai.newBehaviorTree(); bt:setRoot(inv)
@@ -843,7 +885,7 @@ Creates a Monte Carlo tree search engine with deterministic configuration.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newMCTSEngine
+do
   local mcts = lurek.ai.newMCTSEngine(200, 1.41, 32, 12345)
   local actions = function(s) return { 1, 2, 3 } end
   local apply = function(s, a) return s + a end
@@ -862,7 +904,7 @@ Creates an empty need system for decaying named needs.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeedSystem
+do
   local needs = lurek.ai.newNeedSystem()
   needs:addNeed("hunger", 0.05, 0.6, 1.5)
   function lurek.process(dt) needs:update(dt) end
@@ -880,7 +922,7 @@ Creates an empty feed-forward neural network.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeuralNet
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -904,7 +946,7 @@ Creates a neuroevolution population from a layer specification table.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeuroevolution
+do
   local layers = { { inputs = 4, outputs = 8, activation = "relu" }, { inputs = 8, outputs = 2, activation = "softmax" } }
   local ne = lurek.ai.newNeuroevolution(layers, 30, 1)
   function lurek.process(dt) ne:evolve() end
@@ -926,7 +968,7 @@ Creates an ORCA avoidance solver with the supplied prediction horizon.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newORCASolver
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   orca:setPreferredVelocity(idx, 50, 0)
@@ -949,7 +991,7 @@ Creates a behavior tree parallel node with optional success and failure policies
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newParallel
+do
   local par = lurek.ai.newParallel("require_all", "require_one")
   par:addChild(lurek.ai.newAction(function() return "success" end))
   par:addChild(lurek.ai.newAction(function() return "running" end))
@@ -972,7 +1014,7 @@ Creates a Q-learner with fixed state and action counts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newQLearner
+do
   local ql = lurek.ai.newQLearner(16, 4)
   ql:setLearningRate(0.1)
   ql:setExplorationRate(0.2)
@@ -994,7 +1036,7 @@ Creates a behavior tree repeater decorator with an optional repeat count.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newRepeater
+do
   local rep = lurek.ai.newRepeater(3)
   rep:setChild(lurek.ai.newAction(function() return "success" end))
   local bt = lurek.ai.newBehaviorTree(); bt:setRoot(rep)
@@ -1012,7 +1054,7 @@ Creates a behavior tree selector node with no children.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSelector
+do
   local sel = lurek.ai.newSelector()
   sel:addChild(lurek.ai.newCondition(function() return false end))
   sel:addChild(lurek.ai.newAction(function() return "success" end))
@@ -1030,7 +1072,7 @@ Creates a behavior tree sequence node with no children.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSequence
+do
   local seq = lurek.ai.newSequence()
   seq:addChild(lurek.ai.newCondition(function() return true end))
   seq:addChild(lurek.ai.newAction(function() return "success" end))
@@ -1052,7 +1094,7 @@ Creates an empty named squad. This function is exposed to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSquad
+do
   local squad = lurek.ai.newSquad("alpha")
   squad:addMember("guard_01")
   squad:setFormation("wedge", 32)
@@ -1070,7 +1112,7 @@ Creates an empty finite state machine with Lua-backed states and transitions.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStateMachine
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
   fsm:addState("chase", {})
@@ -1089,7 +1131,7 @@ Creates an empty steering manager with support for built-in and custom behaviors
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSteeringManager
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:addWander(20, 40, 5, 0.3)
@@ -1107,7 +1149,7 @@ Creates an empty stimulus world for visual and auditory stimulus records.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStimulusWorld
+do
   local sw = lurek.ai.newStimulusWorld()
   sw:addAuditory(100, 200, 1.0, 150, 0.5, "footstep")
   function lurek.process(dt) sw:update(dt) end
@@ -1129,7 +1171,7 @@ Creates a strategy AI that reevaluates goals on a fixed interval.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStrategyAI
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("expand")
   s:addGoal("defend")
@@ -1147,7 +1189,7 @@ Creates a behavior tree succeeder decorator with an empty sequence child.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSucceeder
+do
   local suc = lurek.ai.newSucceeder()
   suc:setChild(lurek.ai.newAction(function() return "failure" end))
   local bt = lurek.ai.newBehaviorTree(); bt:setRoot(suc)
@@ -1165,7 +1207,7 @@ Creates an empty trait profile with modifier support.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newTraitProfile
+do
   local traits = lurek.ai.newTraitProfile()
   traits:set("aggression", 0.7)
   traits:set("courage", 0.4)
@@ -1183,7 +1225,7 @@ Creates an empty utility AI action scorer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newUtilityAI
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end, 1.0)
   uai:addAction("attack", function() return 0.4 end, 1.0)
@@ -1201,7 +1243,7 @@ Creates an isolated AI world for agents, blackboards, and custom decision callba
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
@@ -1220,7 +1262,7 @@ Lua handle for a named agent stored inside an AI world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:addAgent
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   world:addAgent("guard_02")
@@ -1241,7 +1283,7 @@ Adds a tag string to this agent when the agent still exists in its world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:addTag
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:addTag("alive")
@@ -1260,7 +1302,7 @@ Returns a blackboard snapshot for this agent or an empty blackboard when the age
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getBlackboard
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   local bb = agent:getBlackboard()
@@ -1279,7 +1321,7 @@ Returns this agent's decision model name or the default model name for a missing
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getDecisionModel
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   if agent:getDecisionModel() == "fsm" then lurek.log.debug("uses fsm", "ai") end
@@ -1297,7 +1339,7 @@ Returns this agent's maximum steering force or the default force for a missing a
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getMaxForce
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   local f = agent:getMaxForce()
@@ -1316,7 +1358,7 @@ Returns this agent's maximum movement speed or the default speed for a missing a
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getMaxSpeed
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   local cap = agent:getMaxSpeed()
@@ -1335,7 +1377,7 @@ Returns this agent's stable world name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getName
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   local name = agent:getName()
@@ -1354,7 +1396,7 @@ Returns this agent's world position or the origin when the agent has been remove
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getPosition
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setPosition(50, 75)
@@ -1374,7 +1416,7 @@ Returns this agent's integer priority or zero when the agent has been removed.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getPriority
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setPriority(5)
@@ -1393,7 +1435,7 @@ Returns this agent's velocity vector or zero velocity when the agent has been re
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:getVelocity
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setVelocity(40, 30)
@@ -1417,7 +1459,7 @@ Returns whether this agent currently has the given tag.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:hasTag
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:addTag("boss")
@@ -1438,7 +1480,7 @@ Removes a tag string from this agent when the agent still exists in its world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:removeTag
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:addTag("burning")
@@ -1459,7 +1501,7 @@ Installs a Lua callback as this agent's decision model and stores it in the call
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setCustomModel
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("custom_agent")
   agent:setCustomModel(function(ag, bb, dt)
@@ -1487,7 +1529,7 @@ Sets this agent's built-in decision model from a string name when the name is re
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setDecisionModel
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setDecisionModel("bt")
@@ -1507,7 +1549,7 @@ Sets this agent's maximum steering force when the agent still exists in its worl
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setMaxForce
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setMaxForce(300)
@@ -1527,7 +1569,7 @@ Sets this agent's maximum movement speed when the agent still exists in its worl
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setMaxSpeed
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setMaxSpeed(150)
@@ -1548,7 +1590,7 @@ Sets this agent's world position when the agent still exists in its world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setPosition
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setPosition(320, 240)
@@ -1568,7 +1610,7 @@ Sets this agent's integer priority when the agent still exists in its world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setPriority
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setPriority(10)
@@ -1589,7 +1631,7 @@ Sets this agent's velocity vector when the agent still exists in its world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:setVelocity
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   agent:setVelocity(40, 0)
@@ -1607,7 +1649,7 @@ Returns the Lua-visible type name for this agent handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:type
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   if agent:type() == "Agent" then lurek.log.debug("ok", "ai") end
@@ -1629,7 +1671,7 @@ Returns whether this agent handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Agent:typeOf
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("scout_01")
   if agent:typeOf("Object") then lurek.log.debug("inherits Object", "ai") end
@@ -1645,7 +1687,7 @@ Lua handle for a typed AI blackboard storing local key-value facts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newBlackboard
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("alert_level", 0.3)
   bb:setBool("player_seen", false)
@@ -1661,7 +1703,7 @@ Removes every local entry from this blackboard.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:clear
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("hp", 80)
   bb:setBool("alerted", true)
@@ -1687,7 +1729,7 @@ Returns a boolean blackboard fact or the provided fallback when the key is missi
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:getBool
+do
   local bb = lurek.ai.newBlackboard()
   bb:setBool("player_visible", true)
   lurek.log.info("visible=" .. tostring(bb:getBool("player_visible", false)), "ai")
@@ -1706,7 +1748,7 @@ Returns every local blackboard key in an array-style Lua table.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:getKeys
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("energy", 50)
   bb:setBool("charging", false)
@@ -1732,7 +1774,7 @@ Returns a numeric blackboard fact or the provided fallback when the key is missi
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:getNumber
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("speed", 5.0)
   local v = bb:getNumber("speed", 0.0)
@@ -1752,7 +1794,7 @@ Returns the number of entries currently stored in this blackboard.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:getSize
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("x", 10)
   bb:setNumber("y", 20)
@@ -1776,7 +1818,7 @@ Returns a string blackboard fact or the provided fallback when the key is missin
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:getString
+do
   local bb = lurek.ai.newBlackboard()
   bb:setString("last_command", "patrol_waypoint_3")
   local cmd = bb:getString("last_command", "idle")
@@ -1799,7 +1841,7 @@ Returns whether the blackboard contains any entry for the given key.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:has
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("ammo", 12)
   lurek.log.info("has ammo: " .. tostring(bb:has("ammo")), "ai")
@@ -1820,7 +1862,7 @@ Removes the given key from the blackboard if it exists.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:remove
+do
   local bb = lurek.ai.newBlackboard()
   bb:setString("target", "goblin_5")
   lurek.log.info("before remove: " .. tostring(bb:has("target")), "ai")
@@ -1843,7 +1885,7 @@ Stores a boolean fact under the given blackboard key.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:setBool
+do
   local bb = lurek.ai.newBlackboard()
   bb:setBool("is_alerted", true)
   bb:setBool("can_attack", false)
@@ -1865,7 +1907,7 @@ Stores a numeric fact under the given blackboard key.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:setNumber
+do
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("health", 100)
   bb:setNumber("aggro_timer", 3.5)
@@ -1887,7 +1929,7 @@ Stores a string fact under the given blackboard key.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:setString
+do
   local bb = lurek.ai.newBlackboard()
   bb:setString("state", "patrol")
   bb:setString("target_id", "player_1")
@@ -1906,7 +1948,7 @@ Returns the Lua-visible type name for this blackboard handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:type
+do
   local a_i_blackboard_obj = lurek.ai.newBlackboard()
   local t = a_i_blackboard_obj:type()
   lurek.log.info("LAIBlackboard:type = " .. t, "ai")
@@ -1928,7 +1970,7 @@ Returns whether this blackboard handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIBlackboard:typeOf
+do
   local a_i_blackboard_obj = lurek.ai.newBlackboard()
   lurek.log.info("is LAIBlackboard: " .. tostring(a_i_blackboard_obj:typeOf("LAIBlackboard")), "ai")
   lurek.log.info("is wrong: " .. tostring(a_i_blackboard_obj:typeOf("Unknown")), "ai")
@@ -1944,7 +1986,7 @@ Lua handle for an AI director that tracks encounter tension and pacing factors.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAIDirector
+do
   local dir = lurek.ai.newAIDirector()
   dir:setTension(0.4)
   function lurek.process(dt) dir:update(dt) end
@@ -1962,7 +2004,7 @@ Returns the ambient intensity derived from current tension and phase.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:ambientIntensity
+do
   local dir = lurek.ai.newAIDirector()
   local amb = dir:ambientIntensity()
   if amb > 0.5 then lurek.log.debug("loud ambience", "ai") end
@@ -1980,7 +2022,7 @@ Returns the loot multiplier derived from current tension and phase.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:lootFactor
+do
   local dir = lurek.ai.newAIDirector()
   lurek.log.debug("loot x" .. dir:lootFactor(), "ai")
 end
@@ -1997,7 +2039,7 @@ Returns the current director phase name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:phase
+do
   local dir = lurek.ai.newAIDirector()
   if dir:phase() == "peak" then lurek.log.info("intense moment", "ai") end
 end
@@ -2016,7 +2058,7 @@ Adds an event intensity sample to the director tension model.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:pushEvent
+do
   local dir = lurek.ai.newAIDirector()
   dir:pushEvent(0.7)
 end
@@ -2031,7 +2073,7 @@ Resets director tension and phase state to defaults.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:reset
+do
   local dir = lurek.ai.newAIDirector()
   dir:reset()
 end
@@ -2050,7 +2092,7 @@ Directly sets the director tension value.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:setTension
+do
   local dir = lurek.ai.newAIDirector()
   dir:setTension(0.9)
 end
@@ -2067,7 +2109,7 @@ Returns the spawn-rate multiplier derived from current tension and phase.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:spawnRateFactor
+do
   local dir = lurek.ai.newAIDirector()
   local mult = dir:spawnRateFactor()
   lurek.log.debug("spawn x" .. mult, "ai")
@@ -2085,7 +2127,7 @@ Returns the current director tension value.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:tension
+do
   local dir = lurek.ai.newAIDirector()
   dir:pushEvent(0.5)
   lurek.log.debug("tension=" .. dir:tension(), "ai")
@@ -2103,7 +2145,7 @@ Returns the Lua-visible type name for this AI director handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIDirector:type
+do
   local a_i_director_obj = lurek.ai.newAIDirector()
   local t = a_i_director_obj:type()
   lurek.log.info("LAIDirector:type = " .. t, "ai")
@@ -2125,7 +2167,7 @@ Returns whether this AI director handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAIDirector:typeOf
+do
   local a_i_director_obj = lurek.ai.newAIDirector()
   lurek.log.info("is LAIDirector: " .. tostring(a_i_director_obj:typeOf("LAIDirector")), "ai")
   lurek.log.info("is wrong: " .. tostring(a_i_director_obj:typeOf("Unknown")), "ai")
@@ -2145,7 +2187,7 @@ Advances director tension decay and phase evaluation.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIDirector:update
+do
   local dir = lurek.ai.newAIDirector()
   function lurek.process(dt) dir:update(dt) end
 end
@@ -2160,7 +2202,7 @@ Lua handle for distance-based AI level-of-detail tier selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAILod
+do
   local lod = lurek.ai.newAILod()
   if lod:shouldUpdate(1, 60) then lurek.log.debug("tier 1 update", "ai") end
 end
@@ -2182,7 +2224,7 @@ Returns whether a tier should update on a given frame counter.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AILod:shouldUpdate
+do
   local lod = lurek.ai.newAILod()
   if lod:shouldUpdate(1, 60) then lurek.log.debug("tier 1 tick", "ai") end
 end
@@ -2199,7 +2241,7 @@ Returns the number of configured AI LOD tiers.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AILod:tierCount
+do
   local lod = lurek.ai.newAILod()
   lurek.log.debug("tiers=" .. lod:tierCount(), "ai")
 end
@@ -2223,7 +2265,7 @@ Returns the LOD tier for an agent position relative to a reference position.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AILod:tierFor
+do
   local lod = lurek.ai.newAILod()
   local tier = lod:tierFor(350, 0, 0, 0)
   lurek.log.info("lod tier at 350: " .. tier, "ai")
@@ -2245,7 +2287,7 @@ Returns the name of an AI LOD tier when the index is valid.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AILod:tierName
+do
   local lod = lurek.ai.newAILod()
   local n = lod:tierName(0)
   if n then lurek.log.debug("tier 0=" .. n, "ai") end
@@ -2263,7 +2305,7 @@ Returns the Lua-visible type name for this AI LOD handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAILod:type
+do
   local a_i_lod_obj = lurek.ai.newAILod()
   local t = a_i_lod_obj:type()
   lurek.log.info("LAILod:type = " .. t, "ai")
@@ -2285,7 +2327,7 @@ Returns whether this AI LOD handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LAILod:typeOf
+do
   local a_i_lod_obj = lurek.ai.newAILod()
   lurek.log.info("is LAILod: " .. tostring(a_i_lod_obj:typeOf("LAILod")), "ai")
   lurek.log.info("is wrong: " .. tostring(a_i_lod_obj:typeOf("Unknown")), "ai")
@@ -2301,7 +2343,7 @@ Lua handle for an AI world that owns named agents, global blackboard data, and c
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
@@ -2323,7 +2365,7 @@ Creates a named agent in this world and returns a handle that can edit its movem
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:addAgent
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   world:addAgent("guard_02")
@@ -2346,7 +2388,7 @@ Returns the named agent handle when it exists in this world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:getAgent
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   local a = world:getAgent("guard_01")
@@ -2365,7 +2407,7 @@ Returns the number of agents currently stored in this world.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:getAgentCount
+do
   local world = lurek.ai.newWorld()
   world:addAgent("a"); world:addAgent("b")
   lurek.log.info("agents=" .. world:getAgentCount(), "ai")
@@ -2383,7 +2425,7 @@ Returns a blackboard snapshot containing the world's shared AI facts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:getGlobalBlackboard
+do
   local world = lurek.ai.newWorld()
   local bb = world:getGlobalBlackboard()
   bb:setNumber("alarm", 0.0)
@@ -2403,7 +2445,7 @@ Removes an agent from this world by using an existing agent handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:removeAgent
+do
   local world = lurek.ai.newWorld()
   local tmp = world:addAgent("temp")
   world:removeAgent(tmp)
@@ -2421,7 +2463,7 @@ Returns the Lua-visible type name for this AI world handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:type
+do
   local world = lurek.ai.newWorld()
   if world:type() == "AIWorld" then lurek.log.debug("got world", "ai") end
 end
@@ -2442,7 +2484,7 @@ Returns whether this AI world handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:typeOf
+do
   local world = lurek.ai.newWorld()
   if world:typeOf("Object") then lurek.log.debug("inherits Object", "ai") end
 end
@@ -2461,7 +2503,7 @@ Advances the world simulation and invokes custom decision callbacks for agents t
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- AIWorld:update
+do
   local world = lurek.ai.newWorld()
   world:addAgent("npc")
   function lurek.process(dt) world:update(dt) end
@@ -2477,7 +2519,7 @@ Lua handle for multi-armed bandit action selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newBandit
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   local arm = b:select()
   b:update(arm, 1.0)
@@ -2495,7 +2537,7 @@ Returns the number of arms in this bandit.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:armCount
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   lurek.log.debug("arms=" .. b:armCount(), "ai")
 end
@@ -2512,7 +2554,7 @@ Returns the arm with the best current estimate.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:bestArm
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   b:update(0, 0.7); b:update(1, 0.3)
   lurek.log.debug("best arm=" .. b:bestArm(), "ai")
@@ -2528,7 +2570,7 @@ Resets all bandit arm statistics. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:reset
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   b:reset()
 end
@@ -2545,7 +2587,7 @@ Selects an arm using the configured bandit strategy.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:select
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   local arm = b:select()
   lurek.log.debug("arm=" .. arm, "ai")
@@ -2563,7 +2605,7 @@ Returns the total number of arm selections recorded by this bandit.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:totalPulls
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   b:select(); b:select()
   lurek.log.debug("pulls=" .. b:totalPulls(), "ai")
@@ -2581,7 +2623,7 @@ Returns the Lua-visible type name for this bandit handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LBandit:type
+do
   local bandit_obj = lurek.ai.newBandit(4, "epsilon-greedy", 0.1, 42)
   local t = bandit_obj:type()
   lurek.log.info("LBandit:type = " .. t, "ai")
@@ -2603,7 +2645,7 @@ Returns whether this bandit handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LBandit:typeOf
+do
   local bandit_obj = lurek.ai.newBandit(4, "epsilon-greedy", 0.1, 42)
   lurek.log.info("is LBandit: " .. tostring(bandit_obj:typeOf("LBandit")), "ai")
   lurek.log.info("is wrong: " .. tostring(bandit_obj:typeOf("Unknown")), "ai")
@@ -2624,7 +2666,7 @@ Updates one arm with a received reward.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Bandit:update
+do
   local b = lurek.ai.newBandit(4, "ucb1", 0.1, 99)
   local arm = b:select()
   b:update(arm, 1.0)
@@ -2640,7 +2682,7 @@ Lua handle for a behavior tree root and its most recent execution status.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LBehaviorTree methods
+do
   local bt = lurek.patterns.newBehaviorTree()
   local seq = bt:addSequence("root-seq")
   local sel = bt:addSelector("fallback")
@@ -2669,7 +2711,7 @@ do -- LBehaviorTree methods
 end
 
 --@api-stub: LGraph
-do -- LGraph methods
+do
   local g = lurek.patterns.newGraph(true)
   local a = g:addNode("A", { hp = 10 })
   local b = g:addNode("B", { hp = 20 })
@@ -2701,7 +2743,7 @@ Returns behavior tree debug counters and status in a Lua table.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:getDebugState
+do
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSequence()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -2722,7 +2764,7 @@ Returns the last behavior tree status string recorded by the tree.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:getLastStatus
+do
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSequence()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -2745,7 +2787,7 @@ Sets the behavior tree root by moving a node handle into the tree.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:setRoot
+do
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSelector()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -2764,7 +2806,7 @@ Returns the Lua-visible type name for this behavior tree handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:type
+do
   local bt = lurek.ai.newBehaviorTree()
   if bt:type() == "BehaviorTree" then lurek.log.debug("ok", "ai") end
 end
@@ -2785,7 +2827,7 @@ Returns whether this behavior tree handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:typeOf
+do
   local bt = lurek.ai.newBehaviorTree()
   if bt:typeOf("Object") then lurek.log.debug("ok", "ai") end
 end
@@ -2800,7 +2842,7 @@ Lua handle for a behavior tree node that can be assembled into composites and de
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newAction
+do
   local act = lurek.ai.newAction(function(dt)
       return "success"
   end)
@@ -2820,7 +2862,7 @@ Adds a child node to a composite selector, sequence, or parallel node.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:addChild
+do
   local seq = lurek.ai.newSequence()
   seq:addChild(lurek.ai.newCondition(function() return true end))
   seq:addChild(lurek.ai.newAction(function() return "success" end))
@@ -2838,7 +2880,7 @@ Returns the number of children owned by this behavior tree node.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:getChildCount
+do
   local seq = lurek.ai.newSequence()
   seq:addChild(lurek.ai.newAction(function() return "success" end))
   lurek.log.debug("children=" .. seq:getChildCount(), "ai")
@@ -2856,7 +2898,7 @@ Returns the repeat count for repeater nodes or zero for other node kinds.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:getCount
+do
   local rep = lurek.ai.newRepeater(7)
   if rep:getCount() == 7 then lurek.log.debug("count ok", "ai") end
 end
@@ -2873,7 +2915,7 @@ Returns the behavior tree node kind as a lowercase string.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:getNodeType
+do
   local seq = lurek.ai.newSequence()
   if seq:getNodeType() == "sequence" then lurek.log.debug("seq ok", "ai") end
 end
@@ -2888,7 +2930,7 @@ Resets this behavior tree node's runtime state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:reset
+do
   local rep = lurek.ai.newRepeater(3)
   rep:setChild(lurek.ai.newAction(function() return "success" end))
   rep:reset()
@@ -2908,7 +2950,7 @@ Sets the single child of a decorator node such as inverter, repeater, or succeed
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:setChild
+do
   local inv = lurek.ai.newInverter()
   inv:setChild(lurek.ai.newCondition(function() return false end))
   local bt = lurek.ai.newBehaviorTree(); bt:setRoot(inv)
@@ -2928,7 +2970,7 @@ Sets the repeat count when this node is a repeater.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:setCount
+do
   local rep = lurek.ai.newRepeater(0)
   rep:setCount(5)
   rep:setChild(lurek.ai.newAction(function() return "success" end))
@@ -2948,7 +2990,7 @@ Sets the failure policy for a parallel node.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:setFailurePolicy
+do
   local par = lurek.ai.newParallel("require_one", "require_one")
   par:setFailurePolicy("require_all")
   par:addChild(lurek.ai.newAction(function() return "running" end))
@@ -2968,7 +3010,7 @@ Sets the success policy for a parallel node.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:setSuccessPolicy
+do
   local par = lurek.ai.newParallel("require_one", "require_one")
   par:setSuccessPolicy("require_all")
   par:addChild(lurek.ai.newAction(function() return "success" end))
@@ -2986,7 +3028,7 @@ Returns the Lua-visible type name for this behavior tree node handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:type
+do
   local seq = lurek.ai.newSequence()
   if seq:type() == "BTNode" then lurek.log.debug("ok", "ai") end
 end
@@ -3007,7 +3049,7 @@ Returns whether this behavior tree node handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BTNode:typeOf
+do
   local sel = lurek.ai.newSelector()
   if sel:typeOf("Object") then lurek.log.debug("ok", "ai") end
 end
@@ -3022,7 +3064,7 @@ Lua handle for a command queue that stores ordered callback-backed commands.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newCommandQueue
+do
   local q = lurek.ai.newCommandQueue()
   q:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   q:enqueue("attack", function() end, { priority = 5 })
@@ -3040,7 +3082,7 @@ Cancels the currently active command when one exists.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:cancelCurrent
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   if cq:cancelCurrent() then lurek.log.debug("cancelled", "ai") end
@@ -3056,7 +3098,7 @@ Removes every queued command. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:clear
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   cq:enqueue("attack", function() end)
@@ -3079,7 +3121,7 @@ Adds a command callback to the back of the queue.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:enqueue
+do
   local q = lurek.ai.newCommandQueue()
   q:enqueue("move", function() end, {x=300, y=200})
   q:enqueue("attack", function() end, {targetId="enemy_01"})
@@ -3098,7 +3140,7 @@ Returns the number of commands currently queued.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:getCount
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   lurek.log.debug("queue=" .. cq:getCount(), "ai")
@@ -3116,7 +3158,7 @@ Returns the current command target coordinates.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:getCurrentTarget
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   local tx, ty = cq:getCurrentTarget()
@@ -3135,7 +3177,7 @@ Returns the type label of the current command when one exists.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:getCurrentType
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   local kind = cq:getCurrentType()
@@ -3154,7 +3196,7 @@ Returns whether the command queue has no commands.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:isEmpty
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   cq:clear()
@@ -3177,7 +3219,7 @@ Adds a command callback to the front of the queue.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:pushFront
+do
   local q = lurek.ai.newCommandQueue()
   q:enqueue("patrol", function() end, {})
   q:pushFront("flee", function() end, {threatX=300, threatY=200})
@@ -3200,7 +3242,7 @@ Replaces the queue contents with one command callback.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:replace
+do
   local q = lurek.ai.newCommandQueue()
   q:enqueue("move", function() end, {x=200, y=100})
   q:replace("attack", function() end, {targetId="bandit_01"})
@@ -3219,7 +3261,7 @@ Returns the Lua-visible type name for this command queue handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:type
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   if cq:type() == "CommandQueue" then lurek.log.debug("ok", "ai") end
@@ -3241,7 +3283,7 @@ Returns whether this command queue handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- CommandQueue:typeOf
+do
   local cq = lurek.ai.newCommandQueue()
   cq:enqueue("move", function() end, { targetX = 200, targetY = 100 })
   if cq:typeOf("Object") then lurek.log.debug("ok", "ai") end
@@ -3257,7 +3299,7 @@ Lua handle for slot-based context steering direction selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newContextSteering
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addAvoidPoint(250, 200, 64, 1.0)
@@ -3282,7 +3324,7 @@ Adds rectangular bounds avoidance to context steering.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:addAvoidBounds
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addAvoidBounds(0, 0, 1280, 720, 32, 1.0)
@@ -3305,7 +3347,7 @@ Adds a point avoidance influence to context steering.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:addAvoidPoint
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addAvoidPoint(300, 200, 64, 1.5)
   cs:addAvoidPoint(100, 350, 48, 1.0)
@@ -3329,7 +3371,7 @@ Adds a context steering target attraction.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:addSeekTarget
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addSeekTarget(400, 400, 0.6)
@@ -3352,7 +3394,7 @@ Adds wander noise to context steering.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:addWander
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addWander(0.5, 0.3)
@@ -3370,7 +3412,7 @@ Returns the magnitude of the last selected context steering slot.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:chosenMagnitude
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:evaluate(0, 0, 0, 0)
@@ -3387,7 +3429,7 @@ Removes all context steering behaviors.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:clearBehaviors
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:clearBehaviors()
@@ -3412,7 +3454,7 @@ Evaluates context steering and returns the selected movement direction.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:evaluate
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   cs:addAvoidPoint(350, 250, 50, 1.0)
@@ -3432,7 +3474,7 @@ Returns the number of directional slots used by this context steering model.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ContextSteering:slotCount
+do
   local cs = lurek.ai.newContextSteering(16)
   cs:addSeekTarget(500, 300, 1.0)
   lurek.log.debug("slots=" .. cs:slotCount(), "ai")
@@ -3450,7 +3492,7 @@ Returns the Lua-visible type name for this context steering handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LContextSteering:type
+do
   local context_steering_obj = lurek.ai.newContextSteering(8)
   local t = context_steering_obj:type()
   lurek.log.info("LContextSteering:type = " .. t, "ai")
@@ -3472,7 +3514,7 @@ Returns whether this context steering handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LContextSteering:typeOf
+do
   local context_steering_obj = lurek.ai.newContextSteering(8)
   lurek.log.info("is LContextSteering: " .. tostring(context_steering_obj:typeOf("LContextSteering")), "ai")
   lurek.log.info("is wrong: " .. tostring(context_steering_obj:typeOf("Unknown")), "ai")
@@ -3488,7 +3530,7 @@ Lua handle for topic and branch selection driven by dialogue AI state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newDialogueAI
+do
   local d = lurek.ai.newDialogueAI()
   local t = d:type()
   local _is_dialogue = d:typeOf("DialogueAI")
@@ -3535,11 +3577,53 @@ Adds a selectable branch under an existing dialogue topic.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:addTopic(id: string, [weight]: number, [fsm_state]: string, [bt_status]: string, [utility_key]: string)`
@@ -3559,11 +3643,53 @@ Adds a selectable dialogue topic with optional context filters.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:clearUtilityScores()`
@@ -3575,11 +3701,53 @@ Removes every stored utility score from this dialogue selector.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:getTopicCount() -> integer`
@@ -3593,11 +3761,53 @@ Returns the number of topics registered in this dialogue selector.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:selectBranch(topic_id: string) -> LuaValue`
@@ -3615,11 +3825,53 @@ Selects the best currently valid branch for the given topic.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:selectTopic() -> LuaValue`
@@ -3633,11 +3885,53 @@ Selects the best currently valid topic using weights and context filters.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:setBTStatus([status]: string)`
@@ -3653,11 +3947,53 @@ Sets the behavior-tree status used as dialogue selection context.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:setFSMState([state]: string)`
@@ -3673,11 +4009,53 @@ Sets the finite-state-machine state used as dialogue selection context.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:setUtilityScore(key: string, score: number)`
@@ -3694,11 +4072,53 @@ Stores a utility score used by topics and branches that reference the given key.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:type() -> string`
@@ -3712,11 +4132,53 @@ Returns the Lua-visible type name for this dialogue AI handle.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LDialogueAI:typeOf(name: string) -> boolean`
@@ -3734,11 +4196,53 @@ Returns whether this dialogue AI handle matches a supported type name.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LEmotionModel`
@@ -3750,7 +4254,7 @@ Lua handle for decaying named emotion intensities.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newEmotionModel
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:add("anger", 0.0, 0.05, 0.15)
@@ -3773,7 +4277,7 @@ Adds an emotion definition with resting value, decay, and visibility threshold.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:add
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.08, 1.0)
   em:add("anger", 0.0, 0.06, 1.0)
@@ -3792,7 +4296,7 @@ Returns the strongest active emotion name when one is available.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:dominant
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:trigger("fear", 0.6)
@@ -3816,7 +4320,7 @@ Returns the current value of a named emotion.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:get
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:trigger("fear", 0.4)
@@ -3839,7 +4343,7 @@ Returns whether a named emotion is currently active.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:isActive
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:trigger("fear", 0.5)
@@ -3856,7 +4360,7 @@ Resets all emotions toward their default state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:reset
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:reset()
@@ -3877,7 +4381,7 @@ Adds an amount to a named emotion. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:trigger
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   em:trigger("fear", 0.5)
@@ -3895,7 +4399,7 @@ Returns the Lua-visible type name for this emotion model handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LEmotionModel:type
+do
   local emotion_model_obj = lurek.ai.newEmotionModel()
   local t = emotion_model_obj:type()
   lurek.log.info("LEmotionModel:type = " .. t, "ai")
@@ -3917,7 +4421,7 @@ Returns whether this emotion model handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LEmotionModel:typeOf
+do
   local emotion_model_obj = lurek.ai.newEmotionModel()
   lurek.log.info("is LEmotionModel: " .. tostring(emotion_model_obj:typeOf("LEmotionModel")), "ai")
   lurek.log.info("is wrong: " .. tostring(emotion_model_obj:typeOf("Unknown")), "ai")
@@ -3937,7 +4441,7 @@ Advances emotion decay over elapsed time.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- EmotionModel:update
+do
   local em = lurek.ai.newEmotionModel()
   em:add("fear", 0.0, 0.1, 0.2)
   function lurek.process(dt) em:update(dt) end
@@ -3953,7 +4457,7 @@ Lua handle for a floating-point genetic algorithm population.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newGeneticAlgorithm
+do
   local ga = lurek.ai.newGeneticAlgorithm(50, 16, 42)
   ga:setFitness(1, 0.7)
   function lurek.process(dt) ga:evolve() end
@@ -3971,7 +4475,7 @@ Returns the genes for the best chromosome in the population.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:bestGenes
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   ga:setFitness(0, 1.0)
   local best = ga:bestGenes()
@@ -3988,7 +4492,7 @@ Advances the genetic algorithm by one generation.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:evolve
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   for i = 1, ga:popSize() do ga:setFitness(i - 1, 0.5) end
   ga:evolve()
@@ -4006,7 +4510,7 @@ Returns the current generation index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:generation
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   if ga:generation() >= 100 then lurek.log.info("done", "ai") end
 end
@@ -4027,7 +4531,7 @@ Returns the genes for a chromosome by zero-based index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:getGenes
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   local genes = ga:getGenes(0)
   lurek.log.debug("g0=" .. genes[1], "ai")
@@ -4045,7 +4549,7 @@ Returns the population size. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:popSize
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   lurek.log.debug("pop=" .. ga:popSize(), "ai")
 end
@@ -4065,7 +4569,7 @@ Sets the fitness value for a chromosome by zero-based index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GeneticAlgorithm:setFitness
+do
   local ga = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   for i = 0, ga:popSize() - 1 do ga:setFitness(i, math.random()) end
 end
@@ -4082,7 +4586,7 @@ Returns the Lua-visible type name for this genetic algorithm handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LGeneticAlgorithm:type
+do
   local genetic_algorithm_obj = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   local t = genetic_algorithm_obj:type()
   lurek.log.info("LGeneticAlgorithm:type = " .. t, "ai")
@@ -4104,7 +4608,7 @@ Returns whether this genetic algorithm handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LGeneticAlgorithm:typeOf
+do
   local genetic_algorithm_obj = lurek.ai.newGeneticAlgorithm(20, 8, 42)
   lurek.log.info("is LGeneticAlgorithm: " .. tostring(genetic_algorithm_obj:typeOf("LGeneticAlgorithm")), "ai")
   lurek.log.info("is wrong: " .. tostring(genetic_algorithm_obj:typeOf("Unknown")), "ai")
@@ -4120,7 +4624,7 @@ Lua handle for a GOAP planner with boolean preconditions, effects, and goals.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newGOAPPlanner
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("eat", 1.0, function() lurek.log.info("eating", "ai") end)
   planner:addGoal("not_hungry", 1.0)
@@ -4142,7 +4646,7 @@ Adds a GOAP action with optional cost and completion callback.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:addAction
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("pickupKey", 2.0, function() lurek.log.info("pickup key", "ai") end)
   planner:addAction("unlockDoor", 1.0, function() lurek.log.info("unlock door", "ai") end)
@@ -4164,7 +4668,7 @@ Adds a GOAP goal with an optional priority weight.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:addGoal
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("rest", 1.0, function() end)
   planner:addGoal("is_rested", 1.0)
@@ -4184,7 +4688,7 @@ Returns the number of GOAP actions registered in this planner.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:getActionCount
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4203,7 +4707,7 @@ Returns the number of GOAP goals registered in this planner.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:getGoalCount
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4222,7 +4726,7 @@ Returns the maximum number of planner iterations allowed during search.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:getMaxIterations
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4246,7 +4750,7 @@ Builds a plan from the supplied boolean world state and returns action names in 
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:plan
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("eat", 1.0, function() end)
   planner:addGoal("not_hungry", 1.0)
@@ -4270,7 +4774,7 @@ Sets one boolean effect produced by an existing GOAP action.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:setEffect
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("openDoor", 1.0, function() end)
   planner:setEffect("openDoor", "door_locked", false)
@@ -4293,7 +4797,7 @@ Sets one desired world-state key for an existing GOAP goal.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:setGoalState
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addGoal("enemy_dead", 1.0)
   planner:setGoalState("enemy_dead", "is_dead", true)
@@ -4314,7 +4818,7 @@ Sets the maximum number of planner iterations allowed during search.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:setMaxIterations
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4337,7 +4841,7 @@ Sets one boolean precondition for an existing GOAP action.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:setPrecondition
+do
   local planner = lurek.ai.newGOAPPlanner()
   planner:addAction("shoot", 1.0, function() end)
   planner:setPrecondition("shoot", "has_ammo", true)
@@ -4356,7 +4860,7 @@ Returns the Lua-visible type name for this GOAP planner handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:type
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4379,7 +4883,7 @@ Returns whether this GOAP planner handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- GOAPPlanner:typeOf
+do
   local p = lurek.ai.newGOAPPlanner()
   p:addAction("eat", 1.0, function() end)
   p:addGoal("not_hungry", 1.0)
@@ -4396,7 +4900,7 @@ Lua handle for a hierarchical task network domain.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newHTNDomain
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("attack", { "has_weapon" }, { "enemy_dead" }, {})
 end
@@ -4416,7 +4920,7 @@ Adds a compound HTN task with one or more ordered method definitions.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- HTNDomain:addCompound
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("attack", {"has_weapon"}, {"enemy_dead"}, {})
   d:addCompound("defeat_enemy", {{"has_weapon"}, {"use_weapon"}})
@@ -4440,7 +4944,7 @@ Adds a primitive HTN task with preconditions, effects, and cleared facts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- HTNDomain:addPrimitive
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("attack", { "has_weapon", "in_range" }, { "enemy_dead" }, { "in_range" })
 end
@@ -4462,7 +4966,7 @@ Plans from a root HTN task and numeric world state facts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- HTNDomain:plan
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("move", {}, {}, {})
   d:addCompound("patrol", {{"move"}})
@@ -4482,7 +4986,7 @@ Returns the number of tasks defined in this HTN domain.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- HTNDomain:taskCount
+do
   local d = lurek.ai.newHTNDomain()
   d:addPrimitive("rest", {}, { "rested" }, {})
   lurek.log.debug("tasks=" .. d:taskCount(), "ai")
@@ -4500,7 +5004,7 @@ Returns the Lua-visible type name for this HTN domain handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LHTNDomain:type
+do
   local h_t_n_domain_obj = lurek.ai.newHTNDomain()
   local t = h_t_n_domain_obj:type()
   lurek.log.info("LHTNDomain:type = " .. t, "ai")
@@ -4522,7 +5026,7 @@ Returns whether this HTN domain handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LHTNDomain:typeOf
+do
   local h_t_n_domain_obj = lurek.ai.newHTNDomain()
   lurek.log.info("is LHTNDomain: " .. tostring(h_t_n_domain_obj:typeOf("LHTNDomain")), "ai")
   lurek.log.info("is wrong: " .. tostring(h_t_n_domain_obj:typeOf("Unknown")), "ai")
@@ -4538,7 +5042,7 @@ Lua handle for a grid-based influence map with named layers.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newInfluenceMap
+do
   local infl = lurek.ai.newInfluenceMap(64, 64, 16)
   infl:addLayer("threat")
   infl:stampInfluence("threat", 320, 240, 80, 1.0, 1.0)
@@ -4558,7 +5062,7 @@ Adds an influence layer with the given name if it does not already exist.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:addLayer
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:addLayer("resource")
@@ -4583,7 +5087,7 @@ Blends two source layers into a destination layer using independent weights.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:blend
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:addLayer("resource")
@@ -4602,7 +5106,7 @@ Clears every influence value in every layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:clearAll
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:clearAll()
@@ -4622,7 +5126,7 @@ Clears every value in a named influence layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:clearLayer
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 100, 100, 64, 1.0, 1.0)
@@ -4644,7 +5148,7 @@ Multiplies a named layer by a decay factor.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:decay
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 100, 100, 64, 1.0, 1.0)
@@ -4663,7 +5167,7 @@ Returns the world size represented by each influence map cell.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getCellSize
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   lurek.log.debug("cell=" .. im:getCellSize(), "ai")
@@ -4681,7 +5185,7 @@ Returns the influence map height in cells.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getHeight
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   lurek.log.debug("h=" .. im:getHeight(), "ai")
@@ -4705,7 +5209,7 @@ Returns one cell value from a named influence layer using one-based cell coordin
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getInfluence
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 256, 256, 64, 1.0, 0.9)
@@ -4729,7 +5233,7 @@ Returns the cell position with the highest value on a named layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getMaxPosition
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 200, 100, 32, 1.0, 1.0)
@@ -4753,7 +5257,7 @@ Returns the cell position with the lowest value on a named layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getMinPosition
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 200, 100, 32, 1.0, 1.0)
@@ -4773,7 +5277,7 @@ Returns the influence map width in cells.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:getWidth
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   lurek.log.debug("w=" .. im:getWidth(), "ai")
@@ -4795,7 +5299,7 @@ Returns whether an influence layer exists.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:hasLayer
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   if im:hasLayer("threat") then lurek.log.debug("layer ok", "ai") end
@@ -4816,7 +5320,7 @@ Propagates influence values across neighboring cells on a named layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:propagate
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 256, 256, 48, 1.0, 0.8)
@@ -4844,7 +5348,7 @@ Returns influence values inside a world-space rectangle on a named layer.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:queryRect
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("resource")
   im:setInfluence("resource", 10, 10, 1.0)
@@ -4869,7 +5373,7 @@ Sets one cell value in a named influence layer using one-based cell coordinates.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:setInfluence
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("hazard")
   im:setInfluence("hazard", 8, 8, 1.0)
@@ -4895,7 +5399,7 @@ Applies a radial influence stamp to a named layer in world coordinates.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:stampInfluence
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   im:stampInfluence("threat", 256, 256, 96, 1.0, 0.75)
@@ -4914,7 +5418,7 @@ Returns the Lua-visible type name for this influence map handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:type
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   if im:type() == "InfluenceMap" then lurek.log.debug("ok", "ai") end
@@ -4936,7 +5440,7 @@ Returns whether this influence map handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- InfluenceMap:typeOf
+do
   local im = lurek.ai.newInfluenceMap(32, 32, 16)
   im:addLayer("threat")
   if im:typeOf("Object") then lurek.log.debug("ok", "ai") end
@@ -4952,7 +5456,7 @@ Lua handle for Monte Carlo tree search over Lua-defined game states and actions.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newMCTSEngine
+do
   local mcts = lurek.ai.newMCTSEngine(200, 1.41, 32, 12345)
   local actions = function(s) return { 1, 2, 3 } end
   local apply = function(s, a) return s + a end
@@ -4978,7 +5482,7 @@ Runs MCTS from a root state using Lua callbacks for actions, transitions, and ev
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- MCTSEngine:search
+do
   local mcts = lurek.ai.newMCTSEngine(100, 1.41, 16, 42)
   local actions = function(s) return {1, 2, 3} end
   local apply   = function(s, a) return s + a end
@@ -4999,7 +5503,7 @@ Returns the Lua-visible type name for this MCTS engine handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LMCTSEngine:type
+do
   local m_c_t_s_engine_obj = lurek.ai.newMCTSEngine(100, 1.41, 5, 42)
   local t = m_c_t_s_engine_obj:type()
   lurek.log.info("LMCTSEngine:type = " .. t, "ai")
@@ -5021,7 +5525,7 @@ Returns whether this MCTS engine handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LMCTSEngine:typeOf
+do
   local m_c_t_s_engine_obj = lurek.ai.newMCTSEngine(100, 1.41, 5, 42)
   lurek.log.info("is LMCTSEngine: " .. tostring(m_c_t_s_engine_obj:typeOf("LMCTSEngine")), "ai")
   lurek.log.info("is wrong: " .. tostring(m_c_t_s_engine_obj:typeOf("Unknown")), "ai")
@@ -5037,7 +5541,7 @@ Lua handle for decaying needs and urgency selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeedSystem
+do
   local needs = lurek.ai.newNeedSystem()
   needs:addNeed("hunger", 0.05, 0.6, 1.5)
   function lurek.process(dt) needs:update(dt) end
@@ -5060,7 +5564,7 @@ Adds a need with decay and urgency tuning values.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeedSystem:addNeed
+do
   local ns = lurek.ai.newNeedSystem()
   ns:addNeed("hunger", 0.05, 0.6, 1.5)
   ns:addNeed("thirst", 0.08, 0.5, 2.0)
@@ -5078,7 +5582,7 @@ Returns the name of the most urgent need when any need is active.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeedSystem:mostUrgent
+do
   local ns = lurek.ai.newNeedSystem()
   ns:addNeed("hunger", 0.05, 0.6, 1.5)
   local n = ns:mostUrgent()
@@ -5100,7 +5604,7 @@ Reduces or satisfies a named need by the supplied amount.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeedSystem:satisfy
+do
   local ns = lurek.ai.newNeedSystem()
   ns:addNeed("hunger", 0.05, 0.6, 1.5)
   ns:satisfy("hunger", 0.4)
@@ -5118,7 +5622,7 @@ Returns the Lua-visible type name for this need system handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeedSystem:type
+do
   local need_system_obj = lurek.ai.newNeedSystem()
   local t = need_system_obj:type()
   lurek.log.info("LNeedSystem:type = " .. t, "ai")
@@ -5140,7 +5644,7 @@ Returns whether this need system handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeedSystem:typeOf
+do
   local need_system_obj = lurek.ai.newNeedSystem()
   lurek.log.info("is LNeedSystem: " .. tostring(need_system_obj:typeOf("LNeedSystem")), "ai")
   lurek.log.info("is wrong: " .. tostring(need_system_obj:typeOf("Unknown")), "ai")
@@ -5160,7 +5664,7 @@ Advances need decay over elapsed time.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeedSystem:update
+do
   local ns = lurek.ai.newNeedSystem()
   ns:addNeed("hunger", 0.05, 0.6, 1.5)
   function lurek.process(dt) ns:update(dt) end
@@ -5182,7 +5686,7 @@ Returns the current value of a named need.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeedSystem:valueOf
+do
   local ns = lurek.ai.newNeedSystem()
   ns:addNeed("hunger", 0.05, 0.6, 1.5)
   if ns:valueOf("hunger") > 0.8 then lurek.log.warn("starving", "ai") end
@@ -5198,7 +5702,7 @@ Lua handle for a feed-forward neural network.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeuralNet
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5220,7 +5724,7 @@ Adds a neural network layer with an activation function.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:addLayer
+do
   local net = lurek.ai.newNeuralNet()
   net:addLayer(2, 4, "relu")
   net:addLayer(4, 1, "relu")
@@ -5244,7 +5748,7 @@ Runs a forward pass and returns output values.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:forward
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5264,7 +5768,7 @@ Returns the network weights as a flat numeric array.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:getWeights
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5284,7 +5788,7 @@ Returns the number of layers in the network.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:layerCount
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5303,7 +5807,7 @@ Returns the total number of trainable parameters.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:paramCount
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5326,7 +5830,7 @@ Replaces the network weights from a flat numeric array.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- NeuralNet:setWeights
+do
   local nn = lurek.ai.newNeuralNet()
   nn:addLayer(4, 8, "relu")
   nn:addLayer(8, 2, "softmax")
@@ -5347,7 +5851,7 @@ Returns the Lua-visible type name for this neural network handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeuralNet:type
+do
   local neural_net_obj = lurek.ai.newNeuralNet()
   local t = neural_net_obj:type()
   lurek.log.info("LNeuralNet:type = " .. t, "ai")
@@ -5369,7 +5873,7 @@ Returns whether this neural network handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeuralNet:typeOf
+do
   local neural_net_obj = lurek.ai.newNeuralNet()
   lurek.log.info("is LNeuralNet: " .. tostring(neural_net_obj:typeOf("LNeuralNet")), "ai")
   lurek.log.info("is wrong: " .. tostring(neural_net_obj:typeOf("Unknown")), "ai")
@@ -5385,7 +5889,7 @@ Lua handle for evolving neural network chromosomes.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newNeuroevolution
+do
   local layers = { { inputs = 4, outputs = 8, activation = "relu" }, { inputs = 8, outputs = 2, activation = "softmax" } }
   local ne = lurek.ai.newNeuroevolution(layers, 30, 1)
   function lurek.process(dt) ne:evolve() end
@@ -5403,7 +5907,7 @@ Returns the best fitness value in the population.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:bestFitness
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   ne:setFitness(0, 0.7)
@@ -5422,7 +5926,7 @@ Converts the best chromosome into a neural network handle when one exists.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:bestNetwork
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   ne:setFitness(0, 1.0)
@@ -5446,7 +5950,7 @@ Converts one chromosome into a neural network handle when the index is valid.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:chromosomeToNet
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   local net = ne:chromosomeToNet(0)
@@ -5463,7 +5967,7 @@ Advances the neuroevolution population by one generation.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:evolve
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   for i = 0, ne:popSize() - 1 do ne:setFitness(i, 0.5) end
@@ -5482,7 +5986,7 @@ Returns the current generation index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:generation
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   if ne:generation() >= 50 then lurek.log.info("converged", "ai") end
@@ -5500,7 +6004,7 @@ Returns the population size. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:popSize
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   lurek.log.debug("pop=" .. ne:popSize(), "ai")
@@ -5521,7 +6025,7 @@ Sets the fitness value for a chromosome by zero-based index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Neuroevolution:setFitness
+do
   local layers = { { inputs = 2, outputs = 4, activation = "relu" }, { inputs = 4, outputs = 1, activation = "tanh" } }
   local ne = lurek.ai.newNeuroevolution(layers, 10, 1)
   ne:setFitness(0, 0.85)
@@ -5539,7 +6043,7 @@ Returns the Lua-visible type name for this neuroevolution handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeuroevolution:type
+do
   local ne_layers = { {inputs=4, outputs=8, activation="relu"}, {inputs=8, outputs=4, activation="softmax"} }
   local ok_ne, neuroevolution_obj = pcall(lurek.ai.newNeuroevolution, ne_layers, 20, 42)
   if not ok_ne then neuroevolution_obj = nil end
@@ -5563,7 +6067,7 @@ Returns whether this neuroevolution handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LNeuroevolution:typeOf
+do
   local ne_layers = { {inputs=4, outputs=8, activation="relu"}, {inputs=8, outputs=4, activation="softmax"} }
   local ok_ne, neuroevolution_obj = pcall(lurek.ai.newNeuroevolution, ne_layers, 20, 42)
   if not ok_ne then neuroevolution_obj = nil end
@@ -5581,7 +6085,7 @@ Lua handle for reciprocal velocity obstacle avoidance agents.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newORCASolver
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   orca:setPreferredVelocity(idx, 50, 0)
@@ -5606,7 +6110,7 @@ Adds an ORCA avoidance agent and returns its zero-based solver index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:addAgent
+do
   local solver = lurek.ai.newORCASolver(2.0)
   solver:addAgent(200, 300, 50, 100)
   solver:compute(1 / 60)
@@ -5625,7 +6129,7 @@ Returns the number of ORCA agents in this solver.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:agentCount
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   lurek.log.debug("agents=" .. orca:agentCount(), "ai")
@@ -5645,7 +6149,7 @@ Computes safe velocities for all ORCA agents.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:compute
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   function lurek.process(dt) orca:compute(dt) end
@@ -5667,7 +6171,7 @@ Returns the computed safe velocity for an ORCA agent.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:getSafeVelocity
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   orca:compute(0.016)
@@ -5691,7 +6195,7 @@ Sets the position for an ORCA agent by zero-based index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:setPosition
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 16, 80)
   orca:setPosition(idx, 120, 100)
@@ -5713,7 +6217,7 @@ Sets the preferred velocity for an ORCA agent by zero-based index.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- ORCASolver:setPreferredVelocity
+do
   local orca = lurek.ai.newORCASolver(2.0)
   local idx = orca:addAgent(100, 100, 14, 80)
   orca:setPreferredVelocity(idx, 60, 0)
@@ -5734,7 +6238,7 @@ Returns the Lua-visible type name for this ORCA solver handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LORCASolver:type
+do
   local o_r_c_a_solver_obj = lurek.ai.newORCASolver(0.5)
   local t = o_r_c_a_solver_obj:type()
   lurek.log.info("LORCASolver:type = " .. t, "ai")
@@ -5756,7 +6260,7 @@ Returns whether this ORCA solver handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LORCASolver:typeOf
+do
   local o_r_c_a_solver_obj = lurek.ai.newORCASolver(0.5)
   lurek.log.info("is LORCASolver: " .. tostring(o_r_c_a_solver_obj:typeOf("LORCASolver")), "ai")
   lurek.log.info("is wrong: " .. tostring(o_r_c_a_solver_obj:typeOf("Unknown")), "ai")
@@ -5772,7 +6276,7 @@ Lua handle for a Q-learning table with configurable exploration and learning par
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newQLearner
+do
   local ql = lurek.ai.newQLearner(16, 4)
   ql:setLearningRate(0.1)
   ql:setExplorationRate(0.2)
@@ -5794,7 +6298,7 @@ Returns the highest-valued action for a one-based state index without exploratio
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:bestAction
+do
   local ql = lurek.ai.newQLearner(8, 4)
   local action = ql:bestAction(1)
   if action >= 1 then lurek.log.debug("greedy=" .. action, "ai") end
@@ -5816,7 +6320,7 @@ Chooses an action for a one-based state index using the learner's exploration po
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:chooseAction
+do
   local ql = lurek.ai.newQLearner(8, 4)
   local action = ql:chooseAction(1)
   lurek.log.debug("action=" .. action, "ai")
@@ -5836,7 +6340,7 @@ Replaces the Q-learner state from a JSON string.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:deserialize
+do
   local ql = lurek.ai.newQLearner(8, 4)
   local saved = ql:serialize()
   ql:deserialize(saved)
@@ -5852,7 +6356,7 @@ Ends the current learning episode and applies episode bookkeeping.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:endEpisode
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:learn(1, 1, 0.5, 2)
   ql:endEpisode()
@@ -5870,7 +6374,7 @@ Returns the number of actions represented by this learner.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getActionCount
+do
   local ql = lurek.ai.newQLearner(8, 4)
   for a = 1, ql:getActionCount() do lurek.log.debug("a=" .. a, "ai") end
 end
@@ -5887,7 +6391,7 @@ Returns the Q-learning gamma discount factor.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getDiscountFactor
+do
   local ql = lurek.ai.newQLearner(8, 4)
   lurek.log.debug("gamma=" .. ql:getDiscountFactor(), "ai")
 end
@@ -5904,7 +6408,7 @@ Returns how many learning episodes have been completed.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getEpisodeCount
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:endEpisode()
   lurek.log.debug("episodes=" .. ql:getEpisodeCount(), "ai")
@@ -5922,7 +6426,7 @@ Returns the exploration decay multiplier.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getExplorationDecay
+do
   local ql = lurek.ai.newQLearner(8, 4)
   lurek.log.debug("decay=" .. ql:getExplorationDecay(), "ai")
 end
@@ -5939,7 +6443,7 @@ Returns the exploration rate used by action selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getExplorationRate
+do
   local ql = lurek.ai.newQLearner(8, 4)
   if ql:getExplorationRate() < 0.05 then lurek.log.info("exploit phase", "ai") end
 end
@@ -5956,7 +6460,7 @@ Returns the Q-learning alpha learning rate.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getLearningRate
+do
   local ql = lurek.ai.newQLearner(8, 4)
   lurek.log.debug("alpha=" .. ql:getLearningRate(), "ai")
 end
@@ -5978,7 +6482,7 @@ Returns the stored Q-value for a one-based state and action pair.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getQValue
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:learn(1, 2, 1.0, 3)
   local q = ql:getQValue(1, 2)
@@ -5997,7 +6501,7 @@ Returns the number of states represented by this learner.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:getStateCount
+do
   local ql = lurek.ai.newQLearner(8, 4)
   lurek.log.debug("states=" .. ql:getStateCount(), "ai")
 end
@@ -6019,7 +6523,7 @@ Applies one Q-learning update from a transition and reward.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:learn
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setLearningRate(0.1)
   ql:learn(2, 1, 1.0, 3)
@@ -6039,7 +6543,7 @@ Serializes the Q-learner state to a JSON string.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:serialize
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:learn(1, 1, 1.0, 2)
   local json = ql:serialize()
@@ -6060,7 +6564,7 @@ Sets the Q-learning gamma discount factor.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:setDiscountFactor
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setDiscountFactor(0.95)
 end
@@ -6079,7 +6583,7 @@ Sets the exploration decay multiplier applied across episodes.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:setExplorationDecay
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setExplorationDecay(0.995)
 end
@@ -6098,7 +6602,7 @@ Sets the exploration rate used by action selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:setExplorationRate
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setExplorationRate(0.1)
 end
@@ -6117,7 +6621,7 @@ Sets the Q-learning alpha learning rate.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:setLearningRate
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setLearningRate(0.05)
 end
@@ -6138,7 +6642,7 @@ Sets the stored Q-value for a one-based state and action pair.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:setQValue
+do
   local ql = lurek.ai.newQLearner(8, 4)
   ql:setQValue(0, 2, 0.85)
   local v = ql:getQValue(0, 2)
@@ -6157,7 +6661,7 @@ Returns the Lua-visible type name for this Q-learner handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:type
+do
   local ql = lurek.ai.newQLearner(8, 4)
   if ql:type() == "QLearner" then lurek.log.debug("ok", "ai") end
 end
@@ -6178,7 +6682,7 @@ Returns whether this Q-learner handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- QLearner:typeOf
+do
   local ql = lurek.ai.newQLearner(8, 4)
   if ql:typeOf("Object") then lurek.log.debug("ok", "ai") end
 end
@@ -6193,7 +6697,7 @@ Lua handle for a named squad with members, leader, formation, and shared blackbo
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSquad
+do
   local squad = lurek.ai.newSquad("alpha")
   squad:addMember("guard_01")
   squad:setFormation("wedge", 32)
@@ -6213,7 +6717,7 @@ Adds a member name to the squad member list.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:addMember
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:addMember("guard_02")
@@ -6232,7 +6736,7 @@ Returns a blackboard snapshot for this squad.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getBlackboard
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   local bb = sq:getBlackboard()
@@ -6251,7 +6755,7 @@ Returns the current squad formation type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getFormation
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:setFormation("wedge", 32)
@@ -6276,7 +6780,7 @@ Returns a member's target formation position relative to the leader position.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getFormationPosition
+do
   local squad = lurek.ai.newSquad("alpha")
   squad:addMember("guard_01")
   squad:setFormation("wedge", 32)
@@ -6296,7 +6800,7 @@ Returns the spacing used by squad formation positioning.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getFormationSpacing
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:setFormation("line", 48)
@@ -6315,7 +6819,7 @@ Returns the squad leader name when one is assigned.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getLeader
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:setLeader("guard_01")
@@ -6335,7 +6839,7 @@ Returns the number of members in this squad.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getMemberCount
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   if sq:getMemberCount() == 0 then lurek.log.warn("squad wiped", "ai") end
@@ -6353,7 +6857,7 @@ Returns all squad members in an array-style Lua table.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getMembers
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:addMember("guard_02")
@@ -6372,7 +6876,7 @@ Returns the squad name. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:getName
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   lurek.log.debug("squad=" .. sq:getName(), "ai")
@@ -6392,7 +6896,7 @@ Removes every member entry with the given name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:removeMember
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:addMember("doomed")
@@ -6414,7 +6918,7 @@ Sets the squad formation type and optionally updates spacing.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:setFormation
+do
   local squad = lurek.ai.newSquad("bravo")
   squad:addMember("soldier_01")
   squad:addMember("soldier_02")
@@ -6436,7 +6940,7 @@ Sets the squad leader name. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:setLeader
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   sq:setLeader("guard_01")
@@ -6454,7 +6958,7 @@ Returns the Lua-visible type name for this squad handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:type
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   if sq:type() == "Squad" then lurek.log.debug("ok", "ai") end
@@ -6476,7 +6980,7 @@ Returns whether this squad handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- Squad:typeOf
+do
   local sq = lurek.ai.newSquad("alpha")
   sq:addMember("guard_01")
   if sq:typeOf("Object") then lurek.log.debug("ok", "ai") end
@@ -6492,7 +6996,7 @@ Lua handle for a finite state machine with Lua-backed state callbacks and transi
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStateMachine
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
   fsm:addState("chase", {})
@@ -6514,7 +7018,7 @@ Adds a state with optional Lua lifecycle callbacks.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:addState
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", { onEnter = function() lurek.log.info("patrol", "ai") end })
   fsm:addState("chase", { onUpdate = function(dt) end })
@@ -6537,7 +7041,7 @@ Adds a transition between two states with an optional guard callback and priorit
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:addTransition
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", {})
   fsm:addState("alert", {})
@@ -6560,7 +7064,7 @@ Immediately switches the current state and resets the time spent in state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:forceState
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("stunned", {}); fsm:setInitialState("stunned")
   fsm:forceState("stunned")
@@ -6578,7 +7082,7 @@ Returns the current state name when the state machine has entered a state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:getCurrentState
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", {}); fsm:setInitialState("patrol")
   local s = fsm:getCurrentState()
@@ -6597,7 +7101,7 @@ Returns how long the machine has spent in the current state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:getTimeInState
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("idle", {}); fsm:setInitialState("idle")
   if fsm:getTimeInState() > 5.0 then fsm:forceState("idle") end
@@ -6617,7 +7121,7 @@ Sets the initial state and also enters it when the machine has no current state 
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:setInitialState
+do
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("idle", {})
   fsm:setInitialState("idle")
@@ -6635,7 +7139,7 @@ Returns the Lua-visible type name for this state machine handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:type
+do
   local fsm = lurek.ai.newStateMachine()
   if fsm:type() == "StateMachine" then lurek.log.debug("ok", "ai") end
 end
@@ -6656,7 +7160,7 @@ Returns whether this state machine handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StateMachine:typeOf
+do
   local fsm = lurek.ai.newStateMachine()
   if fsm:typeOf("Object") then lurek.log.debug("ok", "ai") end
 end
@@ -6671,7 +7175,7 @@ Lua handle for a steering behavior stack that combines movement forces for an ag
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newSteeringManager
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:addWander(20, 40, 5, 0.3)
@@ -6694,7 +7198,7 @@ Adds an arrive behavior that slows the agent as it approaches a target point.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addArrive
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addArrive(400, 300, 1.0)
   local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
@@ -6716,7 +7220,7 @@ Adds a custom steering behavior backed by a Lua callback.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addCustomBehavior
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addCustomBehavior(function(ag, dt)
     return 100, 0   -- constant rightward force
@@ -6739,7 +7243,7 @@ Adds an evade behavior that moves away from another named agent when a threat na
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addEvade
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addEvade("player", 1.0)
   local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
@@ -6763,7 +7267,7 @@ Adds a flee behavior that pushes the agent away from a target point inside a pan
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addFlee
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addFlee(400, 300, 1.0)
   local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
@@ -6788,7 +7292,7 @@ Adds a flocking behavior with separation, alignment, and cohesion weights.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addFlock
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addFlock(80, 1.0, 0.8, 0.6)
   local fx, fy = sm:calculate(200, 200, 10, 0, 100, 50, 1 / 60)
@@ -6810,7 +7314,7 @@ Adds a pursue behavior that chases another named agent when a target name is sup
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addPursue
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addPursue("player", 1.0)
   local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
@@ -6833,7 +7337,7 @@ Adds a seek behavior that pulls the agent toward a target point.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addSeek
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(500, 400, 1.0)
   local fx, fy = sm:calculate(100, 100, 0, 0, 150, 50, 1 / 60)
@@ -6857,7 +7361,7 @@ Adds a wander behavior that produces jittered exploratory movement.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:addWander
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addWander(25, 50, 8, 0.4)
   local fx, fy = sm:calculate(200, 200, 0, 0, 100, 50, 1 / 60)
@@ -6881,7 +7385,7 @@ Runs enabled custom steering callbacks for an agent and returns the weighted com
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:applyCustomSteering
+do
   local world = lurek.ai.newWorld()
   local agent = world:addAgent("steered")
   local sm = lurek.ai.newSteeringManager()
@@ -6915,7 +7419,7 @@ Calculates a steering force for the supplied agent movement state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:calculate
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   local fx, fy = sm:calculate(100, 100, 0, 0, 120, 50, 1 / 60)
@@ -6932,11 +7436,53 @@ Clears the active waypoint path behavior.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LSteeringManager:enableSpatialHash(enabled: boolean)`
@@ -6952,7 +7498,7 @@ Enables or disables spatial hash acceleration for neighbor queries.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:enableSpatialHash
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:enableSpatialHash(true)
@@ -6970,7 +7516,7 @@ Returns the number of steering behaviors configured on this manager.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:getBehaviorCount
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:addWander(20, 40, 5, 0.3)
@@ -6989,7 +7535,7 @@ Returns the current steering force combination mode.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:getCombineMode
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   if sm:getCombineMode() == "weighted_sum" then lurek.log.debug("blend mode", "ai") end
@@ -7007,7 +7553,7 @@ Returns the last steering force calculated by this manager.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:getLastSteering
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   local fx, fy = sm:getLastSteering()
@@ -7026,11 +7572,53 @@ Returns the current one-based waypoint index and total waypoint count.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LSteeringManager:hasPath() -> boolean`
@@ -7044,11 +7632,53 @@ Returns whether this manager currently has an active waypoint path.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LSteeringManager:setCombineMode(mode: string)`
@@ -7064,7 +7694,7 @@ Sets how steering behavior forces are combined.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:setCombineMode
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:setCombineMode("priority")
@@ -7086,11 +7716,53 @@ Sets a waypoint path behavior from an array of `{x, y}` tables.
 Module-level example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newWorld
+-- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+do
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
   function lurek.process(dt) world:update(dt) end
 end
+
+--@api-stub: lurek.ai.newBlackboard
+-- Creates an empty AI blackboard for typed local facts
+do
+  local bb = lurek.ai.newBlackboard()
+  bb:setNumber("alert_level", 0.3)
+  bb:setBool("player_seen", false)
+end
+
+--@api-stub: lurek.ai.newStateMachine
+-- Creates an empty finite state machine with Lua-backed states and transitions
+do
+  local fsm = lurek.ai.newStateMachine()
+  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
+  fsm:addState("chase", {})
+  fsm:setInitialState("patrol")
+end
+
+--@api-stub: lurek.ai.newBehaviorTree
+-- Creates an empty behavior tree that can receive a root node
+do
+  local bt = lurek.ai.newBehaviorTree()
+  local root = lurek.ai.newSequence()
+  root:addChild(lurek.ai.newAction(function() return "success" end))
+  bt:setRoot(root)
+end
+
+--@api-stub: lurek.ai.newSelector
+-- Creates a behavior tree selector node with no children
+do
+  local sel = lurek.ai.newSelector()
+  sel:addChild(lurek.ai.newCondition(function() return false end))
+  sel:addChild(lurek.ai.newAction(function() return "success" end))
+end
+
+--@api-stub: lurek.ai.newSequence
+-- Creates a behavior tree sequence node with no children
+do
+  local seq = lurek.ai.newSequence()
+  seq:addChild(lurek.ai.newCondition(function() return true end))
+  seq:addChild(lurek.ai.newAction(function() return "success" end))
 ```
 
 ### `LSteeringManager:setSpatialHashCellSize(size: number)`
@@ -7106,7 +7778,7 @@ Sets the cell size used by the steering manager spatial hash.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:setSpatialHashCellSize
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   sm:enableSpatialHash(true)
@@ -7125,7 +7797,7 @@ Returns the Lua-visible type name for this steering manager handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:type
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   if sm:type() == "SteeringManager" then lurek.log.debug("ok", "ai") end
@@ -7147,7 +7819,7 @@ Returns whether this steering manager handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- SteeringManager:typeOf
+do
   local sm = lurek.ai.newSteeringManager()
   sm:addSeek(400, 300, 1.0)
   if sm:typeOf("Object") then lurek.log.debug("ok", "ai") end
@@ -7163,7 +7835,7 @@ Lua handle for sensory stimuli tracked in world space.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStimulusWorld
+do
   local sw = lurek.ai.newStimulusWorld()
   sw:addAuditory(100, 200, 1.0, 150, 0.5, "footstep")
   function lurek.process(dt) sw:update(dt) end
@@ -7190,7 +7862,7 @@ Adds an auditory stimulus with decay and returns its identifier.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:addAuditory
+do
   local sw = lurek.ai.newStimulusWorld()
   sw:addAuditory(200, 150, 1.2, 100, 0.8, "footstep")
   lurek.log.info("stimuli: " .. sw:count(), "ai")
@@ -7216,7 +7888,7 @@ Adds a visual stimulus and returns its identifier.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:addVisual
+do
   local sw = lurek.ai.newStimulusWorld()
   sw:addVisual(300, 200, 1.0, 200, "player")
   sw:addAuditory(300, 200, 1.0, 80, 0.5, "footstep")
@@ -7233,7 +7905,7 @@ Removes every active stimulus. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:clear
+do
   local sw = lurek.ai.newStimulusWorld()
   local id = sw:addAuditory(100, 200, 1.0, 150, 0.5, "footstep")
   sw:clear()
@@ -7251,7 +7923,7 @@ Returns the number of active stimuli.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:count
+do
   local sw = lurek.ai.newStimulusWorld()
   sw:addAuditory(200, 100, 1.0, 80, 0.8, "gunshot")
   local n = sw:count()
@@ -7274,7 +7946,7 @@ Removes a stimulus by identifier. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:remove
+do
   local sw = lurek.ai.newStimulusWorld()
   local id = sw:addAuditory(100, 200, 1.0, 150, 0.5, "footstep")
   if sw:remove(id) then lurek.log.debug("removed " .. id, "ai") end
@@ -7292,7 +7964,7 @@ Returns the Lua-visible type name for this stimulus world handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LStimulusWorld:type
+do
   local stimulus_world_obj = lurek.ai.newStimulusWorld()
   local t = stimulus_world_obj:type()
   lurek.log.info("LStimulusWorld:type = " .. t, "ai")
@@ -7314,7 +7986,7 @@ Returns whether this stimulus world handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LStimulusWorld:typeOf
+do
   local stimulus_world_obj = lurek.ai.newStimulusWorld()
   lurek.log.info("is LStimulusWorld: " .. tostring(stimulus_world_obj:typeOf("LStimulusWorld")), "ai")
   lurek.log.info("is wrong: " .. tostring(stimulus_world_obj:typeOf("Unknown")), "ai")
@@ -7334,7 +8006,7 @@ Advances stimulus decay and lifetime state.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StimulusWorld:update
+do
   local sw = lurek.ai.newStimulusWorld()
   local id = sw:addAuditory(100, 200, 1.0, 150, 0.5, "footstep")
   function lurek.process(dt) sw:update(dt) end
@@ -7350,7 +8022,7 @@ Lua handle for interval-based strategic goal selection.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newStrategyAI
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("expand")
   s:addGoal("defend")
@@ -7368,7 +8040,7 @@ Returns the currently active strategic goal when one is selected.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:activeGoal
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("hold"); s:forceEvaluate(function(g) return 1.0 end)
   local g = s:activeGoal()
@@ -7389,7 +8061,7 @@ Adds a named strategic goal. This method is available to Lua scripts.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:addGoal
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("expand")
   s:addGoal("defend")
@@ -7409,7 +8081,7 @@ Adds a context tag to this strategy AI.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:addTag
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addTag("early_game")
 end
@@ -7428,7 +8100,7 @@ Immediately scores all goals and updates the active goal.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:forceEvaluate
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("retreat")
   s:forceEvaluate(function(goal) return goal == "retreat" and 1.0 or 0.0 end)
@@ -7448,7 +8120,7 @@ Removes a context tag from this strategy AI.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:removeTag
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addTag("scout_phase")
   s:removeTag("scout_phase")
@@ -7466,7 +8138,7 @@ Returns time remaining until the next scheduled strategy evaluation.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:timeUntilNext
+do
   local s = lurek.ai.newStrategyAI(2.0)
   lurek.log.debug("next eval in " .. s:timeUntilNext(), "ai")
 end
@@ -7483,7 +8155,7 @@ Returns the Lua-visible type name for this strategy AI handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LStrategyAI:type
+do
   local strategy_a_i_obj = lurek.ai.newStrategyAI(0.25)
   local t = strategy_a_i_obj:type()
   lurek.log.info("LStrategyAI:type = " .. t, "ai")
@@ -7505,7 +8177,7 @@ Returns whether this strategy AI handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LStrategyAI:typeOf
+do
   local strategy_a_i_obj = lurek.ai.newStrategyAI(0.25)
   lurek.log.info("is LStrategyAI: " .. tostring(strategy_a_i_obj:typeOf("LStrategyAI")), "ai")
   lurek.log.info("is wrong: " .. tostring(strategy_a_i_obj:typeOf("Unknown")), "ai")
@@ -7526,7 +8198,7 @@ Advances strategy timing and scores goals when the update interval has elapsed.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- StrategyAI:update
+do
   local s = lurek.ai.newStrategyAI(2.0)
   s:addGoal("expand")
   function lurek.process(dt) s:update(dt, function(goal) return 0.5 end) end
@@ -7542,7 +8214,7 @@ Lua handle for trait values with temporary modifiers and archetype lookup.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newTraitProfile
+do
   local traits = lurek.ai.newTraitProfile()
   traits:set("aggression", 0.7)
   traits:set("courage", 0.4)
@@ -7565,7 +8237,7 @@ Adds a temporary or permanent modifier to a named trait.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:addModifier
+do
   local traits = lurek.ai.newTraitProfile()
   traits:set("courage", 0.5)
   traits:addModifier("courage", -0.3, 5.0, "fear_potion")
@@ -7584,7 +8256,7 @@ Returns the best matching archetype name when the profile can classify one.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:archetype
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   local arch = tp:archetype()
@@ -7607,7 +8279,7 @@ Returns the current value of a named trait including active modifiers.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:get
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   local v = tp:get("aggression")
@@ -7630,7 +8302,7 @@ Returns the base value of a named trait without temporary modifiers.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:getBase
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   local base = tp:getBase("aggression")
@@ -7653,7 +8325,7 @@ Returns whether the profile has a named trait.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:has
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   if tp:has("aggression") then lurek.log.debug("trait set", "ai") end
@@ -7673,7 +8345,7 @@ Removes all trait modifiers that match a source label.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:removeModifiers
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   tp:addModifier("aggression", 0.2, 10.0, "rage_potion")
@@ -7695,7 +8367,7 @@ Sets the base value for a named trait.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:set
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   tp:set("courage", 0.5)
@@ -7713,7 +8385,7 @@ Returns the number of traits stored in the profile.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:traitCount
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   lurek.log.debug("traits=" .. tp:traitCount(), "ai")
@@ -7731,7 +8403,7 @@ Returns the Lua-visible type name for this trait profile handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LTraitProfile:type
+do
   local trait_profile_obj = lurek.ai.newTraitProfile()
   local t = trait_profile_obj:type()
   lurek.log.info("LTraitProfile:type = " .. t, "ai")
@@ -7753,7 +8425,7 @@ Returns whether this trait profile handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- LTraitProfile:typeOf
+do
   local trait_profile_obj = lurek.ai.newTraitProfile()
   lurek.log.info("is LTraitProfile: " .. tostring(trait_profile_obj:typeOf("LTraitProfile")), "ai")
   lurek.log.info("is wrong: " .. tostring(trait_profile_obj:typeOf("Unknown")), "ai")
@@ -7773,7 +8445,7 @@ Advances modifier timers and removes expired modifiers.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- TraitProfile:update
+do
   local tp = lurek.ai.newTraitProfile()
   tp:set("aggression", 0.7)
   tp:addModifier("aggression", 0.2, 5.0, "buff")
@@ -7790,7 +8462,7 @@ Lua handle for utility AI action scoring and consideration curves.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- lurek.ai.newUtilityAI
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end, 1.0)
   uai:addAction("attack", function() return 0.4 end, 1.0)
@@ -7812,7 +8484,7 @@ Adds an action scored by a Lua callback and optional momentum weight.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:addAction
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("heal", function() return 0.9 end)
   uai:addAction("attack", function() return 0.4 end)
@@ -7841,7 +8513,7 @@ Adds a consideration scorer and response curve to an existing utility action.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:addConsideration (custom curve)
+do
   local ua = lurek.ai.newUtilityAI()
   ua:addAction("patrol", function() return 0.4 end, 1.0)
   ua:addConsideration(
@@ -7865,7 +8537,7 @@ Evaluates all actions and returns the winning action name when one is available.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:evaluate
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end)
   uai:addAction("attack", function() return 0.4 end)
@@ -7885,7 +8557,7 @@ Returns the number of actions registered in this utility AI.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:getActionCount
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end)
   uai:addAction("attack", function() return 0.4 end)
@@ -7904,7 +8576,7 @@ Returns the last winning action name when evaluation has selected one.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:getLastAction
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end)
   uai:addAction("attack", function() return 0.4 end)
@@ -7925,7 +8597,7 @@ Returns the Lua-visible type name for this utility AI handle.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:type
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end)
   uai:addAction("attack", function() return 0.4 end)
@@ -7948,7 +8620,7 @@ Returns whether this utility AI handle matches a supported type name.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- UtilityAI:typeOf
+do
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end)
   uai:addAction("attack", function() return 0.4 end)

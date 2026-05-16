@@ -107,11 +107,52 @@ Steps support conditional execution (run-if predicates), retry with backoff, tim
 Module example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.newStep
-  local step = lurek.pipeline.newStep("load_audio", function(ctx)
-    ctx.audio_loaded = true
-  end)
-  step:setTag("boot")
+do
+  local pl = lurek.pipeline.newPipeline("loading")
+  pl:addStep(lurek.pipeline.newStep("a", function() end))
+  pl:runAsync({ progress = 0 })
+  function lurek.process(dt) pl:update(dt) end
+end
+
+--@api-stub: Pipeline:update
+do
+  local pl = lurek.pipeline.newPipeline("loader")
+  pl:addStep(lurek.pipeline.newStep("scan", function() end))
+  pl:runAsync()
+  function lurek.process(dt)
+    if pl:update(dt) then lurek.log.info("loader done", "boot") end
+  end
+end
+
+--@api-stub: Pipeline:cancel
+do
+  local pl = lurek.pipeline.newPipeline("net")
+  pl:addStep(lurek.pipeline.newStep("ping", function() end))
+  pl:runAsync()
+  pl:cancel()
+end
+
+--@api-stub: Pipeline:reset
+do
+  local pl = lurek.pipeline.newPipeline("retry")
+  pl:addStep(lurek.pipeline.newStep("once", function() end))
+  pl:run(); pl:reset(); pl:run()
+end
+
+--@api-stub: Pipeline:isRunning
+do
+  local pl = lurek.pipeline.newPipeline("loader")
+  pl:addStep(lurek.pipeline.newStep("a", function() end))
+  pl:runAsync()
+  if pl:isRunning() then lurek.log.debug("loader in flight", "boot") end
+end
+
+--@api-stub: Pipeline:isComplete
+do
+  local pl = lurek.pipeline.newPipeline("boot")
+  pl:addStep(lurek.pipeline.newStep("noop", function() end))
+  pl:run()
+  if pl:isComplete() then lurek.log.info("boot finished", "boot") end
 end
 ```
 
@@ -147,7 +188,7 @@ Creates a pipeline pre-populated with steps from a declarative table definition.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.fromTable
+do
   local def = { name = "save", steps = {
     { name = "snapshot",   deps = {} },
     { name = "write_disk", deps = { "snapshot" } },
@@ -172,7 +213,7 @@ Creates a new empty pipeline with an optional name. Add steps via addStep() or a
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.newPipeline
+do
   local boot = lurek.pipeline.newPipeline("boot")
   boot:addStep(lurek.pipeline.newStep("init", function() end))
   lurek.log.info("pipeline '" .. boot:getName() .. "' built", "boot")
@@ -195,7 +236,7 @@ Creates a new pipeline step with the given name and an optional callback functio
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.newStep
+do
   local step = lurek.pipeline.newStep("load_audio", function(ctx)
     ctx.audio_loaded = true
   end)
@@ -215,7 +256,7 @@ A full pipeline that orchestrates multiple steps with dependency resolution, err
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.fromTable
+do
   local def = { name = "save", steps = {
     { name = "snapshot",   deps = {} },
     { name = "write_disk", deps = { "snapshot" } },
@@ -244,7 +285,7 @@ Adds a branching construct: evaluates a predicate, then runs either the "then" o
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:addBranch
+do
   local pipe = lurek.pipeline.newPipeline("build")
   pipe:addBranch(
     "build_mode",
@@ -274,7 +315,7 @@ Convenience method to create and add a step with dependencies and a condition in
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:addConditional
+do
   local pipe = lurek.pipeline.newPipeline("build")
   pipe:addConditional(
     "embed_symbols",
@@ -301,7 +342,7 @@ Adds an existing step object to this pipeline. The step will be scheduled accord
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:addStep
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:addStep(lurek.pipeline.newStep("read_config", function(ctx) ctx.cfg = {} end))
     :addStep(lurek.pipeline.newStep("warm_cache",  function() end))
@@ -323,7 +364,7 @@ Embeds another pipeline's steps into this pipeline under an alias prefix, with o
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:addSubPipeline
+do
   local parent = lurek.pipeline.newPipeline("full_build")
   local tests  = lurek.pipeline.newPipeline("test_suite")
   tests:addStep(lurek.pipeline.newStep("unit_tests", function() end))
@@ -341,7 +382,7 @@ Cancels all pending and waiting steps. Steps already running or completed are un
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:cancel
+do
   local pl = lurek.pipeline.newPipeline("net")
   pl:addStep(lurek.pipeline.newStep("ping", function() end))
   pl:runAsync()
@@ -358,7 +399,7 @@ Removes all steps from the pipeline, resetting it to an empty state.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:clear
+do
   local pl = lurek.pipeline.newPipeline("hot")
   pl:addStep(lurek.pipeline.newStep("old"))
   pl:clear()
@@ -376,7 +417,7 @@ Returns the shared context table used by the current or most recent pipeline exe
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getContext
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:addStep(lurek.pipeline.newStep("a", function() end))
   pl:runAsync({ progress = 0 })
@@ -396,7 +437,7 @@ Returns the current error mode of the pipeline as a string.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getErrorMode
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:setErrorMode("continue")
   lurek.log.info("error mode: " .. pl:getErrorMode(), "boot")
@@ -414,7 +455,7 @@ Computes the topologically sorted execution order of all steps, respecting depen
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getExecutionOrder
+do
   local pl = lurek.pipeline.newPipeline("plan")
   pl:addStep(lurek.pipeline.newStep("a"))
   local order, err = pl:getExecutionOrder()
@@ -434,7 +475,7 @@ Returns the name of this pipeline. This method is available to Lua scripts.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getName
+do
   local pl = lurek.pipeline.newPipeline("save_routine")
   lurek.log.info("running pipeline " .. pl:getName(), "save")
 end
@@ -451,7 +492,7 @@ Groups steps into parallel execution tiers. Steps within the same group have no 
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getParallelGroups
+do
   local pl = lurek.pipeline.newPipeline("parallel")
   pl:addStep(lurek.pipeline.newStep("a"))
   pl:addStep(lurek.pipeline.newStep("b"))
@@ -471,7 +512,7 @@ Returns the current pipeline result summary table, or nil if no steps exist. Use
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getResult
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:addStep(lurek.pipeline.newStep("noop", function() end))
   pl:run()
@@ -495,7 +536,7 @@ Retrieves a step object by name, or nil if no step with that name exists in this
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getStep
+do
   local pl = lurek.pipeline.fromTable({ steps = { { name = "boot", deps = {} } } })
   local boot = pl:getStep("boot")
   if boot then boot:setCallback(function(ctx) ctx.booted = true end) end
@@ -513,7 +554,7 @@ Returns the total number of steps in this pipeline.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getStepCount
+do
   local pl = lurek.pipeline.newPipeline("dynamic")
   if pl:getStepCount() == 0 then
     lurek.log.warn("nothing to do; skipping run", "boot")
@@ -521,7 +562,7 @@ do -- Pipeline:getStepCount
 end
 
 --@api-stub: Pipeline:getStepsByTag
-do -- Pipeline:getStepsByTag
+do
   local pl = lurek.pipeline.newPipeline("boot")
   local s = lurek.pipeline.newStep("upload_metric"); s:setTag("net"); pl:addStep(s)
   for _, n in ipairs(pl:getStepsByTag("net")) do
@@ -530,14 +571,14 @@ do -- Pipeline:getStepsByTag
 end
 
 --@api-stub: Pipeline:clear
-do -- Pipeline:clear
+do
   local pl = lurek.pipeline.newPipeline("hot")
   pl:addStep(lurek.pipeline.newStep("old"))
   pl:clear()
 end
 
 --@api-stub: Pipeline:validate
-do -- Pipeline:validate
+do
   local pl = lurek.pipeline.newPipeline("check")
   local s = lurek.pipeline.newStep("orphan"); s:dependsOn("missing"); pl:addStep(s)
   local ok, errs = pl:validate()
@@ -547,7 +588,7 @@ do -- Pipeline:validate
 end
 
 --@api-stub: Pipeline:getExecutionOrder
-do -- Pipeline:getExecutionOrder
+do
   local pl = lurek.pipeline.newPipeline("plan")
   pl:addStep(lurek.pipeline.newStep("a"))
   local order, err = pl:getExecutionOrder()
@@ -556,7 +597,7 @@ do -- Pipeline:getExecutionOrder
 end
 
 --@api-stub: Pipeline:getParallelGroups
-do -- Pipeline:getParallelGroups
+do
   local pl = lurek.pipeline.newPipeline("parallel")
   pl:addStep(lurek.pipeline.newStep("a"))
   pl:addStep(lurek.pipeline.newStep("b"))
@@ -574,7 +615,7 @@ Returns a table containing all step objects currently in this pipeline.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getSteps
+do
   local pl = lurek.pipeline.newPipeline("scan")
   pl:addStep(lurek.pipeline.newStep("a"))
   pl:addStep(lurek.pipeline.newStep("b"))
@@ -599,7 +640,7 @@ Returns all steps that have the specified tag assigned.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:getStepsByTag
+do
   local pl = lurek.pipeline.newPipeline("boot")
   local s = lurek.pipeline.newStep("upload_metric"); s:setTag("net"); pl:addStep(s)
   for _, n in ipairs(pl:getStepsByTag("net")) do
@@ -619,7 +660,7 @@ Returns whether all steps have reached a terminal state (completed, failed, skip
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:isComplete
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:addStep(lurek.pipeline.newStep("noop", function() end))
   pl:run()
@@ -638,7 +679,7 @@ Returns whether the pipeline is currently in async execution mode (started via r
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:isRunning
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:addStep(lurek.pipeline.newStep("a", function() end))
   pl:runAsync()
@@ -659,7 +700,7 @@ Registers a low-level event callback for all pipeline lifecycle events. Receives
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:onEvent
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:onEvent(function(event_name, step_name, status, detail)
     lurek.log.debug(event_name .. ":" .. step_name .. ":" .. status, "loader")
@@ -680,7 +721,7 @@ Registers a progress callback invoked after each step finishes (regardless of ou
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:onProgress
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:onProgress(function(name, status)
     lurek.log.debug(name .. " -> " .. status, "loader")
@@ -702,7 +743,7 @@ Removes a step from the pipeline by name. Any other steps that depend on it may 
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:removeStep
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:addStep(lurek.pipeline.newStep("legacy_check", function() end))
   pl:removeStep("legacy_check")
@@ -718,7 +759,7 @@ Resets the pipeline and all steps back to their initial pending state, clearing 
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:reset
+do
   local pl = lurek.pipeline.newPipeline("retry")
   pl:addStep(lurek.pipeline.newStep("once", function() end))
   pl:run(); pl:reset(); pl:run()
@@ -740,7 +781,7 @@ Executes all pipeline steps synchronously in dependency order. Blocks until all 
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:run
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:addStep(lurek.pipeline.newStep("load", function(ctx) ctx.assets = 12 end))
   local result = pl:run({ user = "p1" })
@@ -761,7 +802,7 @@ Starts asynchronous (coroutine-based) execution of the pipeline. Call update(dt)
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:runAsync
+do
   local pl = lurek.pipeline.newPipeline("loading")
   pl:addStep(lurek.pipeline.newStep("a", function() end))
   pl:runAsync({ progress = 0 })
@@ -782,7 +823,7 @@ Sets how the pipeline handles step failures. "abort" stops on first failure; "co
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:setErrorMode
+do
   local pl = lurek.pipeline.newPipeline("scan")
   pl:setErrorMode("continue")
   pl:addStep(lurek.pipeline.newStep("a", function() end))
@@ -802,7 +843,7 @@ Changes the name of this pipeline. This method is available to Lua scripts.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:setName
+do
   local pl = lurek.pipeline.newPipeline("temp")
   pl:setName("scene_" .. "forest_01")
   lurek.log.debug("pipeline renamed to " .. pl:getName(), "scene")
@@ -822,7 +863,7 @@ Registers a callback invoked when the entire pipeline finishes execution. Receiv
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:setOnComplete
+do
   local pl = lurek.pipeline.newPipeline("boot")
   pl:setOnComplete(function(r)
     lurek.log.info("pipeline done: success=" .. tostring(r.success), "boot")
@@ -844,7 +885,7 @@ Registers a callback invoked each time any step completes successfully. Receives
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:setOnStepComplete
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:setOnStepComplete(function(name, _ctx)
     lurek.log.info("loaded: " .. name, "loader")
@@ -866,7 +907,7 @@ Registers a callback invoked each time any step fails. Receives (stepName, error
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:setOnStepError
+do
   local pl = lurek.pipeline.newPipeline("net")
   pl:setOnStepError(function(name, err)
     lurek.log.warn(name .. " failed: " .. err, "net")
@@ -886,7 +927,7 @@ Returns an ASCII art diagram of the pipeline's dependency graph for debugging an
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:toAscii
+do
   local pl = lurek.pipeline.newPipeline("plan")
   pl:addStep(lurek.pipeline.newStep("a"))
   pl:addStep(lurek.pipeline.newStep("b"))
@@ -905,7 +946,7 @@ Serializes the pipeline configuration into a plain Lua table for inspection or p
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:toTable
+do
   local pl = lurek.pipeline.newPipeline("dump")
   pl:addStep(lurek.pipeline.newStep("a"))
   local t = pl:toTable()
@@ -924,7 +965,7 @@ Returns the type name of this object ("LPipeline").
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:type
+do
   local pl = lurek.pipeline.newPipeline("boot")
   if pl:type() == "LPipeline" then
     lurek.log.debug("got a pipeline userdata", "boot")
@@ -947,7 +988,7 @@ Checks whether this object is of a given type name. Accepts "LPipeline", "Pipeli
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:typeOf
+do
   local pl = lurek.pipeline.newPipeline("boot")
   if pl:typeOf("Object") then
     lurek.log.debug("pipeline inherits from Object", "boot")
@@ -970,7 +1011,7 @@ Advances an async pipeline by one frame tick. Resumes coroutines, checks depende
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:update
+do
   local pl = lurek.pipeline.newPipeline("loader")
   pl:addStep(lurek.pipeline.newStep("scan", function() end))
   pl:runAsync()
@@ -991,7 +1032,7 @@ Validates the pipeline structure, checking for missing dependencies and circular
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- Pipeline:validate
+do
   local pl = lurek.pipeline.newPipeline("check")
   local s = lurek.pipeline.newStep("orphan"); s:dependsOn("missing"); pl:addStep(s)
   local ok, errs = pl:validate()
@@ -1010,7 +1051,7 @@ A single executable step within a pipeline, wrapping callback, condition, retry,
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- lurek.pipeline.newStep
+do
   local step = lurek.pipeline.newStep("load_audio", function(ctx)
     ctx.audio_loaded = true
   end)
@@ -1033,7 +1074,7 @@ Declares that this step depends on another step (by name or reference). The depe
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:dependsOn
+do
   local a = lurek.pipeline.newStep("load_assets", function() end)
   local b = lurek.pipeline.newStep("init_scene", function() end)
   b:dependsOn(a)   -- init_scene waits for load_assets
@@ -1052,7 +1093,7 @@ Returns the current attempt number (1-based). Increases with each retry.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getAttempt
+do
   local step = lurek.pipeline.newStep("login", function() end)
   lurek.log.info("attempt=" .. step:getAttempt(), "pipeline")
 end
@@ -1073,7 +1114,7 @@ Retrieves a metadata value previously stored with setData.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getData
+do
   local step = lurek.pipeline.newStep("init_renderer", function() end)
   step:setData("resolution", "1920x1080")
   local res = step:getData("resolution")
@@ -1092,7 +1133,7 @@ Returns the configured delay for this step.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getDelay
+do
   local step = lurek.pipeline.newStep("fetch_data", function() end)
   step:setDelay(1.0)
   lurek.log.info("delay=" .. step:getDelay(), "pipeline")
@@ -1110,7 +1151,7 @@ Returns a list of step names that this step depends on.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getDependencies
+do
   local a = lurek.pipeline.newStep("fetch", function() end)
   local b = lurek.pipeline.newStep("parse", function() end)
   b:dependsOn(a)
@@ -1130,7 +1171,7 @@ Returns the number of dependencies this step has.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getDependencyCount
+do
   local a = lurek.pipeline.newStep("step_a", function() end)
   local b = lurek.pipeline.newStep("step_b", function() end)
   local c = lurek.pipeline.newStep("step_c", function() end)
@@ -1150,7 +1191,7 @@ Returns how long this step took to execute in seconds (measured from start to co
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getDuration
+do
   local step = lurek.pipeline.newStep("gen_terrain", function() end)
   lurek.log.info("duration=" .. step:getDuration() .. "s", "pipeline")
 end
@@ -1167,7 +1208,7 @@ Returns the error message if this step failed, or nil if it has not failed.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getError
+do
   local step = lurek.pipeline.newStep("connect", function() end)
   local err = step:getError()
   lurek.log.info("error=" .. tostring(err), "pipeline")
@@ -1185,7 +1226,7 @@ Returns the unique name of this pipeline step.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getName
+do
   local step = lurek.pipeline.newStep("load_assets", function() end)
   lurek.log.info("step name=" .. step:getName(), "pipeline")
 end
@@ -1202,7 +1243,7 @@ Returns the configured retry count for this step.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getRetryCount
+do
   local step = lurek.pipeline.newStep("save_progress", function() end)
   step:setRetryCount(2)
   lurek.log.info("retry_count=" .. step:getRetryCount(), "pipeline")
@@ -1220,7 +1261,7 @@ Returns the current execution status of this step as a string ("pending", "waiti
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getStatus
+do
   local step = lurek.pipeline.newStep("build_nav", function() end)
   lurek.log.info("initial status=" .. step:getStatus(), "pipeline")
 end
@@ -1237,7 +1278,7 @@ Returns the tag assigned to this step, or nil if none is set.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getTag
+do
   local step = lurek.pipeline.newStep("load_audio", function() end)
   step:setTag("audio")
   lurek.log.info("tag=" .. tostring(step:getTag()), "pipeline")
@@ -1255,7 +1296,7 @@ Returns the configured timeout for this step, or 0 if none is set.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:getTimeout
+do
   local step = lurek.pipeline.newStep("upload", function() end)
   step:setTimeout(10.0)
   lurek.log.info("timeout=" .. step:getTimeout() .. "s", "pipeline")
@@ -1273,7 +1314,7 @@ Returns whether this step is configured for asynchronous coroutine execution.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:isAsync
+do
   local p = lurek.pipeline.newPipeline()
   local step = lurek.pipeline.newStep("transform", function(ctx) return ctx end)
   p:addStep(step)
@@ -1292,7 +1333,7 @@ Returns whether this step is marked as optional.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:isOptional
+do
   local step = lurek.pipeline.newStep("analytics", function() end)
   step:setOptional(true)
   lurek.log.info("is optional=" .. tostring(step:isOptional()), "pipeline")
@@ -1312,7 +1353,7 @@ Marks this step as asynchronous. Async steps run as coroutines and can yield bet
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setAsync
+do
   local p = lurek.pipeline.newPipeline()
   local step = lurek.pipeline.newStep("fetch", function(ctx) return ctx end)
   p:addStep(step)
@@ -1333,7 +1374,7 @@ Sets the main execution function for this step. Called when the step runs.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setCallback
+do
   local step = lurek.pipeline.newStep("process", function() end)
   step:setCallback(function()
     lurek.log.info("step executing: process", "pipeline")
@@ -1355,7 +1396,7 @@ Sets a predicate function that determines whether this step should execute. If t
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setCondition
+do
   local step = lurek.pipeline.newStep("optional_step", function() end)
   step:setCondition(function()
     return true  -- always run in this example
@@ -1378,7 +1419,7 @@ Stores a key-value metadata pair on this step. Useful for passing configuration 
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setData
+do
   local step = lurek.pipeline.newStep("load_level", function() end)
   step:setData("level_id", "dungeon_2")
   step:setData("difficulty", "hard")
@@ -1399,7 +1440,7 @@ Sets a delay in seconds before this step begins execution after its dependencies
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setDelay
+do
   local step = lurek.pipeline.newStep("delayed_step", function() end)
   step:setDelay(0.5)
   lurek.log.info("delay=" .. step:getDelay(), "pipeline")
@@ -1419,7 +1460,7 @@ Sets an error handler callback invoked when this step fails after all retries ar
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setOnError
+do
   local step = lurek.pipeline.newStep("critical_step", function() end)
   step:setOnError(function(err)
     lurek.log.info("step failed: " .. tostring(err), "pipeline")
@@ -1441,7 +1482,7 @@ Marks this step as optional. Optional steps do not cause pipeline failure if the
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setOptional
+do
   local step = lurek.pipeline.newStep("telemetry", function() end)
   step:setOptional(true)
   lurek.log.info("optional=" .. tostring(step:isOptional()), "pipeline")
@@ -1461,7 +1502,7 @@ Sets how many times this step should be retried after a failure before being mar
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setRetryCount
+do
   local step = lurek.pipeline.newStep("fetch_leaderboard", function() end)
   step:setRetryCount(3)
   lurek.log.info("retry_count=" .. step:getRetryCount(), "pipeline")
@@ -1481,7 +1522,7 @@ Sets the delay in seconds between retry attempts for this step.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setRetryDelay
+do
   local step = lurek.pipeline.newStep("send_score", function() end)
   step:setRetryCount(3)
   step:setRetryDelay(0.5)   -- wait 0.5s before each retry
@@ -1502,7 +1543,7 @@ Assigns a tag string to this step for grouping and filtering purposes.
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setTag
+do
   local step = lurek.pipeline.newStep("warmup_shader", function() end)
   step:setTag("graphics")
   lurek.log.info("tag=" .. tostring(step:getTag()), "pipeline")
@@ -1522,7 +1563,7 @@ Sets a maximum execution time for this step. If exceeded in async mode, the step
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:setTimeout
+do
   local step = lurek.pipeline.newStep("network_call", function() end)
   step:setTimeout(5.0)
   lurek.log.info("timeout=" .. step:getTimeout(), "pipeline")
@@ -1540,7 +1581,7 @@ Returns the type name of this object ("LPipelineStep").
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:type
+do
   local step = lurek.pipeline.newStep("test_step", function() end)
   local t = step:type()
   lurek.log.info("LPipelineStep:type=" .. t, "pipeline")
@@ -1562,7 +1603,7 @@ Checks whether this object is of a given type name. Accepts "LPipelineStep", "Pi
 Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
-do -- LPipelineStep:typeOf
+do
   local step = lurek.pipeline.newStep("check_step", function() end)
   lurek.log.info("is PipelineStep: " .. tostring(step:typeOf("PipelineStep")), "pipeline")
   lurek.log.info("is wrong: " .. tostring(step:typeOf("Unknown")), "pipeline")

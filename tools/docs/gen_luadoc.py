@@ -862,6 +862,11 @@ def main():
                 # fallback for missing lua_name:
                 if ":" not in name and ("." not in name):
                     name = f"{class_name}:{method['name']}"
+                # Class methods must use : notation so LuaLS treats self as implicit.
+                # Some lua_name values use ClassName.method (dot) instead of ClassName:method.
+                elif "." in name and ":" not in name:
+                    last_dot = name.rfind(".")
+                    name = name[:last_dot] + ":" + name[last_dot + 1:]
                 write_function_doc(out, method, name)
 
         functions = mod_data.get("functions", [])

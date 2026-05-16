@@ -92,13 +92,51 @@ Auto-scroll adds constant velocity independent of camera movement for ambient ef
 Module example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newLayer
+--@api-stub: lurek.parallax.newLayer
+-- Creates a parallax layer from an options table
+do
   function lurek.init()
     local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
     local sky = lurek.parallax.newLayer({
       texture = sky_tex, scroll_factor_x = 0.15, scroll_factor_y = 0.0, z = 0,
     })
     sky:setRepeat(true, false)
+  end
+end
+
+--@api-stub: lurek.parallax.newSet
+-- Creates an empty parallax layer set
+do
+  function lurek.init()
+    local backdrop = lurek.parallax.newSet("forest_backdrop")
+    backdrop:setVisible(true)
+    lurek.log.info("backdrop ready: " .. backdrop:getName(), "scene")
+  end
+end
+
+--@api-stub: lurek.parallax.newPresetLayer
+-- Creates a parallax layer from a named preset and texture image
+do
+  function lurek.init()
+    local tex = lurek.render.newImage("assets/parallax/clouds.png")
+    local _far = lurek.parallax.newPresetLayer("far", tex)
+  end
+end
+
+--@api-stub: ParallaxLayer:addEffectPass
+do
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+    layer:addEffectPass("motion_blur", { strength = 0.2 })
+  end
+end
+
+--@api-stub: ParallaxLayer:clearEffects
+do
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+    layer:addEffectPass("motion_blur", { strength = 0.1 })
+    layer:clearEffects()
   end
 end
 ```
@@ -135,7 +173,7 @@ Creates a parallax layer from an options table.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newLayer
+do
   function lurek.init()
     local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
     local sky = lurek.parallax.newLayer({
@@ -162,7 +200,7 @@ Creates a parallax layer from a named preset and texture image.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newPresetLayer
+do
   function lurek.init()
     local tex = lurek.render.newImage("assets/parallax/clouds.png")
     local _far = lurek.parallax.newPresetLayer("far", tex)
@@ -185,7 +223,7 @@ Creates an empty parallax layer set.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newSet
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("forest_backdrop")
     backdrop:setVisible(true)
@@ -206,7 +244,7 @@ Lua-side wrapper for a parallax layer and shared render state.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newLayer
+do
   function lurek.init()
     local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
     local sky = lurek.parallax.newLayer({
@@ -231,7 +269,7 @@ Adds a shader effect pass to this layer.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:addEffectPass
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.2 })
@@ -248,7 +286,7 @@ Clears layer clamp bounds. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:clearClamp
+do
   function lurek.init()
     local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
     hills:setRepeat(true, false)
@@ -266,7 +304,7 @@ Clears shader effect passes from this layer.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:clearEffects
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.1 })
@@ -286,7 +324,7 @@ Returns shader effect pass count. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:effectCount
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.1 })
@@ -307,7 +345,7 @@ Returns layer autoscroll velocity.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getAutoscroll
+do
   function lurek.init()
     local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 15 })
     local vx, vy = clouds:getAutoscroll()
@@ -327,7 +365,7 @@ Returns layer blend mode name. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getBlendMode
+do
   function lurek.init()
     local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png"), blend_mode = "additive" })
     if rays:getBlendMode() ~= "normal" then
@@ -348,7 +386,7 @@ Returns parallax depth. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getDepth
+do
   function lurek.init()
     local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setDepth(10.5)
@@ -368,7 +406,7 @@ Returns motion stretch settings. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getMotionStretch
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     layer:setMotionStretch(true, 0.25, 1.4)
@@ -389,7 +427,7 @@ Returns layer offset. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getOffset
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), offset_y = 32 })
     local ox, oy = layer:getOffset()
@@ -409,7 +447,7 @@ Returns layer opacity. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getOpacity
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), opacity = 0.5 })
     local a = fog:getOpacity()
@@ -429,7 +467,7 @@ Returns layer scroll factor. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getScrollFactor
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), scroll_factor_x = 0.3 })
     local fx, fy = layer:getScrollFactor()
@@ -449,7 +487,7 @@ Returns whether layer tiling is enabled.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getTiling
+do
   function lurek.init()
     local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
@@ -471,7 +509,7 @@ Returns layer tint color. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getTint
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(0.5, 0.6, 1.0, 1.0)
@@ -492,7 +530,7 @@ Returns layer z order. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:getZ
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 5 })
     if layer:getZ() < 10 then
@@ -513,7 +551,7 @@ Returns layer visibility. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:isVisible
+do
   local rain
   function lurek.init()
     rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
@@ -538,7 +576,7 @@ Enqueues render commands using explicit camera coordinates.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:render
+do
   local hills
   function lurek.init()
     hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 })
@@ -556,7 +594,7 @@ Enqueues render commands using the runtime camera.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:renderAuto
+do
   local mountains
   function lurek.init()
     mountains = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mountains.png"), scroll_factor_x = 0.25 })
@@ -574,7 +612,7 @@ Resets layer autoscroll offset. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:resetAutoscroll
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), autoscroll_x = 8 })
     fog:resetAutoscroll()
@@ -596,7 +634,7 @@ Sets layer autoscroll velocity. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setAutoscroll
+do
   function lurek.init()
     local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     clouds:setScrollFactor(0, 0)
@@ -618,7 +656,7 @@ Sets layer blend mode by name. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setBlendMode
+do
   function lurek.init()
     local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png") })
     rays:setBlendMode("additive")
@@ -642,7 +680,7 @@ Sets clamp bounds for layer movement.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setClamp
+do
   local ok, err = pcall(function()
     local layer = lurek.parallax.newLayer({texture = lurek.render.newImage("bg_mountains.png"), scroll_factor_x = 0.3})
     layer:setClamp(0, 0, 800, 600)
@@ -665,7 +703,7 @@ Sets parallax depth. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setDepth
+do
   function lurek.init()
     local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setZ(10)
@@ -689,7 +727,7 @@ Sets motion stretch settings. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setMotionStretch
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     layer:setMotionStretch(true, 0.35, 1.6)
@@ -711,7 +749,7 @@ Sets layer offset. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setOffset
+do
   function lurek.init()
     local horizon = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/horizon.png") })
     horizon:setOffset(0, 96)
@@ -732,7 +770,7 @@ Sets layer opacity, clamped to 0..1.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setOpacity
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     fog:setOpacity(0.6)
@@ -754,7 +792,7 @@ Sets horizontal and vertical repeat flags.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setRepeat
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setRepeat(true, false)
@@ -776,7 +814,7 @@ Sets layer scale. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setScale
+do
   function lurek.init()
     local pixels = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pixel_sky.png") })
     pixels:setScale(2.0, 2.0)
@@ -798,7 +836,7 @@ Sets layer scroll factor. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setScrollFactor
+do
   function lurek.init()
     local mid = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/treeline.png") })
     mid:setScrollFactor(0.6, 1.0)
@@ -820,7 +858,7 @@ Sets tile size for tiling. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setTileSize
+do
   function lurek.init()
     local pattern = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pattern.png") })
     pattern:setTiling(true)
@@ -842,7 +880,7 @@ Enables or disables layer tiling. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setTiling
+do
   function lurek.init()
     local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
@@ -866,7 +904,7 @@ Sets layer tint color. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setTint
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(1.0, 0.6, 0.4, 1.0)
@@ -887,7 +925,7 @@ Sets layer visibility. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setVisible
+do
   function lurek.init()
     local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
     rain:setVisible(false)
@@ -908,7 +946,7 @@ Sets layer z order. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:setZ
+do
   function lurek.init()
     local trees = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/trees.png") })
     trees:setZ(20)
@@ -927,7 +965,7 @@ Returns the Lua-visible type name for this parallax layer handle.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:type
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     if layer:type() == "LParallaxLayer" then
@@ -950,7 +988,7 @@ Advances parallax layer autoscroll by delta time.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxLayer:update
+do
   local clouds
   function lurek.init()
     clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 12 })
@@ -968,7 +1006,7 @@ Lua-side wrapper for an ordered parallax layer set.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- lurek.parallax.newSet
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("forest_backdrop")
     backdrop:setVisible(true)
@@ -990,7 +1028,7 @@ Adds a parallax layer to this set. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:addLayer
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("woods")
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 0 })
@@ -1016,7 +1054,7 @@ Returns z order for a layer by one-based index.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:getLayerZAt
+do
   function lurek.init()
     local set = lurek.parallax.newSet("order_debug")
     local img = lurek.render.newImage("assets/parallax/sky.png")
@@ -1041,7 +1079,7 @@ Returns this set name. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:getName
+do
   function lurek.init()
     local set = lurek.parallax.newSet("foreground")
     lurek.log.info("active backdrop: " .. set:getName(), "scene")
@@ -1060,7 +1098,7 @@ Returns set visibility. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:isVisible
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("woods")
@@ -1082,7 +1120,7 @@ Returns the number of layers in this set.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:layerCount
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("count_demo")
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
@@ -1107,7 +1145,7 @@ Removes a layer by one-based index.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:removeLayerAt
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("storm")
     local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
@@ -1131,7 +1169,7 @@ Enqueues render commands for all visible set layers using explicit camera coordi
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:render
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("preview")
@@ -1150,7 +1188,7 @@ Enqueues render commands for all visible set layers using the runtime camera.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:renderAuto
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("scene")
@@ -1173,7 +1211,7 @@ Sets this set name. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:setName
+do
   function lurek.init()
     local set = lurek.parallax.newSet("placeholder")
     set:setName("level_3_backdrop")
@@ -1194,7 +1232,7 @@ Sets set visibility. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:setVisible
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("menu_aware")
     backdrop:setVisible(false)
@@ -1211,7 +1249,7 @@ Sorts layers by z order. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:sortByZ
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("sortable")
     local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
@@ -1233,7 +1271,7 @@ Returns the Lua-visible type name for this parallax set handle.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:type
+do
   function lurek.init()
     local set = lurek.parallax.newSet("intro")
     if set:type() == "LParallaxSet" then
@@ -1256,7 +1294,7 @@ Updates all layers in this set. This method is available to Lua scripts.
 Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
-do -- ParallaxSet:update
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("ambient")

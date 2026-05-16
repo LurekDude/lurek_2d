@@ -68,12 +68,53 @@ Procedural content generation library providing noise, dungeon generation, heigh
 Module example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.cellularAutomata
+-- content/examples/procgen.lua
+-- lurek.procgen API examples.
+-- Run: cargo run -- content/examples/procgen.lua
+
+--@api-stub: lurek.procgen.cellularAutomata
+-- Generate a cave or organic map using cellular automata rules
+do
   local w, h = 64, 48
   local cave = lurek.procgen.cellularAutomata(w, h, { fill = 0.45, iterations = 5, seed = 1337 })
   local floor_count = 0
   for i = 1, #cave do if cave[i] == 0 then floor_count = floor_count + 1 end end
   lurek.log.info("cave generated: " .. floor_count .. " walkable cells of " .. (w * h), "procgen")
+end
+
+--@api-stub: lurek.procgen.floodFill
+-- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test
+do
+  local w, h = 16, 16
+  local grid = {}
+  for i = 1, w * h do grid[i] = 0 end
+  local mask = lurek.procgen.floodFill(grid, w, h, 1, 1, 128, false)
+  lurek.log.debug("flood reached " .. #mask .. " cells from (1,1)", "procgen")
+end
+
+--@api-stub: lurek.procgen.perlinNoise
+-- Sample periodic 2D Perlin noise at a given coordinate
+do
+  local px, py = 8.0, 8.0
+  local n = lurek.procgen.perlinNoise(2.5, 3.1, px, py)
+  if n > 0 then lurek.log.debug("perlin sample positive: " .. n, "procgen") end
+end
+
+--@api-stub: lurek.procgen.poissonDisk
+-- Generate evenly-spaced random points using Poisson disk sampling
+do
+  local pts = lurek.procgen.poissonDisk(800, 600, 32, 30, 42)
+  for i = 1, math.min(3, #pts) do
+    lurek.log.debug("tree at " .. pts[i].x .. "," .. pts[i].y, "procgen")
+  end
+end
+
+--@api-stub: lurek.procgen.voronoi
+-- Compute a Voronoi diagram from a set of seed points
+do
+  local seeds = { { x = 16, y = 16 }, { x = 48, y = 16 }, { x = 32, y = 48 } }
+  local regions, dist, dist2 = lurek.procgen.voronoi(64, 64, seeds, { metric = "euclidean" })
+  lurek.log.info("voronoi regions=" .. #regions .. " near=" .. dist[1] .. " next=" .. dist2[1], "procgen")
 end
 ```
 
@@ -124,7 +165,7 @@ Get the default RGBA display color for a biome type name. Useful for minimap or 
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.biomeColor
+do
   local r, g, b, a = lurek.procgen.biomeColor("desert")
   lurek.log.debug("desert rgba=" .. r .. "," .. g .. "," .. b .. "," .. a, "procgen")
 end
@@ -145,7 +186,7 @@ Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapp
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.bspDungeon
+do
   local d = lurek.procgen.bspDungeon({ width = 80, height = 50, min_size = 8, max_depth = 4, seed = 7 })
   local first = d.rooms[1]
   lurek.log.info("bsp dungeon: " .. #d.rooms .. " rooms, " .. #d.corridors .. " corridors", "procgen")
@@ -169,7 +210,7 @@ Generate a BSP dungeon and stamp named prefab rooms into suitable leaves. Return
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.bspDungeonWithPrefabs
+do
   local prefabs = {
     { name = "boss_room", width = 5, height = 5 },
     { name = "chest_room", width = 3, height = 3 },
@@ -196,7 +237,7 @@ Generate a cave or organic map using cellular automata rules.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.cellularAutomata
+do
   local w, h = 64, 48
   local cave = lurek.procgen.cellularAutomata(w, h, { fill = 0.45, iterations = 5, seed = 1337 })
   local floor_count = 0
@@ -226,7 +267,7 @@ Flood-fill a grid from a starting cell, marking all connected cells that pass a 
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.floodFill
+do
   local w, h = 16, 16
   local grid = {}
   for i = 1, w * h do grid[i] = 0 end
@@ -253,7 +294,7 @@ Generate a single random name based on a Markov chain trained from sample names.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.generateName
+do
   local samples = { "Eldoria", "Mythos", "Arden", "Brindlemar", "Caelum", "Drakov", "Eowyn" }
   local name = lurek.procgen.generateName(samples, 4, 9, 17)
   lurek.log.info("npc named '" .. name .. "'", "procgen")
@@ -279,7 +320,7 @@ Generate multiple random names in one call using Markov chains trained from samp
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.generateNames
+do
   local samples = { "Frostpeak", "Ironhold", "Stormwall", "Embervale", "Greyfen", "Hollowmere" }
   local towns = lurek.procgen.generateNames(samples, 5, 5, 12, 4)
   for i = 1, #towns do lurek.log.debug("town " .. i .. ": " .. towns[i], "procgen") end
@@ -301,7 +342,7 @@ Generate a fractal heightmap using multi-octave noise with optional hydraulic er
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.heightmap
+do
   local hm = lurek.procgen.heightmap({ width = 128, height = 128, scale = 0.05, octaves = 4, persistence = 0.5, seed = 99 })
   local mid = hm.cells[(hm.height / 2) * hm.width + (hm.width / 2)]
   lurek.log.info("heightmap " .. hm.width .. "x" .. hm.height .. " centre=" .. mid, "procgen")
@@ -326,7 +367,7 @@ Convert a cellular automata grid into a heightmap by distance-transforming the f
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.heightmapFromCellular
+do
   local w, h = 8, 8
   local cells = {}
   for i = 1, w * h do cells[i] = (i % 3 == 0) and 1 or 0 end
@@ -350,7 +391,7 @@ Expand an L-system grammar and return the resulting string. Useful for generatin
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.lsystem
+do
   local rules = { F = "F+F-F-F+F" }
   local s = lurek.procgen.lsystem({ axiom = "F", rules = rules, iterations = 3 })
   lurek.log.debug("lsystem string length=" .. #s, "procgen")
@@ -374,7 +415,7 @@ Expand an L-system and interpret the result as turtle-graphics commands, returni
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.lsystemSegments
+do
   local rules = { F = "FF+[+F-F-F]-[-F+F+F]" }
   local segs = lurek.procgen.lsystemSegments({ axiom = "F", rules = rules, iterations = 3 }, 22.5, 4.0)
   lurek.log.info("plant has " .. #segs .. " line segments", "procgen")
@@ -396,7 +437,7 @@ Create a BiomeClassifier object with custom threshold rules for mapping height/m
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.newBiomeClassifier
+do
   local bc = lurek.procgen.newBiomeClassifier({ ocean_threshold = 0.25, warm_temperature = 0.7 })
   lurek.log.debug("biome classifier ready: " .. bc:type(), "procgen")
 end
@@ -419,7 +460,7 @@ Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.noiseMap
+do
   local map = lurek.procgen.noiseMap(64, 64, { scale_x = 0.08, scale_y = 0.08, octaves = 3, persistence = 0.5, seed = 11 })
   lurek.log.info("noise map " .. #map .. " samples, first=" .. map[1], "procgen")
 end
@@ -442,7 +483,7 @@ Generate a 2D noise map using multiple threads for faster computation on large m
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.noiseMapParallel
+do
   local big = lurek.procgen.noiseMapParallel(256, 256, { scale_x = 0.02, scale_y = 0.02, octaves = 5, lacunarity = 2.0 })
   local sample = big[#big / 2]
   lurek.log.info("parallel noise map size=" .. #big .. " mid=" .. sample, "procgen")
@@ -466,7 +507,7 @@ Generate a 2D noise map using multiple threads with a specific seed for reproduc
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.noiseMapParallelSeeded
+do
   local map = lurek.procgen.noiseMapParallelSeeded(64, 64, { scale_x = 0.04, scale_y = 0.04, octaves = 4, seed = 12345 })
   lurek.log.debug("seeded parallel noise first=" .. map[1], "procgen")
 end
@@ -490,7 +531,7 @@ Sample periodic 2D Perlin noise at a given coordinate.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.perlinNoise
+do
   local px, py = 8.0, 8.0
   local n = lurek.procgen.perlinNoise(2.5, 3.1, px, py)
   if n > 0 then lurek.log.debug("perlin sample positive: " .. n, "procgen") end
@@ -516,7 +557,7 @@ Generate evenly-spaced random points using Poisson disk sampling. Useful for pla
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.poissonDisk
+do
   local pts = lurek.procgen.poissonDisk(800, 600, 32, 30, 42)
   for i = 1, math.min(3, #pts) do
     lurek.log.debug("tree at " .. pts[i].x .. "," .. pts[i].y, "procgen")
@@ -539,7 +580,7 @@ Generate a dungeon by placing random non-overlapping rooms and connecting them w
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.roomsDungeon
+do
   local d = lurek.procgen.roomsDungeon({ width = 60, height = 40, max_rooms = 12, min_room_size = 4, max_room_size = 9, seed = 2 })
   local floors = 0
   for i = 1, #d.grid do if d.grid[i] == 1 then floors = floors + 1 end end
@@ -564,7 +605,7 @@ Generate a rooms-based dungeon and place named prefabs into qualifying rooms. Pr
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.roomsDungeonWithPrefabs
+do
   local prefabs = {
     { name = "altar", width = 3, height = 3, mask = {
       0,1,0,
@@ -593,7 +634,7 @@ Sample 2D simplex noise at a point. Returns a value roughly in [-1, 1].
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.simplex2d
+do
   local n = lurek.procgen.simplex2d(12.5, 7.25)
   if math.abs(n) > 0.5 then lurek.log.debug("strong simplex2d response: " .. n, "procgen") end
 end
@@ -616,7 +657,7 @@ Sample 3D simplex noise at a point. The third axis can be used for animation or 
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.simplex3d
+do
   local t = 0.0
   local n = lurek.procgen.simplex3d(4.0, 4.0, t)
   lurek.log.debug("simplex3d sample at t=" .. t .. " -> " .. n, "procgen")
@@ -641,7 +682,7 @@ Compute a Voronoi diagram from a set of seed points. Returns region ownership, d
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.voronoi
+do
   local seeds = { { x = 16, y = 16 }, { x = 48, y = 16 }, { x = 32, y = 48 } }
   local regions, dist, dist2 = lurek.procgen.voronoi(64, 64, seeds, { metric = "euclidean" })
   lurek.log.info("voronoi regions=" .. #regions .. " near=" .. dist[1] .. " next=" .. dist2[1], "procgen")
@@ -663,7 +704,7 @@ Run Wave Function Collapse to generate a grid of tile IDs satisfying adjacency c
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.wfcGenerate
+do
   local tiles = { { id = 1, weight = 1.0 }, { id = 2, weight = 0.5 } }
   local adj   = { [1] = { 1, 2 }, [2] = { 1, 2 } }
   local grid  = lurek.procgen.wfcGenerate({ width = 12, height = 12, tiles = tiles, adjacencies = adj, seed = 1, max_attempts = 5 })
@@ -689,7 +730,7 @@ Generate a connected world graph with named regions and weighted edges. Useful f
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.worldGraph
+do
   local wg = lurek.procgen.worldGraph(1024, 768, 8, 5)
   local first = wg.regions[1]
   lurek.log.info("world has " .. #wg.regions .. " regions and " .. #wg.edges .. " edges", "procgen")
@@ -709,7 +750,7 @@ Lua-visible wrapper around the biome classification engine, used to assign biome
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- lurek.procgen.newBiomeClassifier
+do
   local bc = lurek.procgen.newBiomeClassifier({ ocean_threshold = 0.25, warm_temperature = 0.7 })
   lurek.log.debug("biome classifier ready: " .. bc:type(), "procgen")
 end
@@ -732,7 +773,7 @@ Classify a single point into a biome type based on its environmental parameters.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- BiomeClassifier:classify
+do
   local bc = lurek.procgen.newBiomeClassifier()
   local biome = bc:classify(0.62, 0.35, 0.72)
   lurek.log.info("sample biome=" .. biome, "procgen")
@@ -758,7 +799,7 @@ Classify an entire grid of points into biome types in bulk.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- BiomeClassifier:classifyMap
+do
   local bc = lurek.procgen.newBiomeClassifier()
   local w, h = 2, 2
   local heights = { 0.1, 0.3, 0.6, 0.9 }
@@ -780,7 +821,7 @@ Returns the type name of this object.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- BiomeClassifier:type
+do
   local bc = lurek.procgen.newBiomeClassifier()
   local t = bc:type()
   lurek.log.debug("biome type=" .. t, "procgen")
@@ -802,7 +843,7 @@ Check whether this object matches a given type name.
 Exact example from [procgen.lua](../blob/main/content/examples/procgen.lua):
 
 ```lua
-do -- BiomeClassifier:typeOf
+do
   local bc = lurek.procgen.newBiomeClassifier()
   local ok = bc:typeOf("BiomeClassifier")
   if not ok then lurek.log.warn("unexpected biome classifier type", "procgen") end

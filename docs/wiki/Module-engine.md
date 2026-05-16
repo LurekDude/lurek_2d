@@ -49,11 +49,53 @@ lurek.engine -- Runtime metadata and diagnostics bindings for version, platform,
 Module example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getVersion
-  local version = lurek.engine.getVersion()
-  local save_header = { engine = version, schema = 3, ts = os.time() }
-  lurek.log.info("save header engine=" .. save_header.engine, "save")
+-- Returns the target frame budget for a 60 FPS update loop
+do
+  local budget_ms = lurek.engine.getFrameBudget()
+  local headroom_ms = budget_ms * 0.5
+  function lurek.process(dt)
+    if dt * 1000 > headroom_ms then
+      lurek.log.warn("frame over half-budget: " .. (dt * 1000) .. "ms / " .. budget_ms, "perf")
+    end
+  end
 end
+
+--@api-stub: lurek.engine.memoryUsage
+-- Returns Lua VM memory usage as bytes and rounded kilobytes
+do
+  local accum = 0
+  function lurek.process(dt)
+    accum = accum + dt
+    if accum >= 1.0 then
+      accum = 0
+      local mem = lurek.engine.memoryUsage()
+      lurek.log.debug("lua heap=" .. mem.lua_kb .. "KB (" .. mem.lua_bytes .. " bytes)", "mem")
+    end
+  end
+end
+
+--@api-stub: lurek.engine.platform
+-- Returns the current desktop operating system name
+do
+  local os_name = lurek.engine.platform()
+  local quit_hint = (os_name == "macos") and "Cmd+Q to quit" or "Alt+F4 to quit"
+  lurek.log.info("running on " .. os_name .. " - " .. quit_hint, "boot")
+end
+
+--@api-stub: lurek.engine.uptime
+-- Returns total engine runtime accumulated by the main loop
+do
+  local session_start = lurek.engine.uptime()
+  function lurek.quit()
+    local played = lurek.engine.uptime() - session_start
+    lurek.log.info("session lasted " .. string.format("%.1f", played) .. "s", "session")
+  end
+end
+
+--@api-stub: lurek.engine.fps
+-- Returns the latest frames-per-second value stored by the runtime
+do
+  local font
 ```
 
 ## Key Types
@@ -92,7 +134,7 @@ Returns the latest frames-per-second value stored by the runtime.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.fps
+do
   local font
   function lurek.init() font = lurek.render.newFont(14) end
   function lurek.draw_ui()
@@ -115,7 +157,7 @@ Returns the number of frames counted by the shared runtime clock.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.frameCount
+do
   function lurek.process(_)
     if lurek.engine.frameCount() % 600 == 0 then
       lurek.log.info("autosave tick at frame " .. lurek.engine.frameCount(), "save")
@@ -135,7 +177,7 @@ Returns the configuration reload revision counter.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getConfigRevision
+do
   local last = lurek.engine.getConfigRevision()
   function lurek.process(_)
     local now = lurek.engine.getConfigRevision()
@@ -158,7 +200,7 @@ Returns the target frame budget for a 60 FPS update loop.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getFrameBudget
+do
   local budget_ms = lurek.engine.getFrameBudget()
   local headroom_ms = budget_ms * 0.5
   function lurek.process(dt)
@@ -180,7 +222,7 @@ Returns the latest frame timing profile split by engine phase.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getFrameProfile
+do
   function lurek.draw_ui()
     local p = lurek.engine.getFrameProfile()
     lurek.render.print(string.format("tick=%.2fms process=%.2fms draw=%.2fms", p.app_tick_ms, p.process_ms, p.draw_ms), 8, 28)
@@ -199,7 +241,7 @@ Returns the latest frame timing profile formatted as one text line.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getFrameProfileText
+do
   function lurek.draw_ui()
     lurek.render.print(lurek.engine.getFrameProfileText(), 8, 46)
   end
@@ -217,7 +259,7 @@ Returns current resource memory usage and object counts by resource kind.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getResourceStats
+do
   function lurek.process(_)
     if lurek.engine.frameCount() % 300 ~= 0 then return end
     local stats = lurek.engine.getResourceStats()
@@ -238,7 +280,7 @@ Returns the engine crate version string embedded at build time.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.getVersion
+do
   local version = lurek.engine.getVersion()
   local save_header = { engine = version, schema = 3, ts = os.time() }
   lurek.log.info("save header engine=" .. save_header.engine, "save")
@@ -256,7 +298,7 @@ Returns whether the engine binary was built with debug assertions.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.isDebug
+do
   if lurek.engine.isDebug() then
     lurek.log.setLevel("debug")
     lurek.log.debug("debug build - verbose logging enabled", "boot")
@@ -277,7 +319,7 @@ Returns Lua VM memory usage as bytes and rounded kilobytes.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.memoryUsage
+do
   local accum = 0
   function lurek.process(dt)
     accum = accum + dt
@@ -301,7 +343,7 @@ Returns the current desktop operating system name.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.platform
+do
   local os_name = lurek.engine.platform()
   local quit_hint = (os_name == "macos") and "Cmd+Q to quit" or "Alt+F4 to quit"
   lurek.log.info("running on " .. os_name .. " - " .. quit_hint, "boot")
@@ -321,7 +363,7 @@ Sets the resource memory budget used by resource statistics reporting.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.setResourceBudget
+do
   local mb = 256
   lurek.engine.setResourceBudget(mb * 1024 * 1024)
   lurek.log.info("texture budget set to " .. mb .. " MB", "boot")
@@ -339,7 +381,7 @@ Returns total engine runtime accumulated by the main loop.
 Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
-do -- lurek.engine.uptime
+do
   local session_start = lurek.engine.uptime()
   function lurek.quit()
     local played = lurek.engine.uptime() - session_start

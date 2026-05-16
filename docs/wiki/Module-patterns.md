@@ -305,12 +305,53 @@ Also provides: object pools with acquire/release lifecycle, weighted random sele
 Module example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ## Key Types
@@ -372,7 +413,7 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 --@api-stub: new
-do -- new factories
+do
   local wr = lurek.patterns.newWeightedRandom()
   local bt = lurek.patterns.newBehaviorTree()
   local g = lurek.patterns.newGraph()
@@ -382,7 +423,7 @@ do -- new factories
 end
 
 --@api-stub: LWeightedRandom
-do -- LWeightedRandom methods
+do
   local wr = lurek.patterns.newWeightedRandom()
   local id_a = wr:add(1.0, "a", "low")
   local id_b = wr:add(9.0, "b", "high")
@@ -405,7 +446,7 @@ Create a new shared key-value blackboard supporting reactive watchers for game l
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newBlackboard
+do
   local bb = lurek.patterns.newBlackboard("ai_world")
   bb:set("player_hp", 100)
   bb:set("alarm_on", false)
@@ -429,7 +470,7 @@ Create a new undo/redo command stack for recording and reversing player or edito
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newCommandStack
+do
   local stack = lurek.patterns.newCommandStack(64)
   local x = 0
   stack:execute("move", function() x = x + 10 end, function() x = x - 10 end)
@@ -454,7 +495,7 @@ Create a new debounce that delays firing until input stops for a specified wait 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newDebounce
+do
   local save = lurek.patterns.newDebounce(0.5)
   save:onFire(function() print("autosave") end)
   function lurek.process(dt) save:update(dt) end
@@ -477,7 +518,7 @@ Create a new publish/subscribe event bus for decoupled communication between gam
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
+do
   local bus = lurek.patterns.newEventBus("ui_bus")
   local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
   bus:emit("hp_changed", 42)
@@ -496,7 +537,7 @@ Create a new factory for producing typed game objects from registered constructo
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newFactory
+do
   local enemies = lurek.patterns.newFactory()
   enemies:register("goblin", function(x, y) return { kind = "goblin", x = x, y = y, hp = 20 } end)
   local g = enemies:create("goblin", 64, 32)
@@ -523,7 +564,7 @@ Create a new batching funnel that collects events over a time window and flushes
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newFunnel
+do
   local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
   analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
   analytics:push("level_start", 1)
@@ -547,7 +588,7 @@ Create a new graph data structure with directed or undirected edges, BFS, DFS, a
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- new factories
+do
   local wr = lurek.patterns.newWeightedRandom()
   local bt = lurek.patterns.newBehaviorTree()
   local g = lurek.patterns.newGraph()
@@ -557,7 +598,7 @@ do -- new factories
 end
 
 --@api-stub: LWeightedRandom
-do -- LWeightedRandom methods
+do
   local wr = lurek.patterns.newWeightedRandom()
   local id_a = wr:add(1.0, "a", "low")
   local id_b = wr:add(9.0, "b", "high")
@@ -577,7 +618,7 @@ Create a new dynamic array list with indexed access, insertion, removal, and sea
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newList
+do
   local quests = lurek.patterns.newList()
   quests:add("Find the key")
   quests:add("Open the chest")
@@ -597,7 +638,7 @@ Create a new string-keyed dictionary (map) with keys/values/entries access and m
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newMap
+do
   local m = lurek.patterns.newMap()
   m:set("k", 1)
   print("map has k=" .. tostring(m:has("k")))
@@ -615,7 +656,7 @@ Create a new mediator for channel-based message passing between decoupled game s
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newMediator
+do
   local hub = lurek.patterns.newMediator()
   hub:on("chat", function(user, msg) print(user .. ": " .. msg) end)
   hub:send("chat", "alice", "gg")
@@ -633,7 +674,7 @@ Create a new object pool for reusing pre-allocated game objects to reduce alloca
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newObjectPool
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({ x = 0, y = 0, vx = 0, vy = 0 })
   pool:add({ x = 0, y = 0, vx = 0, vy = 0 })
@@ -657,7 +698,7 @@ Create a new reactive observer that stores values and notifies subscribers when 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newObserver
+do
   local obs = lurek.patterns.newObserver("hud")
   obs:subscribe("score", function(_, v) print("hud score=" .. v) end)
   obs:set("score", 0)
@@ -680,7 +721,7 @@ Create a new priority queue that orders elements by numeric priority (highest fi
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newPriorityQueue
+do
   local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
   jobs:push(10, { kind = "patrol" })
   jobs:push(50, { kind = "attack", target = "player" })
@@ -704,7 +745,7 @@ Create a new FIFO queue with optional capacity limit.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newQueue
+do
   local mail = lurek.patterns.newQueue(0)
   mail:enqueue("hello")
   mail:enqueue("ready?")
@@ -723,7 +764,7 @@ Create a new relationship manager for tracking numeric values and named levels b
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newRelationshipManager
+do
   local rel = lurek.patterns.newRelationshipManager()
   rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
   rel:setValue(101, 202, -50)
@@ -748,7 +789,7 @@ Create a new fixed-size ring buffer for numeric or string values. Oldest entries
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newRing
+do
   local fps_log = lurek.patterns.newRing(60, "fps")
   for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
   print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
@@ -766,7 +807,7 @@ Create a new service locator for registering and retrieving shared services by n
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newServiceLocator
+do
   local services = lurek.patterns.newServiceLocator()
   services:provide("logger", { info = function(m) print("[info] " .. m) end })
   local log = services:locate("logger")
@@ -785,7 +826,7 @@ Create a new string set with add/remove/has operations and set algebra (union, i
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newSet
+do
   local unlocked = lurek.patterns.newSet()
   unlocked:add("level_1")
   unlocked:add("level_2")
@@ -804,7 +845,7 @@ Create a new finite state machine with enter/exit/update callbacks per state.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newSimpleState
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("idle", { enter = function() print("idle") end })
   sm:addState("walk", { update = function(dt) print("walking dt=" .. dt) end })
@@ -828,7 +869,7 @@ Create a new LIFO stack with optional capacity limit.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newStack
+do
   local nav = lurek.patterns.newStack(8)
   nav:push("main_menu")
   nav:push("options")
@@ -848,7 +889,7 @@ Create a new strategy pattern container for hot-swappable algorithm implementati
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newStrategy
+do
   local damage = lurek.patterns.newStrategy()
   damage:register("normal", function(atk, def) return math.max(1, atk - def) end)
   damage:register("crit", function(atk, def) return math.max(1, atk * 2 - def) end)
@@ -872,7 +913,7 @@ Create a new throttle that limits how often an action can fire, enforcing a mini
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newThrottle
+do
   local fire = lurek.patterns.newThrottle(0.25)
   fire:onFire(function() print("BANG") end)
   fire:update(0.016)
@@ -895,7 +936,7 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 end
 
 --@api-stub: new
-do -- new factories
+do
   local wr = lurek.patterns.newWeightedRandom()
   local bt = lurek.patterns.newBehaviorTree()
   local g = lurek.patterns.newGraph()
@@ -905,7 +946,7 @@ do -- new factories
 end
 
 --@api-stub: LWeightedRandom
-do -- LWeightedRandom methods
+do
   local wr = lurek.patterns.newWeightedRandom()
   local id_a = wr:add(1.0, "a", "low")
 ```
@@ -922,7 +963,7 @@ Lua-facing behavior tree for AI decision-making with sequences, selectors, paral
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LBehaviorTree methods
+do
   local bt = lurek.patterns.newBehaviorTree()
   local seq = bt:addSequence("root-seq")
   local sel = bt:addSelector("fallback")
@@ -951,7 +992,7 @@ do -- LBehaviorTree methods
 end
 
 --@api-stub: LGraph
-do -- LGraph methods
+do
   local g = lurek.patterns.newGraph(true)
   local a = g:addNode("A", { hp = 10 })
   local b = g:addNode("B", { hp = 20 })
@@ -988,12 +1029,53 @@ Attach a child node to a parent composite or decorator node.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addInverter([label]: string) -> number`
@@ -1011,12 +1093,53 @@ Create a decorator node that inverts its child's result (success ↔ failure).
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addLeaf(name: string, [label]: string) -> number`
@@ -1035,12 +1158,53 @@ Create a leaf (action) node that will invoke a named callback function on tick.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addParallel(minSuccess: integer, [label]: string) -> number`
@@ -1059,12 +1223,53 @@ Create a parallel composite node that runs all children simultaneously.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addRepeat(count: integer, [label]: string) -> number`
@@ -1083,12 +1288,53 @@ Create a decorator node that repeats its child a fixed number of times.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addSelector([label]: string) -> number`
@@ -1106,12 +1352,53 @@ Create a selector (fallback) composite node. Succeeds if any child succeeds.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:addSequence([label]: string) -> number`
@@ -1129,12 +1416,53 @@ Create a sequence composite node. All children must succeed for this node to suc
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:clearAll()`
@@ -1146,12 +1474,53 @@ Remove all nodes and leaf functions, resetting the tree to empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:nodeCount() -> number`
@@ -1165,12 +1534,53 @@ Return the total number of nodes in the tree.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:resetState()`
@@ -1182,12 +1592,53 @@ Reset the tree's running state. Use between encounters or when restarting AI log
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:setLeaf(name: string, callback: function)`
@@ -1204,12 +1655,53 @@ Register or replace the callback function for a named leaf. The function must re
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBehaviorTree:setRoot(id: integer) -> boolean`
@@ -1227,7 +1719,7 @@ Designate a node as the tree's root. Tick evaluation starts here.
 Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
-do -- BehaviorTree:setRoot
+do
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSelector()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -1246,12 +1738,53 @@ Execute one tick of the behavior tree from the root. Returns the root node's sta
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LBlackboard`
@@ -1263,7 +1796,7 @@ Lua-facing shared key-value blackboard supporting bool/number/string values with
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newBlackboard
+do
   local bb = lurek.patterns.newBlackboard("ai_world")
   bb:set("player_hp", 100)
   bb:set("alarm_on", false)
@@ -1285,7 +1818,7 @@ Remove a single key from the blackboard.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:clear
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("target", "player")
   bb:clear("target")
@@ -1302,7 +1835,7 @@ Remove all keys and values from the blackboard.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:clearAll
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("hp", 100)
   bb:clearAll()
@@ -1325,7 +1858,7 @@ Retrieve the value stored under a key. Returns nil if the key does not exist.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:get
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("ammo", 12)
   local ammo = bb:get("ammo") or 0
@@ -1344,7 +1877,7 @@ Return the current revision counter. Increments on every value change.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:getRevision
+do
   local bb = lurek.patterns.newBlackboard()
   local last_rev = bb:getRevision()
   bb:set("k", 1)
@@ -1367,7 +1900,7 @@ Check whether a key exists on the blackboard.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:has
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("seen_player", true)
   if bb:has("seen_player") then print("AI is alerted") end
@@ -1385,7 +1918,7 @@ Return an array of all keys currently stored on the blackboard.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:keys
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("hp", 50); bb:set("mode", "patrol")
   for _, k in ipairs(bb:keys()) do print(k .. "=" .. tostring(bb:get(k))) end
@@ -1406,7 +1939,7 @@ Set a key to a value (boolean, number, string, or nil to clear). Notifies regist
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:set
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("hp", 100)
   bb:set("name", "Aria")
@@ -1426,7 +1959,7 @@ Return a table containing all current key-value pairs as a snapshot. Useful for 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:snapshot
+do
   local bb = lurek.patterns.newBlackboard()
   bb:set("hp", 80); bb:set("mode", "alert")
   local snap = bb:snapshot()
@@ -1447,7 +1980,7 @@ Remove a previously registered watcher by its ID.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:unwatch
+do
   local bb = lurek.patterns.newBlackboard()
   local id = bb:watch("*", function(k) print("write to " .. k) end)
   bb:set("debug", "on")
@@ -1471,7 +2004,7 @@ Register a watcher callback that fires whenever the specified key changes. Use `
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Blackboard:watch
+do
   local bb = lurek.patterns.newBlackboard()
   local id = bb:watch("hp", function(k, v) print(k .. " changed to " .. v) end)
   bb:set("hp", 75)
@@ -1488,7 +2021,7 @@ Lua-facing undo/redo command stack. Records executed actions with optional undo 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newCommandStack
+do
   local stack = lurek.patterns.newCommandStack(64)
   local x = 0
   stack:execute("move", function() x = x + 10 end, function() x = x - 10 end)
@@ -1509,7 +2042,7 @@ Check whether a redo operation is possible (there are commands ahead of the poin
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:canRedo
+do
   local stack = lurek.patterns.newCommandStack(0)
   stack:execute("noop", function() end, function() end)
   stack:undo()
@@ -1528,7 +2061,7 @@ Check whether an undo operation is possible (there is a command with an undo fun
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:canUndo
+do
   local stack = lurek.patterns.newCommandStack(0)
   stack:execute("noop", function() end, function() end)
   if stack:canUndo() then print("undo enabled") else print("undo disabled") end
@@ -1544,7 +2077,7 @@ Discard all command history and free associated callbacks.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:clearAll
+do
   local stack = lurek.patterns.newCommandStack(0)
   stack:execute("a", function() end, function() end)
   stack:clearAll()
@@ -1567,7 +2100,7 @@ Execute a named command immediately, recording it in history. Discards any redo 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:execute
+do
   local stack = lurek.patterns.newCommandStack(0)
   local doc = { text = "hello" }
   local function run(s) local prev = doc.text; doc.text = doc.text .. s; return prev end
@@ -1588,7 +2121,7 @@ Return the name of the most recently executed (or undone-to) command, or nil if 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:getCurrentName
+do
   local stack = lurek.patterns.newCommandStack(0)
   stack:execute("paint", function() end, function() end)
   local name = stack:getCurrentName()
@@ -1607,7 +2140,7 @@ Return the total number of commands in the history (both undone and available fo
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:getHistorySize
+do
   local stack = lurek.patterns.newCommandStack(0)
   for i = 1, 5 do stack:execute("op_" .. i, function() end, function() end) end
   print("history=" .. stack:getHistorySize())
@@ -1625,7 +2158,7 @@ Redo a previously undone command by re-calling its execute function. Moves the p
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:redo
+do
   local stack = lurek.patterns.newCommandStack(0)
   local n = 0
   stack:execute("step", function() n = n + 1 end, function() n = n - 1 end)
@@ -1646,7 +2179,7 @@ Undo the most recent command by calling its undo function. Moves the pointer bac
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- CommandStack:undo
+do
   local stack = lurek.patterns.newCommandStack(0)
   local x = 5
   stack:execute("inc", function() x = x + 1 end, function() x = x - 1 end)
@@ -1664,7 +2197,7 @@ Lua-facing debounce that delays firing until input stops for a specified wait pe
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newDebounce
+do
   local save = lurek.patterns.newDebounce(0.5)
   save:onFire(function() print("autosave") end)
   function lurek.process(dt) save:update(dt) end
@@ -1681,7 +2214,7 @@ Cancel any pending debounce without firing. The callback will not be called unti
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:cancel
+do
   local d = lurek.patterns.newDebounce(1.0)
   d:onFire(function() print("commit") end)
   d:trigger()
@@ -1701,7 +2234,7 @@ Return the total number of times this debounce has fired since creation.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:getFireCount
+do
   local d = lurek.patterns.newDebounce(0.1)
   d:onFire(function() end)
   d:trigger()
@@ -1721,7 +2254,7 @@ Check whether the debounce is currently waiting to fire (has been triggered but 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:isPending
+do
   local d = lurek.patterns.newDebounce(0.6)
   d:onFire(function() end)
   d:trigger()
@@ -1742,7 +2275,7 @@ Set the callback function to invoke when the debounce fires after the wait perio
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:onFire
+do
   local d = lurek.patterns.newDebounce(0.3)
   d:onFire(function() print("settled") end)
   d:trigger()
@@ -1759,7 +2292,7 @@ Signal input activity. Resets the wait timer so the debounce will fire after the
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:trigger
+do
   local d = lurek.patterns.newDebounce(0.5)
   d:onFire(function() print("autosave!") end)
   d:trigger()
@@ -1783,7 +2316,7 @@ Advance the debounce timer. If the wait period elapsed since last trigger, fires
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Debounce:update
+do
   local d = lurek.patterns.newDebounce(0.4)
   d:onFire(function() print("done typing") end)
   d:trigger()
@@ -1800,7 +2333,7 @@ Lua-facing publish/subscribe event bus allowing decoupled communication between 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
+do
   local bus = lurek.patterns.newEventBus("ui_bus")
   local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
   bus:emit("hp_changed", 42)
@@ -1821,7 +2354,7 @@ Remove all listeners subscribed to a specific event name.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:clear
+do
   local bus = lurek.patterns.newEventBus()
   bus:on("minigame_score", function(s) print("score " .. s) end)
   bus:on("minigame_score", function(s) print("hud " .. s) end)
@@ -1839,7 +2372,7 @@ Remove all listeners from every event on this bus. Resets the bus to empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:clearAll
+do
   local bus = lurek.patterns.newEventBus()
   bus:on("a", function() end)
   bus:on("b", function() end)
@@ -1862,7 +2395,7 @@ Emit an event, invoking all subscribed listeners in priority order with optional
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:emit
+do
   local bus = lurek.patterns.newEventBus()
   bus:on("damage", function(amount, src) print(src .. " dealt " .. amount) end)
   bus:emit("damage", 12, "goblin")
@@ -1881,7 +2414,7 @@ Return an array of all event names that have at least one listener.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:getEvents
+do
   local bus = lurek.patterns.newEventBus()
   bus:on("save", function() end)
   bus:on("quit", function() end)
@@ -1904,7 +2437,7 @@ Return the number of active listeners for a given event name.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:getListenerCount
+do
   local bus = lurek.patterns.newEventBus()
   bus:on("hit", function() end)
   bus:on("hit", function() end)
@@ -1926,7 +2459,7 @@ Unsubscribe a listener by its subscription ID. Removes the callback from the eve
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:off
+do
   local bus = lurek.patterns.newEventBus()
   local id = bus:on("ping", function() print("pong") end)
   bus:off(id)
@@ -1952,7 +2485,7 @@ Subscribe a callback to a named event. Higher priority listeners fire first.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- EventBus:on
+do
   local bus = lurek.patterns.newEventBus("game")
   local id = bus:on("level_clear", function(lvl) print("cleared " .. lvl) end, 100)
   bus:emit("level_clear", "forest_01")
@@ -1969,7 +2502,7 @@ Lua-facing factory pattern for creating typed game objects from registered const
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newFactory
+do
   local enemies = lurek.patterns.newFactory()
   enemies:register("goblin", function(x, y) return { kind = "goblin", x = x, y = y, hp = 20 } end)
   local g = enemies:create("goblin", 64, 32)
@@ -1993,7 +2526,7 @@ Create an alias that maps to an existing type name. `create(alias)` will use the
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:alias
+do
   local f = lurek.patterns.newFactory()
   f:register("goblin", function() return { kind = "goblin" } end)
   f:alias("monster_v1", "goblin")
@@ -2013,7 +2546,7 @@ Remove all registered types and constructors, resetting the factory.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:clearAll
+do
   local f = lurek.patterns.newFactory()
   f:register("x", function() end)
   f:clearAll()
@@ -2037,7 +2570,7 @@ Create a new object by type name, passing additional arguments to the constructo
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:create
+do
   local f = lurek.patterns.newFactory()
   f:register("coin", function(v) return { kind = "coin", value = v } end)
   local c = f:create("coin", 50)
@@ -2058,7 +2591,7 @@ Return an array of all registered type names.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:getTypes
+do
   local f = lurek.patterns.newFactory()
   f:register("a", function() end); f:register("b", function() end)
   for _, name in ipairs(f:getTypes()) do print("type:" .. name) end
@@ -2080,7 +2613,7 @@ Check whether a constructor is registered for the given type name.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:has
+do
   local f = lurek.patterns.newFactory()
   f:register("npc", function() return { kind = "npc" } end)
   if f:has("npc") then print("npc factory ready") end
@@ -2101,7 +2634,7 @@ Register a constructor function for a given type name. Future `create()` calls w
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:register
+do
   local f = lurek.patterns.newFactory()
   f:register("orc", function(x, y) return { kind = "orc", hp = 30, x = x, y = y } end)
   f:register("troll", function(x, y) return { kind = "troll", hp = 80, x = x, y = y } end)
@@ -2122,7 +2655,7 @@ Unregister a type and discard its constructor function.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Factory:remove
+do
   local f = lurek.patterns.newFactory()
   f:register("temp", function() return {} end)
   f:remove("temp")
@@ -2139,7 +2672,7 @@ Lua-facing batching funnel that collects events over a time window and flushes t
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newFunnel
+do
   local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
   analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
   analytics:push("level_start", 1)
@@ -2157,7 +2690,7 @@ Discard all pending entries without flushing or calling the callback.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:discard
+do
   local f = lurek.patterns.newFunnel(2.0, 0)
   f:onFlush(function() end)
   f:push("a", 1); f:push("b", 2)
@@ -2175,7 +2708,7 @@ Force an immediate flush of all pending entries, invoking the callback.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:flush
+do
   local f = lurek.patterns.newFunnel(60.0, 0)
   f:onFlush(function(b) print("manual flush " .. #b) end)
   f:push("crash", 1)
@@ -2194,7 +2727,7 @@ Return the total number of times this funnel has flushed since creation.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:getFlushCount
+do
   local f = lurek.patterns.newFunnel(0, 1)
   f:onFlush(function() end)
   for i = 1, 3 do f:push("e", i) end
@@ -2215,7 +2748,7 @@ Set the callback invoked when the funnel flushes. Receives an array of {tag, val
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:onFlush
+do
   local f = lurek.patterns.newFunnel(1.0, 0)
   f:onFlush(function(batch) print("flushed " .. #batch .. " events") end)
   function lurek.process(dt) f:update(dt) end
@@ -2233,7 +2766,7 @@ Return the number of entries waiting to be flushed.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:pendingCount
+do
   local f = lurek.patterns.newFunnel(5.0, 0)
   f:onFlush(function() end)
   f:push("x", 1); f:push("y", 2); f:push("z", 3)
@@ -2255,7 +2788,7 @@ Push a tagged event into the funnel. May trigger an immediate flush if the max e
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:push
+do
   local f = lurek.patterns.newFunnel(0, 4)
   f:onFlush(function(b) print("batch=" .. #b) end)
   f:push("kill", 1); f:push("kill", 1); f:push("kill", 1); f:push("kill", 1)
@@ -2278,7 +2811,7 @@ Advance the funnel's time window. Flushes and invokes the callback if the window
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Funnel:update
+do
   local f = lurek.patterns.newFunnel(0.5, 0)
   f:onFlush(function(b) print("auto flush " .. #b) end)
   f:push("hit", 5)
@@ -2295,7 +2828,7 @@ Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and co
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LGraph methods
+do
   local g = lurek.patterns.newGraph(true)
   local a = g:addNode("A", { hp = 10 })
   local b = g:addNode("B", { hp = 20 })
@@ -2340,7 +2873,7 @@ Add a directed (or undirected) edge between two nodes with optional weight and l
 Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
-do -- Graph:addEdge
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("city_a")
   local b = g:addNode("city_b")
@@ -2365,7 +2898,7 @@ Add a node to the graph with an optional label and payload value.
 Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
-do -- Graph:addNode
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine")
   n:setCapacity(200)
@@ -2388,12 +2921,53 @@ Perform a breadth-first search from a node. Returns visited node IDs in BFS orde
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:clearAll()`
@@ -2405,12 +2979,53 @@ Remove all nodes, edges, and payloads from the graph.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:dfs(start: integer) -> table`
@@ -2428,12 +3043,53 @@ Perform a depth-first search from a node. Returns visited node IDs in DFS order.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:edgeCount() -> number`
@@ -2447,12 +3103,53 @@ Return the total number of edges in the graph.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil`
@@ -2470,12 +3167,53 @@ Retrieve the payload value stored on a node. Returns nil if no payload.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:hasNode(id: integer) -> boolean`
@@ -2493,7 +3231,7 @@ Check whether a node with the given ID exists in the graph.
 Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
-do -- Graph:hasNode
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("checkpoint")
   if g:hasNode(n) then
@@ -2518,12 +3256,53 @@ Check whether there is any path from one node to another.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:neighbors(id: integer) -> table`
@@ -2541,12 +3320,53 @@ Return an array of node IDs directly connected to the given node.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:nodeCount() -> number`
@@ -2560,12 +3380,53 @@ Return the total number of nodes in the graph.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LGraph:removeEdge(id: integer) -> boolean`
@@ -2583,7 +3444,7 @@ Remove an edge by its ID. Returns true if it existed.
 Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
-do -- Graph:removeEdge
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   local e = g:addEdge(a, b)
@@ -2606,7 +3467,7 @@ Remove a node and all its connected edges. Returns true if the node existed.
 Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
-do -- Graph:removeNode
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("temp")
   g:removeNode(n)
@@ -2623,7 +3484,7 @@ Lua-facing dynamic array list with indexed access, insertion, removal, and searc
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList extra methods
+do
   local l = lurek.patterns.newList()
   l:push("b")
   l:unshift("a")
@@ -2654,7 +3515,7 @@ Append a value to the end of the list.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:add
+do
   local lst = lurek.patterns.newList()
   lst:add("sword")
   lst:add("shield")
@@ -2672,7 +3533,7 @@ Remove all items from the list. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:clear
+do
   local lst = lurek.patterns.newList()
   lst:add("a")
   lst:add("b")
@@ -2696,7 +3557,7 @@ Check whether the list contains a specific value.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:contains
+do
   local lst = lurek.patterns.newList()
   lst:add("fire")
   lst:add("ice")
@@ -2721,7 +3582,7 @@ Get the value at a 1-based index. Returns nil if out of range.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:get
+do
   local lst = lurek.patterns.newList()
   lst:add("apple")
   lst:add("banana")
@@ -2745,12 +3606,53 @@ Find the 1-based index of the first occurrence of a value. Returns nil if not fo
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:insert(index: integer, value: boolean|number|string|table)`
@@ -2767,12 +3669,53 @@ Insert a value at a 1-based index, shifting subsequent items right.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:isEmpty() -> boolean`
@@ -2786,7 +3729,7 @@ Check whether the list is empty. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:isEmpty
+do
   local lst = lurek.patterns.newList()
   lurek.log.info("before add: " .. tostring(lst:isEmpty()), "patterns")
   lst:add("item")
@@ -2805,7 +3748,7 @@ Return the number of items in the list.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:len
+do
   local lst = lurek.patterns.newList()
   for i = 1, 5 do lst:add(i * 10) end
   lurek.log.info("list length=" .. lst:len(), "patterns")
@@ -2823,12 +3766,53 @@ Remove and return the last value. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:push(value: any)`
@@ -2844,12 +3828,53 @@ Append a value to the end of the list (alias for add).
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:remove(index: integer) -> boolean|number|string|table|nil`
@@ -2867,7 +3892,7 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:remove
+do
   local lst = lurek.patterns.newList()
   lst:add("quest_a")
   lst:add("quest_b")
@@ -2886,12 +3911,53 @@ Reverse the order of all items in the list in-place.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:set(index: integer, value: boolean|number|string|table)`
@@ -2908,7 +3974,7 @@ Replace the value at a 1-based index. Errors if index is 0 or out of range.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:set
+do
   local lst = lurek.patterns.newList()
   lst:add("iron_sword")
   lst:add("leather_boots")
@@ -2928,12 +3994,53 @@ Remove and return the first value. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LList:toArray() -> table`
@@ -2947,7 +4054,7 @@ Return all items as an array table. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LList:toArray
+do
   local lst = lurek.patterns.newList()
   lst:add(10)
   lst:add(20)
@@ -2970,12 +4077,53 @@ Insert a value at the beginning of the list.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap`
@@ -2987,7 +4135,7 @@ Lua-facing string-keyed dictionary (map) with keys(), values(), entries(), and m
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LMap methods
+do
   local a = lurek.patterns.newMap()
   a:set("hp", 10)
   a:set("name", "hero")
@@ -3027,12 +4175,53 @@ Remove all entries from the map. This method is available to Lua scripts.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:entries() -> table`
@@ -3046,12 +4235,53 @@ Return an array of {key, value} tables for all entries.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:get(key: string) -> boolean|number|string|table|nil`
@@ -3069,12 +4299,53 @@ Retrieve the value for a key. Returns nil if the key does not exist.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:has(key: string) -> boolean`
@@ -3092,12 +4363,53 @@ Check whether a key exists in the map.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:isEmpty() -> boolean`
@@ -3111,12 +4423,53 @@ Check whether the map has no entries.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:keys() -> table`
@@ -3130,12 +4483,53 @@ Return an array of all keys in the map.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:len() -> number`
@@ -3149,12 +4543,53 @@ Return the number of key-value pairs.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:merge(other: LMap)`
@@ -3170,12 +4605,53 @@ Copy all entries from another LMap into this map. Existing keys are overwritten.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:remove(key: string) -> boolean`
@@ -3193,12 +4669,53 @@ Remove a key from the map. Returns true if it was present.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:set(key: string, value: boolean|number|string|table)`
@@ -3215,12 +4732,53 @@ Set a key-value pair in the map. Replaces any existing value for the same key.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMap:values() -> table`
@@ -3234,12 +4792,53 @@ Return an array of all values in the map.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LMediator`
@@ -3251,7 +4850,7 @@ Lua-facing mediator for channel-based message passing between decoupled game sys
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newMediator
+do
   local hub = lurek.patterns.newMediator()
   hub:on("chat", function(user, msg) print(user .. ": " .. msg) end)
   hub:send("chat", "alice", "gg")
@@ -3271,7 +4870,7 @@ Send a message to all handlers on all channels. Every registered handler receive
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:broadcast
+do
   local m = lurek.patterns.newMediator()
   m:on("audio", function(s) print("audio got " .. s) end)
   m:on("video", function(s) print("video got " .. s) end)
@@ -3290,7 +4889,7 @@ Return an array of all channel names that have at least one handler.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:channels
+do
   local m = lurek.patterns.newMediator()
   m:on("a", function() end); m:on("b", function() end)
   for _, c in ipairs(m:channels()) do print("ch:" .. c) end
@@ -3306,7 +4905,7 @@ Remove all channels and handlers, resetting the mediator.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:clear
+do
   local m = lurek.patterns.newMediator()
   m:on("x", function() end); m:on("y", function() end)
   m:clear()
@@ -3329,7 +4928,7 @@ Return the number of handlers registered on a specific channel.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:handlerCount
+do
   local m = lurek.patterns.newMediator()
   m:on("save", function() end)
   m:on("save", function() end)
@@ -3351,7 +4950,7 @@ Unregister a handler from a channel by its ID.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:off
+do
   local m = lurek.patterns.newMediator()
   local id = m:on("ui", function() print("ui tick") end)
   m:off("ui", id)
@@ -3375,7 +4974,7 @@ Register a handler callback on a named channel. Returns an ID for unregistration
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:on
+do
   local m = lurek.patterns.newMediator()
   local id = m:on("net", function(msg) print("net msg: " .. msg) end)
   m:send("net", "hello")
@@ -3396,7 +4995,7 @@ Remove an entire channel and all its handlers.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:removeChannel
+do
   local m = lurek.patterns.newMediator()
   m:on("temp", function() end)
   m:removeChannel("temp")
@@ -3418,7 +5017,7 @@ Send a message to all handlers on a specific channel with optional payload argum
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Mediator:send
+do
   local m = lurek.patterns.newMediator()
   m:on("damage", function(amount, src) print(src .. " hit for " .. amount) end)
   m:send("damage", 12, "spike_trap")
@@ -3434,7 +5033,7 @@ Lua-facing object pool for reusing pre-allocated game objects (bullets, particle
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newObjectPool
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({ x = 0, y = 0, vx = 0, vy = 0 })
   pool:add({ x = 0, y = 0, vx = 0, vy = 0 })
@@ -3454,7 +5053,7 @@ Take an idle object from the pool and mark it active. Returns nil if the pool is
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:acquire
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({ x = 0, y = 0, vx = 0, vy = 0 })
   local b = pool:acquire()
@@ -3476,7 +5075,7 @@ Add an object to the pool's idle set, making it available for future acquisition
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:add
+do
   local bullets = lurek.patterns.newObjectPool()
   for i = 1, 32 do bullets:add({ x = 0, y = 0, alive = false }) end
   print("pre-warmed bullets=" .. bullets:getAvailableCount())
@@ -3492,7 +5091,7 @@ Destroy all objects (active and idle) and reset the pool to empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:clearAll
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({}); pool:add({})
   pool:clearAll()
@@ -3511,7 +5110,7 @@ Return the number of objects currently checked out from the pool.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:getActiveCount
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({}); pool:add({})
   pool:acquire(); pool:acquire()
@@ -3531,7 +5130,7 @@ Return the number of idle objects ready for acquisition.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:getAvailableCount
+do
   local pool = lurek.patterns.newObjectPool()
   for i = 1, 4 do pool:add({}) end
   pool:acquire()
@@ -3551,7 +5150,7 @@ Return the total number of objects managed by this pool (active + idle).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:getTotalCount
+do
   local pool = lurek.patterns.newObjectPool()
   for i = 1, 16 do pool:add({}) end
   pool:acquire()
@@ -3572,7 +5171,7 @@ Return an active object back to the pool's idle set so it can be reused.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ObjectPool:release
+do
   local pool = lurek.patterns.newObjectPool()
   pool:add({ alive = false })
   local p = pool:acquire()
@@ -3591,7 +5190,7 @@ Lua-facing reactive observer that stores values and notifies subscribers when va
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newObserver
+do
   local obs = lurek.patterns.newObserver("hud")
   obs:subscribe("score", function(_, v) print("hud score=" .. v) end)
   obs:set("score", 0)
@@ -3614,7 +5213,7 @@ Retrieve the current value for a key. Returns nil if not set.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Observer:get
+do
   local o = lurek.patterns.newObserver()
   o:set("score", 1500)
   local s = o:get("score") or 0
@@ -3633,7 +5232,7 @@ Return the total number of active subscriptions across all keys.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Observer:getCount
+do
   local o = lurek.patterns.newObserver()
   o:subscribe("a", function() end)
   o:subscribe("b", function() end)
@@ -3655,7 +5254,7 @@ Set a value by key and notify all subscribers watching that key.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Observer:set
+do
   local o = lurek.patterns.newObserver("player")
   o:subscribe("hp", function(_, v) print("hud hp=" .. v) end)
   o:set("hp", 100)
@@ -3680,7 +5279,7 @@ Subscribe to changes on a specific key. The callback receives (key, newValue) on
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Observer:subscribe
+do
   local o = lurek.patterns.newObserver()
   local id = o:subscribe("*", function(k, v) print("write " .. k .. "=" .. tostring(v)) end)
   o:set("a", 1); o:set("b", "two")
@@ -3701,7 +5300,7 @@ Remove a subscription by its ID. The callback will no longer fire.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Observer:unsubscribe
+do
   local o = lurek.patterns.newObserver()
   local id = o:subscribe("k", function() end)
   o:unsubscribe(id)
@@ -3718,7 +5317,7 @@ Lua-facing priority queue that orders elements by numeric priority (highest firs
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newPriorityQueue
+do
   local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
   jobs:push(10, { kind = "patrol" })
   jobs:push(50, { kind = "attack", target = "player" })
@@ -3736,7 +5335,7 @@ Remove all items from the queue. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:clearAll
+do
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(1, "x"); pq:push(2, "y")
   pq:clearAll()
@@ -3755,7 +5354,7 @@ Check whether the queue contains no items.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:isEmpty
+do
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(1, "task")
   while not pq:isEmpty() do print("processing " .. pq:pop()) end
@@ -3773,7 +5372,7 @@ Return the number of items currently in the queue.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:len
+do
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(1, "a"); pq:push(2, "b"); pq:push(3, "c")
   if pq:len() > 100 then print("queue saturated") end
@@ -3792,7 +5391,7 @@ Return the highest-priority item without removing it. Returns nil if empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:peek
+do
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(5, "build"); pq:push(20, "render")
   local next_job = pq:peek()
@@ -3811,7 +5410,7 @@ Remove and return the highest-priority item. Returns nil if the queue is empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:pop
+do
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(1, "low"); pq:push(99, "high")
   local job = pq:pop()
@@ -3836,7 +5435,7 @@ Add an item with a numeric priority. Higher priority items are dequeued first.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- PriorityQueue:push
+do
   local pq = lurek.patterns.newPriorityQueue("ai")
   pq:push(10, { kind = "patrol" }, "low")
   pq:push(50, { kind = "attack" }, "urgent")
@@ -3854,7 +5453,7 @@ Lua-facing FIFO queue with optional capacity limit. Supports enqueue/dequeue fro
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LQueue extra methods
+do
   local q = lurek.patterns.newQueue(10)
   q:enqueue("b")
   q:enqueueFront("a")
@@ -3885,12 +5484,53 @@ Return the back value without removing it. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:clear()`
@@ -3902,7 +5542,7 @@ Remove all items from the queue. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:clear
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("x"); q:enqueue("y")
   q:clear()
@@ -3921,7 +5561,7 @@ Remove and return the front value. Returns nil if empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:dequeue
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("msg1"); q:enqueue("msg2")
   local m = q:dequeue()
@@ -3940,12 +5580,53 @@ Remove and return the back value. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:enqueue(value: any) -> boolean`
@@ -3963,7 +5644,7 @@ Add a value to the back of the queue. Returns false if at capacity.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:enqueue
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("packet_a"); q:enqueue("packet_b")
   local ok = q:enqueue("packet_c")
@@ -3986,12 +5667,53 @@ Add a value to the front of the queue (priority insertion). Returns false if at 
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:front() -> boolean|number|string|table|nil`
@@ -4005,7 +5727,7 @@ Return the front value without removing it. Returns nil if empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:front
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("first"); q:enqueue("second")
   local f = q:front()
@@ -4029,12 +5751,53 @@ Insert a value at a 1-based index in the queue. Returns false if at capacity.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:isEmpty() -> boolean`
@@ -4048,7 +5811,7 @@ Check whether the queue is empty. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:isEmpty
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("only")
   while not q:isEmpty() do print("got " .. q:dequeue()) end
@@ -4066,7 +5829,7 @@ Check whether the queue has reached its capacity limit.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:isFull
+do
   local q = lurek.patterns.newQueue(2)
   q:enqueue("a"); q:enqueue("b")
   if q:isFull() then print("dropping new inputs") end
@@ -4084,7 +5847,7 @@ Return the current number of items in the queue.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:len
+do
   local q = lurek.patterns.newQueue(0)
   for i = 1, 4 do q:enqueue("e" .. i) end
   print("queue size=" .. q:len())
@@ -4106,12 +5869,53 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:removeAt(index: integer) -> boolean|number|string|table|nil`
@@ -4129,12 +5933,53 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LQueue:toArray() -> table`
@@ -4148,7 +5993,7 @@ Return all queue items as an array table (front to back).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Queue:toArray
+do
   local q = lurek.patterns.newQueue(0)
   q:enqueue("a"); q:enqueue("b"); q:enqueue("c")
   for i, v in ipairs(q:toArray()) do print(i .. ": " .. v) end
@@ -4164,7 +6009,7 @@ Lua-facing relationship manager for tracking numeric values and named levels bet
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newRelationshipManager
+do
   local rel = lurek.patterns.newRelationshipManager()
   rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
   rel:setValue(101, 202, -50)
@@ -4188,7 +6033,7 @@ Add a delta to the relationship value between two entities.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:adjustValue
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:setValue(1, 2, 0)
   rm:adjustValue(1, 2, 25)  -- gift accepted
@@ -4212,7 +6057,7 @@ Define a relationship type with named levels (e.g. "friendship" with levels ["ho
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:defineType
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:defineType("faction", { "hostile", "neutral", "ally" }, "neutral")
   rm:defineType("trust", { "low", "med", "high" }, "low")
@@ -4237,7 +6082,7 @@ Get the named level for a relationship type between two entities.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:getLevel
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:defineType("faction", { "hostile", "ally" }, "hostile")
   rm:setLevel(1, 2, "faction", "ally")
@@ -4262,7 +6107,7 @@ Get the numeric relationship value between two entity IDs.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:getValue
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:setValue(1, 2, 50)
   local price_mult = 1.0 - rm:getValue(1, 2) * 0.005
@@ -4281,7 +6126,7 @@ Return the total number of tracked entity pairs.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:pairCount
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:setValue(1, 2, 10); rm:setValue(2, 3, -10)
   if rm:pairCount() > 10000 then print("WARN large relationship graph") end
@@ -4303,7 +6148,7 @@ Remove all relationship data between two entities.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:removePair
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:setValue(1, 2, 50)
   rm:removePair(1, 2)
@@ -4324,7 +6169,7 @@ Remove a relationship type definition.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:removeType
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:defineType("temp", { "a", "b" }, "a")
   rm:removeType("temp")
@@ -4350,7 +6195,7 @@ Set the named level for a relationship type between two entities.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:setLevel
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:defineType("faction", { "hostile", "neutral", "ally" }, "neutral")
   local ok = rm:setLevel(1, 2, "faction", "ally")
@@ -4373,7 +6218,7 @@ Set the numeric relationship value between two entity IDs.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:setValue
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:setValue(101, 202, 35)
   print("v=" .. rm:getValue(101, 202))
@@ -4392,7 +6237,7 @@ Return all defined relationship type names.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- RelationshipManager:typeNames
+do
   local rm = lurek.patterns.newRelationshipManager()
   rm:defineType("diplomacy", { "war", "peace" }, "peace")
   rm:defineType("trade", { "off", "on" }, "off")
@@ -4409,7 +6254,7 @@ Lua-facing fixed-size ring buffer for numeric or string values. Oldest entries a
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newRing
+do
   local fps_log = lurek.patterns.newRing(60, "fps")
   for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
   print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
@@ -4427,7 +6272,7 @@ Return the arithmetic mean of all numeric values in the ring.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:average
+do
   local r = lurek.patterns.newRing(60)
   for i = 1, 60 do r:push(58 + (i % 4), "fps") end
   print("avg fps=" .. string.format("%.1f", r:average()))
@@ -4443,7 +6288,7 @@ Remove all entries from the ring. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:clear
+do
   local r = lurek.patterns.newRing(8)
   r:push(10, "x"); r:push(20, "x")
   r:clear()
@@ -4462,7 +6307,7 @@ Check whether the ring has reached its maximum capacity.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:isFull
+do
   local r = lurek.patterns.newRing(4)
   for i = 1, 4 do r:push(i, "v") end
   if r:isFull() then print("warm: avg=" .. r:average()) end
@@ -4480,7 +6325,7 @@ Return the most recently pushed entry as a table with id, tag, value, and text f
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:latest
+do
   local r = lurek.patterns.newRing(4)
   r:push("hello", "msg")
   r:push("world", "msg")
@@ -4500,7 +6345,7 @@ Return the number of entries currently in the ring.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:len
+do
   local r = lurek.patterns.newRing(10)
   r:push(1, "x"); r:push(2, "x"); r:push(3, "x")
   if r:len() >= 3 then print("got enough samples") end
@@ -4523,7 +6368,7 @@ Push a number or string value into the ring. Overwrites the oldest entry if the 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:push
+do
   local r = lurek.patterns.newRing(8)
   for i = 1, 10 do r:push(i * 1.5, "sample") end
   print("len=" .. r:len() .. " full=" .. tostring(r:isFull()))
@@ -4541,7 +6386,7 @@ Return the sum of all numeric values in the ring. Non-numeric entries contribute
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:sum
+do
   local r = lurek.patterns.newRing(16)
   for i = 1, 10 do r:push(i * 0.1, "lat") end
   print("total latency=" .. r:sum() .. "s")
@@ -4559,7 +6404,7 @@ Return all entries in the ring as an ordered array of tables (oldest to newest).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Ring:toArray
+do
   local r = lurek.patterns.newRing(4)
   r:push(60, "fps"); r:push(58, "fps"); r:push(61, "fps")
   for _, e in ipairs(r:toArray()) do print(e.tag .. "=" .. e.value) end
@@ -4575,7 +6420,7 @@ Lua-facing service locator for registering and retrieving shared services by nam
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newServiceLocator
+do
   local services = lurek.patterns.newServiceLocator()
   services:provide("logger", { info = function(m) print("[info] " .. m) end })
   local log = services:locate("logger")
@@ -4592,7 +6437,7 @@ Remove all registered services and reset the locator.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:clearAll
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("x", 1); sl:provide("y", 2)
   sl:clearAll()
@@ -4611,7 +6456,7 @@ Return an array of all registered service names.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:getServices
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("a", 1); sl:provide("b", 2)
   for _, name in ipairs(sl:getServices()) do print("svc: " .. name) end
@@ -4633,7 +6478,7 @@ Check whether a service with the given name is currently registered.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:has
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("analytics", {})
   if sl:has("analytics") then print("telemetry on") end
@@ -4655,7 +6500,7 @@ Retrieve a registered service by name. Returns nil if not found.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:locate
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("audio", { volume = 0.8 })
   local audio = sl:locate("audio")
@@ -4677,7 +6522,7 @@ Register a service instance under a given name. Replaces any previously register
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:provide
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("clock", { now = function() return 42.0 end })
   sl:provide("save", { path = "save/slot1.dat" })
@@ -4698,7 +6543,7 @@ Unregister and discard a service by name.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- ServiceLocator:remove
+do
   local sl = lurek.patterns.newServiceLocator()
   sl:provide("net", { online = true })
   sl:remove("net")
@@ -4715,7 +6560,7 @@ Lua-facing string set with add/remove/has operations and set algebra (union, int
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newSet
+do
   local unlocked = lurek.patterns.newSet()
   unlocked:add("level_1")
   unlocked:add("level_2")
@@ -4738,7 +6583,7 @@ Add a string to the set. Returns true if it was not already present.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:add
+do
   local s = lurek.patterns.newSet()
   local was_new = s:add("collected_gem")
   if was_new then print("first gem!") end
@@ -4755,7 +6600,7 @@ Remove all items from the set. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:clear
+do
   local s = lurek.patterns.newSet()
   s:add("seen_intro"); s:add("opened_chest")
   s:clear()
@@ -4778,7 +6623,7 @@ Check whether a string is in the set.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:has
+do
   local s = lurek.patterns.newSet()
   s:add("flying")
   if s:has("flying") then print("ignore gravity") end
@@ -4800,7 +6645,7 @@ Return a new set containing only items present in both this set and another.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:intersection
+do
   local have = lurek.patterns.newSet(); have:add("key"); have:add("map")
   local need = lurek.patterns.newSet(); need:add("map"); need:add("torch")
   local got = have:intersection(need)
@@ -4819,7 +6664,7 @@ Check whether the set is empty. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:isEmpty
+do
   local s = lurek.patterns.newSet()
   if s:isEmpty() then print("no keys yet") end
   s:add("brass_key")
@@ -4838,7 +6683,7 @@ Return the number of items in the set.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:len
+do
   local s = lurek.patterns.newSet()
   s:add("orc"); s:add("goblin"); s:add("orc")
   print("unique enemies killed=" .. s:len())
@@ -4860,7 +6705,7 @@ Remove a string from the set. Returns true if it was present.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:remove
+do
   local s = lurek.patterns.newSet()
   s:add("buff_speed")
   local existed = s:remove("buff_speed")
@@ -4879,7 +6724,7 @@ Return all set items as an array table.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:toArray
+do
   local s = lurek.patterns.newSet()
   s:add("red"); s:add("green"); s:add("blue")
   for _, k in ipairs(s:toArray()) do print("color:" .. k) end
@@ -4901,7 +6746,7 @@ Return a new set containing all items from both this set and another.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Set:union
+do
   local a = lurek.patterns.newSet(); a:add("sword"); a:add("shield")
   local b = lurek.patterns.newSet(); b:add("shield"); b:add("bow")
   local both = a:union(b)
@@ -4918,7 +6763,7 @@ Lua-facing finite state machine with enter/exit/update callbacks per state.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newSimpleState
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("idle", { enter = function() print("idle") end })
   sm:addState("walk", { update = function(dt) print("walking dt=" .. dt) end })
@@ -4941,7 +6786,7 @@ Register a named state with optional enter, exit, and update callbacks.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:addState
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("idle", { enter = function() print("> idle") end, exit = function() print("< idle") end })
   sm:addState("attack", { update = function(dt) print("attacking " .. dt) end })
@@ -4958,7 +6803,7 @@ Remove all states and their callbacks, resetting the state machine.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:clearAll
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("x", {})
   sm:clearAll()
@@ -4977,7 +6822,7 @@ Return the name of the currently active state, or nil if no state is set.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:getCurrent
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("paused", {})
   sm:transitionTo("paused")
@@ -4996,7 +6841,7 @@ Return an array of all registered state names.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:getStates
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("a", {}); sm:addState("b", {}); sm:addState("c", {})
   for _, name in ipairs(sm:getStates()) do print("state:" .. name) end
@@ -5018,7 +6863,7 @@ Check whether a state with the given name is registered.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:hasState
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("boss", {})
   if sm:hasState("boss") then sm:transitionTo("boss") end
@@ -5040,7 +6885,7 @@ Transition to a new state. Calls the current state's `exit` and the target state
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:transitionTo
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("menu", {})
   sm:addState("game", { enter = function() print("game start") end })
@@ -5062,7 +6907,7 @@ Call the current state's update callback with the frame delta time.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- SimpleState:update
+do
   local sm = lurek.patterns.newSimpleState()
   sm:addState("run", { update = function(dt) print("tick " .. dt) end })
   sm:transitionTo("run")
@@ -5079,7 +6924,7 @@ Lua-facing LIFO stack with optional capacity limit. Supports push/pop from both 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LStack extra methods
+do
   local s = lurek.patterns.newStack(10)
   s:push("b")
   s:pushBottom("a")
@@ -5110,7 +6955,7 @@ Remove all items from the stack. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:clear
+do
   local s = lurek.patterns.newStack(0)
   s:push("a"); s:push("b")
   s:clear()
@@ -5134,12 +6979,53 @@ Insert a value at a 1-based index in the stack, shifting items above it. Returns
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:isEmpty() -> boolean`
@@ -5153,7 +7039,7 @@ Check whether the stack is empty. This method is available to Lua scripts.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:isEmpty
+do
   local s = lurek.patterns.newStack(0)
   s:push("only")
   s:pop()
@@ -5172,7 +7058,7 @@ Check whether the stack has reached its capacity limit (if one was set).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:isFull
+do
   local s = lurek.patterns.newStack(2)
   s:push("a"); s:push("b")
   if s:isFull() then print("dialog stack saturated") end
@@ -5190,7 +7076,7 @@ Return the current number of items in the stack.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:len
+do
   local s = lurek.patterns.newStack(0)
   s:push("a"); s:push("b"); s:push("c")
   print("depth=" .. s:len())
@@ -5213,12 +7099,53 @@ Move an item from one 1-based index to another within the stack.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:peek() -> boolean|number|string|table|nil`
@@ -5232,7 +7159,7 @@ Return the top value without removing it. Returns nil if empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:peek
+do
   local s = lurek.patterns.newStack(0)
   s:push("hud"); s:push("dialog")
   local top = s:peek()
@@ -5255,12 +7182,53 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:peekBottom() -> boolean|number|string|table|nil`
@@ -5274,12 +7242,53 @@ Return the bottom value without removing it. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:pop() -> boolean|number|string|table|nil`
@@ -5293,7 +7302,7 @@ Remove and return the top value. Returns nil if the stack is empty.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:pop
+do
   local s = lurek.patterns.newStack(0)
   s:push("menu"); s:push("game")
   local top = s:pop()
@@ -5312,12 +7321,53 @@ Remove and return the bottom value. Returns nil if empty.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:popMany(count: integer) -> table`
@@ -5335,12 +7385,53 @@ Pop up to `count` values from the top and return them as an array table.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:push(value: any) -> boolean`
@@ -5358,7 +7449,7 @@ Push a value onto the top of the stack. Returns false if the stack is at capacit
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:push
+do
   local s = lurek.patterns.newStack(4)
   s:push("scene_main")
   s:push("scene_options")
@@ -5382,12 +7473,53 @@ Push a value onto the bottom of the stack. Returns false if at capacity.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:removeAt(index: integer) -> boolean|number|string|table|nil`
@@ -5405,12 +7537,53 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LStack:toArray() -> table`
@@ -5424,7 +7597,7 @@ Return all stack items as an array table (bottom to top).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Stack:toArray
+do
   local s = lurek.patterns.newStack(0)
   s:push("Main"); s:push("Options"); s:push("Audio")
   for i, v in ipairs(s:toArray()) do print(i .. ": " .. v) end
@@ -5440,7 +7613,7 @@ Lua-facing strategy pattern allowing hot-swappable algorithm implementations by 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newStrategy
+do
   local damage = lurek.patterns.newStrategy()
   damage:register("normal", function(atk, def) return math.max(1, atk - def) end)
   damage:register("crit", function(atk, def) return math.max(1, atk * 2 - def) end)
@@ -5458,7 +7631,7 @@ Remove all strategies and reset the selection.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:clear
+do
   local s = lurek.patterns.newStrategy()
   s:register("x", function() end)
   s:clear()
@@ -5481,7 +7654,7 @@ Execute the currently active strategy, passing through all arguments and returni
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:execute
+do
   local s = lurek.patterns.newStrategy()
   s:register("crit", function(atk, def) return atk * 2 - def end)
   s:set("crit")
@@ -5501,7 +7674,7 @@ Return the name of the currently active strategy, or nil if none set.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:getCurrent
+do
   local s = lurek.patterns.newStrategy()
   s:register("normal", function(x) return x end)
   s:set("normal")
@@ -5525,7 +7698,7 @@ Check whether a strategy with the given name is registered.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:has
+do
   local s = lurek.patterns.newStrategy()
   s:register("legacy", function() end)
   if s:has("legacy") then s:set("legacy") end
@@ -5543,7 +7716,7 @@ Return an array of all registered strategy names.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:names
+do
   local s = lurek.patterns.newStrategy()
   s:register("a", function() end); s:register("b", function() end)
   for _, n in ipairs(s:names()) do print("strat:" .. n) end
@@ -5564,7 +7737,7 @@ Register a named strategy implementation function.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:register
+do
   local s = lurek.patterns.newStrategy()
   s:register("euclid", function(ax, ay, bx, by) return math.sqrt((ax-bx)^2 + (ay-by)^2) end)
   s:register("manhattan", function(ax, ay, bx, by) return math.abs(ax-bx) + math.abs(ay-by) end)
@@ -5587,7 +7760,7 @@ Remove a named strategy. If it was the active strategy, no strategy will be sele
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:remove
+do
   local s = lurek.patterns.newStrategy()
   s:register("old", function() end)
   local removed = s:remove("old")
@@ -5610,7 +7783,7 @@ Switch to a named strategy. Future `execute()` calls will use this implementatio
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Strategy:set
+do
   local s = lurek.patterns.newStrategy()
   s:register("simple", function(x) return x * 2 end)
   local ok = s:set("simple")
@@ -5627,7 +7800,7 @@ Lua-facing throttle that limits how often an action can fire, enforcing a minimu
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newThrottle
+do
   local fire = lurek.patterns.newThrottle(0.25)
   fire:onFire(function() print("BANG") end)
   fire:update(0.016)
@@ -5645,7 +7818,7 @@ Return the total number of times this throttle has fired since creation.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:getFireCount
+do
   local t = lurek.patterns.newThrottle(0.1)
   t:onFire(function() end)
   for i = 1, 5 do t:update(0.1) end
@@ -5664,7 +7837,7 @@ Return how far through the current interval the throttle is (0.0 to 1.0).
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:getProgress
+do
   local t = lurek.patterns.newThrottle(2.0)
   t:onFire(function() end)
   t:update(0.5)
@@ -5686,7 +7859,7 @@ Set the callback function to invoke each time the throttle fires.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:onFire
+do
   local t = lurek.patterns.newThrottle(0.5)
   t:onFire(function() print("tick at " .. os.time()) end)
   function lurek.process(dt) t:update(dt) end
@@ -5702,7 +7875,7 @@ Reset the throttle timer back to zero without firing.
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:reset
+do
   local t = lurek.patterns.newThrottle(1.0)
   t:onFire(function() end)
   t:update(0.7)
@@ -5724,7 +7897,7 @@ Enable or disable the throttle. When disabled, update() will not accumulate time
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:setEnabled
+do
   local t = lurek.patterns.newThrottle(0.5)
   t:onFire(function() print("fire") end)
   t:setEnabled(false)
@@ -5748,7 +7921,7 @@ Advance the throttle timer. If the interval has elapsed, fires the callback and 
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- Throttle:update
+do
   local t = lurek.patterns.newThrottle(0.25)
   t:onFire(function() print("autosave check") end)
   function lurek.process(dt) if t:update(dt) then print("just fired") end end
@@ -5764,7 +7937,7 @@ Lua-facing weighted random selection pool. Add items with weights and pick rando
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- LWeightedRandom methods
+do
   local wr = lurek.patterns.newWeightedRandom()
   local id_a = wr:add(1.0, "a", "low")
   local id_b = wr:add(9.0, "b", "high")
@@ -5801,12 +7974,53 @@ Add an item with a relative weight. Higher weight = higher selection probability
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:clearAll()`
@@ -5818,12 +8032,53 @@ Remove all entries from the pool. This method is available to Lua scripts.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:getRevision() -> number`
@@ -5837,12 +8092,53 @@ Return the revision counter. Increments on any add/remove/weight change.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:isEmpty() -> boolean`
@@ -5856,12 +8152,53 @@ Check whether the pool has no entries.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:len() -> number`
@@ -5875,12 +8212,53 @@ Return the number of entries in the pool.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:pick(sample: number) -> boolean|number|string|table|nil`
@@ -5898,12 +8276,53 @@ Pick one item using a random sample value in [0, 1). Returns its value or nil.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:pickN(count: integer, samples: table) -> table`
@@ -5922,12 +8341,53 @@ Pick multiple unique items. Requires an array of random samples.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:remove(id: integer) -> boolean`
@@ -5945,12 +8405,53 @@ Remove an item by its ID. Returns true if it existed.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:setWeight(id: integer, weight: number) -> boolean`
@@ -5969,12 +8470,53 @@ Change the weight of an existing entry.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 ### `LWeightedRandom:totalWeight() -> number`
@@ -5988,12 +8530,53 @@ Return the sum of all entry weights.
 Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
-do -- lurek.patterns.newEventBus
-  local bus = lurek.patterns.newEventBus("ui_bus")
-  local id = bus:on("hp_changed", function(hp) print("hp now", hp) end)
-  bus:emit("hp_changed", 42)
-  bus:off(id)
+-- Create a new debounce that delays firing until input stops for a specified wait period
+do
+  local save = lurek.patterns.newDebounce(0.5)
+  save:onFire(function() print("autosave") end)
+  function lurek.process(dt) save:update(dt) end
+  save:trigger()
 end
+
+--@api-stub: lurek.patterns.newPriorityQueue
+-- Create a new priority queue that orders elements by numeric priority (highest first)
+do
+  local jobs = lurek.patterns.newPriorityQueue("ai_jobs")
+  jobs:push(10, { kind = "patrol" })
+  jobs:push(50, { kind = "attack", target = "player" })
+  local top = jobs:pop()
+  if top then print("running job: " .. top.kind) end
+end
+
+--@api-stub: lurek.patterns.newRing
+-- Create a new fixed-size ring buffer for numeric or string values
+do
+  local fps_log = lurek.patterns.newRing(60, "fps")
+  for i = 1, 65 do fps_log:push(58 + (i % 4), "frame") end
+  print("avg fps=" .. fps_log:average() .. " entries=" .. fps_log:len())
+end
+
+--@api-stub: lurek.patterns.newFunnel
+-- Create a new batching funnel that collects events over a time window and flushes them together
+do
+  local analytics = lurek.patterns.newFunnel(2.0, 32, "events")
+  analytics:onFlush(function(batch) print("flushing " .. #batch .. " events") end)
+  analytics:push("level_start", 1)
+  analytics:push("kill", 5)
+  function lurek.process(dt) analytics:update(dt) end
+end
+
+--@api-stub: lurek.patterns.newRelationshipManager
+-- Create a new relationship manager for tracking numeric values and named levels between entity pairs
+do
+  local rel = lurek.patterns.newRelationshipManager()
+  rel:defineType("diplomacy", { "hostile", "neutral", "friendly", "ally" }, "neutral")
+  rel:setValue(101, 202, -50)
+  rel:setLevel(101, 202, "diplomacy", "hostile")
+  print("level=" .. rel:getLevel(101, 202, "diplomacy"))
+end
+
+--@api-stub: lurek.patterns.newMediator
 ```
 
 

@@ -145,14 +145,51 @@ Trails render connected segments behind moving particles. Attractors and force z
 Module example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.newSystem
-  local fire = lurek.particle.newSystem({
-    maxParticles = 256, emissionRate = 60,
-    lifetimeMin = 0.4, lifetimeMax = 0.9,
-    speedMin = 40, speedMax = 80, direction = -math.pi/2, spread = 0.3,
-  })
-  fire:setPosition(320, 240)
-  fire:start()
+do
+  local sys = lurek.particle.newSystem({ maxParticles = 128, emissionRate = 30 })
+  sys:start()
+  function lurek.process(dt)
+    sys:update(dt)
+  end
+end
+
+--@api-stub: ParticleSystem:emit
+do
+  local hit = lurek.particle.newSystem({ maxParticles = 64, lifetimeMin = 0.2, lifetimeMax = 0.4 })
+  hit:setPosition(160, 120)
+  hit:emit(24)
+end
+
+--@api-stub: ParticleSystem:start
+do
+  local rain = lurek.particle.newSystem({ maxParticles = 512, emissionRate = 200 })
+  rain:setPosition(400, 0)
+  rain:setEmissionArea("uniform", 800, 1)
+  rain:start()
+end
+
+--@api-stub: ParticleSystem:stop
+do
+  local jet = lurek.particle.newSystem({ emissionRate = 100 })
+  jet:start()
+  function lurek.process(dt)
+    if lurek.input.keyboard.isDown("space") then jet:stop() end
+  end
+end
+
+--@api-stub: ParticleSystem:pause
+do
+  local steam = lurek.particle.newSystem({ emissionRate = 40 })
+  steam:start()
+  if lurek.input.keyboard.isDown("escape") then steam:pause() end
+end
+
+--@api-stub: ParticleSystem:resume
+do
+  local fog = lurek.particle.newSystem({ emissionRate = 20 })
+  fog:start()
+  fog:pause()
+  fog:resume()
 end
 ```
 
@@ -189,7 +226,7 @@ Creates a particle system from a TOML config file.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.fromTOML
+do
   if lurek.particle.fromTOML then
     local toml_str = 'max_particles = 100\nemission_rate = 30.0\nlifetime_min = 0.5\nlifetime_max = 2.0\nspeed_min = 30.0\nspeed_max = 80.0\ndirection = 0.0\nspread = 1.57\ngravity_y = 0.0\n'
     lurek.filesystem.write("save/particle_test.toml", toml_str)
@@ -214,7 +251,7 @@ Creates a particle system from a named preset.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.newPreset
+do
   local smoke = lurek.particle.newPreset("smoke")
   smoke:setPosition(300, 260)
   smoke:start()
@@ -236,7 +273,7 @@ Creates a particle system from an optional config table.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.newSystem
+do
   local fire = lurek.particle.newSystem({
     maxParticles = 256, emissionRate = 60,
     lifetimeMin = 0.4, lifetimeMax = 0.9,
@@ -263,7 +300,7 @@ Creates a trail effect. This function is exposed to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.newTrail
+do
   local sword_trail = lurek.particle.newTrail(0.35, 12.0)
   sword_trail:setHeadColor(1.0, 0.95, 0.6, 1.0)
   sword_trail:setTailColor(1.0, 0.4, 0.0, 0.0)
@@ -283,7 +320,7 @@ Lua-side handle for a particle system stored in shared runtime state.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.fromTOML
+do
   if lurek.particle.fromTOML then
     local toml_str = 'max_particles = 100\nemission_rate = 30.0\nlifetime_min = 0.5\nlifetime_max = 2.0\nspeed_min = 30.0\nspeed_max = 80.0\ndirection = 0.0\nspread = 1.57\ngravity_y = 0.0\n'
     lurek.filesystem.write("save/particle_test.toml", toml_str)
@@ -309,7 +346,7 @@ Adds an attractor to the particle system.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:addAttractor
+do
   local ps = lurek.particle.newSystem({max_particles=1000})
   ps:addAttractor(400, 300, 80, -50)
   ps:start()
@@ -331,7 +368,7 @@ Configures a death sub-emitter from a config table.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:addSubEmitter
+do
   local parent = lurek.particle.newSystem({max_particles=200})
   local sparks  = lurek.particle.newSystem({max_particles=50})
   parent:addSubEmitter({trigger="on_death", max_particles=50})
@@ -355,7 +392,7 @@ Adds a particle sub-system from a config table.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:addSubSystem
+do
   local fire = lurek.particle.newSystem({
     maxParticles = 200, emissionRate = 60,
     lifetimeMin = 0.3, lifetimeMax = 0.7,
@@ -384,7 +421,7 @@ Clears all attractors. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:clearAttractors
+do
   local sys = lurek.particle.newSystem({ emissionRate = 30 })
   sys:addAttractor(200, 200, 400, 80)
   sys:clearAttractors()
@@ -401,7 +438,7 @@ Clears collision bounds. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:clearBounds
+do
   local sys = lurek.particle.newSystem({ emissionRate = 20 })
   sys:setBounds(0, 800, 0, 600, 0.6)
   sys:clearBounds()
@@ -418,7 +455,7 @@ Disables particle collision against a physics world.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:clearCollidesWithPhysics
+do
   local world = lurek.physics.newWorld(0, 9.81)
   local ps = lurek.particle.newSystem({ maxParticles = 64 })
   ps:setCollidesWithPhysics(world)
@@ -437,7 +474,7 @@ Clones this particle system configuration into a new system handle.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:clone
+do
   local proto = lurek.particle.newSystem({ emissionRate = 50, lifetimeMin = 0.5, lifetimeMax = 1.0 })
   local copy = proto:clone()
   copy:setPosition(400, 300)
@@ -456,7 +493,7 @@ Returns the current particle count.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:count
+do
   local smoke = lurek.particle.newSystem({ maxParticles = 200 })
   smoke:start()
   if smoke:count() < 50 then smoke:emit(10) end
@@ -479,7 +516,7 @@ Draws particles to image data. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:drawToImage
+do
   local sys = lurek.particle.newSystem({ maxParticles = 32 })
   sys:setPosition(64, 64)
   sys:emit(20)
@@ -501,7 +538,7 @@ Emits particles immediately. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:emit
+do
   local hit = lurek.particle.newSystem({ maxParticles = 64, lifetimeMin = 0.2, lifetimeMax = 0.4 })
   hit:setPosition(160, 120)
   hit:emit(24)
@@ -519,7 +556,7 @@ Returns attractor count. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getAttractorCount
+do
   local sys = lurek.particle.newSystem({})
   sys:addAttractor(100, 100, 250, 60)
   if sys:getAttractorCount() > 0 then
@@ -539,7 +576,7 @@ Returns maximum particle buffer size.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getBufferSize
+do
   local sys = lurek.particle.newSystem({ maxParticles = 256 })
   local cap = sys:getBufferSize()
   lurek.log.debug("pool capacity=" .. cap, "fx")
@@ -557,7 +594,7 @@ Returns particle color keyframes.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getColors
+do
   local sys = lurek.particle.newSystem({})
   sys:setColors({1, 0, 0, 1}, {0, 0, 1, 1})
   local colors = sys:getColors()
@@ -576,7 +613,7 @@ Returns particle count and errors if the handle was released.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getCount
+do
   local plume = lurek.particle.newSystem({ emissionRate = 25 })
   plume:start()
   local n = plume:getCount()
@@ -595,7 +632,7 @@ Returns emission direction. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getDirection
+do
   local sys = lurek.particle.newSystem({ direction = math.pi/4 })
   local dir = sys:getDirection()
   lurek.log.debug("emit dir rad=" .. dir, "fx")
@@ -613,7 +650,7 @@ Returns emission area distribution and size.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getEmissionArea
+do
   local sys = lurek.particle.newSystem({})
   sys:setEmissionArea("uniform", 120, 40)
   local kind, w, h = sys:getEmissionArea()
@@ -632,7 +669,7 @@ Returns emission rate. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getEmissionRate
+do
   local sys = lurek.particle.newSystem({ emissionRate = 80 })
   if sys:getEmissionRate() > 100 then
     sys:setEmissionRate(100)
@@ -651,7 +688,7 @@ Returns emitter lifetime. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getEmitterLifetime
+do
   local sys = lurek.particle.newSystem({ emitterLifetime = 2.0 })
   if sys:getEmitterLifetime() < 0 then
     lurek.log.info("emitter runs forever", "fx")
@@ -670,7 +707,7 @@ Returns flipbook grid and frame rate when configured.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getFlipbook
+do
   local sys = lurek.particle.newSystem({})
   sys:setFlipbook(4, 2, 12)
   local cols, rows, fps = sys:getFlipbook()
@@ -689,7 +726,7 @@ Returns particle gravity. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getGravity
+do
   local rain = lurek.particle.newSystem({ gravityX = 0, gravityY = 400 })
   local gx, gy = rain:getGravity()
   lurek.log.debug("g=" .. gx .. "," .. gy, "fx")
@@ -707,7 +744,7 @@ Returns particle insert mode. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getInsertMode
+do
   local sys = lurek.particle.newSystem({})
   sys:setInsertMode("random")
   local mode = sys:getInsertMode()
@@ -726,7 +763,7 @@ Returns linear acceleration range.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getLinearAcceleration
+do
   local sys = lurek.particle.newSystem({})
   local xmn, ymn, xmx, ymx = sys:getLinearAcceleration()
   lurek.log.debug("accel x=[" .. xmn .. "," .. xmx .. "]", "fx")
@@ -744,7 +781,7 @@ Returns linear damping range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getLinearDamping
+do
   local sys = lurek.particle.newSystem({ linearDampingMin = 1.0, linearDampingMax = 2.0 })
   local lo, hi = sys:getLinearDamping()
   lurek.log.debug("damping " .. lo .. ".." .. hi, "fx")
@@ -762,7 +799,7 @@ Returns particle spawn offset. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getOffset
+do
   local sys = lurek.particle.newSystem({ offsetX = 4, offsetY = -2 })
   local ox, oy = sys:getOffset()
   lurek.log.debug("offset " .. ox .. "," .. oy, "fx")
@@ -780,7 +817,7 @@ Returns particle lifetime range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getParticleLifetime
+do
   local sys = lurek.particle.newSystem({ lifetimeMin = 0.5, lifetimeMax = 1.2 })
   local lo, hi = sys:getParticleLifetime()
   lurek.log.debug("lifetime " .. lo .. " to " .. hi, "fx")
@@ -798,7 +835,7 @@ Returns emitter position. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getPosition
+do
   local sys = lurek.particle.newSystem({})
   sys:setPosition(50, 75)
   local x, y = sys:getPosition()
@@ -817,7 +854,7 @@ Returns radial acceleration range.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getRadialAcceleration
+do
   local sys = lurek.particle.newSystem({ radialAccelMin = -50, radialAccelMax = -20 })
   local lo, hi = sys:getRadialAcceleration()
   if hi < 0 then lurek.log.info("particles implode", "fx") end
@@ -835,7 +872,7 @@ Returns particle rotation range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getRotation
+do
   local sys = lurek.particle.newSystem({ rotationMin = 0, rotationMax = math.pi })
   local lo, hi = sys:getRotation()
   lurek.log.debug("rot " .. lo .. ".." .. hi, "fx")
@@ -853,7 +890,7 @@ Returns particle shape. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getShape
+do
   local sys = lurek.particle.newSystem({})
   sys:setShape("ring")
   if sys:getShape() == "ring" then
@@ -873,7 +910,7 @@ Returns particle size keyframes. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSizes
+do
   local sys = lurek.particle.newSystem({})
   sys:setSizes(4, 12, 6)
   local sizes = sys:getSizes()
@@ -892,7 +929,7 @@ Returns size variation. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSizeVariation
+do
   local sys = lurek.particle.newSystem({ sizeVariation = 0.6 })
   local v = sys:getSizeVariation()
   lurek.log.debug("size variation=" .. v, "fx")
@@ -910,7 +947,7 @@ Returns particle speed range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSpeed
+do
   local sys = lurek.particle.newSystem({ speedMin = 40, speedMax = 90 })
   local lo, hi = sys:getSpeed()
   local trail_len = (hi - lo) * 0.1
@@ -929,7 +966,7 @@ Returns particle spin range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSpin
+do
   local sys = lurek.particle.newSystem({ spinMin = 0.5, spinMax = 1.5 })
   local lo, hi = sys:getSpin()
   lurek.log.debug("spin " .. lo .. ".." .. hi, "fx")
@@ -947,7 +984,7 @@ Returns spin variation. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSpinVariation
+do
   local sys = lurek.particle.newSystem({ spinVariation = 0.3 })
   if sys:getSpinVariation() > 0 then
     lurek.log.info("spin will jitter per particle", "fx")
@@ -966,7 +1003,7 @@ Returns emission spread. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getSpread
+do
   local sys = lurek.particle.newSystem({ spread = 0.4 })
   local cone = sys:getSpread() * 2
   lurek.log.debug("full cone rad=" .. cone, "fx")
@@ -984,7 +1021,7 @@ Returns tangential acceleration range.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:getTangentialAcceleration
+do
   local sys = lurek.particle.newSystem({ tangentialAccelMin = 30, tangentialAccelMax = 60 })
   local lo, hi = sys:getTangentialAcceleration()
   lurek.log.debug("swirl " .. lo .. ".." .. hi, "fx")
@@ -1002,7 +1039,7 @@ Returns whether particle physics collision is enabled.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:hasCollidesWithPhysics
+do
   local world = lurek.physics.newWorld(0, 9.81)
   local ps = lurek.particle.newSystem({ maxParticles = 64 })
   ps:setCollidesWithPhysics(world)
@@ -1022,7 +1059,7 @@ Returns whether relative rotation is enabled.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:hasRelativeRotation
+do
   local sys = lurek.particle.newSystem({})
   sys:setRelativeRotation(true)
   if sys:hasRelativeRotation() then
@@ -1042,7 +1079,7 @@ Returns whether the particle system is active.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:isActive
+do
   local explosion = lurek.particle.newSystem({ emitterLifetime = 0.1 })
   explosion:emit(80)
   if explosion:isActive() then
@@ -1062,7 +1099,7 @@ Returns whether the particle system has no particles or is missing.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:isEmpty
+do
   local trail_fx = lurek.particle.newSystem({ emissionRate = 0 })
   trail_fx:emit(5)
   if trail_fx:isEmpty() then trail_fx:release() end
@@ -1080,7 +1117,7 @@ Returns whether the particle system has reached capacity.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:isFull
+do
   local heavy = lurek.particle.newSystem({ maxParticles = 32, emissionRate = 200 })
   heavy:start()
   function lurek.process(dt)
@@ -1101,7 +1138,7 @@ Returns whether the particle system is paused.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:isPaused
+do
   local fountain = lurek.particle.newSystem({ emissionRate = 30 })
   fountain:start()
   fountain:pause()
@@ -1120,7 +1157,7 @@ Returns whether the particle system is stopped or missing.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:isStopped
+do
   local burst = lurek.particle.newSystem({})
   if burst:isStopped() then burst:start() end
 end
@@ -1140,7 +1177,7 @@ Moves the particle emitter. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:moveTo
+do
   local exhaust = lurek.particle.newSystem({ emissionRate = 50, lifetimeMin = 0.3, lifetimeMax = 0.6 })
   exhaust:start()
   local ship = { x = 200, y = 300 }
@@ -1160,7 +1197,7 @@ Pauses particle emission and updates.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:pause
+do
   local steam = lurek.particle.newSystem({ emissionRate = 40 })
   steam:start()
   if lurek.input.keyboard.isDown("escape") then steam:pause() end
@@ -1178,7 +1215,7 @@ Releases the particle system from shared storage.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:release
+do
   local oneshot = lurek.particle.newSystem({ maxParticles = 16 })
   oneshot:emit(10)
   oneshot:release()
@@ -1199,7 +1236,7 @@ Enqueues particle render commands with an optional offset.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:render
+do
   local fx = lurek.particle.newSystem({ maxParticles = 128, emissionRate = 40 })
   fx:setPosition(200, 200)
   fx:start()
@@ -1217,7 +1254,7 @@ Resets particles and emitter state.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:reset
+do
   local sparks = lurek.particle.newSystem({ maxParticles = 128, emissionRate = 80 })
   sparks:start()
   sparks:emit(60)
@@ -1234,7 +1271,7 @@ Resumes a paused particle system. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:resume
+do
   local fog = lurek.particle.newSystem({ emissionRate = 20 })
   fog:start()
   fog:pause()
@@ -1259,7 +1296,7 @@ Sets collision bounds for particles.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setBounds
+do
   local ps = lurek.particle.newSystem({max_particles=500})
   ps:setBounds(0, 0, 800, 600, 0.0)
   ps:start()
@@ -1280,7 +1317,7 @@ Sets maximum particle buffer size.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setBufferSize
+do
   local rain = lurek.particle.newSystem({ maxParticles = 64 })
   rain:setBufferSize(1024)
   rain:setEmissionRate(500)
@@ -1303,7 +1340,7 @@ Enables particle collision against a physics world.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setCollidesWithPhysics
+do
   local world = lurek.physics.newWorld(0, 9.81)
   local rain = lurek.particle.newPreset("rain")
   rain:setCollidesWithPhysics(world, 1.0, 0.4)
@@ -1326,7 +1363,7 @@ Sets particle color keyframes from one or more RGBA tables.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setColors
+do
   local fire = lurek.particle.newSystem({ emissionRate = 80 })
   fire:setColors({1, 1, 0.6, 1}, {1, 0.4, 0, 0.8}, {0.2, 0.0, 0.0, 0.0})
   fire:setShape("circle")
@@ -1347,7 +1384,7 @@ Sets a Lua callback for custom emission positions.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setCustomEmissionShape
+do
   local ps = lurek.particle.newSystem({
     maxParticles = 128, emissionRate = 30,
     lifetimeMin = 0.8, lifetimeMax = 1.5,
@@ -1377,7 +1414,7 @@ Sets emission direction. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setDirection
+do
   local jet = lurek.particle.newSystem({ emissionRate = 60 })
   jet:setDirection(math.pi)  -- shoot left
   jet:setSpeed(120, 160)
@@ -1402,7 +1439,7 @@ Sets emission area distribution and size.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setEmissionArea
+do
   local fog = lurek.particle.newSystem({ emissionRate = 40 })
   fog:setEmissionArea("ellipse", 200, 80)
   fog:setColors({0.8, 0.8, 1.0, 0.3}, {0.8, 0.8, 1.0, 0})
@@ -1423,7 +1460,7 @@ Sets emission rate. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setEmissionRate
+do
   local rain = lurek.particle.newSystem({ maxParticles = 400 })
   rain:start()
   local intensity = 0.7
@@ -1444,7 +1481,7 @@ Sets emitter lifetime. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setEmitterLifetime
+do
   local explosion = lurek.particle.newSystem({ emissionRate = 200 })
   explosion:setEmitterLifetime(0.15)
   explosion:start()
@@ -1466,7 +1503,7 @@ Sets flipbook grid and frame rate. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setFlipbook
+do
   local ps = lurek.particle.newSystem({max_particles=300})
   ps:setFlipbook(4, 4, 16)
   ps:start()
@@ -1488,7 +1525,7 @@ Sets particle gravity. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setGravity
+do
   local debris = lurek.particle.newSystem({ emissionRate = 40 })
   debris:setGravity(0, 600)
   debris:setSpeed(120, 200)
@@ -1510,7 +1547,7 @@ Sets particle insert mode. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setInsertMode
+do
   local smoke = lurek.particle.newSystem({ emissionRate = 30 })
   smoke:setInsertMode("bottom")
   smoke:setColors({1, 1, 1, 0.4}, {0.5, 0.5, 0.5, 0})
@@ -1534,7 +1571,7 @@ Sets linear acceleration range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setLinearAcceleration
+do
   local ps = lurek.particle.newSystem({max_particles=500})
   ps:setLinearAcceleration(0, 200, 0, 250)
   ps:start()
@@ -1556,7 +1593,7 @@ Sets linear damping range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setLinearDamping
+do
   local dust = lurek.particle.newSystem({ emissionRate = 40 })
   dust:setLinearDamping(1.5, 2.5)
   dust:setSpeed(60, 100)
@@ -1578,7 +1615,7 @@ Sets particle spawn offset. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setOffset
+do
   local glow = lurek.particle.newSystem({ emissionRate = 25 })
   glow:setOffset(0, -8)
   glow:setSizes(8, 4)
@@ -1599,7 +1636,7 @@ Sets a Lua callback invoked with batched particle death records.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setOnDeathBatch
+do
   local ps = lurek.particle.newSystem({
     maxParticles = 64, emissionRate = 10,
     lifetimeMin = 0.5, lifetimeMax = 1.0,
@@ -1633,7 +1670,7 @@ Sets particle lifetime range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setParticleLifetime
+do
   local smoke = lurek.particle.newSystem({})
   smoke:setParticleLifetime(1.5, 3.0)
   smoke:setEmissionRate(20)
@@ -1655,7 +1692,7 @@ Sets emitter position. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setPosition
+do
   local muzzle = lurek.particle.newSystem({ emissionRate = 0 })
   muzzle:setPosition(220, 180)
   muzzle:emit(12)
@@ -1676,7 +1713,7 @@ Sets radial acceleration range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setRadialAcceleration
+do
   local ps = lurek.particle.newSystem({max_particles=400})
   ps:setRadialAcceleration(50, 100)
   ps:start()
@@ -1697,7 +1734,7 @@ Sets whether particle rotation is relative to movement.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setRelativeRotation
+do
   local arrows = lurek.particle.newSystem({ emissionRate = 30 })
   arrows:setShape("ray")
   arrows:setRelativeRotation(true)
@@ -1720,7 +1757,7 @@ Sets particle rotation range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setRotation
+do
   local leaves = lurek.particle.newSystem({ emissionRate = 20 })
   leaves:setRotation(0, math.pi * 2)
   leaves:setSpin(-1.0, 1.0)
@@ -1741,7 +1778,7 @@ Sets particle shape. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setShape
+do
   local stars = lurek.particle.newSystem({ emissionRate = 20 })
   stars:setShape("diamond")
   stars:setSizes(6, 2)
@@ -1762,7 +1799,7 @@ Sets the particle size keyframes used during a particle's lifetime. Pass two or 
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSizes
+do
   local puff = lurek.particle.newSystem({ emissionRate = 30 })
   puff:setSizes(2, 8, 16, 4)
   puff:setShape("circle")
@@ -1783,7 +1820,7 @@ Sets size variation. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSizeVariation
+do
   local sparks = lurek.particle.newSystem({ emissionRate = 50 })
   sparks:setSizes(3, 1)
   sparks:setSizeVariation(0.4)
@@ -1805,7 +1842,7 @@ Sets particle speed range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSpeed
+do
   local geyser = lurek.particle.newSystem({})
   geyser:setSpeed(180, 260)
   geyser:setDirection(-math.pi/2)
@@ -1828,7 +1865,7 @@ Sets particle spin range. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSpin
+do
   local coins = lurek.particle.newSystem({ emissionRate = 10 })
   coins:setSpin(2.0, 4.0)
   coins:setSpeed(80, 120)
@@ -1849,7 +1886,7 @@ Sets spin variation. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSpinVariation
+do
   local debris = lurek.particle.newSystem({ emissionRate = 60 })
   debris:setSpin(1.0, 2.0)
   debris:setSpinVariation(0.5)
@@ -1870,7 +1907,7 @@ Sets emission spread. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setSpread
+do
   local snow = lurek.particle.newSystem({ emissionRate = 80 })
   snow:setDirection(math.pi/2)
   snow:setSpread(0.25)
@@ -1892,7 +1929,7 @@ Sets tangential acceleration range.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:setTangentialAcceleration
+do
   local ps = lurek.particle.newSystem({max_particles=400})
   ps:setTangentialAcceleration(30, 80)
   ps:start()
@@ -1909,7 +1946,7 @@ Starts particle emission. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:start
+do
   local rain = lurek.particle.newSystem({ maxParticles = 512, emissionRate = 200 })
   rain:setPosition(400, 0)
   rain:setEmissionArea("uniform", 800, 1)
@@ -1926,7 +1963,7 @@ Stops particle emission. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:stop
+do
   local jet = lurek.particle.newSystem({ emissionRate = 100 })
   jet:start()
   function lurek.process(dt)
@@ -1946,7 +1983,7 @@ Returns particle sub-system count.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:subSystemCount
+do
   local ps = lurek.particle.newSystem({ maxParticles = 64 })
   ps:addSubSystem({ maxParticles = 16 })
   ps:addSubSystem({ maxParticles = 16 })
@@ -1970,7 +2007,7 @@ Draws particles to image data. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:toImage
+do
   local sys = lurek.particle.newSystem({ maxParticles = 16 })
   sys:emit(8)
   local img = sys:toImage(64, 64)
@@ -1989,7 +2026,7 @@ Returns the Lua-visible type name for this particle system handle.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:type
+do
   local sys = lurek.particle.newSystem({})
   if sys:type() == "LParticleSystem" then
     sys:start()
@@ -2012,7 +2049,7 @@ Returns whether this particle system handle matches a supported type name.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:typeOf
+do
   local sys = lurek.particle.newSystem({})
   if sys:typeOf("Drawable") then
     lurek.log.info("particle system is drawable", "fx")
@@ -2033,7 +2070,7 @@ Updates the particle system, applies optional physics collision, and invokes pen
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:update
+do
   local sys = lurek.particle.newSystem({ maxParticles = 128, emissionRate = 30 })
   sys:start()
   function lurek.process(dt)
@@ -2055,7 +2092,7 @@ Advances the system by a warm-up duration.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- ParticleSystem:warmUp
+do
   local fountain = lurek.particle.newSystem({ emissionRate = 60, lifetimeMin = 1.0, lifetimeMax = 2.0 })
   fountain:setSpeed(80, 120)
   fountain:start()
@@ -2072,7 +2109,7 @@ Lua-side wrapper for a trail effect.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- lurek.particle.newTrail
+do
   local sword_trail = lurek.particle.newTrail(0.35, 12.0)
   sword_trail:setHeadColor(1.0, 0.95, 0.6, 1.0)
   sword_trail:setTailColor(1.0, 0.4, 0.0, 0.0)
@@ -2089,7 +2126,7 @@ Clears all trail points. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:clear
+do
   local trail = lurek.particle.newTrail(0.4, 8.0)
   trail:pushPoint(50, 50)
   trail:pushPoint(60, 60)
@@ -2113,7 +2150,7 @@ Draws the trail to image data. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:drawToImage
+do
   local trail = lurek.particle.newTrail(0.5, 12.0)
   trail:pushPoint(20, 20)
   trail:pushPoint(80, 60)
@@ -2133,7 +2170,7 @@ Returns trail point lifetime. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:getLifetime
+do
   local trail = lurek.particle.newTrail(0.5, 8.0)
   local life = trail:getLifetime()
   if life > 1.0 then trail:setLifetime(1.0) end
@@ -2151,7 +2188,7 @@ Returns trail point count. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:getPointCount
+do
   local trail = lurek.particle.newTrail(0.3, 6.0)
   trail:pushPoint(0, 0)
   trail:pushPoint(20, 0)
@@ -2171,7 +2208,7 @@ Returns trail width settings. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:getWidth
+do
   local trail = lurek.particle.newTrail(0.3, 12.0)
   trail:setWidth(12.0, 1.0)
   local sw, ew = trail:getWidth()
@@ -2193,7 +2230,7 @@ Adds a point to the trail. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:pushPoint
+do
   local trail = lurek.particle.newTrail(0.4, 8.0)
   function lurek.process(dt)
     local mx, my = lurek.input.getMousePosition()
@@ -2219,7 +2256,7 @@ Sets trail head color. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:setHeadColor
+do
   local trail = lurek.particle.newTrail(2.0, 8.0)
   trail:setHeadColor(1.0, 0.8, 0.0, 1.0)
   trail:setTailColor(1.0, 0.2, 0.0, 0.0)
@@ -2240,7 +2277,7 @@ Sets trail point lifetime. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:setLifetime
+do
   local trail = lurek.particle.newTrail(0.2, 6.0)
   trail:setLifetime(0.8)
   trail:pushPoint(120, 80)
@@ -2260,7 +2297,7 @@ Sets minimum distance between trail points.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:setMinDistance
+do
   local trail = lurek.particle.newTrail(0.4, 8.0)
   trail:setMinDistance(4.0)
   trail:pushPoint(200, 100)
@@ -2284,7 +2321,7 @@ Sets trail tail color. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:setTailColor
+do
   local trail = lurek.particle.newTrail(2.0, 8.0)
   trail:setHeadColor(0.5, 0.8, 1.0, 1.0)
   trail:setTailColor(0.3, 0.5, 1.0, 0.0)
@@ -2306,7 +2343,7 @@ Sets trail start and optional end width.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:setWidth
+do
   local trail = lurek.particle.newTrail(0.3, 4.0)
   trail:setWidth(16.0, 2.0)
   trail:pushPoint(50, 50)
@@ -2324,7 +2361,7 @@ Returns the Lua-visible type name for this trail handle.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do  -- LTrail:type
+do
   local trail = lurek.particle.newTrail(0.4, 8.0)
   local t = trail:type()
   lurek.log.info("LTrail:type = " .. t, "particle")
@@ -2346,7 +2383,7 @@ Returns whether this trail handle matches a supported type name.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do  -- LTrail:typeOf
+do
   local trail = lurek.particle.newTrail(0.4, 8.0)
   lurek.log.info("is LTrail: " .. tostring(trail:typeOf("LTrail")), "particle")
   lurek.log.info("is unknown: " .. tostring(trail:typeOf("Unknown")), "particle")
@@ -2366,7 +2403,7 @@ Updates trail point lifetimes. This method is available to Lua scripts.
 Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
-do -- Trail:update
+do
   local trail = lurek.particle.newTrail(0.5, 10.0)
   trail:pushPoint(100, 100)
   function lurek.process(dt)

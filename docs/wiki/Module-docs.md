@@ -130,10 +130,52 @@ Validation and quality reporting (`validate`, `quality`, `coverage`) check docum
 Module example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.scan
+-- content/examples/docs.lua
+-- lurek.docs API examples.
+-- Run: cargo run -- content/examples/docs.lua
+
+--@api-stub: lurek.docs.scan
+-- Reflects the live `lurek` table and builds a catalog of callable APIs
+do
   local catalog = lurek.docs.scan()
   local count = catalog:entryCount()
   lurek.log.info("docs", "scanned " .. count .. " live API entries")
+end
+
+--@api-stub: lurek.docs.scanModule
+-- Reflects one live `lurek
+do
+  local audio_cat = lurek.docs.scanModule("audio")
+  for _, entry in ipairs(audio_cat:getEntries()) do
+    lurek.log.debug("audio-api", entry:getQualifiedName())
+  end
+end
+
+--@api-stub: lurek.docs.loadToml
+-- Loads a TOML documentation catalog file and converts its entries into an API catalog
+do
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok and catalog:entryCount() == 0 then
+    lurek.log.warn("docs", "audio.toml had no entries")
+  end
+end
+
+--@api-stub: lurek.docs.loadAll
+-- Loads all TOML documentation catalog files from a directory and combines their entries
+do
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local mods = catalog:getModules()
+    lurek.log.info("docs", "loaded " .. #mods .. " documented modules")
+  end
+end
+
+--@api-stub: lurek.docs.describe
+-- Adds or updates the description for one editable catalog entry
+do
+  lurek.docs.scan()
+  lurek.docs.describe("lurek.audio.play", "Play a sound source by name.")
+  lurek.docs.describe("lurek.audio.stop", "Stop a currently playing source.")
 end
 ```
 
@@ -189,7 +231,7 @@ Lists source files in a directory for simple documentation staleness checks.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.checkStaleness
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local result = lurek.docs.checkStaleness(catalog, "src/lua_api")
   lurek.log.info("docs", "scanned " .. #result.current .. " source files")
@@ -211,7 +253,7 @@ Returns documented and live API counts for the full `lurek` table.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.coverage
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local documented, total = lurek.docs.coverage(catalog)
   lurek.log.info("docs", string.format("coverage %d/%d", documented, total))
@@ -234,7 +276,7 @@ Returns documented and live API counts for one module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.coverageModule
+do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
   if ok then
     local documented, total = lurek.docs.coverageModule("audio", catalog)
@@ -257,7 +299,7 @@ Adds or updates the description for one editable catalog entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.describe
+do
   lurek.docs.scan()
   lurek.docs.describe("lurek.audio.play", "Play a sound source by name.")
   lurek.docs.describe("lurek.audio.stop", "Stop a currently playing source.")
@@ -278,7 +320,7 @@ Exports all editor documentation artifacts for a catalog into a directory.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportAll
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportAll, cat, "build/tmp")
 end
@@ -298,7 +340,7 @@ Writes a compact text cheatsheet from catalog entries.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportCheatsheet
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportCheatsheet, cat, "build/tmp/cheatsheet.txt")
 end
@@ -318,7 +360,7 @@ Exports catalog completion metadata to a file.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportCompletions
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportCompletions, cat, "build/tmp/completions.json")
 end
@@ -338,7 +380,7 @@ Exports catalog hover metadata to a file.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportHover
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportHover, cat, "build/tmp/hover.json")
 end
@@ -358,7 +400,7 @@ Writes a Markdown API reference from catalog entries.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportMarkdown
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportMarkdown, cat, "build/tmp/api.md")
 end
@@ -378,7 +420,7 @@ Exports catalog signature metadata to a file.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.exportSignatures
+do
   local cat = lurek.docs.loadAll("docs/api")
   pcall(lurek.docs.exportSignatures, cat, "build/tmp/signatures.json")
 end
@@ -395,7 +437,7 @@ Returns the editable in-memory documentation catalog.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.getCatalog
+do
   lurek.docs.scan()
   local cat = lurek.docs.getCatalog()
   lurek.log.info("docs", "internal catalog has " .. cat:entryCount() .. " entries")
@@ -417,7 +459,7 @@ Loads all TOML documentation catalog files from a directory and combines their e
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.loadAll
+do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
   if ok then
     local mods = catalog:getModules()
@@ -441,7 +483,7 @@ Loads a TOML documentation catalog file and converts its entries into an API cat
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.loadToml
+do
   local ok, cat = pcall(lurek.docs.loadToml, "docs/api/lurek.md")
   -- ok=false if file schema doesn't match; that's fine for headless testing
 end
@@ -462,7 +504,7 @@ Computes documentation quality for a supplied catalog or the editable in-memory 
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.quality
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local q = lurek.docs.quality(catalog)
   lurek.log.info("docs", string.format("overall %.2f (%s)", q:getOverallScore(), q:getGrade()))
@@ -485,7 +527,7 @@ Computes documentation quality for entries belonging to one module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.qualityModule
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local q = lurek.docs.qualityModule("audio", catalog)
   lurek.log.info("audio-docs", "audio module grade: " .. q:getGrade())
@@ -507,7 +549,7 @@ Reflects live `lurek` module tables into plain name and type rows.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.reflectLive
+do
   local audio_only = lurek.docs.reflectLive("audio")
   for _, item in ipairs(audio_only.audio or {}) do
     lurek.log.debug("reflect", item.name .. " (" .. item.type .. ")")
@@ -531,7 +573,7 @@ Reflects an arbitrary Lua table into name, qualifiedName, and type rows.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.reflectTable
+do
   local mod = { greet = function(_) end, version = "1.0", count = 3 }
   local items = lurek.docs.reflectTable(mod, "mymod")
   for _, it in ipairs(items) do
@@ -549,7 +591,7 @@ Clears the editable in-memory documentation catalog.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.resetCatalog
+do
   lurek.docs.scan()
   lurek.docs.resetCatalog()
   assert(lurek.docs.getCatalog():entryCount() == 0, "catalog should be empty")
@@ -571,7 +613,7 @@ Reflects the live `lurek` table and builds a catalog of callable APIs.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.scan
+do
   local catalog = lurek.docs.scan()
   local count = catalog:entryCount()
   lurek.log.info("docs", "scanned " .. count .. " live API entries")
@@ -593,7 +635,7 @@ Reflects one live `lurek.<module>` table and builds a catalog for that module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.scanModule
+do
   local audio_cat = lurek.docs.scanModule("audio")
   for _, entry in ipairs(audio_cat:getEntries()) do
     lurek.log.debug("audio-api", entry:getQualifiedName())
@@ -617,7 +659,7 @@ Builds a schema validator from Lua table rules.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.schema
+do
   local schema = lurek.docs.schema({
     name  = { type = "string", required = true, minLen = 1 },
     level = { type = "integer", required = true, min = 1, max = 99 },
@@ -642,7 +684,7 @@ Builds a schema validator from TOML schema text.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.schemaFromToml
+do
   local schema_toml = [[
 name = "PlayerSave"
 strict = true
@@ -672,7 +714,7 @@ Replaces parameter metadata for one editable catalog entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.setParamInfo
+do
   lurek.docs.scan()
   lurek.docs.setParamInfo("lurek.audio.play", {
     { name = "name", type = "string", description = "source id", optional = false },
@@ -693,7 +735,7 @@ Replaces return-value metadata for one editable catalog entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.setReturnInfo
+do
   lurek.docs.scan()
   lurek.docs.setReturnInfo("lurek.audio.play", {
     { type = "Source", description = "the playing audio source" },
@@ -716,7 +758,7 @@ Compares a documentation catalog with the live reflected `lurek` API table.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.validate
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local report = lurek.docs.validate(catalog)
   if not report:isValid() then
@@ -741,7 +783,7 @@ Compares one module's documentation catalog entries with the live reflected modu
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.validateModule
+do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
   if ok then
     local report = lurek.docs.validateModule("audio", catalog)
@@ -764,7 +806,7 @@ Provides Lua methods for querying, merging, filtering, and exporting catalog dat
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.getCatalog
+do
   lurek.docs.scan()
   local cat = lurek.docs.getCatalog()
   lurek.log.info("docs", "internal catalog has " .. cat:entryCount() .. " entries")
@@ -786,7 +828,7 @@ Counts entries in the catalog, optionally for one module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:entryCount
+do
   local catalog = lurek.docs.scan()
   local total = catalog:entryCount()
   local audio = catalog:entryCount("audio")
@@ -809,7 +851,7 @@ Builds a new catalog containing entries accepted by a Lua predicate.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:filter
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local deprecated = catalog:filter(function(e) return e:getDeprecated() ~= nil end)
   lurek.log.info("docs", deprecated:entryCount() .. " deprecated entries")
@@ -831,7 +873,7 @@ Returns catalog entries, optionally limited to one module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:getEntries
+do
   local catalog = lurek.docs.scan()
   local audio_entries = catalog:getEntries("audio")
   lurek.log.info("docs", "audio has " .. #audio_entries .. " entries")
@@ -853,7 +895,7 @@ Returns one catalog entry by qualified API name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:getEntry
+do
   local catalog = lurek.docs.scan()
   local entry = catalog:getEntry("lurek.audio.play")
   if entry then lurek.log.info("docs", "found: " .. entry:getQualifiedName()) end
@@ -871,7 +913,7 @@ Returns every module represented in this catalog.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:getModules
+do
   local catalog = lurek.docs.scan()
   for _, name in ipairs(catalog:getModules()) do
     lurek.log.debug("docs", "module: " .. name)
@@ -894,7 +936,7 @@ Returns method entries associated with a qualified type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:getTypeMethods
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, m in ipairs(catalog:getTypeMethods("lurek.audio.Source")) do
     lurek.log.debug("docs", "Source method: " .. m:getName())
@@ -917,7 +959,7 @@ Returns type names documented for one module.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:getTypes
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, t in ipairs(catalog:getTypes("audio")) do
     lurek.log.debug("docs", "audio type: " .. t)
@@ -940,7 +982,7 @@ Merges another catalog into this catalog and returns a new catalog value.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:merge
+do
   local live = lurek.docs.scan()
   local toml = lurek.docs.loadAll("docs/api")
   local merged = live:merge(toml)
@@ -963,7 +1005,7 @@ Searches names, qualified names, and descriptions with a case-insensitive substr
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:search
+do
   local catalog = lurek.docs.scan()
   for _, e in ipairs(catalog:search("play")) do
     lurek.log.debug("docs", "match: " .. e:getQualifiedName())
@@ -982,7 +1024,7 @@ Serializes this catalog to formatted JSON.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:toJSON
+do
   local catalog = lurek.docs.scan()
   local json = catalog:toJSON()
   pcall(function() lurek.fs.write("build/api-catalog.json", json) end)
@@ -1000,7 +1042,7 @@ Converts this catalog into plain Lua tables for lightweight inspection.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ApiCatalog:toTable
+do
   local catalog = lurek.docs.scan()
   local raw = catalog:toTable()
   lurek.log.info("docs", "raw catalog has " .. #raw .. " rows")
@@ -1018,7 +1060,7 @@ Returns the Lua-visible type name for this API catalog handle.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LApiCatalog:type
+do
   local api_catalog_obj = lurek.docs.scan(nil)
   local t = api_catalog_obj:type()
   lurek.log.info("LApiCatalog:type = " .. t, "docs")
@@ -1040,7 +1082,7 @@ Returns whether this API catalog handle matches a supported type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LApiCatalog:typeOf
+do
   local api_catalog_obj = lurek.docs.scan(nil)
   lurek.log.info("is LApiCatalog: " .. tostring(api_catalog_obj:typeOf("LApiCatalog")), "docs")
   lurek.log.info("is wrong: " .. tostring(api_catalog_obj:typeOf("Unknown")), "docs")
@@ -1056,10 +1098,52 @@ Provides Lua accessors for documentation entry metadata.
 Module-level example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.scan
+-- content/examples/docs.lua
+-- lurek.docs API examples.
+-- Run: cargo run -- content/examples/docs.lua
+
+--@api-stub: lurek.docs.scan
+-- Reflects the live `lurek` table and builds a catalog of callable APIs
+do
   local catalog = lurek.docs.scan()
   local count = catalog:entryCount()
   lurek.log.info("docs", "scanned " .. count .. " live API entries")
+end
+
+--@api-stub: lurek.docs.scanModule
+-- Reflects one live `lurek
+do
+  local audio_cat = lurek.docs.scanModule("audio")
+  for _, entry in ipairs(audio_cat:getEntries()) do
+    lurek.log.debug("audio-api", entry:getQualifiedName())
+  end
+end
+
+--@api-stub: lurek.docs.loadToml
+-- Loads a TOML documentation catalog file and converts its entries into an API catalog
+do
+  local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
+  if ok and catalog:entryCount() == 0 then
+    lurek.log.warn("docs", "audio.toml had no entries")
+  end
+end
+
+--@api-stub: lurek.docs.loadAll
+-- Loads all TOML documentation catalog files from a directory and combines their entries
+do
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local mods = catalog:getModules()
+    lurek.log.info("docs", "loaded " .. #mods .. " documented modules")
+  end
+end
+
+--@api-stub: lurek.docs.describe
+-- Adds or updates the description for one editable catalog entry
+do
+  lurek.docs.scan()
+  lurek.docs.describe("lurek.audio.play", "Play a sound source by name.")
+  lurek.docs.describe("lurek.audio.stop", "Stop a currently playing source.")
 end
 ```
 
@@ -1074,7 +1158,7 @@ Returns this entry's deprecation text when one was recorded.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getDeprecated
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     local msg = e:getDeprecated()
@@ -1094,7 +1178,7 @@ Returns the prose description recorded for this entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getDescription
+do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
   if ok then
     local entry = catalog:getEntry("lurek.audio.play")
@@ -1114,7 +1198,7 @@ Returns this entry's example text when one was recorded.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getExample
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local entry = catalog:getEntry("lurek.audio.play")
   local snippet = entry and entry:getExample()
@@ -1133,7 +1217,7 @@ Returns the documentation kind recorded for this entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getKind
+do
   local catalog = lurek.docs.scan()
   for _, e in ipairs(catalog:getEntries()) do
     if e:getKind() == "type" then lurek.log.debug("docs", "type: " .. e:getQualifiedName()) end
@@ -1152,7 +1236,7 @@ Returns the module name associated with this documentation entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getModule
+do
   local catalog = lurek.docs.scan()
   local first = catalog:getEntries()[1]
   if first then lurek.log.debug("docs", "module: " .. first:getModule()) end
@@ -1170,7 +1254,7 @@ Returns the short API name stored by this documentation entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getName
+do
   local catalog = lurek.docs.scanModule("audio")
   local entry = catalog:getEntries()[1]
   if entry then lurek.log.debug("docs", "first audio entry: " .. entry:getName()) end
@@ -1188,7 +1272,7 @@ Returns parameter metadata recorded for this entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getParameters
+do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
   if ok then
     local entry = catalog:getEntry("lurek.audio.play")
@@ -1212,7 +1296,7 @@ Returns the full dotted API name stored by this documentation entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getQualifiedName
+do
   local catalog = lurek.docs.scan()
   for _, e in ipairs(catalog:getEntries()) do
     if e:getName() == "info" then lurek.log.debug("docs", e:getQualifiedName()) end
@@ -1231,7 +1315,7 @@ Returns return-value metadata recorded for this entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getReturns
+do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
   if ok then
     local entry = catalog:getEntry("lurek.audio.play")
@@ -1255,7 +1339,7 @@ Returns the documentation quality score calculated for this entry.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getScore
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     if e:getScore() < 0.5 then lurek.log.warn("docs", "low score: " .. e:getQualifiedName()) end
@@ -1274,7 +1358,7 @@ Returns this entry's since-version text when one was recorded.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:getSince
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     local v = e:getSince()
@@ -1294,7 +1378,7 @@ Returns whether this entry has non-empty description text.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:hasDescription
+do
   local catalog = lurek.docs.scan()
   local missing = 0
   for _, e in ipairs(catalog:getEntries()) do
@@ -1315,7 +1399,7 @@ Returns whether this entry has example text.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:hasExample
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local without = 0
   for _, e in ipairs(catalog:getEntries()) do
@@ -1336,7 +1420,7 @@ Returns whether this entry has parameter metadata.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:hasParameters
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     if e:getKind() == "function" and not e:hasParameters() then
@@ -1346,7 +1430,7 @@ do -- DocEntry:hasParameters
 end
 
 --@api-stub: DocEntry:hasReturnType
-do -- DocEntry:hasReturnType
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     if e:getKind() == "function" and not e:hasReturnType() then
@@ -1356,7 +1440,7 @@ do -- DocEntry:hasReturnType
 end
 
 --@api-stub: DocEntry:hasExample
-do -- DocEntry:hasExample
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local without = 0
   for _, e in ipairs(catalog:getEntries()) do
@@ -1368,7 +1452,7 @@ end
 -- â”€â”€ ApiCatalog methods â”€â”€
 
 --@api-stub: ApiCatalog:getModules
-do -- ApiCatalog:getModules
+do
   local catalog = lurek.docs.scan()
   for _, name in ipairs(catalog:getModules()) do
     lurek.log.debug("docs", "module: " .. name)
@@ -1376,14 +1460,14 @@ do -- ApiCatalog:getModules
 end
 
 --@api-stub: ApiCatalog:getEntries
-do -- ApiCatalog:getEntries
+do
   local catalog = lurek.docs.scan()
   local audio_entries = catalog:getEntries("audio")
   lurek.log.info("docs", "audio has " .. #audio_entries .. " entries")
 end
 
 --@api-stub: ApiCatalog:getEntry
-do -- ApiCatalog:getEntry
+do
 ```
 
 ### `LDocEntry:hasReturnType() -> boolean`
@@ -1397,7 +1481,7 @@ Returns whether this entry has return-value metadata.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- DocEntry:hasReturnType
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, e in ipairs(catalog:getEntries()) do
     if e:getKind() == "function" and not e:hasReturnType() then
@@ -1407,7 +1491,7 @@ do -- DocEntry:hasReturnType
 end
 
 --@api-stub: DocEntry:hasExample
-do -- DocEntry:hasExample
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local without = 0
   for _, e in ipairs(catalog:getEntries()) do
@@ -1419,7 +1503,7 @@ end
 -- â”€â”€ ApiCatalog methods â”€â”€
 
 --@api-stub: ApiCatalog:getModules
-do -- ApiCatalog:getModules
+do
   local catalog = lurek.docs.scan()
   for _, name in ipairs(catalog:getModules()) do
     lurek.log.debug("docs", "module: " .. name)
@@ -1427,21 +1511,21 @@ do -- ApiCatalog:getModules
 end
 
 --@api-stub: ApiCatalog:getEntries
-do -- ApiCatalog:getEntries
+do
   local catalog = lurek.docs.scan()
   local audio_entries = catalog:getEntries("audio")
   lurek.log.info("docs", "audio has " .. #audio_entries .. " entries")
 end
 
 --@api-stub: ApiCatalog:getEntry
-do -- ApiCatalog:getEntry
+do
   local catalog = lurek.docs.scan()
   local entry = catalog:getEntry("lurek.audio.play")
   if entry then lurek.log.info("docs", "found: " .. entry:getQualifiedName()) end
 end
 
 --@api-stub: ApiCatalog:getTypes
-do -- ApiCatalog:getTypes
+do
   local catalog = lurek.docs.loadAll("docs/api")
   for _, t in ipairs(catalog:getTypes("audio")) do
     lurek.log.debug("docs", "audio type: " .. t)
@@ -1458,7 +1542,7 @@ Returns the Lua-visible type name for this documentation entry handle.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LDocEntry:type
+do
   local catalog = lurek.docs.scanModule("audio")
     local entry = catalog:getEntries()[1]
   local t = catalog:type()
@@ -1481,7 +1565,7 @@ Returns whether this documentation entry handle matches a supported type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LDocEntry:typeOf
+do
   local catalog = lurek.docs.scanModule("audio")
     local entry = catalog:getEntries()[1]
   lurek.log.info("is LDocEntry: " .. tostring(catalog:typeOf("LDocEntry")), "docs")
@@ -1498,7 +1582,7 @@ Provides Lua accessors for documentation quality scoring results.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.quality
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local q = lurek.docs.quality(catalog)
   lurek.log.info("docs", string.format("overall %.2f (%s)", q:getOverallScore(), q:getGrade()))
@@ -1520,7 +1604,7 @@ Returns the highest-scoring documentation entries.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getBest
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   for _, e in ipairs(q:getBest(5)) do
     lurek.log.info("docs", "exemplar: " .. e:getQualifiedName())
@@ -1543,7 +1627,7 @@ Returns documentation entries whose calculated grade matches a grade string.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getByGrade
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   for _, e in ipairs(q:getByGrade("C")) do
     lurek.log.info("docs", "grade C: " .. e:getQualifiedName())
@@ -1562,7 +1646,7 @@ Returns the letter grade derived from the aggregate documentation score.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getGrade
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   lurek.log.info("docs", "docs grade: " .. q:getGrade())
 end
@@ -1579,7 +1663,7 @@ Returns per-module documentation quality scores.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getModuleScores
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   for module, score in pairs(q:getModuleScores()) do
     lurek.log.debug("docs", string.format("%s : %.2f", module, score))
@@ -1598,7 +1682,7 @@ Returns the aggregate documentation quality score.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getOverallScore
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   if q:getOverallScore() < 0.8 then lurek.log.warn("docs", "quality below threshold") end
 end
@@ -1615,7 +1699,7 @@ Returns a human-readable summary of overall and per-module quality scores.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getSummary
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   lurek.log.info("docs", q:getSummary())
 end
@@ -1636,7 +1720,7 @@ Returns the lowest-scoring documentation entries.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:getWorst
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   for _, e in ipairs(q:getWorst(10)) do
     lurek.log.warn("docs", "worst: " .. e:getQualifiedName())
@@ -1655,7 +1739,7 @@ Serializes this quality report to formatted JSON.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:toJSON
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   pcall(function() lurek.fs.write("build/docs-quality.json", q:toJSON()) end)
 end
@@ -1672,7 +1756,7 @@ Converts this quality report into a plain Lua table.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- QualityReport:toTable
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   local data = q:toTable()
   lurek.log.info("docs", "table overall: " .. tostring(data.overall_score))
@@ -1690,7 +1774,7 @@ Returns the Lua-visible type name for this quality report handle.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LQualityReport:type
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   local t = q:type()
   lurek.log.info("LQualityReport:type = " .. t, "docs")
@@ -1712,7 +1796,7 @@ Returns whether this quality report handle matches a supported type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LQualityReport:typeOf
+do
   local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   lurek.log.info("is LQualityReport: " .. tostring(q:typeOf("LQualityReport")), "docs")
   lurek.log.info("is wrong: " .. tostring(q:typeOf("Unknown")), "docs")
@@ -1728,7 +1812,7 @@ Lua-side schema validator built from docs field rules.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.schema
+do
   local schema = lurek.docs.schema({
     name  = { type = "string", required = true, minLen = 1 },
     level = { type = "integer", required = true, min = 1, max = 99 },
@@ -1751,7 +1835,7 @@ Validates a Lua table and raises a Lua error when schema checks fail.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- Schema:assert
+do
   local schema = lurek.docs.schema({ width = { type = "integer", required = true, min = 1 } }, "Window")
   schema:assert({ width = 1280 })
   lurek.log.info("config", "window config validated")
@@ -1773,7 +1857,7 @@ Validates a Lua table and returns only the boolean result.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- Schema:check
+do
   local schema = lurek.docs.schema({ port = { type = "integer", min = 1, max = 65535 } }, "Net")
   if not schema:check({ port = 8080 }) then
     lurek.log.error("net", "invalid network config")
@@ -1792,7 +1876,7 @@ Returns the field names declared by this schema.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- Schema:getFields
+do
   local schema = lurek.docs.schema({ a = { type = "string" }, b = { type = "number" } }, "AB")
   for _, field in ipairs(schema:getFields()) do
     lurek.log.debug("schema", "field: " .. field)
@@ -1811,7 +1895,7 @@ Returns this schema's display name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- Schema:getName
+do
   local schema = lurek.docs.schema({ x = { type = "number" } }, "Point")
   local label = schema:getName()
   lurek.log.debug("schema", "loaded schema: " .. label)
@@ -1829,7 +1913,7 @@ Returns the Lua-visible type name for this schema handle.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LSchema:type
+do
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
   local result = schema:validate({ hp = -5 })
   local count = (type(result) == "table") and #result or (result and 0 or 1)
@@ -1856,7 +1940,7 @@ Returns whether this schema handle matches a supported type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LSchema:typeOf
+do
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
   local result = schema:validate({ hp = -5 })
   local count = (type(result) == "table") and #result or (result and 0 or 1)
@@ -1883,7 +1967,7 @@ Validates a Lua table and returns a success flag plus structured error rows.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- Schema:validate
+do
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
   local result = schema:validate({ hp = -5 })
   local count = (type(result) == "table") and #result or (result and 0 or 1)
@@ -1902,7 +1986,7 @@ Provides Lua accessors for documentation validation results.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- lurek.docs.validate
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local report = lurek.docs.validate(catalog)
   if not report:isValid() then
@@ -1922,7 +2006,7 @@ Returns catalog APIs whose documentation was incomplete.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:getIncomplete
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   for _, name in ipairs(report:getIncomplete()) do
     lurek.log.info("docs", "needs more detail: " .. name)
@@ -1941,7 +2025,7 @@ Returns live APIs that were missing from the checked catalog.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:getMissing
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   for _, name in ipairs(report:getMissing()) do
     lurek.log.warn("docs", "missing docs: " .. name)
@@ -1960,7 +2044,7 @@ Returns catalog APIs that were not present in the live Lua table.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:getPhantom
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   for _, name in ipairs(report:getPhantom()) do
     lurek.log.warn("docs", "remove stale doc: " .. name)
@@ -1979,7 +2063,7 @@ Returns a compact text summary of missing, phantom, and incomplete counts.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:getSummary
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   lurek.log.info("docs", report:getSummary())
 end
@@ -1996,7 +2080,7 @@ Returns the number of catalog APIs with incomplete documentation.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:incompleteCount
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   lurek.log.info("docs", report:incompleteCount() .. " incomplete doc entries")
 end
@@ -2013,7 +2097,7 @@ Returns whether the validation report has no missing live APIs.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:isValid
+do
   local catalog = lurek.docs.loadAll("docs/api")
   local report = lurek.docs.validate(catalog)
   if not report:isValid() then lurek.log.error("docs", "validation failed") end
@@ -2031,7 +2115,7 @@ Returns the number of live APIs missing from the catalog.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:missingCount
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   if report:missingCount() > 0 then
     lurek.log.error("docs", "missing " .. report:missingCount() .. " doc entries")
@@ -2050,7 +2134,7 @@ Returns the number of catalog APIs absent from live reflection.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:phantomCount
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   lurek.log.info("docs", report:phantomCount() .. " phantom doc entries")
 end
@@ -2067,7 +2151,7 @@ Serializes this validation report to formatted JSON.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:toJSON
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   pcall(function() lurek.fs.write("build/docs-validation.json", report:toJSON()) end)
 end
@@ -2084,7 +2168,7 @@ Converts this validation report into a plain Lua table.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- ValidationReport:toTable
+do
   local report = lurek.docs.validate(lurek.docs.loadAll("docs/api"))
   local data = report:toTable()
   lurek.log.info("docs", "missing rows: " .. #(data.missing or {}))
@@ -2102,7 +2186,7 @@ Returns the Lua-visible type name for this validation report handle.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LValidationReport:type
+do
   local validation_report_obj = lurek.docs.validate(nil)
   local t = validation_report_obj:type()
   lurek.log.info("LValidationReport:type = " .. t, "docs")
@@ -2124,7 +2208,7 @@ Returns whether this validation report handle matches a supported type name.
 Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
-do -- LValidationReport:typeOf
+do
   local validation_report_obj = lurek.docs.validate(nil)
   lurek.log.info("is LValidationReport: " .. tostring(validation_report_obj:typeOf("LValidationReport")), "docs")
   lurek.log.info("is wrong: " .. tostring(validation_report_obj:typeOf("Unknown")), "docs")

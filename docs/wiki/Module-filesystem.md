@@ -109,13 +109,53 @@ Supports synchronous and asynchronous read/write, directory listing, glob matchi
 Module example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.mountZip
-  local ok, pack = pcall(lurek.filesystem.mountZip, "dlc/forest_pack.zip", "mods/forest")
-  if ok and pack:contains("levels/grove.json") then
-    local data = pack:readFile("levels/grove.json")
-    lurek.log.info("forest pack ready: " .. #data .. " bytes", "fs")
+-- Polls watched paths and returns paths that changed since the previous poll
+do
+  local timer = 0
+  function lurek.process(dt)
+    timer = timer + dt
+    if timer < 1 then return end
+    timer = 0
+    for _, path in ipairs(lurek.filesystem.pollWatchers()) do
+      lurek.log.info("changed: " .. path, "hotreload")
+    end
   end
 end
+
+--@api-stub: lurek.filesystem.read
+-- Reads a UTF-8 text file from GameFS
+do
+  local ok, toml = pcall(lurek.filesystem.read, "config/options.toml")
+  if ok then lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config") end
+end
+
+--@api-stub: lurek.filesystem.write
+-- Writes a UTF-8 text file through GameFS
+do
+  local score = 12450
+  lurek.filesystem.write("save/highscore.txt", tostring(score))
+end
+
+--@api-stub: lurek.filesystem.writeJson
+-- Writes JSON text through GameFS
+do
+  lurek.filesystem.writeJson("save/profile.json", '{"name":"hero","level":3}')
+end
+
+--@api-stub: lurek.filesystem.readJson
+-- Reads a JSON document as text from GameFS
+do
+  local json = lurek.filesystem.readJson("save/profile.json")
+  lurek.log.info("profile json bytes: " .. #json, "save")
+end
+
+--@api-stub: lurek.filesystem.readOrWriteJson
+-- Reads a JSON file or writes and returns default JSON when the file is absent
+do
+  local cfg = lurek.filesystem.readOrWriteJson(
+    "save/options.json",
+    '{"volume":0.8,"language":"en"}'
+  )
 ```
 
 ## Key Types
@@ -166,7 +206,7 @@ Appends UTF-8 text to a GameFS file.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.append
+do
   local line = os.date("%Y-%m-%dT%H:%M:%S") .. "\tlevel_complete\tforest_01\n"
   lurek.filesystem.append("save/telemetry.log", line)
 end
@@ -186,7 +226,7 @@ Copies one GameFS file to another path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.copy
+do
   lurek.filesystem.copy("save/slot1.dat", "save/slot1.bak")
   lurek.log.info("backed up slot 1", "save")
 end
@@ -205,7 +245,7 @@ Creates a GameFS directory and any missing parents.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.createDirectory
+do
   lurek.filesystem.createDirectory("save/screenshots")
   lurek.filesystem.write("save/screenshots/last_run.txt", "ok")
 end
@@ -226,7 +266,7 @@ Creates a temporary file through GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.createTempFile
+do
   local tmp = lurek.filesystem.createTempFile("export")
   lurek.filesystem.write(tmp, "snapshot=" .. os.time())
   lurek.log.info("export staged at " .. tmp, "save")
@@ -248,7 +288,7 @@ Returns whether a path exists in GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.exists
+do
   if lurek.filesystem.exists("save/slot1.dat") then
     lurek.log.info("resuming from slot 1", "save")
   else
@@ -272,7 +312,7 @@ Lists immediate entries in a GameFS directory.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getDirectoryItems
+do
   local saves = lurek.filesystem.getDirectoryItems("save")
   lurek.log.info("found " .. #saves .. " save files", "save")
   for _, name in ipairs(saves) do
@@ -292,7 +332,7 @@ Returns the current filesystem identity string.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getIdentity
+do
   local id = lurek.filesystem.getIdentity()
   lurek.log.info("save identity: " .. id, "save")
 end
@@ -313,7 +353,7 @@ Returns file metadata for a GameFS path when available.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getInfo
+do
   local info = lurek.filesystem.getInfo("save/slot1.dat")
   if info then
     lurek.log.info("slot1 " .. info.type .. " " .. info.size .. " bytes", "save")
@@ -332,7 +372,7 @@ Returns the save directory path used by GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getSaveDirectory
+do
   local save_dir = lurek.filesystem.getSaveDirectory()
   lurek.log.info("saves stored at: " .. save_dir, "save")
 end
@@ -349,7 +389,7 @@ Returns the GameFS source root string.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getSource
+do
   local src = lurek.filesystem.getSource()
   lurek.log.info("game source dir: " .. src, "fs")
 end
@@ -366,7 +406,7 @@ Returns the current user's directory path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getUserDirectory
+do
   local home = lurek.filesystem.getUserDirectory()
   lurek.log.info("user home: " .. home, "fs")
 end
@@ -383,7 +423,7 @@ Returns the process working directory.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.getWorkingDirectory
+do
   local cwd = lurek.filesystem.getWorkingDirectory()
   lurek.log.debug("cwd at launch: " .. cwd, "fs")
 end
@@ -404,7 +444,7 @@ Returns GameFS paths matching a glob pattern.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.glob
+do
   local saves = lurek.filesystem.glob("save/slot*.dat")
   for _, path in ipairs(saves) do
     lurek.log.info("save: " .. path, "save")
@@ -427,7 +467,7 @@ Returns whether a GameFS path is a directory.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.isDirectory
+do
   if lurek.filesystem.isDirectory("assets/levels") then
     local levels = lurek.filesystem.getDirectoryItems("assets/levels")
     lurek.log.info("levels available: " .. #levels, "scene")
@@ -450,7 +490,7 @@ Returns whether a GameFS path is a regular file.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.isFile
+do
   pcall(function()
     if lurek.filesystem.isFile("config/options.toml") then
       local ok_cfg, cfg = pcall(lurek.filesystem.read, "config/options.toml")
@@ -477,7 +517,7 @@ Creates an iterator function over lines in a text file.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.lines
+do
   pcall(function()
     local count = 0
     for line in lurek.filesystem.lines("assets/data/dialogue.csv") do
@@ -503,7 +543,7 @@ Lists all paths under a GameFS directory recursively.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.listRecursive
+do
   local ok, files = pcall(lurek.filesystem.listRecursive, "assets/levels")
   if ok then
     lurek.log.info("level assets: " .. #files, "scene")
@@ -526,7 +566,7 @@ Loads a Lua chunk from GameFS and returns it as a Lua function.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.load
+do
   pcall(function()
     local chunk = lurek.filesystem.load("scripts/enemy_ai.lua")
     local enemy_module = chunk()
@@ -548,7 +588,7 @@ Creates a directory under the GameFS base directory.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.mkdir
+do
   pcall(function()
     lurek.filesystem.mkdir("save/run_001")
     lurek.filesystem.write("save/run_001/notes.txt", "ok")
@@ -570,7 +610,7 @@ end
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.mount
+do
   local ok = pcall(lurek.filesystem.mount, "../mods/extra", "mods/extra")
   if ok then lurek.log.info("mounted extra mods", "mods") end
 end
@@ -592,7 +632,7 @@ Opens a ZIP archive and exposes it through a virtual prefix.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.mountZip
+do
   local ok, pack = pcall(lurek.filesystem.mountZip, "dlc/forest_pack.zip", "mods/forest")
   if ok and pack:contains("levels/grove.json") then
     local data = pack:readFile("levels/grove.json")
@@ -615,7 +655,7 @@ Moves or renames one GameFS file to another path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.move
+do
   lurek.filesystem.write("save/slot1.tmp", "level=forest_02;hp=92")
   lurek.filesystem.move("save/slot1.tmp", "save/slot1.dat")
 end
@@ -636,7 +676,7 @@ Loads a file into an immutable file data handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.newFileData
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
     lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
@@ -660,7 +700,7 @@ Opens a GameFS file handle in a requested mode.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.openFile
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "w")
   fh:write("level=forest_01;hp=80;mana=42")
   fh:close()
@@ -682,7 +722,7 @@ Polls an asynchronous file load request.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.pollAsync
+do
   local pending
   function lurek.init() pending = lurek.filesystem.readAsync("assets/levels/forest.json") end
   function lurek.process(dt)
@@ -711,7 +751,7 @@ Polls an asynchronous file write request.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.pollAsyncWrite
+do
   local write_handle
   function lurek.init()
     write_handle = lurek.filesystem.writeAsync("save/telemetry.json", "{\"ok\":true}")
@@ -729,21 +769,24 @@ do -- lurek.filesystem.pollAsyncWrite
   end
 end
 
---@api-stub: lurek.filesystem.mount -- Mounts an external source path at a GameFS mount point
-do -- lurek.filesystem.mount
+--@api-stub: lurek.filesystem.mount
+-- Mounts an external source path at a GameFS mount point
+do
   local ok = pcall(lurek.filesystem.mount, "../mods/extra", "mods/extra")
   if ok then lurek.log.info("mounted extra mods", "mods") end
 end
 
---@api-stub: lurek.filesystem.unmount -- Removes a GameFS mount point
-do -- lurek.filesystem.unmount
+--@api-stub: lurek.filesystem.unmount
+-- Removes a GameFS mount point
+do
   if lurek.filesystem.unmount("mods/extra") then
     lurek.log.info("extra mods unmounted", "mods")
   end
 end
 
---@api-stub: lurek.filesystem.load -- Loads a Lua chunk from GameFS and returns it as a Lua function
-do -- lurek.filesystem.load
+--@api-stub: lurek.filesystem.load
+-- Loads a Lua chunk from GameFS and returns it as a Lua function
+do
   pcall(function()
     local chunk = lurek.filesystem.load("scripts/enemy_ai.lua")
     local enemy_module = chunk()
@@ -751,13 +794,11 @@ do -- lurek.filesystem.load
   end)
 end
 
---@api-stub: lurek.filesystem.newFileData -- Loads a file into an immutable file data handle
-do -- lurek.filesystem.newFileData
+--@api-stub: lurek.filesystem.newFileData
+-- Loads a file into an immutable file data handle
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
-    lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
-  end)
-end
 ```
 
 ### `lurek.filesystem.pollWatchers() -> table`
@@ -771,7 +812,7 @@ Polls watched paths and returns paths that changed since the previous poll.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.pollWatchers
+do
   local timer = 0
   function lurek.process(dt)
     timer = timer + dt
@@ -799,7 +840,7 @@ Reads a UTF-8 text file from GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.read
+do
   local ok, toml = pcall(lurek.filesystem.read, "config/options.toml")
   if ok then lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config") end
 end
@@ -820,7 +861,7 @@ Starts an asynchronous file load request.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.readAsync
+do
   local pending
   function lurek.init()
     pending = lurek.filesystem.readAsync("assets/levels/forest.json")
@@ -843,7 +884,7 @@ Reads a binary file from GameFS and returns the bytes as a Lua string.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.readBytes
+do
   local ok, data = pcall(lurek.filesystem.readBytes, "assets/hero.png")
   if ok then
     lurek.log.info("readBytes got " .. #data .. " bytes", "fs")
@@ -866,7 +907,7 @@ Reads a JSON document as text from GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.readJson
+do
   local json = lurek.filesystem.readJson("save/profile.json")
   lurek.log.info("profile json bytes: " .. #json, "save")
 end
@@ -888,7 +929,7 @@ Reads a JSON file or writes and returns default JSON when the file is absent.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.readOrWriteJson
+do
   local cfg = lurek.filesystem.readOrWriteJson(
     "save/options.json",
     '{"volume":0.8,"language":"en"}'
@@ -910,7 +951,7 @@ Removes a GameFS file or supported path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.remove
+do
   if lurek.filesystem.exists("save/temp_export.json") then
     lurek.filesystem.remove("save/temp_export.json")
     lurek.log.info("cleared stale export", "save")
@@ -931,7 +972,7 @@ Removes a GameFS directory. This function is exposed to Lua scripts.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.removeDir
+do
   if lurek.filesystem.isDirectory("save/screenshots") then
     lurek.filesystem.removeDir("save/screenshots")
     lurek.log.info("cleared screenshots cache", "save")
@@ -952,7 +993,7 @@ Sets the filesystem identity string used by save paths.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.setIdentity
+do
   lurek.filesystem.setIdentity("forest_quest")
   lurek.log.info("save identity set to forest_quest", "save")
 end
@@ -973,7 +1014,7 @@ Returns size and file/directory flags for a GameFS path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.stat
+do
   local ok, s = pcall(lurek.filesystem.stat, "assets/levels/forest.json")
   if ok and s.isFile then
     lurek.log.info("forest.json: " .. s.size .. " bytes", "scene")
@@ -996,7 +1037,7 @@ Resolves a GameFS-relative path against the filesystem base directory.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.toAbsolutePath
+do
   local abs = lurek.filesystem.toAbsolutePath("save/slot1.dat")
   lurek.log.info("absolute path: " .. abs, "fs")
 end
@@ -1017,7 +1058,7 @@ Removes a GameFS mount point. This function is exposed to Lua scripts.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.unmount
+do
   if lurek.filesystem.unmount("mods/extra") then
     lurek.log.info("extra mods unmounted", "mods")
   end
@@ -1037,7 +1078,7 @@ Removes a path from the module-local file watcher.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.unwatchPath
+do
   lurek.filesystem.watchPath("assets/levels/forest.json")
   lurek.filesystem.unwatchPath("assets/levels/forest.json")
 end
@@ -1056,7 +1097,7 @@ Adds a path to the module-local file watcher.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.watchPath
+do
   lurek.filesystem.watchPath("assets/levels/forest.json")
   lurek.filesystem.watchPath("scripts/enemy.lua")
 end
@@ -1076,7 +1117,7 @@ Writes a UTF-8 text file through GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.write
+do
   local score = 12450
   lurek.filesystem.write("save/highscore.txt", tostring(score))
 end
@@ -1098,7 +1139,7 @@ Starts an asynchronous file write request.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.writeAsync
+do
   local write_handle
   function lurek.init()
     local payload = "{\"checkpoint\":7,\"hp\":83}"
@@ -1121,7 +1162,7 @@ Writes binary data through GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.writeBytes
+do
   local payload = string.char(0x89, 0x50, 0x4E, 0x47) -- PNG magic header
   lurek.filesystem.writeBytes("save/test_binary.dat", payload)
   lurek.log.info("writeBytes wrote " .. #payload .. " bytes", "fs")
@@ -1142,7 +1183,7 @@ Writes JSON text through GameFS. This function is exposed to Lua scripts.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.writeJson
+do
   lurek.filesystem.writeJson("save/profile.json", '{"name":"hero","level":3}')
 end
 ```
@@ -1159,7 +1200,7 @@ end
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.newFileData
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
     lurek.log.info("loaded " .. fd:getFilename() .. " (" .. fd:getSize() .. " bytes)", "audio")
@@ -1178,7 +1219,7 @@ Returns the path associated with this file data object.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileData:getFilename
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("assets/levels/forest.json")
     lurek.log.info("loaded " .. fd:getFilename(), "scene")
@@ -1197,7 +1238,7 @@ Returns the byte length of this file data.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileData:getSize
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
     local kb = fd:getSize() / 1024
@@ -1217,7 +1258,7 @@ Returns file data bytes as a Lua string without UTF-8 validation.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileData:getString
+do
   pcall(function()
     local fd = lurek.filesystem.newFileData("config/options.toml")
     local body = fd:getString()
@@ -1237,7 +1278,7 @@ Returns the Lua-visible type name for this file data handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileData:type
+do
   local ok_fd, file_data_obj = pcall(lurek.filesystem.newFileData, "save/highscore.txt")
   if ok_fd and file_data_obj then
     local t = file_data_obj:type()
@@ -1263,7 +1304,7 @@ Returns whether this file data handle matches a supported type name.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileData:typeOf
+do
   local ok_fd2, file_data_obj2 = pcall(lurek.filesystem.newFileData, "save/highscore.txt")
   if ok_fd2 and file_data_obj2 then
     lurek.log.info("is LFileData: " .. tostring(file_data_obj2:typeOf("LFileData")), "filesystem")
@@ -1283,7 +1324,7 @@ Lua-side handle for a mutable file stream opened through GameFS.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.openFile
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "w")
   fh:write("level=forest_01;hp=80;mana=42")
   fh:close()
@@ -1299,7 +1340,7 @@ Closes this file handle. This method is available to Lua scripts.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:close
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "w")
   fh:write("hp=100;mana=50")
   fh:close()
@@ -1315,7 +1356,7 @@ Flushes pending writes on this file handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:flush
+do
   local fh = lurek.filesystem.openFile("save/journal.log", "a")
   fh:write("checkpoint=forest_02\n")
   fh:flush()
@@ -1334,7 +1375,7 @@ Returns the mode used to open this file handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:getMode
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
   lurek.log.debug("opened slot1 in mode " .. fh:getMode(), "save")
   fh:close()
@@ -1352,7 +1393,7 @@ Returns the size of the open file. This method is available to Lua scripts.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:getSize
+do
   pcall(function()
     local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
     lurek.log.info("level file size: " .. fh:getSize(), "scene")
@@ -1372,7 +1413,7 @@ Returns whether the file cursor is at end of file.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:isEOF
+do
   pcall(function()
     local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
     while not fh:isEOF() do
@@ -1399,7 +1440,7 @@ Reads up to an optional byte count and returns text using lossless UTF-8 replace
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:read
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
   local body = fh:read()
   fh:close()
@@ -1418,7 +1459,7 @@ Reads the next line from this file handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:readLine
+do
   pcall(function()
     local fh = lurek.filesystem.openFile("save/telemetry.log", "r")
     local first = fh:readLine()
@@ -1441,7 +1482,7 @@ Moves the file cursor to an absolute byte position.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:seek
+do
   local fh = lurek.filesystem.openFile("save/slot1.dat", "r")
   fh:seek(16)
   local chunk = fh:read(8)
@@ -1461,7 +1502,7 @@ Returns the current file cursor position.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:tell
+do
   pcall(function()
     local fh = lurek.filesystem.openFile("assets/levels/forest.json", "r")
     fh:read(64)
@@ -1482,7 +1523,7 @@ Returns the Lua-visible type name for this file handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:type
+do
   local ok_fh ---@type boolean
   local file_handle_obj ---@type LFileHandle?
   ok_fh, file_handle_obj = pcall(lurek.filesystem.openFile, "save/highscore.txt", nil)
@@ -1507,7 +1548,7 @@ Returns whether this file handle matches a supported type name.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:typeOf
+do
   local ok_fh ---@type boolean
   local file_handle_obj ---@type LFileHandle?
   ok_fh, file_handle_obj = pcall(lurek.filesystem.openFile, "save/highscore.txt", nil)
@@ -1530,7 +1571,7 @@ Writes a string to this file handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LFileHandle:write
+do
   local fh = lurek.filesystem.openFile("save/score.txt", "w")
   local n = fh:write("12450")
   fh:close()
@@ -1547,7 +1588,7 @@ Lua-side handle for a mounted ZIP archive view.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- lurek.filesystem.mountZip
+do
   local ok, pack = pcall(lurek.filesystem.mountZip, "dlc/forest_pack.zip", "mods/forest")
   if ok and pack:contains("levels/grove.json") then
     local data = pack:readFile("levels/grove.json")
@@ -1571,7 +1612,7 @@ Returns whether a virtual path exists in the ZIP mount.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:contains
+do
   pcall(function()
     local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
     if pack:contains("levels/secret.json") then
@@ -1592,7 +1633,7 @@ Returns every virtual file path in the ZIP mount.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:listFiles
+do
   pcall(function()
     local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
     local files = pack:listFiles()
@@ -1612,7 +1653,7 @@ Returns the virtual prefix used by this ZIP mount.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:prefix
+do
   pcall(function()
     local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
     lurek.log.info("pack mounted at " .. pack:prefix(), "mods")
@@ -1635,7 +1676,7 @@ Reads a file from the ZIP mount by virtual path.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:readFile
+do
   pcall(function()
     local pack = lurek.filesystem.mountZip("dlc/forest_pack.zip", "mods/forest")
     local body = pack:readFile("levels/grove.json")
@@ -1655,7 +1696,7 @@ Returns the Lua-visible type name for this ZIP mount handle.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:type
+do
   local ok_zm ---@type boolean
   local zip_mount_obj ---@type LZipMount?
   ok_zm, zip_mount_obj = pcall(lurek.filesystem.mountZip, "assets/data.zip", nil)
@@ -1680,7 +1721,7 @@ Returns whether this ZIP mount handle matches a supported type name.
 Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua):
 
 ```lua
-do -- LZipMount:typeOf
+do
   local ok_zm2 ---@type boolean
   local zip_mount_obj2 ---@type LZipMount?
   ok_zm2, zip_mount_obj2 = pcall(lurek.filesystem.mountZip, "assets/data.zip", nil)

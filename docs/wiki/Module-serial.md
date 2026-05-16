@@ -53,10 +53,54 @@ CSV parsing handles headers, delimiters, quoting, and multi-line fields. TOML su
 Module example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.fromJson
+-- content/examples/serial.lua
+-- lurek.serial API examples.
+-- Run: cargo run -- content/examples/serial.lua
+
+--@api-stub: lurek.serial.fromJson
+-- Parses a JSON string into a Lua table
+do
   local data = lurek.serial.fromJson('{"name":"hero","hp":30}')
   lurek.log.info(data.name .. " hp=" .. data.hp, "serial")
 end
+
+--@api-stub: lurek.serial.toJson
+-- Serializes a Lua value (table, string, number, boolean, or nil) into a JSON string
+do
+  local body = lurek.serial.toJson({ event = "level_up", level = 5 }, true)
+  lurek.log.info(body, "serial")
+end
+
+--@api-stub: lurek.serial.fromToml
+-- Parses a TOML string into a Lua table
+do
+  local cfg = lurek.serial.fromToml('title = "Forest"\n[window]\nwidth = 1280\n')
+  lurek.log.info(cfg.title .. " width=" .. cfg.window.width, "serial")
+end
+
+--@api-stub: lurek.serial.toToml
+-- Serializes a Lua table into a TOML-formatted string
+do
+  local text = lurek.serial.toToml({ audio = { master = 0.8 }, fullscreen = false })
+  lurek.log.info(text, "serial")
+end
+
+--@api-stub: lurek.serial.fromIni
+-- Parses an INI-format string into a Lua table
+do
+  local cfg = lurek.serial.fromIni("[player]\nname=hero\n")
+  lurek.log.info(cfg.player.name, "serial")
+end
+
+--@api-stub: lurek.serial.fromCsv
+-- Parses a CSV string into a Lua table (array of rows)
+do
+  local rows = lurek.serial.fromCsv("name,score\nada,10\nlin,20\n")
+  lurek.log.info(rows[1].name .. " score=" .. rows[1].score, "serial")
+end
+
+--@api-stub: lurek.serial.toCsv
+-- Serializes a Lua table (array of row tables) into a CSV-formatted string
 ```
 
 ## Key Types
@@ -103,7 +147,7 @@ Merges a schema's default values into a data table, filling in any missing field
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.applyDefaults
+do
   local schema = { type = "table", fields = {
     hp = { type = "number", default = 100 },
     name = { type = "string", default = "hero" },
@@ -130,7 +174,7 @@ Universal decoder that parses a string payload into a Lua table using the specif
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.decode
+do
   local a = lurek.serial.decode('{"k":1}')
   local b = lurek.serial.decode("title = \"demo\"", "toml")
   lurek.log.info(a.k .. " " .. b.title, "serial")
@@ -152,7 +196,7 @@ Decodes a binary MessagePack string back into a Lua table. Use this to read save
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.decodeMsgPack
+do
   local bytes = lurek.serial.encodeMsgPack({ tick = 100 })
   local data = lurek.serial.decodeMsgPack(bytes)
   lurek.log.info("tick=" .. data.tick, "serial")
@@ -174,7 +218,7 @@ Parses an XML string into a Lua table structure. Elements become nested tables w
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.decodeXml
+do
   local node = lurek.serial.decodeXml('<root id="1"><child>ok</child></root>')
   lurek.log.info(node.tag .. " id=" .. node.attrs.id, "serial")
 end
@@ -195,7 +239,7 @@ Attempts to auto-detect the serialization format of a string by inspecting its c
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.detectFormat
+do
   local kind = lurek.serial.detectFormat('{"k":1}')
   lurek.log.info("format=" .. tostring(kind), "serial")
 end
@@ -218,7 +262,7 @@ Universal encoder that serializes a Lua value into the specified format. Support
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.encode
+do
   local json = lurek.serial.encode({ hp = 10 }, "json", { pretty = true })
   local csv = lurek.serial.encode({ { name = "ada", score = "10" } }, "csv", { delimiter = ";" })
   lurek.log.info(json .. "\n" .. csv, "serial")
@@ -240,7 +284,7 @@ Encodes a Lua table into a compact binary MessagePack string. MessagePack is fas
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.encodeMsgPack
+do
   local bytes = lurek.serial.encodeMsgPack({ tick = 100, hp = 75 })
   lurek.log.info("encoded bytes=" .. #bytes, "serial")
 end
@@ -263,7 +307,7 @@ Parses a CSV string into a Lua table (array of rows). Each row is either a keyed
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.fromCsv
+do
   local rows = lurek.serial.fromCsv("name,score\nada,10\nlin,20\n")
   lurek.log.info(rows[1].name .. " score=" .. rows[1].score, "serial")
 end
@@ -284,7 +328,7 @@ Parses an INI-format string into a Lua table. Sections become nested tables, and
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.fromIni
+do
   local cfg = lurek.serial.fromIni("[player]\nname=hero\n")
   lurek.log.info(cfg.player.name, "serial")
 end
@@ -305,7 +349,7 @@ Parses a JSON string into a Lua table. Use this to load configuration files, net
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.fromJson
+do
   local data = lurek.serial.fromJson('{"name":"hero","hp":30}')
   lurek.log.info(data.name .. " hp=" .. data.hp, "serial")
 end
@@ -326,7 +370,7 @@ Parses a TOML string into a Lua table. Ideal for loading game configuration file
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.fromToml
+do
   local cfg = lurek.serial.fromToml('title = "Forest"\n[window]\nwidth = 1280\n')
   lurek.log.info(cfg.title .. " width=" .. cfg.window.width, "serial")
 end
@@ -349,7 +393,7 @@ Serializes a Lua table (array of row tables) into a CSV-formatted string. Each r
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.toCsv
+do
   local csv = lurek.serial.toCsv({ { name = "ada", score = "10" } })
   lurek.log.info(csv, "serial")
 end
@@ -371,7 +415,7 @@ Serializes a Lua value (table, string, number, boolean, or nil) into a JSON stri
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.toJson
+do
   local body = lurek.serial.toJson({ event = "level_up", level = 5 }, true)
   lurek.log.info(body, "serial")
 end
@@ -392,7 +436,7 @@ Serializes a Lua table into a TOML-formatted string. Use this to write configura
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.toToml
+do
   local text = lurek.serial.toToml({ audio = { master = 0.8 }, fullscreen = false })
   lurek.log.info(text, "serial")
 end
@@ -414,7 +458,7 @@ Validates a Lua value against a schema table. The schema defines expected types,
 Exact example from [serial.lua](../blob/main/content/examples/serial.lua):
 
 ```lua
-do -- lurek.serial.validate
+do
   local ok, err = lurek.serial.validate({ hp = 30 }, { type = "table", fields = {
     hp = { type = "number", min = 1, max = 999 },
   }})

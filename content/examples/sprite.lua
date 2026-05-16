@@ -2,16 +2,18 @@
 -- lurek.sprite API examples.
 -- Run: cargo run -- content/examples/sprite.lua
 
---@api-stub: lurek.sprite.newSheet -- Creates a new sprite sheet by dividing a texture of the given pixel size into a grid of equal-sized frames
-do -- lurek.sprite.newSheet
+--@api-stub: lurek.sprite.newSheet
+-- Creates a new sprite sheet by dividing a texture of the given pixel size into a grid of equal-sized frames
+do
   -- 256x192 texture sliced into 32x32 cells â†’ 8 cols Ă— 6 rows = 48 frames.
   local sheet = lurek.sprite.newSheet(256, 192, 32, 32)
   local cols, rows = sheet:getGridSize()
   lurek.log.info("sheet ready: " .. cols .. "x" .. rows .. " (" .. sheet:getFrameCount() .. " frames)", "sprite")
 end
 
---@api-stub: lurek.sprite.newRPGMakerSheet -- Creates a sprite sheet using RPG Maker's standard character layout (4 columns × 4 rows per character block)
-do -- lurek.sprite.newRPGMakerSheet
+--@api-stub: lurek.sprite.newRPGMakerSheet
+-- Creates a sprite sheet using RPG Maker's standard character layout (4 columns × 4 rows per character block)
+do
   local hero = lurek.sprite.newRPGMakerSheet(96, 128)
   for _, dir in ipairs({ "down", "left", "right", "up" }) do
     local frames = hero:getGroupFrames(dir)
@@ -19,8 +21,9 @@ do -- lurek.sprite.newRPGMakerSheet
   end
 end
 
---@api-stub: lurek.sprite.parseAtlas -- Parses a TexturePacker JSON atlas string and returns a sprite atlas object
-do -- lurek.sprite.parseAtlas
+--@api-stub: lurek.sprite.parseAtlas
+-- Parses a TexturePacker JSON atlas string and returns a sprite atlas object
+do
   pcall(function()
     local json = tryRead("img/ui_atlas.json")
     if json then
@@ -30,8 +33,9 @@ do -- lurek.sprite.parseAtlas
   end)
 end
 
---@api-stub: lurek.sprite.newAtlasSheet -- Creates a sprite sheet from an existing atlas, treating each atlas entry as a frame within the given sheet dimensions
-do -- lurek.sprite.newAtlasSheet
+--@api-stub: lurek.sprite.newAtlasSheet
+-- Creates a sprite sheet from an existing atlas, treating each atlas entry as a frame within the given sheet dimensions
+do
   pcall(function()
     local json = tryRead("img/items.json")
     if json then
@@ -43,8 +47,9 @@ do -- lurek.sprite.newAtlasSheet
   end)
 end
 
---@api-stub: lurek.sprite.parseAsepriteAtlas -- Parses an Aseprite JSON atlas string and returns a sprite atlas object
-do -- lurek.sprite.parseAsepriteAtlas
+--@api-stub: lurek.sprite.parseAsepriteAtlas
+-- Parses an Aseprite JSON atlas string and returns a sprite atlas object
+do
   pcall(function()
     local json = tryRead("img/hero.json")
     if json then
@@ -56,10 +61,11 @@ do -- lurek.sprite.parseAsepriteAtlas
   end)
 end
 
--- â”€â”€ SpriteSheet methods â”€â”€
+-- SpriteSheet methods
 
 --@api-stub: SpriteSheet:getFrame
-do -- SpriteSheet:getFrame
+-- Returns the frame of this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(128, 64, 32, 32)  -- 4 cols Ă— 2 rows
   local quad = sheet:getFrame(0)
   if quad then
@@ -68,7 +74,8 @@ do -- SpriteSheet:getFrame
 end
 
 --@api-stub: SpriteSheet:getFrameCount
-do -- SpriteSheet:getFrameCount
+-- Returns the number of frame items in this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(192, 32, 32, 32)
   local count = sheet:getFrameCount()
   local frame_at_t = math.floor(1.5 * 8) % count  -- 8 fps, t=1.5s
@@ -76,7 +83,8 @@ do -- SpriteSheet:getFrameCount
 end
 
 --@api-stub: SpriteSheet:getRow
-do -- SpriteSheet:getRow
+-- Returns the row of this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)  -- 3 cols Ă— 4 rows
   local walk_down = sheet:getRow(0)
   for i, q in ipairs(walk_down) do
@@ -85,14 +93,16 @@ do -- SpriteSheet:getRow
 end
 
 --@api-stub: SpriteSheet:getColumn
-do -- SpriteSheet:getColumn
+-- Returns the column of this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)
   local first_col = sheet:getColumn(0)
   lurek.log.info("column 0 holds " .. #first_col .. " stacked poses", "sprite")
 end
 
 --@api-stub: SpriteSheet:getGroupFrames
-do -- SpriteSheet:getGroupFrames
+-- Returns the group frames of this sprite sheet.
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local frames = sheet:getGroupFrames("up")
   if frames then
@@ -102,7 +112,8 @@ do -- SpriteSheet:getGroupFrames
 end
 
 --@api-stub: SpriteSheet:getGroupNames
-do -- SpriteSheet:getGroupNames
+-- Returns the group names of this sprite sheet.
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local names = sheet:getGroupNames()
   table.sort(names)
@@ -110,7 +121,8 @@ do -- SpriteSheet:getGroupNames
 end
 
 --@api-stub: SpriteSheet:getFrameSize
-do -- SpriteSheet:getFrameSize
+-- Returns the frame size of this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(256, 256, 64, 64)
   local fw, fh = sheet:getFrameSize()
   local hitbox = { w = fw - 8, h = fh - 4 }  -- shrink a few px around the sprite
@@ -118,7 +130,8 @@ do -- SpriteSheet:getFrameSize
 end
 
 --@api-stub: SpriteSheet:getGridSize
-do -- SpriteSheet:getGridSize
+-- Returns the grid size of this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)
   local cols, rows = sheet:getGridSize()
   if cols ~= 3 or rows ~= 4 then
@@ -127,16 +140,18 @@ do -- SpriteSheet:getGridSize
 end
 
 --@api-stub: SpriteSheet:drawToImage
-do -- SpriteSheet:drawToImage
+-- Draws or renders this sprite sheet to the current render target.
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local debug_img = sheet:drawToImage(192, 256)  -- 2x scale preview
   lurek.log.info("debug overlay generated: " .. tostring(debug_img), "sprite")
 end
 
--- â”€â”€ SpriteAtlas methods â”€â”€
+-- SpriteAtlas methods
 
 --@api-stub: SpriteAtlas:getEntry
-do -- SpriteAtlas:getEntry
+-- Returns the entry of this sprite atlas.
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -148,7 +163,8 @@ do -- SpriteAtlas:getEntry
 end
 
 --@api-stub: SpriteAtlas:getByIndex
-do -- SpriteAtlas:getByIndex
+-- Returns the by index of this sprite atlas.
+do
   local json = tryRead("img/tiles.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -160,7 +176,8 @@ do -- SpriteAtlas:getByIndex
 end
 
 --@api-stub: SpriteAtlas:entryCount
-do -- SpriteAtlas:entryCount
+-- Performs the entry count operation on this sprite atlas.
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -171,7 +188,8 @@ do -- SpriteAtlas:entryCount
 end
 
 --@api-stub: SpriteAtlas:entryNames
-do -- SpriteAtlas:entryNames
+-- Performs the entry names operation on this sprite atlas.
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -204,17 +222,19 @@ end
 --
 -- Run: cargo run -- content/examples/sprite.lua
 
--- â”€â”€ lurek.sprite.* functions â”€â”€
+-- lurek.sprite.* functions
 
 --@api-stub: SpriteAtlas:getFlipped
-do -- SpriteAtlas:getFlipped
+-- Returns the flipped of this sprite atlas.
+do
   local atlas = lurek.sprite.parseAtlas('{"frames":{},"meta":{"app":"TexturePacker","version":"1.0","image":"sheet.png","format":"RGBA8888","size":{"w":256,"h":256},"scale":"1"}}')
   local entry = atlas:getFlipped("hero_run_01", true, false)
   lurek.log.info("flipped entry: " .. tostring(entry ~= nil), "sprite")
 end
 
 --@api-stub: SpriteSheet:nameGroup
-do -- SpriteSheet:nameGroup
+-- Performs the name group operation on this sprite sheet.
+do
   local sheet = lurek.sprite.newSheet(256, 256, 32, 32)
   sheet:nameGroup("walk", 0, 4)
   sheet:nameGroup("run",  4, 4)
@@ -222,29 +242,17 @@ do -- SpriteSheet:nameGroup
   lurek.log.info("walk frames: " .. #frames, "sprite")
 end
 
--- =============================================================================
--- COVERAGE: 4 uncovered lurek.sprite API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
-
-
 -- -----------------------------------------------------------------------------
 -- SpriteSheet methods
 -- -----------------------------------------------------------------------------
-
--- =============================================================================
--- COVERAGE: 4 uncovered lurek.sprite API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- LSpriteAtlas methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LSpriteAtlas:type -- Returns the type name of this object
-do -- LSpriteAtlas:type
+--@api-stub: LSpriteAtlas:type
+-- Returns the type name of this object
+do
   local ok_a ---@type boolean
   local sprite_atlas_obj ---@type LSpriteAtlas?
   ok_a, sprite_atlas_obj = pcall(lurek.sprite.parseAtlas, "sprites/atlas.png")
@@ -252,16 +260,18 @@ do -- LSpriteAtlas:type
   local t = sprite_atlas_obj and sprite_atlas_obj:type() or "LSpriteAtlas"
   lurek.log.info("LSpriteAtlas:type = " .. t, "sprite")
 end
---@api-stub: LSpriteAtlas:typeOf -- Checks whether this object matches the given type name
-do -- LSpriteAtlas:typeOf
+--@api-stub: LSpriteAtlas:typeOf
+-- Checks whether this object matches the given type name
+do
   local ok_a ---@type boolean
   local sprite_atlas_obj ---@type LSpriteAtlas?
   ok_a, sprite_atlas_obj = pcall(lurek.sprite.parseAtlas, "sprites/atlas.png")
   if not ok_a then sprite_atlas_obj = nil end
   lurek.log.info("is LSpriteAtlas: dummy", "sprite")
 end
---@api-stub: LSpriteSheet:type -- Returns the type name of this object
-do -- LSpriteSheet:type
+--@api-stub: LSpriteSheet:type
+-- Returns the type name of this object
+do
   local ok_s ---@type boolean
   local sprite_sheet_obj ---@type LSpriteSheet?
   ok_s, sprite_sheet_obj = pcall(lurek.sprite.newSheet, "sprites/sheet.png", 32, 32)
@@ -269,8 +279,9 @@ do -- LSpriteSheet:type
   local t = sprite_sheet_obj and sprite_sheet_obj:type() or "LSpriteSheet"
   lurek.log.info("LSpriteSheet:type = " .. t, "sprite")
 end
---@api-stub: LSpriteSheet:typeOf -- Checks whether this object matches the given type name
-do -- LSpriteSheet:typeOf
+--@api-stub: LSpriteSheet:typeOf
+-- Checks whether this object matches the given type name
+do
   local ok_s ---@type boolean
   local sprite_sheet_obj ---@type LSpriteSheet?
   ok_s, sprite_sheet_obj = pcall(lurek.sprite.newSheet, "sprites/sheet.png", 32, 32)
@@ -280,3 +291,18 @@ do -- LSpriteSheet:typeOf
 end
 
 
+--@api-stub: LGroupedFrame:type
+-- Returns the Lua-visible type name string for this grouped frame handle.
+do
+  local batch = lurek.sprite.newBatch("assets/sheet.png", 32, 32)
+  local gf = batch:addGroup(1, 2)
+  lurek.log.info(gf:type(), "sprite")
+end
+
+--@api-stub: LGroupedFrame:typeOf
+-- Returns true if this grouped frame handle matches the given type name string.
+do
+  local batch = lurek.sprite.newBatch("assets/sheet.png", 32, 32)
+  local gf = batch:addGroup(1, 2)
+  lurek.log.info(tostring(gf:typeOf("LGroupedFrame")), "sprite")
+end

@@ -133,12 +133,54 @@ The module provides FFT/IFFT via Cooley-Tukey, LU decomposition for linear syste
 Module example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.newArray
+-- content/examples/compute.lua
+-- lurek.compute API examples.
+-- Run: cargo run -- content/examples/compute.lua
+
+--@api-stub: lurek.compute.newArray
+-- Creates a zero-filled array with the requested shape and data type
+do
   local heat = lurek.compute.newArray({64, 64}, "float32")
   heat:set(1, 1, 1.0)
   heat:set(64, 64, 1.0)
   lurek.log.info("heat grid: " .. heat:getSize() .. " cells", "compute")
 end
+
+--@api-stub: lurek.compute.zeros
+-- Creates a zero-filled array with the requested shape and data type
+do
+  local damage = lurek.compute.zeros({3, 3})
+  damage:set(2, 2, 25.0)
+  local total = damage:sum()
+  lurek.log.info("total damage: " .. total, "compute")
+end
+
+--@api-stub: lurek.compute.ones
+-- Creates a one-filled array with the requested shape and data type
+do
+  local mask = lurek.compute.ones({8, 8})
+  local faded = mask:clamp(0.0, 0.5)
+  lurek.log.info("faded mean: " .. faded:mean(), "compute")
+end
+
+--@api-stub: lurek.compute.range
+-- Creates a one-dimensional range array
+do
+  local frames = lurek.compute.range(0, 10, 1)
+  local doubled = frames:pow(2)
+  lurek.log.info("frame[5]^2 = " .. doubled:get(6), "compute")
+end
+
+--@api-stub: lurek.compute.fromTable
+-- Creates an array from a flat Lua table and optional shape
+do
+  local samples = {0.1, 0.2, 0.4, 0.8, 1.0, 0.8, 0.4}
+  local wave = lurek.compute.fromTable(samples)
+  local peak = wave:max()
+  lurek.log.info("wave peak: " .. peak, "compute")
+end
+
+--@api-stub: lurek.compute.getParThreshold
 ```
 
 ## Key Types
@@ -186,7 +228,7 @@ Creates a 2D affine transform matrix.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.affine2d
+do
   local tx, ty = 100, 50
   local m = lurek.compute.affine2d(tx, ty, 0.0, 2.0, 2.0)
   local origin = lurek.compute.fromTable({0, 0}, {1, 2})
@@ -210,7 +252,7 @@ Computes the FFT of real-valued samples.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.fft
+do
   local samples = {0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0}
   local spectrum = lurek.compute.fft(samples)
   local bin0 = spectrum[1]
@@ -233,7 +275,7 @@ Computes FFT magnitudes for real-valued samples.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.fftMagnitude
+do
   local samples = {0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0}
   local mags = lurek.compute.fftMagnitude(samples)
   lurek.log.info("mag[2] = " .. mags[2], "fft")
@@ -257,7 +299,7 @@ Creates an array from a flat Lua table and optional shape.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.fromTable
+do
   local samples = {0.1, 0.2, 0.4, 0.8, 1.0, 0.8, 0.4}
   local wave = lurek.compute.fromTable(samples)
   local peak = wave:max()
@@ -281,7 +323,7 @@ Creates a square Gaussian kernel array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.gaussianKernel
+do
   local kernel = lurek.compute.gaussianKernel(5, 1.2)
   local weight_sum = kernel:sum()
   lurek.log.info("gaussian sum (should be approx 1.0): " .. weight_sum, "compute")
@@ -299,7 +341,7 @@ Returns the global compute parallelism threshold.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.getParThreshold
+do
   local threshold = lurek.compute.getParThreshold()
   lurek.log.info("compute parallel threshold=" .. threshold, "compute")
 end
@@ -320,7 +362,7 @@ Computes the inverse FFT of complex frequency pairs.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.ifft
+do
   local samples = {1.0, 0.5, 0.0, -0.5}
   local freqs = lurek.compute.fft(samples)
   local rebuilt = lurek.compute.ifft(freqs)
@@ -344,7 +386,7 @@ Creates a zero-filled array with the requested shape and data type.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.newArray
+do
   local heat = lurek.compute.newArray({64, 64}, "float32")
   heat:set(1, 1, 1.0)
   heat:set(64, 64, 1.0)
@@ -368,7 +410,7 @@ Creates a one-filled array with the requested shape and data type.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.ones
+do
   local mask = lurek.compute.ones({8, 8})
   local faded = mask:clamp(0.0, 0.5)
   lurek.log.info("faded mean: " .. faded:mean(), "compute")
@@ -393,7 +435,7 @@ Creates a one-dimensional range array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.range
+do
   local frames = lurek.compute.range(0, 10, 1)
   local doubled = frames:pow(2)
   lurek.log.info("frame[5]^2 = " .. doubled:get(6), "compute")
@@ -415,7 +457,7 @@ Creates a 2D rotation matrix. This function is exposed to Lua scripts.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.rotate2dMatrix
+do
   local angle = math.pi / 4
   local rot = lurek.compute.rotate2dMatrix(angle)
   local pts = lurek.compute.fromTable({1, 0, 0, 1}, {2, 2})
@@ -439,7 +481,7 @@ Sets the global compute parallelism threshold and returns the previous value.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.setParThreshold
+do
   local previous = lurek.compute.getParThreshold()
   lurek.compute.setParThreshold(1024)
   local updated = lurek.compute.getParThreshold()
@@ -463,7 +505,7 @@ Creates a zero-filled array with the requested shape and data type.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.zeros
+do
   local damage = lurek.compute.zeros({3, 3})
   damage:set(2, 2, 25.0)
   local total = damage:sum()
@@ -483,7 +525,7 @@ Lua-side multidimensional numeric array handle.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- lurek.compute.affine2d
+do
   local tx, ty = 100, 50
   local m = lurek.compute.affine2d(tx, ty, 0.0, 2.0, 2.0)
   local origin = lurek.compute.fromTable({0, 0}, {1, 2})
@@ -503,7 +545,7 @@ Returns element-wise absolute values.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:abs
+do
   local deltas = lurek.compute.fromTable({-3, 1, -2, 4})
   local mag = deltas:abs()
   lurek.log.info("abs sum = " .. mag:sum(), "compute")
@@ -525,7 +567,7 @@ Returns element-wise addition with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:add
+do
   local base = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
   local boost = lurek.compute.fromTable({10, 20}, {2})
   local out = base:add(boost) -- row broadcast
@@ -546,7 +588,7 @@ Adds another array into this array in place.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- LArray:addInplace
+do
   local a = lurek.compute.fromTable({1, 2, 3})
   local b = lurek.compute.fromTable({4, 5, 6})
   a:addInplace(b)
@@ -564,7 +606,7 @@ Returns whether all elements are non-zero.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:all
+do
   local switches = lurek.compute.fromTable({1, 1, 1, 1})
   if switches:all() then
     lurek.log.info("door unlocked", "puzzle")
@@ -583,7 +625,7 @@ Returns whether any element is non-zero.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:any
+do
   local hits = lurek.compute.fromTable({0, 0, 1, 0})
   if hits:any() then
     lurek.log.warn("at least one hit registered", "combat")
@@ -602,7 +644,7 @@ Returns the one-based flat index of the maximum value.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:argmax
+do
   local scores = lurek.compute.fromTable({0.2, 0.5, 0.9, 0.4})
   local choice = scores:argmax()
   lurek.log.info("AI picks action " .. choice, "ai")
@@ -620,7 +662,7 @@ Returns the one-based flat index of the minimum value.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:argmin
+do
   local distances = lurek.compute.fromTable({12, 4, 9, 7})
   local nearest = distances:argmin()
   lurek.log.info("nearest enemy index: " .. nearest, "ai")
@@ -642,7 +684,7 @@ Returns element-wise bitwise AND with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseAnd
+do
   local walk = lurek.compute.fromTable({1, 1, 0, 1}, nil, "int32")
   local lit  = lurek.compute.fromTable({1, 0, 1, 1}, nil, "int32")
   local both = walk:bitwiseAnd(lit)
@@ -665,7 +707,7 @@ Returns element-wise left shift by a bit count.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseLShift
+do
   local ids = lurek.compute.fromTable({1, 2, 3, 4}, nil, "int32")
   local packed = ids:bitwiseLShift(4)
   lurek.log.info("packed[2] = " .. packed:get(2), "compute")
@@ -683,7 +725,7 @@ Returns element-wise bitwise NOT.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseNot
+do
   local occupied = lurek.compute.fromTable({1, 0, 0, 1}, nil, "int32")
   local free = occupied:bitwiseNot()
   lurek.log.info("free mask[2] = " .. free:get(2), "tiles")
@@ -705,7 +747,7 @@ Returns element-wise bitwise OR with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseOr
+do
   local fov  = lurek.compute.fromTable({1, 0, 0, 1}, nil, "int32")
   local mem  = lurek.compute.fromTable({0, 1, 0, 0}, nil, "int32")
   local seen = fov:bitwiseOr(mem)
@@ -728,7 +770,7 @@ Returns element-wise right shift by a bit count.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseRShift
+do
   local packed = lurek.compute.fromTable({16, 32, 48, 64}, nil, "int32")
   local high = packed:bitwiseRShift(4)
   lurek.log.info("high[3] = " .. high:get(3), "compute")
@@ -750,7 +792,7 @@ Returns element-wise bitwise XOR with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:bitwiseXor
+do
   local prev = lurek.compute.fromTable({1, 0, 1, 1}, nil, "int32")
   local curr = lurek.compute.fromTable({1, 1, 1, 0}, nil, "int32")
   local changed = prev:bitwiseXor(curr)
@@ -774,7 +816,7 @@ Returns values clamped between minimum and maximum bounds.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:clamp
+do
   local hp = lurek.compute.fromTable({120, -5, 75, 200})
   local clamped = hp:clamp(0, 100)
   lurek.log.info("clamped max = " .. clamped:max(), "compute")
@@ -792,7 +834,7 @@ Returns a copy of this array. This method is available to Lua scripts.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:clone
+do
   local original = lurek.compute.ones({4})
   local copy = original:clone()
   copy:fill(0.0)
@@ -815,7 +857,7 @@ Returns one-dimensional convolution with a kernel array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:convolve1d
+do
   local signal = lurek.compute.fromTable({0, 1, 0, 1, 0, 1, 0})
   local kernel = lurek.compute.fromTable({0.25, 0.5, 0.25})
   local smoothed = signal:convolve1d(kernel)
@@ -838,7 +880,7 @@ Returns two-dimensional convolution with a kernel array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:convolve2D
+do
   local img = lurek.compute.ones({8, 8})
   local k = lurek.compute.gaussianKernel(3, 0.8)
   local blurred = img:convolve2D(k)
@@ -861,7 +903,7 @@ Returns one-dimensional correlation with a template array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:correlate1d
+do
   local stream   = lurek.compute.fromTable({0, 1, 2, 3, 2, 1, 0})
   local template = lurek.compute.fromTable({1, 2, 3})
   local match    = stream:correlate1d(template)
@@ -880,7 +922,7 @@ Counts non-zero elements. This method is available to Lua scripts.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:countNonZero
+do
   local occupied = lurek.compute.fromTable({0, 1, 0, 1, 1, 0})
   local live = occupied:countNonZero()
   lurek.log.info("occupied tiles: " .. live, "compute")
@@ -902,7 +944,7 @@ Returns covariance with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:covariance
+do
   local x = lurek.compute.fromTable({1, 2, 3, 4})
   local y = lurek.compute.fromTable({2, 4, 6, 8})
   local cov = x:covariance(y)
@@ -925,7 +967,7 @@ Returns two-dimensional cross product with another vector.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:cross2d
+do
   local heading = lurek.compute.fromTable({1, 0})
   local target  = lurek.compute.fromTable({0, 1})
   local cross   = heading:cross2d(target)
@@ -944,7 +986,7 @@ Returns cumulative sum over the flattened array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:cumsum
+do
   local scores = lurek.compute.fromTable({1, 2, 3, 4})
   local running = scores:cumsum()
   lurek.log.info("score after 3rd round = " .. running:get(3), "score")
@@ -966,7 +1008,7 @@ Returns finite differences over the flattened array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:diff
+do
   local pos = lurek.compute.fromTable({0, 1, 3, 6, 10})
   local vel = pos:diff(1)
   lurek.log.info("vel[2] = " .. vel:get(2), "compute")
@@ -988,7 +1030,7 @@ Returns morphological dilation with a radius.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:dilate
+do
   local mask = lurek.compute.zeros({5, 5})
   mask:set(3, 3, 1.0)
   local grown = mask:dilate(1)
@@ -1011,7 +1053,7 @@ Returns element-wise division with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:div
+do
   local ms = lurek.compute.fromTable({16, 20, 25, 33})
   local sec = ms:div(1000)
   lurek.log.info("sec[1] = " .. sec:get(1), "compute")
@@ -1031,7 +1073,7 @@ Divides this array by another array in place.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- LArray:divInplace
+do
   local a = lurek.compute.fromTable({8, 12, 16})
   local b = lurek.compute.fromTable({2, 3, 4})
   a:divInplace(b)
@@ -1053,7 +1095,7 @@ Returns dot product with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:dot
+do
   local heading = lurek.compute.fromTable({1, 0})
   local target = lurek.compute.fromTable({0.7, 0.7})
   local alignment = heading:dot(target)
@@ -1077,7 +1119,7 @@ Estimates dominant eigenvalue and eigenvector using power iteration.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:eigenPower
+do
   local A = lurek.compute.fromTable({2,1,1,2}, {2,2}, "float32")
   local result = A:eigenPower(50)
   lurek.log.info("dominant eigenvalue: " .. result.value, "compute")
@@ -1099,7 +1141,7 @@ Returns element-wise equality comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:eq
+do
   local tiles = lurek.compute.fromTable({0, 1, 2, 1, 0}, nil, "int32")
   local walls = tiles:eq(1)
   lurek.log.info("wall count = " .. walls:countNonZero(), "compute")
@@ -1121,7 +1163,7 @@ Returns morphological erosion with a radius.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:erode
+do
   local mask = lurek.compute.ones({4, 4})
   local interior = mask:erode(1)
   lurek.log.info("interior cells: " .. interior:countNonZero(), "compute")
@@ -1143,7 +1185,7 @@ Maps each element through a Lua expression compiled as `function(x) return expre
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:eval
+do
   local a = lurek.compute.fromTable({1, 2, 3})
   local b = a:eval("x * x + 1")
   lurek.log.debug("eval x^2+1: " .. tostring(b:toTable()[2]), "compute")
@@ -1163,7 +1205,7 @@ Fills this array in place with one value.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:fill
+do
   local scratch = lurek.compute.zeros({32, 32})
   scratch:fill(-1.0)
   lurek.log.info("scratch sum after fill: " .. scratch:sum(), "compute")
@@ -1187,7 +1229,7 @@ Returns a flood-filled copy starting at a one-based row and column.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:floodFill
+do
   local grid = lurek.compute.zeros({8,8}, "int32")
   grid:fill(1)
   grid:set(3, 3, 0)
@@ -1211,7 +1253,7 @@ Reads an array element using one-based indices.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:get
+do
   pcall(function()
     local m = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
     local top_right = m:get(1, 2)
@@ -1231,7 +1273,7 @@ Returns the array data type name. This method is available to Lua scripts.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:getDataType
+do
   local mask = lurek.compute.zeros({8}, "int32")
   local dt = mask:getDataType()
   if dt == "int32" then lurek.log.info("ready for bitwise ops", "compute") end
@@ -1249,7 +1291,7 @@ Returns the number of array dimensions.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:getDimensions
+do
   local v = lurek.compute.range(0, 5)
   if v:getDimensions() == 1 then
     lurek.log.info("vector, len=" .. v:getSize(), "compute")
@@ -1275,7 +1317,7 @@ Returns a rectangular region from this array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:getRegion
+do
   local a = lurek.compute.range(0, 64, 1, "int32"):reshape({8, 8})
   local patch = a:getRegion(2, 2, 5, 5)
   lurek.log.info("patch shape: " .. patch:getShape()[1] .. "x" .. patch:getShape()[2], "compute")
@@ -1293,7 +1335,7 @@ Returns the array shape as one-based dimension table.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:getShape
+do
   local grid = lurek.compute.zeros({4, 6})
   local shape = grid:getShape()
   lurek.log.info("grid is " .. shape[1] .. "x" .. shape[2], "compute")
@@ -1311,7 +1353,7 @@ Returns the total number of array elements.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:getSize
+do
   local img = lurek.compute.zeros({16, 16})
   local n = img:getSize()
   lurek.log.info("img has " .. n .. " pixels", "compute")
@@ -1333,7 +1375,7 @@ Returns element-wise greater-than comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:gt
+do
   local heat = lurek.compute.fromTable({0.1, 0.6, 0.8, 0.2})
   local hot = heat:gt(0.5)
   lurek.log.info("hot cells = " .. hot:countNonZero(), "compute")
@@ -1355,7 +1397,7 @@ Returns element-wise greater-or-equal comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:gte
+do
   local dist = lurek.compute.fromTable({2, 5, 7, 9})
   local far = dist:gte(7)
   lurek.log.info("far targets = " .. far:countNonZero(), "compute")
@@ -1379,7 +1421,7 @@ Returns histogram bins for the array values.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:histogram
+do
   local a = lurek.compute.fromTable({1,2,2,3,3,3,4,4,4,4}, nil, "int32")
   local hist = a:histogram(4)
   local ok_h, sz = pcall(function() return hist:len() end)
@@ -1399,7 +1441,7 @@ Returns whether this array is currently stored on the GPU.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:isOnGPU
+do
   local arr = lurek.compute.zeros({4})
   if not arr:isOnGPU() then
     lurek.log.debug("running compute on CPU", "compute")
@@ -1422,7 +1464,7 @@ Solves a linear system using this matrix and a right-hand side array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:linsolve
+do
   local a = lurek.compute.fromTable({2, 1, 1, 3}, {2, 2})
   local b = lurek.compute.fromTable({5, 10})
   local x = a:linsolve(b)
@@ -1445,7 +1487,7 @@ Returns element-wise less-than comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:lt
+do
   local stamina = lurek.compute.fromTable({40, 10, 25, 5})
   local low = stamina:lt(20)
   lurek.log.info("low stamina count = " .. low:countNonZero(), "compute")
@@ -1467,7 +1509,7 @@ Returns element-wise less-or-equal comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:lte
+do
   local scores = lurek.compute.fromTable({100, 120, 95, 130})
   local under_cap = scores:lte(120)
   lurek.log.info("<=120 count = " .. under_cap:countNonZero(), "compute")
@@ -1485,7 +1527,7 @@ Decomposes this matrix into LU data and permutation metadata.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:luDecompose
+do
   local a = lurek.compute.fromTable({4, 3, 6, 3}, {2, 2})
   local lu = a:luDecompose()
   lurek.log.info("LU n=" .. lu.n .. " det_sign=" .. lu.det_sign, "compute")
@@ -1507,7 +1549,7 @@ Maps each element through a Lua function and returns a new array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:map
+do
   local a = lurek.compute.fromTable({1, 4, 9})
   local b = a:map(function(x) return math.sqrt(x) end)
   lurek.log.debug("map sqrt: " .. tostring(b:toTable()[1]), "compute")
@@ -1529,7 +1571,7 @@ Returns matrix multiplication of this array and another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:matmul
+do
   local a = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
   local b = lurek.compute.fromTable({5, 6, 7, 8}, {2, 2})
   local c = a:matmul(b)
@@ -1552,7 +1594,7 @@ Returns total maximum or a maximum array along a one-based axis.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:max
+do
   local latencies = lurek.compute.fromTable({12, 30, 18, 25})
   local worst = latencies:max()
   lurek.log.info("worst latency: " .. worst .. "ms", "net")
@@ -1574,7 +1616,7 @@ Returns total mean or a mean array along a one-based axis.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:mean
+do
   local frame_ms = lurek.compute.fromTable({16.1, 16.7, 17.2, 16.9, 16.4})
   local avg = frame_ms:mean()
   lurek.log.info("avg frame ms: " .. avg, "perf")
@@ -1596,7 +1638,7 @@ Returns total minimum or a minimum array along a one-based axis.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:min
+do
   local costs = lurek.compute.fromTable({7, 3, 9, 4})
   local cheapest = costs:min()
   lurek.log.info("cheapest cost: " .. cheapest, "compute")
@@ -1618,7 +1660,7 @@ Returns element-wise multiplication with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:mul
+do
   local dmg = lurek.compute.fromTable({10, 12, 8})
   local crit = dmg:mul(1.5)
   lurek.log.info("crit total = " .. crit:sum(), "compute")
@@ -1638,7 +1680,7 @@ Multiplies this array by another array in place.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- LArray:mulInplace
+do
   local a = lurek.compute.fromTable({2, 3, 4})
   local b = lurek.compute.fromTable({5, 6, 7})
   a:mulInplace(b)
@@ -1656,7 +1698,7 @@ Returns element-wise negated values.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:neg
+do
   local impulse = lurek.compute.fromTable({2, -1, 4})
   local counter = impulse:neg()
   lurek.log.info("counter[1] = " .. counter:get(1), "compute")
@@ -1678,7 +1720,7 @@ Returns element-wise inequality comparison with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:neq
+do
   local tags = lurek.compute.fromTable({1, 2, 2, 3}, nil, "int32")
   local non_two = tags:neq(2)
   lurek.log.info("non-2 count = " .. non_two:countNonZero(), "compute")
@@ -1701,7 +1743,7 @@ Returns array values normalized into a target range.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:normalizeRange
+do
   local raw = lurek.compute.fromTable({-2, 0, 2, 4})
   local unit = raw:normalizeRange(0, 1)
   lurek.log.info("unit min=" .. unit:min() .. " max=" .. unit:max(), "compute")
@@ -1719,7 +1761,7 @@ Returns this vector normalized to unit length.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:normalizeVec
+do
   local v = lurek.compute.fromTable({3, 4})
   local unit = v:normalizeVec()
   lurek.log.info("unit[1]^2 + unit[2]^2 = " .. unit:pow(2):sum(), "compute")
@@ -1741,7 +1783,7 @@ Returns outer product with another vector array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:outer
+do
   local row = lurek.compute.fromTable({1, 2, 3})
   local col = lurek.compute.fromTable({1, 2})
   local mat = row:outer(col)
@@ -1764,7 +1806,7 @@ Returns Pearson correlation with another array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:pearsonCorr
+do
   local fps = lurek.compute.fromTable({60, 58, 55, 50, 45})
   local entities = lurek.compute.fromTable({100, 150, 200, 280, 360})
   local r = fps:pearsonCorr(entities)
@@ -1787,7 +1829,7 @@ Returns a percentile value from the array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:percentile
+do
   local times = lurek.compute.fromTable({16, 17, 18, 19, 33})
   local p95 = times:percentile(95)
   lurek.log.info("frame p95 = " .. p95 .. "ms", "perf")
@@ -1809,7 +1851,7 @@ Returns this array raised element-wise to a scalar exponent.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:pow
+do
   local v = lurek.compute.fromTable({1, 2, 3, 4})
   local sq = v:pow(2)
   lurek.log.info("4^2 = " .. sq:get(4), "compute")
@@ -1832,7 +1874,7 @@ Reduces array values with a Lua accumulator function.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:reduce
+do
   local a = lurek.compute.fromTable({1, 2, 3, 4})
   local total = a:reduce(function(acc, x) return acc + x end, 0)
   lurek.log.debug("reduce sum: " .. tostring(total), "compute")
@@ -1854,7 +1896,7 @@ Returns a reshaped copy of this array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:reshape
+do
   local row = lurek.compute.range(0, 6)
   local grid = row:reshape({2, 3})
   lurek.log.info("grid[2,3] = " .. grid:get(2, 3), "compute")
@@ -1877,7 +1919,7 @@ Produces prefix accumulator values with a Lua function.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:scan
+do
   local a = lurek.compute.fromTable({1, 2, 3, 4})
   local prefix = a:scan(function(acc, x) return acc + x end, 0)
   lurek.log.debug("scan prefix[4]: " .. tostring(prefix:toTable()[4]), "compute")
@@ -1897,7 +1939,7 @@ Writes an array element using one-based indices followed by the value.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:set
+do
   local board = lurek.compute.zeros({3, 3})
   board:set(2, 2, 1.0)
   lurek.log.info("centre = " .. board:get(2, 2), "compute")
@@ -1919,7 +1961,7 @@ Writes a source array into this array at a one-based row and column.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:setRegion
+do
   local canvas = lurek.compute.zeros({16,16}, "float32")
   local stamp = lurek.compute.ones({4,4}, "float32")
   canvas:setRegion(6, 6, stamp)
@@ -1938,7 +1980,7 @@ Computes Sobel gradients for this array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:sobel
+do
   local img = lurek.compute.ones({4, 4})
   local g = img:sobel()
   lurek.log.info("gx[2,2] = " .. g.gx:get(2, 2) .. " gy[2,2] = " .. g.gy:get(2, 2), "compute")
@@ -1956,7 +1998,7 @@ Returns element-wise square roots.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:sqrt
+do
   local sq = lurek.compute.fromTable({1, 4, 9, 16})
   local roots = sq:sqrt()
   lurek.log.info("sqrt(16) = " .. roots:get(4), "compute")
@@ -1978,7 +2020,7 @@ Returns element-wise subtraction with an array or scalar.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:sub
+do
   local hp = lurek.compute.fromTable({100, 80, 65})
   local after = hp:sub(15)
   lurek.log.info("sub result first = " .. after:get(1), "compute")
@@ -1998,7 +2040,7 @@ Subtracts another array from this array in place.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- LArray:subInplace
+do
   local a = lurek.compute.fromTable({5, 5, 5})
   local b = lurek.compute.fromTable({1, 2, 3})
   a:subInplace(b)
@@ -2020,7 +2062,7 @@ Returns total sum or a summed array along a one-based axis.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:sum
+do
   local hits = lurek.compute.fromTable({3, 1, 4, 1, 5, 9})
   local total = hits:sum()
   lurek.log.info("total damage: " .. total, "compute")
@@ -2042,7 +2084,7 @@ Returns a mask array where values above a threshold are selected.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:threshold
+do
   local field = lurek.compute.range(0, 8)
   local visible = field:threshold(4.0)
   lurek.log.info("cells visible: " .. visible:sum(), "compute")
@@ -2060,7 +2102,7 @@ Returns array values flattened into a Lua table.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:toTable
+do
   local arr = lurek.compute.range(0, 4)
   local flat = arr:toTable()
   lurek.log.info("flat[3] = " .. flat[3] .. ", count=" .. #flat, "compute")
@@ -2082,7 +2124,7 @@ Transforms a point array by this transform matrix.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:transformPoints
+do
   pcall(function()
     local rot = lurek.compute.rotate2dMatrix(math.pi / 2)
     local pts = lurek.compute.fromTable({1, 0, 0, 1}, {2, 2})
@@ -2103,7 +2145,7 @@ Returns a transposed copy of a two-dimensional array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:transpose
+do
   local m = lurek.compute.fromTable({1, 2, 3, 4, 5, 6}, {2, 3})
   local t = m:transpose()
   lurek.log.info("t shape: " .. t:getShape()[1] .. "x" .. t:getShape()[2], "compute")
@@ -2121,7 +2163,7 @@ Returns the Lua-visible type name for this array handle.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:type
+do
   local arr = lurek.compute.zeros({2})
   local kind = arr:type()
   if kind == "Array" then lurek.log.debug("got an Array", "compute") end
@@ -2143,7 +2185,7 @@ Returns whether this array handle matches a supported type name.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:typeOf
+do
   local arr = lurek.compute.zeros({2})
   if arr:typeOf("Array") then
     lurek.log.debug("typeOf check passed", "compute")
@@ -2167,7 +2209,7 @@ Selects values from this array or another array using a mask array.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:where
+do
   local a = lurek.compute.fromTable({1,2,3,4,5,6}, nil, "int32")
   local mask = a:threshold(3)
   local result = a:where(mask, a)
@@ -2186,7 +2228,7 @@ Returns z-score normalized array values.
 Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
 
 ```lua
-do -- Array:zscore
+do
   local features = lurek.compute.fromTable({10, 12, 14, 18, 20})
   local z = features:zscore()
   lurek.log.info("z[1] = " .. z:get(1), "compute")

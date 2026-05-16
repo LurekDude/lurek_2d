@@ -2,8 +2,9 @@
 -- lurek.parallax API examples.
 -- Run: cargo run -- content/examples/parallax.lua
 
---@api-stub: lurek.parallax.newLayer -- Creates a parallax layer from an options table
-do -- lurek.parallax.newLayer
+--@api-stub: lurek.parallax.newLayer
+-- Creates a parallax layer from an options table
+do
   function lurek.init()
     local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
     local sky = lurek.parallax.newLayer({
@@ -13,8 +14,9 @@ do -- lurek.parallax.newLayer
   end
 end
 
---@api-stub: lurek.parallax.newSet -- Creates an empty parallax layer set
-do -- lurek.parallax.newSet
+--@api-stub: lurek.parallax.newSet
+-- Creates an empty parallax layer set
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("forest_backdrop")
     backdrop:setVisible(true)
@@ -22,8 +24,9 @@ do -- lurek.parallax.newSet
   end
 end
 
---@api-stub: lurek.parallax.newPresetLayer -- Creates a parallax layer from a named preset and texture image
-do -- lurek.parallax.newPresetLayer
+--@api-stub: lurek.parallax.newPresetLayer
+-- Creates a parallax layer from a named preset and texture image
+do
   function lurek.init()
     local tex = lurek.render.newImage("assets/parallax/clouds.png")
     local _far = lurek.parallax.newPresetLayer("far", tex)
@@ -31,7 +34,8 @@ do -- lurek.parallax.newPresetLayer
 end
 
 --@api-stub: ParallaxLayer:addEffectPass
-do -- ParallaxLayer:addEffectPass
+-- Adds a effect pass to this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.2 })
@@ -39,7 +43,8 @@ do -- ParallaxLayer:addEffectPass
 end
 
 --@api-stub: ParallaxLayer:clearEffects
-do -- ParallaxLayer:clearEffects
+-- Clears all effects items from this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.1 })
@@ -48,7 +53,8 @@ do -- ParallaxLayer:clearEffects
 end
 
 --@api-stub: ParallaxLayer:effectCount
-do -- ParallaxLayer:effectCount
+-- Performs the effect count operation on this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     layer:addEffectPass("motion_blur", { strength = 0.1 })
@@ -58,7 +64,8 @@ do -- ParallaxLayer:effectCount
 end
 
 --@api-stub: ParallaxLayer:setMotionStretch
-do -- ParallaxLayer:setMotionStretch
+-- Sets the motion stretch of this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     layer:setMotionStretch(true, 0.35, 1.6)
@@ -66,7 +73,8 @@ do -- ParallaxLayer:setMotionStretch
 end
 
 --@api-stub: ParallaxLayer:getMotionStretch
-do -- ParallaxLayer:getMotionStretch
+-- Returns the motion stretch of this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     layer:setMotionStretch(true, 0.25, 1.4)
@@ -75,10 +83,11 @@ do -- ParallaxLayer:getMotionStretch
   end
 end
 
--- â”€â”€ ParallaxLayer methods â”€â”€
+-- ParallaxLayer methods
 
 --@api-stub: ParallaxLayer:type
-do -- ParallaxLayer:type
+-- Returns the Lua-visible type name string for this parallax layer handle.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     if layer:type() == "LParallaxLayer" then
@@ -88,7 +97,8 @@ do -- ParallaxLayer:type
 end
 
 --@api-stub: ParallaxLayer:update
-do -- ParallaxLayer:update
+-- Advances this parallax layer by the given delta time.
+do
   local clouds
   function lurek.init()
     clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 12 })
@@ -97,7 +107,8 @@ do -- ParallaxLayer:update
 end
 
 --@api-stub: ParallaxLayer:render
-do -- ParallaxLayer:render
+-- Draws or renders this parallax layer to the current render target.
+do
   local hills
   function lurek.init()
     hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png"), scroll_factor_x = 0.4 })
@@ -106,7 +117,8 @@ do -- ParallaxLayer:render
 end
 
 --@api-stub: ParallaxLayer:renderAuto
-do -- ParallaxLayer:renderAuto
+-- Draws or renders this parallax layer to the current render target.
+do
   local mountains
   function lurek.init()
     mountains = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mountains.png"), scroll_factor_x = 0.25 })
@@ -115,7 +127,8 @@ do -- ParallaxLayer:renderAuto
 end
 
 --@api-stub: ParallaxLayer:resetAutoscroll
-do -- ParallaxLayer:resetAutoscroll
+-- Resets autoscroll this parallax layer to its default state.
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), autoscroll_x = 8 })
     fog:resetAutoscroll()
@@ -123,7 +136,8 @@ do -- ParallaxLayer:resetAutoscroll
 end
 
 --@api-stub: ParallaxLayer:setScrollFactor
-do -- ParallaxLayer:setScrollFactor
+-- Sets the scroll factor of this parallax layer.
+do
   function lurek.init()
     local mid = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/treeline.png") })
     mid:setScrollFactor(0.6, 1.0)
@@ -131,7 +145,8 @@ do -- ParallaxLayer:setScrollFactor
 end
 
 --@api-stub: ParallaxLayer:getScrollFactor
-do -- ParallaxLayer:getScrollFactor
+-- Returns the scroll factor of this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), scroll_factor_x = 0.3 })
     local fx, fy = layer:getScrollFactor()
@@ -140,7 +155,8 @@ do -- ParallaxLayer:getScrollFactor
 end
 
 --@api-stub: ParallaxLayer:setOffset
-do -- ParallaxLayer:setOffset
+-- Sets the offset of this parallax layer.
+do
   function lurek.init()
     local horizon = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/horizon.png") })
     horizon:setOffset(0, 96)
@@ -148,7 +164,8 @@ do -- ParallaxLayer:setOffset
 end
 
 --@api-stub: ParallaxLayer:getOffset
-do -- ParallaxLayer:getOffset
+-- Returns the offset of this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), offset_y = 32 })
     local ox, oy = layer:getOffset()
@@ -157,7 +174,8 @@ do -- ParallaxLayer:getOffset
 end
 
 --@api-stub: ParallaxLayer:setAutoscroll
-do -- ParallaxLayer:setAutoscroll
+-- Sets the autoscroll of this parallax layer.
+do
   function lurek.init()
     local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
     clouds:setScrollFactor(0, 0)
@@ -166,7 +184,8 @@ do -- ParallaxLayer:setAutoscroll
 end
 
 --@api-stub: ParallaxLayer:getAutoscroll
-do -- ParallaxLayer:getAutoscroll
+-- Returns the autoscroll of this parallax layer.
+do
   function lurek.init()
     local clouds = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png"), autoscroll_x = 15 })
     local vx, vy = clouds:getAutoscroll()
@@ -175,7 +194,8 @@ do -- ParallaxLayer:getAutoscroll
 end
 
 --@api-stub: ParallaxLayer:setRepeat
-do -- ParallaxLayer:setRepeat
+-- Sets the repeat of this parallax layer.
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setRepeat(true, false)
@@ -183,7 +203,8 @@ do -- ParallaxLayer:setRepeat
 end
 
 --@api-stub: ParallaxLayer:setScale
-do -- ParallaxLayer:setScale
+-- Sets the scale of this parallax layer.
+do
   function lurek.init()
     local pixels = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pixel_sky.png") })
     pixels:setScale(2.0, 2.0)
@@ -191,7 +212,8 @@ do -- ParallaxLayer:setScale
 end
 
 --@api-stub: ParallaxLayer:setZ
-do -- ParallaxLayer:setZ
+-- Sets the z of this parallax layer.
+do
   function lurek.init()
     local trees = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/trees.png") })
     trees:setZ(20)
@@ -199,7 +221,8 @@ do -- ParallaxLayer:setZ
 end
 
 --@api-stub: ParallaxLayer:getZ
-do -- ParallaxLayer:getZ
+-- Returns the z of this parallax layer.
+do
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 5 })
     if layer:getZ() < 10 then
@@ -209,7 +232,8 @@ do -- ParallaxLayer:getZ
 end
 
 --@api-stub: ParallaxLayer:setOpacity
-do -- ParallaxLayer:setOpacity
+-- Sets the opacity of this parallax layer.
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
     fog:setOpacity(0.6)
@@ -217,7 +241,8 @@ do -- ParallaxLayer:setOpacity
 end
 
 --@api-stub: ParallaxLayer:getOpacity
-do -- ParallaxLayer:getOpacity
+-- Returns the opacity of this parallax layer.
+do
   function lurek.init()
     local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png"), opacity = 0.5 })
     local a = fog:getOpacity()
@@ -226,7 +251,8 @@ do -- ParallaxLayer:getOpacity
 end
 
 --@api-stub: ParallaxLayer:setTint
-do -- ParallaxLayer:setTint
+-- Sets the tint of this parallax layer.
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(1.0, 0.6, 0.4, 1.0)
@@ -234,7 +260,8 @@ do -- ParallaxLayer:setTint
 end
 
 --@api-stub: ParallaxLayer:getTint
-do -- ParallaxLayer:getTint
+-- Returns the tint of this parallax layer.
+do
   function lurek.init()
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
     sky:setTint(0.5, 0.6, 1.0, 1.0)
@@ -244,7 +271,8 @@ do -- ParallaxLayer:getTint
 end
 
 --@api-stub: ParallaxLayer:setBlendMode
-do -- ParallaxLayer:setBlendMode
+-- Sets the blend mode of this parallax layer.
+do
   function lurek.init()
     local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png") })
     rays:setBlendMode("additive")
@@ -252,7 +280,8 @@ do -- ParallaxLayer:setBlendMode
 end
 
 --@api-stub: ParallaxLayer:getBlendMode
-do -- ParallaxLayer:getBlendMode
+-- Returns the blend mode of this parallax layer.
+do
   function lurek.init()
     local rays = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/godrays.png"), blend_mode = "additive" })
     if rays:getBlendMode() ~= "normal" then
@@ -262,7 +291,8 @@ do -- ParallaxLayer:getBlendMode
 end
 
 --@api-stub: ParallaxLayer:setVisible
-do -- ParallaxLayer:setVisible
+-- Sets the visibility flag for this parallax layer.
+do
   function lurek.init()
     local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
     rain:setVisible(false)
@@ -270,7 +300,8 @@ do -- ParallaxLayer:setVisible
 end
 
 --@api-stub: ParallaxLayer:isVisible
-do -- ParallaxLayer:isVisible
+-- Returns true if this parallax layer is currently visible.
+do
   local rain
   function lurek.init()
     rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
@@ -281,7 +312,8 @@ do -- ParallaxLayer:isVisible
 end
 
 --@api-stub: ParallaxLayer:clearClamp
-do -- ParallaxLayer:clearClamp
+-- Clears all clamp items from this parallax layer.
+do
   function lurek.init()
     local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
     hills:setRepeat(true, false)
@@ -290,7 +322,8 @@ do -- ParallaxLayer:clearClamp
 end
 
 --@api-stub: ParallaxLayer:setTiling
-do -- ParallaxLayer:setTiling
+-- Sets the tiling of this parallax layer.
+do
   function lurek.init()
     local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
@@ -298,7 +331,8 @@ do -- ParallaxLayer:setTiling
 end
 
 --@api-stub: ParallaxLayer:getTiling
-do -- ParallaxLayer:getTiling
+-- Returns the tiling of this parallax layer.
+do
   function lurek.init()
     local stars = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/stars.png") })
     stars:setTiling(true)
@@ -309,7 +343,8 @@ do -- ParallaxLayer:getTiling
 end
 
 --@api-stub: ParallaxLayer:setTileSize
-do -- ParallaxLayer:setTileSize
+-- Sets the tile size of this parallax layer.
+do
   function lurek.init()
     local pattern = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/pattern.png") })
     pattern:setTiling(true)
@@ -318,7 +353,8 @@ do -- ParallaxLayer:setTileSize
 end
 
 --@api-stub: ParallaxLayer:setDepth
-do -- ParallaxLayer:setDepth
+-- Sets the depth of this parallax layer.
+do
   function lurek.init()
     local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setZ(10)
@@ -327,7 +363,8 @@ do -- ParallaxLayer:setDepth
 end
 
 --@api-stub: ParallaxLayer:getDepth
-do -- ParallaxLayer:getDepth
+-- Returns the depth of this parallax layer.
+do
   function lurek.init()
     local mist = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/mist.png") })
     mist:setDepth(10.5)
@@ -335,10 +372,11 @@ do -- ParallaxLayer:getDepth
   end
 end
 
--- â”€â”€ ParallaxSet methods â”€â”€
+-- ParallaxSet methods
 
 --@api-stub: ParallaxSet:type
-do -- ParallaxSet:type
+-- Returns the Lua-visible type name string for this parallax set handle.
+do
   function lurek.init()
     local set = lurek.parallax.newSet("intro")
     if set:type() == "LParallaxSet" then
@@ -348,7 +386,8 @@ do -- ParallaxSet:type
 end
 
 --@api-stub: ParallaxSet:addLayer
-do -- ParallaxSet:addLayer
+-- Adds a layer to this parallax set.
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("woods")
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png"), z = 0 })
@@ -359,7 +398,8 @@ do -- ParallaxSet:addLayer
 end
 
 --@api-stub: ParallaxSet:removeLayerAt
-do -- ParallaxSet:removeLayerAt
+-- Removes a layer at from this parallax set.
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("storm")
     local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
@@ -369,7 +409,8 @@ do -- ParallaxSet:removeLayerAt
 end
 
 --@api-stub: ParallaxSet:layerCount
-do -- ParallaxSet:layerCount
+-- Performs the layer count operation on this parallax set.
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("count_demo")
     local sky = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
@@ -379,7 +420,8 @@ do -- ParallaxSet:layerCount
 end
 
 --@api-stub: ParallaxSet:sortByZ
-do -- ParallaxSet:sortByZ
+-- Performs the sort by z operation on this parallax set.
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("sortable")
     local hills = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/hills.png") })
@@ -390,7 +432,8 @@ do -- ParallaxSet:sortByZ
 end
 
 --@api-stub: ParallaxSet:getLayerZAt
-do -- ParallaxSet:getLayerZAt
+-- Returns the layer z at of this parallax set.
+do
   function lurek.init()
     local set = lurek.parallax.newSet("order_debug")
     local img = lurek.render.newImage("assets/parallax/sky.png")
@@ -404,7 +447,8 @@ do -- ParallaxSet:getLayerZAt
 end
 
 --@api-stub: ParallaxSet:setVisible
-do -- ParallaxSet:setVisible
+-- Sets the visibility flag for this parallax set.
+do
   function lurek.init()
     local backdrop = lurek.parallax.newSet("menu_aware")
     backdrop:setVisible(false)
@@ -412,7 +456,8 @@ do -- ParallaxSet:setVisible
 end
 
 --@api-stub: ParallaxSet:isVisible
-do -- ParallaxSet:isVisible
+-- Returns true if this parallax set is currently visible.
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("woods")
@@ -423,7 +468,8 @@ do -- ParallaxSet:isVisible
 end
 
 --@api-stub: ParallaxSet:update
-do -- ParallaxSet:update
+-- Advances this parallax set by the given delta time.
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("ambient")
@@ -433,7 +479,8 @@ do -- ParallaxSet:update
 end
 
 --@api-stub: ParallaxSet:render
-do -- ParallaxSet:render
+-- Draws or renders this parallax set to the current render target.
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("preview")
@@ -443,7 +490,8 @@ do -- ParallaxSet:render
 end
 
 --@api-stub: ParallaxSet:renderAuto
-do -- ParallaxSet:renderAuto
+-- Draws or renders this parallax set to the current render target.
+do
   local backdrop
   function lurek.init()
     backdrop = lurek.parallax.newSet("scene")
@@ -453,7 +501,8 @@ do -- ParallaxSet:renderAuto
 end
 
 --@api-stub: ParallaxSet:getName
-do -- ParallaxSet:getName
+-- Returns the name of this parallax set.
+do
   function lurek.init()
     local set = lurek.parallax.newSet("foreground")
     lurek.log.info("active backdrop: " .. set:getName(), "scene")
@@ -461,7 +510,8 @@ do -- ParallaxSet:getName
 end
 
 --@api-stub: ParallaxSet:setName
-do -- ParallaxSet:setName
+-- Sets the name of this parallax set.
+do
   function lurek.init()
     local set = lurek.parallax.newSet("placeholder")
     set:setName("level_3_backdrop")
@@ -489,10 +539,11 @@ end
 --
 -- Run: cargo run -- content/examples/parallax.lua
 
--- â”€â”€ lurek.parallax.* functions â”€â”€
+-- lurek.parallax.* functions
 
 --@api-stub: ParallaxLayer:setClamp
-do -- ParallaxLayer:setClamp
+-- Sets the clamp of this parallax layer.
+do
   local ok, err = pcall(function()
     local layer = lurek.parallax.newLayer({texture = lurek.render.newImage("bg_mountains.png"), scroll_factor_x = 0.3})
     layer:setClamp(0, 0, 800, 600)

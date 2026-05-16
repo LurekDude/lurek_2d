@@ -65,11 +65,53 @@ Sprite sheet, texture atlas, and batch rendering primitives for 2D game visuals.
 Module example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.newSheet
+-- content/examples/sprite.lua
+-- lurek.sprite API examples.
+-- Run: cargo run -- content/examples/sprite.lua
+
+--@api-stub: lurek.sprite.newSheet
+-- Creates a new sprite sheet by dividing a texture of the given pixel size into a grid of equal-sized frames
+do
   -- 256x192 texture sliced into 32x32 cells â†’ 8 cols Ă— 6 rows = 48 frames.
   local sheet = lurek.sprite.newSheet(256, 192, 32, 32)
   local cols, rows = sheet:getGridSize()
   lurek.log.info("sheet ready: " .. cols .. "x" .. rows .. " (" .. sheet:getFrameCount() .. " frames)", "sprite")
+end
+
+--@api-stub: lurek.sprite.newRPGMakerSheet
+-- Creates a sprite sheet using RPG Maker's standard character layout (4 columns × 4 rows per character block)
+do
+  local hero = lurek.sprite.newRPGMakerSheet(96, 128)
+  for _, dir in ipairs({ "down", "left", "right", "up" }) do
+    local frames = hero:getGroupFrames(dir)
+    lurek.log.info("hero." .. dir .. " has " .. #frames .. " walk frames", "sprite")
+  end
+end
+
+--@api-stub: lurek.sprite.parseAtlas
+-- Parses a TexturePacker JSON atlas string and returns a sprite atlas object
+do
+  pcall(function()
+    local json = tryRead("img/ui_atlas.json")
+    if json then
+      local atlas = lurek.sprite.parseAtlas(json)
+      lurek.log.info("ui atlas loaded with " .. atlas:entryCount() .. " regions", "sprite")
+    end
+  end)
+end
+
+--@api-stub: lurek.sprite.newAtlasSheet
+-- Creates a sprite sheet from an existing atlas, treating each atlas entry as a frame within the given sheet dimensions
+do
+  pcall(function()
+    local json = tryRead("img/items.json")
+    if json then
+      local atlas = lurek.sprite.parseAtlas(json)
+      local sheet = lurek.sprite.newAtlasSheet(atlas, 512, 512)
+      local sword = sheet:getGroupFrames("sword_iron")
+      if sword then lurek.log.info("sword frame at " .. sword[1].x .. "," .. sword[1].y, "sprite") end
+    end
+  end)
 end
 ```
 
@@ -109,7 +151,7 @@ Creates a sprite sheet from an existing atlas, treating each atlas entry as a fr
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.newAtlasSheet
+do
   pcall(function()
     local json = tryRead("img/items.json")
     if json then
@@ -138,7 +180,7 @@ Creates a sprite sheet using RPG Maker's standard character layout (4 columns ×
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.newRPGMakerSheet
+do
   local hero = lurek.sprite.newRPGMakerSheet(96, 128)
   for _, dir in ipairs({ "down", "left", "right", "up" }) do
     local frames = hero:getGroupFrames(dir)
@@ -165,7 +207,7 @@ Creates a new sprite sheet by dividing a texture of the given pixel size into a 
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.newSheet
+do
   -- 256x192 texture sliced into 32x32 cells â†’ 8 cols Ă— 6 rows = 48 frames.
   local sheet = lurek.sprite.newSheet(256, 192, 32, 32)
   local cols, rows = sheet:getGridSize()
@@ -188,7 +230,7 @@ Parses an Aseprite JSON atlas string and returns a sprite atlas object.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.parseAsepriteAtlas
+do
   pcall(function()
     local json = tryRead("img/hero.json")
     if json then
@@ -216,7 +258,7 @@ Parses a TexturePacker JSON atlas string and returns a sprite atlas object.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.parseAtlas
+do
   pcall(function()
     local json = tryRead("img/ui_atlas.json")
     if json then
@@ -239,7 +281,7 @@ Lua-visible wrapper around a SpriteAtlas, providing named region lookups.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.parseAsepriteAtlas
+do
   pcall(function()
     local json = tryRead("img/hero.json")
     if json then
@@ -263,7 +305,7 @@ Returns the total number of entries (sprite regions) in the atlas.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteAtlas:entryCount
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -285,7 +327,7 @@ Returns an array of all entry names in the atlas.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteAtlas:entryNames
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -313,7 +355,7 @@ Returns a sprite region by its 1-based index in the atlas.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteAtlas:getByIndex
+do
   local json = tryRead("img/tiles.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -340,7 +382,7 @@ Looks up a named sprite region in the atlas by its original filename or tag.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteAtlas:getEntry
+do
   local json = tryRead("img/ui.json")
   if json then
     local atlas = lurek.sprite.parseAtlas(json)
@@ -369,7 +411,7 @@ Returns a copy of a named atlas entry with the specified flip flags applied.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteAtlas:getFlipped
+do
   local atlas = lurek.sprite.parseAtlas('{"frames":{},"meta":{"app":"TexturePacker","version":"1.0","image":"sheet.png","format":"RGBA8888","size":{"w":256,"h":256},"scale":"1"}}')
   local entry = atlas:getFlipped("hero_run_01", true, false)
   lurek.log.info("flipped entry: " .. tostring(entry ~= nil), "sprite")
@@ -387,7 +429,7 @@ Returns the type name of this object.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- LSpriteAtlas:type
+do
   local ok_a ---@type boolean
   local sprite_atlas_obj ---@type LSpriteAtlas?
   ok_a, sprite_atlas_obj = pcall(lurek.sprite.parseAtlas, "sprites/atlas.png")
@@ -412,7 +454,7 @@ Checks whether this object matches the given type name.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- LSpriteAtlas:typeOf
+do
   local ok_a ---@type boolean
   local sprite_atlas_obj ---@type LSpriteAtlas?
   ok_a, sprite_atlas_obj = pcall(lurek.sprite.parseAtlas, "sprites/atlas.png")
@@ -430,7 +472,7 @@ Lua-visible wrapper around a SpriteSheet, providing grid-based frame access,.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- lurek.sprite.newAtlasSheet
+do
   pcall(function()
     local json = tryRead("img/items.json")
     if json then
@@ -459,7 +501,7 @@ Renders the sprite sheet grid into an LImage of the given size for debugging or 
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:drawToImage
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local debug_img = sheet:drawToImage(192, 256)  -- 2x scale preview
   lurek.log.info("debug overlay generated: " .. tostring(debug_img), "sprite")
@@ -481,7 +523,7 @@ Returns all frame quads in the given column of the sprite sheet grid.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getColumn
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)
   local first_col = sheet:getColumn(0)
   lurek.log.info("column 0 holds " .. #first_col .. " stacked poses", "sprite")
@@ -503,7 +545,7 @@ Returns the UV quad for a single frame by its 1-based index.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getFrame
+do
   local sheet = lurek.sprite.newSheet(128, 64, 32, 32)  -- 4 cols Ă— 2 rows
   local quad = sheet:getFrame(0)
   if quad then
@@ -523,7 +565,7 @@ Returns the total number of frames in this sprite sheet.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getFrameCount
+do
   local sheet = lurek.sprite.newSheet(192, 32, 32, 32)
   local count = sheet:getFrameCount()
   local frame_at_t = math.floor(1.5 * 8) % count  -- 8 fps, t=1.5s
@@ -542,7 +584,7 @@ Returns the pixel dimensions of a single frame cell.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getFrameSize
+do
   local sheet = lurek.sprite.newSheet(256, 256, 64, 64)
   local fw, fh = sheet:getFrameSize()
   local hitbox = { w = fw - 8, h = fh - 4 }  -- shrink a few px around the sprite
@@ -561,7 +603,7 @@ Returns the number of columns and rows in the sprite sheet grid.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getGridSize
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)
   local cols, rows = sheet:getGridSize()
   if cols ~= 3 or rows ~= 4 then
@@ -585,7 +627,7 @@ Returns the frame quads for a named animation group.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getGroupFrames
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local frames = sheet:getGroupFrames("up")
   if frames then
@@ -606,7 +648,7 @@ Returns an array of all named animation group names defined on this sheet.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getGroupNames
+do
   local sheet = lurek.sprite.newRPGMakerSheet(96, 128)
   local names = sheet:getGroupNames()
   table.sort(names)
@@ -629,7 +671,7 @@ Returns all frame quads in the given row of the sprite sheet grid.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:getRow
+do
   local sheet = lurek.sprite.newSheet(96, 128, 32, 32)  -- 3 cols Ă— 4 rows
   local walk_down = sheet:getRow(0)
   for i, q in ipairs(walk_down) do
@@ -653,7 +695,7 @@ Defines a named animation group as a contiguous range of frames.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- SpriteSheet:nameGroup
+do
   local sheet = lurek.sprite.newSheet(256, 256, 32, 32)
   sheet:nameGroup("walk", 0, 4)
   sheet:nameGroup("run",  4, 4)
@@ -673,7 +715,7 @@ Returns the type name of this object.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- LSpriteSheet:type
+do
   local ok_s ---@type boolean
   local sprite_sheet_obj ---@type LSpriteSheet?
   ok_s, sprite_sheet_obj = pcall(lurek.sprite.newSheet, "sprites/sheet.png", 32, 32)
@@ -698,7 +740,7 @@ Checks whether this object matches the given type name.
 Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
-do -- LSpriteSheet:typeOf
+do
   local ok_s ---@type boolean
   local sprite_sheet_obj ---@type LSpriteSheet?
   ok_s, sprite_sheet_obj = pcall(lurek.sprite.newSheet, "sprites/sheet.png", 32, 32)

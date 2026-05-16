@@ -54,18 +54,53 @@ TCP debug bridge enabling external tools (VS Code extension, remote inspectors) 
 Module example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.start
-  local debug_port = 17800
-  local ok = pcall(function()
-    local bound = lurek.debugbridge.start(debug_port)
-    if bound then
-      lurek.log.info("debug bridge listening on 127.0.0.1:" .. debug_port, "debugbridge")
+--@api-stub: lurek.debugbridge.stop
+-- Stops the debug bridge server and joins its server thread
+do
+  function lurek.quit()
+    if lurek.debugbridge.isRunning() then
+      lurek.debugbridge.stop()
+      lurek.log.info("debug bridge stopped", "debugbridge")
     end
-  end)
-  if not ok then
-    lurek.log.info("debug bridge unavailable (port in use)", "debugbridge")
   end
 end
+
+--@api-stub: lurek.debugbridge.isRunning
+-- Returns whether the debug bridge server is currently running
+do
+  if lurek.debugbridge.isRunning() then
+    lurek.log.info("debug bridge is up", "debugbridge")
+  else
+    lurek.log.debug("debug bridge disabled this session", "debugbridge")
+  end
+end
+
+--@api-stub: lurek.debugbridge.getPort
+-- Returns the debug bridge TCP port
+do
+  local port = lurek.debugbridge.getPort()
+  if port > 0 then
+    lurek.log.info("connect debugger to tcp://127.0.0.1:" .. port, "debugbridge")
+  end
+end
+
+--@api-stub: lurek.debugbridge.getClientCount
+-- Returns the number of connected debug bridge clients
+do
+  function lurek.process(dt)
+    if lurek.debugbridge.getClientCount() > 0 then
+      lurek.debugbridge.broadcast("frame", '{"dt":' .. dt .. '}')
+    end
+  end
+end
+
+--@api-stub: lurek.debugbridge.poll
+-- Polls pending debugger requests, evaluates supported methods, and queues responses
+do
+  function lurek.process(dt)
+    if lurek.debugbridge.isRunning() then
+      lurek.debugbridge.poll()
+    end
 ```
 
 ## Key Types
@@ -111,7 +146,7 @@ Queues a JSON string payload broadcast for debug bridge clients.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.broadcast
+do
   local function on_enemy_killed(enemy)
     local payload = '{"type":"' .. enemy.type .. '","x":' .. enemy.x .. ',"y":' .. enemy.y .. '}'
     lurek.debugbridge.broadcast("enemy_killed", payload)
@@ -135,7 +170,7 @@ Captures a print message and broadcasts it to debug bridge clients.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.capturePrint
+do
   local _print = print
   print = function(...)
     local parts = {}
@@ -156,7 +191,7 @@ Clears captured print history. This function is exposed to Lua scripts.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.clearPrintHistory
+do
   local function load_scene(name)
     lurek.debugbridge.clearPrintHistory()
     lurek.log.info("entering scene " .. name, "scene")
@@ -176,7 +211,7 @@ Returns and clears the pending hot reload request flag.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.consumeHotReloadRequest
+do
   function lurek.process(dt)
     if lurek.debugbridge.consumeHotReloadRequest() then
       lurek.log.info("remote hot reload requested", "debugbridge")
@@ -196,7 +231,7 @@ Returns the number of connected debug bridge clients.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.getClientCount
+do
   function lurek.process(dt)
     if lurek.debugbridge.getClientCount() > 0 then
       lurek.debugbridge.broadcast("frame", '{"dt":' .. dt .. '}')
@@ -216,7 +251,7 @@ Returns debug bridge performance metrics.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.getPerformance
+do
   local accum = 0
   function lurek.process(dt)
     accum = accum + dt
@@ -240,7 +275,7 @@ Returns the debug bridge TCP port. This function is exposed to Lua scripts.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.getPort
+do
   local port = lurek.debugbridge.getPort()
   if port > 0 then
     lurek.log.info("connect debugger to tcp://127.0.0.1:" .. port, "debugbridge")
@@ -263,7 +298,7 @@ Returns captured print history entries.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.getPrintHistory
+do
   local recent = lurek.debugbridge.getPrintHistory(20)
   for _, entry in ipairs(recent) do
     lurek.log.debug(entry.source .. ":" .. entry.line .. " " .. entry.message, "console")
@@ -282,7 +317,7 @@ Returns debug bridge protocol version, capabilities, and handshake nonce.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.getProtocolInfo
+do
   local info = lurek.debugbridge.getProtocolInfo()
   lurek.log.info("bridge protocol v" .. info.version .. " caps=" .. #info.capabilities, "debugbridge")
 end
@@ -299,7 +334,7 @@ Returns whether the debug bridge server is currently running.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.isRunning
+do
   if lurek.debugbridge.isRunning() then
     lurek.log.info("debug bridge is up", "debugbridge")
   else
@@ -319,7 +354,7 @@ Returns whether a screenshot request is pending.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.isScreenshotRequested
+do
   function lurek.draw_ui()
     if lurek.debugbridge.isScreenshotRequested() then
       lurek.render.print("capturing...", 8, 8)
@@ -337,7 +372,7 @@ Polls pending debugger requests, evaluates supported methods, and queues respons
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.poll
+do
   function lurek.process(dt)
     if lurek.debugbridge.isRunning() then
       lurek.debugbridge.poll()
@@ -359,7 +394,7 @@ Requests a screenshot from the runtime.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.requestScreenshot
+do
   function lurek.init()
     lurek.input.bind("f12", function()
       lurek.debugbridge.requestScreenshot(2)
@@ -382,7 +417,7 @@ Sets the maximum retained print history entry count.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.setMaxPrintHistory
+do
   local in_dev = true
   lurek.debugbridge.setMaxPrintHistory(in_dev and 4096 or 256)
 end
@@ -403,7 +438,7 @@ Starts the localhost debug bridge server on a port.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.start
+do
   local debug_port = 17800
   local ok = pcall(function()
     local bound = lurek.debugbridge.start(debug_port)
@@ -426,7 +461,7 @@ Stops the debug bridge server and joins its server thread.
 Exact example from [debugbridge.lua](../blob/main/content/examples/debugbridge.lua):
 
 ```lua
-do -- lurek.debugbridge.stop
+do
   function lurek.quit()
     if lurek.debugbridge.isRunning() then
       lurek.debugbridge.stop()

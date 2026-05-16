@@ -97,7 +97,13 @@ Mod-loading framework providing discovery, manifest parsing, dependency resoluti
 Module example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newMod
+-- content/examples/mods.lua
+-- lurek.mods API examples.
+-- Run: cargo run -- content/examples/mods.lua
+
+--@api-stub: lurek.mods.newMod
+-- Creates a mod metadata handle from a Lua table
+do
   local hud_mod = lurek.mods.newMod({
     id = "core.hud",
     name = "Core HUD",
@@ -108,6 +114,37 @@ do -- lurek.mods.newMod
   })
   lurek.log.info("built mod " .. hud_mod:getId() .. " v" .. hud_mod:getVersion(), "mods")
 end
+
+--@api-stub: lurek.mods.newModManager
+-- Creates an empty mod manager
+do
+  local manager = lurek.mods.newModManager()
+  lurek.log.info("manager initialised, " .. manager:getModCount() .. " mods", "mods")
+end
+
+--@api-stub: lurek.mods.checkApiVersion
+-- Checks whether a mod API version is compatible with a host version
+do
+  local probe = lurek.mods.newMod({id = "fan.skins", api_version = "1.4.0"})
+  local ok, msg = lurek.mods.checkApiVersion(probe, "1.6.2")
+  if not ok then
+    lurek.log.warn("incompatible mod: " .. (msg or "unknown"), "mods")
+  end
+end
+
+-- â”€â”€ Mod methods â”€â”€
+
+--@api-stub: Mod:getId
+do
+  local m = lurek.mods.newMod({id = "core.audio"})
+  local registry = {}
+  registry[m:getId()] = {volume = 0.8}
+end
+
+--@api-stub: Mod:getName
+do
+  local m = lurek.mods.newMod({id = "ui.theme.dark", name = "Dark Theme"})
+  local label = m:getName()
 ```
 
 ## Key Types
@@ -145,7 +182,7 @@ Checks whether a mod API version is compatible with a host version.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.checkApiVersion
+do
   local probe = lurek.mods.newMod({id = "fan.skins", api_version = "1.4.0"})
   local ok, msg = lurek.mods.checkApiVersion(probe, "1.6.2")
   if not ok then
@@ -169,7 +206,7 @@ Creates a mod metadata handle from a Lua table.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newMod
+do
   local hud_mod = lurek.mods.newMod({
     id = "core.hud",
     name = "Core HUD",
@@ -193,7 +230,7 @@ Creates an empty mod manager. This function is exposed to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newModManager
+do
   local manager = lurek.mods.newModManager()
   lurek.log.info("manager initialised, " .. manager:getModCount() .. " mods", "mods")
 end
@@ -210,7 +247,7 @@ Creates an empty content registry.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newRegistry
+do
   local reg = lurek.mods.newRegistry()
   lurek.log.debug("registry created", "mods")
 end
@@ -228,7 +265,7 @@ Lua-side content registry for storing typed Lua values by id.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newRegistry
+do
   local reg = lurek.mods.newRegistry()
   lurek.log.debug("registry created", "mods")
 end
@@ -250,7 +287,7 @@ Returns one stored value by content type and id.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ContentRegistry:get
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("spell")
   reg:register("spell", "fireball", { cost = 10 })
@@ -274,7 +311,7 @@ Returns all stored values for a content type keyed by id.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ContentRegistry:getAll
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("item")
   reg:register("item", "potion", { name = "Potion" })
@@ -294,7 +331,7 @@ Returns registered content type names.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ContentRegistry:getTypes
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("creature")
   reg:registerType("item")
@@ -318,7 +355,7 @@ Stores a Lua value under a registered content type and id.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ContentRegistry:register
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("weapon")
   reg:register("weapon", "iron_sword", { name = "Iron Sword", damage = 12 })
@@ -339,7 +376,7 @@ Registers a content type name. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ContentRegistry:registerType
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("weapon")
   lurek.log.debug("registered type 'weapon'", "mods")
@@ -357,7 +394,7 @@ Returns the Lua-visible type name for this content registry handle.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LContentRegistry:type
+do
   local content_registry_obj = lurek.mods.newRegistry()
   local t = content_registry_obj:type()
   lurek.log.info("LContentRegistry:type = " .. t, "mods")
@@ -379,7 +416,7 @@ Returns whether this content registry handle matches a supported type name.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LContentRegistry:typeOf
+do
   local content_registry_obj = lurek.mods.newRegistry()
   lurek.log.info("is LContentRegistry: " .. tostring(content_registry_obj:typeOf("LContentRegistry")), "mods")
   lurek.log.info("is wrong: " .. tostring(content_registry_obj:typeOf("Unknown")), "mods")
@@ -395,7 +432,7 @@ Lua-side wrapper for mod metadata, hooks, and config references.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newMod
+do
   local hud_mod = lurek.mods.newMod({
     id = "core.hud",
     name = "Core HUD",
@@ -419,7 +456,7 @@ Returns the optional required API version.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getApiVersion
+do
   local m = lurek.mods.newMod({id = "fan.maps", api_version = "1.5.0"})
   local req = m:getApiVersion()
   if req then
@@ -439,7 +476,7 @@ Returns the mod author. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getAuthor
+do
   local m = lurek.mods.newMod({id = "fan.maps", author = "alice"})
   local credit = m:getAuthor()
   lurek.log.info("map pack by " .. credit, "credits")
@@ -457,7 +494,7 @@ Returns capability names declared by the mod.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getCapabilities
+do
   local m = lurek.mods.newMod({id = "fan.online", capabilities = {"network", "filesystem"}})
   for _, cap in ipairs(m:getCapabilities()) do
     lurek.log.debug(m:getId() .. " uses " .. cap, "mods")
@@ -476,7 +513,7 @@ Returns the stored Lua config value.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getConfig
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfig({music_vol = 0.5})
   local cfg = m:getConfig() or {music_vol = 1.0}
@@ -495,7 +532,7 @@ Returns config schema entries. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getConfigSchema
+do
   local m = lurek.mods.newMod({id = "ui.theme", config_schema = {
     {key = "accent", type = "string", default = "#ff8800"},
   }})
@@ -516,7 +553,7 @@ Returns mod dependency ids. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getDependencies
+do
   local m = lurek.mods.newMod({id = "fan.weapons", dependencies = {"core.combat", "core.audio"}})
   for _, dep in ipairs(m:getDependencies()) do
     lurek.log.debug("requires " .. dep, "mods")
@@ -535,7 +572,7 @@ Returns the mod description. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getDescription
+do
   local m = lurek.mods.newMod({id = "ui.minimap", description = "Adds a corner minimap with fog-of-war."})
   local detail = m:getDescription()
   lurek.log.info("about: " .. detail, "ui")
@@ -557,7 +594,7 @@ Returns a stored hook function by name.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getHook
+do
   local m = lurek.mods.newMod({id = "fan.combat"})
   m:setHook("on_damage", function(amount) return amount * 2 end)
   local fn = m:getHook("on_damage")
@@ -576,7 +613,7 @@ Returns registered hook names. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getHookNames
+do
   local m = lurek.mods.newMod({id = "fan.events"})
   m:setHook("on_load", function() end)
   m:setHook("on_quit", function() end)
@@ -597,7 +634,7 @@ Returns the mod id. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getId
+do
   local m = lurek.mods.newMod({id = "core.audio"})
   local registry = {}
   registry[m:getId()] = {volume = 0.8}
@@ -615,7 +652,7 @@ Returns the mod display name. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getName
+do
   local m = lurek.mods.newMod({id = "ui.theme.dark", name = "Dark Theme"})
   local label = m:getName()
   if label == "" then label = m:getId() end
@@ -634,7 +671,7 @@ Returns the mod priority. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getPriority
+do
   local a = lurek.mods.newMod({id = "core.base", priority = 100})
   local b = lurek.mods.newMod({id = "fan.tweak", priority = 5})
   if a:getPriority() > b:getPriority() then
@@ -654,7 +691,7 @@ Returns the mod version. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:getVersion
+do
   local m = lurek.mods.newMod({id = "core.physics", version = "2.1.0"})
   if m:getVersion() ~= "2.1.0" then
     lurek.log.warn("save was written by " .. m:getVersion(), "save")
@@ -677,7 +714,7 @@ Returns whether a hook name is registered.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:hasHook
+do
   local m = lurek.mods.newMod({id = "fan.input"})
   m:setHook("on_jump", function() end)
   if m:hasHook("on_jump") then
@@ -697,7 +734,7 @@ Returns whether the mod is enabled.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:isEnabled
+do
   local m = lurek.mods.newMod({id = "fan.cheats"})
   if m:isEnabled() then
     lurek.log.debug(m:getId() .. " is active", "mods")
@@ -716,7 +753,7 @@ Returns whether the mod is loaded. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:isLoaded
+do
   local m = lurek.mods.newMod({id = "core.input"})
   if not m:isLoaded() then
     lurek.log.debug("pending: " .. m:getId(), "mods")
@@ -733,7 +770,7 @@ Releases stored Lua registry references for hooks and config.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:releaseRefs
+do
   local m = lurek.mods.newMod({id = "scratch.tmp"})
   m:setHook("on_tick", function() end)
   m:setConfig({foo = 1})
@@ -754,7 +791,7 @@ Sets the required API version string.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setApiVersion
+do
   local m = lurek.mods.newMod({id = "test.fixture"})
   m:setApiVersion("1.6.0")
   lurek.log.debug("fixture api_version=" .. m:getApiVersion(), "test")
@@ -774,7 +811,7 @@ Sets capability names from an array table.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setCapabilities
+do
   local m = lurek.mods.newMod({id = "fan.tools"})
   local caps = m:getCapabilities()
   caps[#caps + 1] = "filesystem"
@@ -795,7 +832,7 @@ Stores a Lua config value for this mod.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setConfig
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfig({music_vol = 0.6, sfx_vol = 1.0, mute = false})
 end
@@ -814,7 +851,7 @@ Sets config schema entries from a Lua table.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setConfigSchema
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfigSchema({
     {key = "music_vol", type = "number", default = "0.8"},
@@ -836,7 +873,7 @@ Sets whether the mod is enabled. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setEnabled
+do
   local m = lurek.mods.newMod({id = "fan.skins"})
   local user_choice = false
   m:setEnabled(user_choice)
@@ -858,7 +895,7 @@ Stores a Lua hook function by name. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- Mod:setHook
+do
   local mod = lurek.mods.newMod({id="example_mod", name="Example", version="1.0"})
   mod:setHook("on_save", function(ctx)
     lurek.log.info("mod saving extra data", "mods")
@@ -878,7 +915,7 @@ Returns the Lua-visible type name for this mod handle.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LMod:type
+do
   local ok ---@type boolean
   local mod_obj ---@type LMod?
   ok, mod_obj = pcall(lurek.mods.newMod, "testmod")
@@ -903,7 +940,7 @@ Returns whether this mod handle matches a supported type name.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LMod:typeOf
+do
   local ok2 ---@type boolean
   local mod_obj2 ---@type LMod?
   ok2, mod_obj2 = pcall(lurek.mods.newMod, "testmod")
@@ -922,7 +959,7 @@ Lua-side wrapper for the mod manager.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- lurek.mods.newModManager
+do
   local manager = lurek.mods.newModManager()
   lurek.log.info("manager initialised, " .. manager:getModCount() .. " mods", "mods")
 end
@@ -937,7 +974,7 @@ Clears explicit load order. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:clearLoadOrder
+do
   local mgr = lurek.mods.newModManager()
   mgr:setLoadOrder({"a", "b", "c"})
   mgr:clearLoadOrder()
@@ -954,7 +991,7 @@ Clears the reload queue. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:clearReloadQueue
+do
   local mgr = lurek.mods.newModManager()
   mgr:markForReload("core.hud")
   mgr:clearReloadQueue()
@@ -973,7 +1010,7 @@ Returns metadata for all registered mods.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getAllMods
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.hud", name = "HUD"}))
   for _, info in ipairs(mgr:getAllMods()) do
@@ -993,7 +1030,7 @@ Returns the resolved load order. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getLoadOrder
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.base", priority = 100}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui",   priority = 10, dependencies = {"core.base"}}))
@@ -1014,7 +1051,7 @@ Returns the number of registered mods.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getModCount
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "a"}))
   mgr:registerMod(lurek.mods.newMod({id = "b"}))
@@ -1037,7 +1074,7 @@ Returns the filesystem path for a registered mod.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getModPath
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.skins"}))
   local path = mgr:getModPath("fan.skins")
@@ -1060,7 +1097,7 @@ Returns metadata for mods declaring a capability.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getModsByCapability
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.audio", capabilities = {"audio"}}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui", capabilities = {"ui"}}))
@@ -1081,7 +1118,7 @@ Returns mod ids waiting for reload.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:getReloadQueue
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "ui.theme"}))
   mgr:markForReload("ui.theme")
@@ -1102,7 +1139,7 @@ Returns whether registered mods have circular dependencies.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:hasCircularDependencies
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "a", dependencies = {"b"}}))
   mgr:registerMod(lurek.mods.newMod({id = "b", dependencies = {"a"}}))
@@ -1127,7 +1164,7 @@ Returns whether a mod id is registered.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:hasMod
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.combat"}))
   if mgr:hasMod("core.combat") then
@@ -1151,7 +1188,7 @@ Marks a mod id for reload. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:markForReload
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.hud"}))
   local queued = mgr:markForReload("core.hud")
@@ -1170,7 +1207,7 @@ Processes and clears the reload queue.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:processReloadQueue
+do
   local mgr = lurek.mods.newModManager()
   ---@diagnostic disable-next-line: undefined-field
   local reloaded = mgr:processReloadQueue()
@@ -1191,7 +1228,7 @@ Registers a mod with the manager. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:registerMod
+do
   local mgr = lurek.mods.newModManager()
   local m = lurek.mods.newMod({id = "core.hud", priority = 50})
   mgr:registerMod(m)
@@ -1214,7 +1251,7 @@ Scans a folder for mod metadata. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:scanFolder
+do
   local mgr = lurek.mods.newModManager()
   local discovered = mgr:scanFolder("content/plugins")
   lurek.log.info("auto-registered " .. #discovered .. " mods", "mods")
@@ -1234,7 +1271,7 @@ Sets explicit load order from an array of mod ids.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:setLoadOrder
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.base"}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui"}))
@@ -1253,7 +1290,7 @@ Returns the Lua-visible type name for this mod manager handle.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LModManager:type
+do
   local mod_manager_obj = lurek.mods.newModManager()
   local t = mod_manager_obj:type()
   lurek.log.info("LModManager:type = " .. t, "mods")
@@ -1275,7 +1312,7 @@ Returns whether this mod manager handle matches a supported type name.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- LModManager:typeOf
+do
   local mod_manager_obj = lurek.mods.newModManager()
   lurek.log.info("is LModManager: " .. tostring(mod_manager_obj:typeOf("LModManager")), "mods")
   lurek.log.info("is wrong: " .. tostring(mod_manager_obj:typeOf("Unknown")), "mods")
@@ -1297,7 +1334,7 @@ Unregisters a mod by id. This method is available to Lua scripts.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:unregisterMod
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.skins"}))
   local removed = mgr:unregisterMod("fan.skins")
@@ -1316,7 +1353,7 @@ Returns dependency validation messages.
 Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
-do -- ModManager:validateDependencies
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.weapons", dependencies = {"core.combat"}}))
   for _, broken_id in ipairs(mgr:validateDependencies()) do

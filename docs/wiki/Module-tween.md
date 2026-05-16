@@ -113,11 +113,53 @@ Smooth value interpolation engine with easing functions, sequenced chains, paral
 Module example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.update
+--@api-stub: lurek.tween.update
+-- Advances all active tweens, sequences, parallels, and springs by the given delta time
+do
   function lurek.process(dt)
     lurek.tween.update(dt)
   end
 end
+
+--@api-stub: lurek.tween.tween
+-- Creates and starts a property tween that smoothly interpolates numeric fields on the target table over the given duration
+do
+  local hud = { alpha = 0, y = -32 }
+  lurek.tween.tween(0.4, hud, { alpha = 1, y = 0 }, "outQuad")
+end
+
+--@api-stub: lurek.tween.sequence
+-- Creates a new empty tween sequence
+do
+  local door = { y = 0 }
+  lurek.tween.sequence()
+    :tween(0.5, door, { y = 64 }, "outQuad")
+    :delay(0.25)
+    :start()
+end
+
+--@api-stub: lurek.tween.parallel
+-- Creates a new empty parallel tween group
+do
+  local actor = { x = 0, alpha = 1 }
+  lurek.tween.parallel()
+    :tween(0.6, actor, { x = 200 }, "inOutQuad")
+    :tween(0.6, actor, { alpha = 0 }, "linear")
+    :start()
+end
+
+--@api-stub: lurek.tween.delay
+-- Creates a one-shot delay
+do
+  lurek.tween.delay(1.5, function()
+    lurek.log.info("respawn now", "spawn")
+  end)
+end
+
+--@api-stub: lurek.tween.cancelAll
+-- Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine
+do
+  lurek.tween.cancelAll()
 ```
 
 ## Key Types
@@ -160,7 +202,7 @@ Immediately cancels all active tweens, sequences, parallels, and springs managed
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.cancelAll
+do
   lurek.tween.cancelAll()
 end
 ```
@@ -181,7 +223,7 @@ Creates a one-shot delay. After the specified seconds elapse, the optional callb
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.delay
+do
   lurek.tween.delay(1.5, function()
     lurek.log.info("respawn now", "spawn")
   end)
@@ -199,7 +241,7 @@ Returns the total number of currently active tweens, sequences, and parallels.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.getActiveCount
+do
   local n = lurek.tween.getActiveCount()
   if n > 100 then
     lurek.log.warn("tween budget exceeded: " .. n, "tween")
@@ -218,7 +260,7 @@ Returns an array of all available easing function names, including both built-in
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.getEasingNames
+do
   local names = lurek.tween.getEasingNames()
   for i = 1, #names do
     lurek.log.debug("easing[" .. i .. "]=" .. names[i], "tween")
@@ -242,7 +284,7 @@ Creates a standalone tween state for manual interpolation. Useful when you need 
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.newState
+do
   local s = lurek.tween.newState(0.5, "outCubic")
   s:tick(1 / 60)
   local x = s:lerp(0, 100)
@@ -261,7 +303,7 @@ Creates a new empty parallel tween group. Add tweens with `:tween()` or `:add()`
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.parallel
+do
   local actor = { x = 0, alpha = 1 }
   lurek.tween.parallel()
     :tween(0.6, actor, { x = 200 }, "inOutQuad")
@@ -284,7 +326,7 @@ Registers a custom easing function by name. The function receives a progress val
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.registerEasing
+do
   lurek.tween.registerEasing("squared", function(t)
     return t * t
   end)
@@ -302,7 +344,7 @@ Creates a new empty tween sequence. Chain `.tween()`, `.delay()`, and `.callback
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.sequence
+do
   local door = { y = 0 }
   lurek.tween.sequence()
     :tween(0.5, door, { y = 64 }, "outQuad")
@@ -328,7 +370,7 @@ Creates a spring-physics animation that smoothly drives table fields toward targ
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.spring
+do
   local cam = { x = 0, y = 0 }
   lurek.tween.spring(cam, { x = 320, y = 180 }, { stiffness = 180, damping = 18 })
 end
@@ -352,7 +394,7 @@ Creates and starts a property tween with a different parameter order: target fir
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.to
+do
   local enemy = { hp = 100 }
   lurek.tween.to(enemy, { hp = 0 }, 0.8, "inQuad")
 end
@@ -376,7 +418,7 @@ Creates and starts a property tween that smoothly interpolates numeric fields on
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.tween
+do
   local hud = { alpha = 0, y = -32 }
   lurek.tween.tween(0.4, hud, { alpha = 1, y = 0 }, "outQuad")
 end
@@ -397,7 +439,7 @@ Creates a sequence from a table of step descriptors. Each step is a table with `
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.tweenChain
+do
   local actor = { x = 0 }
   lurek.tween["tweenChain"]({
     { duration = 0.2, target = actor, fields = { x = 32 }, easing = "linear" },
@@ -425,7 +467,7 @@ Creates and starts a color tween that smoothly interpolates r, g, b, and/or a fi
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.tweenColor
+do
   local c = { r = 1, g = 1, b = 1, a = 1 }
   lurek.tween["tweenColor"](0.4, c, { r = 1, g = 0.2, b = 0.2, a = 0.8 }, "linear")
 end
@@ -444,7 +486,7 @@ Advances all active tweens, sequences, parallels, and springs by the given delta
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.update
+do
   function lurek.process(dt)
     lurek.tween.update(dt)
   end
@@ -463,7 +505,7 @@ Lua-exposed spring physics simulation that smoothly animates table fields toward
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.spring
+do
   local cam = { x = 0, y = 0 }
   lurek.tween.spring(cam, { x = 320, y = 180 }, { stiffness = 180, damping = 18 })
 end
@@ -478,7 +520,7 @@ Cancels this spring animation and cleans up the on-settle callback if one was re
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:cancel
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   sp:cancel()
@@ -500,7 +542,7 @@ Returns the current position of the given spring axis, or `nil` if the axis does
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:getPosition
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   local px = sp:getPosition("x")
@@ -521,7 +563,7 @@ Returns whether this spring is still actively animating.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:isActive
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   if sp:isActive() then
@@ -541,7 +583,7 @@ Returns whether all spring axes have reached their targets within the precision 
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:isSettled
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   if sp:isSettled() then
@@ -563,7 +605,7 @@ Sets the spring damping for all axes. Higher values reduce oscillation and overs
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:setDamping
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   sp:setDamping(24)
@@ -583,7 +625,7 @@ Sets the spring stiffness for all axes. Higher values make the spring snap faste
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:setStiffness
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   sp:setStiffness(240)
@@ -603,7 +645,7 @@ Changes the spring target values for one or more axes. Re-activates the spring i
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:setTarget
+do
   local cam = { x = 0, y = 0 }
   local sp = lurek.tween.spring(cam, { x = 320, y = 180 })
   sp:setTarget({ x = 480, y = 240 })
@@ -621,7 +663,7 @@ Returns the type name of this object.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:type
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   lurek.log.debug("spring type: " .. sp:type(), "tween")
@@ -643,7 +685,7 @@ Checks whether this object matches the given type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:typeOf
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   lurek.log.info("is Spring: " .. tostring(sp:typeOf("Spring")), "tween")
@@ -665,7 +707,7 @@ Manually advances this spring by the given delta time and writes updated positio
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Spring:update
+do
   local cam = { x = 0 }
   local sp = lurek.tween.spring(cam, { x = 320 })
   function lurek.process(dt) sp:update(dt) end
@@ -681,7 +723,7 @@ Creates and starts a property tween that smoothly interpolates numeric fields on
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.to
+do
   local enemy = { hp = 100 }
   lurek.tween.to(enemy, { hp = 0 }, 0.8, "inQuad")
 end
@@ -696,7 +738,7 @@ Yields the current coroutine until this tween completes or is cancelled. Must be
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:await
+do
   local obj = { x = 0 }
   local tw = lurek.tween.tween(0.2, obj, { x = 1 }, "linear")
   local co = coroutine.create(function()
@@ -716,7 +758,7 @@ Cancels this tween immediately, fires the onCancel callback if set, and resumes 
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTween:cancel
+do
   local target = { x = 0 }
   local tw = lurek.tween.tween(1.0, target, { x = 100 })
   tw:cancel()   -- interrupt before it finishes
@@ -735,7 +777,7 @@ Returns the total duration of this tween in seconds.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getDuration
+do
   local obj = { x = 0 }
   local tw = lurek.tween.tween(1.0, obj, { x = 10 })
   lurek.log.debug("duration=" .. tw:getDuration(), "tween")
@@ -753,7 +795,7 @@ Returns the number of seconds that have elapsed since the tween started.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getElapsed
+do
   local obj = { x = 0 }
   local tw = lurek.tween.tween(1.0, obj, { x = 10 })
   lurek.tween.update(0.25)
@@ -772,7 +814,7 @@ Returns an array of field names being tweened on the target table.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getFields
+do
   local obj = { x = 0, y = 0 }
   local tw = lurek.tween.tween(1.0, obj, { x = 10, y = 20 })
   local fields = tw["getFields"](tw)
@@ -791,7 +833,7 @@ Returns the eased progress of this tween as a value from 0.0 to 1.0.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getProgress
+do
   local bar = { fill = 0 }
   local tw = lurek.tween.tween(2.0, bar, { fill = 1 })
   local p = tw:getProgress()
@@ -810,7 +852,7 @@ Returns the number of seconds remaining until this tween completes.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getRemaining
+do
   local obj = { x = 0 }
   local tw = lurek.tween.tween(1.0, obj, { x = 10 })
   lurek.tween.update(0.25)
@@ -829,7 +871,7 @@ Returns whether this tween is still running (not cancelled or completed).
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:isActive
+do
   local card = { y = 0 }
   local tw = lurek.tween.tween(0.6, card, { y = 200 })
   if tw:isActive() then
@@ -853,7 +895,7 @@ Sets a callback to fire when the tween is cancelled. Returns the tween for chain
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:onCancel
+do
   local box = { x = 0 }
   local tw = lurek.tween.tween(0.5, box, { x = 100 })
   tw:onCancel(function() lurek.log.debug("cancelled", "tween") end)
@@ -877,7 +919,7 @@ Sets a callback to fire when the tween completes. Returns the tween for chaining
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:onComplete
+do
   local box = { x = 0 }
   -- onComplete registers a callback; tween auto-starts via lurek.tween.tween.
   lurek.tween.tween(0.5, box, { x = 100 }):onComplete(function()
@@ -901,7 +943,7 @@ Sets a callback to fire every frame while the tween is active. Returns the tween
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:onUpdate
+do
   local box = { x = 0 }
   lurek.tween.tween(0.5, box, { x = 100 }):onUpdate(function(t)
     lurek.log.debug("t=" .. t, "tween")
@@ -918,7 +960,7 @@ Pauses this tween so it stops advancing until resumed.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:pause
+do
   local card = { y = 0 }
   local tw = lurek.tween.tween(0.6, card, { y = 200 })
   tw:pause()
@@ -940,7 +982,7 @@ Chainable version of `setRelative`. Returns the tween for fluent API usage.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:relative
+do
   local obj = { x = 10 }
   local tw = lurek.tween.tween(1.0, obj, { x = 5 }, "linear")
   tw["relative"](tw, true)
@@ -956,7 +998,7 @@ Resumes a paused tween so it continues advancing.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:resume
+do
   local card = { y = 0 }
   local tw = lurek.tween.tween(0.6, card, { y = 200 })
   tw:pause()
@@ -977,7 +1019,7 @@ Sets whether the tween end values are relative to the start values instead of ab
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:setRelative
+do
   local obj = { x = 10 }
   local tw = lurek.tween.tween(1.0, obj, { x = 5 }, "linear")
   tw["setRelative"](tw, true)
@@ -997,7 +1039,7 @@ Sets how many times the tween should repeat after the first play. Use -1 for inf
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:setRepeat
+do
   local glow = { alpha = 0.3 }
   local tw = lurek.tween.tween(0.8, glow, { alpha = 1.0 })
   tw:setRepeat(-1)
@@ -1017,7 +1059,7 @@ Enables or disables yoyo mode, which reverses the tween direction on each repeat
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:setYoyo
+do
   local glow = { alpha = 0.3 }
   local tw = lurek.tween.tween(0.8, glow, { alpha = 1.0 })
   tw:setRepeat(-1)
@@ -1036,7 +1078,7 @@ Returns the type name of this object.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:type
+do
   local box = { x = 0 }
   local tw = lurek.tween.tween(0.5, box, { x = 100 })
   lurek.log.info("Tween:type = " .. tostring(tw and tw:type() or "nil"), "tween")
@@ -1058,7 +1100,7 @@ Checks whether this object matches the given type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:typeOf
+do
   local box = { x = 0 }
   local tw = lurek.tween.tween(0.5, box, { x = 100 })
   lurek.log.info("Tween:typeOf = " .. tostring(tw and tw:typeOf("Tween") or false), "tween")
@@ -1074,7 +1116,7 @@ Creates a new empty parallel tween group. Add tweens with `:tween()` or `:add()`
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.parallel
+do
   local actor = { x = 0, alpha = 1 }
   lurek.tween.parallel()
     :tween(0.6, actor, { x = 200 }, "inOutQuad")
@@ -1097,7 +1139,7 @@ Adds an existing tween handle to this parallel group. The tween becomes owned by
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:add
+do
   local a = { x = 0 }
   local b = { y = 0 }
   local tw1 = lurek.tween.tween(0.4, a, { x = 80 })
@@ -1117,7 +1159,7 @@ Cancels all tweens in this parallel group immediately.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:cancel
+do
   local actor = { x = 0, alpha = 1 }
   local par = lurek.tween.parallel()
     :tween(0.6, actor, { x = 200 })
@@ -1138,7 +1180,7 @@ Returns whether this parallel group is still running.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:isActive
+do
   local actor = { x = 0, alpha = 1 }
   local par = lurek.tween.parallel()
     :tween(0.6, actor, { x = 200 })
@@ -1166,7 +1208,7 @@ Sets a callback to fire when all tweens in this parallel group have finished. Re
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:onComplete
+do
   local actor = { x = 0, alpha = 1 }
   lurek.tween.parallel()
     :tween(0.6, actor, { x = 200 })
@@ -1187,7 +1229,7 @@ Starts all tweens in this parallel group simultaneously.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenParallel:start
+do
   local pos = { x = 0 }
   local col = { a = 1.0 }
   lurek.tween.parallel()
@@ -1217,7 +1259,7 @@ Creates and adds a new tween step directly to this parallel group.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenParallel:tween
+do
   local obj = { x = 0, alpha = 1.0 }
   lurek.tween.parallel()
     :tween(0.5, obj, { x = 200 })
@@ -1238,7 +1280,7 @@ Returns the type name of this object.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:type
+do
   local par = lurek.tween.parallel()
   lurek.log.info("TweenParallel:type = " .. tostring(par:type()), "tween")
 end
@@ -1259,7 +1301,7 @@ Checks whether this object matches the given type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenParallel:typeOf
+do
   local par = lurek.tween.parallel()
   lurek.log.info("TweenParallel:typeOf = " .. tostring(par:typeOf("TweenParallel")), "tween")
 end
@@ -1274,7 +1316,7 @@ Creates a new empty tween sequence. Chain `.tween()`, `.delay()`, and `.callback
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.delay
+do
   lurek.tween.delay(1.5, function()
     lurek.log.info("respawn now", "spawn")
   end)
@@ -1290,7 +1332,7 @@ Yields the current coroutine until this sequence completes or is cancelled. Must
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:await
+do
   local door = { y = 0 }
   local seq = lurek.tween.sequence():tween(0.2, door, { y = 64 }):start()
   local co = coroutine.create(function()
@@ -1316,7 +1358,7 @@ Appends a callback step to this sequence that fires when reached during playback
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:callback
+do
   local door = { y = 0 }
   lurek.tween.sequence()
     :tween(0.3, door, { y = 64 })
@@ -1335,7 +1377,7 @@ Cancels this sequence immediately and resumes any coroutines waiting on it.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:cancel
+do
   local door = { y = 0 }
   local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
   seq:cancel()
@@ -1359,7 +1401,7 @@ Appends a delay step to this sequence. Optionally fires a callback when the dela
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenSequence:delay
+do
   local obj = { x = 0 }
   lurek.tween.sequence()
     :tween(0.2, obj, { x = 100 })
@@ -1381,7 +1423,7 @@ Returns the overall progress ratio of this sequence from 0.0 to 1.0.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:getProgress
+do
   local door = { y = 0 }
   local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
   lurek.log.debug("seq progress=" .. seq["getProgress"](seq), "scene")
@@ -1399,7 +1441,7 @@ Returns whether this sequence is still running.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:isActive
+do
   local door = { y = 0 }
   local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
   if seq:isActive() then
@@ -1424,7 +1466,7 @@ Sets a callback to fire when the sequence finishes all steps. Returns the sequen
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:onComplete
+do
   local door = { y = 0 }
   lurek.tween.sequence()
     :tween(0.4, door, { y = 64 })
@@ -1444,7 +1486,7 @@ Starts playback of this sequence from the first step.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenSequence:start
+do
   local door = { y = 0 }
   local seq = lurek.tween.sequence()
     :tween(0.4, door, { y = 64 })
@@ -1474,7 +1516,7 @@ Appends a tween step to this sequence that animates numeric fields on the target
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenSequence:tween
+do
   local pos = { x = 0, y = 0 }
   lurek.tween.sequence()
     :tween(0.3, pos, { x = 100 })  -- step 1: move right
@@ -1495,7 +1537,7 @@ Returns the type name of this object.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:type
+do
   local seq = lurek.tween.sequence()
   lurek.log.info("TweenSequence:type = " .. tostring(seq:type()), "tween")
 end
@@ -1516,7 +1558,7 @@ Checks whether this object matches the given type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenSequence:typeOf
+do
   local seq = lurek.tween.sequence()
   lurek.log.info("TweenSequence:typeOf = " .. tostring(seq:typeOf("TweenSequence")), "tween")
 end
@@ -1531,7 +1573,7 @@ Lua-exposed standalone tween state for manual interpolation without automatic pr
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- lurek.tween.newState
+do
   local s = lurek.tween.newState(0.5, "outCubic")
   s:tick(1 / 60)
   local x = s:lerp(0, 100)
@@ -1550,7 +1592,7 @@ Returns whether this tween state has finished its full duration.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenState:isComplete
+do
   local s = lurek.tween.newState(0.5)
   s:tick(0.5)
   if s:isComplete() then
@@ -1575,7 +1617,7 @@ Linearly interpolates between two values using the current eased progress.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenState:lerp
+do
   local s = lurek.tween.newState(0.5, "outQuad")
   s:tick(0.25)
   local x = s:lerp(0, 320)
@@ -1593,7 +1635,7 @@ Resets the tween state to the beginning so it can be replayed.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenState:reset
+do
   local s = lurek.tween.newState(0.5)
   s:tick(0.5)
   s:reset()
@@ -1611,7 +1653,7 @@ Returns the raw (un-eased) progress value from 0.0 to 1.0.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenState:t
+do
   local s = lurek.tween.newState(0.5)
   s:tick(0.25)
   local raw = s:t()
@@ -1634,7 +1676,7 @@ Advances the tween state by the given delta time and returns the eased interpola
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- TweenState:tick
+do
   local s = lurek.tween.newState(1.0)
   function lurek.process(dt) s:tick(dt) end
 end
@@ -1651,7 +1693,7 @@ Returns the type name of this object.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenState:type
+do
   local tween_state_obj = lurek.tween.newState(0.5)
   local t = tween_state_obj:type()
   lurek.log.info("LTweenState:type = " .. t, "tween")
@@ -1673,7 +1715,7 @@ Checks whether this object matches the given type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- LTweenState:typeOf
+do
   local tween_state_obj = lurek.tween.newState(0.5)
   lurek.log.info("is LTweenState: " .. tostring(tween_state_obj:typeOf("LTweenState")), "tween")
   lurek.log.info("is wrong: " .. tostring(tween_state_obj:typeOf("Unknown")), "tween")

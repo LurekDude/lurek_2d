@@ -101,7 +101,13 @@ CSS color parsing covers hex, rgb(), rgba(), hsl(), hsla(), and named keywords. 
 Module example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.newDocument
+-- content/examples/html.lua
+-- lurek.html API examples.
+-- Run: cargo run -- content/examples/html.lua
+
+--@api-stub: lurek.html.newDocument
+-- Creates an HTML document from optional source and layout/style options
+do
   local hud = lurek.html.newDocument([[
 <body>
   <div id="score" class="hud-item">Score: 0</div>
@@ -114,6 +120,35 @@ do -- lurek.html.newDocument
   })
   lurek.log.info("newDocument created, dirty=" .. tostring(hud:isDirty()), "html")
 end
+
+--@api-stub: lurek.html.loadDocument
+-- Loads an HTML document from GameFS and optionally loads CSS from options or companion file
+do
+  local ok, doc = pcall(lurek.html.loadDocument, "ui/main_menu.html")
+  if ok and doc then
+    lurek.log.info("loadDocument succeeded", "html")
+  else
+    lurek.log.info("loadDocument: file not found (expected)", "html")
+  end
+end
+
+--@api-stub: lurek.html.supports
+-- Returns whether the HTML engine supports a named feature
+do
+  local has_flex = lurek.html.supports("css-flex")
+  local has_grid = lurek.html.supports("css-grid")
+  lurek.log.info("flex=" .. tostring(has_flex) .. " grid=" .. tostring(has_grid), "html")
+end
+
+--@api-stub: lurek.html.preventDefault
+-- Prevent default for Lua scripts in this module
+do
+  local doc = lurek.html.newDocument("<body><a id='link'>Click</a></body>")
+  doc:on("click", function()
+    lurek.html.preventDefault()
+  end)
+  pcall(function() doc:mousepressed(50, 50, 1) end)
+  lurek.log.info("preventDefault called in handler", "html")
 ```
 
 ## Key Types
@@ -147,7 +182,7 @@ Returns true if default prevented for Lua scripts in this module.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.isDefaultPrevented
+do
   local doc = lurek.html.newDocument("<body><button>OK</button></body>")
   doc:on("click", function()
     lurek.html.preventDefault()
@@ -174,7 +209,7 @@ Loads an HTML document from GameFS and optionally loads CSS from options or comp
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.loadDocument
+do
   local ok, doc = pcall(lurek.html.loadDocument, "ui/main_menu.html")
   if ok and doc then
     lurek.log.info("loadDocument succeeded", "html")
@@ -200,7 +235,7 @@ Creates an HTML document from optional source and layout/style options.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.newDocument
+do
   local hud = lurek.html.newDocument([[
 <body>
   <div id="score" class="hud-item">Score: 0</div>
@@ -224,7 +259,7 @@ Prevent default for Lua scripts in this module.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.preventDefault
+do
   local doc = lurek.html.newDocument("<body><a id='link'>Click</a></body>")
   doc:on("click", function()
     lurek.html.preventDefault()
@@ -243,7 +278,7 @@ Stop propagation for Lua scripts in this module.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.stopPropagation
+do
   local doc = lurek.html.newDocument("<body><div id='inner'>Nested</div></body>")
   doc:on("click", function()
     lurek.html.stopPropagation()
@@ -268,7 +303,7 @@ Returns whether the HTML engine supports a named feature.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.supports
+do
   local has_flex = lurek.html.supports("css-flex")
   local has_grid = lurek.html.supports("css-grid")
   lurek.log.info("flex=" .. tostring(has_flex) .. " grid=" .. tostring(has_grid), "html")
@@ -287,7 +322,7 @@ Lua-side HTML document handle with DOM state, callbacks, and render command acce
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- lurek.html.loadDocument
+do
   local ok, doc = pcall(lurek.html.loadDocument, "ui/main_menu.html")
   if ok and doc then
     lurek.log.info("loadDocument succeeded", "html")
@@ -310,7 +345,7 @@ Appends CSS source text to the document stylesheet.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:addCss
+do
   local doc = lurek.html.newDocument("<body><div id='score'>0</div></body>")
   doc:addCss("#score { color: yellow; }")
   lurek.log.info("addCss appended rule", "html")
@@ -326,7 +361,7 @@ Clears all CSS source text from the document.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:clearCss
+do
   local doc = lurek.html.newDocument("<body><p>text</p></body>", { css = "p { color: red; }" })
   doc:clearCss()
   lurek.log.info("clearCss removed all styles", "html")
@@ -347,7 +382,7 @@ Queues render commands for this document at an optional offset.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:draw
+do
   local doc = lurek.html.newDocument("<body><p>draw</p></body>")
   pcall(function() doc:draw(0, 0) end)
   lurek.log.info("draw attempted (needs graphics ctx)", "html")
@@ -369,7 +404,7 @@ Looks up the first element with a matching id attribute.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:getElementById
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>Hi</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")
@@ -390,7 +425,7 @@ Returns the current document markup string.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:getHtml
+do
   local doc = lurek.html.newDocument("<body><p>hello</p></body>")
   local markup = doc:getHtml()
   lurek.log.info("getHtml len=" .. #markup, "html")
@@ -408,7 +443,7 @@ Returns the root DOM element handle.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:getRoot
+do
   local doc = lurek.html.newDocument("<body><div>root test</div></body>")
   local root = doc:getRoot()
   if root then
@@ -428,7 +463,7 @@ Returns the document layout viewport size.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:getViewport
+do
   local doc = lurek.html.newDocument("<body>vp</body>", { width = 800, height = 600 })
   local w, h = doc:getViewport()
   lurek.log.info("getViewport: " .. tostring(w) .. "x" .. tostring(h), "html")
@@ -446,7 +481,7 @@ Returns whether the document layout is dirty.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:isDirty
+do
   local doc = lurek.html.newDocument("<body><p>dirty?</p></body>")
   local dirty = doc:isDirty()
   lurek.log.info("isDirty=" .. tostring(dirty), "html")
@@ -468,7 +503,7 @@ Forwards a key press to the focused document element and dispatches `keydown`.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:keypressed
+do
   local doc = lurek.html.newDocument("<body><input/></body>")
   doc:keypressed("return")
   lurek.log.info("keypressed(return) sent", "html")
@@ -491,7 +526,7 @@ Forwards mouse movement to the document.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:mousemoved
+do
   local doc = lurek.html.newDocument("<body><div>hover</div></body>")
   doc:mousemoved(110, 205)
   lurek.log.info("mousemoved sent", "html")
@@ -515,7 +550,7 @@ Forwards a mouse press to the document and dispatches a click event when an elem
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:mousepressed
+do
   local doc = lurek.html.newDocument("<body><button>btn</button></body>")
   local consumed = doc:mousepressed(100, 200, 1)
   lurek.log.info("mousepressed consumed=" .. tostring(consumed), "html")
@@ -539,7 +574,7 @@ Forwards a mouse release to the document.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:mousereleased
+do
   local doc = lurek.html.newDocument("<body><button>btn</button></body>")
   doc:mousepressed(100, 200, 1)
   doc:mousereleased(100, 200, 1)
@@ -560,7 +595,7 @@ Removes a document-level event listener by handle.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:off
+do
   local doc = lurek.html.newDocument("<body><p>off test</p></body>")
   local handle = doc:on("click", function() end)
   doc:off(handle)
@@ -584,7 +619,7 @@ Registers a document-level event listener.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:on
+do
   local doc = lurek.html.newDocument("<body><p>click me</p></body>")
   local handle = doc:on("click", function(ev)
     lurek.log.info("doc click event fired", "html")
@@ -608,7 +643,7 @@ Looks up the first element matching a selector.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:query
+do
   local doc = lurek.html.newDocument("<body><p class='info'>msg</p></body>")
   doc:update(0)
   local el = doc:query(".info")
@@ -633,7 +668,7 @@ Returns all elements matching a selector.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:queryAll
+do
   local doc = lurek.html.newDocument("<body><li>a</li><li>b</li><li>c</li></body>")
   doc:update(0)
   local items = doc:queryAll("li")
@@ -650,7 +685,7 @@ Rebuilds document layout immediately.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:relayout
+do
   local doc = lurek.html.newDocument("<body><p>layout</p></body>")
   doc:relayout()
   lurek.log.info("relayout forced", "html")
@@ -671,7 +706,7 @@ Queues render commands for this document at an optional offset.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:render
+do
   local doc = lurek.html.newDocument("<body><p>render</p></body>")
   pcall(function() doc:render(0, 0) end)
   lurek.log.info("render attempted", "html")
@@ -691,7 +726,7 @@ Replaces the document stylesheet text.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:setCss
+do
   local doc = lurek.html.newDocument("<body><p>styled</p></body>")
   doc:setCss("body { margin: 0; } p { font-size: 20px; }")
   lurek.log.info("setCss applied", "html")
@@ -711,7 +746,7 @@ Replaces the document markup and invalidates existing element handles.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:setHtml
+do
   local doc = lurek.html.newDocument("<body><p>old</p></body>")
   doc:setHtml([[<body><div id="score">Score: 100</div></body>]])
   lurek.log.info("setHtml replaced markup", "html")
@@ -732,7 +767,7 @@ Sets the document layout viewport size.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:setViewport
+do
   local doc = lurek.html.newDocument("<body>viewport test</body>")
   doc:setViewport(1920, 1080)
   lurek.log.info("setViewport 1920x1080", "html")
@@ -754,7 +789,7 @@ Forwards text input to the focused document element and dispatches `input`.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:textinput
+do
   local doc = lurek.html.newDocument("<body><input/></body>")
   doc:textinput("a")
   lurek.log.info("textinput('a') sent", "html")
@@ -772,7 +807,7 @@ Returns the Lua-visible type name for this HTML document handle.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:type
+do
   local doc = lurek.html.newDocument("<body>type test</body>")
   local t = doc:type()
   lurek.log.info("LHtmlDocument:type = " .. t, "html")
@@ -794,7 +829,7 @@ Returns whether this document handle matches a supported type name.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:typeOf
+do
   local doc = lurek.html.newDocument("<body>typeOf test</body>")
   lurek.log.info("is LHtmlDocument: " .. tostring(doc:typeOf("LHtmlDocument")), "html")
   lurek.log.info("is wrong: " .. tostring(doc:typeOf("Unknown")), "html")
@@ -814,7 +849,7 @@ Advances document timers and animated state.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:update
+do
   local doc = lurek.html.newDocument("<body><p>tick</p></body>")
   doc:update(1 / 60)
   lurek.log.info("update(dt) called", "html")
@@ -837,7 +872,7 @@ Forwards mouse wheel movement to the document.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:wheelmoved
+do
   local doc = lurek.html.newDocument("<body><div>scroll</div></body>")
   doc:wheelmoved(0, -3)
   lurek.log.info("wheelmoved sent", "html")
@@ -853,7 +888,7 @@ Lua-side DOM element handle with stale-generation detection.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlDocument:getRoot
+do
   local doc = lurek.html.newDocument("<body><div>root test</div></body>")
   local root = doc:getRoot()
   if root then
@@ -875,7 +910,7 @@ Adds a CSS class to this element. This method is available to Lua scripts.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:addClass
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -899,7 +934,7 @@ Appends HTML source to this element's inner HTML.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:appendHtml
+do
   local doc = lurek.html.newDocument("<body><div id='list'><p>A</p></div></body>")
   doc:update(0)
   local el = doc:getElementById("list")
@@ -919,7 +954,7 @@ Removes keyboard focus from this element when it is focused.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:blur
+do
   local doc = lurek.html.newDocument("<body><input id='inp'/></body>")
   doc:update(0)
   local el = doc:getElementById("inp")
@@ -940,7 +975,7 @@ Gives keyboard focus to this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:focus
+do
   local doc = lurek.html.newDocument("<body><input id='inp'/></body>")
   doc:update(0)
   local el = doc:getElementById("inp")
@@ -966,7 +1001,7 @@ Returns an attribute value from this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getAttribute
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -988,7 +1023,7 @@ Returns the document handle that owns this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getDocument
+do
   local doc = lurek.html.newDocument("<body><div id='box'>hi</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -1010,7 +1045,7 @@ Returns this element's inner HTML.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getHtml
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'><b>bold</b></div></body>")
   doc:update(0)
   local el = doc:getElementById("wrap")
@@ -1031,7 +1066,7 @@ Returns this element's id attribute.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getId
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>x</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")
@@ -1052,7 +1087,7 @@ Returns this element's layout rectangle after relayout if needed.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getRect
+do
   local doc = lurek.html.newDocument("<body><div id='box'>rect</div></body>", { width = 400, height = 300 })
   doc:update(0)
   doc:relayout()
@@ -1079,7 +1114,7 @@ Returns an inline or computed style value for this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getStyle
+do
   local doc = lurek.html.newDocument("<body><div id='box' style='color:red'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -1101,7 +1136,7 @@ Returns this element's tag name. This method is available to Lua scripts.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getTagName
+do
   local doc = lurek.html.newDocument("<body><div id='hdr'>title</div></body>")
   doc:update(0)
   local el = doc:getElementById("hdr")
@@ -1122,7 +1157,7 @@ Returns this element's text content.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:getText
+do
   local doc = lurek.html.newDocument("<body><p id='msg'>Hello World</p></body>")
   doc:update(0)
   local el = doc:getElementById("msg")
@@ -1147,7 +1182,7 @@ Returns whether this element has a CSS class.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:hasClass
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary large'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1170,7 +1205,7 @@ Removes an element-level event listener by handle.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:off
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>click</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1198,7 +1233,7 @@ Registers an element-level event listener.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:on
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>click</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1224,7 +1259,7 @@ Looks up the first descendant element matching a selector.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:query
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'><span class='tag'>A</span></div></body>")
   doc:update(0)
   local wrap = doc:getElementById("wrap")
@@ -1250,7 +1285,7 @@ Returns all descendant elements matching a selector.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:queryAll
+do
   local doc = lurek.html.newDocument("<body><ul id='list'><li>1</li><li>2</li><li>3</li></ul></body>")
   doc:update(0)
   local list = doc:getElementById("list")
@@ -1270,7 +1305,7 @@ Removes this element from the document.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:remove
+do
   local doc = lurek.html.newDocument("<body><div id='temp'>remove me</div><p>keep</p></body>")
   doc:update(0)
   local el = doc:getElementById("temp")
@@ -1294,7 +1329,7 @@ Removes an attribute from this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:removeAttribute
+do
   local doc = lurek.html.newDocument("<body><div id='box' data-temp='1'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -1318,7 +1353,7 @@ Removes a CSS class from this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:removeClass
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary large'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1343,7 +1378,7 @@ Sets or clears an attribute on this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:setAttribute
+do
   local doc = lurek.html.newDocument("<body><button id='btn'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1367,7 +1402,7 @@ Replaces this element's inner HTML and may invalidate descendant element handles
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:setHtml
+do
   local doc = lurek.html.newDocument("<body><div id='wrap'>old</div></body>")
   doc:update(0)
   local el = doc:getElementById("wrap")
@@ -1391,7 +1426,7 @@ Sets or clears this element's id attribute.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:setId
+do
   local doc = lurek.html.newDocument("<body><div id='old'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("old")
@@ -1416,7 +1451,7 @@ Sets or clears a style property on this element.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:setStyle
+do
   local doc = lurek.html.newDocument("<body><div id='box'>x</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -1440,7 +1475,7 @@ Replaces this element's text content.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:setText
+do
   local doc = lurek.html.newDocument("<body><p id='msg'>old</p></body>")
   doc:update(0)
   local el = doc:getElementById("msg")
@@ -1467,7 +1502,7 @@ Toggles a CSS class on this element, optionally forcing the final state.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:toggleClass
+do
   local doc = lurek.html.newDocument("<body><button id='btn' class='primary'>Go</button></body>")
   doc:update(0)
   local el = doc:getElementById("btn")
@@ -1489,7 +1524,7 @@ Returns the Lua-visible type name for this HTML element handle.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:type
+do
   local doc = lurek.html.newDocument("<body><div id='box'>Hello</div></body>")
   doc:update(0)
   local el = doc:getElementById("box")
@@ -1514,7 +1549,7 @@ Returns whether this element handle matches a supported type name.
 Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
-do -- LHtmlElement:typeOf
+do
   local doc = lurek.html.newDocument("<body><span id='lbl'>text</span></body>")
   doc:update(0)
   local el = doc:getElementById("lbl")

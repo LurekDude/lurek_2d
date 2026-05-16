@@ -2,8 +2,9 @@
 -- lurek.save API examples.
 -- Run: cargo run -- content/examples/save.lua
 
---@api-stub: lurek.save.newSaveManager -- Create a new SaveManager instance for managing persistent game saves
-do -- lurek.save.newSaveManager
+--@api-stub: lurek.save.newSaveManager
+-- Create a new SaveManager instance for managing persistent game saves
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(1)
   mgr:register("player",
@@ -11,10 +12,11 @@ do -- lurek.save.newSaveManager
     function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
 end
 
--- â”€â”€ SaveManager methods â”€â”€
+-- SaveManager methods
 
 --@api-stub: SaveManager:unregister
-do -- SaveManager:unregister
+-- Performs the unregister operation on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("minigame",
     function() return { score = 0 } end,
@@ -23,14 +25,16 @@ do -- SaveManager:unregister
 end
 
 --@api-stub: SaveManager:setSchemaVersion
-do -- SaveManager:setSchemaVersion
+-- Sets the schema version of this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(3)
   lurek.log.info("save schema is now v" .. mgr:getSchemaVersion(), "save")
 end
 
 --@api-stub: SaveManager:getSchemaVersion
-do -- SaveManager:getSchemaVersion
+-- Returns the schema version of this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(2)
   local ver = mgr:getSchemaVersion()
@@ -38,7 +42,8 @@ do -- SaveManager:getSchemaVersion
 end
 
 --@api-stub: SaveManager:collect
-do -- SaveManager:collect
+-- Collects and returns all completed task results from this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("inventory",
     function() return { gold = 250, potions = 3 } end,
@@ -48,7 +53,8 @@ do -- SaveManager:collect
 end
 
 --@api-stub: SaveManager:restore
-do -- SaveManager:restore
+-- Performs the restore operation on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   local checkpoint
   mgr:register("hp",
@@ -59,7 +65,8 @@ do -- SaveManager:restore
 end
 
 --@api-stub: SaveManager:markDirty
-do -- SaveManager:markDirty
+-- Performs the mark dirty operation on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   local function on_item_picked_up()
     mgr:markDirty()
@@ -68,7 +75,8 @@ do -- SaveManager:markDirty
 end
 
 --@api-stub: SaveManager:isDirty
-do -- SaveManager:isDirty
+-- Returns true if this save manager dirty.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:markDirty()
   if mgr:isDirty() then
@@ -77,7 +85,8 @@ do -- SaveManager:isDirty
 end
 
 --@api-stub: SaveManager:disableAutoSave
-do -- SaveManager:disableAutoSave
+-- Performs the disable auto save operation on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:enableAutoSave(60.0, "auto")
   mgr:disableAutoSave()
@@ -85,7 +94,8 @@ do -- SaveManager:disableAutoSave
 end
 
 --@api-stub: SaveManager:update
-do -- SaveManager:update
+-- Advances this save manager by the given delta time.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:enableAutoSave(30.0, "auto")
   function lurek.process(dt)
@@ -95,14 +105,16 @@ do -- SaveManager:update
 end
 
 --@api-stub: SaveManager:setSummary
-do -- SaveManager:setSummary
+-- Sets the summary of this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   local area, playtime = "Forest", "12:30"
   mgr:setSummary(area .. " â€” " .. playtime)
 end
 
 --@api-stub: SaveManager:getSummary
-do -- SaveManager:getSummary
+-- Returns the summary of this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSummary("Chapter 2 â€” Boss")
   local label = mgr:getSummary()
@@ -110,7 +122,8 @@ do -- SaveManager:getSummary
 end
 
 --@api-stub: SaveManager:reset
-do -- SaveManager:reset
+-- Resets this save manager to its default state.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("player", function() return {} end, function(_) end)
   mgr:reset()
@@ -118,14 +131,16 @@ do -- SaveManager:reset
 end
 
 --@api-stub: SaveManager:setCompress
-do -- SaveManager:setCompress
+-- Sets the compress of this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
   lurek.log.info("compressed saves enabled", "save")
 end
 
 --@api-stub: SaveManager:isCompressed
-do -- SaveManager:isCompressed
+-- Returns true if this save manager compressed.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
   if mgr:isCompressed() then
@@ -134,7 +149,8 @@ do -- SaveManager:isCompressed
 end
 
 --@api-stub: SaveManager:onBeforeSave
-do -- SaveManager:onBeforeSave
+-- Fires the callback registered for the before save event on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:onBeforeSave(function(slot)
     mgr:setSummary("Saved to " .. slot)
@@ -143,7 +159,8 @@ do -- SaveManager:onBeforeSave
 end
 
 --@api-stub: SaveManager:onAfterLoad
-do -- SaveManager:onAfterLoad
+-- Fires the callback registered for the after load event on this save manager.
+do
   local mgr = lurek.save.newSaveManager()
   mgr:onAfterLoad(function(slot)
     lurek.log.info("loaded slot " .. slot .. ", rebuilding scene", "save")
@@ -151,7 +168,8 @@ do -- SaveManager:onAfterLoad
 end
 
 --@api-stub: SaveManager:save
-do -- SaveManager:save
+-- Saves the current state of this save manager.
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -163,7 +181,8 @@ do -- SaveManager:save
 end
 
 --@api-stub: SaveManager:load
-do -- SaveManager:load
+-- Loads into this save manager.
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -174,7 +193,8 @@ do -- SaveManager:load
 end
 
 --@api-stub: SaveManager:delete
-do -- SaveManager:delete
+-- Deletes the  from this save manager.
+do
   local mgr
   function lurek.quit()
     mgr = lurek.save.newSaveManager()
@@ -184,7 +204,8 @@ do -- SaveManager:delete
 end
 
 --@api-stub: SaveManager:getSlots
-do -- SaveManager:getSlots
+-- Returns the slots of this save manager.
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -195,7 +216,8 @@ do -- SaveManager:getSlots
 end
 
 --@api-stub: SaveManager:getSlotInfo
-do -- SaveManager:getSlotInfo
+-- Returns the slot info of this save manager.
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -205,7 +227,8 @@ do -- SaveManager:getSlotInfo
 end
 
 --@api-stub: SaveManager:addMigration
-do -- SaveManager:addMigration
+-- Adds a migration to this save manager.
+do
   local sm = lurek.save.newSaveManager()
   sm:setSchemaVersion(2)
   sm:addMigration(1, function(data)
@@ -216,7 +239,8 @@ do -- SaveManager:addMigration
 end
 
 --@api-stub: SaveManager:enableAutoSave
-do -- SaveManager:enableAutoSave
+-- Performs the enable auto save operation on this save manager.
+do
   local sm = lurek.save.newSaveManager()
   sm:register("state", function() return {score=0} end, function(d) end)
   sm:enableAutoSave(5.0, "slot1")
@@ -224,14 +248,16 @@ do -- SaveManager:enableAutoSave
 end
 
 --@api-stub: SaveManager:exists
-do -- SaveManager:exists
+-- Performs the exists operation on this save manager.
+do
   local sm = lurek.save.newSaveManager()
   local present = sm:exists("slot1")
   lurek.log.info("slot1 exists: " .. tostring(present), "save")
 end
 
 --@api-stub: SaveManager:register
-do -- SaveManager:register
+-- Performs the register operation on this save manager.
+do
   local sm = lurek.save.newSaveManager()
   sm:register("player_state",
     function() return {x=200, y=300, hp=100} end,
@@ -240,24 +266,25 @@ do -- SaveManager:register
   lurek.log.info("component registered", "save")
 end
 
--- =============================================================================
--- COVERAGE: 2 uncovered lurek.save API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
-
 -- -----------------------------------------------------------------------------
 -- SaveManager methods
 -- -----------------------------------------------------------------------------
-
--- =============================================================================
--- COVERAGE: 2 uncovered lurek.save API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- LSaveManager methods
 -- -----------------------------------------------------------------------------
 
 
+--@api-stub: LSaveManager:type
+-- Returns the Lua-visible type name string for this save manager handle.
+do
+  local sm = lurek.save.manager()
+  lurek.log.info(sm:type(), "save")
+end
+
+--@api-stub: LSaveManager:typeOf
+-- Returns true if this save manager handle matches the given type name string.
+do
+  local sm = lurek.save.manager()
+  lurek.log.info(tostring(sm:typeOf("LSaveManager")), "save")
+end

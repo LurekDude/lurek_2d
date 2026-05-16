@@ -74,12 +74,54 @@ Number formatting respects locale decimal separators, grouping, and currency sym
 Module example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.loadTable
+-- content/examples/i18n.lua
+-- lurek.i18n API examples.
+-- Run: cargo run -- content/examples/i18n.lua
+
+--@api-stub: lurek.i18n.loadTable
+-- Loads translations for a locale from a nested Lua table flattened with dot-separated keys
+do
   lurek.i18n.loadTable("en", {
     ui = { start = "Start", quit = "Quit" },
     hud = { score = "Score: {n}" },
   })
 end
+
+--@api-stub: lurek.i18n.unloadTable
+-- Removes all translations for a locale from the catalog
+do
+  lurek.i18n.loadTable("xx", { ui = { start = "Go" } })
+  local removed = lurek.i18n.unloadTable("xx")
+  lurek.log.info("xx removed=" .. tostring(removed), "i18n")
+end
+
+--@api-stub: lurek.i18n.setLanguage
+-- Sets the active locale and invokes registered change callbacks with new and old locale values
+do
+  lurek.i18n.loadTable("fr", { ui = { start = "Commencer" } })
+  lurek.i18n.setLanguage("fr")
+end
+
+--@api-stub: lurek.i18n.getLanguage
+-- Returns the active locale code
+do
+  local active = lurek.i18n.getLanguage()
+  if active then
+    lurek.log.info("active locale=" .. active, "i18n")
+  end
+end
+
+--@api-stub: lurek.i18n.getLanguages
+-- Returns sorted locale codes currently loaded in the catalog
+do
+  for _, code in ipairs(lurek.i18n.getLanguages()) do
+    lurek.log.info("available: " .. code, "i18n")
+  end
+end
+
+--@api-stub: lurek.i18n.setFallbacks
+-- Replaces the fallback locale list used for missing translations
+do
 ```
 
 ## Key Types
@@ -125,7 +167,7 @@ Builds a word-to-keys search index from the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.buildIndex
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start game", quit = "Quit game" } })
   lurek.i18n.setLanguage("en")
   local index = lurek.i18n.buildIndex()
@@ -144,7 +186,7 @@ Returns top-level translation key categories.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.categories
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start" }, hud = { score = "S" } })
   lurek.i18n.setLanguage("en")
   for _, c in ipairs(lurek.i18n.categories()) do
@@ -164,7 +206,7 @@ Detects the system locale when available.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.detectLocale
+do
   local detected = lurek.i18n.detectLocale()
   if detected then
     lurek.log.info("system locale detected: " .. detected, "i18n")
@@ -190,7 +232,7 @@ Formats a timestamp with the active locale and a named format.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.formatDate
+do
   lurek.i18n.setLanguage("en")
   local stamp = lurek.i18n.formatDate(1700000000, "long")
   lurek.log.info("save written " .. stamp, "i18n")
@@ -213,7 +255,7 @@ Formats a number with locale-aware separators and optional decimal precision.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.formatNumber
+do
   lurek.i18n.setLanguage("de")
   local price = lurek.i18n.formatNumber(1234.5, { decimals = 2 })
   lurek.log.info("DE price=" .. price, "i18n")
@@ -231,7 +273,7 @@ Returns sorted locale codes currently loaded in the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getAvailableLanguages
+do
   local langs = lurek.i18n.getAvailableLanguages()
   lurek.log.info("options menu langs=" .. #langs, "i18n")
 end
@@ -248,7 +290,7 @@ Returns the base locale string stored by the localization module.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getBase
+do
   local base = lurek.i18n.getBase()
   if base ~= "" then
     lurek.log.info("source locale=" .. base, "i18n")
@@ -267,7 +309,7 @@ Returns fallback locale codes in lookup order.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getFallbacks
+do
   local chain = lurek.i18n.getFallbacks()
   lurek.log.info("fallback depth=" .. #chain, "i18n")
 end
@@ -284,7 +326,7 @@ Returns sorted translation keys known to the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getKeys
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start", quit = "Quit" } })
   lurek.i18n.setLanguage("en")
   local total = #lurek.i18n.getKeys()
@@ -303,7 +345,7 @@ Returns the active locale code. This function is exposed to Lua scripts.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getLanguage
+do
   local active = lurek.i18n.getLanguage()
   if active then
     lurek.log.info("active locale=" .. active, "i18n")
@@ -322,7 +364,7 @@ Returns sorted locale codes currently loaded in the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getLanguages
+do
   for _, code in ipairs(lurek.i18n.getLanguages()) do
     lurek.log.info("available: " .. code, "i18n")
   end
@@ -340,7 +382,7 @@ Returns locale codes currently loaded in the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.getLoadedLocales
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start" } })
   lurek.i18n.loadTable("fr", { ui = { start = "Commencer" } })
   local locales = lurek.i18n.getLoadedLocales()
@@ -363,7 +405,7 @@ Returns whether the catalog contains a translation key in active or fallback loc
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.hasKey
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start" } })
   lurek.i18n.setLanguage("en")
   if not lurek.i18n.hasKey("ui.credits") then
@@ -387,7 +429,7 @@ Returns whether a locale has translations loaded.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.hasLanguage
+do
   lurek.i18n.loadTable("ja", { ui = { start = "é–‹ĺ§‹" } })
   if lurek.i18n.hasLanguage("ja") then
     lurek.i18n.setLanguage("ja")
@@ -411,7 +453,7 @@ Replaces `{name}` placeholders in a template using string variables.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.interpolate
+do
   local msg = lurek.i18n.interpolate(
     "Player {name} reached level {lvl}",
     { name = "Aria", lvl = "7" }
@@ -435,7 +477,7 @@ Returns whether a locale is written right-to-left.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.isRTL
+do
   local rtl_arabic = lurek.i18n.isRTL("ar-SA")    -- true
   local ltr_english = lurek.i18n.isRTL("en-US")   -- false
   local active_rtl = lurek.i18n.isRTL()            -- tests current locale
@@ -455,7 +497,7 @@ Returns the number of translation keys known to the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.keyCount
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start", quit = "Quit" } })
   lurek.i18n.setLanguage("en")
   lurek.log.info("active locale has " .. lurek.i18n.keyCount() .. " keys", "i18n")
@@ -477,7 +519,7 @@ Returns translation keys belonging to one category prefix.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.keysInCategory
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start", quit = "Quit" } })
   lurek.i18n.setLanguage("en")
   local ui_keys = lurek.i18n.keysInCategory("ui")
@@ -500,7 +542,7 @@ Loads translations for a locale from TOML or JSON source text.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.loadString — JSON
+do
   local json_src = '{"menu":{"start":"Start","quit":"Quit"}}'
   lurek.i18n.loadString("demo_json", json_src, "json")
   lurek.i18n.setLanguage("demo_json")
@@ -522,7 +564,7 @@ Loads translations for a locale from a nested Lua table flattened with dot-separ
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.loadTable
+do
   lurek.i18n.loadTable("en", {
     ui = { start = "Start", quit = "Quit" },
     hud = { score = "Score: {n}" },
@@ -545,7 +587,7 @@ Returns missing translation keys for all locales compared to a reference locale.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.localeCoverage
+do
   lurek.i18n.loadTable("ref_en", { hello = "Hello", bye = "Goodbye", ok = "OK" })
   lurek.i18n.loadTable("ref_fr", { hello = "Bonjour", ok = "Oui" })  -- 'bye' missing
   lurek.i18n.loadTable("ref_de", { hello = "Hallo", bye = "Tschüss" }) -- 'ok' missing
@@ -572,7 +614,7 @@ Merges flat translation entries into an existing locale.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.mergeLocale
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start" } })
   lurek.i18n.mergeLocale("en", {
     ["dialog.intro"] = "Welcome, traveller.",
@@ -590,7 +632,7 @@ Removes every registered locale-change callback.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.offChange
+do
   lurek.i18n.onChange(function() end)
   lurek.i18n.offChange()
   lurek.log.info("locale-change handlers cleared", "i18n")
@@ -610,7 +652,7 @@ Registers a locale-change callback using the shorter alias name.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.onChange
+do
   lurek.i18n.onChange(function(new_locale, _old)
     lurek.log.info("UI rebuild for " .. new_locale, "i18n")
   end)
@@ -630,7 +672,7 @@ Registers a callback invoked when the active locale changes.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.onLanguageChange
+do
   lurek.i18n.onLanguageChange(function(new_locale, old_locale)
     lurek.log.info("locale changed " .. tostring(old_locale) .. " -> " .. new_locale, "i18n")
   end)
@@ -654,7 +696,7 @@ Returns the English plural category key for a number.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.pluralFor
+do
   for _, n in ipairs({ 0, 1, 5 }) do
     local cat = lurek.i18n.pluralFor(n)
     lurek.log.info("n=" .. n .. " -> " .. cat, "i18n")
@@ -678,7 +720,7 @@ Searches translation keys and values for a query string.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.search
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start", restart = "Restart" } })
   lurek.i18n.setLanguage("en")
   local hits = lurek.i18n.search("start", 10)
@@ -703,7 +745,7 @@ Searches a prebuilt word index and returns matching keys.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.searchIndexed
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start game", quit = "Quit game" } })
   lurek.i18n.setLanguage("en")
   local index = lurek.i18n.buildIndex()
@@ -725,7 +767,7 @@ Sets the base locale string stored by the localization module.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.setBase
+do
   lurek.i18n.setBase("en")
 end
 ```
@@ -743,7 +785,7 @@ Replaces the fallback locale list used for missing translations.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.setFallbacks
+do
   lurek.i18n.loadTable("en", { ui = { quit = "Quit" } })
   lurek.i18n.setFallbacks({ "en-US", "en" })
 end
@@ -764,7 +806,7 @@ Sets one translation value for one locale and key.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.setKey
+do
   lurek.i18n.loadTable("en", { ui = { start = "Start" } })
   lurek.i18n.setKey("en", "ui.continue", "Continue")
   lurek.i18n.setLanguage("en")
@@ -785,7 +827,7 @@ Sets the active locale and invokes registered change callbacks with new and old 
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.setLanguage
+do
   lurek.i18n.loadTable("fr", { ui = { start = "Commencer" } })
   lurek.i18n.setLanguage("fr")
 end
@@ -808,7 +850,7 @@ Translates a key using the active locale, optional variables, and optional Engli
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.t
+do
   lurek.i18n.loadTable("en", {
     hud = { score = "Score: {n}", lives = { one = "1 life", other = "{count} lives" } },
   })
@@ -836,7 +878,7 @@ Translates a gender-specific key variant when present, then falls back to the ba
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.tGender
+do
   lurek.i18n.loadTable("en", {
     npc = {
       greet = {
@@ -867,7 +909,7 @@ Removes all translations for a locale from the catalog.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.unloadTable
+do
   lurek.i18n.loadTable("xx", { ui = { start = "Go" } })
   local removed = lurek.i18n.unloadTable("xx")
   lurek.log.info("xx removed=" .. tostring(removed), "i18n")
@@ -889,7 +931,7 @@ Returns whether a locale code has a valid syntax.
 Exact example from [i18n.lua](../blob/main/content/examples/i18n.lua):
 
 ```lua
-do -- lurek.i18n.validateLocale
+do
   local ok_code   = lurek.i18n.validateLocale("en-US")   -- true
   local bad_code  = lurek.i18n.validateLocale("1bad")     -- false
   local empty     = lurek.i18n.validateLocale("")          -- false

@@ -176,12 +176,54 @@ In-memory column-major tabular data engine with lightweight SQL-style queries. `
 Module example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ## Key Types
@@ -226,7 +268,7 @@ Parses a dataframe from binary data.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromBinary
+do
   local original = lurek.dataframe.fromTable({{x = 1}, {x = 2}})
   local blob = original:toBinary()
   local restored = lurek.dataframe.fromBinary(blob)
@@ -249,7 +291,7 @@ Parses a dataframe from CSV text. This function is exposed to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromCSV
+do
   local csv = "weapon,damage,cost\nsword,12,50\nbow,8,40\n"
   local items = lurek.dataframe.fromCSV(csv)
   lurek.log.info("avg damage = " .. items:mean("damage"))
@@ -271,7 +313,7 @@ Parses a dataframe from JSON text. This function is exposed to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromJSON
+do
   local json = '[{"id":1,"name":"Alice"},{"id":2,"name":"Bob"}]'
   local players = lurek.dataframe.fromJSON(json)
   lurek.log.info("rows: " .. players:nrows())
@@ -294,7 +336,7 @@ Creates a dataframe from column names and array-style rows.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromRows
+do
   local columns = {"id", "name", "score"}
   local rows = {
     {1, "Alice", 1200},
@@ -320,7 +362,7 @@ Creates a dataframe from an array table of row tables.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromTable
+do
   local rows = {
     {name = "goblin", hp = 30, level = 2},
     {name = "orc",    hp = 60, level = 5},
@@ -345,7 +387,7 @@ Converts a vectorized frame to a dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromVec
+do
   local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n")
   local vf = lurek.dataframe.toVec(df)
   vf:colMul("hp", 0.5)          -- halve all HP values at once
@@ -365,7 +407,7 @@ Creates an empty dataframe database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDatabase
+do
   local db = lurek.dataframe.newDatabase()
   local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
   db:addTable("players", players)
@@ -384,7 +426,7 @@ Creates an empty dataframe. This function is exposed to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
@@ -409,7 +451,7 @@ Creates a random dataframe from column definitions.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.random
+do
   local defs = {{"id", "id"}, {"hp", "int"}, {"name", "name"}}
   local mob_pool = lurek.dataframe.random(defs, 100, 42)
   lurek.log.info("generated " .. mob_pool:nrows() .. " mobs")
@@ -431,7 +473,7 @@ Converts a dataframe to a vectorized frame.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.toVec
+do
   local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n150,60\n")
   local vf = lurek.dataframe.toVec(df)
   lurek.log.info("VecFrame: " .. vf:nrows() .. " rows, " .. vf:ncols() .. " cols")
@@ -450,7 +492,7 @@ Lua-side in-memory database containing named dataframes.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDatabase
+do
   local db = lurek.dataframe.newDatabase()
   local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
   db:addTable("players", players)
@@ -472,7 +514,7 @@ Adds or replaces a named dataframe table in the database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:addTable
+do
   local db = lurek.dataframe.newDatabase()
   local df = lurek.dataframe.newDataFrame()
   df:addRow({id=1, name="Alice"})
@@ -490,7 +532,7 @@ Removes every table from the database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:clear
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("round", lurek.dataframe.newDataFrame())
   db:clear()
@@ -513,7 +555,7 @@ Returns a copy of a named table when it exists.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:getTable
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("players", lurek.dataframe.fromTable({{name = "Alice"}}))
   local players = db:getTable("players")
@@ -538,7 +580,7 @@ Returns whether a named table exists.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:hasTable
+do
   local db = lurek.dataframe.newDatabase()
   if not db:hasTable("scores") then
     db:addTable("scores", lurek.dataframe.newDataFrame())
@@ -557,7 +599,7 @@ Returns all table names in the database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:listTables
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("a", lurek.dataframe.newDataFrame())
   db:addTable("b", lurek.dataframe.newDataFrame())
@@ -580,7 +622,7 @@ Merges another database into this database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:merge
+do
   local base = lurek.dataframe.newDatabase()
   local mod = lurek.dataframe.newDatabase()
   mod:addTable("extra_items", lurek.dataframe.fromTable({{id = "amulet"}}))
@@ -604,7 +646,7 @@ Runs a SQL-style query against the database tables.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:query
+do
   pcall(function()
     local db = lurek.dataframe.newDatabase()
     db:addTable("players", lurek.dataframe.fromTable({{id = 1, name = "Alice"}}))
@@ -628,7 +670,7 @@ Removes a named table from the database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:removeTable
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("temp", lurek.dataframe.newDataFrame())
   db:removeTable("temp")
@@ -647,7 +689,7 @@ Returns the number of tables in the database.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:tableCount
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("scores", lurek.dataframe.newDataFrame())
   if db:tableCount() > 0 then
@@ -667,7 +709,7 @@ Serializes the database to JSON text.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:toJSON
+do
   local db = lurek.dataframe.newDatabase()
   db:addTable("players", lurek.dataframe.fromTable({{name = "Alice"}}))
   if lurek.fs then lurek.fs.write("save/world.json", db:toJSON()) end
@@ -685,7 +727,7 @@ Returns the Lua-visible type name for this database handle.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:type
+do
   local db = lurek.dataframe.newDatabase()
   if db:type() == "Database" then
     lurek.log.info("got a database, tables=" .. db:tableCount())
@@ -708,7 +750,7 @@ Returns whether this database handle matches a supported type name.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- Database:typeOf
+do
   local db = lurek.dataframe.newDatabase()
   if db:typeOf("Object") then
     lurek.log.info("Database is an Object")
@@ -725,7 +767,7 @@ Lua-side dataframe handle for tabular data with named columns and typed cells.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.fromBinary
+do
   local original = lurek.dataframe.fromTable({{x = 1}, {x = 2}})
   local blob = original:toBinary()
   local restored = lurek.dataframe.fromBinary(blob)
@@ -747,7 +789,7 @@ Adds a column with an optional default value.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:addColumn
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({name="Alice", score=85})
   df:addColumn("grade", {"A"})
@@ -770,7 +812,7 @@ Adds a row from an optional map table and returns its one-based row index.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:addRow
+do
   local log_df = lurek.dataframe.newDataFrame()
   log_df:addColumn("event", "")
   log_df:addColumn("t", 0)
@@ -792,7 +834,7 @@ Appends multiple rows from array-style row tables.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:addRowBatch
+do
   local df = lurek.dataframe.newDataFrame()
   df:addColumn("x", 0)
   df:addColumn("y", 0)
@@ -815,7 +857,7 @@ Applies a Lua function to each value in a column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:apply
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({score=60})
   df:addRow({score=80})
@@ -835,7 +877,7 @@ Returns a deep copy of this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:clone
+do
   local original = lurek.dataframe.fromTable({{x = 1}, {x = 2}})
   local working = original:clone()
   working:addRow({x = 3})
@@ -854,7 +896,7 @@ Returns all column names in order. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:columns
+do
   local df = lurek.dataframe.fromTable({{hp = 100, mp = 50}})
   local headers = df:columns()
   for _, name in ipairs(headers) do
@@ -879,7 +921,7 @@ Returns correlation between two numeric columns.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:corr
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({x=1, y=2})
   df:addRow({x=3, y=4})
@@ -900,7 +942,7 @@ Returns a correlation matrix for numeric columns.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:correlationMatrix
+do
   local df = lurek.dataframe.random({{"dmg", "int"}, {"cost", "int"}}, 50, 5)
   local matrix = df:correlationMatrix()
   lurek.log.info("correlation:\n" .. matrix:toString())
@@ -918,7 +960,7 @@ Returns the row count for this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:count
+do
   local df = lurek.dataframe.fromTable({{kill = 1}, {kill = 1}, {kill = 1}})
   local kills = df:count()
   lurek.log.info("session kills: " .. kills)
@@ -940,7 +982,7 @@ Counts occurrences of each value in a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:countBy
+do
   local df = lurek.dataframe.fromTable({{weapon = "sword"}, {weapon = "bow"}, {weapon = "sword"}})
   local counts = df:countBy("weapon")
   lurek.log.info(counts:toString())
@@ -958,7 +1000,7 @@ Returns summary statistics for numeric columns.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:describe
+do
   local df = lurek.dataframe.random({{"hp", "int"}, {"mp", "int"}}, 200, 11)
   local summary = df:describe()
   lurek.log.info(summary:toString())
@@ -980,7 +1022,7 @@ Returns rows where the chosen column is not nil.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:dropNil
+do
   local df = lurek.dataframe.fromTable({{x = 1}, {x = nil}, {x = 3}})
   local clean = df:dropNil("x")
   lurek.log.info("clean rows: " .. clean:nrows())
@@ -1002,7 +1044,7 @@ Returns entropy for a column. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:entropy
+do
   local df = lurek.dataframe.fromTable({{class = "warrior"}, {class = "mage"}, {class = "warrior"}})
   local h = df:entropy("class")
   lurek.log.info("class entropy bits: " .. h)
@@ -1023,7 +1065,7 @@ Replaces nil cells in a column with a value.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:fillNil
+do
   local df = lurek.dataframe.fromTable({{score = 10}, {score = nil}, {score = 5}})
   df:fillNil("score", 0)
   lurek.log.info("sum after fill: " .. df:sum("score"))
@@ -1047,7 +1089,7 @@ Returns rows whose column value matches a comparison.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:filter
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({age=20, name="Alice"})
   df:addRow({age=35, name="Bob"})
@@ -1071,7 +1113,7 @@ Returns a column as an array table. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:getColumn
+do
   local df = lurek.dataframe.fromTable({{x = 1}, {x = 2}, {x = 3}})
   local xs = df:getColumn("x")
   lurek.log.info("first x = " .. xs[1] .. ", last x = " .. xs[#xs])
@@ -1093,7 +1135,7 @@ Returns a numeric column as an array of numbers.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:getColumnAsF64
+do
   local df = lurek.dataframe.random({{"hp", "int"}}, 16, 6)
   local nums = df:getColumnAsF64("hp")
   lurek.log.info("first hp = " .. nums[1])
@@ -1115,7 +1157,7 @@ Returns a row as a table keyed by column name.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:getRow
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80}})
   local row = df:getRow(1)
   lurek.log.info(row.name .. " has " .. row.hp .. " hp")
@@ -1138,7 +1180,7 @@ Returns one cell value by one-based row and column reference.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:getValue
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80}})
   local hp = df:getValue(1, "hp")
   if hp < 30 then lurek.log.warn("low hp: " .. hp) end
@@ -1162,7 +1204,7 @@ Groups by one column and aggregates another column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:groupAgg
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({team="A", score=10})
   df:addRow({team="A", score=20})
@@ -1187,7 +1229,7 @@ Groups rows by a column and returns a table from group key to dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:groupBy
+do
   local df = lurek.dataframe.fromTable({
     {team = "red", score = 10}, {team = "blue", score = 7}, {team = "red", score = 5},
   })
@@ -1211,7 +1253,7 @@ Groups rows by a column and returns a grouped-frame object.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:groupByObj
+do
   local df = lurek.dataframe.newDataFrame()
   df:addColumn("score", 0) ; df:addColumn("key", "")
   df:addRow({score=1, key="a"}) ; df:addRow({score=2, key="b"}) ; df:addRow({score=3, key="a"})
@@ -1237,7 +1279,7 @@ Returns the first rows of this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:head
+do
   local df = lurek.dataframe.random({{"id", "id"}, {"score", "int"}}, 100, 1)
   local top = df:head(3)
   lurek.log.info("preview:\n" .. top:toString())
@@ -1262,7 +1304,7 @@ Joins this dataframe with another dataframe by column references.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:join
+do
   local left  = lurek.dataframe.newDataFrame()
   local right = lurek.dataframe.newDataFrame()
   left:addRow({id=1, name="Alice"})
@@ -1283,7 +1325,7 @@ Starts a lazy query pipeline from this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- LDataFrame:lazy
+do
   local df = lurek.dataframe.fromTable({
     {name = "alice", hp = 12, team = "red"},
     {name = "bob", hp = 7, team = "blue"},
@@ -1310,7 +1352,7 @@ Returns the maximum value of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:max
+do
   local df = lurek.dataframe.fromTable({{score = 1200}, {score = 4500}, {score = 800}})
   local best = df:max("score")
   lurek.log.info("high score: " .. best)
@@ -1332,7 +1374,7 @@ Returns the numeric mean of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:mean
+do
   local df = lurek.dataframe.fromTable({{dps = 50}, {dps = 70}, {dps = 60}})
   local avg = df:mean("dps")
   lurek.log.info("avg dps: " .. avg)
@@ -1354,7 +1396,7 @@ Returns the numeric median of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:median
+do
   local df = lurek.dataframe.fromTable({{ms = 16}, {ms = 17}, {ms = 18}, {ms = 200}})
   local typical = df:median("ms")
   lurek.log.info("typical ms: " .. typical)
@@ -1374,7 +1416,7 @@ Appends another dataframe into this dataframe in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:merge
+do
   local a = lurek.dataframe.fromTable({{id = 1}, {id = 2}})
   local b = lurek.dataframe.fromTable({{id = 3}, {id = 4}})
   a:merge(b)
@@ -1397,7 +1439,7 @@ Returns the minimum value of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:min
+do
   local df = lurek.dataframe.fromTable({{ms = 16}, {ms = 33}, {ms = 14}})
   local fastest = df:min("ms")
   lurek.log.info("best frame ms: " .. fastest)
@@ -1419,7 +1461,7 @@ Returns the mode value of a column. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:modeVal
+do
   local df = lurek.dataframe.fromTable({{w = "sword"}, {w = "bow"}, {w = "sword"}})
   local favourite = df:modeVal("w")
   lurek.log.info("most-picked: " .. tostring(favourite))
@@ -1437,7 +1479,7 @@ Returns the number of columns in this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:ncols
+do
   local df = lurek.dataframe.fromTable({{x = 1, y = 2, z = 3}})
   for i = 1, df:ncols() do
     lurek.log.info("column " .. i .. " = " .. df:columns()[i])
@@ -1461,7 +1503,7 @@ Adds a range-normalized column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:normalizeCol
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({val=10}) ; df:addRow({val=50}) ; df:addRow({val=90})
   df:normalizeCol("val", 0.0, 1.0, "val_norm")
@@ -1480,7 +1522,7 @@ Returns the number of rows in this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:nrows
+do
   local df = lurek.dataframe.fromTable({{name = "Alice"}, {name = "Bob"}})
   if df:nrows() > 0 then
     lurek.log.info("first player: " .. df:getValue(1, "name"))
@@ -1504,7 +1546,7 @@ Returns rows considered outliers for a numeric column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:outliers
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,10 do df:addRow({v=i}) end
   df:addRow({v=1000})
@@ -1530,7 +1572,7 @@ Pivots rows into columns using row, column, and value fields.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:pivot
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({name="Alice", month="Jan", val=100})
   df:addRow({name="Alice", month="Feb", val=120})
@@ -1557,7 +1599,7 @@ Builds a pivot table using row key, column key, value column, and aggregate func
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:pivotTable
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({region="N", product="A", sales=50})
   df:addRow({region="N", product="B", sales=70})
@@ -1581,7 +1623,7 @@ Runs a SQL-style query against this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:query
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80}, {name = "Bob", hp = 20}})
   local hurt = df:query("SELECT name FROM t WHERE hp < 50")
   lurek.log.info("hurt rows: " .. hurt:nrows())
@@ -1605,7 +1647,7 @@ Returns a dataframe with a rank column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:rank
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({score=80}) ; df:addRow({score=95}) ; df:addRow({score=72})
   local ranked = df:rank("score")
@@ -1626,7 +1668,7 @@ Removes a column by name or one-based index.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:removeColumn
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", password = "x", score = 9}})
   df:removeColumn("password")
   lurek.log.info(df:toCSV())
@@ -1646,7 +1688,7 @@ Removes a row by one-based index. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:removeRow
+do
   local df = lurek.dataframe.fromTable({{name = "Alice"}, {name = "Bob"}, {name = "Cara"}})
   df:removeRow(2)
   lurek.log.info("rows left: " .. df:nrows())
@@ -1667,7 +1709,7 @@ Renames a column by name or one-based index.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:rename
+do
   local df = lurek.dataframe.fromCSV("Player Name,Score\nAlice,1200\n")
   df:rename("Player Name", "name")
   lurek.log.info("first column is now " .. df:columns()[1])
@@ -1691,7 +1733,7 @@ Returns a dataframe with a rolling mean column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:rollingMean
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({v=i*2}) end
   local out = df:rollingMean("v", 3)
@@ -1716,7 +1758,7 @@ Returns a dataframe with a rolling sum column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:rollingSum
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({v=i}) end
   local out = df:rollingSum("v", 3)
@@ -1735,7 +1777,7 @@ Returns an iterator function over one-based row index and row table pairs.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:rows
+do
   local df = lurek.dataframe.fromTable({
     {name = "Alice", hp = 80},
     {name = "Bob", hp = 50},
@@ -1762,7 +1804,7 @@ Returns a sampled dataframe. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:sample
+do
   local df = lurek.dataframe.random({{"id", "id"}, {"score", "int"}}, 1000, 9)
   local subset = df:sample(50, 123)
   lurek.log.info("sampled " .. subset:nrows() .. " rows")
@@ -1784,7 +1826,7 @@ Returns a dataframe with selected columns.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:select
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80, mp = 30, x = 0, y = 0}})
   local hud_view = df:select("name", "hp", "mp")
   lurek.log.info(hud_view:toString())
@@ -1805,7 +1847,7 @@ Replaces a numeric column from an array table of numbers.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:setColumnFromF64
+do
   local df = lurek.dataframe.fromTable({{x = 0}, {x = 0}, {x = 0}})
   df:setColumnFromF64("x", {1.5, 2.5, 3.5})
   lurek.log.info("sum x = " .. df:sum("x"))
@@ -1827,7 +1869,7 @@ Sets one cell value by one-based row and column reference.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:setValue
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({score=50, name="Alice"})
   df:setValue(1, "score", 90)
@@ -1851,7 +1893,7 @@ Returns a one-based inclusive row slice.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:slice
+do
   local df = lurek.dataframe.random({{"id", "id"}, {"score", "int"}}, 100, 2)
   local page = df:slice(11, 20)
   lurek.log.info("page rows: " .. page:nrows())
@@ -1874,7 +1916,7 @@ Returns rows sorted by a column. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:sort
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({score=80}) ; df:addRow({score=60}) ; df:addRow({score=95})
   df:sort("score", true)
@@ -1897,7 +1939,7 @@ Returns the numeric standard deviation of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:stddev
+do
   local df = lurek.dataframe.random({{"ms", "int"}}, 60, 3)
   local s = df:stddev("ms")
   lurek.log.info("ms stddev: " .. s)
@@ -1919,7 +1961,7 @@ Returns the numeric sum of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:sum
+do
   local df = lurek.dataframe.fromTable({{dmg = 12}, {dmg = 20}, {dmg = 8}})
   local total = df:sum("dmg")
   lurek.log.info("total damage: " .. total)
@@ -1941,7 +1983,7 @@ Returns the last rows of this dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:tail
+do
   local df = lurek.dataframe.random({{"t", "int"}, {"event", "name"}}, 50, 7)
   local recent = df:tail(5)
   lurek.log.info("last 5:\n" .. recent:toString())
@@ -1959,7 +2001,7 @@ Serializes this dataframe to binary data.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:toBinary
+do
   local df = lurek.dataframe.fromTable({{id = 1}, {id = 2}})
   local blob = df:toBinary()
   if lurek.fs then lurek.fs.write("save/state.lvdf", blob) end
@@ -1977,7 +2019,7 @@ Serializes this dataframe to CSV text.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:toCSV
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", score = 1200}})
   local csv = df:toCSV()
   if lurek.fs then lurek.fs.write("save/scores.csv", csv) end
@@ -1995,7 +2037,7 @@ Serializes this dataframe to JSON text.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:toJSON
+do
   local df = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
   local json = df:toJSON()
   if lurek.fs then lurek.fs.write("save/players.json", json) end
@@ -2013,7 +2055,7 @@ Formats this dataframe as a human-readable text table.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:toString
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80}, {name = "Bob", hp = 50}})
   lurek.log.info("party:\n" .. df:toString())
 end
@@ -2030,7 +2072,7 @@ Converts this dataframe to an array table of row tables.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:toTable
+do
   local df = lurek.dataframe.fromTable({{name = "Alice", hp = 80}})
   local rows = df:toTable()
   for _, row in ipairs(rows) do
@@ -2050,7 +2092,7 @@ Returns the Lua-visible type name for this dataframe handle.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:type
+do
   local df = lurek.dataframe.newDataFrame()
   if df:type() == "DataFrame" then
     lurek.log.info("got a frame, columns=" .. df:ncols())
@@ -2073,7 +2115,7 @@ Returns whether this dataframe handle matches a supported type name.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:typeOf
+do
   local df = lurek.dataframe.newDataFrame()
   if df:typeOf("Object") then
     lurek.log.info("DataFrame is an Object")
@@ -2096,7 +2138,7 @@ Returns unique values from a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:unique
+do
   local df = lurek.dataframe.fromTable({{type = "goblin"}, {type = "orc"}, {type = "goblin"}})
   local kinds = df:unique("type")
   lurek.log.info("distinct types: " .. #kinds)
@@ -2118,7 +2160,7 @@ Returns the numeric variance of a column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:variance
+do
   local df = lurek.dataframe.random({{"dmg", "int"}}, 100, 4)
   local v = df:variance("dmg")
   lurek.log.info("dmg variance: " .. v)
@@ -2139,7 +2181,7 @@ Adds a cumulative-sum column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withCumsum
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,4 do df:addRow({v=i}) end
   local out = df:withCumsum("v", "v_cumsum")
@@ -2163,7 +2205,7 @@ Returns a dataframe with a column computed from an expression.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withEval
+do
   local df = lurek.dataframe.fromTable({{atk = 10, bonus = 4}, {atk = 8, bonus = 2}})
   local boosted = df:withEval("total", "atk + bonus * 1.5")
   lurek.log.info("max total: " .. boosted:max("total"))
@@ -2184,7 +2226,7 @@ Adds a percent-change column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withPctChange
+do
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({100,110,121,133}) do df:addRow({price=v}) end
   local out = df:withPctChange("price", "price_pct")
@@ -2207,7 +2249,7 @@ Adds a rank column in place. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withRank
+do
   local df = lurek.dataframe.newDataFrame()
   df:addRow({pts=10}) ; df:addRow({pts=30}) ; df:addRow({pts=20})
   local out = df:withRank("pts", true, "pts_rank")
@@ -2230,7 +2272,7 @@ Adds a rolling maximum column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withRollingMax
+do
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({3,1,4,1,5,9,2,6}) do df:addRow({v=v}) end
   local out = df:withRollingMax("v", 3, "v_rollmax")
@@ -2253,7 +2295,7 @@ Adds a rolling mean column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withRollingMean
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({temp=20+i}) end
   local out = df:withRollingMean("temp", 3, "temp_rollmean")
@@ -2276,7 +2318,7 @@ Adds a rolling minimum column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withRollingMin
+do
   local df = lurek.dataframe.newDataFrame()
   for _, v in ipairs({5,3,8,2,7,1}) do df:addRow({v=v}) end
   local out = df:withRollingMin("v", 3, "v_rollmin")
@@ -2299,7 +2341,7 @@ Adds a rolling sum column in place. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:withRollingSum
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,5 do df:addRow({sales=i*10}) end
   local out = df:withRollingSum("sales", 3, "sales_rollsum")
@@ -2321,7 +2363,7 @@ Adds a z-score normalized column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:zscoreCol
+do
   local df = lurek.dataframe.newDataFrame()
   for i=1,6 do df:addRow({v=i*5}) end
   df:zscoreCol("v", "v_zscore")
@@ -2338,7 +2380,7 @@ Lua-side grouped dataframe object containing group keys and subframes.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- DataFrame:groupByObj
+do
   local df = lurek.dataframe.newDataFrame()
   df:addColumn("score", 0) ; df:addColumn("key", "")
   df:addRow({score=1, key="a"}) ; df:addRow({score=2, key="b"}) ; df:addRow({score=3, key="a"})
@@ -2365,7 +2407,7 @@ Aggregates one numeric column in every group by calling a Lua function with that
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- GroupedFrame:aggregate
+do
   local df = lurek.dataframe.newDataFrame()
   df:addColumn("damage", 0) ; df:addColumn("class", "")
   df:addRow({damage=12, class="warrior"}) ; df:addRow({damage=8, class="mage"})
@@ -2393,12 +2435,54 @@ Returns the Lua-visible type name for this grouped frame handle.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LGroupedFrame:typeOf(name: string) -> boolean`
@@ -2416,12 +2500,54 @@ Returns whether this grouped frame handle matches a supported type name.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery`
@@ -2433,7 +2559,7 @@ Lua-side lazy dataframe query pipeline.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- LLazyQuery chain
+do
   local df = lurek.dataframe.fromTable({
     {name = "alice", hp = 12, mana = 5, team = "red"},
     {name = "bob", hp = 7, mana = nil, team = "blue"},
@@ -2474,12 +2600,54 @@ Executes the lazy query and returns a dataframe.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:dropNil(col: string) -> LLazyQuery`
@@ -2497,12 +2665,54 @@ Adds a step that drops rows with nil values in a column.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:filter(col: string, op: string, val: LuaValue) -> LLazyQuery`
@@ -2522,12 +2732,54 @@ Adds a filter step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:head(n: integer) -> LLazyQuery`
@@ -2545,12 +2797,54 @@ Adds a head limit step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:limit(n: integer) -> LLazyQuery`
@@ -2568,12 +2862,54 @@ Adds a row limit step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:select(cols: table) -> LLazyQuery`
@@ -2591,12 +2927,54 @@ Adds a column selection step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:slice(start: integer, end: integer) -> LLazyQuery`
@@ -2615,12 +2993,54 @@ Adds a one-based row slice step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:sort(col: string, [ascending]: boolean) -> LLazyQuery`
@@ -2639,12 +3059,54 @@ Adds a sort step to the lazy query. This method is available to Lua scripts.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:tail(n: integer) -> LLazyQuery`
@@ -2662,12 +3124,54 @@ Adds a tail limit step to the lazy query.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:type() -> string`
@@ -2681,12 +3185,54 @@ Returns the Lua-visible type name for this lazy query handle.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LLazyQuery:typeOf(name: string) -> boolean`
@@ -2704,12 +3250,54 @@ Returns whether this lazy query handle matches a supported type name.
 Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.newDataFrame
+-- content/examples/dataframe.lua
+-- lurek.dataframe API examples.
+-- Run: cargo run -- content/examples/dataframe.lua
+
+--@api-stub: lurek.dataframe.newDataFrame
+-- Creates an empty dataframe
+do
   local stats = lurek.dataframe.newDataFrame()
   stats:addColumn("name", "")
   stats:addColumn("score", 0)
   stats:addRow({name = "Alice", score = 1200})
 end
+
+--@api-stub: lurek.dataframe.newDatabase
+-- Creates an empty dataframe database
+do
+  local db = lurek.dataframe.newDatabase()
+  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice"}})
+  db:addTable("players", players)
+  lurek.log.info("tables: " .. db:tableCount())
+end
+
+--@api-stub: lurek.dataframe.fromTable
+-- Creates a dataframe from an array table of row tables
+do
+  local rows = {
+    {name = "goblin", hp = 30, level = 2},
+    {name = "orc",    hp = 60, level = 5},
+  }
+  local enemies = lurek.dataframe.fromTable(rows)
+  lurek.log.info("loaded " .. enemies:nrows() .. " enemies")
+end
+
+--@api-stub: lurek.dataframe.fromRows
+-- Creates a dataframe from column names and array-style rows
+do
+  local columns = {"id", "name", "score"}
+  local rows = {
+    {1, "Alice", 1200},
+    {2, "Bob", 980},
+  }
+  local scores = lurek.dataframe.fromRows(columns, rows)
+  lurek.log.info("player #2: " .. scores:getValue(2, "name"))
+end
+
+--@api-stub: lurek.dataframe.fromCSV
+-- Parses a dataframe from CSV text
+do
 ```
 
 ### `LVecFrame`
@@ -2721,7 +3309,7 @@ Lua-side vectorized dataframe handle for numeric column operations.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- lurek.dataframe.toVec
+do
   local df = lurek.dataframe.fromCSV("hp,mp\n100,50\n200,80\n150,60\n")
   local vf = lurek.dataframe.toVec(df)
   lurek.log.info("VecFrame: " .. vf:nrows() .. " rows, " .. vf:ncols() .. " cols")
@@ -2743,7 +3331,7 @@ Returns a vectorized frame filtered by a boolean mask table.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:applyMask
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n50\n90\n"))
   local mask = vf:filterMask("hp", ">=", 50)
   local alive = vf:applyMask(mask)   -- 2 rows
@@ -2764,7 +3352,7 @@ Applies absolute value to a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colAbs
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("delta\n-3\n4\n-1\n"))
   vf:colAbs("delta")
   local df = vf:toDataFrame()
@@ -2786,7 +3374,7 @@ Adds a scalar to a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colAdd
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n10\n20\n30\n"))
   vf:colAdd("score", 5)    -- score becomes 15, 25, 35
   local df = vf:toDataFrame()
@@ -2808,7 +3396,7 @@ Casts a vectorized column to another data type in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colCast
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("level\n1\n2\n3\n"))
   vf:colCast("level", "float64")
   lurek.log.info("level dtype after cast: " .. vf:colType("level"))  -- "float64"
@@ -2830,7 +3418,7 @@ Applies ceil to a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colCeil
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("y\n1.1\n2.5\n3.0\n"))
   vf:colCeil("y")
   local df2 = vf:toDataFrame()
@@ -2853,7 +3441,7 @@ Clamps a numeric column in place. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colClamp
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n-5\n50\n150\n"))
   vf:colClamp("hp", 0, 100)   -- HP in [0, 100]
   local df = vf:toDataFrame()
@@ -2875,7 +3463,7 @@ Divides a numeric column by a scalar in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colDiv
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n100\n200\n150\n"))
   vf:colDiv("score", 200)
   local df2 = vf:toDataFrame()
@@ -2896,7 +3484,7 @@ Applies floor to a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colFloor
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1.9\n2.1\n3.7\n"))
   vf:colFloor("x")
   local df2 = vf:toDataFrame()
@@ -2918,7 +3506,7 @@ Multiplies a numeric column by a scalar in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colMul
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dmg\n10\n15\n20\n"))
   vf:colMul("dmg", 1.5)    -- apply 1.5x damage multiplier to all rows
 end
@@ -2937,7 +3525,7 @@ Negates a numeric column in place. This method is available to Lua scripts.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colNeg
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("vy\n3\n-2\n0\n"))
   vf:colNeg("vy")
   local df2 = vf:toDataFrame()
@@ -2961,7 +3549,7 @@ Applies a binary column operation into an output column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colOp
+do
   local df = lurek.dataframe.fromCSV("atk,def\n30,10\n40,15\n20,5\n")
   local vf = lurek.dataframe.toVec(df)
   vf:colOp("net_dmg", "atk", "sub", "def")   -- net_dmg = atk - def per row
@@ -2983,7 +3571,7 @@ Applies square root to a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colSqrt
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("dist_sq\n9\n16\n25\n"))
   vf:colSqrt("dist_sq")   -- dist_sq becomes 3, 4, 5
   local df = vf:toDataFrame()
@@ -3005,7 +3593,7 @@ Subtracts a scalar from a numeric column in place.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colSub
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("stamina\n100\n80\n60\n"))
   vf:colSub("stamina", 10)
   local df2 = vf:toDataFrame()
@@ -3028,7 +3616,7 @@ Returns the data type name for a vectorized column.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:colType
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n20\n"))
   local dtype = vf:colType("hp")
   lurek.log.info("hp dtype: " .. dtype)  -- "float64"
@@ -3046,7 +3634,7 @@ Returns all vectorized column names in order.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:columns
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("a,b,c\n1,2,3\n"))
   local cols = vf:columns()
   for i, name in ipairs(cols) do
@@ -3072,7 +3660,7 @@ Builds a boolean mask for a numeric column comparison.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:filterMask
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp\n10\n50\n90\n"))
   local mask = vf:filterMask("hp", ">=", 50)  -- {false, true, true}
   lurek.log.info("rows with hp >= 50: " .. tostring(mask[2]) .. ", " .. tostring(mask[3]))
@@ -3090,7 +3678,7 @@ Returns the number of columns in this vectorized frame.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:ncols
+do
   local df = lurek.dataframe.fromCSV("hp,mp,atk\n10,5,8\n")
   local vf = lurek.dataframe.toVec(df)
   lurek.log.info("VecFrame cols: " .. vf:ncols())  -- 3
@@ -3109,7 +3697,7 @@ Returns the number of rows in this vectorized frame.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:nrows
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n10\n20\n30\n"))
   lurek.log.info("VecFrame rows: " .. vf:nrows())  -- 3
   local df2 = vf:toDataFrame()
@@ -3133,7 +3721,7 @@ Reduces multiple numeric columns in parallel.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:parReduce
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("hp,mp,atk\n10,5,8\n20,10,12\n"))
   local sums = vf:parReduce({"hp", "mp", "atk"}, "sum")
   for col, s in pairs(sums) do
@@ -3157,7 +3745,7 @@ Applies a scalar operation to multiple numeric columns in parallel.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:parScalarOp
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x,y\n1.0,4.0\n2.0,5.0\n3.0,6.0\n"))
   local scaled = vf:parScalarOp({"x", "y"}, "mul", 2.0)
   lurek.log.info("par scalar done", "dataframe")
@@ -3180,7 +3768,7 @@ Reduces a numeric column with a named operation.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:reduce
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("score\n10\n20\n30\n"))
   local total = vf:reduce("score", "sum")
   local avg   = vf:reduce("score", "mean")
@@ -3199,7 +3787,7 @@ Converts this vectorized frame to a dataframe.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:toDataFrame
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("v\n1\n2\n3\n"))
   vf:colAdd("v", 10)
   local df2 = vf:toDataFrame()
@@ -3218,7 +3806,7 @@ Returns the Lua-visible type name for this vectorized frame handle.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:type
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1\n"))
   if vf:type() == "VecFrame" then
     lurek.log.info("got a VecFrame, rows=" .. vf:nrows())
@@ -3241,7 +3829,7 @@ Returns whether this vectorized frame handle matches a supported type name.
 Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
-do -- VecFrame:typeOf
+do
   local vf = lurek.dataframe.toVec(lurek.dataframe.fromCSV("x\n1\n"))
   if vf:typeOf("Object") then
     lurek.log.info("VecFrame is an Object")

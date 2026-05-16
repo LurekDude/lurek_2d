@@ -468,10 +468,54 @@ Layout uses a flex-based model with containers, rows, columns, grids, and stack 
 Module example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.beginDrag
+-- content/examples/ui.lua
+-- lurek.ui API examples.
+-- Run: cargo run -- content/examples/ui.lua
+
+--@api-stub: lurek.ui.beginDrag
+-- Begins a drag operation on a widget
+do
   local w = lurek.ui.newButton("Drag")
   pcall(function() lurek.ui.beginDrag(w) end)
 end
+
+--@api-stub: lurek.ui.getActiveDrag
+-- Returns the widget index currently being dragged, or nil
+do
+  pcall(function()
+    local v = lurek.ui.getActiveDrag()
+    print("getActiveDrag:", v)
+  end)
+end
+
+--@api-stub: lurek.ui.dropOn
+-- Drops the currently dragged widget onto a target widget
+do
+  local container = lurek.ui.newPanel()
+  local w = lurek.ui.newLabel("drop")
+  pcall(function()
+    lurek.ui.beginDrag(w)
+    lurek.ui.dropOn(container)
+  end)
+end
+
+--@api-stub: lurek.ui.endDrag
+-- Ends the current drag operation without dropping
+do
+  pcall(function()
+    local prev = lurek.ui.endDrag()
+    print("endDrag:", prev)
+  end)
+end
+
+--@api-stub: LUiWidget:animateAlpha
+do
+  local w = lurek.ui.newLabel("alpha")
+  pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
+end
+
+--@api-stub: LUiWidget:animatePosition
+do
 ```
 
 ## Key Types
@@ -534,7 +578,7 @@ Adds a toast notification to the queue.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.addToast
+do
   lurek.ui.addToast({ message = "Achievement!", duration = 2.5 })
   lurek.log.info("toast queued", "ui")
 end
@@ -555,7 +599,7 @@ Begins a drag operation on a widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.beginDrag
+do
   local w = lurek.ui.newButton("Drag")
   pcall(function() lurek.ui.beginDrag(w) end)
 end
@@ -570,7 +614,7 @@ Clears keyboard focus from all widgets.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.clearFocus
+do
   lurek.ui.clearFocus()
   lurek.log.info("focus cleared", "ui")
 end
@@ -585,7 +629,7 @@ Invokes custom draw callbacks for all widgets that have one registered.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.draw
+do
   lurek.ui.draw()
   lurek.log.info("ui draw invoked", "ui")
 end
@@ -607,7 +651,7 @@ Renders the entire UI to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.drawToImage
+do
   local img = lurek.ui.drawToImage(128.0, 64.0)
   lurek.log.info("rendered to image: " .. tostring(img), "ui")
 end
@@ -628,7 +672,7 @@ Drops the currently dragged widget onto a target widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.dropOn
+do
   local container = lurek.ui.newPanel()
   local w = lurek.ui.newLabel("drop")
   pcall(function()
@@ -647,7 +691,7 @@ Ends the current drag operation without dropping.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.endDrag
+do
   pcall(function()
     local prev = lurek.ui.endDrag()
     print("endDrag:", prev)
@@ -666,7 +710,7 @@ Flushes internal UI caches. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.flushCache
+do
   local changed = lurek.ui.flushCache()
   lurek.log.info("cache flushed=" .. tostring(changed), "ui")
 end
@@ -681,7 +725,7 @@ Moves keyboard focus to the next focusable widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.focusNext
+do
   lurek.ui.focusNext()
   lurek.log.info("focus moved next", "ui")
 end
@@ -696,7 +740,7 @@ Moves keyboard focus to the previous focusable widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.focusPrev
+do
   lurek.ui.focusPrev()
   lurek.log.info("focus moved prev", "ui")
 end
@@ -713,7 +757,7 @@ Returns the widget index currently being dragged, or nil.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getActiveDrag
+do
   pcall(function()
     local v = lurek.ui.getActiveDrag()
     print("getActiveDrag:", v)
@@ -732,7 +776,7 @@ Returns the index of the currently focused widget, or nil.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getFocus
+do
   local idx = lurek.ui.getFocus()
   lurek.log.info("focus idx=" .. tostring(idx), "ui")
 end
@@ -749,7 +793,7 @@ Returns the root panel widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getRoot
+do
   local root = lurek.ui.getRoot()
   lurek.log.info("root: " .. tostring(root), "ui")
 end
@@ -766,7 +810,7 @@ Returns whether a theme is currently set.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getTheme
+do
   local theme = lurek.ui.getTheme()
   lurek.log.info("getTheme: " .. tostring(theme), "ui")
 end
@@ -783,7 +827,7 @@ Returns the number of active toast notifications.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getToastCount
+do
   local count = lurek.ui.getToastCount()
   lurek.log.info("toasts=" .. tostring(count), "ui")
 end
@@ -800,7 +844,7 @@ Returns the total number of widgets in the UI context.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getWidgetCount
+do
   local count = lurek.ui.getWidgetCount()
   lurek.log.info("widgets=" .. tostring(count), "ui")
 end
@@ -821,7 +865,7 @@ Delivers a key press event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.keypressed
+do
   local handled = lurek.ui.keypressed("return")
   lurek.log.info("keypressed=" .. tostring(handled), "ui")
 end
@@ -842,7 +886,7 @@ Loads a UI layout from a Lua table definition.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.loadLayout
+do
   local root = lurek.ui.loadLayout({ type = "panel", width = 200, height = 100 })
   lurek.log.info("layout root=" .. tostring(root), "ui")
 end
@@ -863,7 +907,7 @@ Loads a UI layout from a TOML file. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.loadLayoutFile
+do
   local ok, count = pcall(lurek.ui.loadLayoutFile, "content/layouts/hud.toml")
   if ok then lurek.log.info("layout=" .. tostring(count), "ui") end
 end
@@ -885,7 +929,7 @@ Delivers a mouse move event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.mousemoved
+do
   local handled = lurek.ui.mousemoved(150.0, 250.0)
   lurek.log.info("mousemoved=" .. tostring(handled), "ui")
 end
@@ -908,7 +952,7 @@ Delivers a mouse press event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.mousepressed
+do
   local handled = lurek.ui.mousepressed(100.0, 200.0, 1)
   lurek.log.info("mousepressed=" .. tostring(handled), "ui")
 end
@@ -931,7 +975,7 @@ Delivers a mouse release event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.mousereleased
+do
   local handled = lurek.ui.mousereleased(100.0, 200.0, 1)
   lurek.log.info("mousereleased=" .. tostring(handled), "ui")
 end
@@ -948,7 +992,7 @@ Creates a new accordion widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newAccordion
+do
   local acc = lurek.ui.newAccordion()
   lurek.log.info("newAccordion: " .. tostring(acc), "ui")
 end
@@ -969,7 +1013,7 @@ Creates a new area chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newAreaChart
+do
   local chart = lurek.ui.newAreaChart({ width = 300, height = 200, title = "Traffic" })
   lurek.log.info("newAreaChart: " .. tostring(chart), "ui")
 end
@@ -990,7 +1034,7 @@ Creates a new badge widget for displaying counts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newBadge
+do
   local badge = lurek.ui.newBadge(5)
   lurek.log.info("newBadge: " .. tostring(badge), "ui")
 end
@@ -1011,7 +1055,7 @@ Creates a new bar chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newBarChart
+do
   local chart = lurek.ui.newBarChart({ width = 300, height = 200, title = "Sales" })
   lurek.log.info("newBarChart: " .. tostring(chart), "ui")
 end
@@ -1032,7 +1076,7 @@ Creates a new button widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newButton
+do
   local btn = lurek.ui.newButton("Play")
   lurek.log.info("newButton: " .. tostring(btn), "ui")
 end
@@ -1053,7 +1097,7 @@ Creates a new checkbox widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newCheckbox
+do
   local cb = lurek.ui.newCheckbox("Enable music")
   lurek.log.info("newCheckbox: " .. tostring(cb), "ui")
 end
@@ -1070,7 +1114,7 @@ Creates a new color picker widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newColorPicker
+do
   local cp = lurek.ui.newColorPicker()
   lurek.log.info("newColorPicker: " .. tostring(cp), "ui")
 end
@@ -1087,7 +1131,7 @@ Creates a new combo box (drop-down) widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newComboBox
+do
   local combo = lurek.ui.newComboBox()
   lurek.log.info("newComboBox: " .. tostring(combo), "ui")
 end
@@ -1108,7 +1152,7 @@ Creates a new custom widget with optional initial configuration.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newCustomWidget
+do
   local cw = lurek.ui.newCustomWidget({ width = 100, height = 50 })
   lurek.log.info("newCustomWidget: " .. tostring(cw), "ui")
 end
@@ -1129,7 +1173,7 @@ Creates a new dialog widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newDialog
+do
   local dlg = lurek.ui.newDialog("Confirm Exit")
   lurek.log.info("newDialog: " .. tostring(dlg), "ui")
 end
@@ -1146,7 +1190,7 @@ Creates a new dock panel widget for docking child widgets to sides.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newDockPanel
+do
   local dock = lurek.ui.newDockPanel()
   lurek.log.info("newDockPanel: " .. tostring(dock), "ui")
 end
@@ -1163,7 +1207,7 @@ Creates a new image display widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newImageWidget
+do
   local iw = lurek.ui.newImageWidget()
   lurek.log.info("newImageWidget: " .. tostring(iw), "ui")
 end
@@ -1184,7 +1228,7 @@ Creates a new label widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLabel
+do
   local lbl = lurek.ui.newLabel("Score: 0")
   lurek.log.info("newLabel: " .. tostring(lbl), "ui")
 end
@@ -1205,7 +1249,7 @@ Creates a new layout container widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLayout
+do
   local layout = lurek.ui.newLayout("horizontal")
   lurek.log.info("newLayout: " .. tostring(layout), "ui")
 end
@@ -1226,7 +1270,7 @@ Creates a new line chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLineChart
+do
   local chart = lurek.ui.newLineChart({ width = 300, height = 200, title = "FPS" })
   lurek.log.info("newLineChart: " .. tostring(chart), "ui")
 end
@@ -1243,7 +1287,7 @@ Creates a new list box widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newList
+do
   local list = lurek.ui.newList()
   lurek.log.info("newList: " .. tostring(list), "ui")
 end
@@ -1260,7 +1304,7 @@ Creates a new menu bar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newMenuBar
+do
   local mb = lurek.ui.newMenuBar()
   lurek.log.info("newMenuBar: " .. tostring(mb), "ui")
 end
@@ -1281,7 +1325,7 @@ Creates a new menu item widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newMenuItem
+do
   local mi = lurek.ui.newMenuItem("File")
   lurek.log.info("newMenuItem: " .. tostring(mi), "ui")
 end
@@ -1298,7 +1342,7 @@ Creates a new nine-patch widget for scalable bordered images.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newNinePatch
+do
   local np = lurek.ui.newNinePatch()
   lurek.log.info("newNinePatch: " .. tostring(np), "ui")
 end
@@ -1315,7 +1359,7 @@ Creates a new panel widget (container).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newPanel
+do
   local panel = lurek.ui.newPanel()
   lurek.log.info("newPanel: " .. tostring(panel), "ui")
 end
@@ -1336,7 +1380,7 @@ Creates a new pie chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newPieChart
+do
   local chart = lurek.ui.newPieChart({ width = 200, height = 200, title = "Budget" })
   lurek.log.info("newPieChart: " .. tostring(chart), "ui")
 end
@@ -1358,7 +1402,7 @@ Creates a new progress bar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newProgressBar
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   lurek.log.info("newProgressBar: " .. tostring(bar), "ui")
 end
@@ -1380,7 +1424,7 @@ Creates a new radio button widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newRadioButton
+do
   local rb = lurek.ui.newRadioButton("Easy", "difficulty")
   lurek.log.info("newRadioButton: " .. tostring(rb), "ui")
 end
@@ -1401,7 +1445,7 @@ Creates a new scatter plot for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScatterPlot
+do
   local plot = lurek.ui.newScatterPlot({ width = 300, height = 200, title = "Data" })
   lurek.log.info("newScatterPlot: " .. tostring(plot), "ui")
 end
@@ -1422,7 +1466,7 @@ Creates a new scroll bar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScrollBar
+do
   local sb = lurek.ui.newScrollBar(true)
   lurek.log.info("newScrollBar: " .. tostring(sb), "ui")
 end
@@ -1439,7 +1483,7 @@ Creates a new scrollable panel widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScrollPanel
+do
   local sp = lurek.ui.newScrollPanel()
   lurek.log.info("newScrollPanel: " .. tostring(sp), "ui")
 end
@@ -1460,7 +1504,7 @@ Creates a new separator widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSeparator
+do
   local sep = lurek.ui.newSeparator(false)
   lurek.log.info("newSeparator: " .. tostring(sep), "ui")
 end
@@ -1482,7 +1526,7 @@ Creates a new slider widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSlider
+do
   local slider = lurek.ui.newSlider(0, 100)
   lurek.log.info("newSlider: " .. tostring(slider), "ui")
 end
@@ -1504,7 +1548,7 @@ Creates a new spacer widget for spacing between other widgets.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSpacer
+do
   local spacer = lurek.ui.newSpacer(20, 10)
   lurek.log.info("newSpacer: " .. tostring(spacer), "ui")
 end
@@ -1526,7 +1570,7 @@ Creates a new spin box (numeric stepper) widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSpinBox
+do
   local sb = lurek.ui.newSpinBox(1, 10)
   lurek.log.info("newSpinBox: " .. tostring(sb), "ui")
 end
@@ -1547,7 +1591,7 @@ Creates a new split panel widget with two resizable sub-panels.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSplitPanel
+do
   local split = lurek.ui.newSplitPanel("vertical")
   lurek.log.info("newSplitPanel: " .. tostring(split), "ui")
 end
@@ -1564,7 +1608,7 @@ Creates a new status bar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newStatusBar
+do
   local sbar = lurek.ui.newStatusBar()
   lurek.log.info("newStatusBar: " .. tostring(sbar), "ui")
 end
@@ -1585,7 +1629,7 @@ Creates a new toggle switch widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSwitch
+do
   local sw = lurek.ui.newSwitch(false)
   lurek.log.info("newSwitch: " .. tostring(sw), "ui")
 end
@@ -1602,7 +1646,7 @@ Creates a new tab bar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTabBar
+do
   local tabs = lurek.ui.newTabBar()
   lurek.log.info("newTabBar: " .. tostring(tabs), "ui")
 end
@@ -1619,7 +1663,7 @@ Creates a new table widget for tabular data display.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTable
+do
   local tbl = lurek.ui.newTable()
   lurek.log.info("newTable: " .. tostring(tbl), "ui")
 end
@@ -1636,7 +1680,7 @@ Creates a new text input widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTextInput
+do
   local input = lurek.ui.newTextInput()
   lurek.log.info("newTextInput: " .. tostring(input), "ui")
 end
@@ -1653,7 +1697,7 @@ Creates a new UI theme for styling widgets.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTheme
+do
   local theme = lurek.ui.newTheme()
   lurek.log.info("newTheme: " .. tostring(theme), "ui")
 end
@@ -1675,7 +1719,7 @@ Creates a new toast notification widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newToast
+do
   local toast = lurek.ui.newToast("Item collected!", 3.0)
   lurek.log.info("newToast: " .. tostring(toast), "ui")
 end
@@ -1696,7 +1740,7 @@ Creates a new toolbar widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newToolbar
+do
   local tb = lurek.ui.newToolbar("horizontal")
   lurek.log.info("newToolbar: " .. tostring(tb), "ui")
 end
@@ -1717,7 +1761,7 @@ Creates a new tooltip panel widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTooltipPanel
+do
   local tp = lurek.ui.newTooltipPanel("Hover info")
   lurek.log.info("newTooltipPanel: " .. tostring(tp), "ui")
 end
@@ -1734,7 +1778,7 @@ Creates a new tree view widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTreeView
+do
   local tree = lurek.ui.newTreeView()
   lurek.log.info("newTreeView: " .. tostring(tree), "ui")
 end
@@ -1755,7 +1799,7 @@ Creates a new GUI window widget. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newWindow
+do
   local win = lurek.ui.newWindow("Inventory")
   lurek.log.info("newWindow: " .. tostring(win), "ui")
 end
@@ -1776,7 +1820,7 @@ Validates and normalizes a widget state string.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.parseWidgetState
+do
   local state = lurek.ui.parseWidgetState("hovered")
   lurek.log.info("state=" .. tostring(state), "ui")
 end
@@ -1797,7 +1841,7 @@ Renders the UI to a PNG file. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.renderToImage
+do
   pcall(lurek.ui.renderToImage, 256, 256, "save/ui_snapshot.png")
   lurek.log.info("rendered to file", "ui")
 end
@@ -1812,7 +1856,7 @@ Applies the built-in default theme to the UI context.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.setDefaultTheme
+do
   lurek.ui.setDefaultTheme()
   lurek.log.info("default theme set", "ui")
 end
@@ -1831,7 +1875,7 @@ Sets keyboard focus to a widget, or clears focus if nil.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.setFocus
+do
   local btn = lurek.ui.newButton("Focus")
   lurek.ui.setFocus(btn)
   lurek.log.info("focus set", "ui")
@@ -1851,7 +1895,7 @@ Applies a theme to the UI context. This function is exposed to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.setTheme
+do
   local theme = lurek.ui.newTheme()
   lurek.ui.setTheme(theme)
   lurek.log.info("theme applied", "ui")
@@ -1872,7 +1916,7 @@ Sets the viewport size for the UI context.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.setViewport
+do
   lurek.ui.setViewport(1280.0, 720.0)
   lurek.log.info("viewport set", "ui")
 end
@@ -1893,7 +1937,7 @@ Delivers a text input event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.textinput
+do
   local handled = lurek.ui.textinput("A")
   lurek.log.info("textinput=" .. tostring(handled), "ui")
 end
@@ -1912,7 +1956,7 @@ Updates the UI context and dispatches pending events to callbacks.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.update
+do
   lurek.ui.update(0.016)
   lurek.log.info("ui updated", "ui")
 end
@@ -1931,7 +1975,7 @@ Updates data bindings for widgets that reference binding keys.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.update_bindings
+do
   lurek.ui.update_bindings({ health = 75, score = 1200 })
   lurek.log.info("bindings updated", "ui")
 end
@@ -1953,7 +1997,7 @@ Delivers a mouse wheel event to the UI.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.wheelmoved
+do
   local handled = lurek.ui.wheelmoved(0.0, 3.0)
   lurek.log.info("wheelmoved=" .. tostring(handled), "ui")
 end
@@ -1971,7 +2015,7 @@ Adds accordion-specific methods to an accordion widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newAccordion
+do
   local acc = lurek.ui.newAccordion()
   lurek.log.info("newAccordion: " .. tostring(acc), "ui")
 end
@@ -1991,7 +2035,7 @@ Adds a collapsible section to this accordion.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:addSection
+do
   local acc = lurek.ui.newAccordion()
   acc:addSection("Section", 1)
   lurek.log.info("LAccordion:addSection done", "ui")
@@ -2009,7 +2053,7 @@ Returns the number of sections in this accordion.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:getSectionCount
+do
   local acc = lurek.ui.newAccordion()
   local val = acc:getSectionCount()
   lurek.log.info("LAccordion:getSectionCount=" .. tostring(val), "ui")
@@ -2031,7 +2075,7 @@ Returns the title of an accordion section by its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:getSectionTitle
+do
   local acc = lurek.ui.newAccordion()
   local val = acc:getSectionTitle(1)
   lurek.log.info("LAccordion:getSectionTitle=" .. tostring(val), "ui")
@@ -2049,7 +2093,7 @@ Returns whether this accordion is in exclusive mode (only one section open at a 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:isExclusive
+do
   local acc = lurek.ui.newAccordion()
   local val = acc:isExclusive()
   lurek.log.info("LAccordion:isExclusive=" .. tostring(val), "ui")
@@ -2071,7 +2115,7 @@ Returns whether an accordion section is expanded.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:isSectionExpanded
+do
   local acc = lurek.ui.newAccordion()
   local val = acc:isSectionExpanded(1)
   lurek.log.info("LAccordion:isSectionExpanded=" .. tostring(val), "ui")
@@ -2091,7 +2135,7 @@ Sets exclusive mode. When true, expanding one section collapses all others.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:setExclusive
+do
   local acc = lurek.ui.newAccordion()
   acc:setExclusive(1.0)
   lurek.log.info("LAccordion:setExclusive applied", "ui")
@@ -2113,7 +2157,7 @@ Toggles the expanded state of an accordion section by its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAccordion:toggleSection
+do
   local acc = lurek.ui.newAccordion()
   local val = acc:toggleSection(1)
   lurek.log.info("LAccordion:toggleSection=" .. tostring(val), "ui")
@@ -2129,7 +2173,7 @@ Lua-exposed area chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newAreaChart
+do
   local chart = lurek.ui.newAreaChart({ width = 300, height = 200, title = "Traffic" })
   lurek.log.info("newAreaChart: " .. tostring(chart), "ui")
 end
@@ -2152,7 +2196,7 @@ Adds a data layer to this area chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- AreaChart:addLayer
+do
   local ac = new_example_image_widget():newAreaChart(300, 150)
   ac:addLayer("series_a", {1,0.3,0.3,0.7}, {10,20,15,30,25})
   ac:addLayer("series_b", {0.3,0.6,1,0.7}, {5,10,8,14,12})
@@ -2173,7 +2217,7 @@ Renders this area chart to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- AreaChart:drawToImage
+do
   local w = new_example_image_widget():newPanel()
   w:drawToImage()
 end
@@ -2192,7 +2236,7 @@ Sets the maximum Y-axis value for this area chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- AreaChart:setYMax
+do
   local w = new_example_image_widget():newPanel()
   w:setYMax(100)
 end
@@ -2209,7 +2253,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAreaChart:type
+do
   local w = new_example_image_widget():newPanel()
     w:setYMax(100)
   local t = w:type()
@@ -2232,7 +2276,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LAreaChart:typeOf
+do
   local w = new_example_image_widget():newPanel()
     w:setYMax(100)
   lurek.log.info("is LAreaChart: " .. tostring(w:typeOf("LAreaChart")), "ui")
@@ -2249,7 +2293,7 @@ Adds badge-specific methods to a notification badge widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newBadge
+do
   local badge = lurek.ui.newBadge(5)
   lurek.log.info("newBadge: " .. tostring(badge), "ui")
 end
@@ -2266,7 +2310,7 @@ Returns the current notification count of this badge.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LBadge:getCount
+do
   local badge = lurek.ui.newBadge(5)
   local val = badge:getCount()
   lurek.log.info("LBadge:getCount=" .. tostring(val), "ui")
@@ -2284,7 +2328,7 @@ Returns the formatted display text of this badge (e.g. "99+" when count exceeds 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LBadge:getDisplayText
+do
   local badge = lurek.ui.newBadge(5)
   local val = badge:getDisplayText()
   lurek.log.info("LBadge:getDisplayText=" .. tostring(val), "ui")
@@ -2304,7 +2348,7 @@ Sets the notification count displayed by this badge.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LBadge:setCount
+do
   local badge = lurek.ui.newBadge(5)
   badge:setCount(10)
   lurek.log.info("LBadge:setCount applied", "ui")
@@ -2320,7 +2364,7 @@ Lua-exposed bar chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newBarChart
+do
   local chart = lurek.ui.newBarChart({ width = 300, height = 200, title = "Sales" })
   lurek.log.info("newBarChart: " .. tostring(chart), "ui")
 end
@@ -2340,7 +2384,7 @@ Adds a category with values for each series.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- BarChart:addCategory
+do
   lurek.log.info("BarChart:addCategory usage: chart:addCategory('Jan')", "ui")
   local bc = new_example_image_widget():newBarChart(200, 100)
   bc:addCategory("Jan")
@@ -2365,7 +2409,7 @@ Adds a named series to this bar chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- BarChart:addSeries
+do
   local bc = new_example_image_widget():newBarChart(300, 150)
   bc:addCategory("Q1"); bc:addCategory("Q2")
   bc:addSeries("sales",   {0.2, 0.6, 0.9, 1}, {120, 180})
@@ -2387,7 +2431,7 @@ Renders this bar chart to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- BarChart:drawToImage
+do
   local w = new_example_image_widget():newPanel()
   w:drawToImage()
 end
@@ -2404,7 +2448,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LBarChart:type
+do
   local w = new_example_image_widget():newPanel()
     w:drawToImage()
   local t = w:type()
@@ -2427,7 +2471,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LBarChart:typeOf
+do
   local w = new_example_image_widget():newPanel()
     w:drawToImage()
   lurek.log.info("is LBarChart: " .. tostring(w:typeOf("LBarChart")), "ui")
@@ -2444,7 +2488,7 @@ Adds button-specific methods (setText, getText) to a button widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newButton
+do
   local btn = lurek.ui.newButton("Play")
   lurek.log.info("newButton: " .. tostring(btn), "ui")
 end
@@ -2461,7 +2505,7 @@ Returns the current display text of this button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LButton:getText
+do
   local btn = lurek.ui.newButton("Click")
   local val = btn:getText()
   lurek.log.info("LButton:getText=" .. tostring(val), "ui")
@@ -2481,7 +2525,7 @@ Sets the display text on this button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LButton:setText
+do
   local btn = lurek.ui.newButton("Click")
   btn:setText("Hello, world!")
   lurek.log.info("LButton:setText applied", "ui")
@@ -2497,7 +2541,7 @@ Adds checkbox-specific methods to a checkbox widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newCheckbox
+do
   local cb = lurek.ui.newCheckbox("Enable music")
   lurek.log.info("newCheckbox: " .. tostring(cb), "ui")
 end
@@ -2514,7 +2558,7 @@ Returns the label text of this checkbox.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LCheckbox:getText
+do
   local cb = lurek.ui.newCheckbox("Option")
   local val = cb:getText()
   lurek.log.info("LCheckbox:getText=" .. tostring(val), "ui")
@@ -2532,7 +2576,7 @@ Returns whether this checkbox is currently checked.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LCheckbox:isChecked
+do
   local cb = lurek.ui.newCheckbox("Option")
   local val = cb:isChecked()
   lurek.log.info("LCheckbox:isChecked=" .. tostring(val), "ui")
@@ -2552,7 +2596,7 @@ Sets the checked state of this checkbox.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LCheckbox:setChecked
+do
   local cb = lurek.ui.newCheckbox("Option")
   cb:setChecked(true)
   lurek.log.info("LCheckbox:setChecked applied", "ui")
@@ -2572,7 +2616,7 @@ Sets the label text displayed next to this checkbox.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LCheckbox:setText
+do
   local cb = lurek.ui.newCheckbox("Option")
   cb:setText("Hello, world!")
   lurek.log.info("LCheckbox:setText applied", "ui")
@@ -2588,7 +2632,7 @@ Adds color-picker-specific methods to a color picker widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newColorPicker
+do
   local cp = lurek.ui.newColorPicker()
   lurek.log.info("newColorPicker: " .. tostring(cp), "ui")
 end
@@ -2605,7 +2649,7 @@ Returns the current color as RGBA components (0.0 to 1.0).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:getColor
+do
   local cp = lurek.ui.newColorPicker()
   local val = cp:getColor()
   lurek.log.info("LColorPicker:getColor=" .. tostring(val), "ui")
@@ -2623,7 +2667,7 @@ Returns the color mode of this picker (e.g. "rgb", "hsv").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:getColorMode
+do
   local cp = lurek.ui.newColorPicker()
   local val = cp:getColorMode()
   lurek.log.info("LColorPicker:getColorMode=" .. tostring(val), "ui")
@@ -2641,7 +2685,7 @@ Returns whether the alpha channel slider is visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:getShowAlpha
+do
   local cp = lurek.ui.newColorPicker()
   local val = cp:getShowAlpha()
   lurek.log.info("LColorPicker:getShowAlpha=" .. tostring(val), "ui")
@@ -2664,7 +2708,7 @@ Sets the current color as RGBA components.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:setColor
+do
   local cp = lurek.ui.newColorPicker()
   cp:setColor(1.0, 1.0, 0.2, 1.0)
   lurek.log.info("LColorPicker:setColor applied", "ui")
@@ -2684,7 +2728,7 @@ Sets the color mode of this picker (e.g. "rgb", "hsv").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:setColorMode
+do
   local cp = lurek.ui.newColorPicker()
   cp:setColorMode("left")
   lurek.log.info("LColorPicker:setColorMode applied", "ui")
@@ -2704,7 +2748,7 @@ Registers a callback invoked when this color picker's value changes.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:setOnChange
+do
   local cp = lurek.ui.newColorPicker()
   cp:setOnChange(function() end)
   lurek.log.info("LColorPicker:setOnChange callback set", "ui")
@@ -2724,7 +2768,7 @@ Sets whether the alpha channel slider is visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LColorPicker:setShowAlpha
+do
   local cp = lurek.ui.newColorPicker()
   cp:setShowAlpha(1.0)
   lurek.log.info("LColorPicker:setShowAlpha applied", "ui")
@@ -2740,7 +2784,7 @@ Adds combo-box-specific methods to a combo box widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newComboBox
+do
   local combo = lurek.ui.newComboBox()
   lurek.log.info("newComboBox: " .. tostring(combo), "ui")
 end
@@ -2759,7 +2803,7 @@ Appends a new text item to this combo box's dropdown list.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:addItem
+do
   local combo = lurek.ui.newComboBox()
   combo:addItem("Hello, world!")
   lurek.log.info("LComboBox:addItem done", "ui")
@@ -2775,7 +2819,7 @@ Removes all items from this combo box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:clearItems
+do
   local combo = lurek.ui.newComboBox()
   combo:clearItems()
   lurek.log.info("LComboBox:clearItems done", "ui")
@@ -2797,7 +2841,7 @@ Returns the text of the item at the given 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:getItem
+do
   local combo = lurek.ui.newComboBox()
   local val = combo:getItem(1)
   lurek.log.info("LComboBox:getItem=" .. tostring(val), "ui")
@@ -2815,7 +2859,7 @@ Returns the number of items in this combo box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:getItemCount
+do
   local combo = lurek.ui.newComboBox()
   local val = combo:getItemCount()
   lurek.log.info("LComboBox:getItemCount=" .. tostring(val), "ui")
@@ -2833,7 +2877,7 @@ Returns the 1-based index of the currently selected item, or 0 if none is select
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:getSelectedIndex
+do
   local combo = lurek.ui.newComboBox()
   local val = combo:getSelectedIndex()
   lurek.log.info("LComboBox:getSelectedIndex=" .. tostring(val), "ui")
@@ -2851,7 +2895,7 @@ Returns the text of the currently selected item, or nil if none is selected.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:getSelectedItem
+do
   local combo = lurek.ui.newComboBox()
   local val = combo:getSelectedItem()
   lurek.log.info("LComboBox:getSelectedItem=" .. tostring(val), "ui")
@@ -2873,7 +2917,7 @@ Removes the item at the given 1-based index from this combo box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:removeItem
+do
   local combo = lurek.ui.newComboBox()
   combo:removeItem(1)
   lurek.log.info("LComboBox:removeItem done", "ui")
@@ -2893,7 +2937,7 @@ Sets the selected item by 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LComboBox:setSelectedIndex
+do
   local combo = lurek.ui.newComboBox()
   combo:setSelectedIndex(1)
   lurek.log.info("LComboBox:setSelectedIndex applied", "ui")
@@ -2909,7 +2953,7 @@ Adds dialog-specific methods to a dialog widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newDialog
+do
   local dlg = lurek.ui.newDialog("Confirm Exit")
   lurek.log.info("newDialog: " .. tostring(dlg), "ui")
 end
@@ -2931,7 +2975,7 @@ Adds a footer button to this dialog and returns its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:addButton
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:addButton("Hello, world!", function() end)
   lurek.log.info("LDialog:addButton done", "ui")
@@ -2947,7 +2991,7 @@ Closes this dialog and fires the onClose callback if it was open.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:close
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:close()
   lurek.log.info("LDialog:close called", "ui")
@@ -2965,7 +3009,7 @@ Returns the widget index of this dialog's content, or nil if not set.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:getContent
+do
   local dlg = lurek.ui.newDialog("Title")
   local val = dlg:getContent()
   lurek.log.info("LDialog:getContent=" .. tostring(val), "ui")
@@ -2983,7 +3027,7 @@ Returns the title text of this dialog.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:getTitle
+do
   local dlg = lurek.ui.newDialog("Title")
   local val = dlg:getTitle()
   lurek.log.info("LDialog:getTitle=" .. tostring(val), "ui")
@@ -3001,7 +3045,7 @@ Returns whether this dialog is modal (blocks interaction with other widgets).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:isModal
+do
   local dlg = lurek.ui.newDialog("Title")
   local val = dlg:isModal()
   lurek.log.info("LDialog:isModal=" .. tostring(val), "ui")
@@ -3019,7 +3063,7 @@ Returns whether this dialog is currently open and visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:isOpen
+do
   local dlg = lurek.ui.newDialog("Title")
   local val = dlg:isOpen()
   lurek.log.info("LDialog:isOpen=" .. tostring(val), "ui")
@@ -3035,7 +3079,7 @@ Opens this dialog, making it visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:open
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:open()
   lurek.log.info("LDialog:open called", "ui")
@@ -3055,7 +3099,7 @@ Sets the content widget for this dialog.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:setContent
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:setContent(1)
   lurek.log.info("LDialog:setContent applied", "ui")
@@ -3075,7 +3119,7 @@ Sets whether this dialog is modal. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:setModal
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:setModal(1.0)
   lurek.log.info("LDialog:setModal applied", "ui")
@@ -3095,7 +3139,7 @@ Registers a callback invoked when this dialog is closed.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:setOnClose
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:setOnClose(function() end)
   lurek.log.info("LDialog:setOnClose callback set", "ui")
@@ -3115,7 +3159,7 @@ Sets the title text of this dialog. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDialog:setTitle
+do
   local dlg = lurek.ui.newDialog("Title")
   dlg:setTitle("Section")
   lurek.log.info("LDialog:setTitle applied", "ui")
@@ -3131,7 +3175,7 @@ Adds dock-panel-specific methods to a dock panel widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newDockPanel
+do
   local dock = lurek.ui.newDockPanel()
   lurek.log.info("newDockPanel: " .. tostring(dock), "ui")
 end
@@ -3151,7 +3195,7 @@ Docks a child widget to the specified side of this dock panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDockPanel:dock
+do
   local dock = lurek.ui.newDockPanel()
   dock:dock(1, "left")
   lurek.log.info("LDockPanel:dock called", "ui")
@@ -3169,7 +3213,7 @@ Returns the number of widgets docked in this dock panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDockPanel:getDockedCount
+do
   local dock = lurek.ui.newDockPanel()
   local val = dock:getDockedCount()
   lurek.log.info("LDockPanel:getDockedCount=" .. tostring(val), "ui")
@@ -3191,7 +3235,7 @@ Returns the size configured for a dock panel side region.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDockPanel:getSplitSize
+do
   local dock = lurek.ui.newDockPanel()
   local val = dock:getSplitSize("left")
   lurek.log.info("LDockPanel:getSplitSize=" .. tostring(val), "ui")
@@ -3212,7 +3256,7 @@ Sets the size of a dock panel side region.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDockPanel:setSplitSize
+do
   local dock = lurek.ui.newDockPanel()
   dock:setSplitSize("left", 64.0)
   lurek.log.info("LDockPanel:setSplitSize applied", "ui")
@@ -3232,7 +3276,7 @@ Removes a child widget from this dock panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LDockPanel:undock
+do
   local dock = lurek.ui.newDockPanel()
   dock:undock(1)
   lurek.log.info("LDockPanel:undock called", "ui")
@@ -3248,7 +3292,7 @@ Adds GUI-table-specific methods to a table widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTable
+do
   local tbl = lurek.ui.newTable()
   lurek.log.info("newTable: " .. tostring(tbl), "ui")
 end
@@ -3268,7 +3312,7 @@ Adds a new column to this table widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:addColumn
+do
   local tbl = lurek.ui.newTable()
   tbl:addColumn("Hello", 64.0)
   lurek.log.info("LGuiTable:addColumn done", "ui")
@@ -3288,7 +3332,7 @@ Adds a row to this table widget. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:addRow
+do
   local tbl = lurek.ui.newTable()
   tbl:addRow({1, 2, 3})
   lurek.log.info("LGuiTable:addRow done", "ui")
@@ -3311,7 +3355,7 @@ Returns the text of a cell at the given 1-based row and column.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:getCell
+do
   local tbl = lurek.ui.newTable()
   local val = tbl:getCell(1, 1)
   lurek.log.info("LGuiTable:getCell=" .. tostring(val), "ui")
@@ -3329,7 +3373,7 @@ Returns the number of columns in this table widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:getColumnCount
+do
   local tbl = lurek.ui.newTable()
   local val = tbl:getColumnCount()
   lurek.log.info("LGuiTable:getColumnCount=" .. tostring(val), "ui")
@@ -3347,7 +3391,7 @@ Returns the number of rows in this table widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:getRowCount
+do
   local tbl = lurek.ui.newTable()
   local val = tbl:getRowCount()
   lurek.log.info("LGuiTable:getRowCount=" .. tostring(val), "ui")
@@ -3365,7 +3409,7 @@ Returns the 1-based index of the currently selected row, or nil.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:getSelectedRow
+do
   local tbl = lurek.ui.newTable()
   local val = tbl:getSelectedRow()
   lurek.log.info("LGuiTable:getSelectedRow=" .. tostring(val), "ui")
@@ -3383,7 +3427,7 @@ Returns whether columns in this table can be sorted by clicking headers.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:isSortable
+do
   local tbl = lurek.ui.newTable()
   local val = tbl:isSortable()
   lurek.log.info("LGuiTable:isSortable=" .. tostring(val), "ui")
@@ -3405,7 +3449,7 @@ Sets the text of a cell at the given 1-based row and column.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:setCell
+do
   local tbl = lurek.ui.newTable()
   tbl:setCell(1, 1, "Hello, world!")
   lurek.log.info("LGuiTable:setCell applied", "ui")
@@ -3425,7 +3469,7 @@ Registers a callback invoked when a table row is selected.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:setOnSelect
+do
   local tbl = lurek.ui.newTable()
   tbl:setOnSelect(function() end)
   lurek.log.info("LGuiTable:setOnSelect callback set", "ui")
@@ -3445,7 +3489,7 @@ Sets the selected row by its 1-based index, or nil to deselect.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:setSelectedRow
+do
   local tbl = lurek.ui.newTable()
   tbl:setSelectedRow(1)
   lurek.log.info("LGuiTable:setSelectedRow applied", "ui")
@@ -3465,7 +3509,7 @@ Sets whether columns in this table can be sorted by clicking headers.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiTable:setSortable
+do
   local tbl = lurek.ui.newTable()
   tbl:setSortable(1.0)
   lurek.log.info("LGuiTable:setSortable applied", "ui")
@@ -3481,7 +3525,7 @@ Adds GUI-window-specific methods to a window widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newWindow
+do
   local win = lurek.ui.newWindow("Inventory")
   lurek.log.info("newWindow: " .. tostring(win), "ui")
 end
@@ -3498,7 +3542,7 @@ Returns the title bar text of this GUI window.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:getTitle
+do
   local win = lurek.ui.newWindow("Title")
   local val = win:getTitle()
   lurek.log.info("LGuiWindow:getTitle=" .. tostring(val), "ui")
@@ -3516,7 +3560,7 @@ Returns whether this window shows a close button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:isCloseable
+do
   local win = lurek.ui.newWindow("Title")
   local val = win:isCloseable()
   lurek.log.info("LGuiWindow:isCloseable=" .. tostring(val), "ui")
@@ -3534,7 +3578,7 @@ Returns whether this window can be dragged by its title bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:isDraggable
+do
   local win = lurek.ui.newWindow("Title")
   local val = win:isDraggable()
   lurek.log.info("LGuiWindow:isDraggable=" .. tostring(val), "ui")
@@ -3552,7 +3596,7 @@ Returns whether this window can be resized by dragging its edges.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:isResizable
+do
   local win = lurek.ui.newWindow("Title")
   local val = win:isResizable()
   lurek.log.info("LGuiWindow:isResizable=" .. tostring(val), "ui")
@@ -3572,7 +3616,7 @@ Sets whether this window shows a close button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:setCloseable
+do
   local win = lurek.ui.newWindow("Title")
   win:setCloseable(1.0)
   lurek.log.info("LGuiWindow:setCloseable applied", "ui")
@@ -3592,7 +3636,7 @@ Sets whether this window can be dragged by its title bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:setDraggable
+do
   local win = lurek.ui.newWindow("Title")
   win:setDraggable(1.0)
   lurek.log.info("LGuiWindow:setDraggable applied", "ui")
@@ -3612,7 +3656,7 @@ Registers a callback invoked when this window is closed.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:setOnClose
+do
   local win = lurek.ui.newWindow("Title")
   win:setOnClose(function() end)
   lurek.log.info("LGuiWindow:setOnClose callback set", "ui")
@@ -3632,7 +3676,7 @@ Sets whether this window can be resized.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:setResizable
+do
   local win = lurek.ui.newWindow("Title")
   win:setResizable(1.0)
   lurek.log.info("LGuiWindow:setResizable applied", "ui")
@@ -3652,7 +3696,7 @@ Sets the title bar text of this GUI window.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LGuiWindow:setTitle
+do
   local win = lurek.ui.newWindow("Title")
   win:setTitle("Section")
   lurek.log.info("LGuiWindow:setTitle applied", "ui")
@@ -3668,7 +3712,7 @@ Adds image-widget-specific methods to an image widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newImageWidget
+do
   local iw = lurek.ui.newImageWidget()
   lurek.log.info("newImageWidget: " .. tostring(iw), "ui")
 end
@@ -3685,7 +3729,7 @@ Returns the image scaling mode (e.g. "fit", "fill", "stretch").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LImageWidget:getScaleMode
+do
   local iw = lurek.ui.newImageWidget()
   local val = iw:getScaleMode()
   lurek.log.info("LImageWidget:getScaleMode=" .. tostring(val), "ui")
@@ -3703,7 +3747,7 @@ Returns the tint color of this image widget as RGBA components.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LImageWidget:getTint
+do
   local iw = lurek.ui.newImageWidget()
   local val = iw:getTint()
   lurek.log.info("LImageWidget:getTint=" .. tostring(val), "ui")
@@ -3723,7 +3767,7 @@ Sets the image scaling mode (e.g. "fit", "fill", "stretch").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LImageWidget:setScaleMode
+do
   local iw = lurek.ui.newImageWidget()
   iw:setScaleMode("left")
   lurek.log.info("LImageWidget:setScaleMode applied", "ui")
@@ -3746,7 +3790,7 @@ Sets the tint color of this image widget as RGBA components.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LImageWidget:setTint
+do
   local iw = lurek.ui.newImageWidget()
   iw:setTint(1.0, 1.0, 0.2, 1.0)
   lurek.log.info("LImageWidget:setTint applied", "ui")
@@ -3762,7 +3806,7 @@ Adds label-specific methods (setText, getText) to a label widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLabel
+do
   local lbl = lurek.ui.newLabel("Score: 0")
   lurek.log.info("newLabel: " .. tostring(lbl), "ui")
 end
@@ -3779,7 +3823,7 @@ Returns the current display text of this label.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLabel:getText
+do
   local lbl = lurek.ui.newLabel("Text")
   local val = lbl:getText()
   lurek.log.info("LLabel:getText=" .. tostring(val), "ui")
@@ -3799,7 +3843,7 @@ Sets the display text on this label.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLabel:setText
+do
   local lbl = lurek.ui.newLabel("Text")
   lbl:setText("Hello, world!")
   lurek.log.info("LLabel:setText applied", "ui")
@@ -3815,7 +3859,7 @@ Adds layout-specific methods to a layout container widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLayout
+do
   local layout = lurek.ui.newLayout("horizontal")
   lurek.log.info("newLayout: " .. tostring(layout), "ui")
 end
@@ -3832,7 +3876,7 @@ Returns the current cross-axis alignment mode.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:getAlign
+do
   local layout = lurek.ui.newLayout("horizontal")
   local val = layout:getAlign()
   lurek.log.info("LLayout:getAlign=" .. tostring(val), "ui")
@@ -3850,7 +3894,7 @@ Returns the current layout direction.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:getDirection
+do
   local layout = lurek.ui.newLayout("horizontal")
   local val = layout:getDirection()
   lurek.log.info("LLayout:getDirection=" .. tostring(val), "ui")
@@ -3868,7 +3912,7 @@ Returns the current main-axis justification mode.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:getJustify
+do
   local layout = lurek.ui.newLayout("horizontal")
   local val = layout:getJustify()
   lurek.log.info("LLayout:getJustify=" .. tostring(val), "ui")
@@ -3886,7 +3930,7 @@ Returns the current spacing between children.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:getSpacing
+do
   local layout = lurek.ui.newLayout("horizontal")
   local val = layout:getSpacing()
   lurek.log.info("LLayout:getSpacing=" .. tostring(val), "ui")
@@ -3904,7 +3948,7 @@ Returns whether wrapping is enabled for this layout.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:getWrap
+do
   local layout = lurek.ui.newLayout("horizontal")
   local val = layout:getWrap()
   lurek.log.info("LLayout:getWrap=" .. tostring(val), "ui")
@@ -3924,7 +3968,7 @@ Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stre
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setAlign
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setAlign("left")
   lurek.log.info("LLayout:setAlign applied", "ui")
@@ -3944,7 +3988,7 @@ Sets the number of columns for grid layout mode (minimum 1).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setColumns
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setColumns(5)
   lurek.log.info("LLayout:setColumns applied", "ui")
@@ -3964,7 +4008,7 @@ Sets the layout direction for child arrangement ("horizontal", "vertical", or "g
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setDirection
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setDirection("left")
   lurek.log.info("LLayout:setDirection applied", "ui")
@@ -3984,7 +4028,7 @@ Sets the main-axis justification for children (e.g. "start", "center", "end", "s
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setJustify
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setJustify("left")
   lurek.log.info("LLayout:setJustify applied", "ui")
@@ -4004,7 +4048,7 @@ Sets the spacing in pixels between child widgets in this layout.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setSpacing
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setSpacing(0.0)
   lurek.log.info("LLayout:setSpacing applied", "ui")
@@ -4024,7 +4068,7 @@ Enables or disables wrapping of children to the next row/column when they overfl
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLayout:setWrap
+do
   local layout = lurek.ui.newLayout("horizontal")
   layout:setWrap(true)
   lurek.log.info("LLayout:setWrap applied", "ui")
@@ -4040,7 +4084,7 @@ Lua-exposed line chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newLineChart
+do
   local chart = lurek.ui.newLineChart({ width = 300, height = 200, title = "FPS" })
   lurek.log.info("newLineChart: " .. tostring(chart), "ui")
 end
@@ -4063,7 +4107,7 @@ Adds a named series of points to this line chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:addSeries
+do
   local chart = lurek.ui.newLineChart({ width = 300, height = 200, title = "Data" })
   chart:addSeries("hero", {1, 2, 3}, 1.0, 0.8, 0.2)
   lurek.log.info("LLineChart:addSeries done", "ui")
@@ -4083,7 +4127,7 @@ Renders this line chart to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:drawToImage
+do
   local chart = lurek.ui.newLineChart({ width = 256, height = 128, title = "Wave" })
   chart:setXMax(10)
   chart:setYMax(1.0)
@@ -4106,7 +4150,7 @@ Sets the maximum X-axis value for this line chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:setXMax
+do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "FPS" })
   chart:setXMax(60)   -- fixed 60-second window
   lurek.log.info("x-axis max set to 60", "ui")
@@ -4126,7 +4170,7 @@ Sets the maximum Y-axis value for this line chart.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:setYMax
+do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Score" })
   chart:setYMax(1000)
   lurek.log.info("y-axis max set to 1000", "ui")
@@ -4144,7 +4188,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:type
+do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Sales" })
   local t = chart:type()
   lurek.log.info("LLineChart:type=" .. t, "ui")
@@ -4166,7 +4210,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LLineChart:typeOf
+do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Revenue" })
   lurek.log.info("is LLineChart: " .. tostring(chart:typeOf("LLineChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
@@ -4182,7 +4226,7 @@ Adds list-box-specific methods to a list box widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newList
+do
   local list = lurek.ui.newList()
   lurek.log.info("newList: " .. tostring(list), "ui")
 end
@@ -4201,7 +4245,7 @@ Appends a new text item to this list box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:addItem
+do
   local list = lurek.ui.newList()
   list:addItem("Hello, world!")
   lurek.log.info("LListBox:addItem done", "ui")
@@ -4217,7 +4261,7 @@ Removes all items from this list box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:clearItems
+do
   local list = lurek.ui.newList()
   list:clearItems()
   lurek.log.info("LListBox:clearItems done", "ui")
@@ -4239,7 +4283,7 @@ Returns the text of the item at the given 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:getItem
+do
   local list = lurek.ui.newList()
   local val = list:getItem(1)
   lurek.log.info("LListBox:getItem=" .. tostring(val), "ui")
@@ -4257,7 +4301,7 @@ Returns the number of items in this list box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:getItemCount
+do
   local list = lurek.ui.newList()
   local val = list:getItemCount()
   lurek.log.info("LListBox:getItemCount=" .. tostring(val), "ui")
@@ -4275,7 +4319,7 @@ Returns the 1-based index of the currently selected item, or 0 if none.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:getSelectedIndex
+do
   local list = lurek.ui.newList()
   local val = list:getSelectedIndex()
   lurek.log.info("LListBox:getSelectedIndex=" .. tostring(val), "ui")
@@ -4295,7 +4339,7 @@ Removes the item at the given 1-based index from this list box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:removeItem
+do
   local list = lurek.ui.newList()
   list:removeItem(1)
   lurek.log.info("LListBox:removeItem done", "ui")
@@ -4315,7 +4359,7 @@ Sets the pixel height of each item row in this list box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:setItemHeight
+do
   local list = lurek.ui.newList()
   list:setItemHeight(64.0)
   lurek.log.info("LListBox:setItemHeight applied", "ui")
@@ -4335,7 +4379,7 @@ Sets the selected item by 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LListBox:setSelectedIndex
+do
   local list = lurek.ui.newList()
   list:setSelectedIndex(1)
   lurek.log.info("LListBox:setSelectedIndex applied", "ui")
@@ -4351,7 +4395,7 @@ Adds menu-bar-specific methods to a menu bar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newMenuBar
+do
   local mb = lurek.ui.newMenuBar()
   lurek.log.info("newMenuBar: " .. tostring(mb), "ui")
 end
@@ -4370,7 +4414,7 @@ Adds a menu (by its widget index) to this menu bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuBar:addMenu
+do
   local mb = lurek.ui.newMenuBar()
   mb:addMenu(1)
   lurek.log.info("LMenuBar:addMenu done", "ui")
@@ -4388,7 +4432,7 @@ Returns the number of menus in this menu bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuBar:getMenuCount
+do
   local mb = lurek.ui.newMenuBar()
   local val = mb:getMenuCount()
   lurek.log.info("LMenuBar:getMenuCount=" .. tostring(val), "ui")
@@ -4406,7 +4450,7 @@ Returns a table of widget indices for all menus in this menu bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuBar:getMenus
+do
   local mb = lurek.ui.newMenuBar()
   local val = mb:getMenus()
   lurek.log.info("LMenuBar:getMenus=" .. tostring(val), "ui")
@@ -4428,7 +4472,7 @@ Removes a menu from this menu bar by its widget index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuBar:removeMenu
+do
   local mb = lurek.ui.newMenuBar()
   mb:removeMenu(1)
   lurek.log.info("LMenuBar:removeMenu done", "ui")
@@ -4444,7 +4488,7 @@ Adds menu-item-specific methods to a menu item widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newMenuItem
+do
   local mi = lurek.ui.newMenuItem("File")
   lurek.log.info("newMenuItem: " .. tostring(mi), "ui")
 end
@@ -4463,7 +4507,7 @@ Adds a sub-item to this menu item for building nested menus.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:addSubItem
+do
   local mi = lurek.ui.newMenuItem("File")
   mi:addSubItem(1)
   lurek.log.info("LMenuItem:addSubItem done", "ui")
@@ -4481,7 +4525,7 @@ Returns the keyboard shortcut string associated with this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:getShortcut
+do
   local mi = lurek.ui.newMenuItem("File")
   local val = mi:getShortcut()
   lurek.log.info("LMenuItem:getShortcut=" .. tostring(val), "ui")
@@ -4499,7 +4543,7 @@ Returns a table of widget indices for all sub-items of this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:getSubItems
+do
   local mi = lurek.ui.newMenuItem("File")
   local val = mi:getSubItems()
   lurek.log.info("LMenuItem:getSubItems=" .. tostring(val), "ui")
@@ -4517,7 +4561,7 @@ Returns the display text of this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:getText
+do
   local mi = lurek.ui.newMenuItem("File")
   local val = mi:getText()
   lurek.log.info("LMenuItem:getText=" .. tostring(val), "ui")
@@ -4535,7 +4579,7 @@ Returns whether this menu item is checked (for checkable menu items).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:isChecked
+do
   local mi = lurek.ui.newMenuItem("File")
   local val = mi:isChecked()
   lurek.log.info("LMenuItem:isChecked=" .. tostring(val), "ui")
@@ -4555,7 +4599,7 @@ Sets the checked state of this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:setChecked
+do
   local mi = lurek.ui.newMenuItem("File")
   mi:setChecked(1.0)
   lurek.log.info("LMenuItem:setChecked applied", "ui")
@@ -4575,7 +4619,7 @@ Registers a callback invoked when this menu item is clicked.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:setOnClick
+do
   local mi = lurek.ui.newMenuItem("File")
   mi:setOnClick(function() end)
   lurek.log.info("LMenuItem:setOnClick callback set", "ui")
@@ -4595,7 +4639,7 @@ Sets the keyboard shortcut text displayed next to this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:setShortcut
+do
   local mi = lurek.ui.newMenuItem("File")
   mi:setShortcut("Hello")
   lurek.log.info("LMenuItem:setShortcut applied", "ui")
@@ -4615,7 +4659,7 @@ Sets the display text of this menu item.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LMenuItem:setText
+do
   local mi = lurek.ui.newMenuItem("File")
   mi:setText("Hello, world!")
   lurek.log.info("LMenuItem:setText applied", "ui")
@@ -4631,7 +4675,7 @@ Adds nine-patch-specific methods to a nine-patch widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newNinePatch
+do
   local np = lurek.ui.newNinePatch()
   lurek.log.info("newNinePatch: " .. tostring(np), "ui")
 end
@@ -4648,7 +4692,7 @@ Returns the original image dimensions of this nine-patch.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LNinePatch:getImageDimensions
+do
   local np = lurek.ui.newNinePatch()
   local val = np:getImageDimensions()
   lurek.log.info("LNinePatch:getImageDimensions=" .. tostring(val), "ui")
@@ -4666,7 +4710,7 @@ Returns the border insets of this nine-patch.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LNinePatch:getInsets
+do
   local np = lurek.ui.newNinePatch()
   local val = np:getInsets()
   lurek.log.info("LNinePatch:getInsets=" .. tostring(val), "ui")
@@ -4684,7 +4728,7 @@ Returns the computed nine-patch slices as a table of source/dest rectangles for 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LNinePatch:getSlices
+do
   local np = lurek.ui.newNinePatch()
   local val = np:getSlices()
   lurek.log.info("LNinePatch:getSlices=" .. tostring(val), "ui")
@@ -4705,7 +4749,7 @@ Sets the original image dimensions used for nine-patch slice calculations.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LNinePatch:setImageDimensions
+do
   local np = lurek.ui.newNinePatch()
   np:setImageDimensions(64.0, 64.0)
   lurek.log.info("LNinePatch:setImageDimensions applied", "ui")
@@ -4728,7 +4772,7 @@ Sets the border insets defining the stretchable center region of the nine-patch 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LNinePatch:setInsets
+do
   local np = lurek.ui.newNinePatch()
   np:setInsets(64.0, 64.0, 64.0, 64.0)
   lurek.log.info("LNinePatch:setInsets applied", "ui")
@@ -4744,7 +4788,7 @@ Adds panel-specific methods (setTitle, getTitle, setScrollable) to a panel widge
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.getRoot
+do
   local root = lurek.ui.getRoot()
   lurek.log.info("root: " .. tostring(root), "ui")
 end
@@ -4761,7 +4805,7 @@ Returns the title text of this panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LPanel:getTitle
+do
   local panel = lurek.ui.newPanel()
   local val = panel:getTitle()
   lurek.log.info("LPanel:getTitle=" .. tostring(val), "ui")
@@ -4781,7 +4825,7 @@ Enables or disables scrolling within this panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LPanel:setScrollable
+do
   local panel = lurek.ui.newPanel()
   panel:setScrollable(true)
   lurek.log.info("LPanel:setScrollable applied", "ui")
@@ -4801,7 +4845,7 @@ Sets the title text displayed on this panel's header.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LPanel:setTitle
+do
   local panel = lurek.ui.newPanel()
   panel:setTitle("Section")
   lurek.log.info("LPanel:setTitle applied", "ui")
@@ -4817,7 +4861,7 @@ Lua-exposed pie chart for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newPieChart
+do
   local chart = lurek.ui.newPieChart({ width = 200, height = 200, title = "Budget" })
   lurek.log.info("newPieChart: " .. tostring(chart), "ui")
 end
@@ -4840,7 +4884,7 @@ Adds a segment to this pie chart. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- PieChart:addSegment
+do
   local pc = new_example_image_widget():newPieChart(150, 150)
   pc:addSegment("Wheat",  40, {0.9, 0.8, 0.3, 1})
   pc:addSegment("Sheep",  25, {0.8, 0.9, 0.5, 1})
@@ -4862,7 +4906,7 @@ Renders this pie chart to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- PieChart:drawToImage
+do
   local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
   chart:drawToImage()
 end
@@ -4879,7 +4923,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LPieChart:type
+do
   local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
     chart:drawToImage()
   local t = chart:type()
@@ -4902,7 +4946,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LPieChart:typeOf
+do
   local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
     chart:drawToImage()
   lurek.log.info("is LPieChart: " .. tostring(chart:typeOf("LPieChart")), "ui")
@@ -4919,7 +4963,7 @@ Adds progress-bar-specific methods to a progress bar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newProgressBar
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   lurek.log.info("newProgressBar: " .. tostring(bar), "ui")
 end
@@ -4936,7 +4980,7 @@ Returns the maximum value of this progress bar's range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:getMax
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   local val = bar:getMax()
   lurek.log.info("LProgressBar:getMax=" .. tostring(val), "ui")
@@ -4954,7 +4998,7 @@ Returns the minimum value of this progress bar's range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:getMin
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   local val = bar:getMin()
   lurek.log.info("LProgressBar:getMin=" .. tostring(val), "ui")
@@ -4972,7 +5016,7 @@ Returns the normalized progress as a fraction (0.0 to 1.0) of the current range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:getProgress
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   local val = bar:getProgress()
   lurek.log.info("LProgressBar:getProgress=" .. tostring(val), "ui")
@@ -4990,7 +5034,7 @@ Returns the current value of this progress bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:getValue
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   local val = bar:getValue()
   lurek.log.info("LProgressBar:getValue=" .. tostring(val), "ui")
@@ -5011,7 +5055,7 @@ Sets the minimum and maximum bounds for this progress bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:setRange
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   bar:setRange(0.0, 0.0)
   lurek.log.info("LProgressBar:setRange applied", "ui")
@@ -5031,7 +5075,7 @@ Sets the current fill value of this progress bar, clamped to its range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LProgressBar:setValue
+do
   local bar = lurek.ui.newProgressBar(0, 100)
   bar:setValue(1.0)
   lurek.log.info("LProgressBar:setValue applied", "ui")
@@ -5047,7 +5091,7 @@ Adds radio-button-specific methods to a radio button widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newRadioButton
+do
   local rb = lurek.ui.newRadioButton("Easy", "difficulty")
   lurek.log.info("newRadioButton: " .. tostring(rb), "ui")
 end
@@ -5064,7 +5108,7 @@ Returns the radio button group name. Buttons in the same group are mutually excl
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:getGroup
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   local val = rb:getGroup()
   lurek.log.info("LRadioButton:getGroup=" .. tostring(val), "ui")
@@ -5082,7 +5126,7 @@ Returns the label text of this radio button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:getText
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   local val = rb:getText()
   lurek.log.info("LRadioButton:getText=" .. tostring(val), "ui")
@@ -5100,7 +5144,7 @@ Returns whether this radio button is currently selected.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:isSelected
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   local val = rb:isSelected()
   lurek.log.info("LRadioButton:isSelected=" .. tostring(val), "ui")
@@ -5120,7 +5164,7 @@ Sets the radio button group name. Buttons in the same group are mutually exclusi
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:setGroup
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   rb:setGroup("left")
   lurek.log.info("LRadioButton:setGroup applied", "ui")
@@ -5140,7 +5184,7 @@ Registers a callback invoked when this radio button's selection changes.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:setOnChange
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   rb:setOnChange(function() end)
   lurek.log.info("LRadioButton:setOnChange callback set", "ui")
@@ -5160,7 +5204,7 @@ Sets the selected state of this radio button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:setSelected
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   rb:setSelected(1.0)
   lurek.log.info("LRadioButton:setSelected applied", "ui")
@@ -5180,7 +5224,7 @@ Sets the label text of this radio button.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LRadioButton:setText
+do
   local rb = lurek.ui.newRadioButton("Option", "group1")
   rb:setText("Hello, world!")
   lurek.log.info("LRadioButton:setText applied", "ui")
@@ -5196,7 +5240,7 @@ Lua-exposed scatter plot for data visualization.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScatterPlot
+do
   local plot = lurek.ui.newScatterPlot({ width = 300, height = 200, title = "Data" })
   lurek.log.info("newScatterPlot: " .. tostring(plot), "ui")
 end
@@ -5219,7 +5263,7 @@ Adds a data series to this scatter plot.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- ScatterPlot:addSeries
+do
   local sp = new_example_image_widget():newScatterPlot(200, 200)
   sp:addSeries("players", {0.2, 0.7, 1, 1}, {10,20, 30,40, 50,35, 70,55})
   sp:setXRange(0, 100); sp:setYRange(0, 80)
@@ -5240,7 +5284,7 @@ Renders this scatter plot to an image buffer.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- ScatterPlot:drawToImage
+do
   local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:drawToImage()
 end
@@ -5260,7 +5304,7 @@ Sets the X-axis range for this scatter plot.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- ScatterPlot:setXRange
+do
   local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setXRange(1)
 end
@@ -5280,7 +5324,7 @@ Sets the Y-axis range for this scatter plot.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- ScatterPlot:setYRange
+do
   local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setYRange(1)
 end
@@ -5297,7 +5341,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScatterPlot:type
+do
   local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
     plot:setXRange(1)
   local t = plot:type()
@@ -5320,7 +5364,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScatterPlot:typeOf
+do
   local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
     plot:setXRange(1)
   lurek.log.info("is LScatterPlot: " .. tostring(plot:typeOf("LScatterPlot")), "ui")
@@ -5337,7 +5381,7 @@ Adds scroll-bar-specific methods to a scroll bar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScrollBar
+do
   local sb = lurek.ui.newScrollBar(true)
   lurek.log.info("newScrollBar: " .. tostring(sb), "ui")
 end
@@ -5354,7 +5398,7 @@ Returns the total content size tracked by this scroll bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:getContentSize
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   local val = scrollbar:getContentSize()
   lurek.log.info("LScrollBar:getContentSize=" .. tostring(val), "ui")
@@ -5372,7 +5416,7 @@ Returns the current scroll position of this scroll bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:getScrollPosition
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   local val = scrollbar:getScrollPosition()
   lurek.log.info("LScrollBar:getScrollPosition=" .. tostring(val), "ui")
@@ -5390,7 +5434,7 @@ Returns the visible viewport size tracked by this scroll bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:getViewSize
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   local val = scrollbar:getViewSize()
   lurek.log.info("LScrollBar:getViewSize=" .. tostring(val), "ui")
@@ -5408,7 +5452,7 @@ Returns whether this scroll bar is oriented vertically.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:isVertical
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   local val = scrollbar:isVertical()
   lurek.log.info("LScrollBar:isVertical=" .. tostring(val), "ui")
@@ -5428,7 +5472,7 @@ Sets the total content size that this scroll bar represents.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:setContentSize
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   scrollbar:setContentSize(1.0)
   lurek.log.info("LScrollBar:setContentSize applied", "ui")
@@ -5448,7 +5492,7 @@ Registers a callback invoked when this scroll bar's position changes.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:setOnChange
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   scrollbar:setOnChange(function() end)
   lurek.log.info("LScrollBar:setOnChange callback set", "ui")
@@ -5468,7 +5512,7 @@ Sets the scroll position of this scroll bar, clamped to the valid range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:setScrollPosition
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   scrollbar:setScrollPosition(1.0)
   lurek.log.info("LScrollBar:setScrollPosition applied", "ui")
@@ -5488,7 +5532,7 @@ Sets the visible viewport size for this scroll bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollBar:setViewSize
+do
   local scrollbar = lurek.ui.newScrollBar(true)
   scrollbar:setViewSize(1.0)
   lurek.log.info("LScrollBar:setViewSize applied", "ui")
@@ -5504,7 +5548,7 @@ Adds scroll-panel-specific methods to a scroll panel widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newScrollPanel
+do
   local sp = lurek.ui.newScrollPanel()
   lurek.log.info("newScrollPanel: " .. tostring(sp), "ui")
 end
@@ -5521,7 +5565,7 @@ Returns the virtual content dimensions of this scroll panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:getContentSize
+do
   local sp = lurek.ui.newScrollPanel()
   local val = sp:getContentSize()
   lurek.log.info("LScrollPanel:getContentSize=" .. tostring(val), "ui")
@@ -5539,7 +5583,7 @@ Returns the maximum scroll offset allowed in each axis.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:getMaxScroll
+do
   local sp = lurek.ui.newScrollPanel()
   local val = sp:getMaxScroll()
   lurek.log.info("LScrollPanel:getMaxScroll=" .. tostring(val), "ui")
@@ -5557,7 +5601,7 @@ Returns the current scroll offset of this scroll panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:getScrollPosition
+do
   local sp = lurek.ui.newScrollPanel()
   local val = sp:getScrollPosition()
   lurek.log.info("LScrollPanel:getScrollPosition=" .. tostring(val), "ui")
@@ -5575,7 +5619,7 @@ Returns the current scroll speed multiplier.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:getScrollSpeed
+do
   local sp = lurek.ui.newScrollPanel()
   local val = sp:getScrollSpeed()
   lurek.log.info("LScrollPanel:getScrollSpeed=" .. tostring(val), "ui")
@@ -5596,7 +5640,7 @@ Sets the virtual content dimensions of this scroll panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:setContentSize
+do
   local sp = lurek.ui.newScrollPanel()
   sp:setContentSize(64.0, 64.0)
   lurek.log.info("LScrollPanel:setContentSize applied", "ui")
@@ -5617,7 +5661,7 @@ Sets the scroll offset position of this scroll panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:setScrollPosition
+do
   local sp = lurek.ui.newScrollPanel()
   sp:setScrollPosition(0.0, 0.0)
   lurek.log.info("LScrollPanel:setScrollPosition applied", "ui")
@@ -5637,7 +5681,7 @@ Sets the scroll speed multiplier for mouse wheel scrolling.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LScrollPanel:setScrollSpeed
+do
   local sp = lurek.ui.newScrollPanel()
   sp:setScrollSpeed(120.0)
   lurek.log.info("LScrollPanel:setScrollSpeed applied", "ui")
@@ -5653,7 +5697,7 @@ Adds separator-specific methods to a separator widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSeparator
+do
   local sep = lurek.ui.newSeparator(false)
   lurek.log.info("newSeparator: " .. tostring(sep), "ui")
 end
@@ -5670,7 +5714,7 @@ Returns the line thickness of this separator.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSeparator:getThickness
+do
   local sep = lurek.ui.newSeparator(false)
   local val = sep:getThickness()
   lurek.log.info("LSeparator:getThickness=" .. tostring(val), "ui")
@@ -5688,7 +5732,7 @@ Returns whether this separator is oriented vertically.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSeparator:isVertical
+do
   local sep = lurek.ui.newSeparator(false)
   local val = sep:isVertical()
   lurek.log.info("LSeparator:isVertical=" .. tostring(val), "ui")
@@ -5708,7 +5752,7 @@ Sets the line thickness of this separator in pixels.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSeparator:setThickness
+do
   local sep = lurek.ui.newSeparator(false)
   sep:setThickness(64.0)
   lurek.log.info("LSeparator:setThickness applied", "ui")
@@ -5728,7 +5772,7 @@ Sets whether this separator draws vertically or horizontally.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSeparator:setVertical
+do
   local sep = lurek.ui.newSeparator(false)
   sep:setVertical(1.0)
   lurek.log.info("LSeparator:setVertical applied", "ui")
@@ -5744,7 +5788,7 @@ Adds slider-specific methods to a slider widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSlider
+do
   local slider = lurek.ui.newSlider(0, 100)
   lurek.log.info("newSlider: " .. tostring(slider), "ui")
 end
@@ -5761,7 +5805,7 @@ Returns the maximum value of this slider's range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:getMax
+do
   local slider = lurek.ui.newSlider(0, 100)
   local val = slider:getMax()
   lurek.log.info("LSlider:getMax=" .. tostring(val), "ui")
@@ -5779,7 +5823,7 @@ Returns the minimum value of this slider's range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:getMin
+do
   local slider = lurek.ui.newSlider(0, 100)
   local val = slider:getMin()
   lurek.log.info("LSlider:getMin=" .. tostring(val), "ui")
@@ -5797,7 +5841,7 @@ Returns the current value of this slider.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:getValue
+do
   local slider = lurek.ui.newSlider(0, 100)
   local val = slider:getValue()
   lurek.log.info("LSlider:getValue=" .. tostring(val), "ui")
@@ -5818,7 +5862,7 @@ Sets the minimum and maximum bounds for this slider.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:setRange
+do
   local slider = lurek.ui.newSlider(0, 100)
   slider:setRange(0.0, 0.0)
   lurek.log.info("LSlider:setRange applied", "ui")
@@ -5838,7 +5882,7 @@ Sets the step increment for this slider's value snapping.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:setStep
+do
   local slider = lurek.ui.newSlider(0, 100)
   slider:setStep(0.0)
   lurek.log.info("LSlider:setStep applied", "ui")
@@ -5858,7 +5902,7 @@ Sets the current value of this slider, clamped to its range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSlider:setValue
+do
   local slider = lurek.ui.newSlider(0, 100)
   slider:setValue(1.0)
   lurek.log.info("LSlider:setValue applied", "ui")
@@ -5874,7 +5918,7 @@ Adds spin-box-specific methods to a spin box widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSpinBox
+do
   local sb = lurek.ui.newSpinBox(1, 10)
   lurek.log.info("newSpinBox: " .. tostring(sb), "ui")
 end
@@ -5889,7 +5933,7 @@ Decreases this spin box's value by one step.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:decrement
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   sb:decrement()
   lurek.log.info("LSpinBox:decrement called", "ui")
@@ -5907,7 +5951,7 @@ Returns the current numeric value of this spin box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:getValue
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   local val = sb:getValue()
   lurek.log.info("LSpinBox:getValue=" .. tostring(val), "ui")
@@ -5923,7 +5967,7 @@ Increases this spin box's value by one step.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:increment
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   sb:increment()
   lurek.log.info("LSpinBox:increment called", "ui")
@@ -5944,7 +5988,7 @@ Sets the minimum and maximum bounds for this spin box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:setRange
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   sb:setRange(0.0, 0.0)
   lurek.log.info("LSpinBox:setRange applied", "ui")
@@ -5964,7 +6008,7 @@ Sets the step increment for this spin box.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:setStep
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   sb:setStep(0.0)
   lurek.log.info("LSpinBox:setStep applied", "ui")
@@ -5984,7 +6028,7 @@ Sets the numeric value of this spin box, clamped to its range.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSpinBox:setValue
+do
   local sb = lurek.ui.newSpinBox(0, 100)
   sb:setValue(1.0)
   lurek.log.info("LSpinBox:setValue applied", "ui")
@@ -6000,7 +6044,7 @@ Adds split-panel-specific methods to a split panel widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSplitPanel
+do
   local split = lurek.ui.newSplitPanel("vertical")
   lurek.log.info("newSplitPanel: " .. tostring(split), "ui")
 end
@@ -6017,7 +6061,7 @@ Returns the widget index of the first (left/top) child panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:getFirstChild
+do
   local split = lurek.ui.newSplitPanel("vertical")
   local val = split:getFirstChild()
   lurek.log.info("LSplitPanel:getFirstChild=" .. tostring(val), "ui")
@@ -6035,7 +6079,7 @@ Returns the minimum pixel size of each split sub-panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:getMinPanelSize
+do
   local split = lurek.ui.newSplitPanel("vertical")
   local val = split:getMinPanelSize()
   lurek.log.info("LSplitPanel:getMinPanelSize=" .. tostring(val), "ui")
@@ -6053,7 +6097,7 @@ Returns the orientation of this split panel ("horizontal" or "vertical").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:getOrientation
+do
   local split = lurek.ui.newSplitPanel("vertical")
   local val = split:getOrientation()
   lurek.log.info("LSplitPanel:getOrientation=" .. tostring(val), "ui")
@@ -6071,7 +6115,7 @@ Returns the widget index of the second (right/bottom) child panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:getSecondChild
+do
   local split = lurek.ui.newSplitPanel("vertical")
   local val = split:getSecondChild()
   lurek.log.info("LSplitPanel:getSecondChild=" .. tostring(val), "ui")
@@ -6089,7 +6133,7 @@ Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:getSplitPosition
+do
   local split = lurek.ui.newSplitPanel("vertical")
   local val = split:getSplitPosition()
   lurek.log.info("LSplitPanel:getSplitPosition=" .. tostring(val), "ui")
@@ -6109,7 +6153,7 @@ Sets the widget index for the first (left/top) panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:setFirstChild
+do
   local split = lurek.ui.newSplitPanel("vertical")
   split:setFirstChild(1)
   lurek.log.info("LSplitPanel:setFirstChild applied", "ui")
@@ -6129,7 +6173,7 @@ Sets the minimum pixel size of each split sub-panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:setMinPanelSize
+do
   local split = lurek.ui.newSplitPanel("vertical")
   split:setMinPanelSize(1.0)
   lurek.log.info("LSplitPanel:setMinPanelSize applied", "ui")
@@ -6149,7 +6193,7 @@ Sets the orientation of this split panel ("horizontal" or "vertical").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:setOrientation
+do
   local split = lurek.ui.newSplitPanel("vertical")
   split:setOrientation(1.0)
   lurek.log.info("LSplitPanel:setOrientation applied", "ui")
@@ -6169,7 +6213,7 @@ Sets the widget index for the second (right/bottom) panel.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:setSecondChild
+do
   local split = lurek.ui.newSplitPanel("vertical")
   split:setSecondChild(1)
   lurek.log.info("LSplitPanel:setSecondChild applied", "ui")
@@ -6189,7 +6233,7 @@ Sets the split position as a fraction (0.0 to 1.0).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSplitPanel:setSplitPosition
+do
   local split = lurek.ui.newSplitPanel("vertical")
   split:setSplitPosition(1.0)
   lurek.log.info("LSplitPanel:setSplitPosition applied", "ui")
@@ -6205,7 +6249,7 @@ Adds status-bar-specific methods to a status bar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newStatusBar
+do
   local sbar = lurek.ui.newStatusBar()
   lurek.log.info("newStatusBar: " .. tostring(sbar), "ui")
 end
@@ -6225,7 +6269,7 @@ Adds a section to this status bar. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:addSection
+do
   local sbar = lurek.ui.newStatusBar()
   sbar:addSection("Hello, world!", 64.0)
   lurek.log.info("LStatusBar:addSection done", "ui")
@@ -6243,7 +6287,7 @@ Returns the number of sections in this status bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:getSectionCount
+do
   local sbar = lurek.ui.newStatusBar()
   local val = sbar:getSectionCount()
   lurek.log.info("LStatusBar:getSectionCount=" .. tostring(val), "ui")
@@ -6265,7 +6309,7 @@ Returns the text of a status bar section by its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:getSectionText
+do
   local sbar = lurek.ui.newStatusBar()
   local val = sbar:getSectionText(1)
   lurek.log.info("LStatusBar:getSectionText=" .. tostring(val), "ui")
@@ -6285,7 +6329,7 @@ Sets the number of sections, truncating or adding empty sections as needed.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:setSectionCount
+do
   local sbar = lurek.ui.newStatusBar()
   sbar:setSectionCount(10)
   lurek.log.info("LStatusBar:setSectionCount applied", "ui")
@@ -6306,7 +6350,7 @@ Sets the text of a status bar section by its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:setSectionText
+do
   local sbar = lurek.ui.newStatusBar()
   sbar:setSectionText(1, "Hello, world!")
   lurek.log.info("LStatusBar:setSectionText applied", "ui")
@@ -6327,7 +6371,7 @@ Associates a widget with a status bar section (reserved for future use).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LStatusBar:setSectionWidget
+do
   local sbar = lurek.ui.newStatusBar()
   sbar:setSectionWidget(1, 1.0)
   lurek.log.info("LStatusBar:setSectionWidget applied", "ui")
@@ -6343,7 +6387,7 @@ Adds switch-specific methods (setOn, isOn, toggle) to a switch widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newSwitch
+do
   local sw = lurek.ui.newSwitch(false)
   lurek.log.info("newSwitch: " .. tostring(sw), "ui")
 end
@@ -6360,7 +6404,7 @@ Returns whether this switch is currently in the on state.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSwitch:isOn
+do
   local sw = lurek.ui.newSwitch(false)
   local val = sw:isOn()
   lurek.log.info("LSwitch:isOn=" .. tostring(val), "ui")
@@ -6380,7 +6424,7 @@ Sets the on/off state of this toggle switch.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSwitch:setOn
+do
   local sw = lurek.ui.newSwitch(false)
   sw:setOn(function() end)
   lurek.log.info("LSwitch:setOn callback set", "ui")
@@ -6396,7 +6440,7 @@ Toggles this switch between on and off states.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LSwitch:toggle
+do
   local sw = lurek.ui.newSwitch(false)
   local val = sw:toggle()
   lurek.log.info("LSwitch:toggle=" .. tostring(val), "ui")
@@ -6412,7 +6456,7 @@ Adds tab-bar-specific methods to a tab bar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTabBar
+do
   local tabs = lurek.ui.newTabBar()
   lurek.log.info("newTabBar: " .. tostring(tabs), "ui")
 end
@@ -6431,7 +6475,7 @@ Adds a new tab with the given label to this tab bar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:addTab
+do
   local tabs = lurek.ui.newTabBar()
   tabs:addTab("Hello")
   lurek.log.info("LTabBar:addTab done", "ui")
@@ -6449,7 +6493,7 @@ Returns the 1-based index of the currently active tab.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:getActiveTab
+do
   local tabs = lurek.ui.newTabBar()
   local val = tabs:getActiveTab()
   lurek.log.info("LTabBar:getActiveTab=" .. tostring(val), "ui")
@@ -6471,7 +6515,7 @@ Returns the label of the tab at the given 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:getTab
+do
   local tabs = lurek.ui.newTabBar()
   local val = tabs:getTab(1)
   lurek.log.info("LTabBar:getTab=" .. tostring(val), "ui")
@@ -6489,7 +6533,7 @@ Returns the total number of tabs. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:getTabCount
+do
   local tabs = lurek.ui.newTabBar()
   local val = tabs:getTabCount()
   lurek.log.info("LTabBar:getTabCount=" .. tostring(val), "ui")
@@ -6511,7 +6555,7 @@ Removes the tab at the given 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:removeTab
+do
   local tabs = lurek.ui.newTabBar()
   tabs:removeTab(1)
   lurek.log.info("LTabBar:removeTab done", "ui")
@@ -6531,7 +6575,7 @@ Sets the active (selected) tab by 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTabBar:setActiveTab
+do
   local tabs = lurek.ui.newTabBar()
   tabs:setActiveTab(1)
   lurek.log.info("LTabBar:setActiveTab applied", "ui")
@@ -6547,7 +6591,7 @@ Adds text-input-specific methods to a text input widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTextInput
+do
   local input = lurek.ui.newTextInput()
   lurek.log.info("newTextInput: " .. tostring(input), "ui")
 end
@@ -6564,7 +6608,7 @@ Returns the current cursor position (character index) within the text input.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:getCursorPosition
+do
   local input = lurek.ui.newTextInput()
   local val = input:getCursorPosition()
   lurek.log.info("LTextInput:getCursorPosition=" .. tostring(val), "ui")
@@ -6582,7 +6626,7 @@ Returns the placeholder text of this text input.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:getPlaceholder
+do
   local input = lurek.ui.newTextInput()
   local val = input:getPlaceholder()
   lurek.log.info("LTextInput:getPlaceholder=" .. tostring(val), "ui")
@@ -6600,7 +6644,7 @@ Returns the current text content of this text input field.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:getText
+do
   local input = lurek.ui.newTextInput()
   local val = input:getText()
   lurek.log.info("LTextInput:getText=" .. tostring(val), "ui")
@@ -6618,7 +6662,7 @@ Returns whether this text input currently has keyboard focus.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:isFocused
+do
   local input = lurek.ui.newTextInput()
   local val = input:isFocused()
   lurek.log.info("LTextInput:isFocused=" .. tostring(val), "ui")
@@ -6638,7 +6682,7 @@ Sets the maximum number of characters allowed in this text input.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:setMaxLength
+do
   local input = lurek.ui.newTextInput()
   input:setMaxLength(5)
   lurek.log.info("LTextInput:setMaxLength applied", "ui")
@@ -6658,7 +6702,7 @@ Sets the placeholder text shown when the input is empty.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:setPlaceholder
+do
   local input = lurek.ui.newTextInput()
   input:setPlaceholder("Hello, world!")
   lurek.log.info("LTextInput:setPlaceholder applied", "ui")
@@ -6678,7 +6722,7 @@ Sets the text content of this text input field and moves the cursor to the end.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTextInput:setText
+do
   local input = lurek.ui.newTextInput()
   input:setText("Hello, world!")
   lurek.log.info("LTextInput:setText applied", "ui")
@@ -6694,7 +6738,7 @@ Lua-exposed wrapper around a GUI theme for styling widgets.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTheme
+do
   local theme = lurek.ui.newTheme()
   lurek.log.info("newTheme: " .. tostring(theme), "ui")
 end
@@ -6715,7 +6759,7 @@ Sets a style entry for the given widget type and state.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- Theme:setStyle
+do
   local theme = new_example_image_widget():newTheme()
   theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
   theme:setStyle("button.text_color",  {1, 1, 1, 1})
@@ -6734,7 +6778,7 @@ Returns the type name of this object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTheme:type
+do
   local theme = new_example_image_widget():newTheme()
     theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
     theme:setStyle("button.text_color",  {1, 1, 1, 1})
@@ -6758,7 +6802,7 @@ Checks whether this object matches the given type name.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTheme:typeOf
+do
   local theme = new_example_image_widget():newTheme()
     theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
     theme:setStyle("button.text_color",  {1, 1, 1, 1})
@@ -6776,7 +6820,7 @@ Adds toast-specific methods to a toast notification widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newToast
+do
   local toast = lurek.ui.newToast("Item collected!", 3.0)
   lurek.log.info("newToast: " .. tostring(toast), "ui")
 end
@@ -6793,7 +6837,7 @@ Returns the display duration of this toast in seconds.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:getDuration
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   local val = toast:getDuration()
   lurek.log.info("LToast:getDuration=" .. tostring(val), "ui")
@@ -6811,7 +6855,7 @@ Returns the message text of this toast.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:getMessage
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   local val = toast:getMessage()
   lurek.log.info("LToast:getMessage=" .. tostring(val), "ui")
@@ -6829,7 +6873,7 @@ Returns the elapsed fraction (0.0 to 1.0) of this toast's lifetime.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:getProgress
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   local val = toast:getProgress()
   lurek.log.info("LToast:getProgress=" .. tostring(val), "ui")
@@ -6847,7 +6891,7 @@ Returns whether this toast has exceeded its display duration.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:isExpired
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   local val = toast:isExpired()
   lurek.log.info("LToast:isExpired=" .. tostring(val), "ui")
@@ -6867,7 +6911,7 @@ Sets how long this toast is displayed in seconds.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:setDuration
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   toast:setDuration(1.0)
   lurek.log.info("LToast:setDuration applied", "ui")
@@ -6887,7 +6931,7 @@ Sets the message text displayed by this toast notification.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToast:setMessage
+do
   local toast = lurek.ui.newToast("Hello!", 2.0)
   toast:setMessage("level_complete")
   lurek.log.info("LToast:setMessage applied", "ui")
@@ -6903,7 +6947,7 @@ Adds toolbar-specific methods to a toolbar widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newToolbar
+do
   local tb = lurek.ui.newToolbar("horizontal")
   lurek.log.info("newToolbar: " .. tostring(tb), "ui")
 end
@@ -6925,7 +6969,7 @@ Adds a new button to this toolbar and returns its 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:addButton
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:addButton(1, 1.0)
   lurek.log.info("LToolbar:addButton done", "ui")
@@ -6941,7 +6985,7 @@ Adds a visual separator to this toolbar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:addSeparator
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:addSeparator()
   lurek.log.info("LToolbar:addSeparator done", "ui")
@@ -6961,7 +7005,7 @@ Adds a flexible spacer to this toolbar.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:addSpacer
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:addSpacer(64.0)
   lurek.log.info("LToolbar:addSpacer done", "ui")
@@ -6983,7 +7027,7 @@ Returns a table describing the toolbar button with the given ID.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:getButton
+do
   local tb = lurek.ui.newToolbar("horizontal")
   local val = tb:getButton(1)
   lurek.log.info("LToolbar:getButton=" .. tostring(val), "ui")
@@ -7001,7 +7045,7 @@ Returns the toolbar orientation ("horizontal" or "vertical").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:getOrientation
+do
   local tb = lurek.ui.newToolbar("horizontal")
   local val = tb:getOrientation()
   lurek.log.info("LToolbar:getOrientation=" .. tostring(val), "ui")
@@ -7023,7 +7067,7 @@ Returns whether a toolbar button is toggled on.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:isButtonToggled
+do
   local tb = lurek.ui.newToolbar("horizontal")
   local val = tb:isButtonToggled(1)
   lurek.log.info("LToolbar:isButtonToggled=" .. tostring(val), "ui")
@@ -7046,7 +7090,7 @@ Enables or disables a toolbar button by its ID.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:setButtonEnabled
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:setButtonEnabled(1, true)
   lurek.log.info("LToolbar:setButtonEnabled applied", "ui")
@@ -7069,7 +7113,7 @@ Sets the toggle state of a toolbar button by its ID.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:setButtonToggled
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:setButtonToggled(1, 1.0)
   lurek.log.info("LToolbar:setButtonToggled applied", "ui")
@@ -7089,7 +7133,7 @@ Sets the toolbar orientation ("horizontal" or "vertical").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LToolbar:setOrientation
+do
   local tb = lurek.ui.newToolbar("horizontal")
   tb:setOrientation(1.0)
   lurek.log.info("LToolbar:setOrientation applied", "ui")
@@ -7105,7 +7149,7 @@ Adds tooltip-panel-specific methods to a tooltip panel widget table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTooltipPanel
+do
   local tp = lurek.ui.newTooltipPanel("Hover info")
   lurek.log.info("newTooltipPanel: " .. tostring(tp), "ui")
 end
@@ -7122,7 +7166,7 @@ Returns the delay in seconds before this tooltip appears.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:getDelay
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   local val = tp:getDelay()
   lurek.log.info("LTooltipPanel:getDelay=" .. tostring(val), "ui")
@@ -7140,7 +7184,7 @@ Returns the widget index that this tooltip is attached to.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:getTarget
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   local val = tp:getTarget()
   lurek.log.info("LTooltipPanel:getTarget=" .. tostring(val), "ui")
@@ -7158,7 +7202,7 @@ Returns the tooltip display text. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:getText
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   local val = tp:getText()
   lurek.log.info("LTooltipPanel:getText=" .. tostring(val), "ui")
@@ -7178,7 +7222,7 @@ Sets the delay in seconds before this tooltip appears.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:setDelay
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   tp:setDelay(1.0)
   lurek.log.info("LTooltipPanel:setDelay applied", "ui")
@@ -7198,7 +7242,7 @@ Sets the widget index that this tooltip is attached to.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:setTarget
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   tp:setTarget(1.0)
   lurek.log.info("LTooltipPanel:setTarget applied", "ui")
@@ -7218,7 +7262,7 @@ Sets the tooltip display text. This method is available to Lua scripts.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTooltipPanel:setText
+do
   local tp = lurek.ui.newTooltipPanel("Info")
   tp:setText("Hello, world!")
   lurek.log.info("LTooltipPanel:setText applied", "ui")
@@ -7234,7 +7278,7 @@ Registers tree-view-specific Lua methods on a widget method table.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.newTreeView
+do
   local tree = lurek.ui.newTreeView()
   lurek.log.info("newTreeView: " .. tostring(tree), "ui")
 end
@@ -7256,7 +7300,7 @@ Adds node on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:addNode
+do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Hello, world!", 1.0)
   lurek.log.info("LTreeView:addNode done", "ui")
@@ -7272,7 +7316,7 @@ Clears nodes on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:clearNodes
+do
   local tree = lurek.ui.newTreeView()
   tree:clearNodes()
   lurek.log.info("LTreeView:clearNodes done", "ui")
@@ -7288,7 +7332,7 @@ Collapses all nodes in this tree view.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:collapseAll
+do
   local tree = lurek.ui.newTreeView()
   tree:collapseAll()
   lurek.log.info("LTreeView:collapseAll called", "ui")
@@ -7310,7 +7354,7 @@ Collapses the node at the given 1-based index to hide its children.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:collapseNode
+do
   local tree = lurek.ui.newTreeView()
   tree:collapseNode(1)
   lurek.log.info("LTreeView:collapseNode called", "ui")
@@ -7326,7 +7370,7 @@ Expands all nodes in this tree view.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:expandAll
+do
   local tree = lurek.ui.newTreeView()
   tree:expandAll()
   lurek.log.info("LTreeView:expandAll called", "ui")
@@ -7348,7 +7392,7 @@ Expand node on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:expandNode
+do
   local tree = lurek.ui.newTreeView()
   tree:expandNode(1)
   lurek.log.info("LTreeView:expandNode called", "ui")
@@ -7370,7 +7414,7 @@ Returns a table of 1-based child node indices for the node at the given index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getChildNodes
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getChildNodes(1)
   lurek.log.info("LTreeView:getChildNodes=" .. tostring(val), "ui")
@@ -7388,7 +7432,7 @@ Returns the node count on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getNodeCount
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getNodeCount()
   lurek.log.info("LTreeView:getNodeCount=" .. tostring(val), "ui")
@@ -7410,7 +7454,7 @@ Returns the nesting depth of the node at the given index (0 for root nodes).
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getNodeDepth
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getNodeDepth(1)
   lurek.log.info("LTreeView:getNodeDepth=" .. tostring(val), "ui")
@@ -7432,7 +7476,7 @@ Returns the node text on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getNodeText
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getNodeText(1)
   lurek.log.info("LTreeView:getNodeText=" .. tostring(val), "ui")
@@ -7454,7 +7498,7 @@ Returns the 1-based index of the parent of the node at the given index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getParentNode
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getParentNode(1)
   lurek.log.info("LTreeView:getParentNode=" .. tostring(val), "ui")
@@ -7472,7 +7516,7 @@ Returns the 1-based index of the currently selected node.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:getSelectedNode
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:getSelectedNode()
   lurek.log.info("LTreeView:getSelectedNode=" .. tostring(val), "ui")
@@ -7494,7 +7538,7 @@ Returns true if expanded on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:isExpanded
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:isExpanded(1)
   lurek.log.info("LTreeView:isExpanded=" .. tostring(val), "ui")
@@ -7516,7 +7560,7 @@ Returns whether the node at the given 1-based index is expanded. Returns nil if 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:isNodeExpanded
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:isNodeExpanded(1)
   lurek.log.info("LTreeView:isNodeExpanded=" .. tostring(val), "ui")
@@ -7538,7 +7582,7 @@ Removes node on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:removeNode
+do
   local tree = lurek.ui.newTreeView()
   tree:removeNode(1)
   lurek.log.info("LTreeView:removeNode done", "ui")
@@ -7561,7 +7605,7 @@ Sets the node icon on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:setNodeIcon
+do
   local tree = lurek.ui.newTreeView()
   tree:setNodeIcon(1, 1.0)
   lurek.log.info("LTreeView:setNodeIcon applied", "ui")
@@ -7584,7 +7628,7 @@ Sets the node text on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:setNodeText
+do
   local tree = lurek.ui.newTreeView()
   tree:setNodeText(1, "Hello, world!")
   lurek.log.info("LTreeView:setNodeText applied", "ui")
@@ -7606,7 +7650,7 @@ Sets the selected node by 1-based index.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:setSelectedNode
+do
   local tree = lurek.ui.newTreeView()
   tree:setSelectedNode(1)
   lurek.log.info("LTreeView:setSelectedNode applied", "ui")
@@ -7628,7 +7672,7 @@ Toggle node on this LTreeView object.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LTreeView:toggleNode
+do
   local tree = lurek.ui.newTreeView()
   local val = tree:toggleNode(1)
   lurek.log.info("LTreeView:toggleNode=" .. tostring(val), "ui")
@@ -7644,10 +7688,54 @@ Creates a Lua table representing a widget with all shared base methods common to
 Module-level example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- lurek.ui.beginDrag
+-- content/examples/ui.lua
+-- lurek.ui API examples.
+-- Run: cargo run -- content/examples/ui.lua
+
+--@api-stub: lurek.ui.beginDrag
+-- Begins a drag operation on a widget
+do
   local w = lurek.ui.newButton("Drag")
   pcall(function() lurek.ui.beginDrag(w) end)
 end
+
+--@api-stub: lurek.ui.getActiveDrag
+-- Returns the widget index currently being dragged, or nil
+do
+  pcall(function()
+    local v = lurek.ui.getActiveDrag()
+    print("getActiveDrag:", v)
+  end)
+end
+
+--@api-stub: lurek.ui.dropOn
+-- Drops the currently dragged widget onto a target widget
+do
+  local container = lurek.ui.newPanel()
+  local w = lurek.ui.newLabel("drop")
+  pcall(function()
+    lurek.ui.beginDrag(w)
+    lurek.ui.dropOn(container)
+  end)
+end
+
+--@api-stub: lurek.ui.endDrag
+-- Ends the current drag operation without dropping
+do
+  pcall(function()
+    local prev = lurek.ui.endDrag()
+    print("endDrag:", prev)
+  end)
+end
+
+--@api-stub: LUiWidget:animateAlpha
+do
+  local w = lurek.ui.newLabel("alpha")
+  pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
+end
+
+--@api-stub: LUiWidget:animatePosition
+do
 ```
 
 ### `LUiWidget:addChild(child: LWidget)`
@@ -7663,7 +7751,7 @@ Adds a child widget to this widget's hierarchy.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:addChild
+do
   local w = lurek.ui.newPanel()
   w:addChild(1.0)
   lurek.log.info("LUiWidget:addChild done", "ui")
@@ -7687,7 +7775,7 @@ Smoothly animates this widget's opacity toward a target value over the given dur
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:animateAlpha
+do
   local w = lurek.ui.newLabel("alpha")
   pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
 end
@@ -7710,7 +7798,7 @@ Smoothly animates this widget's position toward the target coordinates.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:animatePosition
+do
   local w = lurek.ui.newLabel("move")
   pcall(function() w["animatePosition"](120, 40, 0.25) end)
 end
@@ -7729,7 +7817,7 @@ Attaches this widget to a game entity so it follows the entity's position on scr
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:attachToEntity
+do
   local w = lurek.ui.newPanel()
   w:attachToEntity(1.0)
   lurek.log.info("LUiWidget:attachToEntity called", "ui")
@@ -7749,7 +7837,7 @@ Binds this widget to a data key for use with update_bindings.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:bind
+do
   local w = lurek.ui.newPanel()
   w:bind("player_score")
   lurek.log.info("LUiWidget:bind called", "ui")
@@ -7765,7 +7853,7 @@ Cancels all active animations on this widget, leaving it at its current state.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:cancelAnimations
+do
   local w = lurek.ui.newLabel("cancel")
   pcall(function() w["cancelAnimations"]() end)
 end
@@ -7780,7 +7868,7 @@ Removes all anchor constraints from this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:clearAnchor
+do
   local w = lurek.ui.newPanel()
   w:clearAnchor()
   lurek.log.info("LUiWidget:clearAnchor done", "ui")
@@ -7803,7 +7891,7 @@ Tests whether the given screen-space point is inside this widget's bounds.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:containsPoint
+do
   local w = lurek.ui.newPanel()
   local val = w:containsPoint(0.0, 0.0)
   lurek.log.info("LUiWidget:containsPoint=" .. tostring(val), "ui")
@@ -7819,7 +7907,7 @@ Detaches this widget from any previously attached entity.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:detachFromEntity
+do
   local w = lurek.ui.newPanel()
   w:detachFromEntity()
   lurek.log.info("LUiWidget:detachFromEntity called", "ui")
@@ -7835,7 +7923,7 @@ Instantly makes this widget fully opaque and visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:fadeIn
+do
   local w = lurek.ui.newPanel()
   w:fadeIn()
   lurek.log.info("LUiWidget:fadeIn called", "ui")
@@ -7851,7 +7939,7 @@ Instantly makes this widget fully transparent and hidden.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:fadeOut
+do
   local w = lurek.ui.newPanel()
   w:fadeOut()
   lurek.log.info("LUiWidget:fadeOut called", "ui")
@@ -7873,7 +7961,7 @@ Searches this widget's subtree for a child with the given ID.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:findById
+do
   local w = lurek.ui.newPanel()
   w:findById(1)
   lurek.log.info("LUiWidget:findById called", "ui")
@@ -7891,7 +7979,7 @@ Returns the current opacity of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getAlpha
+do
   local w = lurek.ui.newPanel()
   local val = w:getAlpha()
   lurek.log.info("LUiWidget:getAlpha=" .. tostring(val), "ui")
@@ -7909,7 +7997,7 @@ Returns the number of direct child widgets attached to this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getChildCount
+do
   local w = lurek.ui.newPanel()
   local val = w:getChildCount()
   lurek.log.info("LUiWidget:getChildCount=" .. tostring(val), "ui")
@@ -7927,7 +8015,7 @@ Returns a table of lightweight child widget references, each containing an _idx 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getChildren
+do
   local w = lurek.ui.newPanel()
   local val = w:getChildren()
   lurek.log.info("LUiWidget:getChildren=" .. tostring(val), "ui")
@@ -7945,7 +8033,7 @@ Returns the flex-grow factor of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getFlexGrow
+do
   local w = lurek.ui.newPanel()
   local val = w:getFlexGrow()
   lurek.log.info("LUiWidget:getFlexGrow=" .. tostring(val), "ui")
@@ -7963,7 +8051,7 @@ Returns the flex-shrink factor of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getFlexShrink
+do
   local w = lurek.ui.newPanel()
   local val = w:getFlexShrink()
   lurek.log.info("LUiWidget:getFlexShrink=" .. tostring(val), "ui")
@@ -7981,7 +8069,7 @@ Returns the string identifier assigned to this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getId
+do
   local w = lurek.ui.newPanel()
   local val = w:getId()
   lurek.log.info("LUiWidget:getId=" .. tostring(val), "ui")
@@ -7999,7 +8087,7 @@ Returns the outer margin of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getMargin
+do
   local w = lurek.ui.newPanel()
   local val = w:getMargin()
   lurek.log.info("LUiWidget:getMargin=" .. tostring(val), "ui")
@@ -8017,7 +8105,7 @@ Returns the maximum width and height of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getMaxSize
+do
   local w = lurek.ui.newPanel()
   local val = w:getMaxSize()
   lurek.log.info("LUiWidget:getMaxSize=" .. tostring(val), "ui")
@@ -8035,7 +8123,7 @@ Returns the minimum width and height of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getMinSize
+do
   local w = lurek.ui.newPanel()
   local val = w:getMinSize()
   lurek.log.info("LUiWidget:getMinSize=" .. tostring(val), "ui")
@@ -8053,7 +8141,7 @@ Returns the inner padding of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getPadding
+do
   local w = lurek.ui.newPanel()
   local val = w:getPadding()
   lurek.log.info("LUiWidget:getPadding=" .. tostring(val), "ui")
@@ -8071,7 +8159,7 @@ Returns the local position of this widget relative to its parent.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getPosition
+do
   local w = lurek.ui.newPanel()
   local val = w:getPosition()
   lurek.log.info("LUiWidget:getPosition=" .. tostring(val), "ui")
@@ -8089,7 +8177,7 @@ Returns the computed bounding rectangle of this widget in screen coordinates aft
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getRect
+do
   local w = lurek.ui.newPanel()
   local val = w:getRect()
   lurek.log.info("LUiWidget:getRect=" .. tostring(val), "ui")
@@ -8107,7 +8195,7 @@ Returns the width and height of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getSize
+do
   local w = lurek.ui.newPanel()
   local val = w:getSize()
   lurek.log.info("LUiWidget:getSize=" .. tostring(val), "ui")
@@ -8125,7 +8213,7 @@ Returns the current interaction state of this widget (e.g. "normal", "hovered", 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getState
+do
   local w = lurek.ui.newPanel()
   local val = w:getState()
   lurek.log.info("LUiWidget:getState=" .. tostring(val), "ui")
@@ -8143,7 +8231,7 @@ Returns the tooltip text of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getTooltip
+do
   local w = lurek.ui.newPanel()
   local val = w:getTooltip()
   lurek.log.info("LUiWidget:getTooltip=" .. tostring(val), "ui")
@@ -8161,7 +8249,7 @@ Returns the z-order (draw priority) of this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:getZOrder
+do
   local w = lurek.ui.newPanel()
   local val = w:getZOrder()
   lurek.log.info("LUiWidget:getZOrder=" .. tostring(val), "ui")
@@ -8179,7 +8267,7 @@ Returns whether this widget currently has an active animation.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:isAnimating
+do
   local w = lurek.ui.newLabel("state")
   pcall(function()
     local v = w["isAnimating"]()
@@ -8199,7 +8287,7 @@ Returns whether this widget is currently enabled and can receive input.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:isEnabled
+do
   local w = lurek.ui.newPanel()
   local val = w:isEnabled()
   lurek.log.info("LUiWidget:isEnabled=" .. tostring(val), "ui")
@@ -8217,7 +8305,7 @@ Returns whether this widget is currently visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:isVisible
+do
   local w = lurek.ui.newPanel()
   local val = w:isVisible()
   lurek.log.info("LUiWidget:isVisible=" .. tostring(val), "ui")
@@ -8237,7 +8325,7 @@ Removes a child widget from this widget's hierarchy.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:removeChild
+do
   local w = lurek.ui.newPanel()
   w:removeChild(1.0)
   lurek.log.info("LUiWidget:removeChild done", "ui")
@@ -8257,7 +8345,7 @@ Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setAlpha
+do
   local w = lurek.ui.newPanel()
   w:setAlpha(1.0)
   lurek.log.info("LUiWidget:setAlpha applied", "ui")
@@ -8280,7 +8368,7 @@ Anchors this widget to its parent's edges. Pass nil for any side to leave it una
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setAnchor
+do
   local w = lurek.ui.newPanel()
   w:setAnchor()
   lurek.log.info("LUiWidget:setAnchor applied", "ui")
@@ -8301,7 +8389,7 @@ Centers this widget within its parent using proportional anchor offsets (0.0 to 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setAnchorCenter
+do
   local w = lurek.ui.newPanel()
   w:setAnchorCenter(1.0, 1.0)
   lurek.log.info("LUiWidget:setAnchorCenter applied", "ui")
@@ -8321,7 +8409,7 @@ Enables or disables this widget. Disabled widgets appear grayed out and ignore i
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setEnabled
+do
   local w = lurek.ui.newPanel()
   w:setEnabled(1.0)
   lurek.log.info("LUiWidget:setEnabled applied", "ui")
@@ -8341,7 +8429,7 @@ Sets the flex-grow factor controlling how much extra space this widget receives 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setFlexGrow
+do
   local w = lurek.ui.newPanel()
   w:setFlexGrow(1.0)
   lurek.log.info("LUiWidget:setFlexGrow applied", "ui")
@@ -8361,7 +8449,7 @@ Sets the flex-shrink factor controlling how much this widget shrinks when layout
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setFlexShrink
+do
   local w = lurek.ui.newPanel()
   w:setFlexShrink(1.0)
   lurek.log.info("LUiWidget:setFlexShrink applied", "ui")
@@ -8381,7 +8469,7 @@ Assigns a string identifier to this widget for lookup with findById.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setId
+do
   local w = lurek.ui.newPanel()
   w:setId(1)
   lurek.log.info("LUiWidget:setId applied", "ui")
@@ -8404,7 +8492,7 @@ Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setMargin
+do
   local w = lurek.ui.newPanel()
   w:setMargin(64.0, 64.0, 64.0, 64.0)
   lurek.log.info("LUiWidget:setMargin applied", "ui")
@@ -8425,7 +8513,7 @@ Sets the maximum allowed width and height for this widget during layout.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setMaxSize
+do
   local w = lurek.ui.newPanel()
   w:setMaxSize(64.0, 64.0)
   lurek.log.info("LUiWidget:setMaxSize applied", "ui")
@@ -8446,7 +8534,7 @@ Sets the minimum allowed width and height for this widget during layout.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setMinSize
+do
   local w = lurek.ui.newPanel()
   w:setMinSize(64.0, 64.0)
   lurek.log.info("LUiWidget:setMinSize applied", "ui")
@@ -8466,7 +8554,7 @@ Registers a callback function invoked when this widget's value changes.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setOnChange
+do
   local w = lurek.ui.newPanel()
   w:setOnChange(function() end)
   lurek.log.info("LUiWidget:setOnChange callback set", "ui")
@@ -8486,7 +8574,7 @@ Registers a callback function invoked when this widget is clicked.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setOnClick
+do
   local w = lurek.ui.newPanel()
   w:setOnClick(function() end)
   lurek.log.info("LUiWidget:setOnClick callback set", "ui")
@@ -8507,7 +8595,7 @@ Registers a custom draw callback for this widget, invoked each frame during the 
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setOnDraw
+do
   local w = lurek.ui.newPanel()
   w:setOnDraw(function() end)
   lurek.log.info("LUiWidget:setOnDraw callback set", "ui")
@@ -8530,7 +8618,7 @@ Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, botto
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setPadding
+do
   local w = lurek.ui.newPanel()
   w:setPadding(64.0, 64.0, 64.0, 64.0)
   lurek.log.info("LUiWidget:setPadding applied", "ui")
@@ -8551,7 +8639,7 @@ Sets the local position of this widget relative to its parent.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setPosition
+do
   local w = lurek.ui.newPanel()
   w:setPosition(0.0, 0.0)
   lurek.log.info("LUiWidget:setPosition applied", "ui")
@@ -8572,7 +8660,7 @@ Sets the width and height of this widget in pixels.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setSize
+do
   local w = lurek.ui.newPanel()
   w:setSize(64.0, 64.0)
   lurek.log.info("LUiWidget:setSize applied", "ui")
@@ -8592,7 +8680,7 @@ Sets the tooltip text shown when the user hovers over this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setTooltip
+do
   local w = lurek.ui.newPanel()
   w:setTooltip("Hello, world!")
   lurek.log.info("LUiWidget:setTooltip applied", "ui")
@@ -8612,7 +8700,7 @@ Shows or hides this widget. Hidden widgets are not drawn and do not receive inpu
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setVisible
+do
   local w = lurek.ui.newPanel()
   w:setVisible(1.0)
   lurek.log.info("LUiWidget:setVisible applied", "ui")
@@ -8632,7 +8720,7 @@ Sets the z-order (draw priority) of this widget. Higher values draw on top.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:setZOrder
+do
   local w = lurek.ui.newPanel()
   w:setZOrder(0)
   lurek.log.info("LUiWidget:setZOrder applied", "ui")
@@ -8653,7 +8741,7 @@ Moves this widget to the given position and makes it visible.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:slideIn
+do
   local w = lurek.ui.newPanel()
   w:slideIn(0.0, 0.0)
   lurek.log.info("LUiWidget:slideIn called", "ui")
@@ -8674,7 +8762,7 @@ Moves this widget to the given position and hides it.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:slideOut
+do
   local w = lurek.ui.newPanel()
   w:slideOut(0.0, 0.0)
   lurek.log.info("LUiWidget:slideOut called", "ui")
@@ -8692,7 +8780,7 @@ Returns the type name string of this widget (e.g. "LButton", "LSlider").
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:type
+do
   local w = lurek.ui.newPanel()
   local val = w:type()
   lurek.log.info("LUiWidget:type=" .. tostring(val), "ui")
@@ -8714,7 +8802,7 @@ Checks whether this widget matches the given type name, including base types "LW
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:typeOf
+do
   local w = lurek.ui.newPanel()
   local val = w:typeOf("hero")
   lurek.log.info("LUiWidget:typeOf=" .. tostring(val), "ui")
@@ -8730,7 +8818,7 @@ Removes the data binding from this widget.
 Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
-do -- LUiWidget:unbind
+do
   local w = lurek.ui.newPanel()
   w:unbind()
   lurek.log.info("LUiWidget:unbind called", "ui")

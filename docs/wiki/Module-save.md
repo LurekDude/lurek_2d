@@ -68,12 +68,52 @@ Serialization converts Lua tables to a `SaveValue` tree, then emits Lua-literal 
 Module example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- lurek.save.newSaveManager
+do
   local mgr = lurek.save.newSaveManager()
-  mgr:setSchemaVersion(1)
-  mgr:register("player",
-    function() return { hp = 100, x = 32, y = 64 } end,
-    function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
+  mgr:enableAutoSave(30.0, "auto")
+  function lurek.process(dt)
+    local slot = mgr:update(dt)
+    if slot then mgr:save(slot) end
+  end
+end
+
+--@api-stub: SaveManager:setSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  local area, playtime = "Forest", "12:30"
+  mgr:setSummary(area .. " â€” " .. playtime)
+end
+
+--@api-stub: SaveManager:getSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSummary("Chapter 2 â€” Boss")
+  local label = mgr:getSummary()
+  lurek.log.info("current summary: " .. label, "save")
+end
+
+--@api-stub: SaveManager:reset
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:register("player", function() return {} end, function(_) end)
+  mgr:reset()
+  lurek.log.info("save manager cleared for main menu", "save")
+end
+
+--@api-stub: SaveManager:setCompress
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  lurek.log.info("compressed saves enabled", "save")
+end
+
+--@api-stub: SaveManager:isCompressed
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  if mgr:isCompressed() then
+    lurek.log.info("save format: lz4+base64", "save")
+  end
 end
 ```
 
@@ -102,7 +142,7 @@ Create a new SaveManager instance for managing persistent game saves.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- lurek.save.newSaveManager
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(1)
   mgr:register("player",
@@ -123,7 +163,7 @@ Manages persistent game state: registering data collectors/restorers, serializin
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- lurek.save.newSaveManager
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(1)
   mgr:register("player",
@@ -146,7 +186,7 @@ Register a migration function that transforms save data from one schema version 
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:addMigration
+do
   local sm = lurek.save.newSaveManager()
   sm:setSchemaVersion(2)
   sm:addMigration(1, function(data)
@@ -168,7 +208,7 @@ Invoke all registered collectors and return the assembled save-data table withou
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:collect
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("inventory",
     function() return { gold = 250, potions = 3 } end,
@@ -193,7 +233,7 @@ Permanently delete a save slot file from disk. This action cannot be undone.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:delete
+do
   local mgr
   function lurek.quit()
     mgr = lurek.save.newSaveManager()
@@ -212,7 +252,7 @@ Disable the periodic auto-save timer. Manual saves via save() still work.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:disableAutoSave
+do
   local mgr = lurek.save.newSaveManager()
   mgr:enableAutoSave(60.0, "auto")
   mgr:disableAutoSave()
@@ -234,7 +274,7 @@ Enable periodic auto-saving: when the dirty flag is set, the system writes to th
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:enableAutoSave
+do
   local sm = lurek.save.newSaveManager()
   sm:register("state", function() return {score=0} end, function(d) end)
   sm:enableAutoSave(5.0, "slot1")
@@ -257,7 +297,7 @@ Check whether a save slot file exists on disk without reading its contents.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:exists
+do
   local sm = lurek.save.newSaveManager()
   local present = sm:exists("slot1")
   lurek.log.info("slot1 exists: " .. tostring(present), "save")
@@ -275,7 +315,7 @@ Return the current schema version number set for this save manager.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:getSchemaVersion
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(2)
   local ver = mgr:getSchemaVersion()
@@ -298,7 +338,7 @@ Read metadata for a single save slot without loading its full game state.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:getSlotInfo
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -319,7 +359,7 @@ List all save slots found on disk with their metadata (version, timestamp, summa
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:getSlots
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -341,7 +381,7 @@ Get the current summary string that will be embedded in the next save.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:getSummary
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSummary("Chapter 2 â€” Boss")
   local label = mgr:getSummary()
@@ -360,7 +400,7 @@ Check whether save compression is currently enabled.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:isCompressed
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
   if mgr:isCompressed() then
@@ -380,7 +420,7 @@ Check whether unsaved changes exist since the last save or load.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:isDirty
+do
   local mgr = lurek.save.newSaveManager()
   mgr:markDirty()
   if mgr:isDirty() then
@@ -404,7 +444,7 @@ Load game state from a named slot file. Decompresses if needed, applies migratio
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:load
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -424,7 +464,7 @@ Mark the save state as dirty, indicating unsaved changes exist.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:markDirty
+do
   local mgr = lurek.save.newSaveManager()
   local function on_item_picked_up()
     mgr:markDirty()
@@ -446,7 +486,7 @@ Set a hook function called immediately after a save file is successfully loaded 
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:onAfterLoad
+do
   local mgr = lurek.save.newSaveManager()
   mgr:onAfterLoad(function(slot)
     lurek.log.info("loaded slot " .. slot .. ", rebuilding scene", "save")
@@ -467,7 +507,7 @@ Set a hook function called immediately before each save operation begins.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:onBeforeSave
+do
   local mgr = lurek.save.newSaveManager()
   mgr:onBeforeSave(function(slot)
     mgr:setSummary("Saved to " .. slot)
@@ -491,7 +531,7 @@ Register a named data section with a collector and restorer function pair.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:register
+do
   local sm = lurek.save.newSaveManager()
   sm:register("player_state",
     function() return {x=200, y=300, hp=100} end,
@@ -510,7 +550,7 @@ Completely reset the save manager: unregister all sections, clear migrations, ho
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:reset
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("player", function() return {} end, function(_) end)
   mgr:reset()
@@ -533,7 +573,7 @@ Apply a previously collected save-data table back into game state by invoking al
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:restore
+do
   local mgr = lurek.save.newSaveManager()
   local checkpoint
   mgr:register("hp",
@@ -559,7 +599,7 @@ Persist all registered data sections to the named slot file on disk.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:save
+do
   local mgr
   function lurek.init()
     mgr = lurek.save.newSaveManager()
@@ -584,7 +624,7 @@ Enable or disable LZ4 compression for save files. Compressed saves are smaller o
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:setCompress
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
   lurek.log.info("compressed saves enabled", "save")
@@ -604,7 +644,7 @@ Set the current schema version number for saves produced by this game build.
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:setSchemaVersion
+do
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(3)
   lurek.log.info("save schema is now v" .. mgr:getSchemaVersion(), "save")
@@ -624,7 +664,7 @@ Set a human-readable summary string stored alongside save metadata (e.g. "Level 
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:setSummary
+do
   local mgr = lurek.save.newSaveManager()
   local area, playtime = "Forest", "12:30"
   mgr:setSummary(area .. " â€” " .. playtime)
@@ -642,12 +682,52 @@ Return the type name string for this userdata object.
 Module-level example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- lurek.save.newSaveManager
+do
   local mgr = lurek.save.newSaveManager()
-  mgr:setSchemaVersion(1)
-  mgr:register("player",
-    function() return { hp = 100, x = 32, y = 64 } end,
-    function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
+  mgr:enableAutoSave(30.0, "auto")
+  function lurek.process(dt)
+    local slot = mgr:update(dt)
+    if slot then mgr:save(slot) end
+  end
+end
+
+--@api-stub: SaveManager:setSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  local area, playtime = "Forest", "12:30"
+  mgr:setSummary(area .. " â€” " .. playtime)
+end
+
+--@api-stub: SaveManager:getSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSummary("Chapter 2 â€” Boss")
+  local label = mgr:getSummary()
+  lurek.log.info("current summary: " .. label, "save")
+end
+
+--@api-stub: SaveManager:reset
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:register("player", function() return {} end, function(_) end)
+  mgr:reset()
+  lurek.log.info("save manager cleared for main menu", "save")
+end
+
+--@api-stub: SaveManager:setCompress
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  lurek.log.info("compressed saves enabled", "save")
+end
+
+--@api-stub: SaveManager:isCompressed
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  if mgr:isCompressed() then
+    lurek.log.info("save format: lz4+base64", "save")
+  end
 end
 ```
 
@@ -666,12 +746,52 @@ Check whether this object matches a given type name. Supports "LSaveManager" and
 Module-level example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- lurek.save.newSaveManager
+do
   local mgr = lurek.save.newSaveManager()
-  mgr:setSchemaVersion(1)
-  mgr:register("player",
-    function() return { hp = 100, x = 32, y = 64 } end,
-    function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
+  mgr:enableAutoSave(30.0, "auto")
+  function lurek.process(dt)
+    local slot = mgr:update(dt)
+    if slot then mgr:save(slot) end
+  end
+end
+
+--@api-stub: SaveManager:setSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  local area, playtime = "Forest", "12:30"
+  mgr:setSummary(area .. " â€” " .. playtime)
+end
+
+--@api-stub: SaveManager:getSummary
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSummary("Chapter 2 â€” Boss")
+  local label = mgr:getSummary()
+  lurek.log.info("current summary: " .. label, "save")
+end
+
+--@api-stub: SaveManager:reset
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:register("player", function() return {} end, function(_) end)
+  mgr:reset()
+  lurek.log.info("save manager cleared for main menu", "save")
+end
+
+--@api-stub: SaveManager:setCompress
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  lurek.log.info("compressed saves enabled", "save")
+end
+
+--@api-stub: SaveManager:isCompressed
+do
+  local mgr = lurek.save.newSaveManager()
+  mgr:setCompress(true)
+  if mgr:isCompressed() then
+    lurek.log.info("save format: lz4+base64", "save")
+  end
 end
 ```
 
@@ -688,7 +808,7 @@ Remove a previously registered data section by name, cleaning up its collector a
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:unregister
+do
   local mgr = lurek.save.newSaveManager()
   mgr:register("minigame",
     function() return { score = 0 } end,
@@ -712,7 +832,7 @@ Advance the auto-save timer by dt seconds. Call this once per frame from your ga
 Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
-do -- SaveManager:update
+do
   local mgr = lurek.save.newSaveManager()
   mgr:enableAutoSave(30.0, "auto")
   function lurek.process(dt)

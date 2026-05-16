@@ -78,11 +78,51 @@ Skeletal animation runtime providing hierarchical bone trees, slot-based attachm
 Module example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.newSkeleton
-  local hero = lurek.spine.newSkeleton("hero")
-  local root = hero:addBone("root", { x = 320, y = 240 })
-  hero:addChildBone("torso", root, { y = -40 })
-  lurek.log.info("hero rig built with " .. hero:boneCount() .. " bones", "spine")
+do
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local player = { x = 0, y = 0 }
+  function lurek.process(dt)
+    player.x = player.x + 60 * dt
+    rig:setPosition(player.x, player.y)
+  end
+end
+
+--@api-stub: Skeleton:boneCount
+do
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root"); rig:addChildBone("torso", 0); rig:addChildBone("head", 1)
+  if rig:boneCount() < 3 then
+    lurek.log.warn("rig is missing bones: " .. rig:boneCount(), "spine")
+  end
+end
+
+--@api-stub: Skeleton:slotCount
+do
+  local rig = lurek.spine.newSkeleton("npc")
+  local b = rig:addBone("torso")
+  rig:addSlot("chest", b); rig:addSlot("belt", b)
+  lurek.log.info("rig exposes " .. rig:slotCount() .. " attachment slots", "spine")
+end
+
+--@api-stub: Skeleton:drawToImage
+do
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root", { x = 64, y = 64 })
+  rig:addChildBone("arm", 0, { x = 32 })
+  rig:updateWorldTransforms()
+  local debug_tex = lurek.render.newImage(rig:drawToImage(128, 128))
+  function lurek.draw() lurek.render.draw(debug_tex, 16, 16) end
+end
+
+--@api-stub: Skeleton:stopAnimation
+do
+  local rig = lurek.spine.newSkeleton("npc")
+  rig:addBone("root")
+  local walk = lurek.spine.newSkeletonAnimation("walk", 0.6)
+  rig:addAnimation(walk)
+  rig:playAnimation("walk", true)
+  rig:stopAnimation()
 end
 ```
 
@@ -118,7 +158,7 @@ Parses a JSON string into a SkeletonAnimation. Returns nil if parsing fails or t
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.animationFromJson
+do
   local json = [[
     {
       "name":"json_clip",
@@ -154,7 +194,7 @@ Creates a new empty skeleton with the given name. Add bones and slots to build t
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.newSkeleton
+do
   local hero = lurek.spine.newSkeleton("hero")
   local root = hero:addBone("root", { x = 320, y = 240 })
   hero:addChildBone("torso", root, { y = -40 })
@@ -178,7 +218,7 @@ Creates a new empty animation with the given name and duration. Add keyframes to
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.newSkeletonAnimation
+do
   local idle = lurek.spine.newSkeletonAnimation("idle", 1.5)
   idle:addKeyframe(0, "y", 0.0,  0, "ease_in_out")
   idle:addKeyframe(0, "y", 0.75, 4, "ease_in_out")
@@ -198,7 +238,7 @@ Lua-facing skeleton object providing bone hierarchy, slots, IK, skins, and anima
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.newSkeleton
+do
   local hero = lurek.spine.newSkeleton("hero")
   local root = hero:addBone("root", { x = 320, y = 240 })
   hero:addChildBone("torso", root, { y = -40 })
@@ -219,7 +259,7 @@ Registers a SkeletonAnimation object with this skeleton so it can be played by n
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addAnimation
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   local idle = lurek.spine.newSkeletonAnimation("idle", 1.0)
@@ -244,7 +284,7 @@ Adds a root-level bone to the skeleton with optional transform properties.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addBone
+do
   local sk = lurek.spine.newSkeleton("hero")
   local bid = sk:addBone("root", { x = 0, y = 0 })
   lurek.log.info("root bone: " .. bid, "spine")
@@ -268,7 +308,7 @@ Adds a bone as a child of an existing bone, inheriting its parent's world transf
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addChildBone
+do
   local sk = lurek.spine.newSkeleton("hero")
   local root = sk:addBone("root")
   local upper = sk:addChildBone("upper_arm", root, { x = 0, y = 20 })
@@ -293,7 +333,7 @@ Adds an inverse-kinematics constraint that controls a chain of bones to reach a 
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addIKConstraint
+do
   local sk = lurek.spine.newSkeleton("hero")
   local root = sk:addBone("root")
   local lower = sk:addChildBone("lower_arm", root, { y = -30 })
@@ -315,7 +355,7 @@ Registers a new named skin on this skeleton. Skins remap slot attachments for vi
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addSkin
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addSkin("default"); rig:addSkin("armoured")
   rig:setSkinMapping("armoured", "chest", "plate_chest")
@@ -339,7 +379,7 @@ Adds a slot attached to a specific bone, optionally assigning a default attachme
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:addSlot
+do
   local sk = lurek.spine.newSkeleton("hero")
   local root = sk:addBone("root")
   local sid = sk:addSlot("body_slot", root, "body_sprite.png")
@@ -362,7 +402,7 @@ Blends an animation pose onto the skeleton at a given time with a weight factor 
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:blendAnimation
+do
   local sk = lurek.spine.newSkeleton("hero")
   sk:addBone("root")
   local aim_clip = lurek.spine.newSkeletonAnimation("aim", 1.0)
@@ -382,7 +422,7 @@ Returns the total number of bones in the skeleton.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:boneCount
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root"); rig:addChildBone("torso", 0); rig:addChildBone("head", 1)
   if rig:boneCount() < 3 then
@@ -407,7 +447,7 @@ Renders the skeleton into an in-memory image of the given dimensions and returns
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:drawToImage
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root", { x = 64, y = 64 })
   rig:addChildBone("arm", 0, { x = 32 })
@@ -432,7 +472,7 @@ Searches for a bone by name and returns its zero-based index, or nil if not foun
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:findBone
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   rig:addChildBone("head", 0)
@@ -456,7 +496,7 @@ Searches for a slot by name and returns its zero-based index, or nil if not foun
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:findSlot
+do
   local rig = lurek.spine.newSkeleton("npc")
   local b = rig:addBone("torso")
   rig:addSlot("chest", b, "shirt_default")
@@ -476,7 +516,7 @@ Returns the current playback time of the active animation in seconds.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:getAnimationTime
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   local clip = lurek.spine.newSkeletonAnimation("attack", 0.4)
@@ -503,7 +543,7 @@ Returns the final world-space transform of a bone after hierarchy resolution.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:getBoneWorld
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("muzzle", { x = 50, y = 0 })
   rig:updateWorldTransforms()
@@ -523,7 +563,7 @@ Returns the name of the currently active skin, or nil if no skin is set.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:getSkin
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addSkin("default"); rig:setSkin("default")
   local current = rig:getSkin() or "default"
@@ -547,7 +587,7 @@ Starts playing a named animation on this skeleton. Optionally loops.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:playAnimation
+do
   local sk = lurek.spine.newSkeleton("hero")
   sk:addBone("root")
   local idle = lurek.spine.newSkeletonAnimation("idle", 1.0)
@@ -574,7 +614,7 @@ Sets the world-space target position for a named IK constraint. Call updateWorld
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:setIKTarget
+do
   local sk = lurek.spine.newSkeleton("hero")
   local root = sk:addBone("root")
   local lower = sk:addChildBone("lower_arm", root, { y = -30 })
@@ -598,7 +638,7 @@ Sets the root bone world position, shifting the entire skeleton.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:setPosition
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   local player = { x = 0, y = 0 }
@@ -624,7 +664,7 @@ Activates a named skin, applying its slot-attachment mappings to the skeleton.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:setSkin
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addSkin("default"); rig:addSkin("night")
   if not rig:setSkin("night") then
@@ -648,7 +688,7 @@ Maps a slot to a specific attachment name within a skin. When that skin is activ
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:setSkinMapping
+do
   local sk = lurek.spine.newSkeleton("hero")
   local root = sk:addBone("root")
   sk:addSlot("body_slot", root, "hero_default.png")
@@ -669,7 +709,7 @@ Returns the total number of slots in the skeleton.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:slotCount
+do
   local rig = lurek.spine.newSkeleton("npc")
   local b = rig:addBone("torso")
   rig:addSlot("chest", b); rig:addSlot("belt", b)
@@ -686,7 +726,7 @@ Stops the currently playing animation and resets playback state.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:stopAnimation
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   local walk = lurek.spine.newSkeletonAnimation("walk", 0.6)
@@ -707,7 +747,7 @@ Returns the type name of this userdata object.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeleton:type
+do
   local skeleton_obj = lurek.spine.newSkeleton("test")
   local t = skeleton_obj:type()
   lurek.log.info("LSkeleton:type = " .. t, "spine")
@@ -729,7 +769,7 @@ Checks whether this object is of the given type name. Supports "LSkeleton" and "
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeleton:typeOf
+do
   local skeleton_obj = lurek.spine.newSkeleton("test")
   lurek.log.info("is LSkeleton: " .. tostring(skeleton_obj:typeOf("LSkeleton")), "spine")
   lurek.log.info("is wrong: " .. tostring(skeleton_obj:typeOf("Unknown")), "spine")
@@ -749,7 +789,7 @@ Advances the current animation by a delta time, applying bone transforms to the 
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:updateAnimation
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root")
   local clip = lurek.spine.newSkeletonAnimation("bob", 1.0)
@@ -768,7 +808,7 @@ Recomputes world transforms for all bones in hierarchy order. Call after modifyi
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- Skeleton:updateWorldTransforms
+do
   local rig = lurek.spine.newSkeleton("npc")
   rig:addBone("root", { x = 100, y = 100 })
   rig:addChildBone("arm", 0, { x = 20 })
@@ -786,7 +826,7 @@ Lua-facing animation object containing bone timelines, keyframes, events, and ea
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- lurek.spine.animationFromJson
+do
   local json = [[
     {
       "name":"json_clip",
@@ -822,7 +862,7 @@ Inserts an event trigger at a specific time within the animation timeline.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- SkeletonAnimation:addEventKey
+do
   local anim = lurek.spine.newSkeletonAnimation("walk", 1.0)
   anim:addKeyframe(0, "y", 0.0, 0)
   anim:addEventKey(0.5, "footstep")
@@ -847,7 +887,7 @@ Adds a keyframe to a bone's property timeline at a specific time with a value an
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- SkeletonAnimation:addKeyframe
+do
   local anim = lurek.spine.newSkeletonAnimation("bob", 1.0)
   anim:addKeyframe(0, "y", 0.0,  0)
   anim:addKeyframe(0, "y", 0.5, 10)
@@ -867,7 +907,7 @@ Returns the total duration of this animation in seconds.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- SkeletonAnimation:getDuration
+do
   local clip = lurek.spine.newSkeletonAnimation("attack", 0.45)
   local timer = 0
   function lurek.process(dt)
@@ -893,7 +933,7 @@ Collects all events that fire within a time range. Useful for triggering sound e
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- SkeletonAnimation:getEvents
+do
   local clip = lurek.spine.newSkeletonAnimation("walk", 0.8)
   clip:addEventKey(0.2, "footstep_left"); clip:addEventKey(0.6, "footstep_right")
   local prev = 0
@@ -916,7 +956,7 @@ Returns the number of bone-property timelines in this animation.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- SkeletonAnimation:getTimelineCount
+do
   local clip = lurek.spine.newSkeletonAnimation("idle", 1.0)
   clip:addKeyframe(0, "y", 0, 0); clip:addKeyframe(0, "y", 0.5, 4)
   clip:addKeyframe(1, "rotation", 0, 0); clip:addKeyframe(1, "rotation", 0.5, 0.1)
@@ -939,7 +979,7 @@ Samples all timelines at a given time and returns the computed pose as an array 
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeletonAnimation:poseAt
+do
   local clip = lurek.spine.newSkeletonAnimation("probe", 1.0)
   clip:addKeyframe(0, "x", 0.0, 0.0, "linear")
   clip:addKeyframe(0, "x", 1.0, 10.0, "linear")
@@ -959,7 +999,7 @@ Creates a new animation that plays this animation's keyframes in reverse order.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeletonAnimation:reverse
+do
   local clip = lurek.spine.newSkeletonAnimation("walk", 1.0)
   clip:addKeyframe(0, "y", 0.0, 0.0, "linear")
   clip:addKeyframe(0, "y", 1.0, 4.0, "linear")
@@ -979,7 +1019,7 @@ Returns the type name of this userdata object.
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeletonAnimation:type
+do
   local ok ---@type boolean
   local skeleton_animation_obj ---@type LSkeletonAnimation?
   ok, skeleton_animation_obj = pcall(lurek.spine.newSkeletonAnimation, "assets/hero.skel", 1.0)
@@ -1004,7 +1044,7 @@ Checks whether this object is of the given type name. Supports "LSkeletonAnimati
 Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
-do -- LSkeletonAnimation:typeOf
+do
   local ok2 ---@type boolean
   local skeleton_animation_obj2 ---@type LSkeletonAnimation?
   ok2, skeleton_animation_obj2 = pcall(lurek.spine.newSkeletonAnimation, "assets/hero.skel", 1.0)

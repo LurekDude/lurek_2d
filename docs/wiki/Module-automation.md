@@ -70,16 +70,53 @@ Scripts can be loaded from TOML files or constructed from Lua tables. The simula
 Module example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.load
-  local intro = {
-    meta = { description = "intro cutscene skip" },
-    steps = {
-      { time = 0.0, action = "keypress",   key = "space" },
-      { time = 0.5, action = "keyrelease", key = "space" },
-    },
-  }
-  lurek.automation.load("intro_skip", intro)
+-- Starts playback of a loaded automation script
+do
+  lurek.automation.load("hop", {
+    steps = { { time = 0.2, action = "keypress", key = "space" } },
+  })
+  function lurek.init() lurek.automation.start("hop") end
 end
+
+--@api-stub: lurek.automation.stop
+-- Stops the current automation script
+do
+  function lurek.init()
+    if lurek.automation.isRunning() then
+      lurek.automation.stop()
+    end
+  end
+end
+
+--@api-stub: lurek.automation.pause
+-- Pauses automation playback
+do
+  local menu_open = true
+  if menu_open and lurek.automation.isRunning() then
+    lurek.automation.pause()
+  end
+end
+
+--@api-stub: lurek.automation.resume
+-- Resumes automation playback
+do
+  if lurek.automation.isPaused() then
+    lurek.automation.resume()
+  end
+end
+
+--@api-stub: lurek.automation.update
+-- Advances automation playback and dispatches generated input events
+do
+  function lurek.process(dt)
+    lurek.automation.update(dt)
+  end
+end
+
+--@api-stub: lurek.automation.isRunning
+-- Returns whether automation playback is running
+do
+  function lurek.draw_ui()
 ```
 
 ## Key Types
@@ -129,7 +166,7 @@ Returns a named automation condition value.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getCondition
+do
   local v = lurek.automation.getCondition("boss_dead")
   lurek.log.debug("boss_dead=" .. tostring(v), "automation")
 end
@@ -146,7 +183,7 @@ Returns the current script name when a script is active.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getCurrentScript
+do
   function lurek.draw_ui()
     local name = lurek.automation.getCurrentScript() or "(idle)"
     lurek.render.print("script: " .. name, 8, 40)
@@ -165,7 +202,7 @@ Returns the current step index of the active script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getCurrentStep
+do
   function lurek.draw_ui()
     local i = lurek.automation.getCurrentStep()
     local n = lurek.automation.getStepCount()
@@ -185,7 +222,7 @@ Returns elapsed playback time for the current script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getElapsedTime
+do
   function lurek.draw_ui()
     local t = lurek.automation.getElapsedTime()
     lurek.render.print(string.format("t = %.2fs", t), 8, 56)
@@ -204,7 +241,7 @@ Returns the last automation error message when one exists.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getLastError
+do
   local err = lurek.automation.getLastError()
   if err then lurek.log.error(err, "automation") end
 end
@@ -221,7 +258,7 @@ Returns automation playback speed multiplier.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getPlaybackSpeed
+do
   local speed = lurek.automation.getPlaybackSpeed()
   if speed ~= 1.0 then
     lurek.log.info("automation running at " .. speed .. "x", "automation")
@@ -240,7 +277,7 @@ Returns the names of loaded automation scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getScripts
+do
   lurek.automation.load("a", { steps = { { time = 0, action = "wait" } } })
   lurek.automation.load("b", { steps = { { time = 0, action = "wait" } } })
   for _, name in ipairs(lurek.automation.getScripts()) do
@@ -260,7 +297,7 @@ Returns the number of steps in the active script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getStepCount
+do
   local total = 0
   function lurek.init()
     lurek.automation.start("intro_skip")
@@ -285,7 +322,7 @@ Returns the configured step limit for a loaded script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.getStepLimit
+do
   local limit = lurek.automation.getStepLimit("intro_skip")
   if limit then
     lurek.log.debug("intro_skip step limit = " .. limit, "automation")
@@ -308,7 +345,7 @@ Returns whether a macro is saved. This function is exposed to Lua scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.hasMacro
+do
   if not lurek.automation.hasMacro("dismiss") then
     lurek.log.warn("macro 'dismiss' not registered yet", "automation")
   end
@@ -330,7 +367,7 @@ Returns whether a script is loaded.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.hasScript
+do
   if not lurek.automation.hasScript("attract_loop") then
     lurek.automation.load("attract_loop", {
       steps = { { time = 1.0, action = "keypress", key = "return" } },
@@ -350,7 +387,7 @@ Returns whether the current automation script completed.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.isComplete
+do
   function lurek.process(dt)
     lurek.automation.update(dt)
     if lurek.automation.isComplete() then
@@ -371,7 +408,7 @@ Returns whether the current automation script failed.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.isFailed
+do
   function lurek.process(dt)
     lurek.automation.update(dt)
     if lurek.automation.isFailed() then
@@ -392,7 +429,7 @@ Returns whether automation highlight mode is enabled.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.isHighlightMode
+do
 
   function lurek.draw()
     if lurek.automation.isHighlightMode() then
@@ -414,7 +451,7 @@ Returns whether automation playback is paused.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.isPaused
+do
   if lurek.automation.isPaused() then
     lurek.log.info("script halted on pause menu", "automation")
   end
@@ -432,7 +469,7 @@ Returns whether automation playback is running.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.isRunning
+do
   function lurek.draw_ui()
     if lurek.automation.isRunning() then
       lurek.render.print("[AUTO] press ESC to skip", 8, 8)
@@ -452,7 +489,7 @@ Returns the names of saved macros. This function is exposed to Lua scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.listMacros
+do
   for _, name in ipairs(lurek.automation.listMacros()) do
     lurek.log.debug("macro available: " .. name, "automation")
   end
@@ -473,7 +510,7 @@ Loads an automation script from a Lua table of steps and optional metadata.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.load
+do
   local intro = {
     meta = { description = "intro cutscene skip" },
     steps = {
@@ -499,7 +536,7 @@ Loads an automation script from TOML text.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.loadFromToml
+do
   local toml = [=[
 [meta]
 description = "left-right wiggle"
@@ -525,7 +562,7 @@ Pauses automation playback. This function is exposed to Lua scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.pause
+do
   local menu_open = true
   if menu_open and lurek.automation.isRunning() then
     lurek.automation.pause()
@@ -546,7 +583,7 @@ Starts playback of a saved macro. This function is exposed to Lua scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.playMacro
+do
   function lurek.init()
     if lurek.automation.hasMacro("dismiss") then
       lurek.automation.playMacro("dismiss")
@@ -564,7 +601,7 @@ Resumes automation playback. This function is exposed to Lua scripts.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.resume
+do
   if lurek.automation.isPaused() then
     lurek.automation.resume()
   end
@@ -585,7 +622,7 @@ Saves a loaded script as a named macro.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.saveMacro
+do
   lurek.automation.load("dismiss_dialog", {
     steps = { { time = 0.05, action = "keypress", key = "return" } },
   })
@@ -607,7 +644,7 @@ Sets a named boolean condition used by automation steps.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.setCondition
+do
   local boss_dead = false
   function lurek.process(dt)
     lurek.automation.setCondition("boss_dead", boss_dead)
@@ -628,7 +665,7 @@ Enables or disables automation highlight mode.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.setHighlightMode
+do
   local recording = true
   lurek.automation.setHighlightMode(recording)
 end
@@ -647,7 +684,7 @@ Sets automation playback speed multiplier.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.setPlaybackSpeed
+do
   local fast_ci = true
   lurek.automation.setPlaybackSpeed(fast_ci and 4.0 or 1.0)
 end
@@ -669,7 +706,7 @@ Sets the maximum step count for a loaded script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.setStepLimit
+do
   if lurek.automation.setStepLimit("wiggle", 64) then
     lurek.log.info("wiggle script limited to 64 steps", "automation")
   end
@@ -689,7 +726,7 @@ Starts playback of a loaded automation script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.start
+do
   lurek.automation.load("hop", {
     steps = { { time = 0.2, action = "keypress", key = "space" } },
   })
@@ -706,7 +743,7 @@ Stops the current automation script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.stop
+do
   function lurek.init()
     if lurek.automation.isRunning() then
       lurek.automation.stop()
@@ -730,7 +767,7 @@ Unloads a named automation script.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.unload
+do
   lurek.automation.load("boot_autoplay", { steps = { { time = 0, action = "wait" } } })
   if lurek.automation.unload("boot_autoplay") then
     lurek.log.info("boot_autoplay script removed", "automation")
@@ -751,7 +788,7 @@ Advances automation playback and dispatches generated input events.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.update
+do
   function lurek.process(dt)
     lurek.automation.update(dt)
   end
@@ -772,7 +809,7 @@ Suspends automation updates until a predicate returns true or a timeout elapses.
 Exact example from [automation.lua](../blob/main/content/examples/automation.lua):
 
 ```lua
-do -- lurek.automation.waitUntil
+do
   local level_ready = false
   function lurek.init()
     lurek.automation.waitUntil(function() return level_ready end, 5.0)

@@ -2,8 +2,9 @@
 -- lurek.mods API examples.
 -- Run: cargo run -- content/examples/mods.lua
 
---@api-stub: lurek.mods.newMod -- Creates a mod metadata handle from a Lua table
-do -- lurek.mods.newMod
+--@api-stub: lurek.mods.newMod
+-- Creates a mod metadata handle from a Lua table
+do
   local hud_mod = lurek.mods.newMod({
     id = "core.hud",
     name = "Core HUD",
@@ -15,14 +16,16 @@ do -- lurek.mods.newMod
   lurek.log.info("built mod " .. hud_mod:getId() .. " v" .. hud_mod:getVersion(), "mods")
 end
 
---@api-stub: lurek.mods.newModManager -- Creates an empty mod manager
-do -- lurek.mods.newModManager
+--@api-stub: lurek.mods.newModManager
+-- Creates an empty mod manager
+do
   local manager = lurek.mods.newModManager()
   lurek.log.info("manager initialised, " .. manager:getModCount() .. " mods", "mods")
 end
 
---@api-stub: lurek.mods.checkApiVersion -- Checks whether a mod API version is compatible with a host version
-do -- lurek.mods.checkApiVersion
+--@api-stub: lurek.mods.checkApiVersion
+-- Checks whether a mod API version is compatible with a host version
+do
   local probe = lurek.mods.newMod({id = "fan.skins", api_version = "1.4.0"})
   local ok, msg = lurek.mods.checkApiVersion(probe, "1.6.2")
   if not ok then
@@ -30,17 +33,19 @@ do -- lurek.mods.checkApiVersion
   end
 end
 
--- â”€â”€ Mod methods â”€â”€
+-- Mod methods
 
 --@api-stub: Mod:getId
-do -- Mod:getId
+-- Returns the id of this mod.
+do
   local m = lurek.mods.newMod({id = "core.audio"})
   local registry = {}
   registry[m:getId()] = {volume = 0.8}
 end
 
 --@api-stub: Mod:getName
-do -- Mod:getName
+-- Returns the name of this mod.
+do
   local m = lurek.mods.newMod({id = "ui.theme.dark", name = "Dark Theme"})
   local label = m:getName()
   if label == "" then label = m:getId() end
@@ -48,7 +53,8 @@ do -- Mod:getName
 end
 
 --@api-stub: Mod:getVersion
-do -- Mod:getVersion
+-- Returns the version of this mod.
+do
   local m = lurek.mods.newMod({id = "core.physics", version = "2.1.0"})
   if m:getVersion() ~= "2.1.0" then
     lurek.log.warn("save was written by " .. m:getVersion(), "save")
@@ -56,21 +62,24 @@ do -- Mod:getVersion
 end
 
 --@api-stub: Mod:getAuthor
-do -- Mod:getAuthor
+-- Returns the author of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.maps", author = "alice"})
   local credit = m:getAuthor()
   lurek.log.info("map pack by " .. credit, "credits")
 end
 
 --@api-stub: Mod:getDescription
-do -- Mod:getDescription
+-- Returns the description of this mod.
+do
   local m = lurek.mods.newMod({id = "ui.minimap", description = "Adds a corner minimap with fog-of-war."})
   local detail = m:getDescription()
   lurek.log.info("about: " .. detail, "ui")
 end
 
 --@api-stub: Mod:getDependencies
-do -- Mod:getDependencies
+-- Returns the dependencies of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.weapons", dependencies = {"core.combat", "core.audio"}})
   for _, dep in ipairs(m:getDependencies()) do
     lurek.log.debug("requires " .. dep, "mods")
@@ -78,7 +87,8 @@ do -- Mod:getDependencies
 end
 
 --@api-stub: Mod:getPriority
-do -- Mod:getPriority
+-- Returns the priority of this mod.
+do
   local a = lurek.mods.newMod({id = "core.base", priority = 100})
   local b = lurek.mods.newMod({id = "fan.tweak", priority = 5})
   if a:getPriority() > b:getPriority() then
@@ -87,7 +97,8 @@ do -- Mod:getPriority
 end
 
 --@api-stub: Mod:isEnabled
-do -- Mod:isEnabled
+-- Returns true if this mod is currently enabled.
+do
   local m = lurek.mods.newMod({id = "fan.cheats"})
   if m:isEnabled() then
     lurek.log.debug(m:getId() .. " is active", "mods")
@@ -95,7 +106,8 @@ do -- Mod:isEnabled
 end
 
 --@api-stub: Mod:setEnabled
-do -- Mod:setEnabled
+-- Sets whether this mod is enabled and accepts input.
+do
   local m = lurek.mods.newMod({id = "fan.skins"})
   local user_choice = false
   m:setEnabled(user_choice)
@@ -103,7 +115,8 @@ do -- Mod:setEnabled
 end
 
 --@api-stub: Mod:isLoaded
-do -- Mod:isLoaded
+-- Returns true if this mod loaded.
+do
   local m = lurek.mods.newMod({id = "core.input"})
   if not m:isLoaded() then
     lurek.log.debug("pending: " .. m:getId(), "mods")
@@ -111,7 +124,8 @@ do -- Mod:isLoaded
 end
 
 --@api-stub: Mod:getApiVersion
-do -- Mod:getApiVersion
+-- Returns the api version of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.maps", api_version = "1.5.0"})
   local req = m:getApiVersion()
   if req then
@@ -120,14 +134,16 @@ do -- Mod:getApiVersion
 end
 
 --@api-stub: Mod:setApiVersion
-do -- Mod:setApiVersion
+-- Sets the api version of this mod.
+do
   local m = lurek.mods.newMod({id = "test.fixture"})
   m:setApiVersion("1.6.0")
   lurek.log.debug("fixture api_version=" .. m:getApiVersion(), "test")
 end
 
 --@api-stub: Mod:getCapabilities
-do -- Mod:getCapabilities
+-- Returns the capabilities of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.online", capabilities = {"network", "filesystem"}})
   for _, cap in ipairs(m:getCapabilities()) do
     lurek.log.debug(m:getId() .. " uses " .. cap, "mods")
@@ -135,7 +151,8 @@ do -- Mod:getCapabilities
 end
 
 --@api-stub: Mod:setCapabilities
-do -- Mod:setCapabilities
+-- Sets the capabilities of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.tools"})
   local caps = m:getCapabilities()
   caps[#caps + 1] = "filesystem"
@@ -143,7 +160,8 @@ do -- Mod:setCapabilities
 end
 
 --@api-stub: Mod:getConfigSchema
-do -- Mod:getConfigSchema
+-- Returns the config schema of this mod.
+do
   local m = lurek.mods.newMod({id = "ui.theme", config_schema = {
     {key = "accent", type = "string", default = "#ff8800"},
   }})
@@ -153,7 +171,8 @@ do -- Mod:getConfigSchema
 end
 
 --@api-stub: Mod:setConfigSchema
-do -- Mod:setConfigSchema
+-- Sets the config schema of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfigSchema({
     {key = "music_vol", type = "number", default = "0.8"},
@@ -162,7 +181,8 @@ do -- Mod:setConfigSchema
 end
 
 --@api-stub: Mod:getHook
-do -- Mod:getHook
+-- Returns the hook of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.combat"})
   m:setHook("on_damage", function(amount) return amount * 2 end)
   local fn = m:getHook("on_damage")
@@ -170,7 +190,8 @@ do -- Mod:getHook
 end
 
 --@api-stub: Mod:hasHook
-do -- Mod:hasHook
+-- Returns true if this mod has a hook.
+do
   local m = lurek.mods.newMod({id = "fan.input"})
   m:setHook("on_jump", function() end)
   if m:hasHook("on_jump") then
@@ -179,7 +200,8 @@ do -- Mod:hasHook
 end
 
 --@api-stub: Mod:getHookNames
-do -- Mod:getHookNames
+-- Returns the hook names of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.events"})
   m:setHook("on_load", function() end)
   m:setHook("on_quit", function() end)
@@ -189,13 +211,15 @@ do -- Mod:getHookNames
 end
 
 --@api-stub: Mod:setConfig
-do -- Mod:setConfig
+-- Sets the config of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfig({music_vol = 0.6, sfx_vol = 1.0, mute = false})
 end
 
 --@api-stub: Mod:getConfig
-do -- Mod:getConfig
+-- Returns the config of this mod.
+do
   local m = lurek.mods.newMod({id = "fan.audio"})
   m:setConfig({music_vol = 0.5})
   local cfg = m:getConfig() or {music_vol = 1.0}
@@ -203,17 +227,19 @@ do -- Mod:getConfig
 end
 
 --@api-stub: Mod:releaseRefs
-do -- Mod:releaseRefs
+-- Performs the release refs operation on this mod.
+do
   local m = lurek.mods.newMod({id = "scratch.tmp"})
   m:setHook("on_tick", function() end)
   m:setConfig({foo = 1})
   m:releaseRefs()
 end
 
--- â”€â”€ ModManager methods â”€â”€
+-- ModManager methods
 
 --@api-stub: ModManager:registerMod
-do -- ModManager:registerMod
+-- Performs the register mod operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   local m = lurek.mods.newMod({id = "core.hud", priority = 50})
   mgr:registerMod(m)
@@ -221,7 +247,8 @@ do -- ModManager:registerMod
 end
 
 --@api-stub: ModManager:unregisterMod
-do -- ModManager:unregisterMod
+-- Performs the unregister mod operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.skins"}))
   local removed = mgr:unregisterMod("fan.skins")
@@ -229,7 +256,8 @@ do -- ModManager:unregisterMod
 end
 
 --@api-stub: ModManager:hasMod
-do -- ModManager:hasMod
+-- Returns true if this mod manager has a mod.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.combat"}))
   if mgr:hasMod("core.combat") then
@@ -238,7 +266,8 @@ do -- ModManager:hasMod
 end
 
 --@api-stub: ModManager:getModCount
-do -- ModManager:getModCount
+-- Returns the number of mod items in this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "a"}))
   mgr:registerMod(lurek.mods.newMod({id = "b"}))
@@ -246,7 +275,8 @@ do -- ModManager:getModCount
 end
 
 --@api-stub: ModManager:getAllMods
-do -- ModManager:getAllMods
+-- Returns all mods values associated with this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.hud", name = "HUD"}))
   for _, info in ipairs(mgr:getAllMods()) do
@@ -255,7 +285,8 @@ do -- ModManager:getAllMods
 end
 
 --@api-stub: ModManager:getLoadOrder
-do -- ModManager:getLoadOrder
+-- Returns the load order of this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.base", priority = 100}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui",   priority = 10, dependencies = {"core.base"}}))
@@ -265,7 +296,8 @@ do -- ModManager:getLoadOrder
 end
 
 --@api-stub: ModManager:getModsByCapability
-do -- ModManager:getModsByCapability
+-- Returns the mods by capability of this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.audio", capabilities = {"audio"}}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui", capabilities = {"ui"}}))
@@ -275,7 +307,8 @@ do -- ModManager:getModsByCapability
 end
 
 --@api-stub: ModManager:validateDependencies
-do -- ModManager:validateDependencies
+-- Performs the validate dependencies operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.weapons", dependencies = {"core.combat"}}))
   for _, broken_id in ipairs(mgr:validateDependencies()) do
@@ -284,7 +317,8 @@ do -- ModManager:validateDependencies
 end
 
 --@api-stub: ModManager:hasCircularDependencies
-do -- ModManager:hasCircularDependencies
+-- Returns true if this mod manager has a circular dependencies.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "a", dependencies = {"b"}}))
   mgr:registerMod(lurek.mods.newMod({id = "b", dependencies = {"a"}}))
@@ -294,7 +328,8 @@ do -- ModManager:hasCircularDependencies
 end
 
 --@api-stub: ModManager:setLoadOrder
-do -- ModManager:setLoadOrder
+-- Sets the load order of this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.base"}))
   mgr:registerMod(lurek.mods.newMod({id = "fan.ui"}))
@@ -302,7 +337,8 @@ do -- ModManager:setLoadOrder
 end
 
 --@api-stub: ModManager:clearLoadOrder
-do -- ModManager:clearLoadOrder
+-- Clears all load order items from this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:setLoadOrder({"a", "b", "c"})
   mgr:clearLoadOrder()
@@ -310,14 +346,16 @@ do -- ModManager:clearLoadOrder
 end
 
 --@api-stub: ModManager:scanFolder
-do -- ModManager:scanFolder
+-- Performs the scan folder operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   local discovered = mgr:scanFolder("content/plugins")
   lurek.log.info("auto-registered " .. #discovered .. " mods", "mods")
 end
 
 --@api-stub: ModManager:getModPath
-do -- ModManager:getModPath
+-- Returns the mod path of this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "fan.skins"}))
   local path = mgr:getModPath("fan.skins")
@@ -325,7 +363,8 @@ do -- ModManager:getModPath
 end
 
 --@api-stub: ModManager:markForReload
-do -- ModManager:markForReload
+-- Performs the mark for reload operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "core.hud"}))
   local queued = mgr:markForReload("core.hud")
@@ -333,7 +372,8 @@ do -- ModManager:markForReload
 end
 
 --@api-stub: ModManager:getReloadQueue
-do -- ModManager:getReloadQueue
+-- Returns the reload queue of this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:registerMod(lurek.mods.newMod({id = "ui.theme"}))
   mgr:markForReload("ui.theme")
@@ -343,36 +383,41 @@ do -- ModManager:getReloadQueue
 end
 
 --@api-stub: ModManager:clearReloadQueue
-do -- ModManager:clearReloadQueue
+-- Clears all reload queue items from this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   mgr:markForReload("core.hud")
   mgr:clearReloadQueue()
   lurek.log.debug("queue size=" .. #mgr:getReloadQueue(), "mods")
 end
 --@api-stub: ModManager:processReloadQueue
-do -- ModManager:processReloadQueue
+-- Performs the process reload queue operation on this mod manager.
+do
   local mgr = lurek.mods.newModManager()
   ---@diagnostic disable-next-line: undefined-field
   local reloaded = mgr:processReloadQueue()
   lurek.log.debug("reloaded count=" .. #reloaded, "mods")
 end
--- â”€â”€ Content Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Content Registry
 
---@api-stub: lurek.mods.newRegistry -- Creates an empty content registry
-do -- lurek.mods.newRegistry
+--@api-stub: lurek.mods.newRegistry
+-- Creates an empty content registry
+do
   local reg = lurek.mods.newRegistry()
   lurek.log.debug("registry created", "mods")
 end
 
 --@api-stub: ContentRegistry:registerType
-do -- ContentRegistry:registerType
+-- Performs the register type operation on this content registry.
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("weapon")
   lurek.log.debug("registered type 'weapon'", "mods")
 end
 
 --@api-stub: ContentRegistry:register
-do -- ContentRegistry:register
+-- Performs the register operation on this content registry.
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("weapon")
   reg:register("weapon", "iron_sword", { name = "Iron Sword", damage = 12 })
@@ -380,7 +425,8 @@ do -- ContentRegistry:register
 end
 
 --@api-stub: ContentRegistry:get
-do -- ContentRegistry:get
+-- Returns the  of this content registry.
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("spell")
   reg:register("spell", "fireball", { cost = 10 })
@@ -389,7 +435,8 @@ do -- ContentRegistry:get
 end
 
 --@api-stub: ContentRegistry:getAll
-do -- ContentRegistry:getAll
+-- Returns all  values associated with this content registry.
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("item")
   reg:register("item", "potion", { name = "Potion" })
@@ -398,7 +445,8 @@ do -- ContentRegistry:getAll
 end
 
 --@api-stub: ContentRegistry:getTypes
-do -- ContentRegistry:getTypes
+-- Returns the types of this content registry.
+do
   local reg = lurek.mods.newRegistry()
   reg:registerType("creature")
   reg:registerType("item")
@@ -407,7 +455,8 @@ do -- ContentRegistry:getTypes
 end
 
 --@api-stub: Mod:setHook
-do -- Mod:setHook
+-- Sets the hook of this mod.
+do
   local mod = lurek.mods.newMod({id="example_mod", name="Example", version="1.0"})
   mod:setHook("on_save", function(ctx)
     lurek.log.info("mod saving extra data", "mods")
@@ -415,41 +464,31 @@ do -- Mod:setHook
   lurek.log.info("hook registered: " .. tostring(mod:hasHook("on_save")), "mods")
 end
 
--- =============================================================================
--- COVERAGE: 4 uncovered lurek.mods API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
-
-
 -- -----------------------------------------------------------------------------
 -- ModManager methods
 -- -----------------------------------------------------------------------------
-
--- =============================================================================
--- COVERAGE: 6 uncovered lurek.mods API item(s)
--- Generated by tools/audit/example_add_missing.py
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- =============================================================================
 
 -- -----------------------------------------------------------------------------
 -- LContentRegistry methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LContentRegistry:type -- Returns the Lua-visible type name for this content registry handle
-do -- LContentRegistry:type
+--@api-stub: LContentRegistry:type
+-- Returns the Lua-visible type name for this content registry handle
+do
   local content_registry_obj = lurek.mods.newRegistry()
   local t = content_registry_obj:type()
   lurek.log.info("LContentRegistry:type = " .. t, "mods")
 end
---@api-stub: LContentRegistry:typeOf -- Returns whether this content registry handle matches a supported type name
-do -- LContentRegistry:typeOf
+--@api-stub: LContentRegistry:typeOf
+-- Returns whether this content registry handle matches a supported type name
+do
   local content_registry_obj = lurek.mods.newRegistry()
   lurek.log.info("is LContentRegistry: " .. tostring(content_registry_obj:typeOf("LContentRegistry")), "mods")
   lurek.log.info("is wrong: " .. tostring(content_registry_obj:typeOf("Unknown")), "mods")
 end
---@api-stub: LMod:type -- Returns the Lua-visible type name for this mod handle
-do -- LMod:type
+--@api-stub: LMod:type
+-- Returns the Lua-visible type name for this mod handle
+do
   local ok ---@type boolean
   local mod_obj ---@type LMod?
   ok, mod_obj = pcall(lurek.mods.newMod, "testmod")
@@ -457,8 +496,9 @@ do -- LMod:type
   local t = mod_obj and mod_obj:type() or "LMod"
   lurek.log.info("LMod:type = " .. t, "mods")
 end
---@api-stub: LMod:typeOf -- Returns whether this mod handle matches a supported type name
-do -- LMod:typeOf
+--@api-stub: LMod:typeOf
+-- Returns whether this mod handle matches a supported type name
+do
   local ok2 ---@type boolean
   local mod_obj2 ---@type LMod?
   ok2, mod_obj2 = pcall(lurek.mods.newMod, "testmod")
@@ -466,14 +506,16 @@ do -- LMod:typeOf
   lurek.log.info("is LMod: " .. tostring(mod_obj2 and mod_obj2:typeOf("LMod") or false), "mods")
   lurek.log.info("is wrong: " .. tostring(mod_obj2 and mod_obj2:typeOf("Unknown") or false), "mods")
 end
---@api-stub: LModManager:type -- Returns the Lua-visible type name for this mod manager handle
-do -- LModManager:type
+--@api-stub: LModManager:type
+-- Returns the Lua-visible type name for this mod manager handle
+do
   local mod_manager_obj = lurek.mods.newModManager()
   local t = mod_manager_obj:type()
   lurek.log.info("LModManager:type = " .. t, "mods")
 end
---@api-stub: LModManager:typeOf -- Returns whether this mod manager handle matches a supported type name
-do -- LModManager:typeOf
+--@api-stub: LModManager:typeOf
+-- Returns whether this mod manager handle matches a supported type name
+do
   local mod_manager_obj = lurek.mods.newModManager()
   lurek.log.info("is LModManager: " .. tostring(mod_manager_obj:typeOf("LModManager")), "mods")
   lurek.log.info("is wrong: " .. tostring(mod_manager_obj:typeOf("Unknown")), "mods")

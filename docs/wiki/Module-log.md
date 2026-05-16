@@ -56,10 +56,54 @@ Level filtering is per-sink via `SinkLevel` — each sink independently chooses 
 Module example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.debug
+-- content/examples/log.lua
+-- lurek.log API examples.
+-- Run: cargo run -- content/examples/log.lua
+
+--@api-stub: lurek.log.debug
+-- Logs a debug message with an optional tag
+do
   local player = { x = 128.5, y = 64.0 }
   lurek.log.debug("player pos x=" .. player.x .. " y=" .. player.y, "movement")
 end
+
+--@api-stub: lurek.log.info
+-- Logs an info message with an optional tag
+do
+  local level_name = "forest_01"
+  local entity_count = 47
+  lurek.log.info("loaded level '" .. level_name .. "' with " .. entity_count .. " entities", "scene")
+end
+
+--@api-stub: lurek.log.warn
+-- Logs a warning message with an optional tag
+do
+  local hp = 5
+  if hp < 10 then
+    lurek.log.warn("player hp critical: " .. hp, "combat")
+  end
+end
+
+--@api-stub: lurek.log.error
+-- Logs an error message with an optional tag
+do
+  local asset_path = "sfx/missing_jump.ogg"
+  lurek.log.error("failed to load audio asset: " .. asset_path .. " (using silent fallback)", "audio")
+end
+
+--@api-stub: lurek.log.print
+-- Logs a message at a runtime-selected level with an optional tag
+do
+  local severity = "warn"
+  local fps = 28
+  lurek.log.print(severity, "frame rate dipped to " .. fps, "perf")
+end
+
+--@api-stub: lurek.log.setLevel
+-- Sets the global log level
+do
+  local in_release = true
+  lurek.log.setLevel(in_release and "info" or "debug")
 ```
 
 ## Key Types
@@ -108,7 +152,7 @@ Adds a memory, file, rotating, or callback sink from a config table.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.addSink
+do
   local mem_id = lurek.log.addSink({ type = "memory", capacity = 256, level = "warn" })
   local file_id = lurek.log.addSink({ type = "file", path = "save/session.log", level = "info" })
   lurek.log.warn("session started, mem sink=" .. mem_id .. " file sink=" .. file_id, "boot")
@@ -124,7 +168,7 @@ Removes all sinks and releases callback registry keys.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.clearSinks
+do
   lurek.log.addSink({ type = "memory", capacity = 32 })
   lurek.log.addSink({ type = "memory", capacity = 32, level = "error" })
   lurek.log.clearSinks()
@@ -146,7 +190,7 @@ Logs a debug message with an optional tag.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.debug
+do
   local player = { x = 128.5, y = 64.0 }
   lurek.log.debug("player pos x=" .. player.x .. " y=" .. player.y, "movement")
 end
@@ -166,7 +210,7 @@ Logs a debug message with structured fields.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.debug_fields
+do
   local dt = 0.01666
   lurek.log.debug_fields("frame", {
     dt_ms = dt * 1000,
@@ -190,7 +234,7 @@ Logs an error message with an optional tag.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.error
+do
   local asset_path = "sfx/missing_jump.ogg"
   lurek.log.error("failed to load audio asset: " .. asset_path .. " (using silent fallback)", "audio")
 end
@@ -210,7 +254,7 @@ Logs an error message with structured fields.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.error_fields
+do
   lurek.log.error_fields("save failed", {
     operation = "write",
     path = "save/slot1.dat",
@@ -233,7 +277,7 @@ Flushes a file-backed sink by id when it exists.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.flushFile
+do
   local file_id = lurek.log.addSink({ type = "file", path = "save/crash.log", level = "error" })
   lurek.log.error("uncaught script error: nil player.body", "panic")
   lurek.log.flushFile(file_id)
@@ -251,7 +295,7 @@ Returns the global log level string.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.getLevel
+do
   local current = lurek.log.getLevel()
   if current == "debug" or current == "trace" then
     local snapshot = "entities=124 frame=8421 mem=12MB"
@@ -274,7 +318,7 @@ Logs an info message with an optional tag.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.info
+do
   local level_name = "forest_01"
   local entity_count = 47
   lurek.log.info("loaded level '" .. level_name .. "' with " .. entity_count .. " entities", "scene")
@@ -295,7 +339,7 @@ Logs an info message with structured fields.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.info_fields
+do
   lurek.log.info_fields("checkpoint reached", {
     checkpoint = "forest_clearing",
     play_time_s = 1842,
@@ -315,7 +359,7 @@ Returns metadata for all registered sinks.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.listSinks
+do
   lurek.log.addSink({ type = "memory", capacity = 100, level = "info" })
   local sinks = lurek.log.listSinks()
   for _, s in ipairs(sinks) do
@@ -339,7 +383,7 @@ Logs a message at a runtime-selected level with an optional tag.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.print
+do
   local severity = "warn"
   local fps = 28
   lurek.log.print(severity, "frame rate dipped to " .. fps, "perf")
@@ -362,7 +406,7 @@ Reads entries from a memory sink and optionally drains them.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.readMemory
+do
   local mem_id = lurek.log.addSink({ type = "memory", capacity = 16, level = "warn" })
   lurek.log.warn("collision spike on enemy 7", "physics")
   local entries = lurek.log.readMemory(mem_id, true)
@@ -387,7 +431,7 @@ Removes a sink by id and releases any callback registry key.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.removeSink
+do
   local sink_id = lurek.log.addSink({ type = "memory", capacity = 64 })
   lurek.log.info("temporary diagnostics enabled", "diag")
   local removed = lurek.log.removeSink(sink_id)
@@ -408,7 +452,7 @@ Sets the global log level. This function is exposed to Lua scripts.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.setLevel
+do
   local in_release = true
   lurek.log.setLevel(in_release and "info" or "debug")
   lurek.log.debug("this is filtered out in release builds", "boot")
@@ -431,7 +475,7 @@ Logs a structured message at a runtime-selected level.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.struct
+do
   lurek.log.struct("info", "enemy spawned", {
     enemy_type = "goblin",
     x = 240,
@@ -455,7 +499,7 @@ Logs a warning message with an optional tag.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.warn
+do
   local hp = 5
   if hp < 10 then
     lurek.log.warn("player hp critical: " .. hp, "combat")
@@ -477,7 +521,7 @@ Logs a warning message with structured fields.
 Exact example from [log.lua](../blob/main/content/examples/log.lua):
 
 ```lua
-do -- lurek.log.warn_fields
+do
   local fps, target = 28, 60
   if fps < target * 0.8 then
     lurek.log.warn_fields("frame rate dropped", {

@@ -79,12 +79,54 @@ Engine-native province runtime for strategy-game maps providing topology managem
 Module example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+-- content/examples/province.lua
+-- lurek.province API examples.
+-- Run: cargo run -- content/examples/province.lua
+
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
+
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
+  local reg = lurek.province.get("world")
+  if reg then
+    lurek.log.info("got registry width=" .. reg:getWidth(), "province")
+  end
+end
+
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
+  local found = lurek.province.exists("world")
+  lurek.log.info("exists=" .. tostring(found), "province")
+end
+
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
+  pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
+  local removed = lurek.province.remove("temp_map")
+  lurek.log.info("removed=" .. tostring(removed), "province")
+end
+
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
+  lurek.province.setActive("world")
+  lurek.log.info("active registry set to world", "province")
+end
+
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
+  local active = lurek.province.getActive()
 ```
 
 ## Key Types
@@ -123,7 +165,7 @@ Checks whether a province registry with the given name exists.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.exists
+do
   local found = lurek.province.exists("world")
   lurek.log.info("exists=" .. tostring(found), "province")
 end
@@ -144,7 +186,7 @@ Retrieves an existing province registry by name. Returns nil if no registry with
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.get
+do
   local reg = lurek.province.get("world")
   if reg then
     lurek.log.info("got registry width=" .. reg:getWidth(), "province")
@@ -163,7 +205,7 @@ Returns the currently active province registry, or nil if none is set.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.getActive
+do
   local active = lurek.province.getActive()
   if active then
     lurek.log.info("active=" .. active:getName(), "province")
@@ -187,7 +229,7 @@ Creates a new province registry by loading a color-coded PNG where each unique c
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
@@ -210,7 +252,7 @@ Removes a province registry by name and clears the active registry if it was the
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.remove
+do
   pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
   local removed = lurek.province.remove("temp_map")
   lurek.log.info("removed=" .. tostring(removed), "province")
@@ -269,7 +311,7 @@ Sets the named registry as the active province registry. Returns false if no reg
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.setActive
+do
   lurek.province.setActive("world")
   lurek.log.info("active registry set to world", "province")
 end
@@ -295,7 +337,7 @@ Computes new camera position after zooming centered on an anchor point. Keeps th
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.zoomCameraAt
+do
   local cam_x, cam_y = 0.0, 0.0
   local new_x, new_y = lurek.province.zoomCameraAt(320.0, 240.0, cam_x, cam_y, 1.0, 1.2)
   lurek.log.debug("zoom anchor camera: " .. tostring(new_x) .. "," .. tostring(new_y), "province")
@@ -314,7 +356,7 @@ Handle to a named province registry, exposing spatial queries, style mutations, 
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.get
+do
   local reg = lurek.province.get("world")
   if reg then
     lurek.log.info("got registry width=" .. reg:getWidth(), "province")
@@ -333,7 +375,7 @@ Returns all adjacency pairs in the registry. Each entry has `province_a` and `pr
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:adjacencies
+do
   local reg = lurek.province.get("world")
   if reg then
     local adj = reg:adjacencies()
@@ -353,7 +395,7 @@ Returns all border line segments between adjacent provinces. Each segment is a l
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:borderSegments
+do
   local reg = lurek.province.get("world")
   if reg then
     local segs = reg:borderSegments()
@@ -379,12 +421,54 @@ Computes camera position and zoom so the entire province map fits within the giv
 Module-level example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+-- content/examples/province.lua
+-- lurek.province API examples.
+-- Run: cargo run -- content/examples/province.lua
+
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
+
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
+  local reg = lurek.province.get("world")
+  if reg then
+    lurek.log.info("got registry width=" .. reg:getWidth(), "province")
+  end
+end
+
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
+  local found = lurek.province.exists("world")
+  lurek.log.info("exists=" .. tostring(found), "province")
+end
+
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
+  pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
+  local removed = lurek.province.remove("temp_map")
+  lurek.log.info("removed=" .. tostring(removed), "province")
+end
+
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
+  lurek.province.setActive("world")
+  lurek.log.info("active registry set to world", "province")
+end
+
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
+  local active = lurek.province.getActive()
 ```
 
 ### `LProvinceRegistry:getAt(x: integer, y: integer) -> number`
@@ -403,7 +487,7 @@ Returns the province ID at the given grid cell coordinates. Returns 0 if the cel
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getAt
+do
   local reg = lurek.province.get("world")
   if reg then
     local pid = reg:getAt(0.0, 0.0)
@@ -428,7 +512,7 @@ Returns the border classification string between two adjacent provinces (e.g. "r
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getBorderClass
+do
   local reg = lurek.province.get("world")
   if reg then
     local cls = reg:getBorderClass(1, 2)
@@ -452,7 +536,7 @@ Returns all province changes that occurred after the given revision. Each entry 
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getChangesSince
+do
   local reg = lurek.province.get("world")
   if reg then
     local changes = reg:getChangesSince(0)
@@ -472,7 +556,7 @@ Returns the height of the province grid in cells (pixels of the source PNG).
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getHeight
+do
   local reg = lurek.province.get("world")
   if reg then
     local h = reg:getHeight()
@@ -492,7 +576,7 @@ Returns the string name used to identify this registry in the province system.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getName
+do
   local reg = lurek.province.get("world")
   if reg then
     local name = reg:getName()
@@ -516,7 +600,7 @@ Returns a table of province IDs that share a border with the given province.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getNeighbors
+do
   local reg = lurek.province.get("world")
   if reg then
     local neighbors = reg:getNeighbors(1)
@@ -540,7 +624,7 @@ Returns a snapshot table describing a single province: its ID, revision, style (
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getProvince
+do
   local reg = lurek.province.get("world")
   if reg then
     local snap = reg:getProvince(1)
@@ -560,7 +644,7 @@ Returns the current change revision counter. Incremented on every mutation (colo
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getRevision
+do
   local reg = lurek.province.get("world")
   if reg then
     local rev = reg:getRevision()
@@ -580,7 +664,7 @@ Returns the width of the province grid in cells (pixels of the source PNG).
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:getWidth
+do
   local reg = lurek.province.get("world")
   if reg then
     local w = reg:getWidth()
@@ -604,12 +688,54 @@ Bulk-imports province metadata (colors, capitals, labels, terrain) from external
 Module-level example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+-- content/examples/province.lua
+-- lurek.province API examples.
+-- Run: cargo run -- content/examples/province.lua
+
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
+
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
+  local reg = lurek.province.get("world")
+  if reg then
+    lurek.log.info("got registry width=" .. reg:getWidth(), "province")
+  end
+end
+
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
+  local found = lurek.province.exists("world")
+  lurek.log.info("exists=" .. tostring(found), "province")
+end
+
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
+  pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
+  local removed = lurek.province.remove("temp_map")
+  lurek.log.info("removed=" .. tostring(removed), "province")
+end
+
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
+  lurek.province.setActive("world")
+  lurek.log.info("active registry set to world", "province")
+end
+
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
+  local active = lurek.province.getActive()
 ```
 
 ### `LProvinceRegistry:provinceCount() -> number`
@@ -623,7 +749,7 @@ Returns the total number of distinct provinces in this registry (excluding ID 0)
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:provinceCount
+do
   local reg = lurek.province.get("world")
   if reg then
     local count = reg:provinceCount()
@@ -643,7 +769,7 @@ Returns a sequential table of all province IDs in this registry.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:provinceIds
+do
   local reg = lurek.province.get("world")
   if reg then
     local ids = reg:provinceIds()
@@ -663,7 +789,7 @@ Returns the raw span data for all provinces. Each span is a horizontal run of ce
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:provinceSpans
+do
   local reg = lurek.province.get("world")
   if reg then
     local spans = reg:provinceSpans()
@@ -685,7 +811,7 @@ Renders the province map to the screen using the current camera and style settin
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:render
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok, err = pcall(function() reg:render() end)
@@ -714,12 +840,54 @@ Converts screen-space pixel coordinates to map-space floating-point coordinates 
 Module-level example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+-- content/examples/province.lua
+-- lurek.province API examples.
+-- Run: cargo run -- content/examples/province.lua
+
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
+
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
+  local reg = lurek.province.get("world")
+  if reg then
+    lurek.log.info("got registry width=" .. reg:getWidth(), "province")
+  end
+end
+
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
+  local found = lurek.province.exists("world")
+  lurek.log.info("exists=" .. tostring(found), "province")
+end
+
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
+  pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
+  local removed = lurek.province.remove("temp_map")
+  lurek.log.info("removed=" .. tostring(removed), "province")
+end
+
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
+  lurek.province.setActive("world")
+  lurek.log.info("active registry set to world", "province")
+end
+
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
+  local active = lurek.province.getActive()
 ```
 
 ### `LProvinceRegistry:screenToProvince(screen_x: number, screen_y: number, cam_x: number, cam_y: number, zoom: number, [pixel_size]: number) -> number`
@@ -742,12 +910,54 @@ Converts screen-space coordinates directly to a province ID. Returns nil if the 
 Module-level example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- lurek.province.newFromPng
+-- content/examples/province.lua
+-- lurek.province API examples.
+-- Run: cargo run -- content/examples/province.lua
+
+--@api-stub: lurek.province.newFromPng
+-- Creates a new province registry by loading a color-coded PNG where each unique color represents a distinct province
+do
   local ok, reg = pcall(lurek.province.newFromPng, "world", "content/games/strategy/eu2/map.png")
   if ok and reg then
     lurek.log.info("province registry created: " .. reg:getName(), "province")
   end
 end
+
+--@api-stub: lurek.province.get
+-- Retrieves an existing province registry by name
+do
+  local reg = lurek.province.get("world")
+  if reg then
+    lurek.log.info("got registry width=" .. reg:getWidth(), "province")
+  end
+end
+
+--@api-stub: lurek.province.exists
+-- Checks whether a province registry with the given name exists
+do
+  local found = lurek.province.exists("world")
+  lurek.log.info("exists=" .. tostring(found), "province")
+end
+
+--@api-stub: lurek.province.remove
+-- Removes a province registry by name and clears the active registry if it was the one removed
+do
+  pcall(lurek.province.newFromPng, "temp_map", "content/games/strategy/eu2/map.png")
+  local removed = lurek.province.remove("temp_map")
+  lurek.log.info("removed=" .. tostring(removed), "province")
+end
+
+--@api-stub: lurek.province.setActive
+-- Sets the named registry as the active province registry
+do
+  lurek.province.setActive("world")
+  lurek.log.info("active registry set to world", "province")
+end
+
+--@api-stub: lurek.province.getActive
+-- Returns the currently active province registry, or nil if none is set
+do
+  local active = lurek.province.getActive()
 ```
 
 ### `LProvinceRegistry:setAttr(id: integer, key: string, value: string)`
@@ -765,7 +975,7 @@ Sets a custom string attribute on a province. Attributes are returned in the `at
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setAttr
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setAttr(1, "player_score", "42")
@@ -789,7 +999,7 @@ Sets the border classification between two adjacent provinces. Used to control b
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setBorderClass
+do
   local reg = lurek.province.get("world")
   if reg then
     reg:setBorderClass(1, 2, "coast")
@@ -812,7 +1022,7 @@ Sets the border rendering style index for a province. Controls line thickness, c
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setBorderStyle
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setBorderStyle(1, 1)
@@ -838,7 +1048,7 @@ Sets the capital marker position for a province. The capital is drawn as a small
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setCapital
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setCapital(1, 50.0, 30.0)
@@ -863,7 +1073,7 @@ Sets the fog-of-war state for a province. Typically 0 = revealed, 1 = fogged, 2 
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setFogState
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setFogState(1, 0)
@@ -889,7 +1099,7 @@ Sets the label baseline for a province. The label text is rendered along the lin
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setLabelLine
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setLabelLine(1, 10.0, 20.0, 80.0, 20.0)
@@ -914,7 +1124,7 @@ Sets the display name text for a province. Rendered on the map when `draw_labels
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setLabelText
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setLabelText(1, "Heartland")
@@ -940,7 +1150,7 @@ Sets the political map color for a province. Used in political map mode renderin
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setPoliticalColor
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setPoliticalColor(1, 1.0, 0.8, 0.2, 1.0)
@@ -963,7 +1173,7 @@ Sets the terrain type index for a province. Terrain type controls which fill col
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setTerrainType
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setTerrainType(1, 2)
@@ -986,7 +1196,7 @@ Sets the visibility state for a province. Used for strategic visibility layers s
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:setVisibilityState
+do
   local reg = lurek.province.get("world")
   if reg then
     local ok = reg:setVisibilityState(1, 1)
@@ -1006,7 +1216,7 @@ Returns the type name string for this userdata object.
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:type
+do
   local reg = lurek.province.get("world")
   if reg then
     local t = reg:type()
@@ -1030,7 +1240,7 @@ Checks whether this object matches the given type name. Returns true for "LProvi
 Exact example from [province.lua](../blob/main/content/examples/province.lua):
 
 ```lua
-do -- LProvinceRegistry:typeOf
+do
   local reg = lurek.province.get("world")
   if reg then
     local is_reg = reg:typeOf("LProvinceRegistry")

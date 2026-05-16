@@ -474,10 +474,15 @@ def build_example_indexes(examples: list[ExampleInfo]) -> tuple[dict[str, Exampl
             if stub_match:
                 pending_targets = [stub_match.group(1)]
                 continue
+            # Support both old format (do -- lurek.x.y) and new format (plain do after --@api-stub:)
             block_match = re.match(r"\s*do\s+--\s*(.+?)\s*$", line)
-            if block_match:
+            plain_do = re.match(r"\s*do\s*$", line) and bool(pending_targets)
+            if block_match or plain_do:
                 block = extract_lua_block(lines, index)
-                targets = pending_targets + [block_match.group(1)]
+                if block_match:
+                    targets = pending_targets + [block_match.group(1)]
+                else:
+                    targets = pending_targets
                 pending_targets = []
                 for target in targets:
                     for key in example_key_variants(target):

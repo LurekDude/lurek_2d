@@ -2,8 +2,9 @@
 -- lurek.graph API examples.
 -- Run: cargo run -- content/examples/graph.lua
 
---@api-stub: lurek.graph.newGraph -- Creates an empty logistics graph with no nodes, edges, items, or callbacks
-do -- lurek.graph.newGraph
+--@api-stub: lurek.graph.newGraph
+-- Creates an empty logistics graph with no nodes, edges, items, or callbacks
+do
   local belts = lurek.graph.newGraph()
   local depot = belts:addNode("depot", 32)
   local sink  = belts:addNode("sink", -1)
@@ -11,10 +12,11 @@ do -- lurek.graph.newGraph
   lurek.log.info("belt graph: " .. tostring(belts), "factory")
 end
 
--- â”€â”€ GraphItem methods â”€â”€
+-- GraphItem methods
 
 --@api-stub: GraphItem:getType
-do -- GraphItem:getType
+-- Returns the type of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -23,7 +25,8 @@ do -- GraphItem:getType
 end
 
 --@api-stub: GraphItem:setType
-do -- GraphItem:setType
+-- Sets the type of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -33,7 +36,8 @@ do -- GraphItem:setType
 end
 
 --@api-stub: GraphItem:getDecayTime
-do -- GraphItem:getDecayTime
+-- Returns the decay time of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -44,7 +48,8 @@ do -- GraphItem:getDecayTime
 end
 
 --@api-stub: GraphItem:setDecayTime
-do -- GraphItem:setDecayTime
+-- Sets the decay time of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -54,7 +59,8 @@ do -- GraphItem:setDecayTime
 end
 
 --@api-stub: GraphItem:getRemainingLife
-do -- GraphItem:getRemainingLife
+-- Returns the remaining life of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -65,7 +71,8 @@ do -- GraphItem:getRemainingLife
 end
 
 --@api-stub: GraphItem:isAlive
-do -- GraphItem:isAlive
+-- Returns true if this graph item alive.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -76,7 +83,8 @@ do -- GraphItem:isAlive
 end
 
 --@api-stub: GraphItem:kill
-do -- GraphItem:kill
+-- Performs the kill operation on this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -86,7 +94,8 @@ do -- GraphItem:kill
 end
 
 --@api-stub: GraphItem:getPriority
-do -- GraphItem:getPriority
+-- Returns the priority of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -96,7 +105,8 @@ do -- GraphItem:getPriority
 end
 
 --@api-stub: GraphItem:setPriority
-do -- GraphItem:setPriority
+-- Sets the priority of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -107,7 +117,8 @@ do -- GraphItem:setPriority
 end
 
 --@api-stub: GraphItem:getPosition
-do -- GraphItem:getPosition
+-- Returns the position of this graph item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -121,7 +132,8 @@ do -- GraphItem:getPosition
 end
 
 --@api-stub: GraphItem:type
-do -- GraphItem:type
+-- Returns the Lua-visible type name string for this graph item handle.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -132,7 +144,8 @@ do -- GraphItem:type
 end
 
 --@api-stub: GraphItem:typeOf
-do -- GraphItem:typeOf
+-- Returns true if this graph item handle matches the given type name string.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 16)
   local ore = g:createItem("ore", 30.0)
@@ -142,10 +155,11 @@ do -- GraphItem:typeOf
   end
 end
 
--- â”€â”€ Edge methods â”€â”€
+-- Edge methods
 
 --@api-stub: Edge:getType
-do -- Edge:getType
+-- Returns the type of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -156,7 +170,8 @@ do -- Edge:getType
 end
 
 --@api-stub: Edge:setType
-do -- Edge:setType
+-- Sets the type of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -166,7 +181,8 @@ do -- Edge:setType
 end
 
 --@api-stub: Edge:getFrom
-do -- Edge:getFrom
+-- Returns the from of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -176,7 +192,8 @@ do -- Edge:getFrom
 end
 
 --@api-stub: Edge:getTo
-do -- Edge:getTo
+-- Returns the to of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -186,7 +203,8 @@ do -- Edge:getTo
 end
 
 --@api-stub: Edge:getCapacity
-do -- Edge:getCapacity
+-- Returns the capacity of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -197,7 +215,8 @@ do -- Edge:getCapacity
 end
 
 --@api-stub: Edge:setCapacity
-do -- Edge:setCapacity
+-- Sets the capacity of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -206,7 +225,8 @@ do -- Edge:setCapacity
 end
 
 --@api-stub: Edge:getThroughput
-do -- Edge:getThroughput
+-- Returns the throughput of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -217,7 +237,8 @@ do -- Edge:getThroughput
 end
 
 --@api-stub: Edge:setThroughput
-do -- Edge:setThroughput
+-- Sets the throughput of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -226,7 +247,8 @@ do -- Edge:setThroughput
 end
 
 --@api-stub: Edge:getTravelTime
-do -- Edge:getTravelTime
+-- Returns the travel time of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -237,7 +259,8 @@ do -- Edge:getTravelTime
 end
 
 --@api-stub: Edge:setTravelTime
-do -- Edge:setTravelTime
+-- Sets the travel time of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -246,7 +269,8 @@ do -- Edge:setTravelTime
 end
 
 --@api-stub: Edge:getWeight
-do -- Edge:getWeight
+-- Returns the weight of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -256,7 +280,8 @@ do -- Edge:getWeight
 end
 
 --@api-stub: Edge:setWeight
-do -- Edge:setWeight
+-- Sets the weight of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -265,7 +290,8 @@ do -- Edge:setWeight
 end
 
 --@api-stub: Edge:getSpeedModifier
-do -- Edge:getSpeedModifier
+-- Returns the speed modifier of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -275,7 +301,8 @@ do -- Edge:getSpeedModifier
 end
 
 --@api-stub: Edge:setSpeedModifier
-do -- Edge:setSpeedModifier
+-- Sets the speed modifier of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -284,7 +311,8 @@ do -- Edge:setSpeedModifier
 end
 
 --@api-stub: Edge:getCooldown
-do -- Edge:getCooldown
+-- Returns the cooldown of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -294,7 +322,8 @@ do -- Edge:getCooldown
 end
 
 --@api-stub: Edge:setCooldown
-do -- Edge:setCooldown
+-- Sets the cooldown of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -303,7 +332,8 @@ do -- Edge:setCooldown
 end
 
 --@api-stub: Edge:isOnCooldown
-do -- Edge:isOnCooldown
+-- Returns true if this edge on cooldown.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -315,7 +345,8 @@ do -- Edge:isOnCooldown
 end
 
 --@api-stub: Edge:isBidirectional
-do -- Edge:isBidirectional
+-- Returns true if this edge bidirectional.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -327,7 +358,8 @@ do -- Edge:isBidirectional
 end
 
 --@api-stub: Edge:setBidirectional
-do -- Edge:setBidirectional
+-- Sets the bidirectional of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -336,7 +368,8 @@ do -- Edge:setBidirectional
 end
 
 --@api-stub: Edge:isActive
-do -- Edge:isActive
+-- Returns true if this edge is currently active.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -347,7 +380,8 @@ do -- Edge:isActive
 end
 
 --@api-stub: Edge:setActive
-do -- Edge:setActive
+-- Sets the active of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -356,7 +390,8 @@ do -- Edge:setActive
 end
 
 --@api-stub: Edge:getItemsInTransit
-do -- Edge:getItemsInTransit
+-- Returns the items in transit of this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -367,7 +402,8 @@ do -- Edge:getItemsInTransit
 end
 
 --@api-stub: Edge:addAllowedType
-do -- Edge:addAllowedType
+-- Adds a allowed type to this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -378,7 +414,8 @@ do -- Edge:addAllowedType
 end
 
 --@api-stub: Edge:removeAllowedType
-do -- Edge:removeAllowedType
+-- Removes a allowed type from this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -389,7 +426,8 @@ do -- Edge:removeAllowedType
 end
 
 --@api-stub: Edge:clearAllowedTypes
-do -- Edge:clearAllowedTypes
+-- Clears all allowed types items from this edge.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -399,7 +437,8 @@ do -- Edge:clearAllowedTypes
 end
 
 --@api-stub: Edge:isItemTypeAllowed
-do -- Edge:isItemTypeAllowed
+-- Returns true if this edge item type allowed.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -411,7 +450,8 @@ do -- Edge:isItemTypeAllowed
 end
 
 --@api-stub: Edge:type
-do -- Edge:type
+-- Returns the Lua-visible type name string for this edge handle.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -422,7 +462,8 @@ do -- Edge:type
 end
 
 --@api-stub: Edge:typeOf
-do -- Edge:typeOf
+-- Returns true if this edge handle matches the given type name string.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("source")
   local b = g:addNode("sink")
@@ -432,10 +473,11 @@ do -- Edge:typeOf
   end
 end
 
--- â”€â”€ Node methods â”€â”€
+-- Node methods
 
 --@api-stub: Node:getType
-do -- Node:getType
+-- Returns the type of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   if depot:getType() == "depot" then
@@ -444,14 +486,16 @@ do -- Node:getType
 end
 
 --@api-stub: Node:setType
-do -- Node:setType
+-- Sets the type of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setType("automated_depot")
 end
 
 --@api-stub: Node:getCapacity
-do -- Node:getCapacity
+-- Returns the capacity of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   local cap = depot:getCapacity()
@@ -459,14 +503,16 @@ do -- Node:getCapacity
 end
 
 --@api-stub: Node:setCapacity
-do -- Node:setCapacity
+-- Sets the capacity of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setCapacity(32)  -- silo upgraded to mk-II
 end
 
 --@api-stub: Node:getItemCount
-do -- Node:getItemCount
+-- Returns the number of item items in this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   local item = g:createItem("ore", -1)
@@ -475,7 +521,8 @@ do -- Node:getItemCount
 end
 
 --@api-stub: Node:isFull
-do -- Node:isFull
+-- Returns true if this node full.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setCapacity(1)
@@ -484,7 +531,8 @@ do -- Node:isFull
 end
 
 --@api-stub: Node:isActive
-do -- Node:isActive
+-- Returns true if this node is currently active.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   if depot:isActive() then
@@ -493,14 +541,16 @@ do -- Node:isActive
 end
 
 --@api-stub: Node:setActive
-do -- Node:setActive
+-- Sets the active of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setActive(false)  -- mothballed for the level
 end
 
 --@api-stub: Node:getOverflowPolicy
-do -- Node:getOverflowPolicy
+-- Returns the overflow policy of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setOverflowPolicy("reject")
@@ -508,14 +558,16 @@ do -- Node:getOverflowPolicy
 end
 
 --@api-stub: Node:setOverflowPolicy
-do -- Node:setOverflowPolicy
+-- Sets the overflow policy of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setOverflowPolicy("queue")  -- buffer excess items rather than rejecting them
 end
 
 --@api-stub: Node:getFlowMode
-do -- Node:getFlowMode
+-- Returns the flow mode of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setFlowMode("push")
@@ -523,14 +575,16 @@ do -- Node:getFlowMode
 end
 
 --@api-stub: Node:setFlowMode
-do -- Node:setFlowMode
+-- Sets the flow mode of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setFlowMode("both")
 end
 
 --@api-stub: Node:getPushRate
-do -- Node:getPushRate
+-- Returns the push rate of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPushRate(2.5)
@@ -538,14 +592,16 @@ do -- Node:getPushRate
 end
 
 --@api-stub: Node:setPushRate
-do -- Node:setPushRate
+-- Sets the push rate of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPushRate(5.0)  -- tier-3 pump
 end
 
 --@api-stub: Node:getPullRate
-do -- Node:getPullRate
+-- Returns the pull rate of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPullRate(1.5)
@@ -553,14 +609,16 @@ do -- Node:getPullRate
 end
 
 --@api-stub: Node:setPullRate
-do -- Node:setPullRate
+-- Sets the pull rate of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPullRate(3.0)  -- consumer accepts up to 3 items/s
 end
 
 --@api-stub: Node:getPushFilter
-do -- Node:getPushFilter
+-- Returns the push filter of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPushFilter("ore")
@@ -569,14 +627,16 @@ do -- Node:getPushFilter
 end
 
 --@api-stub: Node:setPushFilter
-do -- Node:setPushFilter
+-- Sets the push filter of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPushFilter("iron_ingot")  -- splitter routes ingots only
 end
 
 --@api-stub: Node:getPullFilter
-do -- Node:getPullFilter
+-- Returns the pull filter of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPullFilter("coal")
@@ -585,14 +645,16 @@ do -- Node:getPullFilter
 end
 
 --@api-stub: Node:setPullFilter
-do -- Node:setPullFilter
+-- Sets the pull filter of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setPullFilter("coal")
 end
 
 --@api-stub: Node:getProcessTime
-do -- Node:getProcessTime
+-- Returns the process time of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setProcessTime(2.0)
@@ -600,14 +662,16 @@ do -- Node:getProcessTime
 end
 
 --@api-stub: Node:setProcessTime
-do -- Node:setProcessTime
+-- Sets the process time of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setProcessTime(1.5)  -- furnace bakes 1.5s per item
 end
 
 --@api-stub: Node:isQueueEnabled
-do -- Node:isQueueEnabled
+-- Returns true if this node is currently enabled.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -617,14 +681,16 @@ do -- Node:isQueueEnabled
 end
 
 --@api-stub: Node:setQueueEnabled
-do -- Node:setQueueEnabled
+-- Sets whether this node is enabled and accepts input.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
 end
 
 --@api-stub: Node:getQueueCapacity
-do -- Node:getQueueCapacity
+-- Returns the queue capacity of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -633,7 +699,8 @@ do -- Node:getQueueCapacity
 end
 
 --@api-stub: Node:setQueueCapacity
-do -- Node:setQueueCapacity
+-- Sets the queue capacity of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -641,7 +708,8 @@ do -- Node:setQueueCapacity
 end
 
 --@api-stub: Node:getQueueSize
-do -- Node:getQueueSize
+-- Returns the queue size of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -650,7 +718,8 @@ do -- Node:getQueueSize
 end
 
 --@api-stub: Node:getItems
-do -- Node:getItems
+-- Returns the items of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   g:addItem(g:createItem("ore", -1), depot)
@@ -659,7 +728,8 @@ do -- Node:getItems
 end
 
 --@api-stub: Node:getEdges
-do -- Node:getEdges
+-- Returns the edges of this node.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("hub")
   local b = g:addNode("leaf")
@@ -668,7 +738,8 @@ do -- Node:getEdges
 end
 
 --@api-stub: Node:clearConversion
-do -- Node:clearConversion
+-- Clears all conversion items from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setConversion("ore", "iron_ingot", 2, 1)
@@ -676,7 +747,8 @@ do -- Node:clearConversion
 end
 
 --@api-stub: Node:clearAllConversions
-do -- Node:clearAllConversions
+-- Clears all all conversions items from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setConversion("ore", "iron_ingot", 2, 1)
@@ -685,7 +757,8 @@ do -- Node:clearAllConversions
 end
 
 --@api-stub: Node:addTag
-do -- Node:addTag
+-- Adds a tag to this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addTag("fuel")
@@ -693,7 +766,8 @@ do -- Node:addTag
 end
 
 --@api-stub: Node:removeTag
-do -- Node:removeTag
+-- Removes a tag from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addTag("sale")
@@ -701,7 +775,8 @@ do -- Node:removeTag
 end
 
 --@api-stub: Node:hasTag
-do -- Node:hasTag
+-- Returns true if this node has a tag.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addTag("safe_zone")
@@ -711,7 +786,8 @@ do -- Node:hasTag
 end
 
 --@api-stub: Node:clearTags
-do -- Node:clearTags
+-- Clears all tags items from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addTag("flagged")
@@ -720,7 +796,8 @@ do -- Node:clearTags
 end
 
 --@api-stub: Node:getTags
-do -- Node:getTags
+-- Returns the tags of this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addTag("fuel")
@@ -729,7 +806,8 @@ do -- Node:getTags
 end
 
 --@api-stub: Node:removeSupply
-do -- Node:removeSupply
+-- Removes a supply from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addSupply("ore", 100)
@@ -737,7 +815,8 @@ do -- Node:removeSupply
 end
 
 --@api-stub: Node:clearSupplies
-do -- Node:clearSupplies
+-- Clears all supplies items from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addSupply("ore", 100)
@@ -746,7 +825,8 @@ do -- Node:clearSupplies
 end
 
 --@api-stub: Node:removeDemand
-do -- Node:removeDemand
+-- Removes a demand from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addDemand("coal", 10, 1)
@@ -754,7 +834,8 @@ do -- Node:removeDemand
 end
 
 --@api-stub: Node:clearDemands
-do -- Node:clearDemands
+-- Clears all demands items from this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:addDemand("ore", 5, 1)
@@ -763,7 +844,8 @@ do -- Node:clearDemands
 end
 
 --@api-stub: Node:enqueue
-do -- Node:enqueue
+-- Performs the enqueue operation on this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -772,7 +854,8 @@ do -- Node:enqueue
 end
 
 --@api-stub: Node:dequeue
-do -- Node:dequeue
+-- Performs the dequeue operation on this node.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   depot:setQueueEnabled(true)
@@ -782,7 +865,8 @@ do -- Node:dequeue
 end
 
 --@api-stub: Node:type
-do -- Node:type
+-- Returns the Lua-visible type name string for this node handle.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   if depot:type() == "GraphNode" then
@@ -791,7 +875,8 @@ do -- Node:type
 end
 
 --@api-stub: Node:typeOf
-do -- Node:typeOf
+-- Returns true if this node handle matches the given type name string.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot", 16)
   if depot:typeOf("GraphNode") then
@@ -799,10 +884,11 @@ do -- Node:typeOf
   end
 end
 
--- â”€â”€ Graph methods â”€â”€
+-- Graph methods
 
 --@api-stub: Graph:removeNode
-do -- Graph:removeNode
+-- Removes a node from this graph.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("temp")
   g:removeNode(n)
@@ -810,7 +896,8 @@ do -- Graph:removeNode
 end
 
 --@api-stub: Graph:hasNode
-do -- Graph:hasNode
+-- Returns true if this graph has a node.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("checkpoint")
   if g:hasNode(n) then
@@ -819,7 +906,8 @@ do -- Graph:hasNode
 end
 
 --@api-stub: Graph:getNodes
-do -- Graph:getNodes
+-- Returns the nodes of this graph.
+do
   local g = lurek.graph.newGraph()
   g:addNode("start")
   g:addNode("end")
@@ -827,7 +915,8 @@ do -- Graph:getNodes
 end
 
 --@api-stub: Graph:getNodeCount
-do -- Graph:getNodeCount
+-- Returns the number of node items in this graph.
+do
   local g = lurek.graph.newGraph()
   g:addNode("start")
   g:addNode("end")
@@ -835,7 +924,8 @@ do -- Graph:getNodeCount
 end
 
 --@api-stub: Graph:removeEdge
-do -- Graph:removeEdge
+-- Removes a edge from this graph.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   local e = g:addEdge(a, b)
@@ -843,7 +933,8 @@ do -- Graph:removeEdge
 end
 
 --@api-stub: Graph:hasEdge
-do -- Graph:hasEdge
+-- Returns true if this graph has a edge.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   local e = g:addEdge(a, b)
@@ -853,7 +944,8 @@ do -- Graph:hasEdge
 end
 
 --@api-stub: Graph:getEdges
-do -- Graph:getEdges
+-- Returns the edges of this graph.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   g:addEdge(a, b)
@@ -861,14 +953,16 @@ do -- Graph:getEdges
 end
 
 --@api-stub: Graph:getEdgeCount
-do -- Graph:getEdgeCount
+-- Returns the number of edge items in this graph.
+do
   local g = lurek.graph.newGraph()
   g:addEdge(g:addNode("a"), g:addNode("b"))
   lurek.log.info("graph has " .. g:getEdgeCount() .. " edges", "factory")
 end
 
 --@api-stub: Graph:removeItem
-do -- Graph:removeItem
+-- Removes a item from this graph.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store", 8)
   local item = g:createItem("ore", -1)
@@ -877,7 +971,8 @@ do -- Graph:removeItem
 end
 
 --@api-stub: Graph:hasItem
-do -- Graph:hasItem
+-- Returns true if this graph has a item.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store")
   local item = g:createItem("ore", -1)
@@ -886,7 +981,8 @@ do -- Graph:hasItem
 end
 
 --@api-stub: Graph:getItems
-do -- Graph:getItems
+-- Returns the items of this graph.
+do
   local g = lurek.graph.newGraph()
   local store = g:addNode("store")
   g:addItem(g:createItem("ore", -1), store)
@@ -895,14 +991,16 @@ do -- Graph:getItems
 end
 
 --@api-stub: Graph:getItemCount
-do -- Graph:getItemCount
+-- Returns the number of item items in this graph.
+do
   local g = lurek.graph.newGraph()
   g:addItem(g:createItem("ore", -1), g:addNode("store"))
   lurek.log.info("items in flight: " .. g:getItemCount(), "factory")
 end
 
 --@api-stub: Graph:update
-do -- Graph:update
+-- Advances this graph by the given delta time.
+do
   local g = lurek.graph.newGraph()
   g:addNode("hub")
   function lurek.process(dt)
@@ -911,14 +1009,16 @@ do -- Graph:update
 end
 
 --@api-stub: Graph:step
-do -- Graph:step
+-- Performs the step operation on this graph.
+do
   local g = lurek.graph.newGraph()
   g:addNode("hub")
   g:step()  -- one deterministic tick
 end
 
 --@api-stub: Graph:tickParallel
-do -- Graph:tickParallel
+-- Performs the tick parallel operation on this graph.
+do
   local g = lurek.graph.newGraph()
   function lurek.process(dt)
     g:tickParallel(dt)
@@ -926,7 +1026,8 @@ do -- Graph:tickParallel
 end
 
 --@api-stub: Graph:getNeighbors
-do -- Graph:getNeighbors
+-- Returns the neighbors of this graph.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("a")
   g:addEdge(a, g:addNode("b"))
@@ -935,7 +1036,8 @@ do -- Graph:getNeighbors
 end
 
 --@api-stub: Graph:getComponents
-do -- Graph:getComponents
+-- Returns the components of this graph.
+do
   local g = lurek.graph.newGraph()
   g:addNode("island_a")
   g:addNode("island_b")
@@ -943,7 +1045,8 @@ do -- Graph:getComponents
 end
 
 --@api-stub: Graph:subgraph
-do -- Graph:subgraph
+-- Performs the subgraph operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("a")
   local b = g:addNode("b")
@@ -955,7 +1058,8 @@ do -- Graph:subgraph
 end
 
 --@api-stub: Graph:hasCycle
-do -- Graph:hasCycle
+-- Returns true if this graph has a cycle.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   g:addEdge(a, b)
@@ -964,7 +1068,8 @@ do -- Graph:hasCycle
 end
 
 --@api-stub: Graph:topologicalSort
-do -- Graph:topologicalSort
+-- Performs the topological sort operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("raw"), g:addNode("ingot")
   g:addEdge(a, b)
@@ -973,7 +1078,8 @@ do -- Graph:topologicalSort
 end
 
 --@api-stub: Graph:mst
-do -- Graph:mst
+-- Performs the mst operation on this graph.
+do
   local g = lurek.graph.newGraph()
   g:addEdge(g:addNode("a"), g:addNode("b"))
   local tree = g:mst()
@@ -981,7 +1087,8 @@ do -- Graph:mst
 end
 
 --@api-stub: Graph:colorGraph
-do -- Graph:colorGraph
+-- Performs the color graph operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local a, b = g:addNode("a"), g:addNode("b")
   g:addEdge(a, b)
@@ -990,7 +1097,8 @@ do -- Graph:colorGraph
 end
 
 --@api-stub: Graph:isBipartite
-do -- Graph:isBipartite
+-- Returns true if this graph bipartite.
+do
   local g = lurek.graph.newGraph()
   g:addEdge(g:addNode("left"), g:addNode("right"))
   if g:isBipartite() then
@@ -999,7 +1107,8 @@ do -- Graph:isBipartite
 end
 
 --@api-stub: Graph:processDemand
-do -- Graph:processDemand
+-- Performs the process demand operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local src = g:addNode("mine")
   src:addSupply("ore", 50)
@@ -1007,7 +1116,8 @@ do -- Graph:processDemand
 end
 
 --@api-stub: Graph:getStats
-do -- Graph:getStats
+-- Returns the stats of this graph.
+do
   local g = lurek.graph.newGraph()
   g:addNode("hub")
   local s = g:getStats()
@@ -1015,7 +1125,8 @@ do -- Graph:getStats
 end
 
 --@api-stub: Graph:type
-do -- Graph:type
+-- Returns the Lua-visible type name string for this graph handle.
+do
   local g = lurek.graph.newGraph()
   if g:type() == "Graph" then
     lurek.log.debug("inspecting a graph root", "factory")
@@ -1023,7 +1134,8 @@ do -- Graph:type
 end
 
 --@api-stub: Graph:typeOf
-do -- Graph:typeOf
+-- Returns true if this graph handle matches the given type name string.
+do
   local g = lurek.graph.newGraph()
   if g:typeOf("Graph") then
     lurek.log.debug("yes, this is a graph", "factory")
@@ -1032,7 +1144,8 @@ end
 
 
 --@api-stub: Node:addDemand
-do -- Node:addDemand
+-- Adds a demand to this node.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("warehouse")
   n:addDemand("food", 50)
@@ -1040,7 +1153,8 @@ do -- Node:addDemand
 end
 
 --@api-stub: Graph:addEdge
-do -- Graph:addEdge
+-- Adds a edge to this graph.
+do
   local g = lurek.graph.newGraph()
   local a = g:addNode("city_a")
   local b = g:addNode("city_b")
@@ -1049,7 +1163,8 @@ do -- Graph:addEdge
 end
 
 --@api-stub: Graph:addItem
-do -- Graph:addItem
+-- Adds a item to this graph.
+do
   local g = lurek.graph.newGraph()
   local depot = g:addNode("depot")
   local item = g:createItem("wood", -1)
@@ -1058,7 +1173,8 @@ do -- Graph:addItem
 end
 
 --@api-stub: Graph:addNode
-do -- Graph:addNode
+-- Adds a node to this graph.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine")
   n:setCapacity(200)
@@ -1066,7 +1182,8 @@ do -- Graph:addNode
 end
 
 --@api-stub: Node:addSupply
-do -- Node:addSupply
+-- Adds a supply to this node.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine")
   n:addSupply("ore", 100)
@@ -1074,7 +1191,8 @@ do -- Node:addSupply
 end
 
 --@api-stub: Graph:astar
-do -- Graph:astar
+-- Performs the astar operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
   g:addEdge(na, nb) ; g:addEdge(nb, nc)
@@ -1083,7 +1201,8 @@ do -- Graph:astar
 end
 
 --@api-stub: Graph:createItem
-do -- Graph:createItem
+-- Performs the create item operation on this graph.
+do
   local g = lurek.graph.newGraph()
   local factory = g:addNode("factory")
   local item = g:createItem("widget", -1)
@@ -1091,7 +1210,8 @@ do -- Graph:createItem
 end
 
 --@api-stub: Graph:findPath
-do -- Graph:findPath
+-- Finds and returns the path in this graph by name or id.
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("A") ; local nb = g:addNode("B")
   g:addEdge(na, nb)
@@ -1100,7 +1220,8 @@ do -- Graph:findPath
 end
 
 --@api-stub: Graph:findPathForItem
-do -- Graph:findPathForItem
+-- Finds and returns the path for item in this graph by name or id.
+do
   local g = lurek.graph.newGraph()
   local ns = g:addNode("source") ; local nk = g:addNode("sink")
   g:addEdge(ns, nk)
@@ -1110,7 +1231,8 @@ do -- Graph:findPathForItem
 end
 
 --@api-stub: Graph:getDistance
-do -- Graph:getDistance
+-- Returns the distance of this graph.
+do
   local g = lurek.graph.newGraph()
   local nx = g:addNode("X") ; local ny = g:addNode("Y")
   g:addEdge(nx, ny)
@@ -1119,7 +1241,8 @@ do -- Graph:getDistance
 end
 
 --@api-stub: Graph:getEdgeBetween
-do -- Graph:getEdgeBetween
+-- Returns the edge between of this graph.
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("A") ; local nb = g:addNode("B")
   g:addEdge(na, nb)
@@ -1128,7 +1251,8 @@ do -- Graph:getEdgeBetween
 end
 
 --@api-stub: Graph:getReachable
-do -- Graph:getReachable
+-- Returns the reachable of this graph.
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
   g:addEdge(na, nb) ; g:addEdge(nb, nc)
@@ -1137,7 +1261,8 @@ do -- Graph:getReachable
 end
 
 --@api-stub: Graph:on
-do -- Graph:on
+-- Fires the callback registered for the  event on this graph.
+do
   local g = lurek.graph.newGraph()
   g:on("itemEnter", function(item, node)
     lurek.log.info("item arrived at " .. tostring(node), "graph")
@@ -1146,7 +1271,8 @@ do -- Graph:on
 end
 
 --@api-stub: Graph:sendItem
-do -- Graph:sendItem
+-- Sends item to the target associated with this graph.
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("A") ; local nb = g:addNode("B")
   local edge = g:addEdge(na, nb)
@@ -1156,209 +1282,225 @@ do -- Graph:sendItem
 end
 
 --@api-stub: Node:setConversion
-do -- Node:setConversion
+-- Sets the conversion of this node.
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("smelter")
   n:setConversion("ore", "ingot", 2, 1)
   lurek.log.info("conversion set", "graph")
 end
 
--- =============================================================================
--- COVERAGE: 125 uncovered lurek.graph API item(s)
--- Generated by tools/audit/example_add_missing.py
--- REQUIRED: replace every --@api-stub: block below with a real scenario.
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- The final committed file must contain ZERO --@api-stub: lines.
--- =============================================================================
-
-
 -- -----------------------------------------------------------------------------
 -- LGraphEdge methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LGraphEdge:getType -- Returns the edge type string used by routing and filters
-do -- LGraphEdge:getType
+--@api-stub: LGraphEdge:getType
+-- Returns the edge type string used by routing and filters
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   lurek.log.info("edge type=" .. edge:getType(), "graph")
 end
---@api-stub: LGraphEdge:setType -- Sets the edge type string used by routing and filters
-do -- LGraphEdge:setType
+--@api-stub: LGraphEdge:setType
+-- Sets the edge type string used by routing and filters
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "dirt_road")
   edge:setType("paved_road")
   lurek.log.info("edge type=" .. edge:getType(), "graph")
 end
---@api-stub: LGraphEdge:getFrom -- Returns the source node for this edge
-do -- LGraphEdge:getFrom
+--@api-stub: LGraphEdge:getFrom
+-- Returns the source node for this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
   local edge = g:addEdge(na, nb, "pipe")
   local from = edge:getFrom()
   lurek.log.info("from type=" .. from:getType(), "graph")
 end
---@api-stub: LGraphEdge:getTo -- Returns the destination node for this edge
-do -- LGraphEdge:getTo
+--@api-stub: LGraphEdge:getTo
+-- Returns the destination node for this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
   local edge = g:addEdge(na, nb, "pipe")
   local to = edge:getTo()
   lurek.log.info("to type=" .. to:getType(), "graph")
 end
---@api-stub: LGraphEdge:getCapacity -- Returns this edge's maximum concurrent item capacity
-do -- LGraphEdge:getCapacity
+--@api-stub: LGraphEdge:getCapacity
+-- Returns this edge's maximum concurrent item capacity
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   edge:setCapacity(50)
   lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
 end
---@api-stub: LGraphEdge:setCapacity -- Sets this edge's maximum concurrent item capacity
-do -- LGraphEdge:setCapacity
+--@api-stub: LGraphEdge:setCapacity
+-- Sets this edge's maximum concurrent item capacity
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   edge:setCapacity(100)
   lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
 end
---@api-stub: LGraphEdge:getThroughput -- Returns this edge's throughput value
-do -- LGraphEdge:getThroughput
+--@api-stub: LGraphEdge:getThroughput
+-- Returns this edge's throughput value
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   edge:setThroughput(5.0)
   lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
 end
---@api-stub: LGraphEdge:setThroughput -- Sets this edge's throughput value
-do -- LGraphEdge:setThroughput
+--@api-stub: LGraphEdge:setThroughput
+-- Sets this edge's throughput value
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   edge:setThroughput(15.0)
   lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
 end
---@api-stub: LGraphEdge:getTravelTime -- Returns the travel time for items moving across this edge
-do -- LGraphEdge:getTravelTime
+--@api-stub: LGraphEdge:getTravelTime
+-- Returns the travel time for items moving across this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setTravelTime(3.5)
   lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
 end
---@api-stub: LGraphEdge:setTravelTime -- Sets the travel time for items moving across this edge
-do -- LGraphEdge:setTravelTime
+--@api-stub: LGraphEdge:setTravelTime
+-- Sets the travel time for items moving across this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setTravelTime(2.0)
   lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
 end
---@api-stub: LGraphEdge:getWeight -- Returns the pathfinding weight for this edge
-do -- LGraphEdge:getWeight
+--@api-stub: LGraphEdge:getWeight
+-- Returns the pathfinding weight for this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setWeight(1.5)
   lurek.log.info("weight=" .. edge:getWeight(), "graph")
 end
---@api-stub: LGraphEdge:setWeight -- Sets the pathfinding weight for this edge
-do -- LGraphEdge:setWeight
+--@api-stub: LGraphEdge:setWeight
+-- Sets the pathfinding weight for this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setWeight(5.0)
   lurek.log.info("weight=" .. edge:getWeight(), "graph")
 end
---@api-stub: LGraphEdge:getSpeedModifier -- Returns this edge's speed modifier
-do -- LGraphEdge:getSpeedModifier
+--@api-stub: LGraphEdge:getSpeedModifier
+-- Returns this edge's speed modifier
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "uphill_road")
   edge:setSpeedModifier(0.6)
   lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
 end
---@api-stub: LGraphEdge:setSpeedModifier -- Sets this edge's speed modifier
-do -- LGraphEdge:setSpeedModifier
+--@api-stub: LGraphEdge:setSpeedModifier
+-- Sets this edge's speed modifier
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "boost_belt")
   edge:setSpeedModifier(2.0)
   lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
 end
---@api-stub: LGraphEdge:getCooldown -- Returns this edge's cooldown timer value
-do -- LGraphEdge:getCooldown
+--@api-stub: LGraphEdge:getCooldown
+-- Returns this edge's cooldown timer value
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "warp_gate")
   edge:setCooldown(5.0)
   lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
 end
---@api-stub: LGraphEdge:setCooldown -- Sets this edge's cooldown timer value
-do -- LGraphEdge:setCooldown
+--@api-stub: LGraphEdge:setCooldown
+-- Sets this edge's cooldown timer value
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "express_belt")
   edge:setCooldown(2.0)
   lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
 end
---@api-stub: LGraphEdge:isOnCooldown -- Returns whether this edge is currently on cooldown
-do -- LGraphEdge:isOnCooldown
+--@api-stub: LGraphEdge:isOnCooldown
+-- Returns whether this edge is currently on cooldown
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   lurek.log.info("on_cooldown=" .. tostring(edge:isOnCooldown()), "graph")
 end
---@api-stub: LGraphEdge:isBidirectional -- Returns whether this edge allows travel in both directions
-do -- LGraphEdge:isBidirectional
+--@api-stub: LGraphEdge:isBidirectional
+-- Returns whether this edge allows travel in both directions
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setBidirectional(true)
   lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
 end
---@api-stub: LGraphEdge:setBidirectional -- Sets whether this edge allows travel in both directions
-do -- LGraphEdge:setBidirectional
+--@api-stub: LGraphEdge:setBidirectional
+-- Sets whether this edge allows travel in both directions
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "road")
   edge:setBidirectional(false)
   lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
 end
---@api-stub: LGraphEdge:isActive -- Returns whether this edge is active for routing and simulation
-do -- LGraphEdge:isActive
+--@api-stub: LGraphEdge:isActive
+-- Returns whether this edge is active for routing and simulation
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
 end
---@api-stub: LGraphEdge:setActive -- Enables or disables this edge for routing and simulation
-do -- LGraphEdge:setActive
+--@api-stub: LGraphEdge:setActive
+-- Enables or disables this edge for routing and simulation
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "bridge")
   edge:setActive(false)
   lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
 end
---@api-stub: LGraphEdge:getItemsInTransit -- Returns graph items currently traveling along this edge
-do -- LGraphEdge:getItemsInTransit
+--@api-stub: LGraphEdge:getItemsInTransit
+-- Returns graph items currently traveling along this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   local items = edge:getItemsInTransit()
   lurek.log.info("items_in_transit=" .. #items, "graph")
 end
---@api-stub: LGraphEdge:addAllowedType -- Allows an item type to traverse this edge
-do -- LGraphEdge:addAllowedType
+--@api-stub: LGraphEdge:addAllowedType
+-- Allows an item type to traverse this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "pipe")
   edge:addAllowedType("water")
   lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
 end
---@api-stub: LGraphEdge:removeAllowedType -- Removes an item type from this edge's allow-list
-do -- LGraphEdge:removeAllowedType
+--@api-stub: LGraphEdge:removeAllowedType
+-- Removes an item type from this edge's allow-list
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "pipe")
@@ -1366,8 +1508,9 @@ do -- LGraphEdge:removeAllowedType
   edge:removeAllowedType("acid")
   lurek.log.info("acid allowed after remove=" .. tostring(edge:isItemTypeAllowed("acid")), "graph")
 end
---@api-stub: LGraphEdge:clearAllowedTypes -- Clears this edge's item type allow-list
-do -- LGraphEdge:clearAllowedTypes
+--@api-stub: LGraphEdge:clearAllowedTypes
+-- Clears this edge's item type allow-list
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
@@ -1375,8 +1518,9 @@ do -- LGraphEdge:clearAllowedTypes
   edge:clearAllowedTypes()
   lurek.log.info("iron allowed after clear=" .. tostring(edge:isItemTypeAllowed("iron")), "graph")
 end
---@api-stub: LGraphEdge:isItemTypeAllowed -- Returns whether an item type may traverse this edge
-do -- LGraphEdge:isItemTypeAllowed
+--@api-stub: LGraphEdge:isItemTypeAllowed
+-- Returns whether an item type may traverse this edge
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "pipe")
@@ -1384,237 +1528,271 @@ do -- LGraphEdge:isItemTypeAllowed
   lurek.log.info("gas allowed=" .. tostring(edge:isItemTypeAllowed("gas")), "graph")
   lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
 end
---@api-stub: LGraphEdge:type -- Returns the Lua-visible type name for this graph edge handle
-do -- LGraphEdge:type
+--@api-stub: LGraphEdge:type
+-- Returns the Lua-visible type name for this graph edge handle
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   lurek.log.info("type=" .. edge:type(), "graph")
 end
---@api-stub: LGraphEdge:typeOf -- Returns whether this graph edge handle matches a supported type name
-do -- LGraphEdge:typeOf
+--@api-stub: LGraphEdge:typeOf
+-- Returns whether this graph edge handle matches a supported type name
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   local edge = g:addEdge(na, nb, "belt")
   lurek.log.info("is GraphEdge=" .. tostring(edge:typeOf("GraphEdge")), "graph")
   lurek.log.info("is Other=" .. tostring(edge:typeOf("Other")), "graph")
 end
---@api-stub: LGraphNode:getType -- Returns this node's type string
-do -- LGraphNode:getType
+--@api-stub: LGraphNode:getType
+-- Returns this node's type string
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   lurek.log.info("node type=" .. n:getType(), "graph")
 end
---@api-stub: LGraphNode:setType -- Sets this node's type string
-do -- LGraphNode:setType
+--@api-stub: LGraphNode:setType
+-- Sets this node's type string
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setType("blast_furnace")
   lurek.log.info("node type=" .. n:getType(), "graph")
 end
---@api-stub: LGraphNode:getCapacity -- Returns this node's item capacity
-do -- LGraphNode:getCapacity
+--@api-stub: LGraphNode:getCapacity
+-- Returns this node's item capacity
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("warehouse", 100)
   lurek.log.info("capacity=" .. n:getCapacity(), "graph")
 end
---@api-stub: LGraphNode:setCapacity -- Sets this node's item capacity
-do -- LGraphNode:setCapacity
+--@api-stub: LGraphNode:setCapacity
+-- Sets this node's item capacity
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("warehouse", 50)
   n:setCapacity(200)
   lurek.log.info("capacity=" .. n:getCapacity(), "graph")
 end
---@api-stub: LGraphNode:getItemCount -- Returns the number of items currently stored on this node
-do -- LGraphNode:getItemCount
+--@api-stub: LGraphNode:getItemCount
+-- Returns the number of items currently stored on this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   lurek.log.info("items=" .. n:getItemCount(), "graph")
 end
---@api-stub: LGraphNode:isFull -- Returns whether this node has reached its item capacity
-do -- LGraphNode:isFull
+--@api-stub: LGraphNode:isFull
+-- Returns whether this node has reached its item capacity
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 4)
   lurek.log.info("full=" .. tostring(n:isFull()), "graph")
 end
---@api-stub: LGraphNode:isActive -- Returns whether this node is active for graph simulation
-do -- LGraphNode:isActive
+--@api-stub: LGraphNode:isActive
+-- Returns whether this node is active for graph simulation
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("reactor", 8)
   lurek.log.info("active=" .. tostring(n:isActive()), "graph")
 end
---@api-stub: LGraphNode:setActive -- Enables or disables this node for graph simulation
-do -- LGraphNode:setActive
+--@api-stub: LGraphNode:setActive
+-- Enables or disables this node for graph simulation
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("reactor", 8)
   n:setActive(false)
   lurek.log.info("active=" .. tostring(n:isActive()), "graph")
 end
---@api-stub: LGraphNode:getOverflowPolicy -- Returns this node's overflow policy name
-do -- LGraphNode:getOverflowPolicy
+--@api-stub: LGraphNode:getOverflowPolicy
+-- Returns this node's overflow policy name
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("silo", 50)
   n:setOverflowPolicy("destroy")
   lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
 end
---@api-stub: LGraphNode:setOverflowPolicy -- Sets this node's overflow policy from a policy name
-do -- LGraphNode:setOverflowPolicy
+--@api-stub: LGraphNode:setOverflowPolicy
+-- Sets this node's overflow policy from a policy name
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("silo", 50)
   n:setOverflowPolicy("reject")
   lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
 end
---@api-stub: LGraphNode:getFlowMode -- Returns this node's flow mode name
-do -- LGraphNode:getFlowMode
+--@api-stub: LGraphNode:getFlowMode
+-- Returns this node's flow mode name
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("distributor", 16)
   n:setFlowMode("both")
   lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
 end
---@api-stub: LGraphNode:setFlowMode -- Sets this node's flow mode from a mode name
-do -- LGraphNode:setFlowMode
+--@api-stub: LGraphNode:setFlowMode
+-- Sets this node's flow mode from a mode name
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("factory", 16)
   n:setFlowMode("pull")
   lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
 end
---@api-stub: LGraphNode:getPushRate -- Returns this node's push rate
-do -- LGraphNode:getPushRate
+--@api-stub: LGraphNode:getPushRate
+-- Returns this node's push rate
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine", 32)
   n:setPushRate(2.5)
   lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
 end
---@api-stub: LGraphNode:setPushRate -- Sets this node's push rate
-do -- LGraphNode:setPushRate
+--@api-stub: LGraphNode:setPushRate
+-- Sets this node's push rate
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine", 32)
   n:setPushRate(5.0)
   lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
 end
---@api-stub: LGraphNode:getPullRate -- Returns this node's pull rate
-do -- LGraphNode:getPullRate
+--@api-stub: LGraphNode:getPullRate
+-- Returns this node's pull rate
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setPullRate(3.0)
   lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
 end
---@api-stub: LGraphNode:setPullRate -- Sets this node's pull rate
-do -- LGraphNode:setPullRate
+--@api-stub: LGraphNode:setPullRate
+-- Sets this node's pull rate
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("assembler", 16)
   n:setPullRate(1.5)
   lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
 end
---@api-stub: LGraphNode:getPushFilter -- Returns this node's optional push item-type filter
-do -- LGraphNode:getPushFilter
+--@api-stub: LGraphNode:getPushFilter
+-- Returns this node's optional push item-type filter
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("sorter", 8)
   n:setPushFilter("iron_ore")
   lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
 end
---@api-stub: LGraphNode:setPushFilter -- Sets or clears this node's push item-type filter
-do -- LGraphNode:setPushFilter
+--@api-stub: LGraphNode:setPushFilter
+-- Sets or clears this node's push item-type filter
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("sorter", 8)
   n:setPushFilter("copper_ore")
   lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
 end
---@api-stub: LGraphNode:getPullFilter -- Returns this node's optional pull item-type filter
-do -- LGraphNode:getPullFilter
+--@api-stub: LGraphNode:getPullFilter
+-- Returns this node's optional pull item-type filter
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setPullFilter("coal")
   lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
 end
---@api-stub: LGraphNode:setPullFilter -- Sets or clears this node's pull item-type filter
-do -- LGraphNode:setPullFilter
+--@api-stub: LGraphNode:setPullFilter
+-- Sets or clears this node's pull item-type filter
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setPullFilter("iron_ore")
   lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
 end
---@api-stub: LGraphNode:getProcessTime -- Returns the processing time used by this node's conversions
-do -- LGraphNode:getProcessTime
+--@api-stub: LGraphNode:getProcessTime
+-- Returns the processing time used by this node's conversions
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("assembler", 8)
   n:setProcessTime(4.0)
   lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
 end
---@api-stub: LGraphNode:setProcessTime -- Sets the processing time used by this node's conversions
-do -- LGraphNode:setProcessTime
+--@api-stub: LGraphNode:setProcessTime
+-- Sets the processing time used by this node's conversions
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("assembler", 8)
   n:setProcessTime(2.0)
   lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
 end
---@api-stub: LGraphNode:isQueueEnabled -- Returns whether this node's explicit queue is enabled
-do -- LGraphNode:isQueueEnabled
+--@api-stub: LGraphNode:isQueueEnabled
+-- Returns whether this node's explicit queue is enabled
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 32)
   n:setQueueEnabled(true)
   lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
 end
---@api-stub: LGraphNode:setQueueEnabled -- Enables or disables this node's explicit queue
-do -- LGraphNode:setQueueEnabled
+--@api-stub: LGraphNode:setQueueEnabled
+-- Enables or disables this node's explicit queue
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("splitter", 8)
   n:setQueueEnabled(false)
   lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
 end
---@api-stub: LGraphNode:getQueueCapacity -- Returns this node's queue capacity
-do -- LGraphNode:getQueueCapacity
+--@api-stub: LGraphNode:getQueueCapacity
+-- Returns this node's queue capacity
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 32)
   n:setQueueEnabled(true); n:setQueueCapacity(10)
   lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
 end
---@api-stub: LGraphNode:setQueueCapacity -- Sets this node's queue capacity
-do -- LGraphNode:setQueueCapacity
+--@api-stub: LGraphNode:setQueueCapacity
+-- Sets this node's queue capacity
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 32)
   n:setQueueEnabled(true); n:setQueueCapacity(20)
   lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
 end
---@api-stub: LGraphNode:getQueueSize -- Returns the number of item ids currently queued at this node
-do -- LGraphNode:getQueueSize
+--@api-stub: LGraphNode:getQueueSize
+-- Returns the number of item ids currently queued at this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   n:setQueueEnabled(true)
   lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
 end
---@api-stub: LGraphNode:getItems -- Returns item handles currently stored on this node
-do -- LGraphNode:getItems
+--@api-stub: LGraphNode:getItems
+-- Returns item handles currently stored on this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   local items = n:getItems()
   lurek.log.info("item_count=" .. #items, "graph")
 end
---@api-stub: LGraphNode:getEdges -- Returns edge handles connected to this node in the requested direction
-do -- LGraphNode:getEdges
+--@api-stub: LGraphNode:getEdges
+-- Returns edge handles connected to this node in the requested direction
+do
   local g = lurek.graph.newGraph()
   local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
   g:addEdge(na, nb, "belt")
   local edges = na:getEdges()
   lurek.log.info("edge_count=" .. #edges, "graph")
 end
---@api-stub: LGraphNode:setConversion -- Configures an item conversion rule on this node
-do -- LGraphNode:setConversion
+--@api-stub: LGraphNode:setConversion
+-- Configures an item conversion rule on this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setConversion("iron_ore", "iron_ingot", 1)
   lurek.log.info("conversion added to furnace", "graph")
 end
---@api-stub: LGraphNode:clearConversion -- Removes a conversion rule by input item type
-do -- LGraphNode:clearConversion
+--@api-stub: LGraphNode:clearConversion
+-- Removes a conversion rule by input item type
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("furnace", 16)
   n:setConversion("iron_ore", "iron_ingot", 1)
   n:clearConversion("iron_ore")
   lurek.log.info("conversion cleared", "graph")
 end
---@api-stub: LGraphNode:clearAllConversions -- Removes every conversion rule from this node
-do -- LGraphNode:clearAllConversions
+--@api-stub: LGraphNode:clearAllConversions
+-- Removes every conversion rule from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("multi_furnace", 32)
   n:setConversion("iron_ore", "iron_ingot", 1)
@@ -1622,98 +1800,111 @@ do -- LGraphNode:clearAllConversions
   n:clearAllConversions()
   lurek.log.info("all conversions cleared", "graph")
 end
---@api-stub: LGraphNode:addTag -- Adds a tag to this node
-do -- LGraphNode:addTag
+--@api-stub: LGraphNode:addTag
+-- Adds a tag to this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("warehouse", 100)
   n:addTag("storage"); n:addTag("secure")
   lurek.log.info("has storage=" .. tostring(n:hasTag("storage")), "graph")
 end
---@api-stub: LGraphNode:removeTag -- Removes a tag from this node
-do -- LGraphNode:removeTag
+--@api-stub: LGraphNode:removeTag
+-- Removes a tag from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   n:addTag("available"); n:removeTag("available")
   lurek.log.info("has available=" .. tostring(n:hasTag("available")), "graph")
 end
---@api-stub: LGraphNode:hasTag -- Returns whether this node has a tag
-do -- LGraphNode:hasTag
+--@api-stub: LGraphNode:hasTag
+-- Returns whether this node has a tag
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("station", 64)
   n:addTag("train_stop")
   lurek.log.info("has train_stop=" .. tostring(n:hasTag("train_stop")), "graph")
 end
---@api-stub: LGraphNode:clearTags -- Removes every tag from this node
-do -- LGraphNode:clearTags
+--@api-stub: LGraphNode:clearTags
+-- Removes every tag from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   n:addTag("a"); n:addTag("b"); n:clearTags()
   lurek.log.info("tags after clear=" .. #n:getTags(), "graph")
 end
---@api-stub: LGraphNode:getTags -- Returns all tags assigned to this node
-do -- LGraphNode:getTags
+--@api-stub: LGraphNode:getTags
+-- Returns all tags assigned to this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 32)
   n:addTag("port"); n:addTag("western")
   local tags = n:getTags()
   lurek.log.info("tag count=" .. #tags, "graph")
 end
---@api-stub: LGraphNode:addSupply -- Adds supply quantity for an item type on this node
-do -- LGraphNode:addSupply
+--@api-stub: LGraphNode:addSupply
+-- Adds supply quantity for an item type on this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine", 100)
   n:addSupply("iron_ore", 500)
   lurek.log.info("supply added", "graph")
 end
---@api-stub: LGraphNode:removeSupply -- Removes supply entry for an item type from this node
-do -- LGraphNode:removeSupply
+--@api-stub: LGraphNode:removeSupply
+-- Removes supply entry for an item type from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine", 100)
   n:addSupply("iron_ore", 500)
   n:removeSupply("iron_ore")
   lurek.log.info("supply removed", "graph")
 end
---@api-stub: LGraphNode:clearSupplies -- Removes every supply entry from this node
-do -- LGraphNode:clearSupplies
+--@api-stub: LGraphNode:clearSupplies
+-- Removes every supply entry from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("mine", 100)
   n:addSupply("gold_ore", 200)
   n:clearSupplies()
   lurek.log.info("all supplies cleared", "graph")
 end
---@api-stub: LGraphNode:addDemand -- Adds demand quantity and optional priority for an item type on this node
-do -- LGraphNode:addDemand
+--@api-stub: LGraphNode:addDemand
+-- Adds demand quantity and optional priority for an item type on this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("factory", 32)
   n:addDemand("steel", 100, 1)   -- priority 1 (high)
   lurek.log.info("demand declared for steel", "graph")
 end
---@api-stub: LGraphNode:removeDemand -- Removes demand entry for an item type from this node
-do -- LGraphNode:removeDemand
+--@api-stub: LGraphNode:removeDemand
+-- Removes demand entry for an item type from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("factory", 32)
   n:addDemand("steel", 100, 1)
   n:removeDemand("steel")
   lurek.log.info("demand removed", "graph")
 end
---@api-stub: LGraphNode:clearDemands -- Removes every demand entry from this node
-do -- LGraphNode:clearDemands
+--@api-stub: LGraphNode:clearDemands
+-- Removes every demand entry from this node
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("factory", 32)
   n:addDemand("wood", 50, 2); n:addDemand("stone", 50, 2)
   n:clearDemands()
   lurek.log.info("all demands cleared", "graph")
 end
---@api-stub: LGraphNode:enqueue -- Adds an item handle to this node's explicit queue
-do -- LGraphNode:enqueue
+--@api-stub: LGraphNode:enqueue
+-- Adds an item handle to this node's explicit queue
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 32)
   n:setQueueEnabled(true)
   n:enqueue(g:createItem("iron_ingot", 1))
   lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
 end
---@api-stub: LGraphNode:dequeue -- Removes and returns the next item from this node's explicit queue
-do -- LGraphNode:dequeue
+--@api-stub: LGraphNode:dequeue
+-- Removes and returns the next item from this node's explicit queue
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("buffer", 32)
   n:setQueueEnabled(true)
@@ -1721,16 +1912,97 @@ do -- LGraphNode:dequeue
   local item = n:dequeue()
   lurek.log.info("dequeued=" .. tostring(item), "graph")
 end
---@api-stub: LGraphNode:type -- Returns the Lua-visible type name for this graph node handle
-do -- LGraphNode:type
+--@api-stub: LGraphNode:type
+-- Returns the Lua-visible type name for this graph node handle
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 8)
   lurek.log.info("type=" .. n:type(), "graph")
 end
---@api-stub: LGraphNode:typeOf -- Returns whether this graph node handle matches a supported type name
-do -- LGraphNode:typeOf
+--@api-stub: LGraphNode:typeOf
+-- Returns whether this graph node handle matches a supported type name
+do
   local g = lurek.graph.newGraph()
   local n = g:addNode("depot", 8)
   lurek.log.info("is GraphNode=" .. tostring(n:typeOf("GraphNode")), "graph")
   lurek.log.info("is Other=" .. tostring(n:typeOf("Other")), "graph")
+end
+
+--@api-stub: LGraph:bfs
+-- Performs a breadth-first search from a start node and returns nodes in visit order.
+do
+  local g = lurek.graph.new()
+  local n1 = g:addNode("A")
+  local n2 = g:addNode("B")
+  g:addEdge(n1, n2, 1.0)
+  local order = g:bfs(n1)
+  lurek.log.debug("bfs nodes=" .. #order, "graph")
+end
+
+--@api-stub: LGraph:clearAll
+-- Removes all nodes and edges from this graph and resets it to an empty state.
+do
+  local g = lurek.graph.new()
+  g:addNode("X")
+  g:clearAll()
+  lurek.log.debug("cleared, nodes=" .. g:nodeCount(), "graph")
+end
+
+--@api-stub: LGraph:dfs
+-- Performs a depth-first search from a start node and returns nodes in visit order.
+do
+  local g = lurek.graph.new()
+  local n1 = g:addNode("A")
+  local n2 = g:addNode("B")
+  g:addEdge(n1, n2, 1.0)
+  local order = g:dfs(n1)
+  lurek.log.debug("dfs nodes=" .. #order, "graph")
+end
+
+--@api-stub: LGraph:edgeCount
+-- Returns the total number of edges currently in this graph.
+do
+  local g = lurek.graph.new()
+  local n1 = g:addNode("A")
+  local n2 = g:addNode("B")
+  g:addEdge(n1, n2, 1.0)
+  lurek.log.debug("edges=" .. g:edgeCount(), "graph")
+end
+
+--@api-stub: LGraph:getNodeValue
+-- Returns the value stored at a node id in this graph.
+do
+  local g = lurek.graph.new()
+  local n = g:addNode("city")
+  lurek.log.debug("value=" .. tostring(g:getNodeValue(n)), "graph")
+end
+
+--@api-stub: LGraph:isConnected
+-- Returns true if all nodes in this graph are reachable from one another.
+do
+  local g = lurek.graph.new()
+  local n1 = g:addNode("A")
+  local n2 = g:addNode("B")
+  g:addEdge(n1, n2, 1.0)
+  lurek.log.debug("connected=" .. tostring(g:isConnected()), "graph")
+end
+
+--@api-stub: LGraph:neighbors
+-- Returns a list of node ids directly connected to a given node in this graph.
+do
+  local g = lurek.graph.new()
+  local n1 = g:addNode("A")
+  local n2 = g:addNode("B")
+  g:addEdge(n1, n2, 1.0)
+  local nb = g:neighbors(n1)
+  lurek.log.debug("neighbors=" .. #nb, "graph")
+end
+
+--@api-stub: LGraph:nodeCount
+-- Returns the total number of nodes currently in this graph.
+do
+  local g = lurek.graph.new()
+  g:addNode("A")
+  g:addNode("B")
+  lurek.log.debug("nodes=" .. g:nodeCount(), "graph")
 end

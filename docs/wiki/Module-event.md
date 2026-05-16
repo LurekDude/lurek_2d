@@ -68,14 +68,53 @@ Centralized event queue and signal dispatch layer providing the backbone for int
 Module example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.exit
-  local fatal = false
-  if fatal then
-    lurek.event.exit(1)
-  else
-    lurek.event.exit(0)
+--@api-stub: lurek.event.poll
+-- Creates a polling function that returns the next queued event each time it is called
+do
+  function lurek.process(dt)
+    for name, a, b in lurek.event.poll() do
+      if name == "keypressed" and a == "escape" then
+        lurek.event.quit()
+      end
+    end
   end
 end
+
+--@api-stub: lurek.event.clear
+-- Clears all pending events from the shared event queue
+do
+  local function load_level(name)
+    lurek.event.clear()
+    lurek.log.info("loaded " .. name .. "; input queue flushed", "scene")
+  end
+  load_level("forest_01")
+end
+
+--@api-stub: lurek.event.newSignal
+-- Creates an isolated signal dispatcher for Lua callbacks
+do
+  local combat = lurek.event.newSignal()
+  combat:register("damage", function(target, amount)
+    lurek.log.info(target .. " took " .. amount .. " hp", "combat")
+  end)
+  combat:emit("damage", "goblin", 12)
+end
+
+--@api-stub: lurek.event.pump
+-- Pumps the shared event queue without removing events for Lua
+do
+  function lurek.process(dt)
+    lurek.event.pump()
+    for name in lurek.event.poll() do
+      lurek.log.debug("event: " .. name, "input")
+    end
+  end
+end
+
+--@api-stub: lurek.event.wait
+-- Waits for the next queued event and returns success, name, and argument table
+do
+  local ok, name, args = lurek.event.wait(0.5)
 ```
 
 ## Key Types
@@ -116,7 +155,7 @@ Clears all pending events from the shared event queue.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.clear
+do
   local function load_level(name)
     lurek.event.clear()
     lurek.log.info("loaded " .. name .. "; input queue flushed", "scene")
@@ -134,7 +173,7 @@ Clears retained pushed event history.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.clearHistory
+do
   lurek.event.enableHistory(16)
   lurek.event.push("temp_event")
   lurek.event.clearHistory()
@@ -155,7 +194,7 @@ Enables event push history with a maximum retained capacity.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.enableHistory
+do
   lurek.event.enableHistory(64)
   lurek.event.push("checkpoint", "boss_arena")
   lurek.event.push("achievement", "first_blood")
@@ -175,7 +214,7 @@ Requests engine shutdown with an optional process exit code.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.exit
+do
   local fatal = false
   if fatal then
     lurek.event.exit(1)
@@ -196,7 +235,7 @@ Moves all deferred events into the shared event queue and clears the deferred bu
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.flushDeferred
+do
   lurek.event.pushDeferred("save", "slot1")
   lurek.event.pushDeferred("save", "slot2")
   local moved = lurek.event.flushDeferred()
@@ -215,7 +254,7 @@ Returns retained pushed event history entries.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.getHistory
+do
   lurek.event.enableHistory(32)
   lurek.event.push("damage", "player", 5)
   for _, entry in ipairs(lurek.event.getHistory()) do
@@ -235,7 +274,7 @@ Creates an isolated signal dispatcher for Lua callbacks.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.newSignal
+do
   local combat = lurek.event.newSignal()
   combat:register("damage", function(target, amount)
     lurek.log.info(target .. " took " .. amount .. " hp", "combat")
@@ -255,7 +294,7 @@ Creates a polling function that returns the next queued event each time it is ca
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.poll
+do
   function lurek.process(dt)
     for name, a, b in lurek.event.poll() do
       if name == "keypressed" and a == "escape" then
@@ -275,7 +314,7 @@ Pumps the shared event queue without removing events for Lua.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.pump
+do
   function lurek.process(dt)
     lurek.event.pump()
     for name in lurek.event.poll() do
@@ -299,7 +338,7 @@ Pushes a normal-priority event into the shared event queue and optional history.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.push
+do
   lurek.event.push("damage", "player", 12)
   for name, target, amount in lurek.event.poll() do
     if name == "damage" then
@@ -323,7 +362,7 @@ Adds a normal-priority event to the deferred buffer instead of the live queue.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.pushDeferred
+do
   for i = 1, 3 do
     lurek.event.pushDeferred("spawn", "enemy", i * 64, 0)
   end
@@ -346,7 +385,7 @@ Adds an event with explicit priority to the deferred buffer.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.pushDeferredPriority
+do
   lurek.event.pushDeferredPriority("ui.toast", "normal", "hello")
   lurek.event.pushDeferredPriority("shutdown", "high")
   lurek.event.flushDeferred()
@@ -368,7 +407,7 @@ Pushes an event with explicit priority into the shared event queue and optional 
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.pushPriority
+do
   lurek.event.push("normal_notice", "late")
   lurek.event.pushPriority("urgent_notice", "high", {source="system"})
   for name, payload in lurek.event.poll() do
@@ -386,7 +425,7 @@ Requests engine shutdown with exit code zero.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.quit
+do
   local function on_quit_button()
     lurek.log.info("user requested quit", "ui")
     lurek.event.quit()
@@ -404,7 +443,7 @@ Requests an engine restart. This function is exposed to Lua scripts.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.restart
+do
   local function apply_graphics_preset(preset)
     lurek.log.info("applied preset '" .. preset .. "', restarting", "boot")
     lurek.event.restart()
@@ -428,7 +467,7 @@ Waits for the next queued event and returns success, name, and argument table.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.wait
+do
   local ok, name, args = lurek.event.wait(0.5)
   if ok then
     lurek.log.info("got event '" .. name .. "' within timeout", "tool")
@@ -450,7 +489,7 @@ Lua-side signal object storing subscriptions and Lua callback registry keys.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- lurek.event.newSignal
+do
   local combat = lurek.event.newSignal()
   combat:register("damage", function(target, amount)
     lurek.log.info(target .. " took " .. amount .. " hp", "combat")
@@ -474,7 +513,7 @@ Removes all callbacks registered for one exact signal event name.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:clear
+do
   local sig = lurek.event.newSignal()
   sig:register("damage", function() end)
   sig:register("damage", function() end)
@@ -494,7 +533,7 @@ Removes every callback from this signal object.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:clearAll
+do
   local sig = lurek.event.newSignal()
   sig:register("a", function() end)
   sig:register("b", function() end)
@@ -519,7 +558,7 @@ Registers a callback for an exact name or wildcard signal pattern.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:connect
+do
   local sig = lurek.event.newSignal()
   local id = sig:connect("*", function(data)
     lurek.log.info("received: " .. tostring(data), "event")
@@ -543,7 +582,7 @@ Emits a signal event and invokes matching callbacks with the remaining arguments
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:emit
+do
   local sig = lurek.event.newSignal()
   sig:register("level_up", function(actor, new_level)
     lurek.log.info(actor .. " reached level " .. new_level, "rpg")
@@ -567,7 +606,7 @@ Returns the callback count for one exact signal event name.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:getCount
+do
   local sig = lurek.event.newSignal()
   sig:register("frame", function() end)
   if sig:getCount("frame") > 0 then
@@ -587,7 +626,7 @@ Returns the total callback count across all signal event names.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:getTotalCount
+do
   local sig = lurek.event.newSignal()
   sig:register("a", function() end)
   sig:register("b", function() end)
@@ -611,7 +650,7 @@ Registers a callback that is removed after its next matching emission.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:once
+do
   local sig = lurek.event.newSignal()
   sig:once("*", function(val)
     lurek.log.info("once fired: " .. tostring(val), "event")
@@ -638,7 +677,7 @@ Registers a callback for an exact signal event name.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:register
+do
   local sig = lurek.event.newSignal()
   local id = sig:register("*", function(payload)
     lurek.log.info("payload: " .. tostring(payload), "event")
@@ -665,7 +704,7 @@ Registers a callback that runs only when a filter callback returns true.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:registerWithFilter
+do
   local sig = lurek.event.newSignal()
   sig:registerWithFilter(
     "combat.event",
@@ -693,7 +732,7 @@ Removes a signal callback by subscription handle.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:remove
+do
   local sig = lurek.event.newSignal()
   local handle = sig:register("tick", function() end)
   local removed = sig:remove(handle)
@@ -712,7 +751,7 @@ Returns the Lua-visible type name for this signal handle.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:type
+do
   local sig = lurek.event.newSignal()
   local kind = sig:type()
   lurek.log.info("created object of type=" .. kind, "diag")
@@ -734,7 +773,7 @@ Returns whether this signal handle matches a supported type name.
 Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
-do -- Signal:typeOf
+do
   local sig = lurek.event.newSignal()
   if sig:typeOf("Signal") and sig:typeOf("Object") then
     lurek.log.info("dispatcher passes Signal+Object guard", "diag")

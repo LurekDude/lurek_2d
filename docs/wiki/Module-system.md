@@ -64,11 +64,53 @@ lurek.system - Provides OS-level utilities including clipboard, system info, env
 Module example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getOS
-  local os_name = runtime.getOS()
-  local mod_key = (os_name == "macOS") and "cmd" or "ctrl"
-  lurek.log.info("running on " .. os_name .. " (modifier=" .. mod_key .. ")", "boot")
+--@api-stub: lurek.runtime.setDebugOverlay
+-- Enables or disables the on-screen debug overlay that shows FPS, draw calls, and other diagnostics
+do
+  function lurek.init()
+    runtime.setDebugOverlay(true)
+    lurek.log.info("debug overlay enabled at startup", "dev")
+  end
 end
+
+--@api-stub: lurek.runtime.getDebugOverlay
+-- Returns whether the on-screen debug overlay is currently enabled
+do
+  function lurek.process(_dt)
+    if runtime.getDebugOverlay() then
+      lurek.log.debug("engine overlay is on, skipping custom HUD", "dev")
+    end
+  end
+end
+
+--@api-stub: lurek.runtime.setLogLevel
+-- Sets the engine-wide log verbosity level at runtime
+do
+  local desired_level = "info"
+  runtime.setLogLevel(desired_level)
+  lurek.log.info("log level set to " .. desired_level, "boot")
+end
+
+--@api-stub: lurek.runtime.getLogLevel
+-- Returns the current engine log verbosity level as a string
+do
+  local level = runtime.getLogLevel()
+  if level == "debug" then
+    lurek.log.warn("log level is debug â€” output will be very chatty", "boot")
+  end
+end
+
+--@api-stub: lurek.runtime.log
+-- Writes a message to the engine log at the specified severity level
+do
+  local severity = "warn"
+  local frame_ms = 22.5
+  runtime.log(severity, "frame budget exceeded: " .. frame_ms .. " ms")
+end
+
+--@api-stub: lurek.runtime.getLastError
+-- Returns the last error for Lua scripts in this module
+do
 ```
 
 ## Key Types
@@ -117,7 +159,7 @@ Creates a JSON-encoded error snapshot from a message string, useful for diagnost
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.errorSnapshot
+do
   local raw_error = "asset not found: hero.png"
   local json = runtime.errorSnapshot(raw_error)
   lurek.log.error("crash snapshot: " .. json, "crash")
@@ -135,7 +177,7 @@ Returns the CPU architecture of the host system.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getArch
+do
   local arch = runtime.getArch()
   local use_neon = (arch == "aarch64") or (arch == "arm64")
   lurek.log.info("arch=" .. arch .. " neon=" .. tostring(use_neon), "boot")
@@ -153,7 +195,7 @@ Returns the command-line arguments passed to the engine as a 1-indexed table of 
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getArgs
+do
   local args = runtime.getArgs()
   for i = 2, #args do
     lurek.log.info("argv[" .. i .. "] = " .. args[i], "boot")
@@ -176,7 +218,7 @@ Summarizes batch results by counting passed, failed, and skipped tasks.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getBatchResults
+do
   local results = runtime.runBatch({
     ok_task = function() return true end,
     bad_task = function() error("intentional") end,
@@ -197,7 +239,7 @@ Reads the current text content from the system clipboard. Returns an empty strin
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getClipboardText
+do
   local raw = runtime.getClipboardText() or ""
   local trimmed = raw:gsub("^%s+", ""):gsub("%s+$", "")
   if #trimmed > 0 then
@@ -217,7 +259,7 @@ Returns a table containing the current engine runtime configuration values.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getConfig
+do
   local cfg = runtime.getConfig()
   lurek.log.info(
     ("config rev=%d physics=%.0f Hz vsync=%s level=%s"):format(
@@ -245,7 +287,7 @@ Returns whether the on-screen debug overlay is currently enabled.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getDebugOverlay
+do
   function lurek.process(_dt)
     if runtime.getDebugOverlay() then
       lurek.log.debug("engine overlay is on, skipping custom HUD", "dev")
@@ -269,7 +311,7 @@ Reads an environment variable by name. Returns `nil` if the variable is not set.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getEnv
+do
   local profile_flag = runtime.getEnv("LUREK_PROFILE")
   if profile_flag == "1" then
     lurek.log.info("profiling mode enabled via LUREK_PROFILE", "dev")
@@ -288,7 +330,7 @@ Returns a table with comprehensive engine and host information.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getInfo
+do
   local info = runtime.getInfo()
   local line = info.engine .. " " .. info.version .. " on " .. info.os ..
     " (" .. info.processors .. " cores, " .. info.memory .. " MiB)"
@@ -307,7 +349,7 @@ Returns the last error for Lua scripts in this module.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getLastError
+do
   function lurek.process(_dt)
     local err = runtime.getLastError()
     if err then
@@ -328,7 +370,7 @@ Returns the current engine log verbosity level as a string.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getLogLevel
+do
   local level = runtime.getLogLevel()
   if level == "debug" then
     lurek.log.warn("log level is debug â€” output will be very chatty", "boot")
@@ -347,7 +389,7 @@ Returns the total physical memory of the host system in megabytes.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getMemorySize
+do
   local ram_mb = runtime.getMemorySize()
   local quality = (ram_mb >= 8192) and "high" or (ram_mb >= 4096 and "medium" or "low")
   lurek.log.info("texture quality preset: " .. quality .. " (" .. ram_mb .. " MiB RAM)", "render")
@@ -369,7 +411,7 @@ Resolves a message string by its identifier from the engine message catalog.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getMessage
+do
   local message_id = "L001"
   local text = runtime.getMessage(message_id)
   lurek.log.info(message_id .. ": " .. text, "i18n")
@@ -387,7 +429,7 @@ Returns the total number of messages registered in the engine message catalog.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getMessageCount
+do
   local n = runtime.getMessageCount()
   if n < 1 then
     lurek.log.warn("message catalogue is empty", "i18n")
@@ -407,7 +449,7 @@ Returns the name of the host operating system as a string.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getOS
+do
   local os_name = runtime.getOS()
   local mod_key = (os_name == "macOS") and "cmd" or "ctrl"
   lurek.log.info("running on " .. os_name .. " (modifier=" .. mod_key .. ")", "boot")
@@ -425,7 +467,7 @@ Returns the current power supply state, battery percentage, and estimated time r
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getPowerInfo
+do
   local state, percent, _seconds = runtime.getPowerInfo()
   local fps_cap = (state == "battery" and (percent or 100) < 30) and 30 or 60
   lurek.log.info("power=" .. state .. " fps_cap=" .. fps_cap, "perf")
@@ -443,7 +485,7 @@ Returns a list of the user's preferred locale identifiers from the operating sys
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getPreferredLocales
+do
   local locales = runtime.getPreferredLocales()
   local picked = locales[1] or "en_US"
   lurek.log.info("ui locale = " .. picked .. " (offered " .. #locales .. ")", "i18n")
@@ -461,7 +503,7 @@ Returns the number of logical processors available on the host machine.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getProcessorCount
+do
   local cores = runtime.getProcessorCount()
   local workers = math.max(1, cores - 1)
   lurek.log.info("spawning " .. workers .. " worker threads (of " .. cores .. ")", "thread")
@@ -479,7 +521,7 @@ Returns the semantic version string of the Lurek2D engine.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.getVersion
+do
   local engine_version = runtime.getVersion()
   local save_header = "lurek2d/" .. engine_version
   lurek.log.info("save header tag: " .. save_header, "save")
@@ -501,7 +543,7 @@ Checks whether a message identifier exists in the engine message catalog.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.hasMessage
+do
   local candidate = "L999"
   if runtime.hasMessage(candidate) then
     lurek.log.info("catalogue has " .. candidate, "i18n")
@@ -525,7 +567,7 @@ Writes a message to the engine log at the specified severity level.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.log
+do
   local severity = "warn"
   local frame_ms = 22.5
   runtime.log(severity, "frame budget exceeded: " .. frame_ms .. " ms")
@@ -547,7 +589,7 @@ Opens a URL in the default system browser. Only `http://`, `https://`, and `mail
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.openURL
+do
   local credits_url = "https://lurek2d.example/credits"
   local opened = runtime.openURL(credits_url)
   if not opened then
@@ -571,7 +613,7 @@ Parses command-line arguments into structured flags, options, and positional val
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.parseArgs
+do
   local input = { "--level=forest_01", "--debug", "save1.dat" }
   local parsed = runtime.parseArgs(input)
   local level = parsed.options.level or "intro"
@@ -589,7 +631,7 @@ Requests a reload of the engine configuration from `conf.lua`. The reload is def
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.reloadConfig
+do
   function lurek.init()
     -- Example: a key-bind that forces conf.toml to be re-read immediately.
     lurek.log.info("requesting conf.toml hot-reload", "dev")
@@ -614,7 +656,7 @@ Executes a table of named task functions sequentially, collecting pass/fail resu
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.runBatch
+do
   local tasks = {
     warmup_cache = function() return true end,
     preload_audio = function() return true end,
@@ -637,7 +679,7 @@ Copies a string to the system clipboard. Logs a warning if the clipboard is unav
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.setClipboardText
+do
   local seed = "world-seed-4815162342"
   runtime.setClipboardText(seed)
   lurek.log.info("copied seed to clipboard: " .. seed, "ui")
@@ -657,7 +699,7 @@ Enables or disables the on-screen debug overlay that shows FPS, draw calls, and 
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.setDebugOverlay
+do
   function lurek.init()
     runtime.setDebugOverlay(true)
     lurek.log.info("debug overlay enabled at startup", "dev")
@@ -678,7 +720,7 @@ Sets the engine-wide log verbosity level at runtime.
 Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
-do -- lurek.runtime.setLogLevel
+do
   local desired_level = "info"
   runtime.setLogLevel(desired_level)
   lurek.log.info("log level set to " .. desired_level, "boot")

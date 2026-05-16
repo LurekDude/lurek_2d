@@ -303,11 +303,53 @@ Geometry: line intersection, point-in-polygon, polygon area/centroid, convex hul
 Module example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newRandomGenerator
-  local rng = lurek.math.newRandomGenerator(1337)
-  local loot_roll = rng:randomInt(1, 100)
-  lurek.log.info("loot roll=" .. loot_roll, "rng")
+-- Creates a tween with a duration and optional easing name
+do
+  local tw = lurek.math.newTween(0.5, "outQuad")
+  tw:addValue(0, 200)
+  function lurek.process(dt) tw:update(dt) end
 end
+
+--@api-stub: lurek.math.newSpatialHash
+-- Creates a spatial hash index with a cell size
+do
+  local hash = lurek.math.newSpatialHash(64)
+  hash:insert("player", 100, 100, 32, 32)
+  local hits = hash:queryCircle(110, 110, 50)
+end
+
+--@api-stub: lurek.math.newNoiseGenerator
+-- Creates a procedural noise generator with an optional seed
+do
+  local terrain = lurek.math.newNoiseGenerator(20260422)
+  local h = terrain:perlin2d(3.5, 7.25)
+  local map = terrain:generateMapCompute(16, 16, {octaves = 3})
+  lurek.log.debug("terrain h=" .. h, "noise")
+  lurek.log.debug("terrain map samples=" .. #map, "noise")
+end
+
+--@api-stub: lurek.math.newRectPacker
+-- Creates a rectangle packer
+do
+  local packer = lurek.math.newRectPacker(256, 256, 2)
+  local x, y = packer:pack(64, 64, "hero")
+  lurek.log.info("packed hero at " .. tostring(x) .. "," .. tostring(y), "atlas")
+end
+
+--@api-stub: RectPacker:pack
+do
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  local x, y = packer:pack(32, 24, "btn_ok")
+  if x and y then
+    lurek.log.debug("packed btn_ok at " .. x .. "," .. y, "atlas")
+  end
+end
+
+--@api-stub: RectPacker:getPacked
+do
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  packer:pack(20, 20, "icon_a")
+  packer:pack(30, 18, "icon_b")
 ```
 
 ## Key Types
@@ -365,7 +407,7 @@ Creates an empty AABB tree. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.aabbTree
+do
   local tree = lurek.math.aabbTree()
   tree:insert(1, 0, 0, 32, 32)
   lurek.log.debug("tree size=" .. tree:len(), "physics")
@@ -387,7 +429,7 @@ Returns absolute value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.abs
+do
   local axis = -0.7
   if lurek.math.abs(axis) > 0.2 then
     lurek.log.debug("axis active", "input")
@@ -410,7 +452,7 @@ Returns arccosine of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.acos
+do
   local angle = lurek.math.acos(0.0)
   lurek.log.debug("acos(0)=" .. lurek.math.deg(angle), "math")
 end
@@ -434,7 +476,7 @@ Returns the angle between two points.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.angleBetween
+do
   local rad = lurek.math.angleBetween(0, 0, 100, 100)
   lurek.log.debug("angle=" .. lurek.math.deg(rad) .. " deg", "geo")
 end
@@ -456,7 +498,7 @@ Applies a named easing function to a normalized value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.applyEasing
+do
   local name = "outBounce"
   local eased = lurek.math.applyEasing(name, 0.75)
   lurek.log.debug(name .. "(0.75)=" .. eased, "tween")
@@ -478,7 +520,7 @@ Returns arcsine of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.asin
+do
   local angle = lurek.math.asin(0.5)
   lurek.log.debug("asin(0.5)=" .. lurek.math.deg(angle), "math")
 end
@@ -500,7 +542,7 @@ Returns arctangent or two-argument arctangent.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.atan
+do
   local a = lurek.math.atan(1.0)
   local b = lurek.math.atan(1.0, -1.0)
   lurek.log.debug("atan results " .. a .. " " .. b, "math")
@@ -523,7 +565,7 @@ Returns two-argument arctangent.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.atan2
+do
   local dx, dy = 100 - 0, 50 - 0
   local heading = lurek.math.atan2(dy, dx)
   lurek.log.info("heading rad=" .. heading, "ai")
@@ -548,7 +590,7 @@ Returns integer grid points along a Bresenham line.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.bresenham
+do
   local pts = lurek.math.bresenham(0, 0, 5, 3)
   lurek.log.info("bresenham steps=" .. #pts, "tile")
 end
@@ -569,7 +611,7 @@ Creates a Catmull-Rom spline from point tables.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.catmullRom
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
   local x, y = cr:sample(0.5)
@@ -592,7 +634,7 @@ Returns ceiling of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.ceil
+do
   local dmg = lurek.math.ceil(2.3)
   lurek.log.info("damage=" .. dmg, "combat")
 end
@@ -617,7 +659,7 @@ Returns whether a circle contains a point.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.circleContainsPoint
+do
   if lurek.math.circleContainsPoint(0, 0, 50, 30, 20) then
     lurek.log.info("inside aura", "trigger")
   end
@@ -644,7 +686,7 @@ Returns whether two circles intersect.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.circleIntersectsCircle
+do
   if lurek.math.circleIntersectsCircle(0, 0, 10, 8, 6, 5) then
     lurek.log.warn("orbs collided", "physics")
   end
@@ -672,7 +714,7 @@ Returns circle-line intersection state and hit points when present.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.circleIntersectsLine
+do
   local hit, ix, iy = lurek.math.circleIntersectsLine(0, 0, 50, -100, 0, 100, 0)
   if hit then
     lurek.log.info("laser hit at " .. ix .. "," .. iy, "fx")
@@ -701,7 +743,7 @@ Returns circle-segment intersection state and hit points when present.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.circleIntersectsSegment
+do
   local hit, ix, iy = lurek.math.circleIntersectsSegment(20, 0, 5, 0, 0, 40, 0)
   if hit then
     lurek.log.info("bullet impact " .. ix .. "," .. iy, "combat")
@@ -726,7 +768,7 @@ Clamps a value to a range. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.clamp
+do
   local angle = lurek.math.clamp(2.5, -math.pi, math.pi)
   lurek.log.debug("clamped angle=" .. angle, "math")
 end
@@ -752,7 +794,7 @@ Returns the closest point on a segment to an input point.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.closestPointOnSegment
+do
   local cx, cy = lurek.math.closestPointOnSegment(50, 30, 0, 0, 100, 0)
   lurek.log.debug("nearest=" .. cx .. "," .. cy, "ai")
 end
@@ -773,7 +815,7 @@ Computes the convex hull for a flat point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.convexHull
+do
   local pts = {0, 0, 100, 0, 50, 50, 100, 100, 0, 100}
   local hull = lurek.math.convexHull(pts)
   lurek.log.info("hull verts=" .. (#hull / 2), "geo")
@@ -795,7 +837,7 @@ Returns cosine of an angle. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.cos
+do
   local t = 1.5
   local x = lurek.math.cos(t) * 50
   lurek.log.debug("orbit x=" .. x, "fx")
@@ -817,7 +859,7 @@ Converts radians to degrees. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.deg
+do
   local heading = lurek.math.deg(math.pi / 2)
   lurek.log.info("heading=" .. heading .. " deg", "compass")
 end
@@ -838,7 +880,7 @@ Computes Delaunay triangles for a flat point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.delaunayTriangulate
+do
   local pts = {0, 0, 100, 0, 50, 80, 60, 30}
   local tris = lurek.math.delaunayTriangulate(pts)
   lurek.log.info("delaunay tris=" .. #tris, "geo")
@@ -863,7 +905,7 @@ Returns Euclidean distance between two points.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.distance
+do
   local d = lurek.math.distance(0, 0, 3, 4)
   if d < 10 then
     lurek.log.debug("near target", "ai")
@@ -889,7 +931,7 @@ Returns squared Euclidean distance between two points.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.distanceSq
+do
   local d2 = lurek.math.distanceSq(0, 0, 3, 4)
   if d2 < 100 then
     lurek.log.debug("within 10 units", "ai")
@@ -912,7 +954,7 @@ Returns exponential of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.exp
+do
   local decay = lurek.math.exp(-0.5)
   lurek.log.debug("decay=" .. decay, "math")
 end
@@ -938,7 +980,7 @@ Samples stateless fractal Brownian motion noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.fbm
+do
   local h = lurek.math.fbm(4.5, 2.0, 12345, 6, 2.0, 0.5)
   local altitude = math.floor(h * 1000)
   lurek.log.info("fbm altitude=" .. altitude, "world")
@@ -960,7 +1002,7 @@ Returns floor of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.floor
+do
   local raw_x = 123.7
   local pixel_x = lurek.math.floor(raw_x)
   lurek.log.debug("pixel x=" .. pixel_x, "render")
@@ -983,7 +1025,7 @@ Returns floating-point remainder.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.fmod
+do
   local wrapped = lurek.math.fmod(7.5, lurek.math.tau)
   lurek.log.debug("wrapped=" .. wrapped, "math")
 end
@@ -1004,7 +1046,7 @@ Converts a hex color string to RGBA channels.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.fromHex
+do
   local r, g, b, a = lurek.math.fromHex("#ff8800")
   lurek.log.debug("hex -> " .. r .. "," .. g .. "," .. b, "color")
 end
@@ -1025,7 +1067,7 @@ Converts a gamma-space channel to linear space.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.gammaToLinear
+do
   local linear = lurek.math.gammaToLinear(0.5)
   lurek.log.debug("0.5 sRGB -> " .. linear .. " linear", "color")
 end
@@ -1053,7 +1095,7 @@ Creates a Hermite spline from endpoints and tangents.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.hermite
+do
   ---@type LHermite
   local h = lurek.math.hermite(0, 0, 100, 100, 50, 0, 0, 50)
   local mx, my = h:sample(0.5)
@@ -1078,7 +1120,7 @@ Converts HSL color values to RGBA channels.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.hslToRgb
+do
   local r, g, b, a = lurek.math.hslToRgb(200, 0.7, 0.5)
   lurek.log.debug("rgb " .. r .. "," .. g .. "," .. b, "color")
 end
@@ -1099,7 +1141,7 @@ Applies back ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inBack
+do
   local v = lurek.math.inBack(0.5)
   lurek.log.debug("inBack=" .. v, "ui")
 end
@@ -1120,7 +1162,7 @@ Applies bounce ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inBounce
+do
   local v = lurek.math.inBounce(0.7)
   lurek.log.debug("inBounce=" .. v, "fx")
 end
@@ -1141,7 +1183,7 @@ Applies cubic ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inCubic
+do
   local charge = lurek.math.inCubic(0.4)
   if charge > 0.5 then
     lurek.log.info("charge ready", "combat")
@@ -1164,7 +1206,7 @@ Applies elastic ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inElastic
+do
   local v = lurek.math.inElastic(0.8)
   lurek.log.debug("inElastic=" .. v, "anim")
 end
@@ -1185,7 +1227,7 @@ Applies exponential ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inExpo
+do
   local v = lurek.math.inExpo(0.85)
   lurek.log.debug("inExpo=" .. v, "fx")
 end
@@ -1206,7 +1248,7 @@ Applies back ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutBack
+do
   local v = lurek.math.inOutBack(0.5)
   lurek.log.debug("inOutBack=" .. v, "fx")
 end
@@ -1227,7 +1269,7 @@ Applies bounce ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutBounce
+do
   local v = lurek.math.inOutBounce(0.5)
   lurek.log.debug("inOutBounce=" .. v, "fx")
 end
@@ -1248,7 +1290,7 @@ Applies cubic ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutCubic
+do
   local t = lurek.math.inOutCubic(0.25)
   local panel_y = 600 - t * 400
   lurek.log.debug("panel y=" .. panel_y, "ui")
@@ -1270,7 +1312,7 @@ Applies elastic ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutElastic
+do
   local v = lurek.math.inOutElastic(0.4)
   lurek.log.debug("inOutElastic=" .. v, "fx")
 end
@@ -1291,7 +1333,7 @@ Applies exponential ease-in-out.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutExpo
+do
   local v = lurek.math.inOutExpo(0.5)
   lurek.log.debug("inOutExpo=" .. v, "fx")
 end
@@ -1312,7 +1354,7 @@ Applies quadratic ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutQuad
+do
   local t = 0.5
   local cam_x = 100 + lurek.math.inOutQuad(t) * 400
   lurek.log.debug("cam x=" .. cam_x, "cam")
@@ -1334,7 +1376,7 @@ Applies quartic ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutQuart
+do
   local v = lurek.math.inOutQuart(0.5)
   lurek.log.debug("inOutQuart=" .. v, "easing")
 end
@@ -1355,7 +1397,7 @@ Applies sine ease-in-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inOutSine
+do
   local v = lurek.math.inOutSine(0.5)
   lurek.log.debug("drift=" .. v, "bg")
 end
@@ -1376,7 +1418,7 @@ Applies quadratic ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inQuad
+do
   local progress = 0.3
   local y = lurek.math.inQuad(progress) * 200
   lurek.log.debug("falling y=" .. y, "anim")
@@ -1398,7 +1440,7 @@ Applies quartic ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inQuart
+do
   local v = lurek.math.inQuart(0.7)
   lurek.log.debug("inQuart=" .. v, "easing")
 end
@@ -1419,7 +1461,7 @@ Applies sine ease-in. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inSine
+do
   local pulse = lurek.math.inSine(0.4)
   lurek.log.debug("pulse=" .. pulse, "fx")
 end
@@ -1442,7 +1484,7 @@ Returns the interpolation factor of a value between two bounds.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.inverseLerp
+do
   local t = lurek.math.inverseLerp(0, 200, 50)
   lurek.log.debug("t=" .. t, "math")
 end
@@ -1463,7 +1505,7 @@ Returns whether a flat polygon point table is convex.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.isConvex
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   if lurek.math.isConvex(poly) then
     lurek.log.debug("polygon is convex", "geo")
@@ -1488,7 +1530,7 @@ Linearly interpolates between two values.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.lerp
+do
   local v = lurek.math.lerp(10.0, 20.0, 0.25)
   lurek.log.debug("lerp v=" .. v, "math")
 end
@@ -1509,7 +1551,7 @@ Applies linear easing. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.linear
+do
   local t = 0.42
   local v = lurek.math.linear(t)
   lurek.log.debug("linear " .. t .. "=" .. v, "easing")
@@ -1531,7 +1573,7 @@ Converts a linear-space channel to gamma space.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.linearToGamma
+do
   local srgb = lurek.math.linearToGamma(0.214)
   lurek.log.debug("linear 0.214 -> " .. srgb .. " sRGB", "color")
 end
@@ -1559,7 +1601,7 @@ Returns intersection point for two infinite lines when present.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.lineIntersect
+do
   local ix, iy = lurek.math.lineIntersect(0, 0, 100, 100, 0, 100, 100, 0)
   if ix then
     lurek.log.debug("cross at " .. ix .. "," .. iy, "geo")
@@ -1583,7 +1625,7 @@ Returns natural logarithm or logarithm with a supplied base.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.log
+do
   local db = 20 * lurek.math.log(0.5, 10)
   lurek.log.debug("0.5 -> " .. db .. " dB", "audio")
 end
@@ -1604,7 +1646,7 @@ Returns the largest supplied value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.max
+do
   local final = lurek.math.max(1, 5 - 7)
   lurek.log.debug("final dmg=" .. final, "combat")
 end
@@ -1625,7 +1667,7 @@ Returns the smallest supplied value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.min
+do
   local function current_hp_or_default(v) return v end
   local clamp_hp = lurek.math.min(100, current_hp_or_default(85), 90)
   lurek.log.debug("hp=" .. clamp_hp, "combat")
@@ -1647,7 +1689,7 @@ Creates a Bezier curve from a flat point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newBezierCurve
+do
   local curve = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local mid_x, mid_y = curve:evaluate(0.5)
   local d_x, d_y = curve:evaluateAtDistance(120)
@@ -1673,7 +1715,7 @@ Creates a circle primitive. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newCircle
+do
   local c = lurek.math.newCircle(0, 0, 25)
   if c:contains(10, 5) then
     lurek.log.debug("inside circle", "geo")
@@ -1696,7 +1738,7 @@ Creates a procedural noise generator with an optional seed.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newNoiseGenerator
+do
   local terrain = lurek.math.newNoiseGenerator(20260422)
   local h = terrain:perlin2d(3.5, 7.25)
   local map = terrain:generateMapCompute(16, 16, {octaves = 3})
@@ -1720,7 +1762,7 @@ Creates a deterministic random generator with an optional seed.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newRandomGenerator
+do
   local rng = lurek.math.newRandomGenerator(1337)
   local loot_roll = rng:randomInt(1, 100)
   lurek.log.info("loot roll=" .. loot_roll, "rng")
@@ -1744,7 +1786,7 @@ Creates a rectangle packer. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newRectPacker
+do
   local packer = lurek.math.newRectPacker(256, 256, 2)
   local x, y = packer:pack(64, 64, "hero")
   lurek.log.info("packed hero at " .. tostring(x) .. "," .. tostring(y), "atlas")
@@ -1766,7 +1808,7 @@ Creates a spatial hash index with a cell size.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newSpatialHash
+do
   local hash = lurek.math.newSpatialHash(64)
   hash:insert("player", 100, 100, 32, 32)
   local hits = hash:queryCircle(110, 110, 50)
@@ -1796,7 +1838,7 @@ Creates a 2D transform. All components are optional; omitting all returns an ide
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newTransform
+do
   local t = lurek.math.newTransform(100, 50, math.pi / 4, 2, 2)
   local wx, wy = t:transformPoint(8, 0)
   lurek.log.debug("rotated corner at " .. wx .. "," .. wy, "xform")
@@ -1819,7 +1861,7 @@ Creates a tween with a duration and optional easing name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newTween
+do
   local tw = lurek.math.newTween(0.5, "outQuad")
   tw:addValue(0, 200)
   function lurek.process(dt) tw:update(dt) end
@@ -1841,7 +1883,7 @@ Applies back ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outBack
+do
   local v = lurek.math.outBack(0.5)
   lurek.log.debug("outBack=" .. v, "ui")
 end
@@ -1862,7 +1904,7 @@ Applies bounce ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outBounce
+do
   local h = lurek.math.outBounce(0.3) * 100
   lurek.log.debug("bounce h=" .. h, "fx")
 end
@@ -1883,7 +1925,7 @@ Applies cubic ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outCubic
+do
   local opacity = lurek.math.outCubic(0.8)
   lurek.log.debug("tooltip alpha=" .. opacity, "ui")
 end
@@ -1904,7 +1946,7 @@ Applies elastic ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outElastic
+do
   local v = lurek.math.outElastic(0.6)
   lurek.log.debug("button bounce=" .. v, "ui")
 end
@@ -1925,7 +1967,7 @@ Applies exponential ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outExpo
+do
   local v = lurek.math.outExpo(0.15)
   lurek.log.debug("outExpo=" .. v, "fx")
 end
@@ -1946,7 +1988,7 @@ Applies quadratic ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outQuad
+do
   local x = lurek.math.outQuad(0.6) * 480
   lurek.log.debug("panel x=" .. x, "ui")
 end
@@ -1967,7 +2009,7 @@ Applies quartic ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outQuart
+do
   local v = lurek.math.outQuart(0.2)
   lurek.log.debug("outQuart=" .. v, "easing")
 end
@@ -1988,7 +2030,7 @@ Applies sine ease-out. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.outSine
+do
   local v = lurek.math.outSine(0.6)
   lurek.log.debug("icon alpha=" .. v, "ui")
 end
@@ -2011,7 +2053,7 @@ Samples stateless 2D Perlin noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.perlin2d
+do
   local n = lurek.math.perlin2d(0.5, 1.25, 42)
   if n > 0.6 then
     lurek.log.info("hill peak", "terrain")
@@ -2037,7 +2079,7 @@ Samples stateless 3D Perlin noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.perlin3d
+do
   local t = 0
   function lurek.process(dt)
     t = t + dt
@@ -2064,7 +2106,7 @@ Returns whether a point lies inside a polygon.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.pointInPolygon
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   if lurek.math.pointInPolygon(poly, 50, 50) then
     lurek.log.info("inside zone", "trigger")
@@ -2087,7 +2129,7 @@ Computes signed area for a flat polygon point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonArea
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   local area = lurek.math.polygonArea(poly)
   lurek.log.info("polygon area=" .. math.abs(area), "geo")
@@ -2109,7 +2151,7 @@ Computes the centroid for a flat polygon point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonCentroid
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   local cx, cy = lurek.math.polygonCentroid(poly)
   lurek.log.debug("centroid " .. cx .. "," .. cy, "geo")
@@ -2134,7 +2176,7 @@ Clips a flat polygon point table against a plane.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonClip
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   local clipped = lurek.math.polygonClip(poly, 1, 0, 50)
   lurek.log.debug("clipped verts=" .. (#clipped / 2), "geo")
@@ -2157,7 +2199,7 @@ Returns polygon difference points for two polygon tables.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonDifference
+do
   local a = {{x=0,y=0},{x=100,y=0},{x=100,y=100},{x=0,y=100}}
   local b = {{x=20,y=20},{x=80,y=20},{x=80,y=80},{x=20,y=80}}
   local diff = lurek.math.polygonDifference(a, b)
@@ -2181,7 +2223,7 @@ Returns polygon intersection points for two polygon tables.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonIntersection
+do
   local a = {{x=0,y=0},{x=100,y=0},{x=100,y=100},{x=0,y=100}}
   local b = {{x=50,y=50},{x=150,y=50},{x=150,y=150},{x=50,y=150}}
   local hit = lurek.math.polygonIntersection(a, b)
@@ -2205,7 +2247,7 @@ Returns polygon union points for two polygon tables.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.polygonUnion
+do
   local a = {{x=0,y=0},{x=100,y=0},{x=100,y=100},{x=0,y=100}}
   local b = {{x=80,y=80},{x=180,y=80},{x=180,y=180},{x=80,y=180}}
   local u = lurek.math.polygonUnion(a, b)
@@ -2229,7 +2271,7 @@ Raises a value to a power. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.pow
+do
   local energy = lurek.math.pow(2.0, 8)
   lurek.log.debug("2^8=" .. energy, "math")
 end
@@ -2250,7 +2292,7 @@ Converts degrees to radians. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.rad
+do
   local turn_deg = 90
   local turn_rad = lurek.math.rad(turn_deg)
   lurek.log.debug(turn_deg .. " deg = " .. turn_rad .. " rad", "math")
@@ -2273,7 +2315,7 @@ Returns a Lua math random value, optionally scaled to one or two bounds.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.random
+do
   local rolled = lurek.math.random(1, 6)
   lurek.log.info("dice=" .. rolled, "rng")
 end
@@ -2295,7 +2337,7 @@ Returns a Lua math random integer in an inclusive range.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.randomInt
+do
   local slot = lurek.math.randomInt(1, 8)
   lurek.log.debug("loot slot=" .. slot, "rng")
 end
@@ -2319,7 +2361,7 @@ Creates a rectangle tuple from center coordinates and size.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.rectFromCenter
+do
   local x, y, w, h = lurek.math.rectFromCenter(100, 100, 32, 32)
   lurek.log.debug("rect " .. x .. "," .. y, "geo")
 end
@@ -2347,7 +2389,7 @@ Returns the union rectangle for two rectangles.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.rectUnion
+do
   local x, y, w, h = lurek.math.rectUnion(0, 0, 50, 50, 30, 30, 60, 60)
   lurek.log.debug("union " .. w .. "x" .. h, "ui")
 end
@@ -2372,7 +2414,7 @@ Remaps a value from one range to another.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.remap
+do
   local mapped = lurek.math.remap(127, 0, 255, 0, 1)
   lurek.log.debug("normalised input=" .. mapped, "input")
 end
@@ -2395,7 +2437,7 @@ Converts RGB channels to HSL values.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.rgbToHsl
+do
   local h, s, l = lurek.math.rgbToHsl(1.0, 0.5, 0.0)
   lurek.log.debug("hsl " .. h .. "," .. s .. "," .. l, "color")
 end
@@ -2416,7 +2458,7 @@ Returns rounded value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.round
+do
   local snapped = lurek.math.round(127.5)
   lurek.log.debug("rounded=" .. snapped, "ui")
 end
@@ -2444,7 +2486,7 @@ Returns whether two segments intersect and their intersection point when present
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.segmentIntersectsSegment
+do
   local hit, ix, iy = lurek.math.segmentIntersectsSegment(0, 0, 100, 0, 50, -50, 50, 50)
   if hit then
     lurek.log.info("blade crossed " .. ix .. "," .. iy, "combat")
@@ -2467,7 +2509,7 @@ Returns the sign of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.sign
+do
   local s = lurek.math.sign(-3.7)
   lurek.log.debug("sign=" .. s, "math")
 end
@@ -2490,7 +2532,7 @@ Samples stateless 2D simplex noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.simplex2d
+do
   local s = lurek.math.simplex2d(2.0, 3.0, 99)
   if s > 0 then
     lurek.log.debug("simplex above zero", "noise")
@@ -2515,7 +2557,7 @@ Samples 2D or 3D simplex noise. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.simplexNoise
+do
   local n = lurek.math.simplexNoise(0.5, 1.5, 0.0)
   lurek.log.debug("simplex=" .. n, "noise")
 end
@@ -2536,7 +2578,7 @@ Returns sine of an angle. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.sin
+do
   local t = 0
   function lurek.process(dt)
     t = t + dt
@@ -2563,7 +2605,7 @@ Applies smoothstep interpolation between two edges.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.smoothstep
+do
   local fade = lurek.math.smoothstep(50, 100, 75)
   lurek.log.debug("fade=" .. fade, "fx")
 end
@@ -2584,7 +2626,7 @@ Returns square root of a value. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.sqrt
+do
   local hyp = lurek.math.sqrt(3 * 3 + 4 * 4)
   lurek.log.debug("hyp=" .. hyp, "math")
 end
@@ -2605,7 +2647,7 @@ Returns tangent of an angle. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.tan
+do
   local slope = lurek.math.tan(math.pi / 6)
   lurek.log.debug("30deg slope=" .. slope, "math")
 end
@@ -2626,7 +2668,7 @@ Triangulates a flat polygon point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.triangulate
+do
   local poly = {0, 0, 100, 0, 100, 100, 0, 100}
   local tris = lurek.math.triangulate(poly)
   lurek.log.info("triangulated into " .. #tris .. " triangles", "geo")
@@ -2649,7 +2691,7 @@ Creates a 2D vector. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.Vec2
+do
   local v = lurek.math.Vec2(10, 20)
   local n = v:normalize()
   lurek.log.debug("normalised x=" .. n.x, "math")
@@ -2673,7 +2715,7 @@ Creates a 3D vector. This function is exposed to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.Vec3
+do
   ---@type LVec3
   local p = lurek.math.Vec3(0, 0, 1)
   local s = p:scale(5)
@@ -2696,7 +2738,7 @@ Builds Voronoi cells from a polygon-style point table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.voronoi
+do
   local seeds = {{x=0,y=0},{x=100,y=0},{x=50,y=80}}
   local cells = lurek.math.voronoi(seeds)
   lurek.log.info("voronoi cells=" .. #cells, "geo")
@@ -2715,7 +2757,7 @@ Lua-side wrapper for an AABB tree spatial index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.aabbTree
+do
   local tree = lurek.math.aabbTree()
   tree:insert(1, 0, 0, 32, 32)
   lurek.log.debug("tree size=" .. tree:len(), "physics")
@@ -2731,7 +2773,7 @@ Clears all items from the tree. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:clear
+do
   local t = lurek.math.aabbTree()
   t:insert(1, 0, 0, 16, 16)
   t:clear()
@@ -2753,7 +2795,7 @@ Returns whether the tree contains an id.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:contains
+do
   local t = lurek.math.aabbTree()
   t:insert(42, 0, 0, 16, 16)
   if t:contains(42) then
@@ -2779,7 +2821,7 @@ Inserts an AABB by id. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:insert
+do
   local tree = lurek.math.aabbTree()
   tree:insert(1, 10, 10, 50, 50)
   tree:insert(2, 80, 80, 120, 120)
@@ -2798,7 +2840,7 @@ Returns whether the tree has no items.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:isEmpty
+do
   local t = lurek.math.aabbTree()
   if t:isEmpty() then
     lurek.log.debug("tree empty", "physics")
@@ -2817,7 +2859,7 @@ Returns the number of items in the tree.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:len
+do
   local t = lurek.math.aabbTree()
   t:insert(1, 0, 0, 8, 8)
   lurek.log.info("aabb tree size=" .. t:len(), "physics")
@@ -2842,7 +2884,7 @@ Queries ids intersecting an AABB. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:query
+do
   local tree = lurek.math.aabbTree()
   tree:insert(1, 0, 0, 40, 40)
   tree:insert(2, 60, 60, 100, 100)
@@ -2867,7 +2909,7 @@ Queries ids containing a point. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:queryPoint
+do
   local t = lurek.math.aabbTree()
   t:insert(1, 0, 0, 32, 32)
   local ids = t:queryPoint(10, 10)
@@ -2890,7 +2932,7 @@ Removes an AABB by id. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:remove
+do
   local t = lurek.math.aabbTree()
   t:insert(1, 0, 0, 32, 32)
   local ok = t:remove(1)
@@ -2909,7 +2951,7 @@ Returns the Lua-visible type name for this AABB tree handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LAabbTree:type
+do
   local aabb_tree_obj = lurek.math.aabbTree()
   local t = aabb_tree_obj:type()
   lurek.log.info("LAabbTree:type = " .. t, "math")
@@ -2931,7 +2973,7 @@ Returns whether this AABB tree handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LAabbTree:typeOf
+do
   local aabb_tree_obj = lurek.math.aabbTree()
   lurek.log.info("is LAabbTree: " .. tostring(aabb_tree_obj:typeOf("LAabbTree")), "math")
   lurek.log.info("is wrong: " .. tostring(aabb_tree_obj:typeOf("Unknown")), "math")
@@ -2957,7 +2999,7 @@ Updates an AABB by id. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- AabbTree:update
+do
   local tree = lurek.math.aabbTree()
   local id = 1
   tree:insert(id, 100, 100, 132, 132)
@@ -2975,7 +3017,7 @@ Lua-side wrapper for a Bezier curve.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newBezierCurve
+do
   local curve = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local mid_x, mid_y = curve:evaluate(0.5)
   local d_x, d_y = curve:evaluateAtDistance(120)
@@ -2999,7 +3041,7 @@ Evaluates this curve at normalized parameter `t`.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:evaluate
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local x, y = c:evaluate(0.25)
   lurek.log.debug("eval " .. x .. "," .. y, "spline")
@@ -3022,7 +3064,7 @@ Evaluates this curve at an approximate distance along the curve.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:evaluateAtDistance
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local x, y = c:evaluateAtDistance(120, 128)
   lurek.log.debug("eval@dist " .. x .. "," .. y, "spline")
@@ -3044,7 +3086,7 @@ Returns a control point by one-based index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:getControlPoint
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local x, y = c:getControlPoint(2)
   lurek.log.debug("cp2=" .. x .. "," .. y, "spline")
@@ -3062,7 +3104,7 @@ Returns the number of control points in this curve.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:getControlPointCount
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local n = c:getControlPointCount()
   lurek.log.info("cp count=" .. n, "spline")
@@ -3080,7 +3122,7 @@ Returns the derivative curve for this Bezier curve.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:getDerivative
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local d = c:getDerivative()
   lurek.log.debug("derivative ready", "spline")
@@ -3102,7 +3144,7 @@ Inserts a control point, optionally before a one-based index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:insertControlPoint
+do
   local bc = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
   bc:insertControlPoint(100, 25, 0.5)
   lurek.log.info("ctrl pts: " .. bc:getControlPointCount(), "math")
@@ -3120,7 +3162,7 @@ Returns the approximate curve length.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:length
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local len = c:length()
   lurek.log.info("arc len=" .. len, "spline")
@@ -3142,7 +3184,7 @@ Removes a control point by one-based index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:removeControlPoint
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local ok = c:removeControlPoint(3)
   lurek.log.debug("removed=" .. tostring(ok), "spline")
@@ -3164,7 +3206,7 @@ Returns sampled points along this curve.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:render
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local pts = c:render(32)
   lurek.log.info("polyline points=" .. #pts, "spline")
@@ -3186,7 +3228,7 @@ Rotates all control points around an origin.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:rotate
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   c:rotate(math.pi / 6, 0, 0)
   lurek.log.debug("rotated", "spline")
@@ -3208,7 +3250,7 @@ Scales all control points around an origin.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:scale
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   c:scale(2.0, 0, 0)
   lurek.log.debug("scaled", "spline")
@@ -3232,7 +3274,7 @@ Sets a control point by one-based index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:setControlPoint
+do
   local bc = lurek.math.newBezierCurve({0,0, 100,0, 200,0})
   bc:setControlPoint(2, 100, 80)
   local cx, cy = bc:getControlPoint(2)
@@ -3254,7 +3296,7 @@ Translates all control points. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- BezierCurve:translate
+do
   local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   c:translate(10, 5)
   lurek.log.debug("translated", "spline")
@@ -3272,7 +3314,7 @@ Returns the Lua-visible type name for this Bezier curve handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LBezierCurve:type
+do
   local bezier_curve_obj = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
   local t = bezier_curve_obj:type()
   lurek.log.info("LBezierCurve:type = " .. t, "math")
@@ -3294,7 +3336,7 @@ Returns whether this Bezier curve handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LBezierCurve:typeOf
+do
   local bezier_curve_obj = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
   lurek.log.info("is LBezierCurve: " .. tostring(bezier_curve_obj:typeOf("LBezierCurve")), "math")
   lurek.log.info("is wrong: " .. tostring(bezier_curve_obj:typeOf("Unknown")), "math")
@@ -3310,7 +3352,7 @@ Lua-side wrapper for a Catmull-Rom spline.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.catmullRom
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
   local x, y = cr:sample(0.5)
@@ -3332,7 +3374,7 @@ Adds a point to the spline. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- CatmullRom:addPoint
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=50},{x=100,y=0},{x=150,y=50}})
   cr:addPoint(200, 0)
@@ -3351,7 +3393,7 @@ Returns the number of points in the spline.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- CatmullRom:len
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=10,y=10},{x=20,y=0},{x=30,y=10}})
   lurek.log.info("control points=" .. cr:len(), "spline")
@@ -3373,7 +3415,7 @@ Removes a point by zero-based index and returns its coordinates.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- CatmullRom:removePoint
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=50},{x=100,y=0},{x=150,y=50}})
   local rx, ry = cr:removePoint(1)
@@ -3396,7 +3438,7 @@ Samples the spline at normalized parameter `t`.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- CatmullRom:sample
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
   local x, y = cr:sample(0.25)
@@ -3420,7 +3462,7 @@ Samples one spline segment at local parameter `t`.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- CatmullRom:sampleSegment
+do
   ---@type LCatmullRom
   local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=20},{x=100,y=0},{x=150,y=20}})
   local x, y = cr:sampleSegment(0, 0.5)
@@ -3439,7 +3481,7 @@ Returns the Lua-visible type name for this spline handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LCatmullRom:type
+do
   local catmull_rom_obj = lurek.math.catmullRom({{0,0},{100,50},{200,0},{300,50}})
   local t = catmull_rom_obj:type()
   lurek.log.info("LCatmullRom:type = " .. t, "math")
@@ -3461,7 +3503,7 @@ Returns whether this spline handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LCatmullRom:typeOf
+do
   local catmull_rom_obj = lurek.math.catmullRom({{0,0},{100,50},{200,0},{300,50}})
   lurek.log.info("is LCatmullRom: " .. tostring(catmull_rom_obj:typeOf("LCatmullRom")), "math")
   lurek.log.info("is wrong: " .. tostring(catmull_rom_obj:typeOf("Unknown")), "math")
@@ -3477,7 +3519,7 @@ Lua-side wrapper for a circle primitive.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newCircle
+do
   local c = lurek.math.newCircle(0, 0, 25)
   if c:contains(10, 5) then
     lurek.log.debug("inside circle", "geo")
@@ -3496,7 +3538,7 @@ Returns this circle axis-aligned bounding box.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:aabb
+do
   local c = lurek.math.newCircle(50, 30, 10)
   local x1, y1, x2, y2 = c:aabb()
   lurek.log.debug("aabb " .. x1 .. "," .. y1 .. " to " .. x2 .. "," .. y2, "geo")
@@ -3514,7 +3556,7 @@ Returns this circle area. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:area
+do
   local c = lurek.math.newCircle(0, 0, 5)
   lurek.log.debug("area=" .. c:area(), "geo")
 end
@@ -3536,7 +3578,7 @@ Returns whether this circle contains a point.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:contains
+do
   local c = lurek.math.newCircle(50, 50, 25)
   if c:contains(60, 60) then
     lurek.log.debug("inside", "geo")
@@ -3559,7 +3601,7 @@ Returns whether this circle intersects another circle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:intersects
+do
   local a = lurek.math.newCircle(0, 0, 10)
   local b = lurek.math.newCircle(15, 0, 10)
   lurek.log.debug("hit=" .. tostring(a:intersects(b)), "geo")
@@ -3577,7 +3619,7 @@ Returns this circle perimeter. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:perimeter
+do
   local c = lurek.math.newCircle(0, 0, 10)
   lurek.log.debug("perimeter=" .. c:perimeter(), "geo")
 end
@@ -3594,7 +3636,7 @@ Returns this circle radius. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:radius
+do
   local c = lurek.math.newCircle(0, 0, 12)
   lurek.log.info("radius=" .. c:radius(), "geo")
 end
@@ -3611,7 +3653,7 @@ Returns the Lua-visible type name for this circle handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LCircle:type
+do
   local circle_obj = lurek.math.newCircle(0, 0, 50)
   local t = circle_obj:type()
   lurek.log.info("LCircle:type = " .. t, "math")
@@ -3633,7 +3675,7 @@ Returns whether this circle handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LCircle:typeOf
+do
   local circle_obj = lurek.math.newCircle(0, 0, 50)
   lurek.log.info("is LCircle: " .. tostring(circle_obj:typeOf("LCircle")), "math")
   lurek.log.info("is wrong: " .. tostring(circle_obj:typeOf("Unknown")), "math")
@@ -3651,7 +3693,7 @@ Returns this circle center x coordinate.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:x
+do
   local c = lurek.math.newCircle(72, 18, 5)
   lurek.log.debug("x=" .. c:x(), "geo")
 end
@@ -3668,7 +3710,7 @@ Returns this circle center y coordinate.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Circle:y
+do
   local c = lurek.math.newCircle(72, 18, 5)
   lurek.log.debug("y=" .. c:y(), "geo")
 end
@@ -3683,7 +3725,7 @@ Lua-side wrapper for a Hermite spline.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.hermite
+do
   ---@type LHermite
   local h = lurek.math.hermite(0, 0, 100, 100, 50, 0, 0, 50)
   local mx, my = h:sample(0.5)
@@ -3706,7 +3748,7 @@ Samples the spline at normalized parameter `t`.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Hermite:sample
+do
   ---@type LHermite
   local h = lurek.math.hermite(0, 0, 100, 100, 50, 0, 0, 50)
   local x, y = h:sample(0.5)
@@ -3725,7 +3767,7 @@ Returns the Lua-visible type name for this spline handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LHermite:type
+do
   local hermite_obj = lurek.math.hermite(0, 0, 1, 0, 100, 0, 1, 0)
   local t = hermite_obj:type()
   lurek.log.info("LHermite:type = " .. t, "math")
@@ -3747,7 +3789,7 @@ Returns whether this spline handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LHermite:typeOf
+do
   local hermite_obj = lurek.math.hermite(0, 0, 1, 0, 100, 0, 1, 0)
   lurek.log.info("is LHermite: " .. tostring(hermite_obj:typeOf("LHermite")), "math")
   lurek.log.info("is wrong: " .. tostring(hermite_obj:typeOf("Unknown")), "math")
@@ -3763,7 +3805,7 @@ Lua-side wrapper for a procedural noise generator.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newNoiseGenerator
+do
   local terrain = lurek.math.newNoiseGenerator(20260422)
   local h = terrain:perlin2d(3.5, 7.25)
   local map = terrain:generateMapCompute(16, 16, {octaves = 3})
@@ -3792,7 +3834,7 @@ Samples fractal Brownian motion noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:fbm
+do
   local ng = lurek.math.newNoiseGenerator(42)
   local v = ng:fbm(0.3, 0.7, 6, 2.0, 0.5)
   lurek.log.info("fbm noise: " .. v, "math")
@@ -3816,7 +3858,7 @@ Generates a noise map and returns it as a flat array table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:generateMap
+do
   local ng = lurek.math.newNoiseGenerator(99)
   local map = ng:generateMap(32, 32, { scale = 0.05, offsetX = 0.0, offsetY = 0.0 })
   lurek.log.info("map size: " .. #map, "math")
@@ -3840,7 +3882,7 @@ Generates a noise map through the compute backend and returns it as a flat array
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:generateMapCompute
+do
   local ng = lurek.math.newNoiseGenerator(101)
   local map = ng:generateMapCompute(16, 16, { octaves = 3, lacunarity = 2.0, gain = 0.5 })
   lurek.log.info("compute map size: " .. #map, "math")
@@ -3858,7 +3900,7 @@ Returns this noise generator seed.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:getSeed
+do
   local n = lurek.math.newNoiseGenerator(2026)
   lurek.log.info("noise seed=" .. n:getSeed(), "noise")
 end
@@ -3879,7 +3921,7 @@ Samples 1D Perlin noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:perlin1d
+do
   local n = lurek.math.newNoiseGenerator(1)
   local wind = n:perlin1d(0.4)
   lurek.log.debug("wind=" .. wind, "weather")
@@ -3902,7 +3944,7 @@ Samples 2D Perlin noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:perlin2d
+do
   local n = lurek.math.newNoiseGenerator(2)
   local h = n:perlin2d(2.5, 4.5)
   lurek.log.debug("h=" .. h, "noise")
@@ -3926,7 +3968,7 @@ Samples 3D Perlin noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:perlin3d
+do
   local n = lurek.math.newNoiseGenerator(3)
   local v = n:perlin3d(1.0, 2.0, 3.0)
   lurek.log.debug("v=" .. v, "noise")
@@ -3951,7 +3993,7 @@ Samples 4D Perlin noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:perlin4d
+do
   local n = lurek.math.newNoiseGenerator(4)
   local v = n:perlin4d(0.1, 0.2, 0.3, 0.4)
   lurek.log.debug("v4=" .. v, "noise")
@@ -3978,7 +4020,7 @@ Samples ridged fractal noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:ridged
+do
   local ng = lurek.math.newNoiseGenerator(7)
   local v = ng:ridged(0.5, 0.5, 5, 2.0, 0.5)
   lurek.log.info("ridged: " .. v, "math")
@@ -3998,7 +4040,7 @@ Sets this noise generator seed. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:setSeed
+do
   local n = lurek.math.newNoiseGenerator(0)
   n:setSeed(99)
   lurek.log.debug("re-seeded", "noise")
@@ -4020,7 +4062,7 @@ Samples 1D simplex noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:simplex1d
+do
   local n = lurek.math.newNoiseGenerator(5)
   local s = n:simplex1d(0.7)
   lurek.log.debug("s1=" .. s, "noise")
@@ -4043,7 +4085,7 @@ Samples 2D simplex noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:simplex2d
+do
   local n = lurek.math.newNoiseGenerator(6)
   local s = n:simplex2d(0.4, 0.6)
   lurek.log.debug("s2=" .. s, "noise")
@@ -4067,7 +4109,7 @@ Samples 3D simplex noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:simplex3d
+do
   local n = lurek.math.newNoiseGenerator(7)
   local s = n:simplex3d(0.1, 0.2, 0.3)
   lurek.log.debug("s3=" .. s, "noise")
@@ -4094,7 +4136,7 @@ Samples turbulence fractal noise.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:turbulence
+do
   local ng = lurek.math.newNoiseGenerator(55)
   local v = ng:turbulence(0.4, 0.6, 5, 2.0, 0.5)
   lurek.log.info("turbulence: " .. v, "math")
@@ -4112,7 +4154,7 @@ Returns the Lua-visible type name for this noise generator handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LNoiseGenerator:type
+do
   local noise_generator_obj = lurek.math.newNoiseGenerator(42)
   local t = noise_generator_obj:type()
   lurek.log.info("LNoiseGenerator:type = " .. t, "math")
@@ -4134,7 +4176,7 @@ Returns whether this noise generator handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LNoiseGenerator:typeOf
+do
   local noise_generator_obj = lurek.math.newNoiseGenerator(42)
   lurek.log.info("is LNoiseGenerator: " .. tostring(noise_generator_obj:typeOf("LNoiseGenerator")), "math")
   lurek.log.info("is wrong: " .. tostring(noise_generator_obj:typeOf("Unknown")), "math")
@@ -4158,7 +4200,7 @@ Samples domain-warped noise coordinates.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:warpDomain
+do
   local ng = lurek.math.newNoiseGenerator(101)
   local wx, wy = ng:warpDomain(0.3, 0.3, 0.8)
   wx = wx or 0.0
@@ -4186,7 +4228,7 @@ Samples 2D Worley noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:worley2d
+do
   local ng = lurek.math.newNoiseGenerator(321)
   local v = ng:worley2d(0.25, 0.75)
   lurek.log.info("worley2d: " .. v, "math")
@@ -4212,7 +4254,7 @@ Samples 3D Worley noise. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- NoiseGenerator:worley3d
+do
   local ng = lurek.math.newNoiseGenerator(654)
   local v = ng:worley3d(0.1, 0.5, 0.9)
   lurek.log.info("worley3d: " .. v, "math")
@@ -4228,7 +4270,7 @@ Lua-side wrapper for a deterministic random generator.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newRandomGenerator
+do
   local rng = lurek.math.newRandomGenerator(1337)
   local loot_roll = rng:randomInt(1, 100)
   lurek.log.info("loot roll=" .. loot_roll, "rng")
@@ -4246,7 +4288,7 @@ Returns this generator seed. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:getSeed
+do
   local rng = lurek.math.newRandomGenerator(20260422)
   local seed = rng:getSeed()
   lurek.log.info("rng seed=" .. seed, "rng")
@@ -4264,7 +4306,7 @@ Returns this generator serialized state string.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:getState
+do
   local rng = lurek.math.newRandomGenerator(77)
   local snapshot = rng:getState()
   lurek.log.debug("state bytes=" .. #snapshot, "rng")
@@ -4282,7 +4324,7 @@ Returns a random floating-point value from the generator.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:random
+do
   local rng = lurek.math.newRandomGenerator(42)
   local v = rng:random()
   lurek.log.debug("u01=" .. v, "rng")
@@ -4305,7 +4347,7 @@ Returns a random floating-point value in a range.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:randomFloat
+do
   local rng = lurek.math.newRandomGenerator(7)
   local angle = rng:randomFloat(0, math.pi * 2)
   lurek.log.debug("angle=" .. angle, "rng")
@@ -4328,7 +4370,7 @@ Returns a random integer in a range.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:randomInt
+do
   local rng = lurek.math.newRandomGenerator(99)
   local roll = rng:randomInt(1, 20)
   lurek.log.info("d20=" .. roll, "rng")
@@ -4351,7 +4393,7 @@ Returns a normally distributed random value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:randomNormal
+do
   local rng = lurek.math.newRandomGenerator(12345)
   local v = rng:randomNormal(0, 1)
   lurek.log.info("normal sample: " .. v, "math")
@@ -4371,7 +4413,7 @@ Resets this generator to a seed value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:setSeed
+do
   local rng = lurek.math.newRandomGenerator(0)
   rng:setSeed(12345)
   lurek.log.debug("after reseed=" .. rng:randomInt(1, 6), "rng")
@@ -4391,7 +4433,7 @@ Restores this generator from a serialized state string.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RandomGenerator:setState
+do
   local rng = lurek.math.newRandomGenerator(77)
   local snap = rng:getState()
   rng:random()
@@ -4410,7 +4452,7 @@ Returns the Lua-visible type name for this random generator handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LRandomGenerator:type
+do
   local random_generator_obj = lurek.math.newRandomGenerator(42)
   local t = random_generator_obj:type()
   lurek.log.info("LRandomGenerator:type = " .. t, "math")
@@ -4432,7 +4474,7 @@ Returns whether this random generator handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LRandomGenerator:typeOf
+do
   local random_generator_obj = lurek.math.newRandomGenerator(42)
   lurek.log.info("is LRandomGenerator: " .. tostring(random_generator_obj:typeOf("LRandomGenerator")), "math")
   lurek.log.info("is wrong: " .. tostring(random_generator_obj:typeOf("Unknown")), "math")
@@ -4448,7 +4490,7 @@ Lua-side wrapper for a rectangle packer.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newRectPacker
+do
   local packer = lurek.math.newRectPacker(256, 256, 2)
   local x, y = packer:pack(64, 64, "hero")
   lurek.log.info("packed hero at " .. tostring(x) .. "," .. tostring(y), "atlas")
@@ -4464,7 +4506,7 @@ Clears packed rectangles from this packer.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RectPacker:clear
+do
   local packer = lurek.math.newRectPacker(128, 128, 2)
   packer:pack(40, 16, "tmp")
   packer:clear()
@@ -4483,7 +4525,7 @@ Returns packed rectangle records.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RectPacker:getPacked
+do
   local packer = lurek.math.newRectPacker(128, 128, 2)
   packer:pack(20, 20, "icon_a")
   packer:pack(30, 18, "icon_b")
@@ -4503,7 +4545,7 @@ Returns occupied area ratio. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RectPacker:occupancy
+do
   local packer = lurek.math.newRectPacker(128, 128, 2)
   packer:pack(32, 32, "slot1")
   local occ = packer:occupancy()
@@ -4528,7 +4570,7 @@ Attempts to pack a rectangle and returns its placement coordinates.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- RectPacker:pack
+do
   local packer = lurek.math.newRectPacker(128, 128, 2)
   local x, y = packer:pack(32, 24, "btn_ok")
   if x and y then
@@ -4546,7 +4588,7 @@ Lua-side wrapper for a spatial hash index.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newSpatialHash
+do
   local hash = lurek.math.newSpatialHash(64)
   hash:insert("player", 100, 100, 32, 32)
   local hits = hash:queryCircle(110, 110, 50)
@@ -4562,7 +4604,7 @@ Clears all items from the spatial hash.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:clear
+do
   local h = lurek.math.newSpatialHash(64)
   h:insert("a", 0, 0, 16, 16)
   h:clear()
@@ -4580,7 +4622,7 @@ Returns the spatial hash cell size.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:getCellSize
+do
   local h = lurek.math.newSpatialHash(96)
   local cs = h:getCellSize()
   lurek.log.debug("cell=" .. cs, "spatial")
@@ -4598,7 +4640,7 @@ Returns the number of items in the spatial hash.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:getItemCount
+do
   local h = lurek.math.newSpatialHash(64)
   h:insert("a", 0, 0, 16, 16)
   lurek.log.info("items=" .. h:getItemCount(), "spatial")
@@ -4622,7 +4664,7 @@ Inserts an item rectangle into the spatial hash.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:insert
+do
   local sh = lurek.math.newSpatialHash(64)
   sh:insert("entity_01", 100, 100, 32, 32)
   sh:insert("entity_02", 200, 150, 32, 32)
@@ -4647,7 +4689,7 @@ Returns ids intersecting a query circle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:queryCircle
+do
   local sh = lurek.math.newSpatialHash(32)
   sh:insert("e1", 100, 100, 16, 16)
   sh:insert("e2", 500, 500, 16, 16)
@@ -4674,7 +4716,7 @@ Returns ids intersecting a query rectangle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:queryRect
+do
   local sh = lurek.math.newSpatialHash(64)
   sh:insert("player", 100, 100, 32, 32)
   sh:insert("enemy", 128, 100, 32, 32)
@@ -4701,7 +4743,7 @@ Returns ids intersecting a query line segment.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:querySegment
+do
   local sh = lurek.math.newSpatialHash(64)
   sh:insert("wall", 200, 100, 240, 300)
   local hits = sh:querySegment(0, 200, 400, 200)
@@ -4722,7 +4764,7 @@ Removes an item from the spatial hash.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:remove
+do
   local h = lurek.math.newSpatialHash(64)
   h:insert("npc", 0, 0, 32, 32)
   h:remove("npc")
@@ -4740,7 +4782,7 @@ Returns the Lua-visible type name for this spatial hash handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LSpatialHash:type
+do
   local spatial_hash_obj = lurek.math.newSpatialHash(64)
   local t = spatial_hash_obj:type()
   lurek.log.info("LSpatialHash:type = " .. t, "math")
@@ -4762,7 +4804,7 @@ Returns whether this spatial hash handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LSpatialHash:typeOf
+do
   local spatial_hash_obj = lurek.math.newSpatialHash(64)
   lurek.log.info("is LSpatialHash: " .. tostring(spatial_hash_obj:typeOf("LSpatialHash")), "math")
   lurek.log.info("is wrong: " .. tostring(spatial_hash_obj:typeOf("Unknown")), "math")
@@ -4786,7 +4828,7 @@ Updates an item rectangle in the spatial hash.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- SpatialHash:update
+do
   local sh = lurek.math.newSpatialHash(64)
   sh:insert("player", 100, 100, 32, 32)
   sh:update("player", 110, 105, 32, 32)
@@ -4803,7 +4845,7 @@ Lua-side wrapper for a 2D transform matrix.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newTransform
+do
   local t = lurek.math.newTransform(100, 50, math.pi / 4, 2, 2)
   local wx, wy = t:transformPoint(8, 0)
   lurek.log.debug("rotated corner at " .. wx .. "," .. wy, "xform")
@@ -4821,7 +4863,7 @@ Returns a copy of this transform. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:clone
+do
   local t = lurek.math.newTransform(10, 20)
   local dup = t:clone()
   dup:translate(5, 0)
@@ -4839,7 +4881,7 @@ Decomposes this transform into component values.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:decompose
+do
   local t = lurek.math.newTransform(100, 50, math.pi / 4, 2, 2)
   local x, y, angle, sx, sy = t:decompose()
   lurek.log.info("xform " .. x .. "," .. y .. " a=" .. angle, "xform")
@@ -4857,7 +4899,7 @@ Returns this transform matrix as a flat array table.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:getMatrix
+do
   local t = lurek.math.newTransform(0, 0, math.pi / 2)
   local m = t:getMatrix()
   lurek.log.debug("matrix elems=" .. #m, "xform")
@@ -4875,7 +4917,7 @@ Returns this transform's inverse.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:inverse
+do
   local t = lurek.math.newTransform(10, 20, 0.3)
   local inv = t:inverse()
   lurek.log.debug("got inverse", "xform")
@@ -4898,7 +4940,7 @@ Transforms a point by this transform's inverse.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:inverseTransformPoint
+do
   local t = lurek.math.newTransform(50, 50, math.pi / 4)
   local lx, ly = t:inverseTransformPoint(100, 50)
   lurek.log.debug("local " .. lx .. "," .. ly, "xform")
@@ -4914,7 +4956,7 @@ Resets this transform to identity.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:reset
+do
   local t = lurek.math.newTransform(10, 20, 0.5)
   t:reset()
   lurek.log.debug("reset to identity", "xform")
@@ -4934,7 +4976,7 @@ Applies a rotation to this transform.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:rotate
+do
   local t = lurek.math.newTransform()
   t:rotate(math.pi / 4)
   lurek.log.debug("rotated 45deg", "xform")
@@ -4955,7 +4997,7 @@ Applies scale to this transform. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:scale
+do
   local t = lurek.math.newTransform()
   t:scale(2, 0.5)
   lurek.log.debug("scaled", "xform")
@@ -4983,7 +5025,7 @@ Replaces this transform from position, rotation, scale, origin, and shear compon
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:setTransformation
+do
   local t = lurek.math.newTransform()
   t:setTransformation(100, 200, 0.5, 2.0, 2.0, 16, 16, 0, 0)
   local x, y = t:transformPoint(0, 0)
@@ -5005,7 +5047,7 @@ Applies shear to this transform. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:shear
+do
   local t = lurek.math.newTransform()
   t:shear(0.2, 0)
   lurek.log.debug("sheared", "xform")
@@ -5028,7 +5070,7 @@ Transforms a point by this transform.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:transformPoint
+do
   local t = lurek.math.newTransform(100, 50, math.pi / 2)
   local wx, wy = t:transformPoint(10, 0)
   lurek.log.debug("world " .. wx .. "," .. wy, "xform")
@@ -5049,7 +5091,7 @@ Applies a translation to this transform.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Transform:translate
+do
   local t = lurek.math.newTransform()
   t:translate(50, -10)
   lurek.log.debug("translated", "xform")
@@ -5067,7 +5109,7 @@ Returns the Lua-visible type name for this transform handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LTransform:type
+do
   local transform_obj = lurek.math.newTransform()
   local t = transform_obj:type()
   lurek.log.info("LTransform:type = " .. t, "math")
@@ -5089,7 +5131,7 @@ Returns whether this transform handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LTransform:typeOf
+do
   local transform_obj = lurek.math.newTransform()
   lurek.log.info("is LTransform: " .. tostring(transform_obj:typeOf("LTransform")), "math")
   lurek.log.info("is wrong: " .. tostring(transform_obj:typeOf("Unknown")), "math")
@@ -5105,7 +5147,7 @@ Lua-side wrapper for numeric tween state.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.newTween
+do
   local tw = lurek.math.newTween(0.5, "outQuad")
   tw:addValue(0, 200)
   function lurek.process(dt) tw:update(dt) end
@@ -5128,7 +5170,7 @@ Adds a value track to this tween. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:addValue
+do
   local tw = lurek.math.newTween(0.5, "outQuad")
   local idx = tw:addValue(0, 200)
   lurek.log.info("value idx=" .. idx, "tween")
@@ -5146,7 +5188,7 @@ Returns all current tween values. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getAllValues
+do
   local tw = lurek.math.newTween(0.5)
   tw:addValue(0, 1)
   local all = tw:getAllValues()
@@ -5165,7 +5207,7 @@ Returns this tween clock time. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getClock
+do
   local tw = lurek.math.newTween(1.0)
   local now = tw:getClock()
   lurek.log.debug("now=" .. now, "tween")
@@ -5183,7 +5225,7 @@ Returns this tween duration. This method is available to Lua scripts.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:getDuration
+do
   local obj = { x = 0 }
   local tw = lurek.tween.tween(1.0, obj, { x = 10 })
   lurek.log.debug("duration=" .. tw:getDuration(), "tween")
@@ -5201,7 +5243,7 @@ Returns this tween easing function name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getEasingName
+do
   local tw = lurek.math.newTween(0.5, "outBack")
   lurek.log.debug("easing=" .. tw:getEasingName(), "tween")
 end
@@ -5218,7 +5260,7 @@ Returns this tween clock time. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getTime
+do
   local tw = lurek.math.newTween(1.0)
   local pct = tw:getTime() / tw:getDuration()
   lurek.log.debug("pct=" .. pct, "tween")
@@ -5240,7 +5282,7 @@ Returns one tween value by one-based index or all values when no index is provid
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getValue
+do
   local tw = lurek.math.newTween(0.5)
   tw:addValue(0, 200)
   local v = tw:getValue(1)
@@ -5259,7 +5301,7 @@ Returns the number of values animated by this tween.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:getValueCount
+do
   local tw = lurek.math.newTween(0.5)
   tw:addValue(0, 10)
   lurek.log.info("count=" .. tw:getValueCount(), "tween")
@@ -5277,7 +5319,7 @@ Returns whether this tween is complete.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:isComplete
+do
   local tw = lurek.math.newTween(0.2)
   if tw:isComplete() then
     lurek.log.debug("ready", "tween")
@@ -5294,7 +5336,7 @@ Resets the tween clock to the beginning.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:reset
+do
   local tw = lurek.math.newTween(0.5)
   tw:addValue(0, 100)
   tw:reset()
@@ -5314,7 +5356,7 @@ Sets this tween clock time. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:set
+do
   local tw = lurek.math.newTween(1.0)
   tw:set(0.25)
   lurek.log.debug("clock set", "tween")
@@ -5334,7 +5376,7 @@ Sets this tween clock time. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:setTime
+do
   local tw = lurek.math.newTween(1.0)
   tw:setTime(0.5)
   lurek.log.debug("seeked to 0.5", "tween")
@@ -5352,7 +5394,7 @@ Returns the Lua-visible type name for this tween handle.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:type
+do
   local box = { x = 0 }
   local tw = lurek.tween.tween(0.5, box, { x = 100 })
   lurek.log.info("Tween:type = " .. tostring(tw and tw:type() or "nil"), "tween")
@@ -5374,7 +5416,7 @@ Returns whether this tween handle matches a supported type name.
 Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
-do -- Tween:typeOf
+do
   local box = { x = 0 }
   local tw = lurek.tween.tween(0.5, box, { x = 100 })
   lurek.log.info("Tween:typeOf = " .. tostring(tw and tw:typeOf("Tween") or false), "tween")
@@ -5396,7 +5438,7 @@ Advances the tween clock and returns whether it is complete.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Tween:update
+do
   local tw = lurek.math.newTween(1.0, "inOutQuad")
   tw:addValue(0, 200)
   tw:update(0.5)
@@ -5413,7 +5455,7 @@ Represents the Lua-visible LVec2 object exposed by this module.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.Vec2
+do
   local v = lurek.math.Vec2(10, 20)
   local n = v:normalize()
   lurek.log.debug("normalised x=" .. n.x, "math")
@@ -5431,7 +5473,7 @@ Returns this vector angle. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:angle
+do
   local v = lurek.math.vec2(0, 1)
   lurek.log.debug("angle=" .. lurek.math.deg(v:angle()), "math")
 end
@@ -5452,7 +5494,7 @@ Returns the scalar 2D cross product with another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:cross
+do
   local a = lurek.math.vec2(1, 0)
   local b = lurek.math.vec2(0, 1)
   lurek.log.debug("cross=" .. a:cross(b), "math")
@@ -5474,7 +5516,7 @@ Returns distance to another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:distance
+do
   local a = lurek.math.vec2(0, 0)
   local b = lurek.math.vec2(3, 4)
   lurek.log.info("dist=" .. a:distance(b), "math")
@@ -5496,7 +5538,7 @@ Returns the dot product with another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:dot
+do
   local a = lurek.math.vec2(1, 0)
   local b = lurek.math.vec2(0, 1)
   lurek.log.debug("dot=" .. a:dot(b), "math")
@@ -5518,7 +5560,7 @@ Creates a unit vector from an angle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec2:fromAngle
+do
   local v = lurek.math.vec2(1, 0)
   local angle = math.pi / 4   -- 45 degrees (northeast)
   local dir = lurek.math.vec2(1, 0).fromAngle(angle)
@@ -5537,7 +5579,7 @@ Returns this vector length. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:length
+do
   local v = lurek.math.vec2(3, 4)
   local len = v:length()
   lurek.log.info("len=" .. len, "math")
@@ -5555,7 +5597,7 @@ Returns this vector squared length.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:lengthSquared
+do
   local v = lurek.math.vec2(3, 4)
   if v:lengthSquared() > 25 then
     lurek.log.debug("vector longer than 5", "math")
@@ -5579,7 +5621,7 @@ Returns a vector interpolated toward another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:lerp
+do
   local a = lurek.math.vec2(0, 0)
   local b = lurek.math.vec2(100, 0)
   local mid = a:lerp(b, 0.5)
@@ -5598,7 +5640,7 @@ Returns a normalized copy of this vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:normalize
+do
   local dir = lurek.math.vec2(10, 0):normalize()
   lurek.log.debug("dir x=" .. dir.x, "math")
 end
@@ -5615,7 +5657,7 @@ Returns a normalized copy of this vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:normalized
+do
   local n = lurek.math.vec2(0, 5):normalized()
   lurek.log.debug("n.y=" .. n.y, "math")
 end
@@ -5632,7 +5674,7 @@ Returns a perpendicular vector. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:perpendicular
+do
   local n = lurek.math.vec2(1, 0):perpendicular()
   lurek.log.debug("perp y=" .. n.y, "math")
 end
@@ -5653,7 +5695,7 @@ Returns this vector reflected around a normal vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:reflect
+do
   local incoming = lurek.math.vec2(1, -1)
   local floor = lurek.math.vec2(0, 1)
   local bounced = incoming:reflect(floor)
@@ -5676,7 +5718,7 @@ Returns this vector rotated by an angle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:rotate
+do
   local v = lurek.math.vec2(10, 0)
   local r = v:rotate(math.pi / 2)
   lurek.log.debug("rotated x=" .. r.x .. " y=" .. r.y, "math")
@@ -5694,7 +5736,7 @@ Returns the Lua-visible type name for this vector handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec2:type
+do
   local vec2_obj = lurek.math.vec2(0, 0)
   local t = vec2_obj:type()
   lurek.log.info("LVec2:type = " .. t, "math")
@@ -5716,7 +5758,7 @@ Returns whether this vector handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec2:typeOf
+do
   local vec2_obj = lurek.math.vec2(0, 0)
   lurek.log.info("is LVec2: " .. tostring(vec2_obj:typeOf("LVec2")), "math")
   lurek.log.info("is wrong: " .. tostring(vec2_obj:typeOf("Unknown")), "math")
@@ -5734,7 +5776,7 @@ Returns this vector x component. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:x
+do
   local v = lurek.math.vec2(7, 9)
   local x = v.x
   lurek.log.debug("x=" .. x, "math")
@@ -5752,7 +5794,7 @@ Returns this vector y component. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec2:y
+do
   local v = lurek.math.vec2(7, 9)
   local y = v.y
   lurek.log.debug("y=" .. y, "math")
@@ -5768,7 +5810,7 @@ Represents the Lua-visible LVec3 object exposed by this module.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- lurek.math.Vec3
+do
   ---@type LVec3
   local p = lurek.math.Vec3(0, 0, 1)
   local s = p:scale(5)
@@ -5791,7 +5833,7 @@ Returns the sum with another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:add
+do
   ---@type LVec3
   local a = lurek.math.vec3(1, 2, 3)
   ---@type LVec3
@@ -5816,7 +5858,7 @@ Returns the 3D cross product with another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:cross
+do
   ---@type LVec3
   local x = lurek.math.vec3(1, 0, 0)
   ---@type LVec3
@@ -5841,7 +5883,7 @@ Returns distance to another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:distance
+do
   ---@type LVec3
   local a = lurek.math.vec3(0, 0, 0)
   ---@type LVec3
@@ -5865,7 +5907,7 @@ Returns the dot product with another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:dot
+do
   ---@type LVec3
   local n = lurek.math.vec3(0, 1, 0)
   ---@type LVec3
@@ -5885,7 +5927,7 @@ Returns this vector length. This method is available to Lua scripts.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:length
+do
   ---@type LVec3
   local v = lurek.math.vec3(1, 2, 2)
   lurek.log.debug("len=" .. v:length(), "math")
@@ -5903,7 +5945,7 @@ Returns this vector squared length.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:lengthSquared
+do
   ---@type LVec3
   local v = lurek.math.vec3(2, 2, 1)
   lurek.log.debug("len2=" .. v:lengthSquared(), "math")
@@ -5926,7 +5968,7 @@ Returns a vector interpolated toward another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:lerp
+do
   ---@type LVec3
   local a = lurek.math.vec3(0, 0, 0)
   ---@type LVec3
@@ -5947,7 +5989,7 @@ Returns a normalized copy of this vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:normalize
+do
   ---@type LVec3
   local v = lurek.math.vec3(0, 0, 5)
   local n = v:normalize()
@@ -5970,7 +6012,7 @@ Returns this vector multiplied by a scalar.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:scale
+do
   ---@type LVec3
   local base = lurek.math.vec3(1, 0, 0)
   local v = base:scale(9.81)
@@ -5993,7 +6035,7 @@ Creates a vector with all components set to one value.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec3:splat
+do
   local v = lurek.math.vec3(0, 0, 0)
   local ones = lurek.math.vec3(1.0, 1.0, 1.0).splat(1.0)
   lurek.log.info("splat=" .. ones.x .. "," .. ones.y .. "," .. ones.z, "math")
@@ -6015,7 +6057,7 @@ Returns the difference from another vector.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- Vec3:sub
+do
   ---@type LVec3
   local a = lurek.math.vec3(5, 5, 5)
   ---@type LVec3
@@ -6036,7 +6078,7 @@ Returns the Lua-visible type name for this vector handle.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec3:type
+do
   local vec3_obj = lurek.math.vec3(0, 0, 0)
   local t = vec3_obj:type()
   lurek.log.info("LVec3:type = " .. t, "math")
@@ -6058,7 +6100,7 @@ Returns whether this vector handle matches a supported type name.
 Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
-do -- LVec3:typeOf
+do
   local vec3_obj = lurek.math.vec3(0, 0, 0)
   lurek.log.info("is LVec3: " .. tostring(vec3_obj:typeOf("LVec3")), "math")
   lurek.log.info("is wrong: " .. tostring(vec3_obj:typeOf("Unknown")), "math")

@@ -103,11 +103,53 @@ Development-time diagnostic utilities exposed as `lurek.devtools.*` for runtime 
 Module example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.log
-  local hp, max_hp = 12, 100
-  local level = (hp < max_hp * 0.2) and "warn" or "info"
-  lurek.devtools.log(level, "player hp " .. hp .. "/" .. max_hp)
+--@api-stub: lurek.devtools.profileFrame
+-- Closes the current profiling frame and stores its zone tree for later inspection
+do
+  function lurek.process(dt)
+    lurek.devtools.profilePush("frame")
+    lurek.devtools.profilePop()
+    lurek.devtools.profileFrame()
+  end
 end
+
+--@api-stub: lurek.devtools.getProfileFrameCount
+-- Returns how many profiling frames are currently stored
+do
+  local n = lurek.devtools.getProfileFrameCount()
+  if n >= 60 then
+    lurek.devtools.info("profiler has " .. n .. " frames buffered â€” ready to summarise")
+  end
+end
+
+--@api-stub: lurek.devtools.getProfileData
+-- Returns the profiler zone tree for a retained frame
+do
+  local zones = lurek.devtools.getProfileData(0)
+  for _, z in ipairs(zones) do
+    lurek.devtools.debug(z.name .. " total=" .. z.time .. "s self=" .. z.selfTime .. "s")
+  end
+end
+
+--@api-stub: lurek.devtools.resetProfile
+-- Clears profiler state, active zones, and retained profiling frames
+do
+  lurek.devtools.resetProfile()
+  lurek.devtools.profilePush("benchmark")
+  lurek.devtools.profilePop()
+  lurek.devtools.profileFrame()
+end
+
+--@api-stub: lurek.devtools.recordFrameTime
+-- Records one CPU frame duration sample for devtools frame statistics
+do
+  function lurek.process(dt)
+    lurek.devtools.recordFrameTime(dt)
+  end
+end
+
+--@api-stub: lurek.devtools.getFrameStats
+-- Returns aggregate CPU frame timing statistics from recorded samples
 ```
 
 ## Key Types
@@ -152,7 +194,7 @@ Clears all in-memory devtools log entries.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.clearLog
+do
   lurek.devtools.info("old session noise")
   lurek.devtools.clearLog()
   lurek.devtools.info("fresh start: level transition complete")
@@ -168,7 +210,7 @@ Removes every path from the module-level file watcher.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.clearWatches
+do
   lurek.devtools.watch("a.lua")
   lurek.devtools.watch("b.lua")
   lurek.devtools.clearWatches()
@@ -189,7 +231,7 @@ Adds a debug-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.debug
+do
   lurek.devtools.debug("debug trace: player_x=32.5, frame=120")
 end
 ```
@@ -207,7 +249,7 @@ Adds an error-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.error
+do
   local path = "assets/missing.png"
   lurek.devtools.error("asset not found: " .. path)
   lurek.devtools.error("continuing with placeholder")
@@ -229,7 +271,7 @@ Evaluates Lua code in the current state and returns success plus values or failu
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.eval
+do
   local ok, value = lurek.devtools.eval("return 21 * 2")
   if ok then
     lurek.devtools.info("eval result = " .. tostring(value))
@@ -254,7 +296,7 @@ Registers a watch expression callback for snapshots and watch panels.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.exposeWatch
+do
   local player = { x = 256, y = 128, hp = 80 }
   local id_x = lurek.devtools.exposeWatch("player.x", function() return player.x end, "actor")
   local id_hp = lurek.devtools.exposeWatch("player.hp", function() return player.hp end, "combat")
@@ -275,7 +317,7 @@ Adds a fatal-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.fatal
+do
   local ok, result = pcall(function()
     lurek.devtools.fatal("save system unavailable")
   end)
@@ -298,7 +340,7 @@ Returns Lua call stack frames using the Lua debug library.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getCallStack
+do
   local frames = lurek.devtools.getCallStack(10)
   for i, f in ipairs(frames) do
     lurek.devtools.debug("frame " .. i .. ": " .. f.source .. ":" .. f.line .. " in " .. f.name)
@@ -317,7 +359,7 @@ Returns retained CPU frame duration samples in insertion order.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getFrameHistory
+do
   lurek.devtools.recordFrameTime(0.016)
   local history = lurek.devtools.getFrameHistory()
   local latest = history[#history] or 0
@@ -336,7 +378,7 @@ Returns the current CPU frame history capacity.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getFrameHistorySize
+do
   lurek.devtools.setFrameHistorySize(50000)
   local cap = lurek.devtools.getFrameHistorySize()
   lurek.devtools.info("frame history capacity = " .. cap .. " (clamped from 50000)")
@@ -354,7 +396,7 @@ Returns aggregate CPU frame timing statistics from recorded samples.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getFrameStats
+do
   lurek.devtools.recordFrameTime(1/60)
   local s = lurek.devtools.getFrameStats()
   if s.p99 > 0.020 then
@@ -374,7 +416,7 @@ Returns aggregate GPU frame timing statistics from recorded samples.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getGpuFrameStats
+do
   lurek.devtools.recordGpuFrameTime(1/90)
   local gpu = lurek.devtools.getGpuFrameStats()
   lurek.devtools.info("gpu avg dt=" .. gpu.avg .. " samples=" .. gpu.samples)
@@ -392,7 +434,7 @@ Returns whether devtools log entries are mirrored to the console.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getLogConsole
+do
   if lurek.devtools.getLogConsole() then
     local entities = 128
     lurek.devtools.debug("world tick: entities=" .. entities)
@@ -411,7 +453,7 @@ Returns the file path currently stored as the devtools log target.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getLogFile
+do
   local path = lurek.devtools.getLogFile()
   if path == "" then
     lurek.devtools.warn("no log file configured; bug reports will lack file output")
@@ -434,7 +476,7 @@ Returns recent devtools log entries as structured tables.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getLogHistory
+do
   lurek.devtools.info("loaded forest_01")
   local recent = lurek.devtools.getLogHistory(20)
   local last = recent[#recent]
@@ -453,7 +495,7 @@ Returns the minimum severity currently used by devtools log output.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getLogLevel
+do
   local current = lurek.devtools.getLogLevel()
   if current == "trace" or current == "debug" then
     lurek.devtools.debug("verbose path active (level=" .. current .. ")")
@@ -476,7 +518,7 @@ Returns the profiler zone tree for a retained frame.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getProfileData
+do
   local zones = lurek.devtools.getProfileData(0)
   for _, z in ipairs(zones) do
     lurek.devtools.debug(z.name .. " total=" .. z.time .. "s self=" .. z.selfTime .. "s")
@@ -495,7 +537,7 @@ Returns how many profiling frames are currently stored.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getProfileFrameCount
+do
   local n = lurek.devtools.getProfileFrameCount()
   if n >= 60 then
     lurek.devtools.info("profiler has " .. n .. " frames buffered â€” ready to summarise")
@@ -514,7 +556,7 @@ Returns all paths currently watched by the module-level file watcher.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getWatchedPaths
+do
   lurek.devtools.watch("conf.toml")
   local paths = lurek.devtools.getWatchedPaths()
   lurek.devtools.info("watching " .. #paths .. " path(s)")
@@ -532,7 +574,7 @@ Evaluates exposed watch callbacks and returns their current values.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getWatches
+do
   local score = 1500
   lurek.devtools.exposeWatch("score", function() return score end, "hud")
   for _, w in ipairs(lurek.devtools.getWatches()) do
@@ -552,7 +594,7 @@ Returns the polling interval hint used by devtools watch UIs.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.getWatchInterval
+do
   local interval = lurek.devtools.getWatchInterval()
   if interval > 1.0 then
     lurek.devtools.warn("watch poll every " .. interval .. "s feels sluggish; consider 0.25")
@@ -573,7 +615,7 @@ Adds an info-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.info
+do
   lurek.devtools.info("game loaded: level=1, entities=42")
 end
 ```
@@ -589,7 +631,7 @@ Returns whether the devtools console is marked open.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.isConsoleOpen
+do
   function lurek.draw_ui()
     if lurek.devtools.isConsoleOpen() then
       -- console panel would be drawn here
@@ -609,7 +651,7 @@ Returns whether the devtools entity inspector is marked open.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.isEntityInspectorOpen
+do
   if lurek.devtools.isEntityInspectorOpen() then
     lurek.devtools.debug("entity inspector active")
   end
@@ -627,7 +669,7 @@ Returns whether CPU profiling zone collection is currently enabled.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.isProfilingEnabled
+do
   if lurek.devtools.isProfilingEnabled() then
     lurek.devtools.profilePush("physics_step")
     lurek.devtools.profilePop()
@@ -649,7 +691,7 @@ Adds a message to the devtools log using an explicit severity level.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.log
+do
   local hp, max_hp = 12, 100
   local level = (hp < max_hp * 0.2) and "warn" or "info"
   lurek.devtools.log(level, "player hp " .. hp .. "/" .. max_hp)
@@ -671,7 +713,7 @@ Creates a dedicated file watcher userdata for one path.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.newFileWatcher
+do
   local fw = lurek.devtools.newFileWatcher("content/examples/devtools.lua")
   fw:onChanged(function() lurek.devtools.info("devtools.lua changed; reloading") end)
   function lurek.process(dt) fw:check() end
@@ -693,7 +735,7 @@ Creates a REPL console userdata with bounded command history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.newRepl
+do
   local repl = lurek.devtools.newRepl(100)
   local result = repl:eval("return math.pi * 2")
   lurek.devtools.info("repl said: " .. result)
@@ -711,7 +753,7 @@ Marks the devtools console as open for UI state tracking.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.openConsole
+do
   lurek.devtools.openConsole()
   lurek.devtools.info("console flag is now " .. tostring(lurek.devtools.isConsoleOpen()))
 end
@@ -728,7 +770,7 @@ Marks the devtools entity inspector as open for UI state tracking.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.openEntityInspector
+do
   lurek.devtools.openEntityInspector()
 end
 ```
@@ -742,7 +784,7 @@ Closes the current profiling frame and stores its zone tree for later inspection
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.profileFrame
+do
   function lurek.process(dt)
     lurek.devtools.profilePush("frame")
     lurek.devtools.profilePop()
@@ -764,7 +806,7 @@ Ends the current profiling zone on the profiler stack.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.profilePop
+do
   lurek.devtools.setProfilingEnabled(true)
   lurek.devtools.profilePush("render_world")
   -- ... draw work happens here ...
@@ -785,7 +827,7 @@ Starts a named profiling zone on the current profiler stack.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.profilePush
+do
   lurek.devtools.setProfilingEnabled(true)
   lurek.devtools.profilePush("ai_update")
   lurek.devtools.profilePush("pathfinding")
@@ -805,7 +847,7 @@ Aggregates retained profiler frames into per-zone timing rows.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.profilerReport
+do
   lurek.devtools.profilePush("sim")
   lurek.devtools.profilePop()
   lurek.devtools.profileFrame()
@@ -828,7 +870,7 @@ Records one CPU frame duration sample for devtools frame statistics.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.recordFrameTime
+do
   function lurek.process(dt)
     lurek.devtools.recordFrameTime(dt)
   end
@@ -848,7 +890,7 @@ Records one GPU frame duration sample for devtools frame statistics.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.recordGpuFrameTime
+do
   function lurek.process(dt)
     lurek.devtools.recordGpuFrameTime(dt * 0.8)
   end
@@ -870,7 +912,7 @@ Removes a previously exposed watch expression by id.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.removeWatch
+do
   local fps_value = 60
   local id = lurek.devtools.exposeWatch("fps", function() return fps_value end)
   local removed = lurek.devtools.removeWatch(id)
@@ -887,7 +929,7 @@ Clears profiler state, active zones, and retained profiling frames.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.resetProfile
+do
   lurek.devtools.resetProfile()
   lurek.devtools.profilePush("benchmark")
   lurek.devtools.profilePop()
@@ -906,7 +948,7 @@ Polls module-level file watches and returns paths that changed since the previou
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.scan
+do
   lurek.devtools.watch("content/examples/devtools.lua")
   function lurek.process(dt)
     for _, path in ipairs(lurek.devtools.scan()) do
@@ -929,7 +971,7 @@ Sets the maximum number of CPU frame duration samples retained by devtools.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setFrameHistorySize
+do
   lurek.devtools.setFrameHistorySize(600)
   lurek.devtools.info("frame history sized for approx 10s at 60fps")
 end
@@ -948,7 +990,7 @@ Enables or disables mirroring devtools log entries to the console.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setLogConsole
+do
   lurek.devtools.setLogConsole(true)
   lurek.devtools.info("console logging on; ready for live debugging")
 end
@@ -967,7 +1009,7 @@ Sets the file path used by devtools file logging state.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setLogFile
+do
   local session_id = 1742
   lurek.devtools.setLogFile("save/logs/session_" .. session_id .. ".log")
   lurek.devtools.info("session log file opened")
@@ -987,7 +1029,7 @@ Sets the minimum severity that remains visible in devtools log output.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setLogLevel
+do
   local shipping = false
   lurek.devtools.setLogLevel(shipping and "info" or "debug")
   lurek.devtools.debug("verbose traces enabled")
@@ -1007,7 +1049,7 @@ Enables or disables collection of CPU profiling zones.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setProfilingEnabled
+do
   local debug_keys_held = true
   lurek.devtools.setProfilingEnabled(debug_keys_held)
   lurek.devtools.info("profiler now " .. (debug_keys_held and "on" or "off"))
@@ -1027,7 +1069,7 @@ Sets the polling interval hint used by devtools watch UIs.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.setWatchInterval
+do
   lurek.devtools.setWatchInterval(0.25)
   lurek.devtools.info("hot-reload poll @ " .. lurek.devtools.getWatchInterval() .. "s")
 end
@@ -1044,7 +1086,7 @@ Captures a combined devtools snapshot containing frame stats, watch values, prof
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.snapshot
+do
   lurek.devtools.recordFrameTime(0.016)
   local snap = lurek.devtools.snapshot()
   lurek.devtools.info("snapshot: fps=" .. snap.frameStats.fps .. " watches=" .. snap.watchCount)
@@ -1064,7 +1106,7 @@ Adds a trace-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.trace
+do
   local dt = 1 / 60
   lurek.devtools.trace("frame dt=" .. dt)
   lurek.devtools.trace("update done")
@@ -1086,7 +1128,7 @@ Removes a path from the module-level devtools file watcher.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.unwatch
+do
   lurek.devtools.watch("content/levels/forest_01.toml")
   local removed = lurek.devtools.unwatch("content/levels/forest_01.toml")
   lurek.devtools.debug("unwatched: " .. tostring(removed))
@@ -1106,7 +1148,7 @@ Adds a warning-level diagnostic message to the devtools log.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.warn
+do
   lurek.devtools.warn("texture cache miss: assets/hero.png")
 end
 ```
@@ -1126,7 +1168,7 @@ Adds a path to the module-level devtools file watcher.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.watch
+do
   local added = lurek.devtools.watch("content/examples/devtools.lua")
   if added then
     lurek.devtools.info("now watching devtools.lua for live reload")
@@ -1146,7 +1188,7 @@ Lua-side file watcher with an optional change callback.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.newFileWatcher
+do
   local fw = lurek.devtools.newFileWatcher("content/examples/devtools.lua")
   fw:onChanged(function() lurek.devtools.info("devtools.lua changed; reloading") end)
   function lurek.process(dt) fw:check() end
@@ -1162,7 +1204,7 @@ Cancels this watcher and removes its callback.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- FileWatcher:cancel
+do
   local fw = lurek.devtools.newFileWatcher("conf.toml")
   fw:onChanged(function() end)
   fw:cancel()
@@ -1181,7 +1223,7 @@ Polls the watcher and invokes the change callback when a change is found.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- FileWatcher:check
+do
   local fw = lurek.devtools.newFileWatcher("content/examples/devtools.lua")
   function lurek.process(dt)
     if fw:check() then lurek.devtools.info("devtools.lua reloaded") end
@@ -1200,7 +1242,7 @@ Returns the watched path. This method is available to Lua scripts.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- FileWatcher:getPath
+do
   local fw = lurek.devtools.newFileWatcher("content/levels/forest_01.toml")
   fw:onChanged(function() lurek.devtools.info("changed: " .. fw:getPath()) end)
 end
@@ -1219,7 +1261,7 @@ Sets the callback invoked when this watcher observes a change.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- FileWatcher:onChanged
+do
   local fw = lurek.devtools.newFileWatcher("conf.toml")
   local reloads = 0
   fw:onChanged(function() reloads = reloads + 1; lurek.devtools.info("reload #" .. reloads) end)
@@ -1237,7 +1279,7 @@ Returns the Lua-visible type name for this file watcher handle.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- LFileWatcher:type
+do
   local file_watcher_obj = lurek.devtools.newFileWatcher("save/")
   local t = file_watcher_obj:type()
   lurek.log.info("LFileWatcher:type = " .. t, "devtools")
@@ -1259,7 +1301,7 @@ Returns whether this file watcher handle matches a supported type name.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- LFileWatcher:typeOf
+do
   local file_watcher_obj = lurek.devtools.newFileWatcher("save/")
   lurek.log.info("is LFileWatcher: " .. tostring(file_watcher_obj:typeOf("LFileWatcher")), "devtools")
   lurek.log.info("is wrong: " .. tostring(file_watcher_obj:typeOf("Unknown")), "devtools")
@@ -1275,7 +1317,7 @@ Lua-side REPL console handle with bounded history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- lurek.devtools.newRepl
+do
   local repl = lurek.devtools.newRepl(100)
   local result = repl:eval("return math.pi * 2")
   lurek.devtools.info("repl said: " .. result)
@@ -1291,7 +1333,7 @@ Clears this REPL console's command history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- ReplConsole:clear
+do
   local repl = lurek.devtools.newRepl(10)
   repl:eval("return 1")
   repl:clear()
@@ -1314,7 +1356,7 @@ Evaluates Lua code through this REPL console and records it in history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- ReplConsole:eval
+do
   local repl = lurek.devtools.newRepl(50)
   local out = repl:eval("return string.upper('hello')")
   lurek.devtools.info("> " .. out)
@@ -1332,7 +1374,7 @@ Returns this REPL console's recorded command history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- ReplConsole:history
+do
   local repl = lurek.devtools.newRepl(20)
   repl:eval("x = 1")
   repl:eval("return x + 1")
@@ -1353,7 +1395,7 @@ Returns the number of entries stored in this REPL console history.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- ReplConsole:len
+do
   local repl = lurek.devtools.newRepl(100)
   repl:eval("print('hi')")
   if repl:len() > 0 then
@@ -1373,7 +1415,7 @@ Returns the Lua-visible type name for this REPL console handle.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- LReplConsole:type
+do
   local repl_console_obj = lurek.devtools.newRepl(50)
   local t = repl_console_obj:type()
   lurek.log.info("LReplConsole:type = " .. t, "devtools")
@@ -1395,7 +1437,7 @@ Returns whether this REPL console handle matches a supported type name.
 Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
-do -- LReplConsole:typeOf
+do
   local repl_console_obj = lurek.devtools.newRepl(50)
   lurek.log.info("is LReplConsole: " .. tostring(repl_console_obj:typeOf("LReplConsole")), "devtools")
   lurek.log.info("is wrong: " .. tostring(repl_console_obj:typeOf("Unknown")), "devtools")
