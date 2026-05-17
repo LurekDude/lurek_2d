@@ -35,7 +35,7 @@ UNKNOWN_SENTINEL = "unknown"
 DYNAMIC_LUA_TYPE = "LuaValue"
 
 TYPE_NORMALIZATIONS = {
-    "any": DYNAMIC_LUA_TYPE,
+    "any": "any",
     "bool": "boolean",
     "int": "number",
     "u8": "number",
@@ -591,6 +591,12 @@ def write_function_doc(out, fn, name):
             out.append(f"--- {line}")
 
     pkeys, ptyp, pdesc, popt = parse_params(fn)
+
+    # For colon-notation methods, self is implicit in LuaLS — skip it from
+    # both annotations and the signature parameter list.
+    if ':' in name and pkeys and pkeys[0] == "self":
+        pkeys = pkeys[1:]
+
     param_names = []
 
     for k in pkeys:
@@ -747,6 +753,10 @@ def main():
     # to avoid 'duplicate-doc-alias' warnings from the Lua language server.
     _SKIP_ALIAS = {"EventBus", "Scheduler", "Stack"}
 
+    # UI widget types that appear only as return types (no class-specific methods)
+    # but should still inherit from LUiWidget in the generated stub.
+    _UI_OPAQUE_WIDGETS = {"LSpacer"}
+
     for type_name in opaque_types:
         if type_name in _SKIP_ALIAS:
             continue
@@ -754,7 +764,8 @@ def main():
             out.append(f"---@alias {type_name} {_OPAQUE_ALIASES[type_name]}")
             out.append("")
         else:
-            out.append(f"---@class {type_name}")
+            parent = " : LUiWidget" if type_name in _UI_OPAQUE_WIDGETS else ""
+            out.append(f"---@class {type_name}{parent}")
             out.append(f"{type_name} = {{}}")
             out.append("")
 
@@ -803,6 +814,7 @@ def main():
     # the Lua language server can resolve lurek.input.keyboard.isDown etc.
     _NESTED_NAMESPACES: dict[str, list[str]] = {
         "input": ["keyboard", "mouse", "gamepad", "touch"],
+        "scene": ["transitions"],
     }
 
     _UI_NON_WIDGET_CLASSES = {
@@ -842,6 +854,8 @@ def main():
             out.append(f"---@class {class_decl}")
             # Hardcoded field annotations for types whose fields are Rust struct members
             # not visible to the Rust parser (registered via add_field_method_get).
+            if class_name == "LUiWidget":
+                out.append("---@field _idx integer  Internal widget pool index.")
             if class_name == "LVec2":
                 out.append("---@field x number  x component")
                 out.append("---@field y number  y component")

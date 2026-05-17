@@ -68,8 +68,14 @@ impl LuaUserData for LuaProvinceGrid {
             let t = lua.create_table()?;
             for (i, &(a, b, bp)) in this.inner.adjacencies().iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Performs the 'province_a' operation.
+                /// @return | nil | No value is returned.
                 entry.set("province_a", a)?;
+                /// Performs the 'province_b' operation.
+                /// @return | nil | No value is returned.
                 entry.set("province_b", b)?;
+                /// Performs the 'border_pixels' operation.
+                /// @return | nil | No value is returned.
                 entry.set("border_pixels", bp)?;
                 t.set(i + 1, entry)?;
             }
@@ -82,9 +88,17 @@ impl LuaUserData for LuaProvinceGrid {
             let t = lua.create_table()?;
             for (i, (id, y, x0, x1)) in this.inner.province_spans().into_iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'province_id' operation.
+                /// @return | nil | No value is returned.
                 row.set("province_id", id)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 row.set("y", y)?;
+                /// Performs the 'x0' operation.
+                /// @return | nil | No value is returned.
                 row.set("x0", x0)?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 row.set("x1", x1)?;
                 t.set(i + 1, row)?;
             }
@@ -98,11 +112,23 @@ impl LuaUserData for LuaProvinceGrid {
             for (i, (a, b, x0, y0, x1, y1)) in this.inner.border_segments().into_iter().enumerate()
             {
                 let seg = lua.create_table()?;
+                /// Performs the 'province_a' operation.
+                /// @return | nil | No value is returned.
                 seg.set("province_a", a)?;
+                /// Performs the 'province_b' operation.
+                /// @return | nil | No value is returned.
                 seg.set("province_b", b)?;
+                /// Performs the 'x0' operation.
+                /// @return | nil | No value is returned.
                 seg.set("x0", x0)?;
+                /// Performs the 'y0' operation.
+                /// @return | nil | No value is returned.
                 seg.set("y0", y0)?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 seg.set("x1", x1)?;
+                /// Performs the 'y1' operation.
+                /// @return | nil | No value is returned.
                 seg.set("y1", y1)?;
                 t.set(i + 1, seg)?;
             }
@@ -117,6 +143,8 @@ impl LuaUserData for LuaProvinceGrid {
             let mut idx = 1usize;
             for (id, rings) in &map {
                 let entry = lua.create_table()?;
+                /// Performs the 'province_id' operation.
+                /// @return | nil | No value is returned.
                 entry.set("province_id", *id)?;
                 let rings_tbl = lua.create_table()?;
                 for (ri, ring) in rings.iter().enumerate() {
@@ -129,6 +157,8 @@ impl LuaUserData for LuaProvinceGrid {
                     }
                     rings_tbl.set(ri + 1, pts)?;
                 }
+                /// Performs the 'rings' operation.
+                /// @return | nil | No value is returned.
                 entry.set("rings", rings_tbl)?;
                 out.set(idx, entry)?;
                 idx += 1;
@@ -144,6 +174,8 @@ impl LuaUserData for LuaProvinceGrid {
             let mut idx = 1usize;
             for (id, rings) in &map {
                 let entry = lua.create_table()?;
+                /// Performs the 'province_id' operation.
+                /// @return | nil | No value is returned.
                 entry.set("province_id", *id)?;
                 let rings_tbl = lua.create_table()?;
                 for (ri, ring) in rings.iter().enumerate() {
@@ -156,6 +188,8 @@ impl LuaUserData for LuaProvinceGrid {
                     }
                     rings_tbl.set(ri + 1, pts)?;
                 }
+                /// Performs the 'rings' operation.
+                /// @return | nil | No value is returned.
                 entry.set("rings", rings_tbl)?;
                 out.set(idx, entry)?;
                 idx += 1;
@@ -318,24 +352,48 @@ impl LuaUserData for LuaProvinceGrid {
                 let spans_tbl = lua.create_table()?;
                 for (i, (id, y, x0, x1)) in spans.into_iter().enumerate() {
                     let row = lua.create_table()?;
+                    /// Performs the 'province_id' operation.
+                    /// @return | nil | No value is returned.
                     row.set("province_id", id)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     row.set("y", y)?;
+                    /// Performs the 'x0' operation.
+                    /// @return | nil | No value is returned.
                     row.set("x0", x0)?;
+                    /// Performs the 'x1' operation.
+                    /// @return | nil | No value is returned.
                     row.set("x1", x1)?;
                     spans_tbl.set(i + 1, row)?;
                 }
+                /// Performs the 'spans' operation.
+                /// @return | nil | No value is returned.
                 result.set("spans", spans_tbl)?;
                 let segs_tbl = lua.create_table()?;
                 for (i, (a, b, x0, y0, x1, y1)) in segs.into_iter().enumerate() {
                     let seg = lua.create_table()?;
+                    /// Performs the 'province_a' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("province_a", a)?;
+                    /// Performs the 'province_b' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("province_b", b)?;
+                    /// Performs the 'x0' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("x0", x0)?;
+                    /// Performs the 'y0' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("y0", y0)?;
+                    /// Performs the 'x1' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("x1", x1)?;
+                    /// Performs the 'y1' operation.
+                    /// @return | nil | No value is returned.
                     seg.set("y1", y1)?;
                     segs_tbl.set(i + 1, seg)?;
                 }
+                /// Performs the 'segments' operation.
+                /// @return | nil | No value is returned.
                 result.set("segments", segs_tbl)?;
                 Ok(LuaValue::Table(result))
             } else {
@@ -794,7 +852,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- fromScreen --
     /// Returns a completed screen capture image or requests one for a future call.
-    /// @return | LImageData? | `LImageData` when capture data is ready, or nil after requesting capture.
+    /// @return | LImageData|nil | `LImageData` when capture data is ready, or nil after requesting capture.
     tbl.set(
         "fromScreen",
         lua.create_function(move |lua, ()| {
@@ -807,6 +865,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
         })?,
     )?;
+    /// Performs the 'image' operation.
+    /// @return | nil | No value is returned.
     lurek.set("image", tbl)?;
     Ok(())
 }
@@ -1139,7 +1199,7 @@ impl mlua::UserData for ImageData {
         /// @param | width | integer | Output width.
         /// @param | height | integer | Output height.
         /// @param | filter | string | Optional filter name, defaulting to `bilinear`.
-        /// @return | LImageData? | Resized `LImageData` handle, or nil when resizing fails.
+        /// @return | LImageData|nil | Resized `LImageData` handle, or nil when resizing fails.
         methods.add_method("resize", |lua, this, args: LuaMultiValue| {
             let mut it = args.into_iter();
             let w = match it.next() {
@@ -1276,7 +1336,7 @@ impl mlua::UserData for ImageData {
         /// @param | y | integer | Region y coordinate.
         /// @param | w | integer | Region width.
         /// @param | h | integer | Region height.
-        /// @return | LImageData? | `LImageData` handle, or nil when the region is out of bounds.
+        /// @return | LImageData|nil | `LImageData` handle, or nil when the region is out of bounds.
         methods.add_method(
             "getRegion",
             |lua, this, (x, y, w, h): (u32, u32, u32, u32)| match this.get_region(x, y, w, h) {
@@ -1368,10 +1428,12 @@ impl mlua::UserData for ImageData {
         /// @return | string | The string `LImageData`.
         methods.add_method("type", |_, _, ()| Ok("LImageData"));
         // -- typeOf --
-        /// Returns whether this image data handle matches the `ImageData` type name.
-        /// @param | name | string | Type name to compare against `ImageData`.
-        /// @return | boolean | True when the supplied type name is `ImageData`.
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "ImageData"));
+        /// Returns whether this image data handle matches the `LImageData` type name.
+        /// @param | name | string | Type name to compare against `LImageData` or `Object`.
+        /// @return | boolean | True when the supplied type name matches.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LImageData" || name == "Object")
+        });
     }
 }
 /// Lua-side handle for palette color remapping.

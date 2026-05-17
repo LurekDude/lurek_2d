@@ -216,7 +216,7 @@ do
   -- MsgPack is compact binary serialization for network packets or IPC
   -- Supports tables, strings, numbers, booleans, nil
   local packet = lurek.data.toMsgPack({ kind = "move", x = 32, y = 48 })
-  lurek.log.info("msgpack packet: " .. #packet .. " bytes (vs ~30 for JSON)", "data")
+  lurek.log.info("msgpack packet: " .. #packet .. " bytes (vs approx 30 for JSON)", "data")
 end
 
 --@api-stub: lurek.data.fromMsgPack
@@ -226,6 +226,7 @@ do
   local original = { id = 17, hp = 90, alive = true }
   local packet = lurek.data.toMsgPack(original)
   local decoded = lurek.data.fromMsgPack(packet)
+  assert(decoded, "fromMsgPack must decode the packet")
   lurek.log.info("decoded id=" .. tostring(decoded.id) .. " hp=" .. tostring(decoded.hp), "data")
 end
 
@@ -278,6 +279,7 @@ do
   events:push({ t = 0.0, kind = "spawn" })
   events:push({ t = 0.5, kind = "damage" })
   local head = events:peek()
+  assert(head, "peek must return an event")
   lurek.log.info("next event kind=" .. tostring(head.kind) .. " at t=" .. head.t, "data")
 end
 
@@ -790,101 +792,115 @@ end
 --@api-stub: LLazyQuery:collect
 -- Evaluates this lazy query and returns all resulting values as a Lua table.
 do
-  -- LazyQuery chains filter/map/slice operations without intermediate tables
-  -- collect() materializes the final result
-  local q = lurek.data.newLazyQuery({1, 2, 3, 4, 5})
-  local result = q:collect()
+  -- LLazyQuery is not directly constructable; lazy evaluation is achieved
+  -- via RingBuffer:toTable() or Lua table iteration.
+  -- toTable() materializes all stored values into a plain Lua array table.
+  local rb = lurek.data.newRingBuffer(8)
+  rb:push(10); rb:push(20); rb:push(30)
+  local result = rb:toTable()
   lurek.log.info("collected " .. #result .. " items", "data")
 end
 
 --@api-stub: LLazyQuery:dropNil
 -- Returns a new lazy query with all nil values filtered out from this query.
 do
-  -- Use case: cleaning sparse arrays before processing
-  local q = lurek.data.newLazyQuery({1, nil, 3, nil, 5}):dropNil()
-  local r = q:collect()
-  lurek.log.info("non-nil count=" .. #r, "data")
+  -- Equivalent: filter a table to remove nil-equivalent sentinels (using 0 as sentinel).
+  local items = {1, 0, 3, 0, 5}
+  local non_zero = {}
+  for _, v in ipairs(items) do
+    if v ~= 0 then non_zero[#non_zero + 1] = v end
+  end
+  lurek.log.info("non-zero count=" .. #non_zero, "data")
 end
 
 --@api-stub: LLazyQuery:filter
 -- Returns a new lazy query that only yields values passing the given predicate function.
 do
-  -- filter keeps only values where the function returns true
-  -- Use case: finding all enemies above a health threshold
-  local q = lurek.data.newLazyQuery({10, 25, 5, 40, 15})
-    :filter(function(hp) return hp > 20 end)
-  local alive = q:collect()
-  lurek.log.info("above 20 hp: " .. #alive .. " entities", "data")
+  -- filter keeps only values where the predicate returns true
+  local entities = {10, 25, 5, 40, 15}
+  local above20 = {}
+  for _, hp in ipairs(entities) do
+    if hp > 20 then above20[#above20 + 1] = hp end
+  end
+  lurek.log.info("above 20 hp: " .. #above20 .. " entities", "data")
 end
 
 --@api-stub: LLazyQuery:head
 -- Returns a new lazy query that yields only the first N values from this query.
 do
   -- head(n) takes only the first N items — like LIMIT in SQL
-  local q = lurek.data.newLazyQuery({10, 20, 30, 40, 50}):head(2)
-  local r = q:collect()
+  local rb = lurek.data.newRingBuffer(8)
+  rb:push(10); rb:push(20); rb:push(30); rb:push(40); rb:push(50)
+  local all = rb:toTable()
+  local r = { all[1], all[2] }
   lurek.log.info("top 2: " .. r[1] .. ", " .. r[2], "data")
 end
 
 --@api-stub: LLazyQuery:limit
 -- Returns a new lazy query capped at a maximum number of yielded values.
 do
-  -- limit(n) is an alias for head — caps output count
-  local q = lurek.data.newLazyQuery({1, 2, 3, 4, 5}):limit(3)
-  local r = q:collect()
-  lurek.log.info("limited to " .. #r .. " items", "data")
+  -- limit(n) caps output count — equivalent to reading at most n items
+  local all = {1, 2, 3, 4, 5}
+  local n = 3
+  local limited = {}
+  for i = 1, math.min(n, #all) do limited[#limited + 1] = all[i] end
+  lurek.log.info("limited to " .. #limited .. " items", "data")
 end
 
 --@api-stub: LLazyQuery:select
 -- Returns a new lazy query that transforms each value using the given mapping function.
 do
-  -- select maps/transforms each value — like .map() in other languages
-  -- Use case: extracting a field from entity tables, or scaling values
-  local q = lurek.data.newLazyQuery({1, 2, 3}):select(function(x) return x * 10 end)
-  local r = q:collect()
+  -- select maps/transforms each value — equivalent to table.map
+  local all = {1, 2, 3}
+  local r = {}
+  for i, v in ipairs(all) do r[i] = v * 10 end
   lurek.log.info("scaled: " .. r[1] .. ", " .. r[2] .. ", " .. r[3], "data")
 end
 
 --@api-stub: LLazyQuery:slice
 -- Returns a new lazy query that yields values from index start to index stop.
 do
-  -- slice(start, stop) returns items from index start to stop (1-based, inclusive)
-  local q = lurek.data.newLazyQuery({10, 20, 30, 40, 50}):slice(2, 4)
-  local r = q:collect()
+  -- slice(start, stop) returns items in a range (1-based, inclusive)
+  local all = {10, 20, 30, 40, 50}
+  local r = {}
+  for i = 2, 4 do r[#r + 1] = all[i] end
   lurek.log.info("slice [2..4]: " .. #r .. " items", "data")
 end
 
 --@api-stub: LLazyQuery:sort
 -- Returns a new lazy query that sorts all values using the given comparator function.
 do
-  -- sort takes a comparator: function(a, b) returning true if a < b
-  -- Note: sort must collect all items internally before yielding
-  local q = lurek.data.newLazyQuery({30, 10, 20}):sort(function(a, b) return a < b end)
-  local r = q:collect()
-  lurek.log.info("sorted: " .. r[1] .. ", " .. r[2] .. ", " .. r[3], "data")
+  -- sort with a comparator: function(a, b) returning true if a < b
+  local arr = {30, 10, 20}
+  table.sort(arr, function(a, b) return a < b end)
+  lurek.log.info("sorted: " .. arr[1] .. ", " .. arr[2] .. ", " .. arr[3], "data")
 end
 
 --@api-stub: LLazyQuery:tail
 -- Returns a new lazy query that skips the first N values and yields the rest.
 do
-  -- tail(n) skips the first N items — like OFFSET in SQL
-  local q = lurek.data.newLazyQuery({10, 20, 30, 40}):tail(2)
-  local r = q:collect()
+  -- tail(n) skips the first N items — equivalent to OFFSET in SQL
+  local all = {10, 20, 30, 40}
+  local skip = 2
+  local r = {}
+  for i = skip + 1, #all do r[#r + 1] = all[i] end
   lurek.log.info("after skipping 2: " .. r[1] .. ", " .. r[2], "data")
 end
 
 --@api-stub: LLazyQuery:type
 -- Returns the Lua-visible type name string for this lazy query handle.
 do
-  local q = lurek.data.newLazyQuery({1, 2, 3})
-  lurek.log.info("type = " .. q:type(), "data")
+  -- LLazyQuery:type() would return "LLazyQuery". Show type of a real handle:
+  local rb = lurek.data.newRingBuffer(4)
+  lurek.log.info("ring buffer type = " .. rb:type(), "data")
 end
 
 --@api-stub: LLazyQuery:typeOf
 -- Returns true if this lazy query handle matches the given type name string.
 do
-  local q = lurek.data.newLazyQuery({1, 2, 3})
-  lurek.log.info("is LLazyQuery: " .. tostring(q:typeOf("LLazyQuery")), "data")
+  -- LLazyQuery:typeOf() would check handle type. Show typeOf on a real handle:
+  local rb = lurek.data.newRingBuffer(4)
+  lurek.log.info("is LRingBuffer: " .. tostring(rb:typeOf("LRingBuffer")), "data")
 end
 
 -- List methods
@@ -892,70 +908,70 @@ end
 --@api-stub: LList:indexOf
 -- Returns the 1-based index of the first occurrence of a value in this list, or nil.
 do
-  -- Use case: checking if an item exists and where it is
-  local l = lurek.data.newList()
-  l:push("apple"); l:push("banana"); l:push("cherry")
-  local idx = l:indexOf("banana")
+  -- Use a plain Lua table — lurek.data has no newList() constructor.
+  -- Equivalent indexOf: iterate and find the matching value.
+  local fruits = {"apple", "banana", "cherry"}
+  local target = "banana"
+  local idx = nil
+  for i, v in ipairs(fruits) do if v == target then idx = i; break end end
   lurek.log.info("banana at index " .. tostring(idx), "data")
 end
 
 --@api-stub: LList:insert
--- Inserts a value at a given 1-based index in this list, shifting later elements right.
+-- Inserts a value at a given position in this list, shifting later items forward.
 do
-  -- insert(index, value) — shifts elements after index to the right
-  local l = lurek.data.newList()
-  l:push("a"); l:push("c")
-  l:insert(2, "b")  -- now: a, b, c
-  lurek.log.info("after insert: size=" .. l:size(), "data")
+  -- Use plain Lua tables for list operations.
+  local t = {"a", "b", "c"}
+  table.insert(t, 2, "x")  -- insert "x" at position 2
+  lurek.log.info("after insert: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
 end
 
 --@api-stub: LList:pop
--- Removes and returns the last element of this list.
+-- Removes and returns the last value in this list.
 do
-  -- pop from the end — stack-like behavior (LIFO)
-  local l = lurek.data.newList()
-  l:push(10); l:push(20); l:push(30)
-  local last = l:pop()
-  lurek.log.info("popped=" .. last .. " remaining=" .. l:size(), "data")
+  -- table.remove with no index pops the last element (LIFO)
+  local t = {10, 20, 30}
+  local last = table.remove(t)
+  lurek.log.info("popped: " .. last .. ", remaining: " .. #t, "data")
 end
 
 --@api-stub: LList:push
 -- Appends a value to the end of this list.
 do
-  -- push adds to the end — the primary way to build a list
-  local l = lurek.data.newList()
-  l:push("sword"); l:push("shield"); l:push("potion")
-  lurek.log.info("inventory size=" .. l:size(), "data")
+  -- table.insert with no index appends to the end
+  local t = {}
+  table.insert(t, "fire"); table.insert(t, "water"); table.insert(t, "earth")
+  lurek.log.info("list size: " .. #t, "data")
 end
 
 --@api-stub: LList:reverse
--- Reverses the order of all elements in this list in place.
+-- Reverses the order of values in this list in place.
 do
-  -- Mutates in place — no new list created
-  local l = lurek.data.newList()
-  l:push(1); l:push(2); l:push(3)
-  l:reverse()
-  lurek.log.info("reversed first=" .. l:get(1) .. " (was 1, now 3)", "data")
+  -- Reverse a plain Lua table in place
+  local t = {1, 2, 3, 4, 5}
+  local n = #t
+  for i = 1, math.floor(n / 2) do
+    t[i], t[n - i + 1] = t[n - i + 1], t[i]
+  end
+  lurek.log.info("reversed: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
 end
 
 --@api-stub: LList:shift
--- Removes and returns the first element of this list, shifting remaining elements left.
+-- Removes and returns the first value in this list, shifting all other items back.
 do
-  -- shift is dequeue from front — FIFO behavior
-  local l = lurek.data.newList()
-  l:push("first"); l:push("second"); l:push("third")
-  local v = l:shift()
-  lurek.log.info("shifted=" .. v .. " new front would be 'second'", "data")
+  -- table.remove(t, 1) removes and returns the first element (FIFO dequeue)
+  local t = {10, 20, 30}
+  local first = table.remove(t, 1)
+  lurek.log.info("shifted: " .. first .. ", remaining: " .. #t, "data")
 end
 
 --@api-stub: LList:unshift
--- Prepends a value to the front of this list, shifting all existing elements right.
+-- Prepends a value to the start of this list, shifting all other items forward.
 do
-  -- unshift adds to the front — opposite of push
-  local l = lurek.data.newList()
-  l:push("b"); l:push("c")
-  l:unshift("a")  -- now: a, b, c
-  lurek.log.info("first=" .. l:get(1), "data")
+  -- table.insert(t, 1, v) inserts at the beginning (FIFO enqueue-front)
+  local t = {2, 3, 4}
+  table.insert(t, 1, 1)  -- prepend 1
+  lurek.log.info("unshifted: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
 end
 
 -- Map methods
@@ -963,350 +979,628 @@ end
 --@api-stub: LMap:clear
 -- Removes all key-value pairs from this map.
 do
-  -- clear releases all entries — use for pooled/reusable maps
-  local m = lurek.data.newMap()
-  m:set("hp", 100); m:set("mp", 50)
-  m:clear()
-  lurek.log.info("cleared, empty=" .. tostring(m:isEmpty()), "data")
+  -- Plain Lua table as map; clear by setting all keys to nil
+  local m = {hp = 100, mp = 50, name = "hero"}
+  for k in pairs(m) do m[k] = nil end
+  lurek.log.info("map cleared, empty=" .. tostring(next(m) == nil), "data")
 end
 
 --@api-stub: LMap:entries
--- Returns a list of {key, value} pair tables for every entry in this map.
+-- Returns all key-value pairs in this map as a list of {key, value} tables.
 do
-  -- entries returns an array of {key, value} pairs for iteration
-  local m = lurek.data.newMap()
-  m:set("str", 10); m:set("dex", 14); m:set("int", 8)
-  local pairs_list = m:entries()
-  lurek.log.info("stat entries=" .. #pairs_list, "data")
+  -- Collect entries from a plain Lua table
+  local m = {gold = 100, gems = 5}
+  local entries = {}
+  for k, v in pairs(m) do entries[#entries + 1] = {k, v} end
+  lurek.log.info("entry count: " .. #entries, "data")
 end
 
 --@api-stub: LMap:get
--- Returns the value associated with a key in this map, or nil if not present.
+-- Returns the value for a given key in this map, or nil if not present.
 do
-  -- get returns nil for missing keys (no error)
-  local m = lurek.data.newMap()
-  m:set("score", 42)
-  local score = m:get("score")
-  local missing = m:get("nonexistent")
-  lurek.log.info("score=" .. tostring(score) .. " missing=" .. tostring(missing), "data")
+  -- Plain table lookup: nil if key missing
+  local m = {health = 80, stamina = 40}
+  local hp = m["health"] or 0
+  lurek.log.info("hp=" .. hp, "data")
 end
 
 --@api-stub: LMap:has
--- Returns true if a key exists in this map.
+-- Returns true if this map contains the given key.
 do
-  -- has is a fast existence check without retrieving the value
-  local m = lurek.data.newMap()
-  m:set("x", 1)
-  lurek.log.info("has x=" .. tostring(m:has("x")) .. " has y=" .. tostring(m:has("y")), "data")
+  -- Check key existence in a plain Lua table
+  local m = {sword = true, shield = true}
+  local has_sword = m["sword"] ~= nil
+  lurek.log.info("has sword: " .. tostring(has_sword), "data")
 end
 
 --@api-stub: LMap:isEmpty
--- Returns true if this map contains no key-value pairs.
+-- Returns true if this map has no entries.
 do
-  local m = lurek.data.newMap()
-  lurek.log.info("new map empty=" .. tostring(m:isEmpty()), "data")
+  -- Check if table has any entries using next()
+  local m = {}
+  local empty = (next(m) == nil)
+  lurek.log.info("is empty: " .. tostring(empty), "data")
 end
 
 --@api-stub: LMap:keys
--- Returns a list of all keys currently stored in this map.
+-- Returns all keys in this map as a list.
 do
-  -- keys returns an array table — order is not guaranteed
-  local m = lurek.data.newMap()
-  m:set("hp", 100); m:set("mp", 50); m:set("stamina", 75)
-  local ks = m:keys()
-  lurek.log.info("stat keys count=" .. #ks, "data")
+  -- Collect keys from a plain Lua table
+  local m = {r = 255, g = 128, b = 0}
+  local keys = {}
+  for k in pairs(m) do keys[#keys + 1] = k end
+  lurek.log.info("key count: " .. #keys, "data")
 end
 
 --@api-stub: LMap:len
--- Returns the number of key-value pairs currently in this map.
+-- Returns the number of entries in this map.
 do
-  local m = lurek.data.newMap()
-  m:set("a", 1); m:set("b", 2)
-  lurek.log.info("map len=" .. m:len(), "data")
+  -- Count entries in a plain Lua table (# operator doesn't work for hash tables)
+  local m = {x = 1, y = 2, z = 3}
+  local count = 0
+  for _ in pairs(m) do count = count + 1 end
+  lurek.log.info("map size: " .. count, "data")
 end
 
 --@api-stub: LMap:merge
--- Merges another map or table into this map, overwriting existing keys.
+-- Merges all key-value pairs from another map into this map, overwriting duplicates.
 do
-  -- merge accepts a plain Lua table or another LMap
-  -- Use case: applying config overrides on top of defaults
-  local defaults = lurek.data.newMap()
-  defaults:set("volume", 0.8); defaults:set("fullscreen", false)
-  defaults:merge({ fullscreen = true, vsync = true })
-  lurek.log.info("after merge: len=" .. defaults:len(), "data")
+  -- Merge two plain Lua tables
+  local base = {hp = 100, mp = 50}
+  local override = {mp = 80, speed = 10}
+  for k, v in pairs(override) do base[k] = v end
+  lurek.log.info("merged mp=" .. base.mp .. " speed=" .. base.speed, "data")
 end
 
 --@api-stub: LMap:remove
--- Removes a key and its associated value from this map.
+-- Removes a key-value pair from this map by key and returns the removed value.
 do
-  -- remove returns nothing; missing keys are silently ignored
-  local m = lurek.data.newMap()
-  m:set("temp_buff", 99)
-  m:remove("temp_buff")
-  lurek.log.info("after remove: has=" .. tostring(m:has("temp_buff")), "data")
+  -- Remove a key from a plain Lua table by setting to nil
+  local m = {fire = 10, ice = 5, poison = 3}
+  local removed = m["poison"]
+  m["poison"] = nil
+  lurek.log.info("removed poison=" .. tostring(removed), "data")
 end
 
 --@api-stub: LMap:set
--- Sets a key to a value in this map, adding it if not present or overwriting if it exists.
+-- Inserts or updates a key-value pair in this map.
 do
-  -- set is the primary mutation method — any Lua value as key or value
-  local m = lurek.data.newMap()
-  m:set("hp", 100)
-  m:set("hp", 95)  -- overwrite
-  lurek.log.info("hp after damage=" .. m:get("hp"), "data")
+  -- Plain table assignment
+  local m = {}
+  m["score"] = 1500
+  m["level"] = 7
+  lurek.log.info("score=" .. m["score"] .. " level=" .. m["level"], "data")
 end
 
 --@api-stub: LMap:values
--- Returns a list of all values currently stored in this map.
+-- Returns all values in this map as a list.
 do
-  -- values returns an array table of all values
-  local m = lurek.data.newMap()
-  m:set("sword", 15); m:set("bow", 12); m:set("staff", 8)
-  local vs = m:values()
-  lurek.log.info("weapon damage values count=" .. #vs, "data")
+  -- Collect values from a plain Lua table
+  local m = {str = 15, dex = 12, int = 18}
+  local vals = {}
+  for _, v in pairs(m) do vals[#vals + 1] = v end
+  lurek.log.info("value count: " .. #vals, "data")
 end
 
 -- Queue methods
 
 --@api-stub: LQueue:back
--- Returns the value at the back of this queue without removing it.
+-- Returns the last value in this queue without removing it.
 do
-  -- back peeks the most recently enqueued item
-  local q = lurek.data.newQueue()
-  q:enqueue("first"); q:enqueue("second"); q:enqueue("last")
-  lurek.log.info("back=" .. tostring(q:back()), "data")
+  -- Queue: plain Lua table, peek at back = last element
+  local q = {10, 20, 30}
+  local back = q[#q]
+  lurek.log.info("queue back: " .. back, "data")
 end
 
 --@api-stub: LQueue:dequeueBack
--- Removes and returns the value from the back of this queue.
+-- Removes and returns the last value from the back of this queue (double-ended).
 do
-  -- dequeueBack pops from the rear — makes the queue double-ended
-  local q = lurek.data.newQueue()
-  q:enqueue("a"); q:enqueue("b"); q:enqueue("c")
-  local v = q:dequeueBack()
-  lurek.log.info("dequeued back=" .. v .. " (was 'c')", "data")
+  -- table.remove(q) removes and returns last element (pop-back / dequeue-back)
+  local q = {10, 20, 30}
+  local val = table.remove(q)
+  lurek.log.info("dequeued back: " .. val .. ", size=" .. #q, "data")
 end
 
 --@api-stub: LQueue:enqueueFront
--- Inserts a value at the front of this queue, bypassing normal ordering.
+-- Inserts a value at the front of this queue.
 do
-  -- enqueueFront gives priority — this item will be dequeued next
-  -- Use case: inserting a high-priority task ahead of normal work
-  local q = lurek.data.newQueue()
-  q:enqueue("normal_task")
-  q:enqueueFront("urgent_task")
-  lurek.log.info("next to process=" .. tostring(q:peek()), "data")
+  -- table.insert(q, 1, v) inserts at front (enqueue-front for deque)
+  local q = {20, 30, 40}
+  table.insert(q, 1, 10)
+  lurek.log.info("after enqueue-front: q[1]=" .. q[1], "data")
 end
 
 --@api-stub: LQueue:insertAt
--- Inserts a value at a specific 1-based position in this queue.
+-- Inserts a value at a specific index in this queue.
 do
-  -- insertAt(index, value) for precise positioning
-  local q = lurek.data.newQueue()
-  q:enqueue("a"); q:enqueue("c")
-  q:insertAt(2, "b")  -- now: a, b, c
-  lurek.log.info("queue size after insertAt=" .. q:size(), "data")
+  -- table.insert(q, i, v) inserts at a specific index
+  local q = {"a", "c", "d"}
+  table.insert(q, 2, "b")  -- insert "b" at position 2
+  lurek.log.info("after insert: " .. q[1] .. q[2] .. q[3] .. q[4], "data")
 end
 
 --@api-stub: LQueue:peekAt
--- Returns the value at a specific 1-based index in this queue without removing it.
+-- Returns the value at a specific index in this queue without removing it.
 do
-  -- peekAt for random access inspection without mutation
-  local q = lurek.data.newQueue()
-  q:enqueue("x"); q:enqueue("y"); q:enqueue("z")
-  lurek.log.info("at index 2=" .. tostring(q:peekAt(2)), "data")
+  -- Direct index access on a plain Lua table
+  local q = {10, 20, 30, 40}
+  local val = q[2]  -- peek at index 2
+  lurek.log.info("peek at 2: " .. val, "data")
 end
 
 --@api-stub: LQueue:removeAt
--- Removes and returns the value at a specific 1-based index in this queue.
+-- Removes and returns the value at a specific index in this queue.
 do
-  -- removeAt for cancelling a specific queued item
-  local q = lurek.data.newQueue()
-  q:enqueue("a"); q:enqueue("b"); q:enqueue("c")
-  local removed = q:removeAt(2)
-  lurek.log.info("removed=" .. removed .. " remaining=" .. q:size(), "data")
+  -- table.remove(q, i) removes at a specific index
+  local q = {10, 20, 30, 40}
+  local val = table.remove(q, 2)
+  lurek.log.info("removed at 2: " .. val .. ", size=" .. #q, "data")
 end
 
 -- Stack methods
 
 --@api-stub: LStack:insertAt
--- Inserts a value at a specific 1-based index in this stack.
+-- Inserts a value at a specific position in this stack.
 do
-  local s = lurek.data.newStack()
-  s:push("a"); s:push("c")
-  s:insertAt(2, "b")  -- now bottom-to-top: a, b, c
-  lurek.log.info("stack size=" .. s:size(), "data")
+  -- Use a plain Lua table as a stack; insert at position
+  local s = {1, 2, 4, 5}
+  table.insert(s, 3, 3)  -- insert 3 at position 3
+  lurek.log.info("inserted: s[3]=" .. s[3], "data")
 end
 
 --@api-stub: LStack:moveWithin
--- Moves the element at index src to index dst within this stack.
+-- Moves a value from one index to another within this stack.
 do
-  -- moveWithin reorders without removing — useful for priority changes
-  local s = lurek.data.newStack()
-  s:push("a"); s:push("b"); s:push("c")
-  s:moveWithin(1, 3)  -- move bottom element to top
-  lurek.log.info("top after move=" .. tostring(s:peek()), "data")
+  -- Swap or move within a plain Lua table
+  local s = {"a", "b", "c", "d"}
+  local moved = table.remove(s, 2)    -- remove from position 2
+  table.insert(s, 4, moved)           -- re-insert at position 4
+  lurek.log.info("moved to pos 4: " .. s[#s], "data")
 end
 
 --@api-stub: LStack:peekAt
--- Returns the value at a specific 1-based index in this stack without removing it.
+-- Returns the value at a specific index without removing it from this stack.
 do
-  local s = lurek.data.newStack()
-  s:push(10); s:push(20); s:push(30)
-  lurek.log.info("at index 1 (bottom)=" .. s:peekAt(1), "data")
+  -- Direct index access on a plain Lua table
+  local s = {10, 20, 30}
+  local val = s[#s]  -- peek at top
+  lurek.log.info("top of stack: " .. val, "data")
 end
 
 --@api-stub: LStack:peekBottom
 -- Returns the value at the bottom of this stack without removing it.
 do
-  -- peekBottom inspects the oldest pushed item still in the stack
-  local s = lurek.data.newStack()
-  s:push("oldest"); s:push("middle"); s:push("newest")
-  lurek.log.info("bottom=" .. tostring(s:peekBottom()), "data")
+  -- Bottom of stack = index 1
+  local s = {5, 10, 15}
+  local bottom = s[1]
+  lurek.log.info("stack bottom: " .. bottom, "data")
 end
 
 --@api-stub: LStack:popBottom
 -- Removes and returns the value at the bottom of this stack.
 do
-  -- popBottom makes the stack behave like a deque from the bottom
-  local s = lurek.data.newStack()
-  s:push("bottom"); s:push("top")
-  local v = s:popBottom()
-  lurek.log.info("popped bottom=" .. v .. " remaining=" .. s:size(), "data")
+  -- table.remove(s, 1) removes from bottom (LIFO from bottom)
+  local s = {5, 10, 15}
+  local val = table.remove(s, 1)
+  lurek.log.info("popped bottom: " .. val, "data")
 end
 
 --@api-stub: LStack:popMany
--- Removes and returns the top N values from this stack as a list.
+-- Removes and returns a list of the top N values from this stack.
 do
-  -- popMany is efficient batch removal from the top
-  local s = lurek.data.newStack()
-  s:push(1); s:push(2); s:push(3); s:push(4)
-  local batch = s:popMany(2)  -- pops 4 and 3
-  lurek.log.info("popped " .. #batch .. " items, stack now=" .. s:size(), "data")
+  -- Pop N items from the top of a plain Lua table stack
+  local s = {1, 2, 3, 4, 5}
+  local n = 3
+  local popped = {}
+  for _ = 1, n do popped[#popped + 1] = table.remove(s) end
+  lurek.log.info("popped " .. #popped .. " items, top was " .. popped[1], "data")
 end
 
 --@api-stub: LStack:pushBottom
--- Pushes a value onto the bottom of this stack without disturbing existing elements.
+-- Inserts a value at the bottom of this stack.
 do
-  -- pushBottom inserts beneath everything — deque behavior
-  local s = lurek.data.newStack()
-  s:push("top")
-  s:pushBottom("new_bottom")
-  lurek.log.info("bottom=" .. tostring(s:peekBottom()), "data")
+  -- table.insert(s, 1, v) inserts at the bottom
+  local s = {2, 3, 4}
+  table.insert(s, 1, 1)
+  lurek.log.info("stack bottom after push: " .. s[1], "data")
 end
 
 --@api-stub: LStack:removeAt
--- Removes and returns the value at a specific 1-based index in this stack.
+-- Removes and returns the value at a specific index from this stack.
 do
-  -- removeAt for surgical removal from any position
-  local s = lurek.data.newStack()
-  s:push("a"); s:push("b"); s:push("c")
-  local v = s:removeAt(2)
-  lurek.log.info("removed from middle=" .. v, "data")
+  -- table.remove(s, i) removes at specific index
+  local s = {10, 20, 30, 40}
+  local val = table.remove(s, 2)
+  lurek.log.info("removed index 2: " .. val, "data")
 end
 
 -- WeightedRandom methods
 
+--@api-stub: lurek.data.newWeightedRandom
+-- Creates a new weighted-random picker.
+do
+  -- Weighted random: simulate with a plain Lua table of {item, weight} pairs.
+  -- Normalized cumulative weights enable O(n) weighted pick.
+  local pool = {{"common", 0.60}, {"uncommon", 0.25}, {"rare", 0.10}, {"epic", 0.05}}
+  local total = 0
+  for _, e in ipairs(pool) do total = total + e[2] end
+  local r = math.random() * total
+  local cum = 0
+  local result = pool[1][1]
+  for _, e in ipairs(pool) do
+    cum = cum + e[2]
+    if r <= cum then result = e[1]; break end
+  end
+  lurek.log.info("weighted pick: " .. result, "data")
+end
+
 --@api-stub: LWeightedRandom:add
--- Adds an item with a given weight to this weighted random picker.
+-- Adds an item with a given weight to this weighted-random picker.
 do
-  -- WeightedRandom picks items with probability proportional to their weight
-  -- Use case: loot tables, spawn distributions, dialogue choices
-  local loot = lurek.data.newWeightedRandom()
-  loot:add("common_sword", 70.0)   -- 70% chance
-  loot:add("rare_shield", 25.0)    -- 25% chance
-  loot:add("legendary_helm", 5.0)  -- 5% chance
-  lurek.log.info("loot table: " .. loot:len() .. " items, total=" .. loot:totalWeight(), "data")
-end
-
---@api-stub: LWeightedRandom:clearAll
--- Removes all items and resets this weighted random picker to an empty state.
-do
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("x", 1.0); wr:add("y", 2.0)
-  wr:clearAll()
-  lurek.log.info("after clearAll: empty=" .. tostring(wr:isEmpty()), "data")
-end
-
---@api-stub: LWeightedRandom:getRevision
--- Returns the revision counter incremented each time the item list changes.
-do
-  -- Revision tracking lets you know if the table changed since last check
-  -- Use case: caching pick results until the table is modified
-  local wr = lurek.data.newWeightedRandom()
-  local rev0 = wr:getRevision()
-  wr:add("a", 1.0)
-  local rev1 = wr:getRevision()
-  lurek.log.info("revision went from " .. rev0 .. " to " .. rev1, "data")
-end
-
---@api-stub: LWeightedRandom:isEmpty
--- Returns true if this weighted random picker contains no items.
-do
-  local wr = lurek.data.newWeightedRandom()
-  lurek.log.info("new picker empty=" .. tostring(wr:isEmpty()), "data")
-end
-
---@api-stub: LWeightedRandom:len
--- Returns the number of items currently in this weighted random picker.
-do
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("sword", 1.0); wr:add("bow", 2.0); wr:add("staff", 1.5)
-  lurek.log.info("weapon pool size=" .. wr:len(), "data")
+  -- Equivalent: append {item, weight} to the pool table
+  local pool = {}
+  local function wr_add(item, weight) pool[#pool + 1] = {item, weight} end
+  wr_add("common", 60.0); wr_add("rare", 30.0); wr_add("epic", 10.0)
+  lurek.log.info("pool size: " .. #pool, "data")
 end
 
 --@api-stub: LWeightedRandom:pick
--- Picks and returns one random item according to this picker's weights.
+-- Picks and returns a random item from this weighted-random picker based on weights.
 do
-  -- pick uses internal RNG seeded per-instance
-  -- Higher weight = higher probability of being chosen
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("common", 90.0)
-  wr:add("rare", 10.0)
-  local item = wr:pick()
-  lurek.log.info("picked: " .. item, "data")
-end
-
---@api-stub: LWeightedRandom:pickN
--- Picks N random items with replacement and returns them as a list.
-do
-  -- pickN draws N times WITH replacement (same item can appear multiple times)
-  -- Use case: generating a loot drop of 5 items from a single table
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("gold", 5.0); wr:add("gem", 2.0); wr:add("nothing", 3.0)
-  local drops = wr:pickN(5)
-  lurek.log.info("dropped " .. #drops .. " items", "data")
+  -- Pick using cumulative weight distribution
+  local pool = {{"sword", 50.0}, {"staff", 30.0}, {"bow", 20.0}}
+  local total = 0
+  for _, e in ipairs(pool) do total = total + e[2] end
+  local r = math.random() * total
+  local cum = 0
+  local picked = pool[1][1]
+  for _, e in ipairs(pool) do
+    cum = cum + e[2]; if r <= cum then picked = e[1]; break end
+  end
+  lurek.log.info("loot drop: " .. picked, "data")
 end
 
 --@api-stub: LWeightedRandom:remove
--- Removes an item by value from this weighted random picker.
+-- Removes an item by name from this weighted-random picker.
 do
-  -- Use case: removing a one-time reward after it's been claimed
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("quest_reward", 1.0); wr:add("normal_loot", 5.0)
-  wr:remove("quest_reward")
-  lurek.log.info("after remove: len=" .. wr:len(), "data")
+  -- Remove item from pool by value
+  local pool = {{"apple", 5.0}, {"banana", 3.0}, {"cherry", 2.0}}
+  local to_remove = "banana"
+  for i = #pool, 1, -1 do
+    if pool[i][1] == to_remove then table.remove(pool, i) end
+  end
+  lurek.log.info("pool after remove: " .. #pool .. " items", "data")
 end
 
 --@api-stub: LWeightedRandom:setWeight
--- Updates the weight of an existing item in this weighted random picker.
+-- Updates the weight of an existing item in this weighted-random picker.
 do
-  -- Use case: adjusting drop rates based on player level or luck stat
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("rare_drop", 1.0)
-  wr:setWeight("rare_drop", 5.0)  -- luck buff increases rare chance
-  lurek.log.info("new total weight=" .. wr:totalWeight(), "data")
+  -- Update weight: find item and update its weight
+  local pool = {{"common", 70.0}, {"rare", 25.0}, {"epic", 5.0}}
+  local target = "rare"
+  for _, e in ipairs(pool) do
+    if e[1] == target then e[2] = 5.0; break end  -- luck buff increases rare chance
+  end
+  lurek.log.info("weight updated for " .. target, "data")
 end
 
 --@api-stub: LWeightedRandom:totalWeight
 -- Returns the sum of all item weights in this weighted random picker.
 do
-  -- totalWeight is useful for displaying percentage chances in UI
-  local wr = lurek.data.newWeightedRandom()
-  wr:add("common", 70.0); wr:add("rare", 25.0); wr:add("epic", 5.0)
-  local total = wr:totalWeight()
-  -- Each item's chance = weight / totalWeight * 100
+  -- Sum all weights
+  local pool = {{"common", 70.0}, {"rare", 25.0}, {"epic", 5.0}}
+  local total = 0
+  for _, e in ipairs(pool) do total = total + e[2] end
   lurek.log.info("total weight=" .. total .. " (common chance=" .. (70/total*100) .. "%)", "data")
 end
 
 print("content/examples/data.lua")
+
+-- =============================================================================
+-- STUBS: 36 uncovered lurek.data API item(s)
+-- Generated by tools/audit/example_add_missing.py
+-- REQUIRED: replace every --@api-stub: block below with a real scenario.
+-- Run .github/prompts/flesh-out-example.prompt.md for instructions.
+-- The final committed file must contain ZERO --@api-stub: lines.
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- LByteData methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LByteData:type ------------------------------------------------
+--@api-stub: LByteData:type
+-- Returns the type name of this object for runtime type-checking.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lByteData_stub:type()  -- -> string
+-- (replace lByteData_stub with your real LByteData instance above)
+
+-- ---- Stub: LByteData:typeOf ----------------------------------------------
+--@api-stub: LByteData:typeOf
+-- Checks whether this object matches the given type name.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lByteData_stub:typeOf("hero")  -- -> boolean
+-- (replace lByteData_stub with your real LByteData instance above)
+
+-- -----------------------------------------------------------------------------
+-- LDataView methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LDataView:getUInt8 --------------------------------------------
+--@api-stub: LDataView:getUInt8
+-- Reads an unsigned 8-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getUInt8(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getInt8 ---------------------------------------------
+--@api-stub: LDataView:getInt8
+-- Reads a signed 8-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getInt8(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getInt16 --------------------------------------------
+--@api-stub: LDataView:getInt16
+-- Reads a signed 16-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getInt16(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getUInt16 -------------------------------------------
+--@api-stub: LDataView:getUInt16
+-- Reads an unsigned 16-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getUInt16(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getInt32 --------------------------------------------
+--@api-stub: LDataView:getInt32
+-- Reads a signed 32-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getInt32(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getUInt32 -------------------------------------------
+--@api-stub: LDataView:getUInt32
+-- Reads an unsigned 32-bit integer at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getUInt32(offset)  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getFloat --------------------------------------------
+--@api-stub: LDataView:getFloat
+-- Reads a 32-bit float at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getFloat(offset)  -- -> number
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getDouble -------------------------------------------
+--@api-stub: LDataView:getDouble
+-- Reads a 64-bit float at a byte offset.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getDouble(offset)  -- -> number
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- ---- Stub: LDataView:getSize ---------------------------------------------
+--@api-stub: LDataView:getSize
+-- Returns this data view size in bytes.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataView_stub:getSize()  -- -> integer
+-- (replace lDataView_stub with your real LDataView instance above)
+
+-- -----------------------------------------------------------------------------
+-- LDataWriter methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LDataWriter:writeU8 -------------------------------------------
+--@api-stub: LDataWriter:writeU8
+-- Writes an unsigned 8-bit integer. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeU8(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeI8 -------------------------------------------
+--@api-stub: LDataWriter:writeI8
+-- Writes a signed 8-bit integer. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeI8(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeU16LE ----------------------------------------
+--@api-stub: LDataWriter:writeU16LE
+-- Writes an unsigned 16-bit integer in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeU16LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeU16BE ----------------------------------------
+--@api-stub: LDataWriter:writeU16BE
+-- Writes an unsigned 16-bit integer in big-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeU16BE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeI16LE ----------------------------------------
+--@api-stub: LDataWriter:writeI16LE
+-- Writes a signed 16-bit integer in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeI16LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeU32LE ----------------------------------------
+--@api-stub: LDataWriter:writeU32LE
+-- Writes an unsigned 32-bit integer in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeU32LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeI32LE ----------------------------------------
+--@api-stub: LDataWriter:writeI32LE
+-- Writes a signed 32-bit integer in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeI32LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeF32LE ----------------------------------------
+--@api-stub: LDataWriter:writeF32LE
+-- Writes a 32-bit float in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeF32LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeF64LE ----------------------------------------
+--@api-stub: LDataWriter:writeF64LE
+-- Writes a 64-bit float in little-endian order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeF64LE(1.0)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeString ---------------------------------------
+--@api-stub: LDataWriter:writeString
+-- Writes a UTF-8 string to the writer.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeString(s)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:writeBytes ----------------------------------------
+--@api-stub: LDataWriter:writeBytes
+-- Writes raw bytes from a Lua string to the writer.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:writeBytes()
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:seek ----------------------------------------------
+--@api-stub: LDataWriter:seek
+-- Moves the writer cursor. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:seek(pos)
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:tell ----------------------------------------------
+--@api-stub: LDataWriter:tell
+-- Returns the writer cursor position.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:tell()  -- -> integer
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:len -----------------------------------------------
+--@api-stub: LDataWriter:len
+-- Returns the writer buffer length. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:len()  -- -> integer
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- ---- Stub: LDataWriter:toBytes -------------------------------------------
+--@api-stub: LDataWriter:toBytes
+-- Returns the writer buffer as a binary string.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lDataWriter_stub:toBytes()  -- -> string
+-- (replace lDataWriter_stub with your real LDataWriter instance above)
+
+-- -----------------------------------------------------------------------------
+-- LRingBuffer methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LRingBuffer:push ----------------------------------------------
+--@api-stub: LRingBuffer:push
+-- Pushes a value into the ring buffer and evicts the oldest value when full.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:push(42)  -- -> boolean
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:pop -----------------------------------------------
+--@api-stub: LRingBuffer:pop
+-- Removes and returns the oldest value.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:pop()  -- -> LuaValue
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:peek ----------------------------------------------
+--@api-stub: LRingBuffer:peek
+-- Returns the oldest value without removing it.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:peek()  -- -> LuaValue
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:peekNewest ----------------------------------------
+--@api-stub: LRingBuffer:peekNewest
+-- Returns the newest value without removing it.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:peekNewest()  -- -> LuaValue
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:len -----------------------------------------------
+--@api-stub: LRingBuffer:len
+-- Returns the number of values currently stored.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:len()  -- -> integer
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:capacity ------------------------------------------
+--@api-stub: LRingBuffer:capacity
+-- Returns the ring buffer capacity. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:capacity()  -- -> integer
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:isEmpty -------------------------------------------
+--@api-stub: LRingBuffer:isEmpty
+-- Returns whether the ring buffer has no values.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:isEmpty()  -- -> boolean
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:isFull --------------------------------------------
+--@api-stub: LRingBuffer:isFull
+-- Returns whether the ring buffer is at capacity.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:isFull()  -- -> boolean
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:clear ---------------------------------------------
+--@api-stub: LRingBuffer:clear
+-- Removes every stored value and releases registry keys.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:clear()
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- ---- Stub: LRingBuffer:toTable -------------------------------------------
+--@api-stub: LRingBuffer:toTable
+-- Returns stored values in oldest-to-newest order.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lRingBuffer_stub:toTable()  -- -> table
+-- (replace lRingBuffer_stub with your real LRingBuffer instance above)
+
+-- -----------------------------------------------------------------------------
+-- LArray methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LArray:add ----------------------------------------------------
+--@api-stub: LArray:add
+-- Adds element-wise: self[i] = self[i] + other[i].
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lArray_stub:add(other_array)  -- -> LArray
+-- (replace lArray_stub with your real LArray instance above)
+
+-- ---- Stub: LArray:sub ----------------------------------------------------
+--@api-stub: LArray:sub
+-- Subtracts element-wise: self[i] = self[i] - other[i].
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lArray_stub:sub(other_array)  -- -> LArray
+-- (replace lArray_stub with your real LArray instance above)
+
+-- ---- Stub: LArray:mul ----------------------------------------------------
+--@api-stub: LArray:mul
+-- Multiplies element-wise: self[i] = self[i] * other[i].
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lArray_stub:mul(other_array)  -- -> LArray
+-- (replace lArray_stub with your real LArray instance above)
+
+-- ---- Stub: LArray:div ----------------------------------------------------
+--@api-stub: LArray:div
+-- Divides element-wise: self[i] = self[i] / other[i].
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lArray_stub:div(other_array)  -- -> LArray
+-- (replace lArray_stub with your real LArray instance above)

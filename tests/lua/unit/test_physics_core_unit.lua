@@ -2058,7 +2058,7 @@ describe("lurek.physics zone events", function()
         world:step(1/60)
         local events = world:getZoneEvents()
         expect_true(#events >= 1, "expected at least one zone event")
-        ---@diagnostic disable-next-line: need-check-nil
+        assert(events[1], "expected at least one zone event in list")
         local first_event = events[1] ---@type {kind: string, zone_id: number, body_id: number}
         expect_equal("enter", first_event.kind)
     end)

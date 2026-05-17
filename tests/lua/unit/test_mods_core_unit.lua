@@ -559,8 +559,8 @@ describe("ModManager reload queue", function()
     -- @covers lurek.mods.newModManager
     it("processReloadQueue returns an array", function()
         local mm = lurek.mods.newModManager()
-        ---@diagnostic disable-next-line: undefined-field
-        local processed = mm:processReloadQueue()
+        local mm_any = mm ---@type any
+        local processed = mm_any:processReloadQueue()
         expect_type("table", processed)
         expect_equal(0, #processed)
     end)

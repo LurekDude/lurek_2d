@@ -2783,12 +2783,13 @@ end
 do
   -- BFS visits nodes level by level (closest first). Use for:
   -- influence spread, finding nearest resource, or flood-fill logic.
-  local g = lurek.graph.newGraph()
+  -- NOTE: bfs() is on lurek.patterns.newGraph() (algorithmic graph), not lurek.graph.newGraph()
+  local g = lurek.patterns.newGraph()
   local center = g:addNode("center")
   local ring1 = g:addNode("ring1")
   local ring2 = g:addNode("ring2")
-  g:addEdge(center, ring1, "path")
-  g:addEdge(ring1, ring2, "path")
+  g:addEdge(center, ring1, 1.0, "path")
+  g:addEdge(ring1, ring2, 1.0, "path")
 
   local visit_order = g:bfs(center)
   lurek.log.info("BFS visited " .. #visit_order .. " nodes", "algorithm")
@@ -2798,12 +2799,13 @@ end
 -- Removes all nodes and edges from this graph and resets it to an empty state.
 do
   -- Use clearAll() to reset a graph for a new level or game restart.
-  local g = lurek.graph.newGraph()
+  -- NOTE: clearAll() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   g:addNode("temp_a")
   g:addNode("temp_b")
 
   g:clearAll()
-  lurek.log.info("graph cleared, nodes=" .. g:getNodeCount(), "reset")
+  lurek.log.info("graph cleared, nodes=" .. g:nodeCount(), "reset")
 end
 
 --@api-stub: LGraph:dfs
@@ -2811,12 +2813,13 @@ end
 do
   -- DFS explores as deep as possible before backtracking. Use for:
   -- maze solving, cycle detection, or topological ordering alternatives.
-  local g = lurek.graph.newGraph()
+  -- NOTE: dfs() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   local root = g:addNode("dungeon_entrance")
   local hall = g:addNode("hallway")
   local chamber = g:addNode("treasure_chamber")
-  g:addEdge(root, hall, "corridor")
-  g:addEdge(hall, chamber, "door")
+  g:addEdge(root, hall, 1.0, "corridor")
+  g:addEdge(hall, chamber, 1.0, "door")
 
   local visit_order = g:dfs(root)
   lurek.log.info("DFS visited " .. #visit_order .. " rooms", "explore")
@@ -2825,10 +2828,11 @@ end
 --@api-stub: LGraph:edgeCount
 -- Returns the total number of edges currently in this graph.
 do
-  local g = lurek.graph.newGraph()
+  -- NOTE: edgeCount() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   local a = g:addNode("A")
   local b = g:addNode("B")
-  g:addEdge(a, b, "link")
+  g:addEdge(a, b, 1.0, "link")
 
   lurek.log.info("total edges: " .. g:edgeCount(), "stats")
 end
@@ -2836,25 +2840,25 @@ end
 --@api-stub: LGraph:getNodeValue
 -- Returns the value stored at a node id in this graph.
 do
-  local g = lurek.graph.newGraph()
-  local city = g:addNode("metropolis")
+  -- NOTE: getNodeValue() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
+  local city = g:addNode("metropolis", 42)
 
   local val = g:getNodeValue(city)
   lurek.log.info("node value: " .. tostring(val), "data")
 end
 
 --@api-stub: LGraph:isConnected
--- Returns true if all nodes in this graph are reachable from one another.
+-- Returns true if there is a path between two given nodes in this graph.
 do
-  -- A connected graph means every node can reach every other node.
-  -- Use to verify supply networks are intact (no isolated nodes).
-  local g = lurek.graph.newGraph()
+  -- isConnected(from, to) checks if there is any path from one node to another.
+  -- NOTE: isConnected() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   local a = g:addNode("base_alpha")
   local b = g:addNode("base_beta")
-  g:addEdge(a, b, "supply_line")
-  g:addEdge(b, a, "supply_line")
+  g:addEdge(a, b, 1.0, "supply_line")
 
-  if g:isConnected() then
+  if g:isConnected(a, b) then
     lurek.log.info("all bases connected — supply network intact", "logistics")
   else
     lurek.log.warn("network broken! Some bases are isolated", "alert")
@@ -2864,12 +2868,13 @@ end
 --@api-stub: LGraph:neighbors
 -- Returns a list of node ids directly connected to a given node in this graph.
 do
-  local g = lurek.graph.newGraph()
+  -- NOTE: neighbors() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   local hub = g:addNode("central_hub")
   local spoke1 = g:addNode("spoke_1")
   local spoke2 = g:addNode("spoke_2")
-  g:addEdge(hub, spoke1, "rail")
-  g:addEdge(hub, spoke2, "rail")
+  g:addEdge(hub, spoke1, 1.0, "rail")
+  g:addEdge(hub, spoke2, 1.0, "rail")
 
   local adjacent = g:neighbors(hub)
   lurek.log.info("hub connects to " .. #adjacent .. " neighbors", "nav")
@@ -2878,7 +2883,8 @@ end
 --@api-stub: LGraph:nodeCount
 -- Returns the total number of nodes currently in this graph.
 do
-  local g = lurek.graph.newGraph()
+  -- NOTE: nodeCount() is on lurek.patterns.newGraph() (algorithmic graph)
+  local g = lurek.patterns.newGraph()
   g:addNode("checkpoint_1")
   g:addNode("checkpoint_2")
   g:addNode("checkpoint_3")
@@ -2887,3 +2893,376 @@ do
 end
 
 print("content/examples/graph.lua")
+
+-- =============================================================================
+-- STUBS: 51 uncovered lurek.graph API item(s)
+-- Generated by tools/audit/example_add_missing.py
+-- REQUIRED: replace every --@api-stub: block below with a real scenario.
+-- Run .github/prompts/flesh-out-example.prompt.md for instructions.
+-- The final committed file must contain ZERO --@api-stub: lines.
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- LGraph methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LGraph:addNode ------------------------------------------------
+--@api-stub: LGraph:addNode
+-- Creates a node with optional type and capacity.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:addNode([node_type], [capacity])  -- -> LGraphNode
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:removeNode ---------------------------------------------
+--@api-stub: LGraph:removeNode
+-- Removes a node and graph links associated with it.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:removeNode(node_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:hasNode ------------------------------------------------
+--@api-stub: LGraph:hasNode
+-- Returns whether a node handle still exists in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:hasNode(node_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getNodes -----------------------------------------------
+--@api-stub: LGraph:getNodes
+-- Returns all nodes in this graph. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getNodes()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getNodeCount -------------------------------------------
+--@api-stub: LGraph:getNodeCount
+-- Returns the number of nodes in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getNodeCount()  -- -> integer
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:addEdge ------------------------------------------------
+--@api-stub: LGraph:addEdge
+-- Creates an edge between two nodes with an optional edge type.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:addEdge(from_ud, to_ud, [edge_type])  -- -> LGraphEdge
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:removeEdge ---------------------------------------------
+--@api-stub: LGraph:removeEdge
+-- Removes an edge by handle. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:removeEdge(edge_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:hasEdge ------------------------------------------------
+--@api-stub: LGraph:hasEdge
+-- Returns whether an edge handle still exists in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:hasEdge(edge_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getEdges -----------------------------------------------
+--@api-stub: LGraph:getEdges
+-- Returns all edges in this graph. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getEdges()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getEdgeCount -------------------------------------------
+--@api-stub: LGraph:getEdgeCount
+-- Returns the number of edges in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getEdgeCount()  -- -> integer
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getEdgeBetween -----------------------------------------
+--@api-stub: LGraph:getEdgeBetween
+-- Returns the edge connecting two nodes when one exists.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getEdgeBetween(from_ud, to_ud)  -- -> LGraphEdge|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:createItem ---------------------------------------------
+--@api-stub: LGraph:createItem
+-- Creates an unplaced graph item with optional type and decay time.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:createItem([item_type], [decay_time])  -- -> LGraphItem
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:addItem ------------------------------------------------
+--@api-stub: LGraph:addItem
+-- Places an item onto a node. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:addItem(item_ud, node_ud)
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:removeItem ---------------------------------------------
+--@api-stub: LGraph:removeItem
+-- Removes an item from this graph. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:removeItem(item_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:hasItem ------------------------------------------------
+--@api-stub: LGraph:hasItem
+-- Returns whether an item handle still exists in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:hasItem(item_ud)  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getItems -----------------------------------------------
+--@api-stub: LGraph:getItems
+-- Returns all items in this graph. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getItems()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getItemCount -------------------------------------------
+--@api-stub: LGraph:getItemCount
+-- Returns the number of items in this graph.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getItemCount()  -- -> integer
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:sendItem -----------------------------------------------
+--@api-stub: LGraph:sendItem
+-- Starts moving an item along an edge.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:sendItem(item_ud, edge_ud)
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:update -------------------------------------------------
+--@api-stub: LGraph:update
+-- Advances graph simulation by delta time and dispatches generated callbacks.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:update(0.016)
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:step ---------------------------------------------------
+--@api-stub: LGraph:step
+-- Runs one discrete graph simulation step and dispatches generated callbacks.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:step()
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:tickParallel -------------------------------------------
+--@api-stub: LGraph:tickParallel
+-- Advances graph simulation through the parallel update path and dispatches generated callbacks.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:tickParallel(0.016)
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:findPath -----------------------------------------------
+--@api-stub: LGraph:findPath
+-- Finds a path between two nodes. This method is available to Lua scripts.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:findPath(from_ud, to_ud)  -- -> table|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:findPathForItem ----------------------------------------
+--@api-stub: LGraph:findPathForItem
+-- Finds a path for a specific item between two nodes while respecting item constraints.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:findPathForItem(item_ud, from_ud, to_ud)  -- -> table|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getDistance --------------------------------------------
+--@api-stub: LGraph:getDistance
+-- Returns graph distance between two nodes when reachable.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getDistance(from_ud, to_ud)  -- -> number|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getReachable -------------------------------------------
+--@api-stub: LGraph:getReachable
+-- Returns nodes reachable from a start node within an optional maximum distance.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getReachable(from_ud, [max_dist])  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getNeighbors -------------------------------------------
+--@api-stub: LGraph:getNeighbors
+-- Returns neighbor nodes connected to a node.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getNeighbors(node_ud)  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getComponents ------------------------------------------
+--@api-stub: LGraph:getComponents
+-- Returns connected components as arrays of node handles.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getComponents()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:subgraph -----------------------------------------------
+--@api-stub: LGraph:subgraph
+-- Creates a new graph containing a subset of nodes.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:subgraph(nodes)  -- -> LGraph
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:hasCycle -----------------------------------------------
+--@api-stub: LGraph:hasCycle
+-- Returns whether this graph contains a cycle.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:hasCycle()  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:topologicalSort ----------------------------------------
+--@api-stub: LGraph:topologicalSort
+-- Returns nodes in topological order when the graph is acyclic.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:topologicalSort()  -- -> table|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:mst ----------------------------------------------------
+--@api-stub: LGraph:mst
+-- Computes a minimum spanning tree using Kruskal and returns edge ids.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:mst()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:colorGraph ---------------------------------------------
+--@api-stub: LGraph:colorGraph
+-- Computes graph coloring and returns color indices by node id.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:colorGraph()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:isBipartite --------------------------------------------
+--@api-stub: LGraph:isBipartite
+-- Returns whether this graph is bipartite.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:isBipartite()  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:astar --------------------------------------------------
+--@api-stub: LGraph:astar
+-- Runs A* pathfinding between two nodes.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:astar(from_node, to_node)  -- -> table|nil
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:processDemand ------------------------------------------
+--@api-stub: LGraph:processDemand
+-- Processes graph supply and demand once and dispatches generated callbacks.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:processDemand()
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:getStats -----------------------------------------------
+--@api-stub: LGraph:getStats
+-- Returns graph counts and aggregate supply-demand statistics.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:getStats()  -- -> table
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:on -----------------------------------------------------
+--@api-stub: LGraph:on
+-- Registers a callback for a named graph event generated during simulation.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:on(event_name, func)
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:type ---------------------------------------------------
+--@api-stub: LGraph:type
+-- Returns the Lua-visible type name for this graph handle.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:type()  -- -> string
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- ---- Stub: LGraph:typeOf -------------------------------------------------
+--@api-stub: LGraph:typeOf
+-- Returns whether this graph handle matches a supported type name.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraph_stub:typeOf("hero")  -- -> boolean
+-- (replace lGraph_stub with your real LGraph instance above)
+
+-- -----------------------------------------------------------------------------
+-- LGraphItem methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: LGraphItem:getType --------------------------------------------
+--@api-stub: LGraphItem:getType
+-- Returns the item type string used by filters, conversions, supplies, and demands.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:getType()  -- -> string
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:setType --------------------------------------------
+--@api-stub: LGraphItem:setType
+-- Changes the item type string used by graph routing and processing rules.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:setType(t)
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:getDecayTime ---------------------------------------
+--@api-stub: LGraphItem:getDecayTime
+-- Returns the total decay lifetime configured for this item.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:getDecayTime()  -- -> number
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:setDecayTime ---------------------------------------
+--@api-stub: LGraphItem:setDecayTime
+-- Sets the total decay lifetime for this item.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:setDecayTime(t)
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:getRemainingLife -----------------------------------
+--@api-stub: LGraphItem:getRemainingLife
+-- Returns this item's remaining lifetime before decay.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:getRemainingLife()  -- -> number
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:isAlive --------------------------------------------
+--@api-stub: LGraphItem:isAlive
+-- Returns whether this item is still alive in the graph simulation.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:isAlive()  -- -> boolean
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:kill -----------------------------------------------
+--@api-stub: LGraphItem:kill
+-- Marks this item as dead so graph processing can remove or ignore it.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:kill()
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:getPriority ----------------------------------------
+--@api-stub: LGraphItem:getPriority
+-- Returns this item's routing or queue priority.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:getPriority()  -- -> integer
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:setPriority ----------------------------------------
+--@api-stub: LGraphItem:setPriority
+-- Sets this item's routing or queue priority.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:setPriority(p)
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:getPosition ----------------------------------------
+--@api-stub: LGraphItem:getPosition
+-- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:getPosition()  -- -> LGraphNode|LGraphEdge|nil
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:type -----------------------------------------------
+--@api-stub: LGraphItem:type
+-- Returns the Lua-visible type name for this graph item handle.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:type()  -- -> string
+-- (replace lGraphItem_stub with your real LGraphItem instance above)
+
+-- ---- Stub: LGraphItem:typeOf ---------------------------------------------
+--@api-stub: LGraphItem:typeOf
+-- Returns whether this graph item handle matches a supported type name.
+-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
+-- lGraphItem_stub:typeOf("hero")  -- -> boolean
+-- (replace lGraphItem_stub with your real LGraphItem instance above)

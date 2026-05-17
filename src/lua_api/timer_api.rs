@@ -38,7 +38,7 @@ impl LuaUserData for LuaScheduler {
         /// Schedules a one-shot callback to fire after the given delay in seconds. Returns an event ID that can be used to cancel, pause, or query the event.
         /// @param | delay | number | Time in seconds before the callback fires.
         /// @param | func | function | Callback to invoke when the delay elapses.
-        /// @return | number | Unique event ID for this scheduled callback.
+        /// @return | integer | Unique event ID for this scheduled callback.
         methods.add_method_mut("after", |lua, this, (delay, func): (f64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let id = this.scheduler.after(delay);
@@ -49,7 +49,7 @@ impl LuaUserData for LuaScheduler {
         /// Schedules a one-shot callback to fire after the given number of frames. Returns an event ID for management.
         /// @param | n | integer | Number of frames to wait before the callback fires.
         /// @param | func | function | Callback to invoke when the frame count elapses.
-        /// @return | number | Unique event ID for this scheduled callback.
+        /// @return | integer | Unique event ID for this scheduled callback.
         methods.add_method_mut("afterFrames", |lua, this, (n, func): (u64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let id = this.scheduler.after_frames(n);
@@ -61,7 +61,7 @@ impl LuaUserData for LuaScheduler {
         /// @param | name | string | Unique name for this scheduled event.
         /// @param | delay | number | Time in seconds before the callback fires.
         /// @param | func | function | Callback to invoke when the delay elapses.
-        /// @return | number | Unique event ID for this scheduled callback.
+        /// @return | integer | Unique event ID for this scheduled callback.
         methods.add_method_mut(
             "afterNamed",
             |lua, this, (name, delay, func): (String, f64, LuaFunction)| {
@@ -81,7 +81,7 @@ impl LuaUserData for LuaScheduler {
         /// @param | interval | number | Time in seconds between each invocation.
         /// @param | func | function | Callback to invoke on each interval tick.
         /// @param | count | integer? | Maximum number of times to fire. Defaults to -1 (infinite).
-        /// @return | number | Unique event ID for this repeating callback.
+        /// @return | integer | Unique event ID for this repeating callback.
         methods.add_method_mut(
             "every",
             |lua, this, (interval, func, count): (f64, LuaFunction, Option<i32>)| {
@@ -96,7 +96,7 @@ impl LuaUserData for LuaScheduler {
         /// @param | n | integer | Number of frames between each invocation.
         /// @param | func | function | Callback to invoke on each frame-interval tick.
         /// @param | count | integer? | Maximum number of times to fire. Defaults to -1 (infinite).
-        /// @return | number | Unique event ID for this repeating callback.
+        /// @return | integer | Unique event ID for this repeating callback.
         methods.add_method_mut(
             "everyFrames",
             |lua, this, (n, func, count): (u64, LuaFunction, Option<i32>)| {
@@ -112,7 +112,7 @@ impl LuaUserData for LuaScheduler {
         /// @param | interval | number | Time in seconds between each invocation.
         /// @param | func | function | Callback to invoke on each interval tick.
         /// @param | count | integer? | Maximum number of times to fire. Defaults to -1 (infinite).
-        /// @return | number | Unique event ID for this repeating callback.
+        /// @return | integer | Unique event ID for this repeating callback.
         methods.add_method_mut(
             "everyNamed",
             |lua, this, (name, interval, func, count): (String, f64, LuaFunction, Option<i32>)| {
@@ -156,7 +156,7 @@ impl LuaUserData for LuaScheduler {
         });
         // -- cancelAll --
         /// Cancels all scheduled events in this scheduler and frees their callbacks. Returns the number of events that were removed.
-        /// @return | number | Count of events that were cancelled.
+        /// @return | integer | Count of events that were cancelled.
         methods.add_method_mut("cancelAll", |lua, this, ()| {
             let n = this.scheduler.cancel_all();
             for (_, key) in this.callbacks.drain() {
@@ -229,7 +229,7 @@ impl LuaUserData for LuaScheduler {
         /// Returns the remaining repeat count for a repeating event. The first return value indicates whether the event was found; the second is the count (0 if not found). A value of -1 means infinite repeats.
         /// @param | id | integer | Event ID to query.
         /// @return | boolean | True if the event exists.
-        /// @return | number | Remaining repeat count, or 0 if not found.
+        /// @return | integer | Remaining repeat count, or 0 if not found.
         methods.add_method("getRepeatCount", |_, this, id: u32| {
             match this.scheduler.get_repeat_count(id) {
                 Some(value) => Ok((true, value)),
@@ -238,7 +238,7 @@ impl LuaUserData for LuaScheduler {
         });
         // -- getCount --
         /// Returns the total number of active scheduled events in this scheduler.
-        /// @return | number | Count of active events.
+        /// @return | integer | Count of active events.
         methods.add_method("getCount", |_, this, ()| Ok(this.scheduler.count() as u32));
         // -- isEmpty --
         /// Returns true if the scheduler has no active events.
@@ -276,7 +276,7 @@ impl LuaUserData for LuaScheduler {
         // -- update --
         /// Advances all time-based events by dt seconds, fires any callbacks whose delay has elapsed, and cleans up completed one-shot events. Call this once per frame with delta time. Returns the number of callbacks that fired.
         /// @param | dt | number | Delta time in seconds since the last update.
-        /// @return | number | Count of callbacks that fired during this update.
+        /// @return | integer | Count of callbacks that fired during this update.
         methods.add_method_mut("update", |lua, this, dt: f64| {
             let fired_ids = this.scheduler.update(dt);
             let fired_count = fired_ids.len() as u32;
@@ -302,7 +302,7 @@ impl LuaUserData for LuaScheduler {
         });
         // -- updateFrames --
         /// Advances all frame-based events by one frame, fires any callbacks whose frame count has been reached, and cleans up completed one-shot events. Call this once per frame. Returns the number of callbacks that fired.
-        /// @return | number | Count of callbacks that fired during this frame update.
+        /// @return | integer | Count of callbacks that fired during this frame update.
         methods.add_method_mut("updateFrames", |lua, this, ()| {
             let fired_ids = this.scheduler.update_frames();
             let fired_count = fired_ids.len() as u32;
@@ -376,7 +376,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getFrameCount --
     /// Returns the total number of frames rendered since the engine started.
-    /// @return | number | Total frame count.
+    /// @return | integer | Total frame count.
     let s = state.clone();
     tbl.set(
         "getFrameCount",
@@ -501,7 +501,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- tickRealTimers --
     /// Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that fired. Call this once per frame after afterReal scheduling.
-    /// @return | number | Count of real-time callbacks that fired.
+    /// @return | integer | Count of real-time callbacks that fired.
     let rt = real_timers;
     tbl.set(
         "tickRealTimers",
@@ -614,7 +614,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- tickWaits --
     /// Checks all pending waitSeconds and waitFrames coroutines, resumes any whose deadline or frame target has been reached, and cleans up completed entries. Returns the number of coroutines that were resumed. Call once per frame.
-    /// @return | number | Count of coroutines resumed.
+    /// @return | integer | Count of coroutines resumed.
     let ws_tick = wait_secs;
     let wf_tick = wait_frames;
     let s_tick = state.clone();
@@ -667,9 +667,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- delay --
     /// Alias for waitSeconds. Yields the current coroutine for the given number of seconds.
+    /// @return | nil | No value is returned.
     let wait_fn: LuaValue = tbl.get("waitSeconds")?;
     // delay: alias for waitSeconds
     tbl.set("delay", wait_fn)?;
+    /// Performs the 'timer' operation.
+    /// @return | nil | No value is returned.
     lurek.set("timer", tbl)?;
     Ok(())
 }

@@ -15,13 +15,25 @@ fn event_to_table(lua: &Lua, ev: NetworkEvent) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
     match ev {
         NetworkEvent::Connect { peer_id, data } => {
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "connect")?;
+            /// Performs the 'peer_id' operation.
+            /// @return | nil | No value is returned.
             t.set("peer_id", peer_id.0)?;
+            /// Performs the 'data' operation.
+            /// @return | nil | No value is returned.
             t.set("data", data)?;
         }
         NetworkEvent::Disconnect { peer_id, data } => {
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "disconnect")?;
+            /// Performs the 'peer_id' operation.
+            /// @return | nil | No value is returned.
             t.set("peer_id", peer_id.0)?;
+            /// Performs the 'data' operation.
+            /// @return | nil | No value is returned.
             t.set("data", data)?;
         }
         NetworkEvent::Receive {
@@ -29,9 +41,17 @@ fn event_to_table(lua: &Lua, ev: NetworkEvent) -> LuaResult<LuaTable<'_>> {
             channel_id,
             data,
         } => {
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "receive")?;
+            /// Performs the 'peer_id' operation.
+            /// @return | nil | No value is returned.
             t.set("peer_id", peer_id.0)?;
+            /// Performs the 'channel_id' operation.
+            /// @return | nil | No value is returned.
             t.set("channel_id", channel_id)?;
+            /// Performs the 'data' operation.
+            /// @return | nil | No value is returned.
             t.set("data", lua.create_string(&data)?)?;
         }
     }
@@ -45,14 +65,32 @@ fn parse_addr(s: &str) -> LuaResult<SocketAddr> {
 /// Converts peer statistics into a Lua table.
 fn stats_to_table(lua: &Lua, stats: PeerStats) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
+    /// Performs the 'round_trip_time' operation.
+    /// @return | nil | No value is returned.
     t.set("round_trip_time", stats.round_trip_time)?;
+    /// Performs the 'round_trip_time_variance' operation.
+    /// @return | nil | No value is returned.
     t.set("round_trip_time_variance", stats.round_trip_time_variance)?;
+    /// Performs the 'packets_sent' operation.
+    /// @return | nil | No value is returned.
     t.set("packets_sent", stats.packets_sent)?;
+    /// Performs the 'packets_lost' operation.
+    /// @return | nil | No value is returned.
     t.set("packets_lost", stats.packets_lost)?;
+    /// Performs the 'packet_loss' operation.
+    /// @return | nil | No value is returned.
     t.set("packet_loss", stats.packet_loss)?;
+    /// Performs the 'incoming_bandwidth' operation.
+    /// @return | nil | No value is returned.
     t.set("incoming_bandwidth", stats.incoming_bandwidth)?;
+    /// Performs the 'outgoing_bandwidth' operation.
+    /// @return | nil | No value is returned.
     t.set("outgoing_bandwidth", stats.outgoing_bandwidth)?;
+    /// Performs the 'incoming_data_total' operation.
+    /// @return | nil | No value is returned.
     t.set("incoming_data_total", stats.incoming_data_total)?;
+    /// Performs the 'outgoing_data_total' operation.
+    /// @return | nil | No value is returned.
     t.set("outgoing_data_total", stats.outgoing_data_total)?;
     Ok(t)
 }
@@ -62,10 +100,20 @@ fn room_to_table<'lua>(
     room: &crate::network::lobby::RoomInfo,
 ) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
+    /// Performs the 'id' operation.
+    /// @return | nil | No value is returned.
     t.set("id", room.id.clone())?;
+    /// Performs the 'name' operation.
+    /// @return | nil | No value is returned.
     t.set("name", room.name.clone())?;
+    /// Performs the 'host' operation.
+    /// @return | nil | No value is returned.
     t.set("host", room.host.clone())?;
+    /// Performs the 'player_count' operation.
+    /// @return | nil | No value is returned.
     t.set("player_count", room.player_count)?;
+    /// Performs the 'max_players' operation.
+    /// @return | nil | No value is returned.
     t.set("max_players", room.max_players)?;
     Ok(t)
 }
@@ -170,8 +218,8 @@ impl LuaUserData for LuaNetworkHost {
         // -- connect --
         /// Connects to a remote address. This method is available to Lua scripts.
         /// @param | addr_str | string | Remote socket address.
-        /// @param | channels | integer | Optional channel count, defaulting to 1.
-        /// @param | data | integer | Optional connection data, defaulting to 0.
+        /// @param | channels? | integer | Optional channel count, defaulting to 1.
+        /// @param | data? | integer | Optional connection data, defaulting to 0.
         /// @return | integer | Peer id.
         methods.add_method(
             "connect",
@@ -190,7 +238,7 @@ impl LuaUserData for LuaNetworkHost {
         /// @param | peer_id | integer | Peer id.
         /// @param | channel_id | integer | Channel id.
         /// @param | data | string | Binary payload string.
-        /// @param | reliable | boolean | Optional reliable flag, defaulting to true.
+        /// @param | reliable? | boolean | Optional reliable flag, defaulting to true.
         /// @return | nil | No value is returned.
         methods.add_method("send", |_, this, (peer_id, channel_id, data, reliable): (usize, u8, LuaString, Option<bool>)| {
                 this.inner
@@ -203,7 +251,7 @@ impl LuaUserData for LuaNetworkHost {
         /// Broadcasts bytes to all connected peers on a channel.
         /// @param | channel_id | integer | Channel id.
         /// @param | data | string | Binary payload string.
-        /// @param | reliable | boolean | Optional reliable flag, defaulting to true.
+        /// @param | reliable? | boolean | Optional reliable flag, defaulting to true.
         /// @return | nil | No value is returned.
         methods.add_method(
             "broadcast",
@@ -223,7 +271,7 @@ impl LuaUserData for LuaNetworkHost {
         // -- disconnect --
         /// Requests a graceful peer disconnect.
         /// @param | peer_id | integer | Peer id.
-        /// @param | data | integer | Optional disconnect data.
+        /// @param | data? | integer | Optional disconnect data.
         /// @return | nil | No value is returned.
         methods.add_method(
             "disconnect",
@@ -237,7 +285,7 @@ impl LuaUserData for LuaNetworkHost {
         // -- disconnectNow --
         /// Disconnects a peer immediately. This method is available to Lua scripts.
         /// @param | peer_id | integer | Peer id.
-        /// @param | data | integer | Optional disconnect data.
+        /// @param | data? | integer | Optional disconnect data.
         /// @return | nil | No value is returned.
         methods.add_method(
             "disconnectNow",
@@ -251,7 +299,7 @@ impl LuaUserData for LuaNetworkHost {
         // -- disconnectLater --
         /// Schedules a peer disconnect after pending packets.
         /// @param | peer_id | integer | Peer id.
-        /// @param | data | integer | Optional disconnect data.
+        /// @param | data? | integer | Optional disconnect data.
         /// @return | nil | No value is returned.
         methods.add_method(
             "disconnectLater",
@@ -357,14 +405,18 @@ impl LuaUserData for LuaNetworkHost {
                 .bandwidth_limit()
                 .map_err(LuaError::external)?;
             let t = lua.create_table()?;
+            /// Performs the 'incoming' operation.
+            /// @return | nil | No value is returned.
             t.set("incoming", inc)?;
+            /// Performs the 'outgoing' operation.
+            /// @return | nil | No value is returned.
             t.set("outgoing", out)?;
             Ok(t)
         });
         // -- setBandwidthLimit --
         /// Sets incoming and outgoing bandwidth limits.
-        /// @param | incoming | integer | Optional incoming bandwidth limit.
-        /// @param | outgoing | integer | Optional outgoing bandwidth limit.
+        /// @param | incoming? | integer | Optional incoming bandwidth limit.
+        /// @param | outgoing? | integer | Optional outgoing bandwidth limit.
         /// @return | nil | No value is returned.
         methods.add_method(
             "setBandwidthLimit",
@@ -376,7 +428,7 @@ impl LuaUserData for LuaNetworkHost {
             },
         );
         // -- getConnectedPeerCount --
-        /// Returns connected peer count. This method is available to Lua scripts.
+        /// Returns the number of currently connected peers.
         /// @return | integer | Connected peer count.
         methods.add_method("getConnectedPeerCount", |_, this, ()| {
             this.inner
@@ -385,7 +437,7 @@ impl LuaUserData for LuaNetworkHost {
                 .map_err(LuaError::external)
         });
         // -- getConnectedPeerIds --
-        /// Returns ids for connected peers. This method is available to Lua scripts.
+        /// Returns an array of ids for all connected peers.
         /// @return | table | Array table of peer ids.
         methods.add_method("getConnectedPeerIds", |_, this, ()| {
             let ids = this
@@ -409,7 +461,7 @@ impl LuaUserData for LuaNetworkHost {
             stats_to_table(lua, stats)
         });
         // -- destroy --
-        /// Destroys the network host. This method is available to Lua scripts.
+        /// Destroys the network host and releases resources.
         /// @return | nil | No value is returned.
         methods.add_method("destroy", |_, this, ()| {
             this.inner.borrow_mut().destroy();
@@ -439,6 +491,8 @@ impl LuaUserData for LuaNetworkHost {
         methods.add_method("isClient", |_, this, ()| {
             Ok(this.inner.borrow().role() == HostRole::Client)
         });
+        /// Returns a string representation of the network host.
+        /// @return | string | Debug string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!(
                 "NetworkHost({})",
@@ -495,7 +549,7 @@ impl LuaUserData for LuaNetworkRuntime {
         // -- httpGet --
         /// Starts an HTTP GET request. This method is available to Lua scripts.
         /// @param | url | string | Request URL.
-        /// @param | headers | table | Optional headers table.
+        /// @param | headers? | table | Optional headers table.
         /// @return | integer | Request id.
         methods.add_method(
             "httpGet",
@@ -517,7 +571,7 @@ impl LuaUserData for LuaNetworkRuntime {
         /// Starts an HTTP POST request. This method is available to Lua scripts.
         /// @param | url | string | Request URL.
         /// @param | body | string | Request body.
-        /// @param | headers | table | Optional headers table.
+        /// @param | headers? | table | Optional headers table.
         /// @return | integer | Request id.
         methods.add_method(
             "httpPost",
@@ -617,66 +671,120 @@ impl LuaUserData for LuaNetworkRuntime {
                         headers,
                         error,
                     } => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         t.set("type", "http")?;
+                        /// Performs the 'request_id' operation.
+                        /// @return | nil | No value is returned.
                         t.set("request_id", *id)?;
+                        /// Performs the 'status' operation.
+                        /// @return | nil | No value is returned.
                         t.set("status", *status)?;
+                        /// Performs the 'body' operation.
+                        /// @return | nil | No value is returned.
                         t.set("body", lua.create_string(body)?)?;
                         if let Some(ref err) = error {
+                            /// Performs the 'error' operation.
+                            /// @return | nil | No value is returned.
                             t.set("error", err.as_str())?;
                         }
                         let headers_table = lua.create_table()?;
                         for (k, v) in headers {
                             headers_table.set(k.as_str(), v.as_str())?;
                         }
+                        /// Performs the 'headers' operation.
+                        /// @return | nil | No value is returned.
                         t.set("headers", headers_table)?;
                     }
                     crate::network::net_thread::NetworkResponse::TcpEvent { id, event } => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         t.set("type", "tcp")?;
+                        /// Performs the 'id' operation.
+                        /// @return | nil | No value is returned.
                         t.set("id", *id)?;
                         match event {
                             crate::network::net_thread::TcpEvent::Connected => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "connected")?;
                             }
                             crate::network::net_thread::TcpEvent::Data(data) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "data")?;
+                                /// Performs the 'data' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("data", lua.create_string(data)?)?;
                             }
                             crate::network::net_thread::TcpEvent::Disconnected(reason) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "disconnected")?;
                                 if !reason.is_empty() {
+                                    /// Performs the 'reason' operation.
+                                    /// @return | nil | No value is returned.
                                     t.set("reason", reason.as_str())?;
                                 }
                             }
                             crate::network::net_thread::TcpEvent::Error(err) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "error")?;
+                                /// Performs the 'error' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("error", err.as_str())?;
                             }
                         }
                     }
                     crate::network::net_thread::NetworkResponse::WebSocketEvent { id, event } => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         t.set("type", "websocket")?;
+                        /// Performs the 'id' operation.
+                        /// @return | nil | No value is returned.
                         t.set("id", *id)?;
                         match event {
                             crate::network::net_thread::WsEvent::Open => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "open")?;
                             }
                             crate::network::net_thread::WsEvent::Text(data) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "text")?;
+                                /// Performs the 'data' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("data", data.as_str())?;
                             }
                             crate::network::net_thread::WsEvent::Binary(data) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "binary")?;
+                                /// Performs the 'data' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("data", lua.create_string(data)?)?;
                             }
                             crate::network::net_thread::WsEvent::Close { code, reason } => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "close")?;
+                                /// Performs the 'code' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("code", *code)?;
                                 if !reason.is_empty() {
+                                    /// Performs the 'reason' operation.
+                                    /// @return | nil | No value is returned.
                                     t.set("reason", reason.as_str())?;
                                 }
                             }
                             crate::network::net_thread::WsEvent::Error(err) => {
+                                /// Performs the 'event' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("event", "error")?;
+                                /// Performs the 'error' operation.
+                                /// @return | nil | No value is returned.
                                 t.set("error", err.as_str())?;
                             }
                         }
@@ -687,12 +795,14 @@ impl LuaUserData for LuaNetworkRuntime {
             Ok(results)
         });
         // -- shutdown --
-        /// Shuts down the network runtime. This method is available to Lua scripts.
+        /// Shuts down the network runtime and cancels pending requests.
         /// @return | nil | No value is returned.
         methods.add_method("shutdown", |_, this, ()| {
             this.inner.borrow_mut().shutdown();
             Ok(())
         });
+        /// Returns a string representation of the network runtime.
+        /// @return | string | Debug string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, _this, ()| {
             Ok("NetworkRuntime".to_string())
         });
@@ -712,9 +822,17 @@ impl LuaUserData for LuaNetworkRuntime {
 /// Registers the `lurek.network` module.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
+    /// Maximum allowed peers per host.
+    /// @return | nil | No value is returned.
     tbl.set("MAX_PEERS", MAX_PEERS as u64)?;
+    /// Default peer limit for new hosts.
+    /// @return | nil | No value is returned.
     tbl.set("DEFAULT_PEERS", DEFAULT_PEERS as u64)?;
+    /// Maximum allowed channels per host.
+    /// @return | nil | No value is returned.
     tbl.set("MAX_CHANNELS", MAX_CHANNELS as u64)?;
+    /// Default channel count for new hosts.
+    /// @return | nil | No value is returned.
     tbl.set("DEFAULT_CHANNELS", DEFAULT_CHANNELS as u64)?;
     // -- newHost --
     /// Creates a network host from an options table.
@@ -809,9 +927,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     // -- unpack --
-    /// Unpacks a binary network message string into Lua values.
+    /// Unpacks a binary network message string into a Lua value.
     /// @param | data | string | Binary packed message.
-    /// @return | LuaValue | Unpacked Lua value.
+    /// @return | table | Unpacked Lua value.
     tbl.set(
         "unpack",
         lua.create_function(|lua, data: LuaString| {
@@ -824,8 +942,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Broadcasts lobby information and returns it as a table.
     /// @param | name | string | Lobby name.
     /// @param | port | integer | Lobby port.
-    /// @param | player_count | integer | Optional current player count, defaulting to 1.
-    /// @param | max_players | integer | Optional maximum players, defaulting to 8.
+    /// @param | player_count? | integer | Optional current player count, defaulting to 1.
+    /// @param | max_players? | integer | Optional maximum players, defaulting to 8.
     /// @return | table | Lobby info table.
     tbl.set("createLobby", lua.create_function(
             |lua, (name, port, player_count, max_players): (String, u16, Option<u32>, Option<u32>)| {
@@ -838,10 +956,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 };
                 crate::network::lobby::broadcast_lobby(&info).map_err(LuaError::external)?;
                 let t = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 t.set("name", info.name.clone())?;
+                /// Performs the 'host' operation.
+                /// @return | nil | No value is returned.
                 t.set("host", info.host.clone())?;
+                /// Performs the 'port' operation.
+                /// @return | nil | No value is returned.
                 t.set("port", info.port)?;
+                /// Performs the 'player_count' operation.
+                /// @return | nil | No value is returned.
                 t.set("player_count", info.player_count)?;
+                /// Performs the 'max_players' operation.
+                /// @return | nil | No value is returned.
                 t.set("max_players", info.max_players)?;
                 Ok(t)
             },
@@ -858,10 +986,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let arr = lua.create_table()?;
             for (i, info) in lobbies.iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 t.set("name", info.name.clone())?;
+                /// Performs the 'host' operation.
+                /// @return | nil | No value is returned.
                 t.set("host", info.host.clone())?;
+                /// Performs the 'port' operation.
+                /// @return | nil | No value is returned.
                 t.set("port", info.port)?;
+                /// Performs the 'player_count' operation.
+                /// @return | nil | No value is returned.
                 t.set("player_count", info.player_count)?;
+                /// Performs the 'max_players' operation.
+                /// @return | nil | No value is returned.
                 t.set("max_players", info.max_players)?;
                 arr.set(i + 1, t)?;
             }
@@ -872,7 +1010,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a local room record. This function is exposed to Lua scripts.
     /// @param | name | string | Room name.
     /// @param | host | string | Host string.
-    /// @param | max_players | integer | Optional maximum players, defaulting to 8.
+    /// @param | max_players? | integer | Optional maximum players, defaulting to 8.
     /// @return | table | Room info table.
     tbl.set(
         "createRoom",
@@ -929,8 +1067,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | host_ud | LNetworkHost | Network host handle.
     /// @param | entity_id | integer | Entity id.
     /// @param | data_tbl | table | Entity field table.
-    /// @param | channel | integer? | Optional channel id, defaulting to 0.
-    /// @param | reliable | boolean? | Optional reliable flag, defaulting to false.
+    /// @param | channel? | integer | Optional channel id, defaulting to 0.
+    /// @param | reliable? | boolean | Optional reliable flag, defaulting to false.
     /// @return | nil | No value is returned.
     tbl.set(
         "syncEntity",
@@ -990,7 +1128,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             match crate::network::relay::decode_ticket(&token) {
                 Some(ticket) => {
                     let t = lua.create_table()?;
+                    /// Performs the 'room_id' operation.
+                    /// @return | nil | No value is returned.
                     t.set("room_id", ticket.room_id)?;
+                    /// Performs the 'peer_id' operation.
+                    /// @return | nil | No value is returned.
                     t.set("peer_id", ticket.peer_id)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -1036,11 +1178,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             };
             let out = crate::network::net_sync::predict_linear(&src, dt);
             let t = lua.create_table()?;
+            /// Performs the 'id' operation.
+            /// @return | nil | No value is returned.
             t.set("id", out.id)?;
+            /// Performs the 'tick' operation.
+            /// @return | nil | No value is returned.
             t.set("tick", out.tick)?;
+            /// Performs the 'x' operation.
+            /// @return | nil | No value is returned.
             t.set("x", out.x)?;
+            /// Performs the 'y' operation.
+            /// @return | nil | No value is returned.
             t.set("y", out.y)?;
+            /// Performs the 'vx' operation.
+            /// @return | nil | No value is returned.
             t.set("vx", out.vx)?;
+            /// Performs the 'vy' operation.
+            /// @return | nil | No value is returned.
             t.set("vy", out.vy)?;
             Ok(t)
         })?,
@@ -1072,15 +1226,29 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             };
             let out = crate::network::net_sync::reconcile(&predicted, &authoritative, alpha);
             let t = lua.create_table()?;
+            /// Performs the 'id' operation.
+            /// @return | nil | No value is returned.
             t.set("id", out.id)?;
+            /// Performs the 'tick' operation.
+            /// @return | nil | No value is returned.
             t.set("tick", out.tick)?;
+            /// Performs the 'x' operation.
+            /// @return | nil | No value is returned.
             t.set("x", out.x)?;
+            /// Performs the 'y' operation.
+            /// @return | nil | No value is returned.
             t.set("y", out.y)?;
+            /// Performs the 'vx' operation.
+            /// @return | nil | No value is returned.
             t.set("vx", out.vx)?;
+            /// Performs the 'vy' operation.
+            /// @return | nil | No value is returned.
             t.set("vy", out.vy)?;
             Ok(t)
         })?,
     )?;
+    /// Performs the 'network' operation.
+    /// @return | nil | No value is returned.
     lurek.set("network", tbl)?;
     Ok(())
 }

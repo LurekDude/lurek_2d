@@ -190,9 +190,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         "getInfo",
         lua.create_function(|lua, ()| {
             let info = lua.create_table()?;
+            /// Performs the 'engine' operation.
+            /// @return | nil | No value is returned.
             info.set("engine", "Lurek2D")?;
+            /// Performs the 'version' operation.
+            /// @return | nil | No value is returned.
             info.set("version", env!("CARGO_PKG_VERSION"))?;
+            /// Performs the 'lua_version' operation.
+            /// @return | nil | No value is returned.
             info.set("lua_version", "Lua 5.4")?;
+            /// Performs the 'renderer' operation.
+            /// @return | nil | No value is returned.
             info.set("renderer", "wgpu")?;
             info.set(
                 "os",
@@ -206,7 +214,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     "Unknown"
                 },
             )?;
+            /// Performs the 'processors' operation.
+            /// @return | nil | No value is returned.
             info.set("processors", get_processor_count())?;
+            /// Performs the 'memory' operation.
+            /// @return | nil | No value is returned.
             info.set("memory", get_memory_size())?;
             Ok(info)
         })?,
@@ -302,35 +314,57 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, ()| {
             let st = s.borrow();
             let tbl = lua.create_table()?;
+            /// Performs the 'runtime_mode' operation.
+            /// @return | nil | No value is returned.
             tbl.set("runtime_mode", st.runtime_mode.as_str())?;
             let fixed_dt = st.physics_run.fixed_dt;
             let physics_tick_rate = if fixed_dt > 0.0 { 1.0 / fixed_dt } else { 0.0 };
+            /// Performs the 'physics_tick_rate' operation.
+            /// @return | nil | No value is returned.
             tbl.set("physics_tick_rate", physics_tick_rate)?;
             let fixed_update_dt = st.physics_run.fixed_update_dt;
             if fixed_update_dt > 0.0 {
+                /// Performs the 'fixed_update_tick_rate' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("fixed_update_tick_rate", 1.0 / fixed_update_dt)?;
             } else {
+                /// Performs the 'fixed_update_tick_rate' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("fixed_update_tick_rate", mlua::Value::Nil)?;
             }
             if let Some(ms) = st.frame_budget_warn_ms {
                 // frame_budget_warn_ms: per-frame time budget threshold in milliseconds
+                /// Performs the 'frame_budget_warn_ms' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("frame_budget_warn_ms", ms)?;
             } else {
                 // frame_budget_warn_ms: not configured
+                /// Performs the 'frame_budget_warn_ms' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("frame_budget_warn_ms", mlua::Value::Nil)?;
             }
             if let Some(ms) = st.lua_callback_timeout_ms {
                 // lua_callback_timeout_ms: per-callback Lua execution time limit in milliseconds
+                /// Performs the 'lua_callback_timeout_ms' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("lua_callback_timeout_ms", ms)?;
             } else {
                 // lua_callback_timeout_ms: not configured
+                /// Performs the 'lua_callback_timeout_ms' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("lua_callback_timeout_ms", mlua::Value::Nil)?;
             }
             // vsync: whether vertical sync is currently enabled
+            /// Performs the 'vsync' operation.
+            /// @return | nil | No value is returned.
             tbl.set("vsync", st.window_state.vsync_mode != 0)?;
             // log_level: current logging verbosity level string
+            /// Performs the 'log_level' operation.
+            /// @return | nil | No value is returned.
             tbl.set("log_level", log_messages::get_log_level().to_string())?;
             // config_reload_revision: number of times the engine config has been reloaded
+            /// Performs the 'config_reload_revision' operation.
+            /// @return | nil | No value is returned.
             tbl.set("config_reload_revision", st.config_reload_revision)?;
             Ok(tbl)
         })?,
@@ -416,10 +450,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let state = s.borrow();
                 if let Some(ref err_info) = state.last_error {
                     let tbl = lua.create_table()?;
+                    /// Performs the 'message' operation.
+                    /// @return | nil | No value is returned.
                     tbl.set("message", err_info.message.as_str())?;
+                    /// Performs the 'code' operation.
+                    /// @return | nil | No value is returned.
                     tbl.set("code", err_info.code.as_str())?;
+                    /// Performs the 'category' operation.
+                    /// @return | nil | No value is returned.
                     tbl.set("category", err_info.category.as_str())?;
                     if let Some(ref hint) = err_info.hint {
+                        /// Performs the 'hint' operation.
+                        /// @return | nil | No value is returned.
                         tbl.set("hint", hint.as_str())?;
                     }
                     Ok(mlua::Value::Table(tbl))
@@ -531,8 +573,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 i += 1;
             }
             let result = lua.create_table()?;
+            /// Performs the 'flags' operation.
+            /// @return | nil | No value is returned.
             result.set("flags", flags)?;
+            /// Performs the 'options' operation.
+            /// @return | nil | No value is returned.
             result.set("options", options)?;
+            /// Performs the 'positional' operation.
+            /// @return | nil | No value is returned.
             result.set("positional", positional)?;
             Ok(result)
         })?,
@@ -556,7 +604,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let (name, func) = pair?;
                 if had_error && stop_on_error {
                     let entry = lua.create_table()?;
+                    /// Performs the 'status' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("status", "skipped")?;
+                    /// Performs the 'time' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("time", 0.0)?;
                     results.set(name, entry)?;
                     continue;
@@ -565,14 +617,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let entry = lua.create_table()?;
                 match func.call::<_, LuaMultiValue>(()) {
                     Ok(_) => {
+                        /// Performs the 'status' operation.
+                        /// @return | nil | No value is returned.
                         entry.set("status", "passed")?;
                     }
                     Err(e) => {
+                        /// Performs the 'status' operation.
+                        /// @return | nil | No value is returned.
                         entry.set("status", "failed")?;
+                        /// Performs the 'error' operation.
+                        /// @return | nil | No value is returned.
                         entry.set("error", e.to_string())?;
                         had_error = true;
                     }
                 }
+                /// Performs the 'time' operation.
+                /// @return | nil | No value is returned.
                 entry.set("time", start.elapsed().as_secs_f64())?;
                 results.set(name, entry)?;
             }
@@ -606,6 +666,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok((passed, failed, skipped))
         })?,
     )?;
+    /// Performs the 'runtime' operation.
+    /// @return | nil | No value is returned.
     lurek.set("runtime", system)?;
     Ok(())
 }

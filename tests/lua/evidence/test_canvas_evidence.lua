@@ -19,7 +19,7 @@ describe("evidence: canvas", function()
         local g = lurek.render
         local has_new    = type(g.newCanvas)   == "function"
         local has_set    = type(g.setCanvas)   == "function"
-        local has_reset  = type(rawget(g, "resetCanvas")) == "function" or true  -- optional
+        local has_reset  = type(rawget(g --[[@as table]], "resetCanvas")) == "function" or true  -- optional
         expect_true(has_new,  "lurek.render.newCanvas must be a function")
         expect_true(has_set,  "lurek.render.setCanvas must be a function")
         local f = io.open(path, "w")
@@ -82,7 +82,7 @@ describe("evidence: canvas", function()
         end
         lurek.render.setCanvas(c)
         -- ... draw calls would go here ...
-        local reset_canvas = rawget(lurek.render, "resetCanvas")
+        local reset_canvas = rawget(lurek.render --[[@as table]], "resetCanvas")
         if type(reset_canvas) == "function" then
             reset_canvas()
         end

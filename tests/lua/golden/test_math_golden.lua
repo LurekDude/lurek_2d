@@ -17,7 +17,7 @@ end)
 -- Compare-only golden suite for migrated_20 artifacts.
 -- Validates migrated image and audio fixtures against committed migrated_20 samples without generating new content in the golden layer.
 
-local function evidence_output_dir()
+local function migrated_20_output_dir()
     return "tests/output/migrated_20/"
 end
 
@@ -26,13 +26,13 @@ local function sample_dir()
 end
 
 local function verify_png(name)
-    local out = evidence_output_dir() .. name .. ".png"
+    local out = migrated_20_output_dir() .. name .. ".png"
     local sample = sample_dir() .. "/" .. name .. ".png"
     expect_golden_file_match(out, sample)
 end
 
 local function verify_wav(name)
-    local out = evidence_output_dir() .. name .. ".wav"
+    local out = migrated_20_output_dir() .. name .. ".wav"
     local sample = sample_dir() .. "/" .. name .. ".wav"
     expect_golden_file_match(out, sample)
 end
@@ -88,7 +88,7 @@ end)
 
 -- @describe golden: migrated 15 evidence comparison
 describe("golden: migrated 15 evidence comparison", function()
-    local OUT = evidence_output_dir("migrated_15") ---@diagnostic disable-line: redundant-parameter
+    local OUT = evidence_output_dir("migrated_15")
     local SAMP = "tests/samples/migrated_15/"
 
     it("matches golden samples", function()

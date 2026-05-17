@@ -66,14 +66,32 @@ fn parse_texture_key_value(
 /// Serializes one raycaster hit result into the Lua table layout returned by cast helpers.
 fn ray_hit_to_table<'lua>(lua: &'lua Lua, hit: &RayHit) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
+    /// Performs the 'distance' operation.
+    /// @return | nil | No value is returned.
     t.set("distance", hit.distance)?;
+    /// Performs the 'raw_distance' operation.
+    /// @return | nil | No value is returned.
     t.set("raw_distance", hit.raw_distance)?;
+    /// Performs the 'cell_value' operation.
+    /// @return | nil | No value is returned.
     t.set("cell_value", hit.cell_value)?;
+    /// Performs the 'alpha' operation.
+    /// @return | nil | No value is returned.
     t.set("alpha", hit.alpha)?;
+    /// Performs the 'side' operation.
+    /// @return | nil | No value is returned.
     t.set("side", hit.side)?;
+    /// Performs the 'tex_u' operation.
+    /// @return | nil | No value is returned.
     t.set("tex_u", hit.tex_u)?;
+    /// Performs the 'hit_x' operation.
+    /// @return | nil | No value is returned.
     t.set("hit_x", hit.hit_x)?;
+    /// Performs the 'hit_y' operation.
+    /// @return | nil | No value is returned.
     t.set("hit_y", hit.hit_y)?;
+    /// Performs the 'hit' operation.
+    /// @return | nil | No value is returned.
     t.set("hit", hit.hit)?;
     Ok(t)
 }
@@ -122,7 +140,7 @@ impl LuaUserData for LuaDoorManager {
         /// @param | y | integer | Grid row of the door cell.
         /// @param | direction | string | Slide axis: "horizontal" or "vertical".
         /// @param | speed | number | How fast the door opens/closes (units per second).
-        /// @return | number | Zero-based index of the newly added door.
+        /// @return | integer | Zero-based index of the newly added door.
         methods.add_method_mut(
             "addDoor",
             |_, this, (x, y, dir_str, speed): (u32, u32, String, f32)| {
@@ -166,8 +184,14 @@ impl LuaUserData for LuaDoorManager {
             let mgr = this.inner.borrow();
             if let Some(door) = mgr.doors().get(index) {
                 let tbl = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("x", door.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("y", door.y)?;
+                /// Performs the 'openAmount' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("openAmount", door.open_amount)?;
                 let state_str = match door.state {
                     DoorState::Closed => "closed",
@@ -175,6 +199,8 @@ impl LuaUserData for LuaDoorManager {
                     DoorState::Open => "open",
                     DoorState::Closing => "closing",
                 };
+                /// Performs the 'state' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("state", state_str)?;
                 Ok(LuaValue::Table(tbl))
             } else {
@@ -183,7 +209,7 @@ impl LuaUserData for LuaDoorManager {
         });
         // -- count --
         /// Returns the total number of registered doors.
-        /// @return | number | Door count.
+        /// @return | integer | Door count.
         methods.add_method("count", |_, this, ()| Ok(this.inner.borrow().doors().len()));
         // -- type --
         /// Returns the type name of this object.
@@ -278,7 +304,9 @@ impl LuaUserData for LuaPointLight {
         methods.add_method("intensity", |_, this, ()| Ok(this.inner.intensity));
         // -- color --
         /// Returns the RGB color components of this light.
-        /// @return | number, number, number | Red, green, blue channels (0.0..1.0).
+        /// @return | number | Red channel (0.0..1.0).
+        /// @return | number | Green channel (0.0..1.0).
+        /// @return | number | Blue channel (0.0..1.0).
         methods.add_method("color", |_, this, ()| {
             Ok((
                 this.inner.color[0],
@@ -295,7 +323,6 @@ impl LuaUserData for LuaPointLight {
         /// @param | b | number | Blue color channel (0.0..1.0).
         /// @param | radius | number | Falloff radius in world units.
         /// @param | intensity | number | Brightness multiplier.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "set",
             |_, this, (x, y, r, g, b, radius, intensity): (f32, f32, f32, f32, f32, f32, f32)| {
@@ -354,7 +381,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the wall type value at a grid cell.
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
-        /// @return | number | Cell value (0 = empty, 1+ = wall type).
+        /// @return | integer | Cell value (0 = empty, 1+ = wall type).
         methods.add_method("getCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.get_cell(x, y))
         });
@@ -379,18 +406,17 @@ impl LuaUserData for LuaRaycaster {
         });
         // -- width --
         /// Returns the map width in grid cells.
-        /// @return | number | Map width.
+        /// @return | integer | Map width.
         methods.add_method("width", |_, this, ()| Ok(this.inner.width()));
         // -- height --
         /// Returns the map height in grid cells.
-        /// @return | number | Map height.
+        /// @return | integer | Map height.
         methods.add_method("height", |_, this, ()| Ok(this.inner.height()));
         // -- setFloorTextureCell --
         /// Assigns a per-cell floor texture override. Pass nil to remove the override.
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
         /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setFloorTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -409,7 +435,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the raw texture id assigned to this floor cell, or nil if none.
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
-        /// @return | number | Raw texture id or nil.
+        /// @return | integer | Raw texture id or nil.
         methods.add_method("getFloorTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.floor_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
@@ -418,7 +444,6 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
         /// @param | texture | LImage? | Texture image, integer id, or nil to clear.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setCeilingTextureCell",
             |_, this, (x, y, texture): (u32, u32, LuaValue)| {
@@ -437,7 +462,7 @@ impl LuaUserData for LuaRaycaster {
         /// Returns the raw texture id assigned to this ceiling cell, or nil if none.
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
-        /// @return | number | Raw texture id or nil.
+        /// @return | integer | Raw texture id or nil.
         methods.add_method("getCeilingTextureCell", |_, this, (x, y): (u32, u32)| {
             Ok(this.ceiling_cell_textures.get(&(x, y)).map(|entry| entry.1))
         });
@@ -447,7 +472,6 @@ impl LuaUserData for LuaRaycaster {
         /// @param | x | integer | Grid column.
         /// @param | y | integer | Grid row.
         /// @param | opts | table? | Options table {texture, depth?, r?, g?, b?, blocked?} or nil to clear.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setLoweredFloorCell",
             |_, this, (x, y, opts): (u32, u32, LuaValue)| {
@@ -512,11 +536,23 @@ impl LuaUserData for LuaRaycaster {
         methods.add_method("getLoweredFloorCell", |lua, this, (x, y): (u32, u32)| {
             if let Some(cell) = this.lowered_floor_cells.get(&(x, y)) {
                 let tbl = lua.create_table()?;
+                /// Performs the 'texture' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("texture", cell.raw_id)?;
+                /// Performs the 'depth' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("depth", cell.depth_offset)?;
+                /// Performs the 'r' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("r", cell.tint[0])?;
+                /// Performs the 'g' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("g", cell.tint[1])?;
+                /// Performs the 'b' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("b", cell.tint[2])?;
+                /// Performs the 'blocked' operation.
+                /// @return | nil | No value is returned.
                 tbl.set("blocked", cell.blocked)?;
                 Ok(LuaValue::Table(tbl))
             } else {
@@ -542,7 +578,9 @@ impl LuaUserData for LuaRaycaster {
         /// @param | py | number | Current Y position in world space.
         /// @param | dx | number | Desired X movement delta.
         /// @param | dy | number | Desired Y movement delta.
-        /// @return | number, number, boolean | Final X, final Y, and whether any movement occurred.
+        /// @return | number | Final X position.
+        /// @return | number | Final Y position.
+        /// @return | boolean | Whether any movement occurred.
         methods.add_method(
             "tryMove",
             |_, this, (px, py, dx, dy): (f32, f32, f32, f32)| {
@@ -564,10 +602,12 @@ impl LuaUserData for LuaRaycaster {
         /// Used for tile-by-tile dungeon crawlers.
         /// @param | px | number | Current X position.
         /// @param | py | number | Current Y position.
-        /// @param | dir | number | Facing direction 1..4 (1=N, 2=E, 3=S, 4=W).
+        /// @param | dir | integer | Facing direction 1..4 (1=N, 2=E, 3=S, 4=W).
         /// @param | action | string | Movement action: "forward", "back", "left", or "right".
         /// @param | step | number | Step distance in world units (typically 1.0).
-        /// @return | number, number, boolean | Final X, final Y, whether move succeeded.
+        /// @return | number | Final X position.
+        /// @return | number | Final Y position.
+        /// @return | boolean | Whether the move succeeded.
         methods.add_method(
             "gridMove",
             |_, this, (px, py, dir, action, step): (f32, f32, u8, String, f32)| {
@@ -671,7 +711,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | oy | number | Ray origin Y.
         /// @param | angle | number | Center angle in radians.
         /// @param | fov | number | Field of view in radians.
-        /// @param | count | number | Number of rays.
+        /// @param | count | integer | Number of rays.
         /// @param | maxDist | number | Maximum ray distance.
         /// @param | step | number? | Walk step along each ray (default 0.2).
         /// @return | table | Array of {x, y} tables representing revealed grid cells.
@@ -701,7 +741,11 @@ impl LuaUserData for LuaRaycaster {
                 let out = lua.create_table()?;
                 for (i, (x, y)) in cells.iter().enumerate() {
                     let row = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     row.set("x", *x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     row.set("y", *y)?;
                     out.set(i + 1, row)?;
                 }
@@ -714,7 +758,10 @@ impl LuaUserData for LuaRaycaster {
         /// @param | y | integer | Tile grid row.
         /// @param | ambient | number | Base ambient light level (0.0..1.0).
         /// @param | lights | table? | Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
-        /// @return | number, number, number, number | Red, green, blue channels and average luminance.
+        /// @return | number | Red light channel.
+        /// @return | number | Green light channel.
+        /// @return | number | Blue light channel.
+        /// @return | number | Average luminance.
         methods.add_method(
             "computeTileLight",
             |_, this, (x, y, ambient, lights_tbl): (u32, u32, f32, LuaValue)| {
@@ -745,13 +792,29 @@ impl LuaUserData for LuaRaycaster {
                 let out = lua.create_table()?;
                 for (i, s) in samples.iter().enumerate() {
                     let row = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     row.set("x", s.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     row.set("y", s.y)?;
+                    /// Performs the 'blocked' operation.
+                    /// @return | nil | No value is returned.
                     row.set("blocked", s.blocked)?;
+                    /// Performs the 'visible' operation.
+                    /// @return | nil | No value is returned.
                     row.set("visible", s.visible)?;
+                    /// Performs the 'r' operation.
+                    /// @return | nil | No value is returned.
                     row.set("r", s.light[0])?;
+                    /// Performs the 'g' operation.
+                    /// @return | nil | No value is returned.
                     row.set("g", s.light[1])?;
+                    /// Performs the 'b' operation.
+                    /// @return | nil | No value is returned.
                     row.set("b", s.light[2])?;
+                    /// Performs the 'luma' operation.
+                    /// @return | nil | No value is returned.
                     row.set("luma", s.luma)?;
                     out.set(i + 1, row)?;
                 }
@@ -760,7 +823,7 @@ impl LuaUserData for LuaRaycaster {
         );
         // -- setWallAlpha --
         /// Sets the transparency for a specific wall tile type, enabling see-through walls.
-        /// @param | tileType | number | The cell value (1..255) whose alpha to change.
+        /// @param | tileType | integer | The cell value (1..255) whose alpha to change.
         /// @param | alpha | number | Opacity (0.0 = fully transparent, 1.0 = fully opaque).
         /// @return | nil | No value is returned.
         methods.add_method_mut("setWallAlpha", |_, this, (tile_type, alpha): (u8, f32)| {
@@ -803,7 +866,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | dirY | number | Camera forward direction Y.
         /// @param | planeX | number | Camera plane X (half-width of FOV).
         /// @param | planeY | number | Camera plane Y (half-width of FOV).
-        /// @param | row | number | Scanline row offset from screen center.
+        /// @param | row | integer | Scanline row offset from screen center.
         /// @return | table | Array of {u, v} tables for each pixel in the row.
         methods.add_method(
             "castFloorRow",
@@ -824,7 +887,11 @@ impl LuaUserData for LuaRaycaster {
                 let tbl = lua.create_table()?;
                 for (i, (u, v)) in uvs.iter().enumerate() {
                     let t = lua.create_table()?;
+                    /// Performs the 'u' operation.
+                    /// @return | nil | No value is returned.
                     t.set("u", *u)?;
+                    /// Performs the 'v' operation.
+                    /// @return | nil | No value is returned.
                     t.set("v", *v)?;
                     tbl.set(i + 1, t)?;
                 }
@@ -848,9 +915,17 @@ impl LuaUserData for LuaRaycaster {
              (sx, sy, px, py, pa, fov, screen_w): (f32, f32, f32, f32, f32, f32, f32)| {
                 let sp = this.inner.project_sprite(sx, sy, px, py, pa, fov, screen_w);
                 let t = lua.create_table()?;
+                /// Performs the 'screen_x' operation.
+                /// @return | nil | No value is returned.
                 t.set("screen_x", sp.screen_x)?;
+                /// Performs the 'scale' operation.
+                /// @return | nil | No value is returned.
                 t.set("scale", sp.scale)?;
+                /// Performs the 'distance' operation.
+                /// @return | nil | No value is returned.
                 t.set("distance", sp.distance)?;
+                /// Performs the 'visible' operation.
+                /// @return | nil | No value is returned.
                 t.set("visible", sp.visible)?;
                 Ok(t)
             },
@@ -894,9 +969,9 @@ impl LuaUserData for LuaRaycaster {
         /// @param | py | number | Player Y position.
         /// @param | angle | number | Player facing angle in radians.
         /// @param | fov | number | Field of view in radians.
-        /// @param | numRays | number | Number of rays (columns) to cast.
-        /// @param | w | number | Output image width in pixels.
-        /// @param | h | number | Output image height in pixels.
+        /// @param | numRays | integer | Number of rays (columns) to cast.
+        /// @param | w | integer | Output image width in pixels.
+        /// @param | h | integer | Output image height in pixels.
         /// @param | maxDist | number | Maximum render distance.
         /// @return | table | Raw depth-map image data.
         methods.add_method(
@@ -958,7 +1033,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | lights | table? | Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
         /// @param | sprites | table? | Array of sprite tables {x, y, texture, size?}.
         /// @param | wallTextures | table? | Map of cell_value -> texture for wall surfaces.
-        /// @return | number | Total number of quads in the built scene.
+        /// @return | integer | Total number of quads in the built scene.
         methods.add_method(
             "buildScene",
             |_,
@@ -1108,7 +1183,7 @@ impl LuaUserData for LuaRaycaster {
         /// @param | sprites | table? | Array of sprite tables.
         /// @param | wallTextures | table? | Map of cell_value -> texture.
         /// @param | models | table? | Array of model instance tables {model, x, y, rotation?, scale?}.
-        /// @return | number | Total number of quads in the built scene.
+        /// @return | integer | Total number of quads in the built scene.
         methods.add_method(
             "buildSceneWithModels",
             |_,
@@ -1324,7 +1399,7 @@ impl LuaUserData for LuaSpriteManager {
         /// @param | y | number | World Y position.
         /// @param | texture | string | Texture asset name.
         /// @param | scale | number? | Sprite size multiplier (default 1.0).
-        /// @return | number | Unique sprite id for later manipulation.
+        /// @return | integer | Unique sprite id for later manipulation.
         methods.add_method_mut(
             "add",
             |_, this, (x, y, texture, scale): (f32, f32, String, Option<f32>)| {
@@ -1381,11 +1456,23 @@ impl LuaUserData for LuaSpriteManager {
                     let dy = s.y - cam_y;
                     let dist = (dx * dx + dy * dy).sqrt();
                     let entry = lua.create_table()?;
+                    /// Performs the 'id' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("id", s.id)?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("x", s.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("y", s.y)?;
+                    /// Performs the 'texture' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("texture", s.texture.clone())?;
+                    /// Performs the 'scale' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("scale", s.scale)?;
+                    /// Performs the 'distance' operation.
+                    /// @return | nil | No value is returned.
                     entry.set("distance", dist)?;
                     tbl.set(i + 1, entry)?;
                 }
@@ -1529,6 +1616,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    /// Performs the 'raycaster' operation.
+    /// @return | nil | No value is returned.
     lurek.set("raycaster", tbl)?;
     Ok(())
 }

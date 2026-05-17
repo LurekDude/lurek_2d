@@ -303,8 +303,7 @@ impl LuaUserData for LuaLight {
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
-        /// @param | a | number | Optional alpha channel, defaulting to 1.0.
-        /// @return | nil | No value is returned.
+        /// @param | a? | number | Alpha channel, defaulting to 1.0.
         methods.add_method(
             "setColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -459,8 +458,7 @@ impl LuaUserData for LuaLight {
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
-        /// @param | a | number | Optional alpha channel, defaulting to 1.0.
-        /// @return | nil | No value is returned.
+        /// @param | a? | number | Alpha channel, defaulting to 1.0.
         methods.add_method(
             "setShadowColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -913,7 +911,6 @@ impl LuaUserData for LuaLight {
         /// Starts a transition toward target color, intensity, and radius values.
         /// @param | target | table | Target table with optional `color`, `intensity`, and `radius` fields.
         /// @param | duration | number | Transition duration in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "transitionTo",
             |_, this, (target, duration): (LuaTable, f32)| {
@@ -1003,7 +1000,7 @@ impl LuaUserData for LuaLight {
         });
         // -- getCookie --
         /// Returns the cookie texture path stored on this Lua light handle.
-        /// @return | LuaValue | Cookie path string, or nil when absent.
+        /// @return | string | Cookie texture path, or nil when absent.
         methods.add_method("getCookie", |_, this, ()| {
             Ok(this.cookie_path.borrow().clone())
         });
@@ -1029,7 +1026,7 @@ impl LuaUserData for LuaLight {
         });
         // -- getNormalMap --
         /// Returns the normal map path used by this light.
-        /// @return | LuaValue | Normal map path string, or nil when absent.
+        /// @return | string | Normal map path, or nil when absent.
         methods.add_method("getNormalMap", |_, this, ()| {
             let st = this.state.borrow();
             let light = st
@@ -1278,7 +1275,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | Light x coordinate.
     /// @param | y | number | Light y coordinate.
     /// @param | radius | number | Light radius.
-    /// @param | opts | table | Optional table of light settings.
+    /// @param | opts? | table | Table of light settings.
     /// @return | LLight | New light handle.
     tbl.set(
         "newLight",
@@ -1304,7 +1301,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newOccluder --
     /// Creates an occluder from a flat vertex coordinate table and optional settings.
     /// @param | vtbl | table | Flat numeric array `[x1, y1, x2, y2, ...]`.
-    /// @param | opts | table | Optional table of occluder settings.
+    /// @param | opts? | table | Table of occluder settings.
     /// @return | LOccluder | New occluder handle.
     tbl.set(
         "newOccluder",
@@ -1327,8 +1324,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | r | number | Red channel.
     /// @param | g | number | Green channel.
     /// @param | b | number | Blue channel.
-    /// @param | a | number | Optional alpha channel, defaulting to 1.0.
-    /// @return | nil | No value is returned.
+    /// @param | a? | number | Alpha channel, defaulting to 1.0.
     tbl.set(
         "setAmbient",
         lua.create_function(move |_, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -1354,7 +1350,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setEnabled --
     /// Enables or disables the shared light world.
     /// @param | enabled | boolean | New enabled flag.
-    /// @return | nil | No value is returned.
     tbl.set(
         "setEnabled",
         lua.create_function(move |_, enabled: bool| {
@@ -1398,7 +1393,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setMaxLights --
     /// Sets the maximum configured light count, clamped to 1 through 256.
     /// @param | n | integer | Requested maximum light count.
-    /// @return | nil | No value is returned.
     tbl.set(
         "setMaxLights",
         lua.create_function(move |_, n: u16| {
@@ -1409,7 +1403,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- clear --
     /// Removes all lights and occluders from the light world.
-    /// @return | nil | No value is returned.
     tbl.set(
         "clear",
         lua.create_function(move |_, ()| {
@@ -1422,7 +1415,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Enables or disables all lights in a group.
     /// @param | group_id | integer | Light group id.
     /// @param | enabled | boolean | New enabled flag for the group.
-    /// @return | nil | No value is returned.
     tbl.set(
         "setGroupEnabled",
         lua.create_function(move |_, (group_id, enabled): (u16, bool)| {
@@ -1437,7 +1429,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets intensity for all lights in a group.
     /// @param | group_id | integer | Light group id.
     /// @param | intensity | number | New intensity value.
-    /// @return | nil | No value is returned.
     tbl.set(
         "setGroupIntensity",
         lua.create_function(move |_, (group_id, intensity): (u16, f32)| {
@@ -1454,8 +1445,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | r | number | Red channel.
     /// @param | g | number | Green channel.
     /// @param | b | number | Blue channel.
-    /// @param | a | number | Optional alpha channel, defaulting to 1.0.
-    /// @return | nil | No value is returned.
+    /// @param | a? | number | Alpha channel, defaulting to 1.0.
     tbl.set(
         "setGroupColor",
         lua.create_function(
@@ -1482,7 +1472,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- advanceFlickers --
     /// Advances flicker animation for all indexed flickering lights.
     /// @param | dt | number | Delta time in seconds.
-    /// @return | nil | No value is returned.
     tbl.set(
         "advanceFlickers",
         lua.create_function(move |_, dt: f32| {
@@ -1515,8 +1504,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let tbl = lua.create_table()?;
             for (i, (x, y, angle)) in hints.iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 t.set("x", *x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 t.set("y", *y)?;
+                /// Performs the 'angle' operation.
+                /// @return | nil | No value is returned.
                 t.set("angle", *angle)?;
                 tbl.set(i + 1, t)?;
             }
@@ -1534,18 +1529,34 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let tbl = lua.create_table()?;
             for (i, h) in hints.iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 t.set("x", h.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 t.set("y", h.y)?;
+                /// Performs the 'radius' operation.
+                /// @return | nil | No value is returned.
                 t.set("radius", h.radius)?;
+                /// Performs the 'intensity' operation.
+                /// @return | nil | No value is returned.
                 t.set("intensity", h.intensity)?;
+                /// Performs the 'direction' operation.
+                /// @return | nil | No value is returned.
                 t.set("direction", h.direction)?;
+                /// Performs the 'normalMap' operation.
+                /// @return | nil | No value is returned.
                 t.set("normalMap", h.path.clone())?;
+                /// Performs the 'strength' operation.
+                /// @return | nil | No value is returned.
                 t.set("strength", h.strength)?;
                 tbl.set(i + 1, t)?;
             }
             Ok(tbl)
         })?,
     )?;
+    /// Performs the 'light' operation.
+    /// @return | nil | No value is returned.
     lurek.set("light", tbl)?;
     Ok(())
 }

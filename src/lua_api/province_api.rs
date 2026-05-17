@@ -79,11 +79,11 @@ impl LuaUserData for LuaProvinceRegistry {
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
         // -- getWidth --
         /// Returns the width of the province grid in cells (pixels of the source PNG).
-        /// @return | number | Grid width in cells.
+        /// @return | integer | Grid width in cells.
         methods.add_method("getWidth", |_, this, ()| this.with_registry(|r| r.width()));
         // -- getHeight --
         /// Returns the height of the province grid in cells (pixels of the source PNG).
-        /// @return | number | Grid height in cells.
+        /// @return | integer | Grid height in cells.
         methods.add_method("getHeight", |_, this, ()| {
             this.with_registry(|r| r.height())
         });
@@ -91,7 +91,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Returns the province ID at the given grid cell coordinates. Returns 0 if the cell is unowned (sea, wasteland, etc.).
         /// @param | x | integer | Zero-based column index.
         /// @param | y | integer | Zero-based row index.
-        /// @return | number | Province ID at (x, y), or 0 for unowned cells.
+        /// @return | integer | Province ID at (x, y), or 0 for unowned cells.
         methods.add_method("getAt", |_, this, (x, y): (u32, u32)| {
             this.with_registry(|r| r.get_at(x, y))
         });
@@ -155,7 +155,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | cam_y | number | Camera center y in map space.
         /// @param | zoom | number | Current zoom factor.
         /// @param | pixel_size | number? | Cell size in screen pixels (default 1.0).
-        /// @return | number | Province ID under the cursor, or nil if none.
+        /// @return | integer | Province ID under the cursor, or nil if none.
         methods.add_method(
             "screenToProvince",
             |_,
@@ -190,7 +190,7 @@ impl LuaUserData for LuaProvinceRegistry {
         );
         // -- provinceCount --
         /// Returns the total number of distinct provinces in this registry (excluding ID 0).
-        /// @return | number | Count of provinces.
+        /// @return | integer | Count of provinces.
         methods.add_method("provinceCount", |_, this, ()| {
             this.with_registry(|r| r.province_count() as u32)
         });
@@ -213,7 +213,11 @@ impl LuaUserData for LuaProvinceRegistry {
             let out = lua.create_table()?;
             for (i, (a, b)) in pairs.into_iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'province_a' operation.
+                /// @return | nil | No value is returned.
                 row.set("province_a", a)?;
+                /// Performs the 'province_b' operation.
+                /// @return | nil | No value is returned.
                 row.set("province_b", b)?;
                 out.set(i + 1, row)?;
             }
@@ -227,9 +231,17 @@ impl LuaUserData for LuaProvinceRegistry {
             let out = lua.create_table()?;
             for (i, (id, y, x0, x1)) in spans.into_iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'province_id' operation.
+                /// @return | nil | No value is returned.
                 row.set("province_id", id)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 row.set("y", y)?;
+                /// Performs the 'x0' operation.
+                /// @return | nil | No value is returned.
                 row.set("x0", x0)?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 row.set("x1", x1)?;
                 out.set(i + 1, row)?;
             }
@@ -243,11 +255,23 @@ impl LuaUserData for LuaProvinceRegistry {
             let out = lua.create_table()?;
             for (i, (a, b, x0, y0, x1, y1)) in segs.into_iter().enumerate() {
                 let seg = lua.create_table()?;
+                /// Performs the 'province_a' operation.
+                /// @return | nil | No value is returned.
                 seg.set("province_a", a)?;
+                /// Performs the 'province_b' operation.
+                /// @return | nil | No value is returned.
                 seg.set("province_b", b)?;
+                /// Performs the 'x0' operation.
+                /// @return | nil | No value is returned.
                 seg.set("x0", x0)?;
+                /// Performs the 'y0' operation.
+                /// @return | nil | No value is returned.
                 seg.set("y0", y0)?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 seg.set("x1", x1)?;
+                /// Performs the 'y1' operation.
+                /// @return | nil | No value is returned.
                 seg.set("y1", y1)?;
                 out.set(i + 1, seg)?;
             }
@@ -255,7 +279,7 @@ impl LuaUserData for LuaProvinceRegistry {
         });
         // -- getRevision --
         /// Returns the current change revision counter. Incremented on every mutation (color, terrain, border, fog changes). Use with `getChangesSince` for incremental updates.
-        /// @return | number | Current revision number.
+        /// @return | integer | Current revision number.
         methods.add_method("getRevision", |_, this, ()| {
             this.with_registry(|r| r.revision())
         });
@@ -269,9 +293,15 @@ impl LuaUserData for LuaProvinceRegistry {
                 return Ok(LuaValue::Nil);
             };
             let out = lua.create_table()?;
+            /// Performs the 'province_id' operation.
+            /// @return | nil | No value is returned.
             out.set("province_id", snap.province_id)?;
+            /// Performs the 'revision' operation.
+            /// @return | nil | No value is returned.
             out.set("revision", snap.revision)?;
             let style = lua.create_table()?;
+            /// Performs the 'political_color' operation.
+            /// @return | nil | No value is returned.
             style.set("political_color", {
                 let t = lua.create_table()?;
                 t.set(1, snap.style.political_color[0])?;
@@ -280,21 +310,39 @@ impl LuaUserData for LuaProvinceRegistry {
                 t.set(4, snap.style.political_color[3])?;
                 t
             })?;
+            /// Performs the 'terrain_type' operation.
+            /// @return | nil | No value is returned.
             style.set("terrain_type", snap.style.terrain_type)?;
+            /// Performs the 'border_style' operation.
+            /// @return | nil | No value is returned.
             style.set("border_style", snap.style.border_style)?;
+            /// Performs the 'fog_state' operation.
+            /// @return | nil | No value is returned.
             style.set("fog_state", snap.style.fog_state)?;
+            /// Performs the 'visibility_state' operation.
+            /// @return | nil | No value is returned.
             style.set("visibility_state", snap.style.visibility_state)?;
+            /// Performs the 'style' operation.
+            /// @return | nil | No value is returned.
             out.set("style", style)?;
             if let Some((cx, cy)) = snap.centroid {
                 let ct = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x", cx)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y", cy)?;
+                /// Performs the 'centroid' operation.
+                /// @return | nil | No value is returned.
                 out.set("centroid", ct)?;
             }
             let attrs = lua.create_table()?;
             for (k, v) in snap.attrs {
                 attrs.set(k, v)?;
             }
+            /// Performs the 'attrs' operation.
+            /// @return | nil | No value is returned.
             out.set("attrs", attrs)?;
             Ok(LuaValue::Table(out))
         });
@@ -341,7 +389,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | g | number | Green component (0.0–1.0).
         /// @param | b | number | Blue component (0.0–1.0).
         /// @param | a | number? | Alpha component (default 1.0).
-        /// @return | nil | No return value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setPoliticalColor",
             |_, this, (id, r, g, b, a): (u32, f32, f32, f32, Option<f32>)| {
@@ -354,7 +402,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the terrain type index for a province. Terrain type controls which fill color or texture is used in terrain map mode.
         /// @param | id | integer | Province ID.
         /// @param | terrain_type | integer | Terrain type index (game-defined meaning).
-        /// @return | nil | No return value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setTerrainType",
             |_, this, (id, terrain_type): (u32, u32)| {
@@ -365,7 +413,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the border rendering style index for a province. Controls line thickness, color, or pattern when borders are drawn.
         /// @param | id | integer | Province ID.
         /// @param | border_style | integer | Border style index (game-defined meaning).
-        /// @return | nil | No return value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setBorderStyle",
             |_, this, (id, border_style): (u32, u32)| {
@@ -375,16 +423,16 @@ impl LuaUserData for LuaProvinceRegistry {
         // -- setFogState --
         /// Sets the fog-of-war state for a province. Typically 0 = revealed, 1 = fogged, 2 = hidden. Controls rendering opacity or overlay.
         /// @param | id | integer | Province ID.
-        /// @param | fog_state | number | Fog state value (game-defined meaning).
-        /// @return | LuaValue | Returned Lua value.
+        /// @param | fog_state | integer | Fog state value (game-defined meaning).
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut("setFogState", |_, this, (id, fog_state): (u32, u8)| {
             this.with_registry_mut(|reg| reg.set_fog_state(id, fog_state))
         });
         // -- setVisibilityState --
         /// Sets the visibility state for a province. Used for strategic visibility layers separate from fog (e.g. scouted vs. unscouted).
         /// @param | id | integer | Province ID.
-        /// @param | visibility_state | number | Visibility state value (game-defined meaning).
-        /// @return | nil | No return value.
+        /// @param | visibility_state | integer | Visibility state value (game-defined meaning).
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setVisibilityState",
             |_, this, (id, visibility_state): (u32, u8)| {
@@ -396,7 +444,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | id | integer | Province ID.
         /// @param | key | string | Attribute name.
         /// @param | value | string | Attribute value.
-        /// @return | nil | No return value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setAttr",
             |_, this, (id, key, value): (u32, String, String)| {
@@ -408,7 +456,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | id | integer | Province ID.
         /// @param | x | number | Capital x position in map space.
         /// @param | y | number | Capital y position in map space.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut("setCapital", |_, this, (id, x, y): (u32, f32, f32)| {
             this.with_registry_mut(|reg| reg.set_capital(id, x, y))
         });
@@ -419,7 +467,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// @param | ay | number | Start y of the label line in map space.
         /// @param | bx | number | End x of the label line in map space.
         /// @param | by | number | End y of the label line in map space.
-        /// @return | nil | No return value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut(
             "setLabelLine",
             |_, this, (id, ax, ay, bx, by): (u32, f32, f32, f32, f32)| {
@@ -430,7 +478,7 @@ impl LuaUserData for LuaProvinceRegistry {
         /// Sets the display name text for a province. Rendered on the map when `draw_labels` is enabled in `render` options.
         /// @param | id | integer | Province ID.
         /// @param | text | string | Province display name.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | boolean | True if the province ID exists.
         methods.add_method_mut("setLabelText", |_, this, (id, text): (u32, String)| {
             this.with_registry_mut(|reg| reg.set_label_text(id, text))
         });
@@ -500,16 +548,24 @@ impl LuaUserData for LuaProvinceRegistry {
                 .with_registry_mut(|reg| import_metadata_from_files(reg, &import_opts))?
                 .map_err(LuaError::RuntimeError)?;
             let out = lua.create_table()?;
+            /// Performs the 'mapped_provinces' operation.
+            /// @return | nil | No value is returned.
             out.set("mapped_provinces", summary.mapped_provinces)?;
+            /// Performs the 'capitals_set' operation.
+            /// @return | nil | No value is returned.
             out.set("capitals_set", summary.capitals_set)?;
+            /// Performs the 'label_lines_set' operation.
+            /// @return | nil | No value is returned.
             out.set("label_lines_set", summary.label_lines_set)?;
+            /// Performs the 'labels_set' operation.
+            /// @return | nil | No value is returned.
             out.set("labels_set", summary.labels_set)?;
             Ok(out)
         });
         // -- render --
         /// Renders the province map to the screen using the current camera and style settings. Generates draw commands for fills, borders, labels, and capitals based on the provided options.
-        /// @param | opts | table? | Render options: map_mode (string?), x/y/zoom/pixel_size/screen_w/screen_h (number?), draw_fills/draw_borders/draw_labels/draw_capitals (boolean?), border_width (number?), hovered_id/selected_id (number?).
-        /// @return | nil | No value is returned.
+        /// @param | opts | table? | Render options: map_mode (string?), x/y/zoom/pixel_size/screen_w/screen_h (number?), draw_fills/draw_borders/draw_labels/draw_capitals (boolean?), border_width (number?), hovered_id/selected_id (integer?).
+        /// @return | nil | No return value.
         methods.add_method("render", |_, this, opts: Option<LuaTable>| {
             let opts = opts;
             let mode = if let Some(ref t) = opts {
@@ -591,48 +647,80 @@ impl LuaUserData for LuaProvinceRegistry {
             let out = lua.create_table()?;
             for (i, (rev, ch)) in changes.into_iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'revision' operation.
+                /// @return | nil | No value is returned.
                 row.set("revision", rev)?;
                 match ch {
                     ProvinceChange::PoliticalColor { province_id, color } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "political_color")?;
+                        /// Performs the 'province_id' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_id", province_id)?;
                         let c = lua.create_table()?;
                         c.set(1, color[0])?;
                         c.set(2, color[1])?;
                         c.set(3, color[2])?;
                         c.set(4, color[3])?;
+                        /// Performs the 'color' operation.
+                        /// @return | nil | No value is returned.
                         row.set("color", c)?;
                     }
                     ProvinceChange::TerrainType {
                         province_id,
                         terrain_type,
                     } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "terrain_type")?;
+                        /// Performs the 'province_id' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_id", province_id)?;
+                        /// Performs the 'terrain_type' operation.
+                        /// @return | nil | No value is returned.
                         row.set("terrain_type", terrain_type)?;
                     }
                     ProvinceChange::BorderStyle {
                         province_id,
                         border_style,
                     } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "border_style")?;
+                        /// Performs the 'province_id' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_id", province_id)?;
+                        /// Performs the 'border_style' operation.
+                        /// @return | nil | No value is returned.
                         row.set("border_style", border_style)?;
                     }
                     ProvinceChange::FogState {
                         province_id,
                         fog_state,
                     } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "fog_state")?;
+                        /// Performs the 'province_id' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_id", province_id)?;
+                        /// Performs the 'fog_state' operation.
+                        /// @return | nil | No value is returned.
                         row.set("fog_state", fog_state)?;
                     }
                     ProvinceChange::VisibilityState {
                         province_id,
                         visibility_state,
                     } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "visibility_state")?;
+                        /// Performs the 'province_id' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_id", province_id)?;
+                        /// Performs the 'visibility_state' operation.
+                        /// @return | nil | No value is returned.
                         row.set("visibility_state", visibility_state)?;
                     }
                     ProvinceChange::BorderClass {
@@ -640,9 +728,17 @@ impl LuaUserData for LuaProvinceRegistry {
                         province_b,
                         class,
                     } => {
+                        /// Performs the 'kind' operation.
+                        /// @return | nil | No value is returned.
                         row.set("kind", "border_class")?;
+                        /// Performs the 'province_a' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_a", province_a)?;
+                        /// Performs the 'province_b' operation.
+                        /// @return | nil | No value is returned.
                         row.set("province_b", province_b)?;
+                        /// Performs the 'class' operation.
+                        /// @return | nil | No value is returned.
                         row.set("class", class.as_str())?;
                     }
                 }
@@ -707,7 +803,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     sanitize_marked_png(in_path.as_str(), out_path.as_str(), &marker_opts)
                         .map_err(LuaError::RuntimeError)?;
                 let out = lua.create_table()?;
+                /// Performs the 'replaced_pixels' operation.
+                /// @return | nil | No value is returned.
                 out.set("replaced_pixels", summary.replaced_pixels)?;
+                /// Performs the 'unresolved_pixels' operation.
+                /// @return | nil | No value is returned.
                 out.set("unresolved_pixels", summary.unresolved_pixels)?;
                 Ok(out)
             },
@@ -817,6 +917,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// Performs the 'province' operation.
+    /// @return | nil | No value is returned.
     lurek.set("province", tbl)?;
     Ok(())
 }

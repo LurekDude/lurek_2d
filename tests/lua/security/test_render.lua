@@ -3,35 +3,42 @@
 
 -- Lurek2D Security Test: API Fuzz / Nil Spam
 -- Tests that core APIs handle nil, wrong types, and edge cases gracefully
----@diagnostic disable: param-type-mismatch
+
+-- Typed-any locals used to pass intentionally wrong values without triggering LuaLS.
+local NIL = nil ---@type any
+local BAD_STR_A = "hello" ---@type any
+local BAD_STR_B = "world" ---@type any
+local BAD_STR_DT = "not_a_number" ---@type any
+local BAD_STR_LOUD = "loud" ---@type any
+local BAD_TABLE = { a = 1 } ---@type any
 
 -- @describe fuzz: nil arguments to core APIs
 describe("fuzz: nil arguments to core APIs", function()
     -- @security lurek.render.setColor
     it("lurek.render.setColor handles nil gracefully", function()
         expect_error(function()
-            lurek.render.setColor(nil, nil, nil)
+            lurek.render.setColor(NIL, NIL, NIL)
         end)
     end)
 
     -- @security lurek.render.rectangle
     it("lurek.render.rectangle handles nil gracefully", function()
         expect_error(function()
-            lurek.render.rectangle(nil, nil, nil, nil, nil)
+            lurek.render.rectangle(NIL, NIL, NIL, NIL, NIL)
         end)
     end)
 
     -- @security lurek.render.circle
     it("lurek.render.circle handles nil gracefully", function()
         expect_error(function()
-            lurek.render.circle(nil, nil, nil, nil)
+            lurek.render.circle(NIL, NIL, NIL, NIL)
         end)
     end)
 
     -- @security lurek.render.line
     it("lurek.render.line with nil args is silently ignored", function()
         -- Should not error; nil coords are filtered out and draw call is skipped.
-        lurek.render.line(nil, nil, nil, nil)
+        lurek.render.line(NIL, NIL, NIL, NIL)
     end)
 end)
 
@@ -40,21 +47,21 @@ describe("fuzz: wrong types to physics", function()
     -- @security lurek.physics.newWorld
     it("lurek.physics.newWorld rejects string gravity", function()
         expect_error(function()
-            lurek.physics.newWorld("hello", "world")
+            lurek.physics.newWorld(BAD_STR_A, BAD_STR_B)
         end)
     end)
 
     -- @security lurek.physics.newBody
     it("lurek.physics.newBody rejects nil world", function()
         expect_error(function()
-            lurek.physics.newBody(nil, 0, 0, "dynamic")
+            lurek.physics.newBody(NIL, 0, 0, "dynamic")
         end)
     end)
 
     -- @security lurek.physics.step
     it("lurek.physics.step rejects nil world", function()
         expect_error(function()
-            lurek.physics.step(nil, 0.016)
+            lurek.physics.step(NIL, 0.016)
         end)
     end)
 
@@ -64,7 +71,7 @@ describe("fuzz: wrong types to physics", function()
     it("lurek.physics.step rejects string dt", function()
         local world = lurek.physics.newWorld(0, 10)
         expect_error(function()
-            lurek.physics.step(world, "not_a_number")
+            lurek.physics.step(world, BAD_STR_DT)
         end)
         lurek.physics.destroyWorld(world)
     end)
@@ -77,7 +84,7 @@ describe("fuzz: wrong types to entity system", function()
     it("universe:set with nil entity id", function()
         local universe = lurek.ecs.newUniverse()
         expect_error(function()
-            universe:set(nil, "key", "value")
+            universe:set(NIL, "key", "value")
         end)
     end)
 
@@ -86,7 +93,7 @@ describe("fuzz: wrong types to entity system", function()
     it("universe:get with nil entity id", function()
         local universe = lurek.ecs.newUniverse()
         expect_error(function()
-            universe:get(nil, "key")
+            universe:get(NIL, "key")
         end)
     end)
 
@@ -95,7 +102,7 @@ describe("fuzz: wrong types to entity system", function()
     it("universe:kill with nil entity id", function()
         local universe = lurek.ecs.newUniverse()
         expect_error(function()
-            universe:kill(nil)
+            universe:kill(NIL)
         end)
     end)
 
@@ -104,7 +111,7 @@ describe("fuzz: wrong types to entity system", function()
     it("universe:isAlive with nil entity id", function()
         local universe = lurek.ecs.newUniverse()
         expect_error(function()
-            universe:isAlive(nil)
+            universe:isAlive(NIL)
         end)
     end)
 end)
@@ -114,14 +121,14 @@ describe("fuzz: wrong types to data module", function()
     -- @security lurek.data.encode
     it("lurek.data.encode rejects nil format", function()
         expect_error(function()
-            lurek.data.encode(nil, { a = 1 })
+            lurek.data.encode(NIL, BAD_TABLE)
         end)
     end)
 
     -- @security lurek.data.decode
     it("lurek.data.decode rejects nil format", function()
         expect_error(function()
-            lurek.data.decode(nil, "{}")
+            lurek.data.decode(NIL, "{}")
         end)
     end)
 
@@ -135,7 +142,7 @@ describe("fuzz: wrong types to data module", function()
     -- @security lurek.data.compress
     it("lurek.data.compress rejects nil", function()
         expect_error(function()
-            lurek.data.compress("deflate", nil)
+            lurek.data.compress("deflate", NIL)
         end)
     end)
 
@@ -154,7 +161,7 @@ describe("fuzz: wrong types to AI module", function()
     it("fsm:addState with nil name", function()
         local fsm = lurek.ai.newStateMachine()
         expect_error(function()
-            fsm:addState(nil, { onUpdate = function() end })
+            fsm:addState(NIL, { onUpdate = function() end })
         end)
     end)
 
@@ -174,21 +181,21 @@ describe("fuzz: wrong types to math module", function()
     -- @security lurek.math.Vec2
     it("Vec2 rejects string args", function()
         expect_error(function()
-            lurek.math.Vec2("hello", "world")
+            lurek.math.Vec2(BAD_STR_A, BAD_STR_B)
         end)
     end)
 
     -- @security lurek.math.sin
     it("sin rejects nil", function()
         expect_error(function()
-            lurek.math.sin(nil)
+            lurek.math.sin(NIL)
         end)
     end)
 
     -- @security lurek.math.lerp
     it("lerp rejects nil", function()
         expect_error(function()
-            lurek.math.lerp(nil, nil, nil)
+            lurek.math.lerp(NIL, NIL, NIL)
         end)
     end)
 end)
@@ -198,14 +205,14 @@ describe("fuzz: wrong types to audio module", function()
     -- @security lurek.audio.setMasterVolume
     it("setMasterVolume rejects string", function()
         expect_error(function()
-            lurek.audio.setMasterVolume("loud")
+            lurek.audio.setMasterVolume(BAD_STR_LOUD)
         end)
     end)
 
     -- @security lurek.audio.setMasterVolume
     it("setMasterVolume rejects nil", function()
         expect_error(function()
-            lurek.audio.setMasterVolume(nil)
+            lurek.audio.setMasterVolume(NIL)
         end)
     end)
 end)
@@ -308,7 +315,7 @@ describe("validation: physics invalid args", function()
     -- @security lurek.physics.step
     it("rejects nil world ID", function()
         expect_error(function()
-            lurek.physics.step(nil, 0.016)
+            lurek.physics.step(NIL, 0.016)
         end, "nil world ID")
     end)
 
@@ -541,7 +548,7 @@ describe("fuzz: P0 modules nil type extreme", function()
     -- @security lurek.image.newImageData
     it("rejects hostile payloads across P0 modules without panic", function()
         expect_error(function()
-            lurek.data.compress("deflate", nil)
+            lurek.data.compress("deflate", NIL)
         end)
 
         expect_error(function()

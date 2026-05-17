@@ -68,53 +68,54 @@ Serialization converts Lua tables to a `SaveValue` tree, then emits Lua-literal 
 Module example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
--- Advances this save manager by the given delta time.
+-- content/examples/save.lua
+-- lurek.save API examples: persistent game state management with SaveManager.
+-- Run: cargo run -- content/examples/save.lua
+
+--@api-stub: lurek.save.newSaveManager
+-- Create a new SaveManager for managing persistent game saves
 do
+  -- newSaveManager() returns a fresh manager with no registered sections.
+  -- You typically create one per game and keep it in a local or module variable.
   local mgr = lurek.save.newSaveManager()
-  mgr:enableAutoSave(30.0, "auto")
-  function lurek.process(dt)
-    local slot = mgr:update(dt)
-    if slot then mgr:save(slot) end
-  end
+  mgr:setSchemaVersion(1)
+  mgr:register("player",
+    function() return { hp = 100, x = 32, y = 64, name = "Hero" } end,
+    function(data)
+      -- This restorer runs when loading a save; apply data back to game state
+      lurek.log.info("restored player: " .. data.name .. " hp=" .. data.hp, "save")
+    end)
 end
 
---@api-stub: SaveManager:setSummary
--- Sets the summary of this save manager.
+--@api-stub: LSaveManager:register
+-- Register a named data section with collector and restorer function pair
 do
+  -- register(name, collectFn, restoreFn) links a key to save/load behavior.
+  -- collectFn: called during save to gather current state into a table.
+  -- restoreFn: called during load to apply saved data back into your game.
   local mgr = lurek.save.newSaveManager()
-  local area, playtime = "Forest", "12:30"
-  mgr:setSummary(area .. " â€” " .. playtime)
-end
 
---@api-stub: SaveManager:getSummary
--- Returns the summary of this save manager.
-do
-  local mgr = lurek.save.newSaveManager()
-  mgr:setSummary("Chapter 2 â€” Boss")
-  local label = mgr:getSummary()
-  lurek.log.info("current summary: " .. label, "save")
-end
+  -- Register player position and stats
+  local player = { x = 200, y = 300, hp = 80, gold = 1500 }
+  mgr:register("player_state",
+    function()
+      return { x = player.x, y = player.y, hp = player.hp, gold = player.gold }
+    end,
+    function(data)
+      player.x = data.x
+      player.y = data.y
+      player.hp = data.hp
+      player.gold = data.gold
+      lurek.log.info("player restored at (" .. data.x .. "," .. data.y .. ")", "save")
+    end)
 
---@api-stub: SaveManager:reset
--- Resets this save manager to its default state.
-do
-  local mgr = lurek.save.newSaveManager()
-  mgr:register("player", function() return {} end, function(_) end)
-  mgr:reset()
-  lurek.log.info("save manager cleared for main menu", "save")
+  -- Register world state separately for clean separation
+  mgr:register("world",
+    function() return { day = 7, weather = "rain" } end,
+    function(data)
+      lurek.log.info("world day " .. data.day .. ", weather: " .. data.weather, "save")
+    end)
 end
-
---@api-stub: SaveManager:setCompress
--- Sets the compress of this save manager.
-do
-  local mgr = lurek.save.newSaveManager()
-  mgr:setCompress(true)
-  lurek.log.info("compressed saves enabled", "save")
-end
-
---@api-stub: SaveManager:isCompressed
--- Returns true if this save manager compressed.
-do
 ```
 
 ## Key Types
@@ -143,11 +144,16 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- newSaveManager() returns a fresh manager with no registered sections.
+  -- You typically create one per game and keep it in a local or module variable.
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(1)
   mgr:register("player",
-    function() return { hp = 100, x = 32, y = 64 } end,
-    function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
+    function() return { hp = 100, x = 32, y = 64, name = "Hero" } end,
+    function(data)
+      -- This restorer runs when loading a save; apply data back to game state
+      lurek.log.info("restored player: " .. data.name .. " hp=" .. data.hp, "save")
+    end)
 end
 ```
 
@@ -164,11 +170,16 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- newSaveManager() returns a fresh manager with no registered sections.
+  -- You typically create one per game and keep it in a local or module variable.
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(1)
   mgr:register("player",
-    function() return { hp = 100, x = 32, y = 64 } end,
-    function(t) lurek.log.info("restored player hp=" .. (t and t.hp or 0), "save") end)
+    function() return { hp = 100, x = 32, y = 64, name = "Hero" } end,
+    function(data)
+      -- This restorer runs when loading a save; apply data back to game state
+      lurek.log.info("restored player: " .. data.name .. " hp=" .. data.hp, "save")
+    end)
 end
 ```
 
@@ -187,13 +198,30 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.newSaveManager()
-  sm:setSchemaVersion(2)
-  sm:addMigration(1, function(data)
-    data.score = data.score or 0
+  -- addMigration(fromVersion, func) registers a transformer that converts
+  -- save data from fromVersion to fromVersion+1.
+  -- Chain multiple migrations to handle multi-version jumps automatically.
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSchemaVersion(3)
+
+  -- v1 -> v2: added inventory.max_slots field
+  mgr:addMigration(1, function(data)
+    if data.inventory then
+      data.inventory.max_slots = data.inventory.max_slots or 20
+    end
     return data
   end)
-  lurek.log.info("migration registered", "save")
+
+  -- v2 -> v3: renamed "hp" to "health" in player section
+  mgr:addMigration(2, function(data)
+    if data.player and data.player.hp then
+      data.player.health = data.player.hp
+      data.player.hp = nil
+    end
+    return data
+  end)
+
+  lurek.log.info("migrations registered: v1->v2, v2->v3", "save")
 end
 ```
 
@@ -209,12 +237,21 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- collect() calls every registered collectFn and bundles results into one table.
+  -- The returned table includes __schema_version, __timestamp, and __summary metadata.
+  -- Useful for preview UI or checkpoint logic without writing to disk.
   local mgr = lurek.save.newSaveManager()
+  mgr:setSchemaVersion(1)
   mgr:register("inventory",
-    function() return { gold = 250, potions = 3 } end,
+    function() return { gold = 250, potions = 3, keys = 1 } end,
     function(_) end)
+  mgr:register("quest_log",
+    function() return { active = "rescue_princess", completed = 4 } end,
+    function(_) end)
+
   local snapshot = mgr:collect()
-  lurek.log.info("snapshot has " .. tostring(snapshot.inventory.gold) .. " gold", "save")
+  lurek.log.info("collected: " .. snapshot.inventory.gold .. " gold, "
+    .. snapshot.quest_log.completed .. " quests done", "save")
 end
 ```
 
@@ -234,11 +271,16 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local mgr
-  function lurek.quit()
-    mgr = lurek.save.newSaveManager()
-    mgr:delete("slot_temp")
-    lurek.log.info("scratch slot removed on quit", "save")
+  -- delete(slot) removes the file. Cannot be undone.
+  -- Use for "delete save" menu option or clearing temporary autosave slots.
+  local mgr = lurek.save.newSaveManager()
+
+  -- Clean up temporary quicksave slot when player reaches a proper checkpoint
+  if mgr:exists("quicksave_temp") then
+    mgr:delete("quicksave_temp")
+    lurek.log.info("temporary quicksave cleaned up", "save")
+  else
+    lurek.log.info("no quicksave_temp slot to clean up", "save")
   end
 end
 ```
@@ -253,8 +295,12 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Use during cutscenes, boss fights, or menus where auto-save would be disruptive.
+  -- Manual saves via save() still work while auto-save is disabled.
   local mgr = lurek.save.newSaveManager()
-  mgr:enableAutoSave(60.0, "auto")
+  mgr:enableAutoSave(30.0, "autosave")
+
+  -- Entering a cutscene: pause auto-save
   mgr:disableAutoSave()
   lurek.log.info("auto-save paused for cutscene", "save")
 end
@@ -275,10 +321,17 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.newSaveManager()
-  sm:register("state", function() return {score=0} end, function(d) end)
-  sm:enableAutoSave(5.0, "slot1")
-  lurek.log.info("auto-save enabled", "save")
+  -- enableAutoSave(interval, slot) checks isDirty() every interval seconds.
+  -- If dirty, it triggers save(slot) automatically.
+  -- You must call update(dt) each frame for the timer to advance.
+  local mgr = lurek.save.newSaveManager()
+  mgr:register("progress",
+    function() return { checkpoint = "bridge", enemies_left = 4 } end,
+    function(_) end)
+
+  -- Auto-save every 60 seconds into the "autosave" slot
+  mgr:enableAutoSave(60.0, "autosave")
+  lurek.log.info("auto-save armed: every 60s -> autosave slot", "save")
 end
 ```
 
@@ -298,9 +351,15 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.newSaveManager()
-  local present = sm:exists("slot1")
-  lurek.log.info("slot1 exists: " .. tostring(present), "save")
+  -- exists(slot) checks the filesystem without reading file contents.
+  -- Use to grey out "Load" buttons or show slot previews conditionally.
+  local mgr = lurek.save.newSaveManager()
+
+  if mgr:exists("slot1") then
+    lurek.log.info("slot1 found - Continue button enabled", "save")
+  else
+    lurek.log.info("no save found - showing New Game only", "save")
+  end
 end
 ```
 
@@ -316,10 +375,13 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Use this to verify the manager version matches what your game expects.
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(2)
   local ver = mgr:getSchemaVersion()
-  if ver < 2 then lurek.log.warn("schema older than expected", "save") end
+  if ver < 3 then
+    lurek.log.info("running schema v" .. ver .. " (pre-inventory update)", "save")
+  end
 end
 ```
 
@@ -339,11 +401,16 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local mgr
-  function lurek.init()
-    mgr = lurek.save.newSaveManager()
-    local info = mgr:getSlotInfo("slot1")
-    if info then lurek.log.info("preview: " .. info.summary, "save") end
+  -- getSlotInfo(slot) returns an info table or nil if the slot doesn't exist.
+  -- Lighter than load() when you only need preview data for a UI.
+  local mgr = lurek.save.newSaveManager()
+  local info = mgr:getSlotInfo("slot1")
+
+  if info then
+    lurek.log.info("slot1 preview: " .. info.summary
+      .. " | saved at " .. tostring(info.timestamp), "save")
+  else
+    lurek.log.info("slot1 is empty", "save")
   end
 end
 ```
@@ -360,11 +427,18 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local mgr
-  function lurek.init()
-    mgr = lurek.save.newSaveManager()
-    for _, info in ipairs(mgr:getSlots()) do
-      lurek.log.info("slot " .. info.slot .. " â€” " .. info.summary, "save")
+  -- getSlots() returns an array of info tables, each with:
+  -- slot (string), version (number), timestamp (number), summary (string)
+  -- Use this to build a save/load slot selection screen.
+  local mgr = lurek.save.newSaveManager()
+  local slots = mgr:getSlots()
+
+  if #slots == 0 then
+    lurek.log.info("no existing saves found", "save")
+  else
+    for i, info in ipairs(slots) do
+      lurek.log.info("[" .. i .. "] " .. info.slot .. " - " .. info.summary
+        .. " (v" .. info.version .. ")", "save")
     end
   end
 end
@@ -382,8 +456,9 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Returns the summary set by setSummary, or empty string if none was set.
   local mgr = lurek.save.newSaveManager()
-  mgr:setSummary("Chapter 2 â€” Boss")
+  mgr:setSummary("Chapter 3 - The Fortress")
   local label = mgr:getSummary()
   lurek.log.info("current summary: " .. label, "save")
 end
@@ -403,8 +478,11 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 do
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
+
   if mgr:isCompressed() then
-    lurek.log.info("save format: lz4+base64", "save")
+    lurek.log.info("compression: ON (smaller files, slightly slower)", "save")
+  else
+    lurek.log.info("compression: OFF (faster writes, larger files)", "save")
   end
 end
 ```
@@ -421,10 +499,14 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- isDirty() returns true if markDirty() was called since the last save/load.
+  -- Use it to show "unsaved" indicators or confirm-quit dialogs.
   local mgr = lurek.save.newSaveManager()
   mgr:markDirty()
+
   if mgr:isDirty() then
-    lurek.log.info("unsaved changes pending", "save")
+    lurek.log.info("WARNING: unsaved progress exists!", "save")
+    -- In a real game: show "Save before quitting?" dialog
   end
 end
 ```
@@ -445,12 +527,19 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local mgr
-  function lurek.init()
-    mgr = lurek.save.newSaveManager()
-    mgr:register("world", function() return {} end, function(_) end)
-    local ok, err = mgr:load("slot1")
-    if not ok then lurek.log.warn("load failed: " .. tostring(err), "save") end
+  -- load(slot) returns (true, nil) on success or (false, error_message) on failure.
+  -- It decompresses if needed, applies migrations, calls all restorers, then fires onAfterLoad.
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSchemaVersion(1)
+  mgr:register("game_state",
+    function() return {} end,
+    function(data)
+      lurek.log.info("loaded level " .. tostring(data.level), "save")
+    end)
+
+  local ok, err = mgr:load("slot1")
+  if not ok then
+    lurek.log.warn("load failed: " .. tostring(err) .. " - starting new game", "save")
   end
 end
 ```
@@ -465,11 +554,18 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Call markDirty() whenever game state changes in a way that should be persisted.
+  -- The auto-save system checks isDirty() to know when to write.
   local mgr = lurek.save.newSaveManager()
-  local function on_item_picked_up()
+  mgr:register("score", function() return 999 end, function(_) end)
+
+  -- Typical pattern: mark dirty on gameplay events
+  local function on_enemy_killed()
     mgr:markDirty()
   end
-  on_item_picked_up()
+
+  on_enemy_killed()
+  lurek.log.info("state marked dirty after kill", "save")
 end
 ```
 
@@ -487,9 +583,13 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- The callback receives the slot name. Use it to rebuild caches, refresh UI,
+  -- or log load events. Pass nil to clear the hook.
   local mgr = lurek.save.newSaveManager()
+
   mgr:onAfterLoad(function(slot)
-    lurek.log.info("loaded slot " .. slot .. ", rebuilding scene", "save")
+    lurek.log.info("loaded from " .. slot .. " - rebuilding sprite cache", "save")
+    -- In a real game: invalidate texture caches, rebuild spatial index, etc.
   end)
 end
 ```
@@ -508,10 +608,14 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- The callback receives the slot name. Use it to finalize state, update summary,
+  -- or log save events. Pass nil to clear the hook.
   local mgr = lurek.save.newSaveManager()
+
   mgr:onBeforeSave(function(slot)
-    mgr:setSummary("Saved to " .. slot)
-    lurek.log.info("about to write slot " .. slot, "save")
+    -- Update summary with current timestamp before writing
+    mgr:setSummary("Saved at frame " .. tostring(lurek.timer.getTime()))
+    lurek.log.info("preparing save to slot: " .. slot, "save")
   end)
 end
 ```
@@ -532,12 +636,31 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.newSaveManager()
-  sm:register("player_state",
-    function() return {x=200, y=300, hp=100} end,
-    function(d) lurek.log.info("restored hp=" .. d.hp, "save") end
-  )
-  lurek.log.info("component registered", "save")
+  -- register(name, collectFn, restoreFn) links a key to save/load behavior.
+  -- collectFn: called during save to gather current state into a table.
+  -- restoreFn: called during load to apply saved data back into your game.
+  local mgr = lurek.save.newSaveManager()
+
+  -- Register player position and stats
+  local player = { x = 200, y = 300, hp = 80, gold = 1500 }
+  mgr:register("player_state",
+    function()
+      return { x = player.x, y = player.y, hp = player.hp, gold = player.gold }
+    end,
+    function(data)
+      player.x = data.x
+      player.y = data.y
+      player.hp = data.hp
+      player.gold = data.gold
+      lurek.log.info("player restored at (" .. data.x .. "," .. data.y .. ")", "save")
+    end)
+
+  -- Register world state separately for clean separation
+  mgr:register("world",
+    function() return { day = 7, weather = "rain" } end,
+    function(data)
+      lurek.log.info("world day " .. data.day .. ", weather: " .. data.weather, "save")
+    end)
 end
 ```
 
@@ -551,10 +674,17 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- reset() returns the manager to its freshly-created state.
+  -- Use when returning to main menu or switching player profiles.
   local mgr = lurek.save.newSaveManager()
+  mgr:setSchemaVersion(2)
   mgr:register("player", function() return {} end, function(_) end)
+  mgr:register("world", function() return {} end, function(_) end)
+  mgr:setCompress(true)
+
+  -- Player returns to title screen
   mgr:reset()
-  lurek.log.info("save manager cleared for main menu", "save")
+  lurek.log.info("save manager fully reset for main menu", "save")
 end
 ```
 
@@ -574,13 +704,22 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- restore(data) takes a table (from collect() or loaded from disk) and calls
+  -- every registered restoreFn with the matching section data.
   local mgr = lurek.save.newSaveManager()
-  local checkpoint
+  local current_hp = 50
+
   mgr:register("hp",
-    function() return 100 end,
-    function(v) lurek.log.info("hp restored to " .. tostring(v), "save") end)
-  checkpoint = mgr:collect()
-  mgr:restore(checkpoint)
+    function() return current_hp end,
+    function(v)
+      current_hp = v
+      lurek.log.info("hp restored to " .. tostring(v), "save")
+    end)
+
+  -- Simulate checkpoint: capture state, then restore it later
+  local checkpoint = mgr:collect()
+  current_hp = 10  -- player takes damage after checkpoint
+  mgr:restore(checkpoint)  -- reverts hp back to 50
 end
 ```
 
@@ -600,14 +739,17 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local mgr
-  function lurek.init()
-    mgr = lurek.save.newSaveManager()
-    mgr:register("world",
-      function() return { seed = 12345, day = 7 } end,
-      function(_) end)
-    mgr:save("slot1")
-  end
+  -- save(slot) writes to save/slot_<name>.sav on disk.
+  -- Calls onBeforeSave hook, runs all collectors, serializes, then writes.
+  local mgr = lurek.save.newSaveManager()
+  mgr:setSchemaVersion(1)
+  mgr:register("game_state",
+    function() return { level = 5, score = 12400, lives = 2 } end,
+    function(_) end)
+  mgr:setSummary("Level 5 - Score 12400")
+
+  mgr:save("slot1")
+  lurek.log.info("game saved to slot1", "save")
 end
 ```
 
@@ -625,9 +767,11 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Compressed saves are smaller on disk but slightly slower to write/read.
+  -- Recommended for large save states (open worlds, inventories with many items).
   local mgr = lurek.save.newSaveManager()
   mgr:setCompress(true)
-  lurek.log.info("compressed saves enabled", "save")
+  lurek.log.info("saves will be LZ4-compressed from now on", "save")
 end
 ```
 
@@ -645,9 +789,11 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Increment the version whenever save data format changes between releases.
+  -- This version is embedded in save files so migrations know which path to take.
   local mgr = lurek.save.newSaveManager()
   mgr:setSchemaVersion(3)
-  lurek.log.info("save schema is now v" .. mgr:getSchemaVersion(), "save")
+  lurek.log.info("save format v3 (added inventory slots)", "save")
 end
 ```
 
@@ -665,9 +811,15 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- The summary is stored alongside save metadata for slot selection UI.
+  -- Update it whenever meaningful progress happens (new area, boss defeated, etc).
   local mgr = lurek.save.newSaveManager()
-  local area, playtime = "Forest", "12:30"
-  mgr:setSummary(area .. " â€” " .. playtime)
+
+  local area_name = "Crystal Caves"
+  local play_hours = 4
+  local play_minutes = 32
+  mgr:setSummary(area_name .. " - " .. play_hours .. "h " .. play_minutes .. "m")
+  lurek.log.info("summary updated for next save", "save")
 end
 ```
 
@@ -683,8 +835,10 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.manager()
-  lurek.log.info(sm:type(), "save")
+  -- type() always returns "LSaveManager". Useful for generic type checking.
+  local mgr = lurek.save.newSaveManager()
+  local t = mgr:type()
+  lurek.log.info("object type: " .. t, "save")  -- prints "LSaveManager"
 end
 ```
 
@@ -704,8 +858,12 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
-  local sm = lurek.save.manager()
-  lurek.log.info(tostring(sm:typeOf("LSaveManager")), "save")
+  -- typeOf(name) accepts "LSaveManager" or "Object".
+  -- Use for duck-typing checks when passing objects between systems.
+  local mgr = lurek.save.newSaveManager()
+  lurek.log.info("is LSaveManager: " .. tostring(mgr:typeOf("LSaveManager")), "save")
+  lurek.log.info("is Object: " .. tostring(mgr:typeOf("Object")), "save")
+  lurek.log.info("is LSource: " .. tostring(mgr:typeOf("LSource")), "save")
 end
 ```
 
@@ -723,11 +881,16 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- Use unregister when a subsystem is destroyed (e.g. minigame ended).
+  -- After unregister, the section is excluded from future save/load cycles.
   local mgr = lurek.save.newSaveManager()
-  mgr:register("minigame",
-    function() return { score = 0 } end,
-    function(_) end)
-  mgr:unregister("minigame")
+  mgr:register("minigame_progress",
+    function() return { score = 450, wave = 3 } end,
+    function(data) lurek.log.info("minigame score=" .. data.score, "save") end)
+
+  -- Player exits the minigame; no longer need to track its state
+  mgr:unregister("minigame_progress")
+  lurek.log.info("minigame section removed from save cycle", "save")
 end
 ```
 
@@ -747,11 +910,18 @@ Exact example from [save.lua](../blob/main/content/examples/save.lua):
 
 ```lua
 do
+  -- update(dt) returns true if an auto-save was triggered this frame.
+  -- Only meaningful when enableAutoSave is active and state is dirty.
   local mgr = lurek.save.newSaveManager()
-  mgr:enableAutoSave(30.0, "auto")
-  function lurek.process(dt)
-    local slot = mgr:update(dt)
-    if slot then mgr:save(slot) end
+  mgr:register("state", function() return { wave = 3 } end, function(_) end)
+  mgr:enableAutoSave(30.0, "autosave")
+  mgr:markDirty()
+
+  -- In your game loop:
+  local dt = 1.0 / 60.0  -- simulated frame delta
+  local triggered = mgr:update(dt)
+  if triggered then
+    lurek.log.info("auto-save fired this frame", "save")
   end
 end
 ```

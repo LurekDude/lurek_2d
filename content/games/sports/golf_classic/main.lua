@@ -393,7 +393,6 @@ function lurek.process(dt)
     end
 
     -- Mouse aim
-    ---@diagnostic disable-next-line: undefined-field
     aim_x, aim_y = lurek.input.mouse.getPosition()
 
     -- ── AIMING ──

@@ -607,7 +607,11 @@ impl LuaUserData for LuaBehaviorTree {
         methods.add_method("getDebugState", |lua, this, ()| {
             let dbg = this.inner.borrow().debug_state();
             let t = lua.create_table()?;
+            /// Performs the 'node_count' operation.
+            /// @return | nil | No value is returned.
             t.set("node_count", dbg.node_count as u32)?;
+            /// Performs the 'last_status' operation.
+            /// @return | nil | No value is returned.
             t.set("last_status", dbg.last_status)?;
             Ok(t)
         });
@@ -1230,14 +1234,14 @@ impl LuaUserData for LuaDialogueAI {
         );
         // -- selectTopic --
         /// Selects the best currently valid topic using weights and context filters.
-        /// @return | LuaValue | Selected topic identifier, or nil when no topic is available.
+        /// @return | string | Selected topic identifier, or nil when no topic is available.
         methods.add_method("selectTopic", |_, this, ()| {
             Ok(this.inner.borrow().select_topic())
         });
         // -- selectBranch --
         /// Selects the best currently valid branch for the given topic.
         /// @param | topic_id | string | Topic identifier whose branches should be considered.
-        /// @return | LuaValue | Selected branch identifier, or nil when no branch is available.
+        /// @return | string | Selected branch identifier, or nil when no branch is available.
         methods.add_method("selectBranch", |_, this, topic_id: String| {
             Ok(this.inner.borrow().select_branch(&topic_id))
         });
@@ -3859,6 +3863,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    /// Performs the 'ai' operation.
+    /// @return | nil | No value is returned.
     lurek.set("ai", tbl)?;
     Ok(())
 }

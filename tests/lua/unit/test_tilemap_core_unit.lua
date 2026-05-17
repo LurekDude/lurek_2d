@@ -1620,7 +1620,8 @@ describe("lurek.tilemap.newMapGen", function()
     -- @covers lurek.tilemap.newMapGroup
     it("creates a MapGen from numeric dimensions", function()
         local group = lurek.tilemap.newMapGroup("world")
-        local gen = lurek.tilemap.newMapGen(group, 4, 4) ---@diagnostic disable-line: param-type-mismatch
+        local group_any = group ---@type any
+        local gen = lurek.tilemap.newMapGen(group_any, 4, 4)
         expect_type("userdata", gen)
     end)
 

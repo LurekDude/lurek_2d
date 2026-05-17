@@ -96,7 +96,7 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- collect --
         /// Pops and returns the next result from the pool's output channel.
-        /// @return | LuaValue | The next result value, or `nil` if the output channel is empty.
+        /// @return | any | The next result value, or `nil` if the output channel is empty.
         methods.add_method("collect", |lua, this, ()| {
             match this.inner.lock().unwrap().collect() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -105,11 +105,11 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- size --
         /// Returns the number of worker threads in the pool.
-        /// @return | number | The pool's worker count.
+        /// @return | integer | The pool's worker count.
         methods.add_method("size", |_, this, ()| Ok(this.inner.lock().unwrap().size()));
         // -- join --
         /// Blocks until all workers finish or the optional timeout elapses.
-        /// @param | timeout | number? | Maximum seconds to wait. If omitted, waits indefinitely.
+        /// @param | timeout? | number | Maximum seconds to wait. If omitted, waits indefinitely.
         /// @return | boolean | `true` if all workers finished, `false` if the timeout expired.
         methods.add_method("join", |_, this, timeout: Option<f64>| {
             let done = if let Some(secs) = timeout {
@@ -166,7 +166,7 @@ impl LuaUserData for LuaPromise {
         });
         // -- result --
         /// Returns the result value of the completed promise.
-        /// @return | LuaValue | The computed result, or `nil` if the promise is not yet done.
+        /// @return | any | The computed result, or `nil` if the promise is not yet done.
         methods.add_method("result", |lua, this, ()| {
             match this.inner.lock().unwrap().result() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -352,6 +352,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(out)
         })?,
     )?;
+    /// Performs the 'thread' operation.
+    /// @return | nil | No value is returned.
     lurek.set("thread", tbl)?;
     Ok(())
 }
@@ -371,7 +373,7 @@ impl LuaUserData for LuaChannel {
         // -- push --
         /// Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
         /// @param | value | any | The value to send through the channel.
-        /// @return | number | The message sequence ID assigned to this push.
+        /// @return | integer | The message sequence ID assigned to this push.
         methods.add_method("push", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             let id = this.inner.push(cv);
@@ -379,22 +381,22 @@ impl LuaUserData for LuaChannel {
         });
         // -- pop --
         /// Removes and returns the next value from the channel without blocking.
-        /// @return | LuaValue | The next value, or `nil` if the channel is empty.
+        /// @return | any | The next value, or `nil` if the channel is empty.
         methods.add_method("pop", |lua, this, ()| match this.inner.pop() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
         });
         // -- peek --
         /// Returns the next value from the channel without removing it.
-        /// @return | LuaValue | The front value, or `nil` if the channel is empty.
+        /// @return | any | The front value, or `nil` if the channel is empty.
         methods.add_method("peek", |lua, this, ()| match this.inner.peek() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
         });
         // -- demand --
         /// Blocks until a value is available on the channel or the optional timeout expires.
-        /// @param | timeout | number? | Maximum seconds to wait. If omitted, waits indefinitely.
-        /// @return | LuaValue | The received value, or `nil` if the timeout expired.
+        /// @param | timeout? | number | Maximum seconds to wait. If omitted, waits indefinitely.
+        /// @return | any | The received value, or `nil` if the timeout expired.
         methods.add_method("demand", |lua, this, timeout: Option<f64>| {
             match this.inner.demand(timeout) {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -403,11 +405,11 @@ impl LuaUserData for LuaChannel {
         });
         // -- getCount --
         /// Returns the number of values currently queued in the channel.
-        /// @return | number | The current item count.
+        /// @return | integer | The current item count.
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.get_count()));
         // -- getCapacity --
         /// Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
-        /// @return | number | The capacity limit, or `nil` if unbounded.
+        /// @return | integer | The capacity limit, or `nil` if unbounded.
         methods.add_method("getCapacity", |_, this, ()| Ok(this.inner.capacity()));
         // -- isBounded --
         /// Checks whether this channel has a fixed capacity limit.
@@ -439,7 +441,7 @@ impl LuaUserData for LuaChannel {
         // -- pushTable --
         /// Pushes a table value onto the channel, raising an error if the value is not a table.
         /// @param | value | table | The table to send through the channel.
-        /// @return | number | The message sequence ID assigned to this push.
+        /// @return | integer | The message sequence ID assigned to this push.
         methods.add_method("pushTable", |_, this, value: LuaValue| {
             match &value {
                 LuaValue::Table(_) => {}
@@ -463,7 +465,7 @@ impl LuaUserData for LuaChannel {
         // -- pushBytes --
         /// Pushes raw binary data onto the channel as a byte blob.
         /// @param | data | string | The binary data to send (Lua strings can hold arbitrary bytes).
-        /// @return | number | The message sequence ID assigned to this push.
+        /// @return | integer | The message sequence ID assigned to this push.
         methods.add_method("pushBytes", |_, this, data: LuaString| {
             let bytes = data.as_bytes().to_vec();
             Ok(this.inner.push(ChannelValue::Bytes(bytes)))

@@ -28,30 +28,35 @@ fn create_widget_table<'a>(
     type_name: &'static str,
 ) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
+    /// Performs the '_idx' operation.
+    /// @return | nil | No value is returned.
     t.set("_idx", idx)?;
     // -- type --
     /// Returns the type name string of this widget (e.g. "LButton", "LSlider").
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | string | The widget type name.
-    t.set("type", lua.create_function(move |_, ()| Ok(type_name))?)?;
+    t.set("type", lua.create_function(move |_, _self: LuaValue| Ok(type_name))?)?;
     // -- typeOf --
     /// Checks whether this widget matches the given type name, including base types "LWidget" and "Object".
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | name | string | The type name to check against.
     /// @return | boolean | True if the widget is of the given type.
     t.set(
         "typeOf",
-        lua.create_function(move |_, name: String| {
+        lua.create_function(move |_, (_self, name): (LuaValue, String)| {
             Ok(name == type_name || name == "LWidget" || name == "Object")
         })?,
     )?;
     let c = ctx.clone();
     // -- setPosition --
     /// Sets the local position of this widget relative to its parent.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | x | number | Horizontal position in pixels.
     /// @param | y | number | Vertical position in pixels.
     /// @return | nil | No return value.
     t.set(
         "setPosition",
-        lua.create_function(move |_, (x, y): (f32, f32)| {
+        lua.create_function(move |_, (_self, x, y): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 let b = w.base_mut();
@@ -64,10 +69,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getPosition --
     /// Returns the local position of this widget relative to its parent.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number | The x and y coordinates in pixels.
     t.set(
         "getPosition",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 let b = w.base();
@@ -80,12 +86,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setSize --
     /// Sets the width and height of this widget in pixels.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | w | number | Width in pixels.
     /// @param | h | number | Height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setSize",
-        lua.create_function(move |_, (w, h): (f32, f32)| {
+        lua.create_function(move |_, (_self, w, h): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(wgt) = g.widgets.get_mut(idx) {
                 let b = wgt.base_mut();
@@ -98,10 +105,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getSize --
     /// Returns the width and height of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number | The width and height in pixels.
     t.set(
         "getSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 let b = w.base();
@@ -114,10 +122,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getRect --
     /// Returns the computed bounding rectangle of this widget in screen coordinates after layout.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number, number, number | The x, y, width, and height of the computed rect.
     t.set(
         "getRect",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 let r = &w.base().computed_rect;
@@ -130,11 +139,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setVisible --
     /// Shows or hides this widget. Hidden widgets are not drawn and do not receive input.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | v | boolean | True to show, false to hide.
     /// @return | nil | No return value.
     t.set(
         "setVisible",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().visible = v;
@@ -145,10 +155,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- isVisible --
     /// Returns whether this widget is currently visible.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | boolean | True if the widget is visible.
     t.set(
         "isVisible",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).is_some_and(|w| w.base().visible))
         })?,
@@ -156,11 +167,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setEnabled --
     /// Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | v | boolean | True to enable, false to disable.
     /// @return | nil | No return value.
     t.set(
         "setEnabled",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 let b = w.base_mut();
@@ -177,10 +189,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- isEnabled --
     /// Returns whether this widget is currently enabled and can receive input.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | boolean | True if the widget is enabled.
     t.set(
         "isEnabled",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).is_some_and(|w| w.base().enabled))
         })?,
@@ -188,11 +201,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setId --
     /// Assigns a string identifier to this widget for lookup with findById.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | id | string | A unique identifier string.
     /// @return | nil | No return value.
     t.set(
         "setId",
-        lua.create_function(move |_, id: String| {
+        lua.create_function(move |_, (_self, id): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().id = id;
@@ -203,10 +217,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getId --
     /// Returns the string identifier assigned to this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | string | The widget ID, or an empty string if none was set.
     t.set(
         "getId",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets
                 .get(idx)
@@ -216,11 +231,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setTooltip --
     /// Sets the tooltip text shown when the user hovers over this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | text | string | The tooltip message.
     /// @return | nil | No return value.
     t.set(
         "setTooltip",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().tooltip = text;
@@ -231,10 +247,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getTooltip --
     /// Returns the tooltip text of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | string | The tooltip text, or an empty string if none is set.
     t.set(
         "getTooltip",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets
                 .get(idx)
@@ -244,10 +261,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getState --
     /// Returns the current interaction state of this widget (e.g. "normal", "hovered", "pressed", "disabled").
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | string | The widget state name.
     t.set(
         "getState",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets
                 .get(idx)
@@ -258,11 +276,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- addChild --
     /// Adds a child widget to this widget's hierarchy.
-    /// @param | child | LWidget | The child widget table or widget index to add.
+    /// @param | self | LUiWidget | The widget instance.
+    /// @param | child | LUiWidget|integer | The child widget table or widget index to add.
     /// @return | nil | No return value.
     t.set(
         "addChild",
-        lua.create_function(move |_, child: LuaValue| {
+        lua.create_function(move |_, (_self, child): (LuaValue, LuaValue)| {
             let child_idx = match child {
                 LuaValue::Table(t) => t.get::<_, usize>("_idx")?,
                 LuaValue::Integer(i) if i >= 0 => i as usize,
@@ -280,11 +299,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- removeChild --
     /// Removes a child widget from this widget's hierarchy.
-    /// @param | child | LWidget | The child widget table or widget index to remove.
+    /// @param | self | LUiWidget | The widget instance.
+    /// @param | child | LUiWidget|integer | The child widget table or widget index to remove.
     /// @return | nil | No return value.
     t.set(
         "removeChild",
-        lua.create_function(move |_, child: LuaValue| {
+        lua.create_function(move |_, (_self, child): (LuaValue, LuaValue)| {
             let child_idx = match child {
                 LuaValue::Table(t) => t.get::<_, usize>("_idx")?,
                 LuaValue::Integer(i) if i >= 0 => i as usize,
@@ -302,10 +322,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getChildCount --
     /// Returns the number of direct child widgets attached to this widget.
-    /// @return | number | The child count.
+    /// @param | self | LUiWidget | The widget instance.
+    /// @return | integer | The child count.
     t.set(
         "getChildCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.child_count(idx))
         })?,
@@ -313,10 +334,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getChildren --
     /// Returns a table of lightweight child widget references, each containing an _idx field.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | table | Array of child widget tables.
     t.set(
         "getChildren",
-        lua.create_function(move |lua, ()| {
+        lua.create_function(move |lua, _self: LuaValue| {
             let child_indices = {
                 let g = c.borrow();
                 g.widgets
@@ -328,6 +350,8 @@ fn create_widget_table<'a>(
             let out = lua.create_table()?;
             for (list_index, child_idx) in child_indices.into_iter().enumerate() {
                 let child = lua.create_table()?;
+                /// Performs the '_idx' operation.
+                /// @return | nil | No value is returned.
                 child.set("_idx", child_idx)?;
                 out.set(list_index + 1, child)?;
             }
@@ -337,15 +361,18 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- findById --
     /// Searches this widget's subtree for a child with the given ID.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | id | string | The widget ID to search for.
     /// @return | LWidget | The found widget table, or nil if not found.
     t.set(
         "findById",
-        lua.create_function(move |lua, id: String| {
+        lua.create_function(move |lua, (_self, id): (LuaValue, String)| {
             let g = c.borrow();
             match g.find_by_id(idx, &id) {
                 Some(found_idx) => {
                     let ft = lua.create_table()?;
+                    /// Performs the '_idx' operation.
+                    /// @return | nil | No value is returned.
                     ft.set("_idx", found_idx)?;
                     Ok(LuaValue::Table(ft))
                 }
@@ -356,11 +383,12 @@ fn create_widget_table<'a>(
     let cbs2 = cbs.clone();
     // -- setOnClick --
     /// Registers a callback function invoked when this widget is clicked.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | f | function | Callback receiving the widget index as argument.
     /// @return | nil | No return value.
     t.set(
         "setOnClick",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_click.insert(idx, key);
             Ok(())
@@ -369,11 +397,12 @@ fn create_widget_table<'a>(
     let cbs2 = cbs.clone();
     // -- setOnChange --
     /// Registers a callback function invoked when this widget's value changes.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | f | function | Callback receiving the widget index as argument.
     /// @return | nil | No return value.
     t.set(
         "setOnChange",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_change.insert(idx, key);
             Ok(())
@@ -382,7 +411,7 @@ fn create_widget_table<'a>(
     let cbs2 = cbs.clone();
     // -- setOnDraw --
     /// Registers a custom draw callback for this widget, invoked each frame during the draw pass.
-    /// @param | _self | LWidget | The widget (ignored, kept for method-call syntax).
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | f | function | Callback receiving a rect table {x, y, w, h} with the computed bounds.
     /// @return | nil | No return value.
     t.set(
@@ -396,12 +425,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- containsPoint --
     /// Tests whether the given screen-space point is inside this widget's bounds.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | x | number | X coordinate in screen pixels.
     /// @param | y | number | Y coordinate in screen pixels.
     /// @return | boolean | True if the point is within the widget.
     t.set(
         "containsPoint",
-        lua.create_function(move |_, (x, y): (f32, f32)| {
+        lua.create_function(move |_, (_self, x, y): (LuaValue, f32, f32)| {
             let g = c.borrow();
             Ok(g.widgets
                 .get(idx)
@@ -411,6 +441,7 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setPadding --
     /// Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | top | number | Top padding in pixels (also used as default for other sides).
     /// @param | right | number? | Right padding. Defaults to top.
     /// @param | bottom | number? | Bottom padding. Defaults to top.
@@ -419,7 +450,7 @@ fn create_widget_table<'a>(
     t.set(
         "setPadding",
         lua.create_function(
-            move |_, (top, right, bottom, left): (f32, Option<f32>, Option<f32>, Option<f32>)| {
+            move |_, (_self, top, right, bottom, left): (LuaValue, f32, Option<f32>, Option<f32>, Option<f32>)| {
                 let mut g = c.borrow_mut();
                 if let Some(w) = g.widgets.get_mut(idx) {
                     let r = right.unwrap_or(top);
@@ -434,10 +465,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getPadding --
     /// Returns the inner padding of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number, number, number | Top, right, bottom, and left padding in pixels.
     t.set(
         "getPadding",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 let p = w.base().padding;
@@ -450,6 +482,7 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setMargin --
     /// Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | top | number | Top margin in pixels (also used as default for other sides).
     /// @param | right | number? | Right margin. Defaults to top.
     /// @param | bottom | number? | Bottom margin. Defaults to top.
@@ -458,7 +491,7 @@ fn create_widget_table<'a>(
     t.set(
         "setMargin",
         lua.create_function(
-            move |_, (top, right, bottom, left): (f32, Option<f32>, Option<f32>, Option<f32>)| {
+            move |_, (_self, top, right, bottom, left): (LuaValue, f32, Option<f32>, Option<f32>, Option<f32>)| {
                 let mut g = c.borrow_mut();
                 if let Some(w) = g.widgets.get_mut(idx) {
                     let r = right.unwrap_or(top);
@@ -473,10 +506,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getMargin --
     /// Returns the outer margin of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number, number, number | Top, right, bottom, and left margin in pixels.
     t.set(
         "getMargin",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 let m = w.base().margin;
@@ -489,11 +523,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setZOrder --
     /// Sets the z-order (draw priority) of this widget. Higher values draw on top.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | z | integer | The z-order integer value.
     /// @return | nil | No return value.
     t.set(
         "setZOrder",
-        lua.create_function(move |_, z: i32| {
+        lua.create_function(move |_, (_self, z): (LuaValue, i32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().z_order = z;
@@ -504,10 +539,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getZOrder --
     /// Returns the z-order (draw priority) of this widget.
-    /// @return | number | The z-order value.
+    /// @param | self | LUiWidget | The widget instance.
+    /// @return | integer | The z-order value.
     t.set(
         "getZOrder",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).map_or(0, |w| w.base().z_order))
         })?,
@@ -515,12 +551,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setMinSize --
     /// Sets the minimum allowed width and height for this widget during layout.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | w | number | Minimum width in pixels.
     /// @param | h | number | Minimum height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setMinSize",
-        lua.create_function(move |_, (w, h): (f32, f32)| {
+        lua.create_function(move |_, (_self, w, h): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(wgt) = g.widgets.get_mut(idx) {
                 let b = wgt.base_mut();
@@ -533,10 +570,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getMinSize --
     /// Returns the minimum width and height of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number | Minimum width and height in pixels.
     t.set(
         "getMinSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 Ok((w.base().min_width, w.base().min_height))
@@ -548,12 +586,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setMaxSize --
     /// Sets the maximum allowed width and height for this widget during layout.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | w | number | Maximum width in pixels.
     /// @param | h | number | Maximum height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setMaxSize",
-        lua.create_function(move |_, (w, h): (f32, f32)| {
+        lua.create_function(move |_, (_self, w, h): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(wgt) = g.widgets.get_mut(idx) {
                 let b = wgt.base_mut();
@@ -566,10 +605,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getMaxSize --
     /// Returns the maximum width and height of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number, number | Maximum width and height in pixels.
     t.set(
         "getMaxSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(w) = g.widgets.get(idx) {
                 Ok((w.base().max_width, w.base().max_height))
@@ -581,6 +621,7 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setAnchor --
     /// Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | left | number? | Distance from parent's left edge, or nil.
     /// @param | top | number? | Distance from parent's top edge, or nil.
     /// @param | right | number? | Distance from parent's right edge, or nil.
@@ -590,7 +631,7 @@ fn create_widget_table<'a>(
         "setAnchor",
         lua.create_function(
             move |_,
-                  (left, top, right, bottom): (
+                  (_self, left, top, right, bottom): (LuaValue,
                 Option<f32>,
                 Option<f32>,
                 Option<f32>,
@@ -611,12 +652,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setAnchorCenter --
     /// Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | cx | number? | Horizontal center fraction (0.5 = centered).
     /// @param | cy | number? | Vertical center fraction (0.5 = centered).
     /// @return | nil | No return value.
     t.set(
         "setAnchorCenter",
-        lua.create_function(move |_, (cx, cy): (Option<f32>, Option<f32>)| {
+        lua.create_function(move |_, (_self, cx, cy): (LuaValue, Option<f32>, Option<f32>)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 let b = w.base_mut();
@@ -629,10 +671,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- clearAnchor --
     /// Removes all anchor constraints from this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "clearAnchor",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().clear_anchors();
@@ -643,11 +686,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setFlexGrow --
     /// Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | grow | number | The grow factor (0 = no growth).
     /// @return | nil | No return value.
     t.set(
         "setFlexGrow",
-        lua.create_function(move |_, grow: f32| {
+        lua.create_function(move |_, (_self, grow): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().flex_grow = grow;
@@ -658,10 +702,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getFlexGrow --
     /// Returns the flex-grow factor of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number | The grow factor.
     t.set(
         "getFlexGrow",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).map_or(0.0, |w| w.base().flex_grow))
         })?,
@@ -669,11 +714,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setFlexShrink --
     /// Sets the flex-shrink factor controlling how much this widget shrinks when layout space is insufficient.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | shrink | number | The shrink factor (0 = no shrinkage).
     /// @return | nil | No return value.
     t.set(
         "setFlexShrink",
-        lua.create_function(move |_, shrink: f32| {
+        lua.create_function(move |_, (_self, shrink): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().flex_shrink = shrink;
@@ -684,10 +730,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getFlexShrink --
     /// Returns the flex-shrink factor of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number | The shrink factor.
     t.set(
         "getFlexShrink",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).map_or(0.0, |w| w.base().flex_shrink))
         })?,
@@ -695,11 +742,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- bind --
     /// Binds this widget to a data key for use with update_bindings.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | key | string | The binding key name.
     /// @return | nil | No return value.
     t.set(
         "bind",
-        lua.create_function(move |_, key: String| {
+        lua.create_function(move |_, (_self, key): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().bind_key = Some(key);
@@ -710,10 +758,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- unbind --
     /// Removes the data binding from this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "unbind",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().bind_key = None;
@@ -724,11 +773,12 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- setAlpha --
     /// Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | alpha | number | The opacity value.
     /// @return | nil | No return value.
     t.set(
         "setAlpha",
-        lua.create_function(move |_, alpha: f32| {
+        lua.create_function(move |_, (_self, alpha): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().alpha = alpha.clamp(0.0, 1.0);
@@ -739,10 +789,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- getAlpha --
     /// Returns the current opacity of this widget.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | number | The alpha value between 0.0 and 1.0.
     t.set(
         "getAlpha",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).map_or(1.0, |w| w.base().alpha))
         })?,
@@ -750,10 +801,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- fadeIn --
     /// Instantly makes this widget fully opaque and visible.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "fadeIn",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().alpha = 1.0;
@@ -765,10 +817,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- fadeOut --
     /// Instantly makes this widget fully transparent and hidden.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "fadeOut",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().alpha = 0.0;
@@ -780,12 +833,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- slideIn --
     /// Moves this widget to the given position and makes it visible.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | x | number | Target x position.
     /// @param | y | number | Target y position.
     /// @return | nil | No return value.
     t.set(
         "slideIn",
-        lua.create_function(move |_, (x, y): (f32, f32)| {
+        lua.create_function(move |_, (_self, x, y): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().x = x;
@@ -798,12 +852,13 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- slideOut --
     /// Moves this widget to the given position and hides it.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | x | number | Target x position.
     /// @param | y | number | Target y position.
     /// @return | nil | No return value.
     t.set(
         "slideOut",
-        lua.create_function(move |_, (x, y): (f32, f32)| {
+        lua.create_function(move |_, (_self, x, y): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().x = x;
@@ -816,6 +871,7 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- animateAlpha --
     /// Smoothly animates this widget's opacity toward a target value over the given duration.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | target | number | Target alpha value (0.0 to 1.0).
     /// @param | duration | number? | Animation duration in seconds. Defaults to 0.2.
     /// @param | hide_on_complete | boolean? | If true, hides the widget when alpha reaches 0.
@@ -823,7 +879,7 @@ fn create_widget_table<'a>(
     t.set(
         "animateAlpha",
         lua.create_function(
-            move |_, (target, duration, hide_on_complete): (f32, Option<f32>, Option<bool>)| {
+            move |_, (_self, target, duration, hide_on_complete): (LuaValue, f32, Option<f32>, Option<bool>)| {
                 Ok(c.borrow_mut().animate_alpha(
                     idx,
                     target,
@@ -836,13 +892,14 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- animatePosition --
     /// Smoothly animates this widget's position toward the target coordinates.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | x | number | Target x position.
     /// @param | y | number | Target y position.
     /// @param | duration | number? | Animation duration in seconds. Defaults to 0.2.
     /// @return | table | Table result returned by this call.
     t.set(
         "animatePosition",
-        lua.create_function(move |_, (x, y, duration): (f32, f32, Option<f32>)| {
+        lua.create_function(move |_, (_self, x, y, duration): (LuaValue, f32, f32, Option<f32>)| {
             Ok(c.borrow_mut()
                 .animate_position(idx, x, y, duration.unwrap_or(0.2)))
         })?,
@@ -850,27 +907,30 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- isAnimating --
     /// Returns whether this widget currently has an active animation.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | boolean | True if an animation is in progress.
     t.set(
         "isAnimating",
-        lua.create_function(move |_, ()| Ok(c.borrow().is_animating(idx)))?,
+        lua.create_function(move |_, _self: LuaValue| Ok(c.borrow().is_animating(idx)))?,
     )?;
     let c = ctx.clone();
     // -- cancelAnimations --
     /// Cancels all active animations on this widget, leaving it at its current state.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "cancelAnimations",
-        lua.create_function(move |_, ()| Ok(c.borrow_mut().cancel_animations(idx)))?,
+        lua.create_function(move |_, _self: LuaValue| Ok(c.borrow_mut().cancel_animations(idx)))?,
     )?;
     let c = ctx.clone();
     // -- attachToEntity --
     /// Attaches this widget to a game entity so it follows the entity's position on screen.
+    /// @param | self | LUiWidget | The widget instance.
     /// @param | entity_id | integer | The entity ID to attach to.
     /// @return | nil | No return value.
     t.set(
         "attachToEntity",
-        lua.create_function(move |_, entity_id: u64| {
+        lua.create_function(move |_, (_self, entity_id): (LuaValue, u64)| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().entity_attachment = Some(entity_id);
@@ -881,10 +941,11 @@ fn create_widget_table<'a>(
     let c = ctx.clone();
     // -- detachFromEntity --
     /// Detaches this widget from any previously attached entity.
+    /// @param | self | LUiWidget | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "detachFromEntity",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(w) = g.widgets.get_mut(idx) {
                 w.base_mut().entity_attachment = None;
@@ -904,11 +965,12 @@ fn add_button_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the display text on this button.
+    /// @param | self | LButton | The widget instance.
     /// @param | text | string | The button label text.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Button(btn)) = g.widgets.get_mut(idx) {
                 btn.text = text;
@@ -919,10 +981,11 @@ fn add_button_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the current display text of this button.
+    /// @param | self | LButton | The widget instance.
     /// @return | string | The button label.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Button(btn)) => btn.text.clone(),
@@ -942,11 +1005,12 @@ fn add_label_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the display text on this label.
+    /// @param | self | LLabel | The widget instance.
     /// @param | text | string | The label text.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Label(lbl)) = g.widgets.get_mut(idx) {
                 lbl.text = text;
@@ -957,10 +1021,11 @@ fn add_label_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the current display text of this label.
+    /// @param | self | LLabel | The widget instance.
     /// @return | string | The label text.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Label(lbl)) => lbl.text.clone(),
@@ -980,11 +1045,12 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the text content of this text input field and moves the cursor to the end.
+    /// @param | self | LTextInput | The widget instance.
     /// @param | text | string | The text to set.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TextInput(ti)) = g.widgets.get_mut(idx) {
                 ti.cursor_pos = text.len();
@@ -996,10 +1062,11 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the current text content of this text input field.
+    /// @param | self | LTextInput | The widget instance.
     /// @return | string | The input text.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TextInput(ti)) => ti.text.clone(),
@@ -1010,11 +1077,12 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- setPlaceholder --
     /// Sets the placeholder text shown when the input is empty.
+    /// @param | self | LTextInput | The widget instance.
     /// @param | text | string | The placeholder text.
     /// @return | nil | No return value.
     t.set(
         "setPlaceholder",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TextInput(ti)) = g.widgets.get_mut(idx) {
                 ti.placeholder = text;
@@ -1025,10 +1093,11 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- getPlaceholder --
     /// Returns the placeholder text of this text input.
+    /// @param | self | LTextInput | The widget instance.
     /// @return | string | The placeholder text.
     t.set(
         "getPlaceholder",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TextInput(ti)) => ti.placeholder.clone(),
@@ -1039,11 +1108,12 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- setMaxLength --
     /// Sets the maximum number of characters allowed in this text input.
+    /// @param | self | LTextInput | The widget instance.
     /// @param | n | integer | Maximum character count.
     /// @return | nil | No return value.
     t.set(
         "setMaxLength",
-        lua.create_function(move |_, n: usize| {
+        lua.create_function(move |_, (_self, n): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TextInput(ti)) = g.widgets.get_mut(idx) {
                 ti.max_length = n;
@@ -1054,10 +1124,11 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- isFocused --
     /// Returns whether this text input currently has keyboard focus.
+    /// @param | self | LTextInput | The widget instance.
     /// @return | boolean | True if focused.
     t.set(
         "isFocused",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TextInput(ti)) => ti.focused,
@@ -1068,10 +1139,11 @@ fn add_text_input_methods(
     let c = ctx.clone();
     // -- getCursorPosition --
     /// Returns the current cursor position (character index) within the text input.
-    /// @return | number | The zero-based cursor position.
+    /// @param | self | LTextInput | The widget instance.
+    /// @return | integer | The zero-based cursor position.
     t.set(
         "getCursorPosition",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TextInput(ti)) => ti.cursor_pos,
@@ -1091,11 +1163,12 @@ fn add_checkbox_methods(
     let c = ctx.clone();
     // -- setChecked --
     /// Sets the checked state of this checkbox.
+    /// @param | self | LCheckbox | The widget instance.
     /// @param | checked | boolean | True to check, false to uncheck.
     /// @return | nil | No return value.
     t.set(
         "setChecked",
-        lua.create_function(move |_, checked: bool| {
+        lua.create_function(move |_, (_self, checked): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::CheckBox(cb)) = g.widgets.get_mut(idx) {
                 cb.checked = checked;
@@ -1106,10 +1179,11 @@ fn add_checkbox_methods(
     let c = ctx.clone();
     // -- isChecked --
     /// Returns whether this checkbox is currently checked.
+    /// @param | self | LCheckbox | The widget instance.
     /// @return | boolean | True if checked.
     t.set(
         "isChecked",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::CheckBox(cb)) => cb.checked,
@@ -1120,11 +1194,12 @@ fn add_checkbox_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the label text displayed next to this checkbox.
+    /// @param | self | LCheckbox | The widget instance.
     /// @param | text | string | The checkbox label.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::CheckBox(cb)) = g.widgets.get_mut(idx) {
                 cb.text = text;
@@ -1135,10 +1210,11 @@ fn add_checkbox_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the label text of this checkbox.
+    /// @param | self | LCheckbox | The widget instance.
     /// @return | string | The checkbox label.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::CheckBox(cb)) => cb.text.clone(),
@@ -1158,11 +1234,12 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- setValue --
     /// Sets the current value of this slider, clamped to its range.
+    /// @param | self | LSlider | The widget instance.
     /// @param | v | number | The value to set.
     /// @return | nil | No return value.
     t.set(
         "setValue",
-        lua.create_function(move |_, v: f64| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Slider(sl)) = g.widgets.get_mut(idx) {
                 sl.set_value(v);
@@ -1173,10 +1250,11 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- getValue --
     /// Returns the current value of this slider.
+    /// @param | self | LSlider | The widget instance.
     /// @return | number | The slider value.
     t.set(
         "getValue",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Slider(sl)) => sl.value,
@@ -1187,12 +1265,13 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- setRange --
     /// Sets the minimum and maximum bounds for this slider.
+    /// @param | self | LSlider | The widget instance.
     /// @param | min | number | Minimum value.
     /// @param | max | number | Maximum value.
     /// @return | nil | No return value.
     t.set(
         "setRange",
-        lua.create_function(move |_, (min, max): (f64, f64)| {
+        lua.create_function(move |_, (_self, min, max): (LuaValue, f64, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Slider(sl)) = g.widgets.get_mut(idx) {
                 sl.min = min;
@@ -1205,11 +1284,12 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- setStep --
     /// Sets the step increment for this slider's value snapping.
+    /// @param | self | LSlider | The widget instance.
     /// @param | step | number | The step size.
     /// @return | nil | No return value.
     t.set(
         "setStep",
-        lua.create_function(move |_, step: f64| {
+        lua.create_function(move |_, (_self, step): (LuaValue, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Slider(sl)) = g.widgets.get_mut(idx) {
                 sl.step = step;
@@ -1220,10 +1300,11 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- getMin --
     /// Returns the minimum value of this slider's range.
+    /// @param | self | LSlider | The widget instance.
     /// @return | number | The minimum value.
     t.set(
         "getMin",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Slider(sl)) => sl.min,
@@ -1234,10 +1315,11 @@ fn add_slider_methods(
     let c = ctx.clone();
     // -- getMax --
     /// Returns the maximum value of this slider's range.
+    /// @param | self | LSlider | The widget instance.
     /// @return | number | The maximum value.
     t.set(
         "getMax",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Slider(sl)) => sl.max,
@@ -1257,11 +1339,12 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- setValue --
     /// Sets the current fill value of this progress bar, clamped to its range.
+    /// @param | self | LProgressBar | The widget instance.
     /// @param | v | number | The progress value.
     /// @return | nil | No return value.
     t.set(
         "setValue",
-        lua.create_function(move |_, v: f64| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ProgressBar(pb)) = g.widgets.get_mut(idx) {
                 pb.value = v.clamp(pb.min, pb.max);
@@ -1272,10 +1355,11 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- getValue --
     /// Returns the current value of this progress bar.
+    /// @param | self | LProgressBar | The widget instance.
     /// @return | number | The progress value.
     t.set(
         "getValue",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ProgressBar(pb)) => pb.value,
@@ -1286,10 +1370,11 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- getProgress --
     /// Returns the normalized progress as a fraction (0.0 to 1.0) of the current range.
+    /// @param | self | LProgressBar | The widget instance.
     /// @return | number | The normalized progress.
     t.set(
         "getProgress",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ProgressBar(pb)) => pb.progress(),
@@ -1300,12 +1385,13 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- setRange --
     /// Sets the minimum and maximum bounds for this progress bar.
+    /// @param | self | LProgressBar | The widget instance.
     /// @param | min | number | Minimum value.
     /// @param | max | number | Maximum value.
     /// @return | nil | No return value.
     t.set(
         "setRange",
-        lua.create_function(move |_, (min, max): (f64, f64)| {
+        lua.create_function(move |_, (_self, min, max): (LuaValue, f64, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ProgressBar(pb)) = g.widgets.get_mut(idx) {
                 pb.min = min;
@@ -1318,10 +1404,11 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- getMin --
     /// Returns the minimum value of this progress bar's range.
+    /// @param | self | LProgressBar | The widget instance.
     /// @return | number | The minimum value.
     t.set(
         "getMin",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ProgressBar(pb)) => pb.min,
@@ -1332,10 +1419,11 @@ fn add_progress_bar_methods(
     let c = ctx.clone();
     // -- getMax --
     /// Returns the maximum value of this progress bar's range.
+    /// @param | self | LProgressBar | The widget instance.
     /// @return | number | The maximum value.
     t.set(
         "getMax",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ProgressBar(pb)) => pb.max,
@@ -1355,11 +1443,12 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- addItem --
     /// Appends a new text item to this combo box's dropdown list.
+    /// @param | self | LComboBox | The widget instance.
     /// @param | text | string | The item label to add.
     /// @return | nil | No return value.
     t.set(
         "addItem",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ComboBox(cb)) = g.widgets.get_mut(idx) {
                 cb.add_item(text);
@@ -1370,11 +1459,12 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- removeItem --
     /// Removes the item at the given 1-based index from this combo box.
+    /// @param | self | LComboBox | The widget instance.
     /// @param | index | integer | The 1-based index of the item to remove.
     /// @return | boolean | True if the item was removed.
     t.set(
         "removeItem",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ComboBox(cb)) = g.widgets.get_mut(idx) {
                 if index >= 1 && index <= cb.items.len() {
@@ -1388,10 +1478,11 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- clearItems --
     /// Removes all items from this combo box.
+    /// @param | self | LComboBox | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "clearItems",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ComboBox(cb)) = g.widgets.get_mut(idx) {
                 cb.clear();
@@ -1402,10 +1493,11 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- getItemCount --
     /// Returns the number of items in this combo box.
-    /// @return | number | The item count.
+    /// @param | self | LComboBox | The widget instance.
+    /// @return | integer | The item count.
     t.set(
         "getItemCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ComboBox(cb)) => cb.items.len(),
@@ -1416,11 +1508,12 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- getItem --
     /// Returns the text of the item at the given 1-based index.
+    /// @param | self | LComboBox | The widget instance.
     /// @param | index | integer | The 1-based item index.
     /// @return | string | The item text, or nil if out of range.
     t.set(
         "getItem",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ComboBox(cb)) => {
@@ -1437,11 +1530,12 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- setSelectedIndex --
     /// Sets the selected item by 1-based index.
+    /// @param | self | LComboBox | The widget instance.
     /// @param | index | integer | The 1-based index of the item to select.
     /// @return | nil | No return value.
     t.set(
         "setSelectedIndex",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ComboBox(cb)) = g.widgets.get_mut(idx) {
                 if index >= 1 && index <= cb.items.len() {
@@ -1454,10 +1548,11 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- getSelectedIndex --
     /// Returns the 1-based index of the currently selected item, or 0 if none is selected.
-    /// @return | number | The selected index.
+    /// @param | self | LComboBox | The widget instance.
+    /// @return | integer | The selected index.
     t.set(
         "getSelectedIndex",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ComboBox(cb)) => cb.selected_index.map_or(0, |i| i + 1),
@@ -1468,10 +1563,11 @@ fn add_combo_box_methods(
     let c = ctx.clone();
     // -- getSelectedItem --
     /// Returns the text of the currently selected item, or nil if none is selected.
+    /// @param | self | LComboBox | The widget instance.
     /// @return | string | The selected item text.
     t.set(
         "getSelectedItem",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ComboBox(cb)) => cb.selected_item().map(|s| s.to_string()),
@@ -1491,11 +1587,12 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- addItem --
     /// Appends a new text item to this list box.
+    /// @param | self | LListBox | The widget instance.
     /// @param | text | string | The item text to add.
     /// @return | nil | No return value.
     t.set(
         "addItem",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ListBox(lb)) = g.widgets.get_mut(idx) {
                 lb.add_item(text);
@@ -1506,11 +1603,12 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- removeItem --
     /// Removes the item at the given 1-based index from this list box.
+    /// @param | self | LListBox | The widget instance.
     /// @param | index | integer | The 1-based index to remove.
     /// @return | nil | No return value.
     t.set(
         "removeItem",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ListBox(lb)) = g.widgets.get_mut(idx) {
                 if index >= 1 {
@@ -1523,10 +1621,11 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- clearItems --
     /// Removes all items from this list box.
+    /// @param | self | LListBox | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "clearItems",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ListBox(lb)) = g.widgets.get_mut(idx) {
                 lb.clear();
@@ -1537,10 +1636,11 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- getItemCount --
     /// Returns the number of items in this list box.
-    /// @return | number | The item count.
+    /// @param | self | LListBox | The widget instance.
+    /// @return | integer | The item count.
     t.set(
         "getItemCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ListBox(lb)) => lb.items.len(),
@@ -1551,11 +1651,12 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- getItem --
     /// Returns the text of the item at the given 1-based index.
+    /// @param | self | LListBox | The widget instance.
     /// @param | index | integer | The 1-based item index.
     /// @return | string | The item text, or empty string if out of range.
     t.set(
         "getItem",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ListBox(lb)) => {
@@ -1572,11 +1673,12 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- setSelectedIndex --
     /// Sets the selected item by 1-based index.
+    /// @param | self | LListBox | The widget instance.
     /// @param | index | integer | The 1-based index of the item to select.
     /// @return | nil | No return value.
     t.set(
         "setSelectedIndex",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ListBox(lb)) = g.widgets.get_mut(idx) {
                 if index >= 1 && index <= lb.items.len() {
@@ -1589,10 +1691,11 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- getSelectedIndex --
     /// Returns the 1-based index of the currently selected item, or 0 if none.
-    /// @return | number | The selected index.
+    /// @param | self | LListBox | The widget instance.
+    /// @return | integer | The selected index.
     t.set(
         "getSelectedIndex",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ListBox(lb)) => lb.selected_index.map_or(0, |i| i + 1),
@@ -1603,11 +1706,12 @@ fn add_list_box_methods(
     let c = ctx.clone();
     // -- setItemHeight --
     /// Sets the pixel height of each item row in this list box.
+    /// @param | self | LListBox | The widget instance.
     /// @param | h | number | Row height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setItemHeight",
-        lua.create_function(move |_, h: f32| {
+        lua.create_function(move |_, (_self, h): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ListBox(lb)) = g.widgets.get_mut(idx) {
                 lb.item_height = h;
@@ -1627,11 +1731,12 @@ fn add_tab_bar_methods(
     let c = ctx.clone();
     // -- addTab --
     /// Adds a new tab with the given label to this tab bar.
+    /// @param | self | LTabBar | The widget instance.
     /// @param | label | string | The tab label text.
     /// @return | nil | No return value.
     t.set(
         "addTab",
-        lua.create_function(move |_, label: String| {
+        lua.create_function(move |_, (_self, label): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TabBar(tb)) = g.widgets.get_mut(idx) {
                 tb.add_tab(label);
@@ -1642,11 +1747,12 @@ fn add_tab_bar_methods(
     let c = ctx.clone();
     // -- removeTab --
     /// Removes the tab at the given 1-based index.
+    /// @param | self | LTabBar | The widget instance.
     /// @param | index | integer | The 1-based tab index.
     /// @return | boolean | True if the tab was removed.
     t.set(
         "removeTab",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TabBar(tb)) = g.widgets.get_mut(idx) {
                 if index >= 1 && index <= tb.tabs.len() {
@@ -1660,11 +1766,12 @@ fn add_tab_bar_methods(
     let c = ctx.clone();
     // -- getTab --
     /// Returns the label of the tab at the given 1-based index.
+    /// @param | self | LTabBar | The widget instance.
     /// @param | index | integer | The 1-based tab index.
     /// @return | string | The tab label, or nil if out of range.
     t.set(
         "getTab",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TabBar(tb)) => {
@@ -1680,11 +1787,12 @@ fn add_tab_bar_methods(
     )?;
     let c = ctx.clone();
     // -- getTabCount --
-    /// Returns the total number of tabs. This method is available to Lua scripts.
-    /// @return | number | The tab count.
+    /// Returns the total number of tabs in this tab bar.
+    /// @param | self | LTabBar | The widget instance.
+    /// @return | integer | The tab count.
     t.set(
         "getTabCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TabBar(tb)) => tb.tabs.len(),
@@ -1695,11 +1803,12 @@ fn add_tab_bar_methods(
     let c = ctx.clone();
     // -- setActiveTab --
     /// Sets the active (selected) tab by 1-based index.
+    /// @param | self | LTabBar | The widget instance.
     /// @param | index | integer | The 1-based tab index to activate.
     /// @return | nil | No return value.
     t.set(
         "setActiveTab",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TabBar(tb)) = g.widgets.get_mut(idx) {
                 if index >= 1 && index <= tb.tabs.len() {
@@ -1712,10 +1821,11 @@ fn add_tab_bar_methods(
     let c = ctx.clone();
     // -- getActiveTab --
     /// Returns the 1-based index of the currently active tab.
-    /// @return | number | The active tab index.
+    /// @param | self | LTabBar | The widget instance.
+    /// @return | integer | The active tab index.
     t.set(
         "getActiveTab",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TabBar(tb)) => tb.active_tab + 1,
@@ -1735,11 +1845,12 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- setValue --
     /// Sets the numeric value of this spin box, clamped to its range.
+    /// @param | self | LSpinBox | The widget instance.
     /// @param | v | number | The value to set.
     /// @return | nil | No return value.
     t.set(
         "setValue",
-        lua.create_function(move |_, v: f64| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SpinBox(sb)) = g.widgets.get_mut(idx) {
                 sb.set_value(v);
@@ -1750,10 +1861,11 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- getValue --
     /// Returns the current numeric value of this spin box.
+    /// @param | self | LSpinBox | The widget instance.
     /// @return | number | The spin box value.
     t.set(
         "getValue",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SpinBox(sb)) => sb.value,
@@ -1764,10 +1876,11 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- increment --
     /// Increases this spin box's value by one step.
+    /// @param | self | LSpinBox | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "increment",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SpinBox(sb)) = g.widgets.get_mut(idx) {
                 sb.increment();
@@ -1778,10 +1891,11 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- decrement --
     /// Decreases this spin box's value by one step.
+    /// @param | self | LSpinBox | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "decrement",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SpinBox(sb)) = g.widgets.get_mut(idx) {
                 sb.decrement();
@@ -1792,12 +1906,13 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- setRange --
     /// Sets the minimum and maximum bounds for this spin box.
+    /// @param | self | LSpinBox | The widget instance.
     /// @param | min | number | Minimum value.
     /// @param | max | number | Maximum value.
     /// @return | nil | No return value.
     t.set(
         "setRange",
-        lua.create_function(move |_, (min, max): (f64, f64)| {
+        lua.create_function(move |_, (_self, min, max): (LuaValue, f64, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SpinBox(sb)) = g.widgets.get_mut(idx) {
                 sb.set_range(min, max);
@@ -1808,11 +1923,12 @@ fn add_spin_box_methods(
     let c = ctx.clone();
     // -- setStep --
     /// Sets the step increment for this spin box.
+    /// @param | self | LSpinBox | The widget instance.
     /// @param | step | number | The step size (minimum 1e-9).
     /// @return | nil | No return value.
     t.set(
         "setStep",
-        lua.create_function(move |_, step: f64| {
+        lua.create_function(move |_, (_self, step): (LuaValue, f64)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SpinBox(sb)) = g.widgets.get_mut(idx) {
                 sb.step = step.max(1e-9);
@@ -1832,11 +1948,12 @@ fn add_switch_methods(
     let c = ctx.clone();
     // -- setOn --
     /// Sets the on/off state of this toggle switch.
+    /// @param | self | LSwitch | The widget instance.
     /// @param | on | boolean | True to turn on, false to turn off.
     /// @return | nil | No return value.
     t.set(
         "setOn",
-        lua.create_function(move |_, on: bool| {
+        lua.create_function(move |_, (_self, on): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Switch(sw)) = g.widgets.get_mut(idx) {
                 sw.set_on(on);
@@ -1847,10 +1964,11 @@ fn add_switch_methods(
     let c = ctx.clone();
     // -- isOn --
     /// Returns whether this switch is currently in the on state.
+    /// @param | self | LSwitch | The widget instance.
     /// @return | boolean | True if the switch is on.
     t.set(
         "isOn",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Switch(sw)) => sw.on,
@@ -1861,10 +1979,11 @@ fn add_switch_methods(
     let c = ctx.clone();
     // -- toggle --
     /// Toggles this switch between on and off states.
+    /// @param | self | LSwitch | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "toggle",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Switch(sw)) = g.widgets.get_mut(idx) {
                 sw.toggle();
@@ -1884,11 +2003,12 @@ fn add_badge_methods(
     let c = ctx.clone();
     // -- setCount --
     /// Sets the notification count displayed by this badge.
+    /// @param | self | LBadge | The widget instance.
     /// @param | count | integer | The notification count.
     /// @return | nil | No return value.
     t.set(
         "setCount",
-        lua.create_function(move |_, count: u32| {
+        lua.create_function(move |_, (_self, count): (LuaValue, u32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Badge(b)) = g.widgets.get_mut(idx) {
                 b.set_count(count);
@@ -1899,10 +2019,11 @@ fn add_badge_methods(
     let c = ctx.clone();
     // -- getCount --
     /// Returns the current notification count of this badge.
-    /// @return | number | The badge count.
+    /// @param | self | LBadge | The widget instance.
+    /// @return | integer | The badge count.
     t.set(
         "getCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Badge(b)) => b.count,
@@ -1913,10 +2034,11 @@ fn add_badge_methods(
     let c = ctx.clone();
     // -- getDisplayText --
     /// Returns the formatted display text of this badge (e.g. "99+" when count exceeds the maximum).
+    /// @param | self | LBadge | The widget instance.
     /// @return | string | The display text.
     t.set(
         "getDisplayText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Badge(b)) => b.display_text(),
@@ -1936,11 +2058,12 @@ fn add_panel_methods(
     let c = ctx.clone();
     // -- setTitle --
     /// Sets the title text displayed on this panel's header.
+    /// @param | self | LPanel | The widget instance.
     /// @param | title | string | The panel title.
     /// @return | nil | No return value.
     t.set(
         "setTitle",
-        lua.create_function(move |_, title: String| {
+        lua.create_function(move |_, (_self, title): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Panel(p)) = g.widgets.get_mut(idx) {
                 p.title = title;
@@ -1951,10 +2074,11 @@ fn add_panel_methods(
     let c = ctx.clone();
     // -- getTitle --
     /// Returns the title text of this panel.
+    /// @param | self | LPanel | The widget instance.
     /// @return | string | The panel title.
     t.set(
         "getTitle",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Panel(p)) => p.title.clone(),
@@ -1965,11 +2089,12 @@ fn add_panel_methods(
     let c = ctx.clone();
     // -- setScrollable --
     /// Enables or disables scrolling within this panel.
+    /// @param | self | LPanel | The widget instance.
     /// @param | scrollable | boolean | True to enable scrolling.
     /// @return | nil | No return value.
     t.set(
         "setScrollable",
-        lua.create_function(move |_, scrollable: bool| {
+        lua.create_function(move |_, (_self, scrollable): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Panel(p)) = g.widgets.get_mut(idx) {
                 p.scrollable = scrollable;
@@ -1989,11 +2114,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setDirection --
     /// Sets the layout direction for child arrangement ("horizontal", "vertical", or "grid").
+    /// @param | self | LLayout | The widget instance.
     /// @param | dir | string | The layout direction.
     /// @return | nil | No return value.
     t.set(
         "setDirection",
-        lua.create_function(move |_, dir: String| {
+        lua.create_function(move |_, (_self, dir): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(layout)) = g.widgets.get_mut(idx) {
                 if let Some(d) = LayoutDirection::parse_str(&dir) {
@@ -2006,10 +2132,11 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- getDirection --
     /// Returns the current layout direction.
+    /// @param | self | LLayout | The widget instance.
     /// @return | string | The direction name.
     t.set(
         "getDirection",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Layout(l)) => l.direction.as_str().to_string(),
@@ -2020,11 +2147,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setSpacing --
     /// Sets the spacing in pixels between child widgets in this layout.
+    /// @param | self | LLayout | The widget instance.
     /// @param | spacing | number | Gap between children in pixels.
     /// @return | nil | No return value.
     t.set(
         "setSpacing",
-        lua.create_function(move |_, spacing: f32| {
+        lua.create_function(move |_, (_self, spacing): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(l)) = g.widgets.get_mut(idx) {
                 l.spacing = spacing;
@@ -2035,10 +2163,11 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- getSpacing --
     /// Returns the current spacing between children.
+    /// @param | self | LLayout | The widget instance.
     /// @return | number | The spacing in pixels.
     t.set(
         "getSpacing",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Layout(l)) => l.spacing,
@@ -2049,11 +2178,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setColumns --
     /// Sets the number of columns for grid layout mode (minimum 1).
+    /// @param | self | LLayout | The widget instance.
     /// @param | n | integer | Column count.
     /// @return | nil | No return value.
     t.set(
         "setColumns",
-        lua.create_function(move |_, n: usize| {
+        lua.create_function(move |_, (_self, n): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(l)) = g.widgets.get_mut(idx) {
                 l.columns = n.max(1);
@@ -2064,11 +2194,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setWrap --
     /// Enables or disables wrapping of children to the next row/column when they overflow.
+    /// @param | self | LLayout | The widget instance.
     /// @param | wrap | boolean | True to enable wrapping.
     /// @return | nil | No return value.
     t.set(
         "setWrap",
-        lua.create_function(move |_, wrap: bool| {
+        lua.create_function(move |_, (_self, wrap): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(l)) = g.widgets.get_mut(idx) {
                 l.wrap = wrap;
@@ -2079,10 +2210,11 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- getWrap --
     /// Returns whether wrapping is enabled for this layout.
+    /// @param | self | LLayout | The widget instance.
     /// @return | boolean | True if wrapping is on.
     t.set(
         "getWrap",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Layout(l)) => l.wrap,
@@ -2093,11 +2225,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setAlign --
     /// Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stretch").
+    /// @param | self | LLayout | The widget instance.
     /// @param | align | string | The alignment mode.
     /// @return | nil | No return value.
     t.set(
         "setAlign",
-        lua.create_function(move |_, align: String| {
+        lua.create_function(move |_, (_self, align): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(l)) = g.widgets.get_mut(idx) {
                 l.align = align;
@@ -2108,10 +2241,11 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- getAlign --
     /// Returns the current cross-axis alignment mode.
+    /// @param | self | LLayout | The widget instance.
     /// @return | string | The alignment mode.
     t.set(
         "getAlign",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Layout(l)) => l.align.clone(),
@@ -2122,11 +2256,12 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- setJustify --
     /// Sets the main-axis justification for children (e.g. "start", "center", "end", "space-between").
+    /// @param | self | LLayout | The widget instance.
     /// @param | justify | string | The justification mode.
     /// @return | nil | No return value.
     t.set(
         "setJustify",
-        lua.create_function(move |_, justify: String| {
+        lua.create_function(move |_, (_self, justify): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Layout(l)) = g.widgets.get_mut(idx) {
                 l.justify = justify;
@@ -2137,10 +2272,11 @@ fn add_layout_methods(
     let c = ctx.clone();
     // -- getJustify --
     /// Returns the current main-axis justification mode.
+    /// @param | self | LLayout | The widget instance.
     /// @return | string | The justification mode.
     t.set(
         "getJustify",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Layout(l)) => l.justify.clone(),
@@ -2160,12 +2296,13 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- setContentSize --
     /// Sets the virtual content dimensions of this scroll panel.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @param | w | number | Content width in pixels.
     /// @param | h | number | Content height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setContentSize",
-        lua.create_function(move |_, (w, h): (f32, f32)| {
+        lua.create_function(move |_, (_self, w, h): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.content_width = w;
@@ -2178,10 +2315,11 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- getContentSize --
     /// Returns the virtual content dimensions of this scroll panel.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @return | number, number | Content width and height in pixels.
     t.set(
         "getContentSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollPanel(sp)) => (sp.content_width, sp.content_height),
@@ -2192,12 +2330,13 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- setScrollPosition --
     /// Sets the scroll offset position of this scroll panel.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @param | x | number | Horizontal scroll offset.
     /// @param | y | number | Vertical scroll offset.
     /// @return | nil | No return value.
     t.set(
         "setScrollPosition",
-        lua.create_function(move |_, (x, y): (f32, f32)| {
+        lua.create_function(move |_, (_self, x, y): (LuaValue, f32, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.scroll_x = x;
@@ -2210,10 +2349,11 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- getScrollPosition --
     /// Returns the current scroll offset of this scroll panel.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @return | number, number | Horizontal and vertical scroll offsets.
     t.set(
         "getScrollPosition",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollPanel(sp)) => (sp.scroll_x, sp.scroll_y),
@@ -2224,10 +2364,11 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- getMaxScroll --
     /// Returns the maximum scroll offset allowed in each axis.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @return | number, number | Maximum horizontal and vertical scroll values.
     t.set(
         "getMaxScroll",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollPanel(sp)) => sp.max_scroll(),
@@ -2238,11 +2379,12 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- setScrollSpeed --
     /// Sets the scroll speed multiplier for mouse wheel scrolling.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @param | speed | number | Scroll speed in pixels per scroll tick.
     /// @return | nil | No return value.
     t.set(
         "setScrollSpeed",
-        lua.create_function(move |_, speed: f32| {
+        lua.create_function(move |_, (_self, speed): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.scroll_speed = speed;
@@ -2253,10 +2395,11 @@ fn add_scroll_panel_methods(
     let c = ctx.clone();
     // -- getScrollSpeed --
     /// Returns the current scroll speed multiplier.
+    /// @param | self | LScrollPanel | The widget instance.
     /// @return | number | The scroll speed.
     t.set(
         "getScrollSpeed",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollPanel(sp)) => sp.scroll_speed,
@@ -2276,6 +2419,7 @@ fn add_nine_patch_methods(
     let c = ctx.clone();
     // -- setInsets --
     /// Sets the border insets defining the stretchable center region of the nine-patch image.
+    /// @param | self | LNinePatch | The widget instance.
     /// @param | left | integer | Left inset in pixels.
     /// @param | top | integer | Top inset in pixels.
     /// @param | right | integer | Right inset in pixels.
@@ -2283,7 +2427,7 @@ fn add_nine_patch_methods(
     /// @return | nil | No return value.
     t.set(
         "setInsets",
-        lua.create_function(move |_, (left, top, right, bottom): (u32, u32, u32, u32)| {
+        lua.create_function(move |_, (_self, left, top, right, bottom): (LuaValue, u32, u32, u32, u32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::NinePatch(np)) = g.widgets.get_mut(idx) {
                 np.inset_left = left;
@@ -2297,10 +2441,11 @@ fn add_nine_patch_methods(
     let c = ctx.clone();
     // -- getInsets --
     /// Returns the border insets of this nine-patch.
-    /// @return | number, number, number, number | Left, top, right, and bottom insets.
+    /// @param | self | LNinePatch | The widget instance.
+    /// @return | integer, integer, integer, integer | Left, top, right, and bottom insets.
     t.set(
         "getInsets",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::NinePatch(np)) => {
@@ -2313,12 +2458,13 @@ fn add_nine_patch_methods(
     let c = ctx.clone();
     // -- setImageDimensions --
     /// Sets the original image dimensions used for nine-patch slice calculations.
+    /// @param | self | LNinePatch | The widget instance.
     /// @param | w | integer | Image width in pixels.
     /// @param | h | integer | Image height in pixels.
     /// @return | nil | No return value.
     t.set(
         "setImageDimensions",
-        lua.create_function(move |_, (w, h): (u32, u32)| {
+        lua.create_function(move |_, (_self, w, h): (LuaValue, u32, u32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::NinePatch(np)) = g.widgets.get_mut(idx) {
                 np.image_width = w;
@@ -2330,10 +2476,11 @@ fn add_nine_patch_methods(
     let c = ctx.clone();
     // -- getImageDimensions --
     /// Returns the original image dimensions of this nine-patch.
-    /// @return | number, number | Image width and height.
+    /// @param | self | LNinePatch | The widget instance.
+    /// @return | integer, integer | Image width and height.
     t.set(
         "getImageDimensions",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::NinePatch(np)) => (np.image_width, np.image_height),
@@ -2344,10 +2491,11 @@ fn add_nine_patch_methods(
     let c = ctx.clone();
     // -- getSlices --
     /// Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
+    /// @param | self | LNinePatch | The widget instance.
     /// @return | table | Array of slice tables with sx, sy, sw, sh, dx, dy, dw, dh fields, or nil.
     t.set(
         "getSlices",
-        lua.create_function(move |lua, ()| {
+        lua.create_function(move |lua, _self: LuaValue| {
             let g = c.borrow();
             match g.widgets.get(idx) {
                 Some(WidgetKind::NinePatch(np)) => {
@@ -2355,13 +2503,29 @@ fn add_nine_patch_methods(
                     let result = lua.create_table()?;
                     for (i, s) in slices.iter().enumerate() {
                         let st = lua.create_table()?;
+                        /// Performs the 'sx' operation.
+                        /// @return | nil | No value is returned.
                         st.set("sx", s.0)?;
+                        /// Performs the 'sy' operation.
+                        /// @return | nil | No value is returned.
                         st.set("sy", s.1)?;
+                        /// Performs the 'sw' operation.
+                        /// @return | nil | No value is returned.
                         st.set("sw", s.2)?;
+                        /// Performs the 'sh' operation.
+                        /// @return | nil | No value is returned.
                         st.set("sh", s.3)?;
+                        /// Performs the 'dx' operation.
+                        /// @return | nil | No value is returned.
                         st.set("dx", s.4)?;
+                        /// Performs the 'dy' operation.
+                        /// @return | nil | No value is returned.
                         st.set("dy", s.5)?;
+                        /// Performs the 'dw' operation.
+                        /// @return | nil | No value is returned.
                         st.set("dw", s.6)?;
+                        /// Performs the 'dh' operation.
+                        /// @return | nil | No value is returned.
                         st.set("dh", s.7)?;
                         result.set(i + 1, st)?;
                     }
@@ -2383,11 +2547,12 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- setMessage --
     /// Sets the message text displayed by this toast notification.
+    /// @param | self | LToast | The widget instance.
     /// @param | msg | string | The toast message.
     /// @return | nil | No return value.
     t.set(
         "setMessage",
-        lua.create_function(move |_, msg: String| {
+        lua.create_function(move |_, (_self, msg): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Toast(toast)) = g.widgets.get_mut(idx) {
                 toast.message = msg;
@@ -2398,10 +2563,11 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- getMessage --
     /// Returns the message text of this toast.
+    /// @param | self | LToast | The widget instance.
     /// @return | string | The toast message.
     t.set(
         "getMessage",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toast(toast)) => toast.message.clone(),
@@ -2412,11 +2578,12 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- setDuration --
     /// Sets how long this toast is displayed in seconds.
+    /// @param | self | LToast | The widget instance.
     /// @param | d | number | Duration in seconds.
     /// @return | nil | No return value.
     t.set(
         "setDuration",
-        lua.create_function(move |_, d: f32| {
+        lua.create_function(move |_, (_self, d): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Toast(toast)) = g.widgets.get_mut(idx) {
                 toast.duration = d.max(0.0);
@@ -2427,10 +2594,11 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- getDuration --
     /// Returns the display duration of this toast in seconds.
+    /// @param | self | LToast | The widget instance.
     /// @return | number | The duration.
     t.set(
         "getDuration",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toast(toast)) => toast.duration,
@@ -2441,10 +2609,11 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- getProgress --
     /// Returns the elapsed fraction (0.0 to 1.0) of this toast's lifetime.
+    /// @param | self | LToast | The widget instance.
     /// @return | number | The progress fraction.
     t.set(
         "getProgress",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toast(toast)) => toast.progress(),
@@ -2455,10 +2624,11 @@ fn add_toast_methods(
     let c = ctx.clone();
     // -- isExpired --
     /// Returns whether this toast has exceeded its display duration.
+    /// @param | self | LToast | The widget instance.
     /// @return | boolean | True if expired.
     t.set(
         "isExpired",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toast(toast)) => toast.is_expired(),
@@ -2478,11 +2648,12 @@ fn add_separator_methods(
     let c = ctx.clone();
     // -- setVertical --
     /// Sets whether this separator draws vertically or horizontally.
+    /// @param | self | LSeparator | The widget instance.
     /// @param | v | boolean | True for vertical, false for horizontal.
     /// @return | nil | No return value.
     t.set(
         "setVertical",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Separator(sep)) = g.widgets.get_mut(idx) {
                 sep.vertical = v;
@@ -2493,10 +2664,11 @@ fn add_separator_methods(
     let c = ctx.clone();
     // -- isVertical --
     /// Returns whether this separator is oriented vertically.
+    /// @param | self | LSeparator | The widget instance.
     /// @return | boolean | True if vertical.
     t.set(
         "isVertical",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Separator(sep)) => sep.vertical,
@@ -2507,11 +2679,12 @@ fn add_separator_methods(
     let c = ctx.clone();
     // -- setThickness --
     /// Sets the line thickness of this separator in pixels.
+    /// @param | self | LSeparator | The widget instance.
     /// @param | thickness | number | Thickness in pixels.
     /// @return | nil | No return value.
     t.set(
         "setThickness",
-        lua.create_function(move |_, thickness: f32| {
+        lua.create_function(move |_, (_self, thickness): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Separator(sep)) = g.widgets.get_mut(idx) {
                 sep.thickness = thickness;
@@ -2522,10 +2695,11 @@ fn add_separator_methods(
     let c = ctx.clone();
     // -- getThickness --
     /// Returns the line thickness of this separator.
+    /// @param | self | LSeparator | The widget instance.
     /// @return | number | The thickness in pixels.
     t.set(
         "getThickness",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Separator(sep)) => sep.thickness,
@@ -2543,13 +2717,14 @@ fn add_tree_view_methods(
     idx: usize,
 ) -> LuaResult<()> {
     let c = ctx.clone();
-    /// Adds node on this LTreeView object.
-    /// @param | text | string | String value for `text`.
-    /// @param | parent_index | integer? | Lua argument for `parent_index`.
-    /// @return | table | Table result returned by this call.
+    /// Adds a new node to this tree view, optionally under a parent node.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | text | string | The node label text.
+    /// @param | parent_index | integer? | The 1-based parent node index, or nil for a root node.
+    /// @return | integer | The 1-based index of the newly added node.
     t.set(
         "addNode",
-        lua.create_function(move |_, (text, parent_index): (String, Option<usize>)| {
+        lua.create_function(move |_, (_self, text, parent_index): (LuaValue, String, Option<usize>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 let pi = parent_index.map(|i| i.saturating_sub(1));
@@ -2560,12 +2735,13 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Toggle node on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @return | boolean | Boolean result returned by this call.
+    /// Toggles the expanded/collapsed state of the node at the given 1-based index.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @return | boolean | True if the node is now expanded, false if collapsed.
     t.set(
         "toggleNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 if index >= 1 {
@@ -2577,12 +2753,13 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Returns true if expanded on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @return | table | Table result returned by this call.
+    /// Returns whether the node at the given 1-based index is currently expanded.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @return | boolean | True if expanded.
     t.set(
         "isExpanded",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TreeView(tv)) => {
@@ -2593,11 +2770,12 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Returns the node count on this LTreeView object.
-    /// @return | table | Table result returned by this call.
+    /// Returns the total number of nodes in this tree view.
+    /// @param | self | LTreeView | The widget instance.
+    /// @return | integer | The node count.
     t.set(
         "getNodeCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TreeView(tv)) => tv.node_count(),
@@ -2606,12 +2784,13 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Removes node on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @return | boolean | Boolean result returned by this call.
+    /// Removes the node at the given 1-based index from this tree view.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @return | boolean | True if the node was removed.
     t.set(
         "removeNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index.checked_sub(1).is_some_and(|i| tv.remove_node(i)))
@@ -2621,11 +2800,12 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Clears nodes on this LTreeView object.
+    /// Removes all nodes from this tree view.
+    /// @param | self | LTreeView | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "clearNodes",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 tv.clear_nodes();
@@ -2634,12 +2814,13 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Returns the node text on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @return | table | Table result returned by this call.
+    /// Returns the text of the node at the given 1-based index.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @return | string | The node text, or nil if the index is invalid.
     t.set(
         "getNodeText",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(index
@@ -2652,13 +2833,14 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Sets the node text on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @param | text | string | String value for `text`.
-    /// @return | boolean | Boolean result returned by this call.
+    /// Sets the text of the node at the given 1-based index.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @param | text | string | The new node text.
+    /// @return | boolean | True if the node text was set.
     t.set(
         "setNodeText",
-        lua.create_function(move |_, (index, text): (usize, String)| {
+        lua.create_function(move |_, (_self, index, text): (LuaValue, usize, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index
@@ -2670,13 +2852,14 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Sets the node icon on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @param | icon | string | Lua argument for `icon`.
-    /// @return | boolean | Boolean result returned by this call.
+    /// Sets the icon of the node at the given 1-based index.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @param | icon | string | The icon identifier string.
+    /// @return | boolean | True if the icon was set.
     t.set(
         "setNodeIcon",
-        lua.create_function(move |_, (index, icon): (usize, String)| {
+        lua.create_function(move |_, (_self, index, icon): (LuaValue, usize, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index
@@ -2688,12 +2871,13 @@ fn add_tree_view_methods(
         })?,
     )?;
     let c = ctx.clone();
-    /// Expand node on this LTreeView object.
-    /// @param | index | integer | Identifier argument for `index`.
-    /// @return | boolean | Boolean result returned by this call.
+    /// Expands the node at the given 1-based index to show its children.
+    /// @param | self | LTreeView | The widget instance.
+    /// @param | index | integer | The 1-based node index.
+    /// @return | boolean | True if the node was expanded.
     t.set(
         "expandNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index.checked_sub(1).is_some_and(|i| tv.expand_node(i)))
@@ -2705,11 +2889,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- collapseNode --
     /// Collapses the node at the given 1-based index to hide its children.
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based node index.
     /// @return | boolean | True if the node was collapsed.
     t.set(
         "collapseNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index.checked_sub(1).is_some_and(|i| tv.collapse_node(i)))
@@ -2721,11 +2906,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- isNodeExpanded --
     /// Returns whether the node at the given 1-based index is expanded. Returns nil if the index is invalid.
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based node index.
     /// @return | boolean | True if expanded, false if collapsed, nil if invalid.
     t.set(
         "isNodeExpanded",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(index.checked_sub(1).and_then(|i| tv.is_node_expanded(i)))
@@ -2737,10 +2923,11 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- expandAll --
     /// Expands all nodes in this tree view.
+    /// @param | self | LTreeView | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "expandAll",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 tv.expand_all();
@@ -2751,10 +2938,11 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- collapseAll --
     /// Collapses all nodes in this tree view.
+    /// @param | self | LTreeView | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "collapseAll",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 tv.collapse_all();
@@ -2765,11 +2953,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- setSelectedNode --
     /// Sets the selected node by 1-based index.
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based node index.
     /// @return | boolean | True if the node was selected.
     t.set(
         "setSelectedNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get_mut(idx) {
                 Ok(index
@@ -2783,10 +2972,11 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- getSelectedNode --
     /// Returns the 1-based index of the currently selected node.
-    /// @return | number | The selected node index, or nil if none.
+    /// @param | self | LTreeView | The widget instance.
+    /// @return | integer | The selected node index, or nil if none.
     t.set(
         "getSelectedNode",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(tv.get_selected_node().map(|i| i + 1))
@@ -2798,11 +2988,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- getChildNodes --
     /// Returns a table of 1-based child node indices for the node at the given index.
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based parent node index.
     /// @return | table | Array of 1-based child indices.
     t.set(
         "getChildNodes",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(index
@@ -2818,11 +3009,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- getParentNode --
     /// Returns the 1-based index of the parent of the node at the given index.
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based node index.
-    /// @return | number | The parent node index, or nil for root nodes.
+    /// @return | integer | The parent node index, or nil for root nodes.
     t.set(
         "getParentNode",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(index
@@ -2838,11 +3030,12 @@ fn add_tree_view_methods(
     let c = ctx.clone();
     // -- getNodeDepth --
     /// Returns the nesting depth of the node at the given index (0 for root nodes).
+    /// @param | self | LTreeView | The widget instance.
     /// @param | index | integer | The 1-based node index.
-    /// @return | number | The depth, or nil if index is invalid.
+    /// @return | integer | The depth, or nil if index is invalid.
     t.set(
         "getNodeDepth",
-        lua.create_function(move |_, index: usize| {
+        lua.create_function(move |_, (_self, index): (LuaValue, usize)| {
             let g = c.borrow();
             if let Some(WidgetKind::TreeView(tv)) = g.widgets.get(idx) {
                 Ok(index.checked_sub(1).and_then(|i| tv.get_node_depth(i)))
@@ -2864,10 +3057,11 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the label text of this radio button.
+    /// @param | self | LRadioButton | The widget instance.
     /// @return | string | The radio button label.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::RadioButton(rb)) => rb.text.clone(),
@@ -2878,11 +3072,12 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the label text of this radio button.
+    /// @param | self | LRadioButton | The widget instance.
     /// @param | text | string | The radio button label.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::RadioButton(rb)) = g.widgets.get_mut(idx) {
                 rb.text = text;
@@ -2893,10 +3088,11 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- isSelected --
     /// Returns whether this radio button is currently selected.
+    /// @param | self | LRadioButton | The widget instance.
     /// @return | boolean | True if selected.
     t.set(
         "isSelected",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::RadioButton(rb)) => rb.selected,
@@ -2907,11 +3103,12 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- setSelected --
     /// Sets the selected state of this radio button.
+    /// @param | self | LRadioButton | The widget instance.
     /// @param | v | boolean | True to select.
     /// @return | nil | No return value.
     t.set(
         "setSelected",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::RadioButton(rb)) = g.widgets.get_mut(idx) {
                 rb.selected = v;
@@ -2922,10 +3119,11 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- getGroup --
     /// Returns the radio button group name. Buttons in the same group are mutually exclusive.
+    /// @param | self | LRadioButton | The widget instance.
     /// @return | string | The group name.
     t.set(
         "getGroup",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::RadioButton(rb)) => rb.group.clone(),
@@ -2936,11 +3134,12 @@ fn add_radio_button_methods(
     let c = ctx.clone();
     // -- setGroup --
     /// Sets the radio button group name. Buttons in the same group are mutually exclusive.
+    /// @param | self | LRadioButton | The widget instance.
     /// @param | group | string | The group name.
     /// @return | nil | No return value.
     t.set(
         "setGroup",
-        lua.create_function(move |_, group: String| {
+        lua.create_function(move |_, (_self, group): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::RadioButton(rb)) = g.widgets.get_mut(idx) {
                 rb.group = group;
@@ -2951,11 +3150,12 @@ fn add_radio_button_methods(
     let cbs2 = cbs.clone();
     // -- setOnChange --
     /// Registers a callback invoked when this radio button's selection changes.
+    /// @param | self | LRadioButton | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnChange",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_change.insert(idx, key);
             Ok(())
@@ -2974,10 +3174,11 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- getScrollPosition --
     /// Returns the current scroll position of this scroll bar.
+    /// @param | self | LScrollBar | The widget instance.
     /// @return | number | The scroll position.
     t.set(
         "getScrollPosition",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollBar(sb)) => sb.position,
@@ -2988,11 +3189,12 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- setScrollPosition --
     /// Sets the scroll position of this scroll bar, clamped to the valid range.
+    /// @param | self | LScrollBar | The widget instance.
     /// @param | v | number | The scroll position.
     /// @return | nil | No return value.
     t.set(
         "setScrollPosition",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollBar(sb)) = g.widgets.get_mut(idx) {
                 sb.position = v.clamp(0.0, (sb.content_size - sb.view_size).max(0.0));
@@ -3003,10 +3205,11 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- getContentSize --
     /// Returns the total content size tracked by this scroll bar.
+    /// @param | self | LScrollBar | The widget instance.
     /// @return | number | The content size.
     t.set(
         "getContentSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollBar(sb)) => sb.content_size,
@@ -3017,11 +3220,12 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- setContentSize --
     /// Sets the total content size that this scroll bar represents.
+    /// @param | self | LScrollBar | The widget instance.
     /// @param | v | number | The content size.
     /// @return | nil | No return value.
     t.set(
         "setContentSize",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollBar(sb)) = g.widgets.get_mut(idx) {
                 sb.content_size = v;
@@ -3032,10 +3236,11 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- getViewSize --
     /// Returns the visible viewport size tracked by this scroll bar.
+    /// @param | self | LScrollBar | The widget instance.
     /// @return | number | The view size.
     t.set(
         "getViewSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollBar(sb)) => sb.view_size,
@@ -3046,11 +3251,12 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- setViewSize --
     /// Sets the visible viewport size for this scroll bar.
+    /// @param | self | LScrollBar | The widget instance.
     /// @param | v | number | The view size.
     /// @return | nil | No return value.
     t.set(
         "setViewSize",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ScrollBar(sb)) = g.widgets.get_mut(idx) {
                 sb.view_size = v;
@@ -3061,10 +3267,11 @@ fn add_scroll_bar_methods(
     let c = ctx.clone();
     // -- isVertical --
     /// Returns whether this scroll bar is oriented vertically.
+    /// @param | self | LScrollBar | The widget instance.
     /// @return | boolean | True if vertical.
     t.set(
         "isVertical",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ScrollBar(sb)) => sb.vertical,
@@ -3075,11 +3282,12 @@ fn add_scroll_bar_methods(
     let cbs2 = cbs.clone();
     // -- setOnChange --
     /// Registers a callback invoked when this scroll bar's position changes.
+    /// @param | self | LScrollBar | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnChange",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_change.insert(idx, key);
             Ok(())
@@ -3098,10 +3306,11 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- getTitle --
     /// Returns the title bar text of this GUI window.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @return | string | The window title.
     t.set(
         "getTitle",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUIWindow(w)) => w.title.clone(),
@@ -3112,11 +3321,12 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- setTitle --
     /// Sets the title bar text of this GUI window.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @param | title | string | The window title.
     /// @return | nil | No return value.
     t.set(
         "setTitle",
-        lua.create_function(move |_, title: String| {
+        lua.create_function(move |_, (_self, title): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUIWindow(w)) = g.widgets.get_mut(idx) {
                 w.title = title;
@@ -3127,10 +3337,11 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- isCloseable --
     /// Returns whether this window shows a close button.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @return | boolean | True if closeable.
     t.set(
         "isCloseable",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUIWindow(w)) => w.closeable,
@@ -3141,11 +3352,12 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- setCloseable --
     /// Sets whether this window shows a close button.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @param | v | boolean | True to show the close button.
     /// @return | nil | No return value.
     t.set(
         "setCloseable",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUIWindow(w)) = g.widgets.get_mut(idx) {
                 w.closeable = v;
@@ -3156,10 +3368,11 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- isDraggable --
     /// Returns whether this window can be dragged by its title bar.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @return | boolean | True if draggable.
     t.set(
         "isDraggable",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUIWindow(w)) => w.draggable,
@@ -3170,11 +3383,12 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- setDraggable --
     /// Sets whether this window can be dragged by its title bar.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @param | v | boolean | True to allow dragging.
     /// @return | nil | No return value.
     t.set(
         "setDraggable",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUIWindow(w)) = g.widgets.get_mut(idx) {
                 w.draggable = v;
@@ -3185,10 +3399,11 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- isResizable --
     /// Returns whether this window can be resized by dragging its edges.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @return | boolean | True if resizable.
     t.set(
         "isResizable",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUIWindow(w)) => w.resizable,
@@ -3199,11 +3414,12 @@ fn add_gui_window_methods(
     let c = ctx.clone();
     // -- setResizable --
     /// Sets whether this window can be resized.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @param | v | boolean | True to allow resizing.
     /// @return | nil | No return value.
     t.set(
         "setResizable",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUIWindow(w)) = g.widgets.get_mut(idx) {
                 w.resizable = v;
@@ -3214,11 +3430,12 @@ fn add_gui_window_methods(
     let cbs2 = cbs.clone();
     // -- setOnClose --
     /// Registers a callback invoked when this window is closed.
+    /// @param | self | LGuiWindow | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnClose",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_close.insert(idx, key);
             Ok(())
@@ -3236,10 +3453,11 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- getOrientation --
     /// Returns the orientation of this split panel ("horizontal" or "vertical").
+    /// @param | self | LSplitPanel | The widget instance.
     /// @return | string | The orientation.
     t.set(
         "getOrientation",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SplitPanel(sp)) => sp.orientation.clone(),
@@ -3250,11 +3468,12 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- setOrientation --
     /// Sets the orientation of this split panel ("horizontal" or "vertical").
+    /// @param | self | LSplitPanel | The widget instance.
     /// @param | v | string | The orientation.
     /// @return | nil | No return value.
     t.set(
         "setOrientation",
-        lua.create_function(move |_, v: String| {
+        lua.create_function(move |_, (_self, v): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SplitPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.orientation = v;
@@ -3265,10 +3484,11 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- getSplitPosition --
     /// Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
+    /// @param | self | LSplitPanel | The widget instance.
     /// @return | number | The split fraction.
     t.set(
         "getSplitPosition",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SplitPanel(sp)) => sp.split_position,
@@ -3279,11 +3499,12 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- setSplitPosition --
     /// Sets the split position as a fraction (0.0 to 1.0).
+    /// @param | self | LSplitPanel | The widget instance.
     /// @param | v | number | The split fraction.
     /// @return | nil | No return value.
     t.set(
         "setSplitPosition",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SplitPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.split_position = v.clamp(0.0, 1.0);
@@ -3294,10 +3515,11 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- getMinPanelSize --
     /// Returns the minimum pixel size of each split sub-panel.
+    /// @param | self | LSplitPanel | The widget instance.
     /// @return | number | The minimum size in pixels.
     t.set(
         "getMinPanelSize",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SplitPanel(sp)) => sp.min_panel_size,
@@ -3308,11 +3530,12 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- setMinPanelSize --
     /// Sets the minimum pixel size of each split sub-panel.
+    /// @param | self | LSplitPanel | The widget instance.
     /// @param | v | number | The minimum size in pixels.
     /// @return | nil | No return value.
     t.set(
         "setMinPanelSize",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SplitPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.min_panel_size = v;
@@ -3323,11 +3546,12 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- setFirstChild --
     /// Sets the widget index for the first (left/top) panel.
+    /// @param | self | LSplitPanel | The widget instance.
     /// @param | child_idx | integer | The widget index.
     /// @return | nil | No return value.
     t.set(
         "setFirstChild",
-        lua.create_function(move |_, child_idx: usize| {
+        lua.create_function(move |_, (_self, child_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SplitPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.first_child = Some(child_idx);
@@ -3338,11 +3562,12 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- setSecondChild --
     /// Sets the widget index for the second (right/bottom) panel.
+    /// @param | self | LSplitPanel | The widget instance.
     /// @param | child_idx | integer | The widget index.
     /// @return | nil | No return value.
     t.set(
         "setSecondChild",
-        lua.create_function(move |_, child_idx: usize| {
+        lua.create_function(move |_, (_self, child_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::SplitPanel(sp)) = g.widgets.get_mut(idx) {
                 sp.second_child = Some(child_idx);
@@ -3353,10 +3578,11 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- getFirstChild --
     /// Returns the widget index of the first (left/top) child panel.
-    /// @return | number | The widget index, or nil if not set.
+    /// @param | self | LSplitPanel | The widget instance.
+    /// @return | integer | The widget index, or nil if not set.
     t.set(
         "getFirstChild",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SplitPanel(sp)) => sp.first_child,
@@ -3367,10 +3593,11 @@ fn add_split_panel_methods(
     let c = ctx.clone();
     // -- getSecondChild --
     /// Returns the widget index of the second (right/bottom) child panel.
-    /// @return | number | The widget index, or nil if not set.
+    /// @param | self | LSplitPanel | The widget instance.
+    /// @return | integer | The widget index, or nil if not set.
     t.set(
         "getSecondChild",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::SplitPanel(sp)) => sp.second_child,
@@ -3390,12 +3617,13 @@ fn add_dock_panel_methods(
     let c = ctx.clone();
     // -- dock --
     /// Docks a child widget to the specified side of this dock panel.
+    /// @param | self | LDockPanel | The widget instance.
     /// @param | child_idx | integer | The widget index to dock.
     /// @param | side | string | The dock side ("left", "right", "top", "bottom", "center").
     /// @return | nil | No return value.
     t.set(
         "dock",
-        lua.create_function(move |_, (child_idx, side): (usize, String)| {
+        lua.create_function(move |_, (_self, child_idx, side): (LuaValue, usize, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::DockPanel(dp)) = g.widgets.get_mut(idx) {
                 dp.docked.push((child_idx, side));
@@ -3406,11 +3634,12 @@ fn add_dock_panel_methods(
     let c = ctx.clone();
     // -- undock --
     /// Removes a child widget from this dock panel.
+    /// @param | self | LDockPanel | The widget instance.
     /// @param | child_idx | integer | The widget index to undock.
     /// @return | nil | No return value.
     t.set(
         "undock",
-        lua.create_function(move |_, child_idx: usize| {
+        lua.create_function(move |_, (_self, child_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::DockPanel(dp)) = g.widgets.get_mut(idx) {
                 dp.docked.retain(|(ci, _)| *ci != child_idx);
@@ -3421,10 +3650,11 @@ fn add_dock_panel_methods(
     let c = ctx.clone();
     // -- getDockedCount --
     /// Returns the number of widgets docked in this dock panel.
-    /// @return | number | The docked widget count.
+    /// @param | self | LDockPanel | The widget instance.
+    /// @return | integer | The docked widget count.
     t.set(
         "getDockedCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::DockPanel(dp)) => dp.docked.len(),
@@ -3435,12 +3665,13 @@ fn add_dock_panel_methods(
     let c = ctx.clone();
     // -- setSplitSize --
     /// Sets the size of a dock panel side region.
+    /// @param | self | LDockPanel | The widget instance.
     /// @param | side | string | The dock side ("left", "right", "top", "bottom").
     /// @param | size | number | The size in pixels.
     /// @return | nil | No return value.
     t.set(
         "setSplitSize",
-        lua.create_function(move |_, (side, size): (String, f32)| {
+        lua.create_function(move |_, (_self, side, size): (LuaValue, String, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::DockPanel(dp)) = g.widgets.get_mut(idx) {
                 if let Some(entry) = dp.split_sizes.iter_mut().find(|(s, _)| *s == side) {
@@ -3455,11 +3686,12 @@ fn add_dock_panel_methods(
     let c = ctx.clone();
     // -- getSplitSize --
     /// Returns the size configured for a dock panel side region.
+    /// @param | self | LDockPanel | The widget instance.
     /// @param | side | string | The dock side.
     /// @return | number | The size in pixels, or nil if not set.
     t.set(
         "getSplitSize",
-        lua.create_function(move |_, side: String| {
+        lua.create_function(move |_, (_self, side): (LuaValue, String)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::DockPanel(dp)) => dp
@@ -3483,10 +3715,11 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- getOrientation --
     /// Returns the toolbar orientation ("horizontal" or "vertical").
+    /// @param | self | LToolbar | The widget instance.
     /// @return | string | The orientation.
     t.set(
         "getOrientation",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toolbar(tb)) => tb.orientation.clone(),
@@ -3497,11 +3730,12 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- setOrientation --
     /// Sets the toolbar orientation ("horizontal" or "vertical").
+    /// @param | self | LToolbar | The widget instance.
     /// @param | v | string | The orientation.
     /// @return | nil | No return value.
     t.set(
         "setOrientation",
-        lua.create_function(move |_, v: String| {
+        lua.create_function(move |_, (_self, v): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get_mut(idx) {
                 tb.orientation = v;
@@ -3512,12 +3746,13 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- addButton --
     /// Adds a new button to this toolbar and returns its 1-based index.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | id | string | The button identifier.
     /// @param | tooltip | string? | Optional tooltip text for the button.
-    /// @return | number | The 1-based index of the added button.
+    /// @return | integer | The 1-based index of the added button.
     t.set(
         "addButton",
-        lua.create_function(move |_, (id, tooltip): (String, Option<String>)| {
+        lua.create_function(move |_, (_self, id, tooltip): (LuaValue, String, Option<String>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get_mut(idx) {
                 Ok(tb.add_button(id, tooltip.unwrap_or_default()) + 1)
@@ -3529,10 +3764,11 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- addSeparator --
     /// Adds a visual separator to this toolbar.
+    /// @param | self | LToolbar | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "addSeparator",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let _ = c.borrow();
             Ok(())
         })?,
@@ -3540,11 +3776,12 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- addSpacer --
     /// Adds a flexible spacer to this toolbar.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | _size | number? | Optional size hint (reserved for future use).
     /// @return | nil | No return value.
     t.set(
         "addSpacer",
-        lua.create_function(move |_, _size: Option<f32>| {
+        lua.create_function(move |_, (_self, _size): (LuaValue, Option<f32>)| {
             let _ = c.borrow();
             Ok(())
         })?,
@@ -3552,18 +3789,27 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- getButton --
     /// Returns a table describing the toolbar button with the given ID.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | id | string | The button identifier.
     /// @return | table | Table with id, tooltip, enabled, toggled fields, or nil if not found.
     t.set(
         "getButton",
-        lua.create_function(move |lua, id: String| {
+        lua.create_function(move |lua, (_self, id): (LuaValue, String)| {
             let g = c.borrow();
             if let Some(WidgetKind::Toolbar(tb)) = g.widgets.get(idx) {
                 if let Some(btn) = tb.buttons.iter().find(|b| b.id == id) {
                     let bt = lua.create_table()?;
+                    /// Performs the 'id' operation.
+                    /// @return | nil | No value is returned.
                     bt.set("id", btn.id.clone())?;
+                    /// Performs the 'tooltip' operation.
+                    /// @return | nil | No value is returned.
                     bt.set("tooltip", btn.tooltip.clone())?;
+                    /// Performs the 'enabled' operation.
+                    /// @return | nil | No value is returned.
                     bt.set("enabled", btn.enabled)?;
+                    /// Performs the 'toggled' operation.
+                    /// @return | nil | No value is returned.
                     bt.set("toggled", btn.toggled)?;
                     return Ok(Some(bt));
                 }
@@ -3574,12 +3820,13 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- setButtonEnabled --
     /// Enables or disables a toolbar button by its ID.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | id | string | The button identifier.
     /// @param | enabled | boolean | True to enable.
     /// @return | boolean | True if the button was found.
     t.set(
         "setButtonEnabled",
-        lua.create_function(move |_, (id, enabled): (String, bool)| {
+        lua.create_function(move |_, (_self, id, enabled): (LuaValue, String, bool)| {
             let mut g = c.borrow_mut();
             Ok(match g.widgets.get_mut(idx) {
                 Some(WidgetKind::Toolbar(tb)) => tb.set_button_enabled(&id, enabled),
@@ -3590,12 +3837,13 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- setButtonToggled --
     /// Sets the toggle state of a toolbar button by its ID.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | id | string | The button identifier.
     /// @param | toggled | boolean | True to toggle on.
     /// @return | boolean | True if the button was found.
     t.set(
         "setButtonToggled",
-        lua.create_function(move |_, (id, toggled): (String, bool)| {
+        lua.create_function(move |_, (_self, id, toggled): (LuaValue, String, bool)| {
             let mut g = c.borrow_mut();
             Ok(match g.widgets.get_mut(idx) {
                 Some(WidgetKind::Toolbar(tb)) => tb.set_button_toggled(&id, toggled),
@@ -3606,11 +3854,12 @@ fn add_toolbar_methods(
     let c = ctx.clone();
     // -- isButtonToggled --
     /// Returns whether a toolbar button is toggled on.
+    /// @param | self | LToolbar | The widget instance.
     /// @param | id | string | The button identifier.
     /// @return | boolean | True if toggled, nil if not found.
     t.set(
         "isButtonToggled",
-        lua.create_function(move |_, id: String| {
+        lua.create_function(move |_, (_self, id): (LuaValue, String)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Toolbar(tb)) => tb.is_button_toggled(&id),
@@ -3630,11 +3879,12 @@ fn add_menu_bar_methods(
     let c = ctx.clone();
     // -- addMenu --
     /// Adds a menu (by its widget index) to this menu bar.
+    /// @param | self | LMenuBar | The widget instance.
     /// @param | menu_idx | integer | The widget index of the menu to add.
     /// @return | nil | No return value.
     t.set(
         "addMenu",
-        lua.create_function(move |_, menu_idx: usize| {
+        lua.create_function(move |_, (_self, menu_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuBar(mb)) = g.widgets.get_mut(idx) {
                 if !mb.menus.contains(&menu_idx) {
@@ -3647,11 +3897,12 @@ fn add_menu_bar_methods(
     let c = ctx.clone();
     // -- removeMenu --
     /// Removes a menu from this menu bar by its widget index.
+    /// @param | self | LMenuBar | The widget instance.
     /// @param | menu_idx | integer | The widget index of the menu to remove.
     /// @return | boolean | True if the menu was found and removed.
     t.set(
         "removeMenu",
-        lua.create_function(move |_, menu_idx: usize| {
+        lua.create_function(move |_, (_self, menu_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuBar(mb)) = g.widgets.get_mut(idx) {
                 mb.menus.retain(|m| *m != menu_idx);
@@ -3664,10 +3915,11 @@ fn add_menu_bar_methods(
     let c = ctx.clone();
     // -- getMenus --
     /// Returns a table of widget indices for all menus in this menu bar.
+    /// @param | self | LMenuBar | The widget instance.
     /// @return | table | Array of menu widget indices.
     t.set(
         "getMenus",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuBar(mb)) => mb.menus.clone(),
@@ -3678,10 +3930,11 @@ fn add_menu_bar_methods(
     let c = ctx.clone();
     // -- getMenuCount --
     /// Returns the number of menus in this menu bar.
-    /// @return | number | The menu count.
+    /// @param | self | LMenuBar | The widget instance.
+    /// @return | integer | The menu count.
     t.set(
         "getMenuCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuBar(mb)) => mb.menus.len(),
@@ -3702,10 +3955,11 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- getText --
     /// Returns the display text of this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @return | string | The menu item text.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuItem(mi)) => mi.text.clone(),
@@ -3716,11 +3970,12 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- setText --
     /// Sets the display text of this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @param | text | string | The menu item text.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuItem(mi)) = g.widgets.get_mut(idx) {
                 mi.text = text;
@@ -3731,10 +3986,11 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- getShortcut --
     /// Returns the keyboard shortcut string associated with this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @return | string | The shortcut text.
     t.set(
         "getShortcut",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuItem(mi)) => mi.shortcut.clone(),
@@ -3745,11 +4001,12 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- setShortcut --
     /// Sets the keyboard shortcut text displayed next to this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @param | shortcut | string | The shortcut text (e.g. "Ctrl+S").
     /// @return | nil | No return value.
     t.set(
         "setShortcut",
-        lua.create_function(move |_, shortcut: String| {
+        lua.create_function(move |_, (_self, shortcut): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuItem(mi)) = g.widgets.get_mut(idx) {
                 mi.shortcut = shortcut;
@@ -3760,10 +4017,11 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- isChecked --
     /// Returns whether this menu item is checked (for checkable menu items).
+    /// @param | self | LMenuItem | The widget instance.
     /// @return | boolean | True if checked.
     t.set(
         "isChecked",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuItem(mi)) => mi.checked,
@@ -3774,11 +4032,12 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- setChecked --
     /// Sets the checked state of this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @param | v | boolean | True to check.
     /// @return | nil | No return value.
     t.set(
         "setChecked",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuItem(mi)) = g.widgets.get_mut(idx) {
                 mi.checked = v;
@@ -3789,11 +4048,12 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- addSubItem --
     /// Adds a sub-item to this menu item for building nested menus.
+    /// @param | self | LMenuItem | The widget instance.
     /// @param | child_idx | integer | The widget index of the sub-item to add.
     /// @return | nil | No return value.
     t.set(
         "addSubItem",
-        lua.create_function(move |_, child_idx: usize| {
+        lua.create_function(move |_, (_self, child_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::MenuItem(mi)) = g.widgets.get_mut(idx) {
                 if !mi.items.contains(&child_idx) {
@@ -3806,10 +4066,11 @@ fn add_menu_item_methods(
     let c = ctx.clone();
     // -- getSubItems --
     /// Returns a table of widget indices for all sub-items of this menu item.
+    /// @param | self | LMenuItem | The widget instance.
     /// @return | table | Array of sub-item widget indices.
     t.set(
         "getSubItems",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::MenuItem(mi)) => mi.items.clone(),
@@ -3820,11 +4081,12 @@ fn add_menu_item_methods(
     let cbs2 = cbs.clone();
     // -- setOnClick --
     /// Registers a callback invoked when this menu item is clicked.
+    /// @param | self | LMenuItem | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnClick",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_click.insert(idx, key);
             Ok(())
@@ -3843,10 +4105,11 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- getTitle --
     /// Returns the title text of this dialog.
+    /// @param | self | LDialog | The widget instance.
     /// @return | string | The dialog title.
     t.set(
         "getTitle",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Dialog(d)) => d.title.clone(),
@@ -3856,12 +4119,13 @@ fn add_dialog_methods(
     )?;
     let c = ctx.clone();
     // -- setTitle --
-    /// Sets the title text of this dialog. This method is available to Lua scripts.
+    /// Sets the title text of this dialog widget.
+    /// @param | self | LDialog | The widget instance.
     /// @param | title | string | The dialog title.
     /// @return | nil | No return value.
     t.set(
         "setTitle",
-        lua.create_function(move |_, title: String| {
+        lua.create_function(move |_, (_self, title): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
                 d.title = title;
@@ -3872,10 +4136,11 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- isModal --
     /// Returns whether this dialog is modal (blocks interaction with other widgets).
+    /// @param | self | LDialog | The widget instance.
     /// @return | boolean | True if modal.
     t.set(
         "isModal",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Dialog(d)) => d.modal,
@@ -3885,12 +4150,13 @@ fn add_dialog_methods(
     )?;
     let c = ctx.clone();
     // -- setModal --
-    /// Sets whether this dialog is modal. This method is available to Lua scripts.
+    /// Sets whether this dialog widget is modal.
+    /// @param | self | LDialog | The widget instance.
     /// @param | v | boolean | True to make modal.
     /// @return | nil | No return value.
     t.set(
         "setModal",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
                 d.modal = v;
@@ -3901,10 +4167,11 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- isOpen --
     /// Returns whether this dialog is currently open and visible.
+    /// @param | self | LDialog | The widget instance.
     /// @return | boolean | True if open.
     t.set(
         "isOpen",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Dialog(d)) => d.open,
@@ -3915,10 +4182,11 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- open --
     /// Opens this dialog, making it visible.
+    /// @param | self | LDialog | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "open",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
                 d.open = true;
@@ -3929,10 +4197,11 @@ fn add_dialog_methods(
     let c2 = ctx.clone();
     // -- close --
     /// Closes this dialog and fires the onClose callback if it was open.
+    /// @param | self | LDialog | The widget instance.
     /// @return | nil | No return value.
     t.set(
         "close",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let mut g = c2.borrow_mut();
             let was_open = matches!(g.widgets.get(idx), Some(WidgetKind::Dialog(d)) if d.open);
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
@@ -3947,11 +4216,12 @@ fn add_dialog_methods(
     let cbs2 = cbs.clone();
     // -- setOnClose --
     /// Registers a callback invoked when this dialog is closed.
+    /// @param | self | LDialog | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnClose",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_close.insert(idx, key);
             Ok(())
@@ -3960,11 +4230,12 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- setContent --
     /// Sets the content widget for this dialog.
+    /// @param | self | LDialog | The widget instance.
     /// @param | content_idx | integer? | The widget index to show as content, or nil to clear.
     /// @return | nil | No return value.
     t.set(
         "setContent",
-        lua.create_function(move |_, content_idx: Option<usize>| {
+        lua.create_function(move |_, (_self, content_idx): (LuaValue, Option<usize>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
                 d.content_idx = content_idx;
@@ -3975,10 +4246,11 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- getContent --
     /// Returns the widget index of this dialog's content, or nil if not set.
-    /// @return | number | The content widget index.
+    /// @param | self | LDialog | The widget instance.
+    /// @return | integer | The content widget index.
     t.set(
         "getContent",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Dialog(d)) => d.content_idx,
@@ -3989,12 +4261,13 @@ fn add_dialog_methods(
     let c = ctx.clone();
     // -- addButton --
     /// Adds a footer button to this dialog and returns its 1-based index.
+    /// @param | self | LDialog | The widget instance.
     /// @param | text | string | The button label.
     /// @param | cb | function? | Optional click callback (reserved for future use).
-    /// @return | number | The 1-based button index.
+    /// @return | integer | The 1-based button index.
     t.set(
         "addButton",
-        lua.create_function(move |_, (text, _cb): (String, Option<LuaFunction>)| {
+        lua.create_function(move |_, (_self, text, _cb): (LuaValue, String, Option<LuaFunction>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Dialog(d)) = g.widgets.get_mut(idx) {
                 d.footer_buttons.push(text);
@@ -4015,13 +4288,14 @@ fn add_status_bar_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     // -- addSection --
-    /// Adds a section to this status bar. This method is available to Lua scripts.
+    /// Adds a labeled section to this status bar.
+    /// @param | self | LStatusBar | The widget instance.
     /// @param | text | string | The section display text.
     /// @param | width | number? | The section width in pixels (default 100).
     /// @return | nil | No return value.
     t.set(
         "addSection",
-        lua.create_function(move |_, (text, width): (String, Option<f32>)| {
+        lua.create_function(move |_, (_self, text, width): (LuaValue, String, Option<f32>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::StatusBar(sb)) = g.widgets.get_mut(idx) {
                 sb.sections.push((text, width.unwrap_or(100.0)));
@@ -4032,12 +4306,13 @@ fn add_status_bar_methods(
     let c = ctx.clone();
     // -- setSectionText --
     /// Sets the text of a status bar section by its 1-based index.
+    /// @param | self | LStatusBar | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @param | text | string | The new section text.
     /// @return | nil | No return value.
     t.set(
         "setSectionText",
-        lua.create_function(move |_, (section_idx, text): (usize, String)| {
+        lua.create_function(move |_, (_self, section_idx, text): (LuaValue, usize, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::StatusBar(sb)) = g.widgets.get_mut(idx) {
                 if section_idx >= 1 && section_idx <= sb.sections.len() {
@@ -4050,11 +4325,12 @@ fn add_status_bar_methods(
     let c = ctx.clone();
     // -- getSectionText --
     /// Returns the text of a status bar section by its 1-based index.
+    /// @param | self | LStatusBar | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @return | string | The section text, or nil if out of range.
     t.set(
         "getSectionText",
-        lua.create_function(move |_, section_idx: usize| {
+        lua.create_function(move |_, (_self, section_idx): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::StatusBar(sb)) => {
@@ -4071,10 +4347,11 @@ fn add_status_bar_methods(
     let c = ctx.clone();
     // -- getSectionCount --
     /// Returns the number of sections in this status bar.
-    /// @return | number | The section count.
+    /// @param | self | LStatusBar | The widget instance.
+    /// @return | integer | The section count.
     t.set(
         "getSectionCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::StatusBar(sb)) => sb.sections.len(),
@@ -4085,11 +4362,12 @@ fn add_status_bar_methods(
     let c = ctx.clone();
     // -- setSectionCount --
     /// Sets the number of sections, truncating or adding empty sections as needed.
+    /// @param | self | LStatusBar | The widget instance.
     /// @param | count | integer | The desired section count.
     /// @return | nil | No return value.
     t.set(
         "setSectionCount",
-        lua.create_function(move |_, count: usize| {
+        lua.create_function(move |_, (_self, count): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::StatusBar(sb)) = g.widgets.get_mut(idx) {
                 if count < sb.sections.len() {
@@ -4106,12 +4384,13 @@ fn add_status_bar_methods(
     let c = ctx.clone();
     // -- setSectionWidget --
     /// Associates a widget with a status bar section (reserved for future use).
+    /// @param | self | LStatusBar | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @param | widget | any | The widget value to associate.
     /// @return | nil | No return value.
     t.set(
         "setSectionWidget",
-        lua.create_function(move |_, (_section_idx, _widget): (usize, LuaValue)| {
+        lua.create_function(move |_, (_self, _section_idx, _widget): (LuaValue, usize, LuaValue)| {
             let _ = c.borrow();
             Ok(())
         })?,
@@ -4128,12 +4407,13 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- addSection --
     /// Adds a collapsible section to this accordion.
+    /// @param | self | LAccordion | The widget instance.
     /// @param | title | string | The section title.
     /// @param | content_idx | integer? | Optional widget index for the section content.
     /// @return | nil | No return value.
     t.set(
         "addSection",
-        lua.create_function(move |_, (title, content_idx): (String, Option<usize>)| {
+        lua.create_function(move |_, (_self, title, content_idx): (LuaValue, String, Option<usize>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Accordion(acc)) = g.widgets.get_mut(idx) {
                 acc.sections.push(AccordionSection {
@@ -4148,10 +4428,11 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- getSectionCount --
     /// Returns the number of sections in this accordion.
-    /// @return | number | The section count.
+    /// @param | self | LAccordion | The widget instance.
+    /// @return | integer | The section count.
     t.set(
         "getSectionCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Accordion(acc)) => acc.sections.len(),
@@ -4162,11 +4443,12 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- toggleSection --
     /// Toggles the expanded state of an accordion section by its 1-based index.
+    /// @param | self | LAccordion | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @return | boolean | The new expanded state.
     t.set(
         "toggleSection",
-        lua.create_function(move |_, section_idx: usize| {
+        lua.create_function(move |_, (_self, section_idx): (LuaValue, usize)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Accordion(acc)) = g.widgets.get_mut(idx) {
                 if section_idx >= 1 && section_idx <= acc.sections.len() {
@@ -4186,11 +4468,12 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- isSectionExpanded --
     /// Returns whether an accordion section is expanded.
+    /// @param | self | LAccordion | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @return | boolean | True if expanded.
     t.set(
         "isSectionExpanded",
-        lua.create_function(move |_, section_idx: usize| {
+        lua.create_function(move |_, (_self, section_idx): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Accordion(acc)) => {
@@ -4205,10 +4488,11 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- isExclusive --
     /// Returns whether this accordion is in exclusive mode (only one section open at a time).
+    /// @param | self | LAccordion | The widget instance.
     /// @return | boolean | True if exclusive.
     t.set(
         "isExclusive",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Accordion(acc)) => acc.exclusive,
@@ -4219,11 +4503,12 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- setExclusive --
     /// Sets exclusive mode. When true, expanding one section collapses all others.
+    /// @param | self | LAccordion | The widget instance.
     /// @param | v | boolean | True for exclusive mode.
     /// @return | nil | No return value.
     t.set(
         "setExclusive",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::Accordion(acc)) = g.widgets.get_mut(idx) {
                 acc.exclusive = v;
@@ -4234,11 +4519,12 @@ fn add_accordion_methods(
     let c = ctx.clone();
     // -- getSectionTitle --
     /// Returns the title of an accordion section by its 1-based index.
+    /// @param | self | LAccordion | The widget instance.
     /// @param | section_idx | integer | The 1-based section index.
     /// @return | string | The section title, or nil if out of range.
     t.set(
         "getSectionTitle",
-        lua.create_function(move |_, section_idx: usize| {
+        lua.create_function(move |_, (_self, section_idx): (LuaValue, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::Accordion(acc)) => {
@@ -4263,11 +4549,12 @@ fn add_tooltip_panel_methods(
 ) -> LuaResult<()> {
     let c = ctx.clone();
     // -- getText --
-    /// Returns the tooltip display text. This method is available to Lua scripts.
+    /// Returns the current tooltip display text.
+    /// @param | self | LTooltipPanel | The widget instance.
     /// @return | string | The tooltip text.
     t.set(
         "getText",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TooltipPanel(tp)) => tp.text.clone(),
@@ -4277,12 +4564,13 @@ fn add_tooltip_panel_methods(
     )?;
     let c = ctx.clone();
     // -- setText --
-    /// Sets the tooltip display text. This method is available to Lua scripts.
+    /// Sets the tooltip panel display text content.
+    /// @param | self | LTooltipPanel | The widget instance.
     /// @param | text | string | The tooltip text.
     /// @return | nil | No return value.
     t.set(
         "setText",
-        lua.create_function(move |_, text: String| {
+        lua.create_function(move |_, (_self, text): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TooltipPanel(tp)) = g.widgets.get_mut(idx) {
                 tp.text = text;
@@ -4293,10 +4581,11 @@ fn add_tooltip_panel_methods(
     let c = ctx.clone();
     // -- getDelay --
     /// Returns the delay in seconds before this tooltip appears.
+    /// @param | self | LTooltipPanel | The widget instance.
     /// @return | number | The delay in seconds.
     t.set(
         "getDelay",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TooltipPanel(tp)) => tp.delay,
@@ -4307,11 +4596,12 @@ fn add_tooltip_panel_methods(
     let c = ctx.clone();
     // -- setDelay --
     /// Sets the delay in seconds before this tooltip appears.
+    /// @param | self | LTooltipPanel | The widget instance.
     /// @param | v | number | The delay in seconds.
     /// @return | nil | No return value.
     t.set(
         "setDelay",
-        lua.create_function(move |_, v: f32| {
+        lua.create_function(move |_, (_self, v): (LuaValue, f32)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TooltipPanel(tp)) = g.widgets.get_mut(idx) {
                 tp.delay = v;
@@ -4322,10 +4612,11 @@ fn add_tooltip_panel_methods(
     let c = ctx.clone();
     // -- getTarget --
     /// Returns the widget index that this tooltip is attached to.
-    /// @return | number | The target widget index, or nil if unset.
+    /// @param | self | LTooltipPanel | The widget instance.
+    /// @return | integer | The target widget index, or nil if unset.
     t.set(
         "getTarget",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::TooltipPanel(tp)) => tp.target_idx,
@@ -4336,11 +4627,12 @@ fn add_tooltip_panel_methods(
     let c = ctx.clone();
     // -- setTarget --
     /// Sets the widget index that this tooltip is attached to.
+    /// @param | self | LTooltipPanel | The widget instance.
     /// @param | target | integer? | The target widget index, or nil to detach.
     /// @return | nil | No return value.
     t.set(
         "setTarget",
-        lua.create_function(move |_, target: Option<usize>| {
+        lua.create_function(move |_, (_self, target): (LuaValue, Option<usize>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::TooltipPanel(tp)) = g.widgets.get_mut(idx) {
                 tp.target_idx = target;
@@ -4361,13 +4653,14 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- getColor --
     /// Returns the current color as RGBA components (0.0 to 1.0).
-    /// @return | number | Red.
-    /// @return | number | Green.
-    /// @return | number | Blue.
-    /// @return | number | Alpha.
+    /// @param | self | LColorPicker | The widget instance.
+    /// @return | number | Red component.
+    /// @return | number | Green component.
+    /// @return | number | Blue component.
+    /// @return | number | Alpha component.
     t.set(
         "getColor",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ColorPicker(cp)) => (cp.r, cp.g, cp.b, cp.a),
@@ -4378,6 +4671,7 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- setColor --
     /// Sets the current color as RGBA components.
+    /// @param | self | LColorPicker | The widget instance.
     /// @param | r | number | Red (0.0 to 1.0).
     /// @param | g | number | Green (0.0 to 1.0).
     /// @param | b | number | Blue (0.0 to 1.0).
@@ -4385,7 +4679,7 @@ fn add_color_picker_methods(
     /// @return | nil | No return value.
     t.set(
         "setColor",
-        lua.create_function(move |_, (r, green, b, a): (f32, f32, f32, Option<f32>)| {
+        lua.create_function(move |_, (_self, r, green, b, a): (LuaValue, f32, f32, f32, Option<f32>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ColorPicker(cp)) = g.widgets.get_mut(idx) {
                 cp.r = r;
@@ -4399,10 +4693,11 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- getShowAlpha --
     /// Returns whether the alpha channel slider is visible.
+    /// @param | self | LColorPicker | The widget instance.
     /// @return | boolean | True if the alpha slider is shown.
     t.set(
         "getShowAlpha",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ColorPicker(cp)) => cp.show_alpha,
@@ -4413,11 +4708,12 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- setShowAlpha --
     /// Sets whether the alpha channel slider is visible.
+    /// @param | self | LColorPicker | The widget instance.
     /// @param | v | boolean | True to show the alpha slider.
     /// @return | nil | No return value.
     t.set(
         "setShowAlpha",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ColorPicker(cp)) = g.widgets.get_mut(idx) {
                 cp.show_alpha = v;
@@ -4428,10 +4724,11 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- getColorMode --
     /// Returns the color mode of this picker (e.g. "rgb", "hsv").
+    /// @param | self | LColorPicker | The widget instance.
     /// @return | string | The color mode.
     t.set(
         "getColorMode",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ColorPicker(cp)) => cp.color_mode.clone(),
@@ -4442,11 +4739,12 @@ fn add_color_picker_methods(
     let c = ctx.clone();
     // -- setColorMode --
     /// Sets the color mode of this picker (e.g. "rgb", "hsv").
+    /// @param | self | LColorPicker | The widget instance.
     /// @param | mode | string | The color mode.
     /// @return | nil | No return value.
     t.set(
         "setColorMode",
-        lua.create_function(move |_, mode: String| {
+        lua.create_function(move |_, (_self, mode): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ColorPicker(cp)) = g.widgets.get_mut(idx) {
                 cp.color_mode = mode;
@@ -4457,11 +4755,12 @@ fn add_color_picker_methods(
     let cbs2 = cbs.clone();
     // -- setOnChange --
     /// Registers a callback invoked when this color picker's value changes.
+    /// @param | self | LColorPicker | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnChange",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_change.insert(idx, key);
             Ok(())
@@ -4480,12 +4779,13 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- addColumn --
     /// Adds a new column to this table widget.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | header | string | The column header text.
     /// @param | width | number? | The column width in pixels (default 100).
     /// @return | nil | No return value.
     t.set(
         "addColumn",
-        lua.create_function(move |_, (header, width): (String, Option<f32>)| {
+        lua.create_function(move |_, (_self, header, width): (LuaValue, String, Option<f32>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUITable(tbl)) = g.widgets.get_mut(idx) {
                 tbl.columns.push(TableColumn {
@@ -4499,10 +4799,11 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- getColumnCount --
     /// Returns the number of columns in this table widget.
-    /// @return | number | The column count.
+    /// @param | self | LGuiTable | The widget instance.
+    /// @return | integer | The column count.
     t.set(
         "getColumnCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUITable(tbl)) => tbl.columns.len(),
@@ -4512,12 +4813,13 @@ fn add_gui_table_methods(
     )?;
     let c = ctx.clone();
     // -- addRow --
-    /// Adds a row to this table widget. This method is available to Lua scripts.
+    /// Adds a row of data to this table widget.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | cells | table | Array of cell text values.
     /// @return | nil | No return value.
     t.set(
         "addRow",
-        lua.create_function(move |_, cells: Vec<String>| {
+        lua.create_function(move |_, (_self, cells): (LuaValue, Vec<String>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUITable(tbl)) = g.widgets.get_mut(idx) {
                 tbl.rows.push(cells);
@@ -4528,10 +4830,11 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- getRowCount --
     /// Returns the number of rows in this table widget.
-    /// @return | number | The row count.
+    /// @param | self | LGuiTable | The widget instance.
+    /// @return | integer | The row count.
     t.set(
         "getRowCount",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUITable(tbl)) => tbl.rows.len(),
@@ -4542,12 +4845,13 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- getCell --
     /// Returns the text of a cell at the given 1-based row and column.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | row | integer | The 1-based row index.
     /// @param | col | integer | The 1-based column index.
     /// @return | string | The cell text, or nil if out of range.
     t.set(
         "getCell",
-        lua.create_function(move |_, (row, col): (usize, usize)| {
+        lua.create_function(move |_, (_self, row, col): (LuaValue, usize, usize)| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUITable(tbl)) => {
@@ -4568,13 +4872,14 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- setCell --
     /// Sets the text of a cell at the given 1-based row and column.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | row | integer | The 1-based row index.
     /// @param | col | integer | The 1-based column index.
     /// @param | text | string | The new cell text.
     /// @return | nil | No return value.
     t.set(
         "setCell",
-        lua.create_function(move |_, (row, col, text): (usize, usize, String)| {
+        lua.create_function(move |_, (_self, row, col, text): (LuaValue, usize, usize, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUITable(tbl)) = g.widgets.get_mut(idx) {
                 if row >= 1 && row <= tbl.rows.len() && col >= 1 && col <= tbl.rows[row - 1].len() {
@@ -4587,10 +4892,11 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- getSelectedRow --
     /// Returns the 1-based index of the currently selected row, or nil.
-    /// @return | number | The selected row index.
+    /// @param | self | LGuiTable | The widget instance.
+    /// @return | integer | The selected row index.
     t.set(
         "getSelectedRow",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUITable(tbl)) => tbl.selected_row.map(|r| r + 1),
@@ -4601,11 +4907,12 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- setSelectedRow --
     /// Sets the selected row by its 1-based index, or nil to deselect.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | row | integer? | The 1-based row index, or nil.
     /// @return | nil | No return value.
     t.set(
         "setSelectedRow",
-        lua.create_function(move |_, row: Option<usize>| {
+        lua.create_function(move |_, (_self, row): (LuaValue, Option<usize>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUITable(tbl)) = g.widgets.get_mut(idx) {
                 tbl.selected_row = row.map(|r| r.saturating_sub(1));
@@ -4616,10 +4923,11 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- isSortable --
     /// Returns whether columns in this table can be sorted by clicking headers.
+    /// @param | self | LGuiTable | The widget instance.
     /// @return | boolean | True if sortable.
     t.set(
         "isSortable",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::GUITable(tbl)) => tbl.sortable,
@@ -4630,11 +4938,12 @@ fn add_gui_table_methods(
     let c = ctx.clone();
     // -- setSortable --
     /// Sets whether columns in this table can be sorted by clicking headers.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | v | boolean | True to enable sorting.
     /// @return | nil | No return value.
     t.set(
         "setSortable",
-        lua.create_function(move |_, v: bool| {
+        lua.create_function(move |_, (_self, v): (LuaValue, bool)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::GUITable(tbl)) = g.widgets.get_mut(idx) {
                 tbl.sortable = v;
@@ -4645,11 +4954,12 @@ fn add_gui_table_methods(
     let cbs2 = cbs.clone();
     // -- setOnSelect --
     /// Registers a callback invoked when a table row is selected.
+    /// @param | self | LGuiTable | The widget instance.
     /// @param | f | function | Callback receiving the widget index.
     /// @return | nil | No return value.
     t.set(
         "setOnSelect",
-        lua.create_function(move |lua, f: LuaFunction| {
+        lua.create_function(move |lua, (_self, f): (LuaValue, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             cbs2.borrow_mut().on_select.insert(idx, key);
             Ok(())
@@ -4667,10 +4977,11 @@ fn add_image_widget_methods(
     let c = ctx.clone();
     // -- getScaleMode --
     /// Returns the image scaling mode (e.g. "fit", "fill", "stretch").
+    /// @param | self | LImageWidget | The widget instance.
     /// @return | string | The scale mode.
     t.set(
         "getScaleMode",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ImageWidget(iw)) => iw.scale_mode.clone(),
@@ -4681,11 +4992,12 @@ fn add_image_widget_methods(
     let c = ctx.clone();
     // -- setScaleMode --
     /// Sets the image scaling mode (e.g. "fit", "fill", "stretch").
+    /// @param | self | LImageWidget | The widget instance.
     /// @param | mode | string | The scale mode.
     /// @return | nil | No return value.
     t.set(
         "setScaleMode",
-        lua.create_function(move |_, mode: String| {
+        lua.create_function(move |_, (_self, mode): (LuaValue, String)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ImageWidget(iw)) = g.widgets.get_mut(idx) {
                 iw.scale_mode = mode;
@@ -4696,13 +5008,14 @@ fn add_image_widget_methods(
     let c = ctx.clone();
     // -- getTint --
     /// Returns the tint color of this image widget as RGBA components.
-    /// @return | number | Red.
-    /// @return | number | Green.
-    /// @return | number | Blue.
-    /// @return | number | Alpha.
+    /// @param | self | LImageWidget | The widget instance.
+    /// @return | number | Red component.
+    /// @return | number | Green component.
+    /// @return | number | Blue component.
+    /// @return | number | Alpha component.
     t.set(
         "getTint",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |_, _self: LuaValue| {
             let g = c.borrow();
             Ok(match g.widgets.get(idx) {
                 Some(WidgetKind::ImageWidget(iw)) => (iw.tint.0, iw.tint.1, iw.tint.2, iw.tint.3),
@@ -4713,6 +5026,7 @@ fn add_image_widget_methods(
     let c = ctx.clone();
     // -- setTint --
     /// Sets the tint color of this image widget as RGBA components.
+    /// @param | self | LImageWidget | The widget instance.
     /// @param | r | number | Red (0.0 to 1.0).
     /// @param | g | number | Green (0.0 to 1.0).
     /// @param | b | number | Blue (0.0 to 1.0).
@@ -4720,7 +5034,7 @@ fn add_image_widget_methods(
     /// @return | nil | No return value.
     t.set(
         "setTint",
-        lua.create_function(move |_, (r, green, b, a): (f32, f32, f32, Option<f32>)| {
+        lua.create_function(move |_, (_self, r, green, b, a): (LuaValue, f32, f32, f32, Option<f32>)| {
             let mut g = c.borrow_mut();
             if let Some(WidgetKind::ImageWidget(iw)) = g.widgets.get_mut(idx) {
                 iw.tint = (r, green, b, a.unwrap_or(1.0));
@@ -4856,7 +5170,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newButton --
-    /// Creates a new button widget. This function is exposed to Lua scripts.
+    /// Creates a new button widget with optional label text.
     /// @param | text | string? | The button label text.
     /// @return | LButton | The new button widget table.
     tbl.set(
@@ -4873,7 +5187,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newLabel --
-    /// Creates a new label widget. This function is exposed to Lua scripts.
+    /// Creates a new label widget for displaying text.
     /// @param | text | string? | The label text.
     /// @return | LLabel | The new label widget table.
     tbl.set(
@@ -4890,7 +5204,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newTextInput --
-    /// Creates a new text input widget. This function is exposed to Lua scripts.
+    /// Creates a new text input widget for user entry.
     /// @return | LTextInput | The new text input widget table.
     tbl.set(
         "newTextInput",
@@ -4906,7 +5220,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newCheckbox --
-    /// Creates a new checkbox widget. This function is exposed to Lua scripts.
+    /// Creates a new checkbox widget with optional label.
     /// @param | text | string? | The checkbox label text.
     /// @return | LCheckbox | The new checkbox widget table.
     tbl.set(
@@ -4923,7 +5237,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newSlider --
-    /// Creates a new slider widget. This function is exposed to Lua scripts.
+    /// Creates a new slider widget with adjustable range.
     /// @param | min | number? | Minimum value (default 0).
     /// @param | max | number? | Maximum value (default 100).
     /// @return | LSlider | The new slider widget table.
@@ -4941,7 +5255,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newProgressBar --
-    /// Creates a new progress bar widget. This function is exposed to Lua scripts.
+    /// Creates a new progress bar widget with min and max.
     /// @param | min | number? | Minimum value (default 0).
     /// @param | max | number? | Maximum value (default 100).
     /// @return | LProgressBar | The new progress bar widget table.
@@ -4975,7 +5289,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newList --
-    /// Creates a new list box widget. This function is exposed to Lua scripts.
+    /// Creates a new list box widget for item selection.
     /// @return | LListBox | The new list box widget table.
     tbl.set(
         "newList",
@@ -5060,7 +5374,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newTabBar --
-    /// Creates a new tab bar widget. This function is exposed to Lua scripts.
+    /// Creates a new tab bar widget for tabbed navigation.
     /// @return | LTabBar | The new tab bar widget table.
     tbl.set(
         "newTabBar",
@@ -5076,7 +5390,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newSeparator --
-    /// Creates a new separator widget. This function is exposed to Lua scripts.
+    /// Creates a new separator widget for visual division.
     /// @param | vertical | boolean? | True for vertical separator (default false).
     /// @return | LSeparator | The new separator widget table.
     tbl.set(
@@ -5132,7 +5446,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newTreeView --
-    /// Creates a new tree view widget. This function is exposed to Lua scripts.
+    /// Creates a new tree view widget for hierarchical data.
     /// @return | LTreeView | The new tree view widget table.
     tbl.set(
         "newTreeView",
@@ -5148,7 +5462,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newRadioButton --
-    /// Creates a new radio button widget. This function is exposed to Lua scripts.
+    /// Creates a new radio button widget in a named group.
     /// @param | text | string? | The radio button label.
     /// @param | group | string? | The radio group name.
     /// @return | LRadioButton | The new radio button widget table.
@@ -5168,7 +5482,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newScrollBar --
-    /// Creates a new scroll bar widget. This function is exposed to Lua scripts.
+    /// Creates a new scroll bar widget for content scrolling.
     /// @param | vertical | boolean? | True for vertical (default true).
     /// @return | LScrollBar | The new scroll bar widget table.
     tbl.set(
@@ -5185,7 +5499,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newWindow --
-    /// Creates a new GUI window widget. This function is exposed to Lua scripts.
+    /// Creates a new GUI window widget with an optional title.
     /// @param | title | string? | The window title.
     /// @return | LGuiWindow | The new window widget table.
     tbl.set(
@@ -5235,7 +5549,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newToolbar --
-    /// Creates a new toolbar widget. This function is exposed to Lua scripts.
+    /// Creates a new toolbar widget for action buttons.
     /// @param | orientation | string? | "horizontal" or "vertical" (default "horizontal").
     /// @return | LToolbar | The new toolbar widget table.
     tbl.set(
@@ -5252,7 +5566,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newMenuBar --
-    /// Creates a new menu bar widget. This function is exposed to Lua scripts.
+    /// Creates a new menu bar widget for top-level menus.
     /// @return | LMenuBar | The new menu bar widget table.
     tbl.set(
         "newMenuBar",
@@ -5268,7 +5582,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newMenuItem --
-    /// Creates a new menu item widget. This function is exposed to Lua scripts.
+    /// Creates a new menu item widget with optional text.
     /// @param | text | string? | The menu item text.
     /// @return | LMenuItem | The new menu item widget table.
     tbl.set(
@@ -5285,7 +5599,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newDialog --
-    /// Creates a new dialog widget. This function is exposed to Lua scripts.
+    /// Creates a new dialog widget with an optional title.
     /// @param | title | string? | The dialog title.
     /// @return | LDialog | The new dialog widget table.
     tbl.set(
@@ -5302,7 +5616,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newStatusBar --
-    /// Creates a new status bar widget. This function is exposed to Lua scripts.
+    /// Creates a new status bar widget for app-level info.
     /// @return | LStatusBar | The new status bar widget table.
     tbl.set(
         "newStatusBar",
@@ -5318,7 +5632,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newAccordion --
-    /// Creates a new accordion widget. This function is exposed to Lua scripts.
+    /// Creates a new accordion widget with collapsible sections.
     /// @return | LAccordion | The new accordion widget table.
     tbl.set(
         "newAccordion",
@@ -5351,7 +5665,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- newColorPicker --
-    /// Creates a new color picker widget. This function is exposed to Lua scripts.
+    /// Creates a new color picker widget for color selection.
     /// @return | LColorPicker | The new color picker widget table.
     tbl.set(
         "newColorPicker",
@@ -5410,7 +5724,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let _cbs = callbacks.clone();
     // -- setTheme --
-    /// Applies a theme to the UI context. This function is exposed to Lua scripts.
+    /// Applies a theme to the entire UI context.
     /// @param | theme_ud | LTheme | The theme userdata to apply.
     /// @return | nil | No return value.
     tbl.set(
@@ -5434,7 +5748,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     let cbs = callbacks.clone();
     // -- getRoot --
-    /// Returns the root panel widget. This function is exposed to Lua scripts.
+    /// Returns the root panel widget of the UI tree.
     /// @return | LPanel | The root panel widget table.
     tbl.set(
         "getRoot",
@@ -5465,7 +5779,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let _cbs = callbacks.clone();
     // -- getFocus --
     /// Returns the index of the currently focused widget, or nil.
-    /// @return | number | The focused widget index.
+    /// @return | integer | The focused widget index.
     tbl.set(
         "getFocus",
         lua.create_function(move |_, ()| Ok(c.borrow().focused_widget))?,
@@ -5530,7 +5844,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let _cbs = callbacks.clone();
     // -- getToastCount --
     /// Returns the number of active toast notifications.
-    /// @return | number | The toast count.
+    /// @return | integer | The toast count.
     tbl.set(
         "getToastCount",
         lua.create_function(move |_, ()| Ok(c.borrow().toast_count()))?,
@@ -5676,9 +5990,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 };
                 if let Some(func) = func_opt {
                     let rect = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     rect.set("x", rx)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     rect.set("y", ry)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     rect.set("w", rw)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     rect.set("h", rh)?;
                     func.call::<_, ()>(rect)?;
                 }
@@ -5691,7 +6013,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- newCustomWidget --
     /// Creates a new custom widget with optional initial configuration.
     /// @param | config | table? | Optional table with x, y, width, height, id, visible, enabled fields.
-    /// @return | LWidget | The new custom widget table.
+    /// @return | LUiWidget | The new custom widget table.
     tbl.set(
         "newCustomWidget",
         lua.create_function(move |lua, config: Option<LuaTable>| {
@@ -5731,7 +6053,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let _cbs = callbacks.clone();
     // -- getWidgetCount --
     /// Returns the total number of widgets in the UI context.
-    /// @return | number | The widget count.
+    /// @return | integer | The widget count.
     tbl.set(
         "getWidgetCount",
         lua.create_function(move |_, ()| Ok(c.borrow().widget_count()))?,
@@ -5942,8 +6264,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
     let c = ctx.clone();
     // -- flushCache --
-    /// Flushes internal UI caches. This function is exposed to Lua scripts.
-    /// @return | table | Table result returned by this call.
+    /// Flushes internal UI layout and render caches.
+    /// @return | nil | No value is returned.
     tbl.set(
         "flushCache",
         lua.create_function(move |_, ()| Ok(c.borrow_mut().flush_cache()))?,
@@ -5971,7 +6293,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let c = ctx.clone();
     // -- getActiveDrag --
     /// Returns the widget index currently being dragged, or nil.
-    /// @return | number | The dragged widget index.
+    /// @return | integer | The dragged widget index.
     tbl.set(
         "getActiveDrag",
         lua.create_function(move |_, ()| Ok(c.borrow().active_drag()))?,
@@ -6040,7 +6362,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- loadLayout --
     /// Loads a UI layout from a Lua table definition.
     /// @param | def | table | The layout definition table.
-    /// @return | number | The root widget index.
+    /// @return | integer | The root widget index.
     tbl.set(
         "loadLayout",
         lua.create_function(move |_, def: mlua::Table| {
@@ -6054,9 +6376,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
     let c = ctx.clone();
     // -- loadLayoutFile --
-    /// Loads a UI layout from a TOML file. This function is exposed to Lua scripts.
+    /// Loads a UI layout from a TOML layout file.
     /// @param | path | string | Path to the TOML layout file.
-    /// @return | number | The root widget index.
+    /// @return | integer | The root widget index.
     tbl.set(
         "loadLayoutFile",
         lua.create_function(move |_, path: String| {
@@ -6072,7 +6394,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
     let c = ctx.clone();
     // -- renderToImage --
-    /// Renders the UI to a PNG file. This function is exposed to Lua scripts.
+    /// Renders the entire UI to a PNG image file.
     /// @param | width | integer | Image width in pixels.
     /// @param | height | integer | Image height in pixels.
     /// @param | path | string | Output file path.
@@ -6084,6 +6406,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             crate::ui::render_to_image(&mut g, width, height, &path).map_err(mlua::Error::external)
         })?,
     )?;
+    /// Performs the 'ui' operation.
+    /// @return | nil | No value is returned.
     luna.set("ui", tbl)?;
     Ok(())
 }
@@ -6331,7 +6655,7 @@ pub struct LuaPieChart {
 impl LuaUserData for LuaPieChart {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addSegment --
-        /// Adds a segment to this pie chart. This method is available to Lua scripts.
+        /// Adds a labeled segment to this pie chart widget.
         /// @param | label | string | The segment label.
         /// @param | value | number | The segment value.
         /// @param | r | number | Red color component.

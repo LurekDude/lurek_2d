@@ -129,7 +129,7 @@ impl LuaUserData for LuaRingBuffer {
             Ok(was_full)
         });
         // -- pop --
-        /// Removes and returns the oldest value.
+        /// Removes and returns the oldest stored value from the ring buffer.
         /// @return | LuaValue | Oldest stored value, or nil when the buffer is empty.
         methods.add_method_mut("pop", |lua, this, ()| match this.inner.pop_front() {
             Some(key) => {
@@ -140,14 +140,14 @@ impl LuaUserData for LuaRingBuffer {
             None => Ok(LuaValue::Nil),
         });
         // -- peek --
-        /// Returns the oldest value without removing it.
+        /// Returns the oldest stored value without removing it from the ring buffer.
         /// @return | LuaValue | Oldest stored value, or nil when the buffer is empty.
         methods.add_method("peek", |lua, this, ()| match this.inner.front() {
             Some(key) => lua.registry_value::<LuaValue>(key),
             None => Ok(LuaValue::Nil),
         });
         // -- peekNewest --
-        /// Returns the newest value without removing it.
+        /// Returns the newest stored value without removing it from the ring buffer.
         /// @return | LuaValue | Newest stored value, or nil when the buffer is empty.
         methods.add_method("peekNewest", |lua, this, ()| match this.inner.back() {
             Some(key) => lua.registry_value::<LuaValue>(key),
@@ -158,7 +158,7 @@ impl LuaUserData for LuaRingBuffer {
         /// @return | integer | Current buffer length.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len() as i64));
         // -- capacity --
-        /// Returns the ring buffer capacity. This method is available to Lua scripts.
+        /// Returns the maximum capacity of the ring buffer.
         /// @return | integer | Maximum number of stored values.
         methods.add_method("capacity", |_, this, ()| Ok(this.capacity as i64));
         // -- isEmpty --
@@ -173,7 +173,7 @@ impl LuaUserData for LuaRingBuffer {
             |_, this, ()| Ok(this.inner.len() >= this.capacity),
         );
         // -- clear --
-        /// Removes every stored value and releases registry keys.
+        /// Removes every stored value and releases their registry keys.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |lua, this, ()| {
             while let Some(key) = this.inner.pop_front() {
@@ -275,7 +275,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- pack --
     /// Packs Lua values into a binary string using a format string.
     /// @param | fmt | string | Binary pack format string.
-    /// @param | vals | LuaValue | Values to pack according to the format.
+    /// @param | ... | any | Values to pack according to the format.
     /// @return | string | Packed binary byte string.
     tbl.set(
         "pack",
@@ -306,7 +306,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- getPackedSize --
     /// Computes the packed byte size for values and a format string.
     /// @param | fmt | string | Binary pack format string.
-    /// @param | vals | LuaValue | Values measured according to the format.
+    /// @param | ... | any | Values measured according to the format.
     /// @return | integer | Packed byte size.
     tbl.set(
         "getPackedSize",
@@ -352,7 +352,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- compressChunks --
     /// Compresses a string or table of strings as a chunked byte stream.
     /// @param | format_str | string | Compression format name.
-    /// @param | chunks | LuaValue | Binary string or array table of binary strings.
+    /// @param | chunks | any | Binary string or array table of binary strings.
     /// @param | level | integer? | Optional compression level; defaults to 6.
     /// @return | string | Compressed binary byte string.
     tbl.set(
@@ -372,7 +372,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- decompressChunks --
     /// Decompresses a string or table of strings as a chunked byte stream.
     /// @param | format_str | string | Compression format name.
-    /// @param | chunks | LuaValue | Binary string or array table of binary strings.
+    /// @param | chunks | any | Binary string or array table of binary strings.
     /// @return | string | Decompressed binary byte string.
     tbl.set(
         "decompressChunks",
@@ -433,7 +433,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- newByteData --
     /// Creates ByteData from a size or string.
     /// @param | value | any | Integer size for zeroed bytes, or string used as initial bytes.
-    /// @return | ByteData | New ByteData userdata.
+    /// @return | LByteData | New LByteData userdata.
     tbl.set(
         "newByteData",
         lua.create_function(|lua, value: LuaValue| {
@@ -475,7 +475,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- write --
     /// Writes binary values into a byte string using a format string.
     /// @param | fmt | string | Binary writer format string.
-    /// @param | vals | LuaValue | Values to write according to the format.
+    /// @param | ... | any | Values to write according to the format.
     /// @return | string | Binary byte string containing written values.
     tbl.set(
         "write",
@@ -515,7 +515,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- parseToml --
     /// Parses TOML text into Lua tables and scalar values.
     /// @param | text | string | TOML document text.
-    /// @return | LuaValue | Lua representation of the TOML document.
+    /// @return | table | Lua representation of the TOML document.
     tbl.set(
         "parseToml",
         lua.create_function(|lua, text: String| {
@@ -524,7 +524,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     // -- encodeToml --
-    /// Encodes a Lua table into TOML text. This function is exposed to Lua scripts.
+    /// Encodes a Lua table into a TOML document string.
     /// @param | tbl | table | Lua table to encode as TOML.
     /// @return | string | TOML document text.
     tbl.set(
@@ -590,6 +590,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    /// Performs the 'data' operation.
+    /// @return | nil | No value is returned.
     luna.set("data", tbl)?;
     Ok(())
 }
@@ -748,7 +750,7 @@ pub struct LuaDataWriter {
 impl LuaUserData for LuaDataWriter {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- writeU8 --
-        /// Writes an unsigned 8-bit integer. This method is available to Lua scripts.
+        /// Appends an unsigned 8-bit integer to the writer buffer.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeU8", |_, this, v: u8| {
@@ -756,7 +758,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeI8 --
-        /// Writes a signed 8-bit integer. This method is available to Lua scripts.
+        /// Appends a signed 8-bit integer to the writer buffer.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeI8", |_, this, v: i8| {
@@ -764,7 +766,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeU16LE --
-        /// Writes an unsigned 16-bit integer in little-endian order.
+        /// Appends an unsigned 16-bit integer in little-endian byte order.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeU16LE", |_, this, v: u16| {
@@ -772,7 +774,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeU16BE --
-        /// Writes an unsigned 16-bit integer in big-endian order.
+        /// Appends an unsigned 16-bit integer in big-endian byte order.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeU16BE", |_, this, v: u16| {
@@ -780,7 +782,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeI16LE --
-        /// Writes a signed 16-bit integer in little-endian order.
+        /// Appends a signed 16-bit integer in little-endian byte order.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeI16LE", |_, this, v: i16| {
@@ -788,7 +790,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeU32LE --
-        /// Writes an unsigned 32-bit integer in little-endian order.
+        /// Appends an unsigned 32-bit integer in little-endian byte order.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeU32LE", |_, this, v: u32| {
@@ -796,7 +798,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeI32LE --
-        /// Writes a signed 32-bit integer in little-endian order.
+        /// Appends a signed 32-bit integer in little-endian byte order.
         /// @param | v | integer | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeI32LE", |_, this, v: i32| {
@@ -804,7 +806,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeF32LE --
-        /// Writes a 32-bit float in little-endian order.
+        /// Appends a 32-bit float value in little-endian byte order.
         /// @param | v | number | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeF32LE", |_, this, v: f32| {
@@ -812,7 +814,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeF64LE --
-        /// Writes a 64-bit float in little-endian order.
+        /// Appends a 64-bit float value in little-endian byte order.
         /// @param | v | number | Value to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeF64LE", |_, this, v: f64| {
@@ -820,7 +822,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeString --
-        /// Writes a UTF-8 string to the writer.
+        /// Appends a UTF-8 encoded string to the writer buffer.
         /// @param | s | string | String contents to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeString", |_, this, s: String| {
@@ -828,7 +830,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- writeBytes --
-        /// Writes raw bytes from a Lua string to the writer.
+        /// Appends raw bytes from a Lua string to the writer buffer.
         /// @param | s | string | Raw byte string to write.
         /// @return | nil | No value is returned.
         methods.add_method_mut("writeBytes", |_, this, s: mlua::String| {
@@ -836,7 +838,7 @@ impl LuaUserData for LuaDataWriter {
             Ok(())
         });
         // -- seek --
-        /// Moves the writer cursor. This method is available to Lua scripts.
+        /// Moves the writer cursor to a specific byte position.
         /// @param | pos | integer | New cursor position in bytes.
         /// @return | nil | No value is returned.
         methods.add_method_mut("seek", |_, this, pos: usize| {
@@ -848,7 +850,7 @@ impl LuaUserData for LuaDataWriter {
         /// @return | integer | Current cursor position in bytes.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.tell()));
         // -- len --
-        /// Returns the writer buffer length. This method is available to Lua scripts.
+        /// Returns the current length of the writer buffer.
         /// @return | integer | Buffer length in bytes.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
         // -- toBytes --
@@ -874,7 +876,7 @@ impl LuaUserData for LuaDataWriter {
 impl mlua::UserData for ByteData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getSize --
-        /// Returns the byte buffer length. This method is available to Lua scripts.
+        /// Returns the byte buffer length in bytes.
         /// @return | integer | Buffer length in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.len()));
         // -- getString --
@@ -895,7 +897,7 @@ impl mlua::UserData for ByteData {
             })
         });
         // -- setByte --
-        /// Writes one byte at a zero-based offset.
+        /// Writes one byte at a zero-based offset inside the buffer.
         /// @param | offset | integer | Zero-based byte offset.
         /// @param | value | integer | Byte value from 0 to 255.
         /// @return | nil | No value is returned.
@@ -911,13 +913,13 @@ impl mlua::UserData for ByteData {
             }
         });
         // -- clone --
-        /// Returns a copy of this byte buffer. This method is available to Lua scripts.
-        /// @return | ByteData | New ByteData userdata containing copied bytes.
+        /// Returns a deep copy of the entire byte buffer.
+        /// @return | LByteData | New LByteData userdata containing copied bytes.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(this.clone_data())
         });
         // -- setBit --
-        /// Sets or clears one bit inside a byte.
+        /// Sets or clears one bit inside a byte at the given offset.
         /// @param | byte_offset | integer | Zero-based byte offset.
         /// @param | bit_offset | integer | Bit offset from 0 to 7 inside the byte.
         /// @param | value | boolean | True to set the bit, false to clear it.
@@ -949,7 +951,7 @@ impl mlua::UserData for ByteData {
             },
         );
         // -- getBit --
-        /// Reads one bit inside a byte. This method is available to Lua scripts.
+        /// Reads one bit inside a byte at the given offsets.
         /// @param | byte_offset | integer | Zero-based byte offset.
         /// @param | bit_offset | integer | Bit offset from 0 to 7 inside the byte.
         /// @return | boolean | True when the bit is set.
@@ -1007,5 +1009,16 @@ impl mlua::UserData for ByteData {
                 Ok(result)
             },
         );
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LByteData".
+        methods.add_method("type", |_, _, ()| Ok("LByteData"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "LByteData" or "Object").
+        /// @return | boolean | True if this object matches the given type.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LByteData" || name == "Object")
+        });
     }
 }

@@ -41,7 +41,7 @@ impl LuaUserData for LuaUniverse {
         /// Stores or replaces a component value on an entity.
         /// @param | id | integer | Entity id that receives the component.
         /// @param | name | string | Component name.
-        /// @param | value | LuaValue | Lua value stored as the component payload.
+        /// @param | value | any | Lua value stored as the component payload.
         /// @return | nil | No value is returned.
         methods.add_method(
             "set",
@@ -53,7 +53,7 @@ impl LuaUserData for LuaUniverse {
         /// Returns a component value from an entity.
         /// @param | id | integer | Entity id to read.
         /// @param | name | string | Component name to read.
-        /// @return | LuaValue | Stored component value, or nil when the entity does not have that component.
+        /// @return | table|number|string|boolean|nil | Stored component value, or nil when the entity does not have that component.
         methods.add_method("get", |lua, this, (id, name): (u32, String)| {
             this.inner.borrow().get_component(lua, id, &name)
         });
@@ -120,7 +120,7 @@ impl LuaUserData for LuaUniverse {
         // -- addSystem --
         /// Registers a Lua system table with optional phase, priority, name, and dependency metadata.
         /// @param | system | table | System table containing update, render, draw, or event methods.
-        /// @param | opts | table | Optional table with priority, phase, name, and after fields.
+        /// @param | opts? | table | Optional table with priority, phase, name, and after fields.
         /// @return | nil | No value is returned.
         methods.add_method(
             "addSystem",
@@ -209,7 +209,7 @@ impl LuaUserData for LuaUniverse {
         // -- emit --
         /// Calls matching event-named functions on registered systems.
         /// @param | event | string | Function name looked up on each system table.
-        /// @param | ... | LuaValue | Extra values forwarded after the system and universe arguments.
+        /// @param | ... | any | Extra values forwarded after the system and universe arguments.
         /// @return | nil | No value is returned.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
@@ -321,28 +321,44 @@ impl LuaUserData for LuaUniverse {
             let added = lua.create_table()?;
             for (i, (id, name)) in diff.added_components.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Performs the 'entity_id' operation.
+                /// @return | nil | No value is returned.
                 entry.set("entity_id", *id)?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 added.set(i + 1, entry)?;
             }
+            /// Performs the 'added_components' operation.
+            /// @return | nil | No value is returned.
             out.set("added_components", added)?;
             let removed = lua.create_table()?;
             for (i, (id, name)) in diff.removed_components.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Performs the 'entity_id' operation.
+                /// @return | nil | No value is returned.
                 entry.set("entity_id", *id)?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 removed.set(i + 1, entry)?;
             }
+            /// Performs the 'removed_components' operation.
+            /// @return | nil | No value is returned.
             out.set("removed_components", removed)?;
             let deleted = lua.create_table()?;
             for (i, id) in diff.deleted_entities.iter().enumerate() {
                 deleted.set(i + 1, *id)?;
             }
+            /// Performs the 'deleted_entities' operation.
+            /// @return | nil | No value is returned.
             out.set("deleted_entities", deleted)?;
             let dirty = lua.create_table()?;
             for (i, id) in diff.dirty_entities.iter().enumerate() {
                 dirty.set(i + 1, *id)?;
             }
+            /// Performs the 'dirty_entities' operation.
+            /// @return | nil | No value is returned.
             out.set("dirty_entities", dirty)?;
             Ok(out)
         });
@@ -357,7 +373,7 @@ impl LuaUserData for LuaUniverse {
             this.inner.borrow_mut().clear(lua)
         });
         // -- addTag --
-        /// Adds a string tag to an entity. This method is available to Lua scripts.
+        /// Assigns a string tag name to an entity in this universe.
         /// @param | id | integer | Entity id to tag.
         /// @param | tag | string | Tag name to add.
         /// @return | nil | No value is returned.
@@ -487,7 +503,8 @@ impl LuaUserData for LuaUniverse {
         // -- getBitmapTagBit --
         /// Returns the bit index assigned to a bitmap tag name.
         /// @param | name | string | Bitmap tag name to inspect.
-        /// @return | LuaValue | Bit index when the tag exists, or nil when the tag is undefined.
+        /// @return | integer | Bit index when the tag exists.
+        /// @return | nil | When the tag is undefined.
         methods.add_method("getBitmapTagBit", |_, this, name: String| {
             Ok(this.inner.borrow().get_bitmap_tag_bit(&name))
         });
@@ -521,7 +538,7 @@ impl LuaUserData for LuaUniverse {
         // -- spawnBlueprint --
         /// Spawns an entity from a named blueprint with optional component overrides.
         /// @param | name | string | Blueprint name to instantiate.
-        /// @param | overrides | table | Optional component overrides applied to this spawn.
+        /// @param | overrides? | table | Optional component overrides applied to this spawn.
         /// @return | integer | Entity id created from the blueprint.
         methods.add_method(
             "spawnBlueprint",
@@ -561,7 +578,7 @@ impl LuaUserData for LuaUniverse {
         // -- setParent --
         /// Sets or clears the parent entity for a child entity.
         /// @param | child_id | integer | Entity id whose parent changes.
-        /// @param | parent_id | integer | Optional parent entity id; nil clears the parent.
+        /// @param | parent_id? | integer | Parent entity id, or nil to clear the parent.
         /// @return | nil | No value is returned.
         methods.add_method(
             "setParent",
@@ -573,7 +590,8 @@ impl LuaUserData for LuaUniverse {
         // -- getParent --
         /// Returns the parent entity id for a child entity.
         /// @param | child_id | integer | Entity id whose parent is read.
-        /// @return | LuaValue | Parent entity id, or nil when the entity has no parent.
+        /// @return | integer | Parent entity id.
+        /// @return | nil | When the entity has no parent.
         methods.add_method("getParent", |_, this, child_id: u32| {
             Ok(this.inner.borrow().get_parent(child_id))
         });
@@ -708,7 +726,7 @@ impl LuaUserData for LuaUniverse {
         /// Spawns multiple entities from a blueprint using shared optional overrides.
         /// @param | name | string | Blueprint name to instantiate.
         /// @param | count | integer | Number of entities to spawn.
-        /// @param | overrides | table | Optional component overrides applied to each spawned entity.
+        /// @param | overrides? | table | Optional component overrides applied to each spawned entity.
         /// @return | table | Array table of spawned entity ids.
         methods.add_method(
             "spawnBulk",
@@ -817,6 +835,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    /// Performs the 'ecs' operation.
+    /// @return | nil | No value is returned.
     lurek.set("ecs", tbl)?;
     Ok(())
 }

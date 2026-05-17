@@ -20,7 +20,10 @@ describe("evidence: bezier", function()
         expect_true(curve:getControlPointCount() == 3, "quadratic curve must have 3 control points")
 
         -- draw control polygon
-        local function cp(i) return curve:getControlPoint(i) end
+        local function cp(i)
+            local x, y = curve:getControlPoint(i)
+            return x --[[@as number]], y --[[@as number]]
+        end
         local cx1,cy1 = cp(1) ; local cx2,cy2 = cp(2) ; local cx3,cy3 = cp(3)
         img:drawLine(cx1, cy1, cx2, cy2, 180, 180, 180, 255)
         img:drawLine(cx2, cy2, cx3, cy3, 180, 180, 180, 255)

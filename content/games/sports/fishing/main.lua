@@ -259,7 +259,6 @@ function lurek.process(delta)
   end
 
   -- Quit
-  ---@diagnostic disable-next-line: undefined-field
   if lurek.input.keyboard.isDown("quit") then
     lurek.event.quit()
     return

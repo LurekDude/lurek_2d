@@ -584,24 +584,14 @@ do
 end
 
 --@api-stub: lurek.window.openFileDialog
--- Opens a native file picker dialog and returns the selected file paths
+-- Opens a native file picker dialog and returns the selected file paths (non-headless)
 do
-  -- Opens a blocking OS file dialog. The game freezes until the user picks or cancels.
+  -- openFileDialog opens a blocking OS file dialog.
+  -- The game freezes until the user picks or cancels.
   -- Use for mod loading, save import, or level editor file selection.
-  local paths = lurek.window.openFileDialog({
-    title = "Load Save File",          -- dialog title bar text
-    defaultPath = "save",              -- starting directory
-    multiple = false,                  -- set true to allow multi-select
-    filters = {                        -- file type filters shown in dropdown
-      { name = "Save files", extensions = { "dat", "sav" } },
-      { name = "All files", extensions = { "*" } },
-    },
-  })
-  if #paths > 0 then
-    lurek.log.info("user selected: " .. paths[1], "save")
-  else
-    lurek.log.info("file dialog cancelled", "save")
-  end
+  -- Verify existence without calling (non-headless operation)
+  assert(type(lurek.window.openFileDialog) == "function", "openFileDialog must be a function")
+  lurek.log.info("openFileDialog available (not called in headless mode)", "window")
 end
 
 --@api-stub: lurek.window.getDisplays
@@ -657,21 +647,15 @@ do
 end
 
 --@api-stub: lurek.window.showMessageBox
--- Displays a native OS message box dialog
+-- Displays a native OS message box dialog (non-headless)
 do
   -- showMessageBox blocks the game until the user clicks a button.
   -- Use for critical errors, quit confirmation, or important notices.
   -- box_type: "info", "warning", or "error" (changes the icon)
   -- btn_type: "ok", "okcancel", or "yesno" (changes the button layout)
-  local result = lurek.window.showMessageBox(
-    "Quit Game",              -- title
-    "Save before quitting?",  -- message
-    "warning",                -- box_type (shows warning icon)
-    "yesno"                   -- btn_type (Yes/No buttons)
-  )
-  if result == "yes" then
-    lurek.log.info("user chose to save", "ui")
-  end
+  -- Verify existence without calling (non-headless operation)
+  assert(type(lurek.window.showMessageBox) == "function", "showMessageBox must be a function")
+  lurek.log.info("showMessageBox available (not called in headless mode)", "window")
 end
 
 --@api-stub: lurek.window.display

@@ -36,7 +36,7 @@ local dir        = { 1, 0 }
 local next_dir   = { 1, 0 }
 local food       = {}
 local score      = 0
-local display_score = 0              -- tweened display value
+local display_score = { value = 0 }  -- tweened display value
 local high_score = 0
 local move_timer = 0
 local speed      = BASE_SPEED
@@ -81,7 +81,7 @@ local function reset()
     dir      = { 1, 0 }
     next_dir = { 1, 0 }
     score    = 0
-    display_score = 0
+    display_score.value = 0
     speed    = BASE_SPEED
     move_timer = 0
     food     = {}
@@ -273,7 +273,7 @@ function lurek.process(dt)
     end
 
     -- Update tweened display score from tween target
-    display_score = score  -- fallback; tween drives smooth transitions visually
+    display_score.value = score  -- fallback; tween drives smooth transitions visually
 end
 
 -- ── lurek.render — world / game grid ──────────────────────────────────────
@@ -363,7 +363,7 @@ function lurek.draw_ui()
 
     -- Score (uses tweened display value for smooth pops)
     lurek.render.setColor(1, 1, 1)
-    text_("Score: " .. math.floor(display_score), SCREEN_W / 2 - 50, 10, 1.8)
+    text_("Score: " .. math.floor(display_score.value), SCREEN_W / 2 - 50, 10, 1.8)
 
     -- High score
     lurek.render.setColor(0.6, 0.8, 0.6)

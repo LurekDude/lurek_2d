@@ -173,7 +173,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getLastError --
     /// Returns the last automation error message when one exists.
-    /// @return | LuaValue | Last error string, or nil when no error is stored.
+    /// @return | string | Last error string.
+    /// @return | nil | Nil when no error is stored.
     let sim = simulator.clone();
     tbl.set(
         "getLastError",
@@ -219,7 +220,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getCurrentScript --
     /// Returns the current script name when a script is active.
-    /// @return | LuaValue | Current script name, or nil when no script is active.
+    /// @return | string | Current script name.
+    /// @return | nil | Nil when no script is active.
     let sim = simulator.clone();
     tbl.set(
         "getCurrentScript",
@@ -251,7 +253,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getStepLimit --
     /// Returns the configured step limit for a loaded script.
     /// @param | name | string | Script name to query.
-    /// @return | LuaValue | Step limit as an integer, or nil when no limit is set.
+    /// @return | integer | Step limit.
+    /// @return | nil | Nil when no limit is set.
     let sim = simulator.clone();
     tbl.set(
         "getStepLimit",
@@ -371,6 +374,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Performs the 'automation' operation.
+    /// @return | nil | No value is returned.
     lurek.set("automation", tbl)?;
     Ok(())
 }

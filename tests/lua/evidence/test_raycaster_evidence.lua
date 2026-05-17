@@ -34,7 +34,7 @@ describe("Evidence: lurek.raycaster API contracts", function()
             local top, bottom = lurek.raycaster.projectColumn(dist, FOV, H)
             local brightness = math.floor(shade * 200 + 0.5)
             for y = 0, H - 1 do
-                if y >= math.floor(top) and y <= math.floor(bottom) then
+                if y >= math.floor(top --[[@as number]]) and y <= math.floor(bottom --[[@as number]]) then
                     img:setPixel(col, y, brightness, brightness, brightness, 255)
                 else
                     -- ceiling or floor

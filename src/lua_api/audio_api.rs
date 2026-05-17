@@ -986,10 +986,10 @@ impl LuaUserData for LuaSoundPool {
         methods.add_method("type", |_, _this, ()| Ok("LSoundPool"));
         // -- typeOf --
         /// Checks whether this object matches the given type name.
-        /// @param | name | string | Type name to check (e.g. "SoundPool" or "Object").
+        /// @param | name | string | Type name to check (e.g. "LSoundPool" or "Object").
         /// @return | boolean | True if this object matches the given type.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "SoundPool" || name == "Object")
+            Ok(name == "LSoundPool" || name == "SoundPool" || name == "Object")
         });
     }
 }
@@ -1000,8 +1000,8 @@ pub struct LuaDecoder {
 impl LuaUserData for LuaDecoder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- decode --
-        /// Decodes the next chunk of audio data and returns it as a SoundData object.
-        /// @return | SoundData | Decoded PCM data, or nil if end of stream reached.
+        /// Decodes the next chunk of audio data and returns it as a LSoundData object.
+        /// @return | LSoundData | Decoded PCM data, or nil if end of stream reached.
         methods.add_method_mut("decode", |lua, this, ()| match this.inner.decode() {
             Some(pcm_i16) => {
                 let samples: Vec<f32> = pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
@@ -1931,8 +1931,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Sets the midi sound font for Lua scripts in this module.
-    /// @param | path | string | Path-like input used by this call.
+    /// Sets the SoundFont file used for MIDI synthesis.
+    /// @param | path | string | Relative path to the .sf2 SoundFont file.
     /// @return | nil | No return value.
     tbl.set(
         "setMidiSoundFont",
@@ -1952,14 +1952,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Returns true if midi sound font for Lua scripts in this module.
-    /// @return | nil | No return value.
+    /// Returns whether a SoundFont file has been loaded for MIDI synthesis.
+    /// @return | boolean | True if a SoundFont is loaded.
     tbl.set(
         "hasMidiSoundFont",
         lua.create_function(move |_, ()| Ok(s.borrow().midi_state.has_soundfont()))?,
     )?;
     let s = state.clone();
-    /// Clears midi sound font for Lua scripts in this module.
+    /// Clears the loaded SoundFont and reverts MIDI synthesis to default.
     /// @return | nil | No return value.
     tbl.set(
         "clearMidiSoundFont",
@@ -2041,8 +2041,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Play queueable for Lua scripts in this module.
-    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// Starts playback of a queueable audio source.
+    /// @param | qsource_id | integer | Queueable source handle returned by newQueueableSource.
     /// @return | nil | No return value.
     tbl.set(
         "playQueueable",
@@ -2053,8 +2053,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Stop queueable for Lua scripts in this module.
-    /// @param | qsource_id | integer | Lua argument for `qsource_id`.
+    /// Stops playback of a queueable audio source.
+    /// @param | qsource_id | integer | Queueable source handle returned by newQueueableSource.
     /// @return | nil | No return value.
     tbl.set(
         "stopQueueable",
@@ -2064,8 +2064,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
-    /// Returns the playback devices for Lua scripts in this module.
-    /// @return | table | Table result returned by this call.
+    /// Returns a list of available audio playback device names.
+    /// @return | table | Array of device name strings.
     tbl.set(
         "getPlaybackDevices",
         lua.create_function(|lua, ()| {
@@ -2077,14 +2077,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(t)
         })?,
     )?;
-    /// Returns the playback device for Lua scripts in this module.
-    /// @return | table | Table result returned by this call.
+    /// Returns the name of the currently active audio playback device.
+    /// @return | string | Current playback device name.
     tbl.set(
         "getPlaybackDevice",
         lua.create_function(|_, ()| Ok(crate::audio::get_playback_device()))?,
     )?;
-    /// Sets the playback device for Lua scripts in this module.
-    /// @param | name | string | String value for `name`.
+    /// Sets the active audio playback device by name.
+    /// @param | name | string | Name of the playback device to activate.
     /// @return | nil | No return value.
     tbl.set(
         "setPlaybackDevice",
@@ -2094,9 +2094,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Create_bus for Lua scripts in this module.
-    /// @param | name | string | String value for `name`.
-    /// @param | parent_name | string? | Lua argument for `parent_name`.
+    /// Creates a named audio bus, optionally parented to another bus.
+    /// @param | name | string | Unique name for the new bus.
+    /// @param | parent_name | string? | Name of the parent bus, or nil for a root bus.
     /// @return | nil | No return value.
     tbl.set(
         "create_bus",
@@ -2160,10 +2160,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
-    /// Remove_effect for Lua scripts in this module.
-    /// @param | bus_name | string | Lua argument for `bus_name`.
-    /// @param | effect_id | integer | Lua argument for `effect_id`.
-    /// @return | nil | No return value.
+    /// Removes an effect from a named audio bus by effect ID.
+    /// @param | bus_name | string | Name of the audio bus.
+    /// @param | effect_id | integer | Effect ID returned by add_effect.
+    /// @return | boolean | True if the effect was successfully removed.
     tbl.set(
         "remove_effect",
         lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
@@ -2182,12 +2182,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Set_effect_param for Lua scripts in this module.
-    /// @param | bus_name | string | Lua argument for `bus_name`.
-    /// @param | effect_id | integer | Lua argument for `effect_id`.
-    /// @param | param_name | string | Lua argument for `param_name`.
-    /// @param | value | number | Lua argument for `value`.
-    /// @return | nil | No return value.
+    /// Sets a parameter value on an effect attached to a named audio bus.
+    /// @param | bus_name | string | Name of the audio bus.
+    /// @param | effect_id | integer | Effect ID returned by add_effect.
+    /// @param | param_name | string | Name of the effect parameter to set.
+    /// @param | value | number | New value for the parameter.
+    /// @return | boolean | True if the parameter was set successfully.
     tbl.set(
         "set_effect_param",
         lua.create_function(
@@ -2601,10 +2601,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
-    /// Normalize file for Lua scripts in this module.
-    /// @param | input | string | Lua argument for `input`.
-    /// @param | output | string | Lua argument for `output`.
-    /// @param | target | number | Lua argument for `target`.
+    /// Normalizes an audio file to a target peak amplitude and saves the result.
+    /// @param | input | string | Relative path to the input audio file.
+    /// @param | output | string | Relative path for the output WAV file.
+    /// @param | target | number | Target peak amplitude (e.g. 0.9 for headroom).
     /// @return | nil | No return value.
     tbl.set(
         "normalizeFile",
@@ -2620,11 +2620,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
-    /// Waveform to png for Lua scripts in this module.
-    /// @param | input | string | Lua argument for `input`.
-    /// @param | output | string | Lua argument for `output`.
-    /// @param | width | integer | Numeric `width` argument for this call.
-    /// @param | height | integer | Numeric `height` argument for this call.
+    /// Renders a waveform visualization of an audio file and saves it as a PNG image.
+    /// @param | input | string | Relative path to the input audio file.
+    /// @param | output | string | Relative path for the output PNG file.
+    /// @param | width | integer | Image width in pixels.
+    /// @param | height | integer | Image height in pixels.
     /// @return | nil | No return value.
     tbl.set(
         "waveformToPng",
@@ -2642,11 +2642,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     let s = state.clone();
-    /// Spectrogram to png for Lua scripts in this module.
-    /// @param | input | string | Lua argument for `input`.
-    /// @param | output | string | Lua argument for `output`.
-    /// @param | width | integer | Numeric `width` argument for this call.
-    /// @param | height | integer | Numeric `height` argument for this call.
+    /// Renders a spectrogram visualization of an audio file and saves it as a PNG image.
+    /// @param | input | string | Relative path to the input audio file.
+    /// @param | output | string | Relative path for the output PNG file.
+    /// @param | width | integer | Image width in pixels.
+    /// @param | height | integer | Image height in pixels.
     /// @return | nil | No return value.
     tbl.set(
         "spectrogramToPng",
@@ -2668,6 +2668,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// Performs the 'audio' operation.
+    /// @return | nil | No value is returned.
     lurek.set("audio", tbl)?;
     Ok(())
 }
@@ -2750,6 +2752,17 @@ impl mlua::UserData for SoundData {
                     index
                 )))
             }
+        });
+        // -- type --
+        /// Returns the type name of this object for runtime type-checking.
+        /// @return | string | Always returns "LSoundData".
+        methods.add_method("type", |_, _, ()| Ok("LSoundData"));
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check (e.g. "LSoundData" or "Object").
+        /// @return | boolean | True if this object matches the given type.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSoundData" || name == "Object")
         });
     }
 }

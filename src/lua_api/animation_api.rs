@@ -185,9 +185,17 @@ impl LuaUserData for LuaAnimation {
         methods.add_method("getQuad", |lua, this, ()| {
             if let Some(q) = this.inner.current_quad() {
                 let t = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 t.set("x", q.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 t.set("y", q.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 t.set("w", q.width)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 t.set("h", q.height)?;
                 Ok(LuaValue::Table(t))
             } else {
@@ -202,8 +210,12 @@ impl LuaUserData for LuaAnimation {
             let tbl = lua.create_table()?;
             for (i, ev) in events.iter().enumerate() {
                 let ev_tbl = lua.create_table()?;
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 ev_tbl.set("type", ev.type_name())?;
                 if let Some(idx) = ev.frame_index() {
+                    /// Performs the 'frame' operation.
+                    /// @return | nil | No value is returned.
                     ev_tbl.set("frame", idx)?;
                 }
                 tbl.set(i + 1, ev_tbl)?;
@@ -281,18 +293,40 @@ impl LuaUserData for LuaAnimation {
                 None => Ok(LuaValue::Nil),
                 Some((from_q, to_q, blend)) => {
                     let from = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     from.set("x", from_q.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     from.set("y", from_q.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     from.set("w", from_q.width)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     from.set("h", from_q.height)?;
                     let to = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     to.set("x", to_q.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     to.set("y", to_q.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     to.set("w", to_q.width)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     to.set("h", to_q.height)?;
                     let t = lua.create_table()?;
+                    /// Performs the 'from' operation.
+                    /// @return | nil | No value is returned.
                     t.set("from", from)?;
+                    /// Performs the 'to' operation.
+                    /// @return | nil | No value is returned.
                     t.set("to", to)?;
+                    /// Performs the 'blend' operation.
+                    /// @return | nil | No value is returned.
                     t.set("blend", blend)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -302,7 +336,7 @@ impl LuaUserData for LuaAnimation {
         /// Rasterizes the current animation frame into an image userdata.
         /// @param | w | integer | Output image width in pixels.
         /// @param | h | integer | Output image height in pixels.
-        /// @return | ImageData | Image data containing the rendered frame.
+        /// @return | LImageData | Image data containing the rendered frame.
         methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
             lua.create_userdata(img)
@@ -311,7 +345,7 @@ impl LuaUserData for LuaAnimation {
         /// Rasterizes all animation frames into a preview grid image.
         /// @param | columns | integer | Number of columns in the preview grid.
         /// @param | cell_size | integer | Size of each preview cell in pixels.
-        /// @return | ImageData | Image data containing the preview grid.
+        /// @return | LImageData | Image data containing the preview grid.
         methods.add_method(
             "drawPreviewGrid",
             |lua, this, (columns, cell_size): (u32, u32)| {
@@ -417,9 +451,17 @@ impl LuaUserData for LuaAnimStateMachine {
             let anim = this.inner.get_animation();
             if let Some(q) = anim.current_quad() {
                 let t = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 t.set("x", q.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 t.set("y", q.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 t.set("w", q.width)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 t.set("h", q.height)?;
                 Ok(LuaValue::Table(t))
             } else {
@@ -524,13 +566,21 @@ impl LuaUserData for LuaBlendLayerSet {
             let out = lua.create_table()?;
             for (i, layer) in this.inner.layers().iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 t.set("name", layer.name.clone())?;
+                /// Performs the 'clip_name' operation.
+                /// @return | nil | No value is returned.
                 t.set("clip_name", layer.clip_name.clone())?;
+                /// Performs the 'weight' operation.
+                /// @return | nil | No value is returned.
                 t.set("weight", layer.weight)?;
                 let bones = lua.create_table()?;
                 for (j, b) in layer.mask.bone_names.iter().enumerate() {
                     bones.set(j + 1, b.clone())?;
                 }
+                /// Performs the 'bones' operation.
+                /// @return | nil | No value is returned.
                 t.set("bones", bones)?;
                 out.set(i + 1, t)?;
             }
@@ -665,6 +715,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let out = lua.create_table()?;
             let anim_clone_for_sm = anim.clone();
             let anim_ud = lua.create_userdata(LuaAnimation { inner: anim })?;
+            /// Performs the 'animation' operation.
+            /// @return | nil | No value is returned.
             out.set("animation", anim_ud)?;
             if let Some(states) = cfg.get::<_, Option<LuaTable>>("states")? {
                 let initial_state = cfg
@@ -689,11 +741,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     }
                 }
                 let sm_ud = lua.create_userdata(LuaAnimStateMachine { inner: sm })?;
+                /// Performs the 'stateMachine' operation.
+                /// @return | nil | No value is returned.
                 out.set("stateMachine", sm_ud)?;
             }
             Ok(out)
         })?,
     )?;
+    /// Performs the 'animation' operation.
+    /// @return | nil | No value is returned.
     luna.set("animation", tbl)?;
     Ok(())
 }

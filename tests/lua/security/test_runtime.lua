@@ -109,9 +109,9 @@ describe("validation: TOML edge cases", function()
     -- @security lurek.data.encodeToml
     it("encodeToml rejects non-table input", function()
         -- encodeToml should only accept table values
+        local bad_input = "not a table" ---@type any
         expect_error(function()
-            ---@diagnostic disable-next-line: param-type-mismatch
-            lurek.data.encodeToml("not a table")
+            lurek.data.encodeToml(bad_input)
         end, "string input should error")
     end)
 

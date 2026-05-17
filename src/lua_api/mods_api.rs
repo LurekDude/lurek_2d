@@ -57,18 +57,38 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
 /// Converts a Rust `ModInfo` value into a Lua table.
 fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
+    /// Performs the 'id' operation.
+    /// @return | nil | No value is returned.
     t.set("id", info.id.as_str())?;
+    /// Performs the 'name' operation.
+    /// @return | nil | No value is returned.
     t.set("name", info.name.as_str())?;
+    /// Performs the 'version' operation.
+    /// @return | nil | No value is returned.
     t.set("version", info.version.as_str())?;
+    /// Performs the 'author' operation.
+    /// @return | nil | No value is returned.
     t.set("author", info.author.as_str())?;
+    /// Performs the 'description' operation.
+    /// @return | nil | No value is returned.
     t.set("description", info.description.as_str())?;
+    /// Performs the 'priority' operation.
+    /// @return | nil | No value is returned.
     t.set("priority", info.priority)?;
+    /// Performs the 'enabled' operation.
+    /// @return | nil | No value is returned.
     t.set("enabled", info.enabled)?;
+    /// Performs the 'loaded' operation.
+    /// @return | nil | No value is returned.
     t.set("loaded", info.loaded)?;
     if let Some(ref p) = info.path {
+        /// Performs the 'path' operation.
+        /// @return | nil | No value is returned.
         t.set("path", p.as_str() as &str)?;
     }
     if let Some(ref av) = info.api_version {
+        /// Performs the 'api_version' operation.
+        /// @return | nil | No value is returned.
         t.set("api_version", av.as_str())?;
     }
     let caps = {
@@ -78,18 +98,28 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
         }
         c
     };
+    /// Performs the 'capabilities' operation.
+    /// @return | nil | No value is returned.
     t.set("capabilities", caps)?;
     let schema = {
         let s = lua.create_table()?;
         for (i, (key, type_hint, default)) in info.config_schema.iter().enumerate() {
             let entry = lua.create_table()?;
+            /// Performs the 'key' operation.
+            /// @return | nil | No value is returned.
             entry.set("key", key.as_str())?;
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             entry.set("type", type_hint.as_str())?;
+            /// Performs the 'default' operation.
+            /// @return | nil | No value is returned.
             entry.set("default", default.as_str())?;
             s.set(i + 1, entry)?;
         }
         s
     };
+    /// Performs the 'config_schema' operation.
+    /// @return | nil | No value is returned.
     t.set("config_schema", schema)?;
     let assets = {
         let a = lua.create_table()?;
@@ -98,14 +128,20 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
         }
         a
     };
+    /// Performs the 'assets' operation.
+    /// @return | nil | No value is returned.
     t.set("assets", assets)?;
     if let Some(ref signature) = info.signature {
+        /// Performs the 'signature' operation.
+        /// @return | nil | No value is returned.
         t.set("signature", signature.as_str())?;
     }
     let deps = lua.create_table()?;
     for (i, dep) in info.dependencies.iter().enumerate() {
         deps.set(i + 1, dep.as_str() as &str)?;
     }
+    /// Performs the 'dependencies' operation.
+    /// @return | nil | No value is returned.
     t.set("dependencies", deps)?;
     Ok(t)
 }
@@ -233,8 +269,14 @@ impl LuaUserData for LuaMod {
             let t = lua.create_table()?;
             for (i, (key, type_hint, default)) in this.inner.config_schema.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Performs the 'key' operation.
+                /// @return | nil | No value is returned.
                 entry.set("key", key.as_str())?;
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 entry.set("type", type_hint.as_str())?;
+                /// Performs the 'default' operation.
+                /// @return | nil | No value is returned.
                 entry.set("default", default.as_str())?;
                 t.set(i + 1, entry)?;
             }
@@ -261,7 +303,6 @@ impl LuaUserData for LuaMod {
         /// Stores a Lua hook function by name. This method is available to Lua scripts.
         /// @param | name | string | Hook name.
         /// @param | func | function | Hook callback function.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setHook",
             |lua, this, (name, func): (String, LuaFunction)| {
@@ -316,7 +357,7 @@ impl LuaUserData for LuaMod {
         });
         // -- getConfig --
         /// Returns the stored Lua config value.
-        /// @return | LuaValue | Stored config value, or nil when unset.
+        /// @return | any | Stored config value, or nil when unset.
         methods.add_method("getConfig", |lua, this, ()| {
             if let Some(key) = &this.config {
                 lua.registry_value::<LuaValue>(key)
@@ -542,7 +583,6 @@ impl LuaUserData for LuaContentRegistry {
         /// @param | type_name | string | Content type name.
         /// @param | id | string | Entry id.
         /// @param | obj | any | Lua value to store.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "register",
             |lua, this, (type_name, id, obj): (String, String, LuaValue)| {
@@ -561,7 +601,7 @@ impl LuaUserData for LuaContentRegistry {
         /// Returns one stored value by content type and id.
         /// @param | type_name | string | Content type name.
         /// @param | id | string | Entry id.
-        /// @return | LuaValue | Stored Lua value, or nil when missing.
+        /// @return | any | Stored Lua value, or nil when missing.
         methods.add_method("get", |lua, this, (type_name, id): (String, String)| {
             let val = this
                 .entries
@@ -729,6 +769,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok((true, LuaValue::Nil))
         })?,
     )?;
+    /// Performs the 'mods' operation.
+    /// @return | nil | No value is returned.
     lurek.set("mods", tbl)?;
     Ok(())
 }

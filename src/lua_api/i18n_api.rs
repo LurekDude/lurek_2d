@@ -117,8 +117,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     let s = shared.clone();
     // -- getLanguage --
-    /// Returns the active locale code. This function is exposed to Lua scripts.
-    /// @return | LuaValue | Active locale string, or nil when no locale is active.
+    /// Returns the active locale code string.
+    /// @return | string | Active locale string, or nil when no locale is active.
     loc.set(
         "getLanguage",
         lua.create_function(move |lua, ()| {
@@ -182,8 +182,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- t --
     /// Translates a key using the active locale, optional variables, and optional English plural selection.
     /// @param | key | string | Translation key.
-    /// @param | vars | table | Optional interpolation variables.
-    /// @param | count | number | Optional plural count, also inserted as `{count}` when variables are used.
+    /// @param | vars? | table | Interpolation variables.
+    /// @param | count? | number | Plural count, also inserted as `{count}` when variables are used.
     /// @return | string | Translated and interpolated text, or the catalog fallback for the key.
     loc.set(
         "t",
@@ -420,7 +420,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- search --
     /// Searches translation keys and values for a query string.
     /// @param | query | string | Search query.
-    /// @param | limit | integer | Optional maximum result count; zero or nil means no truncation.
+    /// @param | limit? | integer | Maximum result count; zero or nil means no truncation.
     /// @return | table | Array table of rows with `key` and `value` fields.
     loc.set(
         "search",
@@ -435,7 +435,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let tbl = lua.create_table()?;
             for (i, (k, v)) in results.iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'key' operation.
+                /// @return | nil | No value is returned.
                 row.set("key", k.as_str())?;
+                /// Performs the 'value' operation.
+                /// @return | nil | No value is returned.
                 row.set("value", v.as_str())?;
                 tbl.set(i + 1, row)?;
             }
@@ -465,7 +469,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Searches a prebuilt word index and returns matching keys.
     /// @param | index | table | Index table returned by `buildIndex`.
     /// @param | query | string | Search query.
-    /// @param | limit | integer | Optional maximum key count; zero or nil means no truncation.
+    /// @param | limit? | integer | Maximum key count; zero or nil means no truncation.
     /// @return | table | Array table of matching translation keys.
     loc.set(
         "searchIndexed",
@@ -534,7 +538,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- formatNumber --
     /// Formats a number with locale-aware separators and optional decimal precision.
     /// @param | n | number | Number to format.
-    /// @param | opts | table | Optional table with `decimals` field, defaulting to 2.
+    /// @param | opts? | table | Table with `decimals` field, defaulting to 2.
     /// @return | string | Formatted number string.
     loc.set(
         "formatNumber",
@@ -551,7 +555,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- formatDate --
     /// Formats a timestamp with the active locale and a named format.
     /// @param | timestamp | integer | Unix timestamp value.
-    /// @param | fmt | string | Optional format name, defaulting to `short`.
+    /// @param | fmt? | string | Format name, defaulting to `short`.
     /// @return | string | Formatted date string.
     loc.set(
         "formatDate",
@@ -566,7 +570,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Translates a gender-specific key variant when present, then falls back to the base key.
     /// @param | key | string | Base translation key.
     /// @param | gender | string | Gender suffix appended to the key.
-    /// @param | vars | table | Optional interpolation variables.
+    /// @param | vars? | table | Interpolation variables.
     /// @return | string | Gender-specific or fallback translated text.
     loc.set(
         "tGender",
@@ -612,7 +616,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let s = shared.clone();
     // -- isRTL --
     /// Returns whether a locale is written right-to-left.
-    /// @param | locale | string? | Optional locale code; defaults to the active locale.
+    /// @param | locale? | string | Locale code; defaults to the active locale.
     /// @return | boolean | True for right-to-left locales.
     loc.set(
         "isRTL",
@@ -631,7 +635,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- detectLocale --
     /// Detects the system locale when available.
-    /// @return | LuaValue | Locale string, or nil when detection fails.
+    /// @return | string | Locale string, or nil when detection fails.
     loc.set(
         "detectLocale",
         lua.create_function(|lua, ()| match detect_system_locale() {
@@ -677,17 +681,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let tbl = lua.create_table()?;
             for (i, gap) in gaps.iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'key' operation.
+                /// @return | nil | No value is returned.
                 row.set("key", gap.key.as_str())?;
                 let missing = lua.create_table()?;
                 for (j, loc) in gap.missing_in.iter().enumerate() {
                     missing.set(j + 1, loc.as_str())?;
                 }
+                /// Performs the 'missing_in' operation.
+                /// @return | nil | No value is returned.
                 row.set("missing_in", missing)?;
                 tbl.set(i + 1, row)?;
             }
             Ok(tbl)
         })?,
     )?;
+    /// Performs the 'i18n' operation.
+    /// @return | nil | No value is returned.
     lurek.set("i18n", loc)?;
     Ok(())
 }

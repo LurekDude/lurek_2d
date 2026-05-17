@@ -830,8 +830,8 @@ min = 1
 max = 99
         ]]
 
-        ---@diagnostic disable-next-line: undefined-field
-        local schema = lurek.docs.schemaFromToml(toml)
+        local docs_any = lurek.docs ---@type any
+        local schema = docs_any.schemaFromToml(toml)
         expect_equal("player", schema:getName())
         expect_false(schema:check({ level = 100 }))
         expect_true(schema:check({ level = 50 }))
@@ -896,8 +896,8 @@ describe("docs strict: LApiCatalog merge / type / typeOf", function()
     -- @covers lurek.docs.getCatalog
     it("LApiCatalog merge returns new catalog and type is callable", function()
         local cat = lurek.docs.getCatalog()
-        ---@diagnostic disable-next-line: param-type-mismatch
-        local ok, merged = pcall(function() return cat:merge(cat) end)
+        local cat_any = cat ---@type any
+        local ok, merged = pcall(function() return cat_any:merge(cat_any) end)
         if ok then
             expect_true(merged ~= nil)
         end

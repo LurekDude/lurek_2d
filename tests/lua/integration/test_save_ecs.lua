@@ -56,7 +56,7 @@ describe("integration: TOML config for entities", function()
 
         -- Create entities from TOML config
         local entities = {}
-        for entity_type, props in pairs(config) do
+        for entity_type, props in pairs(config --[[@as table]]) do
             local id = universe:spawn()
             if type(props) == "table" then
                 for key, value in pairs(props) do

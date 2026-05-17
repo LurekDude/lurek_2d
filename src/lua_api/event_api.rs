@@ -245,10 +245,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- exit --
     /// Requests engine shutdown with an optional process exit code.
-    /// @param | code | integer? | Optional exit code, defaulting to 0.
+    /// @param | code? | integer | Optional exit code, defaulting to 0.
     /// @return | nil | No value is returned.
     tbl.set(
-        "exit",
         lua.create_function(move |_, code: Option<i32>| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
@@ -275,7 +274,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Clears all pending events from the shared event queue.
     /// @return | nil | No value is returned.
     tbl.set(
-        "clear",
         lua.create_function(move |_, ()| {
             s.borrow_mut().event_queue.clear();
             Ok(())
@@ -300,7 +298,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Pumps the shared event queue without removing events for Lua.
     /// @return | nil | No value is returned.
     tbl.set(
-        "pump",
         lua.create_function(move |_, ()| {
             s.borrow().event_queue.pump();
             Ok(())
@@ -309,7 +306,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- wait --
     /// Waits for the next queued event and returns success, name, and argument table.
-    /// @param | timeout | number? | Optional timeout in seconds.
+    /// @param | timeout? | number | Optional timeout in seconds.
     /// @return | boolean | True when an event was received before timeout.
     /// @return | string | Event name, or an empty string on timeout.
     /// @return | table | Array table of event arguments.
@@ -343,10 +340,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- restart --
-    /// Requests an engine restart. This function is exposed to Lua scripts.
+    /// Requests a full engine restart cycle from the runtime.
     /// @return | nil | No value is returned.
     tbl.set(
-        "restart",
         lua.create_function(move |_, ()| {
             s.borrow_mut().restart_requested = true;
             Ok(())
@@ -357,7 +353,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Requests engine shutdown with exit code zero.
     /// @return | nil | No value is returned.
     tbl.set(
-        "quit",
         lua.create_function(move |_, ()| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
@@ -485,12 +480,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let out = lua.create_table()?;
             for (i, (name, args)) in buf.iter().enumerate() {
                 let entry = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 let args_tbl = lua.create_table()?;
                 for (j, arg) in args.iter().enumerate() {
                     let v = event_arg_to_lua_value(lua, arg)?;
                     args_tbl.set(j + 1, v)?;
                 }
+                /// Performs the 'args' operation.
+                /// @return | nil | No value is returned.
                 entry.set("args", args_tbl)?;
                 out.set(i + 1, entry)?;
             }
@@ -502,7 +501,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Clears retained pushed event history.
     /// @return | nil | No value is returned.
     tbl.set(
-        "clearHistory",
         lua.create_function(move |_, ()| {
             hist_c.borrow_mut().clear();
             Ok(())
@@ -601,6 +599,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    /// Performs the 'event' operation.
+    /// @return | nil | No value is returned.
     lurek.set("event", tbl)?;
     Ok(())
 }

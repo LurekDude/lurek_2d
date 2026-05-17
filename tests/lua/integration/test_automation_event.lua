@@ -206,7 +206,7 @@ describe("automation + event integration", function()
         automation.update(0.01)
 
         expect_equal(automation.isFailed(), true)
-        local err = automation.getLastError() or ""
+        local err = (automation.getLastError() or "") --[[@as string]]
         expect_equal(string.find(err, "ready && boss_dead") ~= nil, true)
 
         automation.stop()

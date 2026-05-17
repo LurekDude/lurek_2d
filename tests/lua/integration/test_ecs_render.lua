@@ -25,7 +25,7 @@ describe("integration: entity position drives draw coordinates", function()
         -- Draw commands execute without error
         expect_no_error(function()
             lurek.render.setColor(1, 1, 1, 1)
-            lurek.render.rectangle("fill", x, y, w, h)
+            lurek.render.rectangle("fill", x --[[@as number]], y --[[@as number]], w --[[@as number]], h --[[@as number]])
         end)
     end)
 
@@ -54,7 +54,7 @@ describe("integration: entity position drives draw coordinates", function()
             expect_equal(positions[i][2], y, "entity " .. i .. " y")
             expect_no_error(function()
                 lurek.render.setColor(1, 0, 0, 1)
-                lurek.render.rectangle("fill", x, y, 16, 16)
+                lurek.render.rectangle("fill", x --[[@as number]], y --[[@as number]], 16, 16)
             end)
         end
     end)

@@ -129,52 +129,53 @@ Widgets provide pre-built terminal UI components with default shaded cell backgr
 Module example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
--- Draws or renders this terminal to the current render target.
-do
+  -- Call render(x, y) inside lurek.draw() to display the terminal.
+  -- x, y are optional pixel offsets (default 0, 0).
   local term = lurek.terminal.newTerminal(80, 25)
-  term:addWidget(lurek.terminal.newLabel(2, 2, "HUD"))
-  function lurek.draw() term:render(0, 0) end
+  term:addWidget(lurek.terminal.newLabel(2, 2, "Game HUD"))
+
+  -- In a real game, this would be inside lurek.draw():
+  function lurek.draw()
+    -- Render the terminal at the top-left corner of the window.
+    term:render(0, 0)
+  end
 end
 
 --@api-stub: Terminal:print
--- Performs the print operation on this terminal.
+-- Writes text to the terminal grid starting at a specific cell
 do
+  -- print(col, row, text) writes a string of characters into consecutive cells.
+  -- Faster than calling set() per character; uses default fg/bg from the theme.
   ---@type LTerminal
   local term = lurek.terminal.newTerminal(80, 25)
-  term:print(1, 1, "lurek> print(10)")
-  term:print(1, 2, "10")
+
+  -- Simulate a REPL-style dev console.
+  term:print(1, 1, "lurek> print(2 + 2)")
+  term:print(1, 2, "4")
+  term:print(1, 3, "lurek> _")
 end
 
 --@api-stub: Terminal:setFont
--- Sets the font of this terminal.
+-- Selects the nearest built-in bitmap font by pixel height and refits the window
 do
+  -- setFont picks the closest available monospace glyph set by height.
+  -- The terminal auto-resizes the window to match the new cell dimensions.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A large font for a roguelike where each cell should be clearly visible.
   term:setFont(24)
+
+  -- A small font for a dense debug console with many rows.
+  local debug_term = lurek.terminal.newTerminal(120, 50)
+  debug_term:setFont(12)
 end
 
 --@api-stub: Terminal:setCellSize
--- Sets the cell size of this terminal.
+-- Overrides the cell width and height used for rendering and refits the window
 do
+  -- setCellSize manually controls pixel dimensions per cell, ignoring font metrics.
+  -- Useful for square-cell roguelikes or pixel-art tile grids.
   local term = lurek.terminal.newTerminal(80, 25)
-  term:setCellSize(16, 16)
-end
-
---@api-stub: Terminal:resetCellSize
--- Resets cell size this terminal to its default state.
-do
-  local term = lurek.terminal.newTerminal(80, 25)
-  term:setCellSize(20, 20)
-  term:resetCellSize()
-end
-
---@api-stub: Terminal:getCellSize
--- Returns the cell size of this terminal.
-do
-  local term = lurek.terminal.newTerminal(80, 25)
-  term:setCellSize(18, 18)
-  local cw, ch = term:getCellSize()
-  lurek.log.debug("cell size " .. cw .. "x" .. ch, "term")
-end
 ```
 
 ## Key Types
@@ -224,9 +225,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- The completion engine is global (not per-terminal). Register all valid
+  -- commands at startup so players can tab-complete in the dev console.
   lurek.terminal.addCompletion("spawn")
   lurek.terminal.addCompletion("teleport")
   lurek.terminal.addCompletion("give")
+  lurek.terminal.addCompletion("kill")
+  lurek.terminal.addCompletion("noclip")
+  lurek.terminal.addCompletion("god")
 end
 ```
 
@@ -245,8 +251,16 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Built-in themes: "solarized_dark", "solarized_light", "monokai", "dracula", "nord".
+  -- Themes set the default fg/bg colors used for new text and cleared cells.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Apply a dark theme suitable for a hacker-style dev console.
   lurek.terminal.applyTheme(term, "dracula")
+
+  -- Switch to a light theme for a text-adventure or documentation viewer.
+  local reader = lurek.terminal.newTerminal(80, 40)
+  lurek.terminal.applyTheme(reader, "solarized_light")
 end
 ```
 
@@ -264,9 +278,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Clear history when the player starts a new session or resets the console.
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "spawn enemy 50 50")
+  lurek.terminal.pushCmdHistory(term, "god mode")
+
   lurek.terminal.clearCmdHistory(term)
+  -- Now cmdHistoryLen(term) == 0 and prevCmd(term) returns nil.
 end
 ```
 
@@ -280,8 +298,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Reset the entire completion dictionary (e.g., when switching game modes).
   lurek.terminal.addCompletion("noclip")
+  lurek.terminal.addCompletion("god")
   lurek.terminal.clearCompletions()
+  -- Now getCompletions("") returns an empty table.
 end
 ```
 
@@ -301,10 +322,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Useful for displaying a "history (N)" indicator or deciding when to trim.
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushCmdHistory(term, "kill all")
+  lurek.terminal.pushCmdHistory(term, "spawn chest")
+
   local n = lurek.terminal.cmdHistoryLen(term)
-  lurek.log.info("history depth: " .. n, "term")
+  lurek.log.info("history depth: " .. n, "term") -- 2
 end
 ```
 
@@ -324,10 +348,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- getCompletions returns ALL matches as a table, unlike nextCompletion which cycles.
+  -- Use this to display a dropdown/popup of all valid options.
   lurek.terminal.addCompletion("spawn_enemy")
   lurek.terminal.addCompletion("spawn_item")
+  lurek.terminal.addCompletion("spawn_npc")
+
   local hits = lurek.terminal.getCompletions("spawn")
-  lurek.log.info("matches: " .. #hits, "term")
+  lurek.log.info("matches for 'spawn': " .. #hits, "term") -- 3
 end
 ```
 
@@ -343,9 +371,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use getMaxCols/getMaxRows to clamp user-requested dimensions to safe limits.
   local max_cols = lurek.terminal.getMaxCols()
   local desired = math.min(120, max_cols)
-  lurek.log.info("using " .. desired .. " cols (cap " .. max_cols .. ")", "term")
+  lurek.log.info("using " .. desired .. " cols (engine max: " .. max_cols .. ")", "term")
 end
 ```
 
@@ -363,7 +392,7 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local max_rows = lurek.terminal.getMaxRows()
   local desired = math.min(60, max_rows)
-  lurek.log.info("using " .. desired .. " rows (cap " .. max_rows .. ")", "term")
+  lurek.log.info("using " .. desired .. " rows (engine max: " .. max_rows .. ")", "term")
 end
 ```
 
@@ -385,10 +414,20 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- getScrollback(terminal, offset, count) reads lines from the buffer.
+  -- offset=0 means the newest line; higher offsets go further back in history.
   local term = lurek.terminal.newTerminal(80, 25)
-  lurek.terminal.pushScrollback(term, "build complete")
+  lurek.terminal.pushScrollback(term, "line A")
+  lurek.terminal.pushScrollback(term, "line B")
+  lurek.terminal.pushScrollback(term, "line C")
+
+  -- Retrieve the 10 most recent lines (or fewer if the buffer is shorter).
   local recent = lurek.terminal.getScrollback(term, 0, 10)
-  lurek.log.info("rendering " .. #recent .. " scrollback lines", "term")
+
+  -- Render scrollback onto the terminal grid for a console-like display.
+  for i, line in ipairs(recent) do
+    lurek.log.debug("scrollback[" .. i .. "] = " .. line, "term")
+  end
 end
 ```
 
@@ -411,11 +450,22 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Borders draw box-drawing frames around a rectangular area.
+  -- Use them to visually separate UI regions: status panels, dialog boxes.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A full-screen frame using double-line box-drawing characters.
   local frame = lurek.terminal.newBorder(1, 1, 80, 25)
   frame:setStyle("double")
+
+  -- Optional title text is rendered into the top border line.
   frame:setTitle(" Status ")
   term:addWidget(frame)
+
+  -- Styles available: "single", "double", "ascii".
+  local inner = lurek.terminal.newBorder(3, 3, 30, 10)
+  inner:setStyle("ascii")
+  term:addWidget(inner)
 end
 ```
 
@@ -439,10 +489,22 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Buttons respond to mouse clicks and keyboard activation (Return key when focused).
+  -- Parameters: col, row, width, height (optional, default 1), text (optional).
   local term = lurek.terminal.newTerminal(80, 25)
-  local quit_btn = lurek.terminal.newButton(60, 21, 14, 3, "Quit")
-  quit_btn:setOnClick(function() lurek.log.info("quit pressed", "menu") end)
+
+  -- A quit button for a pause menu: 14 cells wide, 3 cells tall.
+  local quit_btn = lurek.terminal.newButton(60, 21, 14, 3, "[ Quit ]")
+
+  -- Register a click handler. The callback fires on mouse click or Return key.
+  quit_btn:setOnClick(function()
+    lurek.log.info("player pressed quit", "menu")
+  end)
   term:addWidget(quit_btn)
+
+  -- A compact single-row button (height defaults to 1 if omitted).
+  local help_btn = lurek.terminal.newButton(2, 21, 8, 1, "Help")
+  term:addWidget(help_btn)
 end
 ```
 
@@ -464,9 +526,18 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Labels are the simplest widget: static read-only text at a fixed cell.
+  -- Use them for HUD displays, status bars, or section headers.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Place an inventory header at column 2, row 1.
+  -- Positions are 1-based cell coordinates within the terminal grid.
   local title = lurek.terminal.newLabel(2, 1, "== Inventory ==")
   term:addWidget(title)
+
+  -- Labels can be updated dynamically each frame for live stats.
+  local hp_display = lurek.terminal.newLabel(2, 24, "HP: 85/100")
+  term:addWidget(hp_display)
 end
 ```
 
@@ -489,10 +560,21 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Lists display vertically-scrollable items with selection highlighting.
+  -- Perfect for save-file browsers, inventory screens, or quest logs.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Create a list: col=2, row=3, width=30 cells, visible height=10 rows.
   local saves = lurek.terminal.newList(2, 3, 30, 10)
-  saves:addItem("Slot 1 - Forest")
-  saves:addItem("Slot 2 - Cave")
+
+  -- Populate with save-slot descriptions. Items are 1-indexed.
+  saves:addItem("Slot 1 - Forest Temple (02:15)")
+  saves:addItem("Slot 2 - Dark Cave (04:30)")
+  saves:addItem("Slot 3 - Empty")
+
+  -- Pre-select the most recent save.
+  saves:setSelected(1)
+
   term:addWidget(saves)
 end
 ```
@@ -516,9 +598,18 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Panels are container widgets: child positions are relative to the panel origin.
+  -- Use panels for modal dialogs, popup menus, or moveable HUD groups.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A centered pause overlay: 40 cells wide, 10 cells tall.
   local pause_panel = lurek.terminal.newPanel(20, 8, 40, 10)
-  pause_panel:addChild(lurek.terminal.newLabel(1, 1, "PAUSED"))
+
+  -- Children use positions relative to the panel's top-left corner.
+  pause_panel:addChild(lurek.terminal.newLabel(1, 1, "=== PAUSED ==="))
+  pause_panel:addChild(lurek.terminal.newButton(1, 4, 12, 1, "Resume"))
+  pause_panel:addChild(lurek.terminal.newButton(1, 6, 12, 1, "Quit"))
+
   term:addWidget(pause_panel)
 end
 ```
@@ -540,9 +631,19 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- newTerminal(cols, rows) creates a cell grid for text-mode rendering.
+  -- The engine auto-resizes the window to fit the grid using the active font.
+  -- Use this as the root surface for any text-UI: dev console, roguelike map, MUD output.
   local console = lurek.terminal.newTerminal(100, 30)
+
+  -- Verify the grid was allocated at the requested size.
   local cols, rows = console:getDimensions()
-  lurek.log.info("console grid is " .. cols .. "x" .. rows, "term")
+  lurek.log.info("dev console: " .. cols .. "x" .. rows .. " cells", "term")
+
+  -- Default dimensions are 80x40 if you omit both arguments.
+  local default_term = lurek.terminal.newTerminal()
+  local dc, dr = default_term:getDimensions()
+  lurek.log.debug("default grid: " .. dc .. "x" .. dr, "term")
 end
 ```
 
@@ -564,10 +665,19 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- TextBoxes capture keyboard input when focused. Ideal for command prompts,
+  -- chat input, or search fields in a dev console.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A 70-cell wide input bar at the bottom of the console.
   local input = lurek.terminal.newTextBox(2, 24, 70)
+
+  -- Limit how many characters the player can type (useful for name entry).
   input:setMaxLength(64)
+
   term:addWidget(input)
+
+  -- Give this widget keyboard focus so typed characters go here immediately.
   term:setFocus(input)
 end
 ```
@@ -588,11 +698,17 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- nextCmd moves the cursor forward (like pressing Down arrow).
+  -- Returns nil when you reach the newest entry.
   local term = lurek.terminal.newTerminal(80, 25)
-  lurek.terminal.pushCmdHistory(term, "tp 0 0")
-  lurek.terminal.prevCmd(term)
+  lurek.terminal.pushCmdHistory(term, "help")
+  lurek.terminal.pushCmdHistory(term, "status")
+
+  -- Go back, then forward again.
+  lurek.terminal.prevCmd(term) -- "status"
+  lurek.terminal.prevCmd(term) -- "help"
   local newer = lurek.terminal.nextCmd(term)
-  lurek.log.debug("next cmd: " .. tostring(newer), "term")
+  lurek.log.debug("next cmd: " .. tostring(newer), "term") -- "status"
 end
 ```
 
@@ -612,10 +728,17 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- nextCompletion implements tab-cycling: each call advances to the next match.
+  -- After the last candidate it wraps back to the first.
   lurek.terminal.addCompletion("give_gold")
   lurek.terminal.addCompletion("give_xp")
+  lurek.terminal.addCompletion("give_item")
+
+  -- Simulating the player pressing Tab repeatedly.
   local first = lurek.terminal.nextCompletion("give")
-  if first then lurek.log.debug("tab: " .. first, "term") end
+  local second = lurek.terminal.nextCompletion("give")
+  if first then lurek.log.debug("tab1: " .. first, "term") end
+  if second then lurek.log.debug("tab2: " .. second, "term") end
 end
 ```
 
@@ -635,10 +758,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local spans = lurek.terminal.parseAnsi("\27[1;32mOK\27[0m loaded")
+  -- parseAnsi breaks an ANSI string into structured spans you can render manually.
+  -- Each span: { text=string, bold=boolean, fg?={r,g,b}, bg?={r,g,b} }
+  local spans = lurek.terminal.parseAnsi("\27[1;32mOK\27[0m loaded map")
+
+  -- Iterate spans for custom rendering or analysis.
   for _, s in ipairs(spans) do
-    lurek.log.debug("span '" .. s.text .. "' bold=" .. tostring(s.bold), "term")
+    lurek.log.debug("span: '" .. s.text .. "' bold=" .. tostring(s.bold), "term")
   end
+  -- Expected: span "OK" with bold=true, fg={0,255,0}; span " loaded map" with defaults.
 end
 ```
 
@@ -658,10 +786,23 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- prevCmd moves the history cursor one step back (like pressing Up arrow).
+  -- Returns nil when you reach the oldest entry.
   local term = lurek.terminal.newTerminal(80, 25)
+  lurek.terminal.pushCmdHistory(term, "spawn boss")
   lurek.terminal.pushCmdHistory(term, "noclip on")
+
+  -- First call returns the most recent command.
   local recalled = lurek.terminal.prevCmd(term)
-  if recalled then lurek.log.debug("recalled: " .. recalled, "term") end
+  if recalled then
+    lurek.log.debug("recalled: " .. recalled, "term") -- "noclip on"
+  end
+
+  -- Second call goes further back.
+  local older = lurek.terminal.prevCmd(term)
+  if older then
+    lurek.log.debug("older: " .. older, "term") -- "spawn boss"
+  end
 end
 ```
 
@@ -682,9 +823,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- printAnsi is a shortcut: it parses ANSI codes and writes colored text in one call.
+  -- Use this for MUD client output or for rendering pre-colored server messages.
   local term = lurek.terminal.newTerminal(80, 25)
-  local line = "\27[33mWARN:\27[0m low ammo"
-  lurek.terminal.printAnsi(term, 2, 3, line)
+
+  -- A server message with embedded ANSI color codes.
+  local msg = "\27[33mWARN:\27[0m low ammo (\27[1;31m3\27[0m remaining)"
+  lurek.terminal.printAnsi(term, 2, 3, msg)
 end
 ```
 
@@ -706,12 +851,21 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- printHighlighted applies regex-based coloring to a text string.
+  -- Each rule has a `pattern` (Lua pattern), `fg` color {r,g,b} (0-255), and optional `bg`.
+  -- Rules are applied in order; first match wins for overlapping regions.
   local term = lurek.terminal.newTerminal(80, 25)
-  local rules = {
-    { pattern = "ERROR", fg = { 255, 80, 80 } },
-    { pattern = "%d+",   fg = { 120, 200, 255 } },
+
+  -- Define rules for a dev-console log viewer.
+  local log_rules = {
+    { pattern = "ERROR",  fg = { 255, 80, 80 } },   -- red for errors
+    { pattern = "WARN",   fg = { 255, 200, 50 } },  -- yellow for warnings
+    { pattern = "%d+",    fg = { 120, 200, 255 } },  -- cyan for numbers
+    { pattern = "%b\"\"", fg = { 180, 255, 180 } },  -- green for quoted strings
   }
-  lurek.terminal.printHighlighted(term, 2, 5, "ERROR at line 42", rules)
+
+  -- Render a log line with syntax coloring at row 5.
+  lurek.terminal.printHighlighted(term, 2, 5, "ERROR at line 42: \"nil value\"", log_rules)
 end
 ```
 
@@ -730,9 +884,17 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Command history lets players recall previously typed commands with arrow keys.
+  -- Push each submitted command after executing it.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Player types a cheat command and presses Enter.
   local submitted = "give gold 500"
   lurek.terminal.pushCmdHistory(term, submitted)
+
+  -- Later the player can press Up to recall "give gold 500".
+  lurek.terminal.pushCmdHistory(term, "tp 0 0")
+  lurek.terminal.pushCmdHistory(term, "noclip on")
 end
 ```
 
@@ -751,9 +913,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- The scrollback buffer stores output history for a dev console or MUD client.
+  -- New lines go to the end; oldest lines are discarded when the cap is reached.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Simulate a player typing a command and the engine responding.
   lurek.terminal.pushScrollback(term, "> spawn enemy 100 200")
-  lurek.terminal.pushScrollback(term, "spawned goblin#7 at (100, 200)")
+  lurek.terminal.pushScrollback(term, "[engine] spawned goblin#7 at (100, 200)")
+  lurek.terminal.pushScrollback(term, "> kill goblin#7")
+  lurek.terminal.pushScrollback(term, "[engine] goblin#7 destroyed")
 end
 ```
 
@@ -771,6 +939,7 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Remove commands that are no longer valid (e.g., after disabling cheat mode).
   lurek.terminal.addCompletion("debug_crash")
   lurek.terminal.removeCompletion("debug_crash")
 end
@@ -786,9 +955,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Reset when the player changes the input prefix or submits a command.
+  -- This ensures the next Tab press starts from candidate #1 again.
   lurek.terminal.addCompletion("kill_all")
-  lurek.terminal.nextCompletion("kill")
-  lurek.terminal.resetCompletion()
+  lurek.terminal.addCompletion("kill_boss")
+  lurek.terminal.nextCompletion("kill") -- advances internal cursor
+  lurek.terminal.resetCompletion()      -- cursor back to start
 end
 ```
 
@@ -808,10 +980,18 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use scrollbackLen to check how full the buffer is, or to calculate
+  -- scroll positions for a custom scrollbar.
   local term = lurek.terminal.newTerminal(80, 25)
   lurek.terminal.pushScrollback(term, "hello")
-  if lurek.terminal.scrollbackLen(term) > 500 then
-    lurek.log.warn("scrollback growing fast", "term")
+  lurek.terminal.pushScrollback(term, "world")
+
+  local total = lurek.terminal.scrollbackLen(term)
+  lurek.log.info("buffer has " .. total .. " lines", "term")
+
+  -- Example: show a warning when the buffer is getting large.
+  if total > 500 then
+    lurek.log.warn("scrollback growing fast — consider raising the cap", "term")
   end
 end
 ```
@@ -831,9 +1011,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- The default cap prevents unbounded memory growth. Set it higher for
+  -- long play sessions with verbose output, or lower for memory-constrained builds.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Allow up to 2000 lines of history before oldest lines are discarded.
   lurek.terminal.setScrollbackCap(term, 2000)
-  lurek.terminal.pushScrollback(term, "cap set to 2000 lines")
+  lurek.terminal.pushScrollback(term, "cap is now 2000 lines")
 end
 ```
 
@@ -853,9 +1037,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local raw = "\27[31mERROR:\27[0m boss spawn failed"
+  -- External tools or MUD servers send ANSI-coded text. Strip codes when
+  -- you need plain text for logging, searching, or measuring string width.
+  local raw = "\27[31mERROR:\27[0m boss spawn failed at position (10, 20)"
   local plain = lurek.terminal.stripAnsi(raw)
-  lurek.log.warn("clean message: " .. plain, "term")
+
+  -- plain == "ERROR: boss spawn failed at position (10, 20)"
+  lurek.log.warn("clean: " .. plain, "term")
 end
 ```
 
@@ -872,9 +1060,19 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- newTerminal(cols, rows) creates a cell grid for text-mode rendering.
+  -- The engine auto-resizes the window to fit the grid using the active font.
+  -- Use this as the root surface for any text-UI: dev console, roguelike map, MUD output.
   local console = lurek.terminal.newTerminal(100, 30)
+
+  -- Verify the grid was allocated at the requested size.
   local cols, rows = console:getDimensions()
-  lurek.log.info("console grid is " .. cols .. "x" .. rows, "term")
+  lurek.log.info("dev console: " .. cols .. "x" .. rows .. " cells", "term")
+
+  -- Default dimensions are 80x40 if you omit both arguments.
+  local default_term = lurek.terminal.newTerminal()
+  local dc, dr = default_term:getDimensions()
+  lurek.log.debug("default grid: " .. dc .. "x" .. dr, "term")
 end
 ```
 
@@ -892,9 +1090,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Widgets must be added to a terminal before they appear on screen.
+  -- The terminal owns rendering order: widgets draw on top of raw cells.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Build a simple HUD with two labels.
   local hp_label = lurek.terminal.newLabel(2, 2, "HP: 100/100")
+  local mp_label = lurek.terminal.newLabel(2, 3, "MP: 50/50")
   term:addWidget(hp_label)
+  term:addWidget(mp_label)
 end
 ```
 
@@ -908,6 +1112,8 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- autoResize recalculates window size from (cols * cell_w, rows * cell_h).
+  -- Call after changing font or cell size if you want a pixel-perfect fit.
   local term = lurek.terminal.newTerminal(80, 25)
   term:setFont(20)
   term:autoResize()
@@ -924,8 +1130,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Call clear() at the start of each frame for a roguelike or when switching screens.
   local term = lurek.terminal.newTerminal(80, 25)
   term:set(1, 1, "#", 1, 1, 1, 1)
+  term:set(2, 1, "#", 1, 1, 1, 1)
+
+  -- Wipe the entire grid back to default (empty cells with theme colors).
   term:clear()
 end
 ```
@@ -940,8 +1150,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use clearWidgets when transitioning between screens (e.g., menu -> gameplay).
   local term = lurek.terminal.newTerminal(80, 25)
-  term:addWidget(lurek.terminal.newLabel(1, 1, "old screen"))
+  term:addWidget(lurek.terminal.newLabel(1, 1, "Loading..."))
+  term:addWidget(lurek.terminal.newLabel(1, 2, "Please wait"))
+
+  -- Wipe everything before building the new screen.
   term:clearWidgets()
 end
 ```
@@ -963,10 +1177,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- get(col, row) returns 9 values: char codepoint, fg RGBA (4), bg RGBA (4).
+  -- Useful for collision detection in roguelikes or copying cell data.
   local term = lurek.terminal.newTerminal(80, 25)
-  term:set(3, 3, "X", 1, 0, 0, 1)
-  local ch, r, g, b = term:get(3, 3)
-  lurek.log.debug("cell " .. ch .. " fg=" .. r .. "," .. g .. "," .. b, "term")
+  term:set(3, 3, "X", 1, 0, 0, 1, 0, 0, 0, 0)
+
+  local ch, fr, fg, fb, fa, br, bg, bb, ba = term:get(3, 3)
+  lurek.log.debug("cell='" .. string.char(ch) .. "' fg=(" .. fr .. "," .. fg .. "," .. fb .. ")", "term")
 end
 ```
 
@@ -982,10 +1199,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- getCellSize returns the current effective cell dimensions, whether from
+  -- a manual override or the active font metrics.
   local term = lurek.terminal.newTerminal(80, 25)
   term:setCellSize(18, 18)
+
   local cw, ch = term:getCellSize()
-  lurek.log.debug("cell size " .. cw .. "x" .. ch, "term")
+  lurek.log.debug("cell pixels: " .. cw .. "x" .. ch, "term") -- 18x18
 end
 ```
 
@@ -1001,10 +1221,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- getDimensions() returns cols, rows. Use to center content or set boundaries.
   local term = lurek.terminal.newTerminal(80, 25)
   local cols, rows = term:getDimensions()
-  local centre = lurek.terminal.newLabel(math.floor(cols / 2) - 3, math.floor(rows / 2), "HELLO")
-  term:addWidget(centre)
+
+  -- Center a title label horizontally.
+  local title_text = "DUNGEON"
+  local center_col = math.floor((cols - #title_text) / 2) + 1
+  local title = lurek.terminal.newLabel(center_col, 1, title_text)
+  term:addWidget(title)
 end
 ```
 
@@ -1020,12 +1245,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use getFocused to check state before forwarding input events.
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 60)
   term:addWidget(input)
   term:setFocus(input)
-  if term:getFocused() == input then
-    lurek.log.debug("input has focus", "term")
+
+  local focused = term:getFocused()
+  if focused == input then
+    lurek.log.debug("command input has focus", "term")
   end
 end
 ```
@@ -1042,11 +1270,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Check widget count to avoid adding duplicate widgets or for debug info.
   local term = lurek.terminal.newTerminal(80, 25)
   term:addWidget(lurek.terminal.newLabel(1, 1, "a"))
-  if term:getWidgetCount() == 0 then
-    lurek.log.warn("no widgets attached", "term")
-  end
+  term:addWidget(lurek.terminal.newLabel(1, 2, "b"))
+
+  local count = term:getWidgetCount()
+  lurek.log.debug("attached widgets: " .. count, "term") -- 2
 end
 ```
 
@@ -1066,13 +1296,19 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Call keypressed from your lurek.keypressed callback to dispatch keys to widgets.
+  -- Returns true if the terminal consumed the event (e.g., button activation).
   local term = lurek.terminal.newTerminal(80, 25)
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "OK")
-  btn:setOnClick(function() lurek.log.info("ok clicked", "ui") end)
+  btn:setOnClick(function()
+    lurek.log.info("OK button activated via keyboard", "ui")
+  end)
   term:addWidget(btn)
   term:setFocus(btn)
+
+  -- Simulate pressing Enter while the button has focus.
   local consumed = term:keypressed("return")
-  lurek.log.debug("consumed=" .. tostring(consumed), "term")
+  lurek.log.debug("key consumed: " .. tostring(consumed), "term") -- true
 end
 ```
 
@@ -1092,9 +1328,17 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Call from lurek.mousepressed to let the terminal handle button clicks.
+  -- The terminal converts pixel positions to cell coordinates internally.
   local term = lurek.terminal.newTerminal(80, 24)
-  term:mousepressed(10, 5, 1)
-  lurek.log.info("mouse event forwarded", "terminal")
+  local btn = lurek.terminal.newButton(2, 2, 10, 1, "Click me")
+  btn:setOnClick(function()
+    lurek.log.info("button clicked via mouse", "ui")
+  end)
+  term:addWidget(btn)
+
+  -- Simulate a mouse click at pixel position (20, 30), left button.
+  term:mousepressed(20, 30, 1)
 end
 ```
 
@@ -1114,10 +1358,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- print(col, row, text) writes a string of characters into consecutive cells.
+  -- Faster than calling set() per character; uses default fg/bg from the theme.
   ---@type LTerminal
   local term = lurek.terminal.newTerminal(80, 25)
-  term:print(1, 1, "lurek> print(10)")
-  term:print(1, 2, "10")
+
+  -- Simulate a REPL-style dev console.
+  term:print(1, 1, "lurek> print(2 + 2)")
+  term:print(1, 2, "4")
+  term:print(1, 3, "lurek> _")
 end
 ```
 
@@ -1135,9 +1384,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Remove widgets for temporary notifications that expire after a few seconds.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A toast notification that should disappear after being shown.
   local toast = lurek.terminal.newLabel(20, 1, "Item picked up!")
   term:addWidget(toast)
+
+  -- Later (e.g., after 2 seconds): remove it.
   term:removeWidget(toast)
 end
 ```
@@ -1157,9 +1411,16 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Call render(x, y) inside lurek.draw() to display the terminal.
+  -- x, y are optional pixel offsets (default 0, 0).
   local term = lurek.terminal.newTerminal(80, 25)
-  term:addWidget(lurek.terminal.newLabel(2, 2, "HUD"))
-  function lurek.draw() term:render(0, 0) end
+  term:addWidget(lurek.terminal.newLabel(2, 2, "Game HUD"))
+
+  -- In a real game, this would be inside lurek.draw():
+  function lurek.draw()
+    -- Render the terminal at the top-left corner of the window.
+    term:render(0, 0)
+  end
 end
 ```
 
@@ -1173,8 +1434,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- After experimenting with custom cell sizes, reset to let the font control layout.
   local term = lurek.terminal.newTerminal(80, 25)
   term:setCellSize(20, 20)
+
+  -- Revert to automatic sizing based on the active font.
   term:resetCellSize()
 end
 ```
@@ -1203,9 +1467,18 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- set(col, row, ch, fr, fg, fb, fa, br, bg, bb, ba) writes one cell.
+  -- Colors are 0-1 floats: fg RGBA then bg RGBA. Omitted channels default to 1/0.
   local term = lurek.terminal.newTerminal(80, 25)
-  term:set(10, 5, "@", 1, 1, 0, 1, 0, 0, 0, 0)
-  term:set(11, 5, "!", 1, 0.4, 0.4, 1)
+
+  -- Draw the player '@' symbol in green on a dark background.
+  term:set(10, 5, "@", 0, 1, 0, 1, 0.1, 0.1, 0.1, 1)
+
+  -- Draw a red '!' for a danger indicator (no background specified = transparent).
+  term:set(11, 5, "!", 1, 0.2, 0.2, 1)
+
+  -- You can also pass a Unicode codepoint as a number instead of a string.
+  term:set(12, 5, 9829, 1, 0, 0, 1) -- heart symbol (U+2665)
 end
 ```
 
@@ -1224,7 +1497,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- setCellSize manually controls pixel dimensions per cell, ignoring font metrics.
+  -- Useful for square-cell roguelikes or pixel-art tile grids.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- Force square 16x16 cells for a tile-based dungeon view.
   term:setCellSize(16, 16)
 end
 ```
@@ -1243,10 +1520,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Only one widget can have focus at a time. Focused TextBoxes receive typed text.
+  -- Pass nil to clear focus entirely (no widget receives keyboard input).
   local term = lurek.terminal.newTerminal(80, 25)
-  local input = lurek.terminal.newTextBox(2, 24, 60)
-  term:addWidget(input)
-  term:setFocus(input)
+  local cmd_input = lurek.terminal.newTextBox(2, 24, 60)
+  term:addWidget(cmd_input)
+
+  -- Give focus to the command input so typing goes there.
+  term:setFocus(cmd_input)
 end
 ```
 
@@ -1264,8 +1545,16 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- setFont picks the closest available monospace glyph set by height.
+  -- The terminal auto-resizes the window to match the new cell dimensions.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A large font for a roguelike where each cell should be clearly visible.
   term:setFont(24)
+
+  -- A small font for a dense debug console with many rows.
+  local debug_term = lurek.terminal.newTerminal(120, 50)
+  debug_term:setFont(12)
 end
 ```
 
@@ -1285,12 +1574,17 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Call textinput from your lurek.textinput callback for typing into TextBoxes.
+  -- Returns true if the terminal consumed the character.
   local term = lurek.terminal.newTerminal(80, 25)
   local input = lurek.terminal.newTextBox(2, 24, 60)
   term:addWidget(input)
   term:setFocus(input)
+
+  -- Simulate the player typing "hi" into the console.
   term:textinput("h")
   term:textinput("i")
+  -- input:getText() now returns "hi"
 end
 ```
 
@@ -1306,9 +1600,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- type() returns the string identifier of the userdata object.
+  -- Useful for runtime type checks in generic code.
   local terminal_obj = lurek.terminal.newTerminal(80, 24)
   local t = terminal_obj:type()
-  lurek.log.info("LTerminal:type = " .. t, "terminal")
+  lurek.log.info("type = " .. t, "terminal") -- "LTerminal"
 end
 ```
 
@@ -1328,9 +1624,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local terminal_obj2 = lurek.terminal.newTerminal(80, 24)
-  lurek.log.info("is LTerminal: " .. tostring(terminal_obj2 and terminal_obj2:typeOf("LTerminal") or false), "terminal")
-  lurek.log.info("is wrong: " .. tostring(terminal_obj2 and terminal_obj2:typeOf("Unknown") or false), "terminal")
+  -- typeOf accepts "LTerminal" or "Object" (the base type for all engine userdata).
+  local terminal_obj = lurek.terminal.newTerminal(80, 24)
+  lurek.log.info("is LTerminal: " .. tostring(terminal_obj:typeOf("LTerminal")), "terminal") -- true
+  lurek.log.info("is Object: " .. tostring(terminal_obj:typeOf("Object")), "terminal")       -- true
+  lurek.log.info("is wrong: " .. tostring(terminal_obj:typeOf("Unknown")), "terminal")       -- false
 end
 ```
 
@@ -1344,11 +1642,22 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Borders draw box-drawing frames around a rectangular area.
+  -- Use them to visually separate UI regions: status panels, dialog boxes.
   local term = lurek.terminal.newTerminal(80, 25)
+
+  -- A full-screen frame using double-line box-drawing characters.
   local frame = lurek.terminal.newBorder(1, 1, 80, 25)
   frame:setStyle("double")
+
+  -- Optional title text is rendered into the top border line.
   frame:setTitle(" Status ")
   term:addWidget(frame)
+
+  -- Styles available: "single", "double", "ascii".
+  local inner = lurek.terminal.newBorder(3, 3, 30, 10)
+  inner:setStyle("ascii")
+  term:addWidget(inner)
 end
 ```
 
@@ -1366,9 +1675,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Panel children use positions relative to the panel's top-left.
+  -- This makes it easy to move an entire dialog by repositioning only the panel.
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
-  panel:addChild(lurek.terminal.newLabel(1, 1, "PAUSED"))
+  panel:addChild(lurek.terminal.newLabel(1, 1, "=== PAUSED ==="))
   panel:addChild(lurek.terminal.newButton(1, 3, 10, 1, "Resume"))
+  panel:addChild(lurek.terminal.newButton(1, 5, 10, 1, "Options"))
 end
 ```
 
@@ -1388,10 +1700,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Items are displayed as selectable rows. Indices are 1-based.
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Healing Potion x3")
-  inv:addItem("Iron Sword")
+  inv:addItem("Iron Sword +1")
   inv:addItem("Lockpick x5")
+  inv:addItem("Torch x2")
 end
 ```
 
@@ -1405,9 +1719,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use clearChildren to rebuild a panel's content (e.g., switching dialog pages).
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
-  panel:addChild(lurek.terminal.newLabel(1, 1, "old"))
+  panel:addChild(lurek.terminal.newLabel(1, 1, "page 1 content"))
+
+  -- Switch to page 2.
   panel:clearChildren()
+  panel:addChild(lurek.terminal.newLabel(1, 1, "page 2 content"))
 end
 ```
 
@@ -1423,10 +1741,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use clearItems when refreshing a list with new data (e.g., entering a shop).
   local inv = lurek.terminal.newList(2, 3, 30, 8)
-  inv:addItem("stale")
+  inv:addItem("stale data")
+
+  -- Wipe and repopulate with fresh items.
   inv:clearItems()
-  inv:addItem("fresh")
+  inv:addItem("Health Potion - 50g")
+  inv:addItem("Mana Potion - 80g")
 end
 ```
 
@@ -1446,10 +1768,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Access specific children to update them without keeping separate references.
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
-  panel:addChild(lurek.terminal.newLabel(1, 1, "first"))
+  panel:addChild(lurek.terminal.newLabel(1, 1, "Title"))
+  panel:addChild(lurek.terminal.newLabel(1, 2, "Subtitle"))
+
   local first = panel:getChild(1)
-  if first then lurek.log.debug("got first child", "term") end
+  if first then
+    first:setText("Updated Title")
+  end
 end
 ```
 
@@ -1467,8 +1794,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
   panel:addChild(lurek.terminal.newLabel(1, 1, "a"))
+  panel:addChild(lurek.terminal.newLabel(1, 2, "b"))
+
   local n = panel:getChildCount()
-  lurek.log.debug("panel children: " .. n, "term")
+  lurek.log.debug("panel has " .. n .. " children", "term") -- 2
 end
 ```
 
@@ -1484,9 +1813,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local label = lurek.terminal.newLabel(2, 2, "Hello")
+  -- getColor returns r, g, b, a in the 0..1 range plus the bg RGBA.
+  local label = lurek.terminal.newLabel(2, 2, "Health OK")
   local r, g, b, a = label:getColor()
-  lurek.log.debug("colour rgba " .. r .. "," .. g .. "," .. b .. "," .. a, "term")
+  lurek.log.debug("label fg: " .. r .. "," .. g .. "," .. b .. " a=" .. a, "term")
 end
 ```
 
@@ -1506,11 +1836,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Read item text for display, search, or to determine the selected action.
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Iron Sword")
-  inv:addItem("Bow")
+  inv:addItem("Wooden Bow")
+
   local first = inv:getItem(1)
-  lurek.log.debug("first item: " .. first, "term")
+  lurek.log.debug("first item: " .. first, "term") -- "Iron Sword"
 end
 ```
 
@@ -1526,9 +1858,11 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Check item count to show an "empty" placeholder or limit additions.
   local inv = lurek.terminal.newList(2, 3, 30, 8)
+
   if inv:getItemCount() == 0 then
-    inv:addItem("(empty)")
+    inv:addItem("(inventory is empty)")
   end
 end
 ```
@@ -1547,8 +1881,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local name_box = lurek.terminal.newTextBox(2, 5, 24)
   name_box:setMaxLength(16)
+
   local cap = name_box:getMaxLength()
-  lurek.log.info("max name length " .. cap, "term")
+  lurek.log.info("name max length: " .. cap, "term") -- 16
 end
 ```
 
@@ -1564,10 +1899,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- getPosition() returns col, row. Useful for relative positioning of other widgets.
   local label = lurek.terminal.newLabel(10, 5, "anchor")
   local col, row = label:getPosition()
-  local arrow = lurek.terminal.newLabel(col + 8, row, "->")
-  lurek.log.debug("arrow at " .. (col + 8) .. "," .. row, "term")
+
+  -- Place an arrow indicator just to the right of the anchor.
+  local arrow = lurek.terminal.newLabel(col + #"anchor" + 1, row, "<--")
+  lurek.log.debug("arrow at col " .. (col + #"anchor" + 1), "term")
 end
 ```
 
@@ -1585,9 +1923,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local saves = lurek.terminal.newList(2, 3, 30, 8)
   saves:addItem("Slot 1")
+  saves:addItem("Slot 2")
   saves:setSelected(1)
+
   local idx = saves:getSelected()
-  if idx then lurek.log.info("loaded slot " .. idx, "save") end
+  if idx then
+    lurek.log.info("loading save slot " .. idx, "save")
+  end
 end
 ```
 
@@ -1605,7 +1947,7 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local panel = lurek.terminal.newPanel(2, 2, 30, 12)
   local w, h = panel:getSize()
-  lurek.log.info("panel " .. w .. "x" .. h, "term")
+  lurek.log.info("panel dimensions: " .. w .. "x" .. h .. " cells", "term")
 end
 ```
 
@@ -1623,8 +1965,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setStyle("double")
+
   local style = frame:getStyle()
-  lurek.log.info("border style: " .. style, "term")
+  lurek.log.info("border style: " .. style, "term") -- "double"
 end
 ```
 
@@ -1642,8 +1985,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Quit")
   btn:setTag("menu.quit")
+
+  -- In a generic click handler, identify widgets by tag.
   if btn:getTag() == "menu.quit" then
-    lurek.log.info("quit button identified", "ui")
+    lurek.log.info("quit button identified by tag", "ui")
   end
 end
 ```
@@ -1660,10 +2005,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Read back text from an input widget after the player finishes typing.
   local input = lurek.terminal.newTextBox(2, 24, 40)
   input:setText("noclip on")
+
   local typed = input:getText()
-  lurek.log.info("submit: " .. typed, "term")
+  lurek.log.info("player submitted: " .. typed, "term")
 end
 ```
 
@@ -1681,8 +2028,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setTitle(" Status ")
+
   local title = frame:getTitle()
-  lurek.log.debug("frame titled: " .. title, "term")
+  lurek.log.debug("frame title: " .. title, "term") -- " Status "
 end
 ```
 
@@ -1700,8 +2048,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Go")
   btn:setEnabled(false)
+
   if not btn:isEnabled() then
-    lurek.log.debug("button still disabled", "term")
+    lurek.log.debug("button disabled — greying out text", "term")
   end
 end
 ```
@@ -1720,8 +2069,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 do
   local hint = lurek.terminal.newLabel(2, 2, "[E] interact")
   hint:setVisible(false)
+
   if not hint:isVisible() then
-    lurek.log.debug("hint hidden, skipping update", "term")
+    lurek.log.debug("hint is hidden — skipping update logic", "term")
   end
 end
 ```
@@ -1741,8 +2091,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 ```lua
 do
   local panel = lurek.terminal.newPanel(2, 2, 30, 10)
-  local hint = lurek.terminal.newLabel(1, 1, "tip")
+  local hint = lurek.terminal.newLabel(1, 1, "temporary tip")
   panel:addChild(hint)
+
+  -- Remove the hint after the player acknowledges it.
   panel:removeChild(hint)
 end
 ```
@@ -1763,10 +2115,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Use removeItem when the player drops or consumes an inventory item.
   local inv = lurek.terminal.newList(2, 3, 30, 8)
   inv:addItem("Healing Potion")
   inv:addItem("Bomb")
+  inv:addItem("Shield")
+
+  -- Player uses the bomb (index 2).
   inv:removeItem(2)
+  -- List now: "Healing Potion", "Shield"
 end
 ```
 
@@ -1787,9 +2144,15 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Color the widget text. Alpha defaults to 1 if omitted.
   local lbl = lurek.terminal.newLabel(1, 1, "OK")
+
+  -- Green text for success messages.
   lbl:setColor(0.2, 0.9, 0.3)
-  lurek.log.info("widget colour set", "terminal")
+
+  -- Red with partial transparency for a fading warning.
+  local warn_lbl = lurek.terminal.newLabel(1, 2, "DANGER")
+  warn_lbl:setColor(1.0, 0.2, 0.2, 0.7)
 end
 ```
 
@@ -1807,8 +2170,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Disable buttons when their action is not currently available.
   local save_btn = lurek.terminal.newButton(2, 2, 10, 1, "Save")
+
+  -- Disable during combat (player cannot save mid-fight).
   save_btn:setEnabled(false)
+
+  -- Re-enable after combat: save_btn:setEnabled(true)
 end
 ```
 
@@ -1828,8 +2196,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Prevent players from entering excessively long names or commands.
   local name_box = lurek.terminal.newTextBox(2, 5, 24)
-  name_box:setMaxLength(16)
+  name_box:setMaxLength(16) -- maximum 16 characters for player name
 end
 ```
 
@@ -1847,9 +2216,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Fires every time the text is modified (typed, pasted, or set programmatically).
+  -- Use for live search/filter as the player types.
   local search = lurek.terminal.newTextBox(2, 1, 30)
   search:setOnChange(function(text)
-    lurek.log.debug("filter: " .. text, "ui")
+    lurek.log.debug("live filter: '" .. text .. "'", "ui")
+    -- Filter inventory, command list, etc. based on the new text.
   end)
 end
 ```
@@ -1868,8 +2240,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local btn = lurek.terminal.newButton(2, 2, 12, 1, "[ Start ]")
-  btn:setOnClick(function() lurek.log.info("starting game", "menu") end)
+  -- Only valid for button widgets. The callback takes no arguments.
+  local btn = lurek.terminal.newButton(2, 2, 14, 1, "[ New Game ]")
+  btn:setOnClick(function()
+    lurek.log.info("starting new game", "menu")
+  end)
+
+  -- Pass nil to remove the handler.
+  -- btn:setOnClick(nil)
 end
 ```
 
@@ -1887,10 +2265,13 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- The callback receives the new 1-based index (or nil if deselected).
   local saves = lurek.terminal.newList(2, 3, 30, 8)
-  saves:addItem("Slot 1")
+  saves:addItem("Slot 1 - Forest")
+  saves:addItem("Slot 2 - Cave")
   saves:setOnSelect(function(idx)
     lurek.log.debug("preview slot " .. tostring(idx), "ui")
+    -- Load a thumbnail or stats summary for the selected save.
   end)
 end
 ```
@@ -1910,7 +2291,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local label = lurek.terminal.newLabel(1, 1, "tooltip")
+  -- setPosition(col, row) relocates the widget. Use for animations or tooltips.
+  local label = lurek.terminal.newLabel(1, 1, "tooltip: press E")
+
+  -- Move the tooltip to follow a cursor or highlight position.
   label:setPosition(40, 12)
 end
 ```
@@ -1929,10 +2313,12 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Pre-select an item programmatically (e.g., default save slot).
+  -- Pass nil to clear the selection.
   local saves = lurek.terminal.newList(2, 3, 30, 8)
-  saves:addItem("Slot 1")
-  saves:addItem("Slot 2")
-  saves:setSelected(2)
+  saves:addItem("Slot 1 - Forest")
+  saves:addItem("Slot 2 - Cave")
+  saves:setSelected(2) -- highlight "Slot 2 - Cave"
 end
 ```
 
@@ -1951,9 +2337,16 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- setSize(width, height) resizes the widget. Clamped to minimum 1x1.
+  -- For lists, changing height changes how many visible rows are shown.
   local list = lurek.terminal.newList(2, 3, 20, 4)
   list:addItem("sword")
   list:addItem("shield")
+  list:addItem("potion")
+  list:addItem("scroll")
+  list:addItem("ring")
+
+  -- Expand the list to show more items at once.
   list:setSize(20, 8)
 end
 ```
@@ -1974,8 +2367,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Available styles: "single", "double", "rounded", "heavy", "none".
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
-  frame:setStyle("single")
+  frame:setStyle("single") -- thin box-drawing lines
 end
 ```
 
@@ -1993,6 +2387,8 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Tags let you identify widgets without keeping Lua references to each one.
+  -- Useful for event-driven UIs where callbacks need to know which widget fired.
   local btn = lurek.terminal.newButton(2, 2, 10, 1, "Quit")
   btn:setTag("menu.quit")
 end
@@ -2012,7 +2408,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- setText dynamically updates the displayed string. Fires onChange for TextBoxes.
   local fps_label = lurek.terminal.newLabel(2, 1, "FPS: --")
+
+  -- Update each frame with the current frame rate.
   fps_label:setText("FPS: 60")
 end
 ```
@@ -2033,6 +2432,7 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- The title renders inline in the top border, centered.
   local frame = lurek.terminal.newBorder(1, 1, 40, 10)
   frame:setTitle(" Inventory ")
 end
@@ -2052,8 +2452,14 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
+  -- Toggle visibility for contextual HUD elements (e.g., interaction prompts).
   local hint = lurek.terminal.newLabel(2, 2, "[E] interact")
+
+  -- Hide by default; show only when the player is near an interactable.
   hint:setVisible(false)
+
+  -- Later, when player approaches:
+  -- hint:setVisible(true)
 end
 ```
 
@@ -2069,9 +2475,9 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local widget_obj = lurek.terminal.newLabel(0, 0, "hello")
+  local widget_obj = lurek.terminal.newLabel(1, 1, "hello")
   local t = widget_obj:type()
-  lurek.log.info("LWidget:type = " .. t, "terminal")
+  lurek.log.info("type = " .. t, "terminal") -- "LWidget"
 end
 ```
 
@@ -2091,9 +2497,10 @@ Exact example from [terminal.lua](../blob/main/content/examples/terminal.lua):
 
 ```lua
 do
-  local widget_obj2 = lurek.terminal.newLabel(0, 0, "hello")
-  lurek.log.info("is LWidget: " .. tostring(widget_obj2 and widget_obj2:typeOf("LWidget") or false), "terminal")
-  lurek.log.info("is wrong: " .. tostring(widget_obj2 and widget_obj2:typeOf("Unknown") or false), "terminal")
+  local widget_obj = lurek.terminal.newLabel(1, 1, "hello")
+  lurek.log.info("is LWidget: " .. tostring(widget_obj:typeOf("LWidget")), "terminal") -- true
+  lurek.log.info("is Object: " .. tostring(widget_obj:typeOf("Object")), "terminal")   -- true
+  lurek.log.info("is wrong: " .. tostring(widget_obj:typeOf("Unknown")), "terminal")   -- false
 end
 ```
 

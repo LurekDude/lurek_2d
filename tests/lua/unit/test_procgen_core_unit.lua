@@ -812,8 +812,8 @@ describe("procgen.noiseMapParallelSeeded", function()
 
     -- @covers lurek.procgen.noiseMapParallelSeeded
     it("different seeds produce different results", function()
-        local a = lurek.procgen.noiseMapParallelSeeded(8, 8, { seed = 1 })
-        local b = lurek.procgen.noiseMapParallelSeeded(8, 8, { seed = 2 })
+        local a = lurek.procgen.noiseMapParallelSeeded(8, 8, { seed = 1, scale_x = 0.3, scale_y = 0.3 })
+        local b = lurek.procgen.noiseMapParallelSeeded(8, 8, { seed = 2, scale_x = 0.3, scale_y = 0.3 })
         local any_diff = false
         for i = 1, #a do
             if math.abs(a[i] - b[i]) > 1e-5 then

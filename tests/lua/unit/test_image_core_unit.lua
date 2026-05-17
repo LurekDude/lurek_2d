@@ -1497,9 +1497,9 @@ describe("LayeredImage:save", function()
     end)
 end)
 
----@param img ImageData|nil
+---@param img LImageData|nil
 ---@param context string
----@return ImageData
+---@return LImageData
 local function require_image_data(img, context)
     if img == nil then
         error(context .. " returned nil", 2)
@@ -1985,6 +1985,7 @@ describe("image strict: byte constructors and province geometry helpers", functi
         local draw_count = pg:drawShapes()
         local blob = pg:serializeShapeData()
         local decoded = pg:deserializeShapeData(blob)
+        assert(decoded)
 
         expect_type("table", spans)
         expect_type("table", segs)

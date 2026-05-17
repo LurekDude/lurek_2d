@@ -99,7 +99,6 @@ The glossary collects terms that appear across module and API pages.
 - `LGlobeRegistry` ([[lurek.globe|Module-globe]]) - Lua-side handle for creating and locating named globes in one registry.
 - `LGOAPPlanner` ([[lurek.ai|Module-ai]]) - Lua handle for a GOAP planner with boolean preconditions, effects, and goals.
 - `LGraph` ([[lurek.graph|Module-graph]]) - Lua-side graph handle storing graph state and registered event callbacks.
-- `LGraph` ([[lurek.patterns|Module-patterns]]) - Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and connectivity queries.
 - `LGraphEdge` ([[lurek.graph|Module-graph]]) - Lua-side edge handle referencing one edge id inside a graph.
 - `LGraphItem` ([[lurek.graph|Module-graph]]) - Lua-side item handle referencing one item id inside a graph.
 - `LGraphNode` ([[lurek.graph|Module-graph]]) - Lua-side node handle referencing one node id inside a graph.
@@ -144,3 +143,4 @@ The glossary collects terms that appear across module and API pages.
 - `LMinimap` ([[lurek.minimap|Module-minimap]]) - Lua-side wrapper for a minimap instance and access to render command state.
 - `LMod` ([[lurek.mods|Module-mods]]) - Lua-side wrapper for mod metadata, hooks, and config references.
 - `LModManager` ([[lurek.mods|Module-mods]]) - Lua-side wrapper for the mod manager.
+- `LNavGrid` ([[lurek.pathfind|Module-pathfind]]) - Lua-side wrapper for a navigation grid and optional abstract graph cache.

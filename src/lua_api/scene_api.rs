@@ -722,6 +722,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 Some(t) => t,
                 None => lua.create_table()?,
             };
+            /// Performs the '__index' operation.
+            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let instance: LuaTable = lua.create_table()?;
             instance.set_metatable(Some(def));
@@ -739,6 +741,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 Some(t) => t,
                 None => lua.create_table()?,
             };
+            /// Performs the '__index' operation.
+            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let instance: LuaTable = lua.create_table()?;
             instance.set_metatable(Some(def));
@@ -756,6 +760,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 Some(t) => t,
                 None => lua.create_table()?,
             };
+            /// Performs the '__index' operation.
+            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let key = lua.create_registry_value(def)?;
             let ctor = lua.create_function(move |inner_lua, ()| {
@@ -991,6 +997,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     stack_names.set(i + 1, name.as_str())?;
                 }
             }
+            /// Performs the 'stack' operation.
+            /// @return | nil | No value is returned.
             snap.set("stack", stack_names)?;
             let data_snap = lua.create_table()?;
             for (key, reg_key) in &s.data_refs {
@@ -998,6 +1006,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     data_snap.set(key.as_str(), val)?;
                 }
             }
+            /// Performs the 'data' operation.
+            /// @return | nil | No value is returned.
             snap.set("data", data_snap)?;
             Ok(snap)
         })?,
@@ -1035,7 +1045,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "fade",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "fade")?;
+            /// Performs the 'duration' operation.
+            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.5))?;
             Ok(t)
         })?,
@@ -1057,7 +1071,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     "down" | "slidedown" => "slidedown",
                     _ => "slideleft",
                 };
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 t.set("type", dir)?;
+                /// Performs the 'duration' operation.
+                /// @return | nil | No value is returned.
                 t.set("duration", duration.unwrap_or(0.4))?;
                 Ok(t)
             },
@@ -1071,7 +1089,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "wipe",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "wipe")?;
+            /// Performs the 'duration' operation.
+            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.5))?;
             Ok(t)
         })?,
@@ -1084,13 +1106,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "iris",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
+            /// Performs the 'type' operation.
+            /// @return | nil | No value is returned.
             t.set("type", "iris")?;
+            /// Performs the 'duration' operation.
+            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.6))?;
             Ok(t)
         })?,
     )?;
     // transitions: subtable of built-in transition descriptor constructor functions.
+    /// Performs the 'transitions' operation.
+    /// @return | nil | No value is returned.
     tbl.set("transitions", trans_tbl)?;
-    lurek.set("scene", tbl.clone())?;
+    /// Performs the 'scene' operation.
+    /// @return | nil | No value is returned.
+    lurek.set("scene", tbl)?;
     Ok(())
 }

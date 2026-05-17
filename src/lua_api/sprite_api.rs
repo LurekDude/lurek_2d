@@ -18,7 +18,8 @@ impl LuaUserData for LuaSpriteSheet {
         // -- getFrame --
         /// Returns the UV quad for a single frame by its 1-based index.
         /// @param | index | integer | 1-based frame index in the sprite sheet.
-        /// @return | table | Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if out of range.
+        /// @return | table | Quad table `{x, y, w, h}` with normalized UV coordinates.
+        /// @return | nil | Returned if the index is out of range.
         methods.add_method("getFrame", |lua, this, index: usize| {
             match this.inner.get_frame(index) {
                 Some(r) => {
@@ -30,7 +31,7 @@ impl LuaUserData for LuaSpriteSheet {
         });
         // -- getFrameCount --
         /// Returns the total number of frames in this sprite sheet.
-        /// @return | number | Total frame count (columns × rows).
+        /// @return | integer | Total frame count (columns × rows).
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.get_frame_count())
         });
@@ -53,7 +54,8 @@ impl LuaUserData for LuaSpriteSheet {
         // -- getGroupFrames --
         /// Returns the frame quads for a named animation group.
         /// @param | name | string | Name of the animation group (e.g. "walk", "idle").
-        /// @return | table | Array of quad tables for the group, or nil if the group does not exist.
+        /// @return | table | Array of quad tables for the group.
+        /// @return | nil | Returned if the group does not exist.
         methods.add_method("getGroupFrames", |lua, this, name: String| {
             match this.inner.get_group(&name) {
                 Some(frames) => {
@@ -79,7 +81,7 @@ impl LuaUserData for LuaSpriteSheet {
         /// @param | name | string | Name for the group (e.g. "attack").
         /// @param | start | integer | 1-based start frame index.
         /// @param | count | integer | Number of frames in the group.
-        /// @return | nil | No return value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "nameGroup",
             |_, this, (name, start, count): (String, usize, usize)| {
@@ -89,16 +91,16 @@ impl LuaUserData for LuaSpriteSheet {
         );
         // -- getFrameSize --
         /// Returns the pixel dimensions of a single frame cell.
-        /// @return | number | Frame width in pixels.
-        /// @return | number | Frame height in pixels.
+        /// @return | integer | Frame width in pixels.
+        /// @return | integer | Frame height in pixels.
         methods.add_method("getFrameSize", |_, this, ()| {
             let (w, h) = this.inner.get_frame_size();
             Ok((w, h))
         });
         // -- getGridSize --
         /// Returns the number of columns and rows in the sprite sheet grid.
-        /// @return | number | Number of columns.
-        /// @return | number | Number of rows.
+        /// @return | integer | Number of columns.
+        /// @return | integer | Number of rows.
         methods.add_method("getGridSize", |_, this, ()| {
             let (cols, rows) = this.inner.get_grid_size();
             Ok((cols, rows))
@@ -136,16 +138,29 @@ impl LuaUserData for LuaSpriteAtlas {
         // -- getEntry --
         /// Looks up a named sprite region in the atlas by its original filename or tag.
         /// @param | name | string | Entry name (e.g. `"player_idle_0"`).
-        /// @return | table | Entry table `{name, x, y, w, h, rotated}`, or nil if not found.
+        /// @return | table | Entry table `{name, x, y, w, h, rotated}`.
+        /// @return | nil | Returned if the entry is not found.
         methods.add_method("getEntry", |lua, this, name: String| {
             match this.inner.get_entry(&name) {
                 Some(e) => {
                     let t = lua.create_table()?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     t.set("name", e.name.as_str())?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     t.set("x", e.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     t.set("y", e.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     t.set("w", e.w)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     t.set("h", e.h)?;
+                    /// Performs the 'rotated' operation.
+                    /// @return | nil | No value is returned.
                     t.set("rotated", e.rotated)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -155,16 +170,29 @@ impl LuaUserData for LuaSpriteAtlas {
         // -- getByIndex --
         /// Returns a sprite region by its 1-based index in the atlas.
         /// @param | index | integer | 1-based entry index.
-        /// @return | table | Entry table `{name, x, y, w, h, rotated}`, or nil if out of range.
+        /// @return | table | Entry table `{name, x, y, w, h, rotated}`.
+        /// @return | nil | Returned if the index is out of range.
         methods.add_method("getByIndex", |lua, this, index: usize| {
             match this.inner.get_by_index(index.saturating_sub(1)) {
                 Some(e) => {
                     let t = lua.create_table()?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     t.set("name", e.name.as_str())?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     t.set("x", e.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     t.set("y", e.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     t.set("w", e.w)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     t.set("h", e.h)?;
+                    /// Performs the 'rotated' operation.
+                    /// @return | nil | No value is returned.
                     t.set("rotated", e.rotated)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -173,7 +201,7 @@ impl LuaUserData for LuaSpriteAtlas {
         });
         // -- entryCount --
         /// Returns the total number of entries (sprite regions) in the atlas.
-        /// @return | number | Entry count.
+        /// @return | integer | Entry count.
         methods.add_method("entryCount", |_, this, ()| Ok(this.inner.entry_count()));
         // -- entryNames --
         /// Returns an array of all entry names in the atlas.
@@ -191,7 +219,8 @@ impl LuaUserData for LuaSpriteAtlas {
         /// @param | name | string | Entry name to look up.
         /// @param | flip_x | boolean | Mirror horizontally.
         /// @param | flip_y | boolean | Mirror vertically.
-        /// @return | table | Entry table with added `flip_x` and `flip_y` fields, or nil if not found.
+        /// @return | table | Entry table with added `flip_x` and `flip_y` fields.
+        /// @return | nil | Returned if the entry is not found.
         methods.add_method(
             "getFlipped",
             |lua, this, (name, flip_x, flip_y): (String, bool, bool)| match this
@@ -201,13 +230,29 @@ impl LuaUserData for LuaSpriteAtlas {
                 Some(e) => {
                     let flipped = e.get_flipped(flip_x, flip_y);
                     let t = lua.create_table()?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     t.set("name", flipped.name.as_str())?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     t.set("x", flipped.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     t.set("y", flipped.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     t.set("w", flipped.w)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     t.set("h", flipped.h)?;
+                    /// Performs the 'rotated' operation.
+                    /// @return | nil | No value is returned.
                     t.set("rotated", flipped.rotated)?;
+                    /// Performs the 'flip_x' operation.
+                    /// @return | nil | No value is returned.
                     t.set("flip_x", flipped.flip_x)?;
+                    /// Performs the 'flip_y' operation.
+                    /// @return | nil | No value is returned.
                     t.set("flip_y", flipped.flip_y)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -302,15 +347,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             lua.create_userdata(LuaSpriteAtlas { inner: atlas })
         })?,
     )?;
+    /// Performs the 'sprite' operation.
+    /// @return | nil | No value is returned.
     lurek.set("sprite", tbl)?;
     Ok(())
 }
 /// Converts a sprite rectangle into the Lua quad table returned by atlas helpers.
 fn quad_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
+    /// Performs the 'x' operation.
+    /// @return | nil | No value is returned.
     t.set("x", r.x)?;
+    /// Performs the 'y' operation.
+    /// @return | nil | No value is returned.
     t.set("y", r.y)?;
+    /// Performs the 'w' operation.
+    /// @return | nil | No value is returned.
     t.set("w", r.width)?;
+    /// Performs the 'h' operation.
+    /// @return | nil | No value is returned.
     t.set("h", r.height)?;
     Ok(t)
 }

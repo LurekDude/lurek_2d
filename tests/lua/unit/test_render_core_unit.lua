@@ -279,10 +279,10 @@ describe("lurek.render nine-slice", function()
     -- @covers LNineSlice:typeOf
     -- @covers lurek.render.newImage
     -- @covers lurek.render.newNineSlice
-    it("NineSlice:typeOf returns NineSlice", function()
+    it("NineSlice:typeOf returns LNineSlice", function()
         local img = lurek.render.newImage("assets/icon.png")
         local ns = lurek.render.newNineSlice(img, 5, 5, 5, 5)
-        expect_true(ns:typeOf("NineSlice"), "should be NineSlice type")
+        expect_true(ns:typeOf("LNineSlice"), "should be LNineSlice type")
         expect_true(ns:typeOf("Object"), "should be Object type")
     end)
 
@@ -304,7 +304,8 @@ describe("lurek.render.draw polymorphic dispatch", function()
     -- @covers lurek.render.draw
     it("draw() rejects nil with an error", function()
         expect_error(function()
-            lurek.render.draw(nil, 0, 0)
+            local bad = nil ---@type any
+            lurek.render.draw(bad, 0, 0)
         end, "nil")
     end)
 
@@ -1095,7 +1096,7 @@ describe("render strict: LImage methods", function()
     it("LImage type and typeOf return correct strings", function()
         local img = lurek.render.newImage("assets/icon.png")
         expect_equal(img:type(), "LImage")
-        expect_type("string", img:typeOf())
+        expect_true(img:typeOf("LImage"))
     end)
 
     -- @covers LImage:getWidth
@@ -1129,7 +1130,7 @@ describe("render strict: LFont methods", function()
     it("LFont type and typeOf return correct strings", function()
         local font = lurek.render.getDefaultFont()
         expect_equal(font:type(), "LFont")
-        expect_type("string", font:typeOf())
+        expect_true(font:typeOf("LFont"))
     end)
 
     -- @covers LFont:getWidth
@@ -1168,7 +1169,7 @@ describe("render strict: LCanvas methods", function()
     it("LCanvas type and typeOf return correct strings", function()
         local canvas = lurek.render.newCanvas(8, 8)
         expect_equal(canvas:type(), "LCanvas")
-        expect_type("string", canvas:typeOf())
+        expect_true(canvas:typeOf("LCanvas"))
     end)
 
     -- @covers LCanvas:getWidth
@@ -1203,7 +1204,7 @@ describe("render strict: LSpriteBatch methods", function()
         local img = lurek.render.newImage("assets/icon.png")
         local sb = lurek.render.newSpriteBatch(img, 8)
         expect_equal(sb:type(), "LSpriteBatch")
-        expect_type("string", sb:typeOf())
+        expect_true(sb:typeOf("LSpriteBatch"))
     end)
 
     -- @covers LSpriteBatch:getCount
@@ -1241,7 +1242,7 @@ describe("render strict: LMesh methods", function()
             {0,0,0,0}, {1,0,1,0}, {0.5,1,0.5,1}
         })
         expect_equal(mesh:type(), "LMesh")
-        expect_type("string", mesh:typeOf())
+        expect_true(mesh:typeOf("LMesh"))
     end)
 
     -- @covers LMesh:setTexture
@@ -1270,7 +1271,7 @@ describe("render strict: LShader methods", function()
     it("LShader type and typeOf return correct strings", function()
         local shader = lurek.render.newShader("@fragment fn fs() -> @location(0) vec4<f32> { return vec4<f32>(1.0); }")
         expect_equal(shader:type(), "LShader")
-        expect_type("string", shader:typeOf())
+        expect_true(shader:typeOf("LShader"))
     end)
 
     -- @covers LShader:send
@@ -1295,7 +1296,7 @@ describe("render strict: LQuad methods", function()
     it("LQuad type and typeOf return correct strings", function()
         local q = lurek.render.newQuad(0, 0, 1, 1, 1, 1)
         expect_equal(q:type(), "LQuad")
-        expect_type("string", q:typeOf())
+        expect_true(q:typeOf("LQuad"))
     end)
 
     -- @covers LQuad:getViewport

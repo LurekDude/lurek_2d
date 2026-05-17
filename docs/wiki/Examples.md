@@ -53,12 +53,12 @@ Examples come from `content/examples/` and show isolated `lurek.*` namespaces. A
 | [raycaster.lua](../blob/main/content/examples/raycaster.lua) | `lurek.raycaster` | Textured-quad 2.5D raycasting |
 | [render.lua](../blob/main/content/examples/render.lua) | `lurek.render` | Shapes, sprites, canvas, blend modes |
 | [repl.lua](../blob/main/content/examples/repl.lua) | `lurek.repl` | API example |
+| [system.lua](../blob/main/content/examples/system.lua) | `lurek.runtime` | API example |
 | [save.lua](../blob/main/content/examples/save.lua) | `lurek.save` | Save/load game state |
 | [scene.lua](../blob/main/content/examples/scene.lua) | `lurek.scene` | Scene graph, transitions |
 | [serial.lua](../blob/main/content/examples/serial.lua) | `lurek.serial` | Serialisation (TOML/JSON/binary) |
 | [spine.lua](../blob/main/content/examples/spine.lua) | `lurek.spine` | Spine skeletal animation |
 | [sprite.lua](../blob/main/content/examples/sprite.lua) | `lurek.sprite` | Sprite batch |
-| [system.lua](../blob/main/content/examples/system.lua) | `lurek.system` | API example |
 | [terminal.lua](../blob/main/content/examples/terminal.lua) | `lurek.terminal` | In-game terminal widget |
 | [thread.lua](../blob/main/content/examples/thread.lua) | `lurek.thread` | Worker threads, channels |
 | [tilemap.lua](../blob/main/content/examples/tilemap.lua) | `lurek.tilemap` | Tile layers, auto-tile |

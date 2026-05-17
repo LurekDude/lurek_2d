@@ -25,12 +25,12 @@
   - [lurek.data.fromMsgPack(bytes: string) -> LuaValue](#lurekdatafrommsgpackbytes-string-luavalue)
   - [lurek.data.getPackedSize(fmt: string, ...: LuaValue) -> integer](#lurekdatagetpackedsizefmt-string-luavalue-integer)
   - [lurek.data.hash(algo_str: string, raw_data: string) -> string](#lurekdatahashalgostr-string-rawdata-string-string)
-  - [lurek.data.newByteData(value: any) -> ByteData](#lurekdatanewbytedatavalue-any-bytedata)
+  - [lurek.data.newByteData(value: any) -> LByteData](#lurekdatanewbytedatavalue-any-lbytedata)
   - [lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView](#lurekdatanewdataviewraw-string-offset-integer-size-integer-ldataview)
   - [lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer](#lurekdatanewringbuffercapacity-integer-lringbuffer)
   - [lurek.data.newWriter() -> LDataWriter](#lurekdatanewwriter-ldatawriter)
   - [lurek.data.pack(fmt: string, ...: LuaValue) -> string](#lurekdatapackfmt-string-luavalue-string)
-  - [lurek.data.parseToml(text: string) -> LuaValue](#lurekdataparsetomltext-string-luavalue)
+  - [lurek.data.parseToml(text: string) -> table](#lurekdataparsetomltext-string-table)
   - [lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue](#lurekdatareadfmt-string-raw-string-offset-integer-luavalue)
   - [lurek.data.size(fmt: string) -> integer](#lurekdatasizefmt-string-integer)
   - [lurek.data.toMsgPack(value: any) -> string](#lurekdatatomsgpackvalue-any-string)
@@ -38,7 +38,7 @@
   - [lurek.data.write(fmt: string, ...: LuaValue) -> string](#lurekdatawritefmt-string-luavalue-string)
 - [Types and Methods](#types-and-methods)
   - [LByteData](#lbytedata)
-  - [LByteData:clone() -> ByteData](#lbytedataclone-bytedata)
+  - [LByteData:clone() -> LByteData](#lbytedataclone-lbytedata)
   - [LByteData:getBit(byte_offset: integer, bit_offset: integer) -> boolean](#lbytedatagetbitbyteoffset-integer-bitoffset-integer-boolean)
   - [LByteData:getByte(offset: integer) -> integer](#lbytedatagetbyteoffset-integer-integer)
   - [LByteData:getSize() -> integer](#lbytedatagetsize-integer)
@@ -46,6 +46,8 @@
   - [LByteData:readBits(byte_offset: integer, bit_offset: integer, count: integer) -> integer](#lbytedatareadbitsbyteoffset-integer-bitoffset-integer-count-integer-integer)
   - [LByteData:setBit(byte_offset: integer, bit_offset: integer, value: boolean)](#lbytedatasetbitbyteoffset-integer-bitoffset-integer-value-boolean)
   - [LByteData:setByte(offset: integer, value: integer)](#lbytedatasetbyteoffset-integer-value-integer)
+  - [LByteData:type() -> string](#lbytedatatype-string)
+  - [LByteData:typeOf(name: string) -> boolean](#lbytedatatypeofname-string-boolean)
   - [LDataView](#ldataview)
   - [LDataView:getDouble(offset: integer) -> number](#ldataviewgetdoubleoffset-integer-number)
   - [LDataView:getFloat(offset: integer) -> number](#ldataviewgetfloatoffset-integer-number)
@@ -120,52 +122,52 @@ Module example from [data.lua](../blob/main/content/examples/data.lua):
 --@api-stub: lurek.data.pack
 -- Packs Lua values into a binary string using a format string
 do
-  local ok_p, header = pcall(lurek.data.pack, "<HHs", 1, 0, "lurek-save")
-  if ok_p then
-    lurek.log.info("packed save header: " .. tostring(#header) .. " bytes", "data")
-  else
-    lurek.log.info("pack: " .. tostring(header), "data")
-  end
+  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
+  -- Use case: building custom binary save-file headers with a known layout
+  local version = 1
+  local flags = 0
+  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
+  -- The result is a raw binary string; #header gives byte count
+  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
 end
 
 --@api-stub: lurek.data.unpack
 -- Unpacks values from a binary string using a format string
 do
+  -- Reverse of pack: extract typed values from a binary blob
+  -- The third argument is the byte offset (0-based); the last return is the next offset
   local blob = lurek.data.pack("<II", 42, 7)
-  local ok_u, result_tbl = pcall(function() return {lurek.data.unpack("<II", blob, 0)} end)
-  local hp = ok_u and result_tbl[1] or 0
-  local mana = ok_u and result_tbl[2] or 0
-  local next_off = ok_u and result_tbl[3] or 0
-  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " consumed=" .. next_off, "data")
+  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
+  -- next_offset tells you where to continue reading if the blob has more data
+  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
 end
 
 --@api-stub: lurek.data.getPackedSize
 -- Computes the packed byte size for values and a format string
 do
+  -- Useful for pre-allocating buffers or validating record sizes at load time
+  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
   local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
   if size ~= 16 then
     lurek.log.warn("entity record size drifted: " .. size, "data")
+  else
+    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
   end
 end
 
 --@api-stub: lurek.data.compress
 -- Compresses a binary string using a named compression format
 do
+  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
+  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
+  -- Optional third arg is compression level (1-9, default 6)
   local raw = string.rep("level_data ", 256)
   local packed = lurek.data.compress("lz4", raw)
-  lurek.log.info("compressed " .. #raw .. " -> " .. #packed .. " bytes", "data")
-end
-
---@api-stub: lurek.data.decompress
--- Decompresses a binary string using a named compression format
-do
-  local packed = lurek.data.compress("gzip", "tilemap_payload")
-  local raw = lurek.data.decompress("gzip", packed)
 ```
 
 ## Key Types
 
-- `LByteData` (8 methods) - Exposes byte-buffer inspection and bit editing methods to Lua.
+- `LByteData` (10 methods) - Exposes byte-buffer inspection and bit editing methods to Lua.
 - `LDataView` (11 methods) - Creates a DataView over a binary string slice.
 - `LDataWriter` (17 methods) - Lua-side binary writer for sequential byte construction.
 - `LRingBuffer` (12 methods) - Lua-side fixed-capacity FIFO buffer that stores registry-protected Lua values.
@@ -186,12 +188,12 @@ lurek.data.encodeToml(tbl: table) -> string -- Encodes a Lua table into TOML tex
 lurek.data.fromMsgPack(bytes: string) -> LuaValue -- Decodes a structured binary interchange payload back into Lua values.
 lurek.data.getPackedSize(fmt: string, ...: LuaValue) -> integer -- Computes the packed byte size for values and a format string.
 lurek.data.hash(algo_str: string, raw_data: string) -> string -- Hashes a binary string with a named algorithm.
-lurek.data.newByteData(value: any) -> ByteData -- Creates ByteData from a size or string.
+lurek.data.newByteData(value: any) -> LByteData -- Creates ByteData from a size or string.
 lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView -- Creates a DataView over a binary string slice.
 lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer -- Creates a fixed-capacity ring buffer for Lua values.
 lurek.data.newWriter() -> LDataWriter -- Creates an empty binary data writer.
 lurek.data.pack(fmt: string, ...: LuaValue) -> string -- Packs Lua values into a binary string using a format string.
-lurek.data.parseToml(text: string) -> LuaValue -- Parses TOML text into Lua tables and scalar values.
+lurek.data.parseToml(text: string) -> table -- Parses TOML text into Lua tables and scalar values.
 lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue -- Reads binary values from a byte string using a format string.
 -- ... 4 more module functions
 ```
@@ -216,9 +218,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
+  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
+  -- Optional third arg is compression level (1-9, default 6)
   local raw = string.rep("level_data ", 256)
   local packed = lurek.data.compress("lz4", raw)
-  lurek.log.info("compressed " .. #raw .. " -> " .. #packed .. " bytes", "data")
+  local ratio = math.floor((1 - #packed / #raw) * 100)
+  lurek.log.info("lz4 compressed " .. #raw .. " -> " .. #packed .. " bytes (" .. ratio .. "% saved)", "data")
 end
 ```
 
@@ -240,9 +246,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Pass a table of strings for streaming compression without concatenating first
+  -- Useful when building large payloads from parts (header + body + footer)
   local chunks = { "header:", string.rep("A", 2048), ":footer" }
   local packed = lurek.data.compressChunks("zlib", chunks)
-  lurek.log.info("chunk-compressed bytes: " .. #packed, "data")
+  lurek.log.info("chunk-compressed " .. (8 + 2048 + 8) .. " -> " .. #packed .. " bytes", "data")
 end
 ```
 
@@ -262,11 +270,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local payload = lurek.data.pack("<II", 1024, 768)  -- returns a binary Lua string directly
-  local payload_str = payload
-  local ok_c, sum = pcall(lurek.data.crc32, payload_str)
-  local sum_val = ok_c and sum or 0
-  lurek.log.info(string.format("payload crc32 = 0x%08X", sum_val), "data")
+  -- Fast non-cryptographic checksum for quick corruption detection
+  -- Returns an integer, not a binary string
+  local payload = lurek.data.pack("<II", 1024, 768)
+  local checksum = lurek.data.crc32(payload)
+  lurek.log.info(string.format("payload crc32 = 0x%08X", checksum), "data")
 end
 ```
 
@@ -287,6 +295,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reverses encode: text representation back to raw binary
+  -- Use case: reading a base64 save token from a config file
   local b64 = lurek.data.encode("base64", "lurek")
   local raw = lurek.data.decode("base64", b64)
   lurek.log.info("decoded back to: '" .. raw .. "'", "data")
@@ -310,9 +320,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local packed = lurek.data.compress("gzip", "tilemap_payload")
-  local raw = lurek.data.decompress("gzip", packed)
-  lurek.log.info("round-trip ok: " .. raw, "data")
+  -- Must use the same format for compress and decompress
+  -- Use case: loading a gzip-compressed tilemap from disk
+  local original = "tilemap_payload_row_by_row"
+  local packed = lurek.data.compress("gzip", original)
+  local restored = lurek.data.decompress("gzip", packed)
+  -- Round-trip: restored should equal original
+  lurek.log.info("round-trip ok: " .. tostring(restored == original), "data")
 end
 ```
 
@@ -333,8 +347,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local packed = lurek.data.compressChunks("deflate", { "part-a", "part-b" })
+  -- Mirrors compressChunks — same format required
+  local parts = { "part-a", "part-b" }
+  local packed = lurek.data.compressChunks("deflate", parts)
   local restored = lurek.data.decompressChunks("deflate", packed)
+  -- restored is a single string combining all original chunks
   lurek.log.info("restored payload: " .. restored, "data")
 end
 ```
@@ -356,11 +373,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local key = lurek.data.pack("<I", 0xCAFEF00D)  -- returns a binary Lua string directly
-  local key_str = key
-  local ok_e1, hex = pcall(lurek.data.encode, "hex", key_str)
-  local ok_e2, b64 = pcall(lurek.data.encode, "base64", key_str)
-  lurek.log.info("hex=" .. (ok_e1 and hex or "n/a") .. " b64=" .. (ok_e2 and b64 or "n/a"), "data")
+  -- Supported formats: "hex", "base64", "base32"
+  -- Use case: turning binary data into safe printable text for logs, URLs, config
+  local key = lurek.data.pack("<I", 0xCAFEF00D)
+  local hex = lurek.data.encode("hex", key)
+  local b64 = lurek.data.encode("base64", key)
+  -- hex is lowercase hexadecimal, b64 is standard base64 with padding
+  lurek.log.info("hex=" .. hex .. " b64=" .. b64, "data")
 end
 ```
 
@@ -380,7 +399,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local text = lurek.data.encodeToml({ audio = { master = 0.8, music = 0.6 } })
+  -- Reverse of parseToml: serialize Lua tables to TOML for saving config
+  -- Nested tables become TOML sections
+  local text = lurek.data.encodeToml({
+    audio = { master = 0.8, music = 0.6, sfx = 1.0 },
+    controls = { sensitivity = 2.5 }
+  })
   lurek.log.info("toml output:\n" .. text, "data")
 end
 ```
@@ -401,11 +425,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local packet = lurek.data.toMsgPack({ id = 17, hp = 90 })
-  local msg = lurek.data.fromMsgPack(packet)
-  local id = (msg and msg.id) or "nil"
-  local hp = (msg and msg.hp) or "nil"
-  lurek.log.info("decoded id=" .. tostring(id) .. " hp=" .. tostring(hp), "net")
+  -- Round-trip: encode then decode to verify integrity
+  local original = { id = 17, hp = 90, alive = true }
+  local packet = lurek.data.toMsgPack(original)
+  local decoded = lurek.data.fromMsgPack(packet)
+  lurek.log.info("decoded id=" .. tostring(decoded.id) .. " hp=" .. tostring(decoded.hp), "data")
 end
 ```
 
@@ -426,9 +450,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Useful for pre-allocating buffers or validating record sizes at load time
+  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
   local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
   if size ~= 16 then
     lurek.log.warn("entity record size drifted: " .. size, "data")
+  else
+    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
   end
 end
 ```
@@ -450,12 +478,15 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Supported: "md5", "sha1", "sha256", "sha512", "xxhash64"
+  -- Returns raw binary digest — encode to hex for display
+  -- Use case: integrity checking save files, deduplicating assets
   local digest = lurek.data.encode("hex", lurek.data.hash("sha256", "player_save_v3"))
-  lurek.log.info("save digest: " .. digest, "data")
+  lurek.log.info("sha256 digest: " .. digest, "data")
 end
 ```
 
-### `lurek.data.newByteData(value: any) -> ByteData`
+### `lurek.data.newByteData(value: any) -> LByteData`
 
 Creates ByteData from a size or string.
 
@@ -463,7 +494,7 @@ Creates ByteData from a size or string.
 
 - `value` (`any`, required) - Integer size for zeroed bytes, or string used as initial bytes.
 
-**Returns**: `ByteData` - New ByteData userdata.
+**Returns**: `LByteData` - New LByteData userdata.
 
 #### Example
 
@@ -471,8 +502,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local bd = lurek.data.newByteData(16)
-  lurek.log.info("byte data size=" .. bd:getSize(), "data")
+  -- Pass an integer for zeroed buffer, or a string to copy its bytes
+  local zeroed = lurek.data.newByteData(16)
+  local from_str = lurek.data.newByteData("hello")
+  lurek.log.info("zeroed=" .. zeroed:getSize() .. " from_str=" .. from_str:getSize(), "data")
 end
 ```
 
@@ -494,12 +527,15 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local blob = lurek.data.pack("<HHI", 0xBEEF, 0xCAFE, 12345)  -- returns a binary Lua string directly
-  local blob_str = blob
-  local ok_v, view = pcall(lurek.data.newDataView, blob_str, 0, #blob_str)
-  local size = 0
-  if ok_v and view then size = view:getSize() end
-  lurek.log.info("view bytes: " .. size, "data")
+  -- DataView provides random-access typed reads into a binary string
+  -- Optional offset and size allow windowing into a larger buffer
+  local blob = lurek.data.pack("<HHI", 0xBEEF, 0xCAFE, 12345)
+  local view = lurek.data.newDataView(blob, 0, #blob)
+  -- Read individual fields at known offsets without unpacking everything
+  local magic = view:getUInt16(0)
+  local flags = view:getUInt16(2)
+  local id = view:getUInt32(4)
+  lurek.log.info(string.format("magic=0x%04X flags=0x%04X id=%d", magic, flags, id), "data")
 end
 ```
 
@@ -519,9 +555,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Fixed-size FIFO: when full, new pushes evict the oldest value
+  -- Use case: keeping the last N frame times for averaging, input history
   local recent_inputs = lurek.data.newRingBuffer(8)
   recent_inputs:push("jump")
-  lurek.log.info("input buffer size=" .. recent_inputs:len(), "data")
+  recent_inputs:push("dash")
+  recent_inputs:push("attack")
+  lurek.log.info("input buffer len=" .. recent_inputs:len() .. " cap=" .. recent_inputs:capacity(), "data")
 end
 ```
 
@@ -537,10 +577,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- DataWriter builds binary data sequentially with typed write methods
+  -- Use case: assembling custom file formats, network packets, save chunks
   local w = lurek.data.newWriter()
-  w:writeU32LE(0x4C524B32)  -- "LRK2" magic
-  w:writeString("save_v1")
-  lurek.log.info("header bytes: " .. w:len(), "save")
+  w:writeU32LE(0x4C524B32)  -- magic "LRK2" as little-endian u32
+  w:writeString("save_v1")  -- length-prefixed string
+  w:writeF32LE(1.0)         -- version float
+  lurek.log.info("header bytes: " .. w:len(), "data")
 end
 ```
 
@@ -561,16 +604,17 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local ok_p, header = pcall(lurek.data.pack, "<HHs", 1, 0, "lurek-save")
-  if ok_p then
-    lurek.log.info("packed save header: " .. tostring(#header) .. " bytes", "data")
-  else
-    lurek.log.info("pack: " .. tostring(header), "data")
-  end
+  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
+  -- Use case: building custom binary save-file headers with a known layout
+  local version = 1
+  local flags = 0
+  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
+  -- The result is a raw binary string; #header gives byte count
+  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
 end
 ```
 
-### `lurek.data.parseToml(text: string) -> LuaValue`
+### `lurek.data.parseToml(text: string) -> table`
 
 Parses TOML text into Lua tables and scalar values.
 
@@ -578,7 +622,7 @@ Parses TOML text into Lua tables and scalar values.
 
 - `text` (`string`, required) - TOML document text.
 
-**Returns**: `LuaValue` - Lua representation of the TOML document.
+**Returns**: `table` - Lua representation of the TOML document.
 
 #### Example
 
@@ -586,8 +630,19 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local cfg = lurek.data.parseToml("[window]\nwidth = 1280\nheight = 720\n")
+  -- TOML is the config format for lurek games (conf.lua uses it via GameFS)
+  -- Tables map to Lua tables, arrays to sequences, values to native Lua types
+  local cfg = lurek.data.parseToml([[
+[window]
+width = 1280
+height = 720
+vsync = true
+
+[audio]
+master_volume = 0.8
+]])
   lurek.log.info("window=" .. cfg.window.width .. "x" .. cfg.window.height, "data")
+  lurek.log.info("vsync=" .. tostring(cfg.window.vsync), "data")
 end
 ```
 
@@ -609,6 +664,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Mirrors write: reads typed values in order from a binary string
+  -- Third arg is optional byte offset (default 0)
   local record = lurek.data.write("u16 u16", 800, 600)
   local w, h = lurek.data.read("u16 u16", record, 0)
   lurek.log.info("resolution: " .. w .. "x" .. h, "data")
@@ -631,8 +688,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Returns the total byte count for a format without needing actual values
+  -- Useful for calculating stride in a record array or verifying alignment
   local sz = lurek.data.size("u32 f32 f32")
-  lurek.log.info("transform record = " .. sz .. " bytes", "data")
+  lurek.log.info("transform record = " .. sz .. " bytes (id + x + y)", "data")
 end
 ```
 
@@ -652,8 +711,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- MsgPack is compact binary serialization for network packets or IPC
+  -- Supports tables, strings, numbers, booleans, nil
   local packet = lurek.data.toMsgPack({ kind = "move", x = 32, y = 48 })
-  lurek.log.info("msgpack packet size: " .. #packet, "net")
+  lurek.log.info("msgpack packet: " .. #packet .. " bytes (vs approx 30 for JSON)", "data")
 end
 ```
 
@@ -675,12 +736,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reverse of pack: extract typed values from a binary blob
+  -- The third argument is the byte offset (0-based); the last return is the next offset
   local blob = lurek.data.pack("<II", 42, 7)
-  local ok_u, result_tbl = pcall(function() return {lurek.data.unpack("<II", blob, 0)} end)
-  local hp = ok_u and result_tbl[1] or 0
-  local mana = ok_u and result_tbl[2] or 0
-  local next_off = ok_u and result_tbl[3] or 0
-  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " consumed=" .. next_off, "data")
+  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
+  -- next_offset tells you where to continue reading if the blob has more data
+  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
 end
 ```
 
@@ -701,8 +762,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Higher-level format than pack: uses named types like "u32", "f32", "str"
+  -- "str" writes a length-prefixed UTF-8 string
+  -- Use case: writing game entity records to a binary stream
   local record = lurek.data.write("u32 f32 str", 7, 1.5, "goblin")
-  lurek.log.info("entity record bytes: " .. #record, "data")
+  lurek.log.info("entity record: " .. #record .. " bytes", "data")
 end
 ```
 
@@ -715,64 +779,22 @@ Exposes byte-buffer inspection and bit editing methods to Lua.
 
 #### Example
 
-Module-level example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
--- content/examples/data.lua
--- lurek.data API examples.
--- Run: cargo run -- content/examples/data.lua
-
---@api-stub: lurek.data.pack
--- Packs Lua values into a binary string using a format string
 do
-  local ok_p, header = pcall(lurek.data.pack, "<HHs", 1, 0, "lurek-save")
-  if ok_p then
-    lurek.log.info("packed save header: " .. tostring(#header) .. " bytes", "data")
-  else
-    lurek.log.info("pack: " .. tostring(header), "data")
-  end
+  -- Pass an integer for zeroed buffer, or a string to copy its bytes
+  local zeroed = lurek.data.newByteData(16)
+  local from_str = lurek.data.newByteData("hello")
+  lurek.log.info("zeroed=" .. zeroed:getSize() .. " from_str=" .. from_str:getSize(), "data")
 end
-
---@api-stub: lurek.data.unpack
--- Unpacks values from a binary string using a format string
-do
-  local blob = lurek.data.pack("<II", 42, 7)
-  local ok_u, result_tbl = pcall(function() return {lurek.data.unpack("<II", blob, 0)} end)
-  local hp = ok_u and result_tbl[1] or 0
-  local mana = ok_u and result_tbl[2] or 0
-  local next_off = ok_u and result_tbl[3] or 0
-  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " consumed=" .. next_off, "data")
-end
-
---@api-stub: lurek.data.getPackedSize
--- Computes the packed byte size for values and a format string
-do
-  local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
-  if size ~= 16 then
-    lurek.log.warn("entity record size drifted: " .. size, "data")
-  end
-end
-
---@api-stub: lurek.data.compress
--- Compresses a binary string using a named compression format
-do
-  local raw = string.rep("level_data ", 256)
-  local packed = lurek.data.compress("lz4", raw)
-  lurek.log.info("compressed " .. #raw .. " -> " .. #packed .. " bytes", "data")
-end
-
---@api-stub: lurek.data.decompress
--- Decompresses a binary string using a named compression format
-do
-  local packed = lurek.data.compress("gzip", "tilemap_payload")
-  local raw = lurek.data.decompress("gzip", packed)
 ```
 
-### `LByteData:clone() -> ByteData`
+### `LByteData:clone() -> LByteData`
 
 Returns a copy of this byte buffer. This method is available to Lua scripts.
 
-**Returns**: `ByteData` - New ByteData userdata containing copied bytes.
+**Returns**: `LByteData` - New LByteData userdata containing copied bytes.
 
 #### Example
 
@@ -780,10 +802,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- clone creates an independent copy — modifications to one don't affect the other
+  -- Use case: creating variant data from a template
   local original = lurek.data.newByteData(4)
   original:setByte(0, 98); original:setByte(1, 97); original:setByte(2, 115); original:setByte(3, 101)
   local copy = original:clone()
-  copy:setByte(0, 0x42)
+  copy:setByte(0, 0x42)  -- modify only the copy
   lurek.log.info("orig=" .. original:getString() .. " copy=" .. copy:getString(), "data")
 end
 ```
@@ -805,10 +829,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- getBit(byte_offset, bit_offset) → boolean
+  -- Use case: reading individual flags from a packed bitfield
   local fd = lurek.data.newByteData(16)
   fd:setByte(0, 0b10110110)
-  local bit = fd:getBit(0, 1)
-  lurek.log.info("bit 1 = " .. tostring(bit), "data")
+  local bit1 = fd:getBit(0, 1)  -- bit 1 of 10110110 = 1 (true)
+  local bit2 = fd:getBit(0, 3)  -- bit 3 of 10110110 = 0 (false)
+  lurek.log.info("bit1=" .. tostring(bit1) .. " bit3=" .. tostring(bit2), "data")
 end
 ```
 
@@ -828,10 +855,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Read a single byte at a zero-based offset
   local bd = lurek.data.newByteData(3)
-  bd:setByte(0, 65); bd:setByte(1, 66); bd:setByte(2, 67)
+  bd:setByte(0, 65); bd:setByte(1, 66); bd:setByte(2, 67)  -- "ABC"
   local first = bd:getByte(0)
-  lurek.log.info("first byte (A=65) = " .. first, "data")
+  lurek.log.info("first byte = " .. first .. " (A=65)", "data")
 end
 ```
 
@@ -847,8 +875,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local bd = lurek.data.newByteData(5)
-  lurek.log.info("byte data size = " .. bd:getSize(), "data")
+  -- ByteData is a mutable fixed-size byte buffer
+  -- Create with a size (zeroed) or a string (copies bytes)
+  local bd = lurek.data.newByteData(16)
+  lurek.log.info("byte data size = " .. bd:getSize() .. " (16 zeroed bytes)", "data")
 end
 ```
 
@@ -864,11 +894,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- getString returns the buffer contents as a Lua string
+  -- Use case: extract ByteData for hashing or sending over network
   local bd = lurek.data.newByteData(7)
-  local bytes = { 115, 97, 118, 101, 95, 118, 49 } -- "save_v1"
-  for i, b in ipairs(bytes) do bd:setByte(i - 1, b) end
+  local text = "save_v1"
+  for i = 1, #text do bd:setByte(i - 1, string.byte(text, i)) end
   local digest = lurek.data.encode("hex", lurek.data.hash("md5", bd:getString()))
-  lurek.log.info("md5 = " .. digest, "data")
+  lurek.log.info("md5 of '" .. bd:getString() .. "' = " .. digest, "data")
 end
 ```
 
@@ -890,10 +922,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- readBits(byte_offset, bit_offset, count) → integer
+  -- Use case: extracting packed multi-bit fields (tile IDs, color channels)
   local fd = lurek.data.newByteData(16)
   fd:setByte(0, 0xFF)
-  local val = fd:readBits(0, 0, 8)
-  lurek.log.info("read bits: " .. val, "data")
+  local val = fd:readBits(0, 0, 8)  -- read all 8 bits = 255
+  lurek.log.info("read 8 bits from 0xFF: " .. val, "data")
 end
 ```
 
@@ -913,9 +947,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- setBit(byte_offset, bit_offset, value) — set or clear a single bit
+  -- Use case: toggling feature flags in a packed byte
   local fd = lurek.data.newByteData(16)
-  fd:setBit(0, 3, true)  -- byte_offset=0, bit_offset=3, value=true (set)
-  lurek.log.info("bit 3 set to 1", "data")
+  fd:setBit(0, 3, true)   -- set bit 3 → byte becomes 0x08
+  fd:setBit(0, 0, true)   -- set bit 0 → byte becomes 0x09
+  lurek.log.info("byte after setting bits 0,3: " .. fd:getByte(0), "data")
 end
 ```
 
@@ -934,11 +971,138 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Mutate a single byte at a zero-based offset
+  -- Use case: patching individual bytes in a binary template
   local bd = lurek.data.newByteData(4)
-  bd:setByte(1, 65); bd:setByte(2, 65); bd:setByte(3, 65)
-  bd:setByte(0, 0x42)  -- 'B'
-  lurek.log.info("patched: " .. bd:getString(), "data")
+  bd:setByte(0, 0x4C); bd:setByte(1, 0x52); bd:setByte(2, 0x4B); bd:setByte(3, 0x32)
+  lurek.log.info("patched to: " .. bd:getString(), "data")  -- "LRK2"
 end
+```
+
+### `LByteData:type() -> string`
+
+Returns the type name of this object for runtime type-checking.
+
+**Returns**: `string` - Always returns "LByteData".
+
+#### Example
+
+Module-level example from [data.lua](../blob/main/content/examples/data.lua):
+
+```lua
+-- content/examples/data.lua
+-- lurek.data API examples.
+-- Run: cargo run -- content/examples/data.lua
+
+--@api-stub: lurek.data.pack
+-- Packs Lua values into a binary string using a format string
+do
+  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
+  -- Use case: building custom binary save-file headers with a known layout
+  local version = 1
+  local flags = 0
+  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
+  -- The result is a raw binary string; #header gives byte count
+  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
+end
+
+--@api-stub: lurek.data.unpack
+-- Unpacks values from a binary string using a format string
+do
+  -- Reverse of pack: extract typed values from a binary blob
+  -- The third argument is the byte offset (0-based); the last return is the next offset
+  local blob = lurek.data.pack("<II", 42, 7)
+  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
+  -- next_offset tells you where to continue reading if the blob has more data
+  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
+end
+
+--@api-stub: lurek.data.getPackedSize
+-- Computes the packed byte size for values and a format string
+do
+  -- Useful for pre-allocating buffers or validating record sizes at load time
+  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
+  local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
+  if size ~= 16 then
+    lurek.log.warn("entity record size drifted: " .. size, "data")
+  else
+    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
+  end
+end
+
+--@api-stub: lurek.data.compress
+-- Compresses a binary string using a named compression format
+do
+  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
+  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
+  -- Optional third arg is compression level (1-9, default 6)
+  local raw = string.rep("level_data ", 256)
+  local packed = lurek.data.compress("lz4", raw)
+```
+
+### `LByteData:typeOf(name: string) -> boolean`
+
+Checks whether this object matches the given type name.
+
+**Parameters**
+
+- `name` (`string`, required) - Type name to check (e.g. "LByteData" or "Object").
+
+**Returns**: `boolean` - True if this object matches the given type.
+
+#### Example
+
+Module-level example from [data.lua](../blob/main/content/examples/data.lua):
+
+```lua
+-- content/examples/data.lua
+-- lurek.data API examples.
+-- Run: cargo run -- content/examples/data.lua
+
+--@api-stub: lurek.data.pack
+-- Packs Lua values into a binary string using a format string
+do
+  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
+  -- Use case: building custom binary save-file headers with a known layout
+  local version = 1
+  local flags = 0
+  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
+  -- The result is a raw binary string; #header gives byte count
+  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
+end
+
+--@api-stub: lurek.data.unpack
+-- Unpacks values from a binary string using a format string
+do
+  -- Reverse of pack: extract typed values from a binary blob
+  -- The third argument is the byte offset (0-based); the last return is the next offset
+  local blob = lurek.data.pack("<II", 42, 7)
+  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
+  -- next_offset tells you where to continue reading if the blob has more data
+  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
+end
+
+--@api-stub: lurek.data.getPackedSize
+-- Computes the packed byte size for values and a format string
+do
+  -- Useful for pre-allocating buffers or validating record sizes at load time
+  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
+  local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
+  if size ~= 16 then
+    lurek.log.warn("entity record size drifted: " .. size, "data")
+  else
+    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
+  end
+end
+
+--@api-stub: lurek.data.compress
+-- Compresses a binary string using a named compression format
+do
+  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
+  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
+  -- Optional third arg is compression level (1-9, default 6)
+  local raw = string.rep("level_data ", 256)
+  local packed = lurek.data.compress("lz4", raw)
 ```
 
 ### `LDataView`
@@ -951,12 +1115,15 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local blob = lurek.data.pack("<HHI", 0xBEEF, 0xCAFE, 12345)  -- returns a binary Lua string directly
-  local blob_str = blob
-  local ok_v, view = pcall(lurek.data.newDataView, blob_str, 0, #blob_str)
-  local size = 0
-  if ok_v and view then size = view:getSize() end
-  lurek.log.info("view bytes: " .. size, "data")
+  -- DataView provides random-access typed reads into a binary string
+  -- Optional offset and size allow windowing into a larger buffer
+  local blob = lurek.data.pack("<HHI", 0xBEEF, 0xCAFE, 12345)
+  local view = lurek.data.newDataView(blob, 0, #blob)
+  -- Read individual fields at known offsets without unpacking everything
+  local magic = view:getUInt16(0)
+  local flags = view:getUInt16(2)
+  local id = view:getUInt32(4)
+  lurek.log.info(string.format("magic=0x%04X flags=0x%04X id=%d", magic, flags, id), "data")
 end
 ```
 
@@ -976,6 +1143,7 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reads 8 bytes as IEEE 754 float64 — full Lua number precision
   local raw = lurek.data.pack("<d", 1.7e9)
   local t = lurek.data.newDataView(raw):getDouble(0)
   lurek.log.info("timestamp = " .. t, "data")
@@ -998,9 +1166,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local raw = lurek.data.pack("<f", 3.14)
+  -- Reads 4 bytes as IEEE 754 float32
+  local raw = lurek.data.pack("<f", 3.14159)
   local v = lurek.data.newDataView(raw):getFloat(0)
-  lurek.log.info(string.format("f32 = %.4f", v), "data")
+  lurek.log.info(string.format("f32 = %.5f", v), "data")
 end
 ```
 
@@ -1020,6 +1189,7 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reads 2 bytes as signed little-endian int16
   local raw = lurek.data.pack("<h", -1234)
   local v = lurek.data.newDataView(raw):getInt16(0)
   lurek.log.info("signed16 = " .. v, "data")
@@ -1042,6 +1212,7 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reads 4 bytes as signed little-endian int32
   local raw = lurek.data.pack("<i", -42000)
   local v = lurek.data.newDataView(raw):getInt32(0)
   lurek.log.info("signed32 = " .. v, "data")
@@ -1064,9 +1235,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Signed byte: 0xFF = -1, 0x01 = 1
   local view = lurek.data.newDataView(string.char(0xFF, 0x01))
-  local v = view:getInt8(0)
-  lurek.log.info("signed byte = " .. v, "data")
+  local signed = view:getInt8(0)
+  lurek.log.info("signed byte 0xFF = " .. signed .. " (should be -1)", "data")
 end
 ```
 
@@ -1082,9 +1254,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local view = lurek.data.newDataView(lurek.data.pack("<III", 1, 2, 3))
+  -- Use getSize to iterate over fixed-size records in a binary blob
+  local view = lurek.data.newDataView(lurek.data.pack("<III", 100, 200, 300))
   for off = 0, view:getSize() - 4, 4 do
-    lurek.log.info("u32 at " .. off .. " = " .. view:getUInt32(off), "data")
+    lurek.log.info("u32 at offset " .. off .. " = " .. view:getUInt32(off), "data")
   end
 end
 ```
@@ -1105,6 +1278,7 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Reads 2 bytes as unsigned little-endian uint16
   local raw = lurek.data.pack("<H", 0xBEEF)
   local v = lurek.data.newDataView(raw):getUInt16(0)
   lurek.log.info(string.format("u16 = 0x%04X", v), "data")
@@ -1127,9 +1301,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Use case: validating a file magic number from a save file header
   local raw = lurek.data.pack("<I", 0x4C524B32)
   local magic = lurek.data.newDataView(raw):getUInt32(0)
-  if magic == 0x4C524B32 then lurek.log.info("save magic ok", "save") end
+  if magic == 0x4C524B32 then
+    lurek.log.info("save file magic 'LRK2' verified", "data")
+  end
 end
 ```
 
@@ -1149,9 +1326,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local view = lurek.data.newDataView(string.char(0x42, 0xFF))
+  -- Read a single unsigned byte at a zero-based offset
+  local view = lurek.data.newDataView(string.char(0x42, 0xFF, 0x00))
   local first = view:getUInt8(0)
-  lurek.log.info("first byte = " .. first, "data")
+  local second = view:getUInt8(1)
+  lurek.log.info("bytes: " .. first .. ", " .. second, "data")
 end
 ```
 
@@ -1167,9 +1346,9 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local data_view_obj = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
-  local t = data_view_obj:type()
-  lurek.log.info("LDataView:type = " .. t, "data")
+  -- type() returns the string "LDataView" for runtime type checking
+  local view = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
+  lurek.log.info("LDataView:type = " .. view:type(), "data")
 end
 ```
 
@@ -1189,9 +1368,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local data_view_obj = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
-  lurek.log.info("is LDataView: " .. tostring(data_view_obj:typeOf("LDataView")), "data")
-  lurek.log.info("is wrong: " .. tostring(data_view_obj:typeOf("Unknown")), "data")
+  -- typeOf checks against "LDataView" and "Object"
+  local view = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
+  lurek.log.info("is LDataView: " .. tostring(view:typeOf("LDataView")), "data")
+  lurek.log.info("is Object: " .. tostring(view:typeOf("Object")), "data")
 end
 ```
 
@@ -1205,10 +1385,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- DataWriter builds binary data sequentially with typed write methods
+  -- Use case: assembling custom file formats, network packets, save chunks
   local w = lurek.data.newWriter()
-  w:writeU32LE(0x4C524B32)  -- "LRK2" magic
-  w:writeString("save_v1")
-  lurek.log.info("header bytes: " .. w:len(), "save")
+  w:writeU32LE(0x4C524B32)  -- magic "LRK2" as little-endian u32
+  w:writeString("save_v1")  -- length-prefixed string
+  w:writeF32LE(1.0)         -- version float
+  lurek.log.info("header bytes: " .. w:len(), "data")
 end
 ```
 
@@ -1224,9 +1407,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- len returns total bytes written (buffer size), not cursor position
   local w = lurek.data.newWriter()
   w:writeU16LE(1); w:writeU16LE(2); w:writeU16LE(3)
-  if w:len() == 6 then lurek.log.info("buffer fully populated", "data") end
+  if w:len() == 6 then
+    lurek.log.info("3 x u16 = 6 bytes confirmed", "data")
+  end
 end
 ```
 
@@ -1244,10 +1430,15 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- seek moves the cursor to an absolute byte position
+  -- Use case: writing a placeholder, filling data, then patching the placeholder
   local w = lurek.data.newWriter()
-  w:writeU32LE(0)            -- placeholder for total length
-  w:writeString("payload")
-  w:seek(0); w:writeU32LE(w:len())  -- patch length back at offset 0
+  w:writeU32LE(0)            -- placeholder for total length at offset 0
+  w:writeString("payload")   -- actual content
+  local total = w:len()
+  w:seek(0)                  -- jump back to the start
+  w:writeU32LE(total)        -- patch in the real length
+  lurek.log.info("patched length=" .. total .. " at offset 0", "data")
 end
 ```
 
@@ -1263,10 +1454,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- tell returns the current cursor position (byte offset)
+  -- Use case: recording section boundaries for a table-of-contents
   local w = lurek.data.newWriter()
-  w:writeU32LE(0)
+  w:writeU32LE(0)  -- TOC placeholder
   local section_start = w:tell()
-  w:writeString("body")
+  w:writeString("body content here")
   lurek.log.info("section started at offset " .. section_start, "data")
 end
 ```
@@ -1283,8 +1476,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- toBytes extracts the full buffer as a Lua binary string
+  -- After this call the writer is still usable (non-destructive read)
   local w = lurek.data.newWriter()
-  w:writeU32LE(0xDEADBEEF); w:writeString("end")
+  w:writeU32LE(0xDEADBEEF)
+  w:writeString("end")
 ```
 
 ### `LDataWriter:type() -> string`
@@ -1299,9 +1495,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local data_writer_obj = lurek.data.newWriter()
-  local t = data_writer_obj:type()
-  lurek.log.info("LDataWriter:type = " .. t, "data")
+  local w = lurek.data.newWriter()
+  lurek.log.info("LDataWriter:type = " .. w:type(), "data")
 end
 ```
 
@@ -1321,9 +1516,9 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local data_writer_obj = lurek.data.newWriter()
-  lurek.log.info("is LDataWriter: " .. tostring(data_writer_obj:typeOf("LDataWriter")), "data")
-  lurek.log.info("is wrong: " .. tostring(data_writer_obj:typeOf("Unknown")), "data")
+  local w = lurek.data.newWriter()
+  lurek.log.info("is LDataWriter: " .. tostring(w:typeOf("LDataWriter")), "data")
+  lurek.log.info("is Object: " .. tostring(w:typeOf("Object")), "data")
 end
 ```
 
@@ -1341,6 +1536,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Write raw bytes without any length prefix
+  -- Use case: embedding pre-computed binary data or file signatures
   local w = lurek.data.newWriter()
   w:writeBytes(string.char(0x89, 0x50, 0x4E, 0x47))  -- PNG signature
   lurek.log.info("raw bytes hex=" .. lurek.data.encode("hex", w:toBytes()), "data")
@@ -1361,9 +1558,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- 32-bit float: sufficient for positions, velocities, colors
+  -- Use case: writing a 2D position pair
   local w = lurek.data.newWriter()
-  w:writeF32LE(0.5); w:writeF32LE(0.25)
-  lurek.log.info("vec2 bytes=" .. w:len(), "data")
+  w:writeF32LE(123.456)  -- x
+  w:writeF32LE(789.012)  -- y
+  lurek.log.info("vec2 bytes=" .. w:len() .. " (should be 8)", "data")
 end
 ```
 
@@ -1381,9 +1581,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- 64-bit float: full Lua number precision for timestamps or precise math
   local w = lurek.data.newWriter()
   w:writeF64LE(os.time())
-  lurek.log.info("timestamp record bytes=" .. w:len(), "save")
+  lurek.log.info("f64 timestamp record bytes=" .. w:len() .. " (should be 8)", "data")
 end
 ```
 
@@ -1401,8 +1602,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Signed 16-bit: -32768 to 32767
+  -- Use case: writing audio sample deltas or tile height offsets
   local w = lurek.data.newWriter()
-  w:writeI16LE(-15000); w:writeI16LE(15000)
+  w:writeI16LE(-15000)
+  w:writeI16LE(15000)
   lurek.log.info("signed16 record = " .. w:len() .. " bytes", "data")
 end
 ```
@@ -1421,9 +1625,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Signed 32-bit: large ranges for scores, positions, etc.
   local w = lurek.data.newWriter()
-  w:writeI32LE(-1024); w:writeI32LE(2048)
-  lurek.log.info("delta record bytes=" .. w:len(), "data")
+  w:writeI32LE(-100000)  -- debt
+  w:writeI32LE(250000)   -- gold
+  lurek.log.info("economy record bytes=" .. w:len(), "data")
 end
 ```
 
@@ -1441,9 +1647,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Signed byte: -128 to 127
+  -- Use case: writing small delta values for animation keyframes
   local w = lurek.data.newWriter()
-  w:writeI8(-1); w:writeI8(64)
-  lurek.log.info("signed bytes len=" .. w:len(), "data")
+  w:writeI8(-5)   -- delta x
+  w:writeI8(3)    -- delta y
+  lurek.log.info("signed delta bytes: " .. w:len(), "data")
 end
 ```
 
@@ -1461,9 +1670,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Writes a length-prefixed UTF-8 string (4-byte length + content)
+  -- Use case: writing player names, save slot labels
   local w = lurek.data.newWriter()
   w:writeString("player_one")
-  lurek.log.info("string record total bytes=" .. w:len(), "save")
+  lurek.log.info("string record total bytes=" .. w:len() .. " (4 len + 10 chars)", "data")
 end
 ```
 
@@ -1481,9 +1692,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Big-endian: network byte order, used in some protocols
   local w = lurek.data.newWriter()
   w:writeU16BE(0xCAFE)
-  lurek.log.info("BE bytes hex = " .. lurek.data.encode("hex", w:toBytes()), "data")
+  lurek.log.info("BE u16 hex = " .. lurek.data.encode("hex", w:toBytes()), "data")
 end
 ```
 
@@ -1501,8 +1713,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Little-endian unsigned 16-bit (0-65535)
+  -- Use case: writing screen resolution to a config binary
   local w = lurek.data.newWriter()
-  w:writeU16LE(800); w:writeU16LE(600)
+  w:writeU16LE(1920)  -- width
+  w:writeU16LE(1080)  -- height
   lurek.log.info("resolution record = " .. w:len() .. " bytes", "data")
 end
 ```
@@ -1521,9 +1736,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Use case: writing file magic numbers, asset IDs, timestamps
   local w = lurek.data.newWriter()
-  w:writeU32LE(0x4C524B32)
-  lurek.log.info("magic written, len=" .. w:len(), "save")
+  w:writeU32LE(0x4C524B32)  -- "LRK2" magic
+  lurek.log.info("magic written, len=" .. w:len(), "data")
 end
 ```
 
@@ -1541,9 +1757,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Write individual unsigned bytes (0-255)
+  -- Use case: writing a version byte or flags byte at the start of a packet
   local w = lurek.data.newWriter()
-  w:writeU8(0xAB); w:writeU8(0xCD)
-  lurek.log.info("wrote " .. w:len() .. " bytes", "data")
+  w:writeU8(0x01)  -- version
+  w:writeU8(0x03)  -- flags: bit0=compressed, bit1=encrypted
+  lurek.log.info("wrote " .. w:len() .. " flag bytes", "data")
 end
 ```
 
@@ -1557,9 +1776,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- Fixed-size FIFO: when full, new pushes evict the oldest value
+  -- Use case: keeping the last N frame times for averaging, input history
   local recent_inputs = lurek.data.newRingBuffer(8)
   recent_inputs:push("jump")
-  lurek.log.info("input buffer size=" .. recent_inputs:len(), "data")
+  recent_inputs:push("dash")
+  recent_inputs:push("attack")
+  lurek.log.info("input buffer len=" .. recent_inputs:len() .. " cap=" .. recent_inputs:capacity(), "data")
 end
 ```
 
@@ -1575,10 +1798,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- capacity returns the fixed max size set at creation
+  -- Use case: showing buffer fill percentage in debug HUD
   local rb = lurek.data.newRingBuffer(120)
   rb:push(0.016)
   local pct = (rb:len() / rb:capacity()) * 100
-  lurek.log.info(string.format("buffer %.1f%% full", pct), "perf")
+  lurek.log.info(string.format("buffer %.1f%% full (%d/%d)", pct, rb:len(), rb:capacity()), "data")
 end
 ```
 
@@ -1592,10 +1817,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- clear removes all items and releases their Lua registry keys
+  -- Use case: resetting trail positions on teleport
   local trail = lurek.data.newRingBuffer(32)
   for i = 1, 10 do trail:push({ x = i, y = i }) end
   trail:clear()
-  lurek.log.info("trail cleared, len=" .. trail:len(), "fx")
+  lurek.log.info("trail cleared, len=" .. trail:len() .. " (should be 0)", "data")
 end
 ```
 
@@ -1612,8 +1839,9 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 ```lua
 do
   local jobs = lurek.data.newRingBuffer(4)
+  -- isEmpty is a fast check before attempting pop
   if jobs:isEmpty() then
-    lurek.log.info("no pending jobs this frame", "jobs")
+    lurek.log.info("no pending jobs this frame", "data")
   end
 end
 ```
@@ -1630,11 +1858,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- isFull checks whether len == capacity
+  -- Use case: deciding whether to process items before pushing more
   local rb = lurek.data.newRingBuffer(3)
-  rb:push(10)
-  rb:push(20)
-  rb:push(30)
-  lurek.log.info("full: " .. tostring(rb:isFull()), "data")
+  rb:push(10); rb:push(20); rb:push(30)
+  lurek.log.info("full after 3 pushes to cap-3: " .. tostring(rb:isFull()), "data")
 end
 ```
 
@@ -1650,9 +1878,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- len returns current item count (always <= capacity)
   local rb = lurek.data.newRingBuffer(4)
   rb:push(1); rb:push(2); rb:push(3)
-  if rb:len() >= 3 then lurek.log.info("buffered enough samples", "data") end
+  if rb:len() >= 3 then
+    lurek.log.info("buffered " .. rb:len() .. " samples, ready to average", "data")
+  end
 end
 ```
 
@@ -1668,11 +1899,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- peek shows the oldest (next-to-pop) value without consuming it
+  -- Use case: inspect the next event before deciding to process it
   local events = lurek.data.newRingBuffer(8)
   events:push({ t = 0.0, kind = "spawn" })
+  events:push({ t = 0.5, kind = "damage" })
   local head = events:peek()
-  local kind = head and head.kind or "nil"
-  lurek.log.info("next event kind=" .. tostring(kind), "replay")
+  lurek.log.info("next event kind=" .. tostring(head.kind) .. " at t=" .. head.t, "data")
 end
 ```
 
@@ -1688,9 +1921,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- peekNewest returns the most recently pushed value without removing it
+  -- Use case: show the latest input for combo detection
   local recent = lurek.data.newRingBuffer(8)
-  recent:push("a"); recent:push("b"); recent:push("c")
-  lurek.log.info("last input: " .. tostring(recent:peekNewest()), "input")
+  recent:push("left")
+  recent:push("right")
+  recent:push("punch")
+  lurek.log.info("last input: " .. tostring(recent:peekNewest()), "data")
 end
 ```
 
@@ -1706,10 +1943,13 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- pop removes and returns the OLDEST value (FIFO order)
+  -- Returns nil if the buffer is empty
   local jobs = lurek.data.newRingBuffer(4)
-  jobs:push("load_audio"); jobs:push("decode_image")
+  jobs:push("load_audio")
+  jobs:push("decode_image")
   local next_job = jobs:pop()
-  lurek.log.info("running job: " .. tostring(next_job), "jobs")
+  lurek.log.info("running job: " .. tostring(next_job), "data")
 end
 ```
 
@@ -1729,10 +1969,15 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- push returns true if it evicted an older value (buffer was full)
   local frame_times = lurek.data.newRingBuffer(60)
   frame_times:push(0.0166)
   frame_times:push(0.0172)
-  lurek.log.info("samples buffered: " .. frame_times:len(), "perf")
+  -- Fill it up to test eviction
+  for i = 1, 60 do frame_times:push(i * 0.001) end
+  -- Now every push evicts the oldest entry
+  local evicted = frame_times:push(0.999)
+  lurek.log.info("evicted oldest: " .. tostring(evicted), "data")
 end
 ```
 
@@ -1748,10 +1993,12 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
+  -- toTable returns items in oldest-to-newest order as a plain Lua array
+  -- Use case: rendering a trail or replaying buffered inputs
   local rb = lurek.data.newRingBuffer(4)
   rb:push("a"); rb:push("b"); rb:push("c")
   local arr = rb:toTable()
-  lurek.log.info("ordered: " .. table.concat(arr, ","), "data")
+  lurek.log.info("ordered: " .. table.concat(arr, ", "), "data")
 end
 ```
 
@@ -1767,9 +2014,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local ring_buffer_obj = lurek.data.newRingBuffer(32)
-  local t = ring_buffer_obj:type()
-  lurek.log.info("LRingBuffer:type = " .. t, "data")
+  local rb = lurek.data.newRingBuffer(32)
+  lurek.log.info("LRingBuffer:type = " .. rb:type(), "data")
 end
 ```
 
@@ -1789,9 +2035,9 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local ring_buffer_obj = lurek.data.newRingBuffer(32)
-  lurek.log.info("is LRingBuffer: " .. tostring(ring_buffer_obj:typeOf("LRingBuffer")), "data")
-  lurek.log.info("is wrong: " .. tostring(ring_buffer_obj:typeOf("Unknown")), "data")
+  local rb = lurek.data.newRingBuffer(32)
+  lurek.log.info("is LRingBuffer: " .. tostring(rb:typeOf("LRingBuffer")), "data")
+  lurek.log.info("is Object: " .. tostring(rb:typeOf("Object")), "data")
 end
 ```
 

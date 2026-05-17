@@ -598,6 +598,7 @@ describe("lurek.audio newSoundData guard", function()
     -- @covers lurek.audio.newSoundData
     it("newSoundData_invalid_sample_rate_string_errors", function()
         expect_error(function()
+            ---@diagnostic disable-next-line: param-type-mismatch
             lurek.audio.newSoundData(64, "invalid")
         end)
     end)
@@ -605,6 +606,7 @@ describe("lurek.audio newSoundData guard", function()
     -- @covers lurek.audio.newSoundData
     it("newSoundData_boolean_sample_rate_errors", function()
         expect_error(function()
+            ---@diagnostic disable-next-line: param-type-mismatch
             lurek.audio.newSoundData(64, true)
         end)
     end)
@@ -1829,8 +1831,9 @@ describe("lurek.audio.setStereoWidth", function()
 
     -- @covers lurek.audio.setStereoWidth
     it("errors on invalid source handle", function()
+        local bad_handle = 99999999 ---@type any
         expect_error(function()
-            lurek.audio.setStereoWidth(99999999, 1.0) ---@diagnostic disable-line: param-type-mismatch
+            lurek.audio.setStereoWidth(bad_handle, 1.0)
         end, "invalid")
     end)
 end)
@@ -1855,8 +1858,9 @@ describe("lurek.audio.setRandomPitch", function()
 
     -- @covers lurek.audio.setRandomPitch
     it("errors on invalid source", function()
+        local bad_handle = 12345678 ---@type any
         expect_error(function()
-            lurek.audio.setRandomPitch(12345678, 0.9, 1.1) ---@diagnostic disable-line: param-type-mismatch
+            lurek.audio.setRandomPitch(bad_handle, 0.9, 1.1)
         end, "invalid")
     end)
 
@@ -1893,8 +1897,9 @@ describe("lurek.audio.crossfade", function()
     -- @covers lurek.audio.newSource
     it("errors if first source is invalid", function()
         local src_b = lurek.audio.newSource(WAVE, "static")
+        local bad_handle = 99999999 ---@type any
         expect_error(function()
-            lurek.audio.crossfade(99999999, src_b, 0.5) ---@diagnostic disable-line: param-type-mismatch
+            lurek.audio.crossfade(bad_handle, src_b, 0.5)
         end, "invalid")
     end)
 end)

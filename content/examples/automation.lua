@@ -343,7 +343,7 @@ end
 do
   -- Run automation at 4x speed during CI to complete tests faster
   -- Use 0.5x for slow-motion debugging of input timing issues
-  local is_ci = os.getenv("CI") ~= nil
+  local is_ci = false -- os.getenv not available in lurek sandbox
   if is_ci then
     lurek.automation.setPlaybackSpeed(4.0)
   else

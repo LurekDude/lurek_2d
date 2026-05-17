@@ -1097,7 +1097,8 @@ describe("SpriteManager:add", function()
     -- @covers lurek.raycaster.newSpriteManager
     it("add does not crash", function()
         local sm = lurek.raycaster.newSpriteManager()
-        local ok, _ = pcall(function() sm:add(1, 5.0, 5.0, {}) end) ---@diagnostic disable-line: param-type-mismatch
+        local bad_id = 1 ---@type any
+        local ok, _ = pcall(function() sm:add(bad_id, 5.0, 5.0, {}) end)
         expect_type("boolean", ok)
     end)
 end)

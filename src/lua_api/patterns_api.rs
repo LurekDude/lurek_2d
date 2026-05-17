@@ -409,7 +409,7 @@ impl LuaUserData for LuaServiceLocator {
         // -- locate --
         /// Retrieve a registered service by name. Returns nil if not found.
         /// @param | name | string | The service name to look up.
-        /// @return | boolean|number|string|table|nil | The service object, or nil if not registered.
+        /// @return | boolean|number|string|table|function|nil | The service object, or nil if not registered.
         methods.add_method("locate", |lua, this, name: String| {
             let svc = this.services.borrow();
             match svc.get(&name) {
@@ -498,8 +498,8 @@ impl LuaUserData for LuaFactory {
         // -- create --
         /// Create a new object by type name, passing additional arguments to the constructor.
         /// @param | typeName | string | The registered type to instantiate.
-        /// @param | ... | boolean|number|string|table|nil | Extra arguments forwarded to the constructor.
-        /// @return | boolean|number|string|table | The value returned by the constructor function.
+        /// @param | ... | any | Extra arguments forwarded to the constructor.
+        /// @return | boolean|number|string|table|nil | The value returned by the constructor function.
         methods.add_method("create", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let type_name: String = match args_iter.next() {
@@ -1236,12 +1236,20 @@ impl LuaUserData for LuaRing {
             match this.ring.borrow().latest() {
                 Some(e) => {
                     let t = lua.create_table()?;
+                    /// Performs the 'id' operation.
+                    /// @return | nil | No value is returned.
                     t.set("id", e.id)?;
+                    /// Performs the 'tag' operation.
+                    /// @return | nil | No value is returned.
                     t.set("tag", e.tag.as_str())?;
                     if let Some(n) = e.value_f64 {
+                        /// Performs the 'value' operation.
+                        /// @return | nil | No value is returned.
                         t.set("value", n)?;
                     }
                     if let Some(s) = &e.value_str {
+                        /// Performs the 'text' operation.
+                        /// @return | nil | No value is returned.
                         t.set("text", s.as_str())?;
                     }
                     Ok(LuaValue::Table(t))
@@ -1256,12 +1264,20 @@ impl LuaUserData for LuaRing {
             let tbl = lua.create_table()?;
             for (i, e) in this.ring.borrow().iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'id' operation.
+                /// @return | nil | No value is returned.
                 t.set("id", e.id)?;
+                /// Performs the 'tag' operation.
+                /// @return | nil | No value is returned.
                 t.set("tag", e.tag.as_str())?;
                 if let Some(n) = e.value_f64 {
+                    /// Performs the 'value' operation.
+                    /// @return | nil | No value is returned.
                     t.set("value", n)?;
                 }
                 if let Some(s) = &e.value_str {
+                    /// Performs the 'text' operation.
+                    /// @return | nil | No value is returned.
                     t.set("text", s.as_str())?;
                 }
                 tbl.set(i + 1, t)?;
@@ -1377,7 +1393,11 @@ impl LuaFunnel {
             let tbl = lua.create_table()?;
             for (i, e) in entries.iter().enumerate() {
                 let et = lua.create_table()?;
+                /// Performs the 'tag' operation.
+                /// @return | nil | No value is returned.
                 et.set("tag", e.tag.as_str())?;
+                /// Performs the 'value' operation.
+                /// @return | nil | No value is returned.
                 et.set("value", e.value)?;
                 tbl.set(i + 1, et)?;
             }
@@ -2464,7 +2484,11 @@ impl LuaUserData for LuaMap {
             let tbl = lua.create_table()?;
             for (i, (k, rk)) in this.items.borrow().iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'key' operation.
+                /// @return | nil | No value is returned.
                 row.set("key", k.as_str())?;
+                /// Performs the 'value' operation.
+                /// @return | nil | No value is returned.
                 row.set("value", lua.registry_value::<LuaValue>(rk)?)?;
                 tbl.set(i + 1, row)?;
             }
@@ -2873,16 +2897,16 @@ impl LuaBehaviorTree {
 }
 /// Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and connectivity queries.
 #[derive(Clone)]
-struct LuaGraph {
+struct LuaPatternGraph {
     graph: Rc<RefCell<crate::patterns::Graph>>,
     node_payloads: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
     edge_payloads: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
 }
-impl LurekType for LuaGraph {
-    const TYPE_NAME: &'static str = "LGraph";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["LGraph", "Object"];
+impl LurekType for LuaPatternGraph {
+    const TYPE_NAME: &'static str = "LPatternGraph";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LPatternGraph", "Object"];
 }
-impl LuaUserData for LuaGraph {
+impl LuaUserData for LuaPatternGraph {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         add_type_methods(methods);
         // -- addNode --
@@ -3358,19 +3382,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- newGraph --
     /// Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
     /// @param | undirected | boolean? | If true, edges are bidirectional (default false).
-    /// @return | LGraph | A new graph instance.
+    /// @return | LPatternGraph | A new graph instance.
     patterns.set(
         "newGraph",
         lua.create_function(|_, undirected: Option<bool>| {
             let mut g = crate::patterns::Graph::new();
             g.undirected = undirected.unwrap_or(false);
-            Ok(LuaGraph {
+            Ok(LuaPatternGraph {
                 graph: Rc::new(RefCell::new(g)),
                 node_payloads: Rc::new(RefCell::new(HashMap::new())),
                 edge_payloads: Rc::new(RefCell::new(HashMap::new())),
             })
         })?,
     )?;
+    /// Performs the 'patterns' operation.
+    /// @return | nil | No value is returned.
     lurek.set("patterns", patterns)?;
     Ok(())
 }

@@ -176,7 +176,7 @@ describe("Evidence: lurek.math visual scenarios", function()
 
             local hit, ix, iy = lurek.math.segmentIntersectsSegment(x1, y1, x2, y2, 30, 150, 280, 70)
             if hit and ix and iy then
-                img:drawCircle(ix, iy, 3, 255, 210, 100, 255)
+                img:drawCircle(ix --[[@as number]], iy --[[@as number]], 3, 255, 210, 100, 255)
             end
         end
         img:drawLine(30, 150, 280, 70, 255, 120, 120, 255)

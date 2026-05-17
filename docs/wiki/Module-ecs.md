@@ -109,21 +109,24 @@ Supports parent-child relationships with recursive kill propagation, string and 
 Module example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
-        local p, v = w:get(id, "position"), w:get(id, "velocity")
-        p.x, p.y = p.x + v.x * dt, p.y + v.y * dt
-      end
     end
   }
   world:addSystem(move_system, { priority = 10 })
+
+  -- Hook world:update(dt) into lurek.process — the engine calls this each frame.
+  -- dt is the frame delta in seconds (e.g. ~0.016 at 60 FPS).
   function lurek.process(dt) world:update(dt) end
 end
 
 --@api-stub: Universe:render
--- Draws or renders this universe to the current render target.
+-- Runs all registered render-phase systems (render or draw callbacks)
 do
   local world = lurek.ecs.newUniverse()
+
+  -- Render systems use `render(self, world)` or `draw(self, world)`.
+  -- They run after update, in priority order, during the draw pass.
   local draw_system = {
-    render = function(_, w)
+    render = function(self, w)
       for _, id in ipairs(w:query("position", "sprite")) do
         local p = w:get(id, "position")
         lurek.render.rectangle("fill", p.x, p.y, 16, 16)
@@ -131,31 +134,29 @@ do
     end
   }
   world:addSystem(draw_system, { priority = 100 })
+
+  -- Hook into lurek.draw — the engine calls this for the render pass.
   function lurek.draw() world:render() end
 end
 
 --@api-stub: Universe:emit
--- Performs the emit operation on this universe.
+-- Dispatches a named event to all systems that define a matching method
 do
   local world = lurek.ecs.newUniverse()
+
+  -- emit() calls event-named functions on every registered system.
+  -- Systems opt-in by defining a method with that name.
+  -- The system receives (self, world, ...extra_args).
   local hp_system = {
-    damage = function(_, w, id, amount)
-      local h = w:get(id, "health"); h.hp = h.hp - amount
+    damage = function(self, w, id, amount)
+      local h = w:get(id, "health")
+      if h then
+        h.hp = h.hp - amount
+        if h.hp <= 0 then w:kill(id) end
+      end
     end
   }
   world:addSystem(hp_system)
-  local target = world:spawn(); world:set(target, "health", { hp = 10, max = 10 })
-  world:emit("damage", target, 3)
-end
-
---@api-stub: Universe:getSystemCount
--- Returns the number of system items in this universe.
-do
-  local world = lurek.ecs.newUniverse()
-  world:addSystem({ update = function() end })
-  world:addSystem({ render = function() end })
-  lurek.log.info("systems registered=" .. world:getSystemCount(), "ecs")
-end
 ```
 
 ## Key Types
@@ -184,7 +185,12 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
+  -- newUniverse() is the entry point to the entire ECS.
+  -- A universe holds all entities, components, systems, tags, blueprints, and relations.
+  -- You typically create one universe per game world (or one per scene).
   local world = lurek.ecs.newUniverse()
+
+  -- Immediately usable: spawn an entity and assign data
   local hero = world:spawn()
   world:set(hero, "position", { x = 0, y = 0 })
   lurek.log.info("universe ready, first id=" .. hero, "ecs")
@@ -204,7 +210,12 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
+  -- newUniverse() is the entry point to the entire ECS.
+  -- A universe holds all entities, components, systems, tags, blueprints, and relations.
+  -- You typically create one universe per game world (or one per scene).
   local world = lurek.ecs.newUniverse()
+
+  -- Immediately usable: spawn an entity and assign data
   local hero = world:spawn()
   world:set(hero, "position", { x = 0, y = 0 })
   lurek.log.info("universe ready, first id=" .. hero, "ecs")
@@ -227,11 +238,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local parent = u:spawn()
-  local child  = u:spawn()
-  u:addRelation(child, "child_of", parent)
-  lurek.log.info("relation added", "ecs")
+  local world = lurek.ecs.newUniverse()
+  local parent = world:spawn()
+  local child  = world:spawn()
+
+  -- addRelation(from, name, to) creates a directed link.
+  -- Relations are separate from hierarchy (setParent). Use them for
+  -- game-logic links: "child_of", "owns", "targets", "heals".
+  world:addRelation(child, "child_of", parent)
+  world:addRelation(parent, "owns", child)
+  lurek.log.info("relations established", "ecs")
 end
 ```
 
@@ -250,14 +266,28 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:addSystem({
-    query = {"Position", "Velocity"},
-    run = function(entity, pos, vel)
-      lurek.log.info("system tick", "ecs")
-    end,
+  local world = lurek.ecs.newUniverse()
+
+  -- Systems are tables with update/render/draw methods and optional metadata.
+  -- The `opts` table controls execution order and phase assignment.
+  local physics_sys = {
+    update = function(self, w, dt)
+      for _, id in ipairs(w:query("position", "velocity")) do
+        local p, v = w:get(id, "position"), w:get(id, "velocity")
+        p.x = p.x + v.x * dt
+        p.y = p.y + v.y * dt
+      end
+    end
+  }
+
+  -- priority: lower runs first. phase: groups systems for updatePhase().
+  -- name: for debugging. after: dependency ordering (runs after listed systems).
+  world:addSystem(physics_sys, {
+    priority = 10,
+    phase = "update",
+    name = "physics",
   })
-  lurek.log.info("system count: " .. u:getSystemCount(), "ecs")
+  lurek.log.info("system count: " .. world:getSystemCount(), "ecs")
 end
 ```
 
@@ -278,8 +308,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
+
+  -- Tags are lightweight string labels. Unlike components, they carry no data.
+  -- Use them for categorical queries: "player", "enemy", "collectible", "boss".
   world:addTag(hero, "player")
   world:addTag(hero, "alive")
+
+  -- An entity can have many tags simultaneously.
+  -- Tags persist until explicitly removed or the entity is killed.
 end
 ```
 
@@ -298,12 +334,17 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local e = world:spawn(); world:set(e, "score", 99)
+  local e = world:spawn()
+  world:set(e, "score", 99)
+
+  -- applySnapshot() replaces universe state from a snapshot.
+  -- Pair with snapshot() for undo/redo, quicksave, or state rollback.
   local snap = world:snapshot()
   world:clear()
   world:applySnapshot(snap)
+
   local ids = world:getEntities()
-  lurek.log.info("score=" .. world:get(ids[1], "score"), "ecs")
+  lurek.log.info("restored score=" .. world:get(ids[1], "score"), "ecs")
 end
 ```
 
@@ -327,7 +368,12 @@ do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
   local block = world:spawn()
+
+  -- bitmapTag() sets the bit on the entity's tag mask.
+  -- If the tag was not previously defined, it auto-defines it.
+  -- Return value is not used; check hasBitmapTag() to confirm the tag was set.
   world:bitmapTag(block, "solid")
+  lurek.log.debug("solid tag applied: " .. tostring(world:hasBitmapTag(block, "solid")), "ecs")
 end
 ```
 
@@ -348,8 +394,13 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineTag("invincible")
-  local hero = world:spawn(); world:bitmapTag(hero, "invincible")
+  local hero = world:spawn()
+  world:bitmapTag(hero, "invincible")
+
+  -- bitmapUntag() clears the bit. Use for timed power-ups:
+  -- set "invincible" on pickup, clear it after 5 seconds.
   world:bitmapUntag(hero, "invincible")
+  assert(not world:hasBitmapTag(hero, "invincible"))
 end
 ```
 
@@ -365,6 +416,9 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
+
+  -- clear() resets the universe to empty. Use when restarting a level,
+  -- transitioning scenes, or cleaning up before deserialize.
   world:clear()
   lurek.log.info("after clear count=" .. world:getEntityCount(), "ecs")
 end
@@ -387,8 +441,15 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local boss = world:spawn()
-  for _ = 1, 3 do local m = world:spawn(); world:addRelation(boss, "minions", m) end
+  for _ = 1, 3 do
+    local m = world:spawn()
+    world:addRelation(boss, "minions", m)
+  end
+
+  -- clearRelations() removes all links under that relation name.
+  -- Use when a boss dies and all minion links should be severed.
   world:clearRelations(boss, "minions")
+  assert(#world:getRelated(boss, "minions") == 0)
 end
 ```
 
@@ -407,9 +468,17 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:defineBlueprint("enemy", {Health={max=100}, Position={x=0,y=0}})
-  lurek.log.info("blueprint defined", "ecs")
+  local world = lurek.ecs.newUniverse()
+
+  -- Blueprints are component templates. Define once, spawn many.
+  -- The component table maps component names to their default values.
+  -- When spawned, each entity gets a deep copy of these defaults.
+  world:defineBlueprint("enemy", {
+    health   = { hp = 100, max = 100 },
+    position = { x = 0, y = 0 },
+    ai       = { state = "patrol", aggro_range = 150 },
+  })
+  lurek.log.info("enemy blueprint defined", "ecs")
 end
 ```
 
@@ -430,6 +499,10 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
+
+  -- Bitmap tags are a high-performance alternative to string tags.
+  -- defineTag() reserves a bit index (max 64 tags per universe).
+  -- Use them for hot-path checks: collision masks, visibility flags, etc.
   local bit_player = world:defineTag("player")
   local bit_enemy  = world:defineTag("enemy")
   lurek.log.info("player bit=" .. bit_player .. " enemy bit=" .. bit_enemy, "ecs")
@@ -451,10 +524,18 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local e = world:spawn(); world:set(e, "position", { x = 1, y = 2 })
+  local e = world:spawn()
+  world:set(e, "position", { x = 1, y = 2 })
+
+  -- Save state, destroy everything, then restore from snapshot.
+  -- This is the save/load workflow: serialize → write to file → read → deserialize.
   local snap = world:serialize()
   world:clear()
+  assert(world:getEntityCount() == 0)
+
   world:deserialize(snap)
+  assert(world:getEntityCount() > 0)
+  lurek.log.info("deserialized entity count=" .. world:getEntityCount(), "save")
 end
 ```
 
@@ -473,11 +554,15 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local e = u:spawn()
-  u:set(e, "Tag", {})
-  u:each("Tag", function(eid, tag)
-    lurek.log.info("entity: " .. eid, "ecs")
+  local world = lurek.ecs.newUniverse()
+  local e1 = world:spawn(); world:set(e1, "damage_flash", { timer = 0.2 })
+  local e2 = world:spawn(); world:set(e2, "damage_flash", { timer = 0.5 })
+
+  -- each() is a callback-style iterator for a single component.
+  -- The callback receives (entity_id, component_value).
+  -- Simpler than query() when you only need one component.
+  world:each("damage_flash", function(eid, flash)
+    lurek.log.info("entity " .. eid .. " flash timer=" .. flash.timer, "ecs")
   end)
 end
 ```
@@ -498,14 +583,27 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
+
+  -- emit() calls event-named functions on every registered system.
+  -- Systems opt-in by defining a method with that name.
+  -- The system receives (self, world, ...extra_args).
   local hp_system = {
-    damage = function(_, w, id, amount)
-      local h = w:get(id, "health"); h.hp = h.hp - amount
+    damage = function(self, w, id, amount)
+      local h = w:get(id, "health")
+      if h then
+        h.hp = h.hp - amount
+        if h.hp <= 0 then w:kill(id) end
+      end
     end
   }
   world:addSystem(hp_system)
-  local target = world:spawn(); world:set(target, "health", { hp = 10, max = 10 })
+
+  local target = world:spawn()
+  world:set(target, "health", { hp = 10, max = 10 })
+
+  -- emit("damage", target, 3) calls hp_system:damage(world, target, 3)
   world:emit("damage", target, 3)
+  lurek.log.info("hp after hit=" .. world:get(target, "health").hp, "ecs")
 end
 ```
 
@@ -525,10 +623,22 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:defineBlueprint("unit", {Health={max=100}, Position={x=0,y=0}})
-  u:extendBlueprint("boss", "unit", {Health={max=500}})
-  lurek.log.info("boss extended from unit", "ecs")
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("unit", {
+    health   = { hp = 100, max = 100 },
+    position = { x = 0, y = 0 },
+  })
+
+  -- extendBlueprint(child_name, parent_name, overrides) creates inheritance.
+  -- The child inherits all parent components and applies overrides on top.
+  -- Use for enemy variants: goblin → goblin_shaman (more hp, adds mana).
+  world:extendBlueprint("boss", "unit", {
+    health = { hp = 500, max = 500 },  -- overrides parent hp
+  })
+
+  -- "boss" now has position from "unit" and boosted health
+  local comps = world:getBlueprintComponents("boss")
+  lurek.log.info("boss hp=" .. comps.health.hp, "ecs")
 end
 ```
 
@@ -543,9 +653,19 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  world:onComponentAdded("health", function(id) lurek.log.info("hp added to " .. id, "ecs") end)
-  local e = world:spawn(); world:set(e, "health", { hp = 10, max = 10 })
-  function lurek.process() world:flushObservers() end
+
+  -- Observers are deferred: component changes queue events, flushObservers()
+  -- delivers them. This prevents infinite recursion (observer adds component → triggers observer).
+  -- Call flushObservers() once per frame after all mutations are done.
+  world:onComponentAdded("health", function(id, name)
+    lurek.log.info("health added to entity " .. id, "ecs")
+  end)
+
+  local e = world:spawn()
+  world:set(e, "health", { hp = 10, max = 10 })  -- queues the event
+
+  -- Flush delivers queued events to callbacks NOW
+  world:flushObservers()
 end
 ```
 
@@ -569,8 +689,18 @@ do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "position", { x = 10, y = 20 })
+
+  -- get() returns the SAME table reference stored in the universe.
+  -- Mutating the returned table directly changes the component in-place.
+  -- This avoids repeated set() calls for small updates.
   local pos = world:get(e, "position")
-  pos.x = pos.x + 1
+  pos.x = pos.x + 1  -- modifies the component directly
+
+  -- Returns nil if the entity does not have that component.
+  local vel = world:get(e, "velocity")
+  if vel == nil then
+    lurek.log.debug("entity has no velocity component", "ecs")
+  end
 end
 ```
 
@@ -592,8 +722,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineTag("player")
+
+  -- getBitmapTagBit() lets you inspect the internal bit layout.
+  -- Returns nil if the tag name was never defined.
   local bit = world:getBitmapTagBit("player")
   if bit then lurek.log.info("player tag stored at bit " .. bit, "ecs") end
+
+  local unknown = world:getBitmapTagBit("nonexistent")
+  assert(unknown == nil)
 end
 ```
 
@@ -614,9 +750,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+  world:defineBlueprint("goblin", { health = { hp = 3, max = 3 }, speed = { value = 80 } })
+
+  -- getBlueprintComponents() returns the template's component table.
+  -- Use to preview or display blueprint data in editors or tooltips.
   local comps = world:getBlueprintComponents("goblin")
-  if comps then lurek.log.info("goblin starts at hp=" .. comps.health.hp, "ecs") end
+  if comps then
+    lurek.log.info("goblin starts at hp=" .. comps.health.hp .. " speed=" .. comps.speed.value, "ecs")
+  end
 end
 ```
 
@@ -638,8 +779,17 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local root = world:spawn()
-  for _ = 1, 3 do local c = world:spawn(); world:setParent(c, root) end
-  for _, id in ipairs(world:getChildren(root)) do lurek.log.debug("child=" .. id, "scene") end
+  for _ = 1, 3 do
+    local c = world:spawn()
+    world:setParent(c, root)
+  end
+
+  -- getChildren() returns direct children only (not recursive).
+  -- Use for inventory slots, UI container children, or limb hierarchies.
+  local kids = world:getChildren(root)
+  for _, id in ipairs(kids) do
+    lurek.log.debug("child=" .. id, "scene")
+  end
 end
 ```
 
@@ -663,7 +813,13 @@ do
   local e = world:spawn()
   world:set(e, "position", { x = 0, y = 0 })
   world:set(e, "sprite",   { path = "img/hero.png" })
-  for _, name in ipairs(world:getComponents(e)) do lurek.log.debug(name, "inspect") end
+  world:set(e, "health",   { hp = 10, max = 10 })
+
+  -- getComponents() returns {"position", "sprite", "health"} (order may vary).
+  -- Useful for debug inspectors, serialization filters, or dynamic UI panels.
+  for _, name in ipairs(world:getComponents(e)) do
+    lurek.log.debug("component: " .. name, "inspect")
+  end
 end
 ```
 
@@ -682,8 +838,14 @@ do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "hp", 50)
+
+  -- getDirtyEntities() returns ids that had components added, removed, or replaced
+  -- since the last flush. Use for incremental updates: only re-render changed entities,
+  -- only re-sync changed state to network.
   local dirty = world:getDirtyEntities()
   lurek.log.info("dirty count=" .. #dirty, "ecs")
+
+  -- After flushObservers(), the dirty list resets.
   world:flushObservers()
   lurek.log.info("after flush dirty=" .. #world:getDirtyEntities(), "ecs")
 end
@@ -703,6 +865,9 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 5 do world:spawn() end
+
+  -- getEntities() returns every alive entity regardless of components.
+  -- Use for global operations: save-all, debug dump, or despawn-all.
   local all = world:getEntities()
   lurek.log.info("total entities=" .. #all, "ecs")
 end
@@ -725,9 +890,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  for i = 1, 4 do local id = world:spawn(); world:setLayer(id, i % 2) end
+  for i = 1, 4 do
+    local id = world:spawn()
+    world:setLayer(id, i % 2)  -- alternates between layer 0 and 1
+  end
+
+  -- getEntitiesByLayer() returns entities in that exact layer.
+  -- Use for layer-specific logic: only update layer-0 backgrounds,
+  -- or only check collisions within the same layer.
   local fg = world:getEntitiesByLayer(1)
-  lurek.log.debug("layer1=" .. #fg, "ecs")
+  lurek.log.debug("layer 1 entities=" .. #fg, "ecs")
 end
 ```
 
@@ -748,7 +920,13 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  for _ = 1, 3 do local id = world:spawn(); world:addTag(id, "enemy") end
+  for _ = 1, 3 do
+    local id = world:spawn()
+    world:addTag(id, "enemy")
+  end
+
+  -- getEntitiesByTag() is a fast lookup — indexed by the tag system.
+  -- Use it when you need all entities of a category (all enemies, all pickups).
   local enemies = world:getEntitiesByTag("enemy")
   lurek.log.info("enemy count=" .. #enemies, "ecs")
 end
@@ -769,8 +947,14 @@ do
   local world = lurek.ecs.newUniverse()
   local a = world:spawn(); world:setLayer(a, 2)
   local b = world:spawn(); world:setLayer(b, 0)
+  local c = world:spawn(); world:setLayer(c, 1)
+
+  -- getEntitiesSorted() returns ids sorted by layer value (low to high).
+  -- Iterate this for correct back-to-front rendering without manual sorting.
   local order = world:getEntitiesSorted()
-  for _, id in ipairs(order) do lurek.log.debug("draw=" .. id, "ecs") end
+  for _, id in ipairs(order) do
+    lurek.log.debug("draw entity=" .. id .. " layer=" .. world:getLayer(id), "ecs")
+  end
 end
 ```
 
@@ -788,7 +972,13 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   for _ = 1, 12 do world:spawn() end
-  if world:getEntityCount() > 1000 then lurek.log.warn("entity budget exceeded", "ecs") end
+
+  -- getEntityCount() is O(1) — use it for budget checks, HUD display,
+  -- or deciding whether to spawn more enemies.
+  local count = world:getEntityCount()
+  if count > 1000 then
+    lurek.log.warn("entity budget exceeded! count=" .. count, "ecs")
+  end
 end
 ```
 
@@ -809,8 +999,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local e = world:spawn(); world:setLayer(e, 5)
-  if world:getLayer(e) >= 5 then lurek.log.debug("foreground", "ecs") end
+  local e = world:spawn()
+  world:setLayer(e, 5)
+
+  -- getLayer() reads back the assigned layer. Default is 0 if never set.
+  local layer = world:getLayer(e)
+  if layer >= 5 then
+    lurek.log.debug("entity is in foreground layer", "ecs")
+  end
 end
 ```
 
@@ -834,7 +1030,12 @@ do
   local parent = world:spawn()
   local child  = world:spawn()
   world:setParent(child, parent)
-  if world:getParent(child) == parent then lurek.log.debug("attached", "scene") end
+
+  -- getParent() reads the hierarchy link. Returns nil for root entities.
+  -- Use for scene graph traversal: weapons attached to hands, UI to panels.
+  if world:getParent(child) == parent then
+    lurek.log.debug("child is attached to parent", "scene")
+  end
 end
 ```
 
@@ -857,8 +1058,17 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
-  local sword = world:spawn(); world:addRelation(hero, "wields", sword)
-  for _, item in ipairs(world:getRelated(hero, "wields")) do lurek.log.debug("equipped=" .. item, "ecs") end
+  local sword = world:spawn()
+  local shield = world:spawn()
+  world:addRelation(hero, "equips", sword)
+  world:addRelation(hero, "equips", shield)
+
+  -- getRelated() returns all targets for a directed relation.
+  -- Relations are many-to-many: one entity can relate to multiple targets
+  -- under the same relation name. Use for equipment, allies, quest links.
+  for _, item in ipairs(world:getRelated(hero, "equips")) do
+    lurek.log.debug("equipped item=" .. item, "ecs")
+  end
 end
 ```
 
@@ -877,6 +1087,8 @@ do
   local world = lurek.ecs.newUniverse()
   world:addSystem({ update = function() end })
   world:addSystem({ render = function() end })
+
+  -- getSystemCount() is useful for debug overlays or verifying setup.
   lurek.log.info("systems registered=" .. world:getSystemCount(), "ecs")
 end
 ```
@@ -899,8 +1111,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
-  world:addTag(e, "player"); world:addTag(e, "invincible")
-  for _, t in ipairs(world:getTags(e)) do lurek.log.debug(t, "tags") end
+  world:addTag(e, "player")
+  world:addTag(e, "invincible")
+
+  -- getTags() returns all tags as an array. Useful for debug display
+  -- or serialization of entity state.
+  for _, t in ipairs(world:getTags(e)) do
+    lurek.log.debug("tag: " .. t, "tags")
+  end
 end
 ```
 
@@ -924,7 +1142,13 @@ do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:set(e, "stunned", { ticks = 30 })
-  if world:has(e, "stunned") then lurek.log.debug("skip ai", "ecs") end
+
+  -- has() is a fast existence check without retrieving the data.
+  -- Use it to guard logic: skip AI for stunned entities, skip rendering
+  -- for invisible ones, skip movement for frozen ones.
+  if world:has(e, "stunned") then
+    lurek.log.debug("entity stunned — skipping AI this frame", "ecs")
+  end
 end
 ```
 
@@ -947,8 +1171,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineTag("solid")
-  local block = world:spawn(); world:bitmapTag(block, "solid")
-  if world:hasBitmapTag(block, "solid") then lurek.log.debug("collide", "phys") end
+  local block = world:spawn()
+  world:bitmapTag(block, "solid")
+
+  -- hasBitmapTag() is a single bitmask AND — extremely fast.
+  -- Ideal for per-frame collision filtering or physics layer checks.
+  if world:hasBitmapTag(block, "solid") then
+    lurek.log.debug("block is solid — apply collision", "phys")
+  end
 end
 ```
 
@@ -970,7 +1200,12 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
-  if world:hasBlueprint("goblin") then lurek.log.info("goblin ready", "ecs") end
+
+  -- hasBlueprint() checks if a template is available for spawning.
+  -- Use it to guard data-driven spawning from mods or level files.
+  if world:hasBlueprint("goblin") then
+    lurek.log.info("goblin blueprint ready for spawning", "ecs")
+  end
 end
 ```
 
@@ -992,10 +1227,18 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local a = u:spawn(); local b = u:spawn()
-  u:addRelation(a, "ally", b)
-  lurek.log.info("has ally: " .. tostring(u:hasRelation(a, "ally", b)), "ecs")
+  local world = lurek.ecs.newUniverse()
+  local a = world:spawn()
+  local b = world:spawn()
+  world:addRelation(a, "ally", b)
+
+  -- hasRelation() checks one specific link. Use for "is X allied with Y?"
+  -- or "does player have quest from NPC?" checks.
+  local allied = world:hasRelation(a, "ally", b)
+  lurek.log.info("a allied with b: " .. tostring(allied), "ecs")
+
+  -- Relations are directional: a→b exists, but b→a does not (unless added).
+  assert(not world:hasRelation(b, "ally", a))
 end
 ```
 
@@ -1019,7 +1262,12 @@ do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "player")
-  if world:hasTag(e, "player") then lurek.log.debug("hit player", "ecs") end
+
+  -- hasTag() is a quick boolean check, useful in collision callbacks
+  -- or conditional logic without needing a full query.
+  if world:hasTag(e, "player") then
+    lurek.log.debug("hit the player entity!", "ecs")
+  end
 end
 ```
 
@@ -1042,7 +1290,13 @@ do
   local world = lurek.ecs.newUniverse()
   local id = world:spawn()
   world:kill(id)
-  if not world:isAlive(id) then lurek.log.debug("target gone", "ecs") end
+
+  -- isAlive() is essential for deferred logic. If you store an entity id
+  -- and process it later (next frame, after a timer), always check isAlive()
+  -- before accessing components — the entity may have been killed.
+  if not world:isAlive(id) then
+    lurek.log.debug("target already destroyed, skip damage", "ecs")
+  end
 end
 ```
 
@@ -1063,6 +1317,10 @@ do
   local world = lurek.ecs.newUniverse()
   local bullet = world:spawn()
   world:set(bullet, "position", { x = 100, y = 100 })
+
+  -- kill() removes the entity and all its components.
+  -- After kill(), the id is no longer valid — isAlive() returns false.
+  -- Use this when a projectile hits, an enemy dies, or a particle expires.
   world:kill(bullet)
 end
 ```
@@ -1084,7 +1342,15 @@ do
   local world = lurek.ecs.newUniverse()
   local wagon = world:spawn()
   local driver = world:spawn(); world:setParent(driver, wagon)
+  local cargo  = world:spawn(); world:setParent(cargo, wagon)
+
+  -- killRecursive() destroys the entity AND every child in its subtree.
+  -- Use when destroying a composite object: a vehicle kills its passengers,
+  -- a UI panel kills its child widgets.
   world:killRecursive(wagon)
+  assert(not world:isAlive(wagon))
+  assert(not world:isAlive(driver))
+  assert(not world:isAlive(cargo))
 end
 ```
 
@@ -1103,7 +1369,12 @@ do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
   world:defineBlueprint("orc",    { health = { hp = 7, max = 7 } })
-  for _, name in ipairs(world:listBlueprints()) do lurek.log.debug(name, "blueprint") end
+
+  -- listBlueprints() returns names of all templates. Useful for editors,
+  -- spawn menus, or validating that all required templates loaded.
+  for _, name in ipairs(world:listBlueprints()) do
+    lurek.log.debug("blueprint: " .. name, "ecs")
+  end
 end
 ```
 
@@ -1122,12 +1393,18 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:onComponentAdded("Health", function(eid, comp)
-    lurek.log.info("health added to " .. eid, "ecs")
+  local world = lurek.ecs.newUniverse()
+
+  -- onComponentAdded() registers an observer. The callback is queued
+  -- (not called immediately) and delivered during flushObservers().
+  -- Use for reactive systems: auto-add physics body when "collider" appears.
+  world:onComponentAdded("health", function(eid, comp_name)
+    lurek.log.info("health component added to entity " .. eid, "ecs")
   end)
-  local e = u:spawn()
-  u:set(e, "Health", {hp=100})
+
+  local e = world:spawn()
+  world:set(e, "health", { hp = 100, max = 100 })
+  world:flushObservers()  -- delivers the queued event
 end
 ```
 
@@ -1146,13 +1423,18 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:onComponentRemoved("Sprite", function(eid)
-    lurek.log.info("sprite removed from " .. eid, "ecs")
+  local world = lurek.ecs.newUniverse()
+
+  -- onComponentRemoved() fires when remove() is called or an entity is killed.
+  -- Use for cleanup: release physics bodies, stop sounds, remove UI elements.
+  world:onComponentRemoved("sprite", function(eid, comp_name)
+    lurek.log.info("sprite removed from entity " .. eid .. " — freeing texture", "ecs")
   end)
-  local e = u:spawn()
-  u:set(e, "Sprite", {path="hero.png"})
-  u:remove(e, "Sprite")
+
+  local e = world:spawn()
+  world:set(e, "sprite", { path = "hero.png" })
+  world:remove(e, "sprite")
+  world:flushObservers()  -- delivers the queued remove event
 end
 ```
 
@@ -1173,13 +1455,26 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local e = world:spawn()
-  world:set(e, "position", { x = 0, y = 0 })
-  world:set(e, "velocity", { x = 1, y = 0 })
+
+  -- Set up a few entities with different component combinations
+  local mover = world:spawn()
+  world:set(mover, "position", { x = 0, y = 0 })
+  world:set(mover, "velocity", { x = 1, y = 0 })
+
+  local static = world:spawn()
+  world:set(static, "position", { x = 50, y = 50 })
+  -- no velocity — this entity won't appear in a movement query
+
+  -- query() with multiple names = AND filter. Only entities with ALL
+  -- listed components are returned. This is the core of system iteration.
   for _, id in ipairs(world:query("position", "velocity")) do
     local p, v = world:get(id, "position"), world:get(id, "velocity")
     p.x, p.y = p.x + v.x, p.y + v.y
   end
+
+  -- Single-component query also works: find everything that has "position"
+  local all_spatial = world:query("position")
+  lurek.log.debug("spatial entities=" .. #all_spatial, "ecs")
 end
 ```
 
@@ -1200,10 +1495,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  world:defineTag("solid"); world:defineTag("visible")
-  local b = world:spawn(); world:bitmapTag(b, "solid"); world:bitmapTag(b, "visible")
+  world:defineTag("solid")
+  world:defineTag("visible")
+  local block = world:spawn()
+  world:bitmapTag(block, "solid")
+  world:bitmapTag(block, "visible")
+
+  -- queryBitmapAll() requires EVERY listed tag to be present.
+  -- Use for intersection queries: "solid AND visible" = drawable collidables.
   for _, id in ipairs(world:queryBitmapAll({ "solid", "visible" })) do
-    lurek.log.debug("draw block=" .. id, "ecs")
+    lurek.log.debug("draw solid block=" .. id, "ecs")
   end
 end
 ```
@@ -1225,11 +1526,15 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  world:defineTag("enemy"); world:defineTag("hazard")
+  world:defineTag("enemy")
+  world:defineTag("hazard")
   local a = world:spawn(); world:bitmapTag(a, "enemy")
   local b = world:spawn(); world:bitmapTag(b, "hazard")
+
+  -- queryBitmapAny() returns entities matching at least ONE tag from the list.
+  -- Use for "anything dangerous" queries in collision response.
   local danger = world:queryBitmapAny({ "enemy", "hazard" })
-  lurek.log.info("danger count=" .. #danger, "ai")
+  lurek.log.info("dangerous entities=" .. #danger, "ai")
 end
 ```
 
@@ -1251,8 +1556,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineTag("enemy")
-  for _ = 1, 4 do local id = world:spawn(); world:bitmapTag(id, "enemy") end
-  for _, id in ipairs(world:queryBitmapTag("enemy")) do lurek.log.debug("enemy=" .. id, "ai") end
+  for _ = 1, 4 do
+    local id = world:spawn()
+    world:bitmapTag(id, "enemy")
+  end
+
+  -- queryBitmapTag() scans all entities using bitmask checks.
+  -- Faster than string-tag queries for large entity counts.
+  for _, id in ipairs(world:queryBitmapTag("enemy")) do
+    lurek.log.debug("enemy=" .. id, "ai")
+  end
 end
 ```
 
@@ -1275,10 +1588,18 @@ do
   local a = world:spawn()
   world:set(a, "pos", { x = 1, y = 2 })
   world:set(a, "vel", { x = 3, y = 4 })
+
+  -- queryMulti() is a callback-based multi-component query.
+  -- Unlike query() which returns a table of ids, queryMulti() calls
+  -- your function directly with (id, comp1, comp2, ...) — zero allocation.
+  -- Use in hot loops where GC pressure matters.
   world:queryMulti({ "pos", "vel" }, function(id, pos, vel)
     pos.x = pos.x + vel.x
     pos.y = pos.y + vel.y
   end)
+
+  local pos = world:get(a, "pos")
+  lurek.log.info("after queryMulti: x=" .. pos.x .. " y=" .. pos.y, "ecs")
 end
 ```
 
@@ -1299,11 +1620,20 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local e1 = u:spawn(); u:set(e1, "Health", {hp=100})
-  local e2 = u:spawn()
-  local uninjured = u:queryNot({}, {"Health"})
-  lurek.log.info("without health: " .. #uninjured, "ecs")
+  local world = lurek.ecs.newUniverse()
+  local alive = world:spawn()
+  world:set(alive, "health", { hp = 100 })
+  world:set(alive, "position", { x = 0, y = 0 })
+
+  local dead = world:spawn()
+  world:set(dead, "position", { x = 50, y = 50 })
+  world:set(dead, "dead_marker", {})
+
+  -- queryNot(required, excluded) is a powerful filter.
+  -- First table = required components (AND), second = excluded (NOT).
+  -- Here: entities with "position" but WITHOUT "dead_marker".
+  local active = world:queryNot({ "position" }, { "dead_marker" })
+  lurek.log.info("active entities (alive with position)=" .. #active, "ecs")
 end
 ```
 
@@ -1319,6 +1649,9 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:spawn()
+
+  -- release() is identical to clear(). Call it when you are done
+  -- with a universe and want to free memory (e.g. leaving a scene).
   world:release()
 end
 ```
@@ -1340,8 +1673,15 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
-  world:set(e, "burning", { ticks = 60 })
+  world:set(e, "burning", { ticks = 60, dps = 2 })
+
+  -- remove() detaches a component. The entity stays alive — it just loses
+  -- that behavior. Use this for expiring status effects, unequipping items,
+  -- or switching entity states (remove "idle", set "attacking").
   world:remove(e, "burning")
+
+  -- After removal, has() returns false and get() returns nil.
+  assert(not world:has(e, "burning"))
 end
 ```
 
@@ -1363,7 +1703,11 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   world:defineBlueprint("goblin", { health = { hp = 3, max = 3 } })
+
+  -- removeBlueprint() unregisters a template. Returns true if one was removed.
+  -- Use when unloading a mod or resetting level-specific templates.
   world:removeBlueprint("goblin")
+  assert(not world:hasBlueprint("goblin"))
 end
 ```
 
@@ -1383,11 +1727,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local a = u:spawn(); local b = u:spawn()
-  u:addRelation(a, "ally", b)
-  u:removeRelation(a, "ally", b)
-  lurek.log.info("relation removed", "ecs")
+  local world = lurek.ecs.newUniverse()
+  local a = world:spawn()
+  local b = world:spawn()
+  world:addRelation(a, "ally", b)
+
+  -- removeRelation() removes one specific link (from, name, to).
+  -- Use when an alliance breaks, an item is unequipped, or a quest ends.
+  world:removeRelation(a, "ally", b)
+  assert(not world:hasRelation(a, "ally", b))
+  lurek.log.info("alliance broken", "ecs")
 end
 ```
 
@@ -1406,8 +1755,16 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local ai_system = { update = function() end }
+  local ai_system = {
+    update = function(self, w, dt)
+      -- AI logic here
+    end
+  }
   world:addSystem(ai_system, { priority = 50 })
+
+  -- removeSystem() unregisters a system. Pass the SAME table reference.
+  -- Use this for toggling systems: remove AI during cutscenes,
+  -- remove physics during menus, remove rendering during loading.
   world:removeSystem(ai_system)
 end
 ```
@@ -1430,7 +1787,11 @@ do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
   world:addTag(e, "alive")
+
+  -- removeTag() strips one tag. Use for state transitions:
+  -- entity dies → remove "alive", add "dead" for corpse rendering.
   world:removeTag(e, "alive")
+  assert(not world:hasTag(e, "alive"))
 end
 ```
 
@@ -1445,8 +1806,11 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
+
+  -- Render systems use `render(self, world)` or `draw(self, world)`.
+  -- They run after update, in priority order, during the draw pass.
   local draw_system = {
-    render = function(_, w)
+    render = function(self, w)
       for _, id in ipairs(w:query("position", "sprite")) do
         local p = w:get(id, "position")
         lurek.render.rectangle("fill", p.x, p.y, 16, 16)
@@ -1454,6 +1818,8 @@ do
     end
   }
   world:addSystem(draw_system, { priority = 100 })
+
+  -- Hook into lurek.draw — the engine calls this for the render pass.
   function lurek.draw() world:render() end
 end
 ```
@@ -1471,7 +1837,13 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local hero = world:spawn(); world:set(hero, "position", { x = 5, y = 7 })
+  local hero = world:spawn()
+  world:set(hero, "position", { x = 5, y = 7 })
+  world:set(hero, "inventory", { gold = 42 })
+
+  -- serialize() captures all entities and their components as a plain table.
+  -- The result can be saved to disk (via lurek.save or lurek.data.encode)
+  -- and later restored with deserialize().
   local snapshot = world:serialize()
   lurek.log.info("snapshot entries=" .. #snapshot, "save")
 end
@@ -1493,11 +1865,21 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local e = u:spawn()
-  u:set(e, "Position", {x=100, y=200})
-  u:set(e, "Velocity", {vx=5, vy=0})
-  lurek.log.info("components set on entity " .. e, "ecs")
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+
+  -- set(id, name, value) stores any Lua value as a component.
+  -- Tables are the most common: they hold structured data.
+  -- Primitives (numbers, strings, booleans) also work.
+  world:set(e, "position", { x = 100, y = 200 })
+  world:set(e, "velocity", { vx = 5, vy = 0 })
+  world:set(e, "name", "goblin_01")       -- string component
+  world:set(e, "layer", 3)                -- number component
+  world:set(e, "active", true)            -- boolean component
+
+  -- Calling set() again on the same component REPLACES the value.
+  world:set(e, "position", { x = 999, y = 999 })
+  lurek.log.info("position replaced, x=" .. world:get(e, "position").x, "ecs")
 end
 ```
 
@@ -1517,8 +1899,14 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local floor = world:spawn(); world:setLayer(floor, 0)
-  local actor = world:spawn(); world:setLayer(actor, 10)
+  local floor = world:spawn()
+  local actor = world:spawn()
+
+  -- Layers are integers used for sorting during rendering.
+  -- Lower numbers draw first (behind), higher numbers draw last (in front).
+  -- Typical setup: 0=background, 10=actors, 20=particles, 30=UI.
+  world:setLayer(floor, 0)
+  world:setLayer(actor, 10)
 end
 ```
 
@@ -1537,11 +1925,19 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  local parent = u:spawn()
-  local child  = u:spawn()
-  u:setParent(child, parent)
-  lurek.log.info("parent: " .. u:getParent(child), "ecs")
+  local world = lurek.ecs.newUniverse()
+  local parent = world:spawn()
+  local child  = world:spawn()
+
+  -- setParent(child, parent) establishes a hierarchy link.
+  -- Pass nil as parent to detach: setParent(child, nil).
+  -- Use for scene graphs, UI tree, or composite game objects.
+  world:setParent(child, parent)
+  lurek.log.info("parent of child: " .. world:getParent(child), "ecs")
+
+  -- Detach the child
+  world:setParent(child, nil)
+  assert(world:getParent(child) == nil)
 end
 ```
 
@@ -1560,6 +1956,10 @@ do
   local world = lurek.ecs.newUniverse()
   local hero = world:spawn()
   world:set(hero, "hp", 42)
+  world:set(hero, "gold", 100)
+
+  -- snapshot() and serialize() are equivalent. Both produce a table
+  -- that can be stored and later applied with applySnapshot() or deserialize().
   local snap = world:snapshot()
   world:clear()
   world:applySnapshot(snap)
@@ -1580,7 +1980,13 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
+
+  -- spawn() returns a unique integer id for the new entity.
+  -- Entities are lightweight — just an id. All data lives in components.
   local enemy = world:spawn()
+
+  -- Assign components immediately after spawn to define what the entity IS.
+  -- "position" makes it spatial, "health" makes it damageable.
   world:set(enemy, "position", { x = 320, y = 240 })
   world:set(enemy, "health",   { hp = 5, max = 5 })
 end
@@ -1603,10 +2009,21 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:defineBlueprint("goblin", {Health={max=40}, Position={x=0,y=0}})
-  local e = u:spawnBlueprint("goblin", {Position={x=300,y=200}})
-  lurek.log.info("spawned blueprint entity: " .. e, "ecs")
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("goblin", {
+    health   = { hp = 40, max = 40 },
+    position = { x = 0, y = 0 },
+    ai       = { state = "patrol" },
+  })
+
+  -- spawnBlueprint() creates an entity with all blueprint components pre-set.
+  -- Pass an override table to customize the spawn (e.g. different position).
+  -- Overrides merge with blueprint defaults.
+  local e = world:spawnBlueprint("goblin", { position = { x = 300, y = 200 } })
+
+  local pos = world:get(e, "position")
+  local hp  = world:get(e, "health")
+  lurek.log.info("spawned goblin at x=" .. pos.x .. " hp=" .. hp.hp, "ecs")
 end
 ```
 
@@ -1628,10 +2045,17 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 
 ```lua
 do
-  local u = lurek.ecs.newUniverse()
-  u:defineBlueprint("bulk_unit", {Health={max=100}, Position={x=0,y=0}})
-  local ids = u:spawnBulk("bulk_unit", 50, {})
-  lurek.log.info("bulk spawned: " .. #ids, "ecs")
+  local world = lurek.ecs.newUniverse()
+  world:defineBlueprint("particle", {
+    position = { x = 0, y = 0 },
+    lifetime = { remaining = 1.0 },
+  })
+
+  -- spawnBulk(name, count, overrides) spawns N entities from a blueprint.
+  -- Much faster than calling spawnBlueprint() in a loop.
+  -- Use for particle bursts, wave spawning, or populating grids.
+  local ids = world:spawnBulk("particle", 50, {})
+  lurek.log.info("bulk spawned " .. #ids .. " particles", "ecs")
 end
 ```
 
@@ -1649,14 +2073,21 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 do
   local world = lurek.ecs.newUniverse()
   local e = world:spawn()
-  world:set(e, "hp", 10)
-  world:remove(e, "hp")
-  world:kill(e)
+  world:set(e, "hp", 10)     -- triggers added_components entry
+  world:remove(e, "hp")      -- triggers removed_components entry
+  world:kill(e)              -- triggers deleted_entities entry
+
+  -- takeSnapshotDiff() returns a table with four arrays:
+  --   added_components: {entity_id, name} pairs for new components
+  --   removed_components: {entity_id, name} pairs for removed components
+  --   deleted_entities: ids of killed entities
+  --   dirty_entities: ids of any mutated entities
+  -- Use for network replication: send only the diff instead of full state.
   local diff = world:takeSnapshotDiff()
   lurek.log.info(
-    "diff add=" .. #diff.added_components ..
-    " rem=" .. #diff.removed_components ..
-    " del=" .. #diff.deleted_entities,
+    "diff: added=" .. #diff.added_components ..
+    " removed=" .. #diff.removed_components ..
+    " deleted=" .. #diff.deleted_entities,
     "ecs"
   )
 end
@@ -1675,7 +2106,9 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local u = lurek.ecs.newUniverse()
+  -- Returns "LUniverse" — the registered Lua userdata type name.
   local t = u:type()
+  assert(t == "LUniverse")
 end
 ```
 
@@ -1696,7 +2129,11 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local u = lurek.ecs.newUniverse()
-  local ok = u:typeOf("LUniverse")
+  -- typeOf() checks against "LUniverse" and "Object" (base type).
+  -- Use for runtime polymorphism when handling mixed userdata.
+  assert(u:typeOf("LUniverse") == true)
+  assert(u:typeOf("Object") == true)
+  assert(u:typeOf("SomethingElse") == false)
 end
 ```
 
@@ -1715,8 +2152,11 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
+
+  -- Systems are plain Lua tables with an `update(self, world, dt)` method.
+  -- The ECS calls them in priority order every frame.
   local move_system = {
-    update = function(_, w, dt)
+    update = function(self, w, dt)
       for _, id in ipairs(w:query("position", "velocity")) do
         local p, v = w:get(id, "position"), w:get(id, "velocity")
         p.x, p.y = p.x + v.x * dt, p.y + v.y * dt
@@ -1724,6 +2164,9 @@ do
     end
   }
   world:addSystem(move_system, { priority = 10 })
+
+  -- Hook world:update(dt) into lurek.process — the engine calls this each frame.
+  -- dt is the frame delta in seconds (e.g. ~0.016 at 60 FPS).
   function lurek.process(dt) world:update(dt) end
 end
 ```
@@ -1744,13 +2187,28 @@ Exact example from [ecs.lua](../blob/main/content/examples/ecs.lua):
 ```lua
 do
   local world = lurek.ecs.newUniverse()
-  local InputSys = { update = function(self, w, dt) lurek.log.debug("input", "ecs") end }
-  local LogicSys = { update = function(self, w, dt) lurek.log.debug("logic", "ecs") end }
+
+  -- Phases let you split the frame into logical stages.
+  -- Each system is assigned a phase via addSystem opts. updatePhase()
+  -- runs only systems in that phase, in priority order.
+  local InputSys = {
+    update = function(self, w, dt)
+      lurek.log.debug("processing input", "ecs")
+    end
+  }
+  local LogicSys = {
+    update = function(self, w, dt)
+      lurek.log.debug("running game logic", "ecs")
+    end
+  }
+
   world:addSystem(InputSys, { phase = "pre_update", priority = 0 })
   world:addSystem(LogicSys, { phase = "update",     priority = 10 })
+
+  -- Call phases in order — gives you explicit control over execution stages.
   function lurek.process(dt)
     world:updatePhase("pre_update", dt)
-    world:updatePhase("update",     dt)
+    world:updatePhase("update", dt)
   end
 end
 ```

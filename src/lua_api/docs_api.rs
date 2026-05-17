@@ -38,7 +38,11 @@ impl LuaUserData for LuaSchema {
             let errors_tbl = lua.create_table()?;
             for (i, e) in result.errors.iter().enumerate() {
                 let et = lua.create_table()?;
+                /// Performs the 'field' operation.
+                /// @return | nil | No value is returned.
                 et.set("field", e.field.clone())?;
+                /// Performs the 'message' operation.
+                /// @return | nil | No value is returned.
                 et.set("message", e.message.clone())?;
                 errors_tbl.set(i + 1, et)?;
             }
@@ -167,11 +171,21 @@ impl LuaUserData for DocEntry {
             let tbl = lua.create_table()?;
             for (i, p) in this.0.parameters.iter().enumerate() {
                 let pt = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 pt.set("name", p.name.clone())?;
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 pt.set("type", p.type_name.clone())?;
+                /// Performs the 'description' operation.
+                /// @return | nil | No value is returned.
                 pt.set("description", p.description.clone())?;
+                /// Performs the 'optional' operation.
+                /// @return | nil | No value is returned.
                 pt.set("optional", p.optional)?;
                 if let Some(ref d) = p.default {
+                    /// Performs the 'default' operation.
+                    /// @return | nil | No value is returned.
                     pt.set("default", d.clone())?;
                 }
                 tbl.set(i + 1, pt)?;
@@ -185,7 +199,11 @@ impl LuaUserData for DocEntry {
             let tbl = lua.create_table()?;
             for (i, r) in this.0.returns.iter().enumerate() {
                 let rt = lua.create_table()?;
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 rt.set("type", r.type_name.clone())?;
+                /// Performs the 'description' operation.
+                /// @return | nil | No value is returned.
                 rt.set("description", r.description.clone())?;
                 tbl.set(i + 1, rt)?;
             }
@@ -408,11 +426,23 @@ impl LuaUserData for ApiCatalog {
             let tbl = lua.create_table()?;
             for (i, e) in this.0.iter().enumerate() {
                 let et = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 et.set("name", e.name.clone())?;
+                /// Performs the 'qualifiedName' operation.
+                /// @return | nil | No value is returned.
                 et.set("qualifiedName", e.qualified_name.clone())?;
+                /// Performs the 'module' operation.
+                /// @return | nil | No value is returned.
                 et.set("module", e.module.clone())?;
+                /// Performs the 'kind' operation.
+                /// @return | nil | No value is returned.
                 et.set("kind", e.kind.clone())?;
+                /// Performs the 'description' operation.
+                /// @return | nil | No value is returned.
                 et.set("description", e.description.clone())?;
+                /// Performs the 'score' operation.
+                /// @return | nil | No value is returned.
                 et.set("score", docs::quality_score(e))?;
                 tbl.set(i + 1, et)?;
             }
@@ -546,17 +576,23 @@ impl LuaUserData for ValidationReport {
             for (i, m) in this.0.missing.iter().enumerate() {
                 missing.set(i + 1, m.clone())?;
             }
+            /// Performs the 'missing' operation.
+            /// @return | nil | No value is returned.
             tbl.set("missing", missing)?;
             let phantom = lua.create_table()?;
             for (i, p) in this.0.phantom.iter().enumerate() {
                 phantom.set(i + 1, p.clone())?;
             }
+            /// Performs the 'phantom' operation.
+            /// @return | nil | No value is returned.
             tbl.set("phantom", phantom)?;
             let incomplete = lua.create_table()?;
             for (i, inc) in this.0.incomplete.iter().enumerate() {
                 incomplete.set(i + 1, inc.clone())?;
             }
             // incomplete: items with partial or missing documentation
+            /// Performs the 'incomplete' operation.
+            /// @return | nil | No value is returned.
             tbl.set("incomplete", incomplete)?;
             Ok(tbl)
         });
@@ -685,12 +721,18 @@ impl LuaUserData for QualityReport {
         /// @return | table | Table with overallScore, grade, and moduleScores fields.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
+            /// Performs the 'overallScore' operation.
+            /// @return | nil | No value is returned.
             tbl.set("overallScore", this.0.overall_score)?;
+            /// Performs the 'grade' operation.
+            /// @return | nil | No value is returned.
             tbl.set("grade", docs::quality_grade(this.0.overall_score))?;
             let mods = lua.create_table()?;
             for (k, v) in &this.0.module_scores {
                 mods.set(k.clone(), *v)?;
             }
+            /// Performs the 'moduleScores' operation.
+            /// @return | nil | No value is returned.
             tbl.set("moduleScores", mods)?;
             Ok(tbl)
         });
@@ -1131,10 +1173,16 @@ pub fn register(
                 }
             }
             // checkStaleness result: stale source files, current files, missing files
+            /// Performs the 'stale' operation.
+            /// @return | nil | No value is returned.
             tbl.set("stale", stale)?;
             // current: source files with up-to-date documentation
+            /// Performs the 'current' operation.
+            /// @return | nil | No value is returned.
             tbl.set("current", current)?;
             // missing: source files with no associated documentation
+            /// Performs the 'missing' operation.
+            /// @return | nil | No value is returned.
             tbl.set("missing", missing_tbl)?;
             Ok(tbl)
         })?,
@@ -1438,6 +1486,8 @@ pub fn register(
                 for pair in tbl.pairs::<String, LuaValue>() {
                     let (key, val) = pair?;
                     let item = lua.create_table()?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     item.set("name", key.clone())?;
                     let type_name = match &val {
                         LuaValue::Function(_) => "function",
@@ -1449,6 +1499,8 @@ pub fn register(
                         LuaValue::UserData(_) => "userdata",
                         _ => "other",
                     };
+                    /// Performs the 'type' operation.
+                    /// @return | nil | No value is returned.
                     item.set("type", type_name)?;
                     items.set(idx, item)?;
                     idx += 1;
@@ -1501,34 +1553,56 @@ pub fn register(
                     format!("{}.{}", prefix, key_str)
                 };
                 let item = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 item.set("name", key_str)?;
+                /// Performs the 'qualifiedName' operation.
+                /// @return | nil | No value is returned.
                 item.set("qualifiedName", qualified)?;
                 match &v {
                     LuaValue::Function(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "function")?;
                     }
                     LuaValue::Table(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "table")?;
                     }
                     LuaValue::Boolean(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "boolean")?;
                     }
                     LuaValue::Integer(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "integer")?;
                     }
                     LuaValue::Number(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "number")?;
                     }
                     LuaValue::String(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "string")?;
                     }
                     LuaValue::UserData(_) => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "userdata")?;
                     }
                     LuaValue::Nil => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "nil")?;
                     }
                     _ => {
+                        /// Performs the 'type' operation.
+                        /// @return | nil | No value is returned.
                         item.set("type", "other")?;
                     }
                 }
@@ -1538,6 +1612,8 @@ pub fn register(
             Ok(items)
         })?,
     )?;
+    /// Performs the 'docs' operation.
+    /// @return | nil | No value is returned.
     lurek_table.set("docs", docs_tbl)?;
     Ok(())
 }

@@ -49,53 +49,53 @@ lurek.engine -- Runtime metadata and diagnostics bindings for version, platform,
 Module example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
--- Returns the target frame budget for a 60 FPS update loop
+-- Returns the target frame budget in milliseconds (16.67 ms for 60 FPS).
 do
+  -- Compare actual frame time against budget to detect heavy frames early.
   local budget_ms = lurek.engine.getFrameBudget()
-  local headroom_ms = budget_ms * 0.5
+  local warn_threshold = budget_ms * 0.8 -- warn at 80% budget usage
   function lurek.process(dt)
-    if dt * 1000 > headroom_ms then
-      lurek.log.warn("frame over half-budget: " .. (dt * 1000) .. "ms / " .. budget_ms, "perf")
+    local frame_ms = dt * 1000
+    if frame_ms > warn_threshold then
+      lurek.log.warn(string.format("frame budget %.1f/%.1f ms (%.0f%%)",
+        frame_ms, budget_ms, (frame_ms / budget_ms) * 100), "perf")
     end
   end
 end
 
 --@api-stub: lurek.engine.memoryUsage
--- Returns Lua VM memory usage as bytes and rounded kilobytes
+-- Returns a table with lua_bytes and lua_kb fields for Lua VM heap usage.
 do
-  local accum = 0
+  -- Periodically log memory to detect leaks during development.
+  local last_kb = 0
   function lurek.process(dt)
-    accum = accum + dt
-    if accum >= 1.0 then
-      accum = 0
-      local mem = lurek.engine.memoryUsage()
-      lurek.log.debug("lua heap=" .. mem.lua_kb .. "KB (" .. mem.lua_bytes .. " bytes)", "mem")
+    if lurek.engine.frameCount() % 300 ~= 0 then return end
+    local mem = lurek.engine.memoryUsage()
+    local delta = mem.lua_kb - last_kb
+    if delta > 0 then
+      lurek.log.debug(string.format("lua heap: %d KB (+%d KB since last check)",
+        mem.lua_kb, delta), "mem")
     end
+    last_kb = mem.lua_kb
   end
 end
 
 --@api-stub: lurek.engine.platform
--- Returns the current desktop operating system name
+-- Returns "windows", "linux", "macos", or "unknown" for the current OS.
 do
+  -- Use platform name to select platform-specific defaults (paths, key hints).
   local os_name = lurek.engine.platform()
-  local quit_hint = (os_name == "macos") and "Cmd+Q to quit" or "Alt+F4 to quit"
-  lurek.log.info("running on " .. os_name .. " - " .. quit_hint, "boot")
+  local config_dir = "." -- os.getenv not available in lurek sandbox
+  -- In a real deployment outside the sandbox, config_dir would be:
+  -- Windows: os.getenv("APPDATA")  macOS: ~/Library/Application Support  Linux: ~/.config
+  lurek.log.info("platform=" .. os_name .. " config_dir=" .. config_dir, "boot")
 end
 
 --@api-stub: lurek.engine.uptime
--- Returns total engine runtime accumulated by the main loop
+-- Returns total engine runtime in seconds since the process started.
 do
+  -- Track session play time for analytics or idle-kick detection.
   local session_start = lurek.engine.uptime()
-  function lurek.quit()
-    local played = lurek.engine.uptime() - session_start
-    lurek.log.info("session lasted " .. string.format("%.1f", played) .. "s", "session")
-  end
-end
-
---@api-stub: lurek.engine.fps
--- Returns the latest frames-per-second value stored by the runtime
-do
-  local font
 ```
 
 ## Key Types
@@ -131,17 +131,14 @@ Returns the latest frames-per-second value stored by the runtime.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local font
-  function lurek.init() font = lurek.render.newFont(14) end
-  function lurek.draw_ui()
-    local fps = lurek.engine.fps()
-    lurek.render.setFont(font)
-    lurek.render.setColor(1, 1, 0, 1)
-    lurek.render.print(string.format("FPS: %.0f", fps), 8, 8)
+  local current_fps = lurek.engine.fps()
+  -- Use the FPS reading to toggle quality dynamically
+  if current_fps < 30 then
+    lurek.log.warn("FPS below threshold: " .. current_fps, "perf")
   end
 end
 ```
@@ -154,14 +151,14 @@ Returns the number of frames counted by the shared runtime clock.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  function lurek.process(_)
-    if lurek.engine.frameCount() % 600 == 0 then
-      lurek.log.info("autosave tick at frame " .. lurek.engine.frameCount(), "save")
-    end
+  local frames = lurek.engine.frameCount()
+  -- Run expensive work only every 60 frames (roughly once per second at 60 FPS)
+  if frames % 60 == 0 then
+    lurek.log.debug("periodic check at frame " .. frames, "perf")
   end
 end
 ```
@@ -174,18 +171,13 @@ Returns the configuration reload revision counter.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local last = lurek.engine.getConfigRevision()
-  function lurek.process(_)
-    local now = lurek.engine.getConfigRevision()
-    if now ~= last then
-      last = now
-      lurek.log.info("config revision changed to " .. now, "boot")
-    end
-  end
+  local rev = lurek.engine.getConfigRevision()
+  -- Detect when the config was hot-reloaded since last check
+  lurek.log.info("config revision: " .. rev, "boot")
 end
 ```
 
@@ -197,17 +189,13 @@ Returns the target frame budget for a 60 FPS update loop.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
   local budget_ms = lurek.engine.getFrameBudget()
-  local headroom_ms = budget_ms * 0.5
-  function lurek.process(dt)
-    if dt * 1000 > headroom_ms then
-      lurek.log.warn("frame over half-budget: " .. (dt * 1000) .. "ms / " .. budget_ms, "perf")
-    end
-  end
+  -- Compare actual frame time against the budget to detect jank
+  lurek.log.info("frame budget: " .. budget_ms .. " ms", "perf")
 end
 ```
 
@@ -219,13 +207,16 @@ Returns the latest frame timing profile split by engine phase.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  function lurek.draw_ui()
-    local p = lurek.engine.getFrameProfile()
-    lurek.render.print(string.format("tick=%.2fms process=%.2fms draw=%.2fms", p.app_tick_ms, p.process_ms, p.draw_ms), 8, 28)
+  local profile = lurek.engine.getFrameProfile()
+  -- profile is a table of phase timings in milliseconds
+  for phase, ms in pairs(profile) do
+    if ms > 5.0 then
+      lurek.log.warn("slow phase: " .. phase .. " = " .. ms .. " ms", "perf")
+    end
   end
 end
 ```
@@ -238,13 +229,13 @@ Returns the latest frame timing profile formatted as one text line.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  function lurek.draw_ui()
-    lurek.render.print(lurek.engine.getFrameProfileText(), 8, 46)
-  end
+  local text = lurek.engine.getFrameProfileText()
+  -- Display the full profile summary in one line (useful for on-screen debug)
+  lurek.log.info(text, "perf")
 end
 ```
 
@@ -256,16 +247,21 @@ Returns current resource memory usage and object counts by resource kind.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  function lurek.process(_)
-    if lurek.engine.frameCount() % 300 ~= 0 then return end
-    local stats = lurek.engine.getResourceStats()
-    local mb = stats.total_bytes / (1024 * 1024)
-    lurek.log.debug(string.format("tex=%d font=%d canvas=%d total=%.2fMB", stats.texture_count, stats.font_count, stats.canvas_count, mb), "mem")
-  end
+  local stats = lurek.engine.getResourceStats()
+  -- stats contains byte totals, budget, and texture/font/canvas/shader counts
+  lurek.log.info(
+    ("resources: textures=%d fonts=%d usage=%d/%d bytes"):format(
+      stats.texture_count or 0,
+      stats.font_count or 0,
+      stats.total_bytes or 0,
+      stats.budget_bytes or 0
+    ),
+    "perf"
+  )
 end
 ```
 
@@ -277,13 +273,13 @@ Returns the engine crate version string embedded at build time.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
   local version = lurek.engine.getVersion()
-  local save_header = { engine = version, schema = 3, ts = os.time() }
-  lurek.log.info("save header engine=" .. save_header.engine, "save")
+  -- Use engine.getVersion for the Cargo.toml version (vs runtime.getVersion for semver)
+  lurek.log.info("engine crate version: " .. version, "boot")
 end
 ```
 
@@ -295,15 +291,14 @@ Returns whether the engine binary was built with debug assertions.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  if lurek.engine.isDebug() then
-    lurek.log.setLevel("debug")
-    lurek.log.debug("debug build - verbose logging enabled", "boot")
-  else
-    lurek.log.setLevel("info")
+  local debug_build = lurek.engine.isDebug()
+  -- Enable extra validation only in debug builds to avoid performance cost
+  if debug_build then
+    lurek.log.info("debug build: extra asserts are active", "dev")
   end
 end
 ```
@@ -316,19 +311,13 @@ Returns Lua VM memory usage as bytes and rounded kilobytes.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local accum = 0
-  function lurek.process(dt)
-    accum = accum + dt
-    if accum >= 1.0 then
-      accum = 0
-      local mem = lurek.engine.memoryUsage()
-      lurek.log.debug("lua heap=" .. mem.lua_kb .. "KB (" .. mem.lua_bytes .. " bytes)", "mem")
-    end
-  end
+  local mem = lurek.engine.memoryUsage()
+  -- Monitor Lua heap size to catch memory leaks in scripts
+  lurek.log.info("lua memory: " .. mem.lua_kb .. " KB (" .. mem.lua_bytes .. " bytes)", "perf")
 end
 ```
 
@@ -340,13 +329,14 @@ Returns the current desktop operating system name.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local os_name = lurek.engine.platform()
-  local quit_hint = (os_name == "macos") and "Cmd+Q to quit" or "Alt+F4 to quit"
-  lurek.log.info("running on " .. os_name .. " - " .. quit_hint, "boot")
+  local plat = lurek.engine.platform()
+  -- Pick platform-specific asset paths or defaults
+  local config_dir = (plat == "windows") and "%APPDATA%/mygame" or "~/.config/mygame"
+  lurek.log.info("platform=" .. plat .. " config_dir=" .. config_dir, "boot")
 end
 ```
 
@@ -360,13 +350,14 @@ Sets the resource memory budget used by resource statistics reporting.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local mb = 256
-  lurek.engine.setResourceBudget(mb * 1024 * 1024)
-  lurek.log.info("texture budget set to " .. mb .. " MB", "boot")
+  -- Set a 256 MB resource budget; getResourceStats will report usage against this
+  local budget = 256 * 1024 * 1024
+  lurek.engine.setResourceBudget(budget)
+  lurek.log.info("resource budget set to " .. (budget / 1024 / 1024) .. " MB", "perf")
 end
 ```
 
@@ -378,15 +369,14 @@ Returns total engine runtime accumulated by the main loop.
 
 #### Example
 
-Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
+Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local session_start = lurek.engine.uptime()
-  function lurek.quit()
-    local played = lurek.engine.uptime() - session_start
-    lurek.log.info("session lasted " .. string.format("%.1f", played) .. "s", "session")
-  end
+  local seconds = lurek.engine.uptime()
+  -- Show how long the engine has been running (useful for session length tracking)
+  local minutes = math.floor(seconds / 60)
+  lurek.log.info("engine uptime: " .. minutes .. " min (" .. ("%.1f"):format(seconds) .. " s)", "perf")
 end
 ```
 

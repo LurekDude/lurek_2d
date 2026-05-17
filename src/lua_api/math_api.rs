@@ -139,9 +139,10 @@ impl LuaUserData for LuaVec2 {
         });
         // -- fromAngle --
         /// Creates a unit vector from an angle.
+        /// @param | self | LVec2 | The vector instance (ignored; static constructor).
         /// @param | radians | number | Angle in radians.
         /// @return | LVec2 | New vector handle.
-        methods.add_function("fromAngle", |lua, radians: f64| {
+        methods.add_method("fromAngle", |lua, _self, radians: f64| {
             lua.create_userdata(LuaVec2 {
                 inner: Vec2::from_angle(radians as f32),
             })
@@ -310,9 +311,10 @@ impl LuaUserData for LuaVec3 {
         });
         // -- splat --
         /// Creates a vector with all components set to one value.
+        /// @param | self | LVec3 | The vector instance (ignored; static constructor).
         /// @param | v | number | Component value.
         /// @return | LVec3 | New vector handle.
-        methods.add_function("splat", |lua, v: f32| {
+        methods.add_method("splat", |lua, _self, v: f32| {
             lua.create_userdata(LuaVec3 {
                 inner: Vec3::splat(v),
             })
@@ -455,8 +457,8 @@ impl LuaUserData for LuaRandomGenerator {
         });
         // -- randomNormal --
         /// Returns a normally distributed random value.
-        /// @param | stddev | number | Optional standard deviation, defaulting to 1.0.
-        /// @param | mean | number | Optional mean, defaulting to 0.0.
+        /// @param | stddev? | number | Standard deviation (default 1.0).
+        /// @param | mean? | number | Mean value (default 0.0).
         /// @return | number | Random normal value.
         methods.add_method_mut(
             "randomNormal",
@@ -531,7 +533,7 @@ impl LuaUserData for LuaTransform {
         // -- scale --
         /// Applies scale to this transform. This method is available to Lua scripts.
         /// @param | sx | number | X scale.
-        /// @param | sy | number | Optional Y scale, defaulting to `sx`.
+        /// @param | sy? | number | Y scale (defaults to `sx`).
         /// @return | nil | No value is returned.
         methods.add_method_mut("scale", |_, this, (sx, sy): (f32, Option<f32>)| {
             this.inner.scale(sx, sy.unwrap_or(sx));
@@ -558,13 +560,13 @@ impl LuaUserData for LuaTransform {
         /// Replaces this transform from position, rotation, scale, origin, and shear components.
         /// @param | x | number | X translation.
         /// @param | y | number | Y translation.
-        /// @param | angle | number? | Optional rotation angle, defaulting to 0.
-        /// @param | sx | number? | Optional X scale, defaulting to 1.
-        /// @param | sy | number? | Optional Y scale, defaulting to `sx`.
-        /// @param | ox | number? | Optional origin x, defaulting to 0.
-        /// @param | oy | number? | Optional origin y, defaulting to 0.
-        /// @param | kx | number? | Optional X shear, defaulting to 0.
-        /// @param | ky | number? | Optional Y shear, defaulting to 0.
+        /// @param | angle? | number | Rotation angle (default 0).
+        /// @param | sx? | number | X scale (default 1).
+        /// @param | sy? | number | Y scale (defaults to `sx`).
+        /// @param | ox? | number | Origin x offset (default 0).
+        /// @param | oy? | number | Origin y offset (default 0).
+        /// @param | kx? | number | X shear (default 0).
+        /// @param | ky? | number | Y shear (default 0).
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setTransformation",
@@ -644,7 +646,11 @@ impl LuaUserData for LuaTransform {
         });
         // -- decompose --
         /// Decomposes this transform into component values.
-        /// @return | LuaValue | Transform decomposition tuple from the math module.
+        /// @return | number | X translation.
+        /// @return | number | Y translation.
+        /// @return | number | Rotation angle in radians.
+        /// @return | number | X scale.
+        /// @return | number | Y scale.
         methods.add_method("decompose", |_, this, ()| Ok(this.inner.decompose()));
         // -- type --
         /// Returns the Lua-visible type name for this transform handle.
@@ -699,8 +705,8 @@ impl LuaUserData for LuaBezierCurve {
         // -- getControlPoint --
         /// Returns a control point by one-based index.
         /// @param | index | integer | One-based control point index.
-        /// @return | LuaValue | X coordinate, or nil when out of range.
-        /// @return | LuaValue | Y coordinate, or nil when out of range.
+        /// @return | number | X coordinate, or nil when out of range.
+        /// @return | number | Y coordinate, or nil when out of range.
         methods.add_method("getControlPoint", |_, this, index: usize| {
             if index == 0 {
                 return Ok((None, None));
@@ -729,7 +735,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Inserts a control point, optionally before a one-based index.
         /// @param | x | number | Point x coordinate.
         /// @param | y | number | Point y coordinate.
-        /// @param | index | integer | Optional one-based insertion index.
+        /// @param | index? | integer | One-based insertion index.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "insertControlPoint",
@@ -762,7 +768,7 @@ impl LuaUserData for LuaBezierCurve {
         // -- evaluateAtDistance --
         /// Evaluates this curve at an approximate distance along the curve.
         /// @param | distance | number | Distance along the curve.
-        /// @param | samples | integer | Optional sample count, defaulting to 128.
+        /// @param | samples? | integer | Sample count (default 128).
         /// @return | number | Point x coordinate.
         /// @return | number | Point y coordinate.
         methods.add_method(
@@ -838,8 +844,8 @@ impl LuaUserData for LuaTween {
         });
         // -- getValue --
         /// Returns one tween value by one-based index or all values when no index is provided.
-        /// @param | index | integer? | Optional one-based value index.
-        /// @return | LuaValue | Number value or array table of all values.
+        /// @param | index? | integer | One-based value index; omit to return all values as a table.
+        /// @return | number | Tween value at the given index, or a table of all values when index is omitted.
         methods.add_method("getValue", |lua, this, index: Option<usize>| match index {
             Some(i) => {
                 if i == 0 {
@@ -1146,8 +1152,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples 2D Worley noise. This method is available to Lua scripts.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | dist_name | string | Optional distance type name.
-        /// @param | f2 | boolean | Optional second-feature flag.
+        /// @param | dist_name? | string | Distance type name (default `"euclidean"`).
+        /// @param | f2? | boolean | Second-feature flag (default false).
         /// @return | number | Noise value.
         methods.add_method(
             "worley2d",
@@ -1164,8 +1170,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
         /// @param | z | number | Z coordinate.
-        /// @param | dist_name | string | Optional distance type name.
-        /// @param | f2 | boolean | Optional second-feature flag.
+        /// @param | dist_name? | string | Distance type name (default `"euclidean"`).
+        /// @param | f2? | boolean | Second-feature flag (default false).
         /// @return | number | Noise value.
         methods.add_method(
             "worley3d",
@@ -1181,10 +1187,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples fractal Brownian motion noise.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves | integer? | Octave count (default 4).
-        /// @param | lac | number? | Lacunarity (default 2.0).
-        /// @param | pers | number? | Persistence (default 0.5).
-        /// @param | kind | string? | Noise kind name (default `"perlin"`).
+        /// @param | octaves? | integer | Octave count (default 4).
+        /// @param | lac? | number | Lacunarity (default 2.0).
+        /// @param | pers? | number | Persistence (default 0.5).
+        /// @param | kind? | string | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "fbm",
@@ -1216,10 +1222,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples ridged fractal noise. This method is available to Lua scripts.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves | integer? | Octave count (default 4).
-        /// @param | lac | number? | Lacunarity (default 2.0).
-        /// @param | pers | number? | Persistence (default 0.5).
-        /// @param | kind | string? | Noise kind name (default `"perlin"`).
+        /// @param | octaves? | integer | Octave count (default 4).
+        /// @param | lac? | number | Lacunarity (default 2.0).
+        /// @param | pers? | number | Persistence (default 0.5).
+        /// @param | kind? | string | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "ridged",
@@ -1251,10 +1257,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples turbulence fractal noise.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves | integer? | Octave count (default 4).
-        /// @param | lac | number? | Lacunarity (default 2.0).
-        /// @param | pers | number? | Persistence (default 0.5).
-        /// @param | kind | string? | Noise kind name (default `"perlin"`).
+        /// @param | octaves? | integer | Octave count (default 4).
+        /// @param | lac? | number | Lacunarity (default 2.0).
+        /// @param | pers? | number | Persistence (default 0.5).
+        /// @param | kind? | string | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "turbulence",
@@ -1296,7 +1302,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Generates a noise map and returns it as a flat array table.
         /// @param | w | integer | Map width.
         /// @param | h | integer | Map height.
-        /// @param | opts | table | Optional generation options including scale, octaves, kind, fractal, offset, and backend.
+        /// @param | opts? | table | Generation options including scale, octaves, kind, fractal, offset, and backend.
         /// @return | table | Flat array table of noise values.
         methods.add_method(
             "generateMap",
@@ -1344,7 +1350,7 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Generates a noise map through the compute backend and returns it as a flat array table.
         /// @param | w | integer | Map width.
         /// @param | h | integer | Map height.
-        /// @param | opts | table | Optional generation options including scale, octaves, kind, fractal, and offset.
+        /// @param | opts? | table | Generation options including scale, octaves, kind, fractal, and offset.
         /// @return | table | Flat array table of noise values.
         methods.add_method(
             "generateMapCompute",
@@ -1489,9 +1495,9 @@ impl LuaUserData for LuaRectPacker {
         /// Attempts to pack a rectangle and returns its placement coordinates.
         /// @param | w | integer | Rectangle width.
         /// @param | h | integer | Rectangle height.
-        /// @param | id | string | Optional rectangle id.
-        /// @return | LuaValue | X coordinate, or nil when packing fails.
-        /// @return | LuaValue | Y coordinate, or nil when packing fails.
+        /// @param | id? | string | Rectangle id.
+        /// @return | integer | X coordinate, or nil when packing fails.
+        /// @return | integer | Y coordinate, or nil when packing fails.
         methods.add_method_mut(
             "pack",
             |_, this, (w, h, id): (u32, u32, Option<String>)| match this.inner.pack(w, h, id) {
@@ -1517,11 +1523,21 @@ impl LuaUserData for LuaRectPacker {
             let t = lua.create_table()?;
             for (i, r) in this.inner.packed_rects().iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 row.set("x", r.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 row.set("y", r.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 row.set("w", r.w)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 row.set("h", r.h)?;
                 if let Some(id) = &r.id {
+                    /// Performs the 'id' operation.
+                    /// @return | nil | No value is returned.
                     row.set("id", id.clone())?;
                 }
                 t.set(i + 1, row)?;
@@ -1637,7 +1653,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let tbl = lua.create_table()?;
     // -- newRandomGenerator --
     /// Creates a deterministic random generator with an optional seed.
-    /// @param | seed | integer? | Optional seed value.
+    /// @param | seed? | integer | Seed value.
     /// @return | LRandomGenerator | New random generator handle.
     tbl.set(
         "newRandomGenerator",
@@ -1651,15 +1667,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newTransform --
     /// Creates a 2D transform. All components are optional; omitting all returns an identity transform.
-    /// @param | x | number? | X translation (default 0).
-    /// @param | y | number? | Y translation (default 0).
-    /// @param | angle | number? | Rotation angle in radians (default 0).
-    /// @param | sx | number? | X scale factor (default 1).
-    /// @param | sy | number? | Y scale factor; defaults to `sx` when omitted.
-    /// @param | ox | number? | X origin offset for rotation/scale (default 0).
-    /// @param | oy | number? | Y origin offset for rotation/scale (default 0).
-    /// @param | kx | number? | X shear factor (default 0).
-    /// @param | ky | number? | Y shear factor (default 0).
+    /// @param | x? | number | X translation (default 0).
+    /// @param | y? | number | Y translation (default 0).
+    /// @param | angle? | number | Rotation angle in radians (default 0).
+    /// @param | sx? | number | X scale factor (default 1).
+    /// @param | sy? | number | Y scale factor (defaults to `sx`).
+    /// @param | ox? | number | X origin offset for rotation/scale (default 0).
+    /// @param | oy? | number | Y origin offset for rotation/scale (default 0).
+    /// @param | kx? | number | X shear factor (default 0).
+    /// @param | ky? | number | Y shear factor (default 0).
     /// @return | LTransform | New transform handle.
     tbl.set(
         "newTransform",
@@ -1721,7 +1737,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- newTween --
     /// Creates a tween with a duration and optional easing name.
     /// @param | duration | number | Tween duration in seconds.
-    /// @param | easing_name | string | Optional easing name, defaulting to `linear`.
+    /// @param | easing_name? | string | Easing name (default `linear`).
     /// @return | LTween | New tween handle.
     tbl.set(
         "newTween",
@@ -1746,7 +1762,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newNoiseGenerator --
     /// Creates a procedural noise generator with an optional seed.
-    /// @param | seed | integer? | Optional seed value, defaulting to 0.
+    /// @param | seed? | integer | Seed value (default 0).
     /// @return | LNoiseGenerator | New noise generator handle.
     tbl.set(
         "newNoiseGenerator",
@@ -1760,7 +1776,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Creates a rectangle packer. This function is exposed to Lua scripts.
     /// @param | width | integer | Packer width.
     /// @param | height | integer | Packer height.
-    /// @param | padding | integer | Optional padding between rectangles.
+    /// @param | padding? | integer | Padding between rectangles (default 0).
     /// @return | LRectPacker | New rectangle packer handle.
     tbl.set(
         "newRectPacker",
@@ -1774,7 +1790,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless 2D Perlin noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed | integer | Optional seed value, defaulting to 0.
+    /// @param | seed? | integer | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "perlin2d",
@@ -1787,7 +1803,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
     /// @param | z | number | Z coordinate.
-    /// @param | seed | integer | Optional seed value, defaulting to 0.
+    /// @param | seed? | integer | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "perlin3d",
@@ -1799,7 +1815,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless 2D simplex noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed | integer | Optional seed value, defaulting to 0.
+    /// @param | seed? | integer | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "simplex2d",
@@ -1811,10 +1827,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless fractal Brownian motion noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed | integer? | Optional seed value, defaulting to 0.
-    /// @param | octaves | integer? | Optional octave count, defaulting to 4.
-    /// @param | lac | number? | Optional lacunarity, defaulting to 2.0.
-    /// @param | gain | number? | Optional gain, defaulting to 0.5.
+    /// @param | seed? | integer | Seed value (default 0).
+    /// @param | octaves? | integer | Octave count (default 4).
+    /// @param | lac? | number | Lacunarity (default 2.0).
+    /// @param | gain? | number | Gain (default 0.5).
     /// @return | number | Noise value.
     tbl.set(
         "fbm",
@@ -2150,12 +2166,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- circleIntersectsCircle --
     /// Returns whether two circles intersect.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | r1 | number | Lua argument for `r1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
-    /// @param | r2 | number | Lua argument for `r2`.
+    /// @param | x1 | number | First circle center x coordinate.
+    /// @param | y1 | number | First circle center y coordinate.
+    /// @param | r1 | number | First circle radius.
+    /// @param | x2 | number | Second circle center x coordinate.
+    /// @param | y2 | number | Second circle center y coordinate.
+    /// @param | r2 | number | Second circle radius.
     /// @return | boolean | True when the circles intersect.
     tbl.set(
         "circleIntersectsCircle",
@@ -2167,18 +2183,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- circleIntersectsLine --
     /// Returns circle-line intersection state and hit points when present.
-    /// @param | cx | number | Lua argument for `cx`.
-    /// @param | cy | number | Lua argument for `cy`.
-    /// @param | r | number | Lua argument for `r`.
-    /// @param | lx1 | number | Lua argument for `lx1`.
-    /// @param | ly1 | number | Lua argument for `ly1`.
-    /// @param | lx2 | number | Lua argument for `lx2`.
-    /// @param | ly2 | number | Lua argument for `ly2`.
+    /// @param | cx | number | Circle center x coordinate.
+    /// @param | cy | number | Circle center y coordinate.
+    /// @param | r | number | Circle radius.
+    /// @param | lx1 | number | Line start x coordinate.
+    /// @param | ly1 | number | Line start y coordinate.
+    /// @param | lx2 | number | Line end x coordinate.
+    /// @param | ly2 | number | Line end y coordinate.
     /// @return | boolean | True when the line intersects the circle.
-    /// @return | LuaValue | First hit x coordinate, or nil.
-    /// @return | LuaValue | First hit y coordinate, or nil.
-    /// @return | LuaValue | Second hit x coordinate, or nil.
-    /// @return | LuaValue | Second hit y coordinate, or nil.
+    /// @return | number | First hit x coordinate, or nil.
+    /// @return | number | First hit y coordinate, or nil.
+    /// @return | number | Second hit x coordinate, or nil.
+    /// @return | number | Second hit y coordinate, or nil.
     tbl.set(
         "circleIntersectsLine",
         lua.create_function(
@@ -2196,18 +2212,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- circleIntersectsSegment --
     /// Returns circle-segment intersection state and hit points when present.
-    /// @param | cx | number | Lua argument for `cx`.
-    /// @param | cy | number | Lua argument for `cy`.
-    /// @param | r | number | Lua argument for `r`.
-    /// @param | sx1 | number | Lua argument for `sx1`.
-    /// @param | sy1 | number | Lua argument for `sy1`.
-    /// @param | sx2 | number | Lua argument for `sx2`.
-    /// @param | sy2 | number | Lua argument for `sy2`.
+    /// @param | cx | number | Circle center x coordinate.
+    /// @param | cy | number | Circle center y coordinate.
+    /// @param | r | number | Circle radius.
+    /// @param | sx1 | number | Segment start x coordinate.
+    /// @param | sy1 | number | Segment start y coordinate.
+    /// @param | sx2 | number | Segment end x coordinate.
+    /// @param | sy2 | number | Segment end y coordinate.
     /// @return | boolean | True when the segment intersects the circle.
-    /// @return | LuaValue | First hit x coordinate, or nil.
-    /// @return | LuaValue | First hit y coordinate, or nil.
-    /// @return | LuaValue | Second hit x coordinate, or nil.
-    /// @return | LuaValue | Second hit y coordinate, or nil.
+    /// @return | number | First hit x coordinate, or nil.
+    /// @return | number | First hit y coordinate, or nil.
+    /// @return | number | Second hit x coordinate, or nil.
+    /// @return | number | Second hit y coordinate, or nil.
     tbl.set(
         "circleIntersectsSegment",
         lua.create_function(
@@ -2226,12 +2242,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- closestPointOnSegment --
     /// Returns the closest point on a segment to an input point.
-    /// @param | px | number | Lua argument for `px`.
-    /// @param | py | number | Lua argument for `py`.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
+    /// @param | px | number | Point x coordinate.
+    /// @param | py | number | Point y coordinate.
+    /// @param | x1 | number | Segment start x coordinate.
+    /// @param | y1 | number | Segment start y coordinate.
+    /// @param | x2 | number | Segment end x coordinate.
+    /// @param | y2 | number | Segment end y coordinate.
     /// @return | number | Closest point x coordinate.
     /// @return | number | Closest point y coordinate.
     tbl.set(
@@ -2293,16 +2309,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- lineIntersect --
     /// Returns intersection point for two infinite lines when present.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
-    /// @param | x3 | number | Lua argument for `x3`.
-    /// @param | y3 | number | Lua argument for `y3`.
-    /// @param | x4 | number | Lua argument for `x4`.
-    /// @param | y4 | number | Lua argument for `y4`.
-    /// @return | LuaValue | Intersection x coordinate, or nil.
-    /// @return | LuaValue | Intersection y coordinate, or nil.
+    /// @param | x1 | number | First line start x coordinate.
+    /// @param | y1 | number | First line start y coordinate.
+    /// @param | x2 | number | First line end x coordinate.
+    /// @param | y2 | number | First line end y coordinate.
+    /// @param | x3 | number | Second line start x coordinate.
+    /// @param | y3 | number | Second line start y coordinate.
+    /// @param | x4 | number | Second line end x coordinate.
+    /// @param | y4 | number | Second line end y coordinate.
+    /// @return | number | Intersection x coordinate, or nil.
+    /// @return | number | Intersection y coordinate, or nil.
     tbl.set(
         "lineIntersect",
         lua.create_function(
@@ -2367,17 +2383,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- segmentIntersectsSegment --
     /// Returns whether two segments intersect and their intersection point when present.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
-    /// @param | x3 | number | Lua argument for `x3`.
-    /// @param | y3 | number | Lua argument for `y3`.
-    /// @param | x4 | number | Lua argument for `x4`.
-    /// @param | y4 | number | Lua argument for `y4`.
+    /// @param | x1 | number | First segment start x coordinate.
+    /// @param | y1 | number | First segment start y coordinate.
+    /// @param | x2 | number | First segment end x coordinate.
+    /// @param | y2 | number | First segment end y coordinate.
+    /// @param | x3 | number | Second segment start x coordinate.
+    /// @param | y3 | number | Second segment start y coordinate.
+    /// @param | x4 | number | Second segment end x coordinate.
+    /// @param | y4 | number | Second segment end y coordinate.
     /// @return | boolean | True when the segments intersect.
-    /// @return | LuaValue | Intersection x coordinate, or nil.
-    /// @return | LuaValue | Intersection y coordinate, or nil.
+    /// @return | number | Intersection x coordinate, or nil.
+    /// @return | number | Intersection y coordinate, or nil.
     tbl.set(
         "segmentIntersectsSegment",
         lua.create_function(
@@ -2391,10 +2407,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- bresenham --
     /// Returns integer grid points along a Bresenham line.
-    /// @param | x1 | integer | Lua argument for `x1`.
-    /// @param | y1 | integer | Lua argument for `y1`.
-    /// @param | x2 | integer | Lua argument for `x2`.
-    /// @param | y2 | integer | Lua argument for `y2`.
+    /// @param | x1 | integer | Start x coordinate.
+    /// @param | y1 | integer | Start y coordinate.
+    /// @param | x2 | integer | End x coordinate.
+    /// @param | y2 | integer | End y coordinate.
     /// @return | table | Array table of `{x, y}` point tables.
     tbl.set(
         "bresenham",
@@ -2411,10 +2427,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// The mathematical constant π ≈ 3.14159. Equivalent to `math.pi` in standard Lua.
+    /// @return | nil | No value is returned.
     tbl.set("pi", std::f64::consts::PI)?;
     /// The mathematical constant τ = 2π ≈ 6.28318.
+    /// @return | nil | No value is returned.
     tbl.set("tau", std::f64::consts::TAU)?;
     /// Positive infinity constant. Equivalent to `math.huge` in standard Lua.
+    /// @return | nil | No value is returned.
     tbl.set("huge", f64::INFINITY)?;
     // -- rad --
     /// Converts degrees to radians. This function is exposed to Lua scripts.
@@ -2460,7 +2479,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- atan --
     /// Returns arctangent or two-argument arctangent.
     /// @param | y | number | Input value or y coordinate.
-    /// @param | x | number | Optional x coordinate for atan2 behavior.
+    /// @param | x? | number | X coordinate for atan2 behavior.
     /// @return | number | Angle in radians.
     tbl.set(
         "atan",
@@ -2513,7 +2532,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- log --
     /// Returns natural logarithm or logarithm with a supplied base.
     /// @param | x | number | Input value.
-    /// @param | b | number | Optional logarithm base.
+    /// @param | b? | number | Logarithm base.
     /// @return | number | Logarithm value.
     tbl.set(
         "log",
@@ -2568,10 +2587,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- distance --
     /// Returns Euclidean distance between two points.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
+    /// @param | x1 | number | First point x coordinate.
+    /// @param | y1 | number | First point y coordinate.
+    /// @param | x2 | number | Second point x coordinate.
+    /// @param | y2 | number | Second point y coordinate.
     /// @return | number | Distance.
     tbl.set(
         "distance",
@@ -2583,10 +2602,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- distanceSq --
     /// Returns squared Euclidean distance between two points.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
+    /// @param | x1 | number | First point x coordinate.
+    /// @param | y1 | number | First point y coordinate.
+    /// @param | x2 | number | Second point x coordinate.
+    /// @param | y2 | number | Second point y coordinate.
     /// @return | number | Squared distance.
     tbl.set(
         "distanceSq",
@@ -2598,8 +2617,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- random --
     /// Returns a Lua math random value, optionally scaled to one or two bounds.
-    /// @param | a | number | Optional upper bound or lower bound.
-    /// @param | b | number | Optional upper bound.
+    /// @param | a? | number | Upper bound, or lower bound when `b` is given.
+    /// @param | b? | number | Upper bound.
     /// @return | number | Random value.
     tbl.set(
         "random",
@@ -2642,7 +2661,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples 2D or 3D simplex noise. This function is exposed to Lua scripts.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | z | number | Optional Z coordinate.
+    /// @param | z? | number | Z coordinate for 3D noise.
     /// @return | number | Noise value.
     tbl.set(
         "simplexNoise",
@@ -2729,14 +2748,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- hermite --
     /// Creates a Hermite spline from endpoints and tangents.
-    /// @param | p0x | number | Lua argument for `p0x`.
-    /// @param | p0y | number | Lua argument for `p0y`.
-    /// @param | p1x | number | Lua argument for `p1x`.
-    /// @param | p1y | number | Lua argument for `p1y`.
-    /// @param | m0x | number | Lua argument for `m0x`.
-    /// @param | m0y | number | Lua argument for `m0y`.
-    /// @param | m1x | number | Lua argument for `m1x`.
-    /// @param | m1y | number | Lua argument for `m1y`.
+    /// @param | p0x | number | Start point x coordinate.
+    /// @param | p0y | number | Start point y coordinate.
+    /// @param | p1x | number | End point x coordinate.
+    /// @param | p1y | number | End point y coordinate.
+    /// @param | m0x | number | Start tangent x component.
+    /// @param | m0y | number | Start tangent y component.
+    /// @param | m1x | number | End tangent x component.
+    /// @param | m1y | number | End tangent y component.
     /// @return | LHermite | New Hermite spline handle.
     tbl.set("hermite", lua.create_function(|lua, (p0x, p0y, p1x, p1y, m0x, m0y, m1x, m1y): (f32, f32, f32, f32, f32, f32, f32, f32)| {
             let hs = HermiteSpline::new((p0x, p0y), (p1x, p1y), (m0x, m0y), (m1x, m1y));
@@ -2755,11 +2774,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- remap --
     /// Remaps a value from one range to another.
-    /// @param | v | number | Lua argument for `v`.
-    /// @param | in_min | number | Lua argument for `in_min`.
-    /// @param | in_max | number | Lua argument for `in_max`.
-    /// @param | out_min | number | Lua argument for `out_min`.
-    /// @param | out_max | number | Lua argument for `out_max`.
+    /// @param | v | number | Input value.
+    /// @param | in_min | number | Input range minimum.
+    /// @param | in_max | number | Input range maximum.
+    /// @param | out_min | number | Output range minimum.
+    /// @param | out_max | number | Output range maximum.
     /// @return | number | Remapped value.
     tbl.set(
         "remap",
@@ -2786,9 +2805,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set("sign", lua.create_function(|_, v: f32| Ok(sign(v)))?)?;
     // -- smoothstep --
     /// Applies smoothstep interpolation between two edges.
-    /// @param | edge0 | number | Lua argument for `edge0`.
-    /// @param | edge1 | number | Lua argument for `edge1`.
-    /// @param | x | number | Numeric `x` argument for this call.
+    /// @param | edge0 | number | Lower edge.
+    /// @param | edge1 | number | Upper edge.
+    /// @param | x | number | Input value.
     /// @return | number | Smoothstep value.
     tbl.set(
         "smoothstep",
@@ -2808,9 +2827,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- hslToRgb --
     /// Converts HSL color values to RGBA channels.
-    /// @param | h | number | Lua argument for `h`.
-    /// @param | s | number | Lua argument for `s`.
-    /// @param | l | number | Lua argument for `l`.
+    /// @param | h | number | Hue value.
+    /// @param | s | number | Saturation value.
+    /// @param | l | number | Lightness value.
     /// @return | number | Red channel.
     /// @return | number | Green channel.
     /// @return | number | Blue channel.
@@ -2840,9 +2859,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- rgbToHsl --
     /// Converts RGB channels to HSL values.
-    /// @param | r | number | Lua argument for `r`.
-    /// @param | g | number | Lua argument for `g`.
-    /// @param | b | number | Lua argument for `b`.
+    /// @param | r | number | Red channel value.
+    /// @param | g | number | Green channel value.
+    /// @param | b | number | Blue channel value.
     /// @return | number | Hue.
     /// @return | number | Saturation.
     /// @return | number | Lightness.
@@ -2856,14 +2875,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- rectUnion --
     /// Returns the union rectangle for two rectangles.
-    /// @param | x1 | number | Lua argument for `x1`.
-    /// @param | y1 | number | Lua argument for `y1`.
-    /// @param | w1 | number | Lua argument for `w1`.
-    /// @param | h1 | number | Lua argument for `h1`.
-    /// @param | x2 | number | Lua argument for `x2`.
-    /// @param | y2 | number | Lua argument for `y2`.
-    /// @param | w2 | number | Lua argument for `w2`.
-    /// @param | h2 | number | Lua argument for `h2`.
+    /// @param | x1 | number | First rectangle x coordinate.
+    /// @param | y1 | number | First rectangle y coordinate.
+    /// @param | w1 | number | First rectangle width.
+    /// @param | h1 | number | First rectangle height.
+    /// @param | x2 | number | Second rectangle x coordinate.
+    /// @param | y2 | number | Second rectangle y coordinate.
+    /// @param | w2 | number | Second rectangle width.
+    /// @param | h2 | number | Second rectangle height.
     /// @return | number | Union x coordinate.
     /// @return | number | Union y coordinate.
     /// @return | number | Union width.
@@ -2881,10 +2900,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- rectFromCenter --
     /// Creates a rectangle tuple from center coordinates and size.
-    /// @param | cx | number | Lua argument for `cx`.
-    /// @param | cy | number | Lua argument for `cy`.
-    /// @param | w | number | Lua argument for `w`.
-    /// @param | h | number | Lua argument for `h`.
+    /// @param | cx | number | Center x coordinate.
+    /// @param | cy | number | Center y coordinate.
+    /// @param | w | number | Rectangle width.
+    /// @param | h | number | Rectangle height.
     /// @return | number | Rectangle x coordinate.
     /// @return | number | Rectangle y coordinate.
     /// @return | number | Rectangle width.
@@ -2898,10 +2917,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- polygonClip --
     /// Clips a flat polygon point table against a plane.
-    /// @param | pts | table | Lua argument for `pts`.
-    /// @param | nx | number | Lua argument for `nx`.
-    /// @param | ny | number | Lua argument for `ny`.
-    /// @param | d | number | Lua argument for `d`.
+    /// @param | pts | table | Flat numeric polygon point table.
+    /// @param | nx | number | Plane normal x component.
+    /// @param | ny | number | Plane normal y component.
+    /// @param | d | number | Plane distance from origin.
     /// @return | table | Flat numeric clipped polygon point table.
     tbl.set(
         "polygonClip",
@@ -3007,23 +3026,37 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let out = lua.create_table()?;
             for (i, cell) in cells.iter().enumerate() {
                 let site_tbl = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 site_tbl.set("x", cell.site.0)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 site_tbl.set("y", cell.site.1)?;
                 let verts_tbl = lua.create_table()?;
                 for (j, &(vx, vy)) in cell.vertices.iter().enumerate() {
                     let v = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     v.set("x", vx)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     v.set("y", vy)?;
                     verts_tbl.set(j + 1, v)?;
                 }
                 let cell_tbl = lua.create_table()?;
+                /// Performs the 'site' operation.
+                /// @return | nil | No value is returned.
                 cell_tbl.set("site", site_tbl)?;
+                /// Performs the 'vertices' operation.
+                /// @return | nil | No value is returned.
                 cell_tbl.set("vertices", verts_tbl)?;
                 out.set(i + 1, cell_tbl)?;
             }
             Ok(out)
         })?,
     )?;
+    /// Performs the 'math' operation.
+    /// @return | nil | No value is returned.
     luna.set("math", tbl)?;
     Ok(())
 }
@@ -3043,7 +3076,11 @@ fn poly_to_lua_table<'lua>(lua: &'lua Lua, pts: &[(f32, f32)]) -> LuaResult<LuaT
     let arr = lua.create_table()?;
     for (i, (x, y)) in pts.iter().enumerate() {
         let t = lua.create_table()?;
+        /// Performs the 'x' operation.
+        /// @return | nil | No value is returned.
         t.set("x", *x)?;
+        /// Performs the 'y' operation.
+        /// @return | nil | No value is returned.
         t.set("y", *y)?;
         arr.set(i + 1, t)?;
     }

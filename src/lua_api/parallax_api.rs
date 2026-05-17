@@ -132,14 +132,14 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- resetAutoscroll --
-        /// Resets layer autoscroll offset. This method is available to Lua scripts.
+        /// Resets the layer autoscroll offset to zero.
         /// @return | nil | No value is returned.
         methods.add_method("resetAutoscroll", |_, this, ()| {
             this.layer.borrow_mut().reset_autoscroll();
             Ok(())
         });
         // -- setScrollFactor --
-        /// Sets layer scroll factor. This method is available to Lua scripts.
+        /// Sets layer scroll factor for this object.
         /// @param | x | number | X scroll factor.
         /// @param | y | number | Y scroll factor.
         /// @return | nil | No value is returned.
@@ -149,7 +149,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getScrollFactor --
-        /// Returns layer scroll factor. This method is available to Lua scripts.
+        /// Returns layer scroll factor from this object.
         /// @return | number | X scroll factor.
         /// @return | number | Y scroll factor.
         methods.add_method("getScrollFactor", |_, this, ()| {
@@ -157,9 +157,9 @@ impl LuaUserData for LuaParallaxLayer {
             Ok((l.scroll_factor[0], l.scroll_factor[1]))
         });
         // -- setOffset --
-        /// Sets layer offset. This method is available to Lua scripts.
-        /// @param | x | number | Numeric `x` argument for this call.
-        /// @param | y | number | Numeric `y` argument for this call.
+        /// Sets the layer pixel offset for this object.
+        /// @param | x | number | X offset.
+        /// @param | y | number | Y offset.
         /// @return | nil | No value is returned.
         methods.add_method("setOffset", |_, this, (x, y): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -167,7 +167,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getOffset --
-        /// Returns layer offset. This method is available to Lua scripts.
+        /// Returns layer offset for this object.
         /// @return | number | X offset.
         /// @return | number | Y offset.
         methods.add_method("getOffset", |_, this, ()| {
@@ -175,9 +175,9 @@ impl LuaUserData for LuaParallaxLayer {
             Ok((l.offset[0], l.offset[1]))
         });
         // -- setAutoscroll --
-        /// Sets layer autoscroll velocity. This method is available to Lua scripts.
-        /// @param | vx | number | Lua argument for `vx`.
-        /// @param | vy | number | Lua argument for `vy`.
+        /// Sets the layer autoscroll velocity values.
+        /// @param | vx | number | X autoscroll velocity.
+        /// @param | vy | number | Y autoscroll velocity.
         /// @return | nil | No value is returned.
         methods.add_method("setAutoscroll", |_, this, (vx, vy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -194,8 +194,8 @@ impl LuaUserData for LuaParallaxLayer {
         });
         // -- setRepeat --
         /// Sets horizontal and vertical repeat flags.
-        /// @param | rx | boolean | Lua argument for `rx`.
-        /// @param | ry | boolean | Lua argument for `ry`.
+        /// @param | rx | boolean | Repeat horizontally.
+        /// @param | ry | boolean | Repeat vertically.
         /// @return | nil | No value is returned.
         methods.add_method("setRepeat", |_, this, (rx, ry): (bool, bool)| {
             let mut l = this.layer.borrow_mut();
@@ -204,9 +204,9 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- setScale --
-        /// Sets layer scale. This method is available to Lua scripts.
-        /// @param | sx | number | Lua argument for `sx`.
-        /// @param | sy | number | Lua argument for `sy`.
+        /// Sets the layer scale factor for this object.
+        /// @param | sx | number | X scale factor.
+        /// @param | sy | number | Y scale factor.
         /// @return | nil | No value is returned.
         methods.add_method("setScale", |_, this, (sx, sy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
@@ -214,7 +214,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- setZ --
-        /// Sets layer z order. This method is available to Lua scripts.
+        /// Sets the layer z order for this object.
         /// @param | z | integer | Z order.
         /// @return | nil | No value is returned.
         methods.add_method("setZ", |_, this, z: i32| {
@@ -222,7 +222,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getZ --
-        /// Returns layer z order. This method is available to Lua scripts.
+        /// Returns layer z order from this object.
         /// @return | integer | Z order.
         methods.add_method("getZ", |_, this, ()| Ok(this.layer.borrow().z));
         // -- setOpacity --
@@ -234,22 +234,22 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getOpacity --
-        /// Returns layer opacity. This method is available to Lua scripts.
+        /// Returns layer opacity from this object.
         /// @return | number | Opacity value.
         methods.add_method("getOpacity", |_, this, ()| Ok(this.layer.borrow().opacity));
         // -- setTint --
-        /// Sets layer tint color. This method is available to Lua scripts.
-        /// @param | r | number | Lua argument for `r`.
-        /// @param | g | number | Lua argument for `g`.
-        /// @param | b | number | Lua argument for `b`.
-        /// @param | a | number | Lua argument for `a`.
+        /// Sets layer tint color for this object.
+        /// @param | r | number | Red channel (0–1).
+        /// @param | g | number | Green channel (0–1).
+        /// @param | b | number | Blue channel (0–1).
+        /// @param | a | number | Alpha channel (0–1).
         /// @return | nil | No value is returned.
         methods.add_method("setTint", |_, this, (r, g, b, a): (f32, f32, f32, f32)| {
             this.layer.borrow_mut().tint = [r, g, b, a];
             Ok(())
         });
         // -- getTint --
-        /// Returns layer tint color. This method is available to Lua scripts.
+        /// Returns layer tint color from this object.
         /// @return | number | Red channel.
         /// @return | number | Green channel.
         /// @return | number | Blue channel.
@@ -259,7 +259,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok((r, g, b, a))
         });
         // -- setBlendMode --
-        /// Sets layer blend mode by name. This method is available to Lua scripts.
+        /// Sets the layer blend mode by string name.
         /// @param | mode | string | Blend mode name.
         /// @return | nil | No value is returned.
         methods.add_method("setBlendMode", |_, this, mode: String| {
@@ -267,13 +267,13 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getBlendMode --
-        /// Returns layer blend mode name. This method is available to Lua scripts.
+        /// Returns the current layer blend mode name.
         /// @return | string | Blend mode name.
         methods.add_method("getBlendMode", |_, this, ()| {
             Ok(blend_to_str(this.layer.borrow().blend_mode).to_string())
         });
         // -- setVisible --
-        /// Sets layer visibility. This method is available to Lua scripts.
+        /// Sets layer visibility for this object.
         /// @param | v | boolean | Visibility flag.
         /// @return | nil | No value is returned.
         methods.add_method("setVisible", |_, this, v: bool| {
@@ -281,15 +281,15 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- isVisible --
-        /// Returns layer visibility. This method is available to Lua scripts.
+        /// Returns layer visibility and returns a boolean.
         /// @return | boolean | True when visible.
         methods.add_method("isVisible", |_, this, ()| Ok(this.layer.borrow().visible));
         // -- setClamp --
         /// Sets clamp bounds for layer movement.
-        /// @param | min_x | number | Lua argument for `min_x`.
-        /// @param | min_y | number | Lua argument for `min_y`.
-        /// @param | max_x | number | Lua argument for `max_x`.
-        /// @param | max_y | number | Lua argument for `max_y`.
+        /// @param | min_x | number | Minimum X bound.
+        /// @param | min_y | number | Minimum Y bound.
+        /// @param | max_x | number | Maximum X bound.
+        /// @param | max_y | number | Maximum Y bound.
         /// @return | nil | No value is returned.
         methods.add_method(
             "setClamp",
@@ -301,7 +301,7 @@ impl LuaUserData for LuaParallaxLayer {
             },
         );
         // -- clearClamp --
-        /// Clears layer clamp bounds. This method is available to Lua scripts.
+        /// Clears layer clamp bounds on this object.
         /// @return | nil | No value is returned.
         methods.add_method("clearClamp", |_, this, ()| {
             let mut l = this.layer.borrow_mut();
@@ -310,7 +310,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- setTiling --
-        /// Enables or disables layer tiling. This method is available to Lua scripts.
+        /// Enables or disables the layer tiling mode.
         /// @param | enabled | boolean | Tiling flag.
         /// @return | nil | No value is returned.
         methods.add_method("setTiling", |_, this, enabled: bool| {
@@ -324,16 +324,16 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(this.layer.borrow().get_tiling())
         });
         // -- setTileSize --
-        /// Sets tile size for tiling. This method is available to Lua scripts.
-        /// @param | w | number | Lua argument for `w`.
-        /// @param | h | number | Lua argument for `h`.
+        /// Sets tile size for tiling for this object.
+        /// @param | w | number | Tile width.
+        /// @param | h | number | Tile height.
         /// @return | nil | No value is returned.
         methods.add_method("setTileSize", |_, this, (w, h): (f32, f32)| {
             this.layer.borrow_mut().set_tile_size(w, h);
             Ok(())
         });
         // -- setDepth --
-        /// Sets parallax depth. This method is available to Lua scripts.
+        /// Sets parallax depth for this object.
         /// @param | z | number | Depth value.
         /// @return | nil | No value is returned.
         methods.add_method("setDepth", |_, this, z: f32| {
@@ -341,7 +341,7 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- getDepth --
-        /// Returns parallax depth. This method is available to Lua scripts.
+        /// Returns parallax depth from this object.
         /// @return | number | Depth value.
         methods.add_method("getDepth", |_, this, ()| {
             Ok(this.layer.borrow().get_depth())
@@ -349,7 +349,7 @@ impl LuaUserData for LuaParallaxLayer {
         // -- addEffectPass --
         /// Adds a shader effect pass to this layer.
         /// @param | effect_name | string | Effect name.
-        /// @param | params | table | Optional numeric parameter table.
+        /// @param | params? | table | Numeric parameter table.
         /// @return | nil | No value is returned.
         methods.add_method(
             "addEffectPass",
@@ -377,13 +377,13 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
         // -- effectCount --
-        /// Returns shader effect pass count. This method is available to Lua scripts.
+        /// Returns the shader effect pass count for this layer.
         /// @return | integer | Effect pass count.
         methods.add_method("effectCount", |_, this, ()| {
             Ok(this.layer.borrow().effect_count() as i64)
         });
         // -- setMotionStretch --
-        /// Sets motion stretch settings. This method is available to Lua scripts.
+        /// Sets the motion stretch settings for this layer.
         /// @param | enabled | boolean | Motion stretch flag.
         /// @param | strength | number | Stretch strength.
         /// @param | max_scale | number | Maximum stretch scale.
@@ -398,7 +398,7 @@ impl LuaUserData for LuaParallaxLayer {
             },
         );
         // -- getMotionStretch --
-        /// Returns motion stretch settings. This method is available to Lua scripts.
+        /// Returns the current motion stretch settings.
         /// @return | boolean | Motion stretch flag.
         /// @return | number | Stretch strength.
         /// @return | number | Maximum stretch scale.
@@ -447,7 +447,7 @@ impl LuaUserData for LuaParallaxSet {
         /// @return | string | The string `LParallaxSet`.
         methods.add_method("type", |_, _, ()| Ok("LParallaxSet"));
         // -- addLayer --
-        /// Adds a parallax layer to this set. This method is available to Lua scripts.
+        /// Adds a parallax layer to this set handle.
         /// @param | layer | LParallaxLayer | Layer handle.
         /// @return | nil | No value is returned.
         methods.add_method_mut("addLayer", |_, this, layer: LuaAnyUserData| {
@@ -473,9 +473,9 @@ impl LuaUserData for LuaParallaxSet {
         /// @return | integer | Layer count.
         methods.add_method("layerCount", |_, this, ()| Ok(this.layers.len() as i64));
         // -- getLayerZAt --
-        /// Returns z order for a layer by one-based index.
+        /// Returns z order for a layer by one-based index, or nil when out of range.
         /// @param | index | integer | One-based layer index.
-        /// @return | integer | Z order, or nil when out of range.
+        /// @return | integer | Z order.
         methods.add_method("getLayerZAt", |_, this, index: usize| {
             if index == 0 || index > this.layers.len() {
                 return Ok(None);
@@ -484,14 +484,14 @@ impl LuaUserData for LuaParallaxSet {
             Ok(Some(z))
         });
         // -- sortByZ --
-        /// Sorts layers by z order. This method is available to Lua scripts.
+        /// Sorts layers by z order on this object.
         /// @return | nil | No value is returned.
         methods.add_method_mut("sortByZ", |_, this, ()| {
             this.sort_by_z();
             Ok(())
         });
         // -- setVisible --
-        /// Sets set visibility. This method is available to Lua scripts.
+        /// Sets set visibility for this object.
         /// @param | v | boolean | Visibility flag.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setVisible", |_, this, v: bool| {
@@ -499,11 +499,11 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
         // -- isVisible --
-        /// Returns set visibility. This method is available to Lua scripts.
+        /// Returns set visibility and returns a boolean.
         /// @return | boolean | True when visible.
         methods.add_method("isVisible", |_, this, ()| Ok(this.visible));
         // -- update --
-        /// Updates all layers in this set. This method is available to Lua scripts.
+        /// Updates all layers in this parallax set.
         /// @param | dt | number | Delta time in seconds.
         /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| {
@@ -514,8 +514,8 @@ impl LuaUserData for LuaParallaxSet {
         });
         // -- render --
         /// Enqueues render commands for all visible set layers using explicit camera coordinates.
-        /// @param | cam_x | number | Lua argument for `cam_x`.
-        /// @param | cam_y | number | Lua argument for `cam_y`.
+        /// @param | cam_x | number | Camera x coordinate.
+        /// @param | cam_y | number | Camera y coordinate.
         /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             if !this.visible {
@@ -547,11 +547,11 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
         // -- getName --
-        /// Returns this set name. This method is available to Lua scripts.
+        /// Returns this set name from this object.
         /// @return | string | Set name.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
         // -- setName --
-        /// Sets this set name. This method is available to Lua scripts.
+        /// Sets this parallax set name for this object.
         /// @param | name | string | Set name.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setName", |_, this, name: String| {
@@ -736,6 +736,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(LuaParallaxLayer::new(layer, s.clone()))
         })?,
     )?;
+    /// Performs the 'parallax' operation.
+    /// @return | nil | No value is returned.
     lurek.set("parallax", parallax)?;
     Ok(())
 }

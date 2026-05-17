@@ -44,7 +44,7 @@
   - [lurek.ui.newCheckbox([text]: string) -> LCheckbox](#lurekuinewcheckboxtext-string-lcheckbox)
   - [lurek.ui.newColorPicker() -> LColorPicker](#lurekuinewcolorpicker-lcolorpicker)
   - [lurek.ui.newComboBox() -> LComboBox](#lurekuinewcombobox-lcombobox)
-  - [lurek.ui.newCustomWidget([config]: table) -> LWidget](#lurekuinewcustomwidgetconfig-table-lwidget)
+  - [lurek.ui.newCustomWidget([config]: table) -> LUiWidget](#lurekuinewcustomwidgetconfig-table-luiwidget)
   - [lurek.ui.newDialog([title]: string) -> LDialog](#lurekuinewdialogtitle-string-ldialog)
   - [lurek.ui.newDockPanel() -> LDockPanel](#lurekuinewdockpanel-ldockpanel)
   - [lurek.ui.newImageWidget() -> LImageWidget](#lurekuinewimagewidget-limagewidget)
@@ -90,13 +90,13 @@
   - [lurek.ui.wheelmoved(x: number, y: number) -> boolean](#lurekuiwheelmovedx-number-y-number-boolean)
 - [Types and Methods](#types-and-methods)
   - [LAccordion](#laccordion)
-  - [LAccordion:addSection(title: string, [content_idx]: integer)](#laccordionaddsectiontitle-string-contentidx-integer)
-  - [LAccordion:getSectionCount() -> number](#laccordiongetsectioncount-number)
-  - [LAccordion:getSectionTitle(section_idx: integer) -> string](#laccordiongetsectiontitlesectionidx-integer-string)
-  - [LAccordion:isExclusive() -> boolean](#laccordionisexclusive-boolean)
-  - [LAccordion:isSectionExpanded(section_idx: integer) -> boolean](#laccordionissectionexpandedsectionidx-integer-boolean)
-  - [LAccordion:setExclusive(v: boolean)](#laccordionsetexclusivev-boolean)
-  - [LAccordion:toggleSection(section_idx: integer) -> boolean](#laccordiontogglesectionsectionidx-integer-boolean)
+  - [LAccordion:addSection(self: LAccordion, title: string, [content_idx]: integer)](#laccordionaddsectionself-laccordion-title-string-contentidx-integer)
+  - [LAccordion:getSectionCount(self: LAccordion) -> number](#laccordiongetsectioncountself-laccordion-number)
+  - [LAccordion:getSectionTitle(self: LAccordion, section_idx: integer) -> string](#laccordiongetsectiontitleself-laccordion-sectionidx-integer-string)
+  - [LAccordion:isExclusive(self: LAccordion) -> boolean](#laccordionisexclusiveself-laccordion-boolean)
+  - [LAccordion:isSectionExpanded(self: LAccordion, section_idx: integer) -> boolean](#laccordionissectionexpandedself-laccordion-sectionidx-integer-boolean)
+  - [LAccordion:setExclusive(self: LAccordion, v: boolean)](#laccordionsetexclusiveself-laccordion-v-boolean)
+  - [LAccordion:toggleSection(self: LAccordion, section_idx: integer) -> boolean](#laccordiontogglesectionself-laccordion-sectionidx-integer-boolean)
   - [LAreaChart](#lareachart)
   - [LAreaChart:addLayer(name: string, vals_tbl: table, r: number, g: number, b: number)](#lareachartaddlayername-string-valstbl-table-r-number-g-number-b-number)
   - [LAreaChart:drawToImage(target: LImageData)](#lareachartdrawtoimagetarget-limagedata)
@@ -104,9 +104,9 @@
   - [LAreaChart:type() -> string](#lareacharttype-string)
   - [LAreaChart:typeOf(name: string) -> boolean](#lareacharttypeofname-string-boolean)
   - [LBadge](#lbadge)
-  - [LBadge:getCount() -> number](#lbadgegetcount-number)
-  - [LBadge:getDisplayText() -> string](#lbadgegetdisplaytext-string)
-  - [LBadge:setCount(count: integer)](#lbadgesetcountcount-integer)
+  - [LBadge:getCount(self: LBadge) -> number](#lbadgegetcountself-lbadge-number)
+  - [LBadge:getDisplayText(self: LBadge) -> string](#lbadgegetdisplaytextself-lbadge-string)
+  - [LBadge:setCount(self: LBadge, count: integer)](#lbadgesetcountself-lbadge-count-integer)
   - [LBarChart](#lbarchart)
   - [LBarChart:addCategory(label: string, vals_tbl: table)](#lbarchartaddcategorylabel-string-valstbl-table)
   - [LBarChart:addSeries(name: string, r: number, g: number, b: number)](#lbarchartaddseriesname-string-r-number-g-number-b-number)
@@ -114,90 +114,90 @@
   - [LBarChart:type() -> string](#lbarcharttype-string)
   - [LBarChart:typeOf(name: string) -> boolean](#lbarcharttypeofname-string-boolean)
   - [LButton](#lbutton)
-  - [LButton:getText() -> string](#lbuttongettext-string)
-  - [LButton:setText(text: string)](#lbuttonsettexttext-string)
+  - [LButton:getText(self: LButton) -> string](#lbuttongettextself-lbutton-string)
+  - [LButton:setText(self: LButton, text: string)](#lbuttonsettextself-lbutton-text-string)
   - [LCheckbox](#lcheckbox)
-  - [LCheckbox:getText() -> string](#lcheckboxgettext-string)
-  - [LCheckbox:isChecked() -> boolean](#lcheckboxischecked-boolean)
-  - [LCheckbox:setChecked(checked: boolean)](#lcheckboxsetcheckedchecked-boolean)
-  - [LCheckbox:setText(text: string)](#lcheckboxsettexttext-string)
+  - [LCheckbox:getText(self: LCheckbox) -> string](#lcheckboxgettextself-lcheckbox-string)
+  - [LCheckbox:isChecked(self: LCheckbox) -> boolean](#lcheckboxischeckedself-lcheckbox-boolean)
+  - [LCheckbox:setChecked(self: LCheckbox, checked: boolean)](#lcheckboxsetcheckedself-lcheckbox-checked-boolean)
+  - [LCheckbox:setText(self: LCheckbox, text: string)](#lcheckboxsettextself-lcheckbox-text-string)
   - [LColorPicker](#lcolorpicker)
-  - [LColorPicker:getColor() -> number](#lcolorpickergetcolor-number)
-  - [LColorPicker:getColorMode() -> string](#lcolorpickergetcolormode-string)
-  - [LColorPicker:getShowAlpha() -> boolean](#lcolorpickergetshowalpha-boolean)
-  - [LColorPicker:setColor(r: number, g: number, b: number, [a]: number)](#lcolorpickersetcolorr-number-g-number-b-number-a-number)
-  - [LColorPicker:setColorMode(mode: string)](#lcolorpickersetcolormodemode-string)
-  - [LColorPicker:setOnChange(f: function)](#lcolorpickersetonchangef-function)
-  - [LColorPicker:setShowAlpha(v: boolean)](#lcolorpickersetshowalphav-boolean)
+  - [LColorPicker:getColor(self: LColorPicker) -> number](#lcolorpickergetcolorself-lcolorpicker-number)
+  - [LColorPicker:getColorMode(self: LColorPicker) -> string](#lcolorpickergetcolormodeself-lcolorpicker-string)
+  - [LColorPicker:getShowAlpha(self: LColorPicker) -> boolean](#lcolorpickergetshowalphaself-lcolorpicker-boolean)
+  - [LColorPicker:setColor(self: LColorPicker, r: number, g: number, b: number, [a]: number)](#lcolorpickersetcolorself-lcolorpicker-r-number-g-number-b-number-a-number)
+  - [LColorPicker:setColorMode(self: LColorPicker, mode: string)](#lcolorpickersetcolormodeself-lcolorpicker-mode-string)
+  - [LColorPicker:setOnChange(self: LColorPicker, f: function)](#lcolorpickersetonchangeself-lcolorpicker-f-function)
+  - [LColorPicker:setShowAlpha(self: LColorPicker, v: boolean)](#lcolorpickersetshowalphaself-lcolorpicker-v-boolean)
   - [LComboBox](#lcombobox)
-  - [LComboBox:addItem(text: string)](#lcomboboxadditemtext-string)
-  - [LComboBox:clearItems()](#lcomboboxclearitems)
-  - [LComboBox:getItem(index: integer) -> string](#lcomboboxgetitemindex-integer-string)
-  - [LComboBox:getItemCount() -> number](#lcomboboxgetitemcount-number)
-  - [LComboBox:getSelectedIndex() -> number](#lcomboboxgetselectedindex-number)
-  - [LComboBox:getSelectedItem() -> string](#lcomboboxgetselecteditem-string)
-  - [LComboBox:removeItem(index: integer) -> boolean](#lcomboboxremoveitemindex-integer-boolean)
-  - [LComboBox:setSelectedIndex(index: integer)](#lcomboboxsetselectedindexindex-integer)
+  - [LComboBox:addItem(self: LComboBox, text: string)](#lcomboboxadditemself-lcombobox-text-string)
+  - [LComboBox:clearItems(self: LComboBox)](#lcomboboxclearitemsself-lcombobox)
+  - [LComboBox:getItem(self: LComboBox, index: integer) -> string](#lcomboboxgetitemself-lcombobox-index-integer-string)
+  - [LComboBox:getItemCount(self: LComboBox) -> number](#lcomboboxgetitemcountself-lcombobox-number)
+  - [LComboBox:getSelectedIndex(self: LComboBox) -> number](#lcomboboxgetselectedindexself-lcombobox-number)
+  - [LComboBox:getSelectedItem(self: LComboBox) -> string](#lcomboboxgetselecteditemself-lcombobox-string)
+  - [LComboBox:removeItem(self: LComboBox, index: integer) -> boolean](#lcomboboxremoveitemself-lcombobox-index-integer-boolean)
+  - [LComboBox:setSelectedIndex(self: LComboBox, index: integer)](#lcomboboxsetselectedindexself-lcombobox-index-integer)
   - [LDialog](#ldialog)
-  - [LDialog:addButton(text: string, [cb]: function) -> number](#ldialogaddbuttontext-string-cb-function-number)
-  - [LDialog:close()](#ldialogclose)
-  - [LDialog:getContent() -> number](#ldialoggetcontent-number)
-  - [LDialog:getTitle() -> string](#ldialoggettitle-string)
-  - [LDialog:isModal() -> boolean](#ldialogismodal-boolean)
-  - [LDialog:isOpen() -> boolean](#ldialogisopen-boolean)
-  - [LDialog:open()](#ldialogopen)
-  - [LDialog:setContent([content_idx]: integer)](#ldialogsetcontentcontentidx-integer)
-  - [LDialog:setModal(v: boolean)](#ldialogsetmodalv-boolean)
-  - [LDialog:setOnClose(f: function)](#ldialogsetonclosef-function)
-  - [LDialog:setTitle(title: string)](#ldialogsettitletitle-string)
+  - [LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number](#ldialogaddbuttonself-ldialog-text-string-cb-function-number)
+  - [LDialog:close(self: LDialog)](#ldialogcloseself-ldialog)
+  - [LDialog:getContent(self: LDialog) -> number](#ldialoggetcontentself-ldialog-number)
+  - [LDialog:getTitle(self: LDialog) -> string](#ldialoggettitleself-ldialog-string)
+  - [LDialog:isModal(self: LDialog) -> boolean](#ldialogismodalself-ldialog-boolean)
+  - [LDialog:isOpen(self: LDialog) -> boolean](#ldialogisopenself-ldialog-boolean)
+  - [LDialog:open(self: LDialog)](#ldialogopenself-ldialog)
+  - [LDialog:setContent(self: LDialog, [content_idx]: integer)](#ldialogsetcontentself-ldialog-contentidx-integer)
+  - [LDialog:setModal(self: LDialog, v: boolean)](#ldialogsetmodalself-ldialog-v-boolean)
+  - [LDialog:setOnClose(self: LDialog, f: function)](#ldialogsetoncloseself-ldialog-f-function)
+  - [LDialog:setTitle(self: LDialog, title: string)](#ldialogsettitleself-ldialog-title-string)
   - [LDockPanel](#ldockpanel)
-  - [LDockPanel:dock(child_idx: integer, side: string)](#ldockpaneldockchildidx-integer-side-string)
-  - [LDockPanel:getDockedCount() -> number](#ldockpanelgetdockedcount-number)
-  - [LDockPanel:getSplitSize(side: string) -> number](#ldockpanelgetsplitsizeside-string-number)
-  - [LDockPanel:setSplitSize(side: string, size: number)](#ldockpanelsetsplitsizeside-string-size-number)
-  - [LDockPanel:undock(child_idx: integer)](#ldockpanelundockchildidx-integer)
+  - [LDockPanel:dock(self: LDockPanel, child_idx: integer, side: string)](#ldockpaneldockself-ldockpanel-childidx-integer-side-string)
+  - [LDockPanel:getDockedCount(self: LDockPanel) -> number](#ldockpanelgetdockedcountself-ldockpanel-number)
+  - [LDockPanel:getSplitSize(self: LDockPanel, side: string) -> number](#ldockpanelgetsplitsizeself-ldockpanel-side-string-number)
+  - [LDockPanel:setSplitSize(self: LDockPanel, side: string, size: number)](#ldockpanelsetsplitsizeself-ldockpanel-side-string-size-number)
+  - [LDockPanel:undock(self: LDockPanel, child_idx: integer)](#ldockpanelundockself-ldockpanel-childidx-integer)
   - [LGuiTable](#lguitable)
-  - [LGuiTable:addColumn(header: string, [width]: number)](#lguitableaddcolumnheader-string-width-number)
-  - [LGuiTable:addRow(cells: table)](#lguitableaddrowcells-table)
-  - [LGuiTable:getCell(row: integer, col: integer) -> string](#lguitablegetcellrow-integer-col-integer-string)
-  - [LGuiTable:getColumnCount() -> number](#lguitablegetcolumncount-number)
-  - [LGuiTable:getRowCount() -> number](#lguitablegetrowcount-number)
-  - [LGuiTable:getSelectedRow() -> number](#lguitablegetselectedrow-number)
-  - [LGuiTable:isSortable() -> boolean](#lguitableissortable-boolean)
-  - [LGuiTable:setCell(row: integer, col: integer, text: string)](#lguitablesetcellrow-integer-col-integer-text-string)
-  - [LGuiTable:setOnSelect(f: function)](#lguitablesetonselectf-function)
-  - [LGuiTable:setSelectedRow([row]: integer)](#lguitablesetselectedrowrow-integer)
-  - [LGuiTable:setSortable(v: boolean)](#lguitablesetsortablev-boolean)
+  - [LGuiTable:addColumn(self: LGuiTable, header: string, [width]: number)](#lguitableaddcolumnself-lguitable-header-string-width-number)
+  - [LGuiTable:addRow(self: LGuiTable, cells: table)](#lguitableaddrowself-lguitable-cells-table)
+  - [LGuiTable:getCell(self: LGuiTable, row: integer, col: integer) -> string](#lguitablegetcellself-lguitable-row-integer-col-integer-string)
+  - [LGuiTable:getColumnCount(self: LGuiTable) -> number](#lguitablegetcolumncountself-lguitable-number)
+  - [LGuiTable:getRowCount(self: LGuiTable) -> number](#lguitablegetrowcountself-lguitable-number)
+  - [LGuiTable:getSelectedRow(self: LGuiTable) -> number](#lguitablegetselectedrowself-lguitable-number)
+  - [LGuiTable:isSortable(self: LGuiTable) -> boolean](#lguitableissortableself-lguitable-boolean)
+  - [LGuiTable:setCell(self: LGuiTable, row: integer, col: integer, text: string)](#lguitablesetcellself-lguitable-row-integer-col-integer-text-string)
+  - [LGuiTable:setOnSelect(self: LGuiTable, f: function)](#lguitablesetonselectself-lguitable-f-function)
+  - [LGuiTable:setSelectedRow(self: LGuiTable, [row]: integer)](#lguitablesetselectedrowself-lguitable-row-integer)
+  - [LGuiTable:setSortable(self: LGuiTable, v: boolean)](#lguitablesetsortableself-lguitable-v-boolean)
   - [LGuiWindow](#lguiwindow)
-  - [LGuiWindow:getTitle() -> string](#lguiwindowgettitle-string)
-  - [LGuiWindow:isCloseable() -> boolean](#lguiwindowiscloseable-boolean)
-  - [LGuiWindow:isDraggable() -> boolean](#lguiwindowisdraggable-boolean)
-  - [LGuiWindow:isResizable() -> boolean](#lguiwindowisresizable-boolean)
-  - [LGuiWindow:setCloseable(v: boolean)](#lguiwindowsetcloseablev-boolean)
-  - [LGuiWindow:setDraggable(v: boolean)](#lguiwindowsetdraggablev-boolean)
-  - [LGuiWindow:setOnClose(f: function)](#lguiwindowsetonclosef-function)
-  - [LGuiWindow:setResizable(v: boolean)](#lguiwindowsetresizablev-boolean)
-  - [LGuiWindow:setTitle(title: string)](#lguiwindowsettitletitle-string)
+  - [LGuiWindow:getTitle(self: LGuiWindow) -> string](#lguiwindowgettitleself-lguiwindow-string)
+  - [LGuiWindow:isCloseable(self: LGuiWindow) -> boolean](#lguiwindowiscloseableself-lguiwindow-boolean)
+  - [LGuiWindow:isDraggable(self: LGuiWindow) -> boolean](#lguiwindowisdraggableself-lguiwindow-boolean)
+  - [LGuiWindow:isResizable(self: LGuiWindow) -> boolean](#lguiwindowisresizableself-lguiwindow-boolean)
+  - [LGuiWindow:setCloseable(self: LGuiWindow, v: boolean)](#lguiwindowsetcloseableself-lguiwindow-v-boolean)
+  - [LGuiWindow:setDraggable(self: LGuiWindow, v: boolean)](#lguiwindowsetdraggableself-lguiwindow-v-boolean)
+  - [LGuiWindow:setOnClose(self: LGuiWindow, f: function)](#lguiwindowsetoncloseself-lguiwindow-f-function)
+  - [LGuiWindow:setResizable(self: LGuiWindow, v: boolean)](#lguiwindowsetresizableself-lguiwindow-v-boolean)
+  - [LGuiWindow:setTitle(self: LGuiWindow, title: string)](#lguiwindowsettitleself-lguiwindow-title-string)
   - [LImageWidget](#limagewidget)
-  - [LImageWidget:getScaleMode() -> string](#limagewidgetgetscalemode-string)
-  - [LImageWidget:getTint() -> number](#limagewidgetgettint-number)
-  - [LImageWidget:setScaleMode(mode: string)](#limagewidgetsetscalemodemode-string)
-  - [LImageWidget:setTint(r: number, g: number, b: number, [a]: number)](#limagewidgetsettintr-number-g-number-b-number-a-number)
+  - [LImageWidget:getScaleMode(self: LImageWidget) -> string](#limagewidgetgetscalemodeself-limagewidget-string)
+  - [LImageWidget:getTint(self: LImageWidget) -> number](#limagewidgetgettintself-limagewidget-number)
+  - [LImageWidget:setScaleMode(self: LImageWidget, mode: string)](#limagewidgetsetscalemodeself-limagewidget-mode-string)
+  - [LImageWidget:setTint(self: LImageWidget, r: number, g: number, b: number, [a]: number)](#limagewidgetsettintself-limagewidget-r-number-g-number-b-number-a-number)
   - [LLabel](#llabel)
-  - [LLabel:getText() -> string](#llabelgettext-string)
-  - [LLabel:setText(text: string)](#llabelsettexttext-string)
+  - [LLabel:getText(self: LLabel) -> string](#llabelgettextself-llabel-string)
+  - [LLabel:setText(self: LLabel, text: string)](#llabelsettextself-llabel-text-string)
   - [LLayout](#llayout)
-  - [LLayout:getAlign() -> string](#llayoutgetalign-string)
-  - [LLayout:getDirection() -> string](#llayoutgetdirection-string)
-  - [LLayout:getJustify() -> string](#llayoutgetjustify-string)
-  - [LLayout:getSpacing() -> number](#llayoutgetspacing-number)
-  - [LLayout:getWrap() -> boolean](#llayoutgetwrap-boolean)
-  - [LLayout:setAlign(align: string)](#llayoutsetalignalign-string)
-  - [LLayout:setColumns(n: integer)](#llayoutsetcolumnsn-integer)
-  - [LLayout:setDirection(dir: string)](#llayoutsetdirectiondir-string)
-  - [LLayout:setJustify(justify: string)](#llayoutsetjustifyjustify-string)
-  - [LLayout:setSpacing(spacing: number)](#llayoutsetspacingspacing-number)
-  - [LLayout:setWrap(wrap: boolean)](#llayoutsetwrapwrap-boolean)
+  - [LLayout:getAlign(self: LLayout) -> string](#llayoutgetalignself-llayout-string)
+  - [LLayout:getDirection(self: LLayout) -> string](#llayoutgetdirectionself-llayout-string)
+  - [LLayout:getJustify(self: LLayout) -> string](#llayoutgetjustifyself-llayout-string)
+  - [LLayout:getSpacing(self: LLayout) -> number](#llayoutgetspacingself-llayout-number)
+  - [LLayout:getWrap(self: LLayout) -> boolean](#llayoutgetwrapself-llayout-boolean)
+  - [LLayout:setAlign(self: LLayout, align: string)](#llayoutsetalignself-llayout-align-string)
+  - [LLayout:setColumns(self: LLayout, n: integer)](#llayoutsetcolumnsself-llayout-n-integer)
+  - [LLayout:setDirection(self: LLayout, dir: string)](#llayoutsetdirectionself-llayout-dir-string)
+  - [LLayout:setJustify(self: LLayout, justify: string)](#llayoutsetjustifyself-llayout-justify-string)
+  - [LLayout:setSpacing(self: LLayout, spacing: number)](#llayoutsetspacingself-llayout-spacing-number)
+  - [LLayout:setWrap(self: LLayout, wrap: boolean)](#llayoutsetwrapself-llayout-wrap-boolean)
   - [LLineChart](#llinechart)
   - [LLineChart:addSeries(name: string, pts_tbl: table, r: number, g: number, b: number)](#llinechartaddseriesname-string-ptstbl-table-r-number-g-number-b-number)
   - [LLineChart:drawToImage(target: LImageData)](#llinechartdrawtoimagetarget-limagedata)
@@ -206,59 +206,59 @@
   - [LLineChart:type() -> string](#llinecharttype-string)
   - [LLineChart:typeOf(name: string) -> boolean](#llinecharttypeofname-string-boolean)
   - [LListBox](#llistbox)
-  - [LListBox:addItem(text: string)](#llistboxadditemtext-string)
-  - [LListBox:clearItems()](#llistboxclearitems)
-  - [LListBox:getItem(index: integer) -> string](#llistboxgetitemindex-integer-string)
-  - [LListBox:getItemCount() -> number](#llistboxgetitemcount-number)
-  - [LListBox:getSelectedIndex() -> number](#llistboxgetselectedindex-number)
-  - [LListBox:removeItem(index: integer)](#llistboxremoveitemindex-integer)
-  - [LListBox:setItemHeight(h: number)](#llistboxsetitemheighth-number)
-  - [LListBox:setSelectedIndex(index: integer)](#llistboxsetselectedindexindex-integer)
+  - [LListBox:addItem(self: LListBox, text: string)](#llistboxadditemself-llistbox-text-string)
+  - [LListBox:clearItems(self: LListBox)](#llistboxclearitemsself-llistbox)
+  - [LListBox:getItem(self: LListBox, index: integer) -> string](#llistboxgetitemself-llistbox-index-integer-string)
+  - [LListBox:getItemCount(self: LListBox) -> number](#llistboxgetitemcountself-llistbox-number)
+  - [LListBox:getSelectedIndex(self: LListBox) -> number](#llistboxgetselectedindexself-llistbox-number)
+  - [LListBox:removeItem(self: LListBox, index: integer)](#llistboxremoveitemself-llistbox-index-integer)
+  - [LListBox:setItemHeight(self: LListBox, h: number)](#llistboxsetitemheightself-llistbox-h-number)
+  - [LListBox:setSelectedIndex(self: LListBox, index: integer)](#llistboxsetselectedindexself-llistbox-index-integer)
   - [LMenuBar](#lmenubar)
-  - [LMenuBar:addMenu(menu_idx: integer)](#lmenubaraddmenumenuidx-integer)
-  - [LMenuBar:getMenuCount() -> number](#lmenubargetmenucount-number)
-  - [LMenuBar:getMenus() -> table](#lmenubargetmenus-table)
-  - [LMenuBar:removeMenu(menu_idx: integer) -> boolean](#lmenubarremovemenumenuidx-integer-boolean)
+  - [LMenuBar:addMenu(self: LMenuBar, menu_idx: integer)](#lmenubaraddmenuself-lmenubar-menuidx-integer)
+  - [LMenuBar:getMenuCount(self: LMenuBar) -> number](#lmenubargetmenucountself-lmenubar-number)
+  - [LMenuBar:getMenus(self: LMenuBar) -> table](#lmenubargetmenusself-lmenubar-table)
+  - [LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean](#lmenubarremovemenuself-lmenubar-menuidx-integer-boolean)
   - [LMenuItem](#lmenuitem)
-  - [LMenuItem:addSubItem(child_idx: integer)](#lmenuitemaddsubitemchildidx-integer)
-  - [LMenuItem:getShortcut() -> string](#lmenuitemgetshortcut-string)
-  - [LMenuItem:getSubItems() -> table](#lmenuitemgetsubitems-table)
-  - [LMenuItem:getText() -> string](#lmenuitemgettext-string)
-  - [LMenuItem:isChecked() -> boolean](#lmenuitemischecked-boolean)
-  - [LMenuItem:setChecked(v: boolean)](#lmenuitemsetcheckedv-boolean)
-  - [LMenuItem:setOnClick(f: function)](#lmenuitemsetonclickf-function)
-  - [LMenuItem:setShortcut(shortcut: string)](#lmenuitemsetshortcutshortcut-string)
-  - [LMenuItem:setText(text: string)](#lmenuitemsettexttext-string)
+  - [LMenuItem:addSubItem(self: LMenuItem, child_idx: integer)](#lmenuitemaddsubitemself-lmenuitem-childidx-integer)
+  - [LMenuItem:getShortcut(self: LMenuItem) -> string](#lmenuitemgetshortcutself-lmenuitem-string)
+  - [LMenuItem:getSubItems(self: LMenuItem) -> table](#lmenuitemgetsubitemsself-lmenuitem-table)
+  - [LMenuItem:getText(self: LMenuItem) -> string](#lmenuitemgettextself-lmenuitem-string)
+  - [LMenuItem:isChecked(self: LMenuItem) -> boolean](#lmenuitemischeckedself-lmenuitem-boolean)
+  - [LMenuItem:setChecked(self: LMenuItem, v: boolean)](#lmenuitemsetcheckedself-lmenuitem-v-boolean)
+  - [LMenuItem:setOnClick(self: LMenuItem, f: function)](#lmenuitemsetonclickself-lmenuitem-f-function)
+  - [LMenuItem:setShortcut(self: LMenuItem, shortcut: string)](#lmenuitemsetshortcutself-lmenuitem-shortcut-string)
+  - [LMenuItem:setText(self: LMenuItem, text: string)](#lmenuitemsettextself-lmenuitem-text-string)
   - [LNinePatch](#lninepatch)
-  - [LNinePatch:getImageDimensions() -> number, number](#lninepatchgetimagedimensions-number-number)
-  - [LNinePatch:getInsets() -> number, number, number, number](#lninepatchgetinsets-number-number-number-number)
-  - [LNinePatch:getSlices() -> table](#lninepatchgetslices-table)
-  - [LNinePatch:setImageDimensions(w: integer, h: integer)](#lninepatchsetimagedimensionsw-integer-h-integer)
-  - [LNinePatch:setInsets(left: integer, top: integer, right: integer, bottom: integer)](#lninepatchsetinsetsleft-integer-top-integer-right-integer-bottom-integer)
+  - [LNinePatch:getImageDimensions(self: LNinePatch) -> number, number](#lninepatchgetimagedimensionsself-lninepatch-number-number)
+  - [LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number](#lninepatchgetinsetsself-lninepatch-number-number-number-number)
+  - [LNinePatch:getSlices(self: LNinePatch) -> table](#lninepatchgetslicesself-lninepatch-table)
+  - [LNinePatch:setImageDimensions(self: LNinePatch, w: integer, h: integer)](#lninepatchsetimagedimensionsself-lninepatch-w-integer-h-integer)
+  - [LNinePatch:setInsets(self: LNinePatch, left: integer, top: integer, right: integer, bottom: integer)](#lninepatchsetinsetsself-lninepatch-left-integer-top-integer-right-integer-bottom-integer)
   - [LPanel](#lpanel)
-  - [LPanel:getTitle() -> string](#lpanelgettitle-string)
-  - [LPanel:setScrollable(scrollable: boolean)](#lpanelsetscrollablescrollable-boolean)
-  - [LPanel:setTitle(title: string)](#lpanelsettitletitle-string)
+  - [LPanel:getTitle(self: LPanel) -> string](#lpanelgettitleself-lpanel-string)
+  - [LPanel:setScrollable(self: LPanel, scrollable: boolean)](#lpanelsetscrollableself-lpanel-scrollable-boolean)
+  - [LPanel:setTitle(self: LPanel, title: string)](#lpanelsettitleself-lpanel-title-string)
   - [LPieChart](#lpiechart)
   - [LPieChart:addSegment(label: string, value: number, r: number, g: number, b: number)](#lpiechartaddsegmentlabel-string-value-number-r-number-g-number-b-number)
   - [LPieChart:drawToImage(target: LImageData)](#lpiechartdrawtoimagetarget-limagedata)
   - [LPieChart:type() -> string](#lpiecharttype-string)
   - [LPieChart:typeOf(name: string) -> boolean](#lpiecharttypeofname-string-boolean)
   - [LProgressBar](#lprogressbar)
-  - [LProgressBar:getMax() -> number](#lprogressbargetmax-number)
-  - [LProgressBar:getMin() -> number](#lprogressbargetmin-number)
-  - [LProgressBar:getProgress() -> number](#lprogressbargetprogress-number)
-  - [LProgressBar:getValue() -> number](#lprogressbargetvalue-number)
-  - [LProgressBar:setRange(min: number, max: number)](#lprogressbarsetrangemin-number-max-number)
-  - [LProgressBar:setValue(v: number)](#lprogressbarsetvaluev-number)
+  - [LProgressBar:getMax(self: LProgressBar) -> number](#lprogressbargetmaxself-lprogressbar-number)
+  - [LProgressBar:getMin(self: LProgressBar) -> number](#lprogressbargetminself-lprogressbar-number)
+  - [LProgressBar:getProgress(self: LProgressBar) -> number](#lprogressbargetprogressself-lprogressbar-number)
+  - [LProgressBar:getValue(self: LProgressBar) -> number](#lprogressbargetvalueself-lprogressbar-number)
+  - [LProgressBar:setRange(self: LProgressBar, min: number, max: number)](#lprogressbarsetrangeself-lprogressbar-min-number-max-number)
+  - [LProgressBar:setValue(self: LProgressBar, v: number)](#lprogressbarsetvalueself-lprogressbar-v-number)
   - [LRadioButton](#lradiobutton)
-  - [LRadioButton:getGroup() -> string](#lradiobuttongetgroup-string)
-  - [LRadioButton:getText() -> string](#lradiobuttongettext-string)
-  - [LRadioButton:isSelected() -> boolean](#lradiobuttonisselected-boolean)
-  - [LRadioButton:setGroup(group: string)](#lradiobuttonsetgroupgroup-string)
-  - [LRadioButton:setOnChange(f: function)](#lradiobuttonsetonchangef-function)
-  - [LRadioButton:setSelected(v: boolean)](#lradiobuttonsetselectedv-boolean)
-  - [LRadioButton:setText(text: string)](#lradiobuttonsettexttext-string)
+  - [LRadioButton:getGroup(self: LRadioButton) -> string](#lradiobuttongetgroupself-lradiobutton-string)
+  - [LRadioButton:getText(self: LRadioButton) -> string](#lradiobuttongettextself-lradiobutton-string)
+  - [LRadioButton:isSelected(self: LRadioButton) -> boolean](#lradiobuttonisselectedself-lradiobutton-boolean)
+  - [LRadioButton:setGroup(self: LRadioButton, group: string)](#lradiobuttonsetgroupself-lradiobutton-group-string)
+  - [LRadioButton:setOnChange(self: LRadioButton, f: function)](#lradiobuttonsetonchangeself-lradiobutton-f-function)
+  - [LRadioButton:setSelected(self: LRadioButton, v: boolean)](#lradiobuttonsetselectedself-lradiobutton-v-boolean)
+  - [LRadioButton:setText(self: LRadioButton, text: string)](#lradiobuttonsettextself-lradiobutton-text-string)
   - [LScatterPlot](#lscatterplot)
   - [LScatterPlot:addSeries(name: string, pts_tbl: table, r: number, g: number, b: number)](#lscatterplotaddseriesname-string-ptstbl-table-r-number-g-number-b-number)
   - [LScatterPlot:drawToImage(target: LImageData)](#lscatterplotdrawtoimagetarget-limagedata)
@@ -267,183 +267,183 @@
   - [LScatterPlot:type() -> string](#lscatterplottype-string)
   - [LScatterPlot:typeOf(name: string) -> boolean](#lscatterplottypeofname-string-boolean)
   - [LScrollBar](#lscrollbar)
-  - [LScrollBar:getContentSize() -> number](#lscrollbargetcontentsize-number)
-  - [LScrollBar:getScrollPosition() -> number](#lscrollbargetscrollposition-number)
-  - [LScrollBar:getViewSize() -> number](#lscrollbargetviewsize-number)
-  - [LScrollBar:isVertical() -> boolean](#lscrollbarisvertical-boolean)
-  - [LScrollBar:setContentSize(v: number)](#lscrollbarsetcontentsizev-number)
-  - [LScrollBar:setOnChange(f: function)](#lscrollbarsetonchangef-function)
-  - [LScrollBar:setScrollPosition(v: number)](#lscrollbarsetscrollpositionv-number)
-  - [LScrollBar:setViewSize(v: number)](#lscrollbarsetviewsizev-number)
+  - [LScrollBar:getContentSize(self: LScrollBar) -> number](#lscrollbargetcontentsizeself-lscrollbar-number)
+  - [LScrollBar:getScrollPosition(self: LScrollBar) -> number](#lscrollbargetscrollpositionself-lscrollbar-number)
+  - [LScrollBar:getViewSize(self: LScrollBar) -> number](#lscrollbargetviewsizeself-lscrollbar-number)
+  - [LScrollBar:isVertical(self: LScrollBar) -> boolean](#lscrollbarisverticalself-lscrollbar-boolean)
+  - [LScrollBar:setContentSize(self: LScrollBar, v: number)](#lscrollbarsetcontentsizeself-lscrollbar-v-number)
+  - [LScrollBar:setOnChange(self: LScrollBar, f: function)](#lscrollbarsetonchangeself-lscrollbar-f-function)
+  - [LScrollBar:setScrollPosition(self: LScrollBar, v: number)](#lscrollbarsetscrollpositionself-lscrollbar-v-number)
+  - [LScrollBar:setViewSize(self: LScrollBar, v: number)](#lscrollbarsetviewsizeself-lscrollbar-v-number)
   - [LScrollPanel](#lscrollpanel)
-  - [LScrollPanel:getContentSize() -> number, number](#lscrollpanelgetcontentsize-number-number)
-  - [LScrollPanel:getMaxScroll() -> number, number](#lscrollpanelgetmaxscroll-number-number)
-  - [LScrollPanel:getScrollPosition() -> number, number](#lscrollpanelgetscrollposition-number-number)
-  - [LScrollPanel:getScrollSpeed() -> number](#lscrollpanelgetscrollspeed-number)
-  - [LScrollPanel:setContentSize(w: number, h: number)](#lscrollpanelsetcontentsizew-number-h-number)
-  - [LScrollPanel:setScrollPosition(x: number, y: number)](#lscrollpanelsetscrollpositionx-number-y-number)
-  - [LScrollPanel:setScrollSpeed(speed: number)](#lscrollpanelsetscrollspeedspeed-number)
+  - [LScrollPanel:getContentSize(self: LScrollPanel) -> number, number](#lscrollpanelgetcontentsizeself-lscrollpanel-number-number)
+  - [LScrollPanel:getMaxScroll(self: LScrollPanel) -> number, number](#lscrollpanelgetmaxscrollself-lscrollpanel-number-number)
+  - [LScrollPanel:getScrollPosition(self: LScrollPanel) -> number, number](#lscrollpanelgetscrollpositionself-lscrollpanel-number-number)
+  - [LScrollPanel:getScrollSpeed(self: LScrollPanel) -> number](#lscrollpanelgetscrollspeedself-lscrollpanel-number)
+  - [LScrollPanel:setContentSize(self: LScrollPanel, w: number, h: number)](#lscrollpanelsetcontentsizeself-lscrollpanel-w-number-h-number)
+  - [LScrollPanel:setScrollPosition(self: LScrollPanel, x: number, y: number)](#lscrollpanelsetscrollpositionself-lscrollpanel-x-number-y-number)
+  - [LScrollPanel:setScrollSpeed(self: LScrollPanel, speed: number)](#lscrollpanelsetscrollspeedself-lscrollpanel-speed-number)
   - [LSeparator](#lseparator)
-  - [LSeparator:getThickness() -> number](#lseparatorgetthickness-number)
-  - [LSeparator:isVertical() -> boolean](#lseparatorisvertical-boolean)
-  - [LSeparator:setThickness(thickness: number)](#lseparatorsetthicknessthickness-number)
-  - [LSeparator:setVertical(v: boolean)](#lseparatorsetverticalv-boolean)
+  - [LSeparator:getThickness(self: LSeparator) -> number](#lseparatorgetthicknessself-lseparator-number)
+  - [LSeparator:isVertical(self: LSeparator) -> boolean](#lseparatorisverticalself-lseparator-boolean)
+  - [LSeparator:setThickness(self: LSeparator, thickness: number)](#lseparatorsetthicknessself-lseparator-thickness-number)
+  - [LSeparator:setVertical(self: LSeparator, v: boolean)](#lseparatorsetverticalself-lseparator-v-boolean)
   - [LSlider](#lslider)
-  - [LSlider:getMax() -> number](#lslidergetmax-number)
-  - [LSlider:getMin() -> number](#lslidergetmin-number)
-  - [LSlider:getValue() -> number](#lslidergetvalue-number)
-  - [LSlider:setRange(min: number, max: number)](#lslidersetrangemin-number-max-number)
-  - [LSlider:setStep(step: number)](#lslidersetstepstep-number)
-  - [LSlider:setValue(v: number)](#lslidersetvaluev-number)
+  - [LSlider:getMax(self: LSlider) -> number](#lslidergetmaxself-lslider-number)
+  - [LSlider:getMin(self: LSlider) -> number](#lslidergetminself-lslider-number)
+  - [LSlider:getValue(self: LSlider) -> number](#lslidergetvalueself-lslider-number)
+  - [LSlider:setRange(self: LSlider, min: number, max: number)](#lslidersetrangeself-lslider-min-number-max-number)
+  - [LSlider:setStep(self: LSlider, step: number)](#lslidersetstepself-lslider-step-number)
+  - [LSlider:setValue(self: LSlider, v: number)](#lslidersetvalueself-lslider-v-number)
   - [LSpinBox](#lspinbox)
-  - [LSpinBox:decrement()](#lspinboxdecrement)
-  - [LSpinBox:getValue() -> number](#lspinboxgetvalue-number)
-  - [LSpinBox:increment()](#lspinboxincrement)
-  - [LSpinBox:setRange(min: number, max: number)](#lspinboxsetrangemin-number-max-number)
-  - [LSpinBox:setStep(step: number)](#lspinboxsetstepstep-number)
-  - [LSpinBox:setValue(v: number)](#lspinboxsetvaluev-number)
+  - [LSpinBox:decrement(self: LSpinBox)](#lspinboxdecrementself-lspinbox)
+  - [LSpinBox:getValue(self: LSpinBox) -> number](#lspinboxgetvalueself-lspinbox-number)
+  - [LSpinBox:increment(self: LSpinBox)](#lspinboxincrementself-lspinbox)
+  - [LSpinBox:setRange(self: LSpinBox, min: number, max: number)](#lspinboxsetrangeself-lspinbox-min-number-max-number)
+  - [LSpinBox:setStep(self: LSpinBox, step: number)](#lspinboxsetstepself-lspinbox-step-number)
+  - [LSpinBox:setValue(self: LSpinBox, v: number)](#lspinboxsetvalueself-lspinbox-v-number)
   - [LSplitPanel](#lsplitpanel)
-  - [LSplitPanel:getFirstChild() -> number](#lsplitpanelgetfirstchild-number)
-  - [LSplitPanel:getMinPanelSize() -> number](#lsplitpanelgetminpanelsize-number)
-  - [LSplitPanel:getOrientation() -> string](#lsplitpanelgetorientation-string)
-  - [LSplitPanel:getSecondChild() -> number](#lsplitpanelgetsecondchild-number)
-  - [LSplitPanel:getSplitPosition() -> number](#lsplitpanelgetsplitposition-number)
-  - [LSplitPanel:setFirstChild(child_idx: integer)](#lsplitpanelsetfirstchildchildidx-integer)
-  - [LSplitPanel:setMinPanelSize(v: number)](#lsplitpanelsetminpanelsizev-number)
-  - [LSplitPanel:setOrientation(v: string)](#lsplitpanelsetorientationv-string)
-  - [LSplitPanel:setSecondChild(child_idx: integer)](#lsplitpanelsetsecondchildchildidx-integer)
-  - [LSplitPanel:setSplitPosition(v: number)](#lsplitpanelsetsplitpositionv-number)
+  - [LSplitPanel:getFirstChild(self: LSplitPanel) -> number](#lsplitpanelgetfirstchildself-lsplitpanel-number)
+  - [LSplitPanel:getMinPanelSize(self: LSplitPanel) -> number](#lsplitpanelgetminpanelsizeself-lsplitpanel-number)
+  - [LSplitPanel:getOrientation(self: LSplitPanel) -> string](#lsplitpanelgetorientationself-lsplitpanel-string)
+  - [LSplitPanel:getSecondChild(self: LSplitPanel) -> number](#lsplitpanelgetsecondchildself-lsplitpanel-number)
+  - [LSplitPanel:getSplitPosition(self: LSplitPanel) -> number](#lsplitpanelgetsplitpositionself-lsplitpanel-number)
+  - [LSplitPanel:setFirstChild(self: LSplitPanel, child_idx: integer)](#lsplitpanelsetfirstchildself-lsplitpanel-childidx-integer)
+  - [LSplitPanel:setMinPanelSize(self: LSplitPanel, v: number)](#lsplitpanelsetminpanelsizeself-lsplitpanel-v-number)
+  - [LSplitPanel:setOrientation(self: LSplitPanel, v: string)](#lsplitpanelsetorientationself-lsplitpanel-v-string)
+  - [LSplitPanel:setSecondChild(self: LSplitPanel, child_idx: integer)](#lsplitpanelsetsecondchildself-lsplitpanel-childidx-integer)
+  - [LSplitPanel:setSplitPosition(self: LSplitPanel, v: number)](#lsplitpanelsetsplitpositionself-lsplitpanel-v-number)
   - [LStatusBar](#lstatusbar)
-  - [LStatusBar:addSection(text: string, [width]: number)](#lstatusbaraddsectiontext-string-width-number)
-  - [LStatusBar:getSectionCount() -> number](#lstatusbargetsectioncount-number)
-  - [LStatusBar:getSectionText(section_idx: integer) -> string](#lstatusbargetsectiontextsectionidx-integer-string)
-  - [LStatusBar:setSectionCount(count: integer)](#lstatusbarsetsectioncountcount-integer)
-  - [LStatusBar:setSectionText(section_idx: integer, text: string)](#lstatusbarsetsectiontextsectionidx-integer-text-string)
-  - [LStatusBar:setSectionWidget(section_idx: integer, widget: any)](#lstatusbarsetsectionwidgetsectionidx-integer-widget-any)
+  - [LStatusBar:addSection(self: LStatusBar, text: string, [width]: number)](#lstatusbaraddsectionself-lstatusbar-text-string-width-number)
+  - [LStatusBar:getSectionCount(self: LStatusBar) -> number](#lstatusbargetsectioncountself-lstatusbar-number)
+  - [LStatusBar:getSectionText(self: LStatusBar, section_idx: integer) -> string](#lstatusbargetsectiontextself-lstatusbar-sectionidx-integer-string)
+  - [LStatusBar:setSectionCount(self: LStatusBar, count: integer)](#lstatusbarsetsectioncountself-lstatusbar-count-integer)
+  - [LStatusBar:setSectionText(self: LStatusBar, section_idx: integer, text: string)](#lstatusbarsetsectiontextself-lstatusbar-sectionidx-integer-text-string)
+  - [LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any)](#lstatusbarsetsectionwidgetself-lstatusbar-sectionidx-integer-widget-any)
   - [LSwitch](#lswitch)
-  - [LSwitch:isOn() -> boolean](#lswitchison-boolean)
-  - [LSwitch:setOn(on: boolean)](#lswitchsetonon-boolean)
-  - [LSwitch:toggle()](#lswitchtoggle)
+  - [LSwitch:isOn(self: LSwitch) -> boolean](#lswitchisonself-lswitch-boolean)
+  - [LSwitch:setOn(self: LSwitch, on: boolean)](#lswitchsetonself-lswitch-on-boolean)
+  - [LSwitch:toggle(self: LSwitch)](#lswitchtoggleself-lswitch)
   - [LTabBar](#ltabbar)
-  - [LTabBar:addTab(label: string)](#ltabbaraddtablabel-string)
-  - [LTabBar:getActiveTab() -> number](#ltabbargetactivetab-number)
-  - [LTabBar:getTab(index: integer) -> string](#ltabbargettabindex-integer-string)
-  - [LTabBar:getTabCount() -> number](#ltabbargettabcount-number)
-  - [LTabBar:removeTab(index: integer) -> boolean](#ltabbarremovetabindex-integer-boolean)
-  - [LTabBar:setActiveTab(index: integer)](#ltabbarsetactivetabindex-integer)
+  - [LTabBar:addTab(self: LTabBar, label: string)](#ltabbaraddtabself-ltabbar-label-string)
+  - [LTabBar:getActiveTab(self: LTabBar) -> number](#ltabbargetactivetabself-ltabbar-number)
+  - [LTabBar:getTab(self: LTabBar, index: integer) -> string](#ltabbargettabself-ltabbar-index-integer-string)
+  - [LTabBar:getTabCount(self: LTabBar) -> number](#ltabbargettabcountself-ltabbar-number)
+  - [LTabBar:removeTab(self: LTabBar, index: integer) -> boolean](#ltabbarremovetabself-ltabbar-index-integer-boolean)
+  - [LTabBar:setActiveTab(self: LTabBar, index: integer)](#ltabbarsetactivetabself-ltabbar-index-integer)
   - [LTextInput](#ltextinput)
-  - [LTextInput:getCursorPosition() -> number](#ltextinputgetcursorposition-number)
-  - [LTextInput:getPlaceholder() -> string](#ltextinputgetplaceholder-string)
-  - [LTextInput:getText() -> string](#ltextinputgettext-string)
-  - [LTextInput:isFocused() -> boolean](#ltextinputisfocused-boolean)
-  - [LTextInput:setMaxLength(n: integer)](#ltextinputsetmaxlengthn-integer)
-  - [LTextInput:setPlaceholder(text: string)](#ltextinputsetplaceholdertext-string)
-  - [LTextInput:setText(text: string)](#ltextinputsettexttext-string)
+  - [LTextInput:getCursorPosition(self: LTextInput) -> number](#ltextinputgetcursorpositionself-ltextinput-number)
+  - [LTextInput:getPlaceholder(self: LTextInput) -> string](#ltextinputgetplaceholderself-ltextinput-string)
+  - [LTextInput:getText(self: LTextInput) -> string](#ltextinputgettextself-ltextinput-string)
+  - [LTextInput:isFocused(self: LTextInput) -> boolean](#ltextinputisfocusedself-ltextinput-boolean)
+  - [LTextInput:setMaxLength(self: LTextInput, n: integer)](#ltextinputsetmaxlengthself-ltextinput-n-integer)
+  - [LTextInput:setPlaceholder(self: LTextInput, text: string)](#ltextinputsetplaceholderself-ltextinput-text-string)
+  - [LTextInput:setText(self: LTextInput, text: string)](#ltextinputsettextself-ltextinput-text-string)
   - [LTheme](#ltheme)
   - [LTheme:setStyle(widget_type: string, state: string, style_table: table)](#lthemesetstylewidgettype-string-state-string-styletable-table)
   - [LTheme:type() -> string](#lthemetype-string)
   - [LTheme:typeOf(name: string) -> boolean](#lthemetypeofname-string-boolean)
   - [LToast](#ltoast)
-  - [LToast:getDuration() -> number](#ltoastgetduration-number)
-  - [LToast:getMessage() -> string](#ltoastgetmessage-string)
-  - [LToast:getProgress() -> number](#ltoastgetprogress-number)
-  - [LToast:isExpired() -> boolean](#ltoastisexpired-boolean)
-  - [LToast:setDuration(d: number)](#ltoastsetdurationd-number)
-  - [LToast:setMessage(msg: string)](#ltoastsetmessagemsg-string)
+  - [LToast:getDuration(self: LToast) -> number](#ltoastgetdurationself-ltoast-number)
+  - [LToast:getMessage(self: LToast) -> string](#ltoastgetmessageself-ltoast-string)
+  - [LToast:getProgress(self: LToast) -> number](#ltoastgetprogressself-ltoast-number)
+  - [LToast:isExpired(self: LToast) -> boolean](#ltoastisexpiredself-ltoast-boolean)
+  - [LToast:setDuration(self: LToast, d: number)](#ltoastsetdurationself-ltoast-d-number)
+  - [LToast:setMessage(self: LToast, msg: string)](#ltoastsetmessageself-ltoast-msg-string)
   - [LToolbar](#ltoolbar)
-  - [LToolbar:addButton(id: string, [tooltip]: string) -> number](#ltoolbaraddbuttonid-string-tooltip-string-number)
-  - [LToolbar:addSeparator()](#ltoolbaraddseparator)
-  - [LToolbar:addSpacer([_size]: number)](#ltoolbaraddspacersize-number)
-  - [LToolbar:getButton(id: string) -> table](#ltoolbargetbuttonid-string-table)
-  - [LToolbar:getOrientation() -> string](#ltoolbargetorientation-string)
-  - [LToolbar:isButtonToggled(id: string) -> boolean](#ltoolbarisbuttontoggledid-string-boolean)
-  - [LToolbar:setButtonEnabled(id: string, enabled: boolean) -> boolean](#ltoolbarsetbuttonenabledid-string-enabled-boolean-boolean)
-  - [LToolbar:setButtonToggled(id: string, toggled: boolean) -> boolean](#ltoolbarsetbuttontoggledid-string-toggled-boolean-boolean)
-  - [LToolbar:setOrientation(v: string)](#ltoolbarsetorientationv-string)
+  - [LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number](#ltoolbaraddbuttonself-ltoolbar-id-string-tooltip-string-number)
+  - [LToolbar:addSeparator(self: LToolbar)](#ltoolbaraddseparatorself-ltoolbar)
+  - [LToolbar:addSpacer(self: LToolbar, [_size]: number)](#ltoolbaraddspacerself-ltoolbar-size-number)
+  - [LToolbar:getButton(self: LToolbar, id: string) -> table](#ltoolbargetbuttonself-ltoolbar-id-string-table)
+  - [LToolbar:getOrientation(self: LToolbar) -> string](#ltoolbargetorientationself-ltoolbar-string)
+  - [LToolbar:isButtonToggled(self: LToolbar, id: string) -> boolean](#ltoolbarisbuttontoggledself-ltoolbar-id-string-boolean)
+  - [LToolbar:setButtonEnabled(self: LToolbar, id: string, enabled: boolean) -> boolean](#ltoolbarsetbuttonenabledself-ltoolbar-id-string-enabled-boolean-boolean)
+  - [LToolbar:setButtonToggled(self: LToolbar, id: string, toggled: boolean) -> boolean](#ltoolbarsetbuttontoggledself-ltoolbar-id-string-toggled-boolean-boolean)
+  - [LToolbar:setOrientation(self: LToolbar, v: string)](#ltoolbarsetorientationself-ltoolbar-v-string)
   - [LTooltipPanel](#ltooltippanel)
-  - [LTooltipPanel:getDelay() -> number](#ltooltippanelgetdelay-number)
-  - [LTooltipPanel:getTarget() -> number](#ltooltippanelgettarget-number)
-  - [LTooltipPanel:getText() -> string](#ltooltippanelgettext-string)
-  - [LTooltipPanel:setDelay(v: number)](#ltooltippanelsetdelayv-number)
-  - [LTooltipPanel:setTarget([target]: integer)](#ltooltippanelsettargettarget-integer)
-  - [LTooltipPanel:setText(text: string)](#ltooltippanelsettexttext-string)
+  - [LTooltipPanel:getDelay(self: LTooltipPanel) -> number](#ltooltippanelgetdelayself-ltooltippanel-number)
+  - [LTooltipPanel:getTarget(self: LTooltipPanel) -> number](#ltooltippanelgettargetself-ltooltippanel-number)
+  - [LTooltipPanel:getText(self: LTooltipPanel) -> string](#ltooltippanelgettextself-ltooltippanel-string)
+  - [LTooltipPanel:setDelay(self: LTooltipPanel, v: number)](#ltooltippanelsetdelayself-ltooltippanel-v-number)
+  - [LTooltipPanel:setTarget(self: LTooltipPanel, [target]: integer)](#ltooltippanelsettargetself-ltooltippanel-target-integer)
+  - [LTooltipPanel:setText(self: LTooltipPanel, text: string)](#ltooltippanelsettextself-ltooltippanel-text-string)
   - [LTreeView](#ltreeview)
-  - [LTreeView:addNode(text: string, [parent_index]: integer) -> table](#ltreeviewaddnodetext-string-parentindex-integer-table)
-  - [LTreeView:clearNodes()](#ltreeviewclearnodes)
-  - [LTreeView:collapseAll()](#ltreeviewcollapseall)
-  - [LTreeView:collapseNode(index: integer) -> boolean](#ltreeviewcollapsenodeindex-integer-boolean)
-  - [LTreeView:expandAll()](#ltreeviewexpandall)
-  - [LTreeView:expandNode(index: integer) -> boolean](#ltreeviewexpandnodeindex-integer-boolean)
-  - [LTreeView:getChildNodes(index: integer) -> table](#ltreeviewgetchildnodesindex-integer-table)
-  - [LTreeView:getNodeCount() -> table](#ltreeviewgetnodecount-table)
-  - [LTreeView:getNodeDepth(index: integer) -> number](#ltreeviewgetnodedepthindex-integer-number)
-  - [LTreeView:getNodeText(index: integer) -> table](#ltreeviewgetnodetextindex-integer-table)
-  - [LTreeView:getParentNode(index: integer) -> number](#ltreeviewgetparentnodeindex-integer-number)
-  - [LTreeView:getSelectedNode() -> number](#ltreeviewgetselectednode-number)
-  - [LTreeView:isExpanded(index: integer) -> table](#ltreeviewisexpandedindex-integer-table)
-  - [LTreeView:isNodeExpanded(index: integer) -> boolean](#ltreeviewisnodeexpandedindex-integer-boolean)
-  - [LTreeView:removeNode(index: integer) -> boolean](#ltreeviewremovenodeindex-integer-boolean)
-  - [LTreeView:setNodeIcon(index: integer, icon: string) -> boolean](#ltreeviewsetnodeiconindex-integer-icon-string-boolean)
-  - [LTreeView:setNodeText(index: integer, text: string) -> boolean](#ltreeviewsetnodetextindex-integer-text-string-boolean)
-  - [LTreeView:setSelectedNode(index: integer) -> boolean](#ltreeviewsetselectednodeindex-integer-boolean)
-  - [LTreeView:toggleNode(index: integer) -> boolean](#ltreeviewtogglenodeindex-integer-boolean)
+  - [LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer](#ltreeviewaddnodeself-ltreeview-text-string-parentindex-integer-integer)
+  - [LTreeView:clearNodes(self: LTreeView)](#ltreeviewclearnodesself-ltreeview)
+  - [LTreeView:collapseAll(self: LTreeView)](#ltreeviewcollapseallself-ltreeview)
+  - [LTreeView:collapseNode(self: LTreeView, index: integer) -> boolean](#ltreeviewcollapsenodeself-ltreeview-index-integer-boolean)
+  - [LTreeView:expandAll(self: LTreeView)](#ltreeviewexpandallself-ltreeview)
+  - [LTreeView:expandNode(self: LTreeView, index: integer) -> boolean](#ltreeviewexpandnodeself-ltreeview-index-integer-boolean)
+  - [LTreeView:getChildNodes(self: LTreeView, index: integer) -> table](#ltreeviewgetchildnodesself-ltreeview-index-integer-table)
+  - [LTreeView:getNodeCount(self: LTreeView) -> table](#ltreeviewgetnodecountself-ltreeview-table)
+  - [LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number](#ltreeviewgetnodedepthself-ltreeview-index-integer-number)
+  - [LTreeView:getNodeText(self: LTreeView, index: integer) -> table](#ltreeviewgetnodetextself-ltreeview-index-integer-table)
+  - [LTreeView:getParentNode(self: LTreeView, index: integer) -> number](#ltreeviewgetparentnodeself-ltreeview-index-integer-number)
+  - [LTreeView:getSelectedNode(self: LTreeView) -> number](#ltreeviewgetselectednodeself-ltreeview-number)
+  - [LTreeView:isExpanded(self: LTreeView, index: integer) -> table](#ltreeviewisexpandedself-ltreeview-index-integer-table)
+  - [LTreeView:isNodeExpanded(self: LTreeView, index: integer) -> boolean](#ltreeviewisnodeexpandedself-ltreeview-index-integer-boolean)
+  - [LTreeView:removeNode(self: LTreeView, index: integer) -> boolean](#ltreeviewremovenodeself-ltreeview-index-integer-boolean)
+  - [LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean](#ltreeviewsetnodeiconself-ltreeview-index-integer-icon-string-boolean)
+  - [LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean](#ltreeviewsetnodetextself-ltreeview-index-integer-text-string-boolean)
+  - [LTreeView:setSelectedNode(self: LTreeView, index: integer) -> boolean](#ltreeviewsetselectednodeself-ltreeview-index-integer-boolean)
+  - [LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean](#ltreeviewtogglenodeself-ltreeview-index-integer-boolean)
   - [LUiWidget](#luiwidget)
-  - [LUiWidget:addChild(child: LWidget)](#luiwidgetaddchildchild-lwidget)
-  - [LUiWidget:animateAlpha(target: number, [duration]: number, [hide_on_complete]: boolean) -> table](#luiwidgetanimatealphatarget-number-duration-number-hideoncomplete-boolean-table)
-  - [LUiWidget:animatePosition(x: number, y: number, [duration]: number) -> table](#luiwidgetanimatepositionx-number-y-number-duration-number-table)
-  - [LUiWidget:attachToEntity(entity_id: integer)](#luiwidgetattachtoentityentityid-integer)
-  - [LUiWidget:bind(key: string)](#luiwidgetbindkey-string)
-  - [LUiWidget:cancelAnimations()](#luiwidgetcancelanimations)
-  - [LUiWidget:clearAnchor()](#luiwidgetclearanchor)
-  - [LUiWidget:containsPoint(x: number, y: number) -> boolean](#luiwidgetcontainspointx-number-y-number-boolean)
-  - [LUiWidget:detachFromEntity()](#luiwidgetdetachfromentity)
-  - [LUiWidget:fadeIn()](#luiwidgetfadein)
-  - [LUiWidget:fadeOut()](#luiwidgetfadeout)
-  - [LUiWidget:findById(id: string) -> LWidget](#luiwidgetfindbyidid-string-lwidget)
-  - [LUiWidget:getAlpha() -> number](#luiwidgetgetalpha-number)
-  - [LUiWidget:getChildCount() -> number](#luiwidgetgetchildcount-number)
-  - [LUiWidget:getChildren() -> table](#luiwidgetgetchildren-table)
-  - [LUiWidget:getFlexGrow() -> number](#luiwidgetgetflexgrow-number)
-  - [LUiWidget:getFlexShrink() -> number](#luiwidgetgetflexshrink-number)
-  - [LUiWidget:getId() -> string](#luiwidgetgetid-string)
-  - [LUiWidget:getMargin() -> number, number, number, number](#luiwidgetgetmargin-number-number-number-number)
-  - [LUiWidget:getMaxSize() -> number, number](#luiwidgetgetmaxsize-number-number)
-  - [LUiWidget:getMinSize() -> number, number](#luiwidgetgetminsize-number-number)
-  - [LUiWidget:getPadding() -> number, number, number, number](#luiwidgetgetpadding-number-number-number-number)
-  - [LUiWidget:getPosition() -> number, number](#luiwidgetgetposition-number-number)
-  - [LUiWidget:getRect() -> number, number, number, number](#luiwidgetgetrect-number-number-number-number)
-  - [LUiWidget:getSize() -> number, number](#luiwidgetgetsize-number-number)
-  - [LUiWidget:getState() -> string](#luiwidgetgetstate-string)
-  - [LUiWidget:getTooltip() -> string](#luiwidgetgettooltip-string)
-  - [LUiWidget:getZOrder() -> number](#luiwidgetgetzorder-number)
-  - [LUiWidget:isAnimating() -> boolean](#luiwidgetisanimating-boolean)
-  - [LUiWidget:isEnabled() -> boolean](#luiwidgetisenabled-boolean)
-  - [LUiWidget:isVisible() -> boolean](#luiwidgetisvisible-boolean)
-  - [LUiWidget:removeChild(child: LWidget)](#luiwidgetremovechildchild-lwidget)
-  - [LUiWidget:setAlpha(alpha: number)](#luiwidgetsetalphaalpha-number)
+  - [LUiWidget:addChild(self: LUiWidget, child: LUiWidget|integer)](#luiwidgetaddchildself-luiwidget-child-luiwidgetinteger)
+  - [LUiWidget:animateAlpha(self: LUiWidget, target: number, [duration]: number, [hide_on_complete]: boolean) -> table](#luiwidgetanimatealphaself-luiwidget-target-number-duration-number-hideoncomplete-boolean-table)
+  - [LUiWidget:animatePosition(self: LUiWidget, x: number, y: number, [duration]: number) -> table](#luiwidgetanimatepositionself-luiwidget-x-number-y-number-duration-number-table)
+  - [LUiWidget:attachToEntity(self: LUiWidget, entity_id: integer)](#luiwidgetattachtoentityself-luiwidget-entityid-integer)
+  - [LUiWidget:bind(self: LUiWidget, key: string)](#luiwidgetbindself-luiwidget-key-string)
+  - [LUiWidget:cancelAnimations(self: LUiWidget)](#luiwidgetcancelanimationsself-luiwidget)
+  - [LUiWidget:clearAnchor(self: LUiWidget)](#luiwidgetclearanchorself-luiwidget)
+  - [LUiWidget:containsPoint(self: LUiWidget, x: number, y: number) -> boolean](#luiwidgetcontainspointself-luiwidget-x-number-y-number-boolean)
+  - [LUiWidget:detachFromEntity(self: LUiWidget)](#luiwidgetdetachfromentityself-luiwidget)
+  - [LUiWidget:fadeIn(self: LUiWidget)](#luiwidgetfadeinself-luiwidget)
+  - [LUiWidget:fadeOut(self: LUiWidget)](#luiwidgetfadeoutself-luiwidget)
+  - [LUiWidget:findById(self: LUiWidget, id: string) -> LWidget](#luiwidgetfindbyidself-luiwidget-id-string-lwidget)
+  - [LUiWidget:getAlpha(self: LUiWidget) -> number](#luiwidgetgetalphaself-luiwidget-number)
+  - [LUiWidget:getChildCount(self: LUiWidget) -> number](#luiwidgetgetchildcountself-luiwidget-number)
+  - [LUiWidget:getChildren(self: LUiWidget) -> table](#luiwidgetgetchildrenself-luiwidget-table)
+  - [LUiWidget:getFlexGrow(self: LUiWidget) -> number](#luiwidgetgetflexgrowself-luiwidget-number)
+  - [LUiWidget:getFlexShrink(self: LUiWidget) -> number](#luiwidgetgetflexshrinkself-luiwidget-number)
+  - [LUiWidget:getId(self: LUiWidget) -> string](#luiwidgetgetidself-luiwidget-string)
+  - [LUiWidget:getMargin(self: LUiWidget) -> number, number, number, number](#luiwidgetgetmarginself-luiwidget-number-number-number-number)
+  - [LUiWidget:getMaxSize(self: LUiWidget) -> number, number](#luiwidgetgetmaxsizeself-luiwidget-number-number)
+  - [LUiWidget:getMinSize(self: LUiWidget) -> number, number](#luiwidgetgetminsizeself-luiwidget-number-number)
+  - [LUiWidget:getPadding(self: LUiWidget) -> number, number, number, number](#luiwidgetgetpaddingself-luiwidget-number-number-number-number)
+  - [LUiWidget:getPosition(self: LUiWidget) -> number, number](#luiwidgetgetpositionself-luiwidget-number-number)
+  - [LUiWidget:getRect(self: LUiWidget) -> number, number, number, number](#luiwidgetgetrectself-luiwidget-number-number-number-number)
+  - [LUiWidget:getSize(self: LUiWidget) -> number, number](#luiwidgetgetsizeself-luiwidget-number-number)
+  - [LUiWidget:getState(self: LUiWidget) -> string](#luiwidgetgetstateself-luiwidget-string)
+  - [LUiWidget:getTooltip(self: LUiWidget) -> string](#luiwidgetgettooltipself-luiwidget-string)
+  - [LUiWidget:getZOrder(self: LUiWidget) -> number](#luiwidgetgetzorderself-luiwidget-number)
+  - [LUiWidget:isAnimating(self: LUiWidget) -> boolean](#luiwidgetisanimatingself-luiwidget-boolean)
+  - [LUiWidget:isEnabled(self: LUiWidget) -> boolean](#luiwidgetisenabledself-luiwidget-boolean)
+  - [LUiWidget:isVisible(self: LUiWidget) -> boolean](#luiwidgetisvisibleself-luiwidget-boolean)
+  - [LUiWidget:removeChild(self: LUiWidget, child: LUiWidget|integer)](#luiwidgetremovechildself-luiwidget-child-luiwidgetinteger)
+  - [LUiWidget:setAlpha(self: LUiWidget, alpha: number)](#luiwidgetsetalphaself-luiwidget-alpha-number)
   - [LUiWidget:setAnchor([left]: number, [top]: number, [right]: number, [bottom]: number)](#luiwidgetsetanchorleft-number-top-number-right-number-bottom-number)
-  - [LUiWidget:setAnchorCenter([cx]: number, [cy]: number)](#luiwidgetsetanchorcentercx-number-cy-number)
-  - [LUiWidget:setEnabled(v: boolean)](#luiwidgetsetenabledv-boolean)
-  - [LUiWidget:setFlexGrow(grow: number)](#luiwidgetsetflexgrowgrow-number)
-  - [LUiWidget:setFlexShrink(shrink: number)](#luiwidgetsetflexshrinkshrink-number)
-  - [LUiWidget:setId(id: string)](#luiwidgetsetidid-string)
-  - [LUiWidget:setMargin(top: number, [right]: number, [bottom]: number, [left]: number)](#luiwidgetsetmargintop-number-right-number-bottom-number-left-number)
-  - [LUiWidget:setMaxSize(w: number, h: number)](#luiwidgetsetmaxsizew-number-h-number)
-  - [LUiWidget:setMinSize(w: number, h: number)](#luiwidgetsetminsizew-number-h-number)
-  - [LUiWidget:setOnChange(f: function)](#luiwidgetsetonchangef-function)
-  - [LUiWidget:setOnClick(f: function)](#luiwidgetsetonclickf-function)
-  - [LUiWidget:setOnDraw(_self: LWidget, f: function)](#luiwidgetsetondrawself-lwidget-f-function)
-  - [LUiWidget:setPadding(top: number, [right]: number, [bottom]: number, [left]: number)](#luiwidgetsetpaddingtop-number-right-number-bottom-number-left-number)
-  - [LUiWidget:setPosition(x: number, y: number)](#luiwidgetsetpositionx-number-y-number)
-  - [LUiWidget:setSize(w: number, h: number)](#luiwidgetsetsizew-number-h-number)
-  - [LUiWidget:setTooltip(text: string)](#luiwidgetsettooltiptext-string)
-  - [LUiWidget:setVisible(v: boolean)](#luiwidgetsetvisiblev-boolean)
-  - [LUiWidget:setZOrder(z: integer)](#luiwidgetsetzorderz-integer)
-  - [LUiWidget:slideIn(x: number, y: number)](#luiwidgetslideinx-number-y-number)
-  - [LUiWidget:slideOut(x: number, y: number)](#luiwidgetslideoutx-number-y-number)
-  - [LUiWidget:type() -> string](#luiwidgettype-string)
-  - [LUiWidget:typeOf(name: string) -> boolean](#luiwidgettypeofname-string-boolean)
-  - [LUiWidget:unbind()](#luiwidgetunbind)
+  - [LUiWidget:setAnchorCenter(self: LUiWidget, [cx]: number, [cy]: number)](#luiwidgetsetanchorcenterself-luiwidget-cx-number-cy-number)
+  - [LUiWidget:setEnabled(self: LUiWidget, v: boolean)](#luiwidgetsetenabledself-luiwidget-v-boolean)
+  - [LUiWidget:setFlexGrow(self: LUiWidget, grow: number)](#luiwidgetsetflexgrowself-luiwidget-grow-number)
+  - [LUiWidget:setFlexShrink(self: LUiWidget, shrink: number)](#luiwidgetsetflexshrinkself-luiwidget-shrink-number)
+  - [LUiWidget:setId(self: LUiWidget, id: string)](#luiwidgetsetidself-luiwidget-id-string)
+  - [LUiWidget:setMargin(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number)](#luiwidgetsetmarginself-luiwidget-top-number-right-number-bottom-number-left-number)
+  - [LUiWidget:setMaxSize(self: LUiWidget, w: number, h: number)](#luiwidgetsetmaxsizeself-luiwidget-w-number-h-number)
+  - [LUiWidget:setMinSize(self: LUiWidget, w: number, h: number)](#luiwidgetsetminsizeself-luiwidget-w-number-h-number)
+  - [LUiWidget:setOnChange(self: LUiWidget, f: function)](#luiwidgetsetonchangeself-luiwidget-f-function)
+  - [LUiWidget:setOnClick(self: LUiWidget, f: function)](#luiwidgetsetonclickself-luiwidget-f-function)
+  - [LUiWidget:setOnDraw(self: LUiWidget, f: function)](#luiwidgetsetondrawself-luiwidget-f-function)
+  - [LUiWidget:setPadding(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number)](#luiwidgetsetpaddingself-luiwidget-top-number-right-number-bottom-number-left-number)
+  - [LUiWidget:setPosition(self: LUiWidget, x: number, y: number)](#luiwidgetsetpositionself-luiwidget-x-number-y-number)
+  - [LUiWidget:setSize(self: LUiWidget, w: number, h: number)](#luiwidgetsetsizeself-luiwidget-w-number-h-number)
+  - [LUiWidget:setTooltip(self: LUiWidget, text: string)](#luiwidgetsettooltipself-luiwidget-text-string)
+  - [LUiWidget:setVisible(self: LUiWidget, v: boolean)](#luiwidgetsetvisibleself-luiwidget-v-boolean)
+  - [LUiWidget:setZOrder(self: LUiWidget, z: integer)](#luiwidgetsetzorderself-luiwidget-z-integer)
+  - [LUiWidget:slideIn(self: LUiWidget, x: number, y: number)](#luiwidgetslideinself-luiwidget-x-number-y-number)
+  - [LUiWidget:slideOut(self: LUiWidget, x: number, y: number)](#luiwidgetslideoutself-luiwidget-x-number-y-number)
+  - [LUiWidget:type(self: LUiWidget) -> string](#luiwidgettypeself-luiwidget-string)
+  - [LUiWidget:typeOf(self: LUiWidget, name: string) -> boolean](#luiwidgettypeofself-luiwidget-name-string-boolean)
+  - [LUiWidget:unbind(self: LUiWidget)](#luiwidgetunbindself-luiwidget)
 - [Examples](#examples)
 - [Reference Games](#reference-games)
 - [Related Modules](#related-modules)
@@ -469,53 +469,53 @@ Module example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 -- content/examples/ui.lua
--- lurek.ui API examples.
+-- Demonstrates every lurek.ui.* function with realistic game UI patterns.
 -- Run: cargo run -- content/examples/ui.lua
 
 --@api-stub: lurek.ui.beginDrag
 -- Begins a drag operation on a widget
 do
-  local w = lurek.ui.newButton("Drag")
-  pcall(function() lurek.ui.beginDrag(w) end)
+  -- Start dragging an inventory item when the player holds left-click.
+  -- The widget follows the cursor until dropOn() or endDrag() is called.
+  local slot = lurek.ui.newButton("Iron Sword")
+  lurek.ui.beginDrag(slot)
 end
 
 --@api-stub: lurek.ui.getActiveDrag
 -- Returns the widget index currently being dragged, or nil
 do
-  pcall(function()
-    local v = lurek.ui.getActiveDrag()
-    print("getActiveDrag:", v)
-  end)
+  -- Check if the player is currently moving an item between inventory slots.
+  -- Returns nil when nothing is being dragged — useful for cursor icon switching.
+  local dragged = lurek.ui.getActiveDrag()
+  if dragged then
+    print("Currently dragging widget:", dragged)
+  end
 end
 
 --@api-stub: lurek.ui.dropOn
 -- Drops the currently dragged widget onto a target widget
 do
-  local container = lurek.ui.newPanel()
-  local w = lurek.ui.newLabel("drop")
-  pcall(function()
-    lurek.ui.beginDrag(w)
-    lurek.ui.dropOn(container)
-  end)
+  -- Simulate equipping an item: drag from inventory, drop onto equipment slot.
+  -- The target widget receives the dragged widget as a new child.
+  local equipment_slot = lurek.ui.newPanel()
+  local item = lurek.ui.newLabel("Steel Shield")
+  lurek.ui.beginDrag(item)
+  lurek.ui.dropOn(equipment_slot)
 end
 
 --@api-stub: lurek.ui.endDrag
 -- Ends the current drag operation without dropping
 do
-  pcall(function()
-    local prev = lurek.ui.endDrag()
-    print("endDrag:", prev)
-  end)
+  -- Cancel the drag if the player releases outside any valid drop target.
+  -- Returns the widget that was being dragged so you can snap it back.
+  local cancelled_widget = lurek.ui.endDrag()
+  print("Drag cancelled, returning widget:", cancelled_widget)
 end
 
 --@api-stub: LUiWidget:animateAlpha
 -- Performs the animate alpha operation on this ui widget.
 do
-  local w = lurek.ui.newLabel("alpha")
-  pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
-end
-
---@api-stub: LUiWidget:animatePosition
+  -- Fade a damage indicator to transparent over 0.25 seconds.
 ```
 
 ## Key Types
@@ -600,8 +600,10 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = lurek.ui.newButton("Drag")
-  pcall(function() lurek.ui.beginDrag(w) end)
+  -- Start dragging an inventory item when the player holds left-click.
+  -- The widget follows the cursor until dropOn() or endDrag() is called.
+  local slot = lurek.ui.newButton("Iron Sword")
+  lurek.ui.beginDrag(slot)
 end
 ```
 
@@ -673,12 +675,12 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local container = lurek.ui.newPanel()
-  local w = lurek.ui.newLabel("drop")
-  pcall(function()
-    lurek.ui.beginDrag(w)
-    lurek.ui.dropOn(container)
-  end)
+  -- Simulate equipping an item: drag from inventory, drop onto equipment slot.
+  -- The target widget receives the dragged widget as a new child.
+  local equipment_slot = lurek.ui.newPanel()
+  local item = lurek.ui.newLabel("Steel Shield")
+  lurek.ui.beginDrag(item)
+  lurek.ui.dropOn(equipment_slot)
 end
 ```
 
@@ -692,10 +694,10 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  pcall(function()
-    local prev = lurek.ui.endDrag()
-    print("endDrag:", prev)
-  end)
+  -- Cancel the drag if the player releases outside any valid drop target.
+  -- Returns the widget that was being dragged so you can snap it back.
+  local cancelled_widget = lurek.ui.endDrag()
+  print("Drag cancelled, returning widget:", cancelled_widget)
 end
 ```
 
@@ -758,10 +760,12 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  pcall(function()
-    local v = lurek.ui.getActiveDrag()
-    print("getActiveDrag:", v)
-  end)
+  -- Check if the player is currently moving an item between inventory slots.
+  -- Returns nil when nothing is being dragged — useful for cursor icon switching.
+  local dragged = lurek.ui.getActiveDrag()
+  if dragged then
+    print("Currently dragging widget:", dragged)
+  end
 end
 ```
 
@@ -1137,7 +1141,7 @@ do
 end
 ```
 
-### `lurek.ui.newCustomWidget([config]: table) -> LWidget`
+### `lurek.ui.newCustomWidget([config]: table) -> LUiWidget`
 
 Creates a new custom widget with optional initial configuration.
 
@@ -1145,7 +1149,7 @@ Creates a new custom widget with optional initial configuration.
 
 - `config` (`table`, optional) - Optional table with x, y, width, height, id, visible, enabled fields.
 
-**Returns**: `LWidget` - The new custom widget table.
+**Returns**: `LUiWidget` - The new custom widget table.
 
 #### Example
 
@@ -2021,12 +2025,13 @@ do
 end
 ```
 
-### `LAccordion:addSection(title: string, [content_idx]: integer)`
+### `LAccordion:addSection(self: LAccordion, title: string, [content_idx]: integer)`
 
 Adds a collapsible section to this accordion.
 
 **Parameters**
 
+- `self` (`LAccordion`, required) - The widget instance.
 - `title` (`string`, required) - The section title.
 - `content_idx` (`integer`, optional) - Optional widget index for the section content.
 
@@ -2042,9 +2047,13 @@ do
 end
 ```
 
-### `LAccordion:getSectionCount() -> number`
+### `LAccordion:getSectionCount(self: LAccordion) -> number`
 
 Returns the number of sections in this accordion.
+
+**Parameters**
+
+- `self` (`LAccordion`, required) - The widget instance.
 
 **Returns**: `number` - The section count.
 
@@ -2060,12 +2069,13 @@ do
 end
 ```
 
-### `LAccordion:getSectionTitle(section_idx: integer) -> string`
+### `LAccordion:getSectionTitle(self: LAccordion, section_idx: integer) -> string`
 
 Returns the title of an accordion section by its 1-based index.
 
 **Parameters**
 
+- `self` (`LAccordion`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 
 **Returns**: `string` - The section title, or nil if out of range.
@@ -2082,9 +2092,13 @@ do
 end
 ```
 
-### `LAccordion:isExclusive() -> boolean`
+### `LAccordion:isExclusive(self: LAccordion) -> boolean`
 
 Returns whether this accordion is in exclusive mode (only one section open at a time).
+
+**Parameters**
+
+- `self` (`LAccordion`, required) - The widget instance.
 
 **Returns**: `boolean` - True if exclusive.
 
@@ -2100,12 +2114,13 @@ do
 end
 ```
 
-### `LAccordion:isSectionExpanded(section_idx: integer) -> boolean`
+### `LAccordion:isSectionExpanded(self: LAccordion, section_idx: integer) -> boolean`
 
 Returns whether an accordion section is expanded.
 
 **Parameters**
 
+- `self` (`LAccordion`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 
 **Returns**: `boolean` - True if expanded.
@@ -2122,12 +2137,13 @@ do
 end
 ```
 
-### `LAccordion:setExclusive(v: boolean)`
+### `LAccordion:setExclusive(self: LAccordion, v: boolean)`
 
 Sets exclusive mode. When true, expanding one section collapses all others.
 
 **Parameters**
 
+- `self` (`LAccordion`, required) - The widget instance.
 - `v` (`boolean`, required) - True for exclusive mode.
 
 #### Example
@@ -2137,17 +2153,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local acc = lurek.ui.newAccordion()
-  acc:setExclusive(1.0)
+  acc:setExclusive(true)
   lurek.log.info("LAccordion:setExclusive applied", "ui")
 end
 ```
 
-### `LAccordion:toggleSection(section_idx: integer) -> boolean`
+### `LAccordion:toggleSection(self: LAccordion, section_idx: integer) -> boolean`
 
 Toggles the expanded state of an accordion section by its 1-based index.
 
 **Parameters**
 
+- `self` (`LAccordion`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 
 **Returns**: `boolean` - The new expanded state.
@@ -2197,9 +2214,9 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local ac = new_example_image_widget():newAreaChart(300, 150)
-  ac:addLayer("series_a", {1,0.3,0.3,0.7}, {10,20,15,30,25})
-  ac:addLayer("series_b", {0.3,0.6,1,0.7}, {5,10,8,14,12})
+  local ac = lurek.ui.newAreaChart({})
+  ac:addLayer("series_a", {10,20,15,30,25}, 1.0, 0.3, 0.3)
+  ac:addLayer("series_b", {5,10,8,14,12}, 0.3, 0.6, 1.0)
   lurek.log.info("area layers added", "ui")
 end
 ```
@@ -2218,8 +2235,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-  w:drawToImage()
+  local w = lurek.ui.newBarChart({})
+  w:drawToImage(lurek.image.newImageData(64, 64))
 end
 ```
 
@@ -2237,7 +2254,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
+  local w = lurek.ui.newAreaChart({})
   w:setYMax(100)
 end
 ```
@@ -2254,8 +2271,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-    w:setYMax(100)
+  local w = lurek.ui.newAreaChart({})
+  w:setYMax(100)
   local t = w:type()
   lurek.log.info("LAreaChart:type = " .. t, "ui")
 end
@@ -2277,8 +2294,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-    w:setYMax(100)
+  local w = lurek.ui.newAreaChart({})
+  w:setYMax(100)
   lurek.log.info("is LAreaChart: " .. tostring(w:typeOf("LAreaChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
 end
@@ -2299,9 +2316,13 @@ do
 end
 ```
 
-### `LBadge:getCount() -> number`
+### `LBadge:getCount(self: LBadge) -> number`
 
 Returns the current notification count of this badge.
+
+**Parameters**
+
+- `self` (`LBadge`, required) - The widget instance.
 
 **Returns**: `number` - The badge count.
 
@@ -2317,9 +2338,13 @@ do
 end
 ```
 
-### `LBadge:getDisplayText() -> string`
+### `LBadge:getDisplayText(self: LBadge) -> string`
 
 Returns the formatted display text of this badge (e.g. "99+" when count exceeds the maximum).
+
+**Parameters**
+
+- `self` (`LBadge`, required) - The widget instance.
 
 **Returns**: `string` - The display text.
 
@@ -2335,12 +2360,13 @@ do
 end
 ```
 
-### `LBadge:setCount(count: integer)`
+### `LBadge:setCount(self: LBadge, count: integer)`
 
 Sets the notification count displayed by this badge.
 
 **Parameters**
 
+- `self` (`LBadge`, required) - The widget instance.
 - `count` (`integer`, required) - The notification count.
 
 #### Example
@@ -2386,9 +2412,9 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   lurek.log.info("BarChart:addCategory usage: chart:addCategory('Jan')", "ui")
-  local bc = new_example_image_widget():newBarChart(200, 100)
-  bc:addCategory("Jan")
-  bc:addCategory("Feb")
+  local bc = lurek.ui.newBarChart({})
+  bc:addCategory("Jan", {100})
+  bc:addCategory("Feb", {80})
   lurek.log.info("categories added", "ui")
 end
 ```
@@ -2410,10 +2436,10 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local bc = new_example_image_widget():newBarChart(300, 150)
-  bc:addCategory("Q1"); bc:addCategory("Q2")
-  bc:addSeries("sales",   {0.2, 0.6, 0.9, 1}, {120, 180})
-  bc:addSeries("returns", {0.9, 0.3, 0.2, 1}, {10,  15})
+  local bc = lurek.ui.newBarChart({})
+  bc:addCategory("Q1", {120}); bc:addCategory("Q2", {180})
+  bc:addSeries("sales", 0.2, 0.6, 0.9)
+  bc:addSeries("returns", 0.9, 0.3, 0.2)
   lurek.log.info("bar series added", "ui")
 end
 ```
@@ -2432,8 +2458,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-  w:drawToImage()
+  local w = lurek.ui.newBarChart({})
+  w:drawToImage(lurek.image.newImageData(64, 64))
 end
 ```
 
@@ -2449,8 +2475,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-    w:drawToImage()
+  local w = lurek.ui.newBarChart({})
+  w:drawToImage(lurek.image.newImageData(64, 64))
   local t = w:type()
   lurek.log.info("LBarChart:type = " .. t, "ui")
 end
@@ -2472,8 +2498,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = new_example_image_widget():newPanel()
-    w:drawToImage()
+  local w = lurek.ui.newBarChart({})
+  w:drawToImage(lurek.image.newImageData(64, 64))
   lurek.log.info("is LBarChart: " .. tostring(w:typeOf("LBarChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
 end
@@ -2494,9 +2520,13 @@ do
 end
 ```
 
-### `LButton:getText() -> string`
+### `LButton:getText(self: LButton) -> string`
 
 Returns the current display text of this button.
+
+**Parameters**
+
+- `self` (`LButton`, required) - The widget instance.
 
 **Returns**: `string` - The button label.
 
@@ -2512,12 +2542,13 @@ do
 end
 ```
 
-### `LButton:setText(text: string)`
+### `LButton:setText(self: LButton, text: string)`
 
 Sets the display text on this button.
 
 **Parameters**
 
+- `self` (`LButton`, required) - The widget instance.
 - `text` (`string`, required) - The button label text.
 
 #### Example
@@ -2547,9 +2578,13 @@ do
 end
 ```
 
-### `LCheckbox:getText() -> string`
+### `LCheckbox:getText(self: LCheckbox) -> string`
 
 Returns the label text of this checkbox.
+
+**Parameters**
+
+- `self` (`LCheckbox`, required) - The widget instance.
 
 **Returns**: `string` - The checkbox label.
 
@@ -2565,9 +2600,13 @@ do
 end
 ```
 
-### `LCheckbox:isChecked() -> boolean`
+### `LCheckbox:isChecked(self: LCheckbox) -> boolean`
 
 Returns whether this checkbox is currently checked.
+
+**Parameters**
+
+- `self` (`LCheckbox`, required) - The widget instance.
 
 **Returns**: `boolean` - True if checked.
 
@@ -2583,12 +2622,13 @@ do
 end
 ```
 
-### `LCheckbox:setChecked(checked: boolean)`
+### `LCheckbox:setChecked(self: LCheckbox, checked: boolean)`
 
 Sets the checked state of this checkbox.
 
 **Parameters**
 
+- `self` (`LCheckbox`, required) - The widget instance.
 - `checked` (`boolean`, required) - True to check, false to uncheck.
 
 #### Example
@@ -2603,12 +2643,13 @@ do
 end
 ```
 
-### `LCheckbox:setText(text: string)`
+### `LCheckbox:setText(self: LCheckbox, text: string)`
 
 Sets the label text displayed next to this checkbox.
 
 **Parameters**
 
+- `self` (`LCheckbox`, required) - The widget instance.
 - `text` (`string`, required) - The checkbox label.
 
 #### Example
@@ -2638,9 +2679,13 @@ do
 end
 ```
 
-### `LColorPicker:getColor() -> number`
+### `LColorPicker:getColor(self: LColorPicker) -> number`
 
 Returns the current color as RGBA components (0.0 to 1.0).
+
+**Parameters**
+
+- `self` (`LColorPicker`, required) - The widget instance.
 
 **Returns**: `number` - Red.
 
@@ -2656,9 +2701,13 @@ do
 end
 ```
 
-### `LColorPicker:getColorMode() -> string`
+### `LColorPicker:getColorMode(self: LColorPicker) -> string`
 
 Returns the color mode of this picker (e.g. "rgb", "hsv").
+
+**Parameters**
+
+- `self` (`LColorPicker`, required) - The widget instance.
 
 **Returns**: `string` - The color mode.
 
@@ -2674,9 +2723,13 @@ do
 end
 ```
 
-### `LColorPicker:getShowAlpha() -> boolean`
+### `LColorPicker:getShowAlpha(self: LColorPicker) -> boolean`
 
 Returns whether the alpha channel slider is visible.
+
+**Parameters**
+
+- `self` (`LColorPicker`, required) - The widget instance.
 
 **Returns**: `boolean` - True if the alpha slider is shown.
 
@@ -2692,12 +2745,13 @@ do
 end
 ```
 
-### `LColorPicker:setColor(r: number, g: number, b: number, [a]: number)`
+### `LColorPicker:setColor(self: LColorPicker, r: number, g: number, b: number, [a]: number)`
 
 Sets the current color as RGBA components.
 
 **Parameters**
 
+- `self` (`LColorPicker`, required) - The widget instance.
 - `r` (`number`, required) - Red (0.0 to 1.0).
 - `g` (`number`, required) - Green (0.0 to 1.0).
 - `b` (`number`, required) - Blue (0.0 to 1.0).
@@ -2715,12 +2769,13 @@ do
 end
 ```
 
-### `LColorPicker:setColorMode(mode: string)`
+### `LColorPicker:setColorMode(self: LColorPicker, mode: string)`
 
 Sets the color mode of this picker (e.g. "rgb", "hsv").
 
 **Parameters**
 
+- `self` (`LColorPicker`, required) - The widget instance.
 - `mode` (`string`, required) - The color mode.
 
 #### Example
@@ -2735,12 +2790,13 @@ do
 end
 ```
 
-### `LColorPicker:setOnChange(f: function)`
+### `LColorPicker:setOnChange(self: LColorPicker, f: function)`
 
 Registers a callback invoked when this color picker's value changes.
 
 **Parameters**
 
+- `self` (`LColorPicker`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -2755,12 +2811,13 @@ do
 end
 ```
 
-### `LColorPicker:setShowAlpha(v: boolean)`
+### `LColorPicker:setShowAlpha(self: LColorPicker, v: boolean)`
 
 Sets whether the alpha channel slider is visible.
 
 **Parameters**
 
+- `self` (`LColorPicker`, required) - The widget instance.
 - `v` (`boolean`, required) - True to show the alpha slider.
 
 #### Example
@@ -2770,7 +2827,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local cp = lurek.ui.newColorPicker()
-  cp:setShowAlpha(1.0)
+  cp:setShowAlpha(true)
   lurek.log.info("LColorPicker:setShowAlpha applied", "ui")
 end
 ```
@@ -2790,12 +2847,13 @@ do
 end
 ```
 
-### `LComboBox:addItem(text: string)`
+### `LComboBox:addItem(self: LComboBox, text: string)`
 
 Appends a new text item to this combo box's dropdown list.
 
 **Parameters**
 
+- `self` (`LComboBox`, required) - The widget instance.
 - `text` (`string`, required) - The item label to add.
 
 #### Example
@@ -2810,9 +2868,13 @@ do
 end
 ```
 
-### `LComboBox:clearItems()`
+### `LComboBox:clearItems(self: LComboBox)`
 
 Removes all items from this combo box.
+
+**Parameters**
+
+- `self` (`LComboBox`, required) - The widget instance.
 
 #### Example
 
@@ -2826,12 +2888,13 @@ do
 end
 ```
 
-### `LComboBox:getItem(index: integer) -> string`
+### `LComboBox:getItem(self: LComboBox, index: integer) -> string`
 
 Returns the text of the item at the given 1-based index.
 
 **Parameters**
 
+- `self` (`LComboBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based item index.
 
 **Returns**: `string` - The item text, or nil if out of range.
@@ -2848,9 +2911,13 @@ do
 end
 ```
 
-### `LComboBox:getItemCount() -> number`
+### `LComboBox:getItemCount(self: LComboBox) -> number`
 
 Returns the number of items in this combo box.
+
+**Parameters**
+
+- `self` (`LComboBox`, required) - The widget instance.
 
 **Returns**: `number` - The item count.
 
@@ -2866,9 +2933,13 @@ do
 end
 ```
 
-### `LComboBox:getSelectedIndex() -> number`
+### `LComboBox:getSelectedIndex(self: LComboBox) -> number`
 
 Returns the 1-based index of the currently selected item, or 0 if none is selected.
+
+**Parameters**
+
+- `self` (`LComboBox`, required) - The widget instance.
 
 **Returns**: `number` - The selected index.
 
@@ -2884,9 +2955,13 @@ do
 end
 ```
 
-### `LComboBox:getSelectedItem() -> string`
+### `LComboBox:getSelectedItem(self: LComboBox) -> string`
 
 Returns the text of the currently selected item, or nil if none is selected.
+
+**Parameters**
+
+- `self` (`LComboBox`, required) - The widget instance.
 
 **Returns**: `string` - The selected item text.
 
@@ -2902,12 +2977,13 @@ do
 end
 ```
 
-### `LComboBox:removeItem(index: integer) -> boolean`
+### `LComboBox:removeItem(self: LComboBox, index: integer) -> boolean`
 
 Removes the item at the given 1-based index from this combo box.
 
 **Parameters**
 
+- `self` (`LComboBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based index of the item to remove.
 
 **Returns**: `boolean` - True if the item was removed.
@@ -2924,12 +3000,13 @@ do
 end
 ```
 
-### `LComboBox:setSelectedIndex(index: integer)`
+### `LComboBox:setSelectedIndex(self: LComboBox, index: integer)`
 
 Sets the selected item by 1-based index.
 
 **Parameters**
 
+- `self` (`LComboBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based index of the item to select.
 
 #### Example
@@ -2959,12 +3036,13 @@ do
 end
 ```
 
-### `LDialog:addButton(text: string, [cb]: function) -> number`
+### `LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number`
 
 Adds a footer button to this dialog and returns its 1-based index.
 
 **Parameters**
 
+- `self` (`LDialog`, required) - The widget instance.
 - `text` (`string`, required) - The button label.
 - `cb` (`function`, optional) - Optional click callback (reserved for future use).
 
@@ -2982,9 +3060,13 @@ do
 end
 ```
 
-### `LDialog:close()`
+### `LDialog:close(self: LDialog)`
 
 Closes this dialog and fires the onClose callback if it was open.
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 #### Example
 
@@ -2998,9 +3080,13 @@ do
 end
 ```
 
-### `LDialog:getContent() -> number`
+### `LDialog:getContent(self: LDialog) -> number`
 
 Returns the widget index of this dialog's content, or nil if not set.
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 **Returns**: `number` - The content widget index.
 
@@ -3016,9 +3102,13 @@ do
 end
 ```
 
-### `LDialog:getTitle() -> string`
+### `LDialog:getTitle(self: LDialog) -> string`
 
 Returns the title text of this dialog.
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 **Returns**: `string` - The dialog title.
 
@@ -3034,9 +3124,13 @@ do
 end
 ```
 
-### `LDialog:isModal() -> boolean`
+### `LDialog:isModal(self: LDialog) -> boolean`
 
 Returns whether this dialog is modal (blocks interaction with other widgets).
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 **Returns**: `boolean` - True if modal.
 
@@ -3052,9 +3146,13 @@ do
 end
 ```
 
-### `LDialog:isOpen() -> boolean`
+### `LDialog:isOpen(self: LDialog) -> boolean`
 
 Returns whether this dialog is currently open and visible.
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 **Returns**: `boolean` - True if open.
 
@@ -3070,9 +3168,13 @@ do
 end
 ```
 
-### `LDialog:open()`
+### `LDialog:open(self: LDialog)`
 
 Opens this dialog, making it visible.
+
+**Parameters**
+
+- `self` (`LDialog`, required) - The widget instance.
 
 #### Example
 
@@ -3086,12 +3188,13 @@ do
 end
 ```
 
-### `LDialog:setContent([content_idx]: integer)`
+### `LDialog:setContent(self: LDialog, [content_idx]: integer)`
 
 Sets the content widget for this dialog.
 
 **Parameters**
 
+- `self` (`LDialog`, required) - The widget instance.
 - `content_idx` (`integer`, optional) - The widget index to show as content, or nil to clear.
 
 #### Example
@@ -3106,12 +3209,13 @@ do
 end
 ```
 
-### `LDialog:setModal(v: boolean)`
+### `LDialog:setModal(self: LDialog, v: boolean)`
 
 Sets whether this dialog is modal. This method is available to Lua scripts.
 
 **Parameters**
 
+- `self` (`LDialog`, required) - The widget instance.
 - `v` (`boolean`, required) - True to make modal.
 
 #### Example
@@ -3121,17 +3225,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local dlg = lurek.ui.newDialog("Title")
-  dlg:setModal(1.0)
+  dlg:setModal(true)
   lurek.log.info("LDialog:setModal applied", "ui")
 end
 ```
 
-### `LDialog:setOnClose(f: function)`
+### `LDialog:setOnClose(self: LDialog, f: function)`
 
 Registers a callback invoked when this dialog is closed.
 
 **Parameters**
 
+- `self` (`LDialog`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -3146,12 +3251,13 @@ do
 end
 ```
 
-### `LDialog:setTitle(title: string)`
+### `LDialog:setTitle(self: LDialog, title: string)`
 
 Sets the title text of this dialog. This method is available to Lua scripts.
 
 **Parameters**
 
+- `self` (`LDialog`, required) - The widget instance.
 - `title` (`string`, required) - The dialog title.
 
 #### Example
@@ -3181,12 +3287,13 @@ do
 end
 ```
 
-### `LDockPanel:dock(child_idx: integer, side: string)`
+### `LDockPanel:dock(self: LDockPanel, child_idx: integer, side: string)`
 
 Docks a child widget to the specified side of this dock panel.
 
 **Parameters**
 
+- `self` (`LDockPanel`, required) - The widget instance.
 - `child_idx` (`integer`, required) - The widget index to dock.
 - `side` (`string`, required) - The dock side ("left", "right", "top", "bottom", "center").
 
@@ -3202,9 +3309,13 @@ do
 end
 ```
 
-### `LDockPanel:getDockedCount() -> number`
+### `LDockPanel:getDockedCount(self: LDockPanel) -> number`
 
 Returns the number of widgets docked in this dock panel.
+
+**Parameters**
+
+- `self` (`LDockPanel`, required) - The widget instance.
 
 **Returns**: `number` - The docked widget count.
 
@@ -3220,12 +3331,13 @@ do
 end
 ```
 
-### `LDockPanel:getSplitSize(side: string) -> number`
+### `LDockPanel:getSplitSize(self: LDockPanel, side: string) -> number`
 
 Returns the size configured for a dock panel side region.
 
 **Parameters**
 
+- `self` (`LDockPanel`, required) - The widget instance.
 - `side` (`string`, required) - The dock side.
 
 **Returns**: `number` - The size in pixels, or nil if not set.
@@ -3242,12 +3354,13 @@ do
 end
 ```
 
-### `LDockPanel:setSplitSize(side: string, size: number)`
+### `LDockPanel:setSplitSize(self: LDockPanel, side: string, size: number)`
 
 Sets the size of a dock panel side region.
 
 **Parameters**
 
+- `self` (`LDockPanel`, required) - The widget instance.
 - `side` (`string`, required) - The dock side ("left", "right", "top", "bottom").
 - `size` (`number`, required) - The size in pixels.
 
@@ -3263,12 +3376,13 @@ do
 end
 ```
 
-### `LDockPanel:undock(child_idx: integer)`
+### `LDockPanel:undock(self: LDockPanel, child_idx: integer)`
 
 Removes a child widget from this dock panel.
 
 **Parameters**
 
+- `self` (`LDockPanel`, required) - The widget instance.
 - `child_idx` (`integer`, required) - The widget index to undock.
 
 #### Example
@@ -3298,12 +3412,13 @@ do
 end
 ```
 
-### `LGuiTable:addColumn(header: string, [width]: number)`
+### `LGuiTable:addColumn(self: LGuiTable, header: string, [width]: number)`
 
 Adds a new column to this table widget.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `header` (`string`, required) - The column header text.
 - `width` (`number`, optional) - The column width in pixels (default 100).
 
@@ -3319,12 +3434,13 @@ do
 end
 ```
 
-### `LGuiTable:addRow(cells: table)`
+### `LGuiTable:addRow(self: LGuiTable, cells: table)`
 
 Adds a row to this table widget. This method is available to Lua scripts.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `cells` (`table`, required) - Array of cell text values.
 
 #### Example
@@ -3339,12 +3455,13 @@ do
 end
 ```
 
-### `LGuiTable:getCell(row: integer, col: integer) -> string`
+### `LGuiTable:getCell(self: LGuiTable, row: integer, col: integer) -> string`
 
 Returns the text of a cell at the given 1-based row and column.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `row` (`integer`, required) - The 1-based row index.
 - `col` (`integer`, required) - The 1-based column index.
 
@@ -3362,9 +3479,13 @@ do
 end
 ```
 
-### `LGuiTable:getColumnCount() -> number`
+### `LGuiTable:getColumnCount(self: LGuiTable) -> number`
 
 Returns the number of columns in this table widget.
+
+**Parameters**
+
+- `self` (`LGuiTable`, required) - The widget instance.
 
 **Returns**: `number` - The column count.
 
@@ -3380,9 +3501,13 @@ do
 end
 ```
 
-### `LGuiTable:getRowCount() -> number`
+### `LGuiTable:getRowCount(self: LGuiTable) -> number`
 
 Returns the number of rows in this table widget.
+
+**Parameters**
+
+- `self` (`LGuiTable`, required) - The widget instance.
 
 **Returns**: `number` - The row count.
 
@@ -3398,9 +3523,13 @@ do
 end
 ```
 
-### `LGuiTable:getSelectedRow() -> number`
+### `LGuiTable:getSelectedRow(self: LGuiTable) -> number`
 
 Returns the 1-based index of the currently selected row, or nil.
+
+**Parameters**
+
+- `self` (`LGuiTable`, required) - The widget instance.
 
 **Returns**: `number` - The selected row index.
 
@@ -3416,9 +3545,13 @@ do
 end
 ```
 
-### `LGuiTable:isSortable() -> boolean`
+### `LGuiTable:isSortable(self: LGuiTable) -> boolean`
 
 Returns whether columns in this table can be sorted by clicking headers.
+
+**Parameters**
+
+- `self` (`LGuiTable`, required) - The widget instance.
 
 **Returns**: `boolean` - True if sortable.
 
@@ -3434,12 +3567,13 @@ do
 end
 ```
 
-### `LGuiTable:setCell(row: integer, col: integer, text: string)`
+### `LGuiTable:setCell(self: LGuiTable, row: integer, col: integer, text: string)`
 
 Sets the text of a cell at the given 1-based row and column.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `row` (`integer`, required) - The 1-based row index.
 - `col` (`integer`, required) - The 1-based column index.
 - `text` (`string`, required) - The new cell text.
@@ -3456,12 +3590,13 @@ do
 end
 ```
 
-### `LGuiTable:setOnSelect(f: function)`
+### `LGuiTable:setOnSelect(self: LGuiTable, f: function)`
 
 Registers a callback invoked when a table row is selected.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -3476,12 +3611,13 @@ do
 end
 ```
 
-### `LGuiTable:setSelectedRow([row]: integer)`
+### `LGuiTable:setSelectedRow(self: LGuiTable, [row]: integer)`
 
 Sets the selected row by its 1-based index, or nil to deselect.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `row` (`integer`, optional) - The 1-based row index, or nil.
 
 #### Example
@@ -3496,12 +3632,13 @@ do
 end
 ```
 
-### `LGuiTable:setSortable(v: boolean)`
+### `LGuiTable:setSortable(self: LGuiTable, v: boolean)`
 
 Sets whether columns in this table can be sorted by clicking headers.
 
 **Parameters**
 
+- `self` (`LGuiTable`, required) - The widget instance.
 - `v` (`boolean`, required) - True to enable sorting.
 
 #### Example
@@ -3511,7 +3648,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tbl = lurek.ui.newTable()
-  tbl:setSortable(1.0)
+  tbl:setSortable(true)
   lurek.log.info("LGuiTable:setSortable applied", "ui")
 end
 ```
@@ -3531,9 +3668,13 @@ do
 end
 ```
 
-### `LGuiWindow:getTitle() -> string`
+### `LGuiWindow:getTitle(self: LGuiWindow) -> string`
 
 Returns the title bar text of this GUI window.
+
+**Parameters**
+
+- `self` (`LGuiWindow`, required) - The widget instance.
 
 **Returns**: `string` - The window title.
 
@@ -3549,9 +3690,13 @@ do
 end
 ```
 
-### `LGuiWindow:isCloseable() -> boolean`
+### `LGuiWindow:isCloseable(self: LGuiWindow) -> boolean`
 
 Returns whether this window shows a close button.
+
+**Parameters**
+
+- `self` (`LGuiWindow`, required) - The widget instance.
 
 **Returns**: `boolean` - True if closeable.
 
@@ -3567,9 +3712,13 @@ do
 end
 ```
 
-### `LGuiWindow:isDraggable() -> boolean`
+### `LGuiWindow:isDraggable(self: LGuiWindow) -> boolean`
 
 Returns whether this window can be dragged by its title bar.
+
+**Parameters**
+
+- `self` (`LGuiWindow`, required) - The widget instance.
 
 **Returns**: `boolean` - True if draggable.
 
@@ -3585,9 +3734,13 @@ do
 end
 ```
 
-### `LGuiWindow:isResizable() -> boolean`
+### `LGuiWindow:isResizable(self: LGuiWindow) -> boolean`
 
 Returns whether this window can be resized by dragging its edges.
+
+**Parameters**
+
+- `self` (`LGuiWindow`, required) - The widget instance.
 
 **Returns**: `boolean` - True if resizable.
 
@@ -3603,12 +3756,13 @@ do
 end
 ```
 
-### `LGuiWindow:setCloseable(v: boolean)`
+### `LGuiWindow:setCloseable(self: LGuiWindow, v: boolean)`
 
 Sets whether this window shows a close button.
 
 **Parameters**
 
+- `self` (`LGuiWindow`, required) - The widget instance.
 - `v` (`boolean`, required) - True to show the close button.
 
 #### Example
@@ -3618,17 +3772,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local win = lurek.ui.newWindow("Title")
-  win:setCloseable(1.0)
+  win:setCloseable(true)
   lurek.log.info("LGuiWindow:setCloseable applied", "ui")
 end
 ```
 
-### `LGuiWindow:setDraggable(v: boolean)`
+### `LGuiWindow:setDraggable(self: LGuiWindow, v: boolean)`
 
 Sets whether this window can be dragged by its title bar.
 
 **Parameters**
 
+- `self` (`LGuiWindow`, required) - The widget instance.
 - `v` (`boolean`, required) - True to allow dragging.
 
 #### Example
@@ -3638,17 +3793,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local win = lurek.ui.newWindow("Title")
-  win:setDraggable(1.0)
+  win:setDraggable(true)
   lurek.log.info("LGuiWindow:setDraggable applied", "ui")
 end
 ```
 
-### `LGuiWindow:setOnClose(f: function)`
+### `LGuiWindow:setOnClose(self: LGuiWindow, f: function)`
 
 Registers a callback invoked when this window is closed.
 
 **Parameters**
 
+- `self` (`LGuiWindow`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -3663,12 +3819,13 @@ do
 end
 ```
 
-### `LGuiWindow:setResizable(v: boolean)`
+### `LGuiWindow:setResizable(self: LGuiWindow, v: boolean)`
 
 Sets whether this window can be resized.
 
 **Parameters**
 
+- `self` (`LGuiWindow`, required) - The widget instance.
 - `v` (`boolean`, required) - True to allow resizing.
 
 #### Example
@@ -3678,17 +3835,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local win = lurek.ui.newWindow("Title")
-  win:setResizable(1.0)
+  win:setResizable(true)
   lurek.log.info("LGuiWindow:setResizable applied", "ui")
 end
 ```
 
-### `LGuiWindow:setTitle(title: string)`
+### `LGuiWindow:setTitle(self: LGuiWindow, title: string)`
 
 Sets the title bar text of this GUI window.
 
 **Parameters**
 
+- `self` (`LGuiWindow`, required) - The widget instance.
 - `title` (`string`, required) - The window title.
 
 #### Example
@@ -3718,9 +3876,13 @@ do
 end
 ```
 
-### `LImageWidget:getScaleMode() -> string`
+### `LImageWidget:getScaleMode(self: LImageWidget) -> string`
 
 Returns the image scaling mode (e.g. "fit", "fill", "stretch").
+
+**Parameters**
+
+- `self` (`LImageWidget`, required) - The widget instance.
 
 **Returns**: `string` - The scale mode.
 
@@ -3736,9 +3898,13 @@ do
 end
 ```
 
-### `LImageWidget:getTint() -> number`
+### `LImageWidget:getTint(self: LImageWidget) -> number`
 
 Returns the tint color of this image widget as RGBA components.
+
+**Parameters**
+
+- `self` (`LImageWidget`, required) - The widget instance.
 
 **Returns**: `number` - Red.
 
@@ -3754,12 +3920,13 @@ do
 end
 ```
 
-### `LImageWidget:setScaleMode(mode: string)`
+### `LImageWidget:setScaleMode(self: LImageWidget, mode: string)`
 
 Sets the image scaling mode (e.g. "fit", "fill", "stretch").
 
 **Parameters**
 
+- `self` (`LImageWidget`, required) - The widget instance.
 - `mode` (`string`, required) - The scale mode.
 
 #### Example
@@ -3774,12 +3941,13 @@ do
 end
 ```
 
-### `LImageWidget:setTint(r: number, g: number, b: number, [a]: number)`
+### `LImageWidget:setTint(self: LImageWidget, r: number, g: number, b: number, [a]: number)`
 
 Sets the tint color of this image widget as RGBA components.
 
 **Parameters**
 
+- `self` (`LImageWidget`, required) - The widget instance.
 - `r` (`number`, required) - Red (0.0 to 1.0).
 - `g` (`number`, required) - Green (0.0 to 1.0).
 - `b` (`number`, required) - Blue (0.0 to 1.0).
@@ -3812,9 +3980,13 @@ do
 end
 ```
 
-### `LLabel:getText() -> string`
+### `LLabel:getText(self: LLabel) -> string`
 
 Returns the current display text of this label.
+
+**Parameters**
+
+- `self` (`LLabel`, required) - The widget instance.
 
 **Returns**: `string` - The label text.
 
@@ -3830,12 +4002,13 @@ do
 end
 ```
 
-### `LLabel:setText(text: string)`
+### `LLabel:setText(self: LLabel, text: string)`
 
 Sets the display text on this label.
 
 **Parameters**
 
+- `self` (`LLabel`, required) - The widget instance.
 - `text` (`string`, required) - The label text.
 
 #### Example
@@ -3865,9 +4038,13 @@ do
 end
 ```
 
-### `LLayout:getAlign() -> string`
+### `LLayout:getAlign(self: LLayout) -> string`
 
 Returns the current cross-axis alignment mode.
+
+**Parameters**
+
+- `self` (`LLayout`, required) - The widget instance.
 
 **Returns**: `string` - The alignment mode.
 
@@ -3883,9 +4060,13 @@ do
 end
 ```
 
-### `LLayout:getDirection() -> string`
+### `LLayout:getDirection(self: LLayout) -> string`
 
 Returns the current layout direction.
+
+**Parameters**
+
+- `self` (`LLayout`, required) - The widget instance.
 
 **Returns**: `string` - The direction name.
 
@@ -3901,9 +4082,13 @@ do
 end
 ```
 
-### `LLayout:getJustify() -> string`
+### `LLayout:getJustify(self: LLayout) -> string`
 
 Returns the current main-axis justification mode.
+
+**Parameters**
+
+- `self` (`LLayout`, required) - The widget instance.
 
 **Returns**: `string` - The justification mode.
 
@@ -3919,9 +4104,13 @@ do
 end
 ```
 
-### `LLayout:getSpacing() -> number`
+### `LLayout:getSpacing(self: LLayout) -> number`
 
 Returns the current spacing between children.
+
+**Parameters**
+
+- `self` (`LLayout`, required) - The widget instance.
 
 **Returns**: `number` - The spacing in pixels.
 
@@ -3937,9 +4126,13 @@ do
 end
 ```
 
-### `LLayout:getWrap() -> boolean`
+### `LLayout:getWrap(self: LLayout) -> boolean`
 
 Returns whether wrapping is enabled for this layout.
+
+**Parameters**
+
+- `self` (`LLayout`, required) - The widget instance.
 
 **Returns**: `boolean` - True if wrapping is on.
 
@@ -3955,12 +4148,13 @@ do
 end
 ```
 
-### `LLayout:setAlign(align: string)`
+### `LLayout:setAlign(self: LLayout, align: string)`
 
 Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stretch").
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `align` (`string`, required) - The alignment mode.
 
 #### Example
@@ -3975,12 +4169,13 @@ do
 end
 ```
 
-### `LLayout:setColumns(n: integer)`
+### `LLayout:setColumns(self: LLayout, n: integer)`
 
 Sets the number of columns for grid layout mode (minimum 1).
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `n` (`integer`, required) - Column count.
 
 #### Example
@@ -3995,12 +4190,13 @@ do
 end
 ```
 
-### `LLayout:setDirection(dir: string)`
+### `LLayout:setDirection(self: LLayout, dir: string)`
 
 Sets the layout direction for child arrangement ("horizontal", "vertical", or "grid").
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `dir` (`string`, required) - The layout direction.
 
 #### Example
@@ -4015,12 +4211,13 @@ do
 end
 ```
 
-### `LLayout:setJustify(justify: string)`
+### `LLayout:setJustify(self: LLayout, justify: string)`
 
 Sets the main-axis justification for children (e.g. "start", "center", "end", "space-between").
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `justify` (`string`, required) - The justification mode.
 
 #### Example
@@ -4035,12 +4232,13 @@ do
 end
 ```
 
-### `LLayout:setSpacing(spacing: number)`
+### `LLayout:setSpacing(self: LLayout, spacing: number)`
 
 Sets the spacing in pixels between child widgets in this layout.
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `spacing` (`number`, required) - Gap between children in pixels.
 
 #### Example
@@ -4055,12 +4253,13 @@ do
 end
 ```
 
-### `LLayout:setWrap(wrap: boolean)`
+### `LLayout:setWrap(self: LLayout, wrap: boolean)`
 
 Enables or disables wrapping of children to the next row/column when they overflow.
 
 **Parameters**
 
+- `self` (`LLayout`, required) - The widget instance.
 - `wrap` (`boolean`, required) - True to enable wrapping.
 
 #### Example
@@ -4109,7 +4308,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local chart = lurek.ui.newLineChart({ width = 300, height = 200, title = "Data" })
-  chart:addSeries("hero", {1, 2, 3}, 1.0, 0.8, 0.2)
+  chart:addSeries("hero", {{1,10},{2,20},{3,30}}, 1.0, 0.8, 0.2)
   lurek.log.info("LLineChart:addSeries done", "ui")
 end
 ```
@@ -4232,12 +4431,13 @@ do
 end
 ```
 
-### `LListBox:addItem(text: string)`
+### `LListBox:addItem(self: LListBox, text: string)`
 
 Appends a new text item to this list box.
 
 **Parameters**
 
+- `self` (`LListBox`, required) - The widget instance.
 - `text` (`string`, required) - The item text to add.
 
 #### Example
@@ -4252,9 +4452,13 @@ do
 end
 ```
 
-### `LListBox:clearItems()`
+### `LListBox:clearItems(self: LListBox)`
 
 Removes all items from this list box.
+
+**Parameters**
+
+- `self` (`LListBox`, required) - The widget instance.
 
 #### Example
 
@@ -4268,12 +4472,13 @@ do
 end
 ```
 
-### `LListBox:getItem(index: integer) -> string`
+### `LListBox:getItem(self: LListBox, index: integer) -> string`
 
 Returns the text of the item at the given 1-based index.
 
 **Parameters**
 
+- `self` (`LListBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based item index.
 
 **Returns**: `string` - The item text, or empty string if out of range.
@@ -4290,9 +4495,13 @@ do
 end
 ```
 
-### `LListBox:getItemCount() -> number`
+### `LListBox:getItemCount(self: LListBox) -> number`
 
 Returns the number of items in this list box.
+
+**Parameters**
+
+- `self` (`LListBox`, required) - The widget instance.
 
 **Returns**: `number` - The item count.
 
@@ -4308,9 +4517,13 @@ do
 end
 ```
 
-### `LListBox:getSelectedIndex() -> number`
+### `LListBox:getSelectedIndex(self: LListBox) -> number`
 
 Returns the 1-based index of the currently selected item, or 0 if none.
+
+**Parameters**
+
+- `self` (`LListBox`, required) - The widget instance.
 
 **Returns**: `number` - The selected index.
 
@@ -4326,12 +4539,13 @@ do
 end
 ```
 
-### `LListBox:removeItem(index: integer)`
+### `LListBox:removeItem(self: LListBox, index: integer)`
 
 Removes the item at the given 1-based index from this list box.
 
 **Parameters**
 
+- `self` (`LListBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based index to remove.
 
 #### Example
@@ -4346,12 +4560,13 @@ do
 end
 ```
 
-### `LListBox:setItemHeight(h: number)`
+### `LListBox:setItemHeight(self: LListBox, h: number)`
 
 Sets the pixel height of each item row in this list box.
 
 **Parameters**
 
+- `self` (`LListBox`, required) - The widget instance.
 - `h` (`number`, required) - Row height in pixels.
 
 #### Example
@@ -4366,12 +4581,13 @@ do
 end
 ```
 
-### `LListBox:setSelectedIndex(index: integer)`
+### `LListBox:setSelectedIndex(self: LListBox, index: integer)`
 
 Sets the selected item by 1-based index.
 
 **Parameters**
 
+- `self` (`LListBox`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based index of the item to select.
 
 #### Example
@@ -4401,12 +4617,13 @@ do
 end
 ```
 
-### `LMenuBar:addMenu(menu_idx: integer)`
+### `LMenuBar:addMenu(self: LMenuBar, menu_idx: integer)`
 
 Adds a menu (by its widget index) to this menu bar.
 
 **Parameters**
 
+- `self` (`LMenuBar`, required) - The widget instance.
 - `menu_idx` (`integer`, required) - The widget index of the menu to add.
 
 #### Example
@@ -4421,9 +4638,13 @@ do
 end
 ```
 
-### `LMenuBar:getMenuCount() -> number`
+### `LMenuBar:getMenuCount(self: LMenuBar) -> number`
 
 Returns the number of menus in this menu bar.
+
+**Parameters**
+
+- `self` (`LMenuBar`, required) - The widget instance.
 
 **Returns**: `number` - The menu count.
 
@@ -4439,9 +4660,13 @@ do
 end
 ```
 
-### `LMenuBar:getMenus() -> table`
+### `LMenuBar:getMenus(self: LMenuBar) -> table`
 
 Returns a table of widget indices for all menus in this menu bar.
+
+**Parameters**
+
+- `self` (`LMenuBar`, required) - The widget instance.
 
 **Returns**: `table` - Array of menu widget indices.
 
@@ -4457,12 +4682,13 @@ do
 end
 ```
 
-### `LMenuBar:removeMenu(menu_idx: integer) -> boolean`
+### `LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean`
 
 Removes a menu from this menu bar by its widget index.
 
 **Parameters**
 
+- `self` (`LMenuBar`, required) - The widget instance.
 - `menu_idx` (`integer`, required) - The widget index of the menu to remove.
 
 **Returns**: `boolean` - True if the menu was found and removed.
@@ -4494,12 +4720,13 @@ do
 end
 ```
 
-### `LMenuItem:addSubItem(child_idx: integer)`
+### `LMenuItem:addSubItem(self: LMenuItem, child_idx: integer)`
 
 Adds a sub-item to this menu item for building nested menus.
 
 **Parameters**
 
+- `self` (`LMenuItem`, required) - The widget instance.
 - `child_idx` (`integer`, required) - The widget index of the sub-item to add.
 
 #### Example
@@ -4514,9 +4741,13 @@ do
 end
 ```
 
-### `LMenuItem:getShortcut() -> string`
+### `LMenuItem:getShortcut(self: LMenuItem) -> string`
 
 Returns the keyboard shortcut string associated with this menu item.
+
+**Parameters**
+
+- `self` (`LMenuItem`, required) - The widget instance.
 
 **Returns**: `string` - The shortcut text.
 
@@ -4532,9 +4763,13 @@ do
 end
 ```
 
-### `LMenuItem:getSubItems() -> table`
+### `LMenuItem:getSubItems(self: LMenuItem) -> table`
 
 Returns a table of widget indices for all sub-items of this menu item.
+
+**Parameters**
+
+- `self` (`LMenuItem`, required) - The widget instance.
 
 **Returns**: `table` - Array of sub-item widget indices.
 
@@ -4550,9 +4785,13 @@ do
 end
 ```
 
-### `LMenuItem:getText() -> string`
+### `LMenuItem:getText(self: LMenuItem) -> string`
 
 Returns the display text of this menu item.
+
+**Parameters**
+
+- `self` (`LMenuItem`, required) - The widget instance.
 
 **Returns**: `string` - The menu item text.
 
@@ -4568,9 +4807,13 @@ do
 end
 ```
 
-### `LMenuItem:isChecked() -> boolean`
+### `LMenuItem:isChecked(self: LMenuItem) -> boolean`
 
 Returns whether this menu item is checked (for checkable menu items).
+
+**Parameters**
+
+- `self` (`LMenuItem`, required) - The widget instance.
 
 **Returns**: `boolean` - True if checked.
 
@@ -4586,12 +4829,13 @@ do
 end
 ```
 
-### `LMenuItem:setChecked(v: boolean)`
+### `LMenuItem:setChecked(self: LMenuItem, v: boolean)`
 
 Sets the checked state of this menu item.
 
 **Parameters**
 
+- `self` (`LMenuItem`, required) - The widget instance.
 - `v` (`boolean`, required) - True to check.
 
 #### Example
@@ -4601,17 +4845,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local mi = lurek.ui.newMenuItem("File")
-  mi:setChecked(1.0)
+  mi:setChecked(true)
   lurek.log.info("LMenuItem:setChecked applied", "ui")
 end
 ```
 
-### `LMenuItem:setOnClick(f: function)`
+### `LMenuItem:setOnClick(self: LMenuItem, f: function)`
 
 Registers a callback invoked when this menu item is clicked.
 
 **Parameters**
 
+- `self` (`LMenuItem`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -4626,12 +4871,13 @@ do
 end
 ```
 
-### `LMenuItem:setShortcut(shortcut: string)`
+### `LMenuItem:setShortcut(self: LMenuItem, shortcut: string)`
 
 Sets the keyboard shortcut text displayed next to this menu item.
 
 **Parameters**
 
+- `self` (`LMenuItem`, required) - The widget instance.
 - `shortcut` (`string`, required) - The shortcut text (e.g. "Ctrl+S").
 
 #### Example
@@ -4646,12 +4892,13 @@ do
 end
 ```
 
-### `LMenuItem:setText(text: string)`
+### `LMenuItem:setText(self: LMenuItem, text: string)`
 
 Sets the display text of this menu item.
 
 **Parameters**
 
+- `self` (`LMenuItem`, required) - The widget instance.
 - `text` (`string`, required) - The menu item text.
 
 #### Example
@@ -4681,9 +4928,13 @@ do
 end
 ```
 
-### `LNinePatch:getImageDimensions() -> number, number`
+### `LNinePatch:getImageDimensions(self: LNinePatch) -> number, number`
 
 Returns the original image dimensions of this nine-patch.
+
+**Parameters**
+
+- `self` (`LNinePatch`, required) - The widget instance.
 
 **Returns**: `number, number` - Image width and height.
 
@@ -4699,9 +4950,13 @@ do
 end
 ```
 
-### `LNinePatch:getInsets() -> number, number, number, number`
+### `LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number`
 
 Returns the border insets of this nine-patch.
+
+**Parameters**
+
+- `self` (`LNinePatch`, required) - The widget instance.
 
 **Returns**: `number, number, number, number` - Left, top, right, and bottom insets.
 
@@ -4717,9 +4972,13 @@ do
 end
 ```
 
-### `LNinePatch:getSlices() -> table`
+### `LNinePatch:getSlices(self: LNinePatch) -> table`
 
 Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
+
+**Parameters**
+
+- `self` (`LNinePatch`, required) - The widget instance.
 
 **Returns**: `table` - Array of slice tables with sx, sy, sw, sh, dx, dy, dw, dh fields, or nil.
 
@@ -4735,12 +4994,13 @@ do
 end
 ```
 
-### `LNinePatch:setImageDimensions(w: integer, h: integer)`
+### `LNinePatch:setImageDimensions(self: LNinePatch, w: integer, h: integer)`
 
 Sets the original image dimensions used for nine-patch slice calculations.
 
 **Parameters**
 
+- `self` (`LNinePatch`, required) - The widget instance.
 - `w` (`integer`, required) - Image width in pixels.
 - `h` (`integer`, required) - Image height in pixels.
 
@@ -4756,12 +5016,13 @@ do
 end
 ```
 
-### `LNinePatch:setInsets(left: integer, top: integer, right: integer, bottom: integer)`
+### `LNinePatch:setInsets(self: LNinePatch, left: integer, top: integer, right: integer, bottom: integer)`
 
 Sets the border insets defining the stretchable center region of the nine-patch image.
 
 **Parameters**
 
+- `self` (`LNinePatch`, required) - The widget instance.
 - `left` (`integer`, required) - Left inset in pixels.
 - `top` (`integer`, required) - Top inset in pixels.
 - `right` (`integer`, required) - Right inset in pixels.
@@ -4794,9 +5055,13 @@ do
 end
 ```
 
-### `LPanel:getTitle() -> string`
+### `LPanel:getTitle(self: LPanel) -> string`
 
 Returns the title text of this panel.
+
+**Parameters**
+
+- `self` (`LPanel`, required) - The widget instance.
 
 **Returns**: `string` - The panel title.
 
@@ -4812,12 +5077,13 @@ do
 end
 ```
 
-### `LPanel:setScrollable(scrollable: boolean)`
+### `LPanel:setScrollable(self: LPanel, scrollable: boolean)`
 
 Enables or disables scrolling within this panel.
 
 **Parameters**
 
+- `self` (`LPanel`, required) - The widget instance.
 - `scrollable` (`boolean`, required) - True to enable scrolling.
 
 #### Example
@@ -4832,12 +5098,13 @@ do
 end
 ```
 
-### `LPanel:setTitle(title: string)`
+### `LPanel:setTitle(self: LPanel, title: string)`
 
 Sets the title text displayed on this panel's header.
 
 **Parameters**
 
+- `self` (`LPanel`, required) - The widget instance.
 - `title` (`string`, required) - The panel title.
 
 #### Example
@@ -4885,10 +5152,10 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local pc = new_example_image_widget():newPieChart(150, 150)
-  pc:addSegment("Wheat",  40, {0.9, 0.8, 0.3, 1})
-  pc:addSegment("Sheep",  25, {0.8, 0.9, 0.5, 1})
-  pc:addSegment("Forest", 35, {0.2, 0.7, 0.3, 1})
+  local pc = lurek.ui.newPieChart({})
+  pc:addSegment("Wheat", 40, 0.9, 0.8, 0.3)
+  pc:addSegment("Sheep", 25, 0.8, 0.9, 0.5)
+  pc:addSegment("Forest", 35, 0.2, 0.7, 0.3)
   lurek.log.info("pie segments added", "ui")
 end
 ```
@@ -4907,8 +5174,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
-  chart:drawToImage()
+  local chart = lurek.ui.newPieChart({{label="HP",value=70}})
+  chart:drawToImage(lurek.image.newImageData(64, 64))
 end
 ```
 
@@ -4924,8 +5191,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
-    chart:drawToImage()
+  local chart = lurek.ui.newPieChart({{label="HP",value=70}})
+    chart:drawToImage(lurek.image.newImageData(64, 64))
   local t = chart:type()
   lurek.log.info("LPieChart:type = " .. t, "ui")
 end
@@ -4947,8 +5214,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
-    chart:drawToImage()
+  local chart = lurek.ui.newPieChart({{label="HP",value=70}})
+    chart:drawToImage(lurek.image.newImageData(64, 64))
   lurek.log.info("is LPieChart: " .. tostring(chart:typeOf("LPieChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
 end
@@ -4969,9 +5236,13 @@ do
 end
 ```
 
-### `LProgressBar:getMax() -> number`
+### `LProgressBar:getMax(self: LProgressBar) -> number`
 
 Returns the maximum value of this progress bar's range.
+
+**Parameters**
+
+- `self` (`LProgressBar`, required) - The widget instance.
 
 **Returns**: `number` - The maximum value.
 
@@ -4987,9 +5258,13 @@ do
 end
 ```
 
-### `LProgressBar:getMin() -> number`
+### `LProgressBar:getMin(self: LProgressBar) -> number`
 
 Returns the minimum value of this progress bar's range.
+
+**Parameters**
+
+- `self` (`LProgressBar`, required) - The widget instance.
 
 **Returns**: `number` - The minimum value.
 
@@ -5005,9 +5280,13 @@ do
 end
 ```
 
-### `LProgressBar:getProgress() -> number`
+### `LProgressBar:getProgress(self: LProgressBar) -> number`
 
 Returns the normalized progress as a fraction (0.0 to 1.0) of the current range.
+
+**Parameters**
+
+- `self` (`LProgressBar`, required) - The widget instance.
 
 **Returns**: `number` - The normalized progress.
 
@@ -5023,9 +5302,13 @@ do
 end
 ```
 
-### `LProgressBar:getValue() -> number`
+### `LProgressBar:getValue(self: LProgressBar) -> number`
 
 Returns the current value of this progress bar.
+
+**Parameters**
+
+- `self` (`LProgressBar`, required) - The widget instance.
 
 **Returns**: `number` - The progress value.
 
@@ -5041,12 +5324,13 @@ do
 end
 ```
 
-### `LProgressBar:setRange(min: number, max: number)`
+### `LProgressBar:setRange(self: LProgressBar, min: number, max: number)`
 
 Sets the minimum and maximum bounds for this progress bar.
 
 **Parameters**
 
+- `self` (`LProgressBar`, required) - The widget instance.
 - `min` (`number`, required) - Minimum value.
 - `max` (`number`, required) - Maximum value.
 
@@ -5062,12 +5346,13 @@ do
 end
 ```
 
-### `LProgressBar:setValue(v: number)`
+### `LProgressBar:setValue(self: LProgressBar, v: number)`
 
 Sets the current fill value of this progress bar, clamped to its range.
 
 **Parameters**
 
+- `self` (`LProgressBar`, required) - The widget instance.
 - `v` (`number`, required) - The progress value.
 
 #### Example
@@ -5097,9 +5382,13 @@ do
 end
 ```
 
-### `LRadioButton:getGroup() -> string`
+### `LRadioButton:getGroup(self: LRadioButton) -> string`
 
 Returns the radio button group name. Buttons in the same group are mutually exclusive.
+
+**Parameters**
+
+- `self` (`LRadioButton`, required) - The widget instance.
 
 **Returns**: `string` - The group name.
 
@@ -5115,9 +5404,13 @@ do
 end
 ```
 
-### `LRadioButton:getText() -> string`
+### `LRadioButton:getText(self: LRadioButton) -> string`
 
 Returns the label text of this radio button.
+
+**Parameters**
+
+- `self` (`LRadioButton`, required) - The widget instance.
 
 **Returns**: `string` - The radio button label.
 
@@ -5133,9 +5426,13 @@ do
 end
 ```
 
-### `LRadioButton:isSelected() -> boolean`
+### `LRadioButton:isSelected(self: LRadioButton) -> boolean`
 
 Returns whether this radio button is currently selected.
+
+**Parameters**
+
+- `self` (`LRadioButton`, required) - The widget instance.
 
 **Returns**: `boolean` - True if selected.
 
@@ -5151,12 +5448,13 @@ do
 end
 ```
 
-### `LRadioButton:setGroup(group: string)`
+### `LRadioButton:setGroup(self: LRadioButton, group: string)`
 
 Sets the radio button group name. Buttons in the same group are mutually exclusive.
 
 **Parameters**
 
+- `self` (`LRadioButton`, required) - The widget instance.
 - `group` (`string`, required) - The group name.
 
 #### Example
@@ -5171,12 +5469,13 @@ do
 end
 ```
 
-### `LRadioButton:setOnChange(f: function)`
+### `LRadioButton:setOnChange(self: LRadioButton, f: function)`
 
 Registers a callback invoked when this radio button's selection changes.
 
 **Parameters**
 
+- `self` (`LRadioButton`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -5191,12 +5490,13 @@ do
 end
 ```
 
-### `LRadioButton:setSelected(v: boolean)`
+### `LRadioButton:setSelected(self: LRadioButton, v: boolean)`
 
 Sets the selected state of this radio button.
 
 **Parameters**
 
+- `self` (`LRadioButton`, required) - The widget instance.
 - `v` (`boolean`, required) - True to select.
 
 #### Example
@@ -5206,17 +5506,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local rb = lurek.ui.newRadioButton("Option", "group1")
-  rb:setSelected(1.0)
+  rb:setSelected(true)
   lurek.log.info("LRadioButton:setSelected applied", "ui")
 end
 ```
 
-### `LRadioButton:setText(text: string)`
+### `LRadioButton:setText(self: LRadioButton, text: string)`
 
 Sets the label text of this radio button.
 
 **Parameters**
 
+- `self` (`LRadioButton`, required) - The widget instance.
 - `text` (`string`, required) - The radio button label.
 
 #### Example
@@ -5264,8 +5565,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local sp = new_example_image_widget():newScatterPlot(200, 200)
-  sp:addSeries("players", {0.2, 0.7, 1, 1}, {10,20, 30,40, 50,35, 70,55})
+  local sp = lurek.ui.newScatterPlot({})
+  sp:addSeries("players", {{10,20},{30,40},{50,35},{70,55}}, 0.2, 0.7, 1.0)
   sp:setXRange(0, 100); sp:setYRange(0, 80)
   lurek.log.info("scatter series added", "ui")
 end
@@ -5285,8 +5586,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
-  plot:drawToImage()
+  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  plot:drawToImage(lurek.image.newImageData(64, 64))
 end
 ```
 
@@ -5305,8 +5606,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
-  plot:setXRange(1)
+  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  plot:setXRange(1, 10)
 end
 ```
 
@@ -5325,8 +5626,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
-  plot:setYRange(1)
+  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+  plot:setYRange(1, 10)
 end
 ```
 
@@ -5342,8 +5643,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
-    plot:setXRange(1)
+  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+    plot:setXRange(1, 10)
   local t = plot:type()
   lurek.log.info("LScatterPlot:type = " .. t, "ui")
 end
@@ -5365,8 +5666,8 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
-    plot:setXRange(1)
+  local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
+    plot:setXRange(1, 10)
   lurek.log.info("is LScatterPlot: " .. tostring(plot:typeOf("LScatterPlot")), "ui")
   lurek.log.info("is wrong: " .. tostring(plot:typeOf("Unknown")), "ui")
 end
@@ -5387,9 +5688,13 @@ do
 end
 ```
 
-### `LScrollBar:getContentSize() -> number`
+### `LScrollBar:getContentSize(self: LScrollBar) -> number`
 
 Returns the total content size tracked by this scroll bar.
+
+**Parameters**
+
+- `self` (`LScrollBar`, required) - The widget instance.
 
 **Returns**: `number` - The content size.
 
@@ -5405,9 +5710,13 @@ do
 end
 ```
 
-### `LScrollBar:getScrollPosition() -> number`
+### `LScrollBar:getScrollPosition(self: LScrollBar) -> number`
 
 Returns the current scroll position of this scroll bar.
+
+**Parameters**
+
+- `self` (`LScrollBar`, required) - The widget instance.
 
 **Returns**: `number` - The scroll position.
 
@@ -5423,9 +5732,13 @@ do
 end
 ```
 
-### `LScrollBar:getViewSize() -> number`
+### `LScrollBar:getViewSize(self: LScrollBar) -> number`
 
 Returns the visible viewport size tracked by this scroll bar.
+
+**Parameters**
+
+- `self` (`LScrollBar`, required) - The widget instance.
 
 **Returns**: `number` - The view size.
 
@@ -5441,9 +5754,13 @@ do
 end
 ```
 
-### `LScrollBar:isVertical() -> boolean`
+### `LScrollBar:isVertical(self: LScrollBar) -> boolean`
 
 Returns whether this scroll bar is oriented vertically.
+
+**Parameters**
+
+- `self` (`LScrollBar`, required) - The widget instance.
 
 **Returns**: `boolean` - True if vertical.
 
@@ -5459,12 +5776,13 @@ do
 end
 ```
 
-### `LScrollBar:setContentSize(v: number)`
+### `LScrollBar:setContentSize(self: LScrollBar, v: number)`
 
 Sets the total content size that this scroll bar represents.
 
 **Parameters**
 
+- `self` (`LScrollBar`, required) - The widget instance.
 - `v` (`number`, required) - The content size.
 
 #### Example
@@ -5479,12 +5797,13 @@ do
 end
 ```
 
-### `LScrollBar:setOnChange(f: function)`
+### `LScrollBar:setOnChange(self: LScrollBar, f: function)`
 
 Registers a callback invoked when this scroll bar's position changes.
 
 **Parameters**
 
+- `self` (`LScrollBar`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index.
 
 #### Example
@@ -5499,12 +5818,13 @@ do
 end
 ```
 
-### `LScrollBar:setScrollPosition(v: number)`
+### `LScrollBar:setScrollPosition(self: LScrollBar, v: number)`
 
 Sets the scroll position of this scroll bar, clamped to the valid range.
 
 **Parameters**
 
+- `self` (`LScrollBar`, required) - The widget instance.
 - `v` (`number`, required) - The scroll position.
 
 #### Example
@@ -5519,12 +5839,13 @@ do
 end
 ```
 
-### `LScrollBar:setViewSize(v: number)`
+### `LScrollBar:setViewSize(self: LScrollBar, v: number)`
 
 Sets the visible viewport size for this scroll bar.
 
 **Parameters**
 
+- `self` (`LScrollBar`, required) - The widget instance.
 - `v` (`number`, required) - The view size.
 
 #### Example
@@ -5554,9 +5875,13 @@ do
 end
 ```
 
-### `LScrollPanel:getContentSize() -> number, number`
+### `LScrollPanel:getContentSize(self: LScrollPanel) -> number, number`
 
 Returns the virtual content dimensions of this scroll panel.
+
+**Parameters**
+
+- `self` (`LScrollPanel`, required) - The widget instance.
 
 **Returns**: `number, number` - Content width and height in pixels.
 
@@ -5572,9 +5897,13 @@ do
 end
 ```
 
-### `LScrollPanel:getMaxScroll() -> number, number`
+### `LScrollPanel:getMaxScroll(self: LScrollPanel) -> number, number`
 
 Returns the maximum scroll offset allowed in each axis.
+
+**Parameters**
+
+- `self` (`LScrollPanel`, required) - The widget instance.
 
 **Returns**: `number, number` - Maximum horizontal and vertical scroll values.
 
@@ -5590,9 +5919,13 @@ do
 end
 ```
 
-### `LScrollPanel:getScrollPosition() -> number, number`
+### `LScrollPanel:getScrollPosition(self: LScrollPanel) -> number, number`
 
 Returns the current scroll offset of this scroll panel.
+
+**Parameters**
+
+- `self` (`LScrollPanel`, required) - The widget instance.
 
 **Returns**: `number, number` - Horizontal and vertical scroll offsets.
 
@@ -5608,9 +5941,13 @@ do
 end
 ```
 
-### `LScrollPanel:getScrollSpeed() -> number`
+### `LScrollPanel:getScrollSpeed(self: LScrollPanel) -> number`
 
 Returns the current scroll speed multiplier.
+
+**Parameters**
+
+- `self` (`LScrollPanel`, required) - The widget instance.
 
 **Returns**: `number` - The scroll speed.
 
@@ -5626,12 +5963,13 @@ do
 end
 ```
 
-### `LScrollPanel:setContentSize(w: number, h: number)`
+### `LScrollPanel:setContentSize(self: LScrollPanel, w: number, h: number)`
 
 Sets the virtual content dimensions of this scroll panel.
 
 **Parameters**
 
+- `self` (`LScrollPanel`, required) - The widget instance.
 - `w` (`number`, required) - Content width in pixels.
 - `h` (`number`, required) - Content height in pixels.
 
@@ -5647,12 +5985,13 @@ do
 end
 ```
 
-### `LScrollPanel:setScrollPosition(x: number, y: number)`
+### `LScrollPanel:setScrollPosition(self: LScrollPanel, x: number, y: number)`
 
 Sets the scroll offset position of this scroll panel.
 
 **Parameters**
 
+- `self` (`LScrollPanel`, required) - The widget instance.
 - `x` (`number`, required) - Horizontal scroll offset.
 - `y` (`number`, required) - Vertical scroll offset.
 
@@ -5668,12 +6007,13 @@ do
 end
 ```
 
-### `LScrollPanel:setScrollSpeed(speed: number)`
+### `LScrollPanel:setScrollSpeed(self: LScrollPanel, speed: number)`
 
 Sets the scroll speed multiplier for mouse wheel scrolling.
 
 **Parameters**
 
+- `self` (`LScrollPanel`, required) - The widget instance.
 - `speed` (`number`, required) - Scroll speed in pixels per scroll tick.
 
 #### Example
@@ -5703,9 +6043,13 @@ do
 end
 ```
 
-### `LSeparator:getThickness() -> number`
+### `LSeparator:getThickness(self: LSeparator) -> number`
 
 Returns the line thickness of this separator.
+
+**Parameters**
+
+- `self` (`LSeparator`, required) - The widget instance.
 
 **Returns**: `number` - The thickness in pixels.
 
@@ -5721,9 +6065,13 @@ do
 end
 ```
 
-### `LSeparator:isVertical() -> boolean`
+### `LSeparator:isVertical(self: LSeparator) -> boolean`
 
 Returns whether this separator is oriented vertically.
+
+**Parameters**
+
+- `self` (`LSeparator`, required) - The widget instance.
 
 **Returns**: `boolean` - True if vertical.
 
@@ -5739,12 +6087,13 @@ do
 end
 ```
 
-### `LSeparator:setThickness(thickness: number)`
+### `LSeparator:setThickness(self: LSeparator, thickness: number)`
 
 Sets the line thickness of this separator in pixels.
 
 **Parameters**
 
+- `self` (`LSeparator`, required) - The widget instance.
 - `thickness` (`number`, required) - Thickness in pixels.
 
 #### Example
@@ -5759,12 +6108,13 @@ do
 end
 ```
 
-### `LSeparator:setVertical(v: boolean)`
+### `LSeparator:setVertical(self: LSeparator, v: boolean)`
 
 Sets whether this separator draws vertically or horizontally.
 
 **Parameters**
 
+- `self` (`LSeparator`, required) - The widget instance.
 - `v` (`boolean`, required) - True for vertical, false for horizontal.
 
 #### Example
@@ -5774,7 +6124,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local sep = lurek.ui.newSeparator(false)
-  sep:setVertical(1.0)
+  sep:setVertical(true)
   lurek.log.info("LSeparator:setVertical applied", "ui")
 end
 ```
@@ -5794,9 +6144,13 @@ do
 end
 ```
 
-### `LSlider:getMax() -> number`
+### `LSlider:getMax(self: LSlider) -> number`
 
 Returns the maximum value of this slider's range.
+
+**Parameters**
+
+- `self` (`LSlider`, required) - The widget instance.
 
 **Returns**: `number` - The maximum value.
 
@@ -5812,9 +6166,13 @@ do
 end
 ```
 
-### `LSlider:getMin() -> number`
+### `LSlider:getMin(self: LSlider) -> number`
 
 Returns the minimum value of this slider's range.
+
+**Parameters**
+
+- `self` (`LSlider`, required) - The widget instance.
 
 **Returns**: `number` - The minimum value.
 
@@ -5830,9 +6188,13 @@ do
 end
 ```
 
-### `LSlider:getValue() -> number`
+### `LSlider:getValue(self: LSlider) -> number`
 
 Returns the current value of this slider.
+
+**Parameters**
+
+- `self` (`LSlider`, required) - The widget instance.
 
 **Returns**: `number` - The slider value.
 
@@ -5848,12 +6210,13 @@ do
 end
 ```
 
-### `LSlider:setRange(min: number, max: number)`
+### `LSlider:setRange(self: LSlider, min: number, max: number)`
 
 Sets the minimum and maximum bounds for this slider.
 
 **Parameters**
 
+- `self` (`LSlider`, required) - The widget instance.
 - `min` (`number`, required) - Minimum value.
 - `max` (`number`, required) - Maximum value.
 
@@ -5869,12 +6232,13 @@ do
 end
 ```
 
-### `LSlider:setStep(step: number)`
+### `LSlider:setStep(self: LSlider, step: number)`
 
 Sets the step increment for this slider's value snapping.
 
 **Parameters**
 
+- `self` (`LSlider`, required) - The widget instance.
 - `step` (`number`, required) - The step size.
 
 #### Example
@@ -5889,12 +6253,13 @@ do
 end
 ```
 
-### `LSlider:setValue(v: number)`
+### `LSlider:setValue(self: LSlider, v: number)`
 
 Sets the current value of this slider, clamped to its range.
 
 **Parameters**
 
+- `self` (`LSlider`, required) - The widget instance.
 - `v` (`number`, required) - The value to set.
 
 #### Example
@@ -5924,9 +6289,13 @@ do
 end
 ```
 
-### `LSpinBox:decrement()`
+### `LSpinBox:decrement(self: LSpinBox)`
 
 Decreases this spin box's value by one step.
+
+**Parameters**
+
+- `self` (`LSpinBox`, required) - The widget instance.
 
 #### Example
 
@@ -5940,9 +6309,13 @@ do
 end
 ```
 
-### `LSpinBox:getValue() -> number`
+### `LSpinBox:getValue(self: LSpinBox) -> number`
 
 Returns the current numeric value of this spin box.
+
+**Parameters**
+
+- `self` (`LSpinBox`, required) - The widget instance.
 
 **Returns**: `number` - The spin box value.
 
@@ -5958,9 +6331,13 @@ do
 end
 ```
 
-### `LSpinBox:increment()`
+### `LSpinBox:increment(self: LSpinBox)`
 
 Increases this spin box's value by one step.
+
+**Parameters**
+
+- `self` (`LSpinBox`, required) - The widget instance.
 
 #### Example
 
@@ -5974,12 +6351,13 @@ do
 end
 ```
 
-### `LSpinBox:setRange(min: number, max: number)`
+### `LSpinBox:setRange(self: LSpinBox, min: number, max: number)`
 
 Sets the minimum and maximum bounds for this spin box.
 
 **Parameters**
 
+- `self` (`LSpinBox`, required) - The widget instance.
 - `min` (`number`, required) - Minimum value.
 - `max` (`number`, required) - Maximum value.
 
@@ -5995,12 +6373,13 @@ do
 end
 ```
 
-### `LSpinBox:setStep(step: number)`
+### `LSpinBox:setStep(self: LSpinBox, step: number)`
 
 Sets the step increment for this spin box.
 
 **Parameters**
 
+- `self` (`LSpinBox`, required) - The widget instance.
 - `step` (`number`, required) - The step size (minimum 1e-9).
 
 #### Example
@@ -6015,12 +6394,13 @@ do
 end
 ```
 
-### `LSpinBox:setValue(v: number)`
+### `LSpinBox:setValue(self: LSpinBox, v: number)`
 
 Sets the numeric value of this spin box, clamped to its range.
 
 **Parameters**
 
+- `self` (`LSpinBox`, required) - The widget instance.
 - `v` (`number`, required) - The value to set.
 
 #### Example
@@ -6050,9 +6430,13 @@ do
 end
 ```
 
-### `LSplitPanel:getFirstChild() -> number`
+### `LSplitPanel:getFirstChild(self: LSplitPanel) -> number`
 
 Returns the widget index of the first (left/top) child panel.
+
+**Parameters**
+
+- `self` (`LSplitPanel`, required) - The widget instance.
 
 **Returns**: `number` - The widget index, or nil if not set.
 
@@ -6068,9 +6452,13 @@ do
 end
 ```
 
-### `LSplitPanel:getMinPanelSize() -> number`
+### `LSplitPanel:getMinPanelSize(self: LSplitPanel) -> number`
 
 Returns the minimum pixel size of each split sub-panel.
+
+**Parameters**
+
+- `self` (`LSplitPanel`, required) - The widget instance.
 
 **Returns**: `number` - The minimum size in pixels.
 
@@ -6086,9 +6474,13 @@ do
 end
 ```
 
-### `LSplitPanel:getOrientation() -> string`
+### `LSplitPanel:getOrientation(self: LSplitPanel) -> string`
 
 Returns the orientation of this split panel ("horizontal" or "vertical").
+
+**Parameters**
+
+- `self` (`LSplitPanel`, required) - The widget instance.
 
 **Returns**: `string` - The orientation.
 
@@ -6104,9 +6496,13 @@ do
 end
 ```
 
-### `LSplitPanel:getSecondChild() -> number`
+### `LSplitPanel:getSecondChild(self: LSplitPanel) -> number`
 
 Returns the widget index of the second (right/bottom) child panel.
+
+**Parameters**
+
+- `self` (`LSplitPanel`, required) - The widget instance.
 
 **Returns**: `number` - The widget index, or nil if not set.
 
@@ -6122,9 +6518,13 @@ do
 end
 ```
 
-### `LSplitPanel:getSplitPosition() -> number`
+### `LSplitPanel:getSplitPosition(self: LSplitPanel) -> number`
 
 Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
+
+**Parameters**
+
+- `self` (`LSplitPanel`, required) - The widget instance.
 
 **Returns**: `number` - The split fraction.
 
@@ -6140,12 +6540,13 @@ do
 end
 ```
 
-### `LSplitPanel:setFirstChild(child_idx: integer)`
+### `LSplitPanel:setFirstChild(self: LSplitPanel, child_idx: integer)`
 
 Sets the widget index for the first (left/top) panel.
 
 **Parameters**
 
+- `self` (`LSplitPanel`, required) - The widget instance.
 - `child_idx` (`integer`, required) - The widget index.
 
 #### Example
@@ -6160,12 +6561,13 @@ do
 end
 ```
 
-### `LSplitPanel:setMinPanelSize(v: number)`
+### `LSplitPanel:setMinPanelSize(self: LSplitPanel, v: number)`
 
 Sets the minimum pixel size of each split sub-panel.
 
 **Parameters**
 
+- `self` (`LSplitPanel`, required) - The widget instance.
 - `v` (`number`, required) - The minimum size in pixels.
 
 #### Example
@@ -6180,12 +6582,13 @@ do
 end
 ```
 
-### `LSplitPanel:setOrientation(v: string)`
+### `LSplitPanel:setOrientation(self: LSplitPanel, v: string)`
 
 Sets the orientation of this split panel ("horizontal" or "vertical").
 
 **Parameters**
 
+- `self` (`LSplitPanel`, required) - The widget instance.
 - `v` (`string`, required) - The orientation.
 
 #### Example
@@ -6195,17 +6598,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local split = lurek.ui.newSplitPanel("vertical")
-  split:setOrientation(1.0)
+  split:setOrientation("horizontal")
   lurek.log.info("LSplitPanel:setOrientation applied", "ui")
 end
 ```
 
-### `LSplitPanel:setSecondChild(child_idx: integer)`
+### `LSplitPanel:setSecondChild(self: LSplitPanel, child_idx: integer)`
 
 Sets the widget index for the second (right/bottom) panel.
 
 **Parameters**
 
+- `self` (`LSplitPanel`, required) - The widget instance.
 - `child_idx` (`integer`, required) - The widget index.
 
 #### Example
@@ -6220,12 +6624,13 @@ do
 end
 ```
 
-### `LSplitPanel:setSplitPosition(v: number)`
+### `LSplitPanel:setSplitPosition(self: LSplitPanel, v: number)`
 
 Sets the split position as a fraction (0.0 to 1.0).
 
 **Parameters**
 
+- `self` (`LSplitPanel`, required) - The widget instance.
 - `v` (`number`, required) - The split fraction.
 
 #### Example
@@ -6255,12 +6660,13 @@ do
 end
 ```
 
-### `LStatusBar:addSection(text: string, [width]: number)`
+### `LStatusBar:addSection(self: LStatusBar, text: string, [width]: number)`
 
 Adds a section to this status bar. This method is available to Lua scripts.
 
 **Parameters**
 
+- `self` (`LStatusBar`, required) - The widget instance.
 - `text` (`string`, required) - The section display text.
 - `width` (`number`, optional) - The section width in pixels (default 100).
 
@@ -6276,9 +6682,13 @@ do
 end
 ```
 
-### `LStatusBar:getSectionCount() -> number`
+### `LStatusBar:getSectionCount(self: LStatusBar) -> number`
 
 Returns the number of sections in this status bar.
+
+**Parameters**
+
+- `self` (`LStatusBar`, required) - The widget instance.
 
 **Returns**: `number` - The section count.
 
@@ -6294,12 +6704,13 @@ do
 end
 ```
 
-### `LStatusBar:getSectionText(section_idx: integer) -> string`
+### `LStatusBar:getSectionText(self: LStatusBar, section_idx: integer) -> string`
 
 Returns the text of a status bar section by its 1-based index.
 
 **Parameters**
 
+- `self` (`LStatusBar`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 
 **Returns**: `string` - The section text, or nil if out of range.
@@ -6316,12 +6727,13 @@ do
 end
 ```
 
-### `LStatusBar:setSectionCount(count: integer)`
+### `LStatusBar:setSectionCount(self: LStatusBar, count: integer)`
 
 Sets the number of sections, truncating or adding empty sections as needed.
 
 **Parameters**
 
+- `self` (`LStatusBar`, required) - The widget instance.
 - `count` (`integer`, required) - The desired section count.
 
 #### Example
@@ -6336,12 +6748,13 @@ do
 end
 ```
 
-### `LStatusBar:setSectionText(section_idx: integer, text: string)`
+### `LStatusBar:setSectionText(self: LStatusBar, section_idx: integer, text: string)`
 
 Sets the text of a status bar section by its 1-based index.
 
 **Parameters**
 
+- `self` (`LStatusBar`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 - `text` (`string`, required) - The new section text.
 
@@ -6357,12 +6770,13 @@ do
 end
 ```
 
-### `LStatusBar:setSectionWidget(section_idx: integer, widget: any)`
+### `LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any)`
 
 Associates a widget with a status bar section (reserved for future use).
 
 **Parameters**
 
+- `self` (`LStatusBar`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
 - `widget` (`any`, required) - The widget value to associate.
 
@@ -6393,9 +6807,13 @@ do
 end
 ```
 
-### `LSwitch:isOn() -> boolean`
+### `LSwitch:isOn(self: LSwitch) -> boolean`
 
 Returns whether this switch is currently in the on state.
+
+**Parameters**
+
+- `self` (`LSwitch`, required) - The widget instance.
 
 **Returns**: `boolean` - True if the switch is on.
 
@@ -6411,12 +6829,13 @@ do
 end
 ```
 
-### `LSwitch:setOn(on: boolean)`
+### `LSwitch:setOn(self: LSwitch, on: boolean)`
 
 Sets the on/off state of this toggle switch.
 
 **Parameters**
 
+- `self` (`LSwitch`, required) - The widget instance.
 - `on` (`boolean`, required) - True to turn on, false to turn off.
 
 #### Example
@@ -6426,14 +6845,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local sw = lurek.ui.newSwitch(false)
-  sw:setOn(function() end)
+  sw:setOn(true)
   lurek.log.info("LSwitch:setOn callback set", "ui")
 end
 ```
 
-### `LSwitch:toggle()`
+### `LSwitch:toggle(self: LSwitch)`
 
 Toggles this switch between on and off states.
+
+**Parameters**
+
+- `self` (`LSwitch`, required) - The widget instance.
 
 #### Example
 
@@ -6462,12 +6885,13 @@ do
 end
 ```
 
-### `LTabBar:addTab(label: string)`
+### `LTabBar:addTab(self: LTabBar, label: string)`
 
 Adds a new tab with the given label to this tab bar.
 
 **Parameters**
 
+- `self` (`LTabBar`, required) - The widget instance.
 - `label` (`string`, required) - The tab label text.
 
 #### Example
@@ -6482,9 +6906,13 @@ do
 end
 ```
 
-### `LTabBar:getActiveTab() -> number`
+### `LTabBar:getActiveTab(self: LTabBar) -> number`
 
 Returns the 1-based index of the currently active tab.
+
+**Parameters**
+
+- `self` (`LTabBar`, required) - The widget instance.
 
 **Returns**: `number` - The active tab index.
 
@@ -6500,12 +6928,13 @@ do
 end
 ```
 
-### `LTabBar:getTab(index: integer) -> string`
+### `LTabBar:getTab(self: LTabBar, index: integer) -> string`
 
 Returns the label of the tab at the given 1-based index.
 
 **Parameters**
 
+- `self` (`LTabBar`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based tab index.
 
 **Returns**: `string` - The tab label, or nil if out of range.
@@ -6522,9 +6951,13 @@ do
 end
 ```
 
-### `LTabBar:getTabCount() -> number`
+### `LTabBar:getTabCount(self: LTabBar) -> number`
 
 Returns the total number of tabs. This method is available to Lua scripts.
+
+**Parameters**
+
+- `self` (`LTabBar`, required) - The widget instance.
 
 **Returns**: `number` - The tab count.
 
@@ -6540,12 +6973,13 @@ do
 end
 ```
 
-### `LTabBar:removeTab(index: integer) -> boolean`
+### `LTabBar:removeTab(self: LTabBar, index: integer) -> boolean`
 
 Removes the tab at the given 1-based index.
 
 **Parameters**
 
+- `self` (`LTabBar`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based tab index.
 
 **Returns**: `boolean` - True if the tab was removed.
@@ -6562,12 +6996,13 @@ do
 end
 ```
 
-### `LTabBar:setActiveTab(index: integer)`
+### `LTabBar:setActiveTab(self: LTabBar, index: integer)`
 
 Sets the active (selected) tab by 1-based index.
 
 **Parameters**
 
+- `self` (`LTabBar`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based tab index to activate.
 
 #### Example
@@ -6597,9 +7032,13 @@ do
 end
 ```
 
-### `LTextInput:getCursorPosition() -> number`
+### `LTextInput:getCursorPosition(self: LTextInput) -> number`
 
 Returns the current cursor position (character index) within the text input.
+
+**Parameters**
+
+- `self` (`LTextInput`, required) - The widget instance.
 
 **Returns**: `number` - The zero-based cursor position.
 
@@ -6615,9 +7054,13 @@ do
 end
 ```
 
-### `LTextInput:getPlaceholder() -> string`
+### `LTextInput:getPlaceholder(self: LTextInput) -> string`
 
 Returns the placeholder text of this text input.
+
+**Parameters**
+
+- `self` (`LTextInput`, required) - The widget instance.
 
 **Returns**: `string` - The placeholder text.
 
@@ -6633,9 +7076,13 @@ do
 end
 ```
 
-### `LTextInput:getText() -> string`
+### `LTextInput:getText(self: LTextInput) -> string`
 
 Returns the current text content of this text input field.
+
+**Parameters**
+
+- `self` (`LTextInput`, required) - The widget instance.
 
 **Returns**: `string` - The input text.
 
@@ -6651,9 +7098,13 @@ do
 end
 ```
 
-### `LTextInput:isFocused() -> boolean`
+### `LTextInput:isFocused(self: LTextInput) -> boolean`
 
 Returns whether this text input currently has keyboard focus.
+
+**Parameters**
+
+- `self` (`LTextInput`, required) - The widget instance.
 
 **Returns**: `boolean` - True if focused.
 
@@ -6669,12 +7120,13 @@ do
 end
 ```
 
-### `LTextInput:setMaxLength(n: integer)`
+### `LTextInput:setMaxLength(self: LTextInput, n: integer)`
 
 Sets the maximum number of characters allowed in this text input.
 
 **Parameters**
 
+- `self` (`LTextInput`, required) - The widget instance.
 - `n` (`integer`, required) - Maximum character count.
 
 #### Example
@@ -6689,12 +7141,13 @@ do
 end
 ```
 
-### `LTextInput:setPlaceholder(text: string)`
+### `LTextInput:setPlaceholder(self: LTextInput, text: string)`
 
 Sets the placeholder text shown when the input is empty.
 
 **Parameters**
 
+- `self` (`LTextInput`, required) - The widget instance.
 - `text` (`string`, required) - The placeholder text.
 
 #### Example
@@ -6709,12 +7162,13 @@ do
 end
 ```
 
-### `LTextInput:setText(text: string)`
+### `LTextInput:setText(self: LTextInput, text: string)`
 
 Sets the text content of this text input field and moves the cursor to the end.
 
 **Parameters**
 
+- `self` (`LTextInput`, required) - The widget instance.
 - `text` (`string`, required) - The text to set.
 
 #### Example
@@ -6760,9 +7214,9 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local theme = new_example_image_widget():newTheme()
-  theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
-  theme:setStyle("button.text_color",  {1, 1, 1, 1})
+  local theme = lurek.ui.newTheme()
+  theme:setStyle("button", "normal", {bg = {0.2, 0.4, 0.8, 1}})
+  theme:setStyle("button", "hovered", {bg = {0.3, 0.5, 0.9, 1}})
   lurek.log.info("theme styles set", "ui")
 end
 ```
@@ -6779,9 +7233,9 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local theme = new_example_image_widget():newTheme()
-    theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
-    theme:setStyle("button.text_color",  {1, 1, 1, 1})
+  local theme = lurek.ui.newTheme()
+  theme:setStyle("button", "normal", {bg = {0.2, 0.4, 0.8, 1}})
+  theme:setStyle("button", "hovered", {bg = {0.3, 0.5, 0.9, 1}})
   local t = theme:type()
   lurek.log.info("LTheme:type = " .. t, "ui")
 end
@@ -6803,9 +7257,9 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local theme = new_example_image_widget():newTheme()
-    theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
-    theme:setStyle("button.text_color",  {1, 1, 1, 1})
+  local theme = lurek.ui.newTheme()
+  theme:setStyle("button", "normal", {bg = {0.2, 0.4, 0.8, 1}})
+  theme:setStyle("label", "normal", {fg = {1, 1, 1, 1}})
   lurek.log.info("is LTheme: " .. tostring(theme:typeOf("LTheme")), "ui")
   lurek.log.info("is wrong: " .. tostring(theme:typeOf("Unknown")), "ui")
 end
@@ -6826,9 +7280,13 @@ do
 end
 ```
 
-### `LToast:getDuration() -> number`
+### `LToast:getDuration(self: LToast) -> number`
 
 Returns the display duration of this toast in seconds.
+
+**Parameters**
+
+- `self` (`LToast`, required) - The widget instance.
 
 **Returns**: `number` - The duration.
 
@@ -6844,9 +7302,13 @@ do
 end
 ```
 
-### `LToast:getMessage() -> string`
+### `LToast:getMessage(self: LToast) -> string`
 
 Returns the message text of this toast.
+
+**Parameters**
+
+- `self` (`LToast`, required) - The widget instance.
 
 **Returns**: `string` - The toast message.
 
@@ -6862,9 +7324,13 @@ do
 end
 ```
 
-### `LToast:getProgress() -> number`
+### `LToast:getProgress(self: LToast) -> number`
 
 Returns the elapsed fraction (0.0 to 1.0) of this toast's lifetime.
+
+**Parameters**
+
+- `self` (`LToast`, required) - The widget instance.
 
 **Returns**: `number` - The progress fraction.
 
@@ -6880,9 +7346,13 @@ do
 end
 ```
 
-### `LToast:isExpired() -> boolean`
+### `LToast:isExpired(self: LToast) -> boolean`
 
 Returns whether this toast has exceeded its display duration.
+
+**Parameters**
+
+- `self` (`LToast`, required) - The widget instance.
 
 **Returns**: `boolean` - True if expired.
 
@@ -6898,12 +7368,13 @@ do
 end
 ```
 
-### `LToast:setDuration(d: number)`
+### `LToast:setDuration(self: LToast, d: number)`
 
 Sets how long this toast is displayed in seconds.
 
 **Parameters**
 
+- `self` (`LToast`, required) - The widget instance.
 - `d` (`number`, required) - Duration in seconds.
 
 #### Example
@@ -6918,12 +7389,13 @@ do
 end
 ```
 
-### `LToast:setMessage(msg: string)`
+### `LToast:setMessage(self: LToast, msg: string)`
 
 Sets the message text displayed by this toast notification.
 
 **Parameters**
 
+- `self` (`LToast`, required) - The widget instance.
 - `msg` (`string`, required) - The toast message.
 
 #### Example
@@ -6953,12 +7425,13 @@ do
 end
 ```
 
-### `LToolbar:addButton(id: string, [tooltip]: string) -> number`
+### `LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number`
 
 Adds a new button to this toolbar and returns its 1-based index.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `id` (`string`, required) - The button identifier.
 - `tooltip` (`string`, optional) - Optional tooltip text for the button.
 
@@ -6971,14 +7444,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  tb:addButton(1, 1.0)
+  tb:addButton("save", "Save")
   lurek.log.info("LToolbar:addButton done", "ui")
 end
 ```
 
-### `LToolbar:addSeparator()`
+### `LToolbar:addSeparator(self: LToolbar)`
 
 Adds a visual separator to this toolbar.
+
+**Parameters**
+
+- `self` (`LToolbar`, required) - The widget instance.
 
 #### Example
 
@@ -6992,12 +7469,13 @@ do
 end
 ```
 
-### `LToolbar:addSpacer([_size]: number)`
+### `LToolbar:addSpacer(self: LToolbar, [_size]: number)`
 
 Adds a flexible spacer to this toolbar.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `_size` (`number`, optional) - Optional size hint (reserved for future use).
 
 #### Example
@@ -7012,12 +7490,13 @@ do
 end
 ```
 
-### `LToolbar:getButton(id: string) -> table`
+### `LToolbar:getButton(self: LToolbar, id: string) -> table`
 
 Returns a table describing the toolbar button with the given ID.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `id` (`string`, required) - The button identifier.
 
 **Returns**: `table` - Table with id, tooltip, enabled, toggled fields, or nil if not found.
@@ -7029,14 +7508,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  local val = tb:getButton(1)
+  local val = tb:getButton("save")
   lurek.log.info("LToolbar:getButton=" .. tostring(val), "ui")
 end
 ```
 
-### `LToolbar:getOrientation() -> string`
+### `LToolbar:getOrientation(self: LToolbar) -> string`
 
 Returns the toolbar orientation ("horizontal" or "vertical").
+
+**Parameters**
+
+- `self` (`LToolbar`, required) - The widget instance.
 
 **Returns**: `string` - The orientation.
 
@@ -7052,12 +7535,13 @@ do
 end
 ```
 
-### `LToolbar:isButtonToggled(id: string) -> boolean`
+### `LToolbar:isButtonToggled(self: LToolbar, id: string) -> boolean`
 
 Returns whether a toolbar button is toggled on.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `id` (`string`, required) - The button identifier.
 
 **Returns**: `boolean` - True if toggled, nil if not found.
@@ -7069,17 +7553,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  local val = tb:isButtonToggled(1)
+  local val = tb:isButtonToggled("save")
   lurek.log.info("LToolbar:isButtonToggled=" .. tostring(val), "ui")
 end
 ```
 
-### `LToolbar:setButtonEnabled(id: string, enabled: boolean) -> boolean`
+### `LToolbar:setButtonEnabled(self: LToolbar, id: string, enabled: boolean) -> boolean`
 
 Enables or disables a toolbar button by its ID.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `id` (`string`, required) - The button identifier.
 - `enabled` (`boolean`, required) - True to enable.
 
@@ -7092,17 +7577,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  tb:setButtonEnabled(1, true)
+  tb:setButtonEnabled("save", true)
   lurek.log.info("LToolbar:setButtonEnabled applied", "ui")
 end
 ```
 
-### `LToolbar:setButtonToggled(id: string, toggled: boolean) -> boolean`
+### `LToolbar:setButtonToggled(self: LToolbar, id: string, toggled: boolean) -> boolean`
 
 Sets the toggle state of a toolbar button by its ID.
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `id` (`string`, required) - The button identifier.
 - `toggled` (`boolean`, required) - True to toggle on.
 
@@ -7115,17 +7601,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  tb:setButtonToggled(1, 1.0)
+  tb:setButtonToggled("save", true)
   lurek.log.info("LToolbar:setButtonToggled applied", "ui")
 end
 ```
 
-### `LToolbar:setOrientation(v: string)`
+### `LToolbar:setOrientation(self: LToolbar, v: string)`
 
 Sets the toolbar orientation ("horizontal" or "vertical").
 
 **Parameters**
 
+- `self` (`LToolbar`, required) - The widget instance.
 - `v` (`string`, required) - The orientation.
 
 #### Example
@@ -7135,7 +7622,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tb = lurek.ui.newToolbar("horizontal")
-  tb:setOrientation(1.0)
+  tb:setOrientation("horizontal")
   lurek.log.info("LToolbar:setOrientation applied", "ui")
 end
 ```
@@ -7155,9 +7642,13 @@ do
 end
 ```
 
-### `LTooltipPanel:getDelay() -> number`
+### `LTooltipPanel:getDelay(self: LTooltipPanel) -> number`
 
 Returns the delay in seconds before this tooltip appears.
+
+**Parameters**
+
+- `self` (`LTooltipPanel`, required) - The widget instance.
 
 **Returns**: `number` - The delay in seconds.
 
@@ -7173,9 +7664,13 @@ do
 end
 ```
 
-### `LTooltipPanel:getTarget() -> number`
+### `LTooltipPanel:getTarget(self: LTooltipPanel) -> number`
 
 Returns the widget index that this tooltip is attached to.
+
+**Parameters**
+
+- `self` (`LTooltipPanel`, required) - The widget instance.
 
 **Returns**: `number` - The target widget index, or nil if unset.
 
@@ -7191,9 +7686,13 @@ do
 end
 ```
 
-### `LTooltipPanel:getText() -> string`
+### `LTooltipPanel:getText(self: LTooltipPanel) -> string`
 
 Returns the tooltip display text. This method is available to Lua scripts.
+
+**Parameters**
+
+- `self` (`LTooltipPanel`, required) - The widget instance.
 
 **Returns**: `string` - The tooltip text.
 
@@ -7209,12 +7708,13 @@ do
 end
 ```
 
-### `LTooltipPanel:setDelay(v: number)`
+### `LTooltipPanel:setDelay(self: LTooltipPanel, v: number)`
 
 Sets the delay in seconds before this tooltip appears.
 
 **Parameters**
 
+- `self` (`LTooltipPanel`, required) - The widget instance.
 - `v` (`number`, required) - The delay in seconds.
 
 #### Example
@@ -7229,12 +7729,13 @@ do
 end
 ```
 
-### `LTooltipPanel:setTarget([target]: integer)`
+### `LTooltipPanel:setTarget(self: LTooltipPanel, [target]: integer)`
 
 Sets the widget index that this tooltip is attached to.
 
 **Parameters**
 
+- `self` (`LTooltipPanel`, required) - The widget instance.
 - `target` (`integer`, optional) - The target widget index, or nil to detach.
 
 #### Example
@@ -7249,12 +7750,13 @@ do
 end
 ```
 
-### `LTooltipPanel:setText(text: string)`
+### `LTooltipPanel:setText(self: LTooltipPanel, text: string)`
 
 Sets the tooltip display text. This method is available to Lua scripts.
 
 **Parameters**
 
+- `self` (`LTooltipPanel`, required) - The widget instance.
 - `text` (`string`, required) - The tooltip text.
 
 #### Example
@@ -7284,16 +7786,17 @@ do
 end
 ```
 
-### `LTreeView:addNode(text: string, [parent_index]: integer) -> table`
+### `LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer`
 
 Adds node on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `text` (`string`, required) - String value for `text`.
 - `parent_index` (`integer`, optional) - Lua argument for `parent_index`.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `integer` - The 1-based index of the newly added node.
 
 #### Example
 
@@ -7307,9 +7810,13 @@ do
 end
 ```
 
-### `LTreeView:clearNodes()`
+### `LTreeView:clearNodes(self: LTreeView)`
 
 Clears nodes on this LTreeView object.
+
+**Parameters**
+
+- `self` (`LTreeView`, required) - The widget instance.
 
 #### Example
 
@@ -7323,9 +7830,13 @@ do
 end
 ```
 
-### `LTreeView:collapseAll()`
+### `LTreeView:collapseAll(self: LTreeView)`
 
 Collapses all nodes in this tree view.
+
+**Parameters**
+
+- `self` (`LTreeView`, required) - The widget instance.
 
 #### Example
 
@@ -7339,12 +7850,13 @@ do
 end
 ```
 
-### `LTreeView:collapseNode(index: integer) -> boolean`
+### `LTreeView:collapseNode(self: LTreeView, index: integer) -> boolean`
 
 Collapses the node at the given 1-based index to hide its children.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
 **Returns**: `boolean` - True if the node was collapsed.
@@ -7361,9 +7873,13 @@ do
 end
 ```
 
-### `LTreeView:expandAll()`
+### `LTreeView:expandAll(self: LTreeView)`
 
 Expands all nodes in this tree view.
+
+**Parameters**
+
+- `self` (`LTreeView`, required) - The widget instance.
 
 #### Example
 
@@ -7377,12 +7893,13 @@ do
 end
 ```
 
-### `LTreeView:expandNode(index: integer) -> boolean`
+### `LTreeView:expandNode(self: LTreeView, index: integer) -> boolean`
 
 Expand node on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 
 **Returns**: `boolean` - Boolean result returned by this call.
@@ -7399,12 +7916,13 @@ do
 end
 ```
 
-### `LTreeView:getChildNodes(index: integer) -> table`
+### `LTreeView:getChildNodes(self: LTreeView, index: integer) -> table`
 
 Returns a table of 1-based child node indices for the node at the given index.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based parent node index.
 
 **Returns**: `table` - Array of 1-based child indices.
@@ -7421,9 +7939,13 @@ do
 end
 ```
 
-### `LTreeView:getNodeCount() -> table`
+### `LTreeView:getNodeCount(self: LTreeView) -> table`
 
 Returns the node count on this LTreeView object.
+
+**Parameters**
+
+- `self` (`LTreeView`, required) - The widget instance.
 
 **Returns**: `table` - Table result returned by this call.
 
@@ -7439,12 +7961,13 @@ do
 end
 ```
 
-### `LTreeView:getNodeDepth(index: integer) -> number`
+### `LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number`
 
 Returns the nesting depth of the node at the given index (0 for root nodes).
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
 **Returns**: `number` - The depth, or nil if index is invalid.
@@ -7461,12 +7984,13 @@ do
 end
 ```
 
-### `LTreeView:getNodeText(index: integer) -> table`
+### `LTreeView:getNodeText(self: LTreeView, index: integer) -> table`
 
 Returns the node text on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 
 **Returns**: `table` - Table result returned by this call.
@@ -7483,12 +8007,13 @@ do
 end
 ```
 
-### `LTreeView:getParentNode(index: integer) -> number`
+### `LTreeView:getParentNode(self: LTreeView, index: integer) -> number`
 
 Returns the 1-based index of the parent of the node at the given index.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
 **Returns**: `number` - The parent node index, or nil for root nodes.
@@ -7505,9 +8030,13 @@ do
 end
 ```
 
-### `LTreeView:getSelectedNode() -> number`
+### `LTreeView:getSelectedNode(self: LTreeView) -> number`
 
 Returns the 1-based index of the currently selected node.
+
+**Parameters**
+
+- `self` (`LTreeView`, required) - The widget instance.
 
 **Returns**: `number` - The selected node index, or nil if none.
 
@@ -7523,12 +8052,13 @@ do
 end
 ```
 
-### `LTreeView:isExpanded(index: integer) -> table`
+### `LTreeView:isExpanded(self: LTreeView, index: integer) -> table`
 
 Returns true if expanded on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 
 **Returns**: `table` - Table result returned by this call.
@@ -7545,12 +8075,13 @@ do
 end
 ```
 
-### `LTreeView:isNodeExpanded(index: integer) -> boolean`
+### `LTreeView:isNodeExpanded(self: LTreeView, index: integer) -> boolean`
 
 Returns whether the node at the given 1-based index is expanded. Returns nil if the index is invalid.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
 **Returns**: `boolean` - True if expanded, false if collapsed, nil if invalid.
@@ -7567,12 +8098,13 @@ do
 end
 ```
 
-### `LTreeView:removeNode(index: integer) -> boolean`
+### `LTreeView:removeNode(self: LTreeView, index: integer) -> boolean`
 
 Removes node on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 
 **Returns**: `boolean` - Boolean result returned by this call.
@@ -7589,12 +8121,13 @@ do
 end
 ```
 
-### `LTreeView:setNodeIcon(index: integer, icon: string) -> boolean`
+### `LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean`
 
 Sets the node icon on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 - `icon` (`string`, required) - Lua argument for `icon`.
 
@@ -7607,17 +8140,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local tree = lurek.ui.newTreeView()
-  tree:setNodeIcon(1, 1.0)
+  tree:setNodeIcon(1, "folder")
   lurek.log.info("LTreeView:setNodeIcon applied", "ui")
 end
 ```
 
-### `LTreeView:setNodeText(index: integer, text: string) -> boolean`
+### `LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean`
 
 Sets the node text on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 - `text` (`string`, required) - String value for `text`.
 
@@ -7635,12 +8169,13 @@ do
 end
 ```
 
-### `LTreeView:setSelectedNode(index: integer) -> boolean`
+### `LTreeView:setSelectedNode(self: LTreeView, index: integer) -> boolean`
 
 Sets the selected node by 1-based index.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
 **Returns**: `boolean` - True if the node was selected.
@@ -7657,12 +8192,13 @@ do
 end
 ```
 
-### `LTreeView:toggleNode(index: integer) -> boolean`
+### `LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean`
 
 Toggle node on this LTreeView object.
 
 **Parameters**
 
+- `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - Identifier argument for `index`.
 
 **Returns**: `boolean` - Boolean result returned by this call.
@@ -7685,66 +8221,23 @@ Creates a Lua table representing a widget with all shared base methods common to
 
 #### Example
 
-Module-level example from [ui.lua](../blob/main/content/examples/ui.lua):
+Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
--- content/examples/ui.lua
--- lurek.ui API examples.
--- Run: cargo run -- content/examples/ui.lua
-
---@api-stub: lurek.ui.beginDrag
--- Begins a drag operation on a widget
 do
-  local w = lurek.ui.newButton("Drag")
-  pcall(function() lurek.ui.beginDrag(w) end)
+  local cw = lurek.ui.newCustomWidget({ width = 100, height = 50 })
+  lurek.log.info("newCustomWidget: " .. tostring(cw), "ui")
 end
-
---@api-stub: lurek.ui.getActiveDrag
--- Returns the widget index currently being dragged, or nil
-do
-  pcall(function()
-    local v = lurek.ui.getActiveDrag()
-    print("getActiveDrag:", v)
-  end)
-end
-
---@api-stub: lurek.ui.dropOn
--- Drops the currently dragged widget onto a target widget
-do
-  local container = lurek.ui.newPanel()
-  local w = lurek.ui.newLabel("drop")
-  pcall(function()
-    lurek.ui.beginDrag(w)
-    lurek.ui.dropOn(container)
-  end)
-end
-
---@api-stub: lurek.ui.endDrag
--- Ends the current drag operation without dropping
-do
-  pcall(function()
-    local prev = lurek.ui.endDrag()
-    print("endDrag:", prev)
-  end)
-end
-
---@api-stub: LUiWidget:animateAlpha
--- Performs the animate alpha operation on this ui widget.
-do
-  local w = lurek.ui.newLabel("alpha")
-  pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
-end
-
---@api-stub: LUiWidget:animatePosition
 ```
 
-### `LUiWidget:addChild(child: LWidget)`
+### `LUiWidget:addChild(self: LUiWidget, child: LUiWidget|integer)`
 
 Adds a child widget to this widget's hierarchy.
 
 **Parameters**
 
-- `child` (`LWidget`, required) - The child widget table or widget index to add.
+- `self` (`LUiWidget`, required) - The widget instance.
+- `child` (`LUiWidget|integer`, required) - The child widget table or widget index to add.
 
 #### Example
 
@@ -7753,17 +8246,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:addChild(1.0)
+  w:addChild(lurek.ui.newLabel("x"))
   lurek.log.info("LUiWidget:addChild done", "ui")
 end
 ```
 
-### `LUiWidget:animateAlpha(target: number, [duration]: number, [hide_on_complete]: boolean) -> table`
+### `LUiWidget:animateAlpha(self: LUiWidget, target: number, [duration]: number, [hide_on_complete]: boolean) -> table`
 
 Smoothly animates this widget's opacity toward a target value over the given duration.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `target` (`number`, required) - Target alpha value (0.0 to 1.0).
 - `duration` (`number`, optional) - Animation duration in seconds. Defaults to 0.2.
 - `hide_on_complete` (`boolean`, optional) - If true, hides the widget when alpha reaches 0.
@@ -7776,17 +8270,20 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = lurek.ui.newLabel("alpha")
-  pcall(function() w["animateAlpha"](0.5, 0.25, false) end)
+  -- Fade a damage indicator to transparent over 0.25 seconds.
+  -- Parameters: target alpha, duration, loop flag.
+  local damage_text = lurek.ui.newLabel("-42 HP")
+  damage_text:animateAlpha(0.0, 0.25, false)
 end
 ```
 
-### `LUiWidget:animatePosition(x: number, y: number, [duration]: number) -> table`
+### `LUiWidget:animatePosition(self: LUiWidget, x: number, y: number, [duration]: number) -> table`
 
 Smoothly animates this widget's position toward the target coordinates.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `x` (`number`, required) - Target x position.
 - `y` (`number`, required) - Target y position.
 - `duration` (`number`, optional) - Animation duration in seconds. Defaults to 0.2.
@@ -7799,17 +8296,20 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = lurek.ui.newLabel("move")
-  pcall(function() w["animatePosition"](120, 40, 0.25) end)
+  -- Slide a notification toast from off-screen to its final position.
+  -- Parameters: target x, target y, duration in seconds.
+  local toast = lurek.ui.newLabel("Quest Complete!")
+  toast:animatePosition(120, 40, 0.25)
 end
 ```
 
-### `LUiWidget:attachToEntity(entity_id: integer)`
+### `LUiWidget:attachToEntity(self: LUiWidget, entity_id: integer)`
 
 Attaches this widget to a game entity so it follows the entity's position on screen.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `entity_id` (`integer`, required) - The entity ID to attach to.
 
 #### Example
@@ -7824,12 +8324,13 @@ do
 end
 ```
 
-### `LUiWidget:bind(key: string)`
+### `LUiWidget:bind(self: LUiWidget, key: string)`
 
 Binds this widget to a data key for use with update_bindings.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `key` (`string`, required) - The binding key name.
 
 #### Example
@@ -7844,9 +8345,13 @@ do
 end
 ```
 
-### `LUiWidget:cancelAnimations()`
+### `LUiWidget:cancelAnimations(self: LUiWidget)`
 
 Cancels all active animations on this widget, leaving it at its current state.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 
@@ -7854,14 +8359,20 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = lurek.ui.newLabel("cancel")
-  pcall(function() w["cancelAnimations"]() end)
+  -- Immediately stop all running animations on a widget.
+  -- Use when the player opens a new screen and old transitions are irrelevant.
+  local dialog = lurek.ui.newLabel("Loading...")
+  dialog:cancelAnimations()
 end
 ```
 
-### `LUiWidget:clearAnchor()`
+### `LUiWidget:clearAnchor(self: LUiWidget)`
 
 Removes all anchor constraints from this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 
@@ -7875,12 +8386,13 @@ do
 end
 ```
 
-### `LUiWidget:containsPoint(x: number, y: number) -> boolean`
+### `LUiWidget:containsPoint(self: LUiWidget, x: number, y: number) -> boolean`
 
 Tests whether the given screen-space point is inside this widget's bounds.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `x` (`number`, required) - X coordinate in screen pixels.
 - `y` (`number`, required) - Y coordinate in screen pixels.
 
@@ -7898,9 +8410,13 @@ do
 end
 ```
 
-### `LUiWidget:detachFromEntity()`
+### `LUiWidget:detachFromEntity(self: LUiWidget)`
 
 Detaches this widget from any previously attached entity.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 
@@ -7914,9 +8430,13 @@ do
 end
 ```
 
-### `LUiWidget:fadeIn()`
+### `LUiWidget:fadeIn(self: LUiWidget)`
 
 Instantly makes this widget fully opaque and visible.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 
@@ -7930,9 +8450,13 @@ do
 end
 ```
 
-### `LUiWidget:fadeOut()`
+### `LUiWidget:fadeOut(self: LUiWidget)`
 
 Instantly makes this widget fully transparent and hidden.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 
@@ -7946,12 +8470,13 @@ do
 end
 ```
 
-### `LUiWidget:findById(id: string) -> LWidget`
+### `LUiWidget:findById(self: LUiWidget, id: string) -> LWidget`
 
 Searches this widget's subtree for a child with the given ID.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `id` (`string`, required) - The widget ID to search for.
 
 **Returns**: `LWidget` - The found widget table, or nil if not found.
@@ -7963,14 +8488,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:findById(1)
+  w:findById("widget1")
   lurek.log.info("LUiWidget:findById called", "ui")
 end
 ```
 
-### `LUiWidget:getAlpha() -> number`
+### `LUiWidget:getAlpha(self: LUiWidget) -> number`
 
 Returns the current opacity of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number` - The alpha value between 0.0 and 1.0.
 
@@ -7986,9 +8515,13 @@ do
 end
 ```
 
-### `LUiWidget:getChildCount() -> number`
+### `LUiWidget:getChildCount(self: LUiWidget) -> number`
 
 Returns the number of direct child widgets attached to this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number` - The child count.
 
@@ -8004,9 +8537,13 @@ do
 end
 ```
 
-### `LUiWidget:getChildren() -> table`
+### `LUiWidget:getChildren(self: LUiWidget) -> table`
 
 Returns a table of lightweight child widget references, each containing an _idx field.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `table` - Array of child widget tables.
 
@@ -8022,9 +8559,13 @@ do
 end
 ```
 
-### `LUiWidget:getFlexGrow() -> number`
+### `LUiWidget:getFlexGrow(self: LUiWidget) -> number`
 
 Returns the flex-grow factor of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number` - The grow factor.
 
@@ -8040,9 +8581,13 @@ do
 end
 ```
 
-### `LUiWidget:getFlexShrink() -> number`
+### `LUiWidget:getFlexShrink(self: LUiWidget) -> number`
 
 Returns the flex-shrink factor of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number` - The shrink factor.
 
@@ -8058,9 +8603,13 @@ do
 end
 ```
 
-### `LUiWidget:getId() -> string`
+### `LUiWidget:getId(self: LUiWidget) -> string`
 
 Returns the string identifier assigned to this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `string` - The widget ID, or an empty string if none was set.
 
@@ -8076,9 +8625,13 @@ do
 end
 ```
 
-### `LUiWidget:getMargin() -> number, number, number, number`
+### `LUiWidget:getMargin(self: LUiWidget) -> number, number, number, number`
 
 Returns the outer margin of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number, number, number` - Top, right, bottom, and left margin in pixels.
 
@@ -8094,9 +8647,13 @@ do
 end
 ```
 
-### `LUiWidget:getMaxSize() -> number, number`
+### `LUiWidget:getMaxSize(self: LUiWidget) -> number, number`
 
 Returns the maximum width and height of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number` - Maximum width and height in pixels.
 
@@ -8112,9 +8669,13 @@ do
 end
 ```
 
-### `LUiWidget:getMinSize() -> number, number`
+### `LUiWidget:getMinSize(self: LUiWidget) -> number, number`
 
 Returns the minimum width and height of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number` - Minimum width and height in pixels.
 
@@ -8130,9 +8691,13 @@ do
 end
 ```
 
-### `LUiWidget:getPadding() -> number, number, number, number`
+### `LUiWidget:getPadding(self: LUiWidget) -> number, number, number, number`
 
 Returns the inner padding of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number, number, number` - Top, right, bottom, and left padding in pixels.
 
@@ -8148,9 +8713,13 @@ do
 end
 ```
 
-### `LUiWidget:getPosition() -> number, number`
+### `LUiWidget:getPosition(self: LUiWidget) -> number, number`
 
 Returns the local position of this widget relative to its parent.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number` - The x and y coordinates in pixels.
 
@@ -8166,9 +8735,13 @@ do
 end
 ```
 
-### `LUiWidget:getRect() -> number, number, number, number`
+### `LUiWidget:getRect(self: LUiWidget) -> number, number, number, number`
 
 Returns the computed bounding rectangle of this widget in screen coordinates after layout.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number, number, number` - The x, y, width, and height of the computed rect.
 
@@ -8184,9 +8757,13 @@ do
 end
 ```
 
-### `LUiWidget:getSize() -> number, number`
+### `LUiWidget:getSize(self: LUiWidget) -> number, number`
 
 Returns the width and height of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number, number` - The width and height in pixels.
 
@@ -8202,9 +8779,13 @@ do
 end
 ```
 
-### `LUiWidget:getState() -> string`
+### `LUiWidget:getState(self: LUiWidget) -> string`
 
 Returns the current interaction state of this widget (e.g. "normal", "hovered", "pressed", "disabled").
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `string` - The widget state name.
 
@@ -8220,9 +8801,13 @@ do
 end
 ```
 
-### `LUiWidget:getTooltip() -> string`
+### `LUiWidget:getTooltip(self: LUiWidget) -> string`
 
 Returns the tooltip text of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `string` - The tooltip text, or an empty string if none is set.
 
@@ -8238,9 +8823,13 @@ do
 end
 ```
 
-### `LUiWidget:getZOrder() -> number`
+### `LUiWidget:getZOrder(self: LUiWidget) -> number`
 
 Returns the z-order (draw priority) of this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `number` - The z-order value.
 
@@ -8256,9 +8845,13 @@ do
 end
 ```
 
-### `LUiWidget:isAnimating() -> boolean`
+### `LUiWidget:isAnimating(self: LUiWidget) -> boolean`
 
 Returns whether this widget currently has an active animation.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `boolean` - True if an animation is in progress.
 
@@ -8268,17 +8861,21 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 
 ```lua
 do
-  local w = lurek.ui.newLabel("state")
-  pcall(function()
-    local v = w["isAnimating"]()
-    print("isAnimating:", v)
-  end)
+  -- Poll animation state to prevent input during transitions.
+  -- Useful to block button clicks while a menu is still sliding in.
+  local menu = lurek.ui.newLabel("Main Menu")
+  local busy = menu:isAnimating()
+  print("Menu animating:", busy)
 end
 ```
 
-### `LUiWidget:isEnabled() -> boolean`
+### `LUiWidget:isEnabled(self: LUiWidget) -> boolean`
 
 Returns whether this widget is currently enabled and can receive input.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `boolean` - True if the widget is enabled.
 
@@ -8294,9 +8891,13 @@ do
 end
 ```
 
-### `LUiWidget:isVisible() -> boolean`
+### `LUiWidget:isVisible(self: LUiWidget) -> boolean`
 
 Returns whether this widget is currently visible.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `boolean` - True if the widget is visible.
 
@@ -8312,13 +8913,14 @@ do
 end
 ```
 
-### `LUiWidget:removeChild(child: LWidget)`
+### `LUiWidget:removeChild(self: LUiWidget, child: LUiWidget|integer)`
 
 Removes a child widget from this widget's hierarchy.
 
 **Parameters**
 
-- `child` (`LWidget`, required) - The child widget table or widget index to remove.
+- `self` (`LUiWidget`, required) - The widget instance.
+- `child` (`LUiWidget|integer`, required) - The child widget table or widget index to remove.
 
 #### Example
 
@@ -8327,17 +8929,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:removeChild(1.0)
+  w:removeChild(lurek.ui.newLabel("x"))
   lurek.log.info("LUiWidget:removeChild done", "ui")
 end
 ```
 
-### `LUiWidget:setAlpha(alpha: number)`
+### `LUiWidget:setAlpha(self: LUiWidget, alpha: number)`
 
 Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `alpha` (`number`, required) - The opacity value.
 
 #### Example
@@ -8375,12 +8978,13 @@ do
 end
 ```
 
-### `LUiWidget:setAnchorCenter([cx]: number, [cy]: number)`
+### `LUiWidget:setAnchorCenter(self: LUiWidget, [cx]: number, [cy]: number)`
 
 Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `cx` (`number`, optional) - Horizontal center fraction (0.5 = centered).
 - `cy` (`number`, optional) - Vertical center fraction (0.5 = centered).
 
@@ -8396,12 +9000,13 @@ do
 end
 ```
 
-### `LUiWidget:setEnabled(v: boolean)`
+### `LUiWidget:setEnabled(self: LUiWidget, v: boolean)`
 
 Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `v` (`boolean`, required) - True to enable, false to disable.
 
 #### Example
@@ -8411,17 +9016,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:setEnabled(1.0)
+  w:setEnabled(true)
   lurek.log.info("LUiWidget:setEnabled applied", "ui")
 end
 ```
 
-### `LUiWidget:setFlexGrow(grow: number)`
+### `LUiWidget:setFlexGrow(self: LUiWidget, grow: number)`
 
 Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `grow` (`number`, required) - The grow factor (0 = no growth).
 
 #### Example
@@ -8436,12 +9042,13 @@ do
 end
 ```
 
-### `LUiWidget:setFlexShrink(shrink: number)`
+### `LUiWidget:setFlexShrink(self: LUiWidget, shrink: number)`
 
 Sets the flex-shrink factor controlling how much this widget shrinks when layout space is insufficient.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `shrink` (`number`, required) - The shrink factor (0 = no shrinkage).
 
 #### Example
@@ -8456,12 +9063,13 @@ do
 end
 ```
 
-### `LUiWidget:setId(id: string)`
+### `LUiWidget:setId(self: LUiWidget, id: string)`
 
 Assigns a string identifier to this widget for lookup with findById.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `id` (`string`, required) - A unique identifier string.
 
 #### Example
@@ -8471,17 +9079,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:setId(1)
+  w:setId("widget1")
   lurek.log.info("LUiWidget:setId applied", "ui")
 end
 ```
 
-### `LUiWidget:setMargin(top: number, [right]: number, [bottom]: number, [left]: number)`
+### `LUiWidget:setMargin(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number)`
 
 Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `top` (`number`, required) - Top margin in pixels (also used as default for other sides).
 - `right` (`number`, optional) - Right margin. Defaults to top.
 - `bottom` (`number`, optional) - Bottom margin. Defaults to top.
@@ -8499,12 +9108,13 @@ do
 end
 ```
 
-### `LUiWidget:setMaxSize(w: number, h: number)`
+### `LUiWidget:setMaxSize(self: LUiWidget, w: number, h: number)`
 
 Sets the maximum allowed width and height for this widget during layout.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `w` (`number`, required) - Maximum width in pixels.
 - `h` (`number`, required) - Maximum height in pixels.
 
@@ -8520,12 +9130,13 @@ do
 end
 ```
 
-### `LUiWidget:setMinSize(w: number, h: number)`
+### `LUiWidget:setMinSize(self: LUiWidget, w: number, h: number)`
 
 Sets the minimum allowed width and height for this widget during layout.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `w` (`number`, required) - Minimum width in pixels.
 - `h` (`number`, required) - Minimum height in pixels.
 
@@ -8541,12 +9152,13 @@ do
 end
 ```
 
-### `LUiWidget:setOnChange(f: function)`
+### `LUiWidget:setOnChange(self: LUiWidget, f: function)`
 
 Registers a callback function invoked when this widget's value changes.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index as argument.
 
 #### Example
@@ -8561,12 +9173,13 @@ do
 end
 ```
 
-### `LUiWidget:setOnClick(f: function)`
+### `LUiWidget:setOnClick(self: LUiWidget, f: function)`
 
 Registers a callback function invoked when this widget is clicked.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving the widget index as argument.
 
 #### Example
@@ -8581,13 +9194,13 @@ do
 end
 ```
 
-### `LUiWidget:setOnDraw(_self: LWidget, f: function)`
+### `LUiWidget:setOnDraw(self: LUiWidget, f: function)`
 
 Registers a custom draw callback for this widget, invoked each frame during the draw pass.
 
 **Parameters**
 
-- `_self` (`LWidget`, required) - The widget (ignored, kept for method-call syntax).
+- `self` (`LUiWidget`, required) - The widget instance.
 - `f` (`function`, required) - Callback receiving a rect table {x, y, w, h} with the computed bounds.
 
 #### Example
@@ -8602,12 +9215,13 @@ do
 end
 ```
 
-### `LUiWidget:setPadding(top: number, [right]: number, [bottom]: number, [left]: number)`
+### `LUiWidget:setPadding(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number)`
 
 Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `top` (`number`, required) - Top padding in pixels (also used as default for other sides).
 - `right` (`number`, optional) - Right padding. Defaults to top.
 - `bottom` (`number`, optional) - Bottom padding. Defaults to top.
@@ -8625,12 +9239,13 @@ do
 end
 ```
 
-### `LUiWidget:setPosition(x: number, y: number)`
+### `LUiWidget:setPosition(self: LUiWidget, x: number, y: number)`
 
 Sets the local position of this widget relative to its parent.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `x` (`number`, required) - Horizontal position in pixels.
 - `y` (`number`, required) - Vertical position in pixels.
 
@@ -8646,12 +9261,13 @@ do
 end
 ```
 
-### `LUiWidget:setSize(w: number, h: number)`
+### `LUiWidget:setSize(self: LUiWidget, w: number, h: number)`
 
 Sets the width and height of this widget in pixels.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `w` (`number`, required) - Width in pixels.
 - `h` (`number`, required) - Height in pixels.
 
@@ -8667,12 +9283,13 @@ do
 end
 ```
 
-### `LUiWidget:setTooltip(text: string)`
+### `LUiWidget:setTooltip(self: LUiWidget, text: string)`
 
 Sets the tooltip text shown when the user hovers over this widget.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `text` (`string`, required) - The tooltip message.
 
 #### Example
@@ -8687,12 +9304,13 @@ do
 end
 ```
 
-### `LUiWidget:setVisible(v: boolean)`
+### `LUiWidget:setVisible(self: LUiWidget, v: boolean)`
 
 Shows or hides this widget. Hidden widgets are not drawn and do not receive input.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `v` (`boolean`, required) - True to show, false to hide.
 
 #### Example
@@ -8702,17 +9320,18 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local w = lurek.ui.newPanel()
-  w:setVisible(1.0)
+  w:setVisible(true)
   lurek.log.info("LUiWidget:setVisible applied", "ui")
 end
 ```
 
-### `LUiWidget:setZOrder(z: integer)`
+### `LUiWidget:setZOrder(self: LUiWidget, z: integer)`
 
 Sets the z-order (draw priority) of this widget. Higher values draw on top.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `z` (`integer`, required) - The z-order integer value.
 
 #### Example
@@ -8727,12 +9346,13 @@ do
 end
 ```
 
-### `LUiWidget:slideIn(x: number, y: number)`
+### `LUiWidget:slideIn(self: LUiWidget, x: number, y: number)`
 
 Moves this widget to the given position and makes it visible.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `x` (`number`, required) - Target x position.
 - `y` (`number`, required) - Target y position.
 
@@ -8748,12 +9368,13 @@ do
 end
 ```
 
-### `LUiWidget:slideOut(x: number, y: number)`
+### `LUiWidget:slideOut(self: LUiWidget, x: number, y: number)`
 
 Moves this widget to the given position and hides it.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `x` (`number`, required) - Target x position.
 - `y` (`number`, required) - Target y position.
 
@@ -8769,9 +9390,13 @@ do
 end
 ```
 
-### `LUiWidget:type() -> string`
+### `LUiWidget:type(self: LUiWidget) -> string`
 
 Returns the type name string of this widget (e.g. "LButton", "LSlider").
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 **Returns**: `string` - The widget type name.
 
@@ -8787,12 +9412,13 @@ do
 end
 ```
 
-### `LUiWidget:typeOf(name: string) -> boolean`
+### `LUiWidget:typeOf(self: LUiWidget, name: string) -> boolean`
 
 Checks whether this widget matches the given type name, including base types "LWidget" and "Object".
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `name` (`string`, required) - The type name to check against.
 
 **Returns**: `boolean` - True if the widget is of the given type.
@@ -8809,9 +9435,13 @@ do
 end
 ```
 
-### `LUiWidget:unbind()`
+### `LUiWidget:unbind(self: LUiWidget)`
 
 Removes the data binding from this widget.
+
+**Parameters**
+
+- `self` (`LUiWidget`, required) - The widget instance.
 
 #### Example
 

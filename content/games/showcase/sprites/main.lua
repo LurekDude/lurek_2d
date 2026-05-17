@@ -578,11 +578,12 @@ function lurek.draw()
     for _, obj in ipairs(drawables) do
         if obj.kind == "tree" then
             lurek.render.setColor(1, 1, 1)
-            lurek.render.draw(img_tree, obj.data.x, obj.data.y, 0, s, s)
+            lurek.render.draw(img_tree --[[@as LImage]], obj.data.x, obj.data.y, 0, s, s)
         elseif obj.kind == "player" then
             local tint = tint_modes[tint_index]
             lurek.render.setColor(tint.r, tint.g, tint.b)
-            lurek.render.draw(img_char[player.frame], player.x, player.y, 0, s, s)
+            local frame_img = img_char[player.frame] --[[@as LImage]]
+            lurek.render.draw(frame_img, player.x, player.y, 0, s, s)
         end
     end
 

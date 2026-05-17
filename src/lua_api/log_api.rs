@@ -23,8 +23,14 @@ fn dispatch(
                 if let Some(key) = callback_keys.borrow().get(&sink.id) {
                     if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
                         if let Ok(record_table) = lua.create_table() {
+                            /// Performs the 'level' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("level", level.as_str().to_lowercase());
+                            /// Performs the 'tag' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("tag", tag);
+                            /// Performs the 'message' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("message", message);
                             let _ = func.call::<LuaTable, ()>(record_table);
                         }
@@ -52,14 +58,22 @@ fn dispatch_structured(
                 if let Some(key) = callback_keys.borrow().get(&sink.id) {
                     if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
                         if let Ok(record_table) = lua.create_table() {
+                            /// Performs the 'level' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("level", level.as_str().to_lowercase());
+                            /// Performs the 'tag' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("tag", tag);
+                            /// Performs the 'message' operation.
+                            /// @return | nil | No value is returned.
                             let _ = record_table.set("message", message);
                             if !fields.is_empty() {
                                 if let Ok(fields_table) = lua.create_table() {
                                     for (key, value) in fields {
                                         let _ = fields_table.set(key.as_str(), value.clone());
                                     }
+                                    /// Performs the 'fields' operation.
+                                    /// @return | nil | No value is returned.
                                     let _ = record_table.set("fields", fields_table);
                                 }
                             }
@@ -209,7 +223,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a message at a runtime-selected level with an optional tag.
     /// @param | level | string | Log level string.
     /// @param | message | string | Message text.
-    /// @param | tag | string | Optional tag, defaulting to `Lua`.
+    /// @param | tag? | string | Optional tag, defaulting to `Lua`.
     /// @return | nil | No value is returned.
     tbl.set(
         "print",
@@ -376,10 +390,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let out = lua.create_table()?;
             for (i, sink) in s.borrow().sinks.iter().enumerate() {
                 let st = lua.create_table()?;
+                /// Performs the 'id' operation.
+                /// @return | nil | No value is returned.
                 st.set("id", sink.id)?;
+                /// Performs the 'type' operation.
+                /// @return | nil | No value is returned.
                 st.set("type", sink.type_name())?;
+                /// Performs the 'level' operation.
+                /// @return | nil | No value is returned.
                 st.set("level", sink.min_level.as_str())?;
                 if let Some(p) = sink.path() {
+                    /// Performs the 'path' operation.
+                    /// @return | nil | No value is returned.
                     st.set("path", p)?;
                 }
                 out.set(i + 1, st)?;
@@ -391,7 +413,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- readMemory --
     /// Reads entries from a memory sink and optionally drains them.
     /// @param | id | integer | Memory sink id.
-    /// @param | drain | boolean | Optional drain flag, defaulting to false.
+    /// @param | drain? | boolean | Optional drain flag, defaulting to false.
     /// @return | table | Array table of memory log entries.
     tbl.set(
         "readMemory",
@@ -408,14 +430,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     let out = lua.create_table()?;
                     for (i, entry) in entries.iter().enumerate() {
                         let et = lua.create_table()?;
+                        /// Performs the 'level' operation.
+                        /// @return | nil | No value is returned.
                         et.set("level", entry.level.as_str())?;
+                        /// Performs the 'tag' operation.
+                        /// @return | nil | No value is returned.
                         et.set("tag", entry.tag.as_str())?;
+                        /// Performs the 'message' operation.
+                        /// @return | nil | No value is returned.
                         et.set("message", entry.message.as_str())?;
                         if let Some(ref fields) = entry.fields {
                             let ft = lua.create_table()?;
                             for (k, v) in fields {
                                 ft.set(k.as_str(), v.as_str())?;
                             }
+                            /// Performs the 'fields' operation.
+                            /// @return | nil | No value is returned.
                             et.set("fields", ft)?;
                         }
                         out.set(i + 1, et)?;
@@ -571,6 +601,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(())
         })?,
     )?;
+    /// Performs the 'log' operation.
+    /// @return | nil | No value is returned.
     lurek.set("log", tbl)?;
     Ok(())
 }

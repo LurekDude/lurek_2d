@@ -377,9 +377,8 @@ function lurek.process(dt)
                     hack.input_idx = hack.input_idx + 1
                     local px = player.gx * TILE - TILE / 2
                     local py = player.gy * TILE - TILE / 2
-                    local hack_ps = hack_particles
+                    local hack_ps = hack_particles ---@type any
                     if hack_ps ~= nil then
-                        ---@diagnostic disable-next-line
                         hack_ps:moveTo(px, py)
                         hack_ps:emit(8)
                     end
@@ -541,9 +540,8 @@ function use_gadget(idx)
         -- EMP pulse particles
         local px = player.gx * TILE - TILE / 2
         local py = player.gy * TILE - TILE / 2
-        local emp = emp_particles
+        local emp = emp_particles ---@type any
         if emp ~= nil then
-            ---@diagnostic disable-next-line
             emp:moveTo(px, py)
             emp:emit(40)
         end
@@ -575,9 +573,8 @@ function do_interact()
         show_msg("DATA DOWNLOADED â€” reach the exit!", 2.5)
         local px = player.gx * TILE - TILE / 2
         local py = player.gy * TILE - TILE / 2
-        local hack_ps = hack_particles
+        local hack_ps = hack_particles ---@type any
         if hack_ps ~= nil then
-            ---@diagnostic disable-next-line
             hack_ps:moveTo(px, py)
             hack_ps:emit(20)
         end
@@ -699,15 +696,13 @@ function lurek.draw()
     circ(px, py - 6, 3, 0.1, 0.4, 0.7, 1)
 
     -- Particles
-    local emp = emp_particles
+    local emp = emp_particles ---@type any
     if emp ~= nil then
-        ---@diagnostic disable-next-line
         emp:render()
     end
 
-    local hack_ps = hack_particles
+    local hack_ps = hack_particles ---@type any
     if hack_ps ~= nil then
-        ---@diagnostic disable-next-line
         hack_ps:render()
     end
 end

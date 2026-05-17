@@ -210,7 +210,7 @@ impl LuaUserData for LuaImage {
         /// @return | string | Always "Image".
         methods.add_method("typeOf", |_, _, ()| Ok("Image"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this image object.
         /// @return | string | Always "LImage".
         methods.add_method("type", |_, _, ()| Ok("LImage"));
     }
@@ -329,7 +329,7 @@ impl LuaUserData for LuaFont {
         /// @return | string | Always "Font".
         methods.add_method("typeOf", |_, _, ()| Ok("Font"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this font object.
         /// @return | string | Always "LFont".
         methods.add_method("type", |_, _, ()| Ok("LFont"));
     }
@@ -392,7 +392,7 @@ impl LuaUserData for LuaCanvas {
         /// @return | string | Always "Canvas".
         methods.add_method("typeOf", |_, _, ()| Ok("Canvas"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this canvas object.
         /// @return | string | Always "LCanvas".
         methods.add_method("type", |_, _, ()| Ok("LCanvas"));
     }
@@ -491,7 +491,7 @@ impl LuaUserData for LuaSpriteBatch {
         /// @return | string | Always "SpriteBatch".
         methods.add_method("typeOf", |_, _, ()| Ok("SpriteBatch"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this sprite batch.
         /// @return | string | Always "LSpriteBatch".
         methods.add_method("type", |_, _, ()| Ok("LSpriteBatch"));
     }
@@ -576,7 +576,7 @@ impl LuaUserData for LuaMesh {
             Ok(())
         });
         // -- release --
-        /// Releases the mesh resource. This method is available to Lua scripts.
+        /// Releases the mesh GPU resource and invalidates the handle.
         /// @return | boolean | True if the mesh was valid and was released.
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
@@ -587,7 +587,7 @@ impl LuaUserData for LuaMesh {
         /// @return | string | Always "Mesh".
         methods.add_method("typeOf", |_, _, ()| Ok("Mesh"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this mesh object.
         /// @return | string | Always "LMesh".
         methods.add_method("type", |_, _, ()| Ok("LMesh"));
     }
@@ -644,7 +644,7 @@ impl LuaUserData for LuaShader {
         /// @return | string | Always "Shader".
         methods.add_method("typeOf", |_, _, ()| Ok("Shader"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this shader object.
         /// @return | string | Always "LShader".
         methods.add_method("type", |_, _, ()| Ok("LShader"));
     }
@@ -693,7 +693,7 @@ impl LuaUserData for LuaQuad {
         /// @return | string | Always "Quad".
         methods.add_method("typeOf", |_, _, ()| Ok("Quad"));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this quad object.
         /// @return | string | Always "LQuad".
         methods.add_method("type", |_, _, ()| Ok("LQuad"));
     }
@@ -870,7 +870,7 @@ impl LuaUserData for LuaShape {
             },
         );
         // -- circle --
-        /// Adds a circle command to the shape. This method is available to Lua scripts.
+        /// Adds a filled or outlined circle command to the shape.
         /// @param | mode | string | "fill" or "line".
         /// @param | x | number | Center X.
         /// @param | y | number | Center Y.
@@ -1017,7 +1017,7 @@ impl LuaUserData for LuaShape {
             Ok(())
         });
         // -- arc --
-        /// Adds an arc command to the shape. This method is available to Lua scripts.
+        /// Adds a filled or outlined arc command to the shape.
         /// @param | mode | string | "fill" or "line".
         /// @param | x | number | Center X.
         /// @param | y | number | Center Y.
@@ -1107,7 +1107,7 @@ impl LuaUserData for LuaShape {
             Ok(name == "Shape" || name == "Object")
         });
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this shape object.
         /// @return | string | Always "LShape".
         methods.add_method("type", |_, _, ()| Ok("LShape"));
     }
@@ -1156,7 +1156,7 @@ impl LuaUserData for LuaDrawLayer {
         /// @return | number | Queue length.
         methods.add_method("getCount", |_, this, ()| Ok(this.entries.len() as i64));
         // -- type --
-        /// Returns the internal Lua type tag. This method is available to Lua scripts.
+        /// Returns the type name string for this draw layer.
         /// @return | string | Always "LDrawLayer".
         methods.add_method("type", |_, _, ()| Ok("LDrawLayer"));
         // -- typeOf --
@@ -1288,7 +1288,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- circle --
-    /// Draws a circle. This function is exposed to Lua scripts.
+    /// Draws a filled or outlined circle at the given position.
     /// @param | mode | string | "fill" or "line".
     /// @param | x | number | Center X.
     /// @param | y | number | Center Y.
@@ -1308,7 +1308,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- ellipse --
-    /// Draws an ellipse. This function is exposed to Lua scripts.
+    /// Draws a filled or outlined ellipse at the given position.
     /// @param | mode | string | "fill" or "line".
     /// @param | x | number | Center X.
     /// @param | y | number | Center Y.
@@ -1429,7 +1429,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     #[allow(clippy::type_complexity)]
     // -- arc --
-    /// Draws a circular arc. This function is exposed to Lua scripts.
+    /// Draws a filled or outlined circular arc segment.
     /// @param | mode | string | "fill" or "line".
     /// @param | x | number | Center X.
     /// @param | y | number | Center Y.
@@ -1515,7 +1515,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | sy | number? | Scale Y (default 1).
     /// @param | ox | number? | Origin offset X (default 0).
     /// @param | oy | number? | Origin offset Y (default 0).
-    /// @return | table | Table result returned by this call.
+    /// @return | nil | No return value.
     graphics.set(
         "draw",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -1972,7 +1972,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- getLineWidth --
-    /// Returns the current line width. This function is exposed to Lua scripts.
+    /// Returns the current line width used for line-mode drawing.
     /// @return | number | Line width in pixels.
     graphics.set(
         "getLineWidth",
@@ -1994,7 +1994,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- getPointSize --
-    /// Returns the current point size. This function is exposed to Lua scripts.
+    /// Returns the current point diameter used for point drawing.
     /// @return | number | Point diameter in pixels.
     graphics.set(
         "getPointSize",
@@ -3223,16 +3223,38 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let st = s.borrow();
             let r = st.compute_stats();
             let stats = lua.create_table()?;
+            /// Performs the 'drawcalls' operation.
+            /// @return | nil | No value is returned.
             stats.set("drawcalls", r.draw_calls)?;
+            /// Performs the 'textures' operation.
+            /// @return | nil | No value is returned.
             stats.set("textures", r.textures)?;
+            /// Performs the 'fonts' operation.
+            /// @return | nil | No value is returned.
             stats.set("fonts", r.fonts)?;
+            /// Performs the 'canvases' operation.
+            /// @return | nil | No value is returned.
             stats.set("canvases", r.canvases)?;
+            /// Performs the 'texture_memory' operation.
+            /// @return | nil | No value is returned.
             stats.set("texture_memory", r.texture_memory)?;
+            /// Performs the 'gpu_draw_calls' operation.
+            /// @return | nil | No value is returned.
             stats.set("gpu_draw_calls", st.render_stats.draw_calls)?;
+            /// Performs the 'batched_draws' operation.
+            /// @return | nil | No value is returned.
             stats.set("batched_draws", st.render_stats.batched_draws)?;
+            /// Performs the 'texture_switches' operation.
+            /// @return | nil | No value is returned.
             stats.set("texture_switches", st.render_stats.texture_switches)?;
+            /// Performs the 'canvas_switches' operation.
+            /// @return | nil | No value is returned.
             stats.set("canvas_switches", st.render_stats.canvas_switches)?;
+            /// Performs the 'shader_switches' operation.
+            /// @return | nil | No value is returned.
             stats.set("shader_switches", st.render_stats.shader_switches)?;
+            /// Performs the 'cpu_render_ms' operation.
+            /// @return | nil | No value is returned.
             stats.set("cpu_render_ms", st.render_stats.cpu_render_ms)?;
             Ok(stats)
         })?,
@@ -3721,7 +3743,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- drawHexTile --
-    /// Draws a regular hexagonal tile. This function is exposed to Lua scripts.
+    /// Draws a regular hexagonal tile at the given center position.
     /// @param | cx | number | Center X.
     /// @param | cy | number | Center Y.
     /// @param | size | number | Hex radius (must be positive).
@@ -4281,7 +4303,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- drawHexTile --
-    /// Draws a regular hexagonal tile. This function is exposed to Lua scripts.
+    /// Draws a regular hexagonal tile at the given center position.
     /// @param | cx | number | Center X.
     /// @param | cy | number | Center Y.
     /// @param | size | number | Hex radius (must be positive).
@@ -4613,6 +4635,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    /// Performs the 'render' operation.
+    /// @return | nil | No value is returned.
     lurek.set("render", graphics)?;
     Ok(())
 }

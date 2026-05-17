@@ -57,14 +57,24 @@ impl DevtoolsShared {
 /// Converts a profiler zone tree into a Lua table.
 fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>> {
     let tbl = lua.create_table()?;
+    /// Performs the 'name' operation.
+    /// @return | nil | No value is returned.
     tbl.set("name", zone.name.clone())?;
+    /// Performs the 'time' operation.
+    /// @return | nil | No value is returned.
     tbl.set("time", zone.total_time())?;
+    /// Performs the 'selfTime' operation.
+    /// @return | nil | No value is returned.
     tbl.set("selfTime", zone.self_time())?;
+    /// Performs the 'startTime' operation.
+    /// @return | nil | No value is returned.
     tbl.set("startTime", zone.start_time)?;
     let children = lua.create_table()?;
     for (i, child) in zone.children.iter().enumerate() {
         children.set(i + 1, zone_to_table(lua, child)?)?;
     }
+    /// Performs the 'children' operation.
+    /// @return | nil | No value is returned.
     tbl.set("children", children)?;
     Ok(tbl)
 }
@@ -312,12 +322,24 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let tbl = lua.create_table()?;
             for (i, entry) in entries.iter().enumerate() {
                 let e = lua.create_table()?;
+                /// Performs the 'level' operation.
+                /// @return | nil | No value is returned.
                 e.set("level", entry.level.clone())?;
+                /// Performs the 'timestamp' operation.
+                /// @return | nil | No value is returned.
                 e.set("timestamp", entry.timestamp)?;
+                /// Performs the 'message' operation.
+                /// @return | nil | No value is returned.
                 e.set("message", entry.message.clone())?;
+                /// Performs the 'source' operation.
+                /// @return | nil | No value is returned.
                 e.set("source", entry.source.clone())?;
+                /// Performs the 'line' operation.
+                /// @return | nil | No value is returned.
                 e.set("line", entry.line)?;
                 if let Some(ref cat) = entry.category {
+                    /// Performs the 'category' operation.
+                    /// @return | nil | No value is returned.
                     e.set("category", cat.clone())?;
                 }
                 tbl.set(i + 1, e)?;
@@ -461,14 +483,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(move |lua, ()| {
             let snap = s.borrow().frame_stats.snapshot();
             let tbl = lua.create_table()?;
+            /// Performs the 'fps' operation.
+            /// @return | nil | No value is returned.
             tbl.set("fps", snap.fps)?;
+            /// Performs the 'dt' operation.
+            /// @return | nil | No value is returned.
             tbl.set("dt", snap.dt)?;
+            /// Performs the 'avg' operation.
+            /// @return | nil | No value is returned.
             tbl.set("avg", snap.avg)?;
+            /// Performs the 'min' operation.
+            /// @return | nil | No value is returned.
             tbl.set("min", snap.min)?;
+            /// Performs the 'max' operation.
+            /// @return | nil | No value is returned.
             tbl.set("max", snap.max)?;
+            /// Performs the 'p50' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p50", snap.p50)?;
+            /// Performs the 'p95' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p95", snap.p95)?;
+            /// Performs the 'p99' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p99", snap.p99)?;
+            /// Performs the 'samples' operation.
+            /// @return | nil | No value is returned.
             tbl.set("samples", snap.samples)?;
             Ok(tbl)
         })?,
@@ -496,14 +536,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(move |lua, ()| {
             let snap = s.borrow().gpu_frame_stats.snapshot();
             let tbl = lua.create_table()?;
+            /// Performs the 'fps' operation.
+            /// @return | nil | No value is returned.
             tbl.set("fps", snap.fps)?;
+            /// Performs the 'dt' operation.
+            /// @return | nil | No value is returned.
             tbl.set("dt", snap.dt)?;
+            /// Performs the 'avg' operation.
+            /// @return | nil | No value is returned.
             tbl.set("avg", snap.avg)?;
+            /// Performs the 'min' operation.
+            /// @return | nil | No value is returned.
             tbl.set("min", snap.min)?;
+            /// Performs the 'max' operation.
+            /// @return | nil | No value is returned.
             tbl.set("max", snap.max)?;
+            /// Performs the 'p50' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p50", snap.p50)?;
+            /// Performs the 'p95' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p95", snap.p95)?;
+            /// Performs the 'p99' operation.
+            /// @return | nil | No value is returned.
             tbl.set("p99", snap.p99)?;
+            /// Performs the 'samples' operation.
+            /// @return | nil | No value is returned.
             tbl.set("samples", snap.samples)?;
             Ok(tbl)
         })?,
@@ -792,14 +850,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let tbl = lua.create_table()?;
             for (i, entry) in st.watches.iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 row.set("name", entry.name.clone())?;
+                /// Performs the 'category' operation.
+                /// @return | nil | No value is returned.
                 row.set("category", entry.category.clone())?;
                 let getter: LuaFunction = lua.registry_value(&entry.getter)?;
                 match getter.call::<_, LuaValue>(()) {
                     Ok(v) => {
+                        /// Performs the 'value' operation.
+                        /// @return | nil | No value is returned.
                         row.set("value", v)?;
                     }
                     Err(e) => {
+                        /// Performs the 'value' operation.
+                        /// @return | nil | No value is returned.
                         row.set("value", format!("(error: {})", e))?;
                     }
                 }
@@ -820,28 +886,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let snap = lua.create_table()?;
             let fs = st.frame_stats.snapshot();
             let fst = lua.create_table()?;
+            /// Performs the 'fps' operation.
+            /// @return | nil | No value is returned.
             fst.set("fps", fs.fps)?;
+            /// Performs the 'dt' operation.
+            /// @return | nil | No value is returned.
             fst.set("dt", fs.dt)?;
+            /// Performs the 'avg' operation.
+            /// @return | nil | No value is returned.
             fst.set("avg", fs.avg)?;
+            /// Performs the 'p95' operation.
+            /// @return | nil | No value is returned.
             fst.set("p95", fs.p95)?;
+            /// Performs the 'p99' operation.
+            /// @return | nil | No value is returned.
             fst.set("p99", fs.p99)?;
+            /// Performs the 'frameStats' operation.
+            /// @return | nil | No value is returned.
             snap.set("frameStats", fst)?;
             let watches_tbl = lua.create_table()?;
             for (i, entry) in st.watches.iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 row.set("name", entry.name.clone())?;
+                /// Performs the 'category' operation.
+                /// @return | nil | No value is returned.
                 row.set("category", entry.category.clone())?;
                 let getter: LuaFunction = lua.registry_value(&entry.getter)?;
                 match getter.call::<_, LuaValue>(()) {
                     Ok(v) => {
+                        /// Performs the 'value' operation.
+                        /// @return | nil | No value is returned.
                         row.set("value", v)?;
                     }
                     Err(e) => {
+                        /// Performs the 'value' operation.
+                        /// @return | nil | No value is returned.
                         row.set("value", format!("(error: {})", e))?;
                     }
                 }
                 watches_tbl.set(i + 1, row)?;
             }
+            /// Performs the 'watches' operation.
+            /// @return | nil | No value is returned.
             snap.set("watches", watches_tbl)?;
             let profile_tbl = lua.create_table()?;
             if let Some(zones) = st.profiler.get_frame(0) {
@@ -849,16 +937,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     profile_tbl.set(i + 1, zone_to_table(lua, zone)?)?;
                 }
             }
+            /// Performs the 'profile' operation.
+            /// @return | nil | No value is returned.
             snap.set("profile", profile_tbl)?;
             let log_tbl = lua.create_table()?;
             for (i, entry) in st.logger.tail(Some(10)).iter().enumerate() {
                 let et = lua.create_table()?;
+                /// Performs the 'level' operation.
+                /// @return | nil | No value is returned.
                 et.set("level", entry.level.clone())?;
+                /// Performs the 'message' operation.
+                /// @return | nil | No value is returned.
                 et.set("message", entry.message.clone())?;
+                /// Performs the 'source' operation.
+                /// @return | nil | No value is returned.
                 et.set("source", entry.source.clone())?;
                 log_tbl.set(i + 1, et)?;
             }
+            /// Performs the 'log' operation.
+            /// @return | nil | No value is returned.
             snap.set("log", log_tbl)?;
+            /// Performs the 'watchCount' operation.
+            /// @return | nil | No value is returned.
             snap.set("watchCount", st.watches.len())?;
             Ok(snap)
         })?,
@@ -897,8 +997,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let out = lua.create_table()?;
             for (i, (name, (total, calls, min, max, self_ms))) in aggregated.iter().enumerate() {
                 let row = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 row.set("name", name.clone())?;
+                /// Performs the 'calls' operation.
+                /// @return | nil | No value is returned.
                 row.set("calls", *calls)?;
+                /// Performs the 'total_ms' operation.
+                /// @return | nil | No value is returned.
                 row.set("total_ms", *total)?;
                 row.set(
                     "avg_ms",
@@ -908,8 +1014,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                         0.0
                     },
                 )?;
+                /// Performs the 'min_ms' operation.
+                /// @return | nil | No value is returned.
                 row.set("min_ms", if *min == f64::MAX { 0.0 } else { *min })?;
+                /// Performs the 'max_ms' operation.
+                /// @return | nil | No value is returned.
                 row.set("max_ms", *max)?;
+                /// Performs the 'self_ms' operation.
+                /// @return | nil | No value is returned.
                 row.set("self_ms", *self_ms)?;
                 out.set(i + 1, row)?;
             }
@@ -946,6 +1058,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    /// Performs the 'devtools' operation.
+    /// @return | nil | No value is returned.
     lurek.set("devtools", dt)?;
     Ok(())
 }

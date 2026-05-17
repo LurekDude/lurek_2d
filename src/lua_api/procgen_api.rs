@@ -219,7 +219,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let out = lua.create_table()?;
                 for (i, (px, py)) in points.iter().enumerate() {
                     let pt = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     pt.set("x", *px)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     pt.set("y", *py)?;
                     out.set(i + 1, pt)?;
                 }
@@ -301,23 +305,43 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let rooms_tbl = lua.create_table()?;
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
             let corr_tbl = lua.create_table()?;
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
+                /// Performs the 'y1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
+                /// Performs the 'x2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
+                /// Performs the 'y2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
             let out = lua.create_table()?;
+            /// Performs the 'rooms' operation.
+            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
+            /// Performs the 'corridors' operation.
+            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
             Ok(out)
         })?,
@@ -368,31 +392,61 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let rooms_tbl = lua.create_table()?;
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
             let corr_tbl = lua.create_table()?;
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
+                /// Performs the 'y1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
+                /// Performs the 'x2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
+                /// Performs the 'y2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
             let out = lua.create_table()?;
+            /// Performs the 'rooms' operation.
+            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
+            /// Performs the 'corridors' operation.
+            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
             let p_tbl = lua.create_table()?;
             for (i, p) in placements.iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'name' operation.
+                /// @return | nil | No value is returned.
                 t.set("name", p.name.as_str())?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 t.set("x", p.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 t.set("y", p.y)?;
+                /// Performs the 'width' operation.
+                /// @return | nil | No value is returned.
                 t.set("width", p.width)?;
+                /// Performs the 'height' operation.
+                /// @return | nil | No value is returned.
                 t.set("height", p.height)?;
                 p_tbl.set(i + 1, t)?;
             }
@@ -431,18 +485,34 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let rooms_tbl = lua.create_table()?;
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
+                /// Performs the 'x' operation.
+                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
+                /// Performs the 'y' operation.
+                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
+                /// Performs the 'w' operation.
+                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
+                /// Performs the 'h' operation.
+                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
             let corr_tbl = lua.create_table()?;
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
+                /// Performs the 'x1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
+                /// Performs the 'y1' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
+                /// Performs the 'x2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
+                /// Performs the 'y2' operation.
+                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
@@ -451,10 +521,20 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 grid_tbl.set(i + 1, v)?;
             }
             let out = lua.create_table()?;
+            /// Performs the 'rooms' operation.
+            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
+            /// Performs the 'corridors' operation.
+            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
+            /// Performs the 'grid' operation.
+            /// @return | nil | No value is returned.
             out.set("grid", grid_tbl)?;
+            /// Performs the 'width' operation.
+            /// @return | nil | No value is returned.
             out.set("width", cfg.width)?;
+            /// Performs the 'height' operation.
+            /// @return | nil | No value is returned.
             out.set("height", cfg.height)?;
             Ok(out)
         })?,
@@ -515,18 +595,34 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let rooms_tbl = lua.create_table()?;
                 for (i, r) in d.rooms.iter().enumerate() {
                     let rt = lua.create_table()?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("x", r.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("y", r.y)?;
+                    /// Performs the 'w' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("w", r.w)?;
+                    /// Performs the 'h' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("h", r.h)?;
                     rooms_tbl.set(i + 1, rt)?;
                 }
                 let corr_tbl = lua.create_table()?;
                 for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                     let ct = lua.create_table()?;
+                    /// Performs the 'x1' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("x1", x1)?;
+                    /// Performs the 'y1' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("y1", y1)?;
+                    /// Performs the 'x2' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("x2", x2)?;
+                    /// Performs the 'y2' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("y2", y2)?;
                     corr_tbl.set(i + 1, ct)?;
                 }
@@ -535,18 +631,38 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     grid_tbl.set(i + 1, v)?;
                 }
                 let out = lua.create_table()?;
+                /// Performs the 'rooms' operation.
+                /// @return | nil | No value is returned.
                 out.set("rooms", rooms_tbl)?;
+                /// Performs the 'corridors' operation.
+                /// @return | nil | No value is returned.
                 out.set("corridors", corr_tbl)?;
+                /// Performs the 'grid' operation.
+                /// @return | nil | No value is returned.
                 out.set("grid", grid_tbl)?;
+                /// Performs the 'width' operation.
+                /// @return | nil | No value is returned.
                 out.set("width", cfg.width)?;
+                /// Performs the 'height' operation.
+                /// @return | nil | No value is returned.
                 out.set("height", cfg.height)?;
                 let p_tbl = lua.create_table()?;
                 for (i, p) in placements.iter().enumerate() {
                     let t = lua.create_table()?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     t.set("name", p.name.as_str())?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     t.set("x", p.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     t.set("y", p.y)?;
+                    /// Performs the 'width' operation.
+                    /// @return | nil | No value is returned.
                     t.set("width", p.width)?;
+                    /// Performs the 'height' operation.
+                    /// @return | nil | No value is returned.
                     t.set("height", p.height)?;
                     p_tbl.set(i + 1, t)?;
                 }
@@ -594,8 +710,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 out.set(i + 1, v)?;
             }
             let res = lua.create_table()?;
+            /// Performs the 'cells' operation.
+            /// @return | nil | No value is returned.
             res.set("cells", out)?;
+            /// Performs the 'width' operation.
+            /// @return | nil | No value is returned.
             res.set("width", hm.width)?;
+            /// Performs the 'height' operation.
+            /// @return | nil | No value is returned.
             res.set("height", hm.height)?;
             Ok(res)
         })?,
@@ -621,8 +743,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     out_cells.set(i + 1, v)?;
                 }
                 let res = lua.create_table()?;
+                /// Performs the 'cells' operation.
+                /// @return | nil | No value is returned.
                 res.set("cells", out_cells)?;
+                /// Performs the 'width' operation.
+                /// @return | nil | No value is returned.
                 res.set("width", hm.width)?;
+                /// Performs the 'height' operation.
+                /// @return | nil | No value is returned.
                 res.set("height", hm.height)?;
                 Ok(res)
             },
@@ -679,8 +807,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 out.set(i + 1, c.unwrap_or(0))?;
             }
             let res = lua.create_table()?;
+            /// Performs the 'cells' operation.
+            /// @return | nil | No value is returned.
             res.set("cells", out)?;
+            /// Performs the 'width' operation.
+            /// @return | nil | No value is returned.
             res.set("width", grid.width)?;
+            /// Performs the 'height' operation.
+            /// @return | nil | No value is returned.
             res.set("height", grid.height)?;
             Ok(res)
         })?,
@@ -747,9 +881,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let out = lua.create_table()?;
                 for (i, (x1, y1, x2, y2)) in segs.iter().enumerate() {
                     let st = lua.create_table()?;
+                    /// Performs the 'x1' operation.
+                    /// @return | nil | No value is returned.
                     st.set("x1", *x1)?;
+                    /// Performs the 'y1' operation.
+                    /// @return | nil | No value is returned.
                     st.set("y1", *y1)?;
+                    /// Performs the 'x2' operation.
+                    /// @return | nil | No value is returned.
                     st.set("x2", *x2)?;
+                    /// Performs the 'y2' operation.
+                    /// @return | nil | No value is returned.
                     st.set("y2", *y2)?;
                     out.set(i + 1, st)?;
                 }
@@ -833,28 +975,50 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let regions_tbl = lua.create_table()?;
                 for (i, r) in wg.regions.iter().enumerate() {
                     let rt = lua.create_table()?;
+                    /// Performs the 'id' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("id", r.id)?;
+                    /// Performs the 'name' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("name", r.name.clone())?;
+                    /// Performs the 'x' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("x", r.x)?;
+                    /// Performs the 'y' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("y", r.y)?;
                     let tags_tbl = lua.create_table()?;
                     for (j, tag) in r.tags.iter().enumerate() {
                         tags_tbl.set(j + 1, tag.clone())?;
                     }
+                    /// Performs the 'tags' operation.
+                    /// @return | nil | No value is returned.
                     rt.set("tags", tags_tbl)?;
                     regions_tbl.set(i + 1, rt)?;
                 }
                 let edges_tbl = lua.create_table()?;
                 for (i, e) in wg.edges.iter().enumerate() {
                     let et = lua.create_table()?;
+                    /// Performs the 'from' operation.
+                    /// @return | nil | No value is returned.
                     et.set("from", e.from)?;
+                    /// Performs the 'to' operation.
+                    /// @return | nil | No value is returned.
                     et.set("to", e.to)?;
+                    /// Performs the 'cost' operation.
+                    /// @return | nil | No value is returned.
                     et.set("cost", e.cost)?;
+                    /// Performs the 'bidirectional' operation.
+                    /// @return | nil | No value is returned.
                     et.set("bidirectional", e.bidirectional)?;
                     edges_tbl.set(i + 1, et)?;
                 }
                 let out = lua.create_table()?;
+                /// Performs the 'regions' operation.
+                /// @return | nil | No value is returned.
                 out.set("regions", regions_tbl)?;
+                /// Performs the 'edges' operation.
+                /// @return | nil | No value is returned.
                 out.set("edges", edges_tbl)?;
                 Ok(out)
             },
@@ -1046,6 +1210,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok((r, g, b, a))
         })?,
     )?;
+    /// Performs the 'procgen' operation.
+    /// @return | nil | No value is returned.
     luna.set("procgen", tbl)?;
     Ok(())
 }

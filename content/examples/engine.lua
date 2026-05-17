@@ -48,14 +48,9 @@ end
 do
   -- Use platform name to select platform-specific defaults (paths, key hints).
   local os_name = lurek.engine.platform()
-  local config_dir
-  if os_name == "windows" then
-    config_dir = os.getenv("APPDATA") or "."
-  elseif os_name == "macos" then
-    config_dir = os.getenv("HOME") .. "/Library/Application Support"
-  else
-    config_dir = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
-  end
+  local config_dir = "." -- os.getenv not available in lurek sandbox
+  -- In a real deployment outside the sandbox, config_dir would be:
+  -- Windows: os.getenv("APPDATA")  macOS: ~/Library/Application Support  Linux: ~/.config
   lurek.log.info("platform=" .. os_name .. " config_dir=" .. config_dir, "boot")
 end
 

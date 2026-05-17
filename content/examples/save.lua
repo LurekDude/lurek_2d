@@ -199,8 +199,12 @@ do
   local mgr = lurek.save.newSaveManager()
 
   -- Clean up temporary quicksave slot when player reaches a proper checkpoint
-  mgr:delete("quicksave_temp")
-  lurek.log.info("temporary quicksave cleaned up", "save")
+  if mgr:exists("quicksave_temp") then
+    mgr:delete("quicksave_temp")
+    lurek.log.info("temporary quicksave cleaned up", "save")
+  else
+    lurek.log.info("no quicksave_temp slot to clean up", "save")
+  end
 end
 
 --@api-stub: LSaveManager:exists

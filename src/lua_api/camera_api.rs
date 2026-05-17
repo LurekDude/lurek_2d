@@ -945,6 +945,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             })
         })?,
     )?;
+    /// Performs the 'camera' operation.
+    /// @return | nil | No value is returned.
     lurek.set("camera", tbl)?;
     Ok(())
 }

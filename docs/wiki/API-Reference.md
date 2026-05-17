@@ -165,12 +165,12 @@
   - [LEventBus](#leventbus)
   - [LFactory](#lfactory)
   - [LFunnel](#lfunnel)
-  - [LGraph](#lgraph)
   - [LList](#llist)
   - [LMap](#lmap)
   - [LMediator](#lmediator)
   - [LObjectPool](#lobjectpool)
   - [LObserver](#lobserver)
+  - [LPatternGraph](#lpatterngraph)
   - [LPriorityQueue](#lpriorityqueue)
   - [LQueue](#lqueue)
   - [LRelationshipManager](#lrelationshipmanager)
@@ -505,8 +505,8 @@ LDialogueAI:addBranch(topic_id: string, branch_id: string, [weight]: number, [fs
 LDialogueAI:addTopic(id: string, [weight]: number, [fsm_state]: string, [bt_status]: string, [utility_key]: string) -- Adds a selectable dialogue topic with optional context filters.
 LDialogueAI:clearUtilityScores() -- Removes every stored utility score from this dialogue selector.
 LDialogueAI:getTopicCount() -> integer -- Returns the number of topics registered in this dialogue selector.
-LDialogueAI:selectBranch(topic_id: string) -> LuaValue -- Selects the best currently valid branch for the given topic.
-LDialogueAI:selectTopic() -> LuaValue -- Selects the best currently valid topic using weights and context filters.
+LDialogueAI:selectBranch(topic_id: string) -> string -- Selects the best currently valid branch for the given topic.
+LDialogueAI:selectTopic() -> string -- Selects the best currently valid topic using weights and context filters.
 LDialogueAI:setBTStatus([status]: string) -- Sets the behavior-tree status used as dialogue selection context.
 LDialogueAI:setFSMState([state]: string) -- Sets the finite-state-machine state used as dialogue selection context.
 LDialogueAI:setUtilityScore(key: string, score: number) -- Stores a utility score used by topics and branches that reference the given key.
@@ -815,8 +815,8 @@ LAnimation:addFrame(x: number, y: number, w: number, h: number) -> integer -- Ad
 LAnimation:addFramesFromGrid(tw: integer, th: integer, fw: integer, fh: integer, start: integer, count: integer) -> integer -- Adds frames by slicing a texture grid.
 LAnimation:addFramesFromRects(rects: table) -> integer -- Adds frames from an array of rectangle tables.
 LAnimation:crossfade(clip_name: string, duration: number) -> boolean -- Starts a crossfade from the current clip to another clip.
-LAnimation:drawPreviewGrid(columns: integer, cell_size: integer) -> ImageData -- Rasterizes all animation frames into a preview grid image.
-LAnimation:drawToImage(w: integer, h: integer) -> ImageData -- Rasterizes the current animation frame into an image userdata.
+LAnimation:drawPreviewGrid(columns: integer, cell_size: integer) -> LImageData -- Rasterizes all animation frames into a preview grid image.
+LAnimation:drawToImage(w: integer, h: integer) -> LImageData -- Rasterizes the current animation frame into an image userdata.
 LAnimation:getBlendState() -> LuaValue -- Returns current crossfade rectangles and blend factor when a crossfade is active.
 LAnimation:getClip() -> LuaValue -- Returns the current clip name when a clip is active.
 LAnimation:getClipCount() -> integer -- Returns the number of named clips stored in this animation.
@@ -1019,7 +1019,7 @@ LBus:typeOf(name: string) -> boolean -- Checks whether this object matches the g
 ### LDecoder
 
 ```lua
-LDecoder:decode() -> SoundData -- Decodes the next chunk of audio data and returns it as a SoundData object.
+LDecoder:decode() -> LSoundData -- Decodes the next chunk of audio data and returns it as a LSoundData object.
 LDecoder:getBitDepth() -> integer -- Returns the bit depth of the source audio file.
 LDecoder:getChannelCount() -> integer -- Returns the number of audio channels in the source file.
 LDecoder:getDuration() -> number -- Returns the total duration of the source audio file in seconds.
@@ -1099,6 +1099,8 @@ LSoundData:getSample(index: integer) -> number -- Returns the sample value at th
 LSoundData:getSampleCount() -> integer -- Returns the total number of samples stored in this sound buffer.
 LSoundData:getSampleRate() -> integer -- Returns the playback sample rate of this sound buffer.
 LSoundData:setSample(index: integer, value: number) -- Overwrites the sample value at the given zero-based sample index.
+LSoundData:type() -> string -- Returns the type name of this object for runtime type-checking.
+LSoundData:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LSoundPool
@@ -1413,12 +1415,12 @@ lurek.data.encodeToml(tbl: table) -> string -- Encodes a Lua table into TOML tex
 lurek.data.fromMsgPack(bytes: string) -> LuaValue -- Decodes a structured binary interchange payload back into Lua values.
 lurek.data.getPackedSize(fmt: string, ...: LuaValue) -> integer -- Computes the packed byte size for values and a format string.
 lurek.data.hash(algo_str: string, raw_data: string) -> string -- Hashes a binary string with a named algorithm.
-lurek.data.newByteData(value: any) -> ByteData -- Creates ByteData from a size or string.
+lurek.data.newByteData(value: any) -> LByteData -- Creates ByteData from a size or string.
 lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView -- Creates a DataView over a binary string slice.
 lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer -- Creates a fixed-capacity ring buffer for Lua values.
 lurek.data.newWriter() -> LDataWriter -- Creates an empty binary data writer.
 lurek.data.pack(fmt: string, ...: LuaValue) -> string -- Packs Lua values into a binary string using a format string.
-lurek.data.parseToml(text: string) -> LuaValue -- Parses TOML text into Lua tables and scalar values.
+lurek.data.parseToml(text: string) -> table -- Parses TOML text into Lua tables and scalar values.
 lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue -- Reads binary values from a byte string using a format string.
 lurek.data.size(fmt: string) -> integer -- Measures fixed byte size for a binary format string.
 lurek.data.toMsgPack(value: any) -> string -- Encodes a Lua value into the current structured binary interchange payload.
@@ -1429,7 +1431,7 @@ lurek.data.write(fmt: string, ...: LuaValue) -> string -- Writes binary values i
 ### LByteData
 
 ```lua
-LByteData:clone() -> ByteData -- Returns a copy of this byte buffer. This method is available to Lua scripts.
+LByteData:clone() -> LByteData -- Returns a copy of this byte buffer. This method is available to Lua scripts.
 LByteData:getBit(byte_offset: integer, bit_offset: integer) -> boolean -- Reads one bit inside a byte. This method is available to Lua scripts.
 LByteData:getByte(offset: integer) -> integer -- Reads one byte at a zero-based offset.
 LByteData:getSize() -> integer -- Returns the byte buffer length. This method is available to Lua scripts.
@@ -1437,6 +1439,8 @@ LByteData:getString() -> string -- Returns the byte buffer as a string.
 LByteData:readBits(byte_offset: integer, bit_offset: integer, count: integer) -> integer -- Reads up to 32 bits starting at a byte and bit offset.
 LByteData:setBit(byte_offset: integer, bit_offset: integer, value: boolean) -- Sets or clears one bit inside a byte.
 LByteData:setByte(offset: integer, value: integer) -- Writes one byte at a zero-based offset.
+LByteData:type() -> string -- Returns the type name of this object for runtime type-checking.
+LByteData:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LDataView
@@ -2409,14 +2413,14 @@ lurek.graph.newGraph() -> LGraph -- Creates an empty logistics graph with no nod
 LGraph:addEdge(from_ud: LGraphNode, to_ud: LGraphNode, [edge_type]: string) -> LGraphEdge -- Creates an edge between two nodes with an optional edge type.
 LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode) -- Places an item onto a node. This method is available to Lua scripts.
 LGraph:addNode([node_type]: string, [capacity]: integer) -> LGraphNode -- Creates a node with optional type and capacity.
-LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> any -- Runs A* pathfinding between two nodes.
+LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil -- Runs A* pathfinding between two nodes.
 LGraph:colorGraph() -> table -- Computes graph coloring and returns color indices by node id.
 LGraph:createItem([item_type]: string, [decay_time]: number) -> LGraphItem -- Creates an unplaced graph item with optional type and decay time.
-LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> any -- Finds a path between two nodes. This method is available to Lua scripts.
-LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> any -- Finds a path for a specific item between two nodes while respecting item constraints.
+LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil -- Finds a path between two nodes. This method is available to Lua scripts.
+LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil -- Finds a path for a specific item between two nodes while respecting item constraints.
 LGraph:getComponents() -> table -- Returns connected components as arrays of node handles.
-LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> any -- Returns graph distance between two nodes when reachable.
-LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> any -- Returns the edge connecting two nodes when one exists.
+LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil -- Returns graph distance between two nodes when reachable.
+LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil -- Returns the edge connecting two nodes when one exists.
 LGraph:getEdgeCount() -> integer -- Returns the number of edges in this graph.
 LGraph:getEdges() -> table -- Returns all edges in this graph. This method is available to Lua scripts.
 LGraph:getItemCount() -> integer -- Returns the number of items in this graph.
@@ -2441,7 +2445,7 @@ LGraph:sendItem(item_ud: LGraphItem, edge_ud: LGraphEdge) -- Starts moving an it
 LGraph:step() -- Runs one discrete graph simulation step and dispatches generated callbacks.
 LGraph:subgraph(nodes: table) -> LGraph -- Creates a new graph containing a subset of nodes.
 LGraph:tickParallel(dt: number) -- Advances graph simulation through the parallel update path and dispatches generated callbacks.
-LGraph:topologicalSort() -> any -- Returns nodes in topological order when the graph is acyclic.
+LGraph:topologicalSort() -> table|nil -- Returns nodes in topological order when the graph is acyclic.
 LGraph:type() -> string -- Returns the Lua-visible type name for this graph handle.
 LGraph:typeOf(name: string) -> boolean -- Returns whether this graph handle matches a supported type name.
 LGraph:update(dt: number) -- Advances graph simulation by delta time and dispatches generated callbacks.
@@ -2484,7 +2488,7 @@ LGraphEdge:typeOf(name: string) -> boolean -- Returns whether this graph edge ha
 
 ```lua
 LGraphItem:getDecayTime() -> number -- Returns the total decay lifetime configured for this item.
-LGraphItem:getPosition() -> any -- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
+LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil -- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
 LGraphItem:getPriority() -> integer -- Returns this item's routing or queue priority.
 LGraphItem:getRemainingLife() -> number -- Returns this item's remaining lifetime before decay.
 LGraphItem:getType() -> string -- Returns the item type string used by filters, conversions, supplies, and demands.
@@ -2508,7 +2512,7 @@ LGraphNode:clearConversion(in_type: string) -> boolean -- Removes a conversion r
 LGraphNode:clearDemands() -- Removes every demand entry from this node.
 LGraphNode:clearSupplies() -- Removes every supply entry from this node.
 LGraphNode:clearTags() -- Removes every tag from this node. This method is available to Lua scripts.
-LGraphNode:dequeue() -> any -- Removes and returns the next item from this node's explicit queue.
+LGraphNode:dequeue() -> LGraphItem|nil -- Removes and returns the next item from this node's explicit queue.
 LGraphNode:enqueue(item_ud: LGraphItem) -> boolean -- Adds an item handle to this node's explicit queue.
 LGraphNode:getCapacity() -> integer -- Returns this node's item capacity.
 LGraphNode:getEdges([dir]: string) -> table -- Returns edge handles connected to this node in the requested direction.
@@ -2517,9 +2521,9 @@ LGraphNode:getItemCount() -> integer -- Returns the number of items currently st
 LGraphNode:getItems() -> table -- Returns item handles currently stored on this node.
 LGraphNode:getOverflowPolicy() -> string -- Returns this node's overflow policy name.
 LGraphNode:getProcessTime() -> number -- Returns the processing time used by this node's conversions.
-LGraphNode:getPullFilter() -> any -- Returns this node's optional pull item-type filter.
+LGraphNode:getPullFilter() -> string|nil -- Returns this node's optional pull item-type filter.
 LGraphNode:getPullRate() -> number -- Returns this node's pull rate. This method is available to Lua scripts.
-LGraphNode:getPushFilter() -> any -- Returns this node's optional push item-type filter.
+LGraphNode:getPushFilter() -> string|nil -- Returns this node's optional push item-type filter.
 LGraphNode:getPushRate() -> number -- Returns this node's push rate. This method is available to Lua scripts.
 LGraphNode:getQueueCapacity() -> integer -- Returns this node's queue capacity.
 LGraphNode:getQueueSize() -> integer -- Returns the number of item ids currently queued at this node.
@@ -2674,7 +2678,7 @@ lurek.i18n.validateLocale(locale: string) -> boolean -- Returns whether a locale
 [[Module page|Module-image]]
 
 ```lua
-lurek.image.fromScreen() -> LImageData? -- Returns a completed screen capture image or requests one for a future call.
+lurek.image.fromScreen() -> LImageData|nil -- Returns a completed screen capture image or requests one for a future call.
 lurek.image.isCompressed(filename: string) -> boolean -- Returns whether a GameFS image file begins with DDS compressed image magic bytes.
 lurek.image.loadImage(filename: string) -> LImageData -- Loads and decodes image data from GameFS.
 lurek.image.loadLayered(filename: string) -> LLayeredImage -- Loads a serialized layered image stack from GameFS.
@@ -2725,7 +2729,7 @@ LImageData:getDimensions() -> integer -- Returns image dimensions. This method i
 LImageData:getHeight() -> integer -- Returns image height. This method is available to Lua scripts.
 LImageData:getPixel(x: integer, y: integer) -> integer -- Returns RGBA channels at a pixel coordinate.
 LImageData:getRawBytes() -> string -- Returns raw image bytes as a Lua string.
-LImageData:getRegion(x: integer, y: integer, w: integer, h: integer) -> LImageData? -- Returns an image region when the requested rectangle is inside bounds.
+LImageData:getRegion(x: integer, y: integer, w: integer, h: integer) -> LImageData|nil -- Returns an image region when the requested rectangle is inside bounds.
 LImageData:getString() -> string -- Returns raw image bytes as a Lua string.
 LImageData:getWidth() -> integer -- Returns image width. This method is available to Lua scripts.
 LImageData:grayscale() -- Converts this image to grayscale in place.
@@ -2735,7 +2739,7 @@ LImageData:mapPixels(func: function) -- Applies a Lua callback to every pixel an
 LImageData:noise(amount: integer) -- Adds noise to this image in place. This method is available to Lua scripts.
 LImageData:paste(src_ud: LImageData, dx: integer, dy: integer) -- Pastes a source image into this image at unsigned destination coordinates.
 LImageData:posterize(levels: integer) -- Reduces image colors to a fixed number of levels in place.
-LImageData:resize(width: integer, height: integer, filter: string) -> LImageData? -- Returns a resized image using an optional named filter.
+LImageData:resize(width: integer, height: integer, filter: string) -> LImageData|nil -- Returns a resized image using an optional named filter.
 LImageData:resizeNearest(new_w: integer, new_h: integer) -> LImageData -- Returns a resized image using nearest-neighbor sampling.
 LImageData:rotate90cw() -> LImageData -- Returns a new image rotated ninety degrees clockwise.
 LImageData:saturation(factor: number) -- Applies a saturation factor to this image in place.
@@ -2746,7 +2750,7 @@ LImageData:sharpen() -> LImageData -- Returns a sharpened copy of this image.
 LImageData:threshold(value: integer) -- Applies a threshold filter to this image in place.
 LImageData:tint(tr: integer, tg: integer, tb: integer, factor: number) -- Blends this image toward a tint color in place.
 LImageData:type() -> string -- Returns the Lua-visible type name for this image data handle.
-LImageData:typeOf(name: string) -> boolean -- Returns whether this image data handle matches the `ImageData` type name.
+LImageData:typeOf(name: string) -> boolean -- Returns whether this image data handle matches the `LImageData` type name.
 ```
 
 ### LLayeredImage
@@ -3353,7 +3357,7 @@ LVec2:angle() -> number -- Returns this vector angle. This method is available t
 LVec2:cross(other: LVec2) -> number -- Returns the scalar 2D cross product with another vector.
 LVec2:distance(other: LVec2) -> number -- Returns distance to another vector.
 LVec2:dot(other: LVec2) -> number -- Returns the dot product with another vector.
-LVec2:fromAngle(radians: number) -> LVec2 -- Creates a unit vector from an angle.
+LVec2:fromAngle(self: LVec2, radians: number) -> LVec2 -- Creates a unit vector from an angle.
 LVec2:length() -> number -- Returns this vector length. This method is available to Lua scripts.
 LVec2:lengthSquared() -> number -- Returns this vector squared length.
 LVec2:lerp(other: LVec2, t: number) -> LVec2 -- Returns a vector interpolated toward another vector.
@@ -3380,7 +3384,7 @@ LVec3:lengthSquared() -> number -- Returns this vector squared length.
 LVec3:lerp(other: LVec3, t: number) -> LVec3 -- Returns a vector interpolated toward another vector.
 LVec3:normalize() -> LVec3 -- Returns a normalized copy of this vector.
 LVec3:scale(s: number) -> LVec3 -- Returns this vector multiplied by a scalar.
-LVec3:splat(v: number) -> LVec3 -- Creates a vector with all components set to one value.
+LVec3:splat(self: LVec3, v: number) -> LVec3 -- Creates a vector with all components set to one value.
 LVec3:sub(other: LVec3) -> LVec3 -- Returns the difference from another vector.
 LVec3:type() -> string -- Returns the Lua-visible type name for this vector handle.
 LVec3:typeOf(name: string) -> boolean -- Returns whether this vector handle matches a supported type name.
@@ -3409,7 +3413,7 @@ LMinimap:clearPath([id]: integer) -- Clears one path by id or all paths when no 
 LMinimap:clearViewportRect() -- Clears the viewport rectangle. This method is available to Lua scripts.
 LMinimap:drawLine(x1: number, y1: number, x2: number, y2: number, color_tbl: table) -- Adds an overlay line. This method is available to Lua scripts.
 LMinimap:drawRect(x: number, y: number, w: number, h: number, color_tbl: table) -- Adds an overlay rectangle. This method is available to Lua scripts.
-LMinimap:drawToImage(pixel_size: integer) -> LuaValue -- Draws the minimap into image data at a pixel size.
+LMinimap:drawToImage(pixel_size: integer) -> LImageData -- Draws the minimap into image data at a pixel size.
 LMinimap:getCellCount() -> integer -- Returns the total number of grid cells.
 LMinimap:getCenter() -> number -- Returns minimap world center. This method is available to Lua scripts.
 LMinimap:getCenterX() -> number -- Returns minimap world center x coordinate.
@@ -3730,7 +3734,7 @@ LParticleSystem:clearBounds() -- Clears collision bounds. This method is availab
 LParticleSystem:clearCollidesWithPhysics() -- Disables particle collision against a physics world.
 LParticleSystem:clone() -> LParticleSystem -- Clones this particle system configuration into a new system handle.
 LParticleSystem:count() -> integer -- Returns the current particle count.
-LParticleSystem:drawToImage(w: integer, h: integer) -> LuaValue -- Draws particles to image data. This method is available to Lua scripts.
+LParticleSystem:drawToImage(w: integer, h: integer) -> LImageData -- Draws particles to image data. This method is available to Lua scripts.
 LParticleSystem:emit(count: integer) -- Emits particles immediately. This method is available to Lua scripts.
 LParticleSystem:getAttractorCount() -> integer -- Returns attractor count. This method is available to Lua scripts.
 LParticleSystem:getBufferSize() -> integer -- Returns maximum particle buffer size.
@@ -3803,7 +3807,7 @@ LParticleSystem:setTangentialAcceleration(min: number, max: number) -- Sets tang
 LParticleSystem:start() -- Starts particle emission. This method is available to Lua scripts.
 LParticleSystem:stop() -- Stops particle emission. This method is available to Lua scripts.
 LParticleSystem:subSystemCount() -> integer -- Returns particle sub-system count.
-LParticleSystem:toImage(w: integer, h: integer) -> LuaValue -- Draws particles to image data. This method is available to Lua scripts.
+LParticleSystem:toImage(w: integer, h: integer) -> LImageData -- Draws particles to image data. This method is available to Lua scripts.
 LParticleSystem:type() -> string -- Returns the Lua-visible type name for this particle system handle.
 LParticleSystem:typeOf(name: string) -> boolean -- Returns whether this particle system handle matches a supported type name.
 LParticleSystem:update(dt: number) -- Updates the particle system, applies optional physics collision, and invokes pending callbacks.
@@ -3814,7 +3818,7 @@ LParticleSystem:warmUp(seconds: number) -- Advances the system by a warm-up dura
 
 ```lua
 LTrail:clear() -- Clears all trail points. This method is available to Lua scripts.
-LTrail:drawToImage(w: integer, h: integer) -> LuaValue -- Draws the trail to image data. This method is available to Lua scripts.
+LTrail:drawToImage(w: integer, h: integer) -> LImageData -- Draws the trail to image data. This method is available to Lua scripts.
 LTrail:getLifetime() -> number -- Returns trail point lifetime. This method is available to Lua scripts.
 LTrail:getPointCount() -> integer -- Returns trail point count. This method is available to Lua scripts.
 LTrail:getWidth() -> LuaValue -- Returns trail width settings. This method is available to Lua scripts.
@@ -3835,14 +3839,14 @@ LTrail:update(dt: number) -- Updates trail point lifetimes. This method is avail
 
 ```lua
 lurek.pathfind.getThreadCount() -> integer -- Returns the pathfinding thread count.
-lurek.pathfind.newFlowField(grid_ud: userdata) -> LFlowField -- Creates a flow field for a navigation grid.
+lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField -- Creates a flow field for a navigation grid.
 lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid. This function is exposed to Lua scripts.
 lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid. This function is exposed to Lua scripts.
 lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid. This function is exposed to Lua scripts.
-lurek.pathfind.newNavGridFromTileMap(tm_ud: userdata, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
+lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
 lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh. This function is exposed to Lua scripts.
-lurek.pathfind.newPathfinder(grid_ud: userdata) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
-lurek.pathfind.newPathFlowField(grid_ud: userdata) -> LAIFlowField -- Creates an AI flow field from a path grid.
+lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
+lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField -- Creates an AI flow field from a path grid.
 lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid. This function is exposed to Lua scripts.
 lurek.pathfind.rangeMap(opts: table) -> table -- Computes reachable cells from range map options.
 lurek.pathfind.setThreadCount(count: integer) -- Records a warning because pathfinding thread count is not implemented.
@@ -3853,7 +3857,7 @@ lurek.pathfind.setThreadCount(count: integer) -- Records a warning because pathf
 ```lua
 LAIFlowField:getDirection(x: integer, y: integer) -> LuaValue -- Returns flow direction for a one-based cell.
 LAIFlowField:getDistance(x: integer, y: integer) -> LuaValue -- Returns distance to goal for a one-based cell.
-LAIFlowField:getGoal() -> integer? -- Returns the one-based flow field goal when set.
+LAIFlowField:getGoal() -> integer|nil -- Returns the one-based flow field goal when set.
 LAIFlowField:getHeight() -> integer -- Returns flow field height. This method is available to Lua scripts.
 LAIFlowField:getWidth() -> integer -- Returns flow field width. This method is available to Lua scripts.
 LAIFlowField:hasGoal() -> boolean -- Returns whether a goal is set. This method is available to Lua scripts.
@@ -3942,8 +3946,8 @@ LNavMesh:typeOf(name: string) -> boolean -- Returns whether this navmesh handle 
 ### LPathGrid
 
 ```lua
-LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table? -- Finds a path between one-based path grid cells.
-LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table? -- Finds a smoothed path between one-based path grid cells.
+LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil -- Finds a path between one-based path grid cells.
+LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil -- Finds a smoothed path between one-based path grid cells.
 LPathGrid:getCellSize() -> number -- Returns path grid cell size. This method is available to Lua scripts.
 LPathGrid:getCost(x: integer, y: integer) -> number -- Returns movement cost at a one-based cell.
 LPathGrid:getHeight() -> integer -- Returns grid height. This method is available to Lua scripts.
@@ -3989,7 +3993,7 @@ lurek.patterns.newDebounce(wait: number) -> LDebounce -- Create a new debounce t
 lurek.patterns.newEventBus([name]: string) -> LEventBus -- Create a new publish/subscribe event bus for decoupled communication between game systems.
 lurek.patterns.newFactory() -> LFactory -- Create a new factory for producing typed game objects from registered constructor functions.
 lurek.patterns.newFunnel(window: number, [maxEntries]: integer, [name]: string) -> LFunnel -- Create a new batching funnel that collects events over a time window and flushes them together.
-lurek.patterns.newGraph([undirected]: boolean) -> LGraph -- Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
+lurek.patterns.newGraph([undirected]: boolean) -> LPatternGraph -- Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
 lurek.patterns.newList() -> LList -- Create a new dynamic array list with indexed access, insertion, removal, and search.
 lurek.patterns.newMap() -> LMap -- Create a new string-keyed dictionary (map) with keys/values/entries access and merge support.
 lurek.patterns.newMediator() -> LMediator -- Create a new mediator for channel-based message passing between decoupled game systems.
@@ -4082,7 +4086,7 @@ LEventBus:on(event: string, callback: function, [priority]: integer) -> number -
 ```lua
 LFactory:alias(alias: string, canonical: string) -- Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor.
 LFactory:clearAll() -- Remove all registered types and constructors, resetting the factory.
-LFactory:create(typeName: string, ...: boolean|number|string|table|nil) -> boolean|number|string|table -- Create a new object by type name, passing additional arguments to the constructor.
+LFactory:create(typeName: string, ...: any) -> boolean|number|string|table|nil -- Create a new object by type name, passing additional arguments to the constructor.
 LFactory:getTypes() -> table -- Return an array of all registered type names.
 LFactory:has(typeName: string) -> boolean -- Check whether a constructor is registered for the given type name.
 LFactory:register(typeName: string, ctor: function) -- Register a constructor function for a given type name. Future `create()` calls with this type will invoke it.
@@ -4099,24 +4103,6 @@ LFunnel:onFlush(f: function) -- Set the callback invoked when the funnel flushes
 LFunnel:pendingCount() -> number -- Return the number of entries waiting to be flushed.
 LFunnel:push(tag: string, [value]: number) -- Push a tagged event into the funnel. May trigger an immediate flush if the max entry count is reached.
 LFunnel:update(dt: number) -> boolean -- Advance the funnel's time window. Flushes and invokes the callback if the window elapsed.
-```
-
-### LGraph
-
-```lua
-LGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number -- Add a directed (or undirected) edge between two nodes with optional weight and label.
-LGraph:addNode([label]: string, [value]: boolean|number|string|table) -> number -- Add a node to the graph with an optional label and payload value.
-LGraph:bfs(start: integer) -> table -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
-LGraph:clearAll() -- Remove all nodes, edges, and payloads from the graph.
-LGraph:dfs(start: integer) -> table -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
-LGraph:edgeCount() -> number -- Return the total number of edges in the graph.
-LGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil -- Retrieve the payload value stored on a node. Returns nil if no payload.
-LGraph:hasNode(id: integer) -> boolean -- Check whether a node with the given ID exists in the graph.
-LGraph:isConnected(from: integer, to: integer) -> boolean -- Check whether there is any path from one node to another.
-LGraph:neighbors(id: integer) -> table -- Return an array of node IDs directly connected to the given node.
-LGraph:nodeCount() -> number -- Return the total number of nodes in the graph.
-LGraph:removeEdge(id: integer) -> boolean -- Remove an edge by its ID. Returns true if it existed.
-LGraph:removeNode(id: integer) -> boolean -- Remove a node and all its connected edges. Returns true if the node existed.
 ```
 
 ### LList
@@ -4189,6 +4175,24 @@ LObserver:getCount() -> number -- Return the total number of active subscription
 LObserver:set(key: string, value: boolean|number|string|table) -- Set a value by key and notify all subscribers watching that key.
 LObserver:subscribe(key: string, callback: function, [once]: boolean) -> number -- Subscribe to changes on a specific key. The callback receives (key, newValue) on each change.
 LObserver:unsubscribe(id: integer) -- Remove a subscription by its ID. The callback will no longer fire.
+```
+
+### LPatternGraph
+
+```lua
+LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number -- Add a directed (or undirected) edge between two nodes with optional weight and label.
+LPatternGraph:addNode([label]: string, [value]: boolean|number|string|table) -> number -- Add a node to the graph with an optional label and payload value.
+LPatternGraph:bfs(start: integer) -> table -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
+LPatternGraph:clearAll() -- Remove all nodes, edges, and payloads from the graph.
+LPatternGraph:dfs(start: integer) -> table -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
+LPatternGraph:edgeCount() -> number -- Return the total number of edges in the graph.
+LPatternGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil -- Retrieve the payload value stored on a node. Returns nil if no payload.
+LPatternGraph:hasNode(id: integer) -> boolean -- Check whether a node with the given ID exists in the graph.
+LPatternGraph:isConnected(from: integer, to: integer) -> boolean -- Check whether there is any path from one node to another.
+LPatternGraph:neighbors(id: integer) -> table -- Return an array of node IDs directly connected to the given node.
+LPatternGraph:nodeCount() -> number -- Return the total number of nodes in the graph.
+LPatternGraph:removeEdge(id: integer) -> boolean -- Remove an edge by its ID. Returns true if it existed.
+LPatternGraph:removeNode(id: integer) -> boolean -- Remove a node and all its connected edges. Returns true if the node existed.
 ```
 
 ### LPriorityQueue
@@ -4990,7 +4994,7 @@ LCanvas:getHeight() -> number -- Returns the height of this canvas in pixels.
 LCanvas:getWidth() -> number -- Returns the width of this canvas in pixels.
 LCanvas:release() -> boolean -- Releases the canvas GPU resource. If this canvas is currently active, drawing reverts to the screen.
 LCanvas:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LCanvas:typeOf() -> string -- Returns the type name of this object.
+LCanvas:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LDrawLayer
@@ -5016,7 +5020,7 @@ LFont:getWrap(text: string, limit: number) -> table, number -- Word-wraps text t
 LFont:release() -> boolean -- Releases the font resource. The handle becomes invalid after this call.
 LFont:setLineHeight(height: number) -- Overrides the line height used for multi-line text rendering.
 LFont:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LFont:typeOf() -> string -- Returns the type name of this object.
+LFont:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LImage
@@ -5028,7 +5032,7 @@ LImage:getId() -> number -- Returns the internal numeric handle ID for this imag
 LImage:getWidth() -> number -- Returns the width of this image in pixels.
 LImage:release() -> boolean -- Releases the GPU memory for this image. The handle becomes invalid after this call.
 LImage:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LImage:typeOf() -> string -- Returns the type name of this object.
+LImage:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LImageData
@@ -5054,7 +5058,7 @@ LMesh:release() -> boolean -- Releases the mesh resource. This method is availab
 LMesh:setTexture([image]: LImage) -- Assigns or removes a texture for this mesh. Pass nil to clear the texture.
 LMesh:setVertex(index: integer, data: table) -- Updates a single vertex by 1-based index. Table format: {x, y, u, v, r, g, b, a}.
 LMesh:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LMesh:typeOf() -> string -- Returns the type name of this object.
+LMesh:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LNineSlice
@@ -5084,7 +5088,7 @@ LQuad:getTextureDimensions() -> number, number -- Returns the full dimensions of
 LQuad:getViewport() -> number, number, number, number -- Returns the quad's viewport rectangle within the source texture.
 LQuad:setViewport(x: number, y: number, w: number, h: number) -- Updates the quad's viewport rectangle.
 LQuad:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LQuad:typeOf() -> string -- Returns the type name of this object.
+LQuad:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LShader
@@ -5094,7 +5098,7 @@ LShader:hasUniform(name: string) -> boolean -- Checks whether this shader declar
 LShader:release() -> boolean -- Releases the shader resource. If active, the default shader is restored.
 LShader:send(name: string, value: number|boolean|table) -- Sends a uniform value to this shader by name. Supported types: number, boolean, or table (vec2/vec3/vec4).
 LShader:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LShader:typeOf() -> string -- Returns the type name of this object.
+LShader:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ### LShape
@@ -5127,7 +5131,7 @@ LSpriteBatch:getBufferSize() -> number -- Returns the maximum number of entries 
 LSpriteBatch:getCount() -> number -- Returns the number of sprite entries currently in the batch.
 LSpriteBatch:release() -> boolean -- Releases the sprite batch resource.
 LSpriteBatch:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LSpriteBatch:typeOf() -> string -- Returns the type name of this object.
+LSpriteBatch:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
 ## lurek.repl
@@ -5201,7 +5205,7 @@ lurek.scene.define([def]: table) -> function -- Create a reusable scene construc
 lurek.scene.depth() -> number -- Alias for `getStackSize`. Returns the total number of scenes currently on the stack.
 lurek.scene.deserializeScene(snapshot: table) -- Restore shared scene data from a previously-serialized snapshot table. Only the `data` key-value map is res...
 lurek.scene.draw() -- Call `draw(self)` on every scene in the stack from bottom to top. This is the legacy draw callback — prefer...
-lurek.scene.fade([duration]: number) -> table -- Helper sub-table `lurek.scene.transitions` with convenience factory functions that build transition descrip...
+lurek.scene.transitions.fade([duration]: number) -> table -- Helper sub-table `lurek.scene.transitions` with convenience factory functions that build transition descrip...
 lurek.scene.getActiveScenes() -> table -- Returns a Lua array of all active scene tables ordered by their layer value (lowest layer first). Includes...
 lurek.scene.getCurrent() -> table|nil -- Returns the scene table currently on top of the stack, or nil if the stack is empty. Use this to inspect or...
 lurek.scene.getCurrentLayer() -> number -- Get the rendering layer of the current top scene. Returns 0 if the stack is empty or if no layer was explic...
@@ -5215,7 +5219,7 @@ lurek.scene.getTransitionProgressEased() -> number -- Returns the eased progress
 lurek.scene.getTransitionTypes() -> table -- Returns a Lua array of all supported transition type name strings. Use this to discover available transitio...
 lurek.scene.hasData(key: string) -> boolean -- Check whether a key exists in the shared scene data map without retrieving its value.
 lurek.scene.hasRegistered(name: string) -> boolean -- Check whether a scene is registered under the given name.
-lurek.scene.iris([duration]: number) -> table -- Create an iris (circle) transition descriptor table. A circular aperture opens or closes to reveal the new...
+lurek.scene.transitions.iris([duration]: number) -> table -- Create an iris (circle) transition descriptor table. A circular aperture opens or closes to reveal the new...
 lurek.scene.isEmpty() -> boolean -- Returns true if the scene stack contains no scenes at all. Useful for guarding against calling `pop` on an...
 lurek.scene.isOverlay() -> boolean -- Returns true if the current top scene was pushed via `pushOverlay`. Overlay scenes do not pause the scene b...
 lurek.scene.isPreloaded(name: string) -> boolean -- Returns true if the named preload loader has already been executed at least once. Once a loader runs, subse...
@@ -5240,11 +5244,11 @@ lurek.scene.renderUi() -- Call `render_ui(self)` on every scene in the stack fro
 lurek.scene.serializeScene() -> table -- Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` arr...
 lurek.scene.setCurrentLayer(layer: integer) -> boolean -- Set the rendering layer of the current top scene. Scenes with higher layer values are processed and drawn a...
 lurek.scene.setData(key: string, value: any) -- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use...
-lurek.scene.slide([direction]: string, [duration]: number) -> table -- Create a directional slide transition descriptor table. The new scene slides in from the specified directio...
+lurek.scene.transitions.slide([direction]: string, [duration]: number) -> table -- Create a directional slide transition descriptor table. The new scene slides in from the specified directio...
 lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any) -- Replace the current top scene with a different one without changing stack depth. The old scene receives `le...
 lurek.scene.unregisterScene(name: string) -- Remove a scene registration by name. Does not pop the scene if it is currently active on the stack — it onl...
 lurek.scene.update(dt: number) -- Advance any active transition animation and call `update(self, dt)` on the current top scene. Call this onc...
-lurek.scene.wipe([duration]: number) -> table -- Create a horizontal wipe transition descriptor table. A wipe bar sweeps across the screen to reveal the new...
+lurek.scene.transitions.wipe([duration]: number) -> table -- Create a horizontal wipe transition descriptor table. A wipe bar sweeps across the screen to reveal the new...
 ```
 
 ### LDepthSorter
@@ -5305,7 +5309,7 @@ LSkeleton:addSkin(name: string) -- Registers a new named skin on this skeleton. 
 LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> number -- Adds a slot attached to a specific bone, optionally assigning a default attachment name.
 LSkeleton:blendAnimation(anim: LSkeletonAnimation, time: number, [blend_weight]: number) -- Blends an animation pose onto the skeleton at a given time with a weight factor for smooth transitions.
 LSkeleton:boneCount() -> number -- Returns the total number of bones in the skeleton.
-LSkeleton:drawToImage(w: integer, h: integer) -> LImage -- Renders the skeleton into an in-memory image of the given dimensions and returns it as LImage userdata.
+LSkeleton:drawToImage(w: integer, h: integer) -> LImageData -- Renders the skeleton into an in-memory image of the given dimensions and returns it as LImageData userdata.
 LSkeleton:findBone(name: string) -> number -- Searches for a bone by name and returns its zero-based index, or nil if not found.
 LSkeleton:findSlot(name: string) -> number -- Searches for a slot by name and returns its zero-based index, or nil if not found.
 LSkeleton:getAnimationTime() -> number -- Returns the current playback time of the active animation in seconds.
@@ -5537,12 +5541,12 @@ lurek.thread.newThread(code: string) -> LThread -- Creates a new worker thread t
 
 ```lua
 LChannel:clear() -- Removes all pending values from the channel.
-LChannel:demand([timeout]: number) -> LuaValue -- Blocks until a value is available on the channel or the optional timeout expires.
+LChannel:demand([timeout]: number) -> any -- Blocks until a value is available on the channel or the optional timeout expires.
 LChannel:getCapacity() -> number -- Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
 LChannel:getCount() -> number -- Returns the number of values currently queued in the channel.
 LChannel:isBounded() -> boolean -- Checks whether this channel has a fixed capacity limit.
-LChannel:peek() -> LuaValue -- Returns the next value from the channel without removing it.
-LChannel:pop() -> LuaValue -- Removes and returns the next value from the channel without blocking.
+LChannel:peek() -> any -- Returns the next value from the channel without removing it.
+LChannel:pop() -> any -- Removes and returns the next value from the channel without blocking.
 LChannel:popBytes() -> string -- Pops the next value from the channel only if it is a byte blob, discarding non-bytes values.
 LChannel:popTable() -> table -- Pops the next value from the channel only if it is a table, discarding non-table values.
 LChannel:push(value: any) -> number -- Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
@@ -5560,7 +5564,7 @@ LChannel:typeOf(name: string) -> boolean -- Checks whether this object matches t
 LPromise:chain(code: string, ...: any) -> LPromise -- Creates a new promise that runs the given code with the parent promise's result as its first argument.
 LPromise:getError() -> string -- Returns the error message from the promise, if it terminated with an error.
 LPromise:isDone() -> boolean -- Checks whether the asynchronous computation has completed.
-LPromise:result() -> LuaValue -- Returns the result value of the completed promise.
+LPromise:result() -> any -- Returns the result value of the completed promise.
 LPromise:type() -> string -- Returns the type name of this object.
 LPromise:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5579,7 +5583,7 @@ LThread:wait() -- Blocks the calling thread until the worker thread finishes exe
 ### LThreadPool
 
 ```lua
-LThreadPool:collect() -> LuaValue -- Pops and returns the next result from the pool's output channel.
+LThreadPool:collect() -> any -- Pops and returns the next result from the pool's output channel.
 LThreadPool:getInputChannel() -> LChannel -- Returns the pool's shared input channel that feeds work items to worker threads.
 LThreadPool:getOutputChannel() -> LChannel -- Returns the pool's shared output channel where worker threads place their results.
 LThreadPool:join([timeout]: number) -> boolean -- Blocks until all workers finish or the optional timeout elapses.
@@ -5965,7 +5969,7 @@ LTweenParallel:cancel() -- Cancels all tweens in this parallel group immediately
 LTweenParallel:isActive() -> boolean -- Returns whether this parallel group is still running.
 LTweenParallel:onComplete(self: LTweenParallel, f: function) -> LTweenParallel -- Sets a callback to fire when all tweens in this parallel group have finished. Returns the group for chaining.
 LTweenParallel:start() -> LTweenParallel -- Starts all tweens in this parallel group simultaneously.
-LTweenParallel:tween(self: LTweenParallel, duration: number, target: table, fields: table, [easing]: string) -> LTweenParallel -- Creates and adds a new tween step directly to this parallel group.
+LTweenParallel:tween(duration: number, target: table, fields: table, [easing]: string) -> LTweenParallel -- Creates and adds a new tween step directly to this parallel group.
 LTweenParallel:type() -> string -- Returns the type name of this object.
 LTweenParallel:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5981,7 +5985,7 @@ LTweenSequence:getProgress() -> number -- Returns the overall progress ratio of 
 LTweenSequence:isActive() -> boolean -- Returns whether this sequence is still running.
 LTweenSequence:onComplete(self: LTweenSequence, f: function) -> LTweenSequence -- Sets a callback to fire when the sequence finishes all steps. Returns the sequence for chaining.
 LTweenSequence:start() -> LTweenSequence -- Starts playback of this sequence from the first step.
-LTweenSequence:tween(self: LTweenSequence, duration: number, target: table, fields: table, [easing]: string) -> LTweenSequence -- Appends a tween step to this sequence that animates numeric fields on the target table.
+LTweenSequence:tween(duration: number, target: table, fields: table, [easing]: string) -> LTweenSequence -- Appends a tween step to this sequence that animates numeric fields on the target table.
 LTweenSequence:type() -> string -- Returns the type name of this object.
 LTweenSequence:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -6033,7 +6037,7 @@ lurek.ui.newButton([text]: string) -> LButton -- Creates a new button widget. Th
 lurek.ui.newCheckbox([text]: string) -> LCheckbox -- Creates a new checkbox widget. This function is exposed to Lua scripts.
 lurek.ui.newColorPicker() -> LColorPicker -- Creates a new color picker widget. This function is exposed to Lua scripts.
 lurek.ui.newComboBox() -> LComboBox -- Creates a new combo box (drop-down) widget.
-lurek.ui.newCustomWidget([config]: table) -> LWidget -- Creates a new custom widget with optional initial configuration.
+lurek.ui.newCustomWidget([config]: table) -> LUiWidget -- Creates a new custom widget with optional initial configuration.
 lurek.ui.newDialog([title]: string) -> LDialog -- Creates a new dialog widget. This function is exposed to Lua scripts.
 lurek.ui.newDockPanel() -> LDockPanel -- Creates a new dock panel widget for docking child widgets to sides.
 lurek.ui.newImageWidget() -> LImageWidget -- Creates a new image display widget.
@@ -6082,13 +6086,13 @@ lurek.ui.wheelmoved(x: number, y: number) -> boolean -- Delivers a mouse wheel e
 ### LAccordion
 
 ```lua
-LAccordion:addSection(title: string, [content_idx]: integer) -- Adds a collapsible section to this accordion.
-LAccordion:getSectionCount() -> number -- Returns the number of sections in this accordion.
-LAccordion:getSectionTitle(section_idx: integer) -> string -- Returns the title of an accordion section by its 1-based index.
-LAccordion:isExclusive() -> boolean -- Returns whether this accordion is in exclusive mode (only one section open at a time).
-LAccordion:isSectionExpanded(section_idx: integer) -> boolean -- Returns whether an accordion section is expanded.
-LAccordion:setExclusive(v: boolean) -- Sets exclusive mode. When true, expanding one section collapses all others.
-LAccordion:toggleSection(section_idx: integer) -> boolean -- Toggles the expanded state of an accordion section by its 1-based index.
+LAccordion:addSection(self: LAccordion, title: string, [content_idx]: integer) -- Adds a collapsible section to this accordion.
+LAccordion:getSectionCount(self: LAccordion) -> number -- Returns the number of sections in this accordion.
+LAccordion:getSectionTitle(self: LAccordion, section_idx: integer) -> string -- Returns the title of an accordion section by its 1-based index.
+LAccordion:isExclusive(self: LAccordion) -> boolean -- Returns whether this accordion is in exclusive mode (only one section open at a time).
+LAccordion:isSectionExpanded(self: LAccordion, section_idx: integer) -> boolean -- Returns whether an accordion section is expanded.
+LAccordion:setExclusive(self: LAccordion, v: boolean) -- Sets exclusive mode. When true, expanding one section collapses all others.
+LAccordion:toggleSection(self: LAccordion, section_idx: integer) -> boolean -- Toggles the expanded state of an accordion section by its 1-based index.
 ```
 
 ### LAreaChart
@@ -6104,9 +6108,9 @@ LAreaChart:typeOf(name: string) -> boolean -- Checks whether this object matches
 ### LBadge
 
 ```lua
-LBadge:getCount() -> number -- Returns the current notification count of this badge.
-LBadge:getDisplayText() -> string -- Returns the formatted display text of this badge (e.g. "99+" when count exceeds the maximum).
-LBadge:setCount(count: integer) -- Sets the notification count displayed by this badge.
+LBadge:getCount(self: LBadge) -> number -- Returns the current notification count of this badge.
+LBadge:getDisplayText(self: LBadge) -> string -- Returns the formatted display text of this badge (e.g. "99+" when count exceeds the maximum).
+LBadge:setCount(self: LBadge, count: integer) -- Sets the notification count displayed by this badge.
 ```
 
 ### LBarChart
@@ -6122,130 +6126,130 @@ LBarChart:typeOf(name: string) -> boolean -- Checks whether this object matches 
 ### LButton
 
 ```lua
-LButton:getText() -> string -- Returns the current display text of this button.
-LButton:setText(text: string) -- Sets the display text on this button.
+LButton:getText(self: LButton) -> string -- Returns the current display text of this button.
+LButton:setText(self: LButton, text: string) -- Sets the display text on this button.
 ```
 
 ### LCheckbox
 
 ```lua
-LCheckbox:getText() -> string -- Returns the label text of this checkbox.
-LCheckbox:isChecked() -> boolean -- Returns whether this checkbox is currently checked.
-LCheckbox:setChecked(checked: boolean) -- Sets the checked state of this checkbox.
-LCheckbox:setText(text: string) -- Sets the label text displayed next to this checkbox.
+LCheckbox:getText(self: LCheckbox) -> string -- Returns the label text of this checkbox.
+LCheckbox:isChecked(self: LCheckbox) -> boolean -- Returns whether this checkbox is currently checked.
+LCheckbox:setChecked(self: LCheckbox, checked: boolean) -- Sets the checked state of this checkbox.
+LCheckbox:setText(self: LCheckbox, text: string) -- Sets the label text displayed next to this checkbox.
 ```
 
 ### LColorPicker
 
 ```lua
-LColorPicker:getColor() -> number -- Returns the current color as RGBA components (0.0 to 1.0).
-LColorPicker:getColorMode() -> string -- Returns the color mode of this picker (e.g. "rgb", "hsv").
-LColorPicker:getShowAlpha() -> boolean -- Returns whether the alpha channel slider is visible.
-LColorPicker:setColor(r: number, g: number, b: number, [a]: number) -- Sets the current color as RGBA components.
-LColorPicker:setColorMode(mode: string) -- Sets the color mode of this picker (e.g. "rgb", "hsv").
-LColorPicker:setOnChange(f: function) -- Registers a callback invoked when this color picker's value changes.
-LColorPicker:setShowAlpha(v: boolean) -- Sets whether the alpha channel slider is visible.
+LColorPicker:getColor(self: LColorPicker) -> number -- Returns the current color as RGBA components (0.0 to 1.0).
+LColorPicker:getColorMode(self: LColorPicker) -> string -- Returns the color mode of this picker (e.g. "rgb", "hsv").
+LColorPicker:getShowAlpha(self: LColorPicker) -> boolean -- Returns whether the alpha channel slider is visible.
+LColorPicker:setColor(self: LColorPicker, r: number, g: number, b: number, [a]: number) -- Sets the current color as RGBA components.
+LColorPicker:setColorMode(self: LColorPicker, mode: string) -- Sets the color mode of this picker (e.g. "rgb", "hsv").
+LColorPicker:setOnChange(self: LColorPicker, f: function) -- Registers a callback invoked when this color picker's value changes.
+LColorPicker:setShowAlpha(self: LColorPicker, v: boolean) -- Sets whether the alpha channel slider is visible.
 ```
 
 ### LComboBox
 
 ```lua
-LComboBox:addItem(text: string) -- Appends a new text item to this combo box's dropdown list.
-LComboBox:clearItems() -- Removes all items from this combo box.
-LComboBox:getItem(index: integer) -> string -- Returns the text of the item at the given 1-based index.
-LComboBox:getItemCount() -> number -- Returns the number of items in this combo box.
-LComboBox:getSelectedIndex() -> number -- Returns the 1-based index of the currently selected item, or 0 if none is selected.
-LComboBox:getSelectedItem() -> string -- Returns the text of the currently selected item, or nil if none is selected.
-LComboBox:removeItem(index: integer) -> boolean -- Removes the item at the given 1-based index from this combo box.
-LComboBox:setSelectedIndex(index: integer) -- Sets the selected item by 1-based index.
+LComboBox:addItem(self: LComboBox, text: string) -- Appends a new text item to this combo box's dropdown list.
+LComboBox:clearItems(self: LComboBox) -- Removes all items from this combo box.
+LComboBox:getItem(self: LComboBox, index: integer) -> string -- Returns the text of the item at the given 1-based index.
+LComboBox:getItemCount(self: LComboBox) -> number -- Returns the number of items in this combo box.
+LComboBox:getSelectedIndex(self: LComboBox) -> number -- Returns the 1-based index of the currently selected item, or 0 if none is selected.
+LComboBox:getSelectedItem(self: LComboBox) -> string -- Returns the text of the currently selected item, or nil if none is selected.
+LComboBox:removeItem(self: LComboBox, index: integer) -> boolean -- Removes the item at the given 1-based index from this combo box.
+LComboBox:setSelectedIndex(self: LComboBox, index: integer) -- Sets the selected item by 1-based index.
 ```
 
 ### LDialog
 
 ```lua
-LDialog:addButton(text: string, [cb]: function) -> number -- Adds a footer button to this dialog and returns its 1-based index.
-LDialog:close() -- Closes this dialog and fires the onClose callback if it was open.
-LDialog:getContent() -> number -- Returns the widget index of this dialog's content, or nil if not set.
-LDialog:getTitle() -> string -- Returns the title text of this dialog.
-LDialog:isModal() -> boolean -- Returns whether this dialog is modal (blocks interaction with other widgets).
-LDialog:isOpen() -> boolean -- Returns whether this dialog is currently open and visible.
-LDialog:open() -- Opens this dialog, making it visible.
-LDialog:setContent([content_idx]: integer) -- Sets the content widget for this dialog.
-LDialog:setModal(v: boolean) -- Sets whether this dialog is modal. This method is available to Lua scripts.
-LDialog:setOnClose(f: function) -- Registers a callback invoked when this dialog is closed.
-LDialog:setTitle(title: string) -- Sets the title text of this dialog. This method is available to Lua scripts.
+LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number -- Adds a footer button to this dialog and returns its 1-based index.
+LDialog:close(self: LDialog) -- Closes this dialog and fires the onClose callback if it was open.
+LDialog:getContent(self: LDialog) -> number -- Returns the widget index of this dialog's content, or nil if not set.
+LDialog:getTitle(self: LDialog) -> string -- Returns the title text of this dialog.
+LDialog:isModal(self: LDialog) -> boolean -- Returns whether this dialog is modal (blocks interaction with other widgets).
+LDialog:isOpen(self: LDialog) -> boolean -- Returns whether this dialog is currently open and visible.
+LDialog:open(self: LDialog) -- Opens this dialog, making it visible.
+LDialog:setContent(self: LDialog, [content_idx]: integer) -- Sets the content widget for this dialog.
+LDialog:setModal(self: LDialog, v: boolean) -- Sets whether this dialog is modal. This method is available to Lua scripts.
+LDialog:setOnClose(self: LDialog, f: function) -- Registers a callback invoked when this dialog is closed.
+LDialog:setTitle(self: LDialog, title: string) -- Sets the title text of this dialog. This method is available to Lua scripts.
 ```
 
 ### LDockPanel
 
 ```lua
-LDockPanel:dock(child_idx: integer, side: string) -- Docks a child widget to the specified side of this dock panel.
-LDockPanel:getDockedCount() -> number -- Returns the number of widgets docked in this dock panel.
-LDockPanel:getSplitSize(side: string) -> number -- Returns the size configured for a dock panel side region.
-LDockPanel:setSplitSize(side: string, size: number) -- Sets the size of a dock panel side region.
-LDockPanel:undock(child_idx: integer) -- Removes a child widget from this dock panel.
+LDockPanel:dock(self: LDockPanel, child_idx: integer, side: string) -- Docks a child widget to the specified side of this dock panel.
+LDockPanel:getDockedCount(self: LDockPanel) -> number -- Returns the number of widgets docked in this dock panel.
+LDockPanel:getSplitSize(self: LDockPanel, side: string) -> number -- Returns the size configured for a dock panel side region.
+LDockPanel:setSplitSize(self: LDockPanel, side: string, size: number) -- Sets the size of a dock panel side region.
+LDockPanel:undock(self: LDockPanel, child_idx: integer) -- Removes a child widget from this dock panel.
 ```
 
 ### LGuiTable
 
 ```lua
-LGuiTable:addColumn(header: string, [width]: number) -- Adds a new column to this table widget.
-LGuiTable:addRow(cells: table) -- Adds a row to this table widget. This method is available to Lua scripts.
-LGuiTable:getCell(row: integer, col: integer) -> string -- Returns the text of a cell at the given 1-based row and column.
-LGuiTable:getColumnCount() -> number -- Returns the number of columns in this table widget.
-LGuiTable:getRowCount() -> number -- Returns the number of rows in this table widget.
-LGuiTable:getSelectedRow() -> number -- Returns the 1-based index of the currently selected row, or nil.
-LGuiTable:isSortable() -> boolean -- Returns whether columns in this table can be sorted by clicking headers.
-LGuiTable:setCell(row: integer, col: integer, text: string) -- Sets the text of a cell at the given 1-based row and column.
-LGuiTable:setOnSelect(f: function) -- Registers a callback invoked when a table row is selected.
-LGuiTable:setSelectedRow([row]: integer) -- Sets the selected row by its 1-based index, or nil to deselect.
-LGuiTable:setSortable(v: boolean) -- Sets whether columns in this table can be sorted by clicking headers.
+LGuiTable:addColumn(self: LGuiTable, header: string, [width]: number) -- Adds a new column to this table widget.
+LGuiTable:addRow(self: LGuiTable, cells: table) -- Adds a row to this table widget. This method is available to Lua scripts.
+LGuiTable:getCell(self: LGuiTable, row: integer, col: integer) -> string -- Returns the text of a cell at the given 1-based row and column.
+LGuiTable:getColumnCount(self: LGuiTable) -> number -- Returns the number of columns in this table widget.
+LGuiTable:getRowCount(self: LGuiTable) -> number -- Returns the number of rows in this table widget.
+LGuiTable:getSelectedRow(self: LGuiTable) -> number -- Returns the 1-based index of the currently selected row, or nil.
+LGuiTable:isSortable(self: LGuiTable) -> boolean -- Returns whether columns in this table can be sorted by clicking headers.
+LGuiTable:setCell(self: LGuiTable, row: integer, col: integer, text: string) -- Sets the text of a cell at the given 1-based row and column.
+LGuiTable:setOnSelect(self: LGuiTable, f: function) -- Registers a callback invoked when a table row is selected.
+LGuiTable:setSelectedRow(self: LGuiTable, [row]: integer) -- Sets the selected row by its 1-based index, or nil to deselect.
+LGuiTable:setSortable(self: LGuiTable, v: boolean) -- Sets whether columns in this table can be sorted by clicking headers.
 ```
 
 ### LGuiWindow
 
 ```lua
-LGuiWindow:getTitle() -> string -- Returns the title bar text of this GUI window.
-LGuiWindow:isCloseable() -> boolean -- Returns whether this window shows a close button.
-LGuiWindow:isDraggable() -> boolean -- Returns whether this window can be dragged by its title bar.
-LGuiWindow:isResizable() -> boolean -- Returns whether this window can be resized by dragging its edges.
-LGuiWindow:setCloseable(v: boolean) -- Sets whether this window shows a close button.
-LGuiWindow:setDraggable(v: boolean) -- Sets whether this window can be dragged by its title bar.
-LGuiWindow:setOnClose(f: function) -- Registers a callback invoked when this window is closed.
-LGuiWindow:setResizable(v: boolean) -- Sets whether this window can be resized.
-LGuiWindow:setTitle(title: string) -- Sets the title bar text of this GUI window.
+LGuiWindow:getTitle(self: LGuiWindow) -> string -- Returns the title bar text of this GUI window.
+LGuiWindow:isCloseable(self: LGuiWindow) -> boolean -- Returns whether this window shows a close button.
+LGuiWindow:isDraggable(self: LGuiWindow) -> boolean -- Returns whether this window can be dragged by its title bar.
+LGuiWindow:isResizable(self: LGuiWindow) -> boolean -- Returns whether this window can be resized by dragging its edges.
+LGuiWindow:setCloseable(self: LGuiWindow, v: boolean) -- Sets whether this window shows a close button.
+LGuiWindow:setDraggable(self: LGuiWindow, v: boolean) -- Sets whether this window can be dragged by its title bar.
+LGuiWindow:setOnClose(self: LGuiWindow, f: function) -- Registers a callback invoked when this window is closed.
+LGuiWindow:setResizable(self: LGuiWindow, v: boolean) -- Sets whether this window can be resized.
+LGuiWindow:setTitle(self: LGuiWindow, title: string) -- Sets the title bar text of this GUI window.
 ```
 
 ### LImageWidget
 
 ```lua
-LImageWidget:getScaleMode() -> string -- Returns the image scaling mode (e.g. "fit", "fill", "stretch").
-LImageWidget:getTint() -> number -- Returns the tint color of this image widget as RGBA components.
-LImageWidget:setScaleMode(mode: string) -- Sets the image scaling mode (e.g. "fit", "fill", "stretch").
-LImageWidget:setTint(r: number, g: number, b: number, [a]: number) -- Sets the tint color of this image widget as RGBA components.
+LImageWidget:getScaleMode(self: LImageWidget) -> string -- Returns the image scaling mode (e.g. "fit", "fill", "stretch").
+LImageWidget:getTint(self: LImageWidget) -> number -- Returns the tint color of this image widget as RGBA components.
+LImageWidget:setScaleMode(self: LImageWidget, mode: string) -- Sets the image scaling mode (e.g. "fit", "fill", "stretch").
+LImageWidget:setTint(self: LImageWidget, r: number, g: number, b: number, [a]: number) -- Sets the tint color of this image widget as RGBA components.
 ```
 
 ### LLabel
 
 ```lua
-LLabel:getText() -> string -- Returns the current display text of this label.
-LLabel:setText(text: string) -- Sets the display text on this label.
+LLabel:getText(self: LLabel) -> string -- Returns the current display text of this label.
+LLabel:setText(self: LLabel, text: string) -- Sets the display text on this label.
 ```
 
 ### LLayout
 
 ```lua
-LLayout:getAlign() -> string -- Returns the current cross-axis alignment mode.
-LLayout:getDirection() -> string -- Returns the current layout direction.
-LLayout:getJustify() -> string -- Returns the current main-axis justification mode.
-LLayout:getSpacing() -> number -- Returns the current spacing between children.
-LLayout:getWrap() -> boolean -- Returns whether wrapping is enabled for this layout.
-LLayout:setAlign(align: string) -- Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stretch").
-LLayout:setColumns(n: integer) -- Sets the number of columns for grid layout mode (minimum 1).
-LLayout:setDirection(dir: string) -- Sets the layout direction for child arrangement ("horizontal", "vertical", or "grid").
-LLayout:setJustify(justify: string) -- Sets the main-axis justification for children (e.g. "start", "center", "end", "space-between").
-LLayout:setSpacing(spacing: number) -- Sets the spacing in pixels between child widgets in this layout.
-LLayout:setWrap(wrap: boolean) -- Enables or disables wrapping of children to the next row/column when they overflow.
+LLayout:getAlign(self: LLayout) -> string -- Returns the current cross-axis alignment mode.
+LLayout:getDirection(self: LLayout) -> string -- Returns the current layout direction.
+LLayout:getJustify(self: LLayout) -> string -- Returns the current main-axis justification mode.
+LLayout:getSpacing(self: LLayout) -> number -- Returns the current spacing between children.
+LLayout:getWrap(self: LLayout) -> boolean -- Returns whether wrapping is enabled for this layout.
+LLayout:setAlign(self: LLayout, align: string) -- Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stretch").
+LLayout:setColumns(self: LLayout, n: integer) -- Sets the number of columns for grid layout mode (minimum 1).
+LLayout:setDirection(self: LLayout, dir: string) -- Sets the layout direction for child arrangement ("horizontal", "vertical", or "grid").
+LLayout:setJustify(self: LLayout, justify: string) -- Sets the main-axis justification for children (e.g. "start", "center", "end", "space-between").
+LLayout:setSpacing(self: LLayout, spacing: number) -- Sets the spacing in pixels between child widgets in this layout.
+LLayout:setWrap(self: LLayout, wrap: boolean) -- Enables or disables wrapping of children to the next row/column when they overflow.
 ```
 
 ### LLineChart
@@ -6262,55 +6266,55 @@ LLineChart:typeOf(name: string) -> boolean -- Checks whether this object matches
 ### LListBox
 
 ```lua
-LListBox:addItem(text: string) -- Appends a new text item to this list box.
-LListBox:clearItems() -- Removes all items from this list box.
-LListBox:getItem(index: integer) -> string -- Returns the text of the item at the given 1-based index.
-LListBox:getItemCount() -> number -- Returns the number of items in this list box.
-LListBox:getSelectedIndex() -> number -- Returns the 1-based index of the currently selected item, or 0 if none.
-LListBox:removeItem(index: integer) -- Removes the item at the given 1-based index from this list box.
-LListBox:setItemHeight(h: number) -- Sets the pixel height of each item row in this list box.
-LListBox:setSelectedIndex(index: integer) -- Sets the selected item by 1-based index.
+LListBox:addItem(self: LListBox, text: string) -- Appends a new text item to this list box.
+LListBox:clearItems(self: LListBox) -- Removes all items from this list box.
+LListBox:getItem(self: LListBox, index: integer) -> string -- Returns the text of the item at the given 1-based index.
+LListBox:getItemCount(self: LListBox) -> number -- Returns the number of items in this list box.
+LListBox:getSelectedIndex(self: LListBox) -> number -- Returns the 1-based index of the currently selected item, or 0 if none.
+LListBox:removeItem(self: LListBox, index: integer) -- Removes the item at the given 1-based index from this list box.
+LListBox:setItemHeight(self: LListBox, h: number) -- Sets the pixel height of each item row in this list box.
+LListBox:setSelectedIndex(self: LListBox, index: integer) -- Sets the selected item by 1-based index.
 ```
 
 ### LMenuBar
 
 ```lua
-LMenuBar:addMenu(menu_idx: integer) -- Adds a menu (by its widget index) to this menu bar.
-LMenuBar:getMenuCount() -> number -- Returns the number of menus in this menu bar.
-LMenuBar:getMenus() -> table -- Returns a table of widget indices for all menus in this menu bar.
-LMenuBar:removeMenu(menu_idx: integer) -> boolean -- Removes a menu from this menu bar by its widget index.
+LMenuBar:addMenu(self: LMenuBar, menu_idx: integer) -- Adds a menu (by its widget index) to this menu bar.
+LMenuBar:getMenuCount(self: LMenuBar) -> number -- Returns the number of menus in this menu bar.
+LMenuBar:getMenus(self: LMenuBar) -> table -- Returns a table of widget indices for all menus in this menu bar.
+LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean -- Removes a menu from this menu bar by its widget index.
 ```
 
 ### LMenuItem
 
 ```lua
-LMenuItem:addSubItem(child_idx: integer) -- Adds a sub-item to this menu item for building nested menus.
-LMenuItem:getShortcut() -> string -- Returns the keyboard shortcut string associated with this menu item.
-LMenuItem:getSubItems() -> table -- Returns a table of widget indices for all sub-items of this menu item.
-LMenuItem:getText() -> string -- Returns the display text of this menu item.
-LMenuItem:isChecked() -> boolean -- Returns whether this menu item is checked (for checkable menu items).
-LMenuItem:setChecked(v: boolean) -- Sets the checked state of this menu item.
-LMenuItem:setOnClick(f: function) -- Registers a callback invoked when this menu item is clicked.
-LMenuItem:setShortcut(shortcut: string) -- Sets the keyboard shortcut text displayed next to this menu item.
-LMenuItem:setText(text: string) -- Sets the display text of this menu item.
+LMenuItem:addSubItem(self: LMenuItem, child_idx: integer) -- Adds a sub-item to this menu item for building nested menus.
+LMenuItem:getShortcut(self: LMenuItem) -> string -- Returns the keyboard shortcut string associated with this menu item.
+LMenuItem:getSubItems(self: LMenuItem) -> table -- Returns a table of widget indices for all sub-items of this menu item.
+LMenuItem:getText(self: LMenuItem) -> string -- Returns the display text of this menu item.
+LMenuItem:isChecked(self: LMenuItem) -> boolean -- Returns whether this menu item is checked (for checkable menu items).
+LMenuItem:setChecked(self: LMenuItem, v: boolean) -- Sets the checked state of this menu item.
+LMenuItem:setOnClick(self: LMenuItem, f: function) -- Registers a callback invoked when this menu item is clicked.
+LMenuItem:setShortcut(self: LMenuItem, shortcut: string) -- Sets the keyboard shortcut text displayed next to this menu item.
+LMenuItem:setText(self: LMenuItem, text: string) -- Sets the display text of this menu item.
 ```
 
 ### LNinePatch
 
 ```lua
-LNinePatch:getImageDimensions() -> number, number -- Returns the original image dimensions of this nine-patch.
-LNinePatch:getInsets() -> number, number, number, number -- Returns the border insets of this nine-patch.
-LNinePatch:getSlices() -> table -- Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
-LNinePatch:setImageDimensions(w: integer, h: integer) -- Sets the original image dimensions used for nine-patch slice calculations.
-LNinePatch:setInsets(left: integer, top: integer, right: integer, bottom: integer) -- Sets the border insets defining the stretchable center region of the nine-patch image.
+LNinePatch:getImageDimensions(self: LNinePatch) -> number, number -- Returns the original image dimensions of this nine-patch.
+LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number -- Returns the border insets of this nine-patch.
+LNinePatch:getSlices(self: LNinePatch) -> table -- Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
+LNinePatch:setImageDimensions(self: LNinePatch, w: integer, h: integer) -- Sets the original image dimensions used for nine-patch slice calculations.
+LNinePatch:setInsets(self: LNinePatch, left: integer, top: integer, right: integer, bottom: integer) -- Sets the border insets defining the stretchable center region of the nine-patch image.
 ```
 
 ### LPanel
 
 ```lua
-LPanel:getTitle() -> string -- Returns the title text of this panel.
-LPanel:setScrollable(scrollable: boolean) -- Enables or disables scrolling within this panel.
-LPanel:setTitle(title: string) -- Sets the title text displayed on this panel's header.
+LPanel:getTitle(self: LPanel) -> string -- Returns the title text of this panel.
+LPanel:setScrollable(self: LPanel, scrollable: boolean) -- Enables or disables scrolling within this panel.
+LPanel:setTitle(self: LPanel, title: string) -- Sets the title text displayed on this panel's header.
 ```
 
 ### LPieChart
@@ -6325,24 +6329,24 @@ LPieChart:typeOf(name: string) -> boolean -- Checks whether this object matches 
 ### LProgressBar
 
 ```lua
-LProgressBar:getMax() -> number -- Returns the maximum value of this progress bar's range.
-LProgressBar:getMin() -> number -- Returns the minimum value of this progress bar's range.
-LProgressBar:getProgress() -> number -- Returns the normalized progress as a fraction (0.0 to 1.0) of the current range.
-LProgressBar:getValue() -> number -- Returns the current value of this progress bar.
-LProgressBar:setRange(min: number, max: number) -- Sets the minimum and maximum bounds for this progress bar.
-LProgressBar:setValue(v: number) -- Sets the current fill value of this progress bar, clamped to its range.
+LProgressBar:getMax(self: LProgressBar) -> number -- Returns the maximum value of this progress bar's range.
+LProgressBar:getMin(self: LProgressBar) -> number -- Returns the minimum value of this progress bar's range.
+LProgressBar:getProgress(self: LProgressBar) -> number -- Returns the normalized progress as a fraction (0.0 to 1.0) of the current range.
+LProgressBar:getValue(self: LProgressBar) -> number -- Returns the current value of this progress bar.
+LProgressBar:setRange(self: LProgressBar, min: number, max: number) -- Sets the minimum and maximum bounds for this progress bar.
+LProgressBar:setValue(self: LProgressBar, v: number) -- Sets the current fill value of this progress bar, clamped to its range.
 ```
 
 ### LRadioButton
 
 ```lua
-LRadioButton:getGroup() -> string -- Returns the radio button group name. Buttons in the same group are mutually exclusive.
-LRadioButton:getText() -> string -- Returns the label text of this radio button.
-LRadioButton:isSelected() -> boolean -- Returns whether this radio button is currently selected.
-LRadioButton:setGroup(group: string) -- Sets the radio button group name. Buttons in the same group are mutually exclusive.
-LRadioButton:setOnChange(f: function) -- Registers a callback invoked when this radio button's selection changes.
-LRadioButton:setSelected(v: boolean) -- Sets the selected state of this radio button.
-LRadioButton:setText(text: string) -- Sets the label text of this radio button.
+LRadioButton:getGroup(self: LRadioButton) -> string -- Returns the radio button group name. Buttons in the same group are mutually exclusive.
+LRadioButton:getText(self: LRadioButton) -> string -- Returns the label text of this radio button.
+LRadioButton:isSelected(self: LRadioButton) -> boolean -- Returns whether this radio button is currently selected.
+LRadioButton:setGroup(self: LRadioButton, group: string) -- Sets the radio button group name. Buttons in the same group are mutually exclusive.
+LRadioButton:setOnChange(self: LRadioButton, f: function) -- Registers a callback invoked when this radio button's selection changes.
+LRadioButton:setSelected(self: LRadioButton, v: boolean) -- Sets the selected state of this radio button.
+LRadioButton:setText(self: LRadioButton, text: string) -- Sets the label text of this radio button.
 ```
 
 ### LScatterPlot
@@ -6359,114 +6363,114 @@ LScatterPlot:typeOf(name: string) -> boolean -- Checks whether this object match
 ### LScrollBar
 
 ```lua
-LScrollBar:getContentSize() -> number -- Returns the total content size tracked by this scroll bar.
-LScrollBar:getScrollPosition() -> number -- Returns the current scroll position of this scroll bar.
-LScrollBar:getViewSize() -> number -- Returns the visible viewport size tracked by this scroll bar.
-LScrollBar:isVertical() -> boolean -- Returns whether this scroll bar is oriented vertically.
-LScrollBar:setContentSize(v: number) -- Sets the total content size that this scroll bar represents.
-LScrollBar:setOnChange(f: function) -- Registers a callback invoked when this scroll bar's position changes.
-LScrollBar:setScrollPosition(v: number) -- Sets the scroll position of this scroll bar, clamped to the valid range.
-LScrollBar:setViewSize(v: number) -- Sets the visible viewport size for this scroll bar.
+LScrollBar:getContentSize(self: LScrollBar) -> number -- Returns the total content size tracked by this scroll bar.
+LScrollBar:getScrollPosition(self: LScrollBar) -> number -- Returns the current scroll position of this scroll bar.
+LScrollBar:getViewSize(self: LScrollBar) -> number -- Returns the visible viewport size tracked by this scroll bar.
+LScrollBar:isVertical(self: LScrollBar) -> boolean -- Returns whether this scroll bar is oriented vertically.
+LScrollBar:setContentSize(self: LScrollBar, v: number) -- Sets the total content size that this scroll bar represents.
+LScrollBar:setOnChange(self: LScrollBar, f: function) -- Registers a callback invoked when this scroll bar's position changes.
+LScrollBar:setScrollPosition(self: LScrollBar, v: number) -- Sets the scroll position of this scroll bar, clamped to the valid range.
+LScrollBar:setViewSize(self: LScrollBar, v: number) -- Sets the visible viewport size for this scroll bar.
 ```
 
 ### LScrollPanel
 
 ```lua
-LScrollPanel:getContentSize() -> number, number -- Returns the virtual content dimensions of this scroll panel.
-LScrollPanel:getMaxScroll() -> number, number -- Returns the maximum scroll offset allowed in each axis.
-LScrollPanel:getScrollPosition() -> number, number -- Returns the current scroll offset of this scroll panel.
-LScrollPanel:getScrollSpeed() -> number -- Returns the current scroll speed multiplier.
-LScrollPanel:setContentSize(w: number, h: number) -- Sets the virtual content dimensions of this scroll panel.
-LScrollPanel:setScrollPosition(x: number, y: number) -- Sets the scroll offset position of this scroll panel.
-LScrollPanel:setScrollSpeed(speed: number) -- Sets the scroll speed multiplier for mouse wheel scrolling.
+LScrollPanel:getContentSize(self: LScrollPanel) -> number, number -- Returns the virtual content dimensions of this scroll panel.
+LScrollPanel:getMaxScroll(self: LScrollPanel) -> number, number -- Returns the maximum scroll offset allowed in each axis.
+LScrollPanel:getScrollPosition(self: LScrollPanel) -> number, number -- Returns the current scroll offset of this scroll panel.
+LScrollPanel:getScrollSpeed(self: LScrollPanel) -> number -- Returns the current scroll speed multiplier.
+LScrollPanel:setContentSize(self: LScrollPanel, w: number, h: number) -- Sets the virtual content dimensions of this scroll panel.
+LScrollPanel:setScrollPosition(self: LScrollPanel, x: number, y: number) -- Sets the scroll offset position of this scroll panel.
+LScrollPanel:setScrollSpeed(self: LScrollPanel, speed: number) -- Sets the scroll speed multiplier for mouse wheel scrolling.
 ```
 
 ### LSeparator
 
 ```lua
-LSeparator:getThickness() -> number -- Returns the line thickness of this separator.
-LSeparator:isVertical() -> boolean -- Returns whether this separator is oriented vertically.
-LSeparator:setThickness(thickness: number) -- Sets the line thickness of this separator in pixels.
-LSeparator:setVertical(v: boolean) -- Sets whether this separator draws vertically or horizontally.
+LSeparator:getThickness(self: LSeparator) -> number -- Returns the line thickness of this separator.
+LSeparator:isVertical(self: LSeparator) -> boolean -- Returns whether this separator is oriented vertically.
+LSeparator:setThickness(self: LSeparator, thickness: number) -- Sets the line thickness of this separator in pixels.
+LSeparator:setVertical(self: LSeparator, v: boolean) -- Sets whether this separator draws vertically or horizontally.
 ```
 
 ### LSlider
 
 ```lua
-LSlider:getMax() -> number -- Returns the maximum value of this slider's range.
-LSlider:getMin() -> number -- Returns the minimum value of this slider's range.
-LSlider:getValue() -> number -- Returns the current value of this slider.
-LSlider:setRange(min: number, max: number) -- Sets the minimum and maximum bounds for this slider.
-LSlider:setStep(step: number) -- Sets the step increment for this slider's value snapping.
-LSlider:setValue(v: number) -- Sets the current value of this slider, clamped to its range.
+LSlider:getMax(self: LSlider) -> number -- Returns the maximum value of this slider's range.
+LSlider:getMin(self: LSlider) -> number -- Returns the minimum value of this slider's range.
+LSlider:getValue(self: LSlider) -> number -- Returns the current value of this slider.
+LSlider:setRange(self: LSlider, min: number, max: number) -- Sets the minimum and maximum bounds for this slider.
+LSlider:setStep(self: LSlider, step: number) -- Sets the step increment for this slider's value snapping.
+LSlider:setValue(self: LSlider, v: number) -- Sets the current value of this slider, clamped to its range.
 ```
 
 ### LSpinBox
 
 ```lua
-LSpinBox:decrement() -- Decreases this spin box's value by one step.
-LSpinBox:getValue() -> number -- Returns the current numeric value of this spin box.
-LSpinBox:increment() -- Increases this spin box's value by one step.
-LSpinBox:setRange(min: number, max: number) -- Sets the minimum and maximum bounds for this spin box.
-LSpinBox:setStep(step: number) -- Sets the step increment for this spin box.
-LSpinBox:setValue(v: number) -- Sets the numeric value of this spin box, clamped to its range.
+LSpinBox:decrement(self: LSpinBox) -- Decreases this spin box's value by one step.
+LSpinBox:getValue(self: LSpinBox) -> number -- Returns the current numeric value of this spin box.
+LSpinBox:increment(self: LSpinBox) -- Increases this spin box's value by one step.
+LSpinBox:setRange(self: LSpinBox, min: number, max: number) -- Sets the minimum and maximum bounds for this spin box.
+LSpinBox:setStep(self: LSpinBox, step: number) -- Sets the step increment for this spin box.
+LSpinBox:setValue(self: LSpinBox, v: number) -- Sets the numeric value of this spin box, clamped to its range.
 ```
 
 ### LSplitPanel
 
 ```lua
-LSplitPanel:getFirstChild() -> number -- Returns the widget index of the first (left/top) child panel.
-LSplitPanel:getMinPanelSize() -> number -- Returns the minimum pixel size of each split sub-panel.
-LSplitPanel:getOrientation() -> string -- Returns the orientation of this split panel ("horizontal" or "vertical").
-LSplitPanel:getSecondChild() -> number -- Returns the widget index of the second (right/bottom) child panel.
-LSplitPanel:getSplitPosition() -> number -- Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
-LSplitPanel:setFirstChild(child_idx: integer) -- Sets the widget index for the first (left/top) panel.
-LSplitPanel:setMinPanelSize(v: number) -- Sets the minimum pixel size of each split sub-panel.
-LSplitPanel:setOrientation(v: string) -- Sets the orientation of this split panel ("horizontal" or "vertical").
-LSplitPanel:setSecondChild(child_idx: integer) -- Sets the widget index for the second (right/bottom) panel.
-LSplitPanel:setSplitPosition(v: number) -- Sets the split position as a fraction (0.0 to 1.0).
+LSplitPanel:getFirstChild(self: LSplitPanel) -> number -- Returns the widget index of the first (left/top) child panel.
+LSplitPanel:getMinPanelSize(self: LSplitPanel) -> number -- Returns the minimum pixel size of each split sub-panel.
+LSplitPanel:getOrientation(self: LSplitPanel) -> string -- Returns the orientation of this split panel ("horizontal" or "vertical").
+LSplitPanel:getSecondChild(self: LSplitPanel) -> number -- Returns the widget index of the second (right/bottom) child panel.
+LSplitPanel:getSplitPosition(self: LSplitPanel) -> number -- Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
+LSplitPanel:setFirstChild(self: LSplitPanel, child_idx: integer) -- Sets the widget index for the first (left/top) panel.
+LSplitPanel:setMinPanelSize(self: LSplitPanel, v: number) -- Sets the minimum pixel size of each split sub-panel.
+LSplitPanel:setOrientation(self: LSplitPanel, v: string) -- Sets the orientation of this split panel ("horizontal" or "vertical").
+LSplitPanel:setSecondChild(self: LSplitPanel, child_idx: integer) -- Sets the widget index for the second (right/bottom) panel.
+LSplitPanel:setSplitPosition(self: LSplitPanel, v: number) -- Sets the split position as a fraction (0.0 to 1.0).
 ```
 
 ### LStatusBar
 
 ```lua
-LStatusBar:addSection(text: string, [width]: number) -- Adds a section to this status bar. This method is available to Lua scripts.
-LStatusBar:getSectionCount() -> number -- Returns the number of sections in this status bar.
-LStatusBar:getSectionText(section_idx: integer) -> string -- Returns the text of a status bar section by its 1-based index.
-LStatusBar:setSectionCount(count: integer) -- Sets the number of sections, truncating or adding empty sections as needed.
-LStatusBar:setSectionText(section_idx: integer, text: string) -- Sets the text of a status bar section by its 1-based index.
-LStatusBar:setSectionWidget(section_idx: integer, widget: any) -- Associates a widget with a status bar section (reserved for future use).
+LStatusBar:addSection(self: LStatusBar, text: string, [width]: number) -- Adds a section to this status bar. This method is available to Lua scripts.
+LStatusBar:getSectionCount(self: LStatusBar) -> number -- Returns the number of sections in this status bar.
+LStatusBar:getSectionText(self: LStatusBar, section_idx: integer) -> string -- Returns the text of a status bar section by its 1-based index.
+LStatusBar:setSectionCount(self: LStatusBar, count: integer) -- Sets the number of sections, truncating or adding empty sections as needed.
+LStatusBar:setSectionText(self: LStatusBar, section_idx: integer, text: string) -- Sets the text of a status bar section by its 1-based index.
+LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any) -- Associates a widget with a status bar section (reserved for future use).
 ```
 
 ### LSwitch
 
 ```lua
-LSwitch:isOn() -> boolean -- Returns whether this switch is currently in the on state.
-LSwitch:setOn(on: boolean) -- Sets the on/off state of this toggle switch.
-LSwitch:toggle() -- Toggles this switch between on and off states.
+LSwitch:isOn(self: LSwitch) -> boolean -- Returns whether this switch is currently in the on state.
+LSwitch:setOn(self: LSwitch, on: boolean) -- Sets the on/off state of this toggle switch.
+LSwitch:toggle(self: LSwitch) -- Toggles this switch between on and off states.
 ```
 
 ### LTabBar
 
 ```lua
-LTabBar:addTab(label: string) -- Adds a new tab with the given label to this tab bar.
-LTabBar:getActiveTab() -> number -- Returns the 1-based index of the currently active tab.
-LTabBar:getTab(index: integer) -> string -- Returns the label of the tab at the given 1-based index.
-LTabBar:getTabCount() -> number -- Returns the total number of tabs. This method is available to Lua scripts.
-LTabBar:removeTab(index: integer) -> boolean -- Removes the tab at the given 1-based index.
-LTabBar:setActiveTab(index: integer) -- Sets the active (selected) tab by 1-based index.
+LTabBar:addTab(self: LTabBar, label: string) -- Adds a new tab with the given label to this tab bar.
+LTabBar:getActiveTab(self: LTabBar) -> number -- Returns the 1-based index of the currently active tab.
+LTabBar:getTab(self: LTabBar, index: integer) -> string -- Returns the label of the tab at the given 1-based index.
+LTabBar:getTabCount(self: LTabBar) -> number -- Returns the total number of tabs. This method is available to Lua scripts.
+LTabBar:removeTab(self: LTabBar, index: integer) -> boolean -- Removes the tab at the given 1-based index.
+LTabBar:setActiveTab(self: LTabBar, index: integer) -- Sets the active (selected) tab by 1-based index.
 ```
 
 ### LTextInput
 
 ```lua
-LTextInput:getCursorPosition() -> number -- Returns the current cursor position (character index) within the text input.
-LTextInput:getPlaceholder() -> string -- Returns the placeholder text of this text input.
-LTextInput:getText() -> string -- Returns the current text content of this text input field.
-LTextInput:isFocused() -> boolean -- Returns whether this text input currently has keyboard focus.
-LTextInput:setMaxLength(n: integer) -- Sets the maximum number of characters allowed in this text input.
-LTextInput:setPlaceholder(text: string) -- Sets the placeholder text shown when the input is empty.
-LTextInput:setText(text: string) -- Sets the text content of this text input field and moves the cursor to the end.
+LTextInput:getCursorPosition(self: LTextInput) -> number -- Returns the current cursor position (character index) within the text input.
+LTextInput:getPlaceholder(self: LTextInput) -> string -- Returns the placeholder text of this text input.
+LTextInput:getText(self: LTextInput) -> string -- Returns the current text content of this text input field.
+LTextInput:isFocused(self: LTextInput) -> boolean -- Returns whether this text input currently has keyboard focus.
+LTextInput:setMaxLength(self: LTextInput, n: integer) -- Sets the maximum number of characters allowed in this text input.
+LTextInput:setPlaceholder(self: LTextInput, text: string) -- Sets the placeholder text shown when the input is empty.
+LTextInput:setText(self: LTextInput, text: string) -- Sets the text content of this text input field and moves the cursor to the end.
 ```
 
 ### LTheme
@@ -6480,122 +6484,122 @@ LTheme:typeOf(name: string) -> boolean -- Checks whether this object matches the
 ### LToast
 
 ```lua
-LToast:getDuration() -> number -- Returns the display duration of this toast in seconds.
-LToast:getMessage() -> string -- Returns the message text of this toast.
-LToast:getProgress() -> number -- Returns the elapsed fraction (0.0 to 1.0) of this toast's lifetime.
-LToast:isExpired() -> boolean -- Returns whether this toast has exceeded its display duration.
-LToast:setDuration(d: number) -- Sets how long this toast is displayed in seconds.
-LToast:setMessage(msg: string) -- Sets the message text displayed by this toast notification.
+LToast:getDuration(self: LToast) -> number -- Returns the display duration of this toast in seconds.
+LToast:getMessage(self: LToast) -> string -- Returns the message text of this toast.
+LToast:getProgress(self: LToast) -> number -- Returns the elapsed fraction (0.0 to 1.0) of this toast's lifetime.
+LToast:isExpired(self: LToast) -> boolean -- Returns whether this toast has exceeded its display duration.
+LToast:setDuration(self: LToast, d: number) -- Sets how long this toast is displayed in seconds.
+LToast:setMessage(self: LToast, msg: string) -- Sets the message text displayed by this toast notification.
 ```
 
 ### LToolbar
 
 ```lua
-LToolbar:addButton(id: string, [tooltip]: string) -> number -- Adds a new button to this toolbar and returns its 1-based index.
-LToolbar:addSeparator() -- Adds a visual separator to this toolbar.
-LToolbar:addSpacer([_size]: number) -- Adds a flexible spacer to this toolbar.
-LToolbar:getButton(id: string) -> table -- Returns a table describing the toolbar button with the given ID.
-LToolbar:getOrientation() -> string -- Returns the toolbar orientation ("horizontal" or "vertical").
-LToolbar:isButtonToggled(id: string) -> boolean -- Returns whether a toolbar button is toggled on.
-LToolbar:setButtonEnabled(id: string, enabled: boolean) -> boolean -- Enables or disables a toolbar button by its ID.
-LToolbar:setButtonToggled(id: string, toggled: boolean) -> boolean -- Sets the toggle state of a toolbar button by its ID.
-LToolbar:setOrientation(v: string) -- Sets the toolbar orientation ("horizontal" or "vertical").
+LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number -- Adds a new button to this toolbar and returns its 1-based index.
+LToolbar:addSeparator(self: LToolbar) -- Adds a visual separator to this toolbar.
+LToolbar:addSpacer(self: LToolbar, [_size]: number) -- Adds a flexible spacer to this toolbar.
+LToolbar:getButton(self: LToolbar, id: string) -> table -- Returns a table describing the toolbar button with the given ID.
+LToolbar:getOrientation(self: LToolbar) -> string -- Returns the toolbar orientation ("horizontal" or "vertical").
+LToolbar:isButtonToggled(self: LToolbar, id: string) -> boolean -- Returns whether a toolbar button is toggled on.
+LToolbar:setButtonEnabled(self: LToolbar, id: string, enabled: boolean) -> boolean -- Enables or disables a toolbar button by its ID.
+LToolbar:setButtonToggled(self: LToolbar, id: string, toggled: boolean) -> boolean -- Sets the toggle state of a toolbar button by its ID.
+LToolbar:setOrientation(self: LToolbar, v: string) -- Sets the toolbar orientation ("horizontal" or "vertical").
 ```
 
 ### LTooltipPanel
 
 ```lua
-LTooltipPanel:getDelay() -> number -- Returns the delay in seconds before this tooltip appears.
-LTooltipPanel:getTarget() -> number -- Returns the widget index that this tooltip is attached to.
-LTooltipPanel:getText() -> string -- Returns the tooltip display text. This method is available to Lua scripts.
-LTooltipPanel:setDelay(v: number) -- Sets the delay in seconds before this tooltip appears.
-LTooltipPanel:setTarget([target]: integer) -- Sets the widget index that this tooltip is attached to.
-LTooltipPanel:setText(text: string) -- Sets the tooltip display text. This method is available to Lua scripts.
+LTooltipPanel:getDelay(self: LTooltipPanel) -> number -- Returns the delay in seconds before this tooltip appears.
+LTooltipPanel:getTarget(self: LTooltipPanel) -> number -- Returns the widget index that this tooltip is attached to.
+LTooltipPanel:getText(self: LTooltipPanel) -> string -- Returns the tooltip display text. This method is available to Lua scripts.
+LTooltipPanel:setDelay(self: LTooltipPanel, v: number) -- Sets the delay in seconds before this tooltip appears.
+LTooltipPanel:setTarget(self: LTooltipPanel, [target]: integer) -- Sets the widget index that this tooltip is attached to.
+LTooltipPanel:setText(self: LTooltipPanel, text: string) -- Sets the tooltip display text. This method is available to Lua scripts.
 ```
 
 ### LTreeView
 
 ```lua
-LTreeView:addNode(text: string, [parent_index]: integer) -> table -- Adds node on this LTreeView object.
-LTreeView:clearNodes() -- Clears nodes on this LTreeView object.
-LTreeView:collapseAll() -- Collapses all nodes in this tree view.
-LTreeView:collapseNode(index: integer) -> boolean -- Collapses the node at the given 1-based index to hide its children.
-LTreeView:expandAll() -- Expands all nodes in this tree view.
-LTreeView:expandNode(index: integer) -> boolean -- Expand node on this LTreeView object.
-LTreeView:getChildNodes(index: integer) -> table -- Returns a table of 1-based child node indices for the node at the given index.
-LTreeView:getNodeCount() -> table -- Returns the node count on this LTreeView object.
-LTreeView:getNodeDepth(index: integer) -> number -- Returns the nesting depth of the node at the given index (0 for root nodes).
-LTreeView:getNodeText(index: integer) -> table -- Returns the node text on this LTreeView object.
-LTreeView:getParentNode(index: integer) -> number -- Returns the 1-based index of the parent of the node at the given index.
-LTreeView:getSelectedNode() -> number -- Returns the 1-based index of the currently selected node.
-LTreeView:isExpanded(index: integer) -> table -- Returns true if expanded on this LTreeView object.
-LTreeView:isNodeExpanded(index: integer) -> boolean -- Returns whether the node at the given 1-based index is expanded. Returns nil if the index is invalid.
-LTreeView:removeNode(index: integer) -> boolean -- Removes node on this LTreeView object.
-LTreeView:setNodeIcon(index: integer, icon: string) -> boolean -- Sets the node icon on this LTreeView object.
-LTreeView:setNodeText(index: integer, text: string) -> boolean -- Sets the node text on this LTreeView object.
-LTreeView:setSelectedNode(index: integer) -> boolean -- Sets the selected node by 1-based index.
-LTreeView:toggleNode(index: integer) -> boolean -- Toggle node on this LTreeView object.
+LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer -- Adds node on this LTreeView object.
+LTreeView:clearNodes(self: LTreeView) -- Clears nodes on this LTreeView object.
+LTreeView:collapseAll(self: LTreeView) -- Collapses all nodes in this tree view.
+LTreeView:collapseNode(self: LTreeView, index: integer) -> boolean -- Collapses the node at the given 1-based index to hide its children.
+LTreeView:expandAll(self: LTreeView) -- Expands all nodes in this tree view.
+LTreeView:expandNode(self: LTreeView, index: integer) -> boolean -- Expand node on this LTreeView object.
+LTreeView:getChildNodes(self: LTreeView, index: integer) -> table -- Returns a table of 1-based child node indices for the node at the given index.
+LTreeView:getNodeCount(self: LTreeView) -> table -- Returns the node count on this LTreeView object.
+LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number -- Returns the nesting depth of the node at the given index (0 for root nodes).
+LTreeView:getNodeText(self: LTreeView, index: integer) -> table -- Returns the node text on this LTreeView object.
+LTreeView:getParentNode(self: LTreeView, index: integer) -> number -- Returns the 1-based index of the parent of the node at the given index.
+LTreeView:getSelectedNode(self: LTreeView) -> number -- Returns the 1-based index of the currently selected node.
+LTreeView:isExpanded(self: LTreeView, index: integer) -> table -- Returns true if expanded on this LTreeView object.
+LTreeView:isNodeExpanded(self: LTreeView, index: integer) -> boolean -- Returns whether the node at the given 1-based index is expanded. Returns nil if the index is invalid.
+LTreeView:removeNode(self: LTreeView, index: integer) -> boolean -- Removes node on this LTreeView object.
+LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean -- Sets the node icon on this LTreeView object.
+LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean -- Sets the node text on this LTreeView object.
+LTreeView:setSelectedNode(self: LTreeView, index: integer) -> boolean -- Sets the selected node by 1-based index.
+LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean -- Toggle node on this LTreeView object.
 ```
 
 ### LUiWidget
 
 ```lua
-LUiWidget:addChild(child: LWidget) -- Adds a child widget to this widget's hierarchy.
-LUiWidget:animateAlpha(target: number, [duration]: number, [hide_on_complete]: boolean) -> table -- Smoothly animates this widget's opacity toward a target value over the given duration.
-LUiWidget:animatePosition(x: number, y: number, [duration]: number) -> table -- Smoothly animates this widget's position toward the target coordinates.
-LUiWidget:attachToEntity(entity_id: integer) -- Attaches this widget to a game entity so it follows the entity's position on screen.
-LUiWidget:bind(key: string) -- Binds this widget to a data key for use with update_bindings.
-LUiWidget:cancelAnimations() -- Cancels all active animations on this widget, leaving it at its current state.
-LUiWidget:clearAnchor() -- Removes all anchor constraints from this widget.
-LUiWidget:containsPoint(x: number, y: number) -> boolean -- Tests whether the given screen-space point is inside this widget's bounds.
-LUiWidget:detachFromEntity() -- Detaches this widget from any previously attached entity.
-LUiWidget:fadeIn() -- Instantly makes this widget fully opaque and visible.
-LUiWidget:fadeOut() -- Instantly makes this widget fully transparent and hidden.
-LUiWidget:findById(id: string) -> LWidget -- Searches this widget's subtree for a child with the given ID.
-LUiWidget:getAlpha() -> number -- Returns the current opacity of this widget.
-LUiWidget:getChildCount() -> number -- Returns the number of direct child widgets attached to this widget.
-LUiWidget:getChildren() -> table -- Returns a table of lightweight child widget references, each containing an _idx field.
-LUiWidget:getFlexGrow() -> number -- Returns the flex-grow factor of this widget.
-LUiWidget:getFlexShrink() -> number -- Returns the flex-shrink factor of this widget.
-LUiWidget:getId() -> string -- Returns the string identifier assigned to this widget.
-LUiWidget:getMargin() -> number, number, number, number -- Returns the outer margin of this widget.
-LUiWidget:getMaxSize() -> number, number -- Returns the maximum width and height of this widget.
-LUiWidget:getMinSize() -> number, number -- Returns the minimum width and height of this widget.
-LUiWidget:getPadding() -> number, number, number, number -- Returns the inner padding of this widget.
-LUiWidget:getPosition() -> number, number -- Returns the local position of this widget relative to its parent.
-LUiWidget:getRect() -> number, number, number, number -- Returns the computed bounding rectangle of this widget in screen coordinates after layout.
-LUiWidget:getSize() -> number, number -- Returns the width and height of this widget.
-LUiWidget:getState() -> string -- Returns the current interaction state of this widget (e.g. "normal", "hovered", "pressed", "disabled").
-LUiWidget:getTooltip() -> string -- Returns the tooltip text of this widget.
-LUiWidget:getZOrder() -> number -- Returns the z-order (draw priority) of this widget.
-LUiWidget:isAnimating() -> boolean -- Returns whether this widget currently has an active animation.
-LUiWidget:isEnabled() -> boolean -- Returns whether this widget is currently enabled and can receive input.
-LUiWidget:isVisible() -> boolean -- Returns whether this widget is currently visible.
-LUiWidget:removeChild(child: LWidget) -- Removes a child widget from this widget's hierarchy.
-LUiWidget:setAlpha(alpha: number) -- Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
+LUiWidget:addChild(self: LUiWidget, child: LUiWidget|integer) -- Adds a child widget to this widget's hierarchy.
+LUiWidget:animateAlpha(self: LUiWidget, target: number, [duration]: number, [hide_on_complete]: boolean) -> table -- Smoothly animates this widget's opacity toward a target value over the given duration.
+LUiWidget:animatePosition(self: LUiWidget, x: number, y: number, [duration]: number) -> table -- Smoothly animates this widget's position toward the target coordinates.
+LUiWidget:attachToEntity(self: LUiWidget, entity_id: integer) -- Attaches this widget to a game entity so it follows the entity's position on screen.
+LUiWidget:bind(self: LUiWidget, key: string) -- Binds this widget to a data key for use with update_bindings.
+LUiWidget:cancelAnimations(self: LUiWidget) -- Cancels all active animations on this widget, leaving it at its current state.
+LUiWidget:clearAnchor(self: LUiWidget) -- Removes all anchor constraints from this widget.
+LUiWidget:containsPoint(self: LUiWidget, x: number, y: number) -> boolean -- Tests whether the given screen-space point is inside this widget's bounds.
+LUiWidget:detachFromEntity(self: LUiWidget) -- Detaches this widget from any previously attached entity.
+LUiWidget:fadeIn(self: LUiWidget) -- Instantly makes this widget fully opaque and visible.
+LUiWidget:fadeOut(self: LUiWidget) -- Instantly makes this widget fully transparent and hidden.
+LUiWidget:findById(self: LUiWidget, id: string) -> LWidget -- Searches this widget's subtree for a child with the given ID.
+LUiWidget:getAlpha(self: LUiWidget) -> number -- Returns the current opacity of this widget.
+LUiWidget:getChildCount(self: LUiWidget) -> number -- Returns the number of direct child widgets attached to this widget.
+LUiWidget:getChildren(self: LUiWidget) -> table -- Returns a table of lightweight child widget references, each containing an _idx field.
+LUiWidget:getFlexGrow(self: LUiWidget) -> number -- Returns the flex-grow factor of this widget.
+LUiWidget:getFlexShrink(self: LUiWidget) -> number -- Returns the flex-shrink factor of this widget.
+LUiWidget:getId(self: LUiWidget) -> string -- Returns the string identifier assigned to this widget.
+LUiWidget:getMargin(self: LUiWidget) -> number, number, number, number -- Returns the outer margin of this widget.
+LUiWidget:getMaxSize(self: LUiWidget) -> number, number -- Returns the maximum width and height of this widget.
+LUiWidget:getMinSize(self: LUiWidget) -> number, number -- Returns the minimum width and height of this widget.
+LUiWidget:getPadding(self: LUiWidget) -> number, number, number, number -- Returns the inner padding of this widget.
+LUiWidget:getPosition(self: LUiWidget) -> number, number -- Returns the local position of this widget relative to its parent.
+LUiWidget:getRect(self: LUiWidget) -> number, number, number, number -- Returns the computed bounding rectangle of this widget in screen coordinates after layout.
+LUiWidget:getSize(self: LUiWidget) -> number, number -- Returns the width and height of this widget.
+LUiWidget:getState(self: LUiWidget) -> string -- Returns the current interaction state of this widget (e.g. "normal", "hovered", "pressed", "disabled").
+LUiWidget:getTooltip(self: LUiWidget) -> string -- Returns the tooltip text of this widget.
+LUiWidget:getZOrder(self: LUiWidget) -> number -- Returns the z-order (draw priority) of this widget.
+LUiWidget:isAnimating(self: LUiWidget) -> boolean -- Returns whether this widget currently has an active animation.
+LUiWidget:isEnabled(self: LUiWidget) -> boolean -- Returns whether this widget is currently enabled and can receive input.
+LUiWidget:isVisible(self: LUiWidget) -> boolean -- Returns whether this widget is currently visible.
+LUiWidget:removeChild(self: LUiWidget, child: LUiWidget|integer) -- Removes a child widget from this widget's hierarchy.
+LUiWidget:setAlpha(self: LUiWidget, alpha: number) -- Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
 LUiWidget:setAnchor([left]: number, [top]: number, [right]: number, [bottom]: number) -- Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
-LUiWidget:setAnchorCenter([cx]: number, [cy]: number) -- Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
-LUiWidget:setEnabled(v: boolean) -- Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
-LUiWidget:setFlexGrow(grow: number) -- Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
-LUiWidget:setFlexShrink(shrink: number) -- Sets the flex-shrink factor controlling how much this widget shrinks when layout space is insufficient.
-LUiWidget:setId(id: string) -- Assigns a string identifier to this widget for lookup with findById.
-LUiWidget:setMargin(top: number, [right]: number, [bottom]: number, [left]: number) -- Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS sho...
-LUiWidget:setMaxSize(w: number, h: number) -- Sets the maximum allowed width and height for this widget during layout.
-LUiWidget:setMinSize(w: number, h: number) -- Sets the minimum allowed width and height for this widget during layout.
-LUiWidget:setOnChange(f: function) -- Registers a callback function invoked when this widget's value changes.
-LUiWidget:setOnClick(f: function) -- Registers a callback function invoked when this widget is clicked.
-LUiWidget:setOnDraw(_self: LWidget, f: function) -- Registers a custom draw callback for this widget, invoked each frame during the draw pass.
-LUiWidget:setPadding(top: number, [right]: number, [bottom]: number, [left]: number) -- Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS sh...
-LUiWidget:setPosition(x: number, y: number) -- Sets the local position of this widget relative to its parent.
-LUiWidget:setSize(w: number, h: number) -- Sets the width and height of this widget in pixels.
-LUiWidget:setTooltip(text: string) -- Sets the tooltip text shown when the user hovers over this widget.
-LUiWidget:setVisible(v: boolean) -- Shows or hides this widget. Hidden widgets are not drawn and do not receive input.
-LUiWidget:setZOrder(z: integer) -- Sets the z-order (draw priority) of this widget. Higher values draw on top.
-LUiWidget:slideIn(x: number, y: number) -- Moves this widget to the given position and makes it visible.
-LUiWidget:slideOut(x: number, y: number) -- Moves this widget to the given position and hides it.
-LUiWidget:type() -> string -- Returns the type name string of this widget (e.g. "LButton", "LSlider").
-LUiWidget:typeOf(name: string) -> boolean -- Checks whether this widget matches the given type name, including base types "LWidget" and "Object".
-LUiWidget:unbind() -- Removes the data binding from this widget.
+LUiWidget:setAnchorCenter(self: LUiWidget, [cx]: number, [cy]: number) -- Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
+LUiWidget:setEnabled(self: LUiWidget, v: boolean) -- Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
+LUiWidget:setFlexGrow(self: LUiWidget, grow: number) -- Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
+LUiWidget:setFlexShrink(self: LUiWidget, shrink: number) -- Sets the flex-shrink factor controlling how much this widget shrinks when layout space is insufficient.
+LUiWidget:setId(self: LUiWidget, id: string) -- Assigns a string identifier to this widget for lookup with findById.
+LUiWidget:setMargin(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number) -- Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS sho...
+LUiWidget:setMaxSize(self: LUiWidget, w: number, h: number) -- Sets the maximum allowed width and height for this widget during layout.
+LUiWidget:setMinSize(self: LUiWidget, w: number, h: number) -- Sets the minimum allowed width and height for this widget during layout.
+LUiWidget:setOnChange(self: LUiWidget, f: function) -- Registers a callback function invoked when this widget's value changes.
+LUiWidget:setOnClick(self: LUiWidget, f: function) -- Registers a callback function invoked when this widget is clicked.
+LUiWidget:setOnDraw(self: LUiWidget, f: function) -- Registers a custom draw callback for this widget, invoked each frame during the draw pass.
+LUiWidget:setPadding(self: LUiWidget, top: number, [right]: number, [bottom]: number, [left]: number) -- Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS sh...
+LUiWidget:setPosition(self: LUiWidget, x: number, y: number) -- Sets the local position of this widget relative to its parent.
+LUiWidget:setSize(self: LUiWidget, w: number, h: number) -- Sets the width and height of this widget in pixels.
+LUiWidget:setTooltip(self: LUiWidget, text: string) -- Sets the tooltip text shown when the user hovers over this widget.
+LUiWidget:setVisible(self: LUiWidget, v: boolean) -- Shows or hides this widget. Hidden widgets are not drawn and do not receive input.
+LUiWidget:setZOrder(self: LUiWidget, z: integer) -- Sets the z-order (draw priority) of this widget. Higher values draw on top.
+LUiWidget:slideIn(self: LUiWidget, x: number, y: number) -- Moves this widget to the given position and makes it visible.
+LUiWidget:slideOut(self: LUiWidget, x: number, y: number) -- Moves this widget to the given position and hides it.
+LUiWidget:type(self: LUiWidget) -> string -- Returns the type name string of this widget (e.g. "LButton", "LSlider").
+LUiWidget:typeOf(self: LUiWidget, name: string) -> boolean -- Checks whether this widget matches the given type name, including base types "LWidget" and "Object".
+LUiWidget:unbind(self: LUiWidget) -- Removes the data binding from this widget.
 ```
 
 ## lurek.window

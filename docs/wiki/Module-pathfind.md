@@ -15,14 +15,14 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.pathfind.getThreadCount() -> integer](#lurekpathfindgetthreadcount-integer)
-  - [lurek.pathfind.newFlowField(grid_ud: userdata) -> LFlowField](#lurekpathfindnewflowfieldgridud-userdata-lflowfield)
+  - [lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField](#lurekpathfindnewflowfieldgridud-lnavgrid-lflowfield)
   - [lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid](#lurekpathfindnewhexgridwidth-integer-height-integer-layoutstr-string-lhexgrid)
   - [lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid](#lurekpathfindnewjpsgridwidth-integer-height-integer-ljpsgrid)
   - [lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid](#lurekpathfindnewnavgridwidth-integer-height-integer-lnavgrid)
-  - [lurek.pathfind.newNavGridFromTileMap(tm_ud: userdata, layer_index: integer, blocked_table: table) -> LNavGrid](#lurekpathfindnewnavgridfromtilemaptmud-userdata-layerindex-integer-blockedtable-table-lnavgrid)
+  - [lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid](#lurekpathfindnewnavgridfromtilemaptmud-ltilemap-layerindex-integer-blockedtable-table-lnavgrid)
   - [lurek.pathfind.newNavMesh() -> LNavMesh](#lurekpathfindnewnavmesh-lnavmesh)
-  - [lurek.pathfind.newPathfinder(grid_ud: userdata) -> LUnitPathfinder](#lurekpathfindnewpathfindergridud-userdata-lunitpathfinder)
-  - [lurek.pathfind.newPathFlowField(grid_ud: userdata) -> LAIFlowField](#lurekpathfindnewpathflowfieldgridud-userdata-laiflowfield)
+  - [lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder](#lurekpathfindnewpathfindergridud-lnavgrid-lunitpathfinder)
+  - [lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField](#lurekpathfindnewpathflowfieldgridud-lpathgrid-laiflowfield)
   - [lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid](#lurekpathfindnewpathgridw-integer-h-integer-cellsize-number-lpathgrid)
   - [lurek.pathfind.rangeMap(opts: table) -> table](#lurekpathfindrangemapopts-table-table)
   - [lurek.pathfind.setThreadCount(count: integer)](#lurekpathfindsetthreadcountcount-integer)
@@ -30,7 +30,7 @@
   - [LAIFlowField](#laiflowfield)
   - [LAIFlowField:getDirection(x: integer, y: integer) -> LuaValue](#laiflowfieldgetdirectionx-integer-y-integer-luavalue)
   - [LAIFlowField:getDistance(x: integer, y: integer) -> LuaValue](#laiflowfieldgetdistancex-integer-y-integer-luavalue)
-  - [LAIFlowField:getGoal() -> integer?](#laiflowfieldgetgoal-integer)
+  - [LAIFlowField:getGoal() -> integer|nil](#laiflowfieldgetgoal-integernil)
   - [LAIFlowField:getHeight() -> integer](#laiflowfieldgetheight-integer)
   - [LAIFlowField:getWidth() -> integer](#laiflowfieldgetwidth-integer)
   - [LAIFlowField:hasGoal() -> boolean](#laiflowfieldhasgoal-boolean)
@@ -95,8 +95,8 @@
   - [LNavMesh:type() -> string](#lnavmeshtype-string)
   - [LNavMesh:typeOf(name: string) -> boolean](#lnavmeshtypeofname-string-boolean)
   - [LPathGrid](#lpathgrid)
-  - [LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table?](#lpathgridfindpathsx-integer-sy-integer-gx-integer-gy-integer-table)
-  - [LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table?](#lpathgridfindpathsmoothedsx-integer-sy-integer-gx-integer-gy-integer-table)
+  - [LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil](#lpathgridfindpathsx-integer-sy-integer-gx-integer-gy-integer-tablenil)
+  - [LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil](#lpathgridfindpathsmoothedsx-integer-sy-integer-gx-integer-gy-integer-tablenil)
   - [LPathGrid:getCellSize() -> number](#lpathgridgetcellsize-number)
   - [LPathGrid:getCost(x: integer, y: integer) -> number](#lpathgridgetcostx-integer-y-integer-number)
   - [LPathGrid:getHeight() -> integer](#lpathgridgetheight-integer)
@@ -149,53 +149,53 @@ Module example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 -- content/examples/pathfind.lua
--- lurek.pathfind API examples.
+-- lurek.pathfind API examples: navigation grids, A* pathfinding, flow fields, hex grids, JPS, nav meshes, and range maps.
 -- Run: cargo run -- content/examples/pathfind.lua
 
 --@api-stub: lurek.pathfind.newNavGrid
--- Creates a navigation grid
+-- Creates a navigation grid for tile-based pathfinding
 do
+  -- A NavGrid is the fundamental data structure for grid-based pathfinding.
+  -- It stores per-cell movement costs: 1 = normal, 0 = blocked, 2-255 = weighted terrain.
+  -- Use it for top-down RPGs, RTS games, tower defense, or any tile-based movement.
   local grid = lurek.pathfind.newNavGrid(64, 48)
-  grid:setCost(10, 10, 0)  -- mark a wall: cost 0 == blocked
-  grid:setCost(11, 10, 5)  -- swamp: 5x slower than open ground
+
+  -- Mark walls (cost 0 = impassable) to create dungeon corridors
+  grid:setCost(10, 10, 0)
+
+  -- Weighted terrain: swamp costs 5x more than open ground, so pathfinder avoids it
+  grid:setCost(11, 10, 5)
+
   lurek.log.info("nav grid ready: " .. grid:getWidth() .. "x" .. grid:getHeight(), "pathfind")
 end
 
 --@api-stub: lurek.pathfind.newPathfinder
--- Creates a unit pathfinder for a navigation grid
+-- Creates a unit pathfinder bound to a navigation grid
 do
+  -- UnitPathfinder runs A* search on a NavGrid and returns waypoint arrays.
+  -- It supports path caching so repeated queries for the same route are instant.
+  -- Typical use: one pathfinder per faction or AI group sharing the same grid.
   local grid = lurek.pathfind.newNavGrid(64, 48)
   local pf = lurek.pathfind.newPathfinder(grid)
+
+  -- Enable caching for RTS units that recalculate paths each frame
   pf:setCacheEnabled(true)
   pf:setCacheMaxSize(128)
 end
 
 --@api-stub: lurek.pathfind.newFlowField
--- Creates a flow field for a navigation grid
+-- Creates a flow field for guiding many units toward a single goal
 do
+  -- Flow fields are ideal when many units move toward the same target (RTS, tower defense).
+  -- Instead of running A* per unit, calculate one field and query direction per cell.
+  -- Cost: O(cells) to build, O(1) per unit per frame to query.
   local grid = lurek.pathfind.newNavGrid(48, 32)
   local field = lurek.pathfind.newFlowField(grid)
-  field:calculate(40, 28)  -- goal cell (1-based)
-  local dx, dy = field:getDirection(5, 5)
-  lurek.log.debug("flow at (5,5): " .. dx .. "," .. dy, "pathfind")
-end
 
---@api-stub: lurek.pathfind.newPathGrid
--- Creates a cell-size path grid
-do
-  local grid = lurek.pathfind.newPathGrid(40, 30, 32)  -- 40x30 tiles, 32px each
-  grid:setWalkable(15, 10, false)
-  grid:setCost(15, 11, 3.0)  -- difficult terrain
-  lurek.log.info("path grid cell size = " .. grid:getCellSize(), "pathfind")
-end
+  -- Calculate flow toward goal cell (1-based coordinates)
+  field:calculate(40, 28)
 
---@api-stub: lurek.pathfind.newPathFlowField
--- Creates an AI flow field from a path grid
-do
-  local grid = lurek.pathfind.newPathGrid(32, 24, 16)
-  grid:setWalkable(10, 10, false)
-  local field = lurek.pathfind.newPathFlowField(grid)
-  field:setGoal(30, 22)
+  -- Each unit queries its current cell for movement direction
 ```
 
 ## Key Types
@@ -215,14 +215,14 @@ do
 
 ```lua
 lurek.pathfind.getThreadCount() -> integer -- Returns the pathfinding thread count.
-lurek.pathfind.newFlowField(grid_ud: userdata) -> LFlowField -- Creates a flow field for a navigation grid.
+lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField -- Creates a flow field for a navigation grid.
 lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid. This function is exposed to Lua scripts.
 lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid. This function is exposed to Lua scripts.
 lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid. This function is exposed to Lua scripts.
-lurek.pathfind.newNavGridFromTileMap(tm_ud: userdata, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
+lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
 lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh. This function is exposed to Lua scripts.
-lurek.pathfind.newPathfinder(grid_ud: userdata) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
-lurek.pathfind.newPathFlowField(grid_ud: userdata) -> LAIFlowField -- Creates an AI flow field from a path grid.
+lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
+lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField -- Creates an AI flow field from a path grid.
 lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid. This function is exposed to Lua scripts.
 lurek.pathfind.rangeMap(opts: table) -> table -- Computes reachable cells from range map options.
 lurek.pathfind.setThreadCount(count: integer) -- Records a warning because pathfinding thread count is not implemented.
@@ -242,6 +242,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use this to check if async pathfinding is available.
+  -- Returns 0 = synchronous (main thread). Future versions may return > 0.
   local n = lurek.pathfind.getThreadCount()
   if n == 0 then
     lurek.log.info("pathfinding runs synchronously on the main thread", "pathfind")
@@ -249,13 +251,13 @@ do
 end
 ```
 
-### `lurek.pathfind.newFlowField(grid_ud: userdata) -> LFlowField`
+### `lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField`
 
 Creates a flow field for a navigation grid.
 
 **Parameters**
 
-- `grid_ud` (`userdata`, required) - Lua argument for `grid_ud`.
+- `grid_ud` (`LNavGrid`, required) - Navigation grid to compute flow field from.
 
 **Returns**: `LFlowField` - New flow field handle.
 
@@ -265,9 +267,16 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Flow fields are ideal when many units move toward the same target (RTS, tower defense).
+  -- Instead of running A* per unit, calculate one field and query direction per cell.
+  -- Cost: O(cells) to build, O(1) per unit per frame to query.
   local grid = lurek.pathfind.newNavGrid(48, 32)
   local field = lurek.pathfind.newFlowField(grid)
-  field:calculate(40, 28)  -- goal cell (1-based)
+
+  -- Calculate flow toward goal cell (1-based coordinates)
+  field:calculate(40, 28)
+
+  -- Each unit queries its current cell for movement direction
   local dx, dy = field:getDirection(5, 5)
   lurek.log.debug("flow at (5,5): " .. dx .. "," .. dy, "pathfind")
 end
@@ -291,9 +300,16 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- HexGrid supports "pointy" (pointy-top) and "flat" (flat-top) hex orientations.
+  -- Use it for Civilization-style strategy, hex-based tactics, or board games.
+  -- All coordinates are offset (col, row), 1-based.
   local hex = lurek.pathfind.newHexGrid(20, 16, "pointy")
+
+  -- Mountain hex: impassable
   hex:setBlocked(5, 5, true)
-  hex:setCost(6, 5, 2.5)  -- forest hex
+  -- Forest hex: passable but costs 2.5 movement points
+  hex:setCost(6, 5, 2.5)
+
   lurek.log.info("hex grid blocked at 5,5: " .. tostring(hex:isBlocked(5, 5)), "hex")
 end
 ```
@@ -315,8 +331,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- JPS is an optimized A* variant for uniform-cost grids (blocked or open only).
+  -- It skips intermediate nodes, making it 10-100x faster than plain A* on open maps.
+  -- Best for: large open maps, RTS, games where all walkable cells have equal cost.
   local jps = lurek.pathfind.newJpsGrid(128, 128)
+
+  -- Place a single obstacle
   jps:setBlocked(64, 64, true)
+
+  -- JPS returns only key turning points, not every cell along the path
   local path = jps:findPath(1, 1, 128, 128)
   lurek.log.info("jps path waypoints: " .. (path and #path or 0), "pathfind")
 end
@@ -339,20 +362,28 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- A NavGrid is the fundamental data structure for grid-based pathfinding.
+  -- It stores per-cell movement costs: 1 = normal, 0 = blocked, 2-255 = weighted terrain.
+  -- Use it for top-down RPGs, RTS games, tower defense, or any tile-based movement.
   local grid = lurek.pathfind.newNavGrid(64, 48)
-  grid:setCost(10, 10, 0)  -- mark a wall: cost 0 == blocked
-  grid:setCost(11, 10, 5)  -- swamp: 5x slower than open ground
+
+  -- Mark walls (cost 0 = impassable) to create dungeon corridors
+  grid:setCost(10, 10, 0)
+
+  -- Weighted terrain: swamp costs 5x more than open ground, so pathfinder avoids it
+  grid:setCost(11, 10, 5)
+
   lurek.log.info("nav grid ready: " .. grid:getWidth() .. "x" .. grid:getHeight(), "pathfind")
 end
 ```
 
-### `lurek.pathfind.newNavGridFromTileMap(tm_ud: userdata, layer_index: integer, blocked_table: table) -> LNavGrid`
+### `lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid`
 
 Creates a navigation grid from a tilemap layer and blocked gid table.
 
 **Parameters**
 
-- `tm_ud` (`userdata`, required) - Lua argument for `tm_ud`.
+- `tm_ud` (`LTileMap`, required) - Tilemap to derive navigation grid from.
 - `layer_index` (`integer`, required) - Lua argument for `layer_index`.
 - `blocked_table` (`table`, required) - Lua argument for `blocked_table`.
 
@@ -364,9 +395,14 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Automatically converts a tilemap into a navigation grid by marking
+  -- specific tile GIDs as blocked. Great for loading Tiled/LDtk maps.
+  -- Layer index and GIDs are all 1-based in Lua.
   local tm = lurek.tilemap.newTileMap(40, 25, 32)
   tm:addLayer("walls", 40, 25)
   tm:setTile(1, 10, 5, 7)  -- place wall tile (gid=7) on layer 1
+
+  -- GIDs 7, 8, 9 are treated as walls; everything else is walkable
   local grid = lurek.pathfind.newNavGridFromTileMap(tm, 1, {7, 8, 9})
   lurek.log.info("nav grid from tilemap: " .. grid:getWidth() .. "x" .. grid:getHeight(), "pathfind")
 end
@@ -384,7 +420,12 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- NavMesh pathfinding works on arbitrary convex polygons instead of grids.
+  -- Use it for open worlds, irregularly shaped rooms, or when tile grids are too coarse.
+  -- Workflow: define polygons → connect adjacent ones → query paths between world points.
   local mesh = lurek.pathfind.newNavMesh()
+
+  -- Define two adjacent rooms as convex polygons
   local a = mesh:addPolygon({
     {x = 0, y = 0},
     {x = 100, y = 0},
@@ -397,19 +438,23 @@ do
     {x = 200, y = 100},
     {x = 100, y = 100},
   })
+
+  -- Connect them bidirectionally (units can walk both ways)
   mesh:connectPolygons(a, b, true)
+
+  -- Find path between world-space points across the mesh
   local path = mesh:findPath(10, 10, 180, 70)
   lurek.log.info("navmesh waypoints: " .. (path and #path or 0), "pathfind")
 end
 ```
 
-### `lurek.pathfind.newPathfinder(grid_ud: userdata) -> LUnitPathfinder`
+### `lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder`
 
 Creates a unit pathfinder for a navigation grid.
 
 **Parameters**
 
-- `grid_ud` (`userdata`, required) - Lua argument for `grid_ud`.
+- `grid_ud` (`LNavGrid`, required) - Navigation grid to pathfind on.
 
 **Returns**: `LUnitPathfinder` - New pathfinder handle.
 
@@ -419,20 +464,25 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- UnitPathfinder runs A* search on a NavGrid and returns waypoint arrays.
+  -- It supports path caching so repeated queries for the same route are instant.
+  -- Typical use: one pathfinder per faction or AI group sharing the same grid.
   local grid = lurek.pathfind.newNavGrid(64, 48)
   local pf = lurek.pathfind.newPathfinder(grid)
+
+  -- Enable caching for RTS units that recalculate paths each frame
   pf:setCacheEnabled(true)
   pf:setCacheMaxSize(128)
 end
 ```
 
-### `lurek.pathfind.newPathFlowField(grid_ud: userdata) -> LAIFlowField`
+### `lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField`
 
 Creates an AI flow field from a path grid.
 
 **Parameters**
 
-- `grid_ud` (`userdata`, required) - Lua argument for `grid_ud`.
+- `grid_ud` (`LPathGrid`, required) - Path grid to compute AI flow field from.
 
 **Returns**: `LAIFlowField` - New AI flow field handle.
 
@@ -442,10 +492,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- AI flow fields are perfect for enemy AI: set the player as the goal,
+  -- then each enemy reads its cell direction to move toward the player.
+  -- Recalculate when the player moves significantly or obstacles change.
   local grid = lurek.pathfind.newPathGrid(32, 24, 16)
-  grid:setWalkable(10, 10, false)
+  grid:setWalkable(10, 10, false)  -- obstacle
+
   local field = lurek.pathfind.newPathFlowField(grid)
-  field:setGoal(30, 22)
+  field:setGoal(30, 22)  -- player position in grid coordinates
+
   lurek.log.debug("ai field has goal: " .. tostring(field:hasGoal()), "ai")
 end
 ```
@@ -468,9 +523,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- PathGrid is a higher-level grid that maps pixel coordinates to cells.
+  -- Use it when your world uses pixel positions and you want automatic conversion.
+  -- cell_size determines tile dimensions (e.g., 32px tiles for a platformer map).
   local grid = lurek.pathfind.newPathGrid(40, 30, 32)  -- 40x30 tiles, 32px each
+
+  -- Block a doorway and add difficult terrain (float cost multiplier)
   grid:setWalkable(15, 10, false)
-  grid:setCost(15, 11, 3.0)  -- difficult terrain
+  grid:setCost(15, 11, 3.0)  -- mud: 3x slower than normal ground
+
   lurek.log.info("path grid cell size = " .. grid:getCellSize(), "pathfind")
 end
 ```
@@ -491,10 +552,19 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- RangeMap is ideal for showing movement or attack range in turn-based tactics.
+  -- It flood-fills from an origin cell, accumulating cost, stopping at the budget limit.
+  -- Returns cells with their accumulated cost so you can color-code "easy" vs "far" tiles.
   local result = lurek.pathfind.rangeMap({
-    width = 16, height = 16, origin_x = 8, origin_y = 8,
-    budget = 5.0, diagonal = true,
+    width = 16, height = 16,
+    origin_x = 8, origin_y = 8,  -- unit position (1-based)
+    budget = 5.0,                  -- max movement points this turn
+    diagonal = true,               -- allow diagonal movement
+    -- Optional: costs = {...} (flat array w*h of per-cell costs, default 1.0)
+    -- Optional: blocked = {...} (flat array w*h of booleans, default false)
   })
+
+  -- result.cells = array of {x, y, cost} tables for all reachable tiles
   lurek.log.info("reachable cells within 5 moves: " .. #result.cells, "tactics")
 end
 ```
@@ -513,6 +583,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- This API is reserved for future multi-threaded pathfinding.
+  -- Calling it now logs a warning but does not error, ensuring forward compatibility.
   local desired_workers = 4
   lurek.pathfind.setThreadCount(desired_workers)
   lurek.log.info("requested " .. desired_workers .. " pathfind workers", "pathfind")
@@ -532,10 +604,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- AI flow fields are perfect for enemy AI: set the player as the goal,
+  -- then each enemy reads its cell direction to move toward the player.
+  -- Recalculate when the player moves significantly or obstacles change.
   local grid = lurek.pathfind.newPathGrid(32, 24, 16)
-  grid:setWalkable(10, 10, false)
+  grid:setWalkable(10, 10, false)  -- obstacle
+
   local field = lurek.pathfind.newPathFlowField(grid)
-  field:setGoal(30, 22)
+  field:setGoal(30, 22)  -- player position in grid coordinates
+
   lurek.log.debug("ai field has goal: " .. tostring(field:hasGoal()), "ai")
 end
 ```
@@ -598,11 +675,11 @@ do
 end
 ```
 
-### `LAIFlowField:getGoal() -> integer?`
+### `LAIFlowField:getGoal() -> integer|nil`
 
 Returns the one-based flow field goal when set.
 
-**Returns**: `integer?` - Goal x coordinate, or nil.
+**Returns**: `integer|nil` - Goal x coordinate, or nil.
 
 #### Example
 
@@ -760,9 +837,16 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Flow fields are ideal when many units move toward the same target (RTS, tower defense).
+  -- Instead of running A* per unit, calculate one field and query direction per cell.
+  -- Cost: O(cells) to build, O(1) per unit per frame to query.
   local grid = lurek.pathfind.newNavGrid(48, 32)
   local field = lurek.pathfind.newFlowField(grid)
-  field:calculate(40, 28)  -- goal cell (1-based)
+
+  -- Calculate flow toward goal cell (1-based coordinates)
+  field:calculate(40, 28)
+
+  -- Each unit queries its current cell for movement direction
   local dx, dy = field:getDirection(5, 5)
   lurek.log.debug("flow at (5,5): " .. dx .. "," .. dy, "pathfind")
 end
@@ -784,9 +868,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- After calculate(), every reachable cell stores a direction toward the goal.
+  -- The optional unit_size parameter enables clearance-based pathfinding (default 1).
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local ff = lurek.pathfind.newFlowField(grid)
-  ff:calculate(16, 16)
+  ff:calculate(16, 16)  -- all units head toward cell (16, 16)
   lurek.log.info("flow field calculated", "pathfind")
 end
 ```
@@ -806,9 +892,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Multi-target flow fields guide units toward the nearest of several goals.
+  -- Use case: multiple resource deposits, multiple exits, or group rally points.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local ff = lurek.pathfind.newFlowField(grid)
-  ff:calculateMulti({{x=8,y=8},{x=24,y=24}})
+  ff:calculateMulti({{x=8,y=8},{x=24,y=24}})  -- two rally points
   lurek.log.info("multi-target flow field done", "pathfind")
 end
 ```
@@ -830,6 +918,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use this for AI priority: enemies closer to the goal (lower cost) are more dangerous.
+  -- Also useful for rendering heat maps or determining if a unit is "stuck".
   local g = lurek.pathfind.newNavGrid(32, 32)
   local f = lurek.pathfind.newFlowField(g)
   f:calculate(16, 16)
@@ -855,6 +945,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Each cell stores a direction vector pointing toward the goal.
+  -- Units simply read their current cell and move in that direction.
+  -- Returns (0,0) for unreachable or goal cells.
   local g = lurek.pathfind.newNavGrid(32, 32)
   local f = lurek.pathfind.newFlowField(g)
   f:calculate(30, 30)
@@ -880,6 +973,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Angle is measured from positive X axis, counter-clockwise.
+  -- Directly usable for rotating a unit sprite to face movement direction.
   local g = lurek.pathfind.newNavGrid(32, 32)
   local f = lurek.pathfind.newFlowField(g)
   f:calculate(20, 20)
@@ -900,6 +995,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Useful for debugging or verifying multi-target fields.
+  -- Returns array of {x, y} tables (1-based coordinates).
   local g = lurek.pathfind.newNavGrid(20, 20)
   local f = lurek.pathfind.newFlowField(g)
   f:calculateMulti({{x=5, y=5}, {x=15, y=15}}, 1)
@@ -920,6 +1017,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Always check before querying directions to avoid reading uninitialized data.
   local g = lurek.pathfind.newNavGrid(16, 16)
   local f = lurek.pathfind.newFlowField(g)
   if not f:isCalculated() then
@@ -948,6 +1046,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- steer() converts world pixel coordinates to grid cells, reads direction,
+  -- and returns a velocity vector scaled by speed. Parameters:
+  --   wx, wy = world position in pixels
+  --   speed  = desired movement speed
+  --   tw, th = tile width and height (for world-to-grid conversion)
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local ff = lurek.pathfind.newFlowField(grid)
   ff:calculate(16, 16)
@@ -1008,9 +1111,16 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- HexGrid supports "pointy" (pointy-top) and "flat" (flat-top) hex orientations.
+  -- Use it for Civilization-style strategy, hex-based tactics, or board games.
+  -- All coordinates are offset (col, row), 1-based.
   local hex = lurek.pathfind.newHexGrid(20, 16, "pointy")
+
+  -- Mountain hex: impassable
   hex:setBlocked(5, 5, true)
-  hex:setCost(6, 5, 2.5)  -- forest hex
+  -- Forest hex: passable but costs 2.5 movement points
+  hex:setCost(6, 5, 2.5)
+
   lurek.log.info("hex grid blocked at 5,5: " .. tostring(hex:isBlocked(5, 5)), "hex")
 end
 ```
@@ -1034,6 +1144,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Hex distance is the minimum number of steps between two hex cells.
+  -- Useful for range checks in turn-based games (attack range, spell range).
   local hg = lurek.pathfind.newHexGrid(16, 16)
   local d = hg:distance(1, 1, 6, 4)
   lurek.log.info("hex distance: " .. d, "pathfind")
@@ -1058,6 +1170,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Computes line-of-sight from (col, row) up to max_range hexes away.
+  -- Blocked hexes stop visibility. Returns array of {col, row} tables.
+  -- Use for fog-of-war or unit vision in turn-based strategy.
   local hg = lurek.pathfind.newHexGrid(16, 16)
   local visible = hg:fieldOfView(8, 8, 4)
   lurek.log.info("visible cells: " .. #visible, "pathfind")
@@ -1083,6 +1198,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Returns array of {col, row} tables representing the hex path.
+  -- Respects blocked cells and terrain costs set via setCost/setBlocked.
   local hg = lurek.pathfind.newHexGrid(16, 16)
   local path = hg:findPath(1, 1, 8, 4)
   lurek.log.info("hex path: " .. (path and #path or 0), "pathfind")
@@ -1133,6 +1250,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Hex-aware LOS: traces the hex line and checks for blocked cells along it.
   local hg = lurek.pathfind.newHexGrid(16, 16)
   local los = hg:lineOfSight(1, 1, 8, 4)
   lurek.log.info("hex los: " .. tostring(los), "pathfind")
@@ -1157,6 +1275,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Flood-fills outward from (col, row), accumulating hex terrain costs.
+  -- Returns all cells reachable within the budget.
+  -- Use for highlighting valid movement tiles in a tactics game.
   local hg = lurek.pathfind.newHexGrid(16, 16)
   local cells = hg:rangeOfMovement(8, 8, 3)
   lurek.log.info("cells in range: " .. #cells, "pathfind")
@@ -1180,7 +1301,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 ```lua
 do
   local hg = lurek.pathfind.newHexGrid(16, 16)
-  hg:setBlocked(4, 4, true)
+  hg:setBlocked(4, 4, true)  -- mountain: units cannot enter
   lurek.log.info("hex cell 4,4 blocked", "pathfind")
 end
 ```
@@ -1201,9 +1322,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Hex costs are floats: 1.0 = plains, 2.0 = forest, 3.0 = swamp.
+  -- Units with enough movement budget can still traverse expensive hexes.
   local hex = lurek.pathfind.newHexGrid(15, 12, "flat")
-  hex:setCost(5, 4, 2.0)  -- forest hex
-  hex:setCost(6, 4, 3.0)  -- swamp hex
+  hex:setCost(5, 4, 2.0)  -- forest hex: costs 2 movement points
+  hex:setCost(6, 4, 3.0)  -- swamp hex: costs 3 movement points
 end
 ```
 
@@ -1257,8 +1380,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- JPS is an optimized A* variant for uniform-cost grids (blocked or open only).
+  -- It skips intermediate nodes, making it 10-100x faster than plain A* on open maps.
+  -- Best for: large open maps, RTS, games where all walkable cells have equal cost.
   local jps = lurek.pathfind.newJpsGrid(128, 128)
+
+  -- Place a single obstacle
   jps:setBlocked(64, 64, true)
+
+  -- JPS returns only key turning points, not every cell along the path
   local path = jps:findPath(1, 1, 128, 128)
   lurek.log.info("jps path waypoints: " .. (path and #path or 0), "pathfind")
 end
@@ -1283,6 +1413,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- JPS returns only jump points (turning points), not every cell.
+  -- The path has fewer waypoints than standard A*, but covers the same route.
+  -- Returns array of {x, y} tables or nil.
   local jg = lurek.pathfind.newJpsGrid(64, 64)
   local path = jg:findPath(1, 1, 63, 63)
   lurek.log.info("jps path: " .. (path and #path or 0), "pathfind")
@@ -1330,6 +1463,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- JPS grids only support binary walkability (no weighted costs).
+  -- This is the only way to modify the grid; there is no setCost for JPS.
   local jg = lurek.pathfind.newJpsGrid(32, 32)
   jg:setBlocked(15, 15, true)
   lurek.log.info("jps cell blocked", "pathfind")
@@ -1386,9 +1521,17 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- A NavGrid is the fundamental data structure for grid-based pathfinding.
+  -- It stores per-cell movement costs: 1 = normal, 0 = blocked, 2-255 = weighted terrain.
+  -- Use it for top-down RPGs, RTS games, tower defense, or any tile-based movement.
   local grid = lurek.pathfind.newNavGrid(64, 48)
-  grid:setCost(10, 10, 0)  -- mark a wall: cost 0 == blocked
-  grid:setCost(11, 10, 5)  -- swamp: 5x slower than open ground
+
+  -- Mark walls (cost 0 = impassable) to create dungeon corridors
+  grid:setCost(10, 10, 0)
+
+  -- Weighted terrain: swamp costs 5x more than open ground, so pathfinder avoids it
+  grid:setCost(11, 10, 5)
+
   lurek.log.info("nav grid ready: " .. grid:getWidth() .. "x" .. grid:getHeight(), "pathfind")
 end
 ```
@@ -1403,10 +1546,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Typical frame loop: mark dirty → rebuildAbstract → clearDirty
   local grid = lurek.pathfind.newNavGrid(64, 64)
   grid:setDirty(10, 10, 4, 4)
   grid:rebuildAbstract()
-  grid:clearDirty()
+  grid:clearDirty()  -- reset for next frame's changes
 end
 ```
 
@@ -1424,9 +1568,13 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Common pattern: fill with 0 (all blocked), then "carve" walkable corridors.
+  -- This is useful for procedural dungeon generation.
   local grid = lurek.pathfind.newNavGrid(50, 50)
   grid:fill(0)  -- start fully blocked
-  for x = 10, 40 do grid:setCost(x, 25, 1) end  -- carve a corridor
+
+  -- Carve a horizontal corridor at row 25
+  for x = 10, 40 do grid:setCost(x, 25, 1) end
 end
 ```
 
@@ -1448,8 +1596,10 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Efficient bulk operation for placing rooms, clearing areas, or building walls.
+  -- (x, y) is the top-left corner (1-based), (w, h) is the size.
   local grid = lurek.pathfind.newNavGrid(64, 64)
-  grid:fillRect(10, 10, 20, 20, 1)
+  grid:fillRect(10, 10, 20, 20, 1)  -- clear a 20x20 room at position (10,10)
   lurek.log.info("rect filled", "pathfind")
 end
 ```
@@ -1490,6 +1640,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use getCost to check terrain type before committing a unit to move there.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   grid:setCost(10, 10, 5)
   local c = grid:getCost(10, 10)
@@ -1532,6 +1683,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 ```lua
 do
   local grid = lurek.pathfind.newNavGrid(64, 48)
+  -- Multi-return: w, h in one call for efficiency
   local w, h = grid:getDimensions()
   local total = w * h
   lurek.log.info("grid has " .. total .. " cells", "pathfind")
@@ -1591,6 +1743,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Equivalent to getCost(x,y) == 0 but more readable for guard checks.
   local grid = lurek.pathfind.newNavGrid(20, 20)
   grid:setCost(5, 5, 0)
   if grid:isBlocked(5, 5) then
@@ -1617,6 +1770,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Unlike isBlocked (which checks cost==0), isWalkable also considers unit_size.
+  -- A 2x2 unit needs all 4 cells to be unblocked to be "walkable" at a position.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   grid:setBlocked(10, 10, true)
   lurek.log.info("walkable 10,10: " .. tostring(grid:isWalkable(10, 10)), "pathfind")
@@ -1637,6 +1792,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use for save/load or network sync of map state.
+  -- Each byte in the string = cost of one cell, in row-major order (row 1 first).
   local grid = lurek.pathfind.newNavGrid(4, 2)
   grid:loadFromString(string.char(1,1,0,1, 1,5,5,1))
   lurek.log.info("loaded grid, cell (2,2) cost=" .. grid:getCost(2, 2), "save")
@@ -1653,9 +1810,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Call this after modifying blocked cells to update hierarchical pathfinding.
+  -- Expensive operation; batch your grid changes, then rebuild once.
   local grid = lurek.pathfind.newNavGrid(64, 64)
   grid:setChunkSize(16)
-  for x = 1, 64 do grid:setCost(x, 32, 0) end  -- horizontal wall
+
+  -- Build a horizontal wall across the map
+  for x = 1, 64 do grid:setCost(x, 32, 0) end
+
+  -- Rebuild so the abstract graph knows about the wall
   grid:rebuildAbstract()
 end
 ```
@@ -1672,6 +1835,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- The returned string can be written to a file or sent over the network.
+  -- Pair with loadFromString for full round-trip serialization.
   local grid = lurek.pathfind.newNavGrid(8, 8)
   grid:setCost(4, 4, 0)
   local blob = grid:saveToString()
@@ -1695,6 +1860,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Convenience method: setBlocked(x,y,true) is clearer than setCost(x,y,0).
   local grid = lurek.pathfind.newNavGrid(32, 32)
   grid:setBlocked(8, 8, true)
   lurek.log.info("cell 8,8 blocked", "pathfind")
@@ -1715,9 +1881,12 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- HPA* divides the grid into chunks and builds an abstract graph of chunk boundaries.
+  -- Large maps (128x128+) benefit significantly from hierarchical search.
+  -- Smaller chunks = more accuracy but more abstract nodes; 8-16 is typical.
   local grid = lurek.pathfind.newNavGrid(128, 128)
-  grid:setChunkSize(16)
-  grid:rebuildAbstract()
+  grid:setChunkSize(16)  -- 16x16 cell chunks
+  grid:rebuildAbstract()  -- must rebuild after setting chunk size
 end
 ```
 
@@ -1737,10 +1906,13 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Cost values control how the A* heuristic weighs paths.
+  -- A path through cost-5 cells is 5x "longer" than through cost-1 cells.
+  -- The pathfinder will route around expensive terrain when cheaper paths exist.
   local grid = lurek.pathfind.newNavGrid(32, 32)
-  grid:setCost(16, 16, 0)   -- wall
-  grid:setCost(17, 16, 5)   -- swamp
-  grid:setCost(18, 16, 10)  -- deep water
+  grid:setCost(16, 16, 0)   -- wall: completely impassable
+  grid:setCost(17, 16, 5)   -- swamp: passable but expensive
+  grid:setCost(18, 16, 10)  -- deep water: very expensive
 end
 ```
 
@@ -1758,6 +1930,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- "none"       = 4-directional only (roguelike cardinal movement)
+  -- "always"     = 8-directional, can cut through wall corners
+  -- "nocornercut"= 8-directional but cannot squeeze past diagonal wall corners
   local grid = lurek.pathfind.newNavGrid(40, 40)
   grid:setDiagonalMode("nocornercut")
   lurek.log.info("diagonal mode set to " .. grid:getDiagonalMode(), "pathfind")
@@ -1781,10 +1956,13 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Instead of rebuilding the entire abstract graph, mark only changed regions.
+  -- After marking dirty regions, call rebuildAbstract to patch just those chunks.
   local grid = lurek.pathfind.newNavGrid(64, 64)
   grid:setCost(20, 20, 0)
   grid:setCost(21, 20, 0)
-  grid:setDirty(20, 20, 2, 1)  -- 2x1 rectangle from (20,20)
+  -- Mark the 2x1 region starting at (20,20) as needing re-analysis
+  grid:setDirty(20, 20, 2, 1)
 end
 ```
 
@@ -1839,7 +2017,12 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- NavMesh pathfinding works on arbitrary convex polygons instead of grids.
+  -- Use it for open worlds, irregularly shaped rooms, or when tile grids are too coarse.
+  -- Workflow: define polygons → connect adjacent ones → query paths between world points.
   local mesh = lurek.pathfind.newNavMesh()
+
+  -- Define two adjacent rooms as convex polygons
   local a = mesh:addPolygon({
     {x = 0, y = 0},
     {x = 100, y = 0},
@@ -1852,7 +2035,11 @@ do
     {x = 200, y = 100},
     {x = 100, y = 100},
   })
+
+  -- Connect them bidirectionally (units can walk both ways)
   mesh:connectPolygons(a, b, true)
+
+  -- Find path between world-space points across the mesh
   local path = mesh:findPath(10, 10, 180, 70)
   lurek.log.info("navmesh waypoints: " .. (path and #path or 0), "pathfind")
 end
@@ -1874,6 +2061,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Each polygon must have at least 3 vertices defined as {x, y} tables.
+  -- The returned ID is used to connect polygons together.
+  -- Keep polygons convex; the engine does not triangulate concave shapes.
   local mesh = lurek.pathfind.newNavMesh()
   local id = mesh:addPolygon({
     {x = 0, y = 0},
@@ -1903,9 +2093,13 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Connections represent doorways, passages, or shared edges between areas.
+  -- Set bidirectional=true for normal passages, false for one-way doors or cliffs.
   local mesh = lurek.pathfind.newNavMesh()
   local a = mesh:addPolygon({{x=0,y=0},{x=5,y=0},{x=5,y=5},{x=0,y=5}})
   local b = mesh:addPolygon({{x=5,y=0},{x=10,y=0},{x=10,y=5},{x=5,y=5}})
+
+  -- true = bidirectional (A↔B); false = one-way (A→B only)
   mesh:connectPolygons(a, b, true)
 end
 ```
@@ -1929,10 +2123,14 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- The pathfinder locates which polygon contains start/goal, then searches
+  -- the polygon graph. Returns waypoint tables {x, y} in world coordinates.
+  -- Returns nil if start or goal is outside the mesh, or no connection exists.
   local mesh = lurek.pathfind.newNavMesh()
   local a = mesh:addPolygon({{x=0,y=0},{x=5,y=0},{x=5,y=5},{x=0,y=5}})
   local b = mesh:addPolygon({{x=5,y=0},{x=10,y=0},{x=10,y=5},{x=5,y=5}})
   mesh:connectPolygons(a, b, true)
+
   local path = mesh:findPath(1, 1, 9, 4)
   lurek.log.debug("navmesh path points=" .. (path and #path or 0), "pathfind")
 end
@@ -2006,14 +2204,20 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- PathGrid is a higher-level grid that maps pixel coordinates to cells.
+  -- Use it when your world uses pixel positions and you want automatic conversion.
+  -- cell_size determines tile dimensions (e.g., 32px tiles for a platformer map).
   local grid = lurek.pathfind.newPathGrid(40, 30, 32)  -- 40x30 tiles, 32px each
+
+  -- Block a doorway and add difficult terrain (float cost multiplier)
   grid:setWalkable(15, 10, false)
-  grid:setCost(15, 11, 3.0)  -- difficult terrain
+  grid:setCost(15, 11, 3.0)  -- mud: 3x slower than normal ground
+
   lurek.log.info("path grid cell size = " .. grid:getCellSize(), "pathfind")
 end
 ```
 
-### `LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table?`
+### `LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil`
 
 Finds a path between one-based path grid cells.
 
@@ -2024,7 +2228,7 @@ Finds a path between one-based path grid cells.
 - `gx` (`integer`, required) - Lua argument for `gx`.
 - `gy` (`integer`, required) - Lua argument for `gy`.
 
-**Returns**: `table?` - Array table of point tables, or nil when no path exists.
+**Returns**: `table|nil` - Array table of point tables, or nil when no path exists.
 
 #### Example
 
@@ -2032,13 +2236,15 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Works like UnitPathfinder:findPath but operates on the PathGrid directly.
+  -- Returns array of {x, y} tables or nil.
   local pg = lurek.pathfind.newPathGrid(32, 32, 16)
   local path = pg:findPath(1, 1, 31, 31)
   lurek.log.info("path grid path: " .. (path and #path or 0), "pathfind")
 end
 ```
 
-### `LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table?`
+### `LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil`
 
 Finds a smoothed path between one-based path grid cells.
 
@@ -2049,7 +2255,7 @@ Finds a smoothed path between one-based path grid cells.
 - `gx` (`integer`, required) - Lua argument for `gx`.
 - `gy` (`integer`, required) - Lua argument for `gy`.
 
-**Returns**: `table?` - Array table of point tables, or nil when no path exists.
+**Returns**: `table|nil` - Array table of point tables, or nil when no path exists.
 
 #### Example
 
@@ -2075,6 +2281,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use cell size to convert between grid coordinates and pixel positions:
+  -- pixel_x = (grid_x - 1) * cellSize, grid_x = floor(pixel_x / cellSize) + 1
   local g = lurek.pathfind.newPathGrid(20, 15, 64)
   local cs = g:getCellSize()
   lurek.log.info("each cell = " .. cs .. " px", "pathfind")
@@ -2160,6 +2368,7 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Check before placing units or validating movement targets.
   local g = lurek.pathfind.newPathGrid(20, 20, 32)
   g:setWalkable(10, 10, false)
   if not g:isWalkable(10, 10) then
@@ -2184,9 +2393,11 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- PathGrid costs are floating-point for finer granularity than NavGrid's u8.
+  -- Values < 1.0 = fast terrain (roads), > 1.0 = slow terrain (mud, sand).
   local g = lurek.pathfind.newPathGrid(40, 30, 32)
-  g:setCost(20, 15, 3.0)  -- mud
-  g:setCost(21, 15, 0.5)  -- road
+  g:setCost(20, 15, 3.0)  -- mud: 3x slower
+  g:setCost(21, 15, 0.5)  -- road: 2x faster than normal
 end
 ```
 
@@ -2206,6 +2417,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Unlike NavGrid which uses cost=0 for blocking, PathGrid has explicit walkability.
+  -- Useful for dynamic doors: close a doorway, open another.
   local g = lurek.pathfind.newPathGrid(30, 20, 32)
   g:setWalkable(15, 10, false)  -- close a doorway
   g:setWalkable(16, 10, true)   -- open another
@@ -2262,8 +2475,13 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- UnitPathfinder runs A* search on a NavGrid and returns waypoint arrays.
+  -- It supports path caching so repeated queries for the same route are instant.
+  -- Typical use: one pathfinder per faction or AI group sharing the same grid.
   local grid = lurek.pathfind.newNavGrid(64, 48)
   local pf = lurek.pathfind.newPathfinder(grid)
+
+  -- Enable caching for RTS units that recalculate paths each frame
   pf:setCacheEnabled(true)
   pf:setCacheMaxSize(128)
 end
@@ -2279,10 +2497,12 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Always clear cache after changing grid costs or blocking cells,
+  -- otherwise pathfinder may return stale routes that pass through new walls.
   local g = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(g)
-  g:setCost(8, 8, 0)  -- new wall
-  pf:clearCache()
+  g:setCost(8, 8, 0)  -- new wall added dynamically
+  pf:clearCache()      -- invalidate outdated cached paths
 end
 ```
 
@@ -2305,6 +2525,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use when a unit spawns or is pushed onto a blocked cell and needs relocation.
+  -- Searches in expanding rings from (x, y) up to max_radius cells away.
+  -- Returns nil, nil if no walkable cell is found within range.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
   local cx, cy = pf:findNearestWalkable(15, 15, 5)
@@ -2333,11 +2556,16 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- For real-time games, use partial pathfinding to spread computation across frames.
+  -- The pathfinder expands at most max_nodes, then returns the best path found so far.
+  -- The second return value is true if the path reaches the exact goal.
   local grid = lurek.pathfind.newNavGrid(32, 32)
-  grid:fillRect(15, 1, 15, 31, 0)
+  grid:fillRect(15, 1, 15, 31, 0)  -- vertical wall with no gap
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPartialPath(1, 16, 30, 16, 200)
-  lurek.log.info("partial path length: " .. #path, "pathfind")
+
+  -- Budget of 200 nodes: may not reach the goal if the map is complex
+  local path, complete = pf:findPartialPath(1, 16, 30, 16, 200)
+  lurek.log.info("partial path length: " .. #path .. ", complete: " .. tostring(complete), "pathfind")
 end
 ```
 
@@ -2361,6 +2589,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- The core pathfinding function. Returns an array of {x, y} waypoint tables,
+  -- or nil if no path exists. All coordinates are 1-based.
+  -- Optional unit_size parameter for clearance-based pathfinding (large units).
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
   local path = pf:findPath(1, 1, 31, 31)
@@ -2389,10 +2620,14 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Bidirectional A* can be faster than standard A* on large open maps because
+  -- it explores from both start and goal, meeting in the middle.
+  -- Optional max_nodes parameter limits expansion (0 = unlimited).
+  -- Returns (path, complete): path may be partial if max_nodes is exceeded.
   local grid = lurek.pathfind.newNavGrid(64, 64)
   local pf = lurek.pathfind.newPathfinder(grid)
-  local path = pf:findPathBidirectional(1, 1, 63, 63)
-  lurek.log.info("bidir path: " .. (path and #path or 0), "pathfind")
+  local path, complete = pf:findPathBidirectional(1, 1, 63, 63)
+  lurek.log.info("bidir path: " .. (path and #path or 0) .. ", complete=" .. tostring(complete), "pathfind")
 end
 ```
 
@@ -2416,6 +2651,9 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Smoothed paths remove unnecessary intermediate waypoints where straight-line
+  -- movement is possible. Results in more natural-looking unit movement.
+  -- Slightly more expensive than findPath due to the post-processing pass.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
   local path = pf:findPathSmooth(1, 1, 31, 31)
@@ -2459,8 +2697,10 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Unlike length, cost accounts for terrain weights.
+  -- A short path through swamp can cost more than a long path on road.
   local g = lurek.pathfind.newNavGrid(32, 32)
-  g:setCost(10, 10, 5)
+  g:setCost(10, 10, 5)  -- expensive swamp cell
   local pf = lurek.pathfind.newPathfinder(g)
   local path = pf:findPath(1, 1, 20, 20)
   if path then
@@ -2485,6 +2725,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Use path length to compare route options or estimate travel time.
+  -- Length is in grid-cell units (diagonal steps count as ~1.41).
   local g = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(g)
   local path = pf:findPath(1, 1, 30, 30)
@@ -2513,6 +2755,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Uses octile distance: max(dx,dy) + (sqrt(2)-1) * min(dx,dy).
+  -- Useful for quick distance estimates without running full A*.
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
   local h = pf:heuristicDistance(1, 1, 21, 16)
@@ -2560,6 +2804,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Useful for validating movement orders: "can this unit reach the target at all?"
+  -- Does not return the path itself, just the reachability status.
   local grid = lurek.pathfind.newNavGrid(16, 16)
   local pf = lurek.pathfind.newPathfinder(grid)
   local ok = pf:isReachable(1, 1, 15, 15)
@@ -2587,6 +2833,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Uses Bresenham-style ray traversal. Useful for ranged attacks, guard vision,
+  -- and path smoothing (skip intermediate waypoints if LOS is clear).
   local grid = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(grid)
   local los = pf:lineOfSight(1, 1, 15, 15)
@@ -2608,6 +2856,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- When enabled, identical (start,goal) queries return cached results instantly.
+  -- Disable cache when the grid changes frequently to avoid stale paths.
   local g = lurek.pathfind.newNavGrid(32, 32)
   local pf = lurek.pathfind.newPathfinder(g)
   pf:setCacheEnabled(true)
@@ -2629,6 +2879,8 @@ Exact example from [pathfind.lua](../blob/main/content/examples/pathfind.lua):
 
 ```lua
 do
+  -- Set based on expected unique paths. For RTS with many units,
+  -- 256-512 is typical. Lower values save memory at the cost of re-computation.
   local g = lurek.pathfind.newNavGrid(64, 64)
   local pf = lurek.pathfind.newPathfinder(g)
   pf:setCacheEnabled(true)

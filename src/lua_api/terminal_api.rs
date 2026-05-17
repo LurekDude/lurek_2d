@@ -407,8 +407,8 @@ impl LuaUserData for LuaTerminal {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- set --
         /// Writes a character with foreground and background color to a specific cell in the terminal grid.
-        /// @param | col | number | Column index (1-based).
-        /// @param | row | number | Row index (1-based).
+        /// @param | col | integer | Column index (1-based).
+        /// @param | row | integer | Row index (1-based).
         /// @param | ch | string|number | Character as a string or Unicode codepoint.
         /// @param | fr | number? | Foreground red (0-1, default 1).
         /// @param | fg | number? | Foreground green (0-1, default 1).
@@ -450,7 +450,7 @@ impl LuaUserData for LuaTerminal {
         /// Reads the character and colors at a specific cell in the terminal grid.
         /// @param | col | integer | Column index (1-based).
         /// @param | row | integer | Row index (1-based).
-        /// @return | number, number, number, number, number, number, number, number, number | Character codepoint, fg RGBA, bg RGBA.
+        /// @return | integer, number, number, number, number, number, number, number, number | Character codepoint, fg RGBA, bg RGBA.
         methods.add_method("get", |_, this, (col, row): (usize, usize)| {
             let cell = this.binding.terminal.borrow().get(col, row);
             Ok((
@@ -480,7 +480,7 @@ impl LuaUserData for LuaTerminal {
         );
         // -- getDimensions --
         /// Returns the number of columns and rows in the terminal grid.
-        /// @return | number, number | Column count, row count.
+        /// @return | integer, integer | Column count, row count.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.binding.terminal.borrow().get_dimensions())
         });
@@ -511,7 +511,7 @@ impl LuaUserData for LuaTerminal {
         });
         // -- getWidgetCount --
         /// Returns the number of widgets currently attached to this terminal.
-        /// @return | number | Widget count.
+        /// @return | integer | Widget count.
         methods.add_method("getWidgetCount", |_, this, ()| {
             Ok(this.binding.terminal.borrow().get_widget_count())
         });
@@ -576,7 +576,7 @@ impl LuaUserData for LuaTerminal {
         /// @param | px | number | Pixel X position of the mouse click.
         /// @param | py | number | Pixel Y position of the mouse click.
         /// @param | button | integer? | Mouse button index (default 1 for left).
-        /// @return | nil | No return value.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "mousepressed",
             |lua, this, (px, py, button): (f32, f32, Option<usize>)| {
@@ -707,7 +707,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getPosition --
         /// Returns the widget position as 1-based column and row.
-        /// @return | number, number | Column, row.
+        /// @return | integer, integer | Column, row.
         methods.add_method("getPosition", |_, this, ()| {
             with_widget(&this.binding, "Widget:getPosition", |widget| {
                 Ok(widget.base.position_1based())
@@ -727,7 +727,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getSize --
         /// Returns the widget dimensions as width and height in cell units.
-        /// @return | number, number | Width, height.
+        /// @return | integer, integer | Width, height.
         methods.add_method("getSize", |_, this, ()| {
             with_widget(&this.binding, "Widget:getSize", |widget| {
                 Ok((widget.base.width, widget.base.height))
@@ -818,7 +818,7 @@ impl LuaUserData for LuaWidget {
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
         /// @param | a | number? | Alpha channel (default 1).
-        /// @return | nil | No return value.
+        /// @return | nil | No value is returned.
         methods.add_method(
             "setColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -830,11 +830,7 @@ impl LuaUserData for LuaWidget {
             },
         );
         // -- getColor --
-        /// Returns the current RGBA color assigned to this widget.
-
-        // -- getColor --
         /// Returns the foreground color of the widget as RGBA components.
-        /// @return | number, number, number, number | Red, green, blue, and alpha components in the 0..1 range.
         /// @return | number, number, number, number | Red, green, blue, and alpha channels.
         methods.add_method("getColor", |_, this, ()| {
             with_widget(&this.binding, "Widget:getColor", |widget| {
@@ -861,7 +857,7 @@ impl LuaUserData for LuaWidget {
         // -- setMaxLength --
         /// Sets the maximum number of characters allowed in a text box widget.
         /// @param | maxLength | integer | Maximum character count.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("setMaxLength", |_, this, max_length: usize| {
             with_widget_mut(&this.binding, "Widget:setMaxLength", |widget| {
                 widget
@@ -871,7 +867,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getMaxLength --
         /// Returns the maximum character limit of a text box widget.
-        /// @return | number | Maximum character count.
+        /// @return | integer | Maximum character count.
         methods.add_method("getMaxLength", |_, this, ()| {
             with_widget(&this.binding, "Widget:getMaxLength", |widget| {
                 widget
@@ -896,7 +892,7 @@ impl LuaUserData for LuaWidget {
         // -- addItem --
         /// Appends a text item to a list widget.
         /// @param | item | string | The item text to add.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("addItem", |_, this, item: String| {
             with_widget_mut(&this.binding, "Widget:addItem", |widget| {
                 widget
@@ -907,7 +903,7 @@ impl LuaUserData for LuaWidget {
         // -- removeItem --
         /// Removes a list item by its 1-based index.
         /// @param | index | integer | 1-based item index to remove.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("removeItem", |_, this, index: usize| {
             with_widget_mut(&this.binding, "Widget:removeItem", |widget| {
                 widget
@@ -917,7 +913,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- clearItems --
         /// Removes all items from a list widget.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("clearItems", |_, this, ()| {
             with_widget_mut(&this.binding, "Widget:clearItems", |widget| {
                 widget
@@ -927,7 +923,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getItemCount --
         /// Returns the number of items in a list widget.
-        /// @return | number | Item count.
+        /// @return | integer | Item count.
         methods.add_method("getItemCount", |_, this, ()| {
             with_widget(&this.binding, "Widget:getItemCount", |widget| {
                 widget
@@ -963,7 +959,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getSelected --
         /// Returns the 1-based index of the currently selected list item, or nil if nothing is selected.
-        /// @return | number | Selected item index, or nil.
+        /// @return | integer | Selected item index, or nil.
         methods.add_method("getSelected", |_, this, ()| {
             with_widget(&this.binding, "Widget:getSelected", |widget| {
                 widget
@@ -988,7 +984,7 @@ impl LuaUserData for LuaWidget {
         // -- setStyle --
         /// Sets the border drawing style for a border or panel widget.
         /// @param | styleName | string | Border style name (e.g. "single", "double", "rounded", "heavy", "none").
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("setStyle", |_, this, style_name: String| {
             let style = BorderStyle::from_str_name(&style_name)
                 .ok_or_else(|| runtime_error("Widget:setStyle", "invalid border style"))?;
@@ -1012,7 +1008,7 @@ impl LuaUserData for LuaWidget {
         // -- setTitle --
         /// Sets the title text displayed in the border of a border or panel widget.
         /// @param | title | string | The title text.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("setTitle", |_, this, title: String| {
             with_widget_mut(&this.binding, "Widget:setTitle", |widget| {
                 widget
@@ -1131,7 +1127,7 @@ impl LuaUserData for LuaWidget {
         });
         // -- getChildCount --
         /// Returns the number of child widgets in a panel widget.
-        /// @return | number | Child count.
+        /// @return | integer | Child count.
         methods.add_method("getChildCount", |_, this, ()| {
             with_widget(&this.binding, "Widget:getChildCount", |widget| {
                 if !widget.is_panel() {
@@ -1258,10 +1254,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
     // -- newButton --
     /// Creates a new clickable button widget with the given position, size, and label text.
-    /// @param | col | number | Column position (1-based).
-    /// @param | row | number | Row position (1-based).
-    /// @param | width | number | Button width in cells.
-    /// @param | height | number? | Button height in cells (default 1).
+    /// @param | col | integer | Column position (1-based).
+    /// @param | row | integer | Row position (1-based).
+    /// @param | width | integer | Button width in cells.
+    /// @param | height | integer? | Button height in cells (default 1).
     /// @param | text | string? | Button label text (default empty).
     /// @return | LWidget | The new button widget.
     tbl.set(
@@ -1363,9 +1359,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Appends a line of text to the terminal scrollback buffer for later retrieval.
     /// @param | terminal | LTerminal | The terminal to push to.
     /// @param | line | string | The text line to append.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "pushScrollback",
         lua.create_function(move |_, (term_ud, line): (LuaAnyUserData, String)| {
             let term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
             let _ = s.borrow();
@@ -1403,7 +1398,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- scrollbackLen --
     /// Returns the number of lines currently stored in the terminal scrollback buffer.
     /// @param | terminal | LTerminal | The terminal to query.
-    /// @return | number | Line count.
+    /// @return | integer | Line count.
     tbl.set(
         "scrollbackLen",
         lua.create_function(|_, term_ud: LuaAnyUserData| {
@@ -1416,9 +1411,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Sets the maximum number of lines retained in the terminal scrollback buffer. Older lines are discarded when the cap is exceeded.
     /// @param | terminal | LTerminal | The terminal to configure.
     /// @param | cap | integer | Maximum number of scrollback lines.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "setScrollbackCap",
         lua.create_function(|_, (term_ud, cap): (LuaAnyUserData, usize)| {
             let term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
             term_ref
@@ -1433,9 +1427,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Appends a command string to the terminal command history for up/down arrow recall.
     /// @param | terminal | LTerminal | The terminal to push to.
     /// @param | cmd | string | The command string to store.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "pushCmdHistory",
         lua.create_function(|_, (term_ud, cmd): (LuaAnyUserData, String)| {
             let term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
             term_ref
@@ -1473,7 +1466,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- cmdHistoryLen --
     /// Returns the number of commands currently stored in the terminal command history.
     /// @param | terminal | LTerminal | The terminal to query.
-    /// @return | number | History entry count.
+    /// @return | integer | History entry count.
     tbl.set(
         "cmdHistoryLen",
         lua.create_function(|_, term_ud: LuaAnyUserData| {
@@ -1485,9 +1478,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- clearCmdHistory --
     /// Removes all entries from the terminal command history.
     /// @param | terminal | LTerminal | The terminal to clear.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "clearCmdHistory",
         lua.create_function(|_, term_ud: LuaAnyUserData| {
             let term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
             term_ref.binding.terminal.borrow_mut().clear_cmd_history();
@@ -1522,11 +1514,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- printHighlighted --
     /// Renders syntax-highlighted text onto the terminal grid using a table of highlight rules with regex patterns and colors.
     /// @param | terminal | LTerminal | The terminal to print to.
-    /// @param | col | number | Starting column (1-based).
-    /// @param | row | number | Row to print on (1-based).
+    /// @param | col | integer | Starting column (1-based).
+    /// @param | row | integer | Row to print on (1-based).
     /// @param | text | string | The text to highlight.
     /// @param | rules | table | Array of rule tables, each with `pattern` (string), `fg` (table {r,g,b} 0-255), and optional `bg` (table {r,g,b} 0-255).
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
         "printHighlighted",
         lua.create_function(
@@ -1604,20 +1596,40 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let arr = lua.create_table()?;
             for (i, span) in spans.iter().enumerate() {
                 let t = lua.create_table()?;
+                /// Performs the 'text' operation.
+                /// @return | nil | No value is returned.
                 t.set("text", span.text.clone())?;
+                /// Performs the 'bold' operation.
+                /// @return | nil | No value is returned.
                 t.set("bold", span.bold)?;
                 if let Some(ref c) = span.fg {
                     let ct = lua.create_table()?;
+                    /// Performs the 'r' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("r", c.r)?;
+                    /// Performs the 'g' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("g", c.g)?;
+                    /// Performs the 'b' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("b", c.b)?;
+                    /// Performs the 'fg' operation.
+                    /// @return | nil | No value is returned.
                     t.set("fg", ct)?;
                 }
                 if let Some(ref c) = span.bg {
                     let ct = lua.create_table()?;
+                    /// Performs the 'r' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("r", c.r)?;
+                    /// Performs the 'g' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("g", c.g)?;
+                    /// Performs the 'b' operation.
+                    /// @return | nil | No value is returned.
                     ct.set("b", c.b)?;
+                    /// Performs the 'bg' operation.
+                    /// @return | nil | No value is returned.
                     t.set("bg", ct)?;
                 }
                 arr.set(i + 1, t)?;
@@ -1631,7 +1643,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | col | integer | Starting column (1-based).
     /// @param | row | integer | Row to print on (1-based).
     /// @param | text | string | Text containing ANSI escape sequences.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
         "printAnsi",
         lua.create_function(
@@ -1682,9 +1694,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- addCompletion --
     /// Registers a candidate string for tab-completion in the shared completion engine.
     /// @param | candidate | string | The completion candidate to add.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "addCompletion",
         lua.create_function(move |_, candidate: String| {
             crc.borrow_mut().add_candidate(&candidate);
             Ok(())
@@ -1694,9 +1705,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- removeCompletion --
     /// Removes a previously registered completion candidate from the shared completion engine.
     /// @param | candidate | string | The completion candidate to remove.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "removeCompletion",
         lua.create_function(move |_, candidate: String| {
             crc.borrow_mut().remove_candidate(&candidate);
             Ok(())
@@ -1705,9 +1715,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let crc = comp_rc.clone();
     // -- clearCompletions --
     /// Removes all registered completion candidates from the shared completion engine.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "clearCompletions",
         lua.create_function(move |_, ()| {
             crc.borrow_mut().clear();
             Ok(())
@@ -1743,9 +1752,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let crc = comp_rc.clone();
     // -- resetCompletion --
     /// Resets the completion cycling state so the next call to nextCompletion starts from the first match.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set(
-        "resetCompletion",
         lua.create_function(move |_, ()| {
             crc.borrow_mut().reset();
             Ok(())
@@ -1753,18 +1761,20 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
     // -- getMaxCols --
     /// Returns the engine-defined maximum number of columns a terminal grid can have.
-    /// @return | number | Maximum column count.
+    /// @return | integer | Maximum column count.
     tbl.set(
         "getMaxCols",
         lua.create_function(|_, ()| Ok(crate::terminal::MAX_COLS as u32))?,
     )?;
     // -- getMaxRows --
     /// Returns the engine-defined maximum number of rows a terminal grid can have.
-    /// @return | number | Maximum row count.
+    /// @return | integer | Maximum row count.
     tbl.set(
         "getMaxRows",
         lua.create_function(|_, ()| Ok(crate::terminal::MAX_ROWS as u32))?,
     )?;
+    /// Performs the 'terminal' operation.
+    /// @return | nil | No value is returned.
     luna.set("terminal", tbl)?;
     Ok(())
 }

@@ -23,9 +23,9 @@ describe("integration: localized strings in UI labels", function()
 
         -- Create UI label and apply localized string
         local label = lurek.ui.newLabel()
-        label.setText(start_text)
+        label:setText(start_text)
         expect_no_error(function()
-            label.setText(quit_text)
+            label:setText(quit_text)
         end)
     end)
 
@@ -46,9 +46,9 @@ describe("integration: localized strings in UI labels", function()
         expect_equal("Cze    ", pl_text, "Polish greeting")
 
         local label = lurek.ui.newLabel()
-        label.setText(pl_text)
+        label:setText(pl_text)
         expect_no_error(function()
-            label.setText(en_text)
+            label:setText(en_text)
         end)
     end)
 

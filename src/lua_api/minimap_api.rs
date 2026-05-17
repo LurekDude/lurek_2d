@@ -63,11 +63,11 @@ pub struct LuaMinimap {
 impl LuaUserData for LuaMinimap {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getGridWidth --
-        /// Returns the minimap grid width. This method is available to Lua scripts.
+        /// Returns the width of the minimap grid in cells.
         /// @return | integer | Grid width in cells.
         methods.add_method("getGridWidth", |_, this, ()| Ok(this.inner.grid_width()));
         // -- getGridHeight --
-        /// Returns the minimap grid height. This method is available to Lua scripts.
+        /// Returns the height of the minimap grid in cells.
         /// @return | integer | Grid height in cells.
         methods.add_method("getGridHeight", |_, this, ()| Ok(this.inner.grid_height()));
         // -- getCellCount --
@@ -75,7 +75,7 @@ impl LuaUserData for LuaMinimap {
         /// @return | integer | Cell count.
         methods.add_method("getCellCount", |_, this, ()| Ok(this.inner.grid_size()));
         // -- getGridSize --
-        /// Returns the minimap grid size. This method is available to Lua scripts.
+        /// Returns the minimap grid width and height in cells.
         /// @return | integer | Grid width in cells.
         /// @return | integer | Grid height in cells.
         methods.add_method("getGridSize", |_, this, ()| {
@@ -94,14 +94,14 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.display_height())
         });
         // -- getDisplaySize --
-        /// Returns the minimap display size. This method is available to Lua scripts.
+        /// Returns the minimap display width and height in pixels.
         /// @return | integer | Display width in pixels.
         /// @return | integer | Display height in pixels.
         methods.add_method("getDisplaySize", |_, this, ()| {
             Ok((this.inner.display_width(), this.inner.display_height()))
         });
         // -- setDisplaySize --
-        /// Sets the minimap display size. This method is available to Lua scripts.
+        /// Sets the minimap display width and height in pixels.
         /// @param | w | integer | Display width in pixels.
         /// @param | h | integer | Display height in pixels.
         /// @return | nil | No value is returned.
@@ -155,12 +155,12 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
         // -- setTerrainColor --
-        /// Sets RGBA color for a terrain type. This method is available to Lua scripts.
+        /// Sets the RGBA display color for a terrain type.
         /// @param | terrain_type | integer | Terrain type id.
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
-        /// @param | a | number | Optional alpha channel, defaulting to 1.0.
+        /// @param | a? | number | Alpha channel, defaults to 1.0.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setTerrainColor",
@@ -204,7 +204,7 @@ impl LuaUserData for LuaMinimap {
                 .map(|s| s.to_string()))
         });
         // -- setFogEnabled --
-        /// Enables or disables fog display. This method is available to Lua scripts.
+        /// Enables or disables the minimap fog display.
         /// @param | enabled | boolean | Fog enabled flag.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setFogEnabled", |_, this, enabled: bool| {
@@ -245,11 +245,11 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.get_fog_level(x - 1, y - 1) as u8)
         });
         // -- setFogColor --
-        /// Sets the fog overlay color. This method is available to Lua scripts.
-        /// @param | r | number | Lua argument for `r`.
-        /// @param | g | number | Lua argument for `g`.
-        /// @param | b | number | Lua argument for `b`.
-        /// @param | a | number? | Lua argument for `a`.
+        /// Sets the RGBA fog overlay color for covered cells.
+        /// @param | r | number | Red channel.
+        /// @param | g | number | Green channel.
+        /// @param | b | number | Blue channel.
+        /// @param | a? | number | Alpha channel, defaults to 0.8.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setFogColor",
@@ -259,7 +259,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- getFogColor --
-        /// Returns the fog overlay color. This method is available to Lua scripts.
+        /// Returns the current RGBA fog overlay color.
         /// @return | number | Red channel.
         /// @return | number | Green channel.
         /// @return | number | Blue channel.
@@ -284,11 +284,11 @@ impl LuaUserData for LuaMinimap {
         });
         // -- addObjectType --
         /// Adds an object type and returns its one-based index.
-        /// @param | name | string | String value for `name`.
-        /// @param | r | number | Lua argument for `r`.
-        /// @param | g | number | Lua argument for `g`.
-        /// @param | b | number | Lua argument for `b`.
-        /// @param | a | number? | Lua argument for `a`.
+        /// @param | name | string | Object type name.
+        /// @param | r | number | Red channel.
+        /// @param | g | number | Green channel.
+        /// @param | b | number | Blue channel.
+        /// @param | a? | number | Alpha channel, defaults to 1.0.
         /// @return | integer | One-based object type index.
         methods.add_method_mut(
             "addObjectType",
@@ -338,8 +338,8 @@ impl LuaUserData for LuaMinimap {
         /// Assigns an image texture to an object type.
         /// @param | type_idx | integer | One-based object type index.
         /// @param | image_ud | LImage | Image handle from `lurek.render.newImage`.
-        /// @param | width | number | Optional display width.
-        /// @param | height | number | Optional display height.
+        /// @param | width? | number | Display width override.
+        /// @param | height? | number | Display height override.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setObjectTypeTexture",
@@ -388,7 +388,7 @@ impl LuaUserData for LuaMinimap {
         /// @param | x | number | Object x coordinate.
         /// @param | y | number | Object y coordinate.
         /// @param | type_idx | integer | One-based object type index.
-        /// @param | owner | integer | Optional owner id, defaulting to 0.
+        /// @param | owner? | integer | Owner id, defaults to 0.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setObject",
@@ -404,7 +404,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- removeObject --
-        /// Removes an object by id. This method is available to Lua scripts.
+        /// Removes a minimap object by its unique id.
         /// @param | id | integer | Object id.
         /// @return | boolean | True when an object was removed.
         methods.add_method_mut("removeObject", |_, this, id: u32| {
@@ -424,12 +424,12 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.object_count())
         });
         // -- setOwnerColor --
-        /// Sets RGBA color for an owner id. This method is available to Lua scripts.
-        /// @param | owner | integer | Lua argument for `owner`.
-        /// @param | r | number | Lua argument for `r`.
-        /// @param | g | number | Lua argument for `g`.
-        /// @param | b | number | Lua argument for `b`.
-        /// @param | a | number? | Lua argument for `a`.
+        /// Sets the RGBA display color for an owner id.
+        /// @param | owner | integer | Owner id.
+        /// @param | r | number | Red channel.
+        /// @param | g | number | Green channel.
+        /// @param | b | number | Blue channel.
+        /// @param | a? | number | Alpha channel, defaults to 1.0.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setOwnerColor",
@@ -440,7 +440,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- getOwnerColor --
-        /// Returns RGBA color for an owner id. This method is available to Lua scripts.
+        /// Returns the current RGBA color for an owner id.
         /// @param | owner | integer | Owner id.
         /// @return | number | Red channel.
         /// @return | number | Green channel.
@@ -451,7 +451,7 @@ impl LuaUserData for LuaMinimap {
             Ok((c[0], c[1], c[2], c[3]))
         });
         // -- setColorMode --
-        /// Sets the minimap color mode. This method is available to Lua scripts.
+        /// Sets the minimap color mode to terrain or political.
         /// @param | mode | string | Color mode name, expected `terrain` or `political`.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setColorMode", |_, this, mode: String| {
@@ -471,7 +471,7 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.color_mode().as_str())
         });
         // -- setZoom --
-        /// Sets minimap zoom. This method is available to Lua scripts.
+        /// Sets the minimap zoom magnification level.
         /// @param | zoom | number | Zoom value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setZoom", |_, this, zoom: f32| {
@@ -479,11 +479,11 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
         // -- getZoom --
-        /// Returns minimap zoom. This method is available to Lua scripts.
+        /// Returns the current minimap zoom magnification level.
         /// @return | number | Zoom value.
         methods.add_method("getZoom", |_, this, ()| Ok(this.inner.zoom()));
         // -- setCenter --
-        /// Sets minimap world center. This method is available to Lua scripts.
+        /// Sets the minimap world-space center position.
         /// @param | x | number | Center x coordinate.
         /// @param | y | number | Center y coordinate.
         /// @return | nil | No value is returned.
@@ -522,7 +522,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- getCenter --
-        /// Returns minimap world center. This method is available to Lua scripts.
+        /// Returns the current minimap world-space center position.
         /// @return | number | Center x coordinate.
         /// @return | number | Center y coordinate.
         methods.add_method("getCenter", |_, this, ()| {
@@ -538,10 +538,10 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("getCenterY", |_, this, ()| Ok(this.inner.center_y()));
         // -- setViewportRect --
         /// Sets the visible viewport rectangle shown on the minimap.
-        /// @param | x | number | Numeric `x` argument for this call.
-        /// @param | y | number | Numeric `y` argument for this call.
-        /// @param | w | number | Lua argument for `w`.
-        /// @param | h | number | Lua argument for `h`.
+        /// @param | x | number | Viewport x coordinate.
+        /// @param | y | number | Viewport y coordinate.
+        /// @param | w | number | Viewport width.
+        /// @param | h | number | Viewport height.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setViewportRect",
@@ -551,7 +551,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- clearViewportRect --
-        /// Clears the viewport rectangle. This method is available to Lua scripts.
+        /// Clears the minimap viewport rectangle overlay.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clearViewportRect", |_, this, ()| {
             this.inner.clear_viewport_rect();
@@ -559,10 +559,10 @@ impl LuaUserData for LuaMinimap {
         });
         // -- getViewportRect --
         /// Returns the viewport rectangle when one is set.
-        /// @return | LuaValue | X coordinate, or nil.
-        /// @return | LuaValue | Y coordinate, or nil.
-        /// @return | LuaValue | Width, or nil.
-        /// @return | LuaValue | Height, or nil.
+        /// @return | number | X coordinate, or nil when unset.
+        /// @return | number | Y coordinate, or nil when unset.
+        /// @return | number | Width, or nil when unset.
+        /// @return | number | Height, or nil when unset.
         methods.add_method("getViewportRect", |_, this, ()| {
             match this.inner.viewport_rect() {
                 Some((x, y, w, h)) => Ok((Some(x), Some(y), Some(w), Some(h))),
@@ -585,10 +585,10 @@ impl LuaUserData for LuaMinimap {
         });
         // -- setViewportColor --
         /// Sets the viewport rectangle color.
-        /// @param | r | number | Lua argument for `r`.
-        /// @param | g | number | Lua argument for `g`.
-        /// @param | b | number | Lua argument for `b`.
-        /// @param | a | number? | Lua argument for `a`.
+        /// @param | r | number | Red channel.
+        /// @param | g | number | Green channel.
+        /// @param | b | number | Blue channel.
+        /// @param | a? | number | Alpha channel, defaults to 0.8.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setViewportColor",
@@ -609,14 +609,14 @@ impl LuaUserData for LuaMinimap {
         });
         #[allow(clippy::type_complexity)]
         // -- addPing --
-        /// Adds a timed ping effect at a minimap world position. The ping fades out over its duration.
+        /// Adds a timed ping effect at a minimap world position.
         /// @param | x | number | World x coordinate of the ping.
         /// @param | y | number | World y coordinate of the ping.
-        /// @param | duration | number | How long the ping is visible in seconds.
-        /// @param | r | number? | Red channel of the ping color (0..1, default 1).
-        /// @param | g | number? | Green channel of the ping color (0..1, default 1).
-        /// @param | b | number? | Blue channel of the ping color (0..1, default 0).
-        /// @param | a | number? | Alpha channel of the ping color (0..1, default 1).
+        /// @param | duration | number | Duration in seconds before the ping fades out.
+        /// @param | r? | number | Red channel, defaults to 1.0.
+        /// @param | g? | number | Green channel, defaults to 1.0.
+        /// @param | b? | number | Blue channel, defaults to 0.0.
+        /// @param | a? | number | Alpha channel, defaults to 1.0.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addPing",
@@ -647,14 +647,14 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("getPingCount", |_, this, ()| Ok(this.inner.ping_count()));
         #[allow(clippy::type_complexity)]
         // -- addMarker --
-        /// Adds a marker and returns its id. This method is available to Lua scripts.
+        /// Adds a world-space marker and returns its unique id.
         /// @param | x | number | Marker x coordinate.
         /// @param | y | number | Marker y coordinate.
-        /// @param | desc | string? | Optional marker description.
-        /// @param | r | number? | Optional red channel override (0..1, default 1).
-        /// @param | g | number? | Optional green channel override (0..1, default 0).
-        /// @param | b | number? | Optional blue channel override (0..1, default 0).
-        /// @param | a | number? | Optional alpha channel override (0..1, default 1).
+        /// @param | desc? | string | Marker description.
+        /// @param | r? | number | Red channel override, defaults to 1.0.
+        /// @param | g? | number | Green channel override, defaults to 0.0.
+        /// @param | b? | number | Blue channel override, defaults to 0.0.
+        /// @param | a? | number | Alpha channel override, defaults to 1.0.
         /// @return | integer | Marker id.
         methods.add_method_mut(
             "addMarker",
@@ -680,7 +680,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- removeMarker --
-        /// Removes a marker by id. This method is available to Lua scripts.
+        /// Removes a minimap marker by its unique id.
         /// @param | id | integer | Marker id.
         /// @return | boolean | True when a marker was removed.
         methods.add_method_mut("removeMarker", |_, this, id: u32| {
@@ -701,7 +701,7 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.get_marker_description(id).map(|s| s.to_string()))
         });
         // -- getMarkerCount --
-        /// Returns the number of markers. This method is available to Lua scripts.
+        /// Returns the total number of minimap markers.
         /// @return | integer | Marker count.
         methods.add_method("getMarkerCount", |_, this, ()| {
             Ok(this.inner.marker_count())
@@ -710,8 +710,8 @@ impl LuaUserData for LuaMinimap {
         /// Assigns an image texture to a marker.
         /// @param | id | integer | Marker id.
         /// @param | image_ud | LImage | Image handle from `lurek.render.newImage`.
-        /// @param | width | number | Optional display width.
-        /// @param | height | number | Optional display height.
+        /// @param | width? | number | Display width override.
+        /// @param | height? | number | Display height override.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setMarkerTexture",
@@ -756,7 +756,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- clearMarkerAnimation --
-        /// Clears marker animation by id. This method is available to Lua scripts.
+        /// Clears the animation assigned to a marker by id.
         /// @param | id | integer | Marker id.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clearMarkerAnimation", |_, this, id: u32| {
@@ -764,12 +764,12 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
         // -- drawLine --
-        /// Adds an overlay line. This method is available to Lua scripts.
-        /// @param | x1 | number | Lua argument for `x1`.
-        /// @param | y1 | number | Lua argument for `y1`.
-        /// @param | x2 | number | Lua argument for `x2`.
-        /// @param | y2 | number | Lua argument for `y2`.
-        /// @param | color_tbl | table | Lua argument for `color_tbl`.
+        /// Adds an overlay line between two world-space points.
+        /// @param | x1 | number | Start x coordinate.
+        /// @param | y1 | number | Start y coordinate.
+        /// @param | x2 | number | End x coordinate.
+        /// @param | y2 | number | End y coordinate.
+        /// @param | color_tbl | table | RGBA byte color table.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawLine",
@@ -780,12 +780,12 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- drawRect --
-        /// Adds an overlay rectangle. This method is available to Lua scripts.
-        /// @param | x | number | Numeric `x` argument for this call.
-        /// @param | y | number | Numeric `y` argument for this call.
-        /// @param | w | number | Lua argument for `w`.
-        /// @param | h | number | Lua argument for `h`.
-        /// @param | color_tbl | table | Lua argument for `color_tbl`.
+        /// Adds an overlay rectangle at a world-space position.
+        /// @param | x | number | Rectangle x coordinate.
+        /// @param | y | number | Rectangle y coordinate.
+        /// @param | w | number | Rectangle width.
+        /// @param | h | number | Rectangle height.
+        /// @param | color_tbl | table | RGBA byte color table.
         /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawRect",
@@ -796,7 +796,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- clearOverlay --
-        /// Clears overlay shapes. This method is available to Lua scripts.
+        /// Clears all minimap overlay shapes.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clearOverlay", |_, this, ()| {
             this.inner.clear_overlay();
@@ -831,18 +831,18 @@ impl LuaUserData for LuaMinimap {
         );
         // -- clearPath --
         /// Clears one path by id or all paths when no id is provided.
-        /// @param | id | integer? | Optional path id.
+        /// @param | id? | integer | Path id to clear.
         /// @return | nil | No value is returned.
         methods.add_method_mut("clearPath", |_, this, id: Option<u32>| {
             this.inner.clear_path(id);
             Ok(())
         });
         // -- getPathCount --
-        /// Returns the number of paths. This method is available to Lua scripts.
+        /// Returns the number of active path overlays.
         /// @return | integer | Path count.
         methods.add_method("getPathCount", |_, this, ()| Ok(this.inner.paths().len()));
         // -- setLayer --
-        /// Sets active minimap layer. This method is available to Lua scripts.
+        /// Sets the active minimap display layer index.
         /// @param | layer | integer | Layer index.
         /// @return | nil | No value is returned.
         methods.add_method_mut("setLayer", |_, this, layer: usize| {
@@ -850,7 +850,7 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
         // -- getLayer --
-        /// Returns active minimap layer. This method is available to Lua scripts.
+        /// Returns the active minimap display layer index.
         /// @return | integer | Layer index.
         methods.add_method("getLayer", |_, this, ()| Ok(this.inner.get_layer()));
         // -- getLayerCount --
@@ -858,7 +858,7 @@ impl LuaUserData for LuaMinimap {
         /// @return | integer | Layer count.
         methods.add_method("getLayerCount", |_, this, ()| Ok(this.inner.layer_count()));
         // -- setLayerData --
-        /// Sets raw cell data for a layer. This method is available to Lua scripts.
+        /// Sets raw cell data for a minimap layer.
         /// @param | layer | integer | Layer index.
         /// @param | data_tbl | table | Array table of cell bytes.
         /// @return | nil | No value is returned.
@@ -885,7 +885,7 @@ impl LuaUserData for LuaMinimap {
             },
         );
         // -- getLayerData --
-        /// Returns raw cell data for a layer. This method is available to Lua scripts.
+        /// Returns raw cell data for a minimap layer.
         /// @param | layer | integer | Layer index.
         /// @return | table | Array table of cell bytes, or nil when missing.
         methods.add_method("getLayerData", |lua, this, layer: usize| {
@@ -924,10 +924,10 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("isClickable", |_, this, ()| Ok(this.inner.is_clickable()));
         // -- getHoverInfo --
         /// Returns hover text for a screen position when available.
-        /// @param | sx | number | Lua argument for `sx`.
-        /// @param | sy | number | Lua argument for `sy`.
-        /// @param | mx | number | Lua argument for `mx`.
-        /// @param | my | number | Lua argument for `my`.
+        /// @param | sx | number | Screen x coordinate.
+        /// @param | sy | number | Screen y coordinate.
+        /// @param | mx | number | Minimap x position.
+        /// @param | my | number | Minimap y position.
         /// @return | string | Hover info text, or nil when unavailable.
         methods.add_method(
             "getHoverInfo",
@@ -940,11 +940,12 @@ impl LuaUserData for LuaMinimap {
         );
         // -- screenToGrid --
         /// Converts a screen position to grid coordinates.
-        /// @param | sx | number | Lua argument for `sx`.
-        /// @param | sy | number | Lua argument for `sy`.
-        /// @param | mx | number | Lua argument for `mx`.
-        /// @param | my | number | Lua argument for `my`.
-        /// @return | LuaValue | Conversion result from the minimap module.
+        /// @param | sx | number | Screen x coordinate.
+        /// @param | sy | number | Screen y coordinate.
+        /// @param | mx | number | Minimap x position.
+        /// @param | my | number | Minimap y position.
+        /// @return | number | Grid x coordinate.
+        /// @return | number | Grid y coordinate.
         methods.add_method(
             "screenToGrid",
             |_, this, (sx, sy, mx, my): (f32, f32, f32, f32)| {
@@ -953,11 +954,12 @@ impl LuaUserData for LuaMinimap {
         );
         // -- gridToScreen --
         /// Converts grid coordinates to screen coordinates.
-        /// @param | gx | number | Lua argument for `gx`.
-        /// @param | gy | number | Lua argument for `gy`.
-        /// @param | mx | number | Lua argument for `mx`.
-        /// @param | my | number | Lua argument for `my`.
-        /// @return | LuaValue | Conversion result from the minimap module.
+        /// @param | gx | number | Grid x coordinate.
+        /// @param | gy | number | Grid y coordinate.
+        /// @param | mx | number | Minimap x position.
+        /// @param | my | number | Minimap y position.
+        /// @return | number | Screen x coordinate.
+        /// @return | number | Screen y coordinate.
         methods.add_method(
             "gridToScreen",
             |_, this, (gx, gy, mx, my): (f32, f32, f32, f32)| {
@@ -985,8 +987,8 @@ impl LuaUserData for LuaMinimap {
         });
         // -- render --
         /// Enqueues minimap render commands at an optional screen position.
-        /// @param | x | number | Optional screen x coordinate, defaulting to 0.
-        /// @param | y | number | Optional screen y coordinate, defaulting to 0.
+        /// @param | x? | number | Screen x coordinate, defaults to 0.
+        /// @param | y? | number | Screen y coordinate, defaults to 0.
         /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
             let sx = x.unwrap_or(0.0);
@@ -998,7 +1000,7 @@ impl LuaUserData for LuaMinimap {
         // -- drawToImage --
         /// Draws the minimap into image data at a pixel size.
         /// @param | pixel_size | integer | Pixel size scale.
-        /// @return | LuaValue | Image data returned by the minimap module.
+        /// @return | LImageData | Image data containing the rendered minimap.
         methods.add_method("drawToImage", |_, this, pixel_size: u32| {
             let img = this.inner.draw_to_image(pixel_size);
             Ok(img)
@@ -1013,8 +1015,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a minimap with grid dimensions and optional display size.
     /// @param | grid_w | integer | Grid width in cells.
     /// @param | grid_h | integer | Grid height in cells.
-    /// @param | display_w | integer | Optional display width in pixels, defaulting to 200.
-    /// @param | display_h | integer | Optional display height in pixels, defaulting to 200.
+    /// @param | display_w? | integer | Display width in pixels, defaults to 200.
+    /// @param | display_h? | integer | Display height in pixels, defaults to 200.
     /// @return | LMinimap | New minimap handle.
     tbl.set("newMinimap", lua.create_function(
             move |_, (grid_w, grid_h, display_w, display_h): (u32, u32, Option<u32>, Option<u32>)| {
@@ -1027,6 +1029,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             },
         )?,
     )?;
+    /// Performs the 'minimap' operation.
+    /// @return | nil | No value is returned.
     lurek.set("minimap", tbl)?;
     Ok(())
 }

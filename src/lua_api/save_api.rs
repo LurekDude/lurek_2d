@@ -64,12 +64,18 @@ impl LuaSaveManager {
                 result.set(name.as_str(), val)?;
             }
         }
+        /// Performs the '__schema_version' operation.
+        /// @return | nil | No value is returned.
         result.set("__schema_version", self.manager.schema_version())?;
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_secs_f64())
             .unwrap_or(0.0);
+        /// Performs the '__timestamp' operation.
+        /// @return | nil | No value is returned.
         result.set("__timestamp", timestamp)?;
+        /// Performs the '__summary' operation.
+        /// @return | nil | No value is returned.
         result.set("__summary", self.manager.summary())?;
         Ok(result)
     }
@@ -188,12 +194,20 @@ impl LuaSaveManager {
         match eval_save_content(lua, &content) {
             Ok(data) => {
                 let info = lua.create_table()?;
+                /// Performs the 'slot' operation.
+                /// @return | nil | No value is returned.
                 info.set("slot", slot)?;
                 let ver: i32 = data.get("__schema_version").unwrap_or(0);
                 let ts: f64 = data.get("__timestamp").unwrap_or(0.0);
                 let summary: String = data.get("__summary").unwrap_or_default();
+                /// Performs the 'version' operation.
+                /// @return | nil | No value is returned.
                 info.set("version", ver)?;
+                /// Performs the 'timestamp' operation.
+                /// @return | nil | No value is returned.
                 info.set("timestamp", ts)?;
+                /// Performs the 'summary' operation.
+                /// @return | nil | No value is returned.
                 info.set("summary", summary)?;
                 Ok(Some(info))
             }
@@ -226,7 +240,6 @@ impl LuaUserData for LuaSaveManager {
         /// @param | name | string | Unique section name identifying this chunk of save data (e.g. "player", "inventory").
         /// @param | collectFn | function | Called with no arguments during save; must return the data to persist for this section.
         /// @param | restoreFn | function | Called with the saved value during load; responsible for applying it back to game state.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "register",
             |lua, this, (name, collect_fn, restore_fn): (String, LuaFunction, LuaFunction)| {
@@ -261,7 +274,7 @@ impl LuaUserData for LuaSaveManager {
         });
         // -- getSchemaVersion --
         /// Return the current schema version number set for this save manager.
-        /// @return | number | The active schema version integer.
+        /// @return | integer | The active schema version.
         methods.add_method("getSchemaVersion", |_, this, ()| {
             Ok(this.manager.schema_version())
         });
@@ -270,7 +283,6 @@ impl LuaUserData for LuaSaveManager {
         /// Migrations run in version order when loading saves older than the current schema version.
         /// @param | fromVersion | integer | The schema version this migration upgrades FROM (it produces fromVersion+1).
         /// @param | func | function | Receives the full save data table and must return the transformed table.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "addMigration",
             |lua, this, (from_ver, func): (i32, LuaFunction)| {
@@ -290,7 +302,7 @@ impl LuaUserData for LuaSaveManager {
         /// Apply a previously collected save-data table back into game state by invoking all registered restorers.
         /// Migrations are applied if the table's __schema_version is older than the current version.
         /// @param | data | table | A save-data table (as produced by collect or loaded from disk).
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("restore", |lua, this, data: LuaTable| {
             this.restore_from_table(lua, data)
         });
@@ -310,7 +322,6 @@ impl LuaUserData for LuaSaveManager {
         /// Enable periodic auto-saving: when the dirty flag is set, the system writes to the target slot every interval seconds.
         /// @param | interval | number | Time in seconds between auto-save checks (e.g. 30.0 for every 30 seconds).
         /// @param | slot | string | The slot name to auto-save into (e.g. "autosave").
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "enableAutoSave",
             |_, this, (interval, slot): (f64, String)| {
@@ -417,7 +428,7 @@ impl LuaUserData for LuaSaveManager {
         /// Persist all registered data sections to the named slot file on disk.
         /// Calls the onBeforeSave hook, collects data, optionally compresses, and writes to save/<slot>.sav.
         /// @param | slot | string | Slot name (e.g. "slot1", "quicksave"). The file is stored as save/slot_<name>.sav.
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("save", |lua, this, slot: String| {
             this.save_to_slot(lua, &slot)
         });
@@ -425,14 +436,14 @@ impl LuaUserData for LuaSaveManager {
         /// Load game state from a named slot file. Decompresses if needed, applies migrations, calls restorers, then fires onAfterLoad.
         /// @param | slot | string | Slot name to load (e.g. "slot1").
         /// @return | boolean | True if the load succeeded, false on error.
-        /// @return | string | Error message if the load failed, nil on success.
+        /// @return | string? | Error message if the load failed, nil on success.
         methods.add_method_mut("load", |lua, this, slot: String| {
             this.load_from_slot(lua, &slot)
         });
         // -- delete --
         /// Permanently delete a save slot file from disk. This action cannot be undone.
         /// @param | slot | string | Slot name to delete (e.g. "slot1").
-        /// @return | LuaValue | Returned Lua value.
+        /// @return | nil | No value is returned.
         methods.add_method("delete", |_, this, slot: String| this.delete_slot(&slot));
         // -- exists --
         /// Check whether a save slot file exists on disk without reading its contents.
@@ -450,7 +461,7 @@ impl LuaUserData for LuaSaveManager {
         /// Read metadata for a single save slot without loading its full game state.
         /// Returns nil if the slot does not exist or is corrupted.
         /// @param | slot | string | Slot name to inspect.
-        /// @return | table | Info table with fields: slot, version, timestamp, summary — or nil.
+        /// @return | table? | Info table with fields: slot, version, timestamp, summary, or nil if not found.
         methods.add_method("getSlotInfo", |lua, this, slot: String| {
             match this.read_slot_meta(lua, &slot)? {
                 Some(info) => Ok(LuaValue::Table(info)),
@@ -481,6 +492,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         "newSaveManager",
         lua.create_function(move |lua, ()| lua.create_userdata(LuaSaveManager::new(s.clone())))?,
     )?;
+    /// Performs the 'save' operation.
+    /// @return | nil | No value is returned.
     lurek.set("save", tbl)?;
     Ok(())
 }

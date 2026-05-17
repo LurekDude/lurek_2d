@@ -81,6 +81,7 @@ describe("evidence: html", function()
         local path = dir .. "class_state.json"
         local doc = lurek.html.newDocument('<body><div id="el" class="a b">Test</div></body>')
         local el = doc:getElementById("el")
+        assert(el, "element not found")
         local before_has_c = el:hasClass("c")
         el:addClass("c")
         local after_has_c = el:hasClass("c")

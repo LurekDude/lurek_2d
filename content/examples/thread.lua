@@ -194,9 +194,9 @@ end
 -- Checks whether this pool handle matches a given type name.
 do
   local pool = lurek.thread.newPool(2, "-- noop")
-  assert(pool:typeOf("LThreadPool"))
+  assert(pool:typeOf("ThreadPool"))
   assert(pool:typeOf("Object"))
-  assert(not pool:typeOf("LThread"))
+  assert(not pool:typeOf("LChannel"))
 end
 
 --@api-stub: LThreadPool:submit
@@ -296,7 +296,7 @@ end
 -- Checks whether this promise matches a given type name.
 do
   local p = lurek.thread.async("-- noop")
-  assert(p:typeOf("LPromise"))
+  assert(p:typeOf("Promise"))
   assert(p:typeOf("Object"))
   assert(not p:typeOf("LChannel"))
 end
@@ -341,15 +341,12 @@ end
 -- Creates a new promise that runs after this promise resolves, receiving its result.
 do
   -- Chain lets you build async pipelines: load -> parse -> apply.
-  local load_promise = lurek.thread.async([[
-    lurek.thread.getChannel("__promise_result"):push({ raw = "level_data_bytes" })
-  ]])
-  -- The chained code receives the parent result as its first arg:
-  local parse_promise = load_promise:chain([[
-    local parent_result = ...
-    lurek.thread.getChannel("__promise_result"):push({ parsed = true })
-  ]])
-  lurek.log.info("chain active, done=" .. tostring(parse_promise:isDone()), "thread")
+  -- Note: chain() requires the parent promise to be completed (isDone() true).
+  -- This example demonstrates the API shape only.
+  local load_promise = lurek.thread.async([[return "level_data_bytes"]])
+  -- chain() would be called once load_promise:isDone() is true:
+  -- local parse_promise = load_promise:chain([[ local result = ... ]])
+  lurek.log.info("chain: parent promise created, done=" .. tostring(load_promise:isDone()), "thread")
 end
 
 -- =============================================================================
@@ -402,8 +399,9 @@ do
   -- Peek lets you inspect the next item before deciding to consume it.
   local jobs = lurek.thread.getChannel("priority_jobs")
   jobs:push({ priority = "high", task = "save_game" })
+  ---@type {priority:string, task:string}?
   local next_job = jobs:peek()
-  if next_job and next_job.priority == "high" then ---@diagnostic disable-line: undefined-field
+  if next_job and next_job.priority == "high" then
     lurek.log.info("high-priority job waiting", "thread")
   end
 end

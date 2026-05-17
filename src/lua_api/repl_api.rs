@@ -78,7 +78,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let repl = lua.create_table()?;
     // -- new --
     /// Creates a release-safe REPL session with bounded command history.
-    /// @param | max_history | integer? | Optional maximum number of history entries; defaults to 200.
+    /// @param | max_history? | integer | Maximum number of history entries; defaults to 200.
     /// @return | LReplSession | REPL session handle for eval, history, and completion.
     repl.set(
         "new",
@@ -88,6 +88,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             })
         })?,
     )?;
+    /// Performs the 'repl' operation.
+    /// @return | nil | No value is returned.
     lurek.set("repl", repl)?;
     Ok(())
 }

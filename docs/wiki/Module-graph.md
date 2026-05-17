@@ -20,14 +20,14 @@
   - [LGraph:addEdge(from_ud: LGraphNode, to_ud: LGraphNode, [edge_type]: string) -> LGraphEdge](#lgraphaddedgefromud-lgraphnode-toud-lgraphnode-edgetype-string-lgraphedge)
   - [LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode)](#lgraphadditemitemud-lgraphitem-nodeud-lgraphnode)
   - [LGraph:addNode([node_type]: string, [capacity]: integer) -> LGraphNode](#lgraphaddnodenodetype-string-capacity-integer-lgraphnode)
-  - [LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> any](#lgraphastarfromnode-lgraphnode-tonode-lgraphnode-any)
+  - [LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil](#lgraphastarfromnode-lgraphnode-tonode-lgraphnode-tablenil)
   - [LGraph:colorGraph() -> table](#lgraphcolorgraph-table)
   - [LGraph:createItem([item_type]: string, [decay_time]: number) -> LGraphItem](#lgraphcreateitemitemtype-string-decaytime-number-lgraphitem)
-  - [LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> any](#lgraphfindpathfromud-lgraphnode-toud-lgraphnode-any)
-  - [LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> any](#lgraphfindpathforitemitemud-lgraphitem-fromud-lgraphnode-toud-lgraphnode-any)
+  - [LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil](#lgraphfindpathfromud-lgraphnode-toud-lgraphnode-tablenil)
+  - [LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil](#lgraphfindpathforitemitemud-lgraphitem-fromud-lgraphnode-toud-lgraphnode-tablenil)
   - [LGraph:getComponents() -> table](#lgraphgetcomponents-table)
-  - [LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> any](#lgraphgetdistancefromud-lgraphnode-toud-lgraphnode-any)
-  - [LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> any](#lgraphgetedgebetweenfromud-lgraphnode-toud-lgraphnode-any)
+  - [LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil](#lgraphgetdistancefromud-lgraphnode-toud-lgraphnode-numbernil)
+  - [LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil](#lgraphgetedgebetweenfromud-lgraphnode-toud-lgraphnode-lgraphedgenil)
   - [LGraph:getEdgeCount() -> integer](#lgraphgetedgecount-integer)
   - [LGraph:getEdges() -> table](#lgraphgetedges-table)
   - [LGraph:getItemCount() -> integer](#lgraphgetitemcount-integer)
@@ -52,7 +52,7 @@
   - [LGraph:step()](#lgraphstep)
   - [LGraph:subgraph(nodes: table) -> LGraph](#lgraphsubgraphnodes-table-lgraph)
   - [LGraph:tickParallel(dt: number)](#lgraphtickparalleldt-number)
-  - [LGraph:topologicalSort() -> any](#lgraphtopologicalsort-any)
+  - [LGraph:topologicalSort() -> table|nil](#lgraphtopologicalsort-tablenil)
   - [LGraph:type() -> string](#lgraphtype-string)
   - [LGraph:typeOf(name: string) -> boolean](#lgraphtypeofname-string-boolean)
   - [LGraph:update(dt: number)](#lgraphupdatedt-number)
@@ -87,7 +87,7 @@
   - [LGraphEdge:typeOf(name: string) -> boolean](#lgraphedgetypeofname-string-boolean)
   - [LGraphItem](#lgraphitem)
   - [LGraphItem:getDecayTime() -> number](#lgraphitemgetdecaytime-number)
-  - [LGraphItem:getPosition() -> any](#lgraphitemgetposition-any)
+  - [LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil](#lgraphitemgetposition-lgraphnodelgraphedgenil)
   - [LGraphItem:getPriority() -> integer](#lgraphitemgetpriority-integer)
   - [LGraphItem:getRemainingLife() -> number](#lgraphitemgetremaininglife-number)
   - [LGraphItem:getType() -> string](#lgraphitemgettype-string)
@@ -107,7 +107,7 @@
   - [LGraphNode:clearDemands()](#lgraphnodecleardemands)
   - [LGraphNode:clearSupplies()](#lgraphnodeclearsupplies)
   - [LGraphNode:clearTags()](#lgraphnodecleartags)
-  - [LGraphNode:dequeue() -> any](#lgraphnodedequeue-any)
+  - [LGraphNode:dequeue() -> LGraphItem|nil](#lgraphnodedequeue-lgraphitemnil)
   - [LGraphNode:enqueue(item_ud: LGraphItem) -> boolean](#lgraphnodeenqueueitemud-lgraphitem-boolean)
   - [LGraphNode:getCapacity() -> integer](#lgraphnodegetcapacity-integer)
   - [LGraphNode:getEdges([dir]: string) -> table](#lgraphnodegetedgesdir-string-table)
@@ -116,9 +116,9 @@
   - [LGraphNode:getItems() -> table](#lgraphnodegetitems-table)
   - [LGraphNode:getOverflowPolicy() -> string](#lgraphnodegetoverflowpolicy-string)
   - [LGraphNode:getProcessTime() -> number](#lgraphnodegetprocesstime-number)
-  - [LGraphNode:getPullFilter() -> any](#lgraphnodegetpullfilter-any)
+  - [LGraphNode:getPullFilter() -> string|nil](#lgraphnodegetpullfilter-stringnil)
   - [LGraphNode:getPullRate() -> number](#lgraphnodegetpullrate-number)
-  - [LGraphNode:getPushFilter() -> any](#lgraphnodegetpushfilter-any)
+  - [LGraphNode:getPushFilter() -> string|nil](#lgraphnodegetpushfilter-stringnil)
   - [LGraphNode:getPushRate() -> number](#lgraphnodegetpushrate-number)
   - [LGraphNode:getQueueCapacity() -> integer](#lgraphnodegetqueuecapacity-integer)
   - [LGraphNode:getQueueSize() -> integer](#lgraphnodegetqueuesize-integer)
@@ -170,53 +170,54 @@ Simulation pipeline (`step(dt)`): decay all items, fire conversion rules, match 
 Module example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
--- Advances this graph by the given delta time.
-do
+  -- and conversions. This is the standard way to tick the graph in lurek.process().
   local g = lurek.graph.newGraph()
-  g:addNode("hub")
+  local mine = g:addNode("mine", 32)
+  mine:setFlowMode("push")
+  mine:setPushRate(2.0)
+
   function lurek.process(dt)
+    -- Advance the logistics simulation each frame
     g:update(dt)
   end
 end
 
 --@api-stub: Graph:step
--- Performs the step operation on this graph.
+-- Performs one discrete graph simulation step and dispatches generated callbacks.
 do
+  -- step() is a single deterministic tick (no dt). Use for turn-based games
+  -- or when you want exact frame-by-frame control over the simulation.
   local g = lurek.graph.newGraph()
-  g:addNode("hub")
-  g:step()  -- one deterministic tick
+  local hub = g:addNode("hub", 8)
+
+  -- Turn-based: advance logistics once per player turn
+  g:step()
+  lurek.log.info("logistics step complete", "turn")
 end
 
 --@api-stub: Graph:tickParallel
--- Performs the tick parallel operation on this graph.
+-- Advances graph simulation through the parallel update path.
 do
+  -- tickParallel(dt) is the high-performance path for large graphs.
+  -- It processes nodes in parallel using Rust threads, then dispatches callbacks.
+  -- Use for massive logistics networks (1000+ nodes).
   local g = lurek.graph.newGraph()
+  local hub = g:addNode("central_hub", 64)
+
   function lurek.process(dt)
+    -- Use parallel tick for large-scale factory simulations
     g:tickParallel(dt)
   end
 end
 
 --@api-stub: Graph:getNeighbors
--- Returns the neighbors of this graph.
+-- Returns neighbor nodes connected to a node.
 do
+  -- getNeighbors returns nodes directly reachable via outgoing edges.
+  -- Useful for AI decision-making or fog-of-war reveal.
   local g = lurek.graph.newGraph()
-  local a = g:addNode("a")
-  g:addEdge(a, g:addNode("b"))
-  g:addEdge(a, g:addNode("c"))
-  lurek.log.debug("a has " .. #g:getNeighbors(a) .. " neighbours", "factory")
-end
-
---@api-stub: Graph:getComponents
--- Returns the components of this graph.
-do
-  local g = lurek.graph.newGraph()
-  g:addNode("island_a")
-  g:addNode("island_b")
-  lurek.log.info("disconnected components: " .. #g:getComponents(), "factory")
-end
-
---@api-stub: Graph:subgraph
--- Performs the subgraph operation on this graph.
+  local capital = g:addNode("capital")
+  local port = g:addNode("port")
 ```
 
 ## Key Types
@@ -248,11 +249,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
-  local belts = lurek.graph.newGraph()
-  local depot = belts:addNode("depot", 32)
-  local sink  = belts:addNode("sink", -1)
-  belts:addEdge(depot, sink, "belt")
-  lurek.log.info("belt graph: " .. tostring(belts), "factory")
+  -- newGraph() returns a fresh graph handle. Use it to model any directed network:
+  -- factory belts, quest dependency trees, tech trees, dialog flow, or AI decision graphs.
+  local quest_graph = lurek.graph.newGraph()
+
+  -- Build a simple quest dependency: "find_sword" must complete before "slay_dragon"
+  local find_sword = quest_graph:addNode("find_sword")
+  local slay_dragon = quest_graph:addNode("slay_dragon")
+  quest_graph:addEdge(find_sword, slay_dragon, "requires")
+
+  lurek.log.info("quest graph: " .. quest_graph:getNodeCount() .. " quests, "
+    .. quest_graph:getEdgeCount() .. " dependencies", "quest")
 end
 ```
 
@@ -269,29 +276,38 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Create undirected graph (edges go both ways).
   local g = lurek.patterns.newGraph(true)
-  local a = g:addNode("A", { hp = 10 })
-  local b = g:addNode("B", { hp = 20 })
-  local c = g:addNode("C", { hp = 30 })
-  local eid = g:addEdge(a, b, 1.5, "road")
-  g:addEdge(b, c, 2.0, "path")
 
-  local val = g:getNodeValue(a)
-  local nbs = g:neighbors(a)
-  local bfs = g:bfs(a)
-  local dfs = g:dfs(a)
-  local conn = g:isConnected(a, c)
-  local has = g:hasNode(c)
-  local nc = g:nodeCount()
-  local ec = g:edgeCount()
+  -- Add nodes with optional labels and payload data.
+  local town_a = g:addNode("Riverdale", { population = 500 })
+  local town_b = g:addNode("Hillcrest", { population = 300 })
+  local town_c = g:addNode("Lakewood", { population = 800 })
 
-  g:removeEdge(eid)
-  g:removeNode(c)
+  -- Connect nodes with weighted edges (distance between towns).
+  local road1 = g:addEdge(town_a, town_b, 15.0, "dirt_road")
+  g:addEdge(town_b, town_c, 22.0, "paved_road")
+
+  -- Query node data.
+  local data = g:getNodeValue(town_a)
+  print("Riverdale pop=" .. (data and data.population or 0))
+
+  -- Pathfinding queries.
+  local neighbors = g:neighbors(town_a)
+  local bfs_order = g:bfs(town_a)
+  local dfs_order = g:dfs(town_a)
+  local connected = g:isConnected(town_a, town_c)
+
+  print("neighbors=" .. #neighbors
+    .. " bfs=" .. #bfs_order
+    .. " dfs=" .. #dfs_order
+    .. " a-c connected=" .. tostring(connected))
+
+  -- Modify graph: remove a road and a town.
+  g:removeEdge(road1)
+  g:removeNode(town_c)
+  print("nodes=" .. g:nodeCount() .. " edges=" .. g:edgeCount())
   g:clearAll()
-  lurek.log.debug(
-    "graph hp=" .. tostring(val and val.hp) .. " nbs=" .. tostring(#nbs) .. " bfs=" .. tostring(#bfs) .. " dfs=" .. tostring(#dfs) .. " conn=" .. tostring(conn) .. " has=" .. tostring(has) .. " nc=" .. tostring(nc) .. " ec=" .. tostring(ec),
-    "patterns"
-  )
 end
 ```
 
@@ -313,11 +329,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Edges are directed by default (from -> to). Use setBidirectional(true) for two-way.
+  -- The optional third argument names the edge type for routing filters and rendering.
   local g = lurek.graph.newGraph()
-  local a = g:addNode("city_a")
-  local b = g:addNode("city_b")
-  local e = g:addEdge(a, b, "road")
-  lurek.log.info("edges: " .. g:getEdgeCount(), "graph")
+  local castle = g:addNode("castle")
+  local village = g:addNode("village")
+
+  -- Create a trade route from castle to village
+  local trade_route = g:addEdge(castle, village, "trade_road")
+  trade_route:setTravelTime(2.0)
+  trade_route:setCapacity(10)
+  lurek.log.info("trade route established, edges: " .. g:getEdgeCount(), "world")
 end
 ```
 
@@ -336,11 +358,15 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- addItem places a previously-created item at a specific node.
+  -- The item becomes part of the graph simulation (affected by flow, decay, etc.)
   local g = lurek.graph.newGraph()
-  local depot = g:addNode("depot")
-  local item = g:createItem("wood", -1)
-  g:addItem(item, depot)
-  lurek.log.info("item count: " .. g:getItemCount(), "graph")
+  local warehouse = g:addNode("warehouse", 32)
+  local cargo = g:createItem("spices", -1)
+
+  -- Place the cargo at the warehouse to begin its logistics journey
+  g:addItem(cargo, warehouse)
+  lurek.log.info("warehouse now holds " .. g:getItemCount() .. " items", "trade")
 end
 ```
 
@@ -361,14 +387,20 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Nodes represent locations, buildings, or abstract processing points.
+  -- Type (string) names the node; capacity (number) limits stored items (-1 = unlimited).
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine")
-  n:setCapacity(200)
-  lurek.log.info("nodes: " .. g:getNodeCount(), "graph")
+
+  -- Create a mine with capacity for 200 ore
+  local mine = g:addNode("gold_mine", 200)
+  mine:setFlowMode("push")
+  mine:setPushRate(3.0)
+
+  lurek.log.info("mine created, capacity=" .. mine:getCapacity(), "build")
 end
 ```
 
-### `LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> any`
+### `LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil`
 
 Runs A* pathfinding between two nodes.
 
@@ -377,7 +409,7 @@ Runs A* pathfinding between two nodes.
 - `from_node` (`LGraphNode`, required) - Start node handle.
 - `to_node` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `any` - Array table of `LGraphNode` handles, or nil when no path exists.
+**Returns**: `table|nil` - Array table of `LGraphNode` handles, or nil when no path exists.
 
 #### Example
 
@@ -385,11 +417,23 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- astar() returns an array of node handles forming the shortest path,
+  -- or nil if no path exists. Uses edge weights for cost calculation.
   local g = lurek.graph.newGraph()
-  local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
-  g:addEdge(na, nb) ; g:addEdge(nb, nc)
-  local path = g:astar(na, nc)
-  lurek.log.info("path length: " .. (path and #path or 0), "graph")
+  local start = g:addNode("player_pos")
+  local mid = g:addNode("crossroads")
+  local goal = g:addNode("treasure")
+  local e1 = g:addEdge(start, mid, "road")
+  e1:setWeight(2.0)
+  local e2 = g:addEdge(mid, goal, "road")
+  e2:setWeight(3.0)
+
+  local path = g:astar(start, goal)
+  if path then
+    lurek.log.info("A* path found: " .. #path .. " nodes", "pathfind")
+  else
+    lurek.log.warn("no path to treasure!", "pathfind")
+  end
 end
 ```
 
@@ -405,11 +449,20 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Graph coloring assigns colors so no two adjacent nodes share a color.
+  -- Use for map coloring, scheduling, or register allocation.
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("a"), g:addNode("b")
-  g:addEdge(a, b)
+  local region_a = g:addNode("region_a")
+  local region_b = g:addNode("region_b")
+  local region_c = g:addNode("region_c")
+  g:addEdge(region_a, region_b, "border")
+  g:addEdge(region_b, region_c, "border")
+  g:addEdge(region_a, region_c, "border")
+
   local colors = g:colorGraph()
-  for node_id, c in pairs(colors) do lurek.log.debug("node " .. node_id .. " => colour " .. c, "pathfind") end
+  for node_id, color_idx in pairs(colors) do
+    lurek.log.info("region " .. node_id .. " => color " .. color_idx, "render")
+  end
 end
 ```
 
@@ -430,14 +483,22 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- createItem makes an item but does NOT place it in the graph yet.
+  -- Use addItem(item, node) afterwards to place it at a node.
+  -- decay_time: seconds until item expires. -1 = never decays.
   local g = lurek.graph.newGraph()
-  local factory = g:addNode("factory")
-  local item = g:createItem("widget", -1)
-  lurek.log.info("item alive: " .. tostring(item:isAlive()), "graph")
+
+  -- Create a perishable item (spoils in 60 seconds)
+  local fresh_fish = g:createItem("fish", 60.0)
+  -- Create an immortal item (never decays)
+  local gold_bar = g:createItem("gold", -1)
+
+  lurek.log.info("fish alive=" .. tostring(fresh_fish:isAlive())
+    .. ", gold alive=" .. tostring(gold_bar:isAlive()), "items")
 end
 ```
 
-### `LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> any`
+### `LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil`
 
 Finds a path between two nodes. This method is available to Lua scripts.
 
@@ -446,7 +507,7 @@ Finds a path between two nodes. This method is available to Lua scripts.
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `any` - Path result table with nodes, edges, and cost, or nil when no path exists.
+**Returns**: `table|nil` - Path result table with nodes, edges, and cost, or nil when no path exists.
 
 #### Example
 
@@ -454,15 +515,23 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- findPath returns a table with: nodes (array), edges (array), and cost (number).
+  -- More detailed than astar() which only returns node handles.
   local g = lurek.graph.newGraph()
-  local na = g:addNode("A") ; local nb = g:addNode("B")
-  g:addEdge(na, nb)
-  local p = g:findPath(na, nb)
-  lurek.log.info("found path: " .. (p and #p or 0) .. " nodes", "graph")
+  local town = g:addNode("town")
+  local forest = g:addNode("forest")
+  local cave = g:addNode("cave")
+  g:addEdge(town, forest, "trail")
+  g:addEdge(forest, cave, "hidden_path")
+
+  local result = g:findPath(town, cave)
+  if result then
+    lurek.log.info("path found, cost: " .. tostring(result.cost), "nav")
+  end
 end
 ```
 
-### `LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> any`
+### `LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil`
 
 Finds a path for a specific item between two nodes while respecting item constraints.
 
@@ -472,7 +541,7 @@ Finds a path for a specific item between two nodes while respecting item constra
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `any` - Path result table with nodes, edges, and cost, or nil when no path exists.
+**Returns**: `table|nil` - Path result table with nodes, edges, and cost, or nil when no path exists.
 
 #### Example
 
@@ -480,12 +549,19 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- findPathForItem respects edge allowed-type filters: it only routes through
+  -- edges that permit the item's type. Essential for typed logistics networks.
   local g = lurek.graph.newGraph()
-  local ns = g:addNode("source") ; local nk = g:addNode("sink")
-  g:addEdge(ns, nk)
-  local item = g:createItem("ore", -1)
-  local p = g:findPathForItem(item, ns, nk)
-  lurek.log.info("item path: " .. (p and #p or 0), "graph")
+  local refinery = g:addNode("refinery")
+  local tank = g:addNode("fuel_tank")
+  local pipe = g:addEdge(refinery, tank, "fuel_pipe")
+  pipe:addAllowedType("fuel")  -- only fuel items may use this pipe
+
+  local fuel = g:createItem("fuel", -1)
+  local path = g:findPathForItem(fuel, refinery, tank)
+  if path then
+    lurek.log.info("fuel can reach the tank via pipe", "logistics")
+  end
 end
 ```
 
@@ -501,14 +577,24 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Disconnected components reveal isolated sub-networks.
+  -- Use to detect if supply lines are broken or islands are unreachable.
   local g = lurek.graph.newGraph()
-  g:addNode("island_a")
-  g:addNode("island_b")
-  lurek.log.info("disconnected components: " .. #g:getComponents(), "factory")
+  local mainland = g:addNode("mainland")
+  local coast = g:addNode("coast")
+  g:addEdge(mainland, coast, "road")
+
+  -- These two nodes form a separate island with no connection
+  local island_a = g:addNode("island_north")
+  local island_b = g:addNode("island_south")
+  g:addEdge(island_a, island_b, "bridge")
+
+  local components = g:getComponents()
+  lurek.log.info("network has " .. #components .. " disconnected regions", "logistics")
 end
 ```
 
-### `LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> any`
+### `LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil`
 
 Returns graph distance between two nodes when reachable.
 
@@ -517,7 +603,7 @@ Returns graph distance between two nodes when reachable.
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `any` - Distance number, or nil when no distance is available.
+**Returns**: `number|nil` - Distance number, or nil when no distance is available.
 
 #### Example
 
@@ -525,15 +611,25 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- getDistance returns the weighted shortest-path distance, or nil if unreachable.
+  -- Use for AI range checks ("is this target within striking distance?").
   local g = lurek.graph.newGraph()
-  local nx = g:addNode("X") ; local ny = g:addNode("Y")
-  g:addEdge(nx, ny)
-  local d = g:getDistance(nx, ny)
-  lurek.log.info("distance X->Y: " .. tostring(d), "graph")
+  local guard = g:addNode("guard_post")
+  local gate = g:addNode("city_gate")
+  local throne = g:addNode("throne_room")
+  local e1 = g:addEdge(guard, gate, "corridor")
+  e1:setWeight(1.0)
+  local e2 = g:addEdge(gate, throne, "hallway")
+  e2:setWeight(2.0)
+
+  local dist = g:getDistance(guard, throne)
+  if dist then
+    lurek.log.info("guard to throne distance: " .. dist, "ai")
+  end
 end
 ```
 
-### `LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> any`
+### `LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil`
 
 Returns the edge connecting two nodes when one exists.
 
@@ -542,7 +638,7 @@ Returns the edge connecting two nodes when one exists.
 - `from_ud` (`LGraphNode`, required) - Source node handle.
 - `to_ud` (`LGraphNode`, required) - Destination node handle.
 
-**Returns**: `any` - `LGraphEdge` handle, or nil when no edge connects the nodes.
+**Returns**: `LGraphEdge|nil` - `LGraphEdge` handle, or nil when no edge connects the nodes.
 
 #### Example
 
@@ -550,11 +646,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Lookup a specific edge without iterating all edges.
+  -- Returns nil if no direct edge exists between the two nodes.
   local g = lurek.graph.newGraph()
-  local na = g:addNode("A") ; local nb = g:addNode("B")
-  g:addEdge(na, nb)
-  local e = g:getEdgeBetween(na, nb)
-  lurek.log.info("edge capacity: " .. tostring(e and e:getCapacity() or 0), "graph")
+  local port_a = g:addNode("port_a")
+  local port_b = g:addNode("port_b")
+  g:addEdge(port_a, port_b, "shipping_lane")
+
+  local lane = g:getEdgeBetween(port_a, port_b)
+  if lane then
+    lurek.log.info("shipping lane capacity: " .. lane:getCapacity(), "trade")
+  end
 end
 ```
 
@@ -571,8 +673,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  g:addEdge(g:addNode("a"), g:addNode("b"))
-  lurek.log.info("graph has " .. g:getEdgeCount() .. " edges", "factory")
+  g:addEdge(g:addNode("hub"), g:addNode("spoke_1"), "rail")
+  g:addEdge(g:addNode("hub2"), g:addNode("spoke_2"), "rail")
+
+  lurek.log.info("rail network: " .. g:getEdgeCount() .. " connections", "transport")
 end
 ```
 
@@ -588,10 +692,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Iterate edges for rendering connections on a map.
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("a"), g:addNode("b")
-  g:addEdge(a, b)
-  for _, e in ipairs(g:getEdges()) do lurek.log.debug("edge type " .. e:getType(), "factory") end
+  local hq = g:addNode("headquarters")
+  local outpost = g:addNode("outpost")
+  g:addEdge(hq, outpost, "supply_line")
+
+  for _, edge in ipairs(g:getEdges()) do
+    lurek.log.info("route: " .. edge:getFrom():getType() .. " -> "
+      .. edge:getTo():getType() .. " [" .. edge:getType() .. "]", "map")
+  end
 end
 ```
 
@@ -608,8 +718,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  g:addItem(g:createItem("ore", -1), g:addNode("store"))
-  lurek.log.info("items in flight: " .. g:getItemCount(), "factory")
+  local store = g:addNode("store", 32)
+  g:addItem(g:createItem("widget", -1), store)
+
+  lurek.log.info("items tracked: " .. g:getItemCount(), "logistics")
 end
 ```
 
@@ -625,11 +737,14 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Get a global view of all items for save/load or statistics.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store")
-  g:addItem(g:createItem("ore", -1), store)
-  g:addItem(g:createItem("coal", -1), store)
-  lurek.log.debug("graph holds " .. #g:getItems() .. " items", "factory")
+  local depot = g:addNode("depot", 32)
+  g:addItem(g:createItem("iron", -1), depot)
+  g:addItem(g:createItem("copper", -1), depot)
+  g:addItem(g:createItem("gold", -1), depot)
+
+  lurek.log.info("total items in logistics: " .. #g:getItems(), "stats")
 end
 ```
 
@@ -649,11 +764,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- getNeighbors returns nodes directly reachable via outgoing edges.
+  -- Useful for AI decision-making or fog-of-war reveal.
   local g = lurek.graph.newGraph()
-  local a = g:addNode("a")
-  g:addEdge(a, g:addNode("b"))
-  g:addEdge(a, g:addNode("c"))
-  lurek.log.debug("a has " .. #g:getNeighbors(a) .. " neighbours", "factory")
+  local capital = g:addNode("capital")
+  local port = g:addNode("port")
+  local mine = g:addNode("mountain_mine")
+  g:addEdge(capital, port, "road")
+  g:addEdge(capital, mine, "mountain_pass")
+
+  local neighbors = g:getNeighbors(capital)
+  lurek.log.info("capital connects to " .. #neighbors .. " locations", "map")
 end
 ```
 
@@ -670,8 +791,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  g:addNode("start")
-  g:addNode("end")
+  g:addNode("alpha_base")
+  g:addNode("beta_base")
+  g:addNode("gamma_base")
+
+  lurek.log.info("map has " .. g:getNodeCount() .. " bases", "strategy")
+end
 ```
 
 ### `LGraph:getNodes() -> table`
@@ -686,9 +811,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Iterate all nodes for rendering, saving, or analysis.
   local g = lurek.graph.newGraph()
-  g:addNode("start")
-  g:addNode("end")
+  g:addNode("town_square")
+  g:addNode("harbor")
+  g:addNode("lighthouse")
+
+  for _, node in ipairs(g:getNodes()) do
+    lurek.log.info("location: " .. node:getType(), "map")
+  end
+end
 ```
 
 ### `LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> table`
@@ -708,11 +840,20 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use getReachable for fog-of-war, influence spread, or "what can I reach in N steps?"
+  -- max_dist is optional: omit it to get ALL reachable nodes regardless of distance.
   local g = lurek.graph.newGraph()
-  local na = g:addNode("A") ; local nb = g:addNode("B") ; local nc = g:addNode("C")
-  g:addEdge(na, nb) ; g:addEdge(nb, nc)
-  local reachable = g:getReachable(na, 5)
-  lurek.log.info("reachable: " .. (reachable and #reachable or 0), "graph")
+  local castle = g:addNode("castle")
+  local farm = g:addNode("farm")
+  local mine = g:addNode("distant_mine")
+  local e1 = g:addEdge(castle, farm, "road")
+  e1:setWeight(1.0)
+  local e2 = g:addEdge(farm, mine, "mountain_trail")
+  e2:setWeight(4.0)
+
+  -- What can be reached within distance 3 from the castle?
+  local nearby = g:getReachable(castle, 3.0)
+  lurek.log.info("reachable within range 3: " .. #nearby .. " nodes", "strategy")
 end
 ```
 
@@ -728,10 +869,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- getStats() returns a table with: nodes, edges, items, activity, transit,
+  -- demand, supply, and queue counts. Use for debug overlays or analytics.
   local g = lurek.graph.newGraph()
-  g:addNode("hub")
-  local s = g:getStats()
-  lurek.log.info("nodes=" .. s.nodes .. " edges=" .. s.edges .. " items=" .. s.items, "factory")
+  local depot = g:addNode("depot", 32)
+  g:addItem(g:createItem("cargo", -1), depot)
+
+  local stats = g:getStats()
+  lurek.log.info("graph stats: nodes=" .. stats.nodes
+    .. " edges=" .. stats.edges
+    .. " items=" .. stats.items, "debug")
 end
 ```
 
@@ -747,11 +894,20 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Cycle detection is important for tech trees and quest dependencies:
+  -- a cycle means a circular dependency (bug in game data).
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("a"), g:addNode("b")
-  g:addEdge(a, b)
-  g:addEdge(b, a)  -- creates a cycle
-  if g:hasCycle() then lurek.log.warn("graph has a cycle!", "factory") end
+  local research_a = g:addNode("basic_tools")
+  local research_b = g:addNode("metallurgy")
+  local research_c = g:addNode("advanced_smelting")
+  g:addEdge(research_a, research_b, "requires")
+  g:addEdge(research_b, research_c, "requires")
+
+  if g:hasCycle() then
+    lurek.log.warn("tech tree has circular dependency!", "data")
+  else
+    lurek.log.info("tech tree is valid (no cycles)", "data")
+  end
 end
 ```
 
@@ -772,10 +928,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("a"), g:addNode("b")
-  local e = g:addEdge(a, b)
-  if g:hasEdge(e) then
-    lurek.log.debug("edge a->b is wired", "factory")
+  local a = g:addNode("dock_a")
+  local b = g:addNode("dock_b")
+  local ferry_route = g:addEdge(a, b, "ferry")
+
+  if g:hasEdge(ferry_route) then
+    lurek.log.info("ferry route is operational", "transport")
   end
 end
 ```
@@ -797,10 +955,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store")
-  local item = g:createItem("ore", -1)
-  g:addItem(item, store)
-  if g:hasItem(item) then lurek.log.debug("item still tracked", "factory") end
+  local vault = g:addNode("vault", 4)
+  local diamond = g:createItem("diamond", -1)
+  g:addItem(diamond, vault)
+
+  if g:hasItem(diamond) then
+    lurek.log.info("diamond is safe in the vault", "security")
+  end
 end
 ```
 
@@ -820,10 +981,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use after removal operations to verify cleanup.
   local g = lurek.graph.newGraph()
-  local n = g:addNode("checkpoint")
-  if g:hasNode(n) then
-    lurek.log.debug("checkpoint registered", "factory")
+  local waypoint = g:addNode("checkpoint_alpha")
+
+  if g:hasNode(waypoint) then
+    lurek.log.info("checkpoint registered in navigation graph", "nav")
   end
 end
 ```
@@ -840,10 +1003,18 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- A bipartite graph has no odd-length cycles. Useful for matching problems:
+  -- workers-to-tasks, buyers-to-sellers, students-to-courses.
   local g = lurek.graph.newGraph()
-  g:addEdge(g:addNode("left"), g:addNode("right"))
+  local worker_1 = g:addNode("worker_1")
+  local worker_2 = g:addNode("worker_2")
+  local task_a = g:addNode("task_a")
+  local task_b = g:addNode("task_b")
+  g:addEdge(worker_1, task_a, "can_do")
+  g:addEdge(worker_2, task_b, "can_do")
+
   if g:isBipartite() then
-    lurek.log.debug("graph splits cleanly into two halves", "pathfind")
+    lurek.log.info("graph is bipartite — valid for matching algorithm", "ai")
   end
 end
 ```
@@ -860,10 +1031,21 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- MST finds the cheapest set of edges that connects all nodes.
+  -- Use for optimal road-building, cable layout, or trade route planning.
   local g = lurek.graph.newGraph()
-  g:addEdge(g:addNode("a"), g:addNode("b"))
-  local tree = g:mst()
-  lurek.log.info("MST contains " .. #tree .. " edges", "pathfind")
+  local a = g:addNode("city_a")
+  local b = g:addNode("city_b")
+  local c = g:addNode("city_c")
+  local e1 = g:addEdge(a, b, "road")
+  e1:setWeight(5.0)
+  local e2 = g:addEdge(b, c, "road")
+  e2:setWeight(3.0)
+  local e3 = g:addEdge(a, c, "road")
+  e3:setWeight(7.0)
+
+  local tree_edges = g:mst()
+  lurek.log.info("MST uses " .. #tree_edges .. " edges (cheapest network)", "plan")
 end
 ```
 
@@ -882,11 +1064,28 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Valid events: "itemEnter", "itemLeave", "itemDecay", "itemConvert",
+  --   "itemLost", "edgeEnter", "edgeLeave", "demandFulfilled",
+  --   "supplyDepleted", "itemQueued", "itemDequeued"
+  -- Callbacks fire during update()/step()/tickParallel() when the event occurs.
   local g = lurek.graph.newGraph()
+
+  -- React when an item arrives at a node
   g:on("itemEnter", function(item, node)
-    lurek.log.info("item arrived at " .. tostring(node), "graph")
+    lurek.log.info(item:getType() .. " arrived at " .. node:getType(), "event")
   end)
-  lurek.log.info("listener registered", "graph")
+
+  -- React when an item decays (spoils)
+  g:on("itemDecay", function(item)
+    lurek.log.warn(item:getType() .. " has decayed!", "event")
+  end)
+
+  -- React when supply runs out
+  g:on("supplyDepleted", function(node, item_type)
+    lurek.log.warn(node:getType() .. " ran out of " .. tostring(item_type), "event")
+  end)
+
+  lurek.log.info("event listeners registered", "setup")
 end
 ```
 
@@ -900,10 +1099,18 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- processDemand() matches supply nodes to demand nodes and creates items/routes.
+  -- Call it periodically or after supply/demand changes.
   local g = lurek.graph.newGraph()
-  local src = g:addNode("mine")
-  src:addSupply("ore", 50)
+  local mine = g:addNode("mine", 100)
+  mine:addSupply("iron_ore", 50)
+  local factory = g:addNode("factory", 32)
+  factory:addDemand("iron_ore", 20, 1)
+  g:addEdge(mine, factory, "rail")
+
+  -- Process: mine will attempt to fulfill factory's demand
   g:processDemand()
+  lurek.log.info("supply-demand matching complete", "logistics")
 end
 ```
 
@@ -923,10 +1130,15 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Remove edges to model destroyed bridges, severed supply lines, etc.
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("a"), g:addNode("b")
-  local e = g:addEdge(a, b)
-  g:removeEdge(e)
+  local east = g:addNode("east_fort")
+  local west = g:addNode("west_fort")
+  local bridge = g:addEdge(east, west, "stone_bridge")
+
+  -- Enemy destroys the bridge
+  g:removeEdge(bridge)
+  lurek.log.info("bridge destroyed, edge exists? " .. tostring(g:hasEdge(bridge)), "combat")
 end
 ```
 
@@ -946,11 +1158,15 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Remove items when they are consumed, sold, or destroyed.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 8)
-  local item = g:createItem("ore", -1)
-  g:addItem(item, store)
-  g:removeItem(item)
+  local shop = g:addNode("shop", 16)
+  local potion = g:createItem("healing_potion", -1)
+  g:addItem(potion, shop)
+
+  -- Player buys the potion: remove from shop graph
+  g:removeItem(potion)
+  lurek.log.info("potion sold, still in graph? " .. tostring(g:hasItem(potion)), "shop")
 end
 ```
 
@@ -970,10 +1186,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Removing a node also removes all edges that reference it.
+  -- Items at the removed node become unplaced.
   local g = lurek.graph.newGraph()
-  local n = g:addNode("temp")
-  g:removeNode(n)
-  lurek.log.debug("temp node still here? " .. tostring(g:hasNode(n)), "factory")
+  local outpost = g:addNode("abandoned_outpost")
+  local city = g:addNode("city")
+  g:addEdge(outpost, city, "trail")
+
+  -- Outpost destroyed: remove from graph
+  g:removeNode(outpost)
+  lurek.log.info("outpost removed, still exists? " .. tostring(g:hasNode(outpost)), "world")
 end
 ```
 
@@ -992,12 +1214,21 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- sendItem manually pushes an item onto an edge for transit.
+  -- Use this for direct control (instead of relying on push/pull flow).
+  -- The item will travel for the edge's travelTime before arriving at the destination.
   local g = lurek.graph.newGraph()
-  local na = g:addNode("A") ; local nb = g:addNode("B")
-  local edge = g:addEdge(na, nb)
-  local item = g:createItem("gold", -1)
-  g:sendItem(item, edge)
-  lurek.log.info("item dispatched", "graph")
+  local dock = g:addNode("dock", 32)
+  local island = g:addNode("island", 16)
+  local ferry = g:addEdge(dock, island, "ferry_route")
+  ferry:setTravelTime(3.0)
+
+  local passenger = g:createItem("traveler", -1)
+  g:addItem(passenger, dock)
+
+  -- Manually dispatch the traveler onto the ferry
+  g:sendItem(passenger, ferry)
+  lurek.log.info("traveler boarding ferry (3s crossing)", "transport")
 end
 ```
 
@@ -1011,9 +1242,14 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- step() is a single deterministic tick (no dt). Use for turn-based games
+  -- or when you want exact frame-by-frame control over the simulation.
   local g = lurek.graph.newGraph()
-  g:addNode("hub")
-  g:step()  -- one deterministic tick
+  local hub = g:addNode("hub", 8)
+
+  -- Turn-based: advance logistics once per player turn
+  g:step()
+  lurek.log.info("logistics step complete", "turn")
 end
 ```
 
@@ -1033,14 +1269,19 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use subgraph to extract a local area for focused analysis or rendering.
   local g = lurek.graph.newGraph()
-  local a = g:addNode("a")
-  local b = g:addNode("b")
-  local c = g:addNode("c")
-  g:addEdge(a, b)
-  g:addEdge(b, c)
-  local slice = g:subgraph({ a, b })
-  lurek.log.info("slice nodes=" .. slice:getNodeCount() .. " edges=" .. slice:getEdgeCount(), "factory")
+  local a = g:addNode("zone_a")
+  local b = g:addNode("zone_b")
+  local c = g:addNode("zone_c")
+  g:addEdge(a, b, "path")
+  g:addEdge(b, c, "path")
+  g:addEdge(a, c, "shortcut")
+
+  -- Extract just zones a and b for a local minimap view
+  local local_map = g:subgraph({ a, b })
+  lurek.log.info("local map: " .. local_map:getNodeCount() .. " nodes, "
+    .. local_map:getEdgeCount() .. " edges", "minimap")
 end
 ```
 
@@ -1058,18 +1299,24 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- tickParallel(dt) is the high-performance path for large graphs.
+  -- It processes nodes in parallel using Rust threads, then dispatches callbacks.
+  -- Use for massive logistics networks (1000+ nodes).
   local g = lurek.graph.newGraph()
+  local hub = g:addNode("central_hub", 64)
+
   function lurek.process(dt)
+    -- Use parallel tick for large-scale factory simulations
     g:tickParallel(dt)
   end
 end
 ```
 
-### `LGraph:topologicalSort() -> any`
+### `LGraph:topologicalSort() -> table|nil`
 
 Returns nodes in topological order when the graph is acyclic.
 
-**Returns**: `any` - Array table of `LGraphNode` handles, or nil when sorting is impossible.
+**Returns**: `table|nil` - Array table of `LGraphNode` handles, or nil when sorting is impossible.
 
 #### Example
 
@@ -1077,11 +1324,22 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Topological sort gives a valid processing/research order.
+  -- Returns nil if the graph has a cycle (impossible to sort).
   local g = lurek.graph.newGraph()
-  local a, b = g:addNode("raw"), g:addNode("ingot")
-  g:addEdge(a, b)
+  local gather = g:addNode("gather_herbs")
+  local brew = g:addNode("brew_potion")
+  local enchant = g:addNode("enchant_potion")
+  g:addEdge(gather, brew, "requires")
+  g:addEdge(brew, enchant, "requires")
+
   local order = g:topologicalSort()
-  if order then lurek.log.info("processing order: " .. #order .. " nodes", "factory") end
+  if order then
+    lurek.log.info("crafting order (" .. #order .. " steps):", "craft")
+    for i, node in ipairs(order) do
+      lurek.log.info("  " .. i .. ". " .. node:getType(), "craft")
+    end
+  end
 end
 ```
 
@@ -1098,9 +1356,9 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  if g:type() == "Graph" then
-    lurek.log.debug("inspecting a graph root", "factory")
-  end
+
+  -- Returns "LGraph" — the Lua handle type name
+  lurek.log.debug("graph type: " .. g:type(), "debug")
 end
 ```
 
@@ -1121,8 +1379,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
+
+  -- Matches "Graph", "LGraph", or "Object"
   if g:typeOf("Graph") then
-    lurek.log.debug("yes, this is a graph", "factory")
+    lurek.log.debug("confirmed: this is a graph handle", "debug")
   end
 end
 ```
@@ -1141,9 +1401,15 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Call update(dt) every frame to advance item movement, decay, push/pull flow,
+  -- and conversions. This is the standard way to tick the graph in lurek.process().
   local g = lurek.graph.newGraph()
-  g:addNode("hub")
+  local mine = g:addNode("mine", 32)
+  mine:setFlowMode("push")
+  mine:setPushRate(2.0)
+
   function lurek.process(dt)
+    -- Advance the logistics simulation each frame
     g:update(dt)
   end
 end
@@ -1159,11 +1425,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Edges are directed by default (from -> to). Use setBidirectional(true) for two-way.
+  -- The optional third argument names the edge type for routing filters and rendering.
   local g = lurek.graph.newGraph()
-  local a = g:addNode("city_a")
-  local b = g:addNode("city_b")
-  local e = g:addEdge(a, b, "road")
-  lurek.log.info("edges: " .. g:getEdgeCount(), "graph")
+  local castle = g:addNode("castle")
+  local village = g:addNode("village")
+
+  -- Create a trade route from castle to village
+  local trade_route = g:addEdge(castle, village, "trade_road")
+  trade_route:setTravelTime(2.0)
+  trade_route:setCapacity(10)
+  lurek.log.info("trade route established, edges: " .. g:getEdgeCount(), "world")
 end
 ```
 
@@ -1182,10 +1454,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "pipe")
-  edge:addAllowedType("water")
-  lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
+  local reservoir = g:addNode("reservoir", 8)
+  local treatment = g:addNode("treatment_plant", 8)
+  local pipe = g:addEdge(reservoir, treatment, "water_main")
+
+  -- Only clean water flows through this pipe
+  pipe:addAllowedType("clean_water")
+  lurek.log.info("water pipe filter set", "infra")
 end
 ```
 
@@ -1200,11 +1475,14 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  edge:addAllowedType("iron")
-  edge:clearAllowedTypes()
-  lurek.log.info("iron allowed after clear=" .. tostring(edge:isItemTypeAllowed("iron")), "graph")
+  local a = g:addNode("hub", 8)
+  local b = g:addNode("depot", 8)
+  local belt = g:addEdge(a, b, "universal_belt")
+  belt:addAllowedType("only_iron")
+
+  -- Remove all filters: belt accepts anything again
+  belt:clearAllowedTypes()
+  lurek.log.info("belt filter cleared", "factory")
 end
 ```
 
@@ -1221,10 +1499,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  edge:setCapacity(50)
-  lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
+  local a = g:addNode("station_a", 8)
+  local b = g:addNode("station_b", 8)
+  local rail = g:addEdge(a, b, "rail")
+  rail:setCapacity(12)
+
+  lurek.log.info("rail capacity: " .. rail:getCapacity() .. " cars", "transport")
 end
 ```
 
@@ -1241,10 +1521,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "warp_gate")
-  edge:setCooldown(5.0)
-  lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
+  local cannon = g:addNode("siege_cannon", 8)
+  local target = g:addNode("enemy_wall", 8)
+  local shot = g:addEdge(cannon, target, "cannonball_arc")
+  shot:setCooldown(5.0)
+
+  lurek.log.info("cannon reload time: " .. shot:getCooldown() .. "s", "siege")
 end
 ```
 
@@ -1261,10 +1543,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
-  local edge = g:addEdge(na, nb, "pipe")
-  local from = edge:getFrom()
-  lurek.log.info("from type=" .. from:getType(), "graph")
+  local origin = g:addNode("origin_city", 8)
+  local dest = g:addNode("destination", 8)
+  local route = g:addEdge(origin, dest, "airmail")
+
+  local from_node = route:getFrom()
+  lurek.log.info("mail departs from: " .. from_node:getType(), "mail")
 end
 ```
 
@@ -1281,10 +1565,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  local items = edge:getItemsInTransit()
-  lurek.log.info("items_in_transit=" .. #items, "graph")
+  local factory = g:addNode("factory", 8)
+  local store = g:addNode("store", 8)
+  local truck_route = g:addEdge(factory, store, "delivery")
+
+  local on_road = truck_route:getItemsInTransit()
+  lurek.log.info("deliveries in progress: " .. #on_road, "logistics")
 end
 ```
 
@@ -1301,10 +1587,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "uphill_road")
-  edge:setSpeedModifier(0.6)
-  lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
+  local top = g:addNode("hill_top", 8)
+  local bottom = g:addNode("hill_bottom", 8)
+  local slope = g:addEdge(top, bottom, "steep_slope")
+  slope:setSpeedModifier(1.8)
+
+  lurek.log.info("downhill speed: " .. slope:getSpeedModifier() .. "x normal", "physics")
 end
 ```
 
@@ -1321,10 +1609,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  edge:setThroughput(5.0)
-  lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
+  local pump = g:addNode("pump", 8)
+  local tank = g:addNode("tank", 8)
+  local pipe = g:addEdge(pump, tank, "water_pipe")
+  pipe:setThroughput(5.0)
+
+  lurek.log.info("pipe flow: " .. pipe:getThroughput() .. " liters/sec", "factory")
 end
 ```
 
@@ -1341,10 +1631,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
-  local edge = g:addEdge(na, nb, "pipe")
-  local to = edge:getTo()
-  lurek.log.info("to type=" .. to:getType(), "graph")
+  local origin = g:addNode("sender", 8)
+  local dest = g:addNode("receiver", 8)
+  local route = g:addEdge(origin, dest, "courier")
+
+  local to_node = route:getTo()
+  lurek.log.info("package arrives at: " .. to_node:getType(), "mail")
 end
 ```
 
@@ -1361,10 +1653,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setTravelTime(3.5)
-  lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
+  local city = g:addNode("city", 8)
+  local outpost = g:addNode("outpost", 8)
+  local caravan = g:addEdge(city, outpost, "desert_route")
+  caravan:setTravelTime(8.0)
+
+  lurek.log.info("caravan crossing: " .. caravan:getTravelTime() .. " seconds", "trade")
 end
 ```
 
@@ -1381,9 +1675,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  lurek.log.info("edge type=" .. edge:getType(), "graph")
+  local src = g:addNode("warehouse", 8)
+  local dst = g:addNode("shop", 8)
+  local delivery = g:addEdge(src, dst, "delivery_van")
+
+  -- Use edge type to select rendering: van sprite, pipe sprite, rail sprite, etc.
+  lurek.log.info("transport type: " .. delivery:getType(), "render")
 end
 ```
 
@@ -1400,10 +1697,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setWeight(1.5)
-  lurek.log.info("weight=" .. edge:getWeight(), "graph")
+  local safe = g:addNode("safe_zone", 8)
+  local danger = g:addNode("danger_zone", 8)
+  local path = g:addEdge(safe, danger, "exposed_road")
+  path:setWeight(8.0)
+
+  lurek.log.info("exposed road weight: " .. path:getWeight() .. " (high cost)", "pathfind")
 end
 ```
 
@@ -1420,9 +1719,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
+  local generator = g:addNode("power_plant", 8)
+  local city = g:addNode("city_grid", 8)
+  local power_line = g:addEdge(generator, city, "high_voltage")
+
+  lurek.log.info("power line active: " .. tostring(power_line:isActive()), "infra")
 end
 ```
 
@@ -1439,10 +1740,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setBidirectional(true)
-  lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
+  local town_a = g:addNode("town_a", 8)
+  local town_b = g:addNode("town_b", 8)
+  local highway = g:addEdge(town_a, town_b, "highway")
+  highway:setBidirectional(true)
+
+  lurek.log.info("highway two-way: " .. tostring(highway:isBidirectional()), "world")
 end
 ```
 
@@ -1463,11 +1766,14 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "pipe")
-  edge:addAllowedType("gas")
-  lurek.log.info("gas allowed=" .. tostring(edge:isItemTypeAllowed("gas")), "graph")
-  lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
+  local src = g:addNode("gas_well", 8)
+  local dst = g:addNode("processing", 8)
+  local pipe = g:addEdge(src, dst, "gas_pipe")
+  pipe:addAllowedType("natural_gas")
+
+  -- Check before routing
+  lurek.log.info("gas allowed: " .. tostring(pipe:isItemTypeAllowed("natural_gas")), "check")
+  lurek.log.info("oil allowed: " .. tostring(pipe:isItemTypeAllowed("crude_oil")), "check")
 end
 ```
 
@@ -1484,9 +1790,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  lurek.log.info("on_cooldown=" .. tostring(edge:isOnCooldown()), "graph")
+  local turret = g:addNode("turret", 8)
+  local zone = g:addNode("kill_zone", 8)
+  local fire_arc = g:addEdge(turret, zone, "bullet_stream")
+  fire_arc:setCooldown(1.0)
+
+  -- Check if turret can fire again
+  lurek.log.info("turret on cooldown: " .. tostring(fire_arc:isOnCooldown()), "combat")
 end
 ```
 
@@ -1507,11 +1817,15 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "pipe")
-  edge:addAllowedType("acid")
-  edge:removeAllowedType("acid")
-  lurek.log.info("acid allowed after remove=" .. tostring(edge:isItemTypeAllowed("acid")), "graph")
+  local a = g:addNode("chemical_plant", 8)
+  local b = g:addNode("waste_depot", 8)
+  local pipe = g:addEdge(a, b, "waste_pipe")
+  pipe:addAllowedType("toxic_waste")
+  pipe:addAllowedType("sludge")
+
+  -- Regulation change: no more toxic waste through this pipe
+  pipe:removeAllowedType("toxic_waste")
+  lurek.log.info("toxic waste no longer allowed", "compliance")
 end
 ```
 
@@ -1530,10 +1844,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "bridge")
-  edge:setActive(false)
-  lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
+  local north = g:addNode("north_tower", 8)
+  local south = g:addNode("south_tower", 8)
+  local drawbridge = g:addEdge(north, south, "drawbridge")
+
+  -- Raise the drawbridge: disable the edge
+  drawbridge:setActive(false)
+  lurek.log.info("drawbridge raised, active=" .. tostring(drawbridge:isActive()), "castle")
 end
 ```
 
@@ -1552,10 +1869,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setBidirectional(false)
-  lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
+  local east = g:addNode("east_gate", 8)
+  local west = g:addNode("west_gate", 8)
+  local corridor = g:addEdge(east, west, "castle_corridor")
+
+  -- One-way traffic during evacuation
+  corridor:setBidirectional(false)
+  lurek.log.info("corridor one-way: " .. tostring(not corridor:isBidirectional()), "event")
 end
 ```
 
@@ -1574,10 +1894,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  edge:setCapacity(100)
-  lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
+  local a = g:addNode("dock_a", 8)
+  local b = g:addNode("dock_b", 8)
+  local channel = g:addEdge(a, b, "shipping_channel")
+
+  -- Widen the channel to allow more simultaneous ships
+  channel:setCapacity(25)
+  lurek.log.info("channel expanded to " .. channel:getCapacity(), "infra")
 end
 ```
 
@@ -1596,10 +1919,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "express_belt")
-  edge:setCooldown(2.0)
-  lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
+  local mage = g:addNode("mage_tower", 8)
+  local target = g:addNode("battlefield", 8)
+  local spell_channel = g:addEdge(mage, target, "fireball_path")
+
+  -- Mage needs 8 seconds to recharge between fireballs
+  spell_channel:setCooldown(8.0)
+  lurek.log.info("spell cooldown: " .. spell_channel:getCooldown() .. "s", "combat")
 end
 ```
 
@@ -1618,10 +1944,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "boost_belt")
-  edge:setSpeedModifier(2.0)
-  lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
+  local start = g:addNode("runway_start", 8)
+  local liftoff = g:addNode("liftoff_point", 8)
+  local runway = g:addEdge(start, liftoff, "runway")
+
+  -- Catapult-assisted launch: items move 3x faster on this edge
+  runway:setSpeedModifier(3.0)
+  lurek.log.info("runway boost: " .. runway:getSpeedModifier() .. "x", "launch")
 end
 ```
 
@@ -1640,10 +1969,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  edge:setThroughput(15.0)
-  lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
+  local well = g:addNode("well", 8)
+  local cistern = g:addNode("cistern", 8)
+  local aqueduct = g:addEdge(well, cistern, "aqueduct")
+
+  -- High-capacity Roman aqueduct
+  aqueduct:setThroughput(15.0)
+  lurek.log.info("aqueduct throughput set to " .. aqueduct:getThroughput(), "infra")
 end
 ```
 
@@ -1662,10 +1994,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setTravelTime(2.0)
-  lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
+  local a = g:addNode("mountain_base", 8)
+  local b = g:addNode("summit", 8)
+  local climb = g:addEdge(a, b, "mountain_trail")
+
+  -- Harsh terrain: slow crossing
+  climb:setTravelTime(12.0)
+  lurek.log.info("mountain crossing set to " .. climb:getTravelTime() .. "s", "world")
 end
 ```
 
@@ -1684,10 +2019,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "dirt_road")
-  edge:setType("paved_road")
-  lurek.log.info("edge type=" .. edge:getType(), "graph")
+  local a = g:addNode("port_a", 8)
+  local b = g:addNode("port_b", 8)
+  local route = g:addEdge(a, b, "rowboat")
+
+  -- Player upgrades transport
+  route:setType("steamship")
+  lurek.log.info("route upgraded to: " .. route:getType(), "upgrade")
 end
 ```
 
@@ -1706,10 +2044,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "road")
-  edge:setWeight(5.0)
-  lurek.log.info("weight=" .. edge:getWeight(), "graph")
+  local a = g:addNode("village", 8)
+  local b = g:addNode("market", 8)
+  local road = g:addEdge(a, b, "main_road")
+
+  -- Freshly paved road: low weight = preferred by pathfinder
+  road:setWeight(1.0)
+  lurek.log.info("road weight: " .. road:getWeight(), "pathfind")
 end
 ```
 
@@ -1726,9 +2067,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  lurek.log.info("type=" .. edge:type(), "graph")
+  local a = g:addNode("a", 8)
+  local b = g:addNode("b", 8)
+  local edge = g:addEdge(a, b, "link")
+
+  lurek.log.info("handle type: " .. edge:type(), "debug")
 end
 ```
 
@@ -1749,10 +2092,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  local edge = g:addEdge(na, nb, "belt")
-  lurek.log.info("is GraphEdge=" .. tostring(edge:typeOf("GraphEdge")), "graph")
-  lurek.log.info("is Other=" .. tostring(edge:typeOf("Other")), "graph")
+  local a = g:addNode("a", 8)
+  local b = g:addNode("b", 8)
+  local edge = g:addEdge(a, b, "link")
+
+  lurek.log.info("is GraphEdge: " .. tostring(edge:typeOf("GraphEdge")), "debug")
+  lurek.log.info("is Object: " .. tostring(edge:typeOf("Object")), "debug")
 end
 ```
 
@@ -1766,10 +2111,18 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- createItem makes an item but does NOT place it in the graph yet.
+  -- Use addItem(item, node) afterwards to place it at a node.
+  -- decay_time: seconds until item expires. -1 = never decays.
   local g = lurek.graph.newGraph()
-  local factory = g:addNode("factory")
-  local item = g:createItem("widget", -1)
-  lurek.log.info("item alive: " .. tostring(item:isAlive()), "graph")
+
+  -- Create a perishable item (spoils in 60 seconds)
+  local fresh_fish = g:createItem("fish", 60.0)
+  -- Create an immortal item (never decays)
+  local gold_bar = g:createItem("gold", -1)
+
+  lurek.log.info("fish alive=" .. tostring(fresh_fish:isAlive())
+    .. ", gold alive=" .. tostring(gold_bar:isAlive()), "items")
 end
 ```
 
@@ -1785,21 +2138,26 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Decay models perishable goods: food spoilage, spell duration, buff timers.
+  -- A decay time of -1 means the item never expires.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  local total = ore:getDecayTime()
-  local frac = ore:getRemainingLife() / total
-  lurek.log.debug("ore freshness " .. math.floor(frac * 100) .. "%", "factory")
+  local kitchen = g:addNode("kitchen", 16)
+  local bread = g:createItem("bread", 30.0)  -- spoils after 30 seconds
+  g:addItem(bread, kitchen)
+
+  -- Show freshness percentage in the UI
+  local total = bread:getDecayTime()
+  local remaining = bread:getRemainingLife()
+  local freshness = math.floor((remaining / total) * 100)
+  lurek.log.debug("bread freshness: " .. freshness .. "%", "ui")
 end
 ```
 
-### `LGraphItem:getPosition() -> any`
+### `LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil`
 
 Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
 
-**Returns**: `any` - `LGraphNode` when at a node, `LGraphEdge` when in transit, or no value when unplaced.
+**Returns**: `LGraphNode|LGraphEdge|nil` - `LGraphNode` when at a node, `LGraphEdge` when in transit, or no value when unplaced.
 
 #### Example
 
@@ -1807,15 +2165,27 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- getPosition() returns different values depending on item state:
+  --   At a node: returns (node_handle, nil)
+  --   In transit: returns (edge_handle, progress_0_to_1)
+  --   Unplaced:  returns (nil, nil)
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
+  local mine = g:addNode("mine", 16)
+  local smelter = g:addNode("smelter", 8)
+  local belt = g:addEdge(mine, smelter, "conveyor")
+  local ore = g:createItem("iron_ore", -1)
+  g:addItem(ore, mine)
+
   local first, second = ore:getPosition()
   if second then
-    lurek.log.info("ore in transit progress=" .. tostring(second), "factory")
+    -- Item is on an edge: second is the 0..1 progress along it
+    lurek.log.info("ore in transit, progress=" .. string.format("%.0f%%", second * 100), "factory")
   elseif first then
-    lurek.log.info("ore parked at node", "factory")
+    -- Item is parked at a node
+    lurek.log.info("ore stored at node: " .. first:getType(), "factory")
+  else
+    -- Item is unplaced (just created, not yet added to graph)
+    lurek.log.info("ore is floating (unplaced)", "factory")
   end
 end
 
@@ -1823,37 +2193,25 @@ end
 -- Returns the Lua-visible type name string for this graph item handle.
 do
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:type() == "GraphItem" then
-    lurek.log.debug("inspecting graph item", "factory")
-  end
+  local node = g:addNode("store", 8)
+  local item = g:createItem("gem", -1)
+  g:addItem(item, node)
+
+  -- Useful for generic serialization or debug printing
+  lurek.log.debug("handle type: " .. item:type(), "debug")  -- prints "GraphItem"
 end
 
 --@api-stub: GraphItem:typeOf
 -- Returns true if this graph item handle matches the given type name string.
 do
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:typeOf("Object") then
-    lurek.log.debug("ore is a tracked Lurek object", "factory")
-  end
-end
+  local node = g:addNode("store", 8)
+  local item = g:createItem("gem", -1)
+  g:addItem(item, node)
 
--- Edge methods
-
---@api-stub: Edge:getType
--- Returns the type of this edge.
-do
-  local g = lurek.graph.newGraph()
-  local a = g:addNode("source")
-  local b = g:addNode("sink")
-  local belt = g:addEdge(a, b, "conveyor")
-  if belt:getType() == "conveyor" then
-    lurek.log.debug("rendering conveyor segment", "render")
+  -- typeOf checks against "GraphItem", "Object", or any parent type
+  if item:typeOf("Object") then
+    lurek.log.debug("item is a tracked Lurek engine object", "debug")
 ```
 
 ### `LGraphItem:getPriority() -> integer`
@@ -1868,12 +2226,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Priority determines which items get routed first when edges or nodes are contested.
+  -- Higher priority = processed first in queues and routing decisions.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  ore:setPriority(5)
-  lurek.log.debug("ore priority " .. ore:getPriority(), "factory")
+  local depot = g:addNode("depot", 16)
+  local urgent_package = g:createItem("antidote", -1)
+  g:addItem(urgent_package, depot)
+  urgent_package:setPriority(10)
+
+  lurek.log.debug("antidote priority: " .. urgent_package:getPriority()
+    .. " (will be routed before normal items)", "logistics")
 end
 ```
 
@@ -1889,12 +2251,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use getRemainingLife() to trigger urgency warnings in the UI.
+  -- When remaining life hits 0, the graph fires an "itemDecay" event.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:getRemainingLife() < 5.0 then
-    lurek.log.warn("ore about to spoil!", "factory")
+  local cooler = g:addNode("cooler", 8)
+  local fish = g:createItem("fish", 20.0)
+  g:addItem(fish, cooler)
+
+  -- Warn the player when perishables are about to spoil
+  if fish:getRemainingLife() < 5.0 then
+    lurek.log.warn("fish about to spoil! Deliver it now!", "logistics")
   end
 end
 ```
@@ -1911,11 +2277,17 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Item types drive routing decisions. The graph uses them to match supply/demand
+  -- and decide which edges an item may traverse (via allowed-type filters).
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:getType() == "ore" then lurek.log.info("crate holds raw ore", "factory") end
+  local warehouse = g:addNode("warehouse", 32)
+  local package = g:createItem("health_potion", 60.0)
+  g:addItem(package, warehouse)
+
+  -- Check the type to decide rendering: potions get a glow effect
+  if package:getType() == "health_potion" then
+    lurek.log.info("rendering potion with glow shader", "render")
+  end
 end
 ```
 
@@ -1931,12 +2303,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- isAlive() returns false after the item decays or is manually killed.
+  -- Dead items are ignored by routing but remain queryable until removed.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if not ore:isAlive() then
-    lurek.log.warn("ore decayed before reaching the smelter", "factory")
+  local market = g:addNode("market", 16)
+  local milk = g:createItem("milk", 5.0)
+  g:addItem(milk, market)
+
+  -- In the update loop: check before processing deliveries
+  if not milk:isAlive() then
+    lurek.log.warn("milk expired before delivery — customer unhappy", "economy")
   end
 end
 ```
@@ -1951,12 +2327,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- kill() is useful when a player consumes, sells, or destroys an item manually.
+  -- The graph will fire "itemDecay" on the next step for killed items.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  ore:kill()
-  lurek.log.info("ore manually destroyed, alive=" .. tostring(ore:isAlive()), "factory")
+  local inventory = g:addNode("inventory", 20)
+  local scroll = g:createItem("teleport_scroll", -1)
+  g:addItem(scroll, inventory)
+
+  -- Player uses the scroll: consume it
+  scroll:kill()
+  lurek.log.info("scroll consumed, alive=" .. tostring(scroll:isAlive()), "gameplay")
 end
 ```
 
@@ -1974,12 +2354,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use setDecayTime(-1) to make an item immortal (e.g., quest items that must not expire).
+  -- Use a positive value to start or reset a spoilage timer.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  ore:setDecayTime(-1)
-  lurek.log.debug("ore is now immortal: decay=" .. ore:getDecayTime(), "factory")
+  local vault = g:addNode("vault", 4)
+  local artifact = g:createItem("ancient_relic", 10.0)
+  g:addItem(artifact, vault)
+
+  -- Player casts a preservation spell: relic no longer decays
+  artifact:setDecayTime(-1)
+  lurek.log.info("relic preserved, decay=" .. artifact:getDecayTime(), "magic")
 end
 ```
 
@@ -1997,13 +2381,18 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use priority to implement VIP lanes, emergency routing, or quest-critical deliveries.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  ore:setPriority(10)
-  local rock = g:createItem("rock", 30.0)
-  rock:setPriority(1)  -- ore (10) beats rock (1) at the next bottleneck
+  local hub = g:addNode("hub", 32)
+  local supplies = g:createItem("medical_supplies", -1)
+  local luxury = g:createItem("silk", -1)
+  g:addItem(supplies, hub)
+  g:addItem(luxury, hub)
+
+  -- Medical supplies get priority routing over luxury goods
+  supplies:setPriority(10)
+  luxury:setPriority(1)
+  lurek.log.info("medical supplies will route before silk at bottlenecks", "logistics")
 end
 ```
 
@@ -2021,12 +2410,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Use setType to model item transformation outside of node conversions.
+  -- Example: a crafting system where raw materials get refined mid-transit.
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  ore:setType("iron_ingot")
-  lurek.log.info("ore promoted to " .. ore:getType(), "factory")
+  local forge = g:addNode("forge", 8)
+  local raw_blade = g:createItem("raw_blade", -1)
+  g:addItem(raw_blade, forge)
+
+  -- The smith finishes the blade
+  raw_blade:setType("enchanted_sword")
+  lurek.log.info("blade forged into: " .. raw_blade:getType(), "craft")
 end
 ```
 
@@ -2043,12 +2436,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:type() == "GraphItem" then
-    lurek.log.debug("inspecting graph item", "factory")
-  end
+  local node = g:addNode("store", 8)
+  local item = g:createItem("gem", -1)
+  g:addItem(item, node)
+
+  -- Useful for generic serialization or debug printing
+  lurek.log.debug("handle type: " .. item:type(), "debug")  -- prints "GraphItem"
 end
 ```
 
@@ -2069,11 +2462,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local store = g:addNode("store", 16)
-  local ore = g:createItem("ore", 30.0)
-  g:addItem(ore, store)
-  if ore:typeOf("Object") then
-    lurek.log.debug("ore is a tracked Lurek object", "factory")
+  local node = g:addNode("store", 8)
+  local item = g:createItem("gem", -1)
+  g:addItem(item, node)
+
+  -- typeOf checks against "GraphItem", "Object", or any parent type
+  if item:typeOf("Object") then
+    lurek.log.debug("item is a tracked Lurek engine object", "debug")
   end
 end
 ```
@@ -2088,10 +2483,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
+  -- Nodes represent locations, buildings, or abstract processing points.
+  -- Type (string) names the node; capacity (number) limits stored items (-1 = unlimited).
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine")
-  n:setCapacity(200)
-  lurek.log.info("nodes: " .. g:getNodeCount(), "graph")
+
+  -- Create a mine with capacity for 200 ore
+  local mine = g:addNode("gold_mine", 200)
+  mine:setFlowMode("push")
+  mine:setPushRate(3.0)
+
+  lurek.log.info("mine created, capacity=" .. mine:getCapacity(), "build")
 end
 ```
 
@@ -2112,9 +2513,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("factory", 32)
-  n:addDemand("steel", 100, 1)   -- priority 1 (high)
-  lurek.log.info("demand declared for steel", "graph")
+  local army_camp = g:addNode("army_camp", 64)
+
+  -- Army needs weapons urgently (priority 5) and food normally (priority 2)
+  army_camp:addDemand("weapons", 100, 5)
+  army_camp:addDemand("food", 200, 2)
+  lurek.log.info("army demands registered", "military")
 end
 ```
 
@@ -2134,9 +2538,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine", 100)
-  n:addSupply("iron_ore", 500)
-  lurek.log.info("supply added", "graph")
+  local iron_mine = g:addNode("iron_mine", 200)
+
+  -- This mine can supply 500 units of iron ore to the network
+  iron_mine:addSupply("iron_ore", 500)
+  lurek.log.info("iron mine supply registered", "economy")
 end
 ```
 
@@ -2155,9 +2561,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("warehouse", 100)
-  n:addTag("storage"); n:addTag("secure")
-  lurek.log.info("has storage=" .. tostring(n:hasTag("storage")), "graph")
+  local castle = g:addNode("castle", 100)
+
+  castle:addTag("fortified")
+  castle:addTag("capital")
+  lurek.log.info("castle tagged, has fortified: " .. tostring(castle:hasTag("fortified")), "world")
 end
 ```
 
@@ -2172,11 +2580,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("multi_furnace", 32)
-  n:setConversion("iron_ore", "iron_ingot", 1)
-  n:setConversion("copper_ore", "copper_ingot", 1)
-  n:clearAllConversions()
-  lurek.log.info("all conversions cleared", "graph")
+  local workshop = g:addNode("workshop", 16)
+  workshop:setConversion("wood", "plank", 1, 4)
+  workshop:setConversion("plank", "furniture", 4, 1)
+
+  -- Reset workshop: remove all recipes
+  workshop:clearAllConversions()
+  lurek.log.info("workshop recipes cleared", "craft")
 end
 ```
 
@@ -2197,10 +2607,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setConversion("iron_ore", "iron_ingot", 1)
-  n:clearConversion("iron_ore")
-  lurek.log.info("conversion cleared", "graph")
+  local kiln = g:addNode("kiln", 8)
+  kiln:setConversion("clay", "brick", 2, 4)
+
+  -- Remove the clay recipe (kiln repurposed)
+  kiln:clearConversion("clay")
+  lurek.log.info("clay recipe removed from kiln", "craft")
 end
 ```
 
@@ -2215,10 +2627,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("factory", 32)
-  n:addDemand("wood", 50, 2); n:addDemand("stone", 50, 2)
-  n:clearDemands()
-  lurek.log.info("all demands cleared", "graph")
+  local settlement = g:addNode("settlement", 32)
+  settlement:addDemand("food", 50, 1)
+  settlement:addDemand("tools", 20, 2)
+
+  -- Settlement abandoned: clear all demands
+  settlement:clearDemands()
+  lurek.log.info("settlement demands cleared", "world")
 end
 ```
 
@@ -2233,10 +2648,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine", 100)
-  n:addSupply("gold_ore", 200)
-  n:clearSupplies()
-  lurek.log.info("all supplies cleared", "graph")
+  local harbor = g:addNode("harbor", 64)
+  harbor:addSupply("fish", 100)
+  harbor:addSupply("salt", 50)
+
+  -- Harbor blockaded: all supplies cut off
+  harbor:clearSupplies()
+  lurek.log.info("harbor supplies cleared", "war")
 end
 ```
 
@@ -2251,17 +2669,21 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  n:addTag("a"); n:addTag("b"); n:clearTags()
-  lurek.log.info("tags after clear=" .. #n:getTags(), "graph")
+  local camp = g:addNode("bandit_camp", 8)
+  camp:addTag("hostile")
+  camp:addTag("hidden")
+
+  -- Camp cleared by player: reset all tags
+  camp:clearTags()
+  lurek.log.info("camp tags cleared, count: " .. #camp:getTags(), "quest")
 end
 ```
 
-### `LGraphNode:dequeue() -> any`
+### `LGraphNode:dequeue() -> LGraphItem|nil`
 
 Removes and returns the next item from this node's explicit queue.
 
-**Returns**: `any` - `LGraphItem` handle, or nil when the queue is empty.
+**Returns**: `LGraphItem|nil` - `LGraphItem` handle, or nil when the queue is empty.
 
 #### Example
 
@@ -2270,11 +2692,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 32)
-  n:setQueueEnabled(true)
-  n:enqueue(g:createItem("coal", 1))
-  local item = n:dequeue()
-  lurek.log.info("dequeued=" .. tostring(item), "graph")
+  local serve_counter = g:addNode("counter", 4)
+  serve_counter:setQueueEnabled(true)
+  serve_counter:enqueue(g:createItem("order_42", -1))
+  serve_counter:enqueue(g:createItem("order_43", -1))
+
+  -- Serve next customer
+  local next_order = serve_counter:dequeue()
+  if next_order then
+    lurek.log.info("serving: " .. next_order:getType(), "service")
+  end
 end
 ```
 
@@ -2295,10 +2722,14 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 32)
-  n:setQueueEnabled(true)
-  n:enqueue(g:createItem("iron_ingot", 1))
-  lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
+  local assembly = g:addNode("assembly_station", 8)
+  assembly:setQueueEnabled(true)
+  assembly:setQueueCapacity(10)
+
+  -- Queue up work orders
+  assembly:enqueue(g:createItem("chassis", -1))
+  assembly:enqueue(g:createItem("engine", -1))
+  lurek.log.info("assembly queue: " .. assembly:getQueueSize() .. " items", "factory")
 end
 ```
 
@@ -2315,8 +2746,9 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("warehouse", 100)
-  lurek.log.info("capacity=" .. n:getCapacity(), "graph")
+  local granary = g:addNode("granary", 500)
+
+  lurek.log.info("granary holds " .. granary:getCapacity() .. " bushels", "economy")
 end
 ```
 
@@ -2337,10 +2769,16 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
-  g:addEdge(na, nb, "belt")
-  local edges = na:getEdges()
-  lurek.log.info("edge_count=" .. #edges, "graph")
+  local junction = g:addNode("rail_junction", 8)
+  local north = g:addNode("north_station", 8)
+  local south = g:addNode("south_station", 8)
+  g:addEdge(junction, north, "rail")
+  g:addEdge(junction, south, "rail")
+  g:addEdge(south, junction, "rail")
+
+  -- Get only outgoing edges
+  local out_edges = junction:getEdges("out")
+  lurek.log.info("junction has " .. #out_edges .. " outgoing tracks", "transport")
 end
 ```
 
@@ -2357,9 +2795,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("distributor", 16)
-  n:setFlowMode("both")
-  lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
+  local hub = g:addNode("distribution_hub", 64)
+  hub:setFlowMode("both")
+
+  lurek.log.info("hub flow mode: " .. hub:getFlowMode(), "logistics")
 end
 ```
 
@@ -2376,8 +2815,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  lurek.log.info("items=" .. n:getItemCount(), "graph")
+  local pantry = g:addNode("pantry", 32)
+  g:addItem(g:createItem("bread", -1), pantry)
+  g:addItem(g:createItem("cheese", -1), pantry)
+
+  lurek.log.info("pantry contains " .. pantry:getItemCount() .. " items", "inventory")
 end
 ```
 
@@ -2394,9 +2836,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  local items = n:getItems()
-  lurek.log.info("item_count=" .. #items, "graph")
+  local fridge = g:addNode("fridge", 10)
+  g:addItem(g:createItem("milk", 60.0), fridge)
+  g:addItem(g:createItem("butter", -1), fridge)
+
+  local contents = fridge:getItems()
+  lurek.log.info("fridge has " .. #contents .. " items", "kitchen")
 end
 ```
 
@@ -2413,9 +2858,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("silo", 50)
-  n:setOverflowPolicy("destroy")
-  lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
+  local trash_bin = g:addNode("trash_bin", 10)
+  trash_bin:setOverflowPolicy("destroy")
+
+  lurek.log.info("overflow policy: " .. trash_bin:getOverflowPolicy(), "config")
 end
 ```
 
@@ -2432,17 +2878,18 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("assembler", 8)
-  n:setProcessTime(4.0)
-  lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
+  local oven = g:addNode("bakery_oven", 4)
+  oven:setProcessTime(5.0)
+
+  lurek.log.info("baking time: " .. oven:getProcessTime() .. "s per loaf", "craft")
 end
 ```
 
-### `LGraphNode:getPullFilter() -> any`
+### `LGraphNode:getPullFilter() -> string|nil`
 
 Returns this node's optional pull item-type filter.
 
-**Returns**: `any` - Filter string, or nil when no pull filter is set.
+**Returns**: `string|nil` - Filter string, or nil when no pull filter is set.
 
 #### Example
 
@@ -2451,9 +2898,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setPullFilter("coal")
-  lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
+  local reactor = g:addNode("nuclear_reactor", 4)
+  reactor:setPullFilter("uranium_rod")
+
+  lurek.log.info("reactor pulls: " .. tostring(reactor:getPullFilter()), "energy")
 end
 ```
 
@@ -2470,17 +2918,19 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setPullRate(3.0)
-  lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
+  local crafter = g:addNode("workbench", 16)
+  crafter:setFlowMode("pull")
+  crafter:setPullRate(2.0)
+
+  lurek.log.info("workbench pulls " .. crafter:getPullRate() .. " items/sec", "factory")
 end
 ```
 
-### `LGraphNode:getPushFilter() -> any`
+### `LGraphNode:getPushFilter() -> string|nil`
 
 Returns this node's optional push item-type filter.
 
-**Returns**: `any` - Filter string, or nil when no push filter is set.
+**Returns**: `string|nil` - Filter string, or nil when no push filter is set.
 
 #### Example
 
@@ -2489,9 +2939,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("sorter", 8)
-  n:setPushFilter("iron_ore")
-  lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
+  local sorter = g:addNode("item_sorter", 16)
+  sorter:setPushFilter("electronics")
+
+  lurek.log.info("sorter pushes: " .. tostring(sorter:getPushFilter()), "factory")
 end
 ```
 
@@ -2508,9 +2959,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine", 32)
-  n:setPushRate(2.5)
-  lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
+  local producer = g:addNode("assembly_line", 32)
+  producer:setFlowMode("push")
+  producer:setPushRate(4.0)
+
+  lurek.log.info("assembly pushes " .. producer:getPushRate() .. " items/sec", "factory")
 end
 ```
 
@@ -2527,9 +2980,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 32)
-  n:setQueueEnabled(true); n:setQueueCapacity(10)
-  lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
+  local runway = g:addNode("airport_runway", 2)
+  runway:setQueueEnabled(true)
+  runway:setQueueCapacity(5)
+
+  lurek.log.info("runway queue holds " .. runway:getQueueCapacity() .. " planes", "transport")
 end
 ```
 
@@ -2546,9 +3001,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  n:setQueueEnabled(true)
-  lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
+  local printer = g:addNode("laser_printer", 4)
+  printer:setQueueEnabled(true)
+
+  lurek.log.info("print queue: " .. printer:getQueueSize() .. " jobs", "office")
 end
 ```
 
@@ -2565,10 +3021,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  n:addTag("port"); n:addTag("western")
-  local tags = n:getTags()
-  lurek.log.info("tag count=" .. #tags, "graph")
+  local shrine = g:addNode("shrine", 4)
+  shrine:addTag("holy")
+  shrine:addTag("healing")
+  shrine:addTag("fast_travel")
+
+  local tags = shrine:getTags()
+  lurek.log.info("shrine tags (" .. #tags .. "): " .. table.concat(tags, ", "), "world")
 end
 ```
 
@@ -2585,8 +3044,9 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  lurek.log.info("node type=" .. n:getType(), "graph")
+  local smithy = g:addNode("smithy", 12)
+
+  lurek.log.info("node type: " .. smithy:getType(), "world")
 end
 ```
 
@@ -2607,9 +3067,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("station", 64)
-  n:addTag("train_stop")
-  lurek.log.info("has train_stop=" .. tostring(n:hasTag("train_stop")), "graph")
+  local village = g:addNode("village", 32)
+  village:addTag("peaceful")
+
+  if village:hasTag("peaceful") then
+    lurek.log.info("no combat encounters near this village", "ai")
+  end
 end
 ```
 
@@ -2626,8 +3089,9 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("reactor", 8)
-  lurek.log.info("active=" .. tostring(n:isActive()), "graph")
+  local generator = g:addNode("wind_turbine", 8)
+
+  lurek.log.info("turbine active: " .. tostring(generator:isActive()), "energy")
 end
 ```
 
@@ -2644,8 +3108,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 4)
-  lurek.log.info("full=" .. tostring(n:isFull()), "graph")
+  local locker = g:addNode("locker", 2)
+  g:addItem(g:createItem("book", -1), locker)
+  g:addItem(g:createItem("pen", -1), locker)
+
+  lurek.log.info("locker full: " .. tostring(locker:isFull()), "inventory")
 end
 ```
 
@@ -2662,9 +3129,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 32)
-  n:setQueueEnabled(true)
-  lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
+  local ticket_booth = g:addNode("ticket_booth", 4)
+  ticket_booth:setQueueEnabled(true)
+
+  lurek.log.info("queue enabled: " .. tostring(ticket_booth:isQueueEnabled()), "service")
 end
 ```
 
@@ -2685,10 +3153,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("factory", 32)
-  n:addDemand("steel", 100, 1)
-  n:removeDemand("steel")
-  lurek.log.info("demand removed", "graph")
+  local workshop = g:addNode("workshop", 16)
+  workshop:addDemand("leather", 30, 1)
+
+  -- Workshop switches production: no longer needs leather
+  workshop:removeDemand("leather")
+  lurek.log.info("leather demand removed", "craft")
 end
 ```
 
@@ -2709,10 +3179,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine", 100)
-  n:addSupply("iron_ore", 500)
-  n:removeSupply("iron_ore")
-  lurek.log.info("supply removed", "graph")
+  local quarry = g:addNode("quarry", 100)
+  quarry:addSupply("marble", 300)
+
+  -- Quarry exhausted its marble vein
+  quarry:removeSupply("marble")
+  lurek.log.info("marble supply removed", "economy")
 end
 ```
 
@@ -2733,9 +3205,13 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 32)
-  n:addTag("available"); n:removeTag("available")
-  lurek.log.info("has available=" .. tostring(n:hasTag("available")), "graph")
+  local outpost = g:addNode("outpost", 8)
+  outpost:addTag("manned")
+  outpost:addTag("supply_cached")
+
+  -- Guards withdraw
+  outpost:removeTag("manned")
+  lurek.log.info("outpost manned: " .. tostring(outpost:hasTag("manned")), "military")
 end
 ```
 
@@ -2754,9 +3230,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("reactor", 8)
-  n:setActive(false)
-  lurek.log.info("active=" .. tostring(n:isActive()), "graph")
+  local solar_panel = g:addNode("solar_panel", 4)
+
+  -- Night time: solar panel goes offline
+  solar_panel:setActive(false)
+  lurek.log.info("solar panel active: " .. tostring(solar_panel:isActive()), "energy")
 end
 ```
 
@@ -2775,9 +3253,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("warehouse", 50)
-  n:setCapacity(200)
-  lurek.log.info("capacity=" .. n:getCapacity(), "graph")
+  local barn = g:addNode("barn", 50)
+
+  -- Player expands the barn
+  barn:setCapacity(150)
+  lurek.log.info("barn expanded to " .. barn:getCapacity(), "build")
 end
 ```
 
@@ -2799,9 +3279,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setConversion("iron_ore", "iron_ingot", 1)
-  lurek.log.info("conversion added to furnace", "graph")
+  local brewery = g:addNode("brewery", 16)
+  brewery:setProcessTime(4.0)
+
+  -- 3 wheat + process time -> 1 ale
+  brewery:setConversion("wheat", "ale", 3, 1)
+  lurek.log.info("brewery recipe: 3 wheat -> 1 ale", "craft")
 end
 ```
 
@@ -2820,9 +3303,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("factory", 16)
-  n:setFlowMode("pull")
-  lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
+  local consumer = g:addNode("consumer", 16)
+
+  -- Consumer only pulls items from neighbors, never pushes
+  consumer:setFlowMode("pull")
+  lurek.log.info("consumer flow mode: " .. consumer:getFlowMode(), "logistics")
 end
 ```
 
@@ -2841,9 +3326,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("silo", 50)
-  n:setOverflowPolicy("reject")
-  lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
+  local buffer = g:addNode("overflow_buffer", 5)
+
+  -- When buffer is full, reject new items (sender keeps them)
+  buffer:setOverflowPolicy("reject")
+  lurek.log.info("policy set: " .. buffer:getOverflowPolicy(), "config")
 end
 ```
 
@@ -2862,9 +3349,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("assembler", 8)
-  n:setProcessTime(2.0)
-  lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
+  local press = g:addNode("printing_press", 8)
+
+  -- Fast printing: 0.5 seconds per page
+  press:setProcessTime(0.5)
+  lurek.log.info("print time: " .. press:getProcessTime() .. "s", "craft")
 end
 ```
 
@@ -2883,9 +3372,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setPullFilter("iron_ore")
-  lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
+  local boiler = g:addNode("boiler", 8)
+
+  -- Boiler only accepts coal as fuel
+  boiler:setPullFilter("coal")
+  lurek.log.info("boiler pull filter: " .. tostring(boiler:getPullFilter()), "energy")
 end
 ```
 
@@ -2904,9 +3395,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("assembler", 16)
-  n:setPullRate(1.5)
-  lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
+  local centrifuge = g:addNode("centrifuge", 8)
+  centrifuge:setFlowMode("pull")
+
+  -- Fast centrifuge: high consumption rate
+  centrifuge:setPullRate(6.0)
+  lurek.log.info("centrifuge pull rate: " .. centrifuge:getPullRate(), "factory")
 end
 ```
 
@@ -2925,9 +3419,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("sorter", 8)
-  n:setPushFilter("copper_ore")
-  lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
+  local output_valve = g:addNode("valve", 8)
+
+  -- Valve only outputs steam (filters out water)
+  output_valve:setPushFilter("steam")
+  lurek.log.info("valve push filter: " .. tostring(output_valve:getPushFilter()), "factory")
 end
 ```
 
@@ -2946,9 +3442,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("mine", 32)
-  n:setPushRate(5.0)
-  lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
+  local extractor = g:addNode("ore_extractor", 64)
+  extractor:setFlowMode("push")
+
+  -- Tier 3 extractor: high output rate
+  extractor:setPushRate(8.0)
+  lurek.log.info("extractor push rate: " .. extractor:getPushRate(), "factory")
 end
 ```
 
@@ -2967,9 +3466,12 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("buffer", 32)
-  n:setQueueEnabled(true); n:setQueueCapacity(20)
-  lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
+  local platform = g:addNode("train_platform", 4)
+  platform:setQueueEnabled(true)
+
+  -- Expand platform to hold more waiting trains
+  platform:setQueueCapacity(8)
+  lurek.log.info("platform queue: " .. platform:getQueueCapacity(), "transport")
 end
 ```
 
@@ -2988,9 +3490,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("splitter", 8)
-  n:setQueueEnabled(false)
-  lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
+  local checkout = g:addNode("checkout_counter", 2)
+
+  -- Enable queue: customers line up in order
+  checkout:setQueueEnabled(true)
+  lurek.log.info("checkout queue: " .. tostring(checkout:isQueueEnabled()), "service")
 end
 ```
 
@@ -3009,9 +3513,11 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("furnace", 16)
-  n:setType("blast_furnace")
-  lurek.log.info("node type=" .. n:getType(), "graph")
+  local building = g:addNode("hut", 4)
+
+  -- Upgrade hut to stone house
+  building:setType("stone_house")
+  lurek.log.info("building upgraded to: " .. building:getType(), "build")
 end
 ```
 
@@ -3028,8 +3534,9 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 8)
-  lurek.log.info("type=" .. n:type(), "graph")
+  local node = g:addNode("waypoint", 4)
+
+  lurek.log.info("node handle type: " .. node:type(), "debug")
 end
 ```
 
@@ -3050,9 +3557,10 @@ Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 ```lua
 do
   local g = lurek.graph.newGraph()
-  local n = g:addNode("depot", 8)
-  lurek.log.info("is GraphNode=" .. tostring(n:typeOf("GraphNode")), "graph")
-  lurek.log.info("is Other=" .. tostring(n:typeOf("Other")), "graph")
+  local node = g:addNode("marker", 4)
+
+  lurek.log.info("is GraphNode: " .. tostring(node:typeOf("GraphNode")), "debug")
+  lurek.log.info("is Object: " .. tostring(node:typeOf("Object")), "debug")
 end
 ```
 

@@ -37,16 +37,21 @@ Neither file contains domain logic; they parse command-line arguments and delega
 General example from [ai.lua](../blob/main/content/examples/ai.lua):
 
 ```lua
--- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
-do
+  -- Use an AI world to manage all NPCs in a level. Each world is independent,
+  -- so you can pause dungeon AI while overworld agents keep running.
+  -- Scenario: open-world RPG with separate AI worlds per region.
   local world = lurek.ai.newWorld()
   world:addAgent("guard_01")
+  -- Call world:update(dt) every frame to tick all registered agents.
   function lurek.process(dt) world:update(dt) end
 end
 
 --@api-stub: lurek.ai.newBlackboard
 -- Creates an empty AI blackboard for typed local facts
 do
+  -- Blackboards are key-value stores for AI knowledge. Agents read/write facts
+  -- here so decision logic stays decoupled from game state.
+  -- Scenario: stealth game guard shares "alert_level" across patrol group.
   local bb = lurek.ai.newBlackboard()
   bb:setNumber("alert_level", 0.3)
   bb:setBool("player_seen", false)
@@ -55,6 +60,9 @@ end
 --@api-stub: lurek.ai.newStateMachine
 -- Creates an empty finite state machine with Lua-backed states and transitions
 do
+  -- FSMs are ideal for NPCs with clear, discrete behavior phases.
+  -- Each state has onEnter/onUpdate/onExit callbacks for clean transitions.
+  -- Scenario: guard patrol AI — idle → patrol → alert → chase → attack.
   local fsm = lurek.ai.newStateMachine()
   fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
   fsm:addState("chase", {})
@@ -64,6 +72,9 @@ end
 --@api-stub: lurek.ai.newBehaviorTree
 -- Creates an empty behavior tree that can receive a root node
 do
+  -- Behavior trees compose complex AI from simple reusable nodes.
+  -- Set a root node, then call bt:tick(dt) each frame to evaluate.
+  -- Scenario: boss phase transitions — check HP, pick attack pattern, execute.
   local bt = lurek.ai.newBehaviorTree()
   local root = lurek.ai.newSequence()
   root:addChild(lurek.ai.newAction(function() return "success" end))
@@ -73,17 +84,7 @@ end
 --@api-stub: lurek.ai.newSelector
 -- Creates a behavior tree selector node with no children
 do
-  local sel = lurek.ai.newSelector()
-  sel:addChild(lurek.ai.newCondition(function() return false end))
-  sel:addChild(lurek.ai.newAction(function() return "success" end))
-end
-
---@api-stub: lurek.ai.newSequence
--- Creates a behavior tree sequence node with no children
-do
-  local seq = lurek.ai.newSequence()
-  seq:addChild(lurek.ai.newCondition(function() return true end))
-  seq:addChild(lurek.ai.newAction(function() return "success" end))
+  -- A selector tries each child until one succeeds (OR logic).
 ```
 
 ## Key Types

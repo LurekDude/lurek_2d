@@ -206,7 +206,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- detectFormat --
     /// Attempts to auto-detect the serialization format of a string by inspecting its content (e.g., leading `{` for JSON, `[section]` for INI, XML declaration for XML). Returns the format name or nil if detection fails. Useful for loading user-provided files where the format is unknown.
     /// @param | text | string | The raw text content to analyze.
-    /// @return | string | The detected format name ("json", "toml", "csv", "xml", "ini") or nil if unrecognized.
+    /// @return | string | The detected format name ("json", "toml", "csv", "xml", "ini"), or nil if unrecognized.
     tbl.set(
         "detectFormat",
         lua.create_function(|_, s: String| {
@@ -325,6 +325,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             to_lua(lua, &patched)
         })?,
     )?;
+    /// Performs the 'serial' operation.
+    /// @return | nil | No value is returned.
     lurek.set("serial", tbl)?;
     Ok(())
 }

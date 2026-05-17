@@ -34,56 +34,57 @@ Foundational shared state, engine configuration, error types, resource keys, and
 
 ## Minimal Module Example
 
-General example from [ai.lua](../blob/main/content/examples/ai.lua):
+Module example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
--- Creates an isolated AI world for agents, blackboards, and custom decision callbacks
+-- content/examples/system.lua
+-- lurek.runtime and lurek.engine API examples.
+-- Run: cargo run -- content/examples/system.lua
+
+--@api-stub: lurek.runtime.getOS
+-- Returns the name of the host operating system as a string
 do
-  local world = lurek.ai.newWorld()
-  world:addAgent("guard_01")
-  function lurek.process(dt) world:update(dt) end
+  local os_name = lurek.runtime.getOS()
+  -- Use the OS name to pick platform-appropriate keybinds
+  local mod_key = (os_name == "macOS") and "cmd" or "ctrl"
+  lurek.log.info("running on " .. os_name .. " (modifier=" .. mod_key .. ")", "boot")
 end
 
---@api-stub: lurek.ai.newBlackboard
--- Creates an empty AI blackboard for typed local facts
+--@api-stub: lurek.runtime.getVersion
+-- Returns the semantic version string of the Lurek2D engine
 do
-  local bb = lurek.ai.newBlackboard()
-  bb:setNumber("alert_level", 0.3)
-  bb:setBool("player_seen", false)
+  local engine_version = lurek.runtime.getVersion()
+  -- Embed the engine version in save file headers to detect incompatibility
+  local save_header = "lurek2d/" .. engine_version
+  lurek.log.info("save header tag: " .. save_header, "save")
 end
 
---@api-stub: lurek.ai.newStateMachine
--- Creates an empty finite state machine with Lua-backed states and transitions
+--@api-stub: lurek.runtime.getProcessorCount
+-- Returns the number of logical processors available on the host machine
 do
-  local fsm = lurek.ai.newStateMachine()
-  fsm:addState("patrol", { onEnter = function() lurek.log.info("patrolling", "ai") end })
-  fsm:addState("chase", {})
-  fsm:setInitialState("patrol")
+  local cores = lurek.runtime.getProcessorCount()
+  -- Reserve one core for the main thread, use the rest for workers
+  local workers = math.max(1, cores - 1)
+  lurek.log.info("spawning " .. workers .. " worker threads (of " .. cores .. ")", "thread")
 end
 
---@api-stub: lurek.ai.newBehaviorTree
--- Creates an empty behavior tree that can receive a root node
+--@api-stub: lurek.runtime.getMemorySize
+-- Returns the total physical memory of the host system in megabytes
 do
-  local bt = lurek.ai.newBehaviorTree()
-  local root = lurek.ai.newSequence()
-  root:addChild(lurek.ai.newAction(function() return "success" end))
-  bt:setRoot(root)
+  local ram_mb = lurek.runtime.getMemorySize()
+  -- Auto-detect texture quality based on available RAM
+  local quality = (ram_mb >= 8192) and "high" or (ram_mb >= 4096 and "medium" or "low")
+  lurek.log.info("texture quality preset: " .. quality .. " (" .. ram_mb .. " MiB RAM)", "render")
 end
 
---@api-stub: lurek.ai.newSelector
--- Creates a behavior tree selector node with no children
+--@api-stub: lurek.runtime.openURL
+-- Opens a URL in the default system browser (non-headless; do not call in automated tests)
 do
-  local sel = lurek.ai.newSelector()
-  sel:addChild(lurek.ai.newCondition(function() return false end))
-  sel:addChild(lurek.ai.newAction(function() return "success" end))
-end
-
---@api-stub: lurek.ai.newSequence
--- Creates a behavior tree sequence node with no children
-do
-  local seq = lurek.ai.newSequence()
-  seq:addChild(lurek.ai.newCondition(function() return true end))
-  seq:addChild(lurek.ai.newAction(function() return "success" end))
+  local credits_url = "https://lurek2d.example/credits"
+  -- Only http/https/mailto schemes are allowed; returns false on failure
+  -- Verify the function exists without calling it (non-headless operation)
+  assert(type(lurek.runtime.openURL) == "function", "openURL must be a function")
+  lurek.log.info("openURL available for: " .. credits_url, "system")
 ```
 
 ## Key Types
@@ -98,7 +99,7 @@ No module functions appear in the generated Lua API data.
 
 ## Examples
 
-No module-specific example file was found.
+- [system.lua](../blob/main/content/examples/system.lua) - API example
 
 ## Reference Games
 

@@ -131,6 +131,8 @@ Module example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 -- Advances this camera2d by the given delta time.
 do
+  -- Call update() every frame to advance follow interpolation, shake decay,
+  -- breathing, and sway effects. Without it, effects stay frozen.
   local cam = lurek.camera.new(800, 600)
   function lurek.process(dt) cam:update(dt) end
 end
@@ -138,15 +140,19 @@ end
 --@api-stub: Camera2D:toWorld
 -- Performs the to world operation on this camera2d.
 do
+  -- Convert mouse click screen coordinates to world position.
+  -- Essential for selecting objects, placing buildings, aiming weapons.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300)
+  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
 end
 
 --@api-stub: Camera2D:toScreen
 -- Performs the to screen operation on this camera2d.
 do
+  -- Convert a world-space object position to screen coordinates.
+  -- Use for HUD indicators, health bars above entities, or visibility checks.
   local cam = lurek.camera.new(800, 600)
   local enemy_wx, enemy_wy = 1024, 512
   local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
@@ -156,6 +162,8 @@ end
 --@api-stub: Camera2D:getVisibleArea
 -- Returns the visible area of this camera2d.
 do
+  -- Returns x, y, width, height in world units of what the camera currently sees.
+  -- Use for culling: skip drawing objects outside this rectangle.
   local cam = lurek.camera.new(800, 600)
   local vx, vy, vw, vh = cam:getVisibleArea()
   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
@@ -164,18 +172,10 @@ end
 --@api-stub: Camera2D:lookAt
 -- Performs the look at operation on this camera2d.
 do
+  -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
+  -- Unlike setPosition, you give the center point, not the top-left corner.
   local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024)
-end
-
---@api-stub: Camera2D:move
--- Performs the move operation on this camera2d.
-do
-  local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:move(200 * dt, 0) end
-end
-
---@api-stub: Camera2D:stopPath
+  cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 ```
 
 ## Key Types
@@ -212,9 +212,15 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- The virtual viewport defines how many world units the camera "sees".
+  -- A 1280x720 camera shows a 1280x720 rectangle of the game world at zoom 1.0.
+  -- If you omit the arguments, the defaults are 800x600.
   local cam = lurek.camera.new(1280, 720)
+
+  -- The camera starts at position (0,0), meaning the top-left of the viewport
+  -- maps to world origin. Use setPosition or lookAt to center it elsewhere.
   cam:setPosition(0, 0)
-  lurek.log.info("camera viewport=" .. 1280 .. "x" .. 720, "camera")
+  lurek.log.info("camera viewport=1280x720", "camera")
 end
 ```
 
@@ -235,6 +241,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- newCamera is an alias for lurek.camera.new — use whichever reads better.
+  -- Common pattern: create one camera per game scene or layer.
   local cam = lurek.camera.newCamera(800, 600)
   cam:setPosition(400, 300)
   cam:setZoom(1.0)
@@ -254,7 +262,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- A camera rig manages multiple named cameras with automatic viewport layout.
+  -- Use it for split-screen, minimap, or picture-in-picture setups.
   local rig = lurek.camera.newRig()
+
+  -- splitScreen creates "left" and "right" cameras covering half the window each.
   rig:splitScreen(1280, 720)
   local names = rig:names()
   lurek.log.info("rig camera count=" .. tostring(#names), "camera")
@@ -274,9 +286,15 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- The virtual viewport defines how many world units the camera "sees".
+  -- A 1280x720 camera shows a 1280x720 rectangle of the game world at zoom 1.0.
+  -- If you omit the arguments, the defaults are 800x600.
   local cam = lurek.camera.new(1280, 720)
+
+  -- The camera starts at position (0,0), meaning the top-left of the viewport
+  -- maps to world origin. Use setPosition or lookAt to center it elsewhere.
   cam:setPosition(0, 0)
-  lurek.log.info("camera viewport=" .. 1280 .. "x" .. 720, "camera")
+  lurek.log.info("camera viewport=1280x720", "camera")
 end
 ```
 
@@ -290,12 +308,16 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- apply/reset pattern: everything drawn between apply() and reset()
+  -- is transformed by camera position, zoom, and rotation.
+  -- Draw HUD elements AFTER reset() so they stay screen-fixed.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(100, 50)
   cam:setZoom(1.5)
   cam:apply()
-  -- ... draw world-space sprites here ...
+  -- ... draw world-space sprites, tilemaps, particles here ...
   cam:reset()
+  -- ... draw HUD, menus, debug text here (screen-space) ...
   lurek.log.info("camera applied and reset", "camera")
 end
 ```
@@ -310,6 +332,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- attach/detach is an alternative naming to apply/reset.
+  -- Identical behavior — use whichever naming convention you prefer.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(0, 0)
   cam:attach()
@@ -329,6 +353,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- After clearing, all layers default back to factor 1.0 (full scroll).
   local cam = lurek.camera.new(800, 600)
   cam:setParallaxFactor("clouds", 0.4)
   cam:clearParallaxFactors()
@@ -346,6 +371,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Stop following — camera stays at its current position.
   local cam = lurek.camera.new(800, 600)
   cam:setTarget(400, 300)
   cam:clearTarget()
@@ -363,6 +389,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Always pair with attach(). Failing to detach means HUD draws wrong.
   local cam = lurek.camera.new(800, 600)
   cam:attach()
   cam:detach()
@@ -385,9 +412,12 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Path follow: array of {x, y} waypoints + total duration in seconds.
+  -- Camera interpolates linearly through them. Use for intro flybys, reveals.
+  -- Waypoints use numeric indices: {100, 200} means x=100, y=200.
   local cam = lurek.camera.new(800, 600)
-  local waypoints = {{x=0,y=0},{x=200,y=100},{x=400,y=200}}
-  cam:followPath(waypoints, 3.0)   -- traverse path over 3 seconds
+  local waypoints = {{0, 0}, {200, 100}, {400, 200}}
+  cam:followPath(waypoints, 3.0) -- traverse over 3 seconds
   lurek.log.info("path started, progress=" .. cam:pathProgress(), "camera")
 end
 ```
@@ -404,6 +434,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- First return is a boolean indicating whether bounds are set.
+  -- If true, the next four values are x, y, width, height.
   local cam = lurek.camera.new(800, 600)
   cam:setBounds(0, 0, 100, 50)
   local ok, x, y, w, h = cam:getBounds()
@@ -423,6 +455,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- First return is boolean (has dead zone), then width and height.
   local cam = lurek.camera.new(800, 600)
   cam:setDeadZone(40, 20)
   local ok, w, h = cam:getDeadZone()
@@ -442,6 +475,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- This is the ACTUAL zoom used for rendering, combining base zoom + pulse + breathing.
+  -- Use this instead of getZoom() when you need pixel-accurate calculations.
   local cam = lurek.camera.new(800, 600)
   cam:setZoom(1.0)
   cam:zoomPulse(0.2, 1.0)
@@ -462,6 +497,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns the total pixel offset from sway + shake combined.
+  -- Useful for manual offset of UI elements that need to counter-shake.
   local cam = lurek.camera.new(800, 600)
   cam:startSway(5.0, 2.0, 0.5, 1.0)
   cam:update(0.25)
@@ -540,10 +577,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns 1.0 for layers that have no override set.
   local cam = lurek.camera.new(800, 600)
   cam:setParallaxFactor("sky", 0.1)
   lurek.log.info("sky factor=" .. cam:getParallaxFactor("sky"), "camera")
-  lurek.log.info("unset factor=" .. cam:getParallaxFactor("foreground"), "camera")
+  lurek.log.info("unset factor=" .. cam:getParallaxFactor("foreground"), "camera") -- returns 1.0
 end
 ```
 
@@ -578,6 +616,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- This is the total pixel offset applied to rendering from all active effects.
   local cam = lurek.camera.new(800, 600)
   local x, y = cam:getRenderOffset()
   lurek.log.info("render offset=" .. x .. "," .. y, "camera")
@@ -597,7 +636,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 do
   local cam = lurek.camera.new(800, 600)
-  cam:setRotation(math.pi / 4)
+  cam:setRotation(math.pi / 4) -- 45 degree tilt
   lurek.log.info("rotation=" .. cam:getRotation(), "camera")
 end
 ```
@@ -614,6 +653,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns: has_min, min_value, has_max, max_value
   local cam = lurek.camera.new(800, 600)
   cam:setRotationConstraints(-1.0, 1.0)
   local has_min, min_v, has_max, max_v = cam:getRotationConstraints()
@@ -651,6 +691,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- During an active shake, this returns the random offset applied this frame.
+  -- Use to manually offset certain UI elements that should shake with the camera.
   local cam = lurek.camera.new(800, 600)
   cam:shake(3.0, 0.4)
   cam:update(0.1)
@@ -671,6 +713,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- First return is boolean (has target), then x, y of the target position.
   local cam = lurek.camera.new(800, 600)
   cam:setTarget(12, 34)
   local ok, x, y = cam:getTarget()
@@ -709,6 +752,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns x, y, w, h of the world rectangle currently on screen.
+  -- Use for efficient culling: don't draw objects outside this rect.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(0, 0)
   cam:setZoom(1.0)
@@ -730,7 +775,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 do
   local cam = lurek.camera.new(800, 600)
-  cam:setZoom(0.5)
+  cam:setZoom(0.5) -- 0.5x = zoomed out, shows 1600x1200 of world in 800x600 viewport
   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
 end
 ```
@@ -747,8 +792,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns: has_min, min_value, has_max, max_value
+  -- Use constraints to prevent players from zooming too far in/out.
   local cam = lurek.camera.new(800, 600)
-  cam:setZoomConstraints(0.5, 2.5)
+  cam:setZoomConstraints(0.5, 2.5) -- clamp between 0.5x and 2.5x
   local has_min, min_v, has_max, max_v = cam:getZoomConstraints()
   lurek.log.info("zoom constraints=" .. tostring(has_min) .. "," .. min_v .. "," .. tostring(has_max) .. "," .. max_v, "camera")
 end
@@ -845,8 +892,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- lookAt sets position so the given world point is at viewport center.
+  -- Simpler than manual setPosition math for centering on objects.
   local cam = lurek.camera.new(800, 600)
-  cam:lookAt(512, 256)
+  cam:lookAt(512, 256) -- world point (512, 256) is now at screen center
   local x, y = cam:getPosition()
   lurek.log.info("camera now at " .. x .. "," .. y, "camera")
 end
@@ -867,9 +916,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Additive movement — good for keyboard-driven camera pan in editors.
   local cam = lurek.camera.new(800, 600)
   cam:lookAt(0, 0)
-  cam:move(50, 25)
+  cam:move(50, 25) -- shift 50 right, 25 down
   local x, y = cam:getPosition()
   lurek.log.info("after move: " .. x .. "," .. y, "camera")
 end
@@ -890,6 +940,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Call this from your lurek.resize callback to keep the camera viewport
+  -- synchronized with the window dimensions.
   local cam = lurek.camera.new(800, 600)
   cam:onWindowResize(1920, 1080)
   local x, y, w, h = cam:getViewport()
@@ -915,6 +967,9 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- For pixel-art or fixed-resolution games: define a virtual game size
+  -- and a scale mode to handle different window/monitor aspect ratios.
+  -- Modes: "letterbox" (black bars), "stretch" (distort), "pixelperfect" (integer scale).
   local cam = lurek.camera.new(800, 600)
   cam:onWindowResizeScaled(800, 600, 1200, 600, "letterbox")
   local x, y, w, h = cam:getViewport()
@@ -934,9 +989,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns normalized 0..1 value. Use for progress bars or timed events.
   local cam = lurek.camera.new(800, 600)
-  cam:followPath({{x=0,y=0},{x=400,y=0}}, 4.0)
-  cam:updatePath(1.0)   -- advance 25%
+  cam:followPath({{0, 0}, {400, 0}}, 4.0)
+  cam:updatePath(1.0) -- 25% done
   lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
 end
 ```
@@ -951,6 +1007,9 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Presets configure follow smooth, dead zone, look-ahead, and easing
+  -- in one call. "Aggressive" = fast, nearly 1:1 follow with minimal lag.
+  -- Good for fast-paced action, bullet hell, or racing games.
   local cam = lurek.camera.new(800, 600)
   cam:presetAggressiveFollow()
   lurek.log.info("preset aggressive", "camera")
@@ -967,6 +1026,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Balanced is a good default for most games: responsive but smooth.
   local cam = lurek.camera.new(800, 600)
   cam:presetBalancedFollow()
   lurek.log.info("preset balanced", "camera")
@@ -983,6 +1043,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Cinematic = slow, floaty follow with large dead zone and strong look-ahead.
+  -- Use for exploration, walking simulators, or story-heavy moments.
   local cam = lurek.camera.new(800, 600)
   cam:presetCinematicFollow()
   lurek.log.info("preset cinematic", "camera")
@@ -999,6 +1061,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Tight = very fast convergence, small dead zone.
+  -- The camera stays glued to the player with minimal overshoot.
   local cam = lurek.camera.new(800, 600)
   cam:presetTightFollow()
   lurek.log.info("preset tight", "camera")
@@ -1015,6 +1079,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Free the camera for unbounded panning (debug mode, editor, cutscenes).
   local cam = lurek.camera.new(800, 600)
   cam:setBounds(0, 0, 1024, 768)
   cam:removeBounds()
@@ -1032,6 +1097,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- After reset(), coordinates are screen-space again.
   local cam = lurek.camera.new(800, 600)
   cam:apply()
   -- ... draw game world ...
@@ -1057,8 +1123,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Bounds prevent the camera from scrolling past the world edges.
+  -- For a 2048x1024 tilemap: camera will never show pixels outside that rect.
   local cam = lurek.camera.new(800, 600)
-  cam:setBounds(0, 0, 2048, 1024)   -- constrain to 2048Ă—1024 world
+  cam:setBounds(0, 0, 2048, 1024)
   lurek.log.info("bounds set", "camera")
 end
 ```
@@ -1078,9 +1146,12 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Dead zone: the target can move this many pixels from center without
+  -- triggering camera movement. Prevents jitter from small player movements.
+  -- Platformer tip: use wide horizontal dead zone, narrow vertical.
   local cam = lurek.camera.new(800, 600)
   cam:setFollowSmooth(10.0)
-  cam:setDeadZone(64, 32)   -- 64px horizontal, 32px vertical dead zone
+  cam:setDeadZone(64, 32) -- 64px horizontal, 32px vertical
   cam:setTarget(100, 100)
   cam:update(0.1)
   lurek.log.info("dead zone configured", "camera")
@@ -1101,6 +1172,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Controls the interpolation curve used during follow movement.
+  -- "linear" = constant speed. "smoothstep" = ease-in-out. "easeout" = fast start, slow stop.
   local cam = lurek.camera.new(800, 600)
   cam:setFollowEasing("smoothstep")
   lurek.log.info("follow easing set", "camera")
@@ -1121,8 +1194,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Smoothing speed controls how fast the camera converges on the target.
+  -- Higher = snappier (action games use 8-12). Lower = cinematic (2-4).
   local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(4.0)   -- smooth follow, 4 units/s lag
+  cam:setFollowSmooth(4.0)
   cam:setTarget(200, 100)
   cam:update(0.1)
   local x, y = cam:getPosition()
@@ -1144,9 +1219,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Look-ahead offsets the camera in the direction the target is moving.
+  -- Players see more of what's coming. Value is a multiplier on velocity.
   local cam = lurek.camera.new(800, 600)
   cam:setFollowSmooth(5.0)
-  cam:setLookAhead(2.0)   -- show 2Ă— velocity ahead of target
+  cam:setLookAhead(2.0) -- 2x velocity look-ahead
   cam:setTarget(400, 300)
   cam:update(0.016)
   lurek.log.info("look-ahead set", "camera")
@@ -1168,9 +1245,13 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Each named layer can have a different scroll speed relative to the camera.
+  -- factor=0.0: layer is static (far background).
+  -- factor=1.0: layer scrolls with camera (default, same as foreground).
+  -- factor>1.0: layer scrolls faster (foreground parallax, rare).
   local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("bg_clouds", 0.3)
-  cam:setParallaxFactor("bg_hills", 0.6)
+  cam:setParallaxFactor("bg_clouds", 0.3) -- clouds scroll at 30%
+  cam:setParallaxFactor("bg_hills", 0.6)  -- hills scroll at 60%
   lurek.log.info("parallax bg_clouds=" .. cam:getParallaxFactor("bg_clouds"), "camera")
 end
 ```
@@ -1190,6 +1271,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Position sets the camera's top-left corner in world space.
+  -- For centering on a player, subtract half-viewport from player coords.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(256, 128)
   local x, y = cam:getPosition()
@@ -1212,7 +1295,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 do
   local cam = lurek.camera.new(800, 600)
-  cam:setRotation(math.pi / 8)
+  cam:setRotation(math.pi / 8) -- tilt 22.5 degrees
   lurek.log.info("rotation=" .. cam:getRotation(), "camera")
 end
 ```
@@ -1232,8 +1315,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Clamp rotation to a range. Pass nil for either to leave that side unconstrained.
+  -- Example: limit tilt to +/- 12 degrees for a vehicle camera.
   local cam = lurek.camera.new(800, 600)
-  cam:setRotationConstraints(-0.2, 0.2)
+  cam:setRotationConstraints(-0.2, 0.2) -- approx +/- 11.5 degrees
 end
 ```
 
@@ -1251,6 +1336,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Damping slows down rotation changes, creating smoother transitions.
+  -- Higher = more sluggish rotation response.
   local cam = lurek.camera.new(800, 600)
   cam:setRotationDamping(0.3)
 end
@@ -1271,10 +1358,13 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Setting a target activates the follow system: the camera smoothly
+  -- moves toward that world point every frame (when update() is called).
+  -- Combine with setFollowSmooth, setDeadZone, and setLookAhead for tuning.
   local cam = lurek.camera.new(800, 600)
   cam:setFollowSmooth(5.0)
-  cam:setTarget(320, 240)
-  cam:update(0.016)
+  cam:setTarget(320, 240) -- follow this point
+  cam:update(0.016) -- advance one frame to see movement
   local x, y = cam:getPosition()
   lurek.log.info("after follow: x=" .. x .. " y=" .. y, "camera")
 end
@@ -1297,8 +1387,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Viewport = screen rectangle to render into.
+  -- Split-screen example: left player uses left half of window.
   local cam = lurek.camera.new(800, 600)
-  cam:setViewport(0, 0, 640, 480)
+  cam:setViewport(0, 0, 640, 480) -- render to a 640x480 portion at top-left
   local x, y, w, h = cam:getViewport()
   lurek.log.info("viewport=" .. w .. "x" .. h, "camera")
 end
@@ -1319,7 +1411,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 do
   local cam = lurek.camera.new(800, 600)
-  cam:setZoom(2.0)   -- 2Ă— magnification
+  cam:setZoom(2.0) -- 2x magnification: each world pixel is 2 screen pixels
   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
 end
 ```
@@ -1339,6 +1431,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Prevent the player from zooming beyond useful ranges.
+  -- min=0.6 keeps things readable; max=2.2 prevents excessive close-up.
   local cam = lurek.camera.new(800, 600)
   cam:setZoomConstraints(0.6, 2.2)
 end
@@ -1358,6 +1452,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Damping smooths out zoom changes (e.g., from mouse wheel input).
   local cam = lurek.camera.new(800, 600)
   cam:setZoomDamping(0.2)
 end
@@ -1378,8 +1473,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Shake adds random high-frequency offset that decays over the given duration.
+  -- Use for: explosions, player damage, heavy landings, boss attacks.
   local cam = lurek.camera.new(800, 600)
-  cam:shake(0.5, 8.0)   -- shake for 0.5s with amplitude 8 pixels
+  cam:shake(0.5, 8.0) -- duration=0.5s, intensity=8 pixels
   lurek.log.info("shake started", "camera")
 end
 ```
@@ -1399,8 +1496,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Breathing adds a slow sine-wave zoom oscillation.
+  -- Amplitude 0.02 = 2% zoom variation. Rate = oscillation speed.
+  -- Gives idle scenes a subtle "alive" feeling.
   local cam = lurek.camera.new(800, 600)
-  cam:startBreathing(0.02, 0.4)   -- amplitude 2%, freq 0.4 Hz
+  cam:startBreathing(0.02, 0.4) -- 2% amplitude, 0.4 Hz
   cam:update(0.016)
   lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
 end
@@ -1423,8 +1523,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Sway oscillates the camera position for ambient motion.
+  -- Use for: boat rocking, earthquake tremor, wind in treetops, underwater drift.
+  -- amplitude_x, amplitude_y = max offset; frequency = speed; decay = optional damping.
   local cam = lurek.camera.new(800, 600)
-  cam:startSway(4.0, 1.5, 0.3, 2.0)   -- amp_x=4, amp_y=1.5, freq_x=0.3, freq_y=2
+  cam:startSway(4.0, 1.5, 0.3, 2.0) -- gentle horizontal sway
   cam:update(0.016)
   lurek.log.info("sway active=" .. tostring(cam:isSway()), "camera")
 end
@@ -1457,8 +1560,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  local cam = lurek.camera.get()
-  cam:stopPath()
+  -- Use when the player presses a button to skip a cutscene path.
+  local cam = lurek.camera.new(800, 600)
+  cam:followPath({{0, 0}, {500, 500}}, 5.0)
+  cam:updatePath(1.0) -- advance 1 second
+  cam:stopPath() -- freeze here, don't complete the path
 end
 ```
 
@@ -1489,6 +1595,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Freezes zoom at whatever level it reached. Use when player interrupts.
   local cam = lurek.camera.new(800, 600)
   cam:zoomTo(3.0, 2.0)
   cam:stopZoom()
@@ -1513,6 +1620,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- World-to-screen: check if an object is visible, or position a health bar.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(0, 0)
   cam:setZoom(1.0)
@@ -1538,10 +1646,12 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Screen-to-world conversion respects position, zoom, and rotation.
+  -- Essential for mouse picking: convert click coords to world position.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(100, 100)
   cam:setZoom(2.0)
-  local wx, wy = cam:toWorld(400, 300)   -- screen center
+  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
   lurek.log.info("world(" .. wx .. "," .. wy .. ")", "camera")
 end
 ```
@@ -1559,6 +1669,8 @@ Module-level example from [camera.lua](../blob/main/content/examples/camera.lua)
 ```lua
 -- Advances this camera2d by the given delta time.
 do
+  -- Call update() every frame to advance follow interpolation, shake decay,
+  -- breathing, and sway effects. Without it, effects stay frozen.
   local cam = lurek.camera.new(800, 600)
   function lurek.process(dt) cam:update(dt) end
 end
@@ -1566,15 +1678,19 @@ end
 --@api-stub: Camera2D:toWorld
 -- Performs the to world operation on this camera2d.
 do
+  -- Convert mouse click screen coordinates to world position.
+  -- Essential for selecting objects, placing buildings, aiming weapons.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300)
+  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
 end
 
 --@api-stub: Camera2D:toScreen
 -- Performs the to screen operation on this camera2d.
 do
+  -- Convert a world-space object position to screen coordinates.
+  -- Use for HUD indicators, health bars above entities, or visibility checks.
   local cam = lurek.camera.new(800, 600)
   local enemy_wx, enemy_wy = 1024, 512
   local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
@@ -1584,6 +1700,8 @@ end
 --@api-stub: Camera2D:getVisibleArea
 -- Returns the visible area of this camera2d.
 do
+  -- Returns x, y, width, height in world units of what the camera currently sees.
+  -- Use for culling: skip drawing objects outside this rectangle.
   local cam = lurek.camera.new(800, 600)
   local vx, vy, vw, vh = cam:getVisibleArea()
   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
@@ -1592,18 +1710,10 @@ end
 --@api-stub: Camera2D:lookAt
 -- Performs the look at operation on this camera2d.
 do
+  -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
+  -- Unlike setPosition, you give the center point, not the top-left corner.
   local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024)
-end
-
---@api-stub: Camera2D:move
--- Performs the move operation on this camera2d.
-do
-  local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:move(200 * dt, 0) end
-end
-
---@api-stub: Camera2D:stopPath
+  cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 ```
 
 ### `LCamera:typeOf(name: string) -> boolean`
@@ -1623,6 +1733,8 @@ Module-level example from [camera.lua](../blob/main/content/examples/camera.lua)
 ```lua
 -- Advances this camera2d by the given delta time.
 do
+  -- Call update() every frame to advance follow interpolation, shake decay,
+  -- breathing, and sway effects. Without it, effects stay frozen.
   local cam = lurek.camera.new(800, 600)
   function lurek.process(dt) cam:update(dt) end
 end
@@ -1630,15 +1742,19 @@ end
 --@api-stub: Camera2D:toWorld
 -- Performs the to world operation on this camera2d.
 do
+  -- Convert mouse click screen coordinates to world position.
+  -- Essential for selecting objects, placing buildings, aiming weapons.
   local cam = lurek.camera.new(800, 600)
   cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300)
+  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
 end
 
 --@api-stub: Camera2D:toScreen
 -- Performs the to screen operation on this camera2d.
 do
+  -- Convert a world-space object position to screen coordinates.
+  -- Use for HUD indicators, health bars above entities, or visibility checks.
   local cam = lurek.camera.new(800, 600)
   local enemy_wx, enemy_wy = 1024, 512
   local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
@@ -1648,6 +1764,8 @@ end
 --@api-stub: Camera2D:getVisibleArea
 -- Returns the visible area of this camera2d.
 do
+  -- Returns x, y, width, height in world units of what the camera currently sees.
+  -- Use for culling: skip drawing objects outside this rectangle.
   local cam = lurek.camera.new(800, 600)
   local vx, vy, vw, vh = cam:getVisibleArea()
   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
@@ -1656,18 +1774,10 @@ end
 --@api-stub: Camera2D:lookAt
 -- Performs the look at operation on this camera2d.
 do
+  -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
+  -- Unlike setPosition, you give the center point, not the top-left corner.
   local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024)
-end
-
---@api-stub: Camera2D:move
--- Performs the move operation on this camera2d.
-do
-  local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:move(200 * dt, 0) end
-end
-
---@api-stub: Camera2D:stopPath
+  cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 ```
 
 ### `LCamera:update(dt: number)`
@@ -1684,9 +1794,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- update(dt) must be called every frame. It advances:
+  -- follow interpolation, shake decay, sway animation, and breathing.
   local cam = lurek.camera.new(800, 600)
   cam:shake(1.0, 4.0)
-  cam:update(0.016)   -- advance one frame at 60 fps
+  cam:update(0.016) -- advance one frame at 60 fps
   lurek.log.info("camera updated", "camera")
 end
 ```
@@ -1707,9 +1819,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns true while path is active, false when finished or no path set.
   local cam = lurek.camera.new(800, 600)
-  cam:followPath({{x=0,y=0},{x=200,y=0}}, 2.0)
-  cam:updatePath(0.5)
+  cam:followPath({{0, 0}, {200, 0}}, 2.0)
+  cam:updatePath(0.5) -- advance 0.5 seconds
   lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
 end
 ```
@@ -1730,9 +1843,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns true while active, false when done. Call each frame.
   local cam = lurek.camera.new(800, 600)
   cam:zoomTo(2.0, 1.0)
-  cam:updateZoom(0.5)   -- advance halfway
+  cam:updateZoom(0.5) -- advance halfway through the tween
   lurek.log.info("zoom mid-tween=" .. cam:getZoom(), "camera")
 end
 ```
@@ -1752,8 +1866,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Zoom pulse adds a quick burst to the effective zoom that decays.
+  -- Perfect for: collecting a powerup, critical hit, bass drop in music.
   local cam = lurek.camera.new(800, 600)
-  cam:zoomPulse(0.3, 0.5)   -- +30% zoom pulse decaying over 0.5s
+  cam:zoomPulse(0.3, 0.5) -- +30% zoom burst decaying over 0.5s
   cam:update(0.016)
   lurek.log.info("pulse zoom=" .. cam:getEffectiveZoom(), "camera")
 end
@@ -1775,10 +1891,12 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Smooth animated zoom over time. Optional third param selects easing:
+  -- "linear", "smoothstep", or "easeout" (default).
   local cam = lurek.camera.new(800, 600)
   cam:setZoom(1.0)
-  cam:zoomTo(2.5, 0.8)   -- zoom to 2.5Ă— over 0.8 seconds
-  cam:updateZoom(0.4)
+  cam:zoomTo(2.5, 0.8) -- zoom to 2.5x over 0.8 seconds
+  cam:updateZoom(0.4) -- advance halfway
   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
 end
 ```
@@ -1793,7 +1911,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- A camera rig manages multiple named cameras with automatic viewport layout.
+  -- Use it for split-screen, minimap, or picture-in-picture setups.
   local rig = lurek.camera.newRig()
+
+  -- splitScreen creates "left" and "right" cameras covering half the window each.
   rig:splitScreen(1280, 720)
   local names = rig:names()
   lurek.log.info("rig camera count=" .. tostring(#names), "camera")
@@ -1816,6 +1938,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- rig:apply("name") sets up the viewport and transform for that camera.
+  -- Returns true if the camera exists, false otherwise.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   lurek.log.info("rig apply left=" .. tostring(rig:apply("left")), "camera")
@@ -1838,6 +1962,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns: has_camera, x, y, width, height
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   local ok, x, y, w, h = rig:getViewport("right")
@@ -1883,6 +2008,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- minimap creates "main" and "minimap" cameras.
+  -- The minimap gets a small inset viewport (default 25% of window height).
   local rig = lurek.camera.newRig()
   rig:minimap(1280, 720, 0.25)
   local ok, x, y, w, h = rig:getViewport("minimap")
@@ -1904,6 +2031,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns a Lua table array of all camera name strings in this rig.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   local names = rig:names()
@@ -1928,6 +2056,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Creates "main" and "pip" cameras. PiP defaults to 320x180 in bottom-right.
+  -- Use for: rear-view mirror, security camera feed, dialogue close-up.
   local rig = lurek.camera.newRig()
   rig:pictureInPicture(1280, 720, 320, 180)
   local ok, x, y, w, h = rig:getViewport("pip")
@@ -1953,6 +2083,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Returns true if the camera existed and was removed.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   lurek.log.info("removed left=" .. tostring(rig:remove("left")), "camera")
@@ -1975,6 +2106,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- If the named camera doesn't exist yet, it's auto-created.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   rig:setPosition("left", 50, 75)
@@ -1997,9 +2129,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Useful for split-screen: each player's camera follows their character.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
-  rig:setTarget("left", 100, 150)
+  rig:setTarget("left", 100, 150)  -- player 1's position
+  rig:setTarget("right", 900, 400) -- player 2's position
 end
 ```
 
@@ -2020,7 +2154,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 do
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
-  rig:setZoom("left", 1.2)
+  rig:setZoom("left", 1.2) -- player 1 slightly zoomed in
 end
 ```
 
@@ -2039,6 +2173,8 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- splitScreen creates "left" and "right" cameras, each covering half the window.
+  -- For a 2-player co-op: each player gets their own camera following them.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
   local ok, x, y, w, h = rig:getViewport("left")
@@ -2061,7 +2197,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 ```lua
 do
   local rig = lurek.camera.newRig()
-  lurek.log.info("rig type=" .. rig:type(), "camera")
+  lurek.log.info("rig type=" .. rig:type(), "camera") -- "LCameraRig"
 end
 ```
 
@@ -2081,6 +2217,7 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Matches "LCameraRig" and "Object".
   local rig = lurek.camera.newRig()
   lurek.log.info("rig typeOf LCameraRig=" .. tostring(rig:typeOf("LCameraRig")), "camera")
 end
@@ -2100,9 +2237,12 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
+  -- Call once per frame to update follow, shake, and effects for ALL rig cameras.
   local rig = lurek.camera.newRig()
   rig:splitScreen(1280, 720)
-  rig:updateAll(0.016)
+  rig:setTarget("left", 100, 200)
+  rig:setTarget("right", 800, 400)
+  rig:updateAll(0.016) -- advance all cameras by one frame
 end
 ```
 

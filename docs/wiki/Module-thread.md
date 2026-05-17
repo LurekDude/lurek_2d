@@ -24,12 +24,12 @@
 - [Types and Methods](#types-and-methods)
   - [LChannel](#lchannel)
   - [LChannel:clear()](#lchannelclear)
-  - [LChannel:demand([timeout]: number) -> LuaValue](#lchanneldemandtimeout-number-luavalue)
+  - [LChannel:demand([timeout]: number) -> any](#lchanneldemandtimeout-number-any)
   - [LChannel:getCapacity() -> number](#lchannelgetcapacity-number)
   - [LChannel:getCount() -> number](#lchannelgetcount-number)
   - [LChannel:isBounded() -> boolean](#lchannelisbounded-boolean)
-  - [LChannel:peek() -> LuaValue](#lchannelpeek-luavalue)
-  - [LChannel:pop() -> LuaValue](#lchannelpop-luavalue)
+  - [LChannel:peek() -> any](#lchannelpeek-any)
+  - [LChannel:pop() -> any](#lchannelpop-any)
   - [LChannel:popBytes() -> string](#lchannelpopbytes-string)
   - [LChannel:popTable() -> table](#lchannelpoptable-table)
   - [LChannel:push(value: any) -> number](#lchannelpushvalue-any-number)
@@ -43,7 +43,7 @@
   - [LPromise:chain(code: string, ...: any) -> LPromise](#lpromisechaincode-string-any-lpromise)
   - [LPromise:getError() -> string](#lpromisegeterror-string)
   - [LPromise:isDone() -> boolean](#lpromiseisdone-boolean)
-  - [LPromise:result() -> LuaValue](#lpromiseresult-luavalue)
+  - [LPromise:result() -> any](#lpromiseresult-any)
   - [LPromise:type() -> string](#lpromisetype-string)
   - [LPromise:typeOf(name: string) -> boolean](#lpromisetypeofname-string-boolean)
   - [LThread](#lthread)
@@ -54,7 +54,7 @@
   - [LThread:typeOf(name: string) -> boolean](#lthreadtypeofname-string-boolean)
   - [LThread:wait()](#lthreadwait)
   - [LThreadPool](#lthreadpool)
-  - [LThreadPool:collect() -> LuaValue](#lthreadpoolcollect-luavalue)
+  - [LThreadPool:collect() -> any](#lthreadpoolcollect-any)
   - [LThreadPool:getInputChannel() -> LChannel](#lthreadpoolgetinputchannel-lchannel)
   - [LThreadPool:getOutputChannel() -> LChannel](#lthreadpoolgetoutputchannel-lchannel)
   - [LThreadPool:join([timeout]: number) -> boolean](#lthreadpooljointimeout-number-boolean)
@@ -86,53 +86,54 @@ Background threading with isolated per-thread Lua VMs communicating via typed MP
 Module example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
--- Collects and returns all completed task results from this thread pool.
+-- =============================================================================
+-- Module-level functions
+-- =============================================================================
+
+--@api-stub: lurek.thread.newThread
+-- Creates a new worker thread that executes a Lua code string on a dedicated OS thread.
 do
-  local pool = lurek.thread.newPool(2, "-- worker")
-  function lurek.process(_)
-    local result = pool:collect()
-    while result do
-      lurek.log.debug("got result", "thread")
-      result = pool:collect()
+  -- Use newThread for long-running background tasks like level generation.
+  -- The code string runs in a separate VM with access to lurek.thread channels.
+  local generator = lurek.thread.newThread([[
+    local out = lurek.thread.getChannel("chunks")
+    for i = 1, 16 do
+      out:push({ chunk_id = i, tiles = {} })
     end
+  ]])
+  generator:start()
+end
+
+--@api-stub: lurek.thread.newChannel
+-- Creates a new unbounded channel for sending typed values between threads.
+do
+  -- Unbounded channels grow as needed — useful for event queues where
+  -- you never want producers to block.
+  local events = lurek.thread.newChannel()
+  events:push({ kind = "enemy_spawned", x = 120, y = 80 })
+  events:push({ kind = "pickup_collected", item = "health_potion" })
+  local msg = events:pop()
+  if msg then
+    lurek.log.info("event: " .. msg.kind, "thread")
   end
 end
 
---@api-stub: ThreadPool:size
--- Returns the current size of this thread pool.
+--@api-stub: lurek.thread.newBoundedChannel
+-- Creates a bounded channel with a fixed capacity; pushes block when full.
 do
-  local pool = lurek.thread.newPool(8, "-- worker")
-  local max_inflight = pool:size() * 4
-  lurek.log.info("backpressure cap = " .. max_inflight, "thread")
+  -- Use bounded channels for backpressure: if the consumer is slow,
+  -- producers pause instead of flooding memory.
+  local render_queue = lurek.thread.newBoundedChannel(8)
+  render_queue:tryPush({ cmd = "draw_sprite", id = 1 })
+  render_queue:tryPush({ cmd = "draw_sprite", id = 2 })
+  local accepted = render_queue:tryPush({ cmd = "draw_sprite", id = 3 })
+  lurek.log.info("queued ok=" .. tostring(accepted), "thread")
 end
 
---@api-stub: ThreadPool:join
--- Blocks until this thread pool finishes its current operation.
+--@api-stub: lurek.thread.getChannel
+-- Returns a named shared channel, creating it on first access; same name = same channel.
 do
-  local pool = lurek.thread.newPool(2, [[
-    local n = lurek.thread.getChannel("__pool_input"):pop()
-    if n then lurek.thread.getChannel("__pool_output"):push(n) end
-  ]])
-  pool:submit(1); pool:submit(2)
-  local join_any = pool["join"] --[[@as any]]
-  local done = join_any(pool, 0.25)
-  lurek.log.info("pool joined=" .. tostring(done), "thread")
-end
-
---@api-stub: ThreadPool:getInputChannel
--- Returns the input channel of this thread pool.
-do
-  local pool = lurek.thread.newPool(4, "-- worker")
-  local input = pool:getInputChannel()
-  for i = 1, 100 do input:push(i) end
-end
-
---@api-stub: ThreadPool:getOutputChannel
--- Returns the output channel of this thread pool.
-do
-  local pool = lurek.thread.newPool(4, "-- worker")
-  local out = pool:getOutputChannel()
-  lurek.log.debug("pending results: " .. out:getCount(), "thread")
+  -- Named channels let unrelated code communicate without passing references.
 ```
 
 ## Key Types
@@ -175,53 +176,20 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Use async for one-shot background computations whose result you poll later.
   local promise = lurek.thread.async([[
     local total = 0
     for i = 1, 1000000 do total = total + i end
     lurek.thread.getChannel("__promise_result"):push(total)
   ]])
-  lurek.log.info("checksum job dispatched", "thread")
+  lurek.log.info("async dispatched, done=" .. tostring(promise:isDone()), "thread")
 
-  -- Function form: async(fn, ...)
-  local async_any = lurek.thread["async"] --[[@as any]]
-  local promise_fn = async_any(function(a, b)
+  -- Function form: pass a dumpable function plus arguments
+  local fn_promise = lurek.thread.async(function(a, b)
     return (a or 0) + (b or 0)
   end, 20, 22)
-  lurek.log.info("function async dispatched: " .. tostring(promise_fn:isDone()), "thread")
+  lurek.log.info("fn async dispatched, done=" .. tostring(fn_promise:isDone()), "thread")
 end
-
---@api-stub: lurek.thread.getWorkerCapabilities
--- Returns a list of capability names available inside worker VMs (e
-do
-  local caps = lurek.thread["getWorkerCapabilities"]()
-  for i = 1, #caps do
-    lurek.log.debug("worker api: " .. caps[i], "thread")
-  end
-end
-
--- ThreadHandle methods
-
---@api-stub: ThreadHandle:type
--- Returns the Lua-visible type name string for this thread handle handle.
-do
-  local t = lurek.thread.newThread("-- noop")
-  if t:type() == "LThread" then
-    lurek.log.debug("got a thread handle", "thread")
-  end
-end
-
---@api-stub: ThreadHandle:typeOf
--- Returns true if this thread handle handle matches the given type name string.
-do
-  local t = lurek.thread.newThread("-- noop")
-  assert(t:typeOf("LThread"))
-  assert(t:typeOf("Object"))
-end
-
---@api-stub: ThreadHandle:start
--- Starts the operation managed by this thread handle.
-do
-  local t = lurek.thread.newThread([[
 ```
 
 ### `lurek.thread.getChannel(name: string) -> LChannel`
@@ -240,9 +208,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local jobs = lurek.thread.getChannel("work_queue")
-  jobs:push({ task = "load_chunk", id = 42 })
-  jobs:push({ task = "load_chunk", id = 43 })
+  -- Named channels let unrelated code communicate without passing references.
+  -- Workers and the main thread use the same name to share data.
+  local jobs = lurek.thread.getChannel("pathfind_requests")
+  jobs:push({ from = { x = 0, y = 0 }, to = { x = 50, y = 30 } })
+  jobs:push({ from = { x = 10, y = 5 }, to = { x = 60, y = 40 } })
+  lurek.log.info("queued " .. jobs:getCount() .. " pathfind jobs", "thread")
 end
 ```
 
@@ -258,9 +229,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local caps = lurek.thread["getWorkerCapabilities"]()
+  -- Check which engine subsystems workers can access before dispatching work.
+  local caps = lurek.thread.getWorkerCapabilities()
   for i = 1, #caps do
-    lurek.log.debug("worker api: " .. caps[i], "thread")
+    lurek.log.debug("worker capability: " .. caps[i], "thread")
   end
 end
 ```
@@ -281,12 +253,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local new_bounded = lurek.thread["newBoundedChannel"]
-  local ch = new_bounded(2)
-  ch:tryPush("a")
-  ch:tryPush("b")
-  local pushed = ch:tryPush("c")
-  lurek.log.info("bounded push accepted=" .. tostring(pushed), "thread")
+  -- Use bounded channels for backpressure: if the consumer is slow,
+  -- producers pause instead of flooding memory.
+  local render_queue = lurek.thread.newBoundedChannel(8)
+  render_queue:tryPush({ cmd = "draw_sprite", id = 1 })
+  render_queue:tryPush({ cmd = "draw_sprite", id = 2 })
+  local accepted = render_queue:tryPush({ cmd = "draw_sprite", id = 3 })
+  lurek.log.info("queued ok=" .. tostring(accepted), "thread")
 end
 ```
 
@@ -302,10 +275,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local ch = lurek.thread.newChannel()
-  ch:push({ event = "spawn", x = 100, y = 50 })
-  local msg = ch:pop()
-  lurek.log.info("event=" .. msg.event, "thread") ---@diagnostic disable-line: undefined-field
+  -- Unbounded channels grow as needed — useful for event queues where
+  -- you never want producers to block.
+  local events = lurek.thread.newChannel()
+  events:push({ kind = "enemy_spawned", x = 120, y = 80 })
+  events:push({ kind = "pickup_collected", item = "health_potion" })
+  local msg = events:pop()
+  if msg then
+    lurek.log.info("event: " .. msg.kind, "thread")
+  end
 end
 ```
 
@@ -326,12 +304,19 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Pools are ideal for parallel map generation, AI batch updates, or
+  -- any work that splits into independent units.
   local pool = lurek.thread.newPool(4, [[
     local inp = lurek.thread.getChannel("__pool_input")
     local out = lurek.thread.getChannel("__pool_output")
-    while true do local n = inp:demand(); out:push(n * n) end
+    while true do
+      local task = inp:demand()
+      if not task then break end
+      out:push({ id = task.id, result = task.x * task.x + task.y * task.y })
+    end
   ]])
-  pool:submit(7)
+  pool:submit({ id = 1, x = 3, y = 4 })
+  pool:submit({ id = 2, x = 5, y = 12 })
 end
 ```
 
@@ -351,11 +336,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local worker = lurek.thread.newThread([[
-    local q = lurek.thread.getChannel("work_queue")
-    q:push("hello from worker")
+  -- Use newThread for long-running background tasks like level generation.
+  -- The code string runs in a separate VM with access to lurek.thread channels.
+  local generator = lurek.thread.newThread([[
+    local out = lurek.thread.getChannel("chunks")
+    for i = 1, 16 do
+      out:push({ chunk_id = i, tiles = {} })
+    end
   ]])
-  worker:start()
+  generator:start()
 end
 ```
 
@@ -372,9 +361,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local jobs = lurek.thread.getChannel("work_queue")
-  jobs:push({ task = "load_chunk", id = 42 })
-  jobs:push({ task = "load_chunk", id = 43 })
+  -- Named channels let unrelated code communicate without passing references.
+  -- Workers and the main thread use the same name to share data.
+  local jobs = lurek.thread.getChannel("pathfind_requests")
+  jobs:push({ from = { x = 0, y = 0 }, to = { x = 50, y = 30 } })
+  jobs:push({ from = { x = 10, y = 5 }, to = { x = 60, y = 40 } })
+  lurek.log.info("queued " .. jobs:getCount() .. " pathfind jobs", "thread")
 end
 ```
 
@@ -388,14 +380,17 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local stale = lurek.thread.getChannel("level_events")
-  stale:push({ kind = "old" })
+  -- Clear stale messages when transitioning scenes.
+  local stale = lurek.thread.getChannel("scene_events")
+  stale:push({ kind = "old_scene_event" })
+  stale:push({ kind = "another_old_event" })
   stale:clear()
   assert(stale:getCount() == 0)
+  lurek.log.info("channel cleared for new scene", "thread")
 end
 ```
 
-### `LChannel:demand([timeout]: number) -> LuaValue`
+### `LChannel:demand([timeout]: number) -> any`
 
 Blocks until a value is available on the channel or the optional timeout expires.
 
@@ -403,7 +398,7 @@ Blocks until a value is available on the channel or the optional timeout expires
 
 - `timeout` (`number`, optional) - Maximum seconds to wait. If omitted, waits indefinitely.
 
-**Returns**: `LuaValue` - The received value, or `nil` if the timeout expired.
+**Returns**: `any` - The received value, or `nil` if the timeout expired.
 
 #### Example
 
@@ -411,11 +406,16 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- demand is used inside workers to wait for incoming tasks.
+  -- With a timeout, workers can gracefully exit when idle.
   local worker = lurek.thread.newThread([[
     local inbox = lurek.thread.getChannel("worker_inbox")
     local msg = inbox:demand(1.0)
-    if msg then lurek.thread.getChannel("results"):push("ack") end
+    if msg then
+      lurek.thread.getChannel("worker_results"):push("processed: " .. tostring(msg))
+    end
   ]])
+  lurek.thread.getChannel("worker_inbox"):push("hello")
   worker:start()
 end
 ```
@@ -432,8 +432,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local bounded = lurek.thread["newBoundedChannel"](4)
-  lurek.log.debug("capacity=" .. tostring(bounded["getCapacity"](bounded)), "thread")
+  local bounded = lurek.thread.newBoundedChannel(16)
+  local unbounded = lurek.thread.newChannel()
+  lurek.log.info("bounded cap=" .. tostring(bounded:getCapacity()), "thread")
+  lurek.log.info("unbounded cap=" .. tostring(unbounded:getCapacity()), "thread")
 end
 ```
 
@@ -449,10 +451,14 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local jobs = lurek.thread.getChannel("work_queue")
+  -- Use getCount for backpressure: stop submitting when the queue is deep.
+  local jobs = lurek.thread.getChannel("ai_requests")
+  jobs:push({ entity = 1 })
+  jobs:push({ entity = 2 })
   if jobs:getCount() < 64 then
-    jobs:push({ task = "stream_chunk" })
+    jobs:push({ entity = 3 })
   end
+  lurek.log.info("queued: " .. jobs:getCount(), "thread")
 end
 ```
 
@@ -469,16 +475,17 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 ```lua
 do
   local a = lurek.thread.newChannel()
-  local b = lurek.thread["newBoundedChannel"](2)
-  lurek.log.debug("a bounded=" .. tostring(a["isBounded"](a)) .. " b bounded=" .. tostring(b["isBounded"](b)), "thread")
+  local b = lurek.thread.newBoundedChannel(4)
+  lurek.log.info("unbounded: " .. tostring(a:isBounded()), "thread")
+  lurek.log.info("bounded: " .. tostring(b:isBounded()), "thread")
 end
 ```
 
-### `LChannel:peek() -> LuaValue`
+### `LChannel:peek() -> any`
 
 Returns the next value from the channel without removing it.
 
-**Returns**: `LuaValue` - The front value, or `nil` if the channel is empty.
+**Returns**: `any` - The front value, or `nil` if the channel is empty.
 
 #### Example
 
@@ -486,20 +493,22 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local jobs = lurek.thread.getChannel("work_queue")
-  jobs:push({ priority = "high", task = "save" })
+  -- Peek lets you inspect the next item before deciding to consume it.
+  local jobs = lurek.thread.getChannel("priority_jobs")
+  jobs:push({ priority = "high", task = "save_game" })
+  ---@type {priority:string, task:string}?
   local next_job = jobs:peek()
-  if next_job and next_job.priority == "high" then ---@diagnostic disable-line: undefined-field
-    lurek.log.info("high-priority job pending", "thread")
+  if next_job and next_job.priority == "high" then
+    lurek.log.info("high-priority job waiting", "thread")
   end
 end
 ```
 
-### `LChannel:pop() -> LuaValue`
+### `LChannel:pop() -> any`
 
 Removes and returns the next value from the channel without blocking.
 
-**Returns**: `LuaValue` - The next value, or `nil` if the channel is empty.
+**Returns**: `any` - The next value, or `nil` if the channel is empty.
 
 #### Example
 
@@ -507,10 +516,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Drain the channel each frame to process all pending messages.
   local events = lurek.thread.getChannel("game_events")
-  function lurek.process(_)
-    local ev = events:pop()
-    while ev do ev = events:pop() end
+  events:push({ kind = "test" })
+  local ev = events:pop()
+  while ev do
+    lurek.log.debug("processing: " .. ev.kind, "thread")
+    ev = events:pop()
   end
 end
 ```
@@ -527,10 +539,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local stream = lurek.thread.getChannel("net_in")
-  stream:pushBytes("\x01\x02\x03")
-  local bytes = stream:popBytes()
-  if bytes then lurek.log.debug("got " .. #bytes .. " bytes", "thread") end
+  -- popBytes pairs with pushBytes for binary protocol channels.
+  local net_in = lurek.thread.getChannel("net_in")
+  net_in:pushBytes("\xDE\xAD\xBE\xEF")
+  local bytes = net_in:popBytes()
+  if bytes then
+    lurek.log.info("received " .. #bytes .. " bytes", "thread")
+  end
 end
 ```
 
@@ -546,10 +561,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local ch = lurek.thread.getChannel("packets")
-  ch:pushTable({ op = "spawn", id = 7 })
+  -- popTable filters out non-table noise from a mixed channel.
+  local ch = lurek.thread.getChannel("net_packets")
+  ch:pushTable({ op = "attack", target = 3 })
   local pkt = ch:popTable()
-  if pkt then lurek.log.info("op=" .. pkt.op, "thread") end
+  if pkt then
+    lurek.log.info("got packet op=" .. pkt.op, "thread")
+  end
 end
 ```
 
@@ -569,9 +587,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Push game events for workers to process.
+  -- Returns a sequence ID you can use for ordering or acknowledgment.
   local events = lurek.thread.getChannel("game_events")
-  events:push({ kind = "enemy_killed", id = 17 })
-  events:push({ kind = "score_delta", value = 100 })
+  local seq1 = events:push({ kind = "enemy_killed", id = 17 })
+  local seq2 = events:push({ kind = "score_delta", value = 100 })
+  lurek.log.info("pushed seq " .. seq1 .. " and " .. seq2, "thread")
 end
 ```
 
@@ -591,9 +612,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local stream = lurek.thread.getChannel("net_out")
-  local payload = string.char(0xDE, 0xAD, 0xBE, 0xEF)
-  stream:pushBytes(payload)
+  -- pushBytes is efficient for serialized network frames or compressed data.
+  local net_out = lurek.thread.getChannel("net_out")
+  local header = string.char(0x01, 0x00, 0x00, 0x10)
+  local payload = string.rep("\0", 16)
+  net_out:pushBytes(header .. payload)
+  lurek.log.info("sent " .. #(header .. payload) .. " bytes", "thread")
 end
 ```
 
@@ -613,8 +637,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local ch = lurek.thread.getChannel("packets")
-  ch:pushTable({ op = "spawn", x = 64, y = 32, kind = "goblin" })
+  -- pushTable is a type-safe alternative to push when you know the value is a table.
+  local ch = lurek.thread.getChannel("net_packets")
+  ch:pushTable({ op = "spawn", x = 64, y = 32, entity = "goblin" })
+  ch:pushTable({ op = "move", id = 7, dx = 1, dy = 0 })
 end
 ```
 
@@ -634,9 +660,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local out = lurek.thread.getChannel("worker_results")
-  out:supply({ tile = 1, ok = true })
-  out:supply({ tile = 2, ok = true })
+  -- supply guarantees the consumer received the value before you continue.
+  -- Useful for request-reply patterns between threads.
+  local handoff = lurek.thread.getChannel("handoff_demo")
+  -- In a real scenario, a worker would be waiting to pop from this channel.
+  -- supply blocks until that pop happens:
+  -- handoff:supply({ request = "generate_chunk", id = 5 })
+  lurek.log.info("supply: use for synchronous handoff to a waiting consumer", "thread")
 end
 ```
 
@@ -656,10 +686,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local bounded = lurek.thread["newBoundedChannel"](1)
-  bounded["tryPush"](bounded, "first")
-  local ok = bounded["tryPush"](bounded, "second")
-  lurek.log.debug("second push accepted=" .. tostring(ok), "thread")
+  -- tryPush is non-blocking — use it on the main thread to avoid stalls.
+  local bounded = lurek.thread.newBoundedChannel(2)
+  bounded:tryPush("frame_1")
+  bounded:tryPush("frame_2")
+  local ok = bounded:tryPush("frame_3")
+  lurek.log.info("3rd push accepted=" .. tostring(ok), "thread")
 end
 ```
 
@@ -676,9 +708,7 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 ```lua
 do
   local ch = lurek.thread.newChannel()
-  if ch:type() == "LChannel" then
-    lurek.log.debug("got a channel", "thread")
-  end
+  lurek.log.info("channel type = " .. ch:type(), "thread")
 end
 ```
 
@@ -700,6 +730,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 do
   local ch = lurek.thread.newChannel()
   assert(ch:typeOf("LChannel"))
+  assert(ch:typeOf("Object"))
+  assert(not ch:typeOf("LThread"))
 end
 ```
 
@@ -713,53 +745,20 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Use async for one-shot background computations whose result you poll later.
   local promise = lurek.thread.async([[
     local total = 0
     for i = 1, 1000000 do total = total + i end
     lurek.thread.getChannel("__promise_result"):push(total)
   ]])
-  lurek.log.info("checksum job dispatched", "thread")
+  lurek.log.info("async dispatched, done=" .. tostring(promise:isDone()), "thread")
 
-  -- Function form: async(fn, ...)
-  local async_any = lurek.thread["async"] --[[@as any]]
-  local promise_fn = async_any(function(a, b)
+  -- Function form: pass a dumpable function plus arguments
+  local fn_promise = lurek.thread.async(function(a, b)
     return (a or 0) + (b or 0)
   end, 20, 22)
-  lurek.log.info("function async dispatched: " .. tostring(promise_fn:isDone()), "thread")
+  lurek.log.info("fn async dispatched, done=" .. tostring(fn_promise:isDone()), "thread")
 end
-
---@api-stub: lurek.thread.getWorkerCapabilities
--- Returns a list of capability names available inside worker VMs (e
-do
-  local caps = lurek.thread["getWorkerCapabilities"]()
-  for i = 1, #caps do
-    lurek.log.debug("worker api: " .. caps[i], "thread")
-  end
-end
-
--- ThreadHandle methods
-
---@api-stub: ThreadHandle:type
--- Returns the Lua-visible type name string for this thread handle handle.
-do
-  local t = lurek.thread.newThread("-- noop")
-  if t:type() == "LThread" then
-    lurek.log.debug("got a thread handle", "thread")
-  end
-end
-
---@api-stub: ThreadHandle:typeOf
--- Returns true if this thread handle handle matches the given type name string.
-do
-  local t = lurek.thread.newThread("-- noop")
-  assert(t:typeOf("LThread"))
-  assert(t:typeOf("Object"))
-end
-
---@api-stub: ThreadHandle:start
--- Starts the operation managed by this thread handle.
-do
-  local t = lurek.thread.newThread([[
 ```
 
 ### `LPromise:chain(code: string, ...: any) -> LPromise`
@@ -779,13 +778,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local p1 = lurek.thread.async([[lurek.thread.getChannel("__promise_result"):push(10)]])
-  function lurek.process(_)
-    if p1:isDone() then
-      local p2 = p1["chain"](p1, [[lurek.thread.getChannel("__promise_result"):push((arg[1] or 0) + 5)]])
-      lurek.log.info("chained promise active=" .. tostring(not p2:isDone()), "thread")
-    end
-  end
+  -- Chain lets you build async pipelines: load -> parse -> apply.
+  -- Note: chain() requires the parent promise to be completed (isDone() true).
+  -- This example demonstrates the API shape only.
+  local load_promise = lurek.thread.async([[return "level_data_bytes"]])
+  -- chain() would be called once load_promise:isDone() is true:
+  -- local parse_promise = load_promise:chain([[ local result = ... ]])
+  lurek.log.info("chain: parent promise created, done=" .. tostring(load_promise:isDone()), "thread")
 end
 ```
 
@@ -801,11 +800,12 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local p = lurek.thread.async("error('worker died')")
-  function lurek.process(_)
-    if p:isDone() and not p:result() then
-      lurek.log.error("async failed: " .. (p:getError() or "?"), "thread")
-    end
+  -- Always check getError if result returns nil after isDone.
+  local p = lurek.thread.async("error('worker crashed')")
+  -- After some time:
+  if p:isDone() and not p:result() then
+    local err = p:getError()
+    if err then lurek.log.error("async error: " .. err, "thread") end
   end
 end
 ```
@@ -822,20 +822,19 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Poll isDone each frame to know when the result is available.
   local p = lurek.thread.async([[
     lurek.thread.getChannel("__promise_result"):push(42)
   ]])
-  if p:isDone() then
-    lurek.log.info("promise ready", "thread")
-  end
+  lurek.log.info("promise done=" .. tostring(p:isDone()), "thread")
 end
 ```
 
-### `LPromise:result() -> LuaValue`
+### `LPromise:result() -> any`
 
 Returns the result value of the completed promise.
 
-**Returns**: `LuaValue` - The computed result, or `nil` if the promise is not yet done.
+**Returns**: `any` - The computed result, or `nil` if the promise is not yet done.
 
 #### Example
 
@@ -843,12 +842,14 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Retrieve the result once isDone is true.
   local p = lurek.thread.async([[
     lurek.thread.getChannel("__promise_result"):push({ score = 999 })
   ]])
-  function lurek.process(_)
-    local r = p:result()
-    if r then lurek.log.info("score=" .. r.score, "thread") end
+  -- In a real game loop, poll each frame:
+  local r = p:result()
+  if r then
+    lurek.log.info("async result received", "thread")
   end
 end
 ```
@@ -866,9 +867,7 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 ```lua
 do
   local p = lurek.thread.async("-- noop")
-  if p:type() == "Promise" then
-    lurek.log.debug("promise dispatched", "thread")
-  end
+  lurek.log.info("promise type = " .. p:type(), "thread")
 end
 ```
 
@@ -890,6 +889,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 do
   local p = lurek.thread.async("-- noop")
   assert(p:typeOf("Promise"))
+  assert(p:typeOf("Object"))
+  assert(not p:typeOf("LChannel"))
 end
 ```
 
@@ -903,11 +904,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local worker = lurek.thread.newThread([[
-    local q = lurek.thread.getChannel("work_queue")
-    q:push("hello from worker")
+  -- Use newThread for long-running background tasks like level generation.
+  -- The code string runs in a separate VM with access to lurek.thread channels.
+  local generator = lurek.thread.newThread([[
+    local out = lurek.thread.getChannel("chunks")
+    for i = 1, 16 do
+      out:push({ chunk_id = i, tiles = {} })
+    end
   ]])
-  worker:start()
+  generator:start()
 end
 ```
 
@@ -923,16 +928,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local t = lurek.thread.newThread([[
-    -- safe worker; no error expected
+  -- Always check getError after wait to handle worker failures gracefully.
+  local risky = lurek.thread.newThread([[
+    error("out of memory in chunk generator")
   ]])
-  t:start()
-  t:wait()
-  local err = t:getError()
+  risky:start()
+  risky:wait()
+  local err = risky:getError()
   if err then
-    lurek.log.info("thread error: " .. err, "thread")
-  else
-    lurek.log.info("thread completed cleanly", "thread")
+    lurek.log.error("worker failed: " .. err, "thread")
   end
 end
 ```
@@ -949,13 +953,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local t = lurek.thread.newThread([[
-    -- minimal worker
+  -- Poll isRunning in your game loop to show a loading indicator.
+  local job = lurek.thread.newThread([[
+    -- simulate work
   ]])
-  lurek.log.info("before start: " .. tostring(t:isRunning()), "thread")
-  t:start()
-  lurek.log.info("after start: " .. tostring(t:isRunning()), "thread")
-  t:wait()
+  lurek.log.info("before start: running=" .. tostring(job:isRunning()), "thread")
+  job:start()
+  lurek.log.info("after start: running=" .. tostring(job:isRunning()), "thread")
+  job:wait()
+  lurek.log.info("after wait: running=" .. tostring(job:isRunning()), "thread")
 end
 ```
 
@@ -973,13 +979,16 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Pass initialization data to the worker as varargs.
+  -- Inside the worker, access them via `...` or the `arg` table.
   local t = lurek.thread.newThread([[
-    local ch = lurek.thread.getChannel("result")
-    ch:push(42)
+    local seed, chunk_count = ...
+    local out = lurek.thread.getChannel("gen_results")
+    for i = 1, chunk_count do
+      out:push({ chunk = i, seed = seed + i })
+    end
   ]])
-  t:start()
-  lurek.log.info("thread started, running=" .. tostring(t:isRunning()), "thread")
-  t:wait()
+  t:start(12345, 8)
 end
 ```
 
@@ -995,9 +1004,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local thread_obj = lurek.thread.newThread("worker")
-  local t = thread_obj:type()
-  lurek.log.info("LThread:type = " .. t, "thread")
+  local t = lurek.thread.newThread("-- noop")
+  lurek.log.info("type = " .. t:type(), "thread")
 end
 ```
 
@@ -1017,9 +1025,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local thread_obj2 = lurek.thread.newThread("worker")
-  lurek.log.info("is LThread: " .. tostring(thread_obj2 and thread_obj2:typeOf("LThread") or false), "thread")
-  lurek.log.info("is wrong: " .. tostring(thread_obj2 and thread_obj2:typeOf("Unknown") or false), "thread")
+  local t = lurek.thread.newThread("-- noop")
+  assert(t:typeOf("LThread"))
+  assert(t:typeOf("Object"))
+  assert(not t:typeOf("LChannel"))
 end
 ```
 
@@ -1033,12 +1042,13 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local t = lurek.thread.newThread([[
-    -- lightweight worker
+  -- Use wait when you need the result before proceeding (e.g., loading screen).
+  local loader = lurek.thread.newThread([[
+    lurek.thread.getChannel("level_data"):push({ loaded = true })
   ]])
-  t:start()
-  t:wait()   -- block until done
-  lurek.log.info("thread finished, err=" .. tostring(t:getError()), "thread")
+  loader:start()
+  loader:wait()
+  lurek.log.info("level data ready", "thread")
 end
 ```
 
@@ -1052,20 +1062,27 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Pools are ideal for parallel map generation, AI batch updates, or
+  -- any work that splits into independent units.
   local pool = lurek.thread.newPool(4, [[
     local inp = lurek.thread.getChannel("__pool_input")
     local out = lurek.thread.getChannel("__pool_output")
-    while true do local n = inp:demand(); out:push(n * n) end
+    while true do
+      local task = inp:demand()
+      if not task then break end
+      out:push({ id = task.id, result = task.x * task.x + task.y * task.y })
+    end
   ]])
-  pool:submit(7)
+  pool:submit({ id = 1, x = 3, y = 4 })
+  pool:submit({ id = 2, x = 5, y = 12 })
 end
 ```
 
-### `LThreadPool:collect() -> LuaValue`
+### `LThreadPool:collect() -> any`
 
 Pops and returns the next result from the pool's output channel.
 
-**Returns**: `LuaValue` - The next result value, or `nil` if the output channel is empty.
+**Returns**: `any` - The next result value, or `nil` if the output channel is empty.
 
 #### Example
 
@@ -1073,13 +1090,18 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local pool = lurek.thread.newPool(2, "-- worker")
-  function lurek.process(_)
-    local result = pool:collect()
-    while result do
-      lurek.log.debug("got result", "thread")
-      result = pool:collect()
-    end
+  -- Call collect each frame to drain finished results without blocking.
+  local pool = lurek.thread.newPool(2, [[
+    local inp = lurek.thread.getChannel("__pool_input")
+    local out = lurek.thread.getChannel("__pool_output")
+    while true do local v = inp:demand(); if v then out:push(v * 2) end end
+  ]])
+  pool:submit(5)
+  pool:submit(10)
+  -- In a real game loop you would poll collect every frame:
+  local result = pool:collect()
+  if result then
+    lurek.log.info("pool result: " .. tostring(result), "thread")
   end
 end
 ```
@@ -1096,9 +1118,17 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local pool = lurek.thread.newPool(4, "-- worker")
+  -- Direct channel access is useful for bulk-enqueue without per-item submit calls.
+  local pool = lurek.thread.newPool(4, [[
+    local inp = lurek.thread.getChannel("__pool_input")
+    local out = lurek.thread.getChannel("__pool_output")
+    while true do local v = inp:demand(); if v then out:push(v) end end
+  ]])
   local input = pool:getInputChannel()
-  for i = 1, 100 do input:push(i) end
+  for i = 1, 100 do
+    input:push(i)
+  end
+  lurek.log.info("bulk-queued 100 items", "thread")
 end
 ```
 
@@ -1114,9 +1144,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Read output channel directly when you want getCount or peek.
   local pool = lurek.thread.newPool(4, "-- worker")
   local out = pool:getOutputChannel()
-  lurek.log.debug("pending results: " .. out:getCount(), "thread")
+  lurek.log.info("pending results: " .. out:getCount(), "thread")
 end
 ```
 
@@ -1136,14 +1167,15 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- join with a timeout lets you show progress while waiting.
   local pool = lurek.thread.newPool(2, [[
-    local n = lurek.thread.getChannel("__pool_input"):pop()
+    local n = lurek.thread.getChannel("__pool_input"):demand(0.1)
     if n then lurek.thread.getChannel("__pool_output"):push(n) end
   ]])
-  pool:submit(1); pool:submit(2)
-  local join_any = pool["join"] --[[@as any]]
-  local done = join_any(pool, 0.25)
-  lurek.log.info("pool joined=" .. tostring(done), "thread")
+  pool:submit(1)
+  pool:submit(2)
+  local finished = pool:join(1.0)
+  lurek.log.info("pool join result: " .. tostring(finished), "thread")
 end
 ```
 
@@ -1159,9 +1191,10 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Use size to calculate backpressure limits or partition work.
   local pool = lurek.thread.newPool(8, "-- worker")
-  local max_inflight = pool:size() * 4
-  lurek.log.info("backpressure cap = " .. max_inflight, "thread")
+  local inflight_cap = pool:size() * 4
+  lurek.log.info("pool has " .. pool:size() .. " workers, cap=" .. inflight_cap, "thread")
 end
 ```
 
@@ -1179,13 +1212,17 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
+  -- Submit game tasks as tables with an id so you can match results later.
   local pool = lurek.thread.newPool(4, [[
     local inp = lurek.thread.getChannel("__pool_input")
     local out = lurek.thread.getChannel("__pool_output")
-    while true do out:push(inp:demand() * 2) end
+    while true do
+      local task = inp:demand()
+      if task then out:push({ id = task.id, dist = math.sqrt(task.x^2 + task.y^2) }) end
+    end
   ]])
-  pool:submit({ id = 1, payload = "tile_chunk_a" })
-  pool:submit({ id = 2, payload = "tile_chunk_b" })
+  pool:submit({ id = 1, x = 3, y = 4 })
+  pool:submit({ id = 2, x = 6, y = 8 })
 end
 ```
 
@@ -1202,9 +1239,7 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 ```lua
 do
   local pool = lurek.thread.newPool(2, "-- noop")
-  if pool:type() == "ThreadPool" then
-    lurek.log.debug("pool ready", "thread")
-  end
+  lurek.log.info("pool type = " .. pool:type(), "thread")
 end
 ```
 
@@ -1226,6 +1261,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 do
   local pool = lurek.thread.newPool(2, "-- noop")
   assert(pool:typeOf("ThreadPool"))
+  assert(pool:typeOf("Object"))
+  assert(not pool:typeOf("LChannel"))
 end
 ```
 

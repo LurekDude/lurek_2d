@@ -502,9 +502,9 @@ function GoalMap:bake()
     end
     -- Try lurek.pathfind façade first (P1 advertised but signature varies).
     local lp = lurek and lurek.pathfind
-    if type(lp) == "table" and type(lp.dijkstra) == "function" then
+    if type(lp) == "table" and type(rawget(lp, "dijkstra")) == "function" then
         local ok, dist = pcall(function()
-            return lp.dijkstra({
+            return rawget(lp, "dijkstra")({
                 width = self._w, height = self._h,
                 sources = self._sources, blocker = self._blocker,
             })
