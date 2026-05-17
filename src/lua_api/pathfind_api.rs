@@ -20,10 +20,8 @@ fn waypoints_to_lua<'a>(lua: &'a Lua, path: &[Waypoint]) -> LuaResult<LuaTable<'
     for (i, wp) in path.iter().enumerate() {
         let entry = lua.create_table()?;
         /// Performs the 'x' operation.
-        /// @return | nil | No value is returned.
         entry.set("x", wp.x + 1)?;
         /// Performs the 'y' operation.
-        /// @return | nil | No value is returned.
         entry.set("y", wp.y + 1)?;
         tbl.set(i + 1, entry)?;
     }
@@ -74,7 +72,6 @@ impl LuaUserData for LuaNavGrid {
         /// @param | x | integer | One-based column.
         /// @param | y | integer | One-based row.
         /// @param | cost | integer | Movement cost (0–255).
-        /// @return | nil | No value is returned.
         methods.add_method("setCost", |_, this, (x, y, cost): (u32, u32, u8)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
@@ -92,7 +89,6 @@ impl LuaUserData for LuaNavGrid {
         /// @param | x | integer | One-based column.
         /// @param | y | integer | One-based row.
         /// @param | blocked | boolean | True to block the cell.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setBlocked",
             |_, this, (x, y, blocked): (u32, u32, bool)| {
@@ -126,7 +122,6 @@ impl LuaUserData for LuaNavGrid {
         // -- fill --
         /// Fills the entire grid with a uniform movement cost.
         /// @param | cost | integer | Movement cost (0–255).
-        /// @return | nil | No value is returned.
         methods.add_method("fill", |_, this, cost: u8| {
             this.inner.borrow_mut().fill(cost);
             Ok(())
@@ -138,7 +133,6 @@ impl LuaUserData for LuaNavGrid {
         /// @param | w | integer | Rectangle width in cells.
         /// @param | h | integer | Rectangle height in cells.
         /// @param | cost | integer | Movement cost (0–255).
-        /// @return | nil | No value is returned.
         methods.add_method(
             "fillRect",
             |_, this, (x, y, w, h, cost): (u32, u32, u32, u32, u8)| {
@@ -149,7 +143,6 @@ impl LuaUserData for LuaNavGrid {
         // -- loadFromString --
         /// Loads grid data from a serialized binary string.
         /// @param | data | string | Serialized grid bytes.
-        /// @return | nil | No value is returned.
         methods.add_method("loadFromString", |_, this, data: LuaString| {
             this.inner
                 .borrow_mut()
@@ -165,7 +158,6 @@ impl LuaUserData for LuaNavGrid {
         // -- setChunkSize --
         /// Sets hierarchical chunk size for abstract graph partitioning.
         /// @param | size | integer | Chunk side length in cells.
-        /// @return | nil | No value is returned.
         methods.add_method("setChunkSize", |_, this, size: u32| {
             this.inner.borrow_mut().set_chunk_size(size);
             Ok(())
@@ -178,7 +170,6 @@ impl LuaUserData for LuaNavGrid {
         });
         // -- rebuildAbstract --
         /// Rebuilds the cached abstract graph for this grid.
-        /// @return | nil | No value is returned.
         methods.add_method("rebuildAbstract", |_, this, ()| {
             let grid = this.inner.borrow();
             let chunk_size = grid.get_chunk_size();
@@ -192,14 +183,12 @@ impl LuaUserData for LuaNavGrid {
         /// @param | y | integer | One-based row of the top-left corner.
         /// @param | w | integer | Region width in cells.
         /// @param | h | integer | Region height in cells.
-        /// @return | nil | No value is returned.
         methods.add_method("setDirty", |_, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.inner.borrow_mut().set_dirty(x - 1, y - 1, w, h);
             Ok(())
         });
         // -- clearDirty --
         /// Clears all dirty region markers from the grid.
-        /// @return | nil | No value is returned.
         methods.add_method("clearDirty", |_, this, ()| {
             this.inner.borrow_mut().clear_dirty();
             Ok(())
@@ -207,7 +196,6 @@ impl LuaUserData for LuaNavGrid {
         // -- setDiagonalMode --
         /// Sets diagonal movement mode for this object.
         /// @param | mode | string | Mode name: `none`, `always`, or `nocornercut`.
-        /// @return | nil | No value is returned.
         methods.add_method("setDiagonalMode", |_, this, mode: String| {
             let dm = DiagonalMode::from_lua_str(&mode).ok_or_else(|| {
                 LuaError::external(format!(
@@ -258,6 +246,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y2 | integer | One-based goal row.
         /// @param | unit_size | integer? | Unit footprint in cells (default 1).
         /// @return | table | Array of `{x, y}` waypoint tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPath",
             |lua, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -282,6 +272,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y2 | integer | One-based goal row.
         /// @param | unit_size | integer? | Unit footprint in cells (default 1).
         /// @return | table | Array of `{x, y}` waypoint tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPathSmooth",
             |lua, this, (x1, y1, x2, y2, unit_size): (u32, u32, u32, u32, Option<u32>)| {
@@ -306,7 +298,9 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y2 | integer | One-based row of the goal cell.
         /// @param | unit_size | integer? | Width or height of the unit in grid cells for clearance checks (default 1).
         /// @param | max_nodes | integer? | Optional node-expansion budget; 0 uses the full search.
-        /// @return | table | Array table of waypoint tables, or nil when no path exists.
+        /// @return | table | Array of waypoint tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         /// @return | boolean | True when the path is complete.
         methods.add_method(
             "findPathBidirectional",
@@ -335,10 +329,8 @@ impl LuaUserData for LuaUnitPathfinder {
                         for (i, (cx, cy)) in cells.iter().enumerate() {
                             let entry = lua.create_table()?;
                             /// Performs the 'x' operation.
-                            /// @return | nil | No value is returned.
                             entry.set("x", cx + 1)?;
                             /// Performs the 'y' operation.
-                            /// @return | nil | No value is returned.
                             entry.set("y", cy + 1)?;
                             tbl.set(i + 1, entry)?;
                         }
@@ -373,6 +365,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | max_nodes | integer | Maximum number of nodes to expand before stopping.
         /// @param | unit_size | integer? | Width/height of the unit in grid cells for clearance checks (default 1).
         /// @return | table | Array of `{x, y}` waypoint tables forming the found partial path.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         /// @return | boolean | `true` if the returned path reaches the exact goal cell.
         methods.add_method("findPartialPath", |lua,
              this,
@@ -478,7 +472,6 @@ impl LuaUserData for LuaUnitPathfinder {
         // -- setCacheEnabled --
         /// Enables or disables the path cache on this object.
         /// @param | enabled | boolean | True to enable caching.
-        /// @return | nil | No value is returned.
         methods.add_method("setCacheEnabled", |_, this, enabled: bool| {
             this.inner.borrow_mut().set_cache_enabled(enabled);
             Ok(())
@@ -491,7 +484,6 @@ impl LuaUserData for LuaUnitPathfinder {
         });
         // -- clearCache --
         /// Clears all cached paths on this object.
-        /// @return | nil | No value is returned.
         methods.add_method("clearCache", |_, this, ()| {
             this.inner.borrow_mut().clear_cache();
             Ok(())
@@ -505,7 +497,6 @@ impl LuaUserData for LuaUnitPathfinder {
         // -- setCacheMaxSize --
         /// Sets maximum path cache size for this object.
         /// @param | n | integer | Maximum number of cached paths.
-        /// @return | nil | No value is returned.
         methods.add_method("setCacheMaxSize", |_, this, n: usize| {
             this.inner.borrow_mut().set_cache_max_size(n);
             Ok(())
@@ -536,7 +527,6 @@ impl LuaUserData for LuaFlowField {
         /// @param | tx | integer | One-based target column.
         /// @param | ty | integer | One-based target row.
         /// @param | unit_size | integer? | Unit footprint in cells (default 1).
-        /// @return | nil | No value is returned.
         methods.add_method(
             "calculate",
             |_, this, (tx, ty, unit_size): (u32, u32, Option<u32>)| {
@@ -550,7 +540,6 @@ impl LuaUserData for LuaFlowField {
         /// Calculates a flow field toward multiple target cells.
         /// @param | targets | table | Array of `{x, y}` target tables.
         /// @param | unit_size | integer? | Unit footprint in cells (default 1).
-        /// @return | nil | No value is returned.
         methods.add_method(
             "calculateMulti",
             |_, this, (targets, unit_size): (LuaTable, Option<u32>)| {
@@ -601,16 +590,16 @@ impl LuaUserData for LuaFlowField {
         // -- getTargets --
         /// Returns target cells for this flow field.
         /// @return | table | Array table of target point tables.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method("getTargets", |lua, this, ()| {
             let targets = this.inner.borrow().get_targets();
             let tbl = lua.create_table()?;
             for (i, (x, y)) in targets.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 entry.set("x", x + 1)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 entry.set("y", y + 1)?;
                 tbl.set(i + 1, entry)?;
             }
@@ -675,7 +664,6 @@ impl LuaUserData for LuaPathGrid {
         /// @param | x | integer | One-based column.
         /// @param | y | integer | One-based row.
         /// @param | w | boolean | True to mark the cell walkable.
-        /// @return | nil | No value is returned.
         methods.add_method("setWalkable", |_, this, (x, y, w): (usize, usize, bool)| {
             this.inner.borrow_mut().set_walkable(x - 1, y - 1, w);
             Ok(())
@@ -693,7 +681,6 @@ impl LuaUserData for LuaPathGrid {
         /// @param | x | integer | One-based column.
         /// @param | y | integer | One-based row.
         /// @param | cost | number | Movement cost value.
-        /// @return | nil | No value is returned.
         methods.add_method("setCost", |_, this, (x, y, cost): (usize, usize, f32)| {
             this.inner.borrow_mut().set_cost(x - 1, y - 1, cost);
             Ok(())
@@ -713,6 +700,8 @@ impl LuaUserData for LuaPathGrid {
         /// @param | gx | integer | One-based goal column.
         /// @param | gy | integer | One-based goal row.
         /// @return | table | Array of `{x, y}` point tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPath",
             |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
@@ -727,10 +716,8 @@ impl LuaUserData for LuaPathGrid {
                         for (i, (px, py)) in pts.iter().enumerate() {
                             let pt = lua.create_table()?;
                             /// Performs the 'x' operation.
-                            /// @return | nil | No value is returned.
                             pt.set("x", *px)?;
                             /// Performs the 'y' operation.
-                            /// @return | nil | No value is returned.
                             pt.set("y", *py)?;
                             tbl.set(i + 1, pt)?;
                         }
@@ -746,6 +733,8 @@ impl LuaUserData for LuaPathGrid {
         /// @param | gx | integer | One-based goal column.
         /// @param | gy | integer | One-based goal row.
         /// @return | table | Array of `{x, y}` point tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPathSmoothed",
             |lua, this, (sx, sy, gx, gy): (usize, usize, usize, usize)| -> LuaResult<LuaValue> {
@@ -760,10 +749,8 @@ impl LuaUserData for LuaPathGrid {
                         for (i, (px, py)) in pts.iter().enumerate() {
                             let pt = lua.create_table()?;
                             /// Performs the 'x' operation.
-                            /// @return | nil | No value is returned.
                             pt.set("x", *px)?;
                             /// Performs the 'y' operation.
-                            /// @return | nil | No value is returned.
                             pt.set("y", *py)?;
                             tbl.set(i + 1, pt)?;
                         }
@@ -815,7 +802,6 @@ impl LuaUserData for LuaAiFlowField {
         /// Sets the one-based flow field goal and recalculates the field.
         /// @param | x | integer | One-based goal column.
         /// @param | y | integer | One-based goal row.
-        /// @return | nil | No value is returned.
         methods.add_method("setGoal", |_, this, (x, y): (usize, usize)| {
             this.inner.borrow_mut().set_goal(x - 1, y - 1);
             Ok(())
@@ -879,7 +865,6 @@ impl LuaUserData for LuaHexGrid {
         /// @param | col | integer | One-based hex column.
         /// @param | row | integer | One-based hex row.
         /// @param | blocked | boolean | True to block the cell.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setBlocked",
             |_, this, (col, row, blocked): (u32, u32, bool)| {
@@ -894,7 +879,6 @@ impl LuaUserData for LuaHexGrid {
         /// @param | col | integer | One-based hex column.
         /// @param | row | integer | One-based hex row.
         /// @param | cost | number | Movement cost value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setCost", |_, this, (col, row, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(col - 1, row - 1, cost);
             Ok(())
@@ -914,6 +898,8 @@ impl LuaUserData for LuaHexGrid {
         /// @param | tc | integer | One-based goal column.
         /// @param | tr | integer | One-based goal row.
         /// @return | table | Array of `{col, row}` hex cell tables, or nil when no path exists.
+        /// @field | col | integer | Col.
+        /// @field | row | integer | Row.
         methods.add_method(
             "findPath",
             |lua, this, (fc, fr, tc, tr): (u32, u32, u32, u32)| match this
@@ -927,10 +913,8 @@ impl LuaUserData for LuaHexGrid {
                     for (i, (c, r)) in path.iter().enumerate() {
                         let cell = lua.create_table()?;
                         /// Performs the 'col' operation.
-                        /// @return | nil | No value is returned.
                         cell.set("col", c + 1)?;
                         /// Performs the 'row' operation.
-                        /// @return | nil | No value is returned.
                         cell.set("row", r + 1)?;
                         t.set(i + 1, cell)?;
                     }
@@ -960,6 +944,8 @@ impl LuaUserData for LuaHexGrid {
         /// @param | row | integer | One-based origin row.
         /// @param | max_range | integer | Maximum visibility range in cells.
         /// @return | table | Array of `{col, row}` hex cell tables.
+        /// @field | col | integer | Col.
+        /// @field | row | integer | Row.
         methods.add_method(
             "fieldOfView",
             |lua, this, (col, row, max_range): (u32, u32, u32)| {
@@ -971,10 +957,8 @@ impl LuaUserData for LuaHexGrid {
                 for (i, (c, r)) in cells.iter().enumerate() {
                     let cell = lua.create_table()?;
                     /// Performs the 'col' operation.
-                    /// @return | nil | No value is returned.
                     cell.set("col", c + 1)?;
                     /// Performs the 'row' operation.
-                    /// @return | nil | No value is returned.
                     cell.set("row", r + 1)?;
                     t.set(i + 1, cell)?;
                 }
@@ -987,6 +971,8 @@ impl LuaUserData for LuaHexGrid {
         /// @param | row | integer | One-based origin row.
         /// @param | budget | number | Maximum movement cost budget.
         /// @return | table | Array of `{col, row}` hex cell tables.
+        /// @field | col | integer | Col.
+        /// @field | row | integer | Row.
         methods.add_method(
             "rangeOfMovement",
             |lua, this, (col, row, budget): (u32, u32, f32)| {
@@ -998,10 +984,8 @@ impl LuaUserData for LuaHexGrid {
                 for (i, (c, r)) in cells.iter().enumerate() {
                     let cell = lua.create_table()?;
                     /// Performs the 'col' operation.
-                    /// @return | nil | No value is returned.
                     cell.set("col", c + 1)?;
                     /// Performs the 'row' operation.
-                    /// @return | nil | No value is returned.
                     cell.set("row", r + 1)?;
                     t.set(i + 1, cell)?;
                 }
@@ -1050,7 +1034,6 @@ impl LuaUserData for LuaJpsGrid {
         /// @param | x | integer | One-based column.
         /// @param | y | integer | One-based row.
         /// @param | blocked | boolean | True to block the cell.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setBlocked",
             |_, this, (x, y, blocked): (u32, u32, bool)| {
@@ -1073,6 +1056,8 @@ impl LuaUserData for LuaJpsGrid {
         /// @param | tx | integer | One-based goal column.
         /// @param | ty | integer | One-based goal row.
         /// @return | table | Array of `{x, y}` point tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPath",
             |lua, this, (fx, fy, tx, ty): (u32, u32, u32, u32)| match this
@@ -1086,10 +1071,8 @@ impl LuaUserData for LuaJpsGrid {
                     for (i, (x, y)) in path.iter().enumerate() {
                         let cell = lua.create_table()?;
                         /// Performs the 'x' operation.
-                        /// @return | nil | No value is returned.
                         cell.set("x", x + 1)?;
                         /// Performs the 'y' operation.
-                        /// @return | nil | No value is returned.
                         cell.set("y", y + 1)?;
                         t.set(i + 1, cell)?;
                     }
@@ -1160,6 +1143,8 @@ impl LuaUserData for LuaNavMesh {
         /// @param | gx | number | Goal X in world coordinates.
         /// @param | gy | number | Goal Y in world coordinates.
         /// @return | table | Array of `{x, y}` point tables, or nil when no path exists.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method(
             "findPath",
             |lua, this, (sx, sy, gx, gy): (f32, f32, f32, f32)| {
@@ -1170,10 +1155,8 @@ impl LuaUserData for LuaNavMesh {
                         for (i, (x, y)) in points.iter().enumerate() {
                             let node = lua.create_table()?;
                             /// Performs the 'x' operation.
-                            /// @return | nil | No value is returned.
                             node.set("x", *x)?;
                             /// Performs the 'y' operation.
-                            /// @return | nil | No value is returned.
                             node.set("y", *y)?;
                             out.set(i + 1, node)?;
                         }
@@ -1280,7 +1263,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setThreadCount --
     /// Sets pathfinding thread count (not yet implemented; logs a warning).
     /// @param | count | integer | Desired thread count.
-    /// @return | nil | No value is returned.
     tbl.set(
         "setThreadCount",
         lua.create_function(|_, _count: u32| {
@@ -1379,6 +1361,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Computes reachable cells from range map options.
     /// @param | opts | table | Options with dimensions, origin, budget, optional diagonal flag, costs, and blocked cells.
     /// @return | table | Range map result with `cells`, `width`, and `height` fields.
+    /// @field | cells | number[] | Reachability cost per cell.
+    /// @field | width | integer | Grid width.
+    /// @field | height | integer | Grid height.
     tbl.set(
         "rangeMap",
         lua.create_function(|lua, opts: LuaTable| {
@@ -1420,32 +1405,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (x, y, cost) in rm.reachable_cells_with_cost() {
                 let ct = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x", x + 1)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y", y + 1)?;
                 /// Performs the 'cost' operation.
-                /// @return | nil | No value is returned.
                 ct.set("cost", cost)?;
                 count += 1;
                 cells_tbl.set(count, ct)?;
             }
             let out = lua.create_table()?;
             /// Performs the 'cells' operation.
-            /// @return | nil | No value is returned.
             out.set("cells", cells_tbl)?;
             /// Performs the 'width' operation.
-            /// @return | nil | No value is returned.
             out.set("width", width)?;
             /// Performs the 'height' operation.
-            /// @return | nil | No value is returned.
             out.set("height", height)?;
             Ok(out)
         })?,
     )?;
     /// Performs the 'pathfind' operation.
-    /// @return | nil | No value is returned.
     lurek.set("pathfind", tbl)?;
     Ok(())
 }

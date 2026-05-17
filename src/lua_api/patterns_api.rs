@@ -39,7 +39,6 @@ impl LuaUserData for LuaEventBus {
         // -- off --
         /// Unsubscribe a listener by its subscription ID. Removes the callback from the event bus.
         /// @param | id | integer | The subscription ID returned by `on()`.
-        /// @return | nil | No value is returned.
         methods.add_method("off", |lua, this, id: u64| {
             this.bus.borrow_mut().unsubscribe(id);
             if let Some(key) = this.callbacks.borrow_mut().remove(&id) {
@@ -50,8 +49,7 @@ impl LuaUserData for LuaEventBus {
         // -- emit --
         /// Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
         /// @param | event | string | The event name to emit.
-        /// @param | ... | boolean|number|string|table|nil | Additional arguments passed to each listener callback.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Additional arguments passed to each listener callback.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let event: String = match args_iter.next() {
@@ -80,7 +78,6 @@ impl LuaUserData for LuaEventBus {
         // -- clear --
         /// Remove all listeners subscribed to a specific event name.
         /// @param | event | string | The event name whose listeners will be removed.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, event: String| {
             let removed_ids = this.bus.borrow_mut().clear_event(&event);
             let mut cbs = this.callbacks.borrow_mut();
@@ -93,7 +90,6 @@ impl LuaUserData for LuaEventBus {
         });
         // -- clearAll --
         /// Remove all listeners from every event on this bus. Resets the bus to empty.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             let _ = this.bus.borrow_mut().clear_all();
             let drained: Vec<(u64, LuaRegistryKey)> = this.callbacks.borrow_mut().drain().collect();
@@ -111,7 +107,7 @@ impl LuaUserData for LuaEventBus {
         });
         // -- getEvents --
         /// Return an array of all event names that have at least one listener.
-        /// @return | table | Array of event name strings.
+        /// @return | string[] | Event name strings.
         methods.add_method("getEvents", |lua, this, ()| {
             let names = this.bus.borrow().event_names();
             let table = lua.create_table()?;
@@ -138,8 +134,7 @@ impl LuaUserData for LuaObjectPool {
         add_type_methods(methods);
         // -- add --
         /// Add an object to the pool's idle set, making it available for future acquisition.
-        /// @param | value | any | The object to store in the pool.
-        /// @return | nil | No value is returned.
+        /// @param | value | table | The object table to store in the pool.
         methods.add_method("add", |lua, this, value: LuaValue| {
             let total = this.pool.borrow().total_count();
             let new_ids = this.pool.borrow_mut().prewarm(total + 1);
@@ -151,7 +146,8 @@ impl LuaUserData for LuaObjectPool {
         });
         // -- acquire --
         /// Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
-        /// @return | boolean|number|string|table|nil | The acquired object, or nil if none available.
+        /// @return | table | The acquired object table.
+        /// @return | nil | If none available.
         methods.add_method("acquire", |lua, this, ()| {
             if let Some(id) = this.pool.borrow_mut().acquire() {
                 if let Some(key) = this.idle_objects.borrow_mut().remove(&id) {
@@ -166,8 +162,7 @@ impl LuaUserData for LuaObjectPool {
         });
         // -- release --
         /// Return an active object back to the pool's idle set so it can be reused.
-        /// @param | value | any | The object to release back into the pool.
-        /// @return | nil | No value is returned.
+        /// @param | value | table | The object table to release back into the pool.
         methods.add_method("release", |lua, this, value: LuaValue| {
             if let Some(id) = this.active_queue.borrow_mut().pop_front() {
                 this.pool.borrow_mut().release(id);
@@ -196,7 +191,6 @@ impl LuaUserData for LuaObjectPool {
         });
         // -- clearAll --
         /// Destroy all objects (active and idle) and reset the pool to empty.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             let cap = this.pool.borrow().capacity;
             *this.pool.borrow_mut() = crate::patterns::ObjectPool::new("", cap);
@@ -230,7 +224,6 @@ impl LuaUserData for LuaCommandStack {
         /// @param | name | string | A descriptive name for the command (shown in history).
         /// @param | execFn | function | The function that performs the action.
         /// @param | undoFn | function? | An optional function that reverses the action. If omitted, command cannot be undone.
-        /// @return | nil | No return value.
         methods.add_method(
             "execute",
             |lua, this, (name, exec_fn, undo_fn): (String, LuaFunction, Option<LuaFunction>)| {
@@ -366,7 +359,6 @@ impl LuaUserData for LuaCommandStack {
         });
         // -- clearAll --
         /// Discard all command history and free associated callbacks.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.stack.borrow_mut().clear();
             this.history_ids.borrow_mut().clear();
@@ -396,8 +388,7 @@ impl LuaUserData for LuaServiceLocator {
         // -- provide --
         /// Register a service instance under a given name. Replaces any previously registered service with the same name.
         /// @param | name | string | Unique identifier for the service.
-        /// @param | value | boolean|number|string|table|function | The service object or table to store.
-        /// @return | nil | No value is returned.
+        /// @param | value | table | The service table to register.
         methods.add_method("provide", |lua, this, (name, value): (String, LuaValue)| {
             this.locator.borrow_mut().register(&name);
             let key = lua.create_registry_value(value)?;
@@ -409,7 +400,8 @@ impl LuaUserData for LuaServiceLocator {
         // -- locate --
         /// Retrieve a registered service by name. Returns nil if not found.
         /// @param | name | string | The service name to look up.
-        /// @return | boolean|number|string|table|function|nil | The service object, or nil if not registered.
+        /// @return | table | The service table.
+        /// @return | nil | If not registered.
         methods.add_method("locate", |lua, this, name: String| {
             let svc = this.services.borrow();
             match svc.get(&name) {
@@ -427,7 +419,6 @@ impl LuaUserData for LuaServiceLocator {
         // -- remove --
         /// Unregister and discard a service by name.
         /// @param | name | string | The service name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |lua, this, name: String| {
             this.locator.borrow_mut().unregister(&name);
             if let Some(key) = this.services.borrow_mut().remove(&name) {
@@ -437,7 +428,7 @@ impl LuaUserData for LuaServiceLocator {
         });
         // -- getServices --
         /// Return an array of all registered service names.
-        /// @return | table | Array of service name strings.
+        /// @return | string[] | Service name strings.
         methods.add_method("getServices", |lua, this, ()| {
             let names: Vec<String> = this
                 .locator
@@ -454,7 +445,6 @@ impl LuaUserData for LuaServiceLocator {
         });
         // -- clearAll --
         /// Remove all registered services and reset the locator.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.locator.borrow_mut().clear();
             let drained: Vec<(String, LuaRegistryKey)> =
@@ -483,7 +473,6 @@ impl LuaUserData for LuaFactory {
         /// Register a constructor function for a given type name. Future `create()` calls with this type will invoke it.
         /// @param | typeName | string | The type identifier (e.g. "enemy", "bullet").
         /// @param | ctor | function | A constructor function that returns a new instance.
-        /// @return | nil | No return value.
         methods.add_method(
             "register",
             |lua, this, (type_name, ctor): (String, LuaFunction)| {
@@ -498,8 +487,9 @@ impl LuaUserData for LuaFactory {
         // -- create --
         /// Create a new object by type name, passing additional arguments to the constructor.
         /// @param | typeName | string | The registered type to instantiate.
-        /// @param | ... | any | Extra arguments forwarded to the constructor.
-        /// @return | boolean|number|string|table|nil | The value returned by the constructor function.
+        /// @param | ... | table | Extra arguments forwarded to the constructor.
+        /// @return | table | The created object table.
+        /// @return | nil | When not available.
         methods.add_method("create", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let type_name: String = match args_iter.next() {
@@ -527,7 +517,6 @@ impl LuaUserData for LuaFactory {
         /// Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor.
         /// @param | alias | string | The alternative name.
         /// @param | canonical | string | The existing registered type name.
-        /// @return | nil | No return value.
         methods.add_method(
             "alias",
             |_lua, this, (alias, canonical): (String, String)| {
@@ -537,7 +526,7 @@ impl LuaUserData for LuaFactory {
         );
         // -- getTypes --
         /// Return an array of all registered type names.
-        /// @return | table | Array of type name strings.
+        /// @return | string[] | Type name strings.
         methods.add_method("getTypes", |lua, this, ()| {
             let names: Vec<String> = this
                 .factory
@@ -555,7 +544,6 @@ impl LuaUserData for LuaFactory {
         // -- remove --
         /// Unregister a type and discard its constructor function.
         /// @param | typeName | string | The type name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |lua, this, type_name: String| {
             this.factory.borrow_mut().unregister(&type_name);
             if let Some(key) = this.constructors.borrow_mut().remove(&type_name) {
@@ -565,7 +553,6 @@ impl LuaUserData for LuaFactory {
         });
         // -- clearAll --
         /// Remove all registered types and constructors, resetting the factory.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.factory.borrow_mut().clear();
             let drained: Vec<(String, LuaRegistryKey)> =
@@ -596,7 +583,6 @@ impl LuaUserData for LuaSimpleState {
         /// Register a named state with optional enter, exit, and update callbacks.
         /// @param | name | string | Unique state identifier.
         /// @param | callbacks | table? | Table with optional fields: `enter` (function), `exit` (function), `update` (function receiving dt).
-        /// @return | nil | No return value.
         methods.add_method(
             "addState",
             |lua, this, (name, callbacks): (String, Option<LuaTable>)| {
@@ -668,7 +654,6 @@ impl LuaUserData for LuaSimpleState {
         // -- update --
         /// Call the current state's update callback with the frame delta time.
         /// @param | dt | number | Delta time in seconds since last frame.
-        /// @return | nil | No value is returned.
         methods.add_method("update", |lua, this, dt: f64| {
             let current_opt = this.state.borrow().current().map(|s| s.to_string());
             if let Some(ref current) = current_opt {
@@ -698,7 +683,7 @@ impl LuaUserData for LuaSimpleState {
         });
         // -- getStates --
         /// Return an array of all registered state names.
-        /// @return | table | Array of state name strings.
+        /// @return | string[] | State name strings.
         methods.add_method("getStates", |lua, this, ()| {
             let names: Vec<String> = this
                 .state
@@ -715,7 +700,6 @@ impl LuaUserData for LuaSimpleState {
         });
         // -- clearAll --
         /// Remove all states and their callbacks, resetting the state machine.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             *this.state.borrow_mut() = crate::patterns::SimpleState::new();
             for (_, key) in this.enter_keys.borrow_mut().drain() {
@@ -750,7 +734,6 @@ impl LuaUserData for LuaBlackboard {
         /// Set a key to a value (boolean, number, string, or nil to clear). Notifies registered watchers if value changed.
         /// @param | key | string | The key name.
         /// @param | value | boolean|number|string|nil | The value to store. Pass nil to clear the key.
-        /// @return | nil | No value is returned.
         methods.add_method("set", |lua, this, (key, value): (String, LuaValue)| {
             let prev_rev = this.board.borrow().revision;
             match &value {
@@ -812,14 +795,13 @@ impl LuaUserData for LuaBlackboard {
         // -- clear --
         /// Remove a single key from the blackboard.
         /// @param | key | string | The key to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, key: String| {
             this.board.borrow_mut().clear(&key);
             Ok(())
         });
         // -- keys --
         /// Return an array of all keys currently stored on the blackboard.
-        /// @return | table | Array of key name strings.
+        /// @return | string[] | Key name strings.
         methods.add_method("keys", |lua, this, ()| {
             let keys: Vec<String> = this
                 .board
@@ -857,7 +839,6 @@ impl LuaUserData for LuaBlackboard {
         // -- unwatch --
         /// Remove a previously registered watcher by its ID.
         /// @param | id | integer | The watcher ID returned by `watch()`.
-        /// @return | nil | No value is returned.
         methods.add_method("unwatch", |lua, this, id: u64| {
             if let Some(rk) = this.watchers.borrow_mut().remove(&id) {
                 lua.remove_registry_value(rk)?;
@@ -888,7 +869,6 @@ impl LuaUserData for LuaBlackboard {
         });
         // -- clearAll --
         /// Remove all keys and values from the blackboard.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |_, this, ()| {
             this.board.borrow_mut().clear_all();
             Ok(())
@@ -912,8 +892,7 @@ impl LuaUserData for LuaObserver {
         // -- set --
         /// Set a value by key and notify all subscribers watching that key.
         /// @param | key | string | The property name.
-        /// @param | value | boolean|number|string|table | The new value to store.
-        /// @return | nil | No value is returned.
+        /// @param | value | number | The new value to store.
         methods.add_method("set", |lua, this, (key, new_val): (String, LuaValue)| {
             let rk = lua.create_registry_value(new_val.clone())?;
             if let Some(old_k) = this.values.borrow_mut().insert(key.clone(), rk) {
@@ -933,7 +912,8 @@ impl LuaUserData for LuaObserver {
         // -- get --
         /// Retrieve the current value for a key. Returns nil if not set.
         /// @param | key | string | The property name to look up.
-        /// @return | boolean|number|string|table|nil | The stored value, or nil.
+        /// @return | number | The stored value.
+        /// @return | nil | When not available.
         methods.add_method("get", |lua, this, key: String| {
             match this.values.borrow().get(&key) {
                 Some(rk) => Ok(lua.registry_value::<LuaValue>(rk)?),
@@ -961,7 +941,6 @@ impl LuaUserData for LuaObserver {
         // -- unsubscribe --
         /// Remove a subscription by its ID. The callback will no longer fire.
         /// @param | id | integer | The subscription ID returned by `subscribe()`.
-        /// @return | nil | No value is returned.
         methods.add_method("unsubscribe", |lua, this, id: u64| {
             this.observer.borrow_mut().unsubscribe(id);
             if let Some(rk) = this.callbacks.borrow_mut().remove(&id) {
@@ -993,7 +972,6 @@ impl LuaUserData for LuaThrottle {
         // -- onFire --
         /// Set the callback function to invoke each time the throttle fires.
         /// @param | f | function | The callback to execute on fire.
-        /// @return | nil | No value is returned.
         methods.add_method("onFire", |lua, this, f: LuaFunction| {
             let rk = lua.create_registry_value(f)?;
             if let Some(old) = this.callback.borrow_mut().replace(rk) {
@@ -1017,7 +995,6 @@ impl LuaUserData for LuaThrottle {
         });
         // -- reset --
         /// Reset the throttle timer back to zero without firing.
-        /// @return | nil | No value is returned.
         methods.add_method("reset", |_, this, ()| {
             this.throttle.borrow_mut().reset();
             Ok(())
@@ -1037,7 +1014,6 @@ impl LuaUserData for LuaThrottle {
         // -- setEnabled --
         /// Enable or disable the throttle. When disabled, update() will not accumulate time.
         /// @param | enabled | boolean | True to enable, false to disable.
-        /// @return | nil | No value is returned.
         methods.add_method("setEnabled", |_, this, v: bool| {
             this.throttle.borrow_mut().enabled = v;
             Ok(())
@@ -1060,7 +1036,6 @@ impl LuaUserData for LuaDebounce {
         // -- onFire --
         /// Set the callback function to invoke when the debounce fires after the wait period.
         /// @param | f | function | The callback to execute.
-        /// @return | nil | No value is returned.
         methods.add_method("onFire", |lua, this, f: LuaFunction| {
             let rk = lua.create_registry_value(f)?;
             if let Some(old) = this.callback.borrow_mut().replace(rk) {
@@ -1070,7 +1045,6 @@ impl LuaUserData for LuaDebounce {
         });
         // -- trigger --
         /// Signal input activity. Resets the wait timer so the debounce will fire after the full wait period of inactivity.
-        /// @return | nil | No value is returned.
         methods.add_method("trigger", |_, this, ()| {
             this.debounce.borrow_mut().trigger();
             Ok(())
@@ -1091,7 +1065,6 @@ impl LuaUserData for LuaDebounce {
         });
         // -- cancel --
         /// Cancel any pending debounce without firing. The callback will not be called until triggered again.
-        /// @return | nil | No value is returned.
         methods.add_method("cancel", |_, this, ()| {
             this.debounce.borrow_mut().cancel();
             Ok(())
@@ -1126,7 +1099,7 @@ impl LuaUserData for LuaPriorityQueue {
         // -- push --
         /// Add an item with a numeric priority. Higher priority items are dequeued first.
         /// @param | priority | integer | The priority value (higher = dequeued sooner).
-        /// @param | value | boolean|number|string|table | The payload to store.
+        /// @param | value | table | The payload table to store.
         /// @param | label | string? | Optional human-readable label for debugging.
         /// @return | number | The internal ID of the enqueued item.
         methods.add_method(
@@ -1143,7 +1116,8 @@ impl LuaUserData for LuaPriorityQueue {
         );
         // -- pop --
         /// Remove and return the highest-priority item. Returns nil if the queue is empty.
-        /// @return | boolean|number|string|table|nil | The item value, or nil.
+        /// @return | table | The item table.
+        /// @return | nil | When not available.
         methods.add_method("pop", |lua, this, ()| match this.queue.borrow_mut().pop() {
             Some((id, _priority)) => {
                 if let Some(rk) = this.payloads.borrow_mut().remove(&id) {
@@ -1158,7 +1132,8 @@ impl LuaUserData for LuaPriorityQueue {
         });
         // -- peek --
         /// Return the highest-priority item without removing it. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The item value, or nil.
+        /// @return | table | The item table.
+        /// @return | nil | When not available.
         methods.add_method("peek", |lua, this, ()| match this.queue.borrow().peek() {
             Some(item) => {
                 let id = item.id;
@@ -1181,7 +1156,6 @@ impl LuaUserData for LuaPriorityQueue {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.queue.borrow().is_empty()));
         // -- clearAll --
         /// Remove all items from the queue. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.queue.borrow_mut().clear();
             let drained: Vec<(u64, LuaRegistryKey)> = this.payloads.borrow_mut().drain().collect();
@@ -1232,24 +1206,24 @@ impl LuaUserData for LuaRing {
         // -- latest --
         /// Return the most recently pushed entry as a table with id, tag, value, and text fields. Returns nil if empty.
         /// @return | table|nil | Entry table or nil.
+        /// @field | id | integer | Id.
+        /// @field | tag | string | Tag.
+        /// @field | value | number | Value.
+        /// @field | text | string | Text.
         methods.add_method("latest", |lua, this, ()| {
             match this.ring.borrow().latest() {
                 Some(e) => {
                     let t = lua.create_table()?;
                     /// Performs the 'id' operation.
-                    /// @return | nil | No value is returned.
                     t.set("id", e.id)?;
                     /// Performs the 'tag' operation.
-                    /// @return | nil | No value is returned.
                     t.set("tag", e.tag.as_str())?;
                     if let Some(n) = e.value_f64 {
                         /// Performs the 'value' operation.
-                        /// @return | nil | No value is returned.
                         t.set("value", n)?;
                     }
                     if let Some(s) = &e.value_str {
                         /// Performs the 'text' operation.
-                        /// @return | nil | No value is returned.
                         t.set("text", s.as_str())?;
                     }
                     Ok(LuaValue::Table(t))
@@ -1260,24 +1234,24 @@ impl LuaUserData for LuaRing {
         // -- toArray --
         /// Return all entries in the ring as an ordered array of tables (oldest to newest).
         /// @return | table | Array of entry tables with id, tag, value, and text fields.
+        /// @field | id | integer | Entry id.
+        /// @field | tag | string | Tag string.
+        /// @field | value | number | Numeric value.
+        /// @field | text | string | Text content.
         methods.add_method("toArray", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, e) in this.ring.borrow().iter().enumerate() {
                 let t = lua.create_table()?;
                 /// Performs the 'id' operation.
-                /// @return | nil | No value is returned.
                 t.set("id", e.id)?;
                 /// Performs the 'tag' operation.
-                /// @return | nil | No value is returned.
                 t.set("tag", e.tag.as_str())?;
                 if let Some(n) = e.value_f64 {
                     /// Performs the 'value' operation.
-                    /// @return | nil | No value is returned.
                     t.set("value", n)?;
                 }
                 if let Some(s) = &e.value_str {
                     /// Performs the 'text' operation.
-                    /// @return | nil | No value is returned.
                     t.set("text", s.as_str())?;
                 }
                 tbl.set(i + 1, t)?;
@@ -1302,7 +1276,6 @@ impl LuaUserData for LuaRing {
         methods.add_method("isFull", |_, this, ()| Ok(this.ring.borrow().is_full()));
         // -- clear --
         /// Remove all entries from the ring. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.ring.borrow_mut().clear();
             Ok(())
@@ -1325,7 +1298,6 @@ impl LuaUserData for LuaFunnel {
         // -- onFlush --
         /// Set the callback invoked when the funnel flushes. Receives an array of {tag, value} entries.
         /// @param | f | function | Callback receiving a table array of batched entries.
-        /// @return | nil | No value is returned.
         methods.add_method("onFlush", |lua, this, f: LuaFunction| {
             let rk = lua.create_registry_value(f)?;
             if let Some(old) = this.on_flush.borrow_mut().replace(rk) {
@@ -1337,7 +1309,6 @@ impl LuaUserData for LuaFunnel {
         /// Push a tagged event into the funnel. May trigger an immediate flush if the max entry count is reached.
         /// @param | tag | string | A category label for the event.
         /// @param | value | number? | Optional numeric value (default 0).
-        /// @return | nil | No value is returned.
         methods.add_method("push", |lua, this, (tag, value): (String, Option<f64>)| {
             let (_, should_flush) = this.funnel.borrow_mut().push(&tag, value.unwrap_or(0.0));
             if should_flush {
@@ -1359,11 +1330,9 @@ impl LuaUserData for LuaFunnel {
         });
         // -- flush --
         /// Force an immediate flush of all pending entries, invoking the callback.
-        /// @return | nil | No value is returned.
         methods.add_method("flush", |lua, this, ()| Self::do_flush(lua, this));
         // -- discard --
         /// Discard all pending entries without flushing or calling the callback.
-        /// @return | nil | No value is returned.
         methods.add_method("discard", |_, this, ()| {
             this.funnel.borrow_mut().discard();
             Ok(())
@@ -1394,10 +1363,8 @@ impl LuaFunnel {
             for (i, e) in entries.iter().enumerate() {
                 let et = lua.create_table()?;
                 /// Performs the 'tag' operation.
-                /// @return | nil | No value is returned.
                 et.set("tag", e.tag.as_str())?;
                 /// Performs the 'value' operation.
-                /// @return | nil | No value is returned.
                 et.set("value", e.value)?;
                 tbl.set(i + 1, et)?;
             }
@@ -1423,7 +1390,6 @@ impl LuaUserData for LuaRelationshipManager {
         /// @param | name | string | The relationship type name.
         /// @param | levels | table | Array of level name strings in order.
         /// @param | defaultLevel | string? | The default level for new pairs.
-        /// @return | nil | No return value.
         methods.add_method(
             "defineType",
             |_, this, (name, levels, default_level): (String, LuaTable, Option<String>)| {
@@ -1441,21 +1407,19 @@ impl LuaUserData for LuaRelationshipManager {
         // -- removeType --
         /// Remove a relationship type definition.
         /// @param | name | string | The type name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("removeType", |_, this, name: String| {
             this.rm.borrow_mut().remove_type(&name);
             Ok(())
         });
         // -- typeNames --
         /// Return all defined relationship type names.
-        /// @return | table | Array of type name strings.
+        /// @return | string[] | Type name strings.
         methods.add_method("typeNames", |_, this, ()| Ok(this.rm.borrow().type_names()));
         // -- setValue --
         /// Set the numeric relationship value between two entity IDs.
         /// @param | a | integer | First entity ID.
         /// @param | b | integer | Second entity ID.
         /// @param | value | number | The numeric value to store.
-        /// @return | nil | No value is returned.
         methods.add_method("setValue", |_, this, (a, b, value): (u32, u32, f64)| {
             this.rm.borrow_mut().set_value(a, b, value);
             Ok(())
@@ -1473,7 +1437,6 @@ impl LuaUserData for LuaRelationshipManager {
         /// @param | a | integer | First entity ID.
         /// @param | b | integer | Second entity ID.
         /// @param | delta | number | Amount to add (can be negative).
-        /// @return | nil | No value is returned.
         methods.add_method("adjustValue", |_, this, (a, b, delta): (u32, u32, f64)| {
             this.rm.borrow_mut().adjust_value(a, b, delta);
             Ok(())
@@ -1507,7 +1470,6 @@ impl LuaUserData for LuaRelationshipManager {
         /// Remove all relationship data between two entities.
         /// @param | a | integer | First entity ID.
         /// @param | b | integer | Second entity ID.
-        /// @return | nil | No value is returned.
         methods.add_method("removePair", |_, this, (a, b): (u32, u32)| {
             this.rm.borrow_mut().remove_relation(a, b);
             Ok(())
@@ -1551,7 +1513,6 @@ impl LuaUserData for LuaMediator {
         /// Unregister a handler from a channel by its ID.
         /// @param | channel | string | The channel name.
         /// @param | id | integer | The handler ID to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("off", |lua, this, (channel, id): (String, u64)| {
             this.mediator.borrow_mut().unregister(&channel, id);
             if let Some(key) = this.callbacks.borrow_mut().remove(&id) {
@@ -1562,8 +1523,7 @@ impl LuaUserData for LuaMediator {
         // -- send --
         /// Send a message to all handlers on a specific channel with optional payload arguments.
         /// @param | channel | string | The target channel name.
-        /// @param | ... | boolean|number|string|table|nil | Additional arguments passed to each handler.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Additional arguments passed to each handler.
         methods.add_method("send", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let channel: String = match iter.next() {
@@ -1584,8 +1544,7 @@ impl LuaUserData for LuaMediator {
         });
         // -- broadcast --
         /// Send a message to all handlers on all channels. Every registered handler receives the payload.
-        /// @param | ... | boolean|number|string|table|nil | Arguments passed to every handler.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Arguments passed to every handler.
         methods.add_method("broadcast", |lua, this, args: LuaMultiValue| {
             let extra: Vec<LuaValue> = args.into_iter().collect();
             let names = this.mediator.borrow().channel_names();
@@ -1611,14 +1570,13 @@ impl LuaUserData for LuaMediator {
         });
         // -- channels --
         /// Return an array of all channel names that have at least one handler.
-        /// @return | table | Array of channel name strings.
+        /// @return | string[] | Channel name strings.
         methods.add_method("channels", |_, this, ()| {
             Ok(this.mediator.borrow().channel_names())
         });
         // -- removeChannel --
         /// Remove an entire channel and all its handlers.
         /// @param | channel | string | The channel to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("removeChannel", |lua, this, channel: String| {
             let ids = this.mediator.borrow().get_handlers(&channel);
             this.mediator.borrow_mut().remove_channel(&channel);
@@ -1632,7 +1590,6 @@ impl LuaUserData for LuaMediator {
         });
         // -- clear --
         /// Remove all channels and handlers, resetting the mediator.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             this.mediator.borrow_mut().clear();
             let mut cbs = this.callbacks.borrow_mut();
@@ -1660,7 +1617,6 @@ impl LuaUserData for LuaStrategy {
         /// Register a named strategy implementation function.
         /// @param | name | string | Strategy identifier.
         /// @param | callback | function | The implementation function to call when this strategy is active.
-        /// @return | nil | No return value.
         methods.add_method(
             "register",
             |lua, this, (name, callback): (String, LuaFunction)| {
@@ -1679,8 +1635,9 @@ impl LuaUserData for LuaStrategy {
         });
         // -- execute --
         /// Execute the currently active strategy, passing through all arguments and returning its results.
-        /// @param | ... | boolean|number|string|table|nil | Arguments forwarded to the active strategy function.
-        /// @return | boolean|number|string|table|nil | Return values from the strategy function.
+        /// @param | ... | table | Arguments forwarded to the active strategy function.
+        /// @return | table | Return value from the strategy function.
+        /// @return | nil | When not available.
         methods.add_method("execute", |lua, this, args: LuaMultiValue| {
             let id = match this.strategy.borrow().get_current_id() {
                 Some(id) => id,
@@ -1732,11 +1689,10 @@ impl LuaUserData for LuaStrategy {
         });
         // -- names --
         /// Return an array of all registered strategy names.
-        /// @return | table | Array of strategy name strings.
+        /// @return | string[] | Strategy name strings.
         methods.add_method("names", |_, this, ()| Ok(this.strategy.borrow().names()));
         // -- clear --
         /// Remove all strategies and reset the selection.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             this.strategy.borrow_mut().clear();
             let mut cbs = this.callbacks.borrow_mut();
@@ -1762,7 +1718,7 @@ impl LuaUserData for LuaStack {
         add_type_methods(methods);
         // -- push --
         /// Push a value onto the top of the stack. Returns false if the stack is at capacity.
-        /// @param | value | any | The value to push.
+        /// @param | value | string | The value to push.
         /// @return | boolean | True if pushed, false if full.
         methods.add_method("push", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1775,7 +1731,7 @@ impl LuaUserData for LuaStack {
         });
         // -- pushBottom --
         /// Push a value onto the bottom of the stack. Returns false if at capacity.
-        /// @param | value | any | The value to insert at the bottom.
+        /// @param | value | string | The value to insert at the bottom.
         /// @return | boolean | True if pushed, false if full.
         methods.add_method("pushBottom", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1788,7 +1744,8 @@ impl LuaUserData for LuaStack {
         });
         // -- pop --
         /// Remove and return the top value. Returns nil if the stack is empty.
-        /// @return | boolean|number|string|table|nil | The popped value, or nil.
+        /// @return | string | The popped value.
+        /// @return | nil | When not available.
         methods.add_method("pop", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -1800,7 +1757,8 @@ impl LuaUserData for LuaStack {
         });
         // -- popBottom --
         /// Remove and return the bottom value. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The popped value, or nil.
+        /// @return | string | The popped value.
+        /// @return | nil | When not available.
         methods.add_method("popBottom", |lua, this, ()| {
             if this.items.borrow().is_empty() {
                 return Ok(LuaValue::Nil);
@@ -1813,7 +1771,7 @@ impl LuaUserData for LuaStack {
         // -- popMany --
         /// Pop up to `count` values from the top and return them as an array table.
         /// @param | count | integer | Maximum number of items to pop.
-        /// @return | table | Array of popped values (may be shorter than count).
+        /// @return | integer[] | Popped values (may be shorter than count).
         methods.add_method("popMany", |lua, this, count: usize| {
             let out = lua.create_table()?;
             let n = count.min(this.items.borrow().len());
@@ -1828,7 +1786,8 @@ impl LuaUserData for LuaStack {
         });
         // -- peek --
         /// Return the top value without removing it. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The top value, or nil.
+        /// @return | string | The top value.
+        /// @return | nil | When not available.
         methods.add_method("peek", |lua, this, ()| {
             if let Some(key) = this.items.borrow().last() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -1839,7 +1798,8 @@ impl LuaUserData for LuaStack {
         });
         // -- peekBottom --
         /// Return the bottom value without removing it. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The bottom value, or nil.
+        /// @return | string | The bottom value.
+        /// @return | nil | When not available.
         methods.add_method("peekBottom", |lua, this, ()| {
             if let Some(key) = this.items.borrow().first() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -1851,7 +1811,8 @@ impl LuaUserData for LuaStack {
         // -- peekAt --
         /// Return the value at a 1-based index without removing it. Returns nil if out of range.
         /// @param | index | integer | 1-based position in the stack.
-        /// @return | boolean|number|string|table|nil | The value at that position, or nil.
+        /// @return | string | The value at that position.
+        /// @return | nil | When not available.
         methods.add_method("peekAt", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -1866,7 +1827,7 @@ impl LuaUserData for LuaStack {
         // -- insertAt --
         /// Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | boolean|number|string|table | The value to insert.
+        /// @param | value | string | The value to insert.
         /// @return | boolean | True if inserted, false if full.
         methods.add_method(
             "insertAt",
@@ -1884,7 +1845,8 @@ impl LuaUserData for LuaStack {
         // -- removeAt --
         /// Remove and return the value at a 1-based index. Returns nil if out of range.
         /// @param | index | integer | 1-based position to remove.
-        /// @return | boolean|number|string|table|nil | The removed value, or nil.
+        /// @return | string | The removed value.
+        /// @return | nil | When not available.
         methods.add_method("removeAt", |lua, this, index: usize| {
             if index == 0 || index > this.items.borrow().len() {
                 return Ok(LuaValue::Nil);
@@ -1925,7 +1887,6 @@ impl LuaUserData for LuaStack {
         });
         // -- clear --
         /// Remove all items from the stack. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             let mut items = this.items.borrow_mut();
             for key in items.drain(..) {
@@ -1935,7 +1896,7 @@ impl LuaUserData for LuaStack {
         });
         // -- toArray --
         /// Return all stack items as an array table (bottom to top).
-        /// @return | table | Array of all values.
+        /// @return | number[] | Array of all values.
         methods.add_method("toArray", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, key) in this.items.borrow().iter().enumerate() {
@@ -1961,7 +1922,7 @@ impl LuaUserData for LuaQueue {
         add_type_methods(methods);
         // -- enqueue --
         /// Add a value to the back of the queue. Returns false if at capacity.
-        /// @param | value | any | The value to enqueue.
+        /// @param | value | string | The value to enqueue.
         /// @return | boolean | True if enqueued, false if full.
         methods.add_method("enqueue", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1974,7 +1935,7 @@ impl LuaUserData for LuaQueue {
         });
         // -- enqueueFront --
         /// Add a value to the front of the queue (priority insertion). Returns false if at capacity.
-        /// @param | value | any | The value to insert at the front.
+        /// @param | value | string | The value to insert at the front.
         /// @return | boolean | True if enqueued, false if full.
         methods.add_method("enqueueFront", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1987,7 +1948,8 @@ impl LuaUserData for LuaQueue {
         });
         // -- dequeue --
         /// Remove and return the front value. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The dequeued value, or nil.
+        /// @return | string | The dequeued value.
+        /// @return | nil | When not available.
         methods.add_method("dequeue", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop_front() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -1999,7 +1961,8 @@ impl LuaUserData for LuaQueue {
         });
         // -- dequeueBack --
         /// Remove and return the back value. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The dequeued value, or nil.
+        /// @return | string | The dequeued value.
+        /// @return | nil | When not available.
         methods.add_method("dequeueBack", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop_back() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -2011,7 +1974,8 @@ impl LuaUserData for LuaQueue {
         });
         // -- front --
         /// Return the front value without removing it. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The front value, or nil.
+        /// @return | string | The front value.
+        /// @return | nil | When not available.
         methods.add_method("front", |lua, this, ()| {
             if let Some(key) = this.items.borrow().front() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -2022,7 +1986,8 @@ impl LuaUserData for LuaQueue {
         });
         // -- back --
         /// Return the back value without removing it. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The back value, or nil.
+        /// @return | string | The back value.
+        /// @return | nil | When not available.
         methods.add_method("back", |lua, this, ()| {
             if let Some(key) = this.items.borrow().back() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -2034,7 +1999,8 @@ impl LuaUserData for LuaQueue {
         // -- peekAt --
         /// Return the value at a 1-based index without removing it. Returns nil if out of range.
         /// @param | index | integer | 1-based position.
-        /// @return | boolean|number|string|table|nil | The value, or nil.
+        /// @return | string | The value.
+        /// @return | nil | When not available.
         methods.add_method("peekAt", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -2049,7 +2015,7 @@ impl LuaUserData for LuaQueue {
         // -- insertAt --
         /// Insert a value at a 1-based index in the queue. Returns false if at capacity.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | boolean|number|string|table | The value to insert.
+        /// @param | value | string | The value to insert.
         /// @return | boolean | True if inserted, false if full.
         methods.add_method(
             "insertAt",
@@ -2067,7 +2033,8 @@ impl LuaUserData for LuaQueue {
         // -- removeAt --
         /// Remove and return the value at a 1-based index. Returns nil if out of range.
         /// @param | index | integer | 1-based position to remove.
-        /// @return | boolean|number|string|table|nil | The removed value, or nil.
+        /// @return | string | The removed value.
+        /// @return | nil | When not available.
         methods.add_method("removeAt", |lua, this, index: usize| {
             if index == 0 || index > this.items.borrow().len() {
                 return Ok(LuaValue::Nil);
@@ -2096,7 +2063,6 @@ impl LuaUserData for LuaQueue {
         });
         // -- clear --
         /// Remove all items from the queue. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             let mut items = this.items.borrow_mut();
             for key in items.drain(..) {
@@ -2106,7 +2072,7 @@ impl LuaUserData for LuaQueue {
         });
         // -- toArray --
         /// Return all queue items as an array table (front to back).
-        /// @return | table | Array of all values.
+        /// @return | number[] | Array of all values.
         methods.add_method("toArray", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, key) in this.items.borrow().iter().enumerate() {
@@ -2131,8 +2097,7 @@ impl LuaUserData for LuaList {
         add_type_methods(methods);
         // -- add --
         /// Append a value to the end of the list.
-        /// @param | value | any | The value to append.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The value to append.
         methods.add_method("add", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().push(key);
@@ -2140,8 +2105,7 @@ impl LuaUserData for LuaList {
         });
         // -- push --
         /// Append a value to the end of the list (alias for add).
-        /// @param | value | any | The value to append.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The value to append.
         methods.add_method("push", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().push(key);
@@ -2149,8 +2113,7 @@ impl LuaUserData for LuaList {
         });
         // -- unshift --
         /// Insert a value at the beginning of the list.
-        /// @param | value | any | The value to prepend.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The value to prepend.
         methods.add_method("unshift", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().insert(0, key);
@@ -2159,7 +2122,8 @@ impl LuaUserData for LuaList {
         // -- get --
         /// Get the value at a 1-based index. Returns nil if out of range.
         /// @param | index | integer | 1-based position.
-        /// @return | boolean|number|string|table|nil | The value, or nil.
+        /// @return | string | The value.
+        /// @return | nil | When not available.
         methods.add_method("get", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -2175,8 +2139,7 @@ impl LuaUserData for LuaList {
         // -- set --
         /// Replace the value at a 1-based index. Errors if index is 0 or out of range.
         /// @param | index | integer | 1-based position.
-        /// @param | value | boolean|number|string|table | The new value.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The new value.
         methods.add_method("set", |lua, this, (index, value): (usize, LuaValue)| {
             if index == 0 {
                 return Err(LuaError::runtime("list index must be >= 1"));
@@ -2193,8 +2156,7 @@ impl LuaUserData for LuaList {
         // -- insert --
         /// Insert a value at a 1-based index, shifting subsequent items right.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | boolean|number|string|table | The value to insert.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The value to insert.
         methods.add_method("insert", |lua, this, (index, value): (usize, LuaValue)| {
             let len = this.items.borrow().len();
             let idx = if index == 0 { 0 } else { (index - 1).min(len) };
@@ -2205,7 +2167,8 @@ impl LuaUserData for LuaList {
         // -- remove --
         /// Remove and return the value at a 1-based index. Returns nil if out of range.
         /// @param | index | integer | 1-based position to remove.
-        /// @return | boolean|number|string|table|nil | The removed value, or nil.
+        /// @return | string | The removed value.
+        /// @return | nil | When not available.
         methods.add_method("remove", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -2221,7 +2184,8 @@ impl LuaUserData for LuaList {
         });
         // -- pop --
         /// Remove and return the last value. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The popped value, or nil.
+        /// @return | string | The popped value.
+        /// @return | nil | When not available.
         methods.add_method("pop", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -2233,7 +2197,8 @@ impl LuaUserData for LuaList {
         });
         // -- shift --
         /// Remove and return the first value. Returns nil if empty.
-        /// @return | boolean|number|string|table|nil | The shifted value, or nil.
+        /// @return | string | The shifted value.
+        /// @return | nil | When not available.
         methods.add_method("shift", |lua, this, ()| {
             if this.items.borrow().is_empty() {
                 return Ok(LuaValue::Nil);
@@ -2245,7 +2210,7 @@ impl LuaUserData for LuaList {
         });
         // -- indexOf --
         /// Find the 1-based index of the first occurrence of a value. Returns nil if not found.
-        /// @param | value | any | The value to search for.
+        /// @param | value | string | The value to search for.
         /// @return | integer | The 1-based index, or nil when the value is not found.
         methods.add_method("indexOf", |lua, this, value: LuaValue| {
             for (i, key) in this.items.borrow().iter().enumerate() {
@@ -2258,7 +2223,6 @@ impl LuaUserData for LuaList {
         });
         // -- reverse --
         /// Reverse the order of all items in the list in-place.
-        /// @return | nil | No value is returned.
         methods.add_method("reverse", |_, this, ()| {
             this.items.borrow_mut().reverse();
             Ok(())
@@ -2273,7 +2237,7 @@ impl LuaUserData for LuaList {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.items.borrow().is_empty()));
         // -- contains --
         /// Check whether the list contains a specific value.
-        /// @param | value | any | The value to search for.
+        /// @param | value | string | The value to search for.
         /// @return | boolean | True if found.
         methods.add_method("contains", |lua, this, value: LuaValue| {
             for key in this.items.borrow().iter() {
@@ -2286,7 +2250,6 @@ impl LuaUserData for LuaList {
         });
         // -- clear --
         /// Remove all items from the list. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             let mut items = this.items.borrow_mut();
             for key in items.drain(..) {
@@ -2296,7 +2259,7 @@ impl LuaUserData for LuaList {
         });
         // -- toArray --
         /// Return all items as an array table. This method is available to Lua scripts.
-        /// @return | table | Array of all values.
+        /// @return | number[] | Array of all values.
         methods.add_method("toArray", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, key) in this.items.borrow().iter().enumerate() {
@@ -2350,7 +2313,7 @@ impl LuaUserData for LuaSet {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.items.borrow().is_empty()));
         // -- toArray --
         /// Return all set items as an array table.
-        /// @return | table | Array of string values.
+        /// @return | string[] | String values.
         methods.add_method("toArray", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, k) in this.items.borrow().iter().enumerate() {
@@ -2360,7 +2323,6 @@ impl LuaUserData for LuaSet {
         });
         // -- clear --
         /// Remove all items from the set. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.items.borrow_mut().clear();
             Ok(())
@@ -2409,8 +2371,7 @@ impl LuaUserData for LuaMap {
         // -- set --
         /// Set a key-value pair in the map. Replaces any existing value for the same key.
         /// @param | key | string | The key.
-        /// @param | value | boolean|number|string|table | The value to store.
-        /// @return | nil | No value is returned.
+        /// @param | value | string | The value to store.
         methods.add_method("set", |lua, this, (key, value): (String, LuaValue)| {
             let rk = lua.create_registry_value(value)?;
             if let Some(old) = this.items.borrow_mut().insert(key, rk) {
@@ -2421,7 +2382,8 @@ impl LuaUserData for LuaMap {
         // -- get --
         /// Retrieve the value for a key. Returns nil if the key does not exist.
         /// @param | key | string | The key to look up.
-        /// @return | boolean|number|string|table|nil | The value, or nil.
+        /// @return | string | The value.
+        /// @return | nil | When not available.
         methods.add_method("get", |lua, this, key: String| {
             let items = this.items.borrow();
             match items.get(&key) {
@@ -2458,7 +2420,7 @@ impl LuaUserData for LuaMap {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.items.borrow().is_empty()));
         // -- keys --
         /// Return an array of all keys in the map.
-        /// @return | table | Array of key strings.
+        /// @return | string[] | Key strings.
         methods.add_method("keys", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, k) in this.items.borrow().keys().enumerate() {
@@ -2468,7 +2430,7 @@ impl LuaUserData for LuaMap {
         });
         // -- values --
         /// Return an array of all values in the map.
-        /// @return | table | Array of values.
+        /// @return | number[] | Array of values.
         methods.add_method("values", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, rk) in this.items.borrow().values().enumerate() {
@@ -2480,15 +2442,17 @@ impl LuaUserData for LuaMap {
         // -- entries --
         /// Return an array of {key, value} tables for all entries.
         /// @return | table | Array of entry tables.
+        /// @field | id | integer | Entry id.
+        /// @field | tag | string | Tag string.
+        /// @field | value | number | Numeric value.
+        /// @field | text | string | Text content.
         methods.add_method("entries", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, (k, rk)) in this.items.borrow().iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'key' operation.
-                /// @return | nil | No value is returned.
                 row.set("key", k.as_str())?;
                 /// Performs the 'value' operation.
-                /// @return | nil | No value is returned.
                 row.set("value", lua.registry_value::<LuaValue>(rk)?)?;
                 tbl.set(i + 1, row)?;
             }
@@ -2497,7 +2461,6 @@ impl LuaUserData for LuaMap {
         // -- merge --
         /// Copy all entries from another LMap into this map. Existing keys are overwritten.
         /// @param | other | LMap | The source map to merge from.
-        /// @return | nil | No value is returned.
         methods.add_method("merge", |lua, this, other: LuaAnyUserData| {
             let other_map = other.borrow::<LuaMap>()?;
             for (k, rk) in other_map.items.borrow().iter() {
@@ -2511,7 +2474,6 @@ impl LuaUserData for LuaMap {
         });
         // -- clear --
         /// Remove all entries from the map. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| {
             let drained: Vec<(String, LuaRegistryKey)> = this.items.borrow_mut().drain().collect();
             for (_, rk) in drained {
@@ -2537,7 +2499,7 @@ impl LuaUserData for LuaWeightedRandom {
         // -- add --
         /// Add an item with a relative weight. Higher weight = higher selection probability.
         /// @param | weight | number | The selection weight (must be > 0).
-        /// @param | value | boolean|number|string|table | The payload value returned on pick.
+        /// @param | value | string | The payload value returned on pick.
         /// @param | label | string? | Optional human-readable label.
         /// @return | number | The internal ID of the added entry.
         methods.add_method(
@@ -2576,7 +2538,8 @@ impl LuaUserData for LuaWeightedRandom {
         // -- pick --
         /// Pick one item using a random sample value in [0, 1). Returns its value or nil.
         /// @param | sample | number | A random number in [0, 1) range.
-        /// @return | boolean|number|string|table|nil | The selected item's value, or nil if pool is empty.
+        /// @return | string | The selected item's value.
+        /// @return | nil | If pool is empty.
         methods.add_method("pick", |lua, this, sample: f64| {
             match this.pool.borrow().pick(sample) {
                 Some(id) => {
@@ -2593,7 +2556,7 @@ impl LuaUserData for LuaWeightedRandom {
         /// Pick multiple unique items. Requires an array of random samples.
         /// @param | count | integer | Number of items to pick.
         /// @param | samples | table | Array of random numbers in [0, 1).
-        /// @return | table | Array of picked values.
+        /// @return | number[] | Array of picked values.
         methods.add_method("pickN", |lua, this, (count, samples): (usize, LuaTable)| {
             let svec: Vec<f64> = samples.sequence_values::<f64>().collect::<LuaResult<_>>()?;
             let ids = this.pool.borrow().pick_n(count, &svec);
@@ -2624,7 +2587,6 @@ impl LuaUserData for LuaWeightedRandom {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.pool.borrow().is_empty()));
         // -- clearAll --
         /// Remove all entries from the pool. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.pool.borrow_mut().clear();
             let drained: Vec<(u64, LuaRegistryKey)> = this.payloads.borrow_mut().drain().collect();
@@ -2744,7 +2706,6 @@ impl LuaUserData for LuaBehaviorTree {
         /// Register or replace the callback function for a named leaf. The function must return "success", "failure", or "running".
         /// @param | name | string | The leaf name (matching addLeaf).
         /// @param | callback | function | A function returning a status string.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setLeaf",
             |lua, this, (name, callback): (String, LuaFunction)| {
@@ -2772,7 +2733,6 @@ impl LuaUserData for LuaBehaviorTree {
         });
         // -- resetState --
         /// Reset the tree's running state. Use between encounters or when restarting AI logic.
-        /// @return | nil | No value is returned.
         methods.add_method("resetState", |_, this, ()| {
             this.run_state.borrow_mut().reset();
             Ok(())
@@ -2785,7 +2745,6 @@ impl LuaUserData for LuaBehaviorTree {
         });
         // -- clearAll --
         /// Remove all nodes and leaf functions, resetting the tree to empty.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.tree.borrow_mut().clear();
             this.run_state.borrow_mut().reset();
@@ -2912,7 +2871,7 @@ impl LuaUserData for LuaPatternGraph {
         // -- addNode --
         /// Add a node to the graph with an optional label and payload value.
         /// @param | label | string? | Optional node label.
-        /// @param | value | boolean|number|string|table? | Optional payload stored with the node.
+        /// @param | value | table? | Optional payload stored with the node.
         /// @return | number | The new node's ID.
         methods.add_method(
             "addNode",
@@ -2944,7 +2903,8 @@ impl LuaUserData for LuaPatternGraph {
         // -- getNodeValue --
         /// Retrieve the payload value stored on a node. Returns nil if no payload.
         /// @param | id | integer | The node ID.
-        /// @return | boolean|number|string|table|nil | The payload, or nil.
+        /// @return | table | The payload.
+        /// @return | nil | When not available.
         methods.add_method("getNodeValue", |lua, this, id: u32| {
             let payloads = this.node_payloads.borrow();
             match payloads.get(&id) {
@@ -2986,7 +2946,7 @@ impl LuaUserData for LuaPatternGraph {
         // -- neighbors --
         /// Return an array of node IDs directly connected to the given node.
         /// @param | id | integer | The node ID to query.
-        /// @return | table | Array of neighbor node IDs.
+        /// @return | integer[] | Array of neighbor node IDs.
         methods.add_method("neighbors", |lua, this, id: u32| {
             let nbs = this.graph.borrow().neighbors(id);
             let tbl = lua.create_table()?;
@@ -2998,7 +2958,7 @@ impl LuaUserData for LuaPatternGraph {
         // -- bfs --
         /// Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
         /// @param | start | integer | The starting node ID.
-        /// @return | table | Array of visited node IDs.
+        /// @return | integer[] | Array of visited node IDs.
         methods.add_method("bfs", |lua, this, start: u32| {
             let order = this.graph.borrow().bfs(start);
             let tbl = lua.create_table()?;
@@ -3010,7 +2970,7 @@ impl LuaUserData for LuaPatternGraph {
         // -- dfs --
         /// Perform a depth-first search from a node. Returns visited node IDs in DFS order.
         /// @param | start | integer | The starting node ID.
-        /// @return | table | Array of visited node IDs.
+        /// @return | integer[] | Array of visited node IDs.
         methods.add_method("dfs", |lua, this, start: u32| {
             let order = this.graph.borrow().dfs(start);
             let tbl = lua.create_table()?;
@@ -3048,7 +3008,6 @@ impl LuaUserData for LuaPatternGraph {
         });
         // -- clearAll --
         /// Remove all nodes, edges, and payloads from the graph.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAll", |lua, this, ()| {
             this.graph.borrow_mut().clear();
             let np: Vec<(u32, LuaRegistryKey)> = this.node_payloads.borrow_mut().drain().collect();
@@ -3396,7 +3355,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'patterns' operation.
-    /// @return | nil | No value is returned.
     lurek.set("patterns", patterns)?;
     Ok(())
 }

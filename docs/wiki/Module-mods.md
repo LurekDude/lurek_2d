@@ -20,23 +20,23 @@
   - [lurek.mods.newRegistry() -> LContentRegistry](#lurekmodsnewregistry-lcontentregistry)
 - [Types and Methods](#types-and-methods)
   - [LContentRegistry](#lcontentregistry)
-  - [LContentRegistry:get(type_name: string, id: string) -> LuaValue](#lcontentregistrygettypename-string-id-string-luavalue)
+  - [LContentRegistry:get(type_name: string, id: string) -> table](#lcontentregistrygettypename-string-id-string-table)
   - [LContentRegistry:getAll(type_name: string) -> table](#lcontentregistrygetalltypename-string-table)
-  - [LContentRegistry:getTypes() -> table](#lcontentregistrygettypes-table)
-  - [LContentRegistry:register(type_name: string, id: string, obj: any)](#lcontentregistryregistertypename-string-id-string-obj-any)
+  - [LContentRegistry:getTypes() -> string[]](#lcontentregistrygettypes-string)
+  - [LContentRegistry:register(type_name: string, id: string, obj: table)](#lcontentregistryregistertypename-string-id-string-obj-table)
   - [LContentRegistry:registerType(type_name: string)](#lcontentregistryregistertypetypename-string)
   - [LContentRegistry:type() -> string](#lcontentregistrytype-string)
   - [LContentRegistry:typeOf(name: string) -> boolean](#lcontentregistrytypeofname-string-boolean)
   - [LMod](#lmod)
   - [LMod:getApiVersion() -> string](#lmodgetapiversion-string)
   - [LMod:getAuthor() -> string](#lmodgetauthor-string)
-  - [LMod:getCapabilities() -> table](#lmodgetcapabilities-table)
-  - [LMod:getConfig() -> LuaValue](#lmodgetconfig-luavalue)
+  - [LMod:getCapabilities() -> string[]](#lmodgetcapabilities-string)
+  - [LMod:getConfig() -> table](#lmodgetconfig-table)
   - [LMod:getConfigSchema() -> table](#lmodgetconfigschema-table)
-  - [LMod:getDependencies() -> table](#lmodgetdependencies-table)
+  - [LMod:getDependencies() -> integer[]](#lmodgetdependencies-integer)
   - [LMod:getDescription() -> string](#lmodgetdescription-string)
   - [LMod:getHook(name: string) -> function](#lmodgethookname-string-function)
-  - [LMod:getHookNames() -> table](#lmodgethooknames-table)
+  - [LMod:getHookNames() -> string[]](#lmodgethooknames-string)
   - [LMod:getId() -> string](#lmodgetid-string)
   - [LMod:getName() -> string](#lmodgetname-string)
   - [LMod:getPriority() -> integer](#lmodgetpriority-integer)
@@ -47,7 +47,7 @@
   - [LMod:releaseRefs()](#lmodreleaserefs)
   - [LMod:setApiVersion(api_version: string)](#lmodsetapiversionapiversion-string)
   - [LMod:setCapabilities(caps: table)](#lmodsetcapabilitiescaps-table)
-  - [LMod:setConfig(value: any)](#lmodsetconfigvalue-any)
+  - [LMod:setConfig(value: table)](#lmodsetconfigvalue-table)
   - [LMod:setConfigSchema(schema: table)](#lmodsetconfigschemaschema-table)
   - [LMod:setEnabled(enabled: boolean)](#lmodsetenabledenabled-boolean)
   - [LMod:setHook(name: string, func: function)](#lmodsethookname-string-func-function)
@@ -61,18 +61,18 @@
   - [LModManager:getModCount() -> integer](#lmodmanagergetmodcount-integer)
   - [LModManager:getModPath(mod_id: string) -> string](#lmodmanagergetmodpathmodid-string-string)
   - [LModManager:getModsByCapability(capability: string) -> table](#lmodmanagergetmodsbycapabilitycapability-string-table)
-  - [LModManager:getReloadQueue() -> table](#lmodmanagergetreloadqueue-table)
+  - [LModManager:getReloadQueue() -> integer[]](#lmodmanagergetreloadqueue-integer)
   - [LModManager:hasCircularDependencies() -> boolean](#lmodmanagerhascirculardependencies-boolean)
   - [LModManager:hasMod(mod_id: string) -> boolean](#lmodmanagerhasmodmodid-string-boolean)
   - [LModManager:markForReload(mod_id: string) -> boolean](#lmodmanagermarkforreloadmodid-string-boolean)
-  - [LModManager:processReloadQueue() -> table](#lmodmanagerprocessreloadqueue-table)
+  - [LModManager:processReloadQueue() -> integer[]](#lmodmanagerprocessreloadqueue-integer)
   - [LModManager:registerMod(ud: LMod)](#lmodmanagerregistermodud-lmod)
   - [LModManager:scanFolder(path: string) -> table](#lmodmanagerscanfolderpath-string-table)
   - [LModManager:setLoadOrder(order_table: table)](#lmodmanagersetloadorderordertable-table)
   - [LModManager:type() -> string](#lmodmanagertype-string)
   - [LModManager:typeOf(name: string) -> boolean](#lmodmanagertypeofname-string-boolean)
   - [LModManager:unregisterMod(mod_id: string) -> boolean](#lmodmanagerunregistermodmodid-string-boolean)
-  - [LModManager:validateDependencies() -> table](#lmodmanagervalidatedependencies-table)
+  - [LModManager:validateDependencies() -> string[]](#lmodmanagervalidatedependencies-string)
 - [Examples](#examples)
 - [Reference Games](#reference-games)
 - [Related Modules](#related-modules)
@@ -306,7 +306,7 @@ do
 end
 ```
 
-### `LContentRegistry:get(type_name: string, id: string) -> LuaValue`
+### `LContentRegistry:get(type_name: string, id: string) -> table`
 
 Returns one stored value by content type and id.
 
@@ -315,7 +315,7 @@ Returns one stored value by content type and id.
 - `type_name` (`string`, required) - Content type name.
 - `id` (`string`, required) - Entry id.
 
-**Returns**: `LuaValue` - Stored Lua value, or nil when missing.
+**Returns**: `table` - Stored Lua value.
 
 #### Example
 
@@ -369,11 +369,11 @@ do
 end
 ```
 
-### `LContentRegistry:getTypes() -> table`
+### `LContentRegistry:getTypes() -> string[]`
 
 Returns registered content type names.
 
-**Returns**: `table` - Array table of content type names.
+**Returns**: `string[]` - Content type names.
 
 #### Example
 
@@ -392,7 +392,7 @@ do
 end
 ```
 
-### `LContentRegistry:register(type_name: string, id: string, obj: any)`
+### `LContentRegistry:register(type_name: string, id: string, obj: table)`
 
 Stores a Lua value under a registered content type and id.
 
@@ -400,7 +400,7 @@ Stores a Lua value under a registered content type and id.
 
 - `type_name` (`string`, required) - Content type name.
 - `id` (`string`, required) - Entry id.
-- `obj` (`any`, required) - Lua value to store.
+- `obj` (`table`, required) - Lua value to store.
 
 #### Example
 
@@ -566,11 +566,11 @@ do
 end
 ```
 
-### `LMod:getCapabilities() -> table`
+### `LMod:getCapabilities() -> string[]`
 
 Returns capability names declared by the mod.
 
-**Returns**: `table` - Array table of capability names.
+**Returns**: `string[]` - Capability names.
 
 #### Example
 
@@ -587,11 +587,11 @@ do
 end
 ```
 
-### `LMod:getConfig() -> LuaValue`
+### `LMod:getConfig() -> table`
 
 Returns the stored Lua config value.
 
-**Returns**: `LuaValue` - Stored config value, or nil when unset.
+**Returns**: `table` - Stored config value, or nil when unset.
 
 #### Example
 
@@ -612,7 +612,7 @@ end
 
 Returns config schema entries. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of schema entries with `key`, `type`, and `default` fields.
+**Returns**: `table` - Array of schema entries with `key`, `type`, and `default` fields.
 
 #### Example
 
@@ -634,11 +634,11 @@ do
 end
 ```
 
-### `LMod:getDependencies() -> table`
+### `LMod:getDependencies() -> integer[]`
 
 Returns mod dependency ids. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of dependency ids.
+**Returns**: `integer[]` - Array table of dependency ids.
 
 #### Example
 
@@ -706,11 +706,11 @@ do
 end
 ```
 
-### `LMod:getHookNames() -> table`
+### `LMod:getHookNames() -> string[]`
 
 Returns registered hook names. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of hook names.
+**Returns**: `string[]` - Hook names.
 
 #### Example
 
@@ -958,13 +958,13 @@ do
 end
 ```
 
-### `LMod:setConfig(value: any)`
+### `LMod:setConfig(value: table)`
 
 Stores a Lua config value for this mod.
 
 **Parameters**
 
-- `value` (`any`, required) - Config value to store.
+- `value` (`table`, required) - Config value to store (table, number, string, or boolean).
 
 #### Example
 
@@ -1290,11 +1290,11 @@ do
 end
 ```
 
-### `LModManager:getReloadQueue() -> table`
+### `LModManager:getReloadQueue() -> integer[]`
 
 Returns mod ids waiting for reload.
 
-**Returns**: `table` - Array table of mod ids.
+**Returns**: `integer[]` - Array table of mod ids.
 
 #### Example
 
@@ -1395,11 +1395,11 @@ do
 end
 ```
 
-### `LModManager:processReloadQueue() -> table`
+### `LModManager:processReloadQueue() -> integer[]`
 
 Processes and clears the reload queue.
 
-**Returns**: `table` - Array table of processed mod ids.
+**Returns**: `integer[]` - Array table of processed mod ids.
 
 #### Example
 
@@ -1572,11 +1572,11 @@ do
 end
 ```
 
-### `LModManager:validateDependencies() -> table`
+### `LModManager:validateDependencies() -> string[]`
 
 Returns dependency validation messages.
 
-**Returns**: `table` - Array table of validation message strings.
+**Returns**: `string[]` - Validation message strings.
 
 #### Example
 

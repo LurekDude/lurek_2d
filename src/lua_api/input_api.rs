@@ -61,7 +61,6 @@ impl LuaUserData for LuaCursor {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- release --
         /// Releases cursor resources; currently a no-op for managed cursor handles.
-        /// @return | nil | No value is returned.
         methods.add_method("release", |_, _this, ()| Ok(()));
         // -- getType --
         /// Returns whether this cursor is a system cursor or custom cursor.
@@ -127,7 +126,6 @@ impl LuaUserData for LuaCombo {
         });
         // -- reset --
         /// Resets combo progress and elapsed time.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.detector.reset();
             this.total_elapsed_ms = 0;
@@ -154,6 +152,8 @@ impl LuaUserData for LuaCombo {
         /// Returns step data by one-based index.
         /// @param | index | integer | One-based combo step index.
         /// @return | table | Step table with `key` and `gap_ms`, or nil when out of range.
+        /// @field | key | string | Key name.
+        /// @field | gap_ms | number | Gap in milliseconds.
         methods.add_method("getStep", |lua, this, index: usize| {
             if index == 0 || index > this.detector.steps.len() {
                 return Ok(LuaValue::Nil);
@@ -161,10 +161,8 @@ impl LuaUserData for LuaCombo {
             let step = &this.detector.steps[index - 1];
             let tbl = lua.create_table()?;
             /// Performs the 'key' operation.
-            /// @return | nil | No value is returned.
             tbl.set("key", step.key.clone())?;
             /// Performs the 'gap_ms' operation.
-            /// @return | nil | No value is returned.
             tbl.set("gap_ms", step.max_gap_ms)?;
             Ok(LuaValue::Table(tbl))
         });
@@ -250,7 +248,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- keyboard.setKeyRepeat --
     /// Enables or disables key repeat tracking.
     /// @param | enabled | boolean | New key repeat flag.
-    /// @return | nil | No value is returned.
     keyboard.set(
         "setKeyRepeat",
         lua.create_function(move |_, enabled: bool| {
@@ -270,7 +267,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- keyboard.setTextInput --
     /// Enables or disables text input tracking.
     /// @param | enabled | boolean | New text input flag.
-    /// @return | nil | No value is returned.
     keyboard.set(
         "setTextInput",
         lua.create_function(move |_, enabled: bool| {
@@ -314,7 +310,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'keyboard' operation.
-    /// @return | nil | No value is returned.
     input_tbl.set("keyboard", keyboard)?;
     let mouse = lua.create_table()?;
     let s = state.clone();
@@ -360,7 +355,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- mouse.setVisible --
     /// Sets the mouse cursor visibility state.
     /// @param | visible | boolean | New cursor visibility flag.
-    /// @return | nil | No value is returned.
     mouse.set(
         "setVisible",
         lua.create_function(move |_, visible: bool| {
@@ -380,7 +374,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- mouse.setGrabbed --
     /// Sets whether the mouse is grabbed by the window.
     /// @param | grabbed | boolean | New grabbed flag.
-    /// @return | nil | No value is returned.
     mouse.set(
         "setGrabbed",
         lua.create_function(move |_, grabbed: bool| {
@@ -400,7 +393,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- mouse.setRelativeMode --
     /// Sets the relative mouse input mode state.
     /// @param | relative | boolean | New relative mode flag.
-    /// @return | nil | No value is returned.
     mouse.set(
         "setRelativeMode",
         lua.create_function(move |_, relative: bool| {
@@ -421,7 +413,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Requests a mouse cursor position change.
     /// @param | x | number | Target x coordinate.
     /// @param | y | number | Target y coordinate.
-    /// @return | nil | No value is returned.
     mouse.set(
         "setPosition",
         lua.create_function(move |_, (x, y): (f32, f32)| {
@@ -432,8 +423,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- mouse.setCursor --
     /// Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
-    /// @param | cursor | any | `LCursor`, system cursor string, or nil.
-    /// @return | nil | No value is returned.
+    /// @param | cursor | LCursor | `LCursor`, system cursor string, or nil.
     mouse.set(
         "setCursor",
         lua.create_function(move |_, cursor_val: LuaValue| {
@@ -530,7 +520,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |_, ()| Ok(s.borrow().mouse.get_scroll()))?,
     )?;
     /// Performs the 'mouse' operation.
-    /// @return | nil | No value is returned.
     input_tbl.set("mouse", mouse)?;
     let gamepad = lua.create_table()?;
     let s = state.clone();
@@ -552,7 +541,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- gamepad.getJoysticks --
     /// Returns ids for currently connected gamepads.
-    /// @return | table | Array table of connected gamepad ids.
+    /// @return | integer[] | Array table of connected gamepad ids.
     gamepad.set(
         "getJoysticks",
         lua.create_function(move |lua, ()| {
@@ -667,25 +656,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | y | number | Vertical analog value.
     /// @param | deadzone | number? | Deadzone threshold, defaults to 0.3.
     /// @return | table | Table with `up`, `down`, `left`, `right`, and `direction` fields.
+    /// @field | up | boolean | Up pressed.
+    /// @field | down | boolean | Down pressed.
+    /// @field | left | boolean | Left pressed.
+    /// @field | right | boolean | Right pressed.
+    /// @field | direction | string | Direction name.
     gamepad.set(
         "virtualDpad",
         lua.create_function(move |lua, (x, y, deadzone): (f32, f32, Option<f32>)| {
             let (up, down, left, right, direction) = virtual_dpad(x, y, deadzone.unwrap_or(0.3));
             let tbl = lua.create_table()?;
             /// Performs the 'up' operation.
-            /// @return | nil | No value is returned.
             tbl.set("up", up)?;
             /// Performs the 'down' operation.
-            /// @return | nil | No value is returned.
             tbl.set("down", down)?;
             /// Performs the 'left' operation.
-            /// @return | nil | No value is returned.
             tbl.set("left", left)?;
             /// Performs the 'right' operation.
-            /// @return | nil | No value is returned.
             tbl.set("right", right)?;
             /// Performs the 'direction' operation.
-            /// @return | nil | No value is returned.
             tbl.set("direction", direction)?;
             Ok(tbl)
         })?,
@@ -863,7 +852,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- gamepad.setBackgroundEvents --
     /// Enables or disables background gamepad event processing.
     /// @param | enable | boolean | New background event flag.
-    /// @return | nil | No value is returned.
     gamepad.set(
         "setBackgroundEvents",
         lua.create_function(move |_, enable: bool| {
@@ -884,7 +872,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Stores a controller mapping string for a gamepad GUID.
     /// @param | guid | string | Gamepad GUID.
     /// @param | mapping | string | Mapping string.
-    /// @return | nil | No value is returned.
     gamepad.set(
         "setGamepadMapping",
         lua.create_function(move |_, (guid, mapping): (String, String)| {
@@ -910,7 +897,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- gamepad.loadGamepadMappings --
     /// Loads gamepad mapping strings from a file.
     /// @param | path | string | Mapping file path.
-    /// @return | nil | No value is returned.
     gamepad.set(
         "loadGamepadMappings",
         lua.create_function(move |_, path: String| {
@@ -924,7 +910,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- gamepad.saveGamepadMappings --
     /// Saves gamepad mapping strings to a file.
     /// @param | path | string | Mapping file path.
-    /// @return | nil | No value is returned.
     gamepad.set(
         "saveGamepadMappings",
         lua.create_function(move |_, path: String| {
@@ -936,13 +921,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'gamepad' operation.
-    /// @return | nil | No value is returned.
     input_tbl.set("gamepad", gamepad)?;
     let touch = lua.create_table()?;
     let s = state.clone();
     // -- touch.getTouches --
     /// Returns active touch points with id, position, and pressure.
     /// @return | table | Array table of touch records.
+    /// @field | id | integer | Touch point id.
+    /// @field | x | number | Touch x position.
+    /// @field | y | number | Touch y position.
+    /// @field | pressure | number | Touch pressure.
     touch.set(
         "getTouches",
         lua.create_function(move |lua, ()| {
@@ -952,16 +940,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for (i, tp) in touches.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'id' operation.
-                /// @return | nil | No value is returned.
                 entry.set("id", tp.id)?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 entry.set("x", tp.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 entry.set("y", tp.y)?;
                 /// Performs the 'pressure' operation.
-                /// @return | nil | No value is returned.
                 entry.set("pressure", tp.pressure)?;
                 tbl.set(i + 1, entry)?;
             }
@@ -1020,7 +1004,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |_, id: u64| Ok(s.borrow().touch.was_released(id)))?,
     )?;
     /// Performs the 'touch' operation.
-    /// @return | nil | No value is returned.
     input_tbl.set("touch", touch)?;
     let action_map: Rc<RefCell<HashMap<String, Vec<String>>>> =
         Rc::new(RefCell::new(HashMap::new()));
@@ -1030,8 +1013,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- bind --
     /// Adds one or more keyboard/gamepad bindings to an action.
     /// @param | action | string | Action name.
-    /// @param | keys | any | Binding string or array table of binding strings.
-    /// @return | nil | No value is returned.
+    /// @param | keys | string | Binding string or array table of binding strings.
     input_tbl.set(
         "bind",
         lua.create_function(move |_, (action, keys): (String, LuaValue)| {
@@ -1069,8 +1051,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newMapping --
     /// Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
     /// @param | name | string | Action name.
-    /// @param | keys | any | Binding string or array table of binding strings.
+    /// @param | keys | string | Binding string or array table of binding strings.
     /// @return | table | Mapping table with action query closures.
+    /// @field | isDown | function | Returns true while the action is held.
+    /// @field | wasPressed | function | Returns true on the frame the action was pressed.
+    /// @field | wasReleased | function | Returns true on the frame the action was released.
     input_tbl.set(
         "newMapping",
         lua.create_function(move |lua, (name, keys): (String, LuaValue)| {
@@ -1104,7 +1089,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
             let mapping = lua.create_table()?;
             /// Performs the 'name' operation.
-            /// @return | nil | No value is returned.
             mapping.set("name", name.clone())?;
             let action = name.clone();
             /// Returns whether any bound key for this mapping is currently down.
@@ -1171,7 +1155,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let am = action_map.clone();
     // -- clearBindings --
     /// Removes all action bindings from the map.
-    /// @return | nil | No value is returned.
     input_tbl.set(
         "clearBindings",
         lua.create_function(move |_, ()| {
@@ -1182,7 +1165,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let am = action_map.clone();
     // -- getBindings --
     /// Returns all registered action bindings.
-    /// @return | table | Map table from action names to arrays of binding strings.
+    /// @return | string[] | Map table from action names to arrays of binding strings.
     input_tbl.set(
         "getBindings",
         lua.create_function(move |lua, ()| {
@@ -1332,7 +1315,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let rc = rec_rc.clone();
     // -- startRecording --
     /// Starts recording input events into the module recorder.
-    /// @return | nil | No value is returned.
     input_tbl.set(
         "startRecording",
         lua.create_function(move |_, ()| {
@@ -1357,7 +1339,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- loadRecording --
     /// Loads recording JSON into the module recorder.
     /// @param | json | string | Recording JSON.
-    /// @return | nil | No value is returned.
     input_tbl.set(
         "loadRecording",
         lua.create_function(move |_, json: String| {
@@ -1370,7 +1351,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let rc = rec_rc.clone();
     // -- startPlayback --
     /// Starts playback of the loaded recording.
-    /// @return | nil | No value is returned.
     input_tbl.set(
         "startPlayback",
         lua.create_function(move |_, ()| {
@@ -1381,7 +1361,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let rc = rec_rc.clone();
     // -- stopPlayback --
     /// Stops playback of the loaded recording.
-    /// @return | nil | No value is returned.
     input_tbl.set(
         "stopPlayback",
         lua.create_function(move |_, ()| {
@@ -1416,7 +1395,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let rc = rec_rc.clone();
     // -- advancePlayback --
     /// Advances playback by one frame and returns events for that frame.
-    /// @return | table | Array table of event records with `kind` and `name` fields.
+    /// @return | table | Array of event records with `kind` and `name` fields.
+    /// @field | kind | string | Event kind (press, release, hold).
+    /// @field | name | string | Event name.
     input_tbl.set(
         "advancePlayback",
         lua.create_function(move |lua, ()| {
@@ -1425,10 +1406,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for (i, ev) in events.iter().enumerate() {
                 let etbl = lua.create_table()?;
                 /// Performs the 'kind' operation.
-                /// @return | nil | No value is returned.
                 etbl.set("kind", ev.kind.clone())?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 etbl.set("name", ev.name.clone())?;
                 tbl.set(i + 1, etbl)?;
             }
@@ -1436,7 +1415,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'input' operation.
-    /// @return | nil | No value is returned.
     lurek.set("input", input_tbl)?;
     Ok(())
 }

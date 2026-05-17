@@ -24,7 +24,7 @@ impl LuaUserData for LReplSession {
         });
         // -- history --
         /// Returns the recorded REPL input history in oldest-first order.
-        /// @return | table | Array table of history entry strings.
+        /// @return | string[] | History entry strings.
         methods.add_method("history", |lua, this, ()| {
             let table = lua.create_table()?;
             for (index, entry) in this.inner.history().iter().enumerate() {
@@ -34,7 +34,6 @@ impl LuaUserData for LReplSession {
         });
         // -- clear --
         /// Clears all entries from this REPL session history.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -46,7 +45,7 @@ impl LuaUserData for LReplSession {
         // -- complete --
         /// Returns completion candidates that begin with the supplied prefix.
         /// @param | prefix | string | Prefix text to complete.
-        /// @return | table | Array table of matching completion strings.
+        /// @return | string[] | Matching completion strings.
         methods.add_method("complete", |lua, this, prefix: String| {
             let table = lua.create_table()?;
             for (index, item) in this
@@ -78,7 +77,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let repl = lua.create_table()?;
     // -- new --
     /// Creates a release-safe REPL session with bounded command history.
-    /// @param | max_history? | integer | Maximum number of history entries; defaults to 200.
+    /// @param | max_history | integer? | Maximum number of history entries; defaults to 200.
     /// @return | LReplSession | REPL session handle for eval, history, and completion.
     repl.set(
         "new",
@@ -89,7 +88,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'repl' operation.
-    /// @return | nil | No value is returned.
     lurek.set("repl", repl)?;
     Ok(())
 }

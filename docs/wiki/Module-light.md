@@ -41,7 +41,7 @@
   - [LLight:getAttenuation() -> number](#llightgetattenuation-number)
   - [LLight:getBlendMode() -> string](#llightgetblendmode-string)
   - [LLight:getColor() -> number](#llightgetcolor-number)
-  - [LLight:getCookie() -> LuaValue](#llightgetcookie-luavalue)
+  - [LLight:getCookie() -> string](#llightgetcookie-string)
   - [LLight:getDirection() -> number](#llightgetdirection-number)
   - [LLight:getEnergy() -> number](#llightgetenergy-number)
   - [LLight:getFalloff() -> string](#llightgetfalloff-string)
@@ -51,7 +51,7 @@
   - [LLight:getIntensity() -> number](#llightgetintensity-number)
   - [LLight:getLightMask() -> integer](#llightgetlightmask-integer)
   - [LLight:getLightType() -> string](#llightgetlighttype-string)
-  - [LLight:getNormalMap() -> LuaValue](#llightgetnormalmap-luavalue)
+  - [LLight:getNormalMap() -> string](#llightgetnormalmap-string)
   - [LLight:getNormalStrength() -> number](#llightgetnormalstrength-number)
   - [LLight:getOuterAngle() -> number](#llightgetouterangle-number)
   - [LLight:getPosition() -> number](#llightgetposition-number)
@@ -104,7 +104,7 @@
   - [LOccluder:getLightMask() -> integer](#loccludergetlightmask-integer)
   - [LOccluder:getOpacity() -> number](#loccludergetopacity-number)
   - [LOccluder:getPosition() -> number](#loccludergetposition-number)
-  - [LOccluder:getVertices() -> table](#loccludergetvertices-table)
+  - [LOccluder:getVertices() -> number[]](#loccludergetvertices-number)
   - [LOccluder:isEnabled() -> boolean](#loccluderisenabled-boolean)
   - [LOccluder:isValid() -> boolean](#loccluderisvalid-boolean)
   - [LOccluder:remove()](#loccluderremove)
@@ -432,7 +432,7 @@ Creates a light and applies optional light settings.
 - `x` (`number`, required) - Light x coordinate.
 - `y` (`number`, required) - Light y coordinate.
 - `radius` (`number`, required) - Light radius.
-- `opts` (`table`, optional) - Optional table of light settings.
+- `opts` (`table`, optional) - Table of light settings.
 
 **Returns**: `LLight` - New light handle.
 
@@ -468,7 +468,7 @@ Creates an occluder from a flat vertex coordinate table and optional settings.
 **Parameters**
 
 - `vtbl` (`table`, required) - Flat numeric array `[x1, y1, x2, y2, ...]`.
-- `opts` (`table`, optional) - Optional table of occluder settings.
+- `opts` (`table`, optional) - Table of occluder settings.
 
 **Returns**: `LOccluder` - New occluder handle.
 
@@ -500,7 +500,7 @@ Sets global ambient light color. This function is exposed to Lua scripts.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -547,7 +547,7 @@ Sets color for all lights in a group.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -793,11 +793,11 @@ do
 end
 ```
 
-### `LLight:getCookie() -> LuaValue`
+### `LLight:getCookie() -> string`
 
 Returns the cookie texture path stored on this Lua light handle.
 
-**Returns**: `LuaValue` - Cookie path string, or nil when absent.
+**Returns**: `string` - Cookie texture path, or nil when absent.
 
 #### Example
 
@@ -976,11 +976,11 @@ do
 end
 ```
 
-### `LLight:getNormalMap() -> LuaValue`
+### `LLight:getNormalMap() -> string`
 
 Returns the normal map path used by this light.
 
-**Returns**: `LuaValue` - Normal map path string, or nil when absent.
+**Returns**: `string` - Normal map path, or nil when absent.
 
 #### Example
 
@@ -1316,7 +1316,7 @@ Sets this light RGBA color. This method is available to Lua scripts.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -1707,7 +1707,7 @@ Sets this light shadow RGBA color. This method is available to Lua scripts.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -2058,11 +2058,11 @@ do
 end
 ```
 
-### `LOccluder:getVertices() -> table`
+### `LOccluder:getVertices() -> number[]`
 
 Returns this occluder's flat vertex coordinate list.
 
-**Returns**: `table` - Flat numeric array `[x1, y1, x2, y2, ...]`.
+**Returns**: `number[]` - Flat numeric array `[x1, y1, x2, y2, ...]`.
 
 #### Example
 

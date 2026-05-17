@@ -14,7 +14,7 @@
 - [Key Types](#key-types)
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
-  - [lurek.html.isDefaultPrevented() -> table](#lurekhtmlisdefaultprevented-table)
+  - [lurek.html.isDefaultPrevented() -> boolean](#lurekhtmlisdefaultprevented-boolean)
   - [lurek.html.loadDocument(path: string, [opts]: table) -> LHtmlDocument](#lurekhtmlloaddocumentpath-string-opts-table-lhtmldocument)
   - [lurek.html.newDocument([source]: string, [opts]: table) -> LHtmlDocument](#lurekhtmlnewdocumentsource-string-opts-table-lhtmldocument)
   - [lurek.html.preventDefault()](#lurekhtmlpreventdefault)
@@ -37,7 +37,7 @@
   - [LHtmlDocument:off(handle: integer)](#lhtmldocumentoffhandle-integer)
   - [LHtmlDocument:on(event: string, func: function) -> integer](#lhtmldocumentonevent-string-func-function-integer)
   - [LHtmlDocument:query(selector: string) -> LuaValue](#lhtmldocumentqueryselector-string-luavalue)
-  - [LHtmlDocument:queryAll(selector: string) -> table](#lhtmldocumentqueryallselector-string-table)
+  - [LHtmlDocument:queryAll(selector: string) -> LHtmlElement[]](#lhtmldocumentqueryallselector-string-lhtmlelement)
   - [LHtmlDocument:relayout()](#lhtmldocumentrelayout)
   - [LHtmlDocument:render([x]: number, [y]: number)](#lhtmldocumentrenderx-number-y-number)
   - [LHtmlDocument:setCss(css: string)](#lhtmldocumentsetcsscss-string)
@@ -65,7 +65,7 @@
   - [LHtmlElement:off(handle: integer)](#lhtmlelementoffhandle-integer)
   - [LHtmlElement:on(event: string, func: function) -> integer](#lhtmlelementonevent-string-func-function-integer)
   - [LHtmlElement:query(selector: string) -> LuaValue](#lhtmlelementqueryselector-string-luavalue)
-  - [LHtmlElement:queryAll(selector: string) -> table](#lhtmlelementqueryallselector-string-table)
+  - [LHtmlElement:queryAll(selector: string) -> LHtmlElement[]](#lhtmlelementqueryallselector-string-lhtmlelement)
   - [LHtmlElement:remove()](#lhtmlelementremove)
   - [LHtmlElement:removeAttribute(name: string)](#lhtmlelementremoveattributename-string)
   - [LHtmlElement:removeClass(name: string)](#lhtmlelementremoveclassname-string)
@@ -161,21 +161,21 @@ do
 - Source spec: [docs/specs/html.md](../blob/main/docs/specs/html.md)
 
 ```lua
-lurek.html.isDefaultPrevented() -> table -- Returns true if default prevented for Lua scripts in this module.
+lurek.html.isDefaultPrevented() -> boolean -- Returns whether the default action was prevented.
 lurek.html.loadDocument(path: string, [opts]: table) -> LHtmlDocument -- Loads an HTML document from GameFS and optionally loads CSS from options or companion file.
 lurek.html.newDocument([source]: string, [opts]: table) -> LHtmlDocument -- Creates an HTML document from optional source and layout/style options.
-lurek.html.preventDefault() -- Prevent default for Lua scripts in this module.
-lurek.html.stopPropagation() -- Stop propagation for Lua scripts in this module.
+lurek.html.preventDefault() -- Marks the event as having its default action prevented.
+lurek.html.stopPropagation() -- Stops event propagation to remaining listeners.
 lurek.html.supports(feature: string) -> boolean -- Returns whether the HTML engine supports a named feature.
 ```
 
 ## Module Functions
 
-### `lurek.html.isDefaultPrevented() -> table`
+### `lurek.html.isDefaultPrevented() -> boolean`
 
-Returns true if default prevented for Lua scripts in this module.
+Returns whether the default action was prevented.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `boolean` - True when the default was prevented.
 
 #### Example
 
@@ -203,7 +203,7 @@ Loads an HTML document from GameFS and optionally loads CSS from options or comp
 **Parameters**
 
 - `path` (`string`, required) - GameFS path to the HTML file.
-- `opts` (`table`, optional) - Optional table with `css`, `cssPath`, `width`, and `height` fields.
+- `opts` (`table`, optional) - Table with `css`, `cssPath`, `width`, and `height` fields.
 
 **Returns**: `LHtmlDocument` - Loaded HTML document handle.
 
@@ -237,8 +237,8 @@ Creates an HTML document from optional source and layout/style options.
 
 **Parameters**
 
-- `source` (`string`, optional) - Optional HTML source, defaulting to an empty document.
-- `opts` (`table`, optional) - Optional table with `css`, `cssPath`, `width`, and `height` fields.
+- `source` (`string`, optional) - HTML source, defaulting to an empty document.
+- `opts` (`table`, optional) - Table with `css`, `cssPath`, `width`, and `height` fields.
 
 **Returns**: `LHtmlDocument` - New HTML document handle.
 
@@ -286,7 +286,7 @@ end
 
 ### `lurek.html.preventDefault()`
 
-Prevent default for Lua scripts in this module.
+Marks the event as having its default action prevented.
 
 #### Example
 
@@ -311,7 +311,7 @@ end
 
 ### `lurek.html.stopPropagation()`
 
-Stop propagation for Lua scripts in this module.
+Stops event propagation to remaining listeners.
 
 #### Example
 
@@ -467,8 +467,8 @@ Queues render commands for this document at an optional offset.
 
 **Parameters**
 
-- `x` (`number`, optional) - Optional x offset, defaulting to 0.
-- `y` (`number`, optional) - Optional y offset, defaulting to 0.
+- `x` (`number`, optional) - X offset, defaulting to 0.
+- `y` (`number`, optional) - Y offset, defaulting to 0.
 
 #### Example
 
@@ -702,7 +702,7 @@ Forwards a mouse press to the document and dispatches a click event when an elem
 
 - `x` (`number`, required) - Mouse x coordinate.
 - `y` (`number`, required) - Mouse y coordinate.
-- `button` (`integer`, optional) - Optional mouse button, defaulting to 1.
+- `button` (`integer`, optional) - Mouse button, defaulting to 1.
 
 **Returns**: `boolean` - True when the event was consumed or default was prevented.
 
@@ -740,7 +740,7 @@ Forwards a mouse release to the document.
 
 - `x` (`number`, required) - Mouse x coordinate.
 - `y` (`number`, required) - Mouse y coordinate.
-- `button` (`integer`, optional) - Optional mouse button, defaulting to 1.
+- `button` (`integer`, optional) - Mouse button, defaulting to 1.
 
 **Returns**: `boolean` - True when an element handled the release.
 
@@ -858,7 +858,7 @@ do
 end
 ```
 
-### `LHtmlDocument:queryAll(selector: string) -> table`
+### `LHtmlDocument:queryAll(selector: string) -> LHtmlElement[]`
 
 Returns all elements matching a selector.
 
@@ -866,7 +866,7 @@ Returns all elements matching a selector.
 
 - `selector` (`string`, required) - Selector supported by the HTML engine.
 
-**Returns**: `table` - Array table of `LHtmlElement` handles.
+**Returns**: `LHtmlElement[]` - `LHtmlElement` handles.
 
 #### Example
 
@@ -931,8 +931,8 @@ Queues render commands for this document at an optional offset.
 
 **Parameters**
 
-- `x` (`number`, optional) - Optional x offset, defaulting to 0.
-- `y` (`number`, optional) - Optional y offset, defaulting to 0.
+- `x` (`number`, optional) - X offset, defaulting to 0.
+- `y` (`number`, optional) - Y offset, defaulting to 0.
 
 #### Example
 
@@ -1211,7 +1211,7 @@ end
 
 ### `LHtmlElement:addClass(name: string)`
 
-Adds a CSS class to this element. This method is available to Lua scripts.
+Adds a CSS class to this element's class list.
 
 **Parameters**
 
@@ -1504,7 +1504,7 @@ end
 
 ### `LHtmlElement:getTagName() -> string`
 
-Returns this element's tag name. This method is available to Lua scripts.
+Returns this element's HTML tag name.
 
 **Returns**: `string` - Tag name, or an empty string for missing elements.
 
@@ -1701,7 +1701,7 @@ do
 end
 ```
 
-### `LHtmlElement:queryAll(selector: string) -> table`
+### `LHtmlElement:queryAll(selector: string) -> LHtmlElement[]`
 
 Returns all descendant elements matching a selector.
 
@@ -1709,7 +1709,7 @@ Returns all descendant elements matching a selector.
 
 - `selector` (`string`, required) - Selector supported by the HTML engine.
 
-**Returns**: `table` - Array table of `LHtmlElement` handles.
+**Returns**: `LHtmlElement[]` - `LHtmlElement` handles.
 
 #### Example
 
@@ -1832,7 +1832,7 @@ Sets or clears an attribute on this element.
 **Parameters**
 
 - `name` (`string`, required) - Attribute name.
-- `value` (`string`, optional) - Optional attribute value; nil removes the attribute.
+- `value` (`string`, optional) - Attribute value, or nil to remove the attribute.
 
 #### Example
 
@@ -1897,7 +1897,7 @@ Sets or clears this element's id attribute.
 
 **Parameters**
 
-- `id` (`string`, optional) - Optional id attribute value.
+- `id` (`string`, optional) - Id attribute value, or nil to clear.
 
 #### Example
 
@@ -1925,7 +1925,7 @@ Sets or clears a style property on this element.
 **Parameters**
 
 - `name` (`string`, required) - CSS property name.
-- `value` (`string`, optional) - Optional CSS value; nil clears the property.
+- `value` (`string`, optional) - CSS value, or nil to clear the property.
 
 #### Example
 
@@ -1996,7 +1996,7 @@ Toggles a CSS class on this element, optionally forcing the final state.
 **Parameters**
 
 - `name` (`string`, required) - Class name to toggle.
-- `force` (`boolean`, optional) - Optional forced state.
+- `force` (`boolean`, optional) - Forced state.
 
 **Returns**: `boolean` - Final class presence, or false when the element is unavailable.
 

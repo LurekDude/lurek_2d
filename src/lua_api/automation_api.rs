@@ -14,7 +14,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Loads an automation script from a Lua table of steps and optional metadata.
     /// @param | name | string | Script name used by `start`, macros, and lookup calls.
     /// @param | data | table | Script data table with a `steps` array and optional `meta.description` string.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "load",
@@ -54,7 +53,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getScripts --
     /// Returns the names of loaded automation scripts.
-    /// @return | table | Array table of script names.
+    /// @return | string[] | Script names.
     let sim = simulator.clone();
     tbl.set(
         "getScripts",
@@ -63,7 +62,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- start --
     /// Starts playback of a loaded automation script.
     /// @param | name | string | Loaded script name to start.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "start",
@@ -73,7 +71,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- stop --
     /// Stops the current automation script.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "stop",
@@ -84,7 +81,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- pause --
     /// Pauses automation playback. This function is exposed to Lua scripts.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "pause",
@@ -95,7 +91,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- resume --
     /// Resumes automation playback. This function is exposed to Lua scripts.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "resume",
@@ -107,7 +102,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- update --
     /// Advances automation playback and dispatches generated input events.
     /// @param | dt | number | Elapsed time in seconds.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     let s = state.clone();
     let ws = wait_state.clone();
@@ -173,8 +167,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getLastError --
     /// Returns the last automation error message when one exists.
-    /// @return | string | Last error string.
-    /// @return | nil | Nil when no error is stored.
+    /// @return | string | Last error string, or nil when no error is stored.
     let sim = simulator.clone();
     tbl.set(
         "getLastError",
@@ -184,7 +177,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets a named boolean condition used by automation steps.
     /// @param | name | string | Condition name.
     /// @param | value | boolean | Condition value.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "setCondition",
@@ -220,8 +212,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- getCurrentScript --
     /// Returns the current script name when a script is active.
-    /// @return | string | Current script name.
-    /// @return | nil | Nil when no script is active.
+    /// @return | string | Current script name, or nil when no script is active.
     let sim = simulator.clone();
     tbl.set(
         "getCurrentScript",
@@ -239,7 +230,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Loads an automation script from TOML text.
     /// @param | name | string | Script name used by `start`, macros, and lookup calls.
     /// @param | toml_str | string | TOML automation script contents.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "loadFromToml",
@@ -253,8 +243,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getStepLimit --
     /// Returns the configured step limit for a loaded script.
     /// @param | name | string | Script name to query.
-    /// @return | integer | Step limit.
-    /// @return | nil | Nil when no limit is set.
+    /// @return | integer | Step limit, or nil when no limit is set.
     let sim = simulator.clone();
     tbl.set(
         "getStepLimit",
@@ -278,7 +267,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Saves a loaded script as a named macro.
     /// @param | macro_name | string | Macro name to save.
     /// @param | script_name | string | Loaded script name to copy into the macro store.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "saveMacro",
@@ -293,7 +281,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- playMacro --
     /// Starts playback of a saved macro. This function is exposed to Lua scripts.
     /// @param | name | string | Macro name to play.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "playMacro",
@@ -314,7 +301,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- listMacros --
     /// Returns the names of saved macros. This function is exposed to Lua scripts.
-    /// @return | table | Array table of macro names.
+    /// @return | string[] | Macro names.
     let sim = simulator.clone();
     tbl.set(
         "listMacros",
@@ -323,7 +310,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setPlaybackSpeed --
     /// Sets automation playback speed multiplier.
     /// @param | factor | number | Playback speed multiplier.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "setPlaybackSpeed",
@@ -343,7 +329,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setHighlightMode --
     /// Enables or disables automation highlight mode.
     /// @param | enable | boolean | True to enable highlight mode.
-    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set(
         "setHighlightMode",
@@ -364,7 +349,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Suspends automation updates until a predicate returns true or a timeout elapses.
     /// @param | predicate | function | Function called each update; true resolves the wait.
     /// @param | timeout | number | Maximum wait duration in seconds.
-    /// @return | nil | No value is returned.
     let ws = wait_state.clone();
     tbl.set(
         "waitUntil",
@@ -375,7 +359,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'automation' operation.
-    /// @return | nil | No value is returned.
     lurek.set("automation", tbl)?;
     Ok(())
 }

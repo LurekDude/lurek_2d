@@ -131,7 +131,6 @@ fn path_result_to_lua<'lua>(
         )?;
     }
     /// Performs the 'nodes' operation.
-    /// @return | nil | No value is returned.
     table.set("nodes", nodes_table)?;
     let edges_table = lua.create_table()?;
     for (i, eid) in result.edges.iter().enumerate() {
@@ -144,10 +143,8 @@ fn path_result_to_lua<'lua>(
         )?;
     }
     /// Performs the 'edges' operation.
-    /// @return | nil | No value is returned.
     table.set("edges", edges_table)?;
     /// Performs the 'cost' operation.
-    /// @return | nil | No value is returned.
     table.set("cost", result.cost)?;
     Ok(table)
 }
@@ -166,7 +163,6 @@ impl LuaUserData for LuaGraphItem {
         // -- setType --
         /// Changes the item type string used by graph routing and processing rules.
         /// @param | t | string | New item type.
-        /// @return | nil | No value is returned.
         methods.add_method("setType", |_, this, t: String| {
             with_item_mut!(this, g, item, {
                 item.set_type(&t);
@@ -182,7 +178,6 @@ impl LuaUserData for LuaGraphItem {
         // -- setDecayTime --
         /// Sets the total decay lifetime for this item.
         /// @param | t | number | Decay time in seconds, or the graph's sentinel for no decay.
-        /// @return | nil | No value is returned.
         methods.add_method("setDecayTime", |_, this, t: f64| {
             with_item_mut!(this, g, item, {
                 item.set_decay_time(t);
@@ -203,7 +198,6 @@ impl LuaUserData for LuaGraphItem {
         });
         // -- kill --
         /// Marks this item as dead so graph processing can remove or ignore it.
-        /// @return | nil | No value is returned.
         methods.add_method("kill", |_, this, ()| {
             with_item_mut!(this, g, item, {
                 item.kill();
@@ -219,7 +213,6 @@ impl LuaUserData for LuaGraphItem {
         // -- setPriority --
         /// Sets this item's routing or queue priority.
         /// @param | p | integer | New item priority.
-        /// @return | nil | No value is returned.
         methods.add_method("setPriority", |_, this, p: i32| {
             with_item_mut!(this, g, item, {
                 item.set_priority(p);
@@ -230,8 +223,7 @@ impl LuaUserData for LuaGraphItem {
         /// Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
         /// @return | LGraphNode | Node handle when the item is at a node.
         /// @return | LGraphEdge | Edge handle when the item is in transit.
-        /// @return | number | Transit progress when the item is in transit.
-        /// @return | nil | No value when the item is unplaced.
+        /// @return | number | Transit progress when the item is in transit, or nil no value when the item is unplaced.
         methods.add_method("getPosition", |lua, this, ()| -> LuaResult<LuaMultiValue> {
             let graph = this.graph.borrow();
             let item = graph
@@ -285,7 +277,6 @@ impl LuaUserData for LuaEdge {
         // -- setType --
         /// Sets the edge type string used by routing and filters.
         /// @param | t | string | New edge type.
-        /// @return | nil | No value is returned.
         methods.add_method("setType", |_, this, t: String| {
             with_edge_mut!(this, g, edge, {
                 edge.set_type(&t);
@@ -329,7 +320,6 @@ impl LuaUserData for LuaEdge {
         // -- setCapacity --
         /// Sets this edge's maximum concurrent item capacity.
         /// @param | c | integer | New edge capacity.
-        /// @return | nil | No value is returned.
         methods.add_method("setCapacity", |_, this, c: i32| {
             with_edge_mut!(this, g, edge, {
                 edge.capacity = c;
@@ -345,7 +335,6 @@ impl LuaUserData for LuaEdge {
         // -- setThroughput --
         /// Sets this edge's throughput value.
         /// @param | t | number | New throughput.
-        /// @return | nil | No value is returned.
         methods.add_method("setThroughput", |_, this, t: f64| {
             with_edge_mut!(this, g, edge, {
                 edge.throughput = t;
@@ -361,7 +350,6 @@ impl LuaUserData for LuaEdge {
         // -- setTravelTime --
         /// Sets the travel time for items moving across this edge.
         /// @param | t | number | Travel time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("setTravelTime", |_, this, t: f64| {
             with_edge_mut!(this, g, edge, {
                 edge.travel_time = t;
@@ -377,7 +365,6 @@ impl LuaUserData for LuaEdge {
         // -- setWeight --
         /// Sets the pathfinding weight for this edge.
         /// @param | w | number | Edge weight.
-        /// @return | nil | No value is returned.
         methods.add_method("setWeight", |_, this, w: f64| {
             with_edge_mut!(this, g, edge, {
                 edge.weight = w;
@@ -391,9 +378,8 @@ impl LuaUserData for LuaEdge {
             with_edge!(this, g, edge, Ok(edge.speed_modifier))
         });
         // -- setSpeedModifier --
-        /// Sets this edge's speed modifier.
+        /// Sets this edge's speed modifier value.
         /// @param | m | number | Speed modifier.
-        /// @return | nil | No value is returned.
         methods.add_method("setSpeedModifier", |_, this, m: f64| {
             with_edge_mut!(this, g, edge, {
                 edge.speed_modifier = m;
@@ -409,7 +395,6 @@ impl LuaUserData for LuaEdge {
         // -- setCooldown --
         /// Sets this edge's cooldown timer value.
         /// @param | c | number | Cooldown in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("setCooldown", |_, this, c: f64| {
             with_edge_mut!(this, g, edge, {
                 edge.cooldown = c;
@@ -431,7 +416,6 @@ impl LuaUserData for LuaEdge {
         // -- setBidirectional --
         /// Sets whether this edge allows travel in both directions.
         /// @param | b | boolean | New bidirectional flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setBidirectional", |_, this, b: bool| {
             with_edge_mut!(this, g, edge, {
                 edge.bidirectional = b;
@@ -447,7 +431,6 @@ impl LuaUserData for LuaEdge {
         // -- setActive --
         /// Enables or disables this edge for routing and simulation.
         /// @param | a | boolean | New active flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setActive", |_, this, a: bool| {
             with_edge_mut!(this, g, edge, {
                 edge.active = a;
@@ -456,7 +439,7 @@ impl LuaUserData for LuaEdge {
         });
         // -- getItemsInTransit --
         /// Returns graph items currently traveling along this edge.
-        /// @return | table | Array table of `LGraphItem` handles.
+        /// @return | LGraphItem[] | `LGraphItem` handles.
         methods.add_method("getItemsInTransit", |lua, this, ()| {
             let graph = this.graph.borrow();
             let edge = graph
@@ -478,7 +461,6 @@ impl LuaUserData for LuaEdge {
         // -- addAllowedType --
         /// Allows an item type to traverse this edge.
         /// @param | t | string | Item type to allow.
-        /// @return | nil | No value is returned.
         methods.add_method("addAllowedType", |_, this, t: String| {
             with_edge_mut!(this, g, edge, {
                 edge.add_allowed_type(&t);
@@ -494,7 +476,6 @@ impl LuaUserData for LuaEdge {
         });
         // -- clearAllowedTypes --
         /// Clears this edge's item type allow-list.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAllowedTypes", |_, this, ()| {
             with_edge_mut!(this, g, edge, {
                 edge.clear_allowed_types();
@@ -528,7 +509,7 @@ impl LuaUserData for LuaNode {
             Ok(format!("GraphNode({})", this.id))
         });
         // -- getType --
-        /// Returns this node's type string.
+        /// Returns this node's type classification string.
         /// @return | string | Current node type.
         methods.add_method("getType", |_, this, ()| {
             with_node!(this, g, node, Ok(node.get_type().to_string()))
@@ -536,7 +517,6 @@ impl LuaUserData for LuaNode {
         // -- setType --
         /// Sets this node's type string for this object.
         /// @param | t | string | New node type.
-        /// @return | nil | No value is returned.
         methods.add_method("setType", |_, this, t: String| {
             with_node_mut!(this, g, node, {
                 node.set_type(&t);
@@ -550,9 +530,8 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.get_capacity()))
         });
         // -- setCapacity --
-        /// Sets this node's item capacity.
+        /// Sets this node's item capacity value.
         /// @param | c | integer | New node capacity.
-        /// @return | nil | No value is returned.
         methods.add_method("setCapacity", |_, this, c: i32| {
             with_node_mut!(this, g, node, {
                 node.set_capacity(c);
@@ -580,7 +559,6 @@ impl LuaUserData for LuaNode {
         // -- setActive --
         /// Enables or disables this node for graph simulation.
         /// @param | a | boolean | New active flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setActive", |_, this, a: bool| {
             with_node_mut!(this, g, node, {
                 node.active = a;
@@ -596,7 +574,6 @@ impl LuaUserData for LuaNode {
         // -- setOverflowPolicy --
         /// Sets this node's overflow policy from a policy name.
         /// @param | p | string | Overflow policy string.
-        /// @return | nil | No value is returned.
         methods.add_method("setOverflowPolicy", |_, this, p: String| {
             let policy = OverflowPolicy::from_str(&p).map_err(LuaError::RuntimeError)?;
             with_node_mut!(this, g, node, {
@@ -613,7 +590,6 @@ impl LuaUserData for LuaNode {
         // -- setFlowMode --
         /// Sets this node's flow mode from a mode name.
         /// @param | m | string | Flow mode string.
-        /// @return | nil | No value is returned.
         methods.add_method("setFlowMode", |_, this, m: String| {
             let mode = FlowMode::from_str(&m).map_err(LuaError::RuntimeError)?;
             with_node_mut!(this, g, node, {
@@ -622,7 +598,7 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- getPushRate --
-        /// Returns this node's push rate.
+        /// Returns this node's push rate value.
         /// @return | number | Push rate.
         methods.add_method("getPushRate", |_, this, ()| {
             with_node!(this, g, node, Ok(node.push_rate))
@@ -630,7 +606,6 @@ impl LuaUserData for LuaNode {
         // -- setPushRate --
         /// Sets this node's push rate for this object.
         /// @param | r | number | New push rate.
-        /// @return | nil | No value is returned.
         methods.add_method("setPushRate", |_, this, r: f64| {
             with_node_mut!(this, g, node, {
                 node.push_rate = r;
@@ -638,7 +613,7 @@ impl LuaUserData for LuaNode {
             })
         });
         // -- getPullRate --
-        /// Returns this node's pull rate.
+        /// Returns this node's pull rate value.
         /// @return | number | Pull rate.
         methods.add_method("getPullRate", |_, this, ()| {
             with_node!(this, g, node, Ok(node.pull_rate))
@@ -646,7 +621,6 @@ impl LuaUserData for LuaNode {
         // -- setPullRate --
         /// Sets this node's pull rate for this object.
         /// @param | r | number | New pull rate.
-        /// @return | nil | No value is returned.
         methods.add_method("setPullRate", |_, this, r: f64| {
             with_node_mut!(this, g, node, {
                 node.pull_rate = r;
@@ -655,15 +629,13 @@ impl LuaUserData for LuaNode {
         });
         // -- getPushFilter --
         /// Returns this node's optional push item-type filter.
-        /// @return | string | Filter string when a push filter is set.
-        /// @return | nil | When no push filter is set.
+        /// @return | string | Filter string when a push filter is set, or nil when no push filter is set.
         methods.add_method("getPushFilter", |_, this, ()| {
             with_node!(this, g, node, Ok(node.push_filter.clone()))
         });
         // -- setPushFilter --
         /// Sets or clears this node's push item-type filter.
-        /// @param | f? | string | Item type filter string.
-        /// @return | nil | No value is returned.
+        /// @param | f | string? | Item type filter string.
         methods.add_method("setPushFilter", |_, this, f: Option<String>| {
             with_node_mut!(this, g, node, {
                 node.push_filter = f;
@@ -672,15 +644,13 @@ impl LuaUserData for LuaNode {
         });
         // -- getPullFilter --
         /// Returns this node's optional pull item-type filter.
-        /// @return | string | Filter string when a pull filter is set.
-        /// @return | nil | When no pull filter is set.
+        /// @return | string | Filter string when a pull filter is set, or nil when no pull filter is set.
         methods.add_method("getPullFilter", |_, this, ()| {
             with_node!(this, g, node, Ok(node.pull_filter.clone()))
         });
         // -- setPullFilter --
         /// Sets or clears this node's pull item-type filter.
-        /// @param | f? | string | Item type filter string.
-        /// @return | nil | No value is returned.
+        /// @param | f | string? | Item type filter string.
         methods.add_method("setPullFilter", |_, this, f: Option<String>| {
             with_node_mut!(this, g, node, {
                 node.pull_filter = f;
@@ -696,7 +666,6 @@ impl LuaUserData for LuaNode {
         // -- setProcessTime --
         /// Sets the processing time used by this node's conversions.
         /// @param | t | number | Processing time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("setProcessTime", |_, this, t: f64| {
             with_node_mut!(this, g, node, {
                 node.process_time = t;
@@ -712,7 +681,6 @@ impl LuaUserData for LuaNode {
         // -- setQueueEnabled --
         /// Enables or disables this node's explicit queue.
         /// @param | e | boolean | New queue enabled flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setQueueEnabled", |_, this, e: bool| {
             with_node_mut!(this, g, node, {
                 node.queue_enabled = e;
@@ -726,9 +694,8 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.queue_capacity))
         });
         // -- setQueueCapacity --
-        /// Sets this node's queue capacity.
+        /// Sets this node's queue capacity value.
         /// @param | c | integer | Queue capacity.
-        /// @return | nil | No value is returned.
         methods.add_method("setQueueCapacity", |_, this, c: i32| {
             with_node_mut!(this, g, node, {
                 node.queue_capacity = c;
@@ -743,7 +710,7 @@ impl LuaUserData for LuaNode {
         });
         // -- getItems --
         /// Returns item handles currently stored on this node.
-        /// @return | table | Array table of `LGraphItem` handles.
+        /// @return | LGraphItem[] | `LGraphItem` handles.
         methods.add_method("getItems", |lua, this, ()| {
             let graph = this.graph.borrow();
             let node = graph
@@ -764,8 +731,8 @@ impl LuaUserData for LuaNode {
         });
         // -- getEdges --
         /// Returns edge handles connected to this node in the requested direction.
-        /// @param | dir? | string | Direction string, defaulting to `both`.
-        /// @return | table | Array table of `LGraphEdge` handles.
+        /// @param | dir | string? | Direction string, defaulting to `both`.
+        /// @return | LGraphEdge[] | `LGraphEdge` handles.
         methods.add_method("getEdges", |lua, this, dir: Option<String>| {
             let direction = dir.as_deref().unwrap_or("both");
             let ids = this
@@ -789,8 +756,8 @@ impl LuaUserData for LuaNode {
         /// Configures an item conversion rule on this node.
         /// @param | in_type | string | Input item type.
         /// @param | out_type | string | Output item type.
-        /// @param | in_count? | integer | Input count, defaulting to 1.
-        /// @param | out_count? | integer | Output count, defaulting to 1.
+        /// @param | in_count | integer? | Input count, defaulting to 1.
+        /// @param | out_count | integer? | Output count, defaulting to 1.
         methods.add_method(
             "setConversion",
             |_,
@@ -822,7 +789,6 @@ impl LuaUserData for LuaNode {
         });
         // -- clearAllConversions --
         /// Removes every conversion rule from this node.
-        /// @return | nil | No value is returned.
         methods.add_method("clearAllConversions", |_, this, ()| {
             with_node_mut!(this, g, node, {
                 node.clear_all_conversions();
@@ -832,7 +798,6 @@ impl LuaUserData for LuaNode {
         // -- addTag --
         /// Adds a tag to this node on this object.
         /// @param | tag | string | Tag to add.
-        /// @return | nil | No value is returned.
         methods.add_method("addTag", |_, this, tag: String| {
             with_node_mut!(this, g, node, {
                 node.add_tag(&tag);
@@ -854,8 +819,7 @@ impl LuaUserData for LuaNode {
             with_node!(this, g, node, Ok(node.has_tag(&tag)))
         });
         // -- clearTags --
-        /// Removes every tag from this node.
-        /// @return | nil | No value is returned.
+        /// Removes every tag from this graph node.
         methods.add_method("clearTags", |_, this, ()| {
             with_node_mut!(this, g, node, {
                 node.clear_tags();
@@ -864,7 +828,7 @@ impl LuaUserData for LuaNode {
         });
         // -- getTags --
         /// Returns all tags assigned to this node.
-        /// @return | table | Array table of tag strings.
+        /// @return | string[] | Tag strings.
         methods.add_method("getTags", |lua, this, ()| {
             let graph = this.graph.borrow();
             let node = graph
@@ -900,7 +864,6 @@ impl LuaUserData for LuaNode {
         });
         // -- clearSupplies --
         /// Removes every supply entry from this node.
-        /// @return | nil | No value is returned.
         methods.add_method("clearSupplies", |_, this, ()| {
             with_node_mut!(this, g, node, {
                 node.clear_supplies();
@@ -911,7 +874,7 @@ impl LuaUserData for LuaNode {
         /// Adds demand quantity and optional priority for an item type on this node.
         /// @param | item_type | string | Item type demanded by the node.
         /// @param | quantity | integer | Demand quantity to add.
-        /// @param | priority? | integer | Demand priority, defaulting to 0.
+        /// @param | priority | integer? | Demand priority, defaulting to 0.
         methods.add_method(
             "addDemand",
             |_, this, (item_type, quantity, priority): (String, i32, Option<i32>)| {
@@ -931,7 +894,6 @@ impl LuaUserData for LuaNode {
         });
         // -- clearDemands --
         /// Removes every demand entry from this node.
-        /// @return | nil | No value is returned.
         methods.add_method("clearDemands", |_, this, ()| {
             with_node_mut!(this, g, node, {
                 node.clear_demands();
@@ -948,8 +910,7 @@ impl LuaUserData for LuaNode {
         });
         // -- dequeue --
         /// Removes and returns the next item from this node's explicit queue.
-        /// @return | LGraphItem | Item handle from the queue.
-        /// @return | nil | When the queue is empty.
+        /// @return | LGraphItem | Item handle from the queue, or nil when the queue is empty.
         methods.add_method("dequeue", |_, this, ()| {
             let mut graph = this.graph.borrow_mut();
             let node = graph
@@ -991,8 +952,8 @@ impl LuaUserData for LuaGraph {
         });
         // -- addNode --
         /// Creates a node with optional type and capacity.
-        /// @param | node_type? | string | Node type, defaulting to `default`.
-        /// @param | capacity? | integer | Capacity, defaulting to -1.
+        /// @param | node_type | string? | Node type, defaulting to `default`.
+        /// @param | capacity | integer? | Capacity, defaulting to -1.
         /// @return | LGraphNode | New node handle.
         methods.add_method(
             "addNode",
@@ -1029,8 +990,8 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_node(node.id))
         });
         // -- getNodes --
-        /// Returns all nodes in this graph.
-        /// @return | table | Array table of `LGraphNode` handles.
+        /// Returns all nodes in this logistics graph.
+        /// @return | LGraphNode[] | `LGraphNode` handles.
         methods.add_method("getNodes", |lua, this, ()| {
             let graph = this.inner.borrow();
             let ids = graph.get_node_ids();
@@ -1056,7 +1017,7 @@ impl LuaUserData for LuaGraph {
         /// Creates an edge between two nodes with an optional edge type.
         /// @param | from_ud | LGraphNode | Source node handle.
         /// @param | to_ud | LGraphNode | Destination node handle.
-        /// @param | edge_type? | string | Edge type.
+        /// @param | edge_type | string? | Edge type.
         /// @return | LGraphEdge | New edge handle.
         methods.add_method("addEdge", |_, this, (from_ud, to_ud, edge_type): (LuaAnyUserData, LuaAnyUserData, Option<String>)| {
                 let from = from_ud.borrow::<LuaNode>()?;
@@ -1089,8 +1050,8 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_edge(edge.id))
         });
         // -- getEdges --
-        /// Returns all edges in this graph.
-        /// @return | table | Array table of `LGraphEdge` handles.
+        /// Returns all edges in this logistics graph.
+        /// @return | LGraphEdge[] | `LGraphEdge` handles.
         methods.add_method("getEdges", |lua, this, ()| {
             let graph = this.inner.borrow();
             let ids = graph.get_edge_ids();
@@ -1116,8 +1077,7 @@ impl LuaUserData for LuaGraph {
         /// Returns the edge connecting two nodes when one exists.
         /// @param | from_ud | LGraphNode | Source node handle.
         /// @param | to_ud | LGraphNode | Destination node handle.
-        /// @return | LGraphEdge | Edge handle connecting the two nodes.
-        /// @return | nil | When no edge connects the nodes.
+        /// @return | LGraphEdge | Edge handle connecting the two nodes, or nil when no edge connects the nodes.
         methods.add_method(
             "getEdgeBetween",
             |_, this, (from_ud, to_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -1135,8 +1095,8 @@ impl LuaUserData for LuaGraph {
         );
         // -- createItem --
         /// Creates an unplaced graph item with optional type and decay time.
-        /// @param | item_type? | string | Item type, defaulting to `default`.
-        /// @param | decay_time? | number | Decay lifetime, defaulting to -1.0.
+        /// @param | item_type | string? | Item type, defaulting to `default`.
+        /// @param | decay_time | number? | Decay lifetime, defaulting to -1.0.
         /// @return | LGraphItem | New graph item handle.
         methods.add_method(
             "createItem",
@@ -1151,7 +1111,7 @@ impl LuaUserData for LuaGraph {
             },
         );
         // -- addItem --
-        /// Places an item onto a node.
+        /// Places an item onto a destination node.
         /// @param | item_ud | LGraphItem | Item handle to place.
         /// @param | node_ud | LGraphNode | Destination node handle.
         methods.add_method(
@@ -1166,7 +1126,7 @@ impl LuaUserData for LuaGraph {
             },
         );
         // -- removeItem --
-        /// Removes an item from this graph.
+        /// Removes an item from this logistics graph.
         /// @param | item_ud | LGraphItem | Item handle to remove.
         /// @return | boolean | True when the item was removed.
         methods.add_method("removeItem", |_, this, item_ud: LuaAnyUserData| {
@@ -1182,8 +1142,8 @@ impl LuaUserData for LuaGraph {
             Ok(this.inner.borrow().has_item(item.id))
         });
         // -- getItems --
-        /// Returns all items in this graph.
-        /// @return | table | Array table of `LGraphItem` handles.
+        /// Returns all items in this logistics graph.
+        /// @return | LGraphItem[] | `LGraphItem` handles.
         methods.add_method("getItems", |lua, this, ()| {
             let graph = this.inner.borrow();
             let ids = graph.get_item_ids();
@@ -1223,7 +1183,6 @@ impl LuaUserData for LuaGraph {
         // -- update --
         /// Advances graph simulation by delta time and dispatches generated callbacks.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("update", |lua, this, dt: f64| {
             let events = this.inner.borrow_mut().update(dt);
             let cbs = this.callbacks.borrow();
@@ -1231,7 +1190,6 @@ impl LuaUserData for LuaGraph {
         });
         // -- step --
         /// Runs one discrete graph simulation step and dispatches generated callbacks.
-        /// @return | nil | No value is returned.
         methods.add_method("step", |lua, this, ()| {
             let events = this.inner.borrow_mut().step();
             let cbs = this.callbacks.borrow();
@@ -1240,18 +1198,19 @@ impl LuaUserData for LuaGraph {
         // -- tickParallel --
         /// Advances graph simulation through the parallel update path and dispatches generated callbacks.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("tickParallel", |lua, this, dt: f64| {
             let events = this.inner.borrow_mut().update_parallel(dt);
             let cbs = this.callbacks.borrow();
             dispatch_events(lua, &this.inner, &cbs, events)
         });
         // -- findPath --
-        /// Finds a path between two nodes.
+        /// Finds a path between two graph nodes.
         /// @param | from_ud | LGraphNode | Start node handle.
         /// @param | to_ud | LGraphNode | Target node handle.
-        /// @return | table | Path result table with nodes, edges, and cost.
-        /// @return | nil | When no path exists.
+        /// @return | table | Path result table with nodes, edges, and cost, or nil when no path exists.
+        /// @field | nodes | LGraphNode[] | Path nodes in order.
+        /// @field | edges | LGraphEdge[] | Path edges in order.
+        /// @field | cost | number | Total path cost.
         methods.add_method(
             "findPath",
             |lua, this, (from_ud, to_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -1269,8 +1228,10 @@ impl LuaUserData for LuaGraph {
         /// @param | item_ud | LGraphItem | Item handle used for routing constraints.
         /// @param | from_ud | LGraphNode | Start node handle.
         /// @param | to_ud | LGraphNode | Target node handle.
-        /// @return | table | Path result table with nodes, edges, and cost.
-        /// @return | nil | When no path exists.
+        /// @return | table | Path result table with nodes, edges, and cost, or nil when no path exists.
+        /// @field | nodes | LGraphNode[] | Path nodes in order.
+        /// @field | edges | LGraphEdge[] | Path edges in order.
+        /// @field | cost | number | Total path cost.
         methods.add_method("findPathForItem", |lua, this, (item_ud, from_ud, to_ud): (LuaAnyUserData, LuaAnyUserData, LuaAnyUserData)| {
                 let item = item_ud.borrow::<LuaGraphItem>()?;
                 let from = from_ud.borrow::<LuaNode>()?;
@@ -1286,8 +1247,7 @@ impl LuaUserData for LuaGraph {
         /// Returns graph distance between two nodes when reachable.
         /// @param | from_ud | LGraphNode | Start node handle.
         /// @param | to_ud | LGraphNode | Target node handle.
-        /// @return | number | Distance between the two nodes.
-        /// @return | nil | When no path connects the nodes.
+        /// @return | number | Distance between the two nodes, or nil when no path connects the nodes.
         methods.add_method(
             "getDistance",
             |_, this, (from_ud, to_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -1299,8 +1259,8 @@ impl LuaUserData for LuaGraph {
         // -- getReachable --
         /// Returns nodes reachable from a start node within an optional maximum distance.
         /// @param | from_ud | LGraphNode | Start node handle.
-        /// @param | max_dist? | number | Maximum distance.
-        /// @return | table | Array table of reachable `LGraphNode` handles.
+        /// @param | max_dist | number? | Maximum distance.
+        /// @return | LGraphNode[] | Reachable `LGraphNode` handles.
         methods.add_method(
             "getReachable",
             |lua, this, (from_ud, max_dist): (LuaAnyUserData, Option<f64>)| {
@@ -1322,7 +1282,7 @@ impl LuaUserData for LuaGraph {
         // -- getNeighbors --
         /// Returns neighbor nodes connected to a node.
         /// @param | node_ud | LGraphNode | Node handle to inspect.
-        /// @return | table | Array table of neighboring `LGraphNode` handles.
+        /// @return | LGraphNode[] | Neighboring `LGraphNode` handles.
         methods.add_method("getNeighbors", |lua, this, node_ud: LuaAnyUserData| {
             let node = node_ud.borrow::<LuaNode>()?;
             let ids = this.inner.borrow().get_neighbors(node.id);
@@ -1340,7 +1300,7 @@ impl LuaUserData for LuaGraph {
         });
         // -- getComponents --
         /// Returns connected components as arrays of node handles.
-        /// @return | table | Array table of component tables containing `LGraphNode` handles.
+        /// @return | LGraphNode[] | Component tables containing `LGraphNode` handles.
         methods.add_method("getComponents", |lua, this, ()| {
             let graph = this.inner.borrow();
             let components = graph.get_components();
@@ -1385,8 +1345,7 @@ impl LuaUserData for LuaGraph {
         });
         // -- topologicalSort --
         /// Returns nodes in topological order when the graph is acyclic.
-        /// @return | table | Array table of `LGraphNode` handles in topological order.
-        /// @return | nil | When sorting is impossible due to cycles.
+        /// @return | LGraphNode[] | `LGraphNode` handles in topological order, or nil when sorting is impossible due to cycles.
         methods.add_method("topologicalSort", |lua, this, ()| {
             let graph = this.inner.borrow();
             match graph.topological_sort() {
@@ -1408,7 +1367,7 @@ impl LuaUserData for LuaGraph {
         });
         // -- mst --
         /// Computes a minimum spanning tree using Kruskal and returns edge ids.
-        /// @return | table | Array table of edge ids included in the tree.
+        /// @return | integer[] | Array table of edge ids included in the tree.
         methods.add_method("mst", |lua, this, ()| {
             let edge_ids = this.inner.borrow().mst_kruskal();
             let t = lua.create_table()?;
@@ -1419,7 +1378,7 @@ impl LuaUserData for LuaGraph {
         });
         // -- colorGraph --
         /// Computes graph coloring and returns color indices by node id.
-        /// @return | table | Map table from node id to color index.
+        /// @return | table | Map table from node id (integer key) to color index (integer).
         methods.add_method("colorGraph", |lua, this, ()| {
             let colors = this.inner.borrow().color_graph();
             let t = lua.create_table()?;
@@ -1438,8 +1397,7 @@ impl LuaUserData for LuaGraph {
         /// Runs A* pathfinding between two nodes.
         /// @param | from_node | LGraphNode | Start node handle.
         /// @param | to_node | LGraphNode | Target node handle.
-        /// @return | table | Array table of `LGraphNode` handles along the path.
-        /// @return | nil | When no path exists.
+        /// @return | LGraphNode[] | `LGraphNode` handles along the path, or nil when no path exists.
         methods.add_method(
             "astar",
             |lua, this, (from_node, to_node): (LuaAnyUserData, LuaAnyUserData)| {
@@ -1466,7 +1424,6 @@ impl LuaUserData for LuaGraph {
         );
         // -- processDemand --
         /// Processes graph supply and demand once and dispatches generated callbacks.
-        /// @return | nil | No value is returned.
         methods.add_method("processDemand", |lua, this, ()| {
             let events = this.inner.borrow_mut().process_demand();
             let cbs = this.callbacks.borrow();
@@ -1475,38 +1432,38 @@ impl LuaUserData for LuaGraph {
         // -- getStats --
         /// Returns graph counts and aggregate supply-demand statistics.
         /// @return | table | Table with node, edge, item, activity, transit, demand, supply, and queue counts.
+        /// @field | nodes | integer | Node count.
+        /// @field | edges | integer | Edge count.
+        /// @field | items | integer | Item count.
+        /// @field | activeNodes | integer | Active node count.
+        /// @field | activeEdges | integer | Active edge count.
+        /// @field | itemsInTransit | integer | Items in transit.
+        /// @field | itemsOnNodes | integer | Items on nodes.
+        /// @field | totalDemand | integer | Total demand.
+        /// @field | totalSupply | integer | Total supply.
+        /// @field | queuedItems | integer | Queued item count.
         methods.add_method("getStats", |lua, this, ()| {
             let stats = this.inner.borrow().get_stats();
             let table = lua.create_table()?;
             /// Performs the 'nodes' operation.
-            /// @return | nil | No value is returned.
             table.set("nodes", stats.nodes)?;
             /// Performs the 'edges' operation.
-            /// @return | nil | No value is returned.
             table.set("edges", stats.edges)?;
             /// Performs the 'items' operation.
-            /// @return | nil | No value is returned.
             table.set("items", stats.items)?;
             /// Performs the 'activeNodes' operation.
-            /// @return | nil | No value is returned.
             table.set("activeNodes", stats.active_nodes)?;
             /// Performs the 'activeEdges' operation.
-            /// @return | nil | No value is returned.
             table.set("activeEdges", stats.active_edges)?;
             /// Performs the 'itemsInTransit' operation.
-            /// @return | nil | No value is returned.
             table.set("itemsInTransit", stats.items_in_transit)?;
             /// Performs the 'itemsOnNodes' operation.
-            /// @return | nil | No value is returned.
             table.set("itemsOnNodes", stats.items_on_nodes)?;
             /// Performs the 'totalDemand' operation.
-            /// @return | nil | No value is returned.
             table.set("totalDemand", stats.total_demand)?;
             /// Performs the 'totalSupply' operation.
-            /// @return | nil | No value is returned.
             table.set("totalSupply", stats.total_supply)?;
             /// Performs the 'queuedItems' operation.
-            /// @return | nil | No value is returned.
             table.set("queuedItems", stats.queued_items)?;
             Ok(table)
         });
@@ -1737,7 +1694,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'graph' operation.
-    /// @return | nil | No value is returned.
     lurek.set("graph", tbl)?;
     Ok(())
 }

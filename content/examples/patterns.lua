@@ -2301,7 +2301,19 @@ do
   bt:clearAll()
 end
 
---@api-stub: LGraph
+--@api-stub: LPatternGraph:addNode
+--@api-stub: LPatternGraph:removeNode
+--@api-stub: LPatternGraph:getNodeValue
+--@api-stub: LPatternGraph:addEdge
+--@api-stub: LPatternGraph:removeEdge
+--@api-stub: LPatternGraph:neighbors
+--@api-stub: LPatternGraph:bfs
+--@api-stub: LPatternGraph:dfs
+--@api-stub: LPatternGraph:isConnected
+--@api-stub: LPatternGraph:hasNode
+--@api-stub: LPatternGraph:nodeCount
+--@api-stub: LPatternGraph:edgeCount
+--@api-stub: LPatternGraph:clearAll
 -- Graph data structure with directed/undirected edges, BFS, DFS, and connectivity queries
 do
   -- Create undirected graph (edges go both ways).
@@ -2320,6 +2332,10 @@ do
   -- Query node data.
   local data = g:getNodeValue(town_a)
   print("Riverdale pop=" .. (data and data.population or 0))
+
+  -- Membership check.
+  local exists = g:hasNode(town_a)
+  print("town_a exists=" .. tostring(exists))
 
   -- Pathfinding queries.
   local neighbors = g:neighbors(town_a)

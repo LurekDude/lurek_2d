@@ -58,23 +58,18 @@ impl DevtoolsShared {
 fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>> {
     let tbl = lua.create_table()?;
     /// Performs the 'name' operation.
-    /// @return | nil | No value is returned.
     tbl.set("name", zone.name.clone())?;
     /// Performs the 'time' operation.
-    /// @return | nil | No value is returned.
     tbl.set("time", zone.total_time())?;
     /// Performs the 'selfTime' operation.
-    /// @return | nil | No value is returned.
     tbl.set("selfTime", zone.self_time())?;
     /// Performs the 'startTime' operation.
-    /// @return | nil | No value is returned.
     tbl.set("startTime", zone.start_time)?;
     let children = lua.create_table()?;
     for (i, child) in zone.children.iter().enumerate() {
         children.set(i + 1, zone_to_table(lua, child)?)?;
     }
     /// Performs the 'children' operation.
-    /// @return | nil | No value is returned.
     tbl.set("children", children)?;
     Ok(tbl)
 }
@@ -93,7 +88,6 @@ impl LuaUserData for LuaFileWatcher {
         // -- onChanged --
         /// Sets the callback invoked when this watcher observes a change.
         /// @param | func | function | Callback called with no arguments after a change is detected.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("onChanged", |lua, this, func: LuaFunction| {
             let key = lua.create_registry_value(func)?;
             if let Some(old) = this.callback.borrow_mut().replace(key) {
@@ -122,7 +116,6 @@ impl LuaUserData for LuaFileWatcher {
         methods.add_method("getPath", |_, this, ()| Ok(this.path.clone()));
         // -- cancel --
         /// Cancels this watcher and removes its callback.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.watcher.clear();
             if let Some(key) = this.callback.borrow_mut().take() {
@@ -152,7 +145,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Adds a message to the devtools log using an explicit severity level.
     /// @param | level | string | Log level name such as `trace`, `debug`, `info`, `warn`, `error`, or `fatal`.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "log",
@@ -165,7 +157,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- trace --
     /// Adds a trace-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "trace",
@@ -178,7 +169,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- debug --
     /// Adds a debug-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "debug",
@@ -191,7 +181,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- info --
     /// Adds an info-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "info",
@@ -204,7 +193,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- warn --
     /// Adds a warning-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "warn",
@@ -217,7 +205,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- error --
     /// Adds an error-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "error",
@@ -230,7 +217,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- fatal --
     /// Adds a fatal-level diagnostic message to the devtools log.
     /// @param | message | string | Message text stored in the in-memory log history.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "fatal",
@@ -243,7 +229,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setLogLevel --
     /// Sets the minimum severity that remains visible in devtools log output.
     /// @param | level | string | Log level name parsed by the devtools logger; unknown names are ignored.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogLevel",
@@ -268,7 +253,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setLogConsole --
     /// Enables or disables mirroring devtools log entries to the console.
     /// @param | enabled | boolean | True to emit future log entries to console output.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogConsole",
@@ -290,7 +274,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setLogFile --
     /// Sets the file path used by devtools file logging state.
     /// @param | path | string | File path recorded as the active devtools log target.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setLogFile",
@@ -313,6 +296,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns recent devtools log entries as structured tables.
     /// @param | count | integer? | Optional number of newest entries to return; omitted returns the logger default.
     /// @return | table | Array table containing level, timestamp, message, source, line, and optional category fields.
+    /// @field | level | string | Log level.
+    /// @field | timestamp | number | Unix timestamp.
+    /// @field | message | string | Log message.
+    /// @field | source | string | Source file.
+    /// @field | line | integer | Line number.
+    /// @field | category | string? | Optional log category.
     let s = shared.clone();
     dt.set(
         "getLogHistory",
@@ -323,23 +312,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (i, entry) in entries.iter().enumerate() {
                 let e = lua.create_table()?;
                 /// Performs the 'level' operation.
-                /// @return | nil | No value is returned.
                 e.set("level", entry.level.clone())?;
                 /// Performs the 'timestamp' operation.
-                /// @return | nil | No value is returned.
                 e.set("timestamp", entry.timestamp)?;
                 /// Performs the 'message' operation.
-                /// @return | nil | No value is returned.
                 e.set("message", entry.message.clone())?;
                 /// Performs the 'source' operation.
-                /// @return | nil | No value is returned.
                 e.set("source", entry.source.clone())?;
                 /// Performs the 'line' operation.
-                /// @return | nil | No value is returned.
                 e.set("line", entry.line)?;
                 if let Some(ref cat) = entry.category {
                     /// Performs the 'category' operation.
-                    /// @return | nil | No value is returned.
                     e.set("category", cat.clone())?;
                 }
                 tbl.set(i + 1, e)?;
@@ -350,7 +333,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- clearLog --
     /// Clears all in-memory devtools log entries.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "clearLog",
@@ -363,7 +345,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setProfilingEnabled --
     /// Enables or disables collection of CPU profiling zones.
     /// @param | enabled | boolean | True to record profiling zones into future profiler frames.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setProfilingEnabled",
@@ -385,7 +366,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- profilePush --
     /// Starts a named profiling zone on the current profiler stack.
     /// @param | name | string | Profiling zone name shown in reports and snapshots.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profilePush",
@@ -398,7 +378,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- profilePop --
     /// Ends the current profiling zone on the profiler stack.
     /// @param | name | string? | Optional zone name accepted for API compatibility and ignored by the profiler.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profilePop",
@@ -410,7 +389,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- profileFrame --
     /// Closes the current profiling frame and stores its zone tree for later inspection.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "profileFrame",
@@ -432,7 +410,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- getProfileData --
     /// Returns the profiler zone tree for a retained frame.
     /// @param | frame | integer? | Optional frame index understood by the profiler; omitted reads the newest frame alias used by the backend.
-    /// @return | table | Array table of profiler zones with name, time, selfTime, startTime, and children fields.
+    /// @return | table | Array of profiler zones with name, time, selfTime, startTime, and children fields.
+    /// @field | name | string | Zone name.
+    /// @field | time | number | Total time in ms.
+    /// @field | selfTime | number | Self time in ms.
+    /// @field | startTime | number | Start time in ms.
+    /// @field | children | table | Nested child zones.
     let s = shared.clone();
     dt.set(
         "getProfileData",
@@ -451,7 +434,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- resetProfile --
     /// Clears profiler state, active zones, and retained profiling frames.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "resetProfile",
@@ -464,7 +446,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- recordFrameTime --
     /// Records one CPU frame duration sample for devtools frame statistics.
     /// @param | dt_val | number | Frame duration in seconds.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "recordFrameTime",
@@ -477,6 +458,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- getFrameStats --
     /// Returns aggregate CPU frame timing statistics from recorded samples.
     /// @return | table | Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
+    /// @field | fps | number | Fps.
+    /// @field | dt | number | Dt.
+    /// @field | avg | number | Avg.
+    /// @field | min | number | Min.
+    /// @field | max | number | Max.
+    /// @field | p50 | number | P50.
+    /// @field | p95 | number | P95.
+    /// @field | p99 | number | P99.
+    /// @field | samples | integer | Samples.
     let s = shared.clone();
     dt.set(
         "getFrameStats",
@@ -484,31 +474,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let snap = s.borrow().frame_stats.snapshot();
             let tbl = lua.create_table()?;
             /// Performs the 'fps' operation.
-            /// @return | nil | No value is returned.
             tbl.set("fps", snap.fps)?;
             /// Performs the 'dt' operation.
-            /// @return | nil | No value is returned.
             tbl.set("dt", snap.dt)?;
             /// Performs the 'avg' operation.
-            /// @return | nil | No value is returned.
             tbl.set("avg", snap.avg)?;
             /// Performs the 'min' operation.
-            /// @return | nil | No value is returned.
             tbl.set("min", snap.min)?;
             /// Performs the 'max' operation.
-            /// @return | nil | No value is returned.
             tbl.set("max", snap.max)?;
             /// Performs the 'p50' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p50", snap.p50)?;
             /// Performs the 'p95' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p95", snap.p95)?;
             /// Performs the 'p99' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p99", snap.p99)?;
             /// Performs the 'samples' operation.
-            /// @return | nil | No value is returned.
             tbl.set("samples", snap.samples)?;
             Ok(tbl)
         })?,
@@ -517,7 +498,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- recordGpuFrameTime --
     /// Records one GPU frame duration sample for devtools frame statistics.
     /// @param | dt_val | number | GPU frame duration in seconds.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "recordGpuFrameTime",
@@ -530,6 +510,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- getGpuFrameStats --
     /// Returns aggregate GPU frame timing statistics from recorded samples.
     /// @return | table | Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
+    /// @field | fps | number | Fps.
+    /// @field | dt | number | Dt.
+    /// @field | avg | number | Avg.
+    /// @field | min | number | Min.
+    /// @field | max | number | Max.
+    /// @field | p50 | number | P50.
+    /// @field | p95 | number | P95.
+    /// @field | p99 | number | P99.
+    /// @field | samples | integer | Samples.
     let s = shared.clone();
     dt.set(
         "getGpuFrameStats",
@@ -537,31 +526,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let snap = s.borrow().gpu_frame_stats.snapshot();
             let tbl = lua.create_table()?;
             /// Performs the 'fps' operation.
-            /// @return | nil | No value is returned.
             tbl.set("fps", snap.fps)?;
             /// Performs the 'dt' operation.
-            /// @return | nil | No value is returned.
             tbl.set("dt", snap.dt)?;
             /// Performs the 'avg' operation.
-            /// @return | nil | No value is returned.
             tbl.set("avg", snap.avg)?;
             /// Performs the 'min' operation.
-            /// @return | nil | No value is returned.
             tbl.set("min", snap.min)?;
             /// Performs the 'max' operation.
-            /// @return | nil | No value is returned.
             tbl.set("max", snap.max)?;
             /// Performs the 'p50' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p50", snap.p50)?;
             /// Performs the 'p95' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p95", snap.p95)?;
             /// Performs the 'p99' operation.
-            /// @return | nil | No value is returned.
             tbl.set("p99", snap.p99)?;
             /// Performs the 'samples' operation.
-            /// @return | nil | No value is returned.
             tbl.set("samples", snap.samples)?;
             Ok(tbl)
         })?,
@@ -569,7 +549,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getFrameHistory --
     /// Returns retained CPU frame duration samples in insertion order.
-    /// @return | table | Array table of CPU frame durations in seconds.
+    /// @return | number[] | Array table of CPU frame durations in seconds.
     let s = shared.clone();
     dt.set(
         "getFrameHistory",
@@ -586,7 +566,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setFrameHistorySize --
     /// Sets the maximum number of CPU frame duration samples retained by devtools.
     /// @param | size | integer | Maximum number of frame samples to keep.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setFrameHistorySize",
@@ -634,7 +613,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getWatchedPaths --
     /// Returns all paths currently watched by the module-level file watcher.
-    /// @return | table | Sorted array table of watched path strings.
+    /// @return | string[] | Sorted array table of watched path strings.
     let s = shared.clone();
     dt.set(
         "getWatchedPaths",
@@ -652,7 +631,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- scan --
     /// Polls module-level file watches and returns paths that changed since the previous scan.
-    /// @return | table | Array table of changed path strings.
+    /// @return | string[] | Changed path strings.
     let s = shared.clone();
     dt.set(
         "scan",
@@ -669,7 +648,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- clearWatches --
     /// Removes every path from the module-level file watcher.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "clearWatches",
@@ -691,7 +669,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setWatchInterval --
     /// Sets the polling interval hint used by devtools watch UIs.
     /// @param | interval | number | Watch interval in seconds, clamped to at least 0.01.
-    /// @return | nil | No value is returned.
     let s = shared.clone();
     dt.set(
         "setWatchInterval",
@@ -704,7 +681,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- getCallStack --
     /// Returns Lua call stack frames using the Lua debug library.
     /// @param | max_depth | integer? | Optional maximum number of frames to return; defaults to 20 and is capped at 100.
-    /// @return | table | Array table of frames with source, line, name, and what fields.
+    /// @return | string[] | Array of frames with source, line, name, and what fields.
     dt.set(
         "getCallStack",
         lua.create_function(|lua, max_depth: Option<usize>| {
@@ -841,7 +818,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- getWatches --
     /// Evaluates exposed watch callbacks and returns their current values.
-    /// @return | table | Array table of watch rows with name, category, and value fields.
+    /// @return | table | Array of watch rows with name, category, and value fields.
+    /// @field | name | string | Watch name.
+    /// @field | category | string | Category.
+    /// @field | value | string | Formatted value.
     let s = shared.clone();
     dt.set(
         "getWatches",
@@ -851,21 +831,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (i, entry) in st.watches.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 row.set("name", entry.name.clone())?;
                 /// Performs the 'category' operation.
-                /// @return | nil | No value is returned.
                 row.set("category", entry.category.clone())?;
                 let getter: LuaFunction = lua.registry_value(&entry.getter)?;
                 match getter.call::<_, LuaValue>(()) {
                     Ok(v) => {
                         /// Performs the 'value' operation.
-                        /// @return | nil | No value is returned.
                         row.set("value", v)?;
                     }
                     Err(e) => {
                         /// Performs the 'value' operation.
-                        /// @return | nil | No value is returned.
                         row.set("value", format!("(error: {})", e))?;
                     }
                 }
@@ -878,6 +854,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- snapshot --
     /// Captures a combined devtools snapshot containing frame stats, watch values, profile data, and recent logs.
     /// @return | table | Snapshot table with frameStats, watches, profile, log, and watchCount fields.
+    /// @field | frameStats | table | Frame statistics table.
+    /// @field | watches | table | Watch values table.
+    /// @field | profile | table | Profile data table.
+    /// @field | log | table | Recent log entries table.
+    /// @field | watchCount | integer | WatchCount.
     let s = shared.clone();
     dt.set(
         "snapshot",
@@ -887,49 +868,38 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let fs = st.frame_stats.snapshot();
             let fst = lua.create_table()?;
             /// Performs the 'fps' operation.
-            /// @return | nil | No value is returned.
             fst.set("fps", fs.fps)?;
             /// Performs the 'dt' operation.
-            /// @return | nil | No value is returned.
             fst.set("dt", fs.dt)?;
             /// Performs the 'avg' operation.
-            /// @return | nil | No value is returned.
             fst.set("avg", fs.avg)?;
             /// Performs the 'p95' operation.
-            /// @return | nil | No value is returned.
             fst.set("p95", fs.p95)?;
             /// Performs the 'p99' operation.
-            /// @return | nil | No value is returned.
             fst.set("p99", fs.p99)?;
             /// Performs the 'frameStats' operation.
-            /// @return | nil | No value is returned.
             snap.set("frameStats", fst)?;
             let watches_tbl = lua.create_table()?;
             for (i, entry) in st.watches.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 row.set("name", entry.name.clone())?;
                 /// Performs the 'category' operation.
-                /// @return | nil | No value is returned.
                 row.set("category", entry.category.clone())?;
                 let getter: LuaFunction = lua.registry_value(&entry.getter)?;
                 match getter.call::<_, LuaValue>(()) {
                     Ok(v) => {
                         /// Performs the 'value' operation.
-                        /// @return | nil | No value is returned.
                         row.set("value", v)?;
                     }
                     Err(e) => {
                         /// Performs the 'value' operation.
-                        /// @return | nil | No value is returned.
                         row.set("value", format!("(error: {})", e))?;
                     }
                 }
                 watches_tbl.set(i + 1, row)?;
             }
             /// Performs the 'watches' operation.
-            /// @return | nil | No value is returned.
             snap.set("watches", watches_tbl)?;
             let profile_tbl = lua.create_table()?;
             if let Some(zones) = st.profiler.get_frame(0) {
@@ -938,27 +908,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 }
             }
             /// Performs the 'profile' operation.
-            /// @return | nil | No value is returned.
             snap.set("profile", profile_tbl)?;
             let log_tbl = lua.create_table()?;
             for (i, entry) in st.logger.tail(Some(10)).iter().enumerate() {
                 let et = lua.create_table()?;
                 /// Performs the 'level' operation.
-                /// @return | nil | No value is returned.
                 et.set("level", entry.level.clone())?;
                 /// Performs the 'message' operation.
-                /// @return | nil | No value is returned.
                 et.set("message", entry.message.clone())?;
                 /// Performs the 'source' operation.
-                /// @return | nil | No value is returned.
                 et.set("source", entry.source.clone())?;
                 log_tbl.set(i + 1, et)?;
             }
             /// Performs the 'log' operation.
-            /// @return | nil | No value is returned.
             snap.set("log", log_tbl)?;
             /// Performs the 'watchCount' operation.
-            /// @return | nil | No value is returned.
             snap.set("watchCount", st.watches.len())?;
             Ok(snap)
         })?,
@@ -967,6 +931,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- profilerReport --
     /// Aggregates retained profiler frames into per-zone timing rows.
     /// @return | table | Array table with zone name, call count, total_ms, avg_ms, min_ms, max_ms, and self_ms fields.
+    /// @field | name | string | Zone name.
+    /// @field | call_count | integer | Call count.
+    /// @field | total_ms | number | Total time in ms.
+    /// @field | avg_ms | number | Average time per call in ms.
+    /// @field | min_ms | number | Minimum time in ms.
+    /// @field | max_ms | number | Maximum time in ms.
+    /// @field | self_ms | number | Self time in ms.
     let s = shared.clone();
     dt.set(
         "profilerReport",
@@ -998,13 +969,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (i, (name, (total, calls, min, max, self_ms))) in aggregated.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 row.set("name", name.clone())?;
                 /// Performs the 'calls' operation.
-                /// @return | nil | No value is returned.
                 row.set("calls", *calls)?;
                 /// Performs the 'total_ms' operation.
-                /// @return | nil | No value is returned.
                 row.set("total_ms", *total)?;
                 row.set(
                     "avg_ms",
@@ -1015,13 +983,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     },
                 )?;
                 /// Performs the 'min_ms' operation.
-                /// @return | nil | No value is returned.
                 row.set("min_ms", if *min == f64::MAX { 0.0 } else { *min })?;
                 /// Performs the 'max_ms' operation.
-                /// @return | nil | No value is returned.
                 row.set("max_ms", *max)?;
                 /// Performs the 'self_ms' operation.
-                /// @return | nil | No value is returned.
                 row.set("self_ms", *self_ms)?;
                 out.set(i + 1, row)?;
             }
@@ -1059,7 +1024,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'devtools' operation.
-    /// @return | nil | No value is returned.
     lurek.set("devtools", dt)?;
     Ok(())
 }
@@ -1080,7 +1044,7 @@ impl LuaUserData for LuaReplConsole {
         });
         // -- history --
         /// Returns this REPL console's recorded command history.
-        /// @return | table | Array table of history entry strings.
+        /// @return | string[] | History entry strings.
         methods.add_method("history", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, entry) in this.inner.history().iter().enumerate() {
@@ -1090,7 +1054,6 @@ impl LuaUserData for LuaReplConsole {
         });
         // -- clear --
         /// Clears this REPL console's command history.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())

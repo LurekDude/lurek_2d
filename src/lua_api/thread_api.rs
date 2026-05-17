@@ -32,8 +32,7 @@ impl LuaUserData for LuaThreadHandle {
         });
         // -- start --
         /// Launches the worker thread, executing the Lua code string supplied at creation time.
-        /// @param | ... | any | Zero or more arguments forwarded to the worker as the `arg` table.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Zero or more arguments forwarded to the worker as the `arg` table.
         methods.add_method("start", |_, this, args: LuaMultiValue| {
             let channel_args: Vec<_> = args
                 .into_iter()
@@ -48,7 +47,6 @@ impl LuaUserData for LuaThreadHandle {
         });
         // -- wait --
         /// Blocks the calling thread until the worker thread finishes execution.
-        /// @return | nil | No value is returned.
         methods.add_method("wait", |_, this, ()| {
             this.inner.lock().unwrap().wait();
             Ok(())
@@ -87,8 +85,7 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- submit --
         /// Pushes a value into the pool's input channel for processing by a worker thread.
-        /// @param | value | any | The value to enqueue for processing.
-        /// @return | nil | No value is returned.
+        /// @param | value | table | The message table to send.
         methods.add_method("submit", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             this.inner.lock().unwrap().submit(cv);
@@ -96,7 +93,8 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- collect --
         /// Pops and returns the next result from the pool's output channel.
-        /// @return | any | The next result value, or `nil` if the output channel is empty.
+        /// @return | table | The next result table.
+        /// @return | nil | If the output channel is empty.
         methods.add_method("collect", |lua, this, ()| {
             match this.inner.lock().unwrap().collect() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -109,7 +107,7 @@ impl LuaUserData for LuaThreadPool {
         methods.add_method("size", |_, this, ()| Ok(this.inner.lock().unwrap().size()));
         // -- join --
         /// Blocks until all workers finish or the optional timeout elapses.
-        /// @param | timeout? | number | Maximum seconds to wait. If omitted, waits indefinitely.
+        /// @param | timeout | number? | Maximum seconds to wait. If omitted, waits indefinitely.
         /// @return | boolean | `true` if all workers finished, `false` if the timeout expired.
         methods.add_method("join", |_, this, timeout: Option<f64>| {
             let done = if let Some(secs) = timeout {
@@ -166,7 +164,8 @@ impl LuaUserData for LuaPromise {
         });
         // -- result --
         /// Returns the result value of the completed promise.
-        /// @return | any | The computed result, or `nil` if the promise is not yet done.
+        /// @return | table | The computed result table.
+        /// @return | nil | If the promise is not yet done.
         methods.add_method("result", |lua, this, ()| {
             match this.inner.lock().unwrap().result() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -182,7 +181,7 @@ impl LuaUserData for LuaPromise {
         // -- chain --
         /// Creates a new promise that runs the given code with the parent promise's result as its first argument.
         /// @param | code | string | Lua source code to execute in the chained worker thread.
-        /// @param | ... | any | Additional arguments forwarded after the parent result.
+        /// @param | ... | table | Additional arguments forwarded after the parent result.
         /// @return | LPromise | A new promise representing the chained computation.
         methods.add_method("chain", |_, this, (code, rest): (String, LuaMultiValue)| {
             let parent_result = {
@@ -284,7 +283,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- async --
     /// Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
     /// @param | codeOrFunc | string|function | Lua source code or a dumpable Lua function to execute.
-    /// @param | ... | any | Additional arguments forwarded to the worker.
+    /// @param | ... | table | Additional arguments forwarded to the worker.
     /// @return | LPromise | A promise that resolves to the worker's return value.
     tbl.set(
         "async",
@@ -341,7 +340,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getWorkerCapabilities --
     /// Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
-    /// @return | table | An integer-indexed table of capability name strings.
+    /// @return | string[] | Integer-indexed list of capability name strings.
     tbl.set(
         "getWorkerCapabilities",
         lua.create_function(|lua, ()| {
@@ -353,7 +352,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'thread' operation.
-    /// @return | nil | No value is returned.
     lurek.set("thread", tbl)?;
     Ok(())
 }
@@ -372,7 +370,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- push --
         /// Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
-        /// @param | value | any | The value to send through the channel.
+        /// @param | value | table | The message table to send.
         /// @return | integer | The message sequence ID assigned to this push.
         methods.add_method("push", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -381,22 +379,25 @@ impl LuaUserData for LuaChannel {
         });
         // -- pop --
         /// Removes and returns the next value from the channel without blocking.
-        /// @return | any | The next value, or `nil` if the channel is empty.
+        /// @return | table | The next message table.
+        /// @return | nil | If the channel is empty.
         methods.add_method("pop", |lua, this, ()| match this.inner.pop() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
         });
         // -- peek --
         /// Returns the next value from the channel without removing it.
-        /// @return | any | The front value, or `nil` if the channel is empty.
+        /// @return | table | The front message table.
+        /// @return | nil | If the channel is empty.
         methods.add_method("peek", |lua, this, ()| match this.inner.peek() {
             Some(cv) => channel_value_to_lua(lua, cv),
             None => Ok(LuaValue::Nil),
         });
         // -- demand --
         /// Blocks until a value is available on the channel or the optional timeout expires.
-        /// @param | timeout? | number | Maximum seconds to wait. If omitted, waits indefinitely.
-        /// @return | any | The received value, or `nil` if the timeout expired.
+        /// @param | timeout | number? | Maximum seconds to wait. If omitted, waits indefinitely.
+        /// @return | table | The received message table.
+        /// @return | nil | If the timeout expired.
         methods.add_method("demand", |lua, this, timeout: Option<f64>| {
             match this.inner.demand(timeout) {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -417,23 +418,22 @@ impl LuaUserData for LuaChannel {
         methods.add_method("isBounded", |_, this, ()| Ok(this.inner.is_bounded()));
         // -- tryPush --
         /// Attempts to push a value onto a bounded channel without blocking.
-        /// @param | value | any | The value to send.
-        /// @return | boolean | `true` if the value was enqueued, `false` if the channel is full.
+        /// @param | value | table | The message table to send.
+        /// @return | boolean | true if the value was enqueued, false if the channel is full.
         methods.add_method("tryPush", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             Ok(this.inner.try_push(cv))
         });
         // -- clear --
         /// Removes all pending values from the channel.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
         });
         // -- supply --
         /// Pushes a value and blocks until a consumer pops it (synchronous handoff).
-        /// @param | value | any | The value to hand off to a consumer.
-        /// @return | boolean | `true` when the value has been consumed.
+        /// @param | value | table | The message table to send.
+        /// @return | boolean | true when the value has been consumed.
         methods.add_method("supply", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             Ok(this.inner.supply(cv))

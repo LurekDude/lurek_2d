@@ -2936,6 +2936,7 @@ end
 ## Reference Games
 
 - [sprites](../tree/main/content/games/showcase/sprites) (showcase)
+- [eu2](../tree/main/content/games/strategy/eu2) (strategy)
 
 ## Related Modules
 

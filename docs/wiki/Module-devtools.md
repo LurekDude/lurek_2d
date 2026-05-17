@@ -21,8 +21,8 @@
   - [lurek.devtools.eval(code: string) -> LuaValue](#lurekdevtoolsevalcode-string-luavalue)
   - [lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer](#lurekdevtoolsexposewatchname-string-getter-function-category-string-integer)
   - [lurek.devtools.fatal(message: string)](#lurekdevtoolsfatalmessage-string)
-  - [lurek.devtools.getCallStack([max_depth]: integer) -> table](#lurekdevtoolsgetcallstackmaxdepth-integer-table)
-  - [lurek.devtools.getFrameHistory() -> table](#lurekdevtoolsgetframehistory-table)
+  - [lurek.devtools.getCallStack([max_depth]: integer) -> string[]](#lurekdevtoolsgetcallstackmaxdepth-integer-string)
+  - [lurek.devtools.getFrameHistory() -> number[]](#lurekdevtoolsgetframehistory-number)
   - [lurek.devtools.getFrameHistorySize() -> integer](#lurekdevtoolsgetframehistorysize-integer)
   - [lurek.devtools.getFrameStats() -> table](#lurekdevtoolsgetframestats-table)
   - [lurek.devtools.getGpuFrameStats() -> table](#lurekdevtoolsgetgpuframestats-table)
@@ -32,7 +32,7 @@
   - [lurek.devtools.getLogLevel() -> string](#lurekdevtoolsgetloglevel-string)
   - [lurek.devtools.getProfileData([frame]: integer) -> table](#lurekdevtoolsgetprofiledataframe-integer-table)
   - [lurek.devtools.getProfileFrameCount() -> integer](#lurekdevtoolsgetprofileframecount-integer)
-  - [lurek.devtools.getWatchedPaths() -> table](#lurekdevtoolsgetwatchedpaths-table)
+  - [lurek.devtools.getWatchedPaths() -> string[]](#lurekdevtoolsgetwatchedpaths-string)
   - [lurek.devtools.getWatches() -> table](#lurekdevtoolsgetwatches-table)
   - [lurek.devtools.getWatchInterval() -> number](#lurekdevtoolsgetwatchinterval-number)
   - [lurek.devtools.info(message: string)](#lurekdevtoolsinfomessage-string)
@@ -52,7 +52,7 @@
   - [lurek.devtools.recordGpuFrameTime(dt_val: number)](#lurekdevtoolsrecordgpuframetimedtval-number)
   - [lurek.devtools.removeWatch(id: integer) -> boolean](#lurekdevtoolsremovewatchid-integer-boolean)
   - [lurek.devtools.resetProfile()](#lurekdevtoolsresetprofile)
-  - [lurek.devtools.scan() -> table](#lurekdevtoolsscan-table)
+  - [lurek.devtools.scan() -> string[]](#lurekdevtoolsscan-string)
   - [lurek.devtools.setFrameHistorySize(size: integer)](#lurekdevtoolssetframehistorysizesize-integer)
   - [lurek.devtools.setLogConsole(enabled: boolean)](#lurekdevtoolssetlogconsoleenabled-boolean)
   - [lurek.devtools.setLogFile(path: string)](#lurekdevtoolssetlogfilepath-string)
@@ -75,7 +75,7 @@
   - [LReplConsole](#lreplconsole)
   - [LReplConsole:clear()](#lreplconsoleclear)
   - [LReplConsole:eval(code: string) -> LuaValue](#lreplconsoleevalcode-string-luavalue)
-  - [LReplConsole:history() -> table](#lreplconsolehistory-table)
+  - [LReplConsole:history() -> string[]](#lreplconsolehistory-string)
   - [LReplConsole:len() -> integer](#lreplconsolelen-integer)
   - [LReplConsole:type() -> string](#lreplconsoletype-string)
   - [LReplConsole:typeOf(name: string) -> boolean](#lreplconsoletypeofname-string-boolean)
@@ -169,8 +169,8 @@ lurek.devtools.error(message: string) -- Adds an error-level diagnostic message 
 lurek.devtools.eval(code: string) -> LuaValue -- Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
 lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer -- Registers a watch expression callback for snapshots and watch panels.
 lurek.devtools.fatal(message: string) -- Adds a fatal-level diagnostic message to the devtools log.
-lurek.devtools.getCallStack([max_depth]: integer) -> table -- Returns Lua call stack frames using the Lua debug library.
-lurek.devtools.getFrameHistory() -> table -- Returns retained CPU frame duration samples in insertion order.
+lurek.devtools.getCallStack([max_depth]: integer) -> string[] -- Returns Lua call stack frames using the Lua debug library.
+lurek.devtools.getFrameHistory() -> number[] -- Returns retained CPU frame duration samples in insertion order.
 lurek.devtools.getFrameHistorySize() -> integer -- Returns the current CPU frame history capacity.
 lurek.devtools.getFrameStats() -> table -- Returns aggregate CPU frame timing statistics from recorded samples.
 lurek.devtools.getGpuFrameStats() -> table -- Returns aggregate GPU frame timing statistics from recorded samples.
@@ -359,7 +359,7 @@ do
 end
 ```
 
-### `lurek.devtools.getCallStack([max_depth]: integer) -> table`
+### `lurek.devtools.getCallStack([max_depth]: integer) -> string[]`
 
 Returns Lua call stack frames using the Lua debug library.
 
@@ -367,7 +367,7 @@ Returns Lua call stack frames using the Lua debug library.
 
 - `max_depth` (`integer`, optional) - Optional maximum number of frames to return; defaults to 20 and is capped at 100.
 
-**Returns**: `table` - Array table of frames with source, line, name, and what fields.
+**Returns**: `string[]` - Array of frames with source, line, name, and what fields.
 
 #### Example
 
@@ -390,11 +390,11 @@ do
 end
 ```
 
-### `lurek.devtools.getFrameHistory() -> table`
+### `lurek.devtools.getFrameHistory() -> number[]`
 
 Returns retained CPU frame duration samples in insertion order.
 
-**Returns**: `table` - Array table of CPU frame durations in seconds.
+**Returns**: `number[]` - Array table of CPU frame durations in seconds.
 
 #### Example
 
@@ -589,7 +589,7 @@ Returns the profiler zone tree for a retained frame.
 
 - `frame` (`integer`, optional) - Optional frame index understood by the profiler; omitted reads the newest frame alias used by the backend.
 
-**Returns**: `table` - Array table of profiler zones with name, time, selfTime, startTime, and children fields.
+**Returns**: `table` - Array of profiler zones with name, time, selfTime, startTime, and children fields.
 
 #### Example
 
@@ -634,11 +634,11 @@ do
 end
 ```
 
-### `lurek.devtools.getWatchedPaths() -> table`
+### `lurek.devtools.getWatchedPaths() -> string[]`
 
 Returns all paths currently watched by the module-level file watcher.
 
-**Returns**: `table` - Sorted array table of watched path strings.
+**Returns**: `string[]` - Sorted array table of watched path strings.
 
 #### Example
 
@@ -662,7 +662,7 @@ end
 
 Evaluates exposed watch callbacks and returns their current values.
 
-**Returns**: `table` - Array table of watch rows with name, category, and value fields.
+**Returns**: `table` - Array of watch rows with name, category, and value fields.
 
 #### Example
 
@@ -1117,11 +1117,11 @@ do
 end
 ```
 
-### `lurek.devtools.scan() -> table`
+### `lurek.devtools.scan() -> string[]`
 
 Polls module-level file watches and returns paths that changed since the previous scan.
 
-**Returns**: `table` - Array table of changed path strings.
+**Returns**: `string[]` - Changed path strings.
 
 #### Example
 
@@ -1628,11 +1628,11 @@ do
 end
 ```
 
-### `LReplConsole:history() -> table`
+### `LReplConsole:history() -> string[]`
 
 Returns this REPL console's recorded command history.
 
-**Returns**: `table` - Array table of history entry strings.
+**Returns**: `string[]` - History entry strings.
 
 #### Example
 

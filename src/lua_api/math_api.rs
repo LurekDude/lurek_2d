@@ -368,7 +368,6 @@ impl LuaUserData for LuaCatmullRom {
         /// Adds a point to the spline. This method is available to Lua scripts.
         /// @param | x | number | Point x coordinate.
         /// @param | y | number | Point y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("addPoint", |_, this, (x, y): (f32, f32)| {
             this.inner.add_point((x, y));
             Ok(())
@@ -457,8 +456,8 @@ impl LuaUserData for LuaRandomGenerator {
         });
         // -- randomNormal --
         /// Returns a normally distributed random value.
-        /// @param | stddev? | number | Standard deviation (default 1.0).
-        /// @param | mean? | number | Mean value (default 0.0).
+        /// @param | stddev | number? | Standard deviation (default 1.0).
+        /// @param | mean | number? | Mean value (default 0.0).
         /// @return | number | Random normal value.
         methods.add_method_mut(
             "randomNormal",
@@ -475,7 +474,6 @@ impl LuaUserData for LuaRandomGenerator {
         // -- setSeed --
         /// Resets this generator to a seed value.
         /// @param | seed | integer | Seed value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setSeed", |_, this, seed: u64| {
             this.inner.set_seed(seed);
             Ok(())
@@ -487,7 +485,6 @@ impl LuaUserData for LuaRandomGenerator {
         // -- setState --
         /// Restores this generator from a serialized state string.
         /// @param | state | string | Generator state string.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setState", |_, this, state: String| {
             this.inner.set_state(&state).map_err(LuaError::external)?;
             Ok(())
@@ -517,7 +514,6 @@ impl LuaUserData for LuaTransform {
         /// Applies a translation to this transform.
         /// @param | dx | number | X translation.
         /// @param | dy | number | Y translation.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("translate", |_, this, (dx, dy): (f32, f32)| {
             this.inner.translate(dx, dy);
             Ok(())
@@ -525,7 +521,6 @@ impl LuaUserData for LuaTransform {
         // -- rotate --
         /// Applies a rotation to this transform.
         /// @param | angle | number | Rotation angle.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("rotate", |_, this, angle: f32| {
             this.inner.rotate(angle);
             Ok(())
@@ -533,8 +528,7 @@ impl LuaUserData for LuaTransform {
         // -- scale --
         /// Applies scale to this transform. This method is available to Lua scripts.
         /// @param | sx | number | X scale.
-        /// @param | sy? | number | Y scale (defaults to `sx`).
-        /// @return | nil | No value is returned.
+        /// @param | sy | number? | Y scale (defaults to `sx`).
         methods.add_method_mut("scale", |_, this, (sx, sy): (f32, Option<f32>)| {
             this.inner.scale(sx, sy.unwrap_or(sx));
             Ok(())
@@ -543,14 +537,12 @@ impl LuaUserData for LuaTransform {
         /// Applies shear to this transform. This method is available to Lua scripts.
         /// @param | kx | number | X shear.
         /// @param | ky | number | Y shear.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("shear", |_, this, (kx, ky): (f32, f32)| {
             this.inner.shear(kx, ky);
             Ok(())
         });
         // -- reset --
         /// Resets this transform to identity.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
             Ok(())
@@ -560,14 +552,13 @@ impl LuaUserData for LuaTransform {
         /// Replaces this transform from position, rotation, scale, origin, and shear components.
         /// @param | x | number | X translation.
         /// @param | y | number | Y translation.
-        /// @param | angle? | number | Rotation angle (default 0).
-        /// @param | sx? | number | X scale (default 1).
-        /// @param | sy? | number | Y scale (defaults to `sx`).
-        /// @param | ox? | number | Origin x offset (default 0).
-        /// @param | oy? | number | Origin y offset (default 0).
-        /// @param | kx? | number | X shear (default 0).
-        /// @param | ky? | number | Y shear (default 0).
-        /// @return | nil | No value is returned.
+        /// @param | angle | number? | Rotation angle (default 0).
+        /// @param | sx | number? | X scale (default 1).
+        /// @param | sy | number? | Y scale (defaults to `sx`).
+        /// @param | ox | number? | Origin x offset (default 0).
+        /// @param | oy | number? | Origin y offset (default 0).
+        /// @param | kx | number? | X shear (default 0).
+        /// @param | ky | number? | Y shear (default 0).
         methods.add_method_mut(
             "setTransformation",
             |_,
@@ -631,7 +622,7 @@ impl LuaUserData for LuaTransform {
         });
         // -- getMatrix --
         /// Returns this transform matrix as a flat array table.
-        /// @return | table | Flat matrix values in row order.
+        /// @return | number[] | Flat matrix values in row-major order.
         methods.add_method("getMatrix", |lua, this, ()| {
             let m = this.inner.matrix();
             let t = lua.create_table()?;
@@ -686,6 +677,8 @@ impl LuaUserData for LuaBezierCurve {
         /// Returns sampled points along this curve.
         /// @param | segments | integer | Number of curve segments to sample.
         /// @return | table | Array table of `{x, y}` point arrays.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method("render", |lua, this, segments: usize| {
             let points = this.inner.render(segments);
             let t = lua.create_table()?;
@@ -735,8 +728,7 @@ impl LuaUserData for LuaBezierCurve {
         /// Inserts a control point, optionally before a one-based index.
         /// @param | x | number | Point x coordinate.
         /// @param | y | number | Point y coordinate.
-        /// @param | index? | integer | One-based insertion index.
-        /// @return | nil | No value is returned.
+        /// @param | index | integer? | One-based insertion index.
         methods.add_method_mut(
             "insertControlPoint",
             |_, this, (x, y, index): (f32, f32, Option<usize>)| {
@@ -768,7 +760,7 @@ impl LuaUserData for LuaBezierCurve {
         // -- evaluateAtDistance --
         /// Evaluates this curve at an approximate distance along the curve.
         /// @param | distance | number | Distance along the curve.
-        /// @param | samples? | integer | Sample count (default 128).
+        /// @param | samples | integer? | Sample count (default 128).
         /// @return | number | Point x coordinate.
         /// @return | number | Point y coordinate.
         methods.add_method(
@@ -784,7 +776,6 @@ impl LuaUserData for LuaBezierCurve {
         /// Translates all control points. This method is available to Lua scripts.
         /// @param | dx | number | X translation.
         /// @param | dy | number | Y translation.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("translate", |_, this, (dx, dy): (f32, f32)| {
             this.inner.translate(dx, dy);
             Ok(())
@@ -794,7 +785,6 @@ impl LuaUserData for LuaBezierCurve {
         /// @param | angle | number | Rotation angle.
         /// @param | ox | number | Origin x coordinate.
         /// @param | oy | number | Origin y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("rotate", |_, this, (angle, ox, oy): (f32, f32, f32)| {
             this.inner.rotate(angle, ox, oy);
             Ok(())
@@ -804,7 +794,6 @@ impl LuaUserData for LuaBezierCurve {
         /// @param | s | number | Scale factor.
         /// @param | ox | number | Origin x coordinate.
         /// @param | oy | number | Origin y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("scale", |_, this, (s, ox, oy): (f32, f32, f32)| {
             this.inner.scale(s, ox, oy);
             Ok(())
@@ -837,14 +826,13 @@ impl LuaUserData for LuaTween {
         methods.add_method_mut("update", |_, this, dt: f64| Ok(this.inner.update(dt)));
         // -- reset --
         /// Resets the tween clock to the beginning.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
             Ok(())
         });
         // -- getValue --
         /// Returns one tween value by one-based index or all values when no index is provided.
-        /// @param | index? | integer | One-based value index; omit to return all values as a table.
+        /// @param | index | integer? | One-based value index; omit to return all values as a table.
         /// @return | number | Tween value at the given index, or a table of all values when index is omitted.
         methods.add_method("getValue", |lua, this, index: Option<usize>| match index {
             Some(i) => {
@@ -864,7 +852,7 @@ impl LuaUserData for LuaTween {
         });
         // -- getAllValues --
         /// Returns all current tween values. This method is available to Lua scripts.
-        /// @return | table | Array table of numeric tween values.
+        /// @return | number[] | Numeric tween values.
         methods.add_method("getAllValues", |lua, this, ()| {
             let vals = this.inner.get_all_values();
             let t = lua.create_table()?;
@@ -902,7 +890,6 @@ impl LuaUserData for LuaTween {
         // -- setTime --
         /// Sets this tween clock time. This method is available to Lua scripts.
         /// @param | t | number | New time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setTime", |_, this, t: f64| {
             this.inner.set_time(t);
             Ok(())
@@ -910,7 +897,6 @@ impl LuaUserData for LuaTween {
         // -- set --
         /// Sets this tween clock time. This method is available to Lua scripts.
         /// @param | t | number | New time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("set", |_, this, t: f64| {
             this.inner.set_time(t);
             Ok(())
@@ -951,7 +937,6 @@ impl LuaUserData for LuaSpatialHash {
         /// @param | y | number | Rectangle y coordinate.
         /// @param | w | number | Rectangle width.
         /// @param | h | number | Rectangle height.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "insert",
             |_, this, (id, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -966,7 +951,6 @@ impl LuaUserData for LuaSpatialHash {
         /// @param | y | number | Rectangle y coordinate.
         /// @param | w | number | Rectangle width.
         /// @param | h | number | Rectangle height.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "update",
             |_, this, (id, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -977,14 +961,12 @@ impl LuaUserData for LuaSpatialHash {
         // -- remove --
         /// Removes an item from the spatial hash.
         /// @param | id | string | Item id.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("remove", |_, this, id: String| {
             this.inner.remove(&id);
             Ok(())
         });
         // -- clear --
         /// Clears all items from the spatial hash.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -995,7 +977,7 @@ impl LuaUserData for LuaSpatialHash {
         /// @param | y | number | Query y coordinate.
         /// @param | w | number | Query width.
         /// @param | h | number | Query height.
-        /// @return | table | Array table of item ids.
+        /// @return | integer[] | Item ids.
         methods.add_method(
             "queryRect",
             |lua, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -1012,7 +994,7 @@ impl LuaUserData for LuaSpatialHash {
         /// @param | cx | number | Circle center x coordinate.
         /// @param | cy | number | Circle center y coordinate.
         /// @param | radius | number | Circle radius.
-        /// @return | table | Array table of item ids.
+        /// @return | integer[] | Item ids.
         methods.add_method(
             "queryCircle",
             |lua, this, (cx, cy, radius): (f32, f32, f32)| {
@@ -1030,7 +1012,7 @@ impl LuaUserData for LuaSpatialHash {
         /// @param | y1 | number | Segment start y coordinate.
         /// @param | x2 | number | Segment end x coordinate.
         /// @param | y2 | number | Segment end y coordinate.
-        /// @return | table | Array table of item ids.
+        /// @return | integer[] | Item ids.
         methods.add_method(
             "querySegment",
             |lua, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
@@ -1152,8 +1134,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples 2D Worley noise. This method is available to Lua scripts.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | dist_name? | string | Distance type name (default `"euclidean"`).
-        /// @param | f2? | boolean | Second-feature flag (default false).
+        /// @param | dist_name | string? | Distance type name (default `"euclidean"`).
+        /// @param | f2 | boolean? | Second-feature flag (default false).
         /// @return | number | Noise value.
         methods.add_method(
             "worley2d",
@@ -1170,8 +1152,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
         /// @param | z | number | Z coordinate.
-        /// @param | dist_name? | string | Distance type name (default `"euclidean"`).
-        /// @param | f2? | boolean | Second-feature flag (default false).
+        /// @param | dist_name | string? | Distance type name (default `"euclidean"`).
+        /// @param | f2 | boolean? | Second-feature flag (default false).
         /// @return | number | Noise value.
         methods.add_method(
             "worley3d",
@@ -1187,10 +1169,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples fractal Brownian motion noise.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves? | integer | Octave count (default 4).
-        /// @param | lac? | number | Lacunarity (default 2.0).
-        /// @param | pers? | number | Persistence (default 0.5).
-        /// @param | kind? | string | Noise kind name (default `"perlin"`).
+        /// @param | octaves | integer? | Octave count (default 4).
+        /// @param | lac | number? | Lacunarity (default 2.0).
+        /// @param | pers | number? | Persistence (default 0.5).
+        /// @param | kind | string? | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "fbm",
@@ -1222,10 +1204,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples ridged fractal noise. This method is available to Lua scripts.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves? | integer | Octave count (default 4).
-        /// @param | lac? | number | Lacunarity (default 2.0).
-        /// @param | pers? | number | Persistence (default 0.5).
-        /// @param | kind? | string | Noise kind name (default `"perlin"`).
+        /// @param | octaves | integer? | Octave count (default 4).
+        /// @param | lac | number? | Lacunarity (default 2.0).
+        /// @param | pers | number? | Persistence (default 0.5).
+        /// @param | kind | string? | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "ridged",
@@ -1257,10 +1239,10 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Samples turbulence fractal noise.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @param | octaves? | integer | Octave count (default 4).
-        /// @param | lac? | number | Lacunarity (default 2.0).
-        /// @param | pers? | number | Persistence (default 0.5).
-        /// @param | kind? | string | Noise kind name (default `"perlin"`).
+        /// @param | octaves | integer? | Octave count (default 4).
+        /// @param | lac | number? | Lacunarity (default 2.0).
+        /// @param | pers | number? | Persistence (default 0.5).
+        /// @param | kind | string? | Noise kind name (default `"perlin"`).
         /// @return | number | Noise value.
         methods.add_method(
             "turbulence",
@@ -1302,8 +1284,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Generates a noise map and returns it as a flat array table.
         /// @param | w | integer | Map width.
         /// @param | h | integer | Map height.
-        /// @param | opts? | table | Generation options including scale, octaves, kind, fractal, offset, and backend.
-        /// @return | table | Flat array table of noise values.
+        /// @param | opts | table? | Generation options including scale, octaves, kind, fractal, offset, and backend.
+        /// @return | number[] | Noise values.
         methods.add_method(
             "generateMap",
             |lua, this, (w, h, opts): (u32, u32, Option<LuaTable>)| {
@@ -1350,8 +1332,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// Generates a noise map through the compute backend and returns it as a flat array table.
         /// @param | w | integer | Map width.
         /// @param | h | integer | Map height.
-        /// @param | opts? | table | Generation options including scale, octaves, kind, fractal, and offset.
-        /// @return | table | Flat array table of noise values.
+        /// @param | opts | table? | Generation options including scale, octaves, kind, fractal, and offset.
+        /// @return | number[] | Noise values.
         methods.add_method(
             "generateMapCompute",
             |lua, this, (w, h, opts): (u32, u32, Option<LuaTable>)| {
@@ -1393,7 +1375,6 @@ impl LuaUserData for LuaNoiseGenerator {
         // -- setSeed --
         /// Sets this noise generator seed. This method is available to Lua scripts.
         /// @param | seed | integer | Seed value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setSeed", |_, this, seed: u64| {
             this.inner.set_seed(seed);
             Ok(())
@@ -1495,7 +1476,7 @@ impl LuaUserData for LuaRectPacker {
         /// Attempts to pack a rectangle and returns its placement coordinates.
         /// @param | w | integer | Rectangle width.
         /// @param | h | integer | Rectangle height.
-        /// @param | id? | string | Rectangle id.
+        /// @param | id | string? | Rectangle id.
         /// @return | integer | X coordinate, or nil when packing fails.
         /// @return | integer | Y coordinate, or nil when packing fails.
         methods.add_method_mut(
@@ -1507,7 +1488,6 @@ impl LuaUserData for LuaRectPacker {
         );
         // -- clear --
         /// Clears packed rectangles from this packer.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -1519,25 +1499,25 @@ impl LuaUserData for LuaRectPacker {
         // -- getPacked --
         /// Returns packed rectangle records.
         /// @return | table | Array table with `x`, `y`, `w`, `h`, and optional `id` fields.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
+    /// @field | w | number | Width.
+    /// @field | h | number | Height.
+    /// @field | id | integer? | Optional identifier.
         methods.add_method("getPacked", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, r) in this.inner.packed_rects().iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 row.set("x", r.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 row.set("y", r.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 row.set("w", r.w)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 row.set("h", r.h)?;
                 if let Some(id) = &r.id {
                     /// Performs the 'id' operation.
-                    /// @return | nil | No value is returned.
                     row.set("id", id.clone())?;
                 }
                 t.set(i + 1, row)?;
@@ -1556,7 +1536,6 @@ impl LuaUserData for LuaAabbTree {
         /// @param | min_y | number | Minimum y coordinate.
         /// @param | max_x | number | Maximum x coordinate.
         /// @param | max_y | number | Maximum y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "insert",
             |_, this, (id, min_x, min_y, max_x, max_y): (u64, f32, f32, f32, f32)| {
@@ -1575,7 +1554,7 @@ impl LuaUserData for LuaAabbTree {
         /// @param | min_y | number | Minimum y coordinate.
         /// @param | max_x | number | Maximum x coordinate.
         /// @param | max_y | number | Maximum y coordinate.
-        /// @return | table | Array table of item ids.
+        /// @return | integer[] | Item ids.
         methods.add_method(
             "query",
             |lua, this, (min_x, min_y, max_x, max_y): (f32, f32, f32, f32)| {
@@ -1591,7 +1570,7 @@ impl LuaUserData for LuaAabbTree {
         /// Queries ids containing a point. This method is available to Lua scripts.
         /// @param | x | number | Point x coordinate.
         /// @param | y | number | Point y coordinate.
-        /// @return | table | Array table of item ids.
+        /// @return | integer[] | Item ids.
         methods.add_method("queryPoint", |lua, this, (x, y): (f32, f32)| {
             let ids = this.inner.query_point(x, y);
             let t = lua.create_table()?;
@@ -1629,7 +1608,6 @@ impl LuaUserData for LuaAabbTree {
         methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.is_empty()));
         // -- clear --
         /// Clears all items from the tree. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -1653,7 +1631,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let tbl = lua.create_table()?;
     // -- newRandomGenerator --
     /// Creates a deterministic random generator with an optional seed.
-    /// @param | seed? | integer | Seed value.
+    /// @param | seed | integer? | Seed value.
     /// @return | LRandomGenerator | New random generator handle.
     tbl.set(
         "newRandomGenerator",
@@ -1667,15 +1645,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newTransform --
     /// Creates a 2D transform. All components are optional; omitting all returns an identity transform.
-    /// @param | x? | number | X translation (default 0).
-    /// @param | y? | number | Y translation (default 0).
-    /// @param | angle? | number | Rotation angle in radians (default 0).
-    /// @param | sx? | number | X scale factor (default 1).
-    /// @param | sy? | number | Y scale factor (defaults to `sx`).
-    /// @param | ox? | number | X origin offset for rotation/scale (default 0).
-    /// @param | oy? | number | Y origin offset for rotation/scale (default 0).
-    /// @param | kx? | number | X shear factor (default 0).
-    /// @param | ky? | number | Y shear factor (default 0).
+    /// @param | x | number? | X translation (default 0).
+    /// @param | y | number? | Y translation (default 0).
+    /// @param | angle | number? | Rotation angle in radians (default 0).
+    /// @param | sx | number? | X scale factor (default 1).
+    /// @param | sy | number? | Y scale factor (defaults to `sx`).
+    /// @param | ox | number? | X origin offset for rotation/scale (default 0).
+    /// @param | oy | number? | Y origin offset for rotation/scale (default 0).
+    /// @param | kx | number? | X shear factor (default 0).
+    /// @param | ky | number? | Y shear factor (default 0).
     /// @return | LTransform | New transform handle.
     tbl.set(
         "newTransform",
@@ -1737,7 +1715,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- newTween --
     /// Creates a tween with a duration and optional easing name.
     /// @param | duration | number | Tween duration in seconds.
-    /// @param | easing_name? | string | Easing name (default `linear`).
+    /// @param | easing_name | string? | Easing name (default `linear`).
     /// @return | LTween | New tween handle.
     tbl.set(
         "newTween",
@@ -1762,7 +1740,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newNoiseGenerator --
     /// Creates a procedural noise generator with an optional seed.
-    /// @param | seed? | integer | Seed value (default 0).
+    /// @param | seed | integer? | Seed value (default 0).
     /// @return | LNoiseGenerator | New noise generator handle.
     tbl.set(
         "newNoiseGenerator",
@@ -1776,7 +1754,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Creates a rectangle packer. This function is exposed to Lua scripts.
     /// @param | width | integer | Packer width.
     /// @param | height | integer | Packer height.
-    /// @param | padding? | integer | Padding between rectangles (default 0).
+    /// @param | padding | integer? | Padding between rectangles (default 0).
     /// @return | LRectPacker | New rectangle packer handle.
     tbl.set(
         "newRectPacker",
@@ -1790,7 +1768,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless 2D Perlin noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed? | integer | Seed value (default 0).
+    /// @param | seed | integer? | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "perlin2d",
@@ -1803,7 +1781,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
     /// @param | z | number | Z coordinate.
-    /// @param | seed? | integer | Seed value (default 0).
+    /// @param | seed | integer? | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "perlin3d",
@@ -1815,7 +1793,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless 2D simplex noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed? | integer | Seed value (default 0).
+    /// @param | seed | integer? | Seed value (default 0).
     /// @return | number | Noise value.
     tbl.set(
         "simplex2d",
@@ -1827,10 +1805,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples stateless fractal Brownian motion noise.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | seed? | integer | Seed value (default 0).
-    /// @param | octaves? | integer | Octave count (default 4).
-    /// @param | lac? | number | Lacunarity (default 2.0).
-    /// @param | gain? | number | Gain (default 0.5).
+    /// @param | seed | integer? | Seed value (default 0).
+    /// @param | octaves | integer? | Octave count (default 4).
+    /// @param | lac | number? | Lacunarity (default 2.0).
+    /// @param | gain | number? | Gain (default 0.5).
     /// @return | number | Noise value.
     tbl.set(
         "fbm",
@@ -2070,7 +2048,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- triangulate --
     /// Triangulates a flat polygon point table.
     /// @param | pts | table | Flat numeric table `{x1, y1, x2, y2, ...}` with at least three points.
-    /// @return | table | Array table of flat triangle point tables.
+    /// @return | table | Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
+    /// @field | 1 | number | Point component (interleaved x,y pairs).
     tbl.set(
         "triangulate",
         lua.create_function(|lua, pts: LuaTable| {
@@ -2261,7 +2240,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- convexHull --
     /// Computes the convex hull for a flat point table.
     /// @param | pts | table | Flat numeric point table.
-    /// @return | table | Flat numeric hull point table.
+    /// @return | number[] | Flat numeric hull point table (x1,y1,x2,y2,...).
     tbl.set(
         "convexHull",
         lua.create_function(|lua, pts: LuaTable| {
@@ -2282,7 +2261,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- delaunayTriangulate --
     /// Computes Delaunay triangles for a flat point table.
     /// @param | pts | table | Flat numeric point table.
-    /// @return | table | Array table of triangle index tables.
+    /// @return | table | Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
+    /// @field | 1 | integer | First vertex index.
+    /// @field | 2 | integer | Second vertex index.
+    /// @field | 3 | integer | Third vertex index.
     tbl.set(
         "delaunayTriangulate",
         lua.create_function(|lua, pts: LuaTable| {
@@ -2412,6 +2394,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | x2 | integer | End x coordinate.
     /// @param | y2 | integer | End y coordinate.
     /// @return | table | Array table of `{x, y}` point tables.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
     tbl.set(
         "bresenham",
         lua.create_function(|lua, (x1, y1, x2, y2): (i32, i32, i32, i32)| {
@@ -2427,13 +2411,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// The mathematical constant π ≈ 3.14159. Equivalent to `math.pi` in standard Lua.
-    /// @return | nil | No value is returned.
     tbl.set("pi", std::f64::consts::PI)?;
     /// The mathematical constant τ = 2π ≈ 6.28318.
-    /// @return | nil | No value is returned.
     tbl.set("tau", std::f64::consts::TAU)?;
     /// Positive infinity constant. Equivalent to `math.huge` in standard Lua.
-    /// @return | nil | No value is returned.
     tbl.set("huge", f64::INFINITY)?;
     // -- rad --
     /// Converts degrees to radians. This function is exposed to Lua scripts.
@@ -2479,7 +2460,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- atan --
     /// Returns arctangent or two-argument arctangent.
     /// @param | y | number | Input value or y coordinate.
-    /// @param | x? | number | X coordinate for atan2 behavior.
+    /// @param | x | number? | X coordinate for atan2 behavior.
     /// @return | number | Angle in radians.
     tbl.set(
         "atan",
@@ -2532,7 +2513,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- log --
     /// Returns natural logarithm or logarithm with a supplied base.
     /// @param | x | number | Input value.
-    /// @param | b? | number | Logarithm base.
+    /// @param | b | number? | Logarithm base.
     /// @return | number | Logarithm value.
     tbl.set(
         "log",
@@ -2617,8 +2598,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- random --
     /// Returns a Lua math random value, optionally scaled to one or two bounds.
-    /// @param | a? | number | Upper bound, or lower bound when `b` is given.
-    /// @param | b? | number | Upper bound.
+    /// @param | a | number? | Upper bound, or lower bound when `b` is given.
+    /// @param | b | number? | Upper bound.
     /// @return | number | Random value.
     tbl.set(
         "random",
@@ -2661,7 +2642,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Samples 2D or 3D simplex noise. This function is exposed to Lua scripts.
     /// @param | x | number | X coordinate.
     /// @param | y | number | Y coordinate.
-    /// @param | z? | number | Z coordinate for 3D noise.
+    /// @param | z | number? | Z coordinate for 3D noise.
     /// @return | number | Noise value.
     tbl.set(
         "simplexNoise",
@@ -2921,7 +2902,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | nx | number | Plane normal x component.
     /// @param | ny | number | Plane normal y component.
     /// @param | d | number | Plane distance from origin.
-    /// @return | table | Flat numeric clipped polygon point table.
+    /// @return | number[] | Flat numeric clipped polygon point table (x1,y1,x2,y2,...).
     tbl.set(
         "polygonClip",
         lua.create_function(|lua, (pts, nx, ny, d): (LuaTable, f32, f32, f32)| {
@@ -2976,7 +2957,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Returns polygon intersection points for two polygon tables.
     /// @param | a | table | First polygon table of `{x, y}` points.
     /// @param | b | table | Second polygon table of `{x, y}` points.
-    /// @return | table | Polygon table of result points.
+    /// @return | number[] | Flat array of polygon intersection result points (x1,y1,x2,y2,...).
     tbl.set(
         "polygonIntersection",
         lua.create_function(|lua, (a, b): (LuaTable, LuaTable)| {
@@ -2990,7 +2971,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Returns polygon union points for two polygon tables.
     /// @param | a | table | First polygon table of `{x, y}` points.
     /// @param | b | table | Second polygon table of `{x, y}` points.
-    /// @return | table | Polygon table of result points.
+    /// @return | number[] | Flat array of polygon union result points (x1,y1,x2,y2,...).
     tbl.set(
         "polygonUnion",
         lua.create_function(|lua, (a, b): (LuaTable, LuaTable)| {
@@ -3004,7 +2985,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Returns polygon difference points for two polygon tables.
     /// @param | a | table | First polygon table of `{x, y}` points.
     /// @param | b | table | Second polygon table of `{x, y}` points.
-    /// @return | table | Polygon table of result points.
+    /// @return | number[] | Flat array of polygon difference result points (x1,y1,x2,y2,...).
     tbl.set(
         "polygonDifference",
         lua.create_function(|lua, (a, b): (LuaTable, LuaTable)| {
@@ -3018,6 +2999,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Builds Voronoi cells from a polygon-style point table.
     /// @param | points | table | Point table with `x` and `y` fields.
     /// @return | table | Array table of cells with `site` and `vertices` fields.
+    /// @field | site | table | Site position with `x` and `y` fields.
+    /// @field | vertices | table | Array of vertex positions with `x` and `y` fields.
     tbl.set(
         "voronoi",
         lua.create_function(|lua, points: LuaTable| {
@@ -3027,28 +3010,22 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, cell) in cells.iter().enumerate() {
                 let site_tbl = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 site_tbl.set("x", cell.site.0)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 site_tbl.set("y", cell.site.1)?;
                 let verts_tbl = lua.create_table()?;
                 for (j, &(vx, vy)) in cell.vertices.iter().enumerate() {
                     let v = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     v.set("x", vx)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     v.set("y", vy)?;
                     verts_tbl.set(j + 1, v)?;
                 }
                 let cell_tbl = lua.create_table()?;
                 /// Performs the 'site' operation.
-                /// @return | nil | No value is returned.
                 cell_tbl.set("site", site_tbl)?;
                 /// Performs the 'vertices' operation.
-                /// @return | nil | No value is returned.
                 cell_tbl.set("vertices", verts_tbl)?;
                 out.set(i + 1, cell_tbl)?;
             }
@@ -3056,7 +3033,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'math' operation.
-    /// @return | nil | No value is returned.
     luna.set("math", tbl)?;
     Ok(())
 }
@@ -3077,10 +3053,8 @@ fn poly_to_lua_table<'lua>(lua: &'lua Lua, pts: &[(f32, f32)]) -> LuaResult<LuaT
     for (i, (x, y)) in pts.iter().enumerate() {
         let t = lua.create_table()?;
         /// Performs the 'x' operation.
-        /// @return | nil | No value is returned.
         t.set("x", *x)?;
         /// Performs the 'y' operation.
-        /// @return | nil | No value is returned.
         t.set("y", *y)?;
         arr.set(i + 1, t)?;
     }

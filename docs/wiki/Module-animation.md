@@ -57,7 +57,7 @@
   - [LAnimCurve:clear()](#lanimcurveclear)
   - [LAnimCurve:eval(t: number) -> number](#lanimcurveevalt-number-number)
   - [LAnimCurve:keyframeCount() -> integer](#lanimcurvekeyframecount-integer)
-  - [LAnimCurve:setCustomEasing(func: any)](#lanimcurvesetcustomeasingfunc-any)
+  - [LAnimCurve:setCustomEasing(func: function)](#lanimcurvesetcustomeasingfunc-function)
   - [LAnimCurve:setEasing(mode: string)](#lanimcurveseteasingmode-string)
   - [LAnimCurve:type() -> string](#lanimcurvetype-string)
   - [LAnimCurve:typeOf(name: string) -> boolean](#lanimcurvetypeofname-string-boolean)
@@ -72,10 +72,10 @@
   - [LAnimStateMachine:typeOf(name: string) -> boolean](#lanimstatemachinetypeofname-string-boolean)
   - [LAnimStateMachine:update(dt: number)](#lanimstatemachineupdatedt-number)
   - [LAnimSyncGroup](#lanimsyncgroup)
-  - [LAnimSyncGroup:add(handle: any)](#lanimsyncgroupaddhandle-any)
+  - [LAnimSyncGroup:add(handle: table)](#lanimsyncgroupaddhandle-table)
   - [LAnimSyncGroup:clear()](#lanimsyncgroupclear)
   - [LAnimSyncGroup:memberCount() -> integer](#lanimsyncgroupmembercount-integer)
-  - [LAnimSyncGroup:remove(handle: any)](#lanimsyncgroupremovehandle-any)
+  - [LAnimSyncGroup:remove(handle: table)](#lanimsyncgroupremovehandle-table)
   - [LAnimSyncGroup:type() -> string](#lanimsyncgrouptype-string)
   - [LAnimSyncGroup:typeOf(name: string) -> boolean](#lanimsyncgrouptypeofname-string-boolean)
   - [LBlendLayerSet](#lblendlayerset)
@@ -262,6 +262,7 @@ do
   local json = '{"frames":{"hero 0.ase":{"frame":{"x":0,"y":0,"w":32,"h":32},"duration":100}},'
     .. '"meta":{"size":{"w":32,"h":32},"frameTags":[{"name":"walk","from":0,"to":0,"direction":"forward"}]}}'
   local hero = lurek.animation.fromAseprite(json)
+  assert(hero, "fromAseprite must return an animation")
 
   -- After loading, clips are ready to play by their Aseprite tag name.
   hero:play("walk")
@@ -1390,13 +1391,13 @@ do
 end
 ```
 
-### `LAnimCurve:setCustomEasing(func: any)`
+### `LAnimCurve:setCustomEasing(func: function)`
 
 Sets or clears a Lua callback used to evaluate custom easing.
 
 **Parameters**
 
-- `func` (`any`, required) - Function used as custom easing callback, or nil to clear custom easing.
+- `func` (`function`, required) - Function used as custom easing callback, or nil to clear custom easing.
 
 #### Example
 
@@ -1802,13 +1803,13 @@ do
 end
 ```
 
-### `LAnimSyncGroup:add(handle: any)`
+### `LAnimSyncGroup:add(handle: table)`
 
 Adds an animation-like handle to the sync group.
 
 **Parameters**
 
-- `handle` (`any`, required) - Animation handle accepted by future sync group implementations.
+- `handle` (`table`, required) - Animation handle accepted by future sync group implementations.
 
 #### Example
 
@@ -1869,13 +1870,13 @@ do
 end
 ```
 
-### `LAnimSyncGroup:remove(handle: any)`
+### `LAnimSyncGroup:remove(handle: table)`
 
 Removes an animation-like handle from the sync group.
 
 **Parameters**
 
-- `handle` (`any`, required) - Animation handle accepted by future sync group implementations.
+- `handle` (`table`, required) - Animation handle accepted by future sync group implementations.
 
 #### Example
 

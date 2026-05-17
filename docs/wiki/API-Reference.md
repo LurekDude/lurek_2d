@@ -375,7 +375,7 @@ LAgent:typeOf(name: string) -> boolean -- Returns whether this agent handle matc
 ```lua
 LAIBlackboard:clear() -- Removes every local entry from this blackboard.
 LAIBlackboard:getBool(key: string, [default]: boolean) -> boolean -- Returns a boolean blackboard fact or the provided fallback when the key is missing or not boolean.
-LAIBlackboard:getKeys() -> table -- Returns every local blackboard key in an array-style Lua table.
+LAIBlackboard:getKeys() -> string[] -- Returns every local blackboard key in an array-style Lua table.
 LAIBlackboard:getNumber(key: string, [default]: number) -> number -- Returns a numeric blackboard fact or the provided fallback when the key is missing or not numeric.
 LAIBlackboard:getSize() -> integer -- Returns the number of entries currently stored in this blackboard.
 LAIBlackboard:getString(key: string, [default]: string) -> string -- Returns a string blackboard fact or the provided fallback when the key is missing or not a string.
@@ -531,10 +531,10 @@ LEmotionModel:update(dt: number) -- Advances emotion decay over elapsed time.
 ### LGeneticAlgorithm
 
 ```lua
-LGeneticAlgorithm:bestGenes() -> table -- Returns the genes for the best chromosome in the population.
+LGeneticAlgorithm:bestGenes() -> number[] -- Returns the genes for the best chromosome in the population.
 LGeneticAlgorithm:evolve() -- Advances the genetic algorithm by one generation.
 LGeneticAlgorithm:generation() -> integer -- Returns the current generation index.
-LGeneticAlgorithm:getGenes(idx: integer) -> table -- Returns the genes for a chromosome by zero-based index.
+LGeneticAlgorithm:getGenes(idx: integer) -> integer[] -- Returns the genes for a chromosome by zero-based index.
 LGeneticAlgorithm:popSize() -> integer -- Returns the population size. This method is available to Lua scripts.
 LGeneticAlgorithm:setFitness(idx: integer, fitness: number) -- Sets the fitness value for a chromosome by zero-based index.
 LGeneticAlgorithm:type() -> string -- Returns the Lua-visible type name for this genetic algorithm handle.
@@ -549,7 +549,7 @@ LGOAPPlanner:addGoal(name: string, [priority]: number) -- Adds a GOAP goal with 
 LGOAPPlanner:getActionCount() -> integer -- Returns the number of GOAP actions registered in this planner.
 LGOAPPlanner:getGoalCount() -> integer -- Returns the number of GOAP goals registered in this planner.
 LGOAPPlanner:getMaxIterations() -> integer -- Returns the maximum number of planner iterations allowed during search.
-LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> table -- Builds a plan from the supplied boolean world state and returns action names in execution order.
+LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> string[] -- Builds a plan from the supplied boolean world state and returns action names in execution order.
 LGOAPPlanner:setEffect(action_name: string, key: string, value: boolean) -- Sets one boolean effect produced by an existing GOAP action.
 LGOAPPlanner:setGoalState(goal_name: string, key: string, value: boolean) -- Sets one desired world-state key for an existing GOAP goal.
 LGOAPPlanner:setMaxIterations(n: integer) -- Sets the maximum number of planner iterations allowed during search.
@@ -585,7 +585,7 @@ LInfluenceMap:getMinPosition(layer: string) -> integer, integer -- Returns the c
 LInfluenceMap:getWidth() -> integer -- Returns the influence map width in cells.
 LInfluenceMap:hasLayer(name: string) -> boolean -- Returns whether an influence layer exists.
 LInfluenceMap:propagate(layer: string, [momentum]: number) -- Propagates influence values across neighboring cells on a named layer.
-LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> table -- Returns influence values inside a world-space rectangle on a named layer.
+LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> number[] -- Returns influence values inside a world-space rectangle on a named layer.
 LInfluenceMap:setInfluence(layer: string, x: integer, y: integer, value: number) -- Sets one cell value in a named influence layer using one-based cell coordinates.
 LInfluenceMap:stampInfluence(layer: string, wx: number, wy: number, radius: number, value: number, [falloff]: number) -- Applies a radial influence stamp to a named layer in world coordinates.
 LInfluenceMap:type() -> string -- Returns the Lua-visible type name for this influence map handle.
@@ -616,8 +616,8 @@ LNeedSystem:valueOf(name: string) -> number -- Returns the current value of a na
 
 ```lua
 LNeuralNet:addLayer(inputs: integer, outputs: integer, activation: string) -- Adds a neural network layer with an activation function.
-LNeuralNet:forward(input: table) -> table -- Runs a forward pass and returns output values.
-LNeuralNet:getWeights() -> table -- Returns the network weights as a flat numeric array.
+LNeuralNet:forward(input: table) -> number[] -- Runs a forward pass and returns output values.
+LNeuralNet:getWeights() -> number[] -- Returns the network weights as a flat numeric array.
 LNeuralNet:layerCount() -> integer -- Returns the number of layers in the network.
 LNeuralNet:paramCount() -> integer -- Returns the total number of trainable parameters.
 LNeuralNet:setWeights(weights: table) -> boolean -- Replaces the network weights from a flat numeric array.
@@ -688,7 +688,7 @@ LSquad:getFormationPosition(member_idx: integer, leader_x: number, leader_y: num
 LSquad:getFormationSpacing() -> number -- Returns the spacing used by squad formation positioning.
 LSquad:getLeader() -> LuaValue -- Returns the squad leader name when one is assigned.
 LSquad:getMemberCount() -> integer -- Returns the number of members in this squad.
-LSquad:getMembers() -> table -- Returns all squad members in an array-style Lua table.
+LSquad:getMembers() -> string[] -- Returns all squad members in an array-style Lua table.
 LSquad:getName() -> string -- Returns the squad name. This method is available to Lua scripts.
 LSquad:removeMember(name: string) -- Removes every member entry with the given name.
 LSquad:setFormation(ftype: string, [spacing]: number) -- Sets the squad formation type and optionally updates spacing.
@@ -847,7 +847,7 @@ LAnimCurve:addKeyframe(t: number, v: number) -- Adds a keyframe to the curve. Th
 LAnimCurve:clear() -- Removes all keyframes from this curve.
 LAnimCurve:eval(t: number) -> number -- Evaluates the curve at a time or normalized position.
 LAnimCurve:keyframeCount() -> integer -- Returns the number of keyframes stored in this curve.
-LAnimCurve:setCustomEasing(func: any) -- Sets or clears a Lua callback used to evaluate custom easing.
+LAnimCurve:setCustomEasing(func: function) -- Sets or clears a Lua callback used to evaluate custom easing.
 LAnimCurve:setEasing(mode: string) -- Sets the built-in easing mode used between keyframes.
 LAnimCurve:type() -> string -- Returns the Lua-visible type name for this animation curve handle.
 LAnimCurve:typeOf(name: string) -> boolean -- Returns whether this animation curve handle matches a supported type name.
@@ -870,10 +870,10 @@ LAnimStateMachine:update(dt: number) -- Advances the animation state machine and
 ### LAnimSyncGroup
 
 ```lua
-LAnimSyncGroup:add(handle: any) -- Adds an animation-like handle to the sync group.
+LAnimSyncGroup:add(handle: table) -- Adds an animation-like handle to the sync group.
 LAnimSyncGroup:clear() -- Removes all members from the sync group.
 LAnimSyncGroup:memberCount() -> integer -- Returns the number of handles tracked by the sync group.
-LAnimSyncGroup:remove(handle: any) -- Removes an animation-like handle from the sync group.
+LAnimSyncGroup:remove(handle: table) -- Removes an animation-like handle from the sync group.
 LAnimSyncGroup:type() -> string -- Returns the Lua-visible type name for this animation sync group handle.
 LAnimSyncGroup:typeOf(name: string) -> boolean -- Returns whether this animation sync group handle matches a supported type name.
 ```
@@ -903,10 +903,10 @@ lurek.audio.applyGain(sd_ud: LSoundData, gain: number) -- Applies a gain multipl
 lurek.audio.applyHighpass(sd_ud: LSoundData, cutoff_hz: number) -- Applies a highpass filter in-place to the sound data.
 lurek.audio.applyLowpass(sd_ud: LSoundData, cutoff_hz: number) -- Applies a lowpass filter in-place to the sound data.
 lurek.audio.clearFilter(source: LSource|integer) -- Removes all frequency filters from a source.
-lurek.audio.clearMidiSoundFont() -- Clears midi sound font for Lua scripts in this module.
+lurek.audio.clearMidiSoundFont() -- Clears the loaded SoundFont and reverts MIDI synthesis to default.
 lurek.audio.clearRandomPitch(src_ud: LSource) -- Clears any random pitch range previously set on the source.
 lurek.audio.clone(source: LSource|integer) -> LSource -- Creates an independent copy of a source sharing the same audio data.
-lurek.audio.create_bus(name: string, [parent_name]: string) -- Create_bus for Lua scripts in this module.
+lurek.audio.create_bus(name: string, [parent_name]: string) -- Creates a named audio bus, optionally parented to another bus.
 lurek.audio.crossfade(from_ud: LSource, to_ud: LSource, duration: number) -- Crossfades from one audio source to another over the given duration.
 lurek.audio.fadeIn(source: LSource|integer, dur: number) -- Sets the fade-in duration for a source so it ramps from silence on play.
 lurek.audio.getActiveSourceCount() -> integer -- Returns the number of sources currently playing audio.
@@ -927,8 +927,8 @@ lurek.audio.getMeter() -> number -- Returns the current master peak level for VU
 lurek.audio.getOrientation(source: LSource|integer) -> number, number, number, number, number, number -- Returns the orientation vectors of a source.
 lurek.audio.getPan(source: LSource|integer) -> number -- Returns the current stereo pan position of a source.
 lurek.audio.getPitch(source: LSource|integer) -> number -- Returns the current pitch multiplier of a source.
-lurek.audio.getPlaybackDevice() -> table -- Returns the playback device for Lua scripts in this module.
-lurek.audio.getPlaybackDevices() -> table -- Returns the playback devices for Lua scripts in this module.
+lurek.audio.getPlaybackDevice() -> string -- Returns the name of the currently active audio playback device.
+lurek.audio.getPlaybackDevices() -> string[] -- Returns a list of available audio playback device names.
 lurek.audio.getPosition(source: LSource|integer) -> number, number, number -- Returns the 3D position of a source.
 lurek.audio.getSourceBus(source: LSource|integer) -> LBus -- Returns the bus a source is routed through.
 lurek.audio.getSourceCount() -> integer -- Returns the total number of loaded audio sources (playing or idle).
@@ -936,7 +936,7 @@ lurek.audio.getSourceType(source: LSource|integer) -> string -- Returns whether 
 lurek.audio.getStereoWidth(src_ud: LSource) -> number -- Returns the current stereo width factor of an audio source.
 lurek.audio.getVelocity(source: LSource|integer) -> number, number, number -- Returns the velocity vector of a source.
 lurek.audio.getVolume(source: LSource|integer) -> number -- Returns the current volume of a source.
-lurek.audio.hasMidiSoundFont() -- Returns true if midi sound font for Lua scripts in this module.
+lurek.audio.hasMidiSoundFont() -> boolean -- Returns whether a SoundFont file has been loaded for MIDI synthesis.
 lurek.audio.isLooping(source: LSource|integer) -> boolean -- Returns whether a source has looping enabled.
 lurek.audio.isPaused(source: LSource|integer) -> boolean -- Returns whether a source is currently paused.
 lurek.audio.isPlaying(source: LSource|integer) -> boolean -- Returns whether a source is currently playing.
@@ -954,22 +954,22 @@ lurek.audio.newSource(path: string, [sourceType]: string) -> LSource -- Creates 
 lurek.audio.newSquareWave(freq: number, duration: number, sample_rate: integer, amplitude: number) -> LSoundData -- Generates a square wave as a `SoundData` buffer.
 lurek.audio.newTriangleWave(freq: number, duration: number, sample_rate: integer, amplitude: number) -> LSoundData -- Generates a triangle wave as a `SoundData` buffer.
 lurek.audio.newWhiteNoise(duration: number, sample_rate: integer, amplitude: number, seed: integer) -> LSoundData -- Generates white noise as a `SoundData` buffer using a deterministic seed.
-lurek.audio.normalizeFile(input: string, output: string, target: number) -- Normalize file for Lua scripts in this module.
+lurek.audio.normalizeFile(input: string, output: string, target: number) -- Normalizes an audio file to a target peak amplitude and saves the result.
 lurek.audio.pause(source: LSource|integer) -- Pauses playback of a source at its current position.
 lurek.audio.pauseAll() -- Pauses all currently playing audio sources.
 lurek.audio.play(source: LSource|integer, [options]: table) -> integer -- Starts playback of a source by handle, optionally routing through a named bus.
 lurek.audio.playLooping(source: LSource|integer) -- Starts playback of a source with looping enabled in one call.
-lurek.audio.playQueueable(qsource_id: integer) -- Play queueable for Lua scripts in this module.
+lurek.audio.playQueueable(qsource_id: integer) -- Starts playback of a queueable audio source.
 lurek.audio.processOffline(input: string, output: string, effects_tbl: table) -- Processes an audio file offline through a chain of effects and writes the result to an output file.
 lurek.audio.queueSource(qsource_id: integer, sd: LSoundData) -- Queues a decoded audio chunk for playback on a queueable source.
 lurek.audio.release(source: LSource|integer) -> boolean -- Releases an audio source, freeing its memory and stopping playback.
-lurek.audio.remove_effect(bus_name: string, effect_id: integer) -- Remove_effect for Lua scripts in this module.
+lurek.audio.remove_effect(bus_name: string, effect_id: integer) -> boolean -- Removes an effect from a named audio bus by effect ID.
 lurek.audio.resume(source: LSource|integer) -- Resumes playback of a paused source.
 lurek.audio.resumeAll() -- Resumes all paused audio sources. This function is exposed to Lua scripts.
 lurek.audio.saveWAV(sd_ud: LSoundData, filename: string) -- Encodes the sound data as a WAV file and saves it to the given path (relative to game dir).
 lurek.audio.seek(source: LSource|integer, pos: number) -- Seeks a source to a specific position in seconds.
 lurek.audio.set_bus_volume(name: string, volume: number) -- Sets the volume of a named audio bus.
-lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number) -- Set_effect_param for Lua scripts in this module.
+lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number) -> boolean -- Sets a parameter value on an effect attached to a named audio bus.
 lurek.audio.setDistanceModel(model: string) -- Sets the distance attenuation model for spatial audio.
 lurek.audio.setDopplerScale(scale: number) -- Sets the global Doppler effect intensity multiplier.
 lurek.audio.setHighpass(source: LSource|integer, cutoff_hz: integer) -- Applies a highpass filter to a source, attenuating low frequencies.
@@ -979,23 +979,23 @@ lurek.audio.setLooping(source: LSource|integer, looping: boolean) -- Enables or 
 lurek.audio.setLowpass(source: LSource|integer, cutoff_hz: integer) -- Applies a lowpass filter to a source, attenuating high frequencies.
 lurek.audio.setMasterVolume(vol: number) -- Sets the global master volume affecting all audio output.
 lurek.audio.setMeter(level: number) -- Sets the master peak level for metering purposes.
-lurek.audio.setMidiSoundFont(path: string) -- Sets the midi sound font for Lua scripts in this module.
+lurek.audio.setMidiSoundFont(path: string) -- Sets the SoundFont file used for MIDI synthesis.
 lurek.audio.setOrientation(source: LSource|integer, fx: number, fy: number, fz: number, ux: number, uy: number, uz: number) -- Sets the orientation of a source using forward and up vectors.
 lurek.audio.setPan(source: LSource|integer, pan: number) -- Sets the stereo panning of a source.
 lurek.audio.setPitch(source: LSource|integer, pitch: number) -- Sets the pitch multiplier of a source, affecting playback speed and tone.
-lurek.audio.setPlaybackDevice(name: string) -- Sets the playback device for Lua scripts in this module.
+lurek.audio.setPlaybackDevice(name: string) -- Sets the active audio playback device by name.
 lurek.audio.setPosition(source: LSource|integer, x: number, y: number, [z]: number) -- Sets the 3D position of a source for spatial audio panning and attenuation.
 lurek.audio.setRandomPitch(src_ud: LSource, min: number, max: number) -- Sets a random pitch range for a source; each play picks a random pitch between min and max.
 lurek.audio.setSourceBus(source: LSource|integer, bus: LBus) -- Routes a source through a specific audio bus for grouped mixing.
 lurek.audio.setStereoWidth(src_ud: LSource, width: number) -- Sets the stereo width of an audio source (0.0 = mono, 1.0 = full stereo).
 lurek.audio.setVelocity(source: LSource|integer, x: number, y: number, [z]: number) -- Sets the velocity of a source for Doppler effect calculations.
 lurek.audio.setVolume(source: LSource|integer, vol: number) -- Sets the volume of a source by handle.
-lurek.audio.spectrogramToPng(input: string, output: string, width: integer, height: integer) -- Spectrogram to png for Lua scripts in this module.
+lurek.audio.spectrogramToPng(input: string, output: string, width: integer, height: integer) -- Renders a spectrogram visualization of an audio file and saves it as a PNG image.
 lurek.audio.stop(source: LSource|integer) -- Stops playback of a source and resets its position to the beginning.
 lurek.audio.stopAll() -- Stops all audio sources and resets their positions.
-lurek.audio.stopQueueable(qsource_id: integer) -- Stop queueable for Lua scripts in this module.
+lurek.audio.stopQueueable(qsource_id: integer) -- Stops playback of a queueable audio source.
 lurek.audio.tell(source: LSource|integer) -> number -- Returns the current playback position of a source in seconds.
-lurek.audio.waveformToPng(input: string, output: string, width: integer, height: integer) -- Waveform to png for Lua scripts in this module.
+lurek.audio.waveformToPng(input: string, output: string, width: integer, height: integer) -- Renders a waveform visualization of an audio file and saves it as a PNG image.
 ```
 
 ### LBus
@@ -1156,14 +1156,14 @@ LSource:typeOf(name: string) -> boolean -- Checks whether this object is of the 
 
 ```lua
 lurek.automation.getCondition(name: string) -> boolean -- Returns a named automation condition value.
-lurek.automation.getCurrentScript() -> LuaValue -- Returns the current script name when a script is active.
+lurek.automation.getCurrentScript() -> string -- Returns the current script name when a script is active.
 lurek.automation.getCurrentStep() -> integer -- Returns the current step index of the active script.
 lurek.automation.getElapsedTime() -> number -- Returns elapsed playback time for the current script.
-lurek.automation.getLastError() -> LuaValue -- Returns the last automation error message when one exists.
+lurek.automation.getLastError() -> string -- Returns the last automation error message when one exists.
 lurek.automation.getPlaybackSpeed() -> number -- Returns automation playback speed multiplier.
-lurek.automation.getScripts() -> table -- Returns the names of loaded automation scripts.
+lurek.automation.getScripts() -> string[] -- Returns the names of loaded automation scripts.
 lurek.automation.getStepCount() -> integer -- Returns the number of steps in the active script.
-lurek.automation.getStepLimit(name: string) -> LuaValue -- Returns the configured step limit for a loaded script.
+lurek.automation.getStepLimit(name: string) -> integer -- Returns the configured step limit for a loaded script.
 lurek.automation.hasMacro(name: string) -> boolean -- Returns whether a macro is saved. This function is exposed to Lua scripts.
 lurek.automation.hasScript(name: string) -> boolean -- Returns whether a script is loaded.
 lurek.automation.isComplete() -> boolean -- Returns whether the current automation script completed.
@@ -1171,7 +1171,7 @@ lurek.automation.isFailed() -> boolean -- Returns whether the current automation
 lurek.automation.isHighlightMode() -> boolean -- Returns whether automation highlight mode is enabled.
 lurek.automation.isPaused() -> boolean -- Returns whether automation playback is paused.
 lurek.automation.isRunning() -> boolean -- Returns whether automation playback is running.
-lurek.automation.listMacros() -> table -- Returns the names of saved macros. This function is exposed to Lua scripts.
+lurek.automation.listMacros() -> string[] -- Returns the names of saved macros. This function is exposed to Lua scripts.
 lurek.automation.load(name: string, data: table) -- Loads an automation script from a Lua table of steps and optional metadata.
 lurek.automation.loadFromToml(name: string, toml_str: string) -- Loads an automation script from TOML text.
 lurek.automation.pause() -- Pauses automation playback. This function is exposed to Lua scripts.
@@ -1282,7 +1282,7 @@ LCameraRig:apply(name: string) -> boolean -- Appends render commands for a named
 LCameraRig:getViewport(name: string) -> boolean, number, number, number, number -- Returns a named rig camera viewport with a leading availability flag.
 LCameraRig:has(name: string) -> boolean -- Returns whether this rig contains a named camera.
 LCameraRig:minimap(window_w: number, window_h: number, [ratio]: number) -- Applies a minimap layout using the current window size and optional ratio.
-LCameraRig:names() -> table -- Returns all camera names in this rig.
+LCameraRig:names() -> string[] -- Returns all camera names in this rig.
 LCameraRig:pictureInPicture(window_w: number, window_h: number, [pip_w]: number, [pip_h]: number) -- Applies a picture-in-picture layout using optional inset size.
 LCameraRig:remove(name: string) -> boolean -- Removes a named camera from this rig.
 LCameraRig:setPosition(name: string, x: number, y: number) -- Sets the position of a named rig camera, creating it if needed.
@@ -1301,15 +1301,15 @@ LCameraRig:updateAll(dt: number) -- Advances every camera in this rig. This meth
 ```lua
 lurek.compute.affine2d(tx: number, ty: number, angle_rad: number, sx: number, sy: number) -> LArray -- Creates a 2D affine transform matrix.
 lurek.compute.fft(samples: table) -> table -- Computes the FFT of real-valued samples.
-lurek.compute.fftMagnitude(samples: table) -> table -- Computes FFT magnitudes for real-valued samples.
+lurek.compute.fftMagnitude(samples: table) -> number[] -- Computes FFT magnitudes for real-valued samples.
 lurek.compute.fromTable(data: table, [shape]: table, [dtype]: string) -> LArray -- Creates an array from a flat Lua table and optional shape.
 lurek.compute.gaussianKernel(size: integer, sigma: number) -> LArray -- Creates a square Gaussian kernel array.
 lurek.compute.getParThreshold() -> integer -- Returns the global compute parallelism threshold.
-lurek.compute.ifft(freqs: table) -> table -- Computes the inverse FFT of complex frequency pairs.
+lurek.compute.ifft(freqs: table) -> number[] -- Computes the inverse FFT of complex frequency pairs.
 lurek.compute.newArray(shape: table, [dtype]: string) -> LArray -- Creates a zero-filled array with the requested shape and data type.
 lurek.compute.ones(shape: table, [dtype]: string) -> LArray -- Creates a one-filled array with the requested shape and data type.
 lurek.compute.range(start: number, stop: number, [step]: number, [dtype]: string) -> LArray -- Creates a one-dimensional range array.
-lurek.compute.rotate2dMatrix(angle_rad: number) -> LArray -- Creates a 2D rotation matrix. This function is exposed to Lua scripts.
+lurek.compute.rotate2dMatrix(angle_rad: number) -> LArray -- Creates a 2D rotation matrix from an angle in radians.
 lurek.compute.setParThreshold(threshold: integer) -> integer -- Sets the global compute parallelism threshold and returns the previous value.
 lurek.compute.zeros(shape: table, [dtype]: string) -> LArray -- Creates a zero-filled array with the requested shape and data type.
 ```
@@ -1318,7 +1318,7 @@ lurek.compute.zeros(shape: table, [dtype]: string) -> LArray -- Creates a zero-f
 
 ```lua
 LArray:abs() -> LArray -- Returns element-wise absolute values.
-LArray:add(value: LuaValue) -> LArray -- Returns element-wise addition with an array or scalar.
+LArray:add(value: LArray) -> LArray -- Returns element-wise addition with an array or scalar.
 LArray:addInplace(other: LArray) -- Adds another array into this array in place.
 LArray:all() -> boolean -- Returns whether all elements are non-zero.
 LArray:any() -> boolean -- Returns whether any element is non-zero.
@@ -1331,48 +1331,48 @@ LArray:bitwiseOr(other: LArray) -> LArray -- Returns element-wise bitwise OR wit
 LArray:bitwiseRShift(amount: integer) -> LArray -- Returns element-wise right shift by a bit count.
 LArray:bitwiseXor(other: LArray) -> LArray -- Returns element-wise bitwise XOR with another array.
 LArray:clamp(min: number, max: number) -> LArray -- Returns values clamped between minimum and maximum bounds.
-LArray:clone() -> LArray -- Returns a copy of this array. This method is available to Lua scripts.
+LArray:clone() -> LArray -- Returns an independent deep copy of this array.
 LArray:convolve1d(kernel: LArray) -> LArray -- Returns one-dimensional convolution with a kernel array.
 LArray:convolve2D(kernel: LArray) -> LArray -- Returns two-dimensional convolution with a kernel array.
 LArray:correlate1d(template: LArray) -> LArray -- Returns one-dimensional correlation with a template array.
-LArray:countNonZero() -> integer -- Counts non-zero elements. This method is available to Lua scripts.
+LArray:countNonZero() -> integer -- Counts the number of non-zero elements in this array.
 LArray:covariance(other: LArray) -> number -- Returns covariance with another array.
 LArray:cross2d(other: LArray) -> number -- Returns two-dimensional cross product with another vector.
 LArray:cumsum() -> LArray -- Returns cumulative sum over the flattened array.
 LArray:diff([order]: integer) -> LArray -- Returns finite differences over the flattened array.
 LArray:dilate(radius: integer) -> LArray -- Returns morphological dilation with a radius.
-LArray:div(value: LuaValue) -> LArray -- Returns element-wise division with an array or scalar.
+LArray:div(value: LArray) -> LArray -- Returns element-wise division with an array or scalar.
 LArray:divInplace(other: LArray) -- Divides this array by another array in place.
 LArray:dot(other: LArray) -> number -- Returns dot product with another array.
 LArray:eigenPower([max_iter]: integer, [tol]: number) -> table -- Estimates dominant eigenvalue and eigenvector using power iteration.
-LArray:eq(value: LuaValue) -> LArray -- Returns element-wise equality comparison with an array or scalar.
+LArray:eq(value: LArray) -> LArray -- Returns element-wise equality comparison with an array or scalar.
 LArray:erode(radius: integer) -> LArray -- Returns morphological erosion with a radius.
 LArray:eval(expr: string) -> LArray -- Maps each element through a Lua expression compiled as `function(x) return expression end`.
 LArray:fill(val: number) -- Fills this array in place with one value.
 LArray:floodFill(row: integer, col: integer, val: number) -> LArray -- Returns a flood-filled copy starting at a one-based row and column.
 LArray:get(...: integer) -> number -- Reads an array element using one-based indices.
-LArray:getDataType() -> string -- Returns the array data type name. This method is available to Lua scripts.
+LArray:getDataType() -> string -- Returns the element data type name as a string.
 LArray:getDimensions() -> integer -- Returns the number of array dimensions.
 LArray:getRegion(row: integer, col: integer, rows: integer, cols: integer) -> LArray -- Returns a rectangular region from this array.
-LArray:getShape() -> table -- Returns the array shape as one-based dimension table.
+LArray:getShape() -> integer[] -- Returns the array shape as one-based dimension table.
 LArray:getSize() -> integer -- Returns the total number of array elements.
-LArray:gt(value: LuaValue) -> LArray -- Returns element-wise greater-than comparison with an array or scalar.
-LArray:gte(value: LuaValue) -> LArray -- Returns element-wise greater-or-equal comparison with an array or scalar.
+LArray:gt(value: LArray) -> LArray -- Returns element-wise greater-than comparison with an array or scalar.
+LArray:gte(value: LArray) -> LArray -- Returns element-wise greater-or-equal comparison with an array or scalar.
 LArray:histogram(bins: integer, [lo]: number, [hi]: number) -> table -- Returns histogram bins for the array values.
 LArray:isOnGPU() -> boolean -- Returns whether this array is currently stored on the GPU.
 LArray:linsolve(b: LArray) -> LArray -- Solves a linear system using this matrix and a right-hand side array.
-LArray:lt(value: LuaValue) -> LArray -- Returns element-wise less-than comparison with an array or scalar.
-LArray:lte(value: LuaValue) -> LArray -- Returns element-wise less-or-equal comparison with an array or scalar.
+LArray:lt(value: LArray) -> LArray -- Returns element-wise less-than comparison with an array or scalar.
+LArray:lte(value: LArray) -> LArray -- Returns element-wise less-or-equal comparison with an array or scalar.
 LArray:luDecompose() -> table -- Decomposes this matrix into LU data and permutation metadata.
 LArray:map(func: function) -> LArray -- Maps each element through a Lua function and returns a new array.
 LArray:matmul(other: LArray) -> LArray -- Returns matrix multiplication of this array and another array.
-LArray:max([axis]: integer) -> LuaValue -- Returns total maximum or a maximum array along a one-based axis.
-LArray:mean([axis]: integer) -> LuaValue -- Returns total mean or a mean array along a one-based axis.
-LArray:min([axis]: integer) -> LuaValue -- Returns total minimum or a minimum array along a one-based axis.
-LArray:mul(value: LuaValue) -> LArray -- Returns element-wise multiplication with an array or scalar.
+LArray:max([axis]: integer) -> number|LArray -- Returns total maximum or a maximum array along a one-based axis.
+LArray:mean([axis]: integer) -> number|LArray -- Returns total mean or a mean array along a one-based axis.
+LArray:min([axis]: integer) -> number|LArray -- Returns total minimum or a minimum array along a one-based axis.
+LArray:mul(value: LArray) -> LArray -- Returns element-wise multiplication with an array or scalar.
 LArray:mulInplace(other: LArray) -- Multiplies this array by another array in place.
 LArray:neg() -> LArray -- Returns element-wise negated values.
-LArray:neq(value: LuaValue) -> LArray -- Returns element-wise inequality comparison with an array or scalar.
+LArray:neq(value: LArray) -> LArray -- Returns element-wise inequality comparison with an array or scalar.
 LArray:normalizeRange(lo: number, hi: number) -> LArray -- Returns array values normalized into a target range.
 LArray:normalizeVec() -> LArray -- Returns this vector normalized to unit length.
 LArray:outer(other: LArray) -> LArray -- Returns outer product with another vector array.
@@ -1382,15 +1382,15 @@ LArray:pow(exp: number) -> LArray -- Returns this array raised element-wise to a
 LArray:reduce(func: function, init: number) -> number -- Reduces array values with a Lua accumulator function.
 LArray:reshape(shape: table) -> LArray -- Returns a reshaped copy of this array.
 LArray:scan(func: function, init: number) -> LArray -- Produces prefix accumulator values with a Lua function.
-LArray:set(...: LuaValue) -- Writes an array element using one-based indices followed by the value.
+LArray:set(...: number) -- Writes an array element using one-based indices followed by the value.
 LArray:setRegion(row: integer, col: integer, source: LArray) -- Writes a source array into this array at a one-based row and column.
 LArray:sobel() -> table -- Computes Sobel gradients for this array.
 LArray:sqrt() -> LArray -- Returns element-wise square roots.
-LArray:sub(value: LuaValue) -> LArray -- Returns element-wise subtraction with an array or scalar.
+LArray:sub(value: LArray) -> LArray -- Returns element-wise subtraction with an array or scalar.
 LArray:subInplace(other: LArray) -- Subtracts another array from this array in place.
-LArray:sum([axis]: integer) -> LuaValue -- Returns total sum or a summed array along a one-based axis.
+LArray:sum([axis]: integer) -> number|LArray -- Returns total sum or a summed array along a one-based axis.
 LArray:threshold(val: number) -> LArray -- Returns a mask array where values above a threshold are selected.
-LArray:toTable() -> table -- Returns array values flattened into a Lua table.
+LArray:toTable() -> number[] -- Returns array values flattened into a Lua table.
 LArray:transformPoints(pts: LArray) -> LArray -- Transforms a point array by this transform matrix.
 LArray:transpose() -> LArray -- Returns a transposed copy of a two-dimensional array.
 LArray:type() -> string -- Returns the Lua-visible type name for this array handle.
@@ -1405,40 +1405,40 @@ LArray:zscore() -> LArray -- Returns z-score normalized array values.
 
 ```lua
 lurek.data.compress(format_str: string, raw_data: string, [level]: integer) -> string -- Compresses a binary string using a named compression format.
-lurek.data.compressChunks(format_str: string, chunks: LuaValue, [level]: integer) -> string -- Compresses a string or table of strings as a chunked byte stream.
+lurek.data.compressChunks(format_str: string, chunks: string, [level]: integer) -> string -- Compresses a string or table of strings as a chunked byte stream.
 lurek.data.crc32(raw_data: string) -> integer -- Computes CRC32 for a binary string.
 lurek.data.decode(format_str: string, encoded: string) -> string -- Decodes a string using a named text encoding format.
 lurek.data.decompress(format_str: string, compressed: string) -> string -- Decompresses a binary string using a named compression format.
-lurek.data.decompressChunks(format_str: string, chunks: LuaValue) -> string -- Decompresses a string or table of strings as a chunked byte stream.
+lurek.data.decompressChunks(format_str: string, chunks: string) -> string -- Decompresses a string or table of strings as a chunked byte stream.
 lurek.data.encode(format_str: string, raw_data: string) -> string -- Encodes a binary string using a named text encoding format.
-lurek.data.encodeToml(tbl: table) -> string -- Encodes a Lua table into TOML text. This function is exposed to Lua scripts.
+lurek.data.encodeToml(tbl: table) -> string -- Encodes a Lua table into a TOML document string.
 lurek.data.fromMsgPack(bytes: string) -> LuaValue -- Decodes a structured binary interchange payload back into Lua values.
-lurek.data.getPackedSize(fmt: string, ...: LuaValue) -> integer -- Computes the packed byte size for values and a format string.
+lurek.data.getPackedSize(fmt: string, ...: table) -> integer -- Computes the packed byte size for values and a format string.
 lurek.data.hash(algo_str: string, raw_data: string) -> string -- Hashes a binary string with a named algorithm.
-lurek.data.newByteData(value: any) -> LByteData -- Creates ByteData from a size or string.
+lurek.data.newByteData(value: table) -> LByteData -- Creates ByteData from a size or string.
 lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView -- Creates a DataView over a binary string slice.
 lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer -- Creates a fixed-capacity ring buffer for Lua values.
 lurek.data.newWriter() -> LDataWriter -- Creates an empty binary data writer.
-lurek.data.pack(fmt: string, ...: LuaValue) -> string -- Packs Lua values into a binary string using a format string.
+lurek.data.pack(fmt: string, ...: table) -> string -- Packs Lua values into a binary string using a format string.
 lurek.data.parseToml(text: string) -> table -- Parses TOML text into Lua tables and scalar values.
 lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue -- Reads binary values from a byte string using a format string.
 lurek.data.size(fmt: string) -> integer -- Measures fixed byte size for a binary format string.
-lurek.data.toMsgPack(value: any) -> string -- Encodes a Lua value into the current structured binary interchange payload.
+lurek.data.toMsgPack(value: table) -> string -- Encodes a Lua value into the current structured binary interchange payload.
 lurek.data.unpack(fmt: string, raw: string, [offset]: integer) -> LuaValue -- Unpacks values from a binary string using a format string.
-lurek.data.write(fmt: string, ...: LuaValue) -> string -- Writes binary values into a byte string using a format string.
+lurek.data.write(fmt: string, ...: table) -> string -- Writes binary values into a byte string using a format string.
 ```
 
 ### LByteData
 
 ```lua
-LByteData:clone() -> LByteData -- Returns a copy of this byte buffer. This method is available to Lua scripts.
-LByteData:getBit(byte_offset: integer, bit_offset: integer) -> boolean -- Reads one bit inside a byte. This method is available to Lua scripts.
+LByteData:clone() -> LByteData -- Returns a deep copy of the entire byte buffer.
+LByteData:getBit(byte_offset: integer, bit_offset: integer) -> boolean -- Reads one bit inside a byte at the given offsets.
 LByteData:getByte(offset: integer) -> integer -- Reads one byte at a zero-based offset.
-LByteData:getSize() -> integer -- Returns the byte buffer length. This method is available to Lua scripts.
+LByteData:getSize() -> integer -- Returns the byte buffer length in bytes.
 LByteData:getString() -> string -- Returns the byte buffer as a string.
 LByteData:readBits(byte_offset: integer, bit_offset: integer, count: integer) -> integer -- Reads up to 32 bits starting at a byte and bit offset.
-LByteData:setBit(byte_offset: integer, bit_offset: integer, value: boolean) -- Sets or clears one bit inside a byte.
-LByteData:setByte(offset: integer, value: integer) -- Writes one byte at a zero-based offset.
+LByteData:setBit(byte_offset: integer, bit_offset: integer, value: boolean) -- Sets or clears one bit inside a byte at the given offset.
+LByteData:setByte(offset: integer, value: integer) -- Writes one byte at a zero-based offset inside the buffer.
 LByteData:type() -> string -- Returns the type name of this object for runtime type-checking.
 LByteData:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -1462,38 +1462,38 @@ LDataView:typeOf(name: string) -> boolean -- Returns whether this data view hand
 ### LDataWriter
 
 ```lua
-LDataWriter:len() -> integer -- Returns the writer buffer length. This method is available to Lua scripts.
-LDataWriter:seek(pos: integer) -- Moves the writer cursor. This method is available to Lua scripts.
+LDataWriter:len() -> integer -- Returns the current length of the writer buffer.
+LDataWriter:seek(pos: integer) -- Moves the writer cursor to a specific byte position.
 LDataWriter:tell() -> integer -- Returns the writer cursor position.
 LDataWriter:toBytes() -> string -- Returns the writer buffer as a binary string.
 LDataWriter:type() -> string -- Returns the Lua-visible type name for this data writer handle.
 LDataWriter:typeOf(name: string) -> boolean -- Returns whether this data writer handle matches a supported type name.
-LDataWriter:writeBytes(s: string) -- Writes raw bytes from a Lua string to the writer.
-LDataWriter:writeF32LE(v: number) -- Writes a 32-bit float in little-endian order.
-LDataWriter:writeF64LE(v: number) -- Writes a 64-bit float in little-endian order.
-LDataWriter:writeI16LE(v: integer) -- Writes a signed 16-bit integer in little-endian order.
-LDataWriter:writeI32LE(v: integer) -- Writes a signed 32-bit integer in little-endian order.
-LDataWriter:writeI8(v: integer) -- Writes a signed 8-bit integer. This method is available to Lua scripts.
-LDataWriter:writeString(s: string) -- Writes a UTF-8 string to the writer.
-LDataWriter:writeU16BE(v: integer) -- Writes an unsigned 16-bit integer in big-endian order.
-LDataWriter:writeU16LE(v: integer) -- Writes an unsigned 16-bit integer in little-endian order.
-LDataWriter:writeU32LE(v: integer) -- Writes an unsigned 32-bit integer in little-endian order.
-LDataWriter:writeU8(v: integer) -- Writes an unsigned 8-bit integer. This method is available to Lua scripts.
+LDataWriter:writeBytes(s: string) -- Appends raw bytes from a Lua string to the writer buffer.
+LDataWriter:writeF32LE(v: number) -- Appends a 32-bit float value in little-endian byte order.
+LDataWriter:writeF64LE(v: number) -- Appends a 64-bit float value in little-endian byte order.
+LDataWriter:writeI16LE(v: integer) -- Appends a signed 16-bit integer in little-endian byte order.
+LDataWriter:writeI32LE(v: integer) -- Appends a signed 32-bit integer in little-endian byte order.
+LDataWriter:writeI8(v: integer) -- Appends a signed 8-bit integer to the writer buffer.
+LDataWriter:writeString(s: string) -- Appends a UTF-8 encoded string to the writer buffer.
+LDataWriter:writeU16BE(v: integer) -- Appends an unsigned 16-bit integer in big-endian byte order.
+LDataWriter:writeU16LE(v: integer) -- Appends an unsigned 16-bit integer in little-endian byte order.
+LDataWriter:writeU32LE(v: integer) -- Appends an unsigned 32-bit integer in little-endian byte order.
+LDataWriter:writeU8(v: integer) -- Appends an unsigned 8-bit integer to the writer buffer.
 ```
 
 ### LRingBuffer
 
 ```lua
-LRingBuffer:capacity() -> integer -- Returns the ring buffer capacity. This method is available to Lua scripts.
-LRingBuffer:clear() -- Removes every stored value and releases registry keys.
+LRingBuffer:capacity() -> integer -- Returns the maximum capacity of the ring buffer.
+LRingBuffer:clear() -- Removes every stored value and releases their registry keys.
 LRingBuffer:isEmpty() -> boolean -- Returns whether the ring buffer has no values.
 LRingBuffer:isFull() -> boolean -- Returns whether the ring buffer is at capacity.
 LRingBuffer:len() -> integer -- Returns the number of values currently stored.
-LRingBuffer:peek() -> LuaValue -- Returns the oldest value without removing it.
-LRingBuffer:peekNewest() -> LuaValue -- Returns the newest value without removing it.
-LRingBuffer:pop() -> LuaValue -- Removes and returns the oldest value.
-LRingBuffer:push(value: any) -> boolean -- Pushes a value into the ring buffer and evicts the oldest value when full.
-LRingBuffer:toTable() -> table -- Returns stored values in oldest-to-newest order.
+LRingBuffer:peek() -> LuaValue -- Returns the oldest stored value without removing it from the ring buffer.
+LRingBuffer:peekNewest() -> LuaValue -- Returns the newest stored value without removing it from the ring buffer.
+LRingBuffer:pop() -> LuaValue -- Removes and returns the oldest stored value from the ring buffer.
+LRingBuffer:push(value: table) -> boolean -- Pushes a value into the ring buffer and evicts the oldest value when full.
+LRingBuffer:toTable() -> number[] -- Returns stored values in oldest-to-newest order.
 LRingBuffer:type() -> string -- Returns the Lua-visible type name for this ring buffer handle.
 LRingBuffer:typeOf(name: string) -> boolean -- Returns whether this ring buffer handle matches a supported type name.
 ```
@@ -1520,9 +1520,9 @@ lurek.dataframe.toVec(df: LDataFrame) -> LVecFrame -- Converts a dataframe to a 
 ```lua
 LDatabase:addTable(name: string, df_ud: LDataFrame) -- Adds or replaces a named dataframe table in the database.
 LDatabase:clear() -- Removes every table from the database.
-LDatabase:getTable(name: string) -> LuaValue -- Returns a copy of a named table when it exists.
+LDatabase:getTable(name: string) -> LDataFrame -- Returns a copy of a named table when it exists.
 LDatabase:hasTable(name: string) -> boolean -- Returns whether a named table exists.
-LDatabase:listTables() -> table -- Returns all table names in the database.
+LDatabase:listTables() -> string[] -- Returns all table names in the database.
 LDatabase:merge(other: LDatabase) -- Merges another database into this database.
 LDatabase:query(sql_str: string) -> LDataFrame -- Runs a SQL-style query against the database tables.
 LDatabase:removeTable(name: string) -- Removes a named table from the database.
@@ -1535,59 +1535,59 @@ LDatabase:typeOf(name: string) -> boolean -- Returns whether this database handl
 ### LDataFrame
 
 ```lua
-LDataFrame:addColumn(name: string, [default]: LuaValue) -- Adds a column with an optional default value.
+LDataFrame:addColumn(name: string, [default]: string) -- Adds a column with an optional default value.
 LDataFrame:addRow([row_tbl]: table) -> integer -- Adds a row from an optional map table and returns its one-based row index.
 LDataFrame:addRowBatch(rows: table) -- Appends multiple rows from array-style row tables.
-LDataFrame:apply(col_val: LuaValue, func: function) -- Applies a Lua function to each value in a column in place.
+LDataFrame:apply(col_val: string, func: function) -- Applies a Lua function to each value in a column in place.
 LDataFrame:clone() -> LDataFrame -- Returns a deep copy of this dataframe.
-LDataFrame:columns() -> table -- Returns all column names in order. This method is available to Lua scripts.
-LDataFrame:corr(col_a: LuaValue, col_b: LuaValue) -> number -- Returns correlation between two numeric columns.
+LDataFrame:columns() -> string[] -- Returns all column names in order. This method is available to Lua scripts.
+LDataFrame:corr(col_a: string, col_b: string) -> number -- Returns correlation between two numeric columns.
 LDataFrame:correlationMatrix() -> LDataFrame -- Returns a correlation matrix for numeric columns.
 LDataFrame:count() -> integer -- Returns the row count for this dataframe.
-LDataFrame:countBy(col: any) -> LDataFrame -- Counts occurrences of each value in a column.
+LDataFrame:countBy(col: string) -> LDataFrame -- Counts occurrences of each value in a column.
 LDataFrame:describe() -> LDataFrame -- Returns summary statistics for numeric columns.
-LDataFrame:dropNil(col: any) -> LDataFrame -- Returns rows where the chosen column is not nil.
-LDataFrame:entropy(col: any) -> number -- Returns entropy for a column. This method is available to Lua scripts.
-LDataFrame:fillNil(col: LuaValue, val: LuaValue) -- Replaces nil cells in a column with a value.
-LDataFrame:filter(col: LuaValue, op: string, val: LuaValue) -> LDataFrame -- Returns rows whose column value matches a comparison.
-LDataFrame:getColumn(col: any) -> table -- Returns a column as an array table. This method is available to Lua scripts.
-LDataFrame:getColumnAsF64(col: any) -> table -- Returns a numeric column as an array of numbers.
+LDataFrame:dropNil(col: string) -> LDataFrame -- Returns rows where the chosen column is not nil.
+LDataFrame:entropy(col: string) -> number -- Returns entropy for a column. This method is available to Lua scripts.
+LDataFrame:fillNil(col: string, val: string) -- Replaces nil cells in a column with a value.
+LDataFrame:filter(col: string, op: string, val: string) -> LDataFrame -- Returns rows whose column value matches a comparison.
+LDataFrame:getColumn(col: string) -> number[] -- Returns a column as an array table. This method is available to Lua scripts.
+LDataFrame:getColumnAsF64(col: string) -> number[] -- Returns a numeric column as an array of numbers.
 LDataFrame:getRow(row: integer) -> table -- Returns a row as a table keyed by column name.
-LDataFrame:getValue(row: integer, col: LuaValue) -> LuaValue -- Returns one cell value by one-based row and column reference.
-LDataFrame:groupAgg(group_col: LuaValue, agg_col: LuaValue, fn_name: string) -> LDataFrame -- Groups by one column and aggregates another column.
-LDataFrame:groupBy(col: any) -> table -- Groups rows by a column and returns a table from group key to dataframe.
-LDataFrame:groupByObj(col: any) -> LGroupedFrame -- Groups rows by a column and returns a grouped-frame object.
+LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil -- Returns one cell value by one-based row and column reference.
+LDataFrame:groupAgg(group_col: string, agg_col: string, fn_name: string) -> LDataFrame -- Groups by one column and aggregates another column.
+LDataFrame:groupBy(col: string) -> table -- Groups rows by a column and returns a table from group key to dataframe.
+LDataFrame:groupByObj(col: string) -> LGroupedFrame -- Groups rows by a column and returns a grouped-frame object.
 LDataFrame:head([n]: integer) -> LDataFrame -- Returns the first rows of this dataframe.
-LDataFrame:join(other: LDataFrame, this_col: LuaValue, other_col: LuaValue, [jtype]: string) -> LDataFrame -- Joins this dataframe with another dataframe by column references.
+LDataFrame:join(other: LDataFrame, this_col: string, other_col: string, [jtype]: string) -> LDataFrame -- Joins this dataframe with another dataframe by column references.
 LDataFrame:lazy() -> LLazyQuery -- Starts a lazy query pipeline from this dataframe.
-LDataFrame:max(col: any) -> LuaValue -- Returns the maximum value of a column.
-LDataFrame:mean(col: any) -> number -- Returns the numeric mean of a column.
-LDataFrame:median(col: any) -> number -- Returns the numeric median of a column.
+LDataFrame:max(col: string) -> number|string|boolean|nil -- Returns the maximum value of a column.
+LDataFrame:mean(col: string) -> number -- Returns the numeric mean of a column.
+LDataFrame:median(col: string) -> number -- Returns the numeric median of a column.
 LDataFrame:merge(other: LDataFrame) -- Appends another dataframe into this dataframe in place.
-LDataFrame:min(col: any) -> LuaValue -- Returns the minimum value of a column.
-LDataFrame:modeVal(col: any) -> LuaValue -- Returns the mode value of a column. This method is available to Lua scripts.
+LDataFrame:min(col: string) -> number|string|boolean|nil -- Returns the minimum value of a column.
+LDataFrame:modeVal(col: string) -> number|string|boolean|nil -- Returns the mode value of a column. This method is available to Lua scripts.
 LDataFrame:ncols() -> integer -- Returns the number of columns in this dataframe.
-LDataFrame:normalizeCol(col: LuaValue, out_min: number, out_max: number, name: string) -- Adds a range-normalized column in place.
+LDataFrame:normalizeCol(col: string, out_min: number, out_max: number, name: string) -- Adds a range-normalized column in place.
 LDataFrame:nrows() -> integer -- Returns the number of rows in this dataframe.
-LDataFrame:outliers(col: LuaValue, [threshold]: number) -> LDataFrame -- Returns rows considered outliers for a numeric column.
-LDataFrame:pivot(row_col: LuaValue, col_col: LuaValue, val_col: LuaValue) -> LDataFrame -- Pivots rows into columns using row, column, and value fields.
-LDataFrame:pivotTable(row_key: LuaValue, col_key: LuaValue, value_key: LuaValue, [agg]: string) -> LDataFrame -- Builds a pivot table using row key, column key, value column, and aggregate function.
+LDataFrame:outliers(col: string, [threshold]: number) -> LDataFrame -- Returns rows considered outliers for a numeric column.
+LDataFrame:pivot(row_col: string, col_col: string, val_col: string) -> LDataFrame -- Pivots rows into columns using row, column, and value fields.
+LDataFrame:pivotTable(row_key: string, col_key: string, value_key: string, [agg]: string) -> LDataFrame -- Builds a pivot table using row key, column key, value column, and aggregate function.
 LDataFrame:query(sql_str: string) -> LDataFrame -- Runs a SQL-style query against this dataframe.
-LDataFrame:rank(col: LuaValue, [order]: string, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rank column.
-LDataFrame:removeColumn(col: any) -- Removes a column by name or one-based index.
+LDataFrame:rank(col: string, [order]: string, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rank column.
+LDataFrame:removeColumn(col: string) -- Removes a column by name or one-based index.
 LDataFrame:removeRow(row: integer) -- Removes a row by one-based index. This method is available to Lua scripts.
-LDataFrame:rename(col: LuaValue, new_name: string) -- Renames a column by name or one-based index.
-LDataFrame:rollingMean(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling mean column.
-LDataFrame:rollingSum(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling sum column.
+LDataFrame:rename(col: string, new_name: string) -- Renames a column by name or one-based index.
+LDataFrame:rollingMean(col: string, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling mean column.
+LDataFrame:rollingSum(col: string, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling sum column.
 LDataFrame:rows() -> function -- Returns an iterator function over one-based row index and row table pairs.
 LDataFrame:sample(n: integer, [seed]: integer) -> LDataFrame -- Returns a sampled dataframe. This method is available to Lua scripts.
-LDataFrame:select(...: LuaValue) -> LDataFrame -- Returns a dataframe with selected columns.
-LDataFrame:setColumnFromF64(col: LuaValue, values: table) -- Replaces a numeric column from an array table of numbers.
-LDataFrame:setValue(row: integer, col: LuaValue, val: LuaValue) -- Sets one cell value by one-based row and column reference.
+LDataFrame:select(...: string) -> LDataFrame -- Returns a dataframe with selected columns.
+LDataFrame:setColumnFromF64(col: string, values: table) -- Replaces a numeric column from an array table of numbers.
+LDataFrame:setValue(row: integer, col: string, val: string) -- Sets one cell value by one-based row and column reference.
 LDataFrame:slice(start: integer, end: integer) -> LDataFrame -- Returns a one-based inclusive row slice.
-LDataFrame:sort(col: LuaValue, [ascending]: boolean) -> LDataFrame -- Returns rows sorted by a column. This method is available to Lua scripts.
-LDataFrame:stddev(col: any) -> number -- Returns the numeric standard deviation of a column.
-LDataFrame:sum(col: any) -> number -- Returns the numeric sum of a column.
+LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame -- Returns rows sorted by a column. This method is available to Lua scripts.
+LDataFrame:stddev(col: string) -> number -- Returns the numeric standard deviation of a column.
+LDataFrame:sum(col: string) -> number -- Returns the numeric sum of a column.
 LDataFrame:tail([n]: integer) -> LDataFrame -- Returns the last rows of this dataframe.
 LDataFrame:toBinary() -> string -- Serializes this dataframe to binary data.
 LDataFrame:toCSV() -> string -- Serializes this dataframe to CSV text.
@@ -1596,17 +1596,17 @@ LDataFrame:toString() -> string -- Formats this dataframe as a human-readable te
 LDataFrame:toTable() -> table -- Converts this dataframe to an array table of row tables.
 LDataFrame:type() -> string -- Returns the Lua-visible type name for this dataframe handle.
 LDataFrame:typeOf(name: string) -> boolean -- Returns whether this dataframe handle matches a supported type name.
-LDataFrame:unique(col: any) -> table -- Returns unique values from a column.
-LDataFrame:variance(col: any) -> number -- Returns the numeric variance of a column.
-LDataFrame:withCumsum(col: LuaValue, name: string) -- Adds a cumulative-sum column in place.
+LDataFrame:unique(col: string) -> number[] -- Returns unique values from a column.
+LDataFrame:variance(col: string) -> number -- Returns the numeric variance of a column.
+LDataFrame:withCumsum(col: string, name: string) -- Adds a cumulative-sum column in place.
 LDataFrame:withEval(col_name: string, expr: string) -> LDataFrame -- Returns a dataframe with a column computed from an expression.
-LDataFrame:withPctChange(col: LuaValue, name: string) -- Adds a percent-change column in place.
-LDataFrame:withRank(col: LuaValue, [asc]: boolean, name: string) -- Adds a rank column in place. This method is available to Lua scripts.
-LDataFrame:withRollingMax(col: LuaValue, window: integer, name: string) -- Adds a rolling maximum column in place.
-LDataFrame:withRollingMean(col: LuaValue, window: integer, name: string) -- Adds a rolling mean column in place.
-LDataFrame:withRollingMin(col: LuaValue, window: integer, name: string) -- Adds a rolling minimum column in place.
-LDataFrame:withRollingSum(col: LuaValue, window: integer, name: string) -- Adds a rolling sum column in place. This method is available to Lua scripts.
-LDataFrame:zscoreCol(col: LuaValue, name: string) -- Adds a z-score normalized column in place.
+LDataFrame:withPctChange(col: string, name: string) -- Adds a percent-change column in place.
+LDataFrame:withRank(col: string, [asc]: boolean, name: string) -- Adds a rank column in place. This method is available to Lua scripts.
+LDataFrame:withRollingMax(col: string, window: integer, name: string) -- Adds a rolling maximum column in place.
+LDataFrame:withRollingMean(col: string, window: integer, name: string) -- Adds a rolling mean column in place.
+LDataFrame:withRollingMin(col: string, window: integer, name: string) -- Adds a rolling minimum column in place.
+LDataFrame:withRollingSum(col: string, window: integer, name: string) -- Adds a rolling sum column in place. This method is available to Lua scripts.
+LDataFrame:zscoreCol(col: string, name: string) -- Adds a z-score normalized column in place.
 ```
 
 ### LGroupedFrame
@@ -1622,7 +1622,7 @@ LGroupedFrame:typeOf(name: string) -> boolean -- Returns whether this grouped fr
 ```lua
 LLazyQuery:collect() -> LDataFrame -- Executes the lazy query and returns a dataframe.
 LLazyQuery:dropNil(col: string) -> LLazyQuery -- Adds a step that drops rows with nil values in a column.
-LLazyQuery:filter(col: string, op: string, val: LuaValue) -> LLazyQuery -- Adds a filter step to the lazy query.
+LLazyQuery:filter(col: string, op: string, val: string) -> LLazyQuery -- Adds a filter step to the lazy query.
 LLazyQuery:head(n: integer) -> LLazyQuery -- Adds a head limit step to the lazy query.
 LLazyQuery:limit(n: integer) -> LLazyQuery -- Adds a row limit step to the lazy query.
 LLazyQuery:select(cols: table) -> LLazyQuery -- Adds a column selection step to the lazy query.
@@ -1649,9 +1649,9 @@ LVecFrame:colNeg(col: string) -- Negates a numeric column in place. This method 
 LVecFrame:colOp(out_col: string, left_col: string, op: string, right_col: string) -- Applies a binary column operation into an output column.
 LVecFrame:colSqrt(col: string) -- Applies square root to a numeric column in place.
 LVecFrame:colSub(col: string, val: number) -- Subtracts a scalar from a numeric column in place.
-LVecFrame:colType(col: string) -> LuaValue -- Returns the data type name for a vectorized column.
-LVecFrame:columns() -> table -- Returns all vectorized column names in order.
-LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> table -- Builds a boolean mask for a numeric column comparison.
+LVecFrame:colType(col: string) -> string -- Returns the data type name for a vectorized column.
+LVecFrame:columns() -> string[] -- Returns all vectorized column names in order.
+LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> number[] -- Builds a boolean mask for a numeric column comparison.
 LVecFrame:ncols() -> integer -- Returns the number of columns in this vectorized frame.
 LVecFrame:nrows() -> integer -- Returns the number of rows in this vectorized frame.
 LVecFrame:parReduce(cols_tbl: table, op: string) -> table -- Reduces multiple numeric columns in parallel.
@@ -1669,11 +1669,11 @@ LVecFrame:typeOf(name: string) -> boolean -- Returns whether this vectorized fra
 ```lua
 lurek.debugbridge.broadcast(event: string, json_data: string) -- Queues a JSON string payload broadcast for debug bridge clients.
 lurek.debugbridge.capturePrint(msg: string, [source]: string, [line]: integer) -- Captures a print message and broadcasts it to debug bridge clients.
-lurek.debugbridge.clearPrintHistory() -- Clears captured print history. This function is exposed to Lua scripts.
+lurek.debugbridge.clearPrintHistory() -- Clears all entries from the captured print history buffer.
 lurek.debugbridge.consumeHotReloadRequest() -> boolean -- Returns and clears the pending hot reload request flag.
 lurek.debugbridge.getClientCount() -> integer -- Returns the number of connected debug bridge clients.
 lurek.debugbridge.getPerformance() -> table -- Returns debug bridge performance metrics.
-lurek.debugbridge.getPort() -> integer -- Returns the debug bridge TCP port. This function is exposed to Lua scripts.
+lurek.debugbridge.getPort() -> integer -- Returns the configured TCP port for the debug bridge.
 lurek.debugbridge.getPrintHistory([count]: integer) -> table -- Returns captured print history entries.
 lurek.debugbridge.getProtocolInfo() -> table -- Returns debug bridge protocol version, capabilities, and handshake nonce.
 lurek.debugbridge.isRunning() -> boolean -- Returns whether the debug bridge server is currently running.
@@ -1697,8 +1697,8 @@ lurek.devtools.error(message: string) -- Adds an error-level diagnostic message 
 lurek.devtools.eval(code: string) -> LuaValue -- Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
 lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer -- Registers a watch expression callback for snapshots and watch panels.
 lurek.devtools.fatal(message: string) -- Adds a fatal-level diagnostic message to the devtools log.
-lurek.devtools.getCallStack([max_depth]: integer) -> table -- Returns Lua call stack frames using the Lua debug library.
-lurek.devtools.getFrameHistory() -> table -- Returns retained CPU frame duration samples in insertion order.
+lurek.devtools.getCallStack([max_depth]: integer) -> string[] -- Returns Lua call stack frames using the Lua debug library.
+lurek.devtools.getFrameHistory() -> number[] -- Returns retained CPU frame duration samples in insertion order.
 lurek.devtools.getFrameHistorySize() -> integer -- Returns the current CPU frame history capacity.
 lurek.devtools.getFrameStats() -> table -- Returns aggregate CPU frame timing statistics from recorded samples.
 lurek.devtools.getGpuFrameStats() -> table -- Returns aggregate GPU frame timing statistics from recorded samples.
@@ -1708,7 +1708,7 @@ lurek.devtools.getLogHistory([count]: integer) -> table -- Returns recent devtoo
 lurek.devtools.getLogLevel() -> string -- Returns the minimum severity currently used by devtools log output.
 lurek.devtools.getProfileData([frame]: integer) -> table -- Returns the profiler zone tree for a retained frame.
 lurek.devtools.getProfileFrameCount() -> integer -- Returns how many profiling frames are currently stored.
-lurek.devtools.getWatchedPaths() -> table -- Returns all paths currently watched by the module-level file watcher.
+lurek.devtools.getWatchedPaths() -> string[] -- Returns all paths currently watched by the module-level file watcher.
 lurek.devtools.getWatches() -> table -- Evaluates exposed watch callbacks and returns their current values.
 lurek.devtools.getWatchInterval() -> number -- Returns the polling interval hint used by devtools watch UIs.
 lurek.devtools.info(message: string) -- Adds an info-level diagnostic message to the devtools log.
@@ -1728,7 +1728,7 @@ lurek.devtools.recordFrameTime(dt_val: number) -- Records one CPU frame duration
 lurek.devtools.recordGpuFrameTime(dt_val: number) -- Records one GPU frame duration sample for devtools frame statistics.
 lurek.devtools.removeWatch(id: integer) -> boolean -- Removes a previously exposed watch expression by id.
 lurek.devtools.resetProfile() -- Clears profiler state, active zones, and retained profiling frames.
-lurek.devtools.scan() -> table -- Polls module-level file watches and returns paths that changed since the previous scan.
+lurek.devtools.scan() -> string[] -- Polls module-level file watches and returns paths that changed since the previous scan.
 lurek.devtools.setFrameHistorySize(size: integer) -- Sets the maximum number of CPU frame duration samples retained by devtools.
 lurek.devtools.setLogConsole(enabled: boolean) -- Enables or disables mirroring devtools log entries to the console.
 lurek.devtools.setLogFile(path: string) -- Sets the file path used by devtools file logging state.
@@ -1758,7 +1758,7 @@ LFileWatcher:typeOf(name: string) -> boolean -- Returns whether this file watche
 ```lua
 LReplConsole:clear() -- Clears this REPL console's command history.
 LReplConsole:eval(code: string) -> LuaValue -- Evaluates Lua code through this REPL console and records it in history.
-LReplConsole:history() -> table -- Returns this REPL console's recorded command history.
+LReplConsole:history() -> string[] -- Returns this REPL console's recorded command history.
 LReplConsole:len() -> integer -- Returns the number of entries stored in this REPL console history.
 LReplConsole:type() -> string -- Returns the Lua-visible type name for this REPL console handle.
 LReplConsole:typeOf(name: string) -> boolean -- Returns whether this REPL console handle matches a supported type name.
@@ -1802,13 +1802,13 @@ lurek.docs.validateModule(module_name: string, [catalog_ud]: LApiCatalog) -> LVa
 ```lua
 LApiCatalog:entryCount([module]: string) -> integer -- Counts entries in the catalog, optionally for one module.
 LApiCatalog:filter(predicate: function) -> LApiCatalog -- Builds a new catalog containing entries accepted by a Lua predicate.
-LApiCatalog:getEntries([module]: string) -> table -- Returns catalog entries, optionally limited to one module.
+LApiCatalog:getEntries([module]: string) -> LDocEntry[] -- Returns catalog entries, optionally limited to one module.
 LApiCatalog:getEntry(qualified_name: string) -> LuaValue -- Returns one catalog entry by qualified API name.
-LApiCatalog:getModules() -> table -- Returns every module represented in this catalog.
-LApiCatalog:getTypeMethods(qualified_name: string) -> table -- Returns method entries associated with a qualified type name.
-LApiCatalog:getTypes(module_name: string) -> table -- Returns type names documented for one module.
+LApiCatalog:getModules() -> string[] -- Returns every module represented in this catalog.
+LApiCatalog:getTypeMethods(qualified_name: string) -> LDocEntry[] -- Returns method entries associated with a qualified type name.
+LApiCatalog:getTypes(module_name: string) -> string[] -- Returns type names documented for one module.
 LApiCatalog:merge(other: LApiCatalog) -> LApiCatalog -- Merges another catalog into this catalog and returns a new catalog value.
-LApiCatalog:search(query: string) -> table -- Searches names, qualified names, and descriptions with a case-insensitive substring query.
+LApiCatalog:search(query: string) -> LDocEntry[] -- Searches names, qualified names, and descriptions with a case-insensitive substring query.
 LApiCatalog:toJSON() -> string -- Serializes this catalog to formatted JSON.
 LApiCatalog:toTable() -> table -- Converts this catalog into plain Lua tables for lightweight inspection.
 LApiCatalog:type() -> string -- Returns the Lua-visible type name for this API catalog handle.
@@ -1840,13 +1840,13 @@ LDocEntry:typeOf(name: string) -> boolean -- Returns whether this documentation 
 ### LQualityReport
 
 ```lua
-LQualityReport:getBest([count]: integer) -> table -- Returns the highest-scoring documentation entries.
-LQualityReport:getByGrade(grade: string) -> table -- Returns documentation entries whose calculated grade matches a grade string.
+LQualityReport:getBest([count]: integer) -> LDocEntry[] -- Returns the highest-scoring documentation entries.
+LQualityReport:getByGrade(grade: string) -> LDocEntry[] -- Returns documentation entries whose calculated grade matches a grade string.
 LQualityReport:getGrade() -> string -- Returns the letter grade derived from the aggregate documentation score.
 LQualityReport:getModuleScores() -> table -- Returns per-module documentation quality scores.
 LQualityReport:getOverallScore() -> number -- Returns the aggregate documentation quality score.
 LQualityReport:getSummary() -> string -- Returns a human-readable summary of overall and per-module quality scores.
-LQualityReport:getWorst([count]: integer) -> table -- Returns the lowest-scoring documentation entries.
+LQualityReport:getWorst([count]: integer) -> LDocEntry[] -- Returns the lowest-scoring documentation entries.
 LQualityReport:toJSON() -> string -- Serializes this quality report to formatted JSON.
 LQualityReport:toTable() -> table -- Converts this quality report into a plain Lua table.
 LQualityReport:type() -> string -- Returns the Lua-visible type name for this quality report handle.
@@ -1858,7 +1858,7 @@ LQualityReport:typeOf(name: string) -> boolean -- Returns whether this quality r
 ```lua
 LSchema:assert(data: table) -- Validates a Lua table and raises a Lua error when schema checks fail.
 LSchema:check(data: table) -> boolean -- Validates a Lua table and returns only the boolean result.
-LSchema:getFields() -> table -- Returns the field names declared by this schema.
+LSchema:getFields() -> string[] -- Returns the field names declared by this schema.
 LSchema:getName() -> string -- Returns this schema's display name.
 LSchema:type() -> string -- Returns the Lua-visible type name for this schema handle.
 LSchema:typeOf(name: string) -> boolean -- Returns whether this schema handle matches a supported type name.
@@ -1868,9 +1868,9 @@ LSchema:validate(data: table) -> boolean -- Validates a Lua table and returns a 
 ### LValidationReport
 
 ```lua
-LValidationReport:getIncomplete() -> table -- Returns catalog APIs whose documentation was incomplete.
-LValidationReport:getMissing() -> table -- Returns live APIs that were missing from the checked catalog.
-LValidationReport:getPhantom() -> table -- Returns catalog APIs that were not present in the live Lua table.
+LValidationReport:getIncomplete() -> string[] -- Returns catalog APIs whose documentation was incomplete.
+LValidationReport:getMissing() -> string[] -- Returns live APIs that were missing from the checked catalog.
+LValidationReport:getPhantom() -> string[] -- Returns catalog APIs that were not present in the live Lua table.
 LValidationReport:getSummary() -> string -- Returns a compact text summary of missing, phantom, and incomplete counts.
 LValidationReport:incompleteCount() -> integer -- Returns the number of catalog APIs with incomplete documentation.
 LValidationReport:isValid() -> boolean -- Returns whether the validation report has no missing live APIs.
@@ -1895,7 +1895,7 @@ lurek.ecs.newUniverse() -> LUniverse -- Creates an empty ECS universe for entity
 ```lua
 LUniverse:addRelation(from: integer, name: string, to: integer) -- Adds a named directed relation from one entity to another.
 LUniverse:addSystem(system: table, [opts]: table) -- Registers a Lua system table with optional phase, priority, name, and dependency metadata.
-LUniverse:addTag(id: integer, tag: string) -- Adds a string tag to an entity. This method is available to Lua scripts.
+LUniverse:addTag(id: integer, tag: string) -- Assigns a string tag name to an entity in this universe.
 LUniverse:applySnapshot(snapshot: table) -- Replaces this universe state from a Lua table snapshot.
 LUniverse:bitmapTag(id: integer, name: string) -> integer -- Adds a bitmap tag to an entity, defining the tag if needed.
 LUniverse:bitmapUntag(id: integer, name: string) -- Removes a bitmap tag from an entity.
@@ -1905,25 +1905,25 @@ LUniverse:defineBlueprint(name: string, components: table) -- Defines a named en
 LUniverse:defineTag(name: string) -> integer -- Defines a bitmap tag name and assigns it a bit slot.
 LUniverse:deserialize(snapshot: table) -- Replaces this universe state from a serialized Lua snapshot.
 LUniverse:each(name: string, callback: function) -- Iterates entities with one component and calls a Lua callback for each match.
-LUniverse:emit(event: string, ...: LuaValue) -- Calls matching event-named functions on registered systems.
+LUniverse:emit(event: string, ...: table) -- Calls matching event-named functions on registered systems.
 LUniverse:extendBlueprint(name: string, parent: string, overrides: table) -- Defines a blueprint that inherits from a parent blueprint and applies overrides.
 LUniverse:flushObservers() -- Delivers queued component add and remove events to registered observer callbacks.
-LUniverse:get(id: integer, name: string) -> LuaValue -- Returns a component value from an entity.
-LUniverse:getBitmapTagBit(name: string) -> LuaValue -- Returns the bit index assigned to a bitmap tag name.
+LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil -- Returns a component value from an entity.
+LUniverse:getBitmapTagBit(name: string) -> integer -- Returns the bit index assigned to a bitmap tag name.
 LUniverse:getBlueprintComponents(name: string) -> table -- Returns the component table stored for a blueprint.
-LUniverse:getChildren(parent_id: integer) -> table -- Returns child entity ids for a parent entity.
-LUniverse:getComponents(id: integer) -> table -- Returns component names currently stored on an entity.
-LUniverse:getDirtyEntities() -> table -- Returns entities marked dirty by recent ECS mutations.
-LUniverse:getEntities() -> table -- Returns all live entity ids in this universe.
-LUniverse:getEntitiesByLayer(layer: integer) -> table -- Returns entities assigned to a numeric layer.
-LUniverse:getEntitiesByTag(tag: string) -> table -- Returns entities that have a string tag.
-LUniverse:getEntitiesSorted() -> table -- Returns live entities sorted by ECS layer and stable entity ordering.
+LUniverse:getChildren(parent_id: integer) -> integer[] -- Returns child entity ids for a parent entity.
+LUniverse:getComponents(id: integer) -> string[] -- Returns component names currently stored on an entity.
+LUniverse:getDirtyEntities() -> integer[] -- Returns entities marked dirty by recent ECS mutations.
+LUniverse:getEntities() -> integer[] -- Returns all live entity ids in this universe.
+LUniverse:getEntitiesByLayer(layer: integer) -> integer[] -- Returns entities assigned to a numeric layer.
+LUniverse:getEntitiesByTag(tag: string) -> integer[] -- Returns entities that have a string tag.
+LUniverse:getEntitiesSorted() -> integer[] -- Returns live entities sorted by ECS layer and stable entity ordering.
 LUniverse:getEntityCount() -> integer -- Returns the number of live entities in this universe.
 LUniverse:getLayer(id: integer) -> integer -- Returns the numeric layer assigned to an entity.
-LUniverse:getParent(child_id: integer) -> LuaValue -- Returns the parent entity id for a child entity.
-LUniverse:getRelated(from: integer, name: string) -> table -- Returns targets linked from an entity by a named relation.
+LUniverse:getParent(child_id: integer) -> integer -- Returns the parent entity id for a child entity.
+LUniverse:getRelated(from: integer, name: string) -> integer[] -- Returns targets linked from an entity by a named relation.
 LUniverse:getSystemCount() -> integer -- Returns the number of registered systems.
-LUniverse:getTags(id: integer) -> table -- Returns string tags assigned to an entity.
+LUniverse:getTags(id: integer) -> string[] -- Returns string tags assigned to an entity.
 LUniverse:has(id: integer, name: string) -> boolean -- Returns whether an entity has a named component.
 LUniverse:hasBitmapTag(id: integer, name: string) -> boolean -- Returns whether an entity has a bitmap tag.
 LUniverse:hasBlueprint(name: string) -> boolean -- Returns whether a named blueprint exists.
@@ -1932,15 +1932,15 @@ LUniverse:hasTag(id: integer, tag: string) -> boolean -- Returns whether an enti
 LUniverse:isAlive(id: integer) -> boolean -- Returns whether an entity id currently exists in this universe.
 LUniverse:kill(id: integer) -- Deletes an entity and removes its components from this universe.
 LUniverse:killRecursive(id: integer) -- Deletes an entity and all descendant entities in its hierarchy.
-LUniverse:listBlueprints() -> table -- Returns names of all registered blueprints.
+LUniverse:listBlueprints() -> string[] -- Returns names of all registered blueprints.
 LUniverse:onComponentAdded(name: string, cb: function) -- Registers a callback for queued component-add events with a given component name.
 LUniverse:onComponentRemoved(name: string, cb: function) -- Registers a callback for queued component-remove events with a given component name.
-LUniverse:query(...: string) -> table -- Returns entities that have all component names passed as varargs.
-LUniverse:queryBitmapAll(names: table) -> table -- Returns entities that have every bitmap tag from a list.
-LUniverse:queryBitmapAny(names: table) -> table -- Returns entities with at least one bitmap tag from a list.
-LUniverse:queryBitmapTag(name: string) -> table -- Returns entities with one bitmap tag.
+LUniverse:query(...: string) -> integer[] -- Returns entities that have all component names passed as varargs.
+LUniverse:queryBitmapAll(names: table) -> integer[] -- Returns entities that have every bitmap tag from a list.
+LUniverse:queryBitmapAny(names: table) -> integer[] -- Returns entities with at least one bitmap tag from a list.
+LUniverse:queryBitmapTag(name: string) -> integer[] -- Returns entities with one bitmap tag.
 LUniverse:queryMulti(names_table: table, callback: function) -- Iterates entities that have all component names from a table.
-LUniverse:queryNot(with_tbl: table, without_tbl: table) -> table -- Returns entities that include one component set and exclude another component set.
+LUniverse:queryNot(with_tbl: table, without_tbl: table) -> integer[] -- Returns entities that include one component set and exclude another component set.
 LUniverse:release() -- Releases universe contents by clearing all ECS state.
 LUniverse:remove(id: integer, name: string) -- Removes a named component from an entity.
 LUniverse:removeBlueprint(name: string) -> boolean -- Removes a named blueprint from this universe.
@@ -1949,13 +1949,13 @@ LUniverse:removeSystem(system: table) -- Removes a previously registered Lua sys
 LUniverse:removeTag(id: integer, tag: string) -- Removes a string tag from an entity.
 LUniverse:render() -- Runs registered render-phase systems using their render or draw callbacks.
 LUniverse:serialize() -> table -- Serializes this universe into a Lua table snapshot.
-LUniverse:set(id: integer, name: string, value: LuaValue) -- Stores or replaces a component value on an entity.
+LUniverse:set(id: integer, name: string, value: table) -- Stores or replaces a component value on an entity.
 LUniverse:setLayer(id: integer, layer: integer) -- Assigns a numeric layer to an entity.
 LUniverse:setParent(child_id: integer, [parent_id]: integer) -- Sets or clears the parent entity for a child entity.
 LUniverse:snapshot() -> table -- Serializes this universe into a Lua table snapshot.
 LUniverse:spawn() -> integer -- Creates a new entity in this universe.
 LUniverse:spawnBlueprint(name: string, [overrides]: table) -> integer -- Spawns an entity from a named blueprint with optional component overrides.
-LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> table -- Spawns multiple entities from a blueprint using shared optional overrides.
+LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> integer[] -- Spawns multiple entities from a blueprint using shared optional overrides.
 LUniverse:takeSnapshotDiff() -> table -- Returns and clears accumulated ECS snapshot diff data.
 LUniverse:type() -> string -- Returns the Lua-visible type name for this universe handle.
 LUniverse:typeOf(name: string) -> boolean -- Returns whether this universe handle matches a supported type name.
@@ -1968,7 +1968,7 @@ LUniverse:updatePhase(phase: string, dt: number) -- Runs registered systems assi
 [[Module page|Module-effect]]
 
 ```lua
-lurek.effect.getEffectTypes() -> table -- Returns all built-in post-processing effect type names.
+lurek.effect.getEffectTypes() -> string[] -- Returns all built-in post-processing effect type names.
 lurek.effect.getShaderErrorDisplay() -> boolean -- Returns whether renderer shader error display overlays are enabled.
 lurek.effect.newCustomEffect(shader_id: integer) -> LPostFxEffect -- Creates a custom post-processing effect that references an existing shader id.
 lurek.effect.newEffect(type_name: string) -> LPostFxEffect -- Creates a built-in post-processing effect by type name.
@@ -1989,11 +1989,11 @@ LImageEffect:clear() -- Removes every effect from this image effect chain.
 LImageEffect:clearEffects() -- Removes every effect from this image effect chain.
 LImageEffect:clone() -> LImageEffect -- Creates a new image effect chain with cloned effect entries.
 LImageEffect:effectCount() -> integer -- Returns the number of effects in this image effect chain.
-LImageEffect:getEffect(key: any) -> LuaValue -- Looks up an image effect by one-based index or effect type name.
+LImageEffect:getEffect(key: string) -> LuaValue -- Looks up an image effect by one-based index or effect type name.
 LImageEffect:getEffectCount() -> integer -- Returns the number of effects in this image effect chain.
 LImageEffect:removeByIndex(idx: integer) -> boolean -- Removes an image effect by zero-based internal index.
 LImageEffect:removeByName(name: string) -> boolean -- Removes the first image effect with a matching effect type name.
-LImageEffect:removeEffect(key: any) -> boolean -- Removes an image effect by one-based index or effect type name.
+LImageEffect:removeEffect(key: string) -> boolean -- Removes an image effect by one-based index or effect type name.
 LImageEffect:save() -> boolean -- Reports success for the current image effect save placeholder.
 LImageEffect:type() -> string -- Returns the Lua-visible type name for this image effect handle.
 LImageEffect:typeOf(name: string) -> boolean -- Returns whether this image effect handle matches a supported type name.
@@ -2044,7 +2044,7 @@ LOverlay:pullAmbientFromLight() -- Copies ambient color from the shared light wo
 LOverlay:pushAmbientToLight() -- Copies this overlay ambient color into the shared light world.
 LOverlay:render() -- Queues renderer commands for the overlay's current visual state.
 LOverlay:resize(w: integer, h: integer) -- Resizes the overlay target dimensions.
-LOverlay:setAmbientColor(r: number, g: number, b: number, [a]: number) -- Sets overlay ambient RGBA color. This method is available to Lua scripts.
+LOverlay:setAmbientColor(r: number, g: number, b: number, [a]: number) -- Sets the overlay ambient color from RGBA channels.
 LOverlay:setAmbientEnabled(v: boolean) -- Enables or disables overlay ambient color rendering.
 LOverlay:setCloudCount(v: integer) -- Sets the overlay cloud shadow count.
 LOverlay:setCloudOpacity(v: number) -- Sets cloud shadow opacity. This method is available to Lua scripts.
@@ -2054,7 +2054,7 @@ LOverlay:setCloudSpeed(v: number) -- Sets cloud shadow movement speed. This meth
 LOverlay:setCustomShader([name]: string) -- Sets or clears the custom overlay shader name.
 LOverlay:setFilmGrainEnabled(v: boolean) -- Enables or disables overlay film grain rendering.
 LOverlay:setFilmGrainIntensity(v: number) -- Sets overlay film grain intensity.
-LOverlay:setFogColor(r: number, g: number, b: number, [a]: number) -- Sets overlay fog RGBA color. This method is available to Lua scripts.
+LOverlay:setFogColor(r: number, g: number, b: number, [a]: number) -- Sets the overlay fog color from RGBA channels.
 LOverlay:setFogDensity(v: number) -- Sets overlay fog density. This method is available to Lua scripts.
 LOverlay:setFogEnabled(v: boolean) -- Enables or disables overlay fog rendering.
 LOverlay:setHeatHazeEnabled(v: boolean) -- Enables or disables overlay heat haze rendering.
@@ -2088,7 +2088,7 @@ LPostFxEffect:disableAutoUniforms() -- Disables automatic time and resolution un
 LPostFxEffect:enableAutoUniforms() -- Enables automatic time and resolution uniforms for this effect.
 LPostFxEffect:getEffectType() -> string -- Returns the renderer effect type name.
 LPostFxEffect:getParameter(name: string, [default]: number) -> number -- Reads a numeric shader parameter and falls back to a default value when missing.
-LPostFxEffect:getParameterNames() -> table -- Returns the parameter names stored on this effect.
+LPostFxEffect:getParameterNames() -> string[] -- Returns the parameter names stored on this effect.
 LPostFxEffect:getType() -> string -- Returns the renderer effect type name.
 LPostFxEffect:getTypeName() -> string -- Returns the built-in or custom effect type name.
 LPostFxEffect:hasParameter(name: string) -> boolean -- Returns whether a shader parameter exists on this effect.
@@ -2123,7 +2123,7 @@ LPostFxStack:endCapture() -- Ends post-effect capture and queues a renderer end-
 LPostFxStack:getDimensions() -> integer -- Returns the stack render dimensions.
 LPostFxStack:getEffect(index: integer) -> LuaValue -- Returns the effect handle at a one-based position.
 LPostFxStack:getEffectCount() -> integer -- Returns the number of effect handles in this stack.
-LPostFxStack:getEnabledEffects() -> table -- Returns effect handles whose stack passes are enabled.
+LPostFxStack:getEnabledEffects() -> LPostFxEffect[] -- Returns effect handles whose stack passes are enabled.
 LPostFxStack:getFeedback() -> number -- Returns the current stack feedback blend factor.
 LPostFxStack:getHeight() -> integer -- Returns the stack render height. This method is available to Lua scripts.
 LPostFxStack:getWidth() -> integer -- Returns the stack render width. This method is available to Lua scripts.
@@ -2190,12 +2190,12 @@ lurek.event.getHistory() -> table -- Returns retained pushed event history entri
 lurek.event.newSignal() -> LSignal -- Creates an isolated signal dispatcher for Lua callbacks.
 lurek.event.poll() -> function -- Creates a polling function that returns the next queued event each time it is called.
 lurek.event.pump() -- Pumps the shared event queue without removing events for Lua.
-lurek.event.push(name: string, ...: any) -- Pushes a normal-priority event into the shared event queue and optional history.
-lurek.event.pushDeferred(name: string, ...: any) -- Adds a normal-priority event to the deferred buffer instead of the live queue.
-lurek.event.pushDeferredPriority(name: string, priority: string, ...: any) -- Adds an event with explicit priority to the deferred buffer.
-lurek.event.pushPriority(name: string, priority: string, ...: any) -- Pushes an event with explicit priority into the shared event queue and optional history.
+lurek.event.push(name: string, ...: table) -- Pushes a normal-priority event into the shared event queue and optional history.
+lurek.event.pushDeferred(name: string, ...: table) -- Adds a normal-priority event to the deferred buffer instead of the live queue.
+lurek.event.pushDeferredPriority(name: string, priority: string, ...: table) -- Adds an event with explicit priority to the deferred buffer.
+lurek.event.pushPriority(name: string, priority: string, ...: table) -- Pushes an event with explicit priority into the shared event queue and optional history.
 lurek.event.quit() -- Requests engine shutdown with exit code zero.
-lurek.event.restart() -- Requests an engine restart. This function is exposed to Lua scripts.
+lurek.event.restart() -- Requests a full engine restart cycle from the runtime.
 lurek.event.wait([timeout]: number) -> boolean -- Waits for the next queued event and returns success, name, and argument table.
 ```
 
@@ -2205,7 +2205,7 @@ lurek.event.wait([timeout]: number) -> boolean -- Waits for the next queued even
 LSignal:clear(name: string) -> integer -- Removes all callbacks registered for one exact signal event name.
 LSignal:clearAll() -> integer -- Removes every callback from this signal object.
 LSignal:connect(name: string, func: function) -> integer -- Registers a callback for an exact name or wildcard signal pattern.
-LSignal:emit(name: string, ...: any) -- Emits a signal event and invokes matching callbacks with the remaining arguments.
+LSignal:emit(name: string, ...: table) -- Emits a signal event and invokes matching callbacks with the remaining arguments.
 LSignal:getCount(name: string) -> integer -- Returns the callback count for one exact signal event name.
 LSignal:getTotalCount() -> integer -- Returns the total callback count across all signal event names.
 LSignal:once(name: string, callback: function) -> integer -- Registers a callback that is removed after its next matching emission.
@@ -2226,18 +2226,18 @@ lurek.filesystem.copy(src: string, dst: string) -- Copies one GameFS file to ano
 lurek.filesystem.createDirectory(path: string) -- Creates a GameFS directory and any missing parents.
 lurek.filesystem.createTempFile([prefix]: string) -> string -- Creates a temporary file through GameFS.
 lurek.filesystem.exists(path: string) -> boolean -- Returns whether a path exists in GameFS.
-lurek.filesystem.getDirectoryItems(path: string) -> table -- Lists immediate entries in a GameFS directory.
+lurek.filesystem.getDirectoryItems(path: string) -> string[] -- Lists immediate entries in a GameFS directory.
 lurek.filesystem.getIdentity() -> string -- Returns the current filesystem identity string.
-lurek.filesystem.getInfo(path: string) -> LuaValue -- Returns file metadata for a GameFS path when available.
+lurek.filesystem.getInfo(path: string) -> table -- Returns file metadata for a GameFS path when available.
 lurek.filesystem.getSaveDirectory() -> string -- Returns the save directory path used by GameFS.
 lurek.filesystem.getSource() -> string -- Returns the GameFS source root string.
 lurek.filesystem.getUserDirectory() -> string -- Returns the current user's directory path.
 lurek.filesystem.getWorkingDirectory() -> string -- Returns the process working directory.
-lurek.filesystem.glob(pattern: string) -> table -- Returns GameFS paths matching a glob pattern.
+lurek.filesystem.glob(pattern: string) -> string[] -- Returns GameFS paths matching a glob pattern.
 lurek.filesystem.isDirectory(path: string) -> boolean -- Returns whether a GameFS path is a directory.
 lurek.filesystem.isFile(path: string) -> boolean -- Returns whether a GameFS path is a regular file.
 lurek.filesystem.lines(path: string) -> function -- Creates an iterator function over lines in a text file.
-lurek.filesystem.listRecursive(path: string) -> table -- Lists all paths under a GameFS directory recursively.
+lurek.filesystem.listRecursive(path: string) -> string[] -- Lists all paths under a GameFS directory recursively.
 lurek.filesystem.load(path: string) -> function -- Loads a Lua chunk from GameFS and returns it as a Lua function.
 lurek.filesystem.mkdir(path: string) -- Creates a directory under the GameFS base directory.
 lurek.filesystem.mount(src: string, mp: string) -> boolean
@@ -2245,26 +2245,26 @@ lurek.filesystem.mountZip(archive_path: string, prefix: string) -> LZipMount -- 
 lurek.filesystem.move(src: string, dst: string) -- Moves or renames one GameFS file to another path.
 lurek.filesystem.newFileData(path: string) -> LFileData -- Loads a file into an immutable file data handle.
 lurek.filesystem.openFile(path: string, mode: string) -> LFileHandle -- Opens a GameFS file handle in a requested mode.
-lurek.filesystem.pollAsync(handle_id: integer) -> LuaValue -- Polls an asynchronous file load request.
-lurek.filesystem.pollAsyncWrite(handle_id: integer) -> LuaValue -- Polls an asynchronous file write request.
-lurek.filesystem.pollWatchers() -> table -- Polls watched paths and returns paths that changed since the previous poll.
+lurek.filesystem.pollAsync(handle_id: integer) -> string -- Polls an asynchronous file load request.
+lurek.filesystem.pollAsyncWrite(handle_id: integer) -> string -- Polls an asynchronous file write request.
+lurek.filesystem.pollWatchers() -> string[] -- Polls watched paths and returns paths that changed since the previous poll.
 lurek.filesystem.read(path: string) -> string -- Reads a UTF-8 text file from GameFS.
 lurek.filesystem.readAsync(path: string) -> integer -- Starts an asynchronous file load request.
 lurek.filesystem.readBytes(path: string) -> string -- Reads a binary file from GameFS and returns the bytes as a Lua string.
 lurek.filesystem.readJson(path: string) -> string -- Reads a JSON document as text from GameFS.
 lurek.filesystem.readOrWriteJson(path: string, default_json: string) -> string -- Reads a JSON file or writes and returns default JSON when the file is absent.
 lurek.filesystem.remove(path: string) -- Removes a GameFS file or supported path.
-lurek.filesystem.removeDir(path: string) -- Removes a GameFS directory. This function is exposed to Lua scripts.
+lurek.filesystem.removeDir(path: string) -- Removes a GameFS directory by its path.
 lurek.filesystem.setIdentity(name: string) -- Sets the filesystem identity string used by save paths.
 lurek.filesystem.stat(path: string) -> table -- Returns size and file/directory flags for a GameFS path.
 lurek.filesystem.toAbsolutePath(path: string) -> string -- Resolves a GameFS-relative path against the filesystem base directory.
-lurek.filesystem.unmount(mp: string) -> boolean -- Removes a GameFS mount point. This function is exposed to Lua scripts.
+lurek.filesystem.unmount(mp: string) -> boolean -- Removes a GameFS mount point by its name.
 lurek.filesystem.unwatchPath(path: string) -- Removes a path from the module-local file watcher.
 lurek.filesystem.watchPath(path: string) -- Adds a path to the module-local file watcher.
 lurek.filesystem.write(path: string, data: string) -- Writes a UTF-8 text file through GameFS.
 lurek.filesystem.writeAsync(path: string, data: string) -> integer -- Starts an asynchronous file write request.
 lurek.filesystem.writeBytes(path: string, data: string) -- Writes binary data through GameFS.
-lurek.filesystem.writeJson(path: string, json: string) -- Writes JSON text through GameFS. This function is exposed to Lua scripts.
+lurek.filesystem.writeJson(path: string, json: string) -- Writes JSON text through the GameFS layer.
 ```
 
 ### LFileData
@@ -2280,13 +2280,13 @@ LFileData:typeOf(name: string) -> boolean -- Returns whether this file data hand
 ### LFileHandle
 
 ```lua
-LFileHandle:close() -- Closes this file handle. This method is available to Lua scripts.
+LFileHandle:close() -- Closes this file handle on this object.
 LFileHandle:flush() -- Flushes pending writes on this file handle.
 LFileHandle:getMode() -> string -- Returns the mode used to open this file handle.
-LFileHandle:getSize() -> integer -- Returns the size of the open file. This method is available to Lua scripts.
+LFileHandle:getSize() -> integer -- Returns the size of the open file in bytes.
 LFileHandle:isEOF() -> boolean -- Returns whether the file cursor is at end of file.
 LFileHandle:read([count]: integer) -> string -- Reads up to an optional byte count and returns text using lossless UTF-8 replacement.
-LFileHandle:readLine() -> LuaValue -- Reads the next line from this file handle.
+LFileHandle:readLine() -> string -- Reads the next line from this file handle.
 LFileHandle:seek(pos: integer) -- Moves the file cursor to an absolute byte position.
 LFileHandle:tell() -> integer -- Returns the current file cursor position.
 LFileHandle:type() -> string -- Returns the Lua-visible type name for this file handle.
@@ -2298,7 +2298,7 @@ LFileHandle:write(data: string) -- Writes a string to this file handle.
 
 ```lua
 LZipMount:contains(virtual_path: string) -> boolean -- Returns whether a virtual path exists in the ZIP mount.
-LZipMount:listFiles() -> table -- Returns every virtual file path in the ZIP mount.
+LZipMount:listFiles() -> string[] -- Returns every virtual file path in the ZIP mount.
 LZipMount:prefix() -> string -- Returns the virtual prefix used by this ZIP mount.
 LZipMount:readFile(virtual_path: string) -> string -- Reads a file from the ZIP mount by virtual path.
 LZipMount:type() -> string -- Returns the Lua-visible type name for this ZIP mount handle.
@@ -2311,7 +2311,7 @@ LZipMount:typeOf(name: string) -> boolean -- Returns whether this ZIP mount hand
 
 ```lua
 lurek.globe.generateVoronoi(name: string, seeds_tbl: table, [spec_tbl]: table) -> LGlobe -- Creates a globe and populates provinces from latitude-longitude seed points.
-lurek.globe.get(name: string) -> LuaValue -- Returns a globe from the module registry by name.
+lurek.globe.get(name: string) -> LGlobe -- Returns a globe from the module registry by name.
 lurek.globe.greatCircleDistance(la: number, lo: number, lb: number, lo2: number) -> number -- Computes great-circle distance between two latitude-longitude points.
 lurek.globe.greatCirclePath(la: number, lo: number, lb: number, lo2: number, n: integer) -> table -- Computes sampled latitude-longitude points along a great-circle path.
 lurek.globe.latLonToUnit(lat: number, lon: number) -> table -- Converts latitude and longitude to a unit-sphere 3D vector table.
@@ -2333,25 +2333,25 @@ LGlobe:clearProvinceTexture(id: integer) -> boolean -- Removes texture metadata 
 LGlobe:decodeFogBase64(viewer: string, payload: string) -> boolean -- Loads one viewer's fog state from a base64 string.
 LGlobe:encodeFogBase64(viewer: string) -> string -- Serializes one viewer's fog state to a base64 string.
 LGlobe:exportProvinceMeshOBJ() -> string -- Exports province geometry as Wavefront OBJ text.
-LGlobe:findPath(from_id: integer, to_id: integer) -> LuaValue -- Finds a default-cost province path between two province ids.
+LGlobe:findPath(from_id: integer, to_id: integer) -> string[] -- Finds a default-cost province path between two province ids.
 LGlobe:getCachedReachability(faction: string) -> table -- Returns cached reachability costs for a faction.
 LGlobe:getCamera() -> number -- Returns camera latitude, longitude, and zoom.
 LGlobe:getFogState(viewer: string, id: integer) -> string -- Returns fog-of-war state for one viewer and province.
 LGlobe:getLod() -> string -- Returns the camera-derived level-of-detail tier name.
-LGlobe:getMarkerAttr(id: integer, key: string) -> LuaValue -- Reads a string attribute from a marker.
+LGlobe:getMarkerAttr(id: integer, key: string) -> string -- Reads a string attribute from a marker.
 LGlobe:getName() -> string -- Returns the registry name of this globe.
-LGlobe:getNeighbors(id: integer) -> table -- Returns neighboring province ids for a province.
-LGlobe:getProvinceAttr(id: integer, key: string) -> LuaValue -- Reads a string attribute from a province.
-LGlobe:getProvinceSector(id: integer) -> LuaValue -- Returns the sector name assigned to a province.
-LGlobe:getSectorProvinces(sector: string) -> table -- Returns province ids assigned to a sector.
+LGlobe:getNeighbors(id: integer) -> integer[] -- Returns neighboring province ids for a province.
+LGlobe:getProvinceAttr(id: integer, key: string) -> string -- Reads a string attribute from a province.
+LGlobe:getProvinceSector(id: integer) -> string -- Returns the sector name assigned to a province.
+LGlobe:getSectorProvinces(sector: string) -> integer[] -- Returns province ids assigned to a sector.
 LGlobe:getTimeOfDay() -> number -- Returns globe time of day. This method is available to Lua scripts.
 LGlobe:hideProvince(viewer: string, id: integer) -- Hides a province for one fog-of-war viewer.
 LGlobe:isVisible(viewer: string, id: integer) -> boolean -- Returns whether a province is visible for one fog-of-war viewer.
 LGlobe:moveMarker(id: integer, lat: number, lon: number) -> boolean -- Moves a marker to latitude and longitude coordinates.
 LGlobe:pan(dlat: number, dlon: number) -- Pans the globe camera by latitude and longitude deltas.
-LGlobe:pick(sx: number, sy: number) -> LuaValue -- Picks a province at screen coordinates.
-LGlobe:pickLatLon(sx: number, sy: number) -> LuaValue -- Picks at screen coordinates and returns the hit province centroid screen coordinates.
-LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> LuaValue -- Samples along a screen ray from the camera center and returns the first hit province.
+LGlobe:pick(sx: number, sy: number) -> integer -- Picks a province at screen coordinates.
+LGlobe:pickLatLon(sx: number, sy: number) -> number -- Picks at screen coordinates and returns the hit province centroid screen coordinates.
+LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> integer -- Samples along a screen ray from the camera center and returns the first hit province.
 LGlobe:provinceCount() -> integer -- Returns the number of provinces in this globe.
 LGlobe:reachable(start_id: integer, max_cost: number) -> table -- Returns provinces reachable from a start province within a cost budget.
 LGlobe:removeArc(id: integer) -> boolean -- Removes an arc by id. This method is available to Lua scripts.
@@ -2391,8 +2391,8 @@ LGlobe:zoom(factor: number) -- Multiplies the globe camera zoom by a factor.
 ### LGlobeRegistry
 
 ```lua
-LGlobeRegistry:get(name: string) -> LuaValue -- Returns a globe handle by registry name.
-LGlobeRegistry:names() -> table -- Returns all globe names currently stored in this registry.
+LGlobeRegistry:get(name: string) -> LGlobe -- Returns a globe handle by registry name.
+LGlobeRegistry:names() -> string[] -- Returns all globe names currently stored in this registry.
 LGlobeRegistry:new(name: string, [spec_tbl]: table) -> LGlobe -- Creates a named globe with optional specification fields.
 LGlobeRegistry:remove(name: string) -> boolean -- Removes a globe from the registry by name.
 LGlobeRegistry:type() -> string -- Returns the Lua-visible type name for this globe registry handle.
@@ -2411,41 +2411,41 @@ lurek.graph.newGraph() -> LGraph -- Creates an empty logistics graph with no nod
 
 ```lua
 LGraph:addEdge(from_ud: LGraphNode, to_ud: LGraphNode, [edge_type]: string) -> LGraphEdge -- Creates an edge between two nodes with an optional edge type.
-LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode) -- Places an item onto a node. This method is available to Lua scripts.
+LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode) -- Places an item onto a destination node.
 LGraph:addNode([node_type]: string, [capacity]: integer) -> LGraphNode -- Creates a node with optional type and capacity.
-LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil -- Runs A* pathfinding between two nodes.
+LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> LGraphNode[] -- Runs A* pathfinding between two nodes.
 LGraph:colorGraph() -> table -- Computes graph coloring and returns color indices by node id.
 LGraph:createItem([item_type]: string, [decay_time]: number) -> LGraphItem -- Creates an unplaced graph item with optional type and decay time.
-LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil -- Finds a path between two nodes. This method is available to Lua scripts.
-LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil -- Finds a path for a specific item between two nodes while respecting item constraints.
-LGraph:getComponents() -> table -- Returns connected components as arrays of node handles.
-LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil -- Returns graph distance between two nodes when reachable.
-LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil -- Returns the edge connecting two nodes when one exists.
+LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table -- Finds a path between two graph nodes.
+LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table -- Finds a path for a specific item between two nodes while respecting item constraints.
+LGraph:getComponents() -> LGraphNode[] -- Returns connected components as arrays of node handles.
+LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number -- Returns graph distance between two nodes when reachable.
+LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge -- Returns the edge connecting two nodes when one exists.
 LGraph:getEdgeCount() -> integer -- Returns the number of edges in this graph.
-LGraph:getEdges() -> table -- Returns all edges in this graph. This method is available to Lua scripts.
+LGraph:getEdges() -> LGraphEdge[] -- Returns all edges in this logistics graph.
 LGraph:getItemCount() -> integer -- Returns the number of items in this graph.
-LGraph:getItems() -> table -- Returns all items in this graph. This method is available to Lua scripts.
-LGraph:getNeighbors(node_ud: LGraphNode) -> table -- Returns neighbor nodes connected to a node.
+LGraph:getItems() -> LGraphItem[] -- Returns all items in this logistics graph.
+LGraph:getNeighbors(node_ud: LGraphNode) -> LGraphNode[] -- Returns neighbor nodes connected to a node.
 LGraph:getNodeCount() -> integer -- Returns the number of nodes in this graph.
-LGraph:getNodes() -> table -- Returns all nodes in this graph. This method is available to Lua scripts.
-LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> table -- Returns nodes reachable from a start node within an optional maximum distance.
+LGraph:getNodes() -> LGraphNode[] -- Returns all nodes in this logistics graph.
+LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> LGraphNode[] -- Returns nodes reachable from a start node within an optional maximum distance.
 LGraph:getStats() -> table -- Returns graph counts and aggregate supply-demand statistics.
 LGraph:hasCycle() -> boolean -- Returns whether this graph contains a cycle.
 LGraph:hasEdge(edge_ud: LGraphEdge) -> boolean -- Returns whether an edge handle still exists in this graph.
 LGraph:hasItem(item_ud: LGraphItem) -> boolean -- Returns whether an item handle still exists in this graph.
 LGraph:hasNode(node_ud: LGraphNode) -> boolean -- Returns whether a node handle still exists in this graph.
 LGraph:isBipartite() -> boolean -- Returns whether this graph is bipartite.
-LGraph:mst() -> table -- Computes a minimum spanning tree using Kruskal and returns edge ids.
+LGraph:mst() -> integer[] -- Computes a minimum spanning tree using Kruskal and returns edge ids.
 LGraph:on(event_name: string, func: function) -- Registers a callback for a named graph event generated during simulation.
 LGraph:processDemand() -- Processes graph supply and demand once and dispatches generated callbacks.
-LGraph:removeEdge(edge_ud: LGraphEdge) -> boolean -- Removes an edge by handle. This method is available to Lua scripts.
-LGraph:removeItem(item_ud: LGraphItem) -> boolean -- Removes an item from this graph. This method is available to Lua scripts.
+LGraph:removeEdge(edge_ud: LGraphEdge) -> boolean -- Removes an edge by handle on this object.
+LGraph:removeItem(item_ud: LGraphItem) -> boolean -- Removes an item from this logistics graph.
 LGraph:removeNode(node_ud: LGraphNode) -> boolean -- Removes a node and graph links associated with it.
 LGraph:sendItem(item_ud: LGraphItem, edge_ud: LGraphEdge) -- Starts moving an item along an edge.
 LGraph:step() -- Runs one discrete graph simulation step and dispatches generated callbacks.
 LGraph:subgraph(nodes: table) -> LGraph -- Creates a new graph containing a subset of nodes.
 LGraph:tickParallel(dt: number) -- Advances graph simulation through the parallel update path and dispatches generated callbacks.
-LGraph:topologicalSort() -> table|nil -- Returns nodes in topological order when the graph is acyclic.
+LGraph:topologicalSort() -> LGraphNode[] -- Returns nodes in topological order when the graph is acyclic.
 LGraph:type() -> string -- Returns the Lua-visible type name for this graph handle.
 LGraph:typeOf(name: string) -> boolean -- Returns whether this graph handle matches a supported type name.
 LGraph:update(dt: number) -- Advances graph simulation by delta time and dispatches generated callbacks.
@@ -2459,7 +2459,7 @@ LGraphEdge:clearAllowedTypes() -- Clears this edge's item type allow-list.
 LGraphEdge:getCapacity() -> integer -- Returns this edge's maximum concurrent item capacity.
 LGraphEdge:getCooldown() -> number -- Returns this edge's cooldown timer value.
 LGraphEdge:getFrom() -> LGraphNode -- Returns the source node for this edge.
-LGraphEdge:getItemsInTransit() -> table -- Returns graph items currently traveling along this edge.
+LGraphEdge:getItemsInTransit() -> LGraphItem[] -- Returns graph items currently traveling along this edge.
 LGraphEdge:getSpeedModifier() -> number -- Returns this edge's speed modifier.
 LGraphEdge:getThroughput() -> number -- Returns this edge's throughput value.
 LGraphEdge:getTo() -> LGraphNode -- Returns the destination node for this edge.
@@ -2475,7 +2475,7 @@ LGraphEdge:setActive(a: boolean) -- Enables or disables this edge for routing an
 LGraphEdge:setBidirectional(b: boolean) -- Sets whether this edge allows travel in both directions.
 LGraphEdge:setCapacity(c: integer) -- Sets this edge's maximum concurrent item capacity.
 LGraphEdge:setCooldown(c: number) -- Sets this edge's cooldown timer value.
-LGraphEdge:setSpeedModifier(m: number) -- Sets this edge's speed modifier. This method is available to Lua scripts.
+LGraphEdge:setSpeedModifier(m: number) -- Sets this edge's speed modifier value.
 LGraphEdge:setThroughput(t: number) -- Sets this edge's throughput value.
 LGraphEdge:setTravelTime(t: number) -- Sets the travel time for items moving across this edge.
 LGraphEdge:setType(t: string) -- Sets the edge type string used by routing and filters.
@@ -2488,7 +2488,7 @@ LGraphEdge:typeOf(name: string) -> boolean -- Returns whether this graph edge ha
 
 ```lua
 LGraphItem:getDecayTime() -> number -- Returns the total decay lifetime configured for this item.
-LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil -- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
+LGraphItem:getPosition() -> LGraphNode -- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
 LGraphItem:getPriority() -> integer -- Returns this item's routing or queue priority.
 LGraphItem:getRemainingLife() -> number -- Returns this item's remaining lifetime before decay.
 LGraphItem:getType() -> string -- Returns the item type string used by filters, conversions, supplies, and demands.
@@ -2506,49 +2506,49 @@ LGraphItem:typeOf(name: string) -> boolean -- Returns whether this graph item ha
 ```lua
 LGraphNode:addDemand(item_type: string, quantity: integer, [priority]: integer) -- Adds demand quantity and optional priority for an item type on this node.
 LGraphNode:addSupply(item_type: string, quantity: integer) -- Adds supply quantity for an item type on this node.
-LGraphNode:addTag(tag: string) -- Adds a tag to this node. This method is available to Lua scripts.
+LGraphNode:addTag(tag: string) -- Adds a tag to this node on this object.
 LGraphNode:clearAllConversions() -- Removes every conversion rule from this node.
 LGraphNode:clearConversion(in_type: string) -> boolean -- Removes a conversion rule by input item type.
 LGraphNode:clearDemands() -- Removes every demand entry from this node.
 LGraphNode:clearSupplies() -- Removes every supply entry from this node.
-LGraphNode:clearTags() -- Removes every tag from this node. This method is available to Lua scripts.
-LGraphNode:dequeue() -> LGraphItem|nil -- Removes and returns the next item from this node's explicit queue.
+LGraphNode:clearTags() -- Removes every tag from this graph node.
+LGraphNode:dequeue() -> LGraphItem -- Removes and returns the next item from this node's explicit queue.
 LGraphNode:enqueue(item_ud: LGraphItem) -> boolean -- Adds an item handle to this node's explicit queue.
 LGraphNode:getCapacity() -> integer -- Returns this node's item capacity.
-LGraphNode:getEdges([dir]: string) -> table -- Returns edge handles connected to this node in the requested direction.
+LGraphNode:getEdges([dir]: string) -> LGraphEdge[] -- Returns edge handles connected to this node in the requested direction.
 LGraphNode:getFlowMode() -> string -- Returns this node's flow mode name.
 LGraphNode:getItemCount() -> integer -- Returns the number of items currently stored on this node.
-LGraphNode:getItems() -> table -- Returns item handles currently stored on this node.
+LGraphNode:getItems() -> LGraphItem[] -- Returns item handles currently stored on this node.
 LGraphNode:getOverflowPolicy() -> string -- Returns this node's overflow policy name.
 LGraphNode:getProcessTime() -> number -- Returns the processing time used by this node's conversions.
-LGraphNode:getPullFilter() -> string|nil -- Returns this node's optional pull item-type filter.
-LGraphNode:getPullRate() -> number -- Returns this node's pull rate. This method is available to Lua scripts.
-LGraphNode:getPushFilter() -> string|nil -- Returns this node's optional push item-type filter.
-LGraphNode:getPushRate() -> number -- Returns this node's push rate. This method is available to Lua scripts.
+LGraphNode:getPullFilter() -> string -- Returns this node's optional pull item-type filter.
+LGraphNode:getPullRate() -> number -- Returns this node's pull rate value.
+LGraphNode:getPushFilter() -> string -- Returns this node's optional push item-type filter.
+LGraphNode:getPushRate() -> number -- Returns this node's push rate value.
 LGraphNode:getQueueCapacity() -> integer -- Returns this node's queue capacity.
 LGraphNode:getQueueSize() -> integer -- Returns the number of item ids currently queued at this node.
-LGraphNode:getTags() -> table -- Returns all tags assigned to this node.
-LGraphNode:getType() -> string -- Returns this node's type string. This method is available to Lua scripts.
+LGraphNode:getTags() -> string[] -- Returns all tags assigned to this node.
+LGraphNode:getType() -> string -- Returns this node's type classification string.
 LGraphNode:hasTag(tag: string) -> boolean -- Returns whether this node has a tag.
 LGraphNode:isActive() -> boolean -- Returns whether this node is active for graph simulation.
 LGraphNode:isFull() -> boolean -- Returns whether this node has reached its item capacity.
 LGraphNode:isQueueEnabled() -> boolean -- Returns whether this node's explicit queue is enabled.
 LGraphNode:removeDemand(item_type: string) -> boolean -- Removes demand entry for an item type from this node.
 LGraphNode:removeSupply(item_type: string) -> boolean -- Removes supply entry for an item type from this node.
-LGraphNode:removeTag(tag: string) -> boolean -- Removes a tag from this node. This method is available to Lua scripts.
+LGraphNode:removeTag(tag: string) -> boolean -- Removes a tag from this node on this object.
 LGraphNode:setActive(a: boolean) -- Enables or disables this node for graph simulation.
-LGraphNode:setCapacity(c: integer) -- Sets this node's item capacity. This method is available to Lua scripts.
+LGraphNode:setCapacity(c: integer) -- Sets this node's item capacity value.
 LGraphNode:setConversion(in_type: string, out_type: string, [in_count]: integer, [out_count]: integer) -- Configures an item conversion rule on this node.
 LGraphNode:setFlowMode(m: string) -- Sets this node's flow mode from a mode name.
 LGraphNode:setOverflowPolicy(p: string) -- Sets this node's overflow policy from a policy name.
 LGraphNode:setProcessTime(t: number) -- Sets the processing time used by this node's conversions.
 LGraphNode:setPullFilter([f]: string) -- Sets or clears this node's pull item-type filter.
-LGraphNode:setPullRate(r: number) -- Sets this node's pull rate. This method is available to Lua scripts.
+LGraphNode:setPullRate(r: number) -- Sets this node's pull rate for this object.
 LGraphNode:setPushFilter([f]: string) -- Sets or clears this node's push item-type filter.
-LGraphNode:setPushRate(r: number) -- Sets this node's push rate. This method is available to Lua scripts.
-LGraphNode:setQueueCapacity(c: integer) -- Sets this node's queue capacity. This method is available to Lua scripts.
+LGraphNode:setPushRate(r: number) -- Sets this node's push rate for this object.
+LGraphNode:setQueueCapacity(c: integer) -- Sets this node's queue capacity value.
 LGraphNode:setQueueEnabled(e: boolean) -- Enables or disables this node's explicit queue.
-LGraphNode:setType(t: string) -- Sets this node's type string. This method is available to Lua scripts.
+LGraphNode:setType(t: string) -- Sets this node's type string for this object.
 LGraphNode:type() -> string -- Returns the Lua-visible type name for this graph node handle.
 LGraphNode:typeOf(name: string) -> boolean -- Returns whether this graph node handle matches a supported type name.
 ```
@@ -2558,11 +2558,11 @@ LGraphNode:typeOf(name: string) -> boolean -- Returns whether this graph node ha
 [[Module page|Module-html]]
 
 ```lua
-lurek.html.isDefaultPrevented() -> table -- Returns true if default prevented for Lua scripts in this module.
+lurek.html.isDefaultPrevented() -> boolean -- Returns whether the default action was prevented.
 lurek.html.loadDocument(path: string, [opts]: table) -> LHtmlDocument -- Loads an HTML document from GameFS and optionally loads CSS from options or companion file.
 lurek.html.newDocument([source]: string, [opts]: table) -> LHtmlDocument -- Creates an HTML document from optional source and layout/style options.
-lurek.html.preventDefault() -- Prevent default for Lua scripts in this module.
-lurek.html.stopPropagation() -- Stop propagation for Lua scripts in this module.
+lurek.html.preventDefault() -- Marks the event as having its default action prevented.
+lurek.html.stopPropagation() -- Stops event propagation to remaining listeners.
 lurek.html.supports(feature: string) -> boolean -- Returns whether the HTML engine supports a named feature.
 ```
 
@@ -2584,7 +2584,7 @@ LHtmlDocument:mousereleased(x: number, y: number, [button]: integer) -> boolean 
 LHtmlDocument:off(handle: integer) -- Removes a document-level event listener by handle.
 LHtmlDocument:on(event: string, func: function) -> integer -- Registers a document-level event listener.
 LHtmlDocument:query(selector: string) -> LuaValue -- Looks up the first element matching a selector.
-LHtmlDocument:queryAll(selector: string) -> table -- Returns all elements matching a selector.
+LHtmlDocument:queryAll(selector: string) -> LHtmlElement[] -- Returns all elements matching a selector.
 LHtmlDocument:relayout() -- Rebuilds document layout immediately.
 LHtmlDocument:render([x]: number, [y]: number) -- Queues render commands for this document at an optional offset.
 LHtmlDocument:setCss(css: string) -- Replaces the document stylesheet text.
@@ -2600,7 +2600,7 @@ LHtmlDocument:wheelmoved(dx: number, dy: number) -> boolean -- Forwards mouse wh
 ### LHtmlElement
 
 ```lua
-LHtmlElement:addClass(name: string) -- Adds a CSS class to this element. This method is available to Lua scripts.
+LHtmlElement:addClass(name: string) -- Adds a CSS class to this element's class list.
 LHtmlElement:appendHtml(html: string) -- Appends HTML source to this element's inner HTML.
 LHtmlElement:blur() -- Removes keyboard focus from this element when it is focused.
 LHtmlElement:focus() -- Gives keyboard focus to this element.
@@ -2610,13 +2610,13 @@ LHtmlElement:getHtml() -> string -- Returns this element's inner HTML.
 LHtmlElement:getId() -> LuaValue -- Returns this element's id attribute.
 LHtmlElement:getRect() -> number -- Returns this element's layout rectangle after relayout if needed.
 LHtmlElement:getStyle(name: string) -> LuaValue -- Returns an inline or computed style value for this element.
-LHtmlElement:getTagName() -> string -- Returns this element's tag name. This method is available to Lua scripts.
+LHtmlElement:getTagName() -> string -- Returns this element's HTML tag name.
 LHtmlElement:getText() -> string -- Returns this element's text content.
 LHtmlElement:hasClass(name: string) -> boolean -- Returns whether this element has a CSS class.
 LHtmlElement:off(handle: integer) -- Removes an element-level event listener by handle.
 LHtmlElement:on(event: string, func: function) -> integer -- Registers an element-level event listener.
 LHtmlElement:query(selector: string) -> LuaValue -- Looks up the first descendant element matching a selector.
-LHtmlElement:queryAll(selector: string) -> table -- Returns all descendant elements matching a selector.
+LHtmlElement:queryAll(selector: string) -> LHtmlElement[] -- Returns all descendant elements matching a selector.
 LHtmlElement:remove() -- Removes this element from the document.
 LHtmlElement:removeAttribute(name: string) -- Removes an attribute from this element.
 LHtmlElement:removeClass(name: string) -- Removes a CSS class from this element.
@@ -2635,24 +2635,24 @@ LHtmlElement:typeOf(name: string) -> boolean -- Returns whether this element han
 [[Module page|Module-i18n]]
 
 ```lua
-lurek.i18n.buildIndex() -> table -- Builds a word-to-keys search index from the catalog.
-lurek.i18n.categories() -> table -- Returns top-level translation key categories.
-lurek.i18n.detectLocale() -> LuaValue -- Detects the system locale when available.
+lurek.i18n.buildIndex() -> string[] -- Builds a word-to-keys search index from the catalog.
+lurek.i18n.categories() -> string[] -- Returns top-level translation key categories.
+lurek.i18n.detectLocale() -> string -- Detects the system locale when available.
 lurek.i18n.formatDate(timestamp: integer, [fmt]: string) -> string -- Formats a timestamp with the active locale and a named format.
 lurek.i18n.formatNumber(n: number, [opts]: table) -> string -- Formats a number with locale-aware separators and optional decimal precision.
-lurek.i18n.getAvailableLanguages() -> table -- Returns sorted locale codes currently loaded in the catalog.
+lurek.i18n.getAvailableLanguages() -> string[] -- Returns sorted locale codes currently loaded in the catalog.
 lurek.i18n.getBase() -> string -- Returns the base locale string stored by the localization module.
-lurek.i18n.getFallbacks() -> table -- Returns fallback locale codes in lookup order.
-lurek.i18n.getKeys() -> table -- Returns sorted translation keys known to the catalog.
-lurek.i18n.getLanguage() -> LuaValue -- Returns the active locale code. This function is exposed to Lua scripts.
-lurek.i18n.getLanguages() -> table -- Returns sorted locale codes currently loaded in the catalog.
-lurek.i18n.getLoadedLocales() -> table -- Returns locale codes currently loaded in the catalog.
+lurek.i18n.getFallbacks() -> string[] -- Returns fallback locale codes in lookup order.
+lurek.i18n.getKeys() -> string[] -- Returns sorted translation keys known to the catalog.
+lurek.i18n.getLanguage() -> string -- Returns the active locale code string.
+lurek.i18n.getLanguages() -> string[] -- Returns sorted locale codes currently loaded in the catalog.
+lurek.i18n.getLoadedLocales() -> string[] -- Returns locale codes currently loaded in the catalog.
 lurek.i18n.hasKey(key: string) -> boolean -- Returns whether the catalog contains a translation key in active or fallback locales.
 lurek.i18n.hasLanguage(locale: string) -> boolean -- Returns whether a locale has translations loaded.
 lurek.i18n.interpolate(template: string, vars: table) -> string -- Replaces `{name}` placeholders in a template using string variables.
 lurek.i18n.isRTL([locale]: string) -> boolean -- Returns whether a locale is written right-to-left.
 lurek.i18n.keyCount() -> integer -- Returns the number of translation keys known to the catalog.
-lurek.i18n.keysInCategory(category: string) -> table -- Returns translation keys belonging to one category prefix.
+lurek.i18n.keysInCategory(category: string) -> string[] -- Returns translation keys belonging to one category prefix.
 lurek.i18n.loadString(locale: string, content: string, format: string) -- Loads translations for a locale from TOML or JSON source text.
 lurek.i18n.loadTable(locale: string, tbl: table) -- Loads translations for a locale from a nested Lua table flattened with dot-separated keys.
 lurek.i18n.localeCoverage(reference: string) -> table -- Returns missing translation keys for all locales compared to a reference locale.
@@ -2662,7 +2662,7 @@ lurek.i18n.onChange(cb: function) -- Registers a locale-change callback using th
 lurek.i18n.onLanguageChange(cb: function) -- Registers a callback invoked when the active locale changes.
 lurek.i18n.pluralFor(n: number) -> string -- Returns the English plural category key for a number.
 lurek.i18n.search(query: string, [limit]: integer) -> table -- Searches translation keys and values for a query string.
-lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> table -- Searches a prebuilt word index and returns matching keys.
+lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> string[] -- Searches a prebuilt word index and returns matching keys.
 lurek.i18n.setBase(locale: string) -- Sets the base locale string stored by the localization module.
 lurek.i18n.setFallbacks(locales: table) -- Replaces the fallback locale list used for missing translations.
 lurek.i18n.setKey(locale: string, key: string, value: string) -- Sets one translation value for one locale and key.
@@ -2813,28 +2813,28 @@ LProvinceGrid:typeOf(name: string) -> boolean -- Returns whether this province g
 
 ```lua
 lurek.input.advancePlayback() -> table -- Advances playback by one frame and returns events for that frame.
-lurek.input.bind(action: string, keys: LuaValue) -- Adds one or more keyboard/gamepad bindings to an action.
-lurek.input.clearBindings() -- Removes all action bindings. This function is exposed to Lua scripts.
-lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number -- Returns a gamepad axis value. This function is exposed to Lua scripts.
+lurek.input.bind(action: string, keys: string) -- Adds one or more keyboard/gamepad bindings to an action.
+lurek.input.clearBindings() -- Removes all action bindings from the map.
+lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number -- Returns a gamepad axis value by index.
 lurek.input.gamepad.getAxisCount(id: integer) -> integer -- Returns the axis count for a gamepad.
 lurek.input.gamepad.getBackgroundEvents() -> boolean -- Returns whether background gamepad event processing is enabled.
-lurek.input.getBindings() -> table -- Returns all action bindings. This function is exposed to Lua scripts.
+lurek.input.getBindings() -> string[] -- Returns all registered action bindings.
 lurek.input.gamepad.getButtonCount(id: integer) -> integer -- Returns the button count for a gamepad.
 lurek.input.gamepad.getCount() -> integer -- Returns the number of gamepad slots tracked by the runtime.
 lurek.input.mouse.getCursor() -> string -- Returns the current system cursor name.
-lurek.input.gamepad.getGamepadMappingString(guid: string) -> LuaValue -- Returns a stored mapping string for a gamepad GUID.
+lurek.input.gamepad.getGamepadMappingString(guid: string) -> string -- Returns a stored mapping string for a gamepad GUID.
 lurek.input.gamepad.getGUID(id: integer) -> string -- Returns the GUID string for a gamepad.
 lurek.input.gamepad.getHat(id: integer, hat: integer) -> string -- Returns hat direction for a gamepad hat index.
 lurek.input.gamepad.getJoystickCount() -> integer -- Returns the number of joystick slots tracked by the runtime.
-lurek.input.gamepad.getJoysticks() -> table -- Returns ids for currently connected gamepads.
-lurek.input.keyboard.getKeyFromScancode(scancode: string) -> LuaValue -- Converts a scancode name to its key name when known.
-lurek.input.gamepad.getName(id: integer) -> string -- Returns a gamepad display name. This function is exposed to Lua scripts.
+lurek.input.gamepad.getJoysticks() -> integer[] -- Returns ids for currently connected gamepads.
+lurek.input.keyboard.getKeyFromScancode(scancode: string) -> string -- Converts a scancode name to its key name when known.
+lurek.input.gamepad.getName(id: integer) -> string -- Returns a gamepad display name by its id.
 lurek.input.getPlaybackFrame() -> integer -- Returns the current playback frame index.
 lurek.input.mouse.getPosition() -> number -- Returns the current mouse position.
-lurek.input.touch.getPosition(id: integer) -> number -- Returns the position of a touch id. This function is exposed to Lua scripts.
-lurek.input.touch.getPressure(id: integer) -> number -- Returns pressure for a touch id. This function is exposed to Lua scripts.
+lurek.input.touch.getPosition(id: integer) -> number -- Returns the position of a touch point by id.
+lurek.input.touch.getPressure(id: integer) -> number -- Returns pressure for a touch point by its id.
 lurek.input.mouse.getRelativeMode() -> boolean -- Returns whether relative mouse mode is enabled.
-lurek.input.keyboard.getScancodeFromKey(key: string) -> LuaValue -- Converts a key name to its scancode name when known.
+lurek.input.keyboard.getScancodeFromKey(key: string) -> string -- Converts a key name to its scancode name when known.
 lurek.input.mouse.getSystemCursor(name: string) -> LCursor -- Creates a system cursor handle from a cursor name.
 lurek.input.touch.getTouchCount() -> integer -- Returns the current active touch count.
 lurek.input.touch.getTouches() -> table -- Returns active touch points with id, position, and pressure.
@@ -2847,7 +2847,7 @@ lurek.input.isActionDown(action: string) -> boolean -- Returns whether any bindi
 lurek.input.gamepad.isConnected(id: integer) -> boolean -- Returns whether a gamepad id is currently connected.
 lurek.input.mouse.isCursorSupported() -> boolean -- Returns whether the current platform supports cursor changes.
 lurek.input.gamepad.isDown(id: integer, button: integer) -> boolean -- Returns whether a gamepad button is currently down.
-lurek.input.isDown() -> boolean -- Returns true if down for Lua scripts in this module.
+lurek.input.isDown() -> boolean -- Returns whether any bound key for this mapping is currently down.
 lurek.input.keyboard.isDown(...: string) -> boolean -- Returns whether any of the supplied key names are currently held down.
 lurek.input.mouse.isDown(button: integer) -> boolean -- Returns whether a one-based mouse button index is down.
 lurek.input.gamepad.isGamepad(id: integer) -> boolean -- Returns whether a connected gamepad exists at an id.
@@ -2860,24 +2860,24 @@ lurek.input.gamepad.isVibrationSupported(id: integer) -> boolean -- Returns whet
 lurek.input.mouse.isVisible() -> boolean -- Returns whether the mouse cursor is visible.
 lurek.input.gamepad.loadGamepadMappings(path: string) -- Loads gamepad mapping strings from a file.
 lurek.input.loadRecording(json: string) -- Loads recording JSON into the module recorder.
-lurek.input.newCombo(steps_val: table, [opts]: table) -> LCombo -- Creates a combo detector from string steps or step tables with optional timing.
+lurek.input.newCombo(steps: table, [opts]: table) -> LCombo -- Creates a combo detector from string steps or step tables with optional timing.
 lurek.input.mouse.newCursor(pixels: table, width: integer, height: integer, [hotx]: integer, [hoty]: integer) -> LCursor -- Creates a custom cursor handle from RGBA pixels and hotspot coordinates.
-lurek.input.newMapping(name: string, keys: LuaValue) -> table -- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
+lurek.input.newMapping(name: string, keys: string) -> table -- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
 lurek.input.gamepad.saveGamepadMappings(path: string) -- Saves gamepad mapping strings to a file.
 lurek.input.gamepad.setBackgroundEvents(enable: boolean) -- Enables or disables background gamepad event processing.
-lurek.input.mouse.setCursor(cursor_val: any) -- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
+lurek.input.mouse.setCursor(cursor: LCursor) -- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
 lurek.input.gamepad.setGamepadMapping(guid: string, mapping: string) -- Stores a controller mapping string for a gamepad GUID.
 lurek.input.mouse.setGrabbed(grabbed: boolean) -- Sets whether the mouse is grabbed by the window.
 lurek.input.keyboard.setKeyRepeat(enabled: boolean) -- Enables or disables key repeat tracking.
 lurek.input.mouse.setPosition(x: number, y: number) -- Requests a mouse cursor position change.
-lurek.input.mouse.setRelativeMode(relative: boolean) -- Sets relative mouse mode. This function is exposed to Lua scripts.
+lurek.input.mouse.setRelativeMode(relative: boolean) -- Sets the relative mouse input mode state.
 lurek.input.keyboard.setTextInput(enabled: boolean) -- Enables or disables text input tracking.
 lurek.input.gamepad.setVibration(id: integer, low_freq: number, high_freq: number, duration_ms: number) -> boolean -- Requests gamepad vibration with low and high frequency motor strengths.
-lurek.input.mouse.setVisible(visible: boolean) -- Sets mouse cursor visibility. This function is exposed to Lua scripts.
+lurek.input.mouse.setVisible(visible: boolean) -- Sets the mouse cursor visibility state.
 lurek.input.startPlayback() -- Starts playback of the loaded recording.
 lurek.input.startRecording() -- Starts recording input events into the module recorder.
 lurek.input.stopPlayback() -- Stops playback of the loaded recording.
-lurek.input.stopRecording() -> LuaValue -- Stops input recording and returns the captured recording when one is active.
+lurek.input.stopRecording() -> LInputRecording -- Stops input recording and returns the captured recording when one is active.
 lurek.input.unbind(action: string) -> boolean -- Removes all bindings for an action.
 lurek.input.gamepad.vibrate(id: integer, low_freq: number, high_freq: number, duration_ms: number) -> boolean -- Requests gamepad vibration with low and high frequency motor strengths.
 lurek.input.gamepad.virtualDpad(x: number, y: number, [deadzone]: number) -> table -- Converts analog x and y values into virtual d-pad booleans and direction.
@@ -2888,17 +2888,17 @@ lurek.input.gamepad.wasConnected(id: integer) -> boolean -- Returns whether a ga
 lurek.input.gamepad.wasDisconnected(id: integer) -> boolean -- Returns whether a gamepad disconnected this frame.
 lurek.input.gamepad.wasPressed(id: integer, button: integer) -> boolean -- Returns whether a gamepad button was pressed this frame.
 lurek.input.touch.wasPressed(id: integer) -> boolean -- Returns whether a touch id began this frame.
-lurek.input.wasPressed() -> boolean -- Was pressed for Lua scripts in this module.
+lurek.input.wasPressed() -> boolean -- Returns whether any bound key for this mapping was pressed this frame.
 lurek.input.gamepad.wasReleased(id: integer, button: integer) -> boolean -- Returns whether a gamepad button was released this frame.
 lurek.input.touch.wasReleased(id: integer) -> boolean -- Returns whether a touch id ended this frame.
-lurek.input.wasReleased() -> boolean -- Was released for Lua scripts in this module.
+lurek.input.wasReleased() -> boolean -- Returns whether any bound key for this mapping was released this frame.
 ```
 
 ### LCombo
 
 ```lua
 LCombo:feed(key: string) -> string -- Feeds one key into the combo detector and returns progress status.
-LCombo:getStep(index: integer) -> LuaValue -- Returns step data by one-based index.
+LCombo:getStep(index: integer) -> table -- Returns step data by one-based index.
 LCombo:isInProgress() -> boolean -- Returns whether the combo sequence is partially matched.
 LCombo:progress() -> integer -- Returns the current combo step index reached.
 LCombo:reset() -- Resets combo progress and elapsed time.
@@ -2962,7 +2962,7 @@ LLight:clearNormalMap() -- Clears the normal map path used by this light.
 LLight:getAttenuation() -> number -- Returns this light attenuation coefficients.
 LLight:getBlendMode() -> string -- Returns this light blend mode string.
 LLight:getColor() -> number -- Returns this light RGBA color. This method is available to Lua scripts.
-LLight:getCookie() -> LuaValue -- Returns the cookie texture path stored on this Lua light handle.
+LLight:getCookie() -> string -- Returns the cookie texture path stored on this Lua light handle.
 LLight:getDirection() -> number -- Returns this light direction angle.
 LLight:getEnergy() -> number -- Returns this light energy value. This method is available to Lua scripts.
 LLight:getFalloff() -> string -- Returns this light falloff mode string.
@@ -2972,7 +2972,7 @@ LLight:getInnerAngle() -> number -- Returns this spot light inner cone angle.
 LLight:getIntensity() -> number -- Returns this light intensity. This method is available to Lua scripts.
 LLight:getLightMask() -> integer -- Returns this light's inclusion mask.
 LLight:getLightType() -> string -- Returns this light type string. This method is available to Lua scripts.
-LLight:getNormalMap() -> LuaValue -- Returns the normal map path used by this light.
+LLight:getNormalMap() -> string -- Returns the normal map path used by this light.
 LLight:getNormalStrength() -> number -- Returns this light's normal map strength.
 LLight:getOuterAngle() -> number -- Returns this spot light outer cone angle.
 LLight:getPosition() -> number -- Returns this light position. This method is available to Lua scripts.
@@ -3029,7 +3029,7 @@ LLight:updateTransition(dt: number) -> boolean -- Advances this light's active t
 LOccluder:getLightMask() -> integer -- Returns this occluder's light mask.
 LOccluder:getOpacity() -> number -- Returns this occluder opacity. This method is available to Lua scripts.
 LOccluder:getPosition() -> number -- Returns this occluder position offset.
-LOccluder:getVertices() -> table -- Returns this occluder's flat vertex coordinate list.
+LOccluder:getVertices() -> number[] -- Returns this occluder's flat vertex coordinate list.
 LOccluder:isEnabled() -> boolean -- Returns whether this occluder is enabled.
 LOccluder:isValid() -> boolean -- Returns whether this occluder handle still points to a live occluder.
 LOccluder:remove() -- Removes this occluder from the shared light world.
@@ -3089,7 +3089,7 @@ lurek.math.circleIntersectsLine(cx: number, cy: number, r: number, lx1: number, 
 lurek.math.circleIntersectsSegment(cx: number, cy: number, r: number, sx1: number, sy1: number, sx2: number, sy2: number) -> boolean -- Returns circle-segment intersection state and hit points when present.
 lurek.math.clamp(v: number, min: number, max: number) -> number -- Clamps a value to a range. This function is exposed to Lua scripts.
 lurek.math.closestPointOnSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number) -> number -- Returns the closest point on a segment to an input point.
-lurek.math.convexHull(pts: table) -> table -- Computes the convex hull for a flat point table.
+lurek.math.convexHull(pts: table) -> number[] -- Computes the convex hull for a flat point table.
 lurek.math.cos(x: number) -> number -- Returns cosine of an angle. This function is exposed to Lua scripts.
 lurek.math.deg(rad: number) -> number -- Converts radians to degrees. This function is exposed to Lua scripts.
 lurek.math.delaunayTriangulate(pts: table) -> table -- Computes Delaunay triangles for a flat point table.
@@ -3124,7 +3124,7 @@ lurek.math.isConvex(pts: table) -> boolean -- Returns whether a flat polygon poi
 lurek.math.lerp(a: number, b: number, t: number) -> number -- Linearly interpolates between two values.
 lurek.math.linear(t: number) -> number -- Applies linear easing. This function is exposed to Lua scripts.
 lurek.math.linearToGamma(c: number) -> number -- Converts a linear-space channel to gamma space.
-lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> LuaValue -- Returns intersection point for two infinite lines when present.
+lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> number -- Returns intersection point for two infinite lines when present.
 lurek.math.log(x: number, [b]: number) -> number -- Returns natural logarithm or logarithm with a supplied base.
 lurek.math.max(...: number) -> number -- Returns the largest supplied value.
 lurek.math.min(...: number) -> number -- Returns the smallest supplied value.
@@ -3149,10 +3149,10 @@ lurek.math.perlin3d(x: number, y: number, z: number, [seed]: integer) -> number 
 lurek.math.pointInPolygon(pts: table, px: number, py: number) -> boolean -- Returns whether a point lies inside a polygon.
 lurek.math.polygonArea(pts: table) -> number -- Computes signed area for a flat polygon point table.
 lurek.math.polygonCentroid(pts: table) -> number -- Computes the centroid for a flat polygon point table.
-lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> table -- Clips a flat polygon point table against a plane.
-lurek.math.polygonDifference(a: table, b: table) -> table -- Returns polygon difference points for two polygon tables.
-lurek.math.polygonIntersection(a: table, b: table) -> table -- Returns polygon intersection points for two polygon tables.
-lurek.math.polygonUnion(a: table, b: table) -> table -- Returns polygon union points for two polygon tables.
+lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> number[] -- Clips a flat polygon point table against a plane.
+lurek.math.polygonDifference(a: table, b: table) -> number[] -- Returns polygon difference points for two polygon tables.
+lurek.math.polygonIntersection(a: table, b: table) -> number[] -- Returns polygon intersection points for two polygon tables.
+lurek.math.polygonUnion(a: table, b: table) -> number[] -- Returns polygon union points for two polygon tables.
 lurek.math.pow(x: number, y: number) -> number -- Raises a value to a power. This function is exposed to Lua scripts.
 lurek.math.rad(deg: number) -> number -- Converts degrees to radians. This function is exposed to Lua scripts.
 lurek.math.random([a]: number, [b]: number) -> number -- Returns a Lua math random value, optionally scaled to one or two bounds.
@@ -3184,8 +3184,8 @@ LAabbTree:contains(id: integer) -> boolean -- Returns whether the tree contains 
 LAabbTree:insert(id: integer, min_x: number, min_y: number, max_x: number, max_y: number) -- Inserts an AABB by id. This method is available to Lua scripts.
 LAabbTree:isEmpty() -> boolean -- Returns whether the tree has no items.
 LAabbTree:len() -> integer -- Returns the number of items in the tree.
-LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> table -- Queries ids intersecting an AABB. This method is available to Lua scripts.
-LAabbTree:queryPoint(x: number, y: number) -> table -- Queries ids containing a point. This method is available to Lua scripts.
+LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> integer[] -- Queries ids intersecting an AABB. This method is available to Lua scripts.
+LAabbTree:queryPoint(x: number, y: number) -> integer[] -- Queries ids containing a point. This method is available to Lua scripts.
 LAabbTree:remove(id: integer) -> boolean -- Removes an AABB by id. This method is available to Lua scripts.
 LAabbTree:type() -> string -- Returns the Lua-visible type name for this AABB tree handle.
 LAabbTree:typeOf(name: string) -> boolean -- Returns whether this AABB tree handle matches a supported type name.
@@ -3197,7 +3197,7 @@ LAabbTree:update(id: integer, min_x: number, min_y: number, max_x: number, max_y
 ```lua
 LBezierCurve:evaluate(t: number) -> number -- Evaluates this curve at normalized parameter `t`.
 LBezierCurve:evaluateAtDistance(distance: number, [samples]: integer) -> number -- Evaluates this curve at an approximate distance along the curve.
-LBezierCurve:getControlPoint(index: integer) -> LuaValue -- Returns a control point by one-based index.
+LBezierCurve:getControlPoint(index: integer) -> number -- Returns a control point by one-based index.
 LBezierCurve:getControlPointCount() -> integer -- Returns the number of control points in this curve.
 LBezierCurve:getDerivative() -> LBezierCurve -- Returns the derivative curve for this Bezier curve.
 LBezierCurve:insertControlPoint(x: number, y: number, [index]: integer) -- Inserts a control point, optionally before a one-based index.
@@ -3251,8 +3251,8 @@ LHermite:typeOf(name: string) -> boolean -- Returns whether this spline handle m
 
 ```lua
 LNoiseGenerator:fbm(x: number, y: number, [octaves]: integer, [lac]: number, [pers]: number, [kind]: string) -> number -- Samples fractal Brownian motion noise.
-LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> table -- Generates a noise map and returns it as a flat array table.
-LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> table -- Generates a noise map through the compute backend and returns it as a flat array table.
+LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> number[] -- Generates a noise map and returns it as a flat array table.
+LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> number[] -- Generates a noise map through the compute backend and returns it as a flat array table.
 LNoiseGenerator:getSeed() -> integer -- Returns this noise generator seed.
 LNoiseGenerator:perlin1d(x: number) -> number -- Samples 1D Perlin noise. This method is available to Lua scripts.
 LNoiseGenerator:perlin2d(x: number, y: number) -> number -- Samples 2D Perlin noise. This method is available to Lua scripts.
@@ -3292,7 +3292,7 @@ LRandomGenerator:typeOf(name: string) -> boolean -- Returns whether this random 
 LRectPacker:clear() -- Clears packed rectangles from this packer.
 LRectPacker:getPacked() -> table -- Returns packed rectangle records.
 LRectPacker:occupancy() -> number -- Returns occupied area ratio. This method is available to Lua scripts.
-LRectPacker:pack(w: integer, h: integer, [id]: string) -> LuaValue -- Attempts to pack a rectangle and returns its placement coordinates.
+LRectPacker:pack(w: integer, h: integer, [id]: string) -> integer -- Attempts to pack a rectangle and returns its placement coordinates.
 ```
 
 ### LSpatialHash
@@ -3302,9 +3302,9 @@ LSpatialHash:clear() -- Clears all items from the spatial hash.
 LSpatialHash:getCellSize() -> number -- Returns the spatial hash cell size.
 LSpatialHash:getItemCount() -> integer -- Returns the number of items in the spatial hash.
 LSpatialHash:insert(id: string, x: number, y: number, w: number, h: number) -- Inserts an item rectangle into the spatial hash.
-LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> table -- Returns ids intersecting a query circle.
-LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> table -- Returns ids intersecting a query rectangle.
-LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> table -- Returns ids intersecting a query line segment.
+LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> integer[] -- Returns ids intersecting a query circle.
+LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> integer[] -- Returns ids intersecting a query rectangle.
+LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> integer[] -- Returns ids intersecting a query line segment.
 LSpatialHash:remove(id: string) -- Removes an item from the spatial hash.
 LSpatialHash:type() -> string -- Returns the Lua-visible type name for this spatial hash handle.
 LSpatialHash:typeOf(name: string) -> boolean -- Returns whether this spatial hash handle matches a supported type name.
@@ -3315,8 +3315,8 @@ LSpatialHash:update(id: string, x: number, y: number, w: number, h: number) -- U
 
 ```lua
 LTransform:clone() -> LTransform -- Returns a copy of this transform. This method is available to Lua scripts.
-LTransform:decompose() -> LuaValue -- Decomposes this transform into component values.
-LTransform:getMatrix() -> table -- Returns this transform matrix as a flat array table.
+LTransform:decompose() -> number -- Decomposes this transform into component values.
+LTransform:getMatrix() -> number[] -- Returns this transform matrix as a flat array table.
 LTransform:inverse() -> LTransform -- Returns this transform's inverse.
 LTransform:inverseTransformPoint(x: number, y: number) -> number -- Transforms a point by this transform's inverse.
 LTransform:reset() -- Resets this transform to identity.
@@ -3334,12 +3334,12 @@ LTransform:typeOf(name: string) -> boolean -- Returns whether this transform han
 
 ```lua
 LTween:addValue(start: number, target: number) -> integer -- Adds a value track to this tween. This method is available to Lua scripts.
-LTween:getAllValues() -> table -- Returns all current tween values. This method is available to Lua scripts.
+LTween:getAllValues() -> number[] -- Returns all current tween values. This method is available to Lua scripts.
 LTween:getClock() -> number -- Returns this tween clock time. This method is available to Lua scripts.
 LTween:getDuration() -> number -- Returns this tween duration. This method is available to Lua scripts.
 LTween:getEasingName() -> string -- Returns this tween easing function name.
 LTween:getTime() -> number -- Returns this tween clock time. This method is available to Lua scripts.
-LTween:getValue([index]: integer) -> LuaValue -- Returns one tween value by one-based index or all values when no index is provided.
+LTween:getValue([index]: integer) -> number -- Returns one tween value by one-based index or all values when no index is provided.
 LTween:getValueCount() -> integer -- Returns the number of values animated by this tween.
 LTween:isComplete() -> boolean -- Returns whether this tween is complete.
 LTween:reset() -- Resets the tween clock to the beginning.
@@ -3401,87 +3401,87 @@ lurek.minimap.newMinimap(grid_w: integer, grid_h: integer, [display_w]: integer,
 ### LMinimap
 
 ```lua
-LMinimap:addMarker(x: number, y: number, [desc]: string, [r]: number, [g]: number, [b]: number, [a]: number) -> integer -- Adds a marker and returns its id. This method is available to Lua scripts.
+LMinimap:addMarker(x: number, y: number, [desc]: string, [r]: number, [g]: number, [b]: number, [a]: number) -> integer -- Adds a world-space marker and returns its unique id.
 LMinimap:addObjectType(name: string, r: number, g: number, b: number, [a]: number) -> integer -- Adds an object type and returns its one-based index.
-LMinimap:addPing(x: number, y: number, duration: number, [r]: number, [g]: number, [b]: number, [a]: number) -- Adds a timed ping effect at a minimap world position. The ping fades out over its duration.
-LMinimap:clearMarkerAnimation(id: integer) -- Clears marker animation by id. This method is available to Lua scripts.
+LMinimap:addPing(x: number, y: number, duration: number, [r]: number, [g]: number, [b]: number, [a]: number) -- Adds a timed ping effect at a minimap world position.
+LMinimap:clearMarkerAnimation(id: integer) -- Clears the animation assigned to a marker by id.
 LMinimap:clearMarkerTexture(id: integer) -- Clears image texture from a marker.
 LMinimap:clearObjects() -- Clears all objects from the minimap.
 LMinimap:clearObjectTypeTexture(type_idx: integer) -- Clears image texture for an object type.
-LMinimap:clearOverlay() -- Clears overlay shapes. This method is available to Lua scripts.
+LMinimap:clearOverlay() -- Clears all minimap overlay shapes.
 LMinimap:clearPath([id]: integer) -- Clears one path by id or all paths when no id is provided.
-LMinimap:clearViewportRect() -- Clears the viewport rectangle. This method is available to Lua scripts.
-LMinimap:drawLine(x1: number, y1: number, x2: number, y2: number, color_tbl: table) -- Adds an overlay line. This method is available to Lua scripts.
-LMinimap:drawRect(x: number, y: number, w: number, h: number, color_tbl: table) -- Adds an overlay rectangle. This method is available to Lua scripts.
+LMinimap:clearViewportRect() -- Clears the minimap viewport rectangle overlay.
+LMinimap:drawLine(x1: number, y1: number, x2: number, y2: number, color_tbl: table) -- Adds an overlay line between two world-space points.
+LMinimap:drawRect(x: number, y: number, w: number, h: number, color_tbl: table) -- Adds an overlay rectangle at a world-space position.
 LMinimap:drawToImage(pixel_size: integer) -> LImageData -- Draws the minimap into image data at a pixel size.
 LMinimap:getCellCount() -> integer -- Returns the total number of grid cells.
-LMinimap:getCenter() -> number -- Returns minimap world center. This method is available to Lua scripts.
+LMinimap:getCenter() -> number -- Returns the current minimap world-space center position.
 LMinimap:getCenterX() -> number -- Returns minimap world center x coordinate.
 LMinimap:getCenterY() -> number -- Returns minimap world center y coordinate.
 LMinimap:getColorMode() -> string -- Returns the current minimap color mode.
 LMinimap:getDisplayHeight() -> integer -- Returns the minimap display height.
-LMinimap:getDisplaySize() -> integer -- Returns the minimap display size. This method is available to Lua scripts.
+LMinimap:getDisplaySize() -> integer -- Returns the minimap display width and height in pixels.
 LMinimap:getDisplayWidth() -> integer -- Returns the minimap display width.
-LMinimap:getFogColor() -> number -- Returns the fog overlay color. This method is available to Lua scripts.
+LMinimap:getFogColor() -> number -- Returns the current RGBA fog overlay color.
 LMinimap:getFogLevel(x: integer, y: integer) -> integer -- Returns fog level for a one-based grid cell.
-LMinimap:getGridHeight() -> integer -- Returns the minimap grid height. This method is available to Lua scripts.
-LMinimap:getGridSize() -> integer -- Returns the minimap grid size. This method is available to Lua scripts.
-LMinimap:getGridWidth() -> integer -- Returns the minimap grid width. This method is available to Lua scripts.
+LMinimap:getGridHeight() -> integer -- Returns the height of the minimap grid in cells.
+LMinimap:getGridSize() -> integer -- Returns the minimap grid width and height in cells.
+LMinimap:getGridWidth() -> integer -- Returns the width of the minimap grid in cells.
 LMinimap:getHoverInfo(sx: number, sy: number, mx: number, my: number) -> string -- Returns hover text for a screen position when available.
-LMinimap:getLayer() -> integer -- Returns active minimap layer. This method is available to Lua scripts.
+LMinimap:getLayer() -> integer -- Returns the active minimap display layer index.
 LMinimap:getLayerCount() -> integer -- Returns the number of minimap layers.
-LMinimap:getLayerData(layer: integer) -> table -- Returns raw cell data for a layer. This method is available to Lua scripts.
-LMinimap:getMarkerCount() -> integer -- Returns the number of markers. This method is available to Lua scripts.
+LMinimap:getLayerData(layer: integer) -> integer[] -- Returns raw cell data for a minimap layer.
+LMinimap:getMarkerCount() -> integer -- Returns the total number of minimap markers.
 LMinimap:getMarkerDescription(id: integer) -> string -- Returns a marker description by id.
 LMinimap:getObjectCount() -> integer -- Returns the number of objects on the minimap.
 LMinimap:getObjectTypeCount() -> integer -- Returns the number of object types.
 LMinimap:getOverlayShapeCount() -> integer -- Returns the number of overlay shapes.
-LMinimap:getOwnerColor(owner: integer) -> number -- Returns RGBA color for an owner id. This method is available to Lua scripts.
-LMinimap:getPathCount() -> integer -- Returns the number of paths. This method is available to Lua scripts.
+LMinimap:getOwnerColor(owner: integer) -> number -- Returns the current RGBA color for an owner id.
+LMinimap:getPathCount() -> integer -- Returns the number of active path overlays.
 LMinimap:getPingCount() -> integer -- Returns the number of active pings.
 LMinimap:getTerrain(x: integer, y: integer) -> integer -- Returns terrain type for a one-based grid cell.
 LMinimap:getTerrainColor(terrain_type: integer) -> number -- Returns RGBA color for a terrain type.
 LMinimap:getTileDescription(type_id: integer) -> string -- Returns text description for a tile type.
 LMinimap:getViewportColor() -> number -- Returns the viewport rectangle color.
-LMinimap:getViewportRect() -> LuaValue -- Returns the viewport rectangle when one is set.
-LMinimap:getZoom() -> number -- Returns minimap zoom. This method is available to Lua scripts.
-LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> LuaValue -- Converts grid coordinates to screen coordinates.
+LMinimap:getViewportRect() -> number -- Returns the viewport rectangle when one is set.
+LMinimap:getZoom() -> number -- Returns the current minimap zoom magnification level.
+LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> number -- Converts grid coordinates to screen coordinates.
 LMinimap:hasMarker(id: integer) -> boolean -- Returns whether a marker id exists.
 LMinimap:isAntiAlias() -> boolean -- Returns whether anti-aliasing is enabled.
 LMinimap:isClickable() -> boolean -- Returns whether minimap click handling is enabled.
 LMinimap:isFogEnabled() -> boolean -- Returns whether fog display is enabled.
 LMinimap:isObjectTypeVisible(type_idx: integer) -> boolean -- Returns visibility for an object type by one-based index.
 LMinimap:isViewportVisible() -> boolean -- Returns whether the viewport rectangle is visible.
-LMinimap:removeMarker(id: integer) -> boolean -- Removes a marker by id. This method is available to Lua scripts.
-LMinimap:removeObject(id: integer) -> boolean -- Removes an object by id. This method is available to Lua scripts.
+LMinimap:removeMarker(id: integer) -> boolean -- Removes a minimap marker by its unique id.
+LMinimap:removeObject(id: integer) -> boolean -- Removes a minimap object by its unique id.
 LMinimap:render([x]: number, [y]: number) -- Enqueues minimap render commands at an optional screen position.
 LMinimap:revealRadius(cx: number, cy: number, radius: number) -- Reveals fog inside a world-space radius.
-LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> LuaValue -- Converts a screen position to grid coordinates.
+LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> number -- Converts a screen position to grid coordinates.
 LMinimap:setAntiAlias(enabled: boolean) -- Enables or disables minimap anti-aliasing.
-LMinimap:setCenter(x: number, y: number) -- Sets minimap world center. This method is available to Lua scripts.
+LMinimap:setCenter(x: number, y: number) -- Sets the minimap world-space center position.
 LMinimap:setClickable(enabled: boolean) -- Enables or disables minimap click handling.
-LMinimap:setColorMode(mode: string) -- Sets the minimap color mode. This method is available to Lua scripts.
-LMinimap:setDisplaySize(w: integer, h: integer) -- Sets the minimap display size. This method is available to Lua scripts.
-LMinimap:setFogColor(r: number, g: number, b: number, [a]: number) -- Sets the fog overlay color. This method is available to Lua scripts.
+LMinimap:setColorMode(mode: string) -- Sets the minimap color mode to terrain or political.
+LMinimap:setDisplaySize(w: integer, h: integer) -- Sets the minimap display width and height in pixels.
+LMinimap:setFogColor(r: number, g: number, b: number, [a]: number) -- Sets the RGBA fog overlay color for covered cells.
 LMinimap:setFogData(data: table) -- Replaces fog data from a flat array table.
-LMinimap:setFogEnabled(enabled: boolean) -- Enables or disables fog display. This method is available to Lua scripts.
+LMinimap:setFogEnabled(enabled: boolean) -- Enables or disables the minimap fog display.
 LMinimap:setFogLevel(x: integer, y: integer, level: integer) -- Sets fog level for a one-based grid cell.
-LMinimap:setLayer(layer: integer) -- Sets active minimap layer. This method is available to Lua scripts.
-LMinimap:setLayerData(layer: integer, data_tbl: table) -- Sets raw cell data for a layer. This method is available to Lua scripts.
+LMinimap:setLayer(layer: integer) -- Sets the active minimap display layer index.
+LMinimap:setLayerData(layer: integer, data_tbl: table) -- Sets raw cell data for a minimap layer.
 LMinimap:setMarkerAnimation(id: integer, anim_type: string, speed: number) -- Sets marker animation by type name.
 LMinimap:setMarkerTexture(id: integer, image_ud: LImage, [width]: number, [height]: number) -- Assigns an image texture to a marker.
 LMinimap:setObject(id: integer, x: number, y: number, type_idx: integer, [owner]: integer) -- Adds or updates an object on the minimap.
-LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, width: number, height: number) -- Assigns an image texture to an object type.
+LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, [width]: number, [height]: number) -- Assigns an image texture to an object type.
 LMinimap:setObjectTypeVisible(type_idx: integer, visible: boolean) -- Sets visibility for an object type by one-based index.
-LMinimap:setOwnerColor(owner: integer, r: number, g: number, b: number, [a]: number) -- Sets RGBA color for an owner id. This method is available to Lua scripts.
+LMinimap:setOwnerColor(owner: integer, r: number, g: number, b: number, [a]: number) -- Sets the RGBA display color for an owner id.
 LMinimap:setTerrain(x: integer, y: integer, terrain_type: integer) -- Sets terrain type for a one-based grid cell.
-LMinimap:setTerrainColor(terrain_type: integer, r: number, g: number, b: number, [a]: number) -- Sets RGBA color for a terrain type. This method is available to Lua scripts.
+LMinimap:setTerrainColor(terrain_type: integer, r: number, g: number, b: number, [a]: number) -- Sets the RGBA display color for a terrain type.
 LMinimap:setTerrainData(data: table) -- Replaces terrain data from a flat array table.
 LMinimap:setTileDescription(type_id: integer, desc: string) -- Sets text description for a tile type.
 LMinimap:setViewportColor(r: number, g: number, b: number, [a]: number) -- Sets the viewport rectangle color.
 LMinimap:setViewportRect(x: number, y: number, w: number, h: number) -- Sets the visible viewport rectangle shown on the minimap.
 LMinimap:setViewportVisible(visible: boolean) -- Sets whether the viewport rectangle is visible.
-LMinimap:setZoom(zoom: number) -- Sets minimap zoom. This method is available to Lua scripts.
+LMinimap:setZoom(zoom: number) -- Sets the minimap zoom magnification level.
 LMinimap:showPath(points_tbl: table, color_tbl: table) -> integer -- Adds a colored path overlay and returns its id.
 LMinimap:trackCamera(camera_ud: LCamera) -- Centers the minimap and viewport rectangle from a camera handle.
 LMinimap:type() -> string -- Returns the Lua-visible type name for this minimap handle.
@@ -3503,10 +3503,10 @@ lurek.mods.newRegistry() -> LContentRegistry -- Creates an empty content registr
 ### LContentRegistry
 
 ```lua
-LContentRegistry:get(type_name: string, id: string) -> LuaValue -- Returns one stored value by content type and id.
+LContentRegistry:get(type_name: string, id: string) -> table -- Returns one stored value by content type and id.
 LContentRegistry:getAll(type_name: string) -> table -- Returns all stored values for a content type keyed by id.
-LContentRegistry:getTypes() -> table -- Returns registered content type names.
-LContentRegistry:register(type_name: string, id: string, obj: any) -- Stores a Lua value under a registered content type and id.
+LContentRegistry:getTypes() -> string[] -- Returns registered content type names.
+LContentRegistry:register(type_name: string, id: string, obj: table) -- Stores a Lua value under a registered content type and id.
 LContentRegistry:registerType(type_name: string) -- Registers a content type name. This method is available to Lua scripts.
 LContentRegistry:type() -> string -- Returns the Lua-visible type name for this content registry handle.
 LContentRegistry:typeOf(name: string) -> boolean -- Returns whether this content registry handle matches a supported type name.
@@ -3517,13 +3517,13 @@ LContentRegistry:typeOf(name: string) -> boolean -- Returns whether this content
 ```lua
 LMod:getApiVersion() -> string -- Returns the optional required API version.
 LMod:getAuthor() -> string -- Returns the mod author. This method is available to Lua scripts.
-LMod:getCapabilities() -> table -- Returns capability names declared by the mod.
-LMod:getConfig() -> LuaValue -- Returns the stored Lua config value.
+LMod:getCapabilities() -> string[] -- Returns capability names declared by the mod.
+LMod:getConfig() -> table -- Returns the stored Lua config value.
 LMod:getConfigSchema() -> table -- Returns config schema entries. This method is available to Lua scripts.
-LMod:getDependencies() -> table -- Returns mod dependency ids. This method is available to Lua scripts.
+LMod:getDependencies() -> integer[] -- Returns mod dependency ids. This method is available to Lua scripts.
 LMod:getDescription() -> string -- Returns the mod description. This method is available to Lua scripts.
 LMod:getHook(name: string) -> function -- Returns a stored hook function by name.
-LMod:getHookNames() -> table -- Returns registered hook names. This method is available to Lua scripts.
+LMod:getHookNames() -> string[] -- Returns registered hook names. This method is available to Lua scripts.
 LMod:getId() -> string -- Returns the mod id. This method is available to Lua scripts.
 LMod:getName() -> string -- Returns the mod display name. This method is available to Lua scripts.
 LMod:getPriority() -> integer -- Returns the mod priority. This method is available to Lua scripts.
@@ -3534,7 +3534,7 @@ LMod:isLoaded() -> boolean -- Returns whether the mod is loaded. This method is 
 LMod:releaseRefs() -- Releases stored Lua registry references for hooks and config.
 LMod:setApiVersion(api_version: string) -- Sets the required API version string.
 LMod:setCapabilities(caps: table) -- Sets capability names from an array table.
-LMod:setConfig(value: any) -- Stores a Lua config value for this mod.
+LMod:setConfig(value: table) -- Stores a Lua config value for this mod.
 LMod:setConfigSchema(schema: table) -- Sets config schema entries from a Lua table.
 LMod:setEnabled(enabled: boolean) -- Sets whether the mod is enabled. This method is available to Lua scripts.
 LMod:setHook(name: string, func: function) -- Stores a Lua hook function by name. This method is available to Lua scripts.
@@ -3552,18 +3552,18 @@ LModManager:getLoadOrder() -> table -- Returns the resolved load order. This met
 LModManager:getModCount() -> integer -- Returns the number of registered mods.
 LModManager:getModPath(mod_id: string) -> string -- Returns the filesystem path for a registered mod.
 LModManager:getModsByCapability(capability: string) -> table -- Returns metadata for mods declaring a capability.
-LModManager:getReloadQueue() -> table -- Returns mod ids waiting for reload.
+LModManager:getReloadQueue() -> integer[] -- Returns mod ids waiting for reload.
 LModManager:hasCircularDependencies() -> boolean -- Returns whether registered mods have circular dependencies.
 LModManager:hasMod(mod_id: string) -> boolean -- Returns whether a mod id is registered.
 LModManager:markForReload(mod_id: string) -> boolean -- Marks a mod id for reload. This method is available to Lua scripts.
-LModManager:processReloadQueue() -> table -- Processes and clears the reload queue.
+LModManager:processReloadQueue() -> integer[] -- Processes and clears the reload queue.
 LModManager:registerMod(ud: LMod) -- Registers a mod with the manager. This method is available to Lua scripts.
 LModManager:scanFolder(path: string) -> table -- Scans a folder for mod metadata. This method is available to Lua scripts.
 LModManager:setLoadOrder(order_table: table) -- Sets explicit load order from an array of mod ids.
 LModManager:type() -> string -- Returns the Lua-visible type name for this mod manager handle.
 LModManager:typeOf(name: string) -> boolean -- Returns whether this mod manager handle matches a supported type name.
 LModManager:unregisterMod(mod_id: string) -> boolean -- Unregisters a mod by id. This method is available to Lua scripts.
-LModManager:validateDependencies() -> table -- Returns dependency validation messages.
+LModManager:validateDependencies() -> string[] -- Returns dependency validation messages.
 ```
 
 ## lurek.network
@@ -3583,13 +3583,13 @@ lurek.network.newHost(opts: table) -> LNetworkHost -- Creates a network host fro
 lurek.network.newRelayTicket(room_id: string, peer_id: string) -> string -- Creates an encoded relay ticket. This function is exposed to Lua scripts.
 lurek.network.newRuntime() -> LNetworkRuntime -- Creates a background network runtime.
 lurek.network.newServer(opts: table) -> LNetworkHost -- Creates a server host from an options table.
-lurek.network.pack(value: any) -> string -- Packs a supported Lua value into a binary network message string.
+lurek.network.pack(value: table) -> string -- Packs a supported Lua value into a binary network message string.
 lurek.network.parsePunchProbe(payload: string) -> string -- Parses a relay punch probe payload.
 lurek.network.parseRelayTicket(token: string) -> table -- Parses an encoded relay ticket. This function is exposed to Lua scripts.
 lurek.network.predictLinear(snapshot: table, dt: number) -> table -- Predicts an entity snapshot forward by linear velocity.
 lurek.network.reconcileSnapshot(pred: table, auth: table, alpha: number) -> table -- Reconciles a predicted snapshot toward an authoritative snapshot.
 lurek.network.syncEntity(host_ud: LNetworkHost, entity_id: integer, data_tbl: table, [channel]: integer, [reliable]: boolean) -- Broadcasts a packed entity sync payload through a network host.
-lurek.network.unpack(data: string) -> LuaValue -- Unpacks a binary network message string into Lua values.
+lurek.network.unpack(data: string) -> table -- Unpacks a binary network message string into a Lua value.
 ```
 
 ### LNetworkHost
@@ -3597,7 +3597,7 @@ lurek.network.unpack(data: string) -> LuaValue -- Unpacks a binary network messa
 ```lua
 LNetworkHost:broadcast(channel_id: integer, data: string, [reliable]: boolean) -- Broadcasts bytes to all connected peers on a channel.
 LNetworkHost:connect(addr_str: string, [channels]: integer, [data]: integer) -> integer -- Connects to a remote address. This method is available to Lua scripts.
-LNetworkHost:destroy() -- Destroys the network host. This method is available to Lua scripts.
+LNetworkHost:destroy() -- Destroys the network host and releases resources.
 LNetworkHost:disconnect(peer_id: integer, [data]: integer) -- Requests a graceful peer disconnect.
 LNetworkHost:disconnectLater(peer_id: integer, [data]: integer) -- Schedules a peer disconnect after pending packets.
 LNetworkHost:disconnectNow(peer_id: integer, [data]: integer) -- Disconnects a peer immediately. This method is available to Lua scripts.
@@ -3605,8 +3605,8 @@ LNetworkHost:flush() -- Flushes queued outgoing network packets.
 LNetworkHost:getAddress() -> string -- Returns local host socket address.
 LNetworkHost:getBandwidthLimit() -> table -- Returns incoming and outgoing bandwidth limits.
 LNetworkHost:getChannelLimit() -> integer -- Returns configured channel limit.
-LNetworkHost:getConnectedPeerCount() -> integer -- Returns connected peer count. This method is available to Lua scripts.
-LNetworkHost:getConnectedPeerIds() -> table -- Returns ids for connected peers. This method is available to Lua scripts.
+LNetworkHost:getConnectedPeerCount() -> integer -- Returns the number of currently connected peers.
+LNetworkHost:getConnectedPeerIds() -> integer[] -- Returns an array of ids for all connected peers.
 LNetworkHost:getPeerAddress(peer_id: integer) -> string -- Returns peer socket address when available.
 LNetworkHost:getPeerLimit() -> integer -- Returns configured peer limit. This method is available to Lua scripts.
 LNetworkHost:getPeerState(peer_id: integer) -> string -- Returns peer connection state. This method is available to Lua scripts.
@@ -3633,7 +3633,7 @@ LNetworkRuntime:httpGet(url: string, [headers]: table) -> integer -- Starts an H
 LNetworkRuntime:httpPost(url: string, body: string, [headers]: table) -> integer -- Starts an HTTP POST request. This method is available to Lua scripts.
 LNetworkRuntime:httpRequest(opts: table) -> integer -- Starts an HTTP request from an options table and returns its request id.
 LNetworkRuntime:poll() -> table -- Polls runtime responses for HTTP, TCP, and WebSocket operations.
-LNetworkRuntime:shutdown() -- Shuts down the network runtime. This method is available to Lua scripts.
+LNetworkRuntime:shutdown() -- Shuts down the network runtime and cancels pending requests.
 LNetworkRuntime:tcpClose(id: integer) -- Closes a TCP connection. This method is available to Lua scripts.
 LNetworkRuntime:tcpConnect(addr: string) -> integer -- Opens a TCP connection. This method is available to Lua scripts.
 LNetworkRuntime:tcpSend(id: integer, data: string) -- Sends bytes over a TCP connection. This method is available to Lua scripts.
@@ -3658,38 +3658,38 @@ lurek.parallax.newSet(name: string) -> LParallaxSet -- Creates an empty parallax
 
 ```lua
 LParallaxLayer:addEffectPass(effect_name: string, [params]: table) -- Adds a shader effect pass to this layer.
-LParallaxLayer:clearClamp() -- Clears layer clamp bounds. This method is available to Lua scripts.
+LParallaxLayer:clearClamp() -- Clears layer clamp bounds on this object.
 LParallaxLayer:clearEffects() -- Clears shader effect passes from this layer.
-LParallaxLayer:effectCount() -> integer -- Returns shader effect pass count. This method is available to Lua scripts.
+LParallaxLayer:effectCount() -> integer -- Returns the shader effect pass count for this layer.
 LParallaxLayer:getAutoscroll() -> number -- Returns layer autoscroll velocity.
-LParallaxLayer:getBlendMode() -> string -- Returns layer blend mode name. This method is available to Lua scripts.
-LParallaxLayer:getDepth() -> number -- Returns parallax depth. This method is available to Lua scripts.
-LParallaxLayer:getMotionStretch() -> boolean -- Returns motion stretch settings. This method is available to Lua scripts.
-LParallaxLayer:getOffset() -> number -- Returns layer offset. This method is available to Lua scripts.
-LParallaxLayer:getOpacity() -> number -- Returns layer opacity. This method is available to Lua scripts.
-LParallaxLayer:getScrollFactor() -> number -- Returns layer scroll factor. This method is available to Lua scripts.
+LParallaxLayer:getBlendMode() -> string -- Returns the current layer blend mode name.
+LParallaxLayer:getDepth() -> number -- Returns parallax depth from this object.
+LParallaxLayer:getMotionStretch() -> boolean -- Returns the current motion stretch settings.
+LParallaxLayer:getOffset() -> number -- Returns layer offset for this object.
+LParallaxLayer:getOpacity() -> number -- Returns layer opacity from this object.
+LParallaxLayer:getScrollFactor() -> number -- Returns layer scroll factor from this object.
 LParallaxLayer:getTiling() -> boolean -- Returns whether layer tiling is enabled.
-LParallaxLayer:getTint() -> number -- Returns layer tint color. This method is available to Lua scripts.
-LParallaxLayer:getZ() -> integer -- Returns layer z order. This method is available to Lua scripts.
-LParallaxLayer:isVisible() -> boolean -- Returns layer visibility. This method is available to Lua scripts.
+LParallaxLayer:getTint() -> number -- Returns layer tint color from this object.
+LParallaxLayer:getZ() -> integer -- Returns layer z order from this object.
+LParallaxLayer:isVisible() -> boolean -- Returns layer visibility and returns a boolean.
 LParallaxLayer:render(cam_x: number, cam_y: number) -- Enqueues render commands using explicit camera coordinates.
 LParallaxLayer:renderAuto() -- Enqueues render commands using the runtime camera.
-LParallaxLayer:resetAutoscroll() -- Resets layer autoscroll offset. This method is available to Lua scripts.
-LParallaxLayer:setAutoscroll(vx: number, vy: number) -- Sets layer autoscroll velocity. This method is available to Lua scripts.
-LParallaxLayer:setBlendMode(mode: string) -- Sets layer blend mode by name. This method is available to Lua scripts.
+LParallaxLayer:resetAutoscroll() -- Resets the layer autoscroll offset to zero.
+LParallaxLayer:setAutoscroll(vx: number, vy: number) -- Sets the layer autoscroll velocity values.
+LParallaxLayer:setBlendMode(mode: string) -- Sets the layer blend mode by string name.
 LParallaxLayer:setClamp(min_x: number, min_y: number, max_x: number, max_y: number) -- Sets clamp bounds for layer movement.
-LParallaxLayer:setDepth(z: number) -- Sets parallax depth. This method is available to Lua scripts.
-LParallaxLayer:setMotionStretch(enabled: boolean, strength: number, max_scale: number) -- Sets motion stretch settings. This method is available to Lua scripts.
-LParallaxLayer:setOffset(x: number, y: number) -- Sets layer offset. This method is available to Lua scripts.
+LParallaxLayer:setDepth(z: number) -- Sets parallax depth for this object.
+LParallaxLayer:setMotionStretch(enabled: boolean, strength: number, max_scale: number) -- Sets the motion stretch settings for this layer.
+LParallaxLayer:setOffset(x: number, y: number) -- Sets the layer pixel offset for this object.
 LParallaxLayer:setOpacity(a: number) -- Sets layer opacity, clamped to 0..1.
 LParallaxLayer:setRepeat(rx: boolean, ry: boolean) -- Sets horizontal and vertical repeat flags.
-LParallaxLayer:setScale(sx: number, sy: number) -- Sets layer scale. This method is available to Lua scripts.
-LParallaxLayer:setScrollFactor(x: number, y: number) -- Sets layer scroll factor. This method is available to Lua scripts.
-LParallaxLayer:setTileSize(w: number, h: number) -- Sets tile size for tiling. This method is available to Lua scripts.
-LParallaxLayer:setTiling(enabled: boolean) -- Enables or disables layer tiling. This method is available to Lua scripts.
-LParallaxLayer:setTint(r: number, g: number, b: number, a: number) -- Sets layer tint color. This method is available to Lua scripts.
-LParallaxLayer:setVisible(v: boolean) -- Sets layer visibility. This method is available to Lua scripts.
-LParallaxLayer:setZ(z: integer) -- Sets layer z order. This method is available to Lua scripts.
+LParallaxLayer:setScale(sx: number, sy: number) -- Sets the layer scale factor for this object.
+LParallaxLayer:setScrollFactor(x: number, y: number) -- Sets layer scroll factor for this object.
+LParallaxLayer:setTileSize(w: number, h: number) -- Sets tile size for tiling for this object.
+LParallaxLayer:setTiling(enabled: boolean) -- Enables or disables the layer tiling mode.
+LParallaxLayer:setTint(r: number, g: number, b: number, a: number) -- Sets layer tint color for this object.
+LParallaxLayer:setVisible(v: boolean) -- Sets layer visibility for this object.
+LParallaxLayer:setZ(z: integer) -- Sets the layer z order for this object.
 LParallaxLayer:type() -> string -- Returns the Lua-visible type name for this parallax layer handle.
 LParallaxLayer:update(dt: number) -- Advances parallax layer autoscroll by delta time.
 ```
@@ -3697,19 +3697,19 @@ LParallaxLayer:update(dt: number) -- Advances parallax layer autoscroll by delta
 ### LParallaxSet
 
 ```lua
-LParallaxSet:addLayer(layer: LParallaxLayer) -- Adds a parallax layer to this set. This method is available to Lua scripts.
-LParallaxSet:getLayerZAt(index: integer) -> integer -- Returns z order for a layer by one-based index.
-LParallaxSet:getName() -> string -- Returns this set name. This method is available to Lua scripts.
-LParallaxSet:isVisible() -> boolean -- Returns set visibility. This method is available to Lua scripts.
+LParallaxSet:addLayer(layer: LParallaxLayer) -- Adds a parallax layer to this set handle.
+LParallaxSet:getLayerZAt(index: integer) -> integer -- Returns z order for a layer by one-based index, or nil when out of range.
+LParallaxSet:getName() -> string -- Returns this set name from this object.
+LParallaxSet:isVisible() -> boolean -- Returns set visibility and returns a boolean.
 LParallaxSet:layerCount() -> integer -- Returns the number of layers in this set.
 LParallaxSet:removeLayerAt(index: integer) -> boolean -- Removes a layer by one-based index.
 LParallaxSet:render(cam_x: number, cam_y: number) -- Enqueues render commands for all visible set layers using explicit camera coordinates.
 LParallaxSet:renderAuto() -- Enqueues render commands for all visible set layers using the runtime camera.
-LParallaxSet:setName(name: string) -- Sets this set name. This method is available to Lua scripts.
-LParallaxSet:setVisible(v: boolean) -- Sets set visibility. This method is available to Lua scripts.
-LParallaxSet:sortByZ() -- Sorts layers by z order. This method is available to Lua scripts.
+LParallaxSet:setName(name: string) -- Sets this parallax set name for this object.
+LParallaxSet:setVisible(v: boolean) -- Sets set visibility for this object.
+LParallaxSet:sortByZ() -- Sorts layers by z order on this object.
 LParallaxSet:type() -> string -- Returns the Lua-visible type name for this parallax set handle.
-LParallaxSet:update(dt: number) -- Updates all layers in this set. This method is available to Lua scripts.
+LParallaxSet:update(dt: number) -- Updates all layers in this parallax set.
 ```
 
 ## lurek.particle
@@ -3729,8 +3729,8 @@ lurek.particle.newTrail(lifetime: number, start_width: number) -> LTrail -- Crea
 LParticleSystem:addAttractor(x: number, y: number, strength: number, radius: number) -- Adds an attractor to the particle system.
 LParticleSystem:addSubEmitter(config_tbl: table, [burst_count]: integer) -- Configures a death sub-emitter from a config table.
 LParticleSystem:addSubSystem(config_tbl: table) -> integer -- Adds a particle sub-system from a config table.
-LParticleSystem:clearAttractors() -- Clears all attractors. This method is available to Lua scripts.
-LParticleSystem:clearBounds() -- Clears collision bounds. This method is available to Lua scripts.
+LParticleSystem:clearAttractors() -- Clears all attractors on this object.
+LParticleSystem:clearBounds() -- Clears collision bounds on this object.
 LParticleSystem:clearCollidesWithPhysics() -- Disables particle collision against a physics world.
 LParticleSystem:clone() -> LParticleSystem -- Clones this particle system configuration into a new system handle.
 LParticleSystem:count() -> integer -- Returns the current particle count.
@@ -3755,7 +3755,7 @@ LParticleSystem:getPosition() -> number -- Returns emitter position. This method
 LParticleSystem:getRadialAcceleration() -> number -- Returns radial acceleration range.
 LParticleSystem:getRotation() -> number -- Returns particle rotation range. This method is available to Lua scripts.
 LParticleSystem:getShape() -> string -- Returns particle shape. This method is available to Lua scripts.
-LParticleSystem:getSizes() -> table -- Returns particle size keyframes. This method is available to Lua scripts.
+LParticleSystem:getSizes() -> number[] -- Returns particle size keyframes. This method is available to Lua scripts.
 LParticleSystem:getSizeVariation() -> number -- Returns size variation. This method is available to Lua scripts.
 LParticleSystem:getSpeed() -> number -- Returns particle speed range. This method is available to Lua scripts.
 LParticleSystem:getSpin() -> number -- Returns particle spin range. This method is available to Lua scripts.
@@ -3774,7 +3774,7 @@ LParticleSystem:pause() -- Pauses particle emission and updates.
 LParticleSystem:release() -> boolean -- Releases the particle system from shared storage.
 LParticleSystem:render([ox]: number, [oy]: number) -- Enqueues particle render commands with an optional offset.
 LParticleSystem:reset() -- Resets particles and emitter state.
-LParticleSystem:resume() -- Resumes a paused particle system. This method is available to Lua scripts.
+LParticleSystem:resume() -- Resumes a paused particle system if it was previously paused.
 LParticleSystem:setBounds(xmin: number, xmax: number, ymin: number, ymax: number, restitution: number) -- Sets collision bounds for particles.
 LParticleSystem:setBufferSize(n: integer) -- Sets maximum particle buffer size.
 LParticleSystem:setCollidesWithPhysics(world_ud: LWorld, [probe_radius]: number, [restitution]: number) -- Enables particle collision against a physics world.
@@ -3803,9 +3803,9 @@ LParticleSystem:setSpeed(min: number, max: number) -- Sets particle speed range.
 LParticleSystem:setSpin(min: number, max: number) -- Sets particle spin range. This method is available to Lua scripts.
 LParticleSystem:setSpinVariation(v: number) -- Sets spin variation. This method is available to Lua scripts.
 LParticleSystem:setSpread(spread: number) -- Sets emission spread. This method is available to Lua scripts.
-LParticleSystem:setTangentialAcceleration(min: number, max: number) -- Sets tangential acceleration range.
-LParticleSystem:start() -- Starts particle emission. This method is available to Lua scripts.
-LParticleSystem:stop() -- Stops particle emission. This method is available to Lua scripts.
+LParticleSystem:setTangentialAcceleration(min: number, max: number) -- Sets tangential acceleration range for emitted particles.
+LParticleSystem:start() -- Starts particle emission on this object.
+LParticleSystem:stop() -- Stops particle emission on this object.
 LParticleSystem:subSystemCount() -> integer -- Returns particle sub-system count.
 LParticleSystem:toImage(w: integer, h: integer) -> LImageData -- Draws particles to image data. This method is available to Lua scripts.
 LParticleSystem:type() -> string -- Returns the Lua-visible type name for this particle system handle.
@@ -3817,16 +3817,16 @@ LParticleSystem:warmUp(seconds: number) -- Advances the system by a warm-up dura
 ### LTrail
 
 ```lua
-LTrail:clear() -- Clears all trail points. This method is available to Lua scripts.
+LTrail:clear() -- Clears all trail points on this object.
 LTrail:drawToImage(w: integer, h: integer) -> LImageData -- Draws the trail to image data. This method is available to Lua scripts.
 LTrail:getLifetime() -> number -- Returns trail point lifetime. This method is available to Lua scripts.
 LTrail:getPointCount() -> integer -- Returns trail point count. This method is available to Lua scripts.
-LTrail:getWidth() -> LuaValue -- Returns trail width settings. This method is available to Lua scripts.
+LTrail:getWidth() -> number -- Returns trail width settings from this object.
 LTrail:pushPoint(x: number, y: number) -- Adds a point to the trail. This method is available to Lua scripts.
-LTrail:setHeadColor(r: number, g: number, b: number, a: number) -- Sets trail head color. This method is available to Lua scripts.
+LTrail:setHeadColor(r: number, g: number, b: number, a: number) -- Sets the color of the leading edge of the trail.
 LTrail:setLifetime(lifetime: number) -- Sets trail point lifetime. This method is available to Lua scripts.
 LTrail:setMinDistance(distance: number) -- Sets minimum distance between trail points.
-LTrail:setTailColor(r: number, g: number, b: number, a: number) -- Sets trail tail color. This method is available to Lua scripts.
+LTrail:setTailColor(r: number, g: number, b: number, a: number) -- Sets the color of the trailing edge of the trail.
 LTrail:setWidth(start: number, [end]: number) -- Sets trail start and optional end width.
 LTrail:type() -> string -- Returns the Lua-visible type name for this trail handle.
 LTrail:typeOf(name: string) -> boolean -- Returns whether this trail handle matches a supported type name.
@@ -3840,28 +3840,28 @@ LTrail:update(dt: number) -- Updates trail point lifetimes. This method is avail
 ```lua
 lurek.pathfind.getThreadCount() -> integer -- Returns the pathfinding thread count.
 lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField -- Creates a flow field for a navigation grid.
-lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid. This function is exposed to Lua scripts.
-lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid. This function is exposed to Lua scripts.
-lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid. This function is exposed to Lua scripts.
+lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid with the given dimensions.
+lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid with given dimensions.
+lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid with the given dimensions.
 lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
-lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh. This function is exposed to Lua scripts.
+lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh for polygon-based pathfinding.
 lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
 lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField -- Creates an AI flow field from a path grid.
-lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid. This function is exposed to Lua scripts.
+lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid with given dimensions.
 lurek.pathfind.rangeMap(opts: table) -> table -- Computes reachable cells from range map options.
-lurek.pathfind.setThreadCount(count: integer) -- Records a warning because pathfinding thread count is not implemented.
+lurek.pathfind.setThreadCount(count: integer) -- Sets pathfinding thread count (not yet implemented; logs a warning).
 ```
 
 ### LAIFlowField
 
 ```lua
-LAIFlowField:getDirection(x: integer, y: integer) -> LuaValue -- Returns flow direction for a one-based cell.
-LAIFlowField:getDistance(x: integer, y: integer) -> LuaValue -- Returns distance to goal for a one-based cell.
-LAIFlowField:getGoal() -> integer|nil -- Returns the one-based flow field goal when set.
-LAIFlowField:getHeight() -> integer -- Returns flow field height. This method is available to Lua scripts.
-LAIFlowField:getWidth() -> integer -- Returns flow field width. This method is available to Lua scripts.
-LAIFlowField:hasGoal() -> boolean -- Returns whether a goal is set. This method is available to Lua scripts.
-LAIFlowField:setGoal(x: integer, y: integer) -- Sets the one-based flow field goal.
+LAIFlowField:getDirection(x: integer, y: integer) -> number -- Returns flow direction vector for a one-based cell.
+LAIFlowField:getDistance(x: integer, y: integer) -> number -- Returns distance to goal for a one-based cell.
+LAIFlowField:getGoal() -> integer -- Returns the one-based flow field goal, or nil when no goal is set.
+LAIFlowField:getHeight() -> integer -- Returns flow field height from this object.
+LAIFlowField:getWidth() -> integer -- Returns flow field width from this object.
+LAIFlowField:hasGoal() -> boolean -- Returns whether a flow field goal is currently set.
+LAIFlowField:setGoal(x: integer, y: integer) -- Sets the one-based flow field goal and recalculates the field.
 LAIFlowField:type() -> string -- Returns the Lua-visible type name for this AI flow field handle.
 LAIFlowField:typeOf(name: string) -> boolean -- Returns whether this AI flow field handle matches a supported type name.
 ```
@@ -3871,12 +3871,12 @@ LAIFlowField:typeOf(name: string) -> boolean -- Returns whether this AI flow fie
 ```lua
 LFlowField:calculate(tx: integer, ty: integer, [unit_size]: integer) -- Calculates a flow field toward one target cell.
 LFlowField:calculateMulti(targets: table, [unit_size]: integer) -- Calculates a flow field toward multiple target cells.
-LFlowField:getCostToTarget(x: integer, y: integer) -> LuaValue -- Returns flow field cost to target from a one-based grid cell.
-LFlowField:getDirection(x: integer, y: integer) -> LuaValue -- Returns flow direction at a one-based grid cell.
+LFlowField:getCostToTarget(x: integer, y: integer) -> number -- Returns integration cost to the target from a one-based grid cell.
+LFlowField:getDirection(x: integer, y: integer) -> number -- Returns flow direction vector at a one-based grid cell.
 LFlowField:getDirectionAngle(x: integer, y: integer) -> number -- Returns flow direction angle at a one-based grid cell.
 LFlowField:getTargets() -> table -- Returns target cells for this flow field.
 LFlowField:isCalculated() -> boolean -- Returns whether the flow field has been calculated.
-LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> LuaValue -- Returns steering data for a world position.
+LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> number -- Returns a steering velocity for a world position using the flow field.
 LFlowField:type() -> string -- Returns the Lua-visible type name for this flow field handle.
 LFlowField:typeOf(name: string) -> boolean -- Returns whether this flow field handle matches a supported type name.
 ```
@@ -3884,12 +3884,12 @@ LFlowField:typeOf(name: string) -> boolean -- Returns whether this flow field ha
 ### LHexGrid
 
 ```lua
-LHexGrid:distance(c1: integer, r1: integer, c2: integer, r2: integer) -> number -- Returns distance between two one-based hex cells.
-LHexGrid:fieldOfView(col: integer, row: integer, max_range: integer) -> table -- Returns visible hex cells within range.
+LHexGrid:distance(c1: integer, r1: integer, c2: integer, r2: integer) -> number -- Returns hex distance between two one-based hex cells.
+LHexGrid:fieldOfView(col: integer, row: integer, max_range: integer) -> table -- Returns visible hex cells within range from an origin.
 LHexGrid:findPath(fc: integer, fr: integer, tc: integer, tr: integer) -> table -- Finds a path between one-based hex cells.
-LHexGrid:isBlocked(col: integer, row: integer) -> boolean -- Returns blocked state for a one-based hex cell.
+LHexGrid:isBlocked(col: integer, row: integer) -> boolean -- Returns whether a one-based hex cell is blocked.
 LHexGrid:lineOfSight(fc: integer, fr: integer, tc: integer, tr: integer) -> boolean -- Returns whether two one-based hex cells have line of sight.
-LHexGrid:rangeOfMovement(col: integer, row: integer, budget: number) -> table -- Returns reachable hex cells within movement budget.
+LHexGrid:rangeOfMovement(col: integer, row: integer, budget: number) -> table -- Returns reachable hex cells within a movement budget.
 LHexGrid:setBlocked(col: integer, row: integer, blocked: boolean) -- Sets blocked state for a one-based hex cell.
 LHexGrid:setCost(col: integer, row: integer, cost: number) -- Sets movement cost for a one-based hex cell.
 LHexGrid:type() -> string -- Returns the Lua-visible type name for this hex grid handle.
@@ -3900,8 +3900,8 @@ LHexGrid:typeOf(name: string) -> boolean -- Returns whether this hex grid handle
 
 ```lua
 LJpsGrid:findPath(fx: integer, fy: integer, tx: integer, ty: integer) -> table -- Finds a JPS path between one-based grid cells.
-LJpsGrid:isBlocked(x: integer, y: integer) -> boolean -- Returns blocked state for a one-based grid cell.
-LJpsGrid:setBlocked(x: integer, y: integer, blocked: boolean) -- Sets blocked state for a one-based grid cell.
+LJpsGrid:isBlocked(x: integer, y: integer) -> boolean -- Returns whether a one-based JPS grid cell is blocked.
+LJpsGrid:setBlocked(x: integer, y: integer, blocked: boolean) -- Sets blocked state for a one-based JPS grid cell.
 LJpsGrid:type() -> string -- Returns the Lua-visible type name for this JPS grid handle.
 LJpsGrid:typeOf(name: string) -> boolean -- Returns whether this JPS grid handle matches a supported type name.
 ```
@@ -3909,25 +3909,25 @@ LJpsGrid:typeOf(name: string) -> boolean -- Returns whether this JPS grid handle
 ### LNavGrid
 
 ```lua
-LNavGrid:clearDirty() -- Clears dirty regions. This method is available to Lua scripts.
-LNavGrid:fill(cost: integer) -- Fills the grid with a movement cost.
-LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: u8) -- Fills a one-based rectangular area with a movement cost.
-LNavGrid:getChunkSize() -> integer -- Returns hierarchical chunk size. This method is available to Lua scripts.
+LNavGrid:clearDirty() -- Clears all dirty region markers from the grid.
+LNavGrid:fill(cost: integer) -- Fills the entire grid with a uniform movement cost.
+LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: integer) -- Fills a one-based rectangular area with a movement cost.
+LNavGrid:getChunkSize() -> integer -- Returns the hierarchical chunk size in cells.
 LNavGrid:getCost(x: integer, y: integer) -> integer -- Returns movement cost at a one-based grid cell.
-LNavGrid:getDiagonalMode() -> string -- Returns diagonal movement mode. This method is available to Lua scripts.
-LNavGrid:getDimensions() -> integer -- Returns grid dimensions. This method is available to Lua scripts.
-LNavGrid:getHeight() -> integer -- Returns grid height. This method is available to Lua scripts.
-LNavGrid:getWidth() -> integer -- Returns grid width. This method is available to Lua scripts.
-LNavGrid:isBlocked(x: integer, y: integer) -> boolean -- Returns blocked state at a one-based grid cell.
+LNavGrid:getDiagonalMode() -> string -- Returns the current diagonal movement mode name.
+LNavGrid:getDimensions() -> integer -- Returns grid width and height as two integers.
+LNavGrid:getHeight() -> integer -- Returns grid height from this object.
+LNavGrid:getWidth() -> integer -- Returns grid width from this object.
+LNavGrid:isBlocked(x: integer, y: integer) -> boolean -- Returns whether a one-based grid cell is blocked.
 LNavGrid:isWalkable(x: integer, y: integer, [unit_size]: integer) -> boolean -- Returns whether a one-based grid cell is walkable for a unit size.
-LNavGrid:loadFromString(data: string) -- Loads grid data from a binary string.
+LNavGrid:loadFromString(data: string) -- Loads grid data from a serialized binary string.
 LNavGrid:rebuildAbstract() -- Rebuilds the cached abstract graph for this grid.
-LNavGrid:saveToString() -> string -- Saves grid data to a binary string. This method is available to Lua scripts.
+LNavGrid:saveToString() -> string -- Saves grid data to a serialized binary string.
 LNavGrid:setBlocked(x: integer, y: integer, blocked: boolean) -- Sets blocked state at a one-based grid cell.
-LNavGrid:setChunkSize(size: integer) -- Sets hierarchical chunk size. This method is available to Lua scripts.
-LNavGrid:setCost(x: integer, y: integer, cost: u8) -- Sets movement cost at a one-based grid cell.
-LNavGrid:setDiagonalMode(mode: string) -- Sets diagonal movement mode. This method is available to Lua scripts.
-LNavGrid:setDirty(x: integer, y: integer, w: integer, h: integer) -- Marks a one-based rectangular region dirty.
+LNavGrid:setChunkSize(size: integer) -- Sets hierarchical chunk size for abstract graph partitioning.
+LNavGrid:setCost(x: integer, y: integer, cost: integer) -- Sets movement cost at a one-based grid cell.
+LNavGrid:setDiagonalMode(mode: string) -- Sets diagonal movement mode for this object.
+LNavGrid:setDirty(x: integer, y: integer, w: integer, h: integer) -- Marks a one-based rectangular region dirty for incremental rebuild.
 LNavGrid:type() -> string -- Returns the Lua-visible type name for this navigation grid handle.
 LNavGrid:typeOf(name: string) -> boolean -- Returns whether this navigation grid handle matches a supported type name.
 ```
@@ -3938,7 +3938,7 @@ LNavGrid:typeOf(name: string) -> boolean -- Returns whether this navigation grid
 LNavMesh:addPolygon(vertices: table) -> integer -- Adds a polygon from vertex tables and returns a one-based id.
 LNavMesh:connectPolygons(a: integer, b: integer, [bidirectional]: boolean) -> boolean -- Connects two polygons by one-based id.
 LNavMesh:findPath(sx: number, sy: number, gx: number, gy: number) -> table -- Finds a path through the navmesh between world points.
-LNavMesh:getPolygonCount() -> integer -- Returns navmesh polygon count. This method is available to Lua scripts.
+LNavMesh:getPolygonCount() -> integer -- Returns the total navmesh polygon count.
 LNavMesh:type() -> string -- Returns the Lua-visible type name for this navmesh handle.
 LNavMesh:typeOf(name: string) -> boolean -- Returns whether this navmesh handle matches a supported type name.
 ```
@@ -3946,12 +3946,12 @@ LNavMesh:typeOf(name: string) -> boolean -- Returns whether this navmesh handle 
 ### LPathGrid
 
 ```lua
-LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil -- Finds a path between one-based path grid cells.
-LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil -- Finds a smoothed path between one-based path grid cells.
-LPathGrid:getCellSize() -> number -- Returns path grid cell size. This method is available to Lua scripts.
+LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table -- Finds a path between one-based path grid cells.
+LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table -- Finds a smoothed path between one-based path grid cells.
+LPathGrid:getCellSize() -> number -- Returns path grid cell size from this object.
 LPathGrid:getCost(x: integer, y: integer) -> number -- Returns movement cost at a one-based cell.
-LPathGrid:getHeight() -> integer -- Returns grid height. This method is available to Lua scripts.
-LPathGrid:getWidth() -> integer -- Returns grid width. This method is available to Lua scripts.
+LPathGrid:getHeight() -> integer -- Returns grid height from this object.
+LPathGrid:getWidth() -> integer -- Returns grid width from this object.
 LPathGrid:isWalkable(x: integer, y: integer) -> boolean -- Returns walkability at a one-based cell.
 LPathGrid:setCost(x: integer, y: integer, cost: number) -- Sets movement cost at a one-based cell.
 LPathGrid:setWalkable(x: integer, y: integer, w: boolean) -- Sets walkability at a one-based cell.
@@ -3962,21 +3962,21 @@ LPathGrid:typeOf(name: string) -> boolean -- Returns whether this path grid hand
 ### LUnitPathfinder
 
 ```lua
-LUnitPathfinder:clearCache() -- Clears cached paths. This method is available to Lua scripts.
+LUnitPathfinder:clearCache() -- Clears all cached paths on this object.
 LUnitPathfinder:findNearestWalkable(x: integer, y: integer, max_radius: integer, [unit_size]: integer) -> integer -- Finds nearest walkable one-based grid cell within a radius.
 LUnitPathfinder:findPartialPath(x1: integer, y1: integer, x2: integer, y2: integer, max_nodes: integer, [unit_size]: integer) -> table -- Finds the best reachable path from a start to a goal within a maximum node budget. Useful for incremental p...
 LUnitPathfinder:findPath(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> table -- Finds a path between one-based grid cells.
 LUnitPathfinder:findPathBidirectional(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer, [max_nodes]: integer) -> table -- Finds a path using bidirectional A* and returns completion status.
 LUnitPathfinder:findPathSmooth(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> table -- Finds a smoothed path between one-based grid cells.
-LUnitPathfinder:getCacheSize() -> integer -- Returns current path cache size. This method is available to Lua scripts.
-LUnitPathfinder:getPathCost(path: table) -> number -- Returns path cost for a waypoint table.
-LUnitPathfinder:getPathLength(path: table) -> number -- Returns path length for a waypoint table.
+LUnitPathfinder:getCacheSize() -> integer -- Returns the current path cache entry count.
+LUnitPathfinder:getPathCost(path: table) -> number -- Returns the total movement cost along a waypoint path.
+LUnitPathfinder:getPathLength(path: table) -> number -- Returns the total Euclidean length of a waypoint path.
 LUnitPathfinder:heuristicDistance(x1: integer, y1: integer, x2: integer, y2: integer) -> number -- Returns heuristic distance between two one-based cells.
 LUnitPathfinder:isCacheEnabled() -> boolean -- Returns whether path cache is enabled.
-LUnitPathfinder:isReachable(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> boolean -- Returns whether a target cell is reachable.
+LUnitPathfinder:isReachable(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> boolean -- Returns whether a target cell is reachable from a start cell.
 LUnitPathfinder:lineOfSight(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> boolean -- Returns whether two one-based cells have line of sight.
-LUnitPathfinder:setCacheEnabled(enabled: boolean) -- Enables or disables path cache. This method is available to Lua scripts.
-LUnitPathfinder:setCacheMaxSize(n: integer) -- Sets maximum path cache size. This method is available to Lua scripts.
+LUnitPathfinder:setCacheEnabled(enabled: boolean) -- Enables or disables the path cache on this object.
+LUnitPathfinder:setCacheMaxSize(n: integer) -- Sets maximum path cache size for this object.
 LUnitPathfinder:type() -> string -- Returns the Lua-visible type name for this pathfinder handle.
 LUnitPathfinder:typeOf(name: string) -> boolean -- Returns whether this pathfinder handle matches a supported type name.
 ```
@@ -4038,7 +4038,7 @@ LBlackboard:clearAll() -- Remove all keys and values from the blackboard.
 LBlackboard:get(key: string) -> boolean|number|string|nil -- Retrieve the value stored under a key. Returns nil if the key does not exist.
 LBlackboard:getRevision() -> number -- Return the current revision counter. Increments on every value change.
 LBlackboard:has(key: string) -> boolean -- Check whether a key exists on the blackboard.
-LBlackboard:keys() -> table -- Return an array of all keys currently stored on the blackboard.
+LBlackboard:keys() -> string[] -- Return an array of all keys currently stored on the blackboard.
 LBlackboard:set(key: string, value: boolean|number|string|nil) -- Set a key to a value (boolean, number, string, or nil to clear). Notifies registered watchers if value chan...
 LBlackboard:snapshot() -> table -- Return a table containing all current key-value pairs as a snapshot. Useful for serialization or debug disp...
 LBlackboard:unwatch(id: integer) -- Remove a previously registered watcher by its ID.
@@ -4074,8 +4074,8 @@ LDebounce:update(dt: number) -> boolean -- Advance the debounce timer. If the wa
 ```lua
 LEventBus:clear(event: string) -- Remove all listeners subscribed to a specific event name.
 LEventBus:clearAll() -- Remove all listeners from every event on this bus. Resets the bus to empty.
-LEventBus:emit(event: string, ...: boolean|number|string|table|nil) -- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
-LEventBus:getEvents() -> table -- Return an array of all event names that have at least one listener.
+LEventBus:emit(event: string, ...: table) -- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
+LEventBus:getEvents() -> string[] -- Return an array of all event names that have at least one listener.
 LEventBus:getListenerCount(event: string) -> number -- Return the number of active listeners for a given event name.
 LEventBus:off(id: integer) -- Unsubscribe a listener by its subscription ID. Removes the callback from the event bus.
 LEventBus:on(event: string, callback: function, [priority]: integer) -> number -- Subscribe a callback to a named event. Higher priority listeners fire first.
@@ -4086,8 +4086,8 @@ LEventBus:on(event: string, callback: function, [priority]: integer) -> number -
 ```lua
 LFactory:alias(alias: string, canonical: string) -- Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor.
 LFactory:clearAll() -- Remove all registered types and constructors, resetting the factory.
-LFactory:create(typeName: string, ...: any) -> boolean|number|string|table|nil -- Create a new object by type name, passing additional arguments to the constructor.
-LFactory:getTypes() -> table -- Return an array of all registered type names.
+LFactory:create(typeName: string, ...: table) -> table -- Create a new object by type name, passing additional arguments to the constructor.
+LFactory:getTypes() -> string[] -- Return an array of all registered type names.
 LFactory:has(typeName: string) -> boolean -- Check whether a constructor is registered for the given type name.
 LFactory:register(typeName: string, ctor: function) -- Register a constructor function for a given type name. Future `create()` calls with this type will invoke it.
 LFactory:remove(typeName: string) -- Unregister a type and discard its constructor function.
@@ -4108,22 +4108,22 @@ LFunnel:update(dt: number) -> boolean -- Advance the funnel's time window. Flush
 ### LList
 
 ```lua
-LList:add(value: any) -- Append a value to the end of the list.
+LList:add(value: string) -- Append a value to the end of the list.
 LList:clear() -- Remove all items from the list. This method is available to Lua scripts.
-LList:contains(value: any) -> boolean -- Check whether the list contains a specific value.
-LList:get(index: integer) -> boolean|number|string|table|nil -- Get the value at a 1-based index. Returns nil if out of range.
-LList:indexOf(value: any) -> integer -- Find the 1-based index of the first occurrence of a value. Returns nil if not found.
-LList:insert(index: integer, value: boolean|number|string|table) -- Insert a value at a 1-based index, shifting subsequent items right.
+LList:contains(value: string) -> boolean -- Check whether the list contains a specific value.
+LList:get(index: integer) -> string -- Get the value at a 1-based index. Returns nil if out of range.
+LList:indexOf(value: string) -> integer -- Find the 1-based index of the first occurrence of a value. Returns nil if not found.
+LList:insert(index: integer, value: string) -- Insert a value at a 1-based index, shifting subsequent items right.
 LList:isEmpty() -> boolean -- Check whether the list is empty. This method is available to Lua scripts.
 LList:len() -> number -- Return the number of items in the list.
-LList:pop() -> boolean|number|string|table|nil -- Remove and return the last value. Returns nil if empty.
-LList:push(value: any) -- Append a value to the end of the list (alias for add).
-LList:remove(index: integer) -> boolean|number|string|table|nil -- Remove and return the value at a 1-based index. Returns nil if out of range.
+LList:pop() -> string -- Remove and return the last value. Returns nil if empty.
+LList:push(value: string) -- Append a value to the end of the list (alias for add).
+LList:remove(index: integer) -> string -- Remove and return the value at a 1-based index. Returns nil if out of range.
 LList:reverse() -- Reverse the order of all items in the list in-place.
-LList:set(index: integer, value: boolean|number|string|table) -- Replace the value at a 1-based index. Errors if index is 0 or out of range.
-LList:shift() -> boolean|number|string|table|nil -- Remove and return the first value. Returns nil if empty.
-LList:toArray() -> table -- Return all items as an array table. This method is available to Lua scripts.
-LList:unshift(value: any) -- Insert a value at the beginning of the list.
+LList:set(index: integer, value: string) -- Replace the value at a 1-based index. Errors if index is 0 or out of range.
+LList:shift() -> string -- Remove and return the first value. Returns nil if empty.
+LList:toArray() -> number[] -- Return all items as an array table. This method is available to Lua scripts.
+LList:unshift(value: string) -- Insert a value at the beginning of the list.
 ```
 
 ### LMap
@@ -4131,48 +4131,48 @@ LList:unshift(value: any) -- Insert a value at the beginning of the list.
 ```lua
 LMap:clear() -- Remove all entries from the map. This method is available to Lua scripts.
 LMap:entries() -> table -- Return an array of {key, value} tables for all entries.
-LMap:get(key: string) -> boolean|number|string|table|nil -- Retrieve the value for a key. Returns nil if the key does not exist.
+LMap:get(key: string) -> string -- Retrieve the value for a key. Returns nil if the key does not exist.
 LMap:has(key: string) -> boolean -- Check whether a key exists in the map.
 LMap:isEmpty() -> boolean -- Check whether the map has no entries.
-LMap:keys() -> table -- Return an array of all keys in the map.
+LMap:keys() -> string[] -- Return an array of all keys in the map.
 LMap:len() -> number -- Return the number of key-value pairs.
 LMap:merge(other: LMap) -- Copy all entries from another LMap into this map. Existing keys are overwritten.
 LMap:remove(key: string) -> boolean -- Remove a key from the map. Returns true if it was present.
-LMap:set(key: string, value: boolean|number|string|table) -- Set a key-value pair in the map. Replaces any existing value for the same key.
-LMap:values() -> table -- Return an array of all values in the map.
+LMap:set(key: string, value: string) -- Set a key-value pair in the map. Replaces any existing value for the same key.
+LMap:values() -> number[] -- Return an array of all values in the map.
 ```
 
 ### LMediator
 
 ```lua
-LMediator:broadcast(...: boolean|number|string|table|nil) -- Send a message to all handlers on all channels. Every registered handler receives the payload.
-LMediator:channels() -> table -- Return an array of all channel names that have at least one handler.
+LMediator:broadcast(...: table) -- Send a message to all handlers on all channels. Every registered handler receives the payload.
+LMediator:channels() -> string[] -- Return an array of all channel names that have at least one handler.
 LMediator:clear() -- Remove all channels and handlers, resetting the mediator.
 LMediator:handlerCount(channel: string) -> number -- Return the number of handlers registered on a specific channel.
 LMediator:off(channel: string, id: integer) -- Unregister a handler from a channel by its ID.
 LMediator:on(channel: string, callback: function) -> number -- Register a handler callback on a named channel. Returns an ID for unregistration.
 LMediator:removeChannel(channel: string) -- Remove an entire channel and all its handlers.
-LMediator:send(channel: string, ...: boolean|number|string|table|nil) -- Send a message to all handlers on a specific channel with optional payload arguments.
+LMediator:send(channel: string, ...: table) -- Send a message to all handlers on a specific channel with optional payload arguments.
 ```
 
 ### LObjectPool
 
 ```lua
-LObjectPool:acquire() -> boolean|number|string|table|nil -- Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
-LObjectPool:add(value: any) -- Add an object to the pool's idle set, making it available for future acquisition.
+LObjectPool:acquire() -> table -- Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
+LObjectPool:add(value: table) -- Add an object to the pool's idle set, making it available for future acquisition.
 LObjectPool:clearAll() -- Destroy all objects (active and idle) and reset the pool to empty.
 LObjectPool:getActiveCount() -> number -- Return the number of objects currently checked out from the pool.
 LObjectPool:getAvailableCount() -> number -- Return the number of idle objects ready for acquisition.
 LObjectPool:getTotalCount() -> number -- Return the total number of objects managed by this pool (active + idle).
-LObjectPool:release(value: any) -- Return an active object back to the pool's idle set so it can be reused.
+LObjectPool:release(value: table) -- Return an active object back to the pool's idle set so it can be reused.
 ```
 
 ### LObserver
 
 ```lua
-LObserver:get(key: string) -> boolean|number|string|table|nil -- Retrieve the current value for a key. Returns nil if not set.
+LObserver:get(key: string) -> number -- Retrieve the current value for a key. Returns nil if not set.
 LObserver:getCount() -> number -- Return the total number of active subscriptions across all keys.
-LObserver:set(key: string, value: boolean|number|string|table) -- Set a value by key and notify all subscribers watching that key.
+LObserver:set(key: string, value: number) -- Set a value by key and notify all subscribers watching that key.
 LObserver:subscribe(key: string, callback: function, [once]: boolean) -> number -- Subscribe to changes on a specific key. The callback receives (key, newValue) on each change.
 LObserver:unsubscribe(id: integer) -- Remove a subscription by its ID. The callback will no longer fire.
 ```
@@ -4181,15 +4181,15 @@ LObserver:unsubscribe(id: integer) -- Remove a subscription by its ID. The callb
 
 ```lua
 LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number -- Add a directed (or undirected) edge between two nodes with optional weight and label.
-LPatternGraph:addNode([label]: string, [value]: boolean|number|string|table) -> number -- Add a node to the graph with an optional label and payload value.
-LPatternGraph:bfs(start: integer) -> table -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
+LPatternGraph:addNode([label]: string, [value]: table) -> number -- Add a node to the graph with an optional label and payload value.
+LPatternGraph:bfs(start: integer) -> integer[] -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
 LPatternGraph:clearAll() -- Remove all nodes, edges, and payloads from the graph.
-LPatternGraph:dfs(start: integer) -> table -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
+LPatternGraph:dfs(start: integer) -> integer[] -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
 LPatternGraph:edgeCount() -> number -- Return the total number of edges in the graph.
-LPatternGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil -- Retrieve the payload value stored on a node. Returns nil if no payload.
+LPatternGraph:getNodeValue(id: integer) -> table -- Retrieve the payload value stored on a node. Returns nil if no payload.
 LPatternGraph:hasNode(id: integer) -> boolean -- Check whether a node with the given ID exists in the graph.
 LPatternGraph:isConnected(from: integer, to: integer) -> boolean -- Check whether there is any path from one node to another.
-LPatternGraph:neighbors(id: integer) -> table -- Return an array of node IDs directly connected to the given node.
+LPatternGraph:neighbors(id: integer) -> integer[] -- Return an array of node IDs directly connected to the given node.
 LPatternGraph:nodeCount() -> number -- Return the total number of nodes in the graph.
 LPatternGraph:removeEdge(id: integer) -> boolean -- Remove an edge by its ID. Returns true if it existed.
 LPatternGraph:removeNode(id: integer) -> boolean -- Remove a node and all its connected edges. Returns true if the node existed.
@@ -4201,28 +4201,28 @@ LPatternGraph:removeNode(id: integer) -> boolean -- Remove a node and all its co
 LPriorityQueue:clearAll() -- Remove all items from the queue. This method is available to Lua scripts.
 LPriorityQueue:isEmpty() -> boolean -- Check whether the queue contains no items.
 LPriorityQueue:len() -> number -- Return the number of items currently in the queue.
-LPriorityQueue:peek() -> boolean|number|string|table|nil -- Return the highest-priority item without removing it. Returns nil if empty.
-LPriorityQueue:pop() -> boolean|number|string|table|nil -- Remove and return the highest-priority item. Returns nil if the queue is empty.
-LPriorityQueue:push(priority: integer, value: boolean|number|string|table, [label]: string) -> number -- Add an item with a numeric priority. Higher priority items are dequeued first.
+LPriorityQueue:peek() -> table -- Return the highest-priority item without removing it. Returns nil if empty.
+LPriorityQueue:pop() -> table -- Remove and return the highest-priority item. Returns nil if the queue is empty.
+LPriorityQueue:push(priority: integer, value: table, [label]: string) -> number -- Add an item with a numeric priority. Higher priority items are dequeued first.
 ```
 
 ### LQueue
 
 ```lua
-LQueue:back() -> boolean|number|string|table|nil -- Return the back value without removing it. Returns nil if empty.
+LQueue:back() -> string -- Return the back value without removing it. Returns nil if empty.
 LQueue:clear() -- Remove all items from the queue. This method is available to Lua scripts.
-LQueue:dequeue() -> boolean|number|string|table|nil -- Remove and return the front value. Returns nil if empty.
-LQueue:dequeueBack() -> boolean|number|string|table|nil -- Remove and return the back value. Returns nil if empty.
-LQueue:enqueue(value: any) -> boolean -- Add a value to the back of the queue. Returns false if at capacity.
-LQueue:enqueueFront(value: any) -> boolean -- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
-LQueue:front() -> boolean|number|string|table|nil -- Return the front value without removing it. Returns nil if empty.
-LQueue:insertAt(index: integer, value: boolean|number|string|table) -> boolean -- Insert a value at a 1-based index in the queue. Returns false if at capacity.
+LQueue:dequeue() -> string -- Remove and return the front value. Returns nil if empty.
+LQueue:dequeueBack() -> string -- Remove and return the back value. Returns nil if empty.
+LQueue:enqueue(value: string) -> boolean -- Add a value to the back of the queue. Returns false if at capacity.
+LQueue:enqueueFront(value: string) -> boolean -- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
+LQueue:front() -> string -- Return the front value without removing it. Returns nil if empty.
+LQueue:insertAt(index: integer, value: string) -> boolean -- Insert a value at a 1-based index in the queue. Returns false if at capacity.
 LQueue:isEmpty() -> boolean -- Check whether the queue is empty. This method is available to Lua scripts.
 LQueue:isFull() -> boolean -- Check whether the queue has reached its capacity limit.
 LQueue:len() -> number -- Return the current number of items in the queue.
-LQueue:peekAt(index: integer) -> boolean|number|string|table|nil -- Return the value at a 1-based index without removing it. Returns nil if out of range.
-LQueue:removeAt(index: integer) -> boolean|number|string|table|nil -- Remove and return the value at a 1-based index. Returns nil if out of range.
-LQueue:toArray() -> table -- Return all queue items as an array table (front to back).
+LQueue:peekAt(index: integer) -> string -- Return the value at a 1-based index without removing it. Returns nil if out of range.
+LQueue:removeAt(index: integer) -> string -- Remove and return the value at a 1-based index. Returns nil if out of range.
+LQueue:toArray() -> number[] -- Return all queue items as an array table (front to back).
 ```
 
 ### LRelationshipManager
@@ -4237,7 +4237,7 @@ LRelationshipManager:removePair(a: integer, b: integer) -- Remove all relationsh
 LRelationshipManager:removeType(name: string) -- Remove a relationship type definition.
 LRelationshipManager:setLevel(a: integer, b: integer, typeName: string, level: string) -> boolean -- Set the named level for a relationship type between two entities.
 LRelationshipManager:setValue(a: integer, b: integer, value: number) -- Set the numeric relationship value between two entity IDs.
-LRelationshipManager:typeNames() -> table -- Return all defined relationship type names.
+LRelationshipManager:typeNames() -> string[] -- Return all defined relationship type names.
 ```
 
 ### LRing
@@ -4257,10 +4257,10 @@ LRing:toArray() -> table -- Return all entries in the ring as an ordered array o
 
 ```lua
 LServiceLocator:clearAll() -- Remove all registered services and reset the locator.
-LServiceLocator:getServices() -> table -- Return an array of all registered service names.
+LServiceLocator:getServices() -> string[] -- Return an array of all registered service names.
 LServiceLocator:has(name: string) -> boolean -- Check whether a service with the given name is currently registered.
-LServiceLocator:locate(name: string) -> boolean|number|string|table|nil -- Retrieve a registered service by name. Returns nil if not found.
-LServiceLocator:provide(name: string, value: boolean|number|string|table|function) -- Register a service instance under a given name. Replaces any previously registered service with the same name.
+LServiceLocator:locate(name: string) -> table -- Retrieve a registered service by name. Returns nil if not found.
+LServiceLocator:provide(name: string, value: table) -- Register a service instance under a given name. Replaces any previously registered service with the same name.
 LServiceLocator:remove(name: string) -- Unregister and discard a service by name.
 ```
 
@@ -4274,7 +4274,7 @@ LSet:intersection(other: LSet) -> LSet -- Return a new set containing only items
 LSet:isEmpty() -> boolean -- Check whether the set is empty. This method is available to Lua scripts.
 LSet:len() -> number -- Return the number of items in the set.
 LSet:remove(key: string) -> boolean -- Remove a string from the set. Returns true if it was present.
-LSet:toArray() -> table -- Return all set items as an array table.
+LSet:toArray() -> string[] -- Return all set items as an array table.
 LSet:union(other: LSet) -> LSet -- Return a new set containing all items from both this set and another.
 ```
 
@@ -4284,7 +4284,7 @@ LSet:union(other: LSet) -> LSet -- Return a new set containing all items from bo
 LSimpleState:addState(name: string, [callbacks]: table) -- Register a named state with optional enter, exit, and update callbacks.
 LSimpleState:clearAll() -- Remove all states and their callbacks, resetting the state machine.
 LSimpleState:getCurrent() -> string -- Return the name of the currently active state, or nil if no state is set.
-LSimpleState:getStates() -> table -- Return an array of all registered state names.
+LSimpleState:getStates() -> string[] -- Return an array of all registered state names.
 LSimpleState:hasState(name: string) -> boolean -- Check whether a state with the given name is registered.
 LSimpleState:transitionTo(name: string) -> boolean -- Transition to a new state. Calls the current state's `exit` and the target state's `enter` callbacks.
 LSimpleState:update(dt: number) -- Call the current state's update callback with the frame delta time.
@@ -4294,31 +4294,31 @@ LSimpleState:update(dt: number) -- Call the current state's update callback with
 
 ```lua
 LStack:clear() -- Remove all items from the stack. This method is available to Lua scripts.
-LStack:insertAt(index: integer, value: boolean|number|string|table) -> boolean -- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
+LStack:insertAt(index: integer, value: string) -> boolean -- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 LStack:isEmpty() -> boolean -- Check whether the stack is empty. This method is available to Lua scripts.
 LStack:isFull() -> boolean -- Check whether the stack has reached its capacity limit (if one was set).
 LStack:len() -> number -- Return the current number of items in the stack.
 LStack:moveWithin(from: integer, to: integer) -> boolean -- Move an item from one 1-based index to another within the stack.
-LStack:peek() -> boolean|number|string|table|nil -- Return the top value without removing it. Returns nil if empty.
-LStack:peekAt(index: integer) -> boolean|number|string|table|nil -- Return the value at a 1-based index without removing it. Returns nil if out of range.
-LStack:peekBottom() -> boolean|number|string|table|nil -- Return the bottom value without removing it. Returns nil if empty.
-LStack:pop() -> boolean|number|string|table|nil -- Remove and return the top value. Returns nil if the stack is empty.
-LStack:popBottom() -> boolean|number|string|table|nil -- Remove and return the bottom value. Returns nil if empty.
-LStack:popMany(count: integer) -> table -- Pop up to `count` values from the top and return them as an array table.
-LStack:push(value: any) -> boolean -- Push a value onto the top of the stack. Returns false if the stack is at capacity.
-LStack:pushBottom(value: any) -> boolean -- Push a value onto the bottom of the stack. Returns false if at capacity.
-LStack:removeAt(index: integer) -> boolean|number|string|table|nil -- Remove and return the value at a 1-based index. Returns nil if out of range.
-LStack:toArray() -> table -- Return all stack items as an array table (bottom to top).
+LStack:peek() -> string -- Return the top value without removing it. Returns nil if empty.
+LStack:peekAt(index: integer) -> string -- Return the value at a 1-based index without removing it. Returns nil if out of range.
+LStack:peekBottom() -> string -- Return the bottom value without removing it. Returns nil if empty.
+LStack:pop() -> string -- Remove and return the top value. Returns nil if the stack is empty.
+LStack:popBottom() -> string -- Remove and return the bottom value. Returns nil if empty.
+LStack:popMany(count: integer) -> integer[] -- Pop up to `count` values from the top and return them as an array table.
+LStack:push(value: string) -> boolean -- Push a value onto the top of the stack. Returns false if the stack is at capacity.
+LStack:pushBottom(value: string) -> boolean -- Push a value onto the bottom of the stack. Returns false if at capacity.
+LStack:removeAt(index: integer) -> string -- Remove and return the value at a 1-based index. Returns nil if out of range.
+LStack:toArray() -> number[] -- Return all stack items as an array table (bottom to top).
 ```
 
 ### LStrategy
 
 ```lua
 LStrategy:clear() -- Remove all strategies and reset the selection.
-LStrategy:execute(...: boolean|number|string|table|nil) -> boolean|number|string|table|nil -- Execute the currently active strategy, passing through all arguments and returning its results.
+LStrategy:execute(...: table) -> table -- Execute the currently active strategy, passing through all arguments and returning its results.
 LStrategy:getCurrent() -> string -- Return the name of the currently active strategy, or nil if none set.
 LStrategy:has(name: string) -> boolean -- Check whether a strategy with the given name is registered.
-LStrategy:names() -> table -- Return an array of all registered strategy names.
+LStrategy:names() -> string[] -- Return an array of all registered strategy names.
 LStrategy:register(name: string, callback: function) -- Register a named strategy implementation function.
 LStrategy:remove(name: string) -> boolean -- Remove a named strategy. If it was the active strategy, no strategy will be selected.
 LStrategy:set(name: string) -> boolean -- Switch to a named strategy. Future `execute()` calls will use this implementation.
@@ -4338,13 +4338,13 @@ LThrottle:update(dt: number) -> boolean -- Advance the throttle timer. If the in
 ### LWeightedRandom
 
 ```lua
-LWeightedRandom:add(weight: number, value: boolean|number|string|table, [label]: string) -> number -- Add an item with a relative weight. Higher weight = higher selection probability.
+LWeightedRandom:add(weight: number, value: string, [label]: string) -> number -- Add an item with a relative weight. Higher weight = higher selection probability.
 LWeightedRandom:clearAll() -- Remove all entries from the pool. This method is available to Lua scripts.
 LWeightedRandom:getRevision() -> number -- Return the revision counter. Increments on any add/remove/weight change.
 LWeightedRandom:isEmpty() -> boolean -- Check whether the pool has no entries.
 LWeightedRandom:len() -> number -- Return the number of entries in the pool.
-LWeightedRandom:pick(sample: number) -> boolean|number|string|table|nil -- Pick one item using a random sample value in [0, 1). Returns its value or nil.
-LWeightedRandom:pickN(count: integer, samples: table) -> table -- Pick multiple unique items. Requires an array of random samples.
+LWeightedRandom:pick(sample: number) -> string -- Pick one item using a random sample value in [0, 1). Returns its value or nil.
+LWeightedRandom:pickN(count: integer, samples: table) -> number[] -- Pick multiple unique items. Requires an array of random samples.
 LWeightedRandom:remove(id: integer) -> boolean -- Remove an item by its ID. Returns true if it existed.
 LWeightedRandom:setWeight(id: integer, weight: number) -> boolean -- Change the weight of an existing entry.
 LWeightedRandom:totalWeight() -> number -- Return the sum of all entry weights.
@@ -4359,7 +4359,7 @@ lurek.physics.attachShape(body: LBody, shape: LPhysicsShape) -- Attaches a previ
 lurek.physics.debugDraw(enable: boolean) -- Enables or disables automatic physics debug overlay rendering for the next frame.
 lurek.physics.destroyWorld(world: LWorld) -- No-op placeholder for API parity. Worlds are freed when no longer referenced.
 lurek.physics.drawDebugGpu(world: LWorld, [config]: table) -- Queues a GPU-rendered physics debug visualization using the world's current body state.
-lurek.physics.getBody(world: LWorld, body: LBody) -> number, number, number, number -- Returns position and velocity of a body (free-function variant for quick queries).
+lurek.physics.getBody(world: LWorld, body: LBody) -> number -- Returns position and velocity of a body (free-function variant for quick queries).
 lurek.physics.getCollisions(world: LWorld) -> table -- Returns all collision events from the last world step as {body_a, body_b} pairs.
 lurek.physics.isSleepingAllowed(world: LWorld, body: LBody) -> boolean -- Checks if sleeping is allowed on a body (free-function variant).
 lurek.physics.newBody(world: LWorld, x: number, y: number, bodyType: string) -> LBody -- Creates a new body in a world (free-function variant).
@@ -4395,15 +4395,15 @@ LBody:getAngularVelocity() -> number -- Returns the body's angular (rotational) 
 LBody:getFriction() -> number -- Returns the body's friction coefficient.
 LBody:getGravityScale() -> number -- Returns the gravity scale multiplier for this body (1.0 = normal gravity).
 LBody:getHeight() -> number -- Returns the body's bounding height (from its primary shape).
-LBody:getId() -> number -- Returns the unique numeric ID of this body within the world.
-LBody:getLayer() -> number -- Returns the body's collision layer bitmask.
+LBody:getId() -> integer -- Returns the unique numeric ID of this body within the world.
+LBody:getLayer() -> integer -- Returns the body's collision layer bitmask.
 LBody:getLinearDamping() -> number -- Returns the linear damping factor (velocity decay rate, like air resistance).
-LBody:getMask() -> number -- Returns the body's collision mask (which layers this body can collide with).
+LBody:getMask() -> integer -- Returns the body's collision mask (which layers this body can collide with).
 LBody:getMass() -> number -- Returns the body's total mass (computed from density and fixture areas).
-LBody:getPosition() -> number, number -- Returns the current world-space position of this body.
+LBody:getPosition() -> number -- Returns the current world-space position of this body.
 LBody:getRestitution() -> number -- Returns the body's restitution (bounciness) value.
 LBody:getType() -> string -- Returns the body's type as a string.
-LBody:getVelocity() -> number, number -- Returns the body's current linear velocity.
+LBody:getVelocity() -> number -- Returns the body's current linear velocity.
 LBody:getWidth() -> number -- Returns the body's bounding width (from its primary shape).
 LBody:getX() -> number -- Returns only the X component of the body's position.
 LBody:getY() -> number -- Returns only the Y component of the body's position.
@@ -4436,13 +4436,13 @@ LBody:wakeUp() -- Wakes the body from sleep, making it active in the simulation 
 ### LCellular
 
 ```lua
-LCellular:countCells(cellType: integer) -> number -- Counts how many cells of a given material type exist in the grid.
-LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: number) -- Fills a circular region of cells with a material type.
-LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: number) -- Fills a rectangular region of cells with a material type.
+LCellular:countCells(cellType: integer) -> integer -- Counts how many cells of a given material type exist in the grid.
+LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: integer) -- Fills a circular region of cells with a material type.
+LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: integer) -- Fills a rectangular region of cells with a material type.
 LCellular:findCells(cellType: integer) -> table -- Returns positions of all cells matching a material type.
-LCellular:getCell(cx: integer, cy: integer) -> number -- Returns the material type of a cell at the given grid position.
+LCellular:getCell(cx: integer, cy: integer) -> integer -- Returns the material type of a cell at the given grid position.
 LCellular:loadFromBytes(data: string) -> boolean -- Restores cellular grid state from binary data previously produced by toBytes.
-LCellular:setCell(cx: integer, cy: integer, cellType: number) -- Sets a single cell in the cellular grid to a specific material type.
+LCellular:setCell(cx: integer, cy: integer, cellType: integer) -- Sets a single cell in the cellular grid to a specific material type.
 LCellular:step() -- Advances the cellular simulation by one tick (particles fall, flow, burn, etc.).
 LCellular:stepN(n: integer) -- Advances the cellular simulation by N ticks in a single call.
 LCellular:toBytes() -> string -- Serializes the cellular grid to a compact binary format for saving.
@@ -4456,7 +4456,7 @@ LCellular:typeOf(name: string) -> boolean -- Checks if this object is of a given
 
 ```lua
 LPhysicsShape:destroy() -- No-op placeholder for API consistency. Shapes are freed when no longer referenced.
-LPhysicsShape:getBoundingBox() -> number, number, number, number -- Returns the axis-aligned bounding box of the shape in local coordinates.
+LPhysicsShape:getBoundingBox() -> number -- Returns the axis-aligned bounding box of the shape in local coordinates.
 LPhysicsShape:getRadius() -> number -- Returns the radius of a circle shape. Errors if called on a non-circle shape.
 LPhysicsShape:getType() -> string -- Returns the shape kind as a string: "circle", "rectangle", "polygon", "edge", or "chain".
 LPhysicsShape:setDensity(density: number) -- Sets the density used when this shape is attached to a body (affects mass calculation).
@@ -4470,7 +4470,7 @@ LPhysicsShape:typeOf(name: string) -> boolean -- Checks if this object is of a g
 ### LTerrain
 
 ```lua
-LTerrain:collapseColumns() -> number -- Optimizes terrain by merging vertically adjacent solid cells into larger colliders.
+LTerrain:collapseColumns() -> integer -- Optimizes terrain by merging vertically adjacent solid cells into larger colliders.
 LTerrain:fillAll(solid: boolean) -- Sets all terrain cells to either solid or empty.
 LTerrain:fillCircle(wx: number, wy: number, radius: number, solid: boolean) -- Fills or clears a circular region of terrain cells.
 LTerrain:fillRect(wx: number, wy: number, w: number, h: number, solid: boolean) -- Fills or clears a rectangular region of terrain cells.
@@ -4480,9 +4480,9 @@ LTerrain:isDirty() -> boolean -- Returns true if terrain cells have been modifie
 LTerrain:loadFromBytes(data: string) -> boolean -- Restores terrain grid state from binary data previously produced by toBytes.
 LTerrain:setCell(cx: integer, cy: integer, solid: boolean) -- Sets a single terrain cell to solid or empty.
 LTerrain:solidPositions() -> table -- Returns all solid cell positions as a table of {x, y} entries.
-LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> table -- Spawns small dynamic debris bodies at the given positions (for destruction effects).
+LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> integer[] -- Spawns small dynamic debris bodies at the given positions (for destruction effects).
 LTerrain:toBytes() -> string -- Serializes the terrain grid to a compact binary format for saving.
-LTerrain:toImageData(sr: number, sg: number, sb: number, er: number, eg: number, eb: number) -> string -- Renders the terrain grid to raw RGBA pixel data with solid and empty colors.
+LTerrain:toImageData(sr: integer, sg: integer, sb: integer, er: integer, eg: integer, eb: integer) -> string -- Renders the terrain grid to raw RGBA pixel data with solid and empty colors.
 LTerrain:type() -> string -- Returns the type name of this object ("LTerrain").
 LTerrain:typeOf(name: string) -> boolean -- Checks if this object is of a given type name.
 ```
@@ -4490,18 +4490,18 @@ LTerrain:typeOf(name: string) -> boolean -- Checks if this object is of a given 
 ### LWorld
 
 ```lua
-LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> number -- Creates a distance joint that keeps two bodies at a fixed distance apart, like a rigid rod.
-LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> number -- Attaches a new collider shape to an existing body with material properties.
-LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> number -- Creates a friction joint that applies resistance to relative motion between two bodies.
-LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number -- Creates a gear joint that synchronizes rotation between two bodies at an anchor.
-LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> number -- Creates a motor joint that drives body B toward a target offset from body A using a correction factor.
-LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> number -- Creates a mouse joint that pulls a body toward a world target point with spring-like force.
-LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number -- Creates a prismatic (slider) joint that constrains body B to move along an axis relative to body A.
-LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number -- Creates a pulley joint connecting two bodies so that movement of one affects the other inversely.
-LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number -- Creates a revolute (hinge) joint connecting two bodies at an anchor point. Bodies can rotate freely around...
-LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> number -- Creates a rope joint limiting the maximum distance between two anchor points on two bodies.
-LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number -- Creates a weld joint that rigidly connects two bodies at an anchor point (no relative movement).
-LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number -- Creates a wheel joint simulating a suspension: allows rotation and linear movement along an axis.
+LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> integer -- Creates a distance joint that keeps two bodies at a fixed distance apart, like a rigid rod.
+LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> integer -- Attaches a new collider shape to an existing body with material properties.
+LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> integer -- Creates a friction joint that applies resistance to relative motion between two bodies.
+LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer -- Creates a gear joint that synchronizes rotation between two bodies at an anchor.
+LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> integer -- Creates a motor joint that drives body B toward a target offset from body A using a correction factor.
+LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> integer -- Creates a mouse joint that pulls a body toward a world target point with spring-like force.
+LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer -- Creates a prismatic (slider) joint that constrains body B to move along an axis relative to body A.
+LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer -- Creates a pulley joint connecting two bodies so that movement of one affects the other inversely.
+LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer -- Creates a revolute (hinge) joint connecting two bodies at an anchor point. Bodies can rotate freely around...
+LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> integer -- Creates a rope joint limiting the maximum distance between two anchor points on two bodies.
+LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer -- Creates a weld joint that rigidly connects two bodies at an anchor point (no relative movement).
+LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer -- Creates a wheel joint simulating a suspension: allows rotation and linear movement along an axis.
 LWorld:addZone(x: number, y: number, w: number, h: number) -> LZone -- Creates a rectangular physics zone for area-based effects (custom gravity, damping overrides).
 LWorld:clear() -- Removes all bodies and joints from the world, resetting it to an empty state.
 LWorld:clearBeginContact() -- Removes the begin-contact callback so it is no longer called.
@@ -4510,45 +4510,45 @@ LWorld:clearBodyOneWay(id: integer) -- Removes the one-way platform behavior fro
 LWorld:clearEndContact() -- Removes the end-contact callback so it is no longer called.
 LWorld:destroyBody(id: integer) -- Removes a body from the world by its ID, along with all attached fixtures and joints.
 LWorld:destroyJoint(jointId: integer) -- Removes a joint from the world, disconnecting the two bodies it linked.
-LWorld:drawDebug(target: LImageData, [r]: number, [g]: number, [b]: number, [a]: number) -- Renders a debug visualization of all physics bodies onto a software ImageData target.
-LWorld:fixtureCount(bodyId: integer) -> number -- Returns how many fixtures (colliders) are attached to a body.
+LWorld:drawDebug(target: LImageData, [r]: integer, [g]: integer, [b]: integer, [a]: integer) -- Renders a debug visualization of all physics bodies onto a software ImageData target.
+LWorld:fixtureCount(bodyId: integer) -> integer -- Returns how many fixtures (colliders) are attached to a body.
 LWorld:getBeginContactEvents() -> table -- Returns contact-begin events from the last step (pairs of bodies that started touching).
-LWorld:getBodyAtPoint(x: number, y: number) -> number -- Returns the body ID at a specific world point, or nil if no body is there.
+LWorld:getBodyAtPoint(x: number, y: number) -> integer -- Returns the body ID at a specific world point, or nil if no body is there.
 LWorld:getBodyCCD(id: integer) -> boolean -- Returns whether continuous collision detection is enabled on a body.
 LWorld:getBodyContacts(bodyId: integer) -> table -- Returns all contacts involving a specific body.
-LWorld:getBodyCount() -> number -- Returns the total number of active bodies in the world.
-LWorld:getBodyData(id: integer) -> LuaValue -- Retrieves the Lua data previously attached to a body, or nil if none was set.
-LWorld:getBodyIds() -> table -- Returns a sequential table of all body IDs currently in the world.
-LWorld:getBodyOneWay(id: integer) -> number, number -- Returns the one-way platform normal for a body, or nil,nil if not set.
+LWorld:getBodyCount() -> integer -- Returns the total number of active bodies in the world.
+LWorld:getBodyData(id: integer) -> table -- Retrieves the Lua data previously attached to a body, or nil if none was set.
+LWorld:getBodyIds() -> integer[] -- Returns a sequential table of all body IDs currently in the world.
+LWorld:getBodyOneWay(id: integer) -> number -- Returns the one-way platform normal for a body, or nil,nil if not set.
 LWorld:getBodyType(id: integer) -> string -- Returns the type name of a body as a string.
 LWorld:getCollisionEvents() -> table -- Returns all collision events from the last step as a table of {bodyA, bodyB} pairs.
 LWorld:getContacts() -> table -- Returns all currently active contact manifolds with normals and touching state.
 LWorld:getEndContactEvents() -> table -- Returns contact-end events from the last step (pairs of bodies that stopped touching).
-LWorld:getGravity() -> number, number -- Returns the current world gravity vector.
-LWorld:getJointBodies(jointId: integer) -> number, number -- Returns the two body IDs connected by a joint.
+LWorld:getGravity() -> number -- Returns the current world gravity vector.
+LWorld:getJointBodies(jointId: integer) -> integer -- Returns the two body IDs connected by a joint.
 LWorld:getJointBreakForce(jointId: integer) -> number -- Returns the break force threshold for a joint.
-LWorld:getJointIds() -> table -- Returns a sequential table of all joint IDs currently in the world.
-LWorld:getJointLimits(jointId: integer) -> number, number -- Returns the lower and upper limit values for a joint.
+LWorld:getJointIds() -> integer[] -- Returns a sequential table of all joint IDs currently in the world.
+LWorld:getJointLimits(jointId: integer) -> number -- Returns the lower and upper limit values for a joint.
 LWorld:getJointMotorSpeed(jointId: integer) -> number -- Returns the current motor speed setting of a joint.
 LWorld:getJointType(jointId: integer) -> string -- Returns the type name of a joint (e.g. "revolute", "distance", "prismatic").
 LWorld:getMeter() -> number -- Returns the current pixels-per-meter scale.
-LWorld:getSolverIterations() -> number -- Returns the current number of velocity solver iterations.
+LWorld:getSolverIterations() -> integer -- Returns the current number of velocity solver iterations.
 LWorld:getZoneEvents() -> table -- Returns all zone enter/leave events from the last step.
 LWorld:isBodySleeping(id: integer) -> boolean -- Returns whether a body is currently in the sleeping (inactive) state.
-LWorld:jointCount() -> number -- Returns the total number of joints in the world.
-LWorld:newBodies(specs: table) -> table -- Batch-creates multiple bodies at once for better performance. Each entry is {x, y, type}.
+LWorld:jointCount() -> integer -- Returns the total number of joints in the world.
+LWorld:newBodies(specs: table) -> integer[] -- Batch-creates multiple bodies at once for better performance. Each entry is {x, y, type}.
 LWorld:newBody(x: number, y: number, bodyType: string) -> LBody -- Creates a new physics body at the given position with the specified type.
 LWorld:newChainBody(x: number, y: number, vertices: table, closed: boolean, bodyType: string) -> LBody -- Creates a new body with a chain (polyline) collider. Useful for terrain edges.
 LWorld:newCircleBody(x: number, y: number, radius: number, bodyType: string) -> LBody -- Creates a new body with a circle collider already attached.
 LWorld:newEdgeBody(x: number, y: number, x1: number, y1: number, x2: number, y2: number, bodyType: string) -> LBody -- Creates a new body with an edge (line segment) collider between two local points.
 LWorld:newPolygonBody(x: number, y: number, vertices: table, bodyType: string) -> LBody -- Creates a new body with a convex polygon collider defined by vertex pairs.
-LWorld:queryAABB(x: number, y: number, w: number, h: number) -> table -- Returns all body IDs whose axis-aligned bounding boxes overlap the given rectangle.
+LWorld:queryAABB(x: number, y: number, w: number, h: number) -> integer[] -- Returns all body IDs whose axis-aligned bounding boxes overlap the given rectangle.
 LWorld:raycast(x1: number, y1: number, x2: number, y2: number) -> table -- Casts a ray from point (x1,y1) to (x2,y2) and returns the first body hit, or nil.
 LWorld:raycastAll(x: number, y: number, dx: number, dy: number, maxDist: number) -> table -- Casts a directional ray and returns all bodies hit within max distance as a table of results.
 LWorld:raycastClosest(x: number, y: number, dx: number, dy: number, maxDist: number) -> table -- Casts a directional ray from a point and returns the closest hit within max distance.
 LWorld:setBeginContact(callback: function) -- Registers a callback function invoked whenever two bodies begin touching.
 LWorld:setBodyCCD(id: integer, enabled: boolean) -- Enables or disables continuous collision detection (bullet mode) on a body to prevent tunneling.
-LWorld:setBodyData(id: integer, value: any) -- Attaches arbitrary Lua data to a body ID for later retrieval (e.g. entity reference, tag).
+LWorld:setBodyData(id: integer, value: table) -- Attaches arbitrary Lua data to a body ID for later retrieval (e.g. entity reference, tag).
 LWorld:setBodyOneWay(id: integer, nx: number, ny: number) -- Marks a body as a one-way platform: other bodies can pass through from the opposite side of the normal.
 LWorld:setBodyType(id: integer, bodyType: string) -- Changes the type of an existing body (e.g. from "dynamic" to "static").
 LWorld:setEndContact(callback: function) -- Registers a callback function invoked whenever two bodies stop touching.
@@ -4577,7 +4577,7 @@ LWorld:wakeUpBody(id: integer) -- Forces a sleeping body to wake up and particip
 
 ```lua
 LZone:destroy() -- Removes this zone from the world. Bodies will no longer be affected by it.
-LZone:getId() -> number -- Returns the unique ID of this zone. This method is available to Lua scripts.
+LZone:getId() -> integer -- Returns the unique ID of this zone. This method is available to Lua scripts.
 LZone:setAngularDampingOverride([value]: number) -- Overrides the angular damping of bodies inside this zone, or nil to use each body's own value.
 LZone:setCircle(cx: number, cy: number, radius: number) -- Changes this zone's shape to a circle (overrides the initial rectangle).
 LZone:setEnabled(enabled: boolean) -- Enables or disables this zone. Disabled zones have no effect on bodies.
@@ -4613,14 +4613,14 @@ LPipeline:cancel() -- Cancels all pending and waiting steps. Steps already runni
 LPipeline:clear() -- Removes all steps from the pipeline, resetting it to an empty state.
 LPipeline:getContext() -> table -- Returns the shared context table used by the current or most recent pipeline execution, or nil if none exists.
 LPipeline:getErrorMode() -> string -- Returns the current error mode of the pipeline as a string.
-LPipeline:getExecutionOrder() -> table -- Computes the topologically sorted execution order of all steps, respecting dependencies.
+LPipeline:getExecutionOrder() -> string[] -- Computes the topologically sorted execution order of all steps, respecting dependencies.
 LPipeline:getName() -> string -- Returns the name of this pipeline. This method is available to Lua scripts.
-LPipeline:getParallelGroups() -> table -- Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can...
+LPipeline:getParallelGroups() -> string[] -- Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can...
 LPipeline:getResult() -> table -- Returns the current pipeline result summary table, or nil if no steps exist. Useful for inspecting state af...
 LPipeline:getStep(name: string) -> LPipelineStep -- Retrieves a step object by name, or nil if no step with that name exists in this pipeline.
-LPipeline:getStepCount() -> number -- Returns the total number of steps in this pipeline.
-LPipeline:getSteps() -> table -- Returns a table containing all step objects currently in this pipeline.
-LPipeline:getStepsByTag(tag: string) -> table -- Returns all steps that have the specified tag assigned.
+LPipeline:getStepCount() -> integer -- Returns the total number of steps in this pipeline.
+LPipeline:getSteps() -> LPipelineStep[] -- Returns a table containing all step objects currently in this pipeline.
+LPipeline:getStepsByTag(tag: string) -> LPipelineStep[] -- Returns all steps that have the specified tag assigned.
 LPipeline:isComplete() -> boolean -- Returns whether all steps have reached a terminal state (completed, failed, skipped, or cancelled).
 LPipeline:isRunning() -> boolean -- Returns whether the pipeline is currently in async execution mode (started via runAsync and not yet finished).
 LPipeline:onEvent(callback: function) -- Registers a low-level event callback for all pipeline lifecycle events. Receives (eventName, stepName, stat...
@@ -4646,15 +4646,15 @@ LPipeline:validate() -> boolean -- Validates the pipeline structure, checking fo
 
 ```lua
 LPipelineStep:dependsOn(dep: string|LPipelineStep) -> LPipelineStep -- Declares that this step depends on another step (by name or reference). The dependency must complete before...
-LPipelineStep:getAttempt() -> number -- Returns the current attempt number (1-based). Increases with each retry.
+LPipelineStep:getAttempt() -> integer -- Returns the current attempt number (1-based). Increases with each retry.
 LPipelineStep:getData(key: string) -> string -- Retrieves a metadata value previously stored with setData.
 LPipelineStep:getDelay() -> number -- Returns the configured delay for this step.
-LPipelineStep:getDependencies() -> table -- Returns a list of step names that this step depends on.
-LPipelineStep:getDependencyCount() -> number -- Returns the number of dependencies this step has.
+LPipelineStep:getDependencies() -> string[] -- Returns a list of step names that this step depends on.
+LPipelineStep:getDependencyCount() -> integer -- Returns the number of dependencies this step has.
 LPipelineStep:getDuration() -> number -- Returns how long this step took to execute in seconds (measured from start to completion or failure).
 LPipelineStep:getError() -> string -- Returns the error message if this step failed, or nil if it has not failed.
 LPipelineStep:getName() -> string -- Returns the unique name of this pipeline step.
-LPipelineStep:getRetryCount() -> number -- Returns the configured retry count for this step.
+LPipelineStep:getRetryCount() -> integer -- Returns the configured retry count for this step.
 LPipelineStep:getStatus() -> string -- Returns the current execution status of this step as a string ("pending", "waiting", "running", "completed"...
 LPipelineStep:getTag() -> string -- Returns the tag assigned to this step, or nil if none is set.
 LPipelineStep:getTimeout() -> number -- Returns the configured timeout for this step, or 0 if none is set.
@@ -4683,25 +4683,25 @@ LPipelineStep:typeOf(name: string) -> boolean -- Checks whether this object is o
 lurek.procgen.biomeColor(name: string) -> number -- Get the default RGBA display color for a biome type name. Useful for minimap or debug visualization.
 lurek.procgen.bspDungeon([opts]: table) -> table -- Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapping rooms connected by corr...
 lurek.procgen.bspDungeonWithPrefabs([opts]: table, prefabs: table) -> table -- Generate a BSP dungeon and stamp named prefab rooms into suitable leaves. Returns dungeon layout plus prefa...
-lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> table -- Generate a cave or organic map using cellular automata rules.
-lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> table -- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
+lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> integer[] -- Generate a cave or organic map using cellular automata rules.
+lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> integer[] -- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
 lurek.procgen.generateName(samples: table, [minLen]: number, [maxLen]: number, [seed]: number) -> string -- Generate a single random name based on a Markov chain trained from sample names. Great for NPC names, place...
-lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> table -- Generate multiple random names in one call using Markov chains trained from sample data.
+lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> string[] -- Generate multiple random names in one call using Markov chains trained from sample data.
 lurek.procgen.heightmap([opts]: table) -> table -- Generate a fractal heightmap using multi-octave noise with optional hydraulic erosion.
 lurek.procgen.heightmapFromCellular(width: integer, height: integer, cells: table, [floorValue]: number) -> table -- Convert a cellular automata grid into a heightmap by distance-transforming the floor cells.
 lurek.procgen.lsystem(opts: table) -> string -- Expand an L-system grammar and return the resulting string. Useful for generating branching structures like...
 lurek.procgen.lsystemSegments(opts: table, [angle]: number, [step]: number) -> table -- Expand an L-system and interpret the result as turtle-graphics commands, returning line segments.
 lurek.procgen.newBiomeClassifier([opts]: table) -> BiomeClassifier -- Create a BiomeClassifier object with custom threshold rules for mapping height/moisture/temperature to biom...
-lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
-lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
-lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
+lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
+lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
+lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
 lurek.procgen.perlinNoise(x: number, y: number, periodX: number, periodY: number) -> number -- Sample periodic 2D Perlin noise at a given coordinate.
 lurek.procgen.poissonDisk(width: number, height: number, minDist: number, [maxAttempts]: integer, [seed]: integer) -> table -- Generate evenly-spaced random points using Poisson disk sampling. Useful for placing trees, NPCs, or loot w...
 lurek.procgen.roomsDungeon([opts]: table) -> table -- Generate a dungeon by placing random non-overlapping rooms and connecting them with corridors. Also returns...
 lurek.procgen.roomsDungeonWithPrefabs([opts]: table, prefabs: table, [stampValue]: number) -> table -- Generate a rooms-based dungeon and place named prefabs into qualifying rooms. Prefabs can have custom shape...
 lurek.procgen.simplex2d(x: number, y: number) -> number -- Sample 2D simplex noise at a point. Returns a value roughly in [-1, 1].
 lurek.procgen.simplex3d(x: number, y: number, z: number) -> number -- Sample 3D simplex noise at a point. The third axis can be used for animation or layering.
-lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> table -- Compute a Voronoi diagram from a set of seed points. Returns region ownership, distance-to-nearest, and dis...
+lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> integer[] -- Compute a Voronoi diagram from a set of seed points. Returns region ownership, distance-to-nearest, and dis...
 lurek.procgen.wfcGenerate(opts: table) -> table -- Run Wave Function Collapse to generate a grid of tile IDs satisfying adjacency constraints.
 lurek.procgen.worldGraph(width: number, height: number, regionCount: integer, [seed]: integer) -> table -- Generate a connected world graph with named regions and weighted edges. Useful for overworld maps, trade ro...
 ```
@@ -4710,7 +4710,7 @@ lurek.procgen.worldGraph(width: number, height: number, regionCount: integer, [s
 
 ```lua
 BiomeClassifier:classify(height: number, moisture: number, temperature: number) -> string -- Classify a single point into a biome type based on its environmental parameters.
-BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> table -- Classify an entire grid of points into biome types in bulk.
+BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> string[] -- Classify an entire grid of points into biome types in bulk.
 BiomeClassifier:type() -> string -- Returns the type name of this object.
 BiomeClassifier:typeOf(name: string) -> boolean -- Check whether this object matches a given type name.
 ```
@@ -4736,32 +4736,32 @@ lurek.province.zoomCameraAt(anchor_x: number, anchor_y: number, cam_x: number, c
 LProvinceRegistry:adjacencies() -> table -- Returns all adjacency pairs in the registry. Each entry has `province_a` and `province_b` fields representi...
 LProvinceRegistry:borderSegments() -> table -- Returns all border line segments between adjacent provinces. Each segment is a line from (x0,y0) to (x1,y1)...
 LProvinceRegistry:fitCamera(screen_w: number, screen_h: number, [pixel_size]: number) -> number, number, number -- Computes camera position and zoom so the entire province map fits within the given screen dimensions.
-LProvinceRegistry:getAt(x: integer, y: integer) -> number -- Returns the province ID at the given grid cell coordinates. Returns 0 if the cell is unowned (sea, wastelan...
+LProvinceRegistry:getAt(x: integer, y: integer) -> integer -- Returns the province ID at the given grid cell coordinates. Returns 0 if the cell is unowned (sea, wastelan...
 LProvinceRegistry:getBorderClass(a: integer, b: integer) -> string -- Returns the border classification string between two adjacent provinces (e.g. "river", "mountain", "sea"),...
 LProvinceRegistry:getChangesSince(revision: integer) -> table -- Returns all province changes that occurred after the given revision. Each entry contains the revision numbe...
-LProvinceRegistry:getHeight() -> number -- Returns the height of the province grid in cells (pixels of the source PNG).
+LProvinceRegistry:getHeight() -> integer -- Returns the height of the province grid in cells (pixels of the source PNG).
 LProvinceRegistry:getName() -> string -- Returns the string name used to identify this registry in the province system.
-LProvinceRegistry:getNeighbors(id: integer) -> table -- Returns a table of province IDs that share a border with the given province.
+LProvinceRegistry:getNeighbors(id: integer) -> integer[] -- Returns a table of province IDs that share a border with the given province.
 LProvinceRegistry:getProvince(id: integer) -> table -- Returns a snapshot table describing a single province: its ID, revision, style (political_color, terrain_ty...
-LProvinceRegistry:getRevision() -> number -- Returns the current change revision counter. Incremented on every mutation (color, terrain, border, fog cha...
-LProvinceRegistry:getWidth() -> number -- Returns the width of the province grid in cells (pixels of the source PNG).
+LProvinceRegistry:getRevision() -> integer -- Returns the current change revision counter. Incremented on every mutation (color, terrain, border, fog cha...
+LProvinceRegistry:getWidth() -> integer -- Returns the width of the province grid in cells (pixels of the source PNG).
 LProvinceRegistry:importMetadataFromFiles(opts: table) -> table -- Bulk-imports province metadata (colors, capitals, labels, terrain) from external files (PNG color map, CSV...
-LProvinceRegistry:provinceCount() -> number -- Returns the total number of distinct provinces in this registry (excluding ID 0).
-LProvinceRegistry:provinceIds() -> table -- Returns a sequential table of all province IDs in this registry.
+LProvinceRegistry:provinceCount() -> integer -- Returns the total number of distinct provinces in this registry (excluding ID 0).
+LProvinceRegistry:provinceIds() -> integer[] -- Returns a sequential table of all province IDs in this registry.
 LProvinceRegistry:provinceSpans() -> table -- Returns the raw span data for all provinces. Each span is a horizontal run of cells belonging to one provin...
 LProvinceRegistry:render([opts]: table) -- Renders the province map to the screen using the current camera and style settings. Generates draw commands...
 LProvinceRegistry:screenToMap(screen_x: number, screen_y: number, cam_x: number, cam_y: number, zoom: number, [pixel_size]: number) -> number, number -- Converts screen-space pixel coordinates to map-space floating-point coordinates using the current camera tr...
-LProvinceRegistry:screenToProvince(screen_x: number, screen_y: number, cam_x: number, cam_y: number, zoom: number, [pixel_size]: number) -> number -- Converts screen-space coordinates directly to a province ID. Returns nil if the cursor is outside the map o...
-LProvinceRegistry:setAttr(id: integer, key: string, value: string) -- Sets a custom string attribute on a province. Attributes are returned in the `attrs` table of `getProvince`...
+LProvinceRegistry:screenToProvince(screen_x: number, screen_y: number, cam_x: number, cam_y: number, zoom: number, [pixel_size]: number) -> integer -- Converts screen-space coordinates directly to a province ID. Returns nil if the cursor is outside the map o...
+LProvinceRegistry:setAttr(id: integer, key: string, value: string) -> boolean -- Sets a custom string attribute on a province. Attributes are returned in the `attrs` table of `getProvince`...
 LProvinceRegistry:setBorderClass(a: integer, b: integer, class: string) -- Sets the border classification between two adjacent provinces. Used to control border rendering style (e.g....
-LProvinceRegistry:setBorderStyle(id: integer, border_style: integer) -- Sets the border rendering style index for a province. Controls line thickness, color, or pattern when borde...
-LProvinceRegistry:setCapital(id: integer, x: number, y: number) -> LuaValue -- Sets the capital marker position for a province. The capital is drawn as a small icon during `render` when...
-LProvinceRegistry:setFogState(id: integer, fog_state: number) -> LuaValue -- Sets the fog-of-war state for a province. Typically 0 = revealed, 1 = fogged, 2 = hidden. Controls renderin...
-LProvinceRegistry:setLabelLine(id: integer, ax: number, ay: number, bx: number, by: number) -- Sets the label baseline for a province. The label text is rendered along the line from (ax,ay) to (bx,by),...
-LProvinceRegistry:setLabelText(id: integer, text: string) -> LuaValue -- Sets the display name text for a province. Rendered on the map when `draw_labels` is enabled in `render` op...
-LProvinceRegistry:setPoliticalColor(id: integer, r: number, g: number, b: number, [a]: number) -- Sets the political map color for a province. Used in political map mode rendering and change tracking.
-LProvinceRegistry:setTerrainType(id: integer, terrain_type: integer) -- Sets the terrain type index for a province. Terrain type controls which fill color or texture is used in te...
-LProvinceRegistry:setVisibilityState(id: integer, visibility_state: number) -- Sets the visibility state for a province. Used for strategic visibility layers separate from fog (e.g. scou...
+LProvinceRegistry:setBorderStyle(id: integer, border_style: integer) -> boolean -- Sets the border rendering style index for a province. Controls line thickness, color, or pattern when borde...
+LProvinceRegistry:setCapital(id: integer, x: number, y: number) -> boolean -- Sets the capital marker position for a province. The capital is drawn as a small icon during `render` when...
+LProvinceRegistry:setFogState(id: integer, fog_state: integer) -> boolean -- Sets the fog-of-war state for a province. Typically 0 = revealed, 1 = fogged, 2 = hidden. Controls renderin...
+LProvinceRegistry:setLabelLine(id: integer, ax: number, ay: number, bx: number, by: number) -> boolean -- Sets the label baseline for a province. The label text is rendered along the line from (ax,ay) to (bx,by),...
+LProvinceRegistry:setLabelText(id: integer, text: string) -> boolean -- Sets the display name text for a province. Rendered on the map when `draw_labels` is enabled in `render` op...
+LProvinceRegistry:setPoliticalColor(id: integer, r: number, g: number, b: number, [a]: number) -> boolean -- Sets the political map color for a province. Used in political map mode rendering and change tracking.
+LProvinceRegistry:setTerrainType(id: integer, terrain_type: integer) -> boolean -- Sets the terrain type index for a province. Terrain type controls which fill color or texture is used in te...
+LProvinceRegistry:setVisibilityState(id: integer, visibility_state: integer) -> boolean -- Sets the visibility state for a province. Used for strategic visibility layers separate from fog (e.g. scou...
 LProvinceRegistry:type() -> string -- Returns the type name string for this userdata object.
 LProvinceRegistry:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name. Returns true for "LProvinceRegistry" and "Object".
 ```
@@ -4784,9 +4784,9 @@ lurek.raycaster.projectColumn(distance: number, fov: number, screenHeight: numbe
 ### LDoorManager
 
 ```lua
-LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> number -- Registers a new sliding door at the given grid cell.
+LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> integer -- Registers a new sliding door at the given grid cell.
 LDoorManager:closeDoor(index: integer) -- Begins closing the door at the given index. The door animates over time via `update()`.
-LDoorManager:count() -> number -- Returns the total number of registered doors.
+LDoorManager:count() -> integer -- Returns the total number of registered doors.
 LDoorManager:getDoor(index: integer) -> table -- Returns a table describing the door at the given index, or nil if index is out of range.
 LDoorManager:openDoor(index: integer) -- Begins opening the door at the given index. The door animates over time via `update()`.
 LDoorManager:type() -> string -- Returns the type name of this object.
@@ -4808,7 +4808,7 @@ LHeightMap:typeOf(name: string) -> boolean -- Checks whether this object matches
 ### LPointLight
 
 ```lua
-LPointLight:color() -> number, number, number -- Returns the RGB color components of this light.
+LPointLight:color() -> number -- Returns the RGB color components of this light.
 LPointLight:intensity() -> number -- Returns the brightness multiplier of this light.
 LPointLight:radius() -> number -- Returns the light's falloff radius in world units.
 LPointLight:set(x: number, y: number, r: number, g: number, b: number, radius: number, intensity: number) -- Overwrites all properties of this point light in a single call.
@@ -4822,52 +4822,52 @@ LPointLight:y() -> number -- Returns the Y world position of this light.
 
 ```lua
 LRaycaster:buildMinimapWindow(centerX: number, centerY: number, radius: integer, ambient: number, [lights]: table) -> table -- Generates a grid of minimap tile samples around a center point with lighting info.
-LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> number -- Builds a complete textured raycaster scene for GPU rendering. Stores the output internally.
-LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> number -- Builds a textured raycaster scene with additional 3D .obj model instances projected into the view.
-LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: number) -> table -- Computes floor/ceiling texture UV coordinates for a single scanline row.
+LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> integer -- Builds a complete textured raycaster scene for GPU rendering. Stores the output internally.
+LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> integer -- Builds a textured raycaster scene with additional 3D .obj model instances projected into the view.
+LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: integer) -> table -- Computes floor/ceiling texture UV coordinates for a single scanline row.
 LRaycaster:castRay(ox: number, oy: number, angle: number, maxDist: number) -> table -- Casts a single ray from (ox,oy) at the given angle and returns hit info or nil.
 LRaycaster:castRayMulti(ox: number, oy: number, angle: number, maxDist: number, [maxHits]: integer) -> table -- Casts a single ray that passes through transparent walls, returning multiple hits.
 LRaycaster:castRays(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> table -- Casts multiple rays across a field of view and returns an array of hit tables.
-LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> table -- Casts multiple rays and returns only the corrected distances as a flat array.
-LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number, number, number, number -- Computes the combined lighting color at a tile from ambient and point lights, accounting for walls.
-LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> table -- Renders multiple frames of a rotating camera sweep as a single combined image.
-LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: number, w: number, h: number, maxDist: number) -> table -- Renders a grayscale depth map showing distance-to-wall for each column.
-LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> table -- Renders a debug image showing the line-of-sight ray between two world points.
-LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> table -- Renders a top-down debug view of the map with the player's position and direction.
-LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> table -- Renders a first-person raycaster view to a raw image buffer (no textures, flat-shaded).
-LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> number -- Returns the raw texture id assigned to this ceiling cell, or nil if none.
-LRaycaster:getCell(x: integer, y: integer) -> number -- Returns the wall type value at a grid cell.
-LRaycaster:getFloorTextureCell(x: integer, y: integer) -> number -- Returns the raw texture id assigned to this floor cell, or nil if none.
+LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> number[] -- Casts multiple rays and returns only the corrected distances as a flat array.
+LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number -- Computes the combined lighting color at a tile from ambient and point lights, accounting for walls.
+LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> LImageData -- Renders multiple frames of a rotating camera sweep as a single combined image.
+LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: integer, w: integer, h: integer, maxDist: number) -> LImageData -- Renders a grayscale depth map showing distance-to-wall for each column.
+LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> LImageData -- Renders a debug image showing the line-of-sight ray between two world points.
+LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> LImageData -- Renders a top-down debug view of the map with the player's position and direction.
+LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> LImageData -- Renders a first-person raycaster view to a raw image buffer (no textures, flat-shaded).
+LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> integer -- Returns the raw texture id assigned to this ceiling cell, or nil if none.
+LRaycaster:getCell(x: integer, y: integer) -> integer -- Returns the wall type value at a grid cell.
+LRaycaster:getFloorTextureCell(x: integer, y: integer) -> integer -- Returns the raw texture id assigned to this floor cell, or nil if none.
 LRaycaster:getLoweredFloorCell(x: integer, y: integer) -> table -- Returns the lowered floor configuration at a cell, or nil if the cell is normal.
 LRaycaster:getWallAlpha(tileType: integer) -> number -- Returns the current transparency value for a wall tile type.
-LRaycaster:gridMove(px: number, py: number, dir: number, action: string, step: number) -> number, number, boolean -- Performs a discrete grid-step movement in one of 4 cardinal directions with collision.
-LRaycaster:height() -> number -- Returns the map height in grid cells.
+LRaycaster:gridMove(px: number, py: number, dir: integer, action: string, step: number) -> number -- Performs a discrete grid-step movement in one of 4 cardinal directions with collision.
+LRaycaster:height() -> integer -- Returns the map height in grid cells.
 LRaycaster:isBlocked(x: integer, y: integer) -> boolean -- Returns true if the grid cell is a solid wall (non-zero value).
 LRaycaster:isWalkBlocked(x: integer, y: integer) -> boolean -- Returns true if the cell blocks walking (solid wall OR blocked lowered-floor cell).
 LRaycaster:lineOfSight(x1: number, y1: number, x2: number, y2: number) -> boolean -- Tests whether there is a clear line of sight between two world points (no walls in between).
 LRaycaster:projectSprite(sx: number, sy: number, px: number, py: number, pa: number, fov: number, screenW: number) -> table -- Projects a world-space sprite to screen coordinates for billboard rendering.
-LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: number, maxDist: number, [step]: number) -> table -- Casts rays across the FOV and returns a list of grid cells that are visible (for fog-of-war).
+LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number, [step]: number) -> table -- Casts rays across the FOV and returns a list of grid cells that are visible (for fog-of-war).
 LRaycaster:setCeilingTextureCell(x: integer, y: integer, [texture]: LImage) -- Assigns a per-cell ceiling texture override. Pass nil to remove the override.
 LRaycaster:setCell(x: integer, y: integer, val: integer) -- Sets the wall type value at a grid cell. Non-zero values are solid walls.
 LRaycaster:setCells(cells: table) -- Replaces the entire map grid with a flat array of cell values (row-major order).
 LRaycaster:setFloorTextureCell(x: integer, y: integer, [texture]: LImage) -- Assigns a per-cell floor texture override. Pass nil to remove the override.
 LRaycaster:setLoweredFloorCell(x: integer, y: integer, [opts]: table) -- Marks a cell as a lowered floor (pit) with its own texture, depth, tint, and blocking flag.
-LRaycaster:setWallAlpha(tileType: number, alpha: number) -- Sets the transparency for a specific wall tile type, enabling see-through walls.
-LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number, number, boolean -- Attempts to move from (px,py) by (dx,dy) with wall-slide collision. Returns the final position.
+LRaycaster:setWallAlpha(tileType: integer, alpha: number) -- Sets the transparency for a specific wall tile type, enabling see-through walls.
+LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number -- Attempts to move from (px,py) by (dx,dy) with wall-slide collision. Returns the final position.
 LRaycaster:type() -> string -- Returns the type name of this object ("LRaycaster").
 LRaycaster:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
-LRaycaster:width() -> number -- Returns the map width in grid cells.
+LRaycaster:width() -> integer -- Returns the map width in grid cells.
 ```
 
 ### LSpriteManager
 
 ```lua
-LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> number -- Adds a new sprite to the manager at a world position with a texture name and optional scale.
+LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> integer -- Adds a new sprite to the manager at a world position with a texture name and optional scale.
 LSpriteManager:clear() -- Removes all sprites from the manager.
 LSpriteManager:remove(id: integer) -- Removes a sprite by its id. This method is available to Lua scripts.
 LSpriteManager:setPosition(id: integer, x: number, y: number) -- Updates the world position of an existing sprite.
 LSpriteManager:setVisible(id: integer, visible: boolean) -- Shows or hides a sprite without removing it.
-LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> table -- Sorts all visible sprites by distance from the camera and returns projection data.
+LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> integer[] -- Sorts all visible sprites by distance from the camera and returns projection data.
 LSpriteManager:type() -> string -- Returns the type name of this object ("LSpriteManager").
 LSpriteManager:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -4878,19 +4878,19 @@ LSpriteManager:typeOf(name: string) -> boolean -- Checks whether this object mat
 
 ```lua
 lurek.render.applyTransform(mat: table) -- Multiplies the current transformation matrix by a 3x3 matrix (9 values in row-major order).
-lurek.render.arc(mode: string, x: number, y: number, radius: number, angle1: number, angle2: number, [segments]: number) -- Draws a circular arc. This function is exposed to Lua scripts.
+lurek.render.arc(mode: string, x: number, y: number, radius: number, angle1: number, angle2: number, [segments]: number) -- Draws a filled or outlined circular arc segment.
 lurek.render.beginSortGroup(id: integer) -- Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
 lurek.render.captureScreenshot(callback: function) -- Captures a screenshot as ImageData and passes it to a callback (stub: returns 1x1 placeholder).
-lurek.render.circle(mode: string, x: number, y: number, radius: number) -- Draws a circle. This function is exposed to Lua scripts.
+lurek.render.circle(mode: string, x: number, y: number, radius: number) -- Draws a filled or outlined circle at the given position.
 lurek.render.clear([r]: number, [g]: number, [b]: number) -- Clears all queued render commands for the current frame.
 lurek.render.clearStencil() -- Resets the stencil state to defaults (no stencil operations).
 lurek.render.currentLayer() -> string -- Returns the name of the currently active rendering layer.
-lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -> table -- Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
+lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -- Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
 lurek.render.drawBevelRect(x: number, y: number, w: number, h: number, [bevelW]: number, [style]: string, [opts]: table) -- Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
 lurek.render.drawColoredPolygon(vertices: table, colors: table, [mode]: string) -- Draws a polygon with per-vertex colors.
 lurek.render.drawCubicBezier(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, [segs]: number) -- Draws a cubic Bezier curve through start, two control points, and end.
 lurek.render.drawGradientRect(x: number, y: number, w: number, h: number, c1: table, c2: table, [dir]: string) -- Draws a rectangle with a two-color gradient fill.
-lurek.render.drawHexTile(cx: number, cy: number, size: number, [orientation]: string, [mode]: string) -- Draws a regular hexagonal tile. This function is exposed to Lua scripts.
+lurek.render.drawHexTile(cx: number, cy: number, size: number, [orientation]: string, [mode]: string) -- Draws a regular hexagonal tile at the given center position.
 lurek.render.drawIsoCubeTile(sx: number, sy: number, halfW: number, halfH: number, [opts]: table) -- Draws an isometric cube tile with configurable face colors and optional textures.
 lurek.render.drawMany(list: table) -- Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
 lurek.render.drawNineSlice(slice: LNineSlice, x: number, y: number, w: number, h: number) -- Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
@@ -4898,7 +4898,7 @@ lurek.render.drawPath(path: table, [mode]: string, [close]: boolean) -- Draws a 
 lurek.render.drawq(image: LImage, quad: LQuad, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -- Draws a sub-region of an image defined by a Quad, with optional transform.
 lurek.render.drawQuadBezier(x1: number, y1: number, cx: number, cy: number, x2: number, y2: number, [segments]: number) -- Draws a quadratic Bezier curve through start, control, and end points.
 lurek.render.drawQuadBezier(x1: number, y1: number, cx: number, cy: number, x2: number, y2: number, [segs]: integer) -- Draws a quadratic Bezier curve through start, control, and end points.
-lurek.render.ellipse(mode: string, x: number, y: number, rx: number, ry: number) -- Draws an ellipse. This function is exposed to Lua scripts.
+lurek.render.ellipse(mode: string, x: number, y: number, rx: number, ry: number) -- Draws a filled or outlined ellipse at the given position.
 lurek.render.flushSortGroup(id: integer) -- Ends a sort group and emits all accumulated draw calls in sorted order.
 lurek.render.getBackgroundColor() -> number, number, number, number -- Returns the current background clear color.
 lurek.render.getBlendMode() -> string -- Returns the current blend mode name.
@@ -4916,13 +4916,13 @@ lurek.render.getFontCellWidth(font: LFont) -> number -- Returns the fixed cell w
 lurek.render.getFontDescent(font: LFont) -> number -- Returns the descent (pixels below baseline) of the given font.
 lurek.render.getFontHeight(font: LFont) -> number -- Returns the line height of the given font.
 lurek.render.getFontLineHeight(font: LFont) -> number -- Returns the line spacing of the given font.
-lurek.render.getFontSizes() -> table -- Returns all available built-in font pixel heights.
+lurek.render.getFontSizes() -> number[] -- Returns all available built-in font pixel heights.
 lurek.render.getFontWidth(font: LFont, text: string) -> number -- Measures the pixel width of text using the given font.
 lurek.render.getFontWrap(text: string, limit: number) -> LuaValue, number -- Word-wraps text using the active font and returns the resulting lines and widest line width.
 lurek.render.getHeight() -> number -- Returns the current window height in pixels.
 lurek.render.getLayerZOrder(name: string) -> number -- Returns the z-order value of a named rendering layer.
-lurek.render.getLineWidth() -> number -- Returns the current line width. This function is exposed to Lua scripts.
-lurek.render.getPointSize() -> number -- Returns the current point size. This function is exposed to Lua scripts.
+lurek.render.getLineWidth() -> number -- Returns the current line width used for line-mode drawing.
+lurek.render.getPointSize() -> number -- Returns the current point diameter used for point drawing.
 lurek.render.getScissor() -> number, number, number, number -- Returns the current scissor rectangle, or nothing if no scissor is set.
 lurek.render.getShader() -> LShader -- Returns the currently active shader, or nil if using the default.
 lurek.render.getStats() -> table -- Returns a table of rendering statistics for the current frame.
@@ -4993,8 +4993,8 @@ LCanvas:getDimensions() -> number, number -- Returns both width and height of th
 LCanvas:getHeight() -> number -- Returns the height of this canvas in pixels.
 LCanvas:getWidth() -> number -- Returns the width of this canvas in pixels.
 LCanvas:release() -> boolean -- Releases the canvas GPU resource. If this canvas is currently active, drawing reverts to the screen.
-LCanvas:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LCanvas:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LCanvas:type() -> string -- Returns the type name string for this canvas object.
+LCanvas:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LDrawLayer
@@ -5004,7 +5004,7 @@ LDrawLayer:clear() -- Discards all queued callbacks without executing them.
 LDrawLayer:flush() -- Sorts all queued callbacks by z-depth and executes them in order, then empties the layer.
 LDrawLayer:getCount() -> number -- Returns the number of callbacks currently queued.
 LDrawLayer:queue(z: number, f: function) -- Enqueues a draw callback at the given z-depth. Callbacks execute when flush() is called.
-LDrawLayer:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
+LDrawLayer:type() -> string -- Returns the type name string for this draw layer.
 LDrawLayer:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
@@ -5019,8 +5019,8 @@ LFont:getWidth(text: string) -> number -- Measures the pixel width of a string w
 LFont:getWrap(text: string, limit: number) -> table, number -- Word-wraps text to fit within a pixel width limit and returns the resulting lines.
 LFont:release() -> boolean -- Releases the font resource. The handle becomes invalid after this call.
 LFont:setLineHeight(height: number) -- Overrides the line height used for multi-line text rendering.
-LFont:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LFont:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LFont:type() -> string -- Returns the type name string for this font object.
+LFont:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LImage
@@ -5031,8 +5031,8 @@ LImage:getHeight() -> number -- Returns the height of this image in pixels.
 LImage:getId() -> number -- Returns the internal numeric handle ID for this image.
 LImage:getWidth() -> number -- Returns the width of this image in pixels.
 LImage:release() -> boolean -- Releases the GPU memory for this image. The handle becomes invalid after this call.
-LImage:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LImage:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LImage:type() -> string -- Returns the type name string for this image object.
+LImage:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LImageData
@@ -5054,11 +5054,11 @@ LImageData:typeOf(name: string) -> boolean -- Checks whether this object matches
 ```lua
 LMesh:getVertex(index: integer) -> number, number, number, number, number, number, number, number -- Returns the data for a single vertex by 1-based index.
 LMesh:getVertexCount() -> number -- Returns the number of vertices in this mesh.
-LMesh:release() -> boolean -- Releases the mesh resource. This method is available to Lua scripts.
+LMesh:release() -> boolean -- Releases the mesh GPU resource and invalidates the handle.
 LMesh:setTexture([image]: LImage) -- Assigns or removes a texture for this mesh. Pass nil to clear the texture.
 LMesh:setVertex(index: integer, data: table) -- Updates a single vertex by 1-based index. Table format: {x, y, u, v, r, g, b, a}.
-LMesh:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LMesh:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LMesh:type() -> string -- Returns the type name string for this mesh object.
+LMesh:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LNineSlice
@@ -5087,8 +5087,8 @@ LObjModel:renderToImage(width: integer, height: integer, [rotation]: number) -> 
 LQuad:getTextureDimensions() -> number, number -- Returns the full dimensions of the source texture this quad references.
 LQuad:getViewport() -> number, number, number, number -- Returns the quad's viewport rectangle within the source texture.
 LQuad:setViewport(x: number, y: number, w: number, h: number) -- Updates the quad's viewport rectangle.
-LQuad:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LQuad:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LQuad:type() -> string -- Returns the type name string for this quad object.
+LQuad:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LShader
@@ -5097,15 +5097,15 @@ LQuad:typeOf(name: string) -> boolean -- Checks whether this object matches the 
 LShader:hasUniform(name: string) -> boolean -- Checks whether this shader declares a uniform with the given name.
 LShader:release() -> boolean -- Releases the shader resource. If active, the default shader is restored.
 LShader:send(name: string, value: number|boolean|table) -- Sends a uniform value to this shader by name. Supported types: number, boolean, or table (vec2/vec3/vec4).
-LShader:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LShader:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LShader:type() -> string -- Returns the type name string for this shader object.
+LShader:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ### LShape
 
 ```lua
-LShape:arc(mode: string, x: number, y: number, r: number, astart: number, aend: number, [segments]: number) -- Adds an arc command to the shape. This method is available to Lua scripts.
-LShape:circle(mode: string, x: number, y: number, r: number) -- Adds a circle command to the shape. This method is available to Lua scripts.
+LShape:arc(mode: string, x: number, y: number, r: number, astart: number, aend: number, [segments]: number) -- Adds a filled or outlined arc command to the shape.
+LShape:circle(mode: string, x: number, y: number, r: number) -- Adds a filled or outlined circle command to the shape.
 LShape:clear() -- Removes all drawing commands from this shape, making it empty.
 LShape:draw(x: number, y: number, [rotation]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -- Renders the accumulated shape commands to the screen with optional transform.
 LShape:ellipse(mode: string, x: number, y: number, rx: number, ry: number) -- Adds an ellipse command to the shape.
@@ -5118,7 +5118,7 @@ LShape:roundedRectangle(mode: string, x: number, y: number, w: number, h: number
 LShape:setColor(r: number, g: number, b: number, [a]: number) -- Sets the drawing color for subsequent shape commands.
 LShape:setLineWidth(w: number) -- Sets the line width for subsequent line-mode shape commands.
 LShape:triangle(mode: string, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number) -- Adds a triangle command to the shape.
-LShape:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
+LShape:type() -> string -- Returns the type name string for this shape object.
 LShape:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
 
@@ -5130,8 +5130,8 @@ LSpriteBatch:clear() -- Removes all entries from the sprite batch.
 LSpriteBatch:getBufferSize() -> number -- Returns the maximum number of entries this batch can hold.
 LSpriteBatch:getCount() -> number -- Returns the number of sprite entries currently in the batch.
 LSpriteBatch:release() -> boolean -- Releases the sprite batch resource.
-LSpriteBatch:type() -> string -- Returns the internal Lua type tag. This method is available to Lua scripts.
-LSpriteBatch:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
+LSpriteBatch:type() -> string -- Returns the type name string for this sprite batch.
+LSpriteBatch:typeOf(name: string) -> string -- Returns the type name of this object.
 ```
 
 ## lurek.repl
@@ -5146,9 +5146,9 @@ lurek.repl.new([max_history]: integer) -> LReplSession -- Creates a release-safe
 
 ```lua
 LReplSession:clear() -- Clears all entries from this REPL session history.
-LReplSession:complete(prefix: string) -> table -- Returns completion candidates that begin with the supplied prefix.
+LReplSession:complete(prefix: string) -> string[] -- Returns completion candidates that begin with the supplied prefix.
 LReplSession:eval(code: string) -> string -- Evaluates Lua code and records the input in this REPL history.
-LReplSession:history() -> table -- Returns the recorded REPL input history in oldest-first order.
+LReplSession:history() -> string[] -- Returns the recorded REPL input history in oldest-first order.
 LReplSession:len() -> integer -- Returns the number of entries stored in this REPL history.
 LReplSession:type() -> string -- Returns the Lua-visible type name for this REPL session handle.
 LReplSession:typeOf(name: string) -> boolean -- Returns whether this REPL session handle matches a supported type name.
@@ -5167,11 +5167,11 @@ lurek.save.newSaveManager() -> LSaveManager -- Create a new SaveManager instance
 ```lua
 LSaveManager:addMigration(fromVersion: integer, func: function) -- Register a migration function that transforms save data from one schema version to the next.
 LSaveManager:collect() -> table -- Invoke all registered collectors and return the assembled save-data table without writing to disk.
-LSaveManager:delete(slot: string) -> LuaValue -- Permanently delete a save slot file from disk. This action cannot be undone.
+LSaveManager:delete(slot: string) -- Permanently delete a save slot file from disk. This action cannot be undone.
 LSaveManager:disableAutoSave() -- Disable the periodic auto-save timer. Manual saves via save() still work.
 LSaveManager:enableAutoSave(interval: number, slot: string) -- Enable periodic auto-saving: when the dirty flag is set, the system writes to the target slot every interva...
 LSaveManager:exists(slot: string) -> boolean -- Check whether a save slot file exists on disk without reading its contents.
-LSaveManager:getSchemaVersion() -> number -- Return the current schema version number set for this save manager.
+LSaveManager:getSchemaVersion() -> integer -- Return the current schema version number set for this save manager.
 LSaveManager:getSlotInfo(slot: string) -> table -- Read metadata for a single save slot without loading its full game state.
 LSaveManager:getSlots() -> table -- List all save slots found on disk with their metadata (version, timestamp, summary).
 LSaveManager:getSummary() -> string -- Get the current summary string that will be embedded in the next save.
@@ -5183,8 +5183,8 @@ LSaveManager:onAfterLoad([func]: function) -- Set a hook function called immedia
 LSaveManager:onBeforeSave([func]: function) -- Set a hook function called immediately before each save operation begins.
 LSaveManager:register(name: string, collectFn: function, restoreFn: function) -- Register a named data section with a collector and restorer function pair.
 LSaveManager:reset() -- Completely reset the save manager: unregister all sections, clear migrations, hooks, compression, and dirty...
-LSaveManager:restore(data: table) -> LuaValue -- Apply a previously collected save-data table back into game state by invoking all registered restorers.
-LSaveManager:save(slot: string) -> LuaValue -- Persist all registered data sections to the named slot file on disk.
+LSaveManager:restore(data: table) -- Apply a previously collected save-data table back into game state by invoking all registered restorers.
+LSaveManager:save(slot: string) -- Persist all registered data sections to the named slot file on disk.
 LSaveManager:setCompress(enabled: boolean) -- Enable or disable LZ4 compression for save files. Compressed saves are smaller on disk.
 LSaveManager:setSchemaVersion(version: integer) -- Set the current schema version number for saves produced by this game build.
 LSaveManager:setSummary(summary: string) -- Set a human-readable summary string stored alongside save metadata (e.g. "Level 5 – Forest").
@@ -5212,11 +5212,11 @@ lurek.scene.getCurrentLayer() -> number -- Get the rendering layer of the curren
 lurek.scene.getData(key: string) -> LuaValue -- Retrieve a value from the shared data map by key, or nil if the key has not been set. Commonly used in a sc...
 lurek.scene.getQueuedTransitionCount() -> number -- Returns the number of transitions waiting in the queue behind the currently-playing transition.
 lurek.scene.getRegistered(name: string) -> table|nil -- Retrieve a previously registered scene table by its name, or nil if no scene is registered under that name....
-lurek.scene.getRegisteredNames() -> table -- Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic s...
+lurek.scene.getRegisteredNames() -> string[] -- Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic s...
 lurek.scene.getStackSize() -> number -- Returns the total number of scenes currently on the stack, including overlays. Useful for asserting expecte...
 lurek.scene.getTransitionProgress() -> number -- Returns the raw linear progress (0.0 to 1.0) of the current transition animation, ignoring easing. Returns...
 lurek.scene.getTransitionProgressEased() -> number -- Returns the eased progress (0.0 to 1.0) of the current transition, with the selected easing curve applied....
-lurek.scene.getTransitionTypes() -> table -- Returns a Lua array of all supported transition type name strings. Use this to discover available transitio...
+lurek.scene.getTransitionTypes() -> string[] -- Returns a Lua array of all supported transition type name strings. Use this to discover available transitio...
 lurek.scene.hasData(key: string) -> boolean -- Check whether a key exists in the shared scene data map without retrieving its value.
 lurek.scene.hasRegistered(name: string) -> boolean -- Check whether a scene is registered under the given name.
 lurek.scene.transitions.iris([duration]: number) -> table -- Create an iris (circle) transition descriptor table. A circular aperture opens or closes to reveal the new...
@@ -5233,9 +5233,9 @@ lurek.scene.preload(name: string, loader: function) -- Register a deferred-loadi
 lurek.scene.process(dt: number) -- Call `ready(self)` once on newly-pushed scenes, then call `process(self, dt)` on every active scene ordered...
 lurek.scene.processLate(dt: number) -- Call `process_late(self, dt)` on every active scene after all other processing. Ideal for camera follow log...
 lurek.scene.processPhysics(dt: number) -- Call `process_physics(self, dt)` on every active scene ordered by layer. Run this callback after your physi...
-lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any) -- Push a new scene onto the stack, making it the active scene. The previously-active scene receives its `paus...
-lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any) -- Push a scene as a transparent overlay on top of the current scene. Unlike `push`, the underlying scene is N...
-lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: any) -- Push a preloaded scene onto the stack by name. If the loader registered via `preload` has not yet run, it e...
+lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table) -- Push a new scene onto the stack, making it the active scene. The previously-active scene receives its `paus...
+lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table) -- Push a scene as a transparent overlay on top of the current scene. Unlike `push`, the underlying scene is N...
+lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: table) -- Push a preloaded scene onto the stack by name. If the loader registered via `preload` has not yet run, it e...
 lurek.scene.queueTransition(transition: string, duration: number, [easing]: string) -- Queue a transition to play automatically after the current one finishes. Multiple queued transitions execut...
 lurek.scene.registerScene(name: string, scene: table) -- Register a scene table under a unique name for later retrieval via `getRegistered`, navigation via `popTo`,...
 lurek.scene.removeData(key: string) -- Remove a key and its associated value from the shared scene data map. No-op if the key does not exist.
@@ -5243,9 +5243,9 @@ lurek.scene.render() -- Call `render(self)` on every scene in the stack from bot
 lurek.scene.renderUi() -- Call `render_ui(self)` on every scene in the stack from bottom to top. Use this for screen-space HUD elemen...
 lurek.scene.serializeScene() -> table -- Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` arr...
 lurek.scene.setCurrentLayer(layer: integer) -> boolean -- Set the rendering layer of the current top scene. Scenes with higher layer values are processed and drawn a...
-lurek.scene.setData(key: string, value: any) -- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use...
+lurek.scene.setData(key: string, value: table) -- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use...
 lurek.scene.transitions.slide([direction]: string, [duration]: number) -> table -- Create a directional slide transition descriptor table. The new scene slides in from the specified directio...
-lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any) -- Replace the current top scene with a different one without changing stack depth. The old scene receives `le...
+lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table) -- Replace the current top scene with a different one without changing stack depth. The old scene receives `le...
 lurek.scene.unregisterScene(name: string) -- Remove a scene registration by name. Does not pop the scene if it is currently active on the stack — it onl...
 lurek.scene.update(dt: number) -- Advance any active transition animation and call `update(self, dt)` on the current top scene. Call this onc...
 lurek.scene.transitions.wipe([duration]: number) -> table -- Create a horizontal wipe transition descriptor table. A wipe bar sweeps across the screen to reveal the new...
@@ -5302,16 +5302,16 @@ lurek.spine.newSkeletonAnimation(name: string, duration: number) -> LSkeletonAni
 
 ```lua
 LSkeleton:addAnimation(anim: LSkeletonAnimation) -- Registers a SkeletonAnimation object with this skeleton so it can be played by name.
-LSkeleton:addBone(name: string, [opts]: table) -> number -- Adds a root-level bone to the skeleton with optional transform properties.
-LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> number -- Adds a bone as a child of an existing bone, inheriting its parent's world transform.
-LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> number -- Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
+LSkeleton:addBone(name: string, [opts]: table) -> integer -- Adds a root-level bone to the skeleton with optional transform properties.
+LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> integer -- Adds a bone as a child of an existing bone, inheriting its parent's world transform.
+LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> integer -- Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
 LSkeleton:addSkin(name: string) -- Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
-LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> number -- Adds a slot attached to a specific bone, optionally assigning a default attachment name.
+LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> integer -- Adds a slot attached to a specific bone, optionally assigning a default attachment name.
 LSkeleton:blendAnimation(anim: LSkeletonAnimation, time: number, [blend_weight]: number) -- Blends an animation pose onto the skeleton at a given time with a weight factor for smooth transitions.
-LSkeleton:boneCount() -> number -- Returns the total number of bones in the skeleton.
+LSkeleton:boneCount() -> integer -- Returns the total number of bones in the skeleton.
 LSkeleton:drawToImage(w: integer, h: integer) -> LImageData -- Renders the skeleton into an in-memory image of the given dimensions and returns it as LImageData userdata.
-LSkeleton:findBone(name: string) -> number -- Searches for a bone by name and returns its zero-based index, or nil if not found.
-LSkeleton:findSlot(name: string) -> number -- Searches for a slot by name and returns its zero-based index, or nil if not found.
+LSkeleton:findBone(name: string) -> integer -- Searches for a bone by name and returns its zero-based index, or nil if not found.
+LSkeleton:findSlot(name: string) -> integer -- Searches for a slot by name and returns its zero-based index, or nil if not found.
 LSkeleton:getAnimationTime() -> number -- Returns the current playback time of the active animation in seconds.
 LSkeleton:getBoneWorld(idx: integer) -> table -- Returns the final world-space transform of a bone after hierarchy resolution.
 LSkeleton:getSkin() -> string -- Returns the name of the currently active skin, or nil if no skin is set.
@@ -5320,7 +5320,7 @@ LSkeleton:setIKTarget(name: string, x: number, y: number) -> boolean -- Sets the
 LSkeleton:setPosition(x: number, y: number) -- Sets the root bone world position, shifting the entire skeleton.
 LSkeleton:setSkin(name: string) -> boolean -- Activates a named skin, applying its slot-attachment mappings to the skeleton.
 LSkeleton:setSkinMapping(skin: string, slot: string, attachment: string) -- Maps a slot to a specific attachment name within a skin. When that skin is active, the slot shows this atta...
-LSkeleton:slotCount() -> number -- Returns the total number of slots in the skeleton.
+LSkeleton:slotCount() -> integer -- Returns the total number of slots in the skeleton.
 LSkeleton:stopAnimation() -- Stops the currently playing animation and resets playback state.
 LSkeleton:type() -> string -- Returns the type name of this userdata object.
 LSkeleton:typeOf(name: string) -> boolean -- Checks whether this object is of the given type name. Supports "LSkeleton" and "Object".
@@ -5332,10 +5332,10 @@ LSkeleton:updateWorldTransforms() -- Recomputes world transforms for all bones i
 
 ```lua
 LSkeletonAnimation:addEventKey(time: number, name: string, [value]: number) -- Inserts an event trigger at a specific time within the animation timeline.
-LSkeletonAnimation:addKeyframe(bone_idx: number, property: string, time: number, value: number, [easing]: string) -- Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
+LSkeletonAnimation:addKeyframe(bone_idx: integer, property: string, time: number, value: number, [easing]: string) -- Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
 LSkeletonAnimation:getDuration() -> number -- Returns the total duration of this animation in seconds.
 LSkeletonAnimation:getEvents(from: number, to: number) -> table -- Collects all events that fire within a time range. Useful for triggering sound effects or gameplay actions.
-LSkeletonAnimation:getTimelineCount() -> number -- Returns the number of bone-property timelines in this animation.
+LSkeletonAnimation:getTimelineCount() -> integer -- Returns the number of bone-property timelines in this animation.
 LSkeletonAnimation:poseAt(time: number) -> table -- Samples all timelines at a given time and returns the computed pose as an array of bone-property-value entr...
 LSkeletonAnimation:reverse() -> LSkeletonAnimation -- Creates a new animation that plays this animation's keyframes in reverse order.
 LSkeletonAnimation:type() -> string -- Returns the type name of this userdata object.
@@ -5357,8 +5357,8 @@ lurek.sprite.parseAtlas(json_str: string) -> LSpriteAtlas -- Parses a TexturePac
 ### LSpriteAtlas
 
 ```lua
-LSpriteAtlas:entryCount() -> number -- Returns the total number of entries (sprite regions) in the atlas.
-LSpriteAtlas:entryNames() -> table -- Returns an array of all entry names in the atlas.
+LSpriteAtlas:entryCount() -> integer -- Returns the total number of entries (sprite regions) in the atlas.
+LSpriteAtlas:entryNames() -> string[] -- Returns an array of all entry names in the atlas.
 LSpriteAtlas:getByIndex(index: integer) -> table -- Returns a sprite region by its 1-based index in the atlas.
 LSpriteAtlas:getEntry(name: string) -> table -- Looks up a named sprite region in the atlas by its original filename or tag.
 LSpriteAtlas:getFlipped(name: string, flip_x: boolean, flip_y: boolean) -> table -- Returns a copy of a named atlas entry with the specified flip flags applied.
@@ -5372,11 +5372,11 @@ LSpriteAtlas:typeOf(name: string) -> boolean -- Checks whether this object match
 LSpriteSheet:drawToImage(w: integer, h: integer) -> LImage -- Renders the sprite sheet grid into an LImage of the given size for debugging or previews.
 LSpriteSheet:getColumn(col: integer) -> table -- Returns all frame quads in the given column of the sprite sheet grid.
 LSpriteSheet:getFrame(index: integer) -> table -- Returns the UV quad for a single frame by its 1-based index.
-LSpriteSheet:getFrameCount() -> number -- Returns the total number of frames in this sprite sheet.
-LSpriteSheet:getFrameSize() -> number -- Returns the pixel dimensions of a single frame cell.
-LSpriteSheet:getGridSize() -> number -- Returns the number of columns and rows in the sprite sheet grid.
+LSpriteSheet:getFrameCount() -> integer -- Returns the total number of frames in this sprite sheet.
+LSpriteSheet:getFrameSize() -> integer -- Returns the pixel dimensions of a single frame cell.
+LSpriteSheet:getGridSize() -> integer -- Returns the number of columns and rows in the sprite sheet grid.
 LSpriteSheet:getGroupFrames(name: string) -> table -- Returns the frame quads for a named animation group.
-LSpriteSheet:getGroupNames() -> table -- Returns an array of all named animation group names defined on this sheet.
+LSpriteSheet:getGroupNames() -> string[] -- Returns an array of all named animation group names defined on this sheet.
 LSpriteSheet:getRow(row: integer) -> table -- Returns all frame quads in the given row of the sprite sheet grid.
 LSpriteSheet:nameGroup(name: string, start: integer, count: integer) -- Defines a named animation group as a contiguous range of frames.
 LSpriteSheet:type() -> string -- Returns the type name of this object.
@@ -5390,7 +5390,7 @@ LSpriteSheet:typeOf(name: string) -> boolean -- Checks whether this object match
 ```lua
 lurek.runtime.errorSnapshot(msg: string) -> string -- Creates a JSON-encoded error snapshot from a message string, useful for diagnostics and error reporting.
 lurek.runtime.getArch() -> string -- Returns the CPU architecture of the host system.
-lurek.runtime.getArgs() -> table -- Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
+lurek.runtime.getArgs() -> string[] -- Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
 lurek.runtime.getBatchResults(results: table) -> number -- Summarizes batch results by counting passed, failed, and skipped tasks.
 lurek.runtime.getClipboardText() -> string -- Reads the current text content from the system clipboard. Returns an empty string if the clipboard is unava...
 lurek.runtime.getConfig() -> table -- Returns a table containing the current engine runtime configuration values.
@@ -5404,7 +5404,7 @@ lurek.runtime.getMessage(id: string) -> string -- Resolves a message string by i
 lurek.runtime.getMessageCount() -> number -- Returns the total number of messages registered in the engine message catalog.
 lurek.runtime.getOS() -> string -- Returns the name of the host operating system as a string.
 lurek.runtime.getPowerInfo() -> string -- Returns the current power supply state, battery percentage, and estimated time remaining.
-lurek.runtime.getPreferredLocales() -> table -- Returns a list of the user's preferred locale identifiers from the operating system.
+lurek.runtime.getPreferredLocales() -> string[] -- Returns a list of the user's preferred locale identifiers from the operating system.
 lurek.runtime.getProcessorCount() -> number -- Returns the number of logical processors available on the host machine.
 lurek.runtime.getVersion() -> string -- Returns the semantic version string of the Lurek2D engine.
 lurek.runtime.hasMessage(id: string) -> boolean -- Checks whether a message identifier exists in the engine message catalog.
@@ -5427,13 +5427,13 @@ lurek.terminal.addCompletion(candidate: string) -- Registers a candidate string 
 lurek.terminal.applyTheme(terminal: LTerminal, theme: string) -- Applies a named color theme to the terminal, setting default foreground and background colors.
 lurek.terminal.clearCmdHistory(terminal: LTerminal) -- Removes all entries from the terminal command history.
 lurek.terminal.clearCompletions() -- Removes all registered completion candidates from the shared completion engine.
-lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> number -- Returns the number of commands currently stored in the terminal command history.
-lurek.terminal.getCompletions(prefix: string) -> table -- Returns all completion candidates matching the given prefix string.
-lurek.terminal.getMaxCols() -> number -- Returns the engine-defined maximum number of columns a terminal grid can have.
-lurek.terminal.getMaxRows() -> number -- Returns the engine-defined maximum number of rows a terminal grid can have.
-lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> table -- Retrieves a range of lines from the terminal scrollback buffer.
+lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> integer -- Returns the number of commands currently stored in the terminal command history.
+lurek.terminal.getCompletions(prefix: string) -> string[] -- Returns all completion candidates matching the given prefix string.
+lurek.terminal.getMaxCols() -> integer -- Returns the engine-defined maximum number of columns a terminal grid can have.
+lurek.terminal.getMaxRows() -> integer -- Returns the engine-defined maximum number of rows a terminal grid can have.
+lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> string[] -- Retrieves a range of lines from the terminal scrollback buffer.
 lurek.terminal.newBorder(col: integer, row: integer, width: integer, height: integer) -> LWidget -- Creates a new decorative border widget drawn using box-drawing characters.
-lurek.terminal.newButton(col: number, row: number, width: number, [height]: number, [text]: string) -> LWidget -- Creates a new clickable button widget with the given position, size, and label text.
+lurek.terminal.newButton(col: integer, row: integer, width: integer, [height]: integer, [text]: string) -> LWidget -- Creates a new clickable button widget with the given position, size, and label text.
 lurek.terminal.newLabel(col: integer, row: integer, [text]: string) -> LWidget -- Creates a new label widget that displays static text at the given cell position.
 lurek.terminal.newList(col: integer, row: integer, width: integer, height: integer) -> LWidget -- Creates a new scrollable list widget for displaying and selecting items.
 lurek.terminal.newPanel(col: integer, row: integer, [width]: integer, [height]: integer) -> LWidget -- Creates a new panel widget that can contain child widgets for grouped layout.
@@ -5444,12 +5444,12 @@ lurek.terminal.nextCompletion(prefix: string) -> string -- Cycles to the next ma
 lurek.terminal.parseAnsi(text: string) -> table -- Parses ANSI escape sequences in a string into an array of span tables with text, bold, fg, and bg fields.
 lurek.terminal.prevCmd(terminal: LTerminal) -> string -- Navigates backward in the terminal command history, returning the previous command or nil if at the start.
 lurek.terminal.printAnsi(terminal: LTerminal, col: integer, row: integer, text: string) -- Renders ANSI-colored text directly onto the terminal grid at the given cell position.
-lurek.terminal.printHighlighted(terminal: LTerminal, col: number, row: number, text: string, rules: table) -- Renders syntax-highlighted text onto the terminal grid using a table of highlight rules with regex patterns...
+lurek.terminal.printHighlighted(terminal: LTerminal, col: integer, row: integer, text: string, rules: table) -- Renders syntax-highlighted text onto the terminal grid using a table of highlight rules with regex patterns...
 lurek.terminal.pushCmdHistory(terminal: LTerminal, cmd: string) -- Appends a command string to the terminal command history for up/down arrow recall.
 lurek.terminal.pushScrollback(terminal: LTerminal, line: string) -- Appends a line of text to the terminal scrollback buffer for later retrieval.
 lurek.terminal.removeCompletion(candidate: string) -- Removes a previously registered completion candidate from the shared completion engine.
 lurek.terminal.resetCompletion() -- Resets the completion cycling state so the next call to nextCompletion starts from the first match.
-lurek.terminal.scrollbackLen(terminal: LTerminal) -> number -- Returns the number of lines currently stored in the terminal scrollback buffer.
+lurek.terminal.scrollbackLen(terminal: LTerminal) -> integer -- Returns the number of lines currently stored in the terminal scrollback buffer.
 lurek.terminal.setScrollbackCap(terminal: LTerminal, cap: integer) -- Sets the maximum number of lines retained in the terminal scrollback buffer. Older lines are discarded when...
 lurek.terminal.stripAnsi(text: string) -> string -- Removes all ANSI escape sequences from a string, returning plain text.
 ```
@@ -5461,18 +5461,18 @@ LTerminal:addWidget(widget: LWidget) -- Attaches a widget to this terminal so it
 LTerminal:autoResize() -- Requests the window to resize so it exactly fits the terminal grid at the current cell size.
 LTerminal:clear() -- Clears all cells in the terminal grid, resetting characters and colors to defaults.
 LTerminal:clearWidgets() -- Removes all attached widgets from this terminal at once.
-LTerminal:get(col: integer, row: integer) -> number, number, number, number, number, number, number, number, number -- Reads the character and colors at a specific cell in the terminal grid.
+LTerminal:get(col: integer, row: integer) -> integer, number, number, number, number, number, number, number, number -- Reads the character and colors at a specific cell in the terminal grid.
 LTerminal:getCellSize() -> number, number -- Returns the active terminal cell width and height in pixels, using custom override or font metrics.
-LTerminal:getDimensions() -> number, number -- Returns the number of columns and rows in the terminal grid.
+LTerminal:getDimensions() -> integer, integer -- Returns the number of columns and rows in the terminal grid.
 LTerminal:getFocused() -> LWidget -- Returns the widget that currently has keyboard focus, or nil if no widget is focused.
-LTerminal:getWidgetCount() -> number -- Returns the number of widgets currently attached to this terminal.
+LTerminal:getWidgetCount() -> integer -- Returns the number of widgets currently attached to this terminal.
 LTerminal:keypressed(key: string) -> boolean -- Forwards a key press event to the terminal for widget input processing.
 LTerminal:mousepressed(px: number, py: number, [button]: integer) -- Forwards a mouse press event to the terminal, converting pixel coordinates to cell coordinates.
 LTerminal:print(col: integer, row: integer, text: string) -- Writes text to the terminal grid starting at a specific cell.
 LTerminal:removeWidget(widget: LWidget) -- Detaches a widget from this terminal, removing it from rendering and input handling.
 LTerminal:render([x]: number, [y]: number) -- Renders the terminal grid and widgets and stages a window size matching the grid and active cell size.
 LTerminal:resetCellSize() -- Removes any custom cell size override, reverting to the active font metrics and refitting the window.
-LTerminal:set(col: number, row: number, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number) -- Writes a character with foreground and background color to a specific cell in the terminal grid.
+LTerminal:set(col: integer, row: integer, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number) -- Writes a character with foreground and background color to a specific cell in the terminal grid.
 LTerminal:setCellSize(w: number, h: number) -- Overrides the cell width and height used for rendering this terminal grid and refits the window.
 LTerminal:setFocus([widget]: LWidget) -- Sets which widget currently has keyboard focus, or clears focus when nil is passed.
 LTerminal:setFont(height: integer) -- Selects the nearest built-in bitmap font by pixel height and refits the window to the terminal grid.
@@ -5485,18 +5485,18 @@ LTerminal:typeOf(name: string) -> boolean -- Checks whether this object matches 
 
 ```lua
 LWidget:addChild(child: LWidget) -- Adds a child widget to a panel widget. The child becomes part of the panel layout and rendering.
-LWidget:addItem(item: string) -> LuaValue -- Appends a text item to a list widget.
+LWidget:addItem(item: string) -- Appends a text item to a list widget.
 LWidget:clearChildren() -- Removes all child widgets from a panel widget.
-LWidget:clearItems() -> LuaValue -- Removes all items from a list widget.
+LWidget:clearItems() -- Removes all items from a list widget.
 LWidget:getChild(index: integer) -> LWidget -- Returns a child widget from a panel by its 1-based index, or nil if the index is out of range.
-LWidget:getChildCount() -> number -- Returns the number of child widgets in a panel widget.
-LWidget:getColor() -> number, number, number, number -- Returns the current RGBA color assigned to this widget.
+LWidget:getChildCount() -> integer -- Returns the number of child widgets in a panel widget.
+LWidget:getColor() -> number, number, number, number -- Returns the foreground color of the widget as RGBA components.
 LWidget:getItem(index: integer) -> string -- Returns the text of a list item by its 1-based index.
-LWidget:getItemCount() -> number -- Returns the number of items in a list widget.
-LWidget:getMaxLength() -> number -- Returns the maximum character limit of a text box widget.
-LWidget:getPosition() -> number, number -- Returns the widget position as 1-based column and row.
-LWidget:getSelected() -> number -- Returns the 1-based index of the currently selected list item, or nil if nothing is selected.
-LWidget:getSize() -> number, number -- Returns the widget dimensions as width and height in cell units.
+LWidget:getItemCount() -> integer -- Returns the number of items in a list widget.
+LWidget:getMaxLength() -> integer -- Returns the maximum character limit of a text box widget.
+LWidget:getPosition() -> integer, integer -- Returns the widget position as 1-based column and row.
+LWidget:getSelected() -> integer -- Returns the 1-based index of the currently selected list item, or nil if nothing is selected.
+LWidget:getSize() -> integer, integer -- Returns the widget dimensions as width and height in cell units.
 LWidget:getStyle() -> string -- Returns the current border style name of a border or panel widget.
 LWidget:getTag() -> string -- Returns the current tag string assigned to the widget.
 LWidget:getText() -> string -- Returns the current text content of a label, button, or text box widget.
@@ -5504,20 +5504,20 @@ LWidget:getTitle() -> string -- Returns the current title text of a border or pa
 LWidget:isEnabled() -> boolean -- Returns whether the widget is currently enabled for user interaction.
 LWidget:isVisible() -> boolean -- Returns whether the widget is currently visible.
 LWidget:removeChild(child: LWidget) -- Removes a child widget from a panel, detaching it from the panel layout.
-LWidget:removeItem(index: integer) -> LuaValue -- Removes a list item by its 1-based index.
+LWidget:removeItem(index: integer) -- Removes a list item by its 1-based index.
 LWidget:setColor(r: number, g: number, b: number, [a]: number) -- Sets the foreground color of the widget as RGBA components (0-1 range).
 LWidget:setEnabled(enabled: boolean) -- Controls whether the widget accepts user interaction (clicks, typing).
-LWidget:setMaxLength(maxLength: integer) -> LuaValue -- Sets the maximum number of characters allowed in a text box widget.
+LWidget:setMaxLength(maxLength: integer) -- Sets the maximum number of characters allowed in a text box widget.
 LWidget:setOnChange([callback]: function) -- Registers a callback function invoked when the text content of a text box widget changes. Only valid for te...
 LWidget:setOnClick([callback]: function) -- Registers a callback function invoked when a button widget is clicked. Only valid for button widgets.
 LWidget:setOnSelect([callback]: function) -- Registers a callback function invoked when the selected item in a list widget changes. Only valid for list...
 LWidget:setPosition(col: integer, row: integer) -- Sets the widget position in 1-based cell coordinates within the terminal grid.
 LWidget:setSelected([index]: integer) -- Sets the currently selected item in a list widget by 1-based index, or clears the selection with nil. Fires...
 LWidget:setSize(width: integer, height: integer) -- Sets the widget dimensions in cell units, clamped to a minimum of 1x1.
-LWidget:setStyle(styleName: string) -> LuaValue -- Sets the border drawing style for a border or panel widget.
+LWidget:setStyle(styleName: string) -- Sets the border drawing style for a border or panel widget.
 LWidget:setTag(tag: string) -- Assigns an arbitrary string tag to the widget for identification or grouping.
 LWidget:setText(text: string) -- Sets the display text of a label, button, or text box widget. Fires the onChange callback if the text actua...
-LWidget:setTitle(title: string) -> LuaValue -- Sets the title text displayed in the border of a border or panel widget.
+LWidget:setTitle(title: string) -- Sets the title text displayed in the border of a border or panel widget.
 LWidget:setVisible(visible: boolean) -- Controls whether the widget is drawn and receives input events.
 LWidget:type() -> string -- Returns the type name string "LWidget".
 LWidget:typeOf(name: string) -> boolean -- Checks whether this object matches a given type name. Accepts "LWidget" or "Object".
@@ -5528,9 +5528,9 @@ LWidget:typeOf(name: string) -> boolean -- Checks whether this object matches a 
 [[Module page|Module-thread]]
 
 ```lua
-lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
+lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
 lurek.thread.getChannel(name: string) -> LChannel -- Returns a named shared channel, creating it on first access. Repeated calls with the same name return the s...
-lurek.thread.getWorkerCapabilities() -> table -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
+lurek.thread.getWorkerCapabilities() -> string[] -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
 lurek.thread.newBoundedChannel(capacity: integer) -> LChannel -- Creates a new bounded channel with a fixed capacity, blocking pushes when full.
 lurek.thread.newChannel() -> LChannel -- Creates a new unbounded channel for sending typed values between threads.
 lurek.thread.newPool(size: integer, code: string) -> LThreadPool -- Creates a fixed-size thread pool where each worker runs the same Lua code and consumes items from a shared...
@@ -5541,19 +5541,19 @@ lurek.thread.newThread(code: string) -> LThread -- Creates a new worker thread t
 
 ```lua
 LChannel:clear() -- Removes all pending values from the channel.
-LChannel:demand([timeout]: number) -> any -- Blocks until a value is available on the channel or the optional timeout expires.
-LChannel:getCapacity() -> number -- Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
-LChannel:getCount() -> number -- Returns the number of values currently queued in the channel.
+LChannel:demand([timeout]: number) -> table -- Blocks until a value is available on the channel or the optional timeout expires.
+LChannel:getCapacity() -> integer -- Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
+LChannel:getCount() -> integer -- Returns the number of values currently queued in the channel.
 LChannel:isBounded() -> boolean -- Checks whether this channel has a fixed capacity limit.
-LChannel:peek() -> any -- Returns the next value from the channel without removing it.
-LChannel:pop() -> any -- Removes and returns the next value from the channel without blocking.
+LChannel:peek() -> table -- Returns the next value from the channel without removing it.
+LChannel:pop() -> table -- Removes and returns the next value from the channel without blocking.
 LChannel:popBytes() -> string -- Pops the next value from the channel only if it is a byte blob, discarding non-bytes values.
 LChannel:popTable() -> table -- Pops the next value from the channel only if it is a table, discarding non-table values.
-LChannel:push(value: any) -> number -- Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
-LChannel:pushBytes(data: string) -> number -- Pushes raw binary data onto the channel as a byte blob.
-LChannel:pushTable(value: table) -> number -- Pushes a table value onto the channel, raising an error if the value is not a table.
-LChannel:supply(value: any) -> boolean -- Pushes a value and blocks until a consumer pops it (synchronous handoff).
-LChannel:tryPush(value: any) -> boolean -- Attempts to push a value onto a bounded channel without blocking.
+LChannel:push(value: table) -> integer -- Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
+LChannel:pushBytes(data: string) -> integer -- Pushes raw binary data onto the channel as a byte blob.
+LChannel:pushTable(value: table) -> integer -- Pushes a table value onto the channel, raising an error if the value is not a table.
+LChannel:supply(value: table) -> boolean -- Pushes a value and blocks until a consumer pops it (synchronous handoff).
+LChannel:tryPush(value: table) -> boolean -- Attempts to push a value onto a bounded channel without blocking.
 LChannel:type() -> string -- Returns the type name of this object.
 LChannel:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5561,10 +5561,10 @@ LChannel:typeOf(name: string) -> boolean -- Checks whether this object matches t
 ### LPromise
 
 ```lua
-LPromise:chain(code: string, ...: any) -> LPromise -- Creates a new promise that runs the given code with the parent promise's result as its first argument.
+LPromise:chain(code: string, ...: table) -> LPromise -- Creates a new promise that runs the given code with the parent promise's result as its first argument.
 LPromise:getError() -> string -- Returns the error message from the promise, if it terminated with an error.
 LPromise:isDone() -> boolean -- Checks whether the asynchronous computation has completed.
-LPromise:result() -> any -- Returns the result value of the completed promise.
+LPromise:result() -> table -- Returns the result value of the completed promise.
 LPromise:type() -> string -- Returns the type name of this object.
 LPromise:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5574,7 +5574,7 @@ LPromise:typeOf(name: string) -> boolean -- Checks whether this object matches t
 ```lua
 LThread:getError() -> string -- Returns the error message from the worker thread, if it terminated with an error.
 LThread:isRunning() -> boolean -- Checks whether the worker thread is still executing.
-LThread:start(...: any) -- Launches the worker thread, executing the Lua code string supplied at creation time.
+LThread:start(...: table) -- Launches the worker thread, executing the Lua code string supplied at creation time.
 LThread:type() -> string -- Returns the type name of this object.
 LThread:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 LThread:wait() -- Blocks the calling thread until the worker thread finishes execution.
@@ -5583,12 +5583,12 @@ LThread:wait() -- Blocks the calling thread until the worker thread finishes exe
 ### LThreadPool
 
 ```lua
-LThreadPool:collect() -> any -- Pops and returns the next result from the pool's output channel.
+LThreadPool:collect() -> table -- Pops and returns the next result from the pool's output channel.
 LThreadPool:getInputChannel() -> LChannel -- Returns the pool's shared input channel that feeds work items to worker threads.
 LThreadPool:getOutputChannel() -> LChannel -- Returns the pool's shared output channel where worker threads place their results.
 LThreadPool:join([timeout]: number) -> boolean -- Blocks until all workers finish or the optional timeout elapses.
-LThreadPool:size() -> number -- Returns the number of worker threads in the pool.
-LThreadPool:submit(value: any) -- Pushes a value into the pool's input channel for processing by a worker thread.
+LThreadPool:size() -> integer -- Returns the number of worker threads in the pool.
+LThreadPool:submit(value: table) -- Pushes a value into the pool's input channel for processing by a worker thread.
 LThreadPool:type() -> string -- Returns the type name of this object.
 LThreadPool:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5599,31 +5599,31 @@ LThreadPool:typeOf(name: string) -> boolean -- Checks whether this object matche
 
 ```lua
 lurek.tilemap.fromLDtk(jsonStr: string, [levelName]: string) -> LTileMap -- Loads a tilemap from an LDtk JSON string, optionally targeting a specific level.
-lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> number -- Converts screen-space pixel coordinates to axial hex coordinates.
+lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> integer -- Converts screen-space pixel coordinates to axial hex coordinates.
 lurek.tilemap.fromScreenIso(sx: number, sy: number, tw: number, th: number) -> number -- Converts screen-space coordinates back to tile coordinates for isometric projection.
 lurek.tilemap.hexArea(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells within a filled area of a given radius.
-lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> number -- Computes the hex grid distance between two axial coordinates.
+lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> integer -- Computes the hex grid distance between two axial coordinates.
 lurek.tilemap.hexLine(q1: integer, r1: integer, q2: integer, r2: integer) -> table -- Returns all hex cells along a line between two axial coordinates.
 lurek.tilemap.hexNeighbors(q: integer, r: integer) -> table -- Returns the six neighboring hex cells of a given axial coordinate.
-lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> number -- Reflects a hex cell across an axis through a center point.
+lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> integer -- Reflects a hex cell across an axis through a center point.
 lurek.tilemap.hexRing(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells forming a ring at a given radius around a center.
-lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> number -- Rotates a hex cell around a center point by a number of 60-degree steps.
-lurek.tilemap.hexRound(q: number, r: number) -> number -- Rounds fractional axial hex coordinates to the nearest integer hex cell.
+lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> integer -- Rotates a hex cell around a center point by a number of 60-degree steps.
+lurek.tilemap.hexRound(q: number, r: number) -> integer -- Rounds fractional axial hex coordinates to the nearest integer hex cell.
 lurek.tilemap.hexSpiral(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells in a spiral pattern out to a given radius.
-lurek.tilemap.isoDirectionFromAngle(angle: number) -> number -- Converts an angle in degrees to the nearest isometric direction index.
+lurek.tilemap.isoDirectionFromAngle(angle: number) -> integer -- Converts an angle in degrees to the nearest isometric direction index.
 lurek.tilemap.isoDirectionName(direction: integer) -> string -- Returns a human-readable name for an isometric direction index.
-lurek.tilemap.isoRotate(direction: integer, steps: integer) -> number -- Rotates an isometric direction index by a number of 90-degree steps.
+lurek.tilemap.isoRotate(direction: integer, steps: integer) -> integer -- Rotates an isometric direction index by a number of 90-degree steps.
 lurek.tilemap.loadTMX(xml: string) -> table -- Parses a TMX (Tiled XML) string and returns a table describing the map structure.
 lurek.tilemap.newAutoTileSheet(tileW: integer, tileH: integer, layout: string) -> LAutoTileSheet -- Creates an auto-tile sheet with a given tile size and layout.
 lurek.tilemap.newChunkMap([chunkSize]: integer) -> LChunkMap -- Creates a new infinite chunk-based tile map.
-lurek.tilemap.newIsoMap(width: number, height: number, tileW: number, tileH: number, levelHeight: number, [partCount]: number) -> LIsoMap -- Creates a new isometric map with the given dimensions and tile geometry.
+lurek.tilemap.newIsoMap(width: integer, height: integer, tileW: integer, tileH: integer, levelHeight: integer, [partCount]: integer) -> LIsoMap -- Creates a new isometric map with the given dimensions and tile geometry.
 lurek.tilemap.newLargeMapRenderer(tileW: integer, tileH: integer) -> LLargeMapRenderer -- Creates a chunk-based large-map renderer for efficient rendering of very large maps.
 lurek.tilemap.newMapBlock(width: integer, height: integer, [layers]: integer, [segmentSize]: integer) -> LMapBlock -- Creates a new procedural map block with the given dimensions.
-lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|number, segmentSizeOrHeight: number, [segmentSize]: number) -> LMapGen -- Creates a procedural map generator from a group and either a size preset or explicit dimensions.
+lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|integer, segmentSizeOrHeight: integer, [segmentSize]: integer) -> LMapGen -- Creates a procedural map generator from a group and either a size preset or explicit dimensions.
 lurek.tilemap.newMapGroup(name: string) -> LMapGroup -- Creates a new map group to hold blocks and generation scripts.
 lurek.tilemap.newMapScript() -> LMapScript -- Creates a new empty map-generation script.
 lurek.tilemap.newTileMap(tileWidth: integer, tileHeight: integer, [chunkSize]: integer) -> LTileMap -- Creates a new empty tilemap with the given tile dimensions.
-lurek.tilemap.newTileSet(firstGid: number, tileCount: number, columns: number, tileWidth: number, tileHeight: number, [spacing]: number, [margin]: number) -> LTileSet -- Creates a new tileset from atlas parameters.
+lurek.tilemap.newTileSet(firstGid: integer, tileCount: integer, columns: integer, tileWidth: integer, tileHeight: integer, [spacing]: integer, [margin]: integer) -> LTileSet -- Creates a new tileset from atlas parameters.
 lurek.tilemap.toScreenHex(q: integer, r: integer, size: number) -> number -- Converts axial hex coordinates to screen-space pixel position.
 lurek.tilemap.toScreenIso(tx: number, ty: number, tw: number, th: number) -> number -- Converts tile coordinates to screen-space position for isometric projection.
 ```
@@ -5632,13 +5632,13 @@ lurek.tilemap.toScreenIso(tx: number, ty: number, tw: number, th: number) -> num
 
 ```lua
 LAutoTileSheet:applyToTileSet(tileSet: LTileSet, typeName: string, [startGid]: integer) -- Writes the auto-tile bitmask-to-tile rules from this sheet into a tileset.
-LAutoTileSheet:getBitmaskForTile(tileId: integer) -> number -- Returns the bitmask associated with a tile in this auto-tile sheet.
+LAutoTileSheet:getBitmaskForTile(tileId: integer) -> integer -- Returns the bitmask associated with a tile in this auto-tile sheet.
 LAutoTileSheet:getLayout() -> string -- Returns the auto-tile layout type as a string.
-LAutoTileSheet:getQuad(tileId: integer) -> number -- Returns the source rectangle for a tile in the auto-tile sheet.
-LAutoTileSheet:getTileCount() -> number -- Returns the total number of tiles in this auto-tile sheet.
-LAutoTileSheet:getTileForBitmask(bitmask: integer) -> number -- Looks up which tile corresponds to a given bitmask value.
-LAutoTileSheet:getTileHeight() -> number -- Returns the height of each tile in the auto-tile sheet, in pixels.
-LAutoTileSheet:getTileWidth() -> number -- Returns the width of each tile in the auto-tile sheet, in pixels.
+LAutoTileSheet:getQuad(tileId: integer) -> integer -- Returns the source rectangle for a tile in the auto-tile sheet.
+LAutoTileSheet:getTileCount() -> integer -- Returns the total number of tiles in this auto-tile sheet.
+LAutoTileSheet:getTileForBitmask(bitmask: integer) -> integer -- Looks up which tile corresponds to a given bitmask value.
+LAutoTileSheet:getTileHeight() -> integer -- Returns the height of each tile in the auto-tile sheet, in pixels.
+LAutoTileSheet:getTileWidth() -> integer -- Returns the width of each tile in the auto-tile sheet, in pixels.
 LAutoTileSheet:type() -> string -- Returns the type name of this userdata.
 LAutoTileSheet:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5646,13 +5646,13 @@ LAutoTileSheet:typeOf(name: string) -> boolean -- Checks whether this object mat
 ### LChunkMap
 
 ```lua
-LChunkMap:chunkTileRange(cx: integer, cy: integer) -> number -- Returns the tile-coordinate range covered by a specific chunk.
+LChunkMap:chunkTileRange(cx: integer, cy: integer) -> integer -- Returns the tile-coordinate range covered by a specific chunk.
 LChunkMap:clearTile(x: integer, y: integer) -- Removes the tile at the given world-tile coordinate.
 LChunkMap:fillRect(x0: integer, y0: integer, x1: integer, y1: integer, gid: integer) -- Fills a rectangular region of tiles with a given GID.
 LChunkMap:getChunksInView(vx: number, vy: number, vw: number, vh: number, tw: number, th: number) -> table -- Returns chunk coordinates that overlap a viewport region, given tile dimensions.
-LChunkMap:getChunkSize() -> number -- Returns the size of each chunk in tiles per side.
+LChunkMap:getChunkSize() -> integer -- Returns the size of each chunk in tiles per side.
 LChunkMap:getLoadedChunks() -> table -- Returns a list of all currently loaded chunk coordinates.
-LChunkMap:getTile(x: integer, y: integer) -> number -- Returns the tile GID at the given world-tile coordinate.
+LChunkMap:getTile(x: integer, y: integer) -> integer -- Returns the tile GID at the given world-tile coordinate.
 LChunkMap:loadChunk(cx: integer, cy: integer) -- Loads a chunk into memory at the given chunk coordinates.
 LChunkMap:setTile(x: integer, y: integer, gid: integer) -- Sets the tile GID at the given world-tile coordinate.
 LChunkMap:type() -> string -- Returns the type name of this userdata.
@@ -5663,22 +5663,22 @@ LChunkMap:unloadChunk(cx: integer, cy: integer) -- Unloads a chunk from memory a
 ### LIsoMap
 
 ```lua
-LIsoMap:addLevel() -> number -- Adds a new vertical level to the isometric map and returns its index.
+LIsoMap:addLevel() -> integer -- Adds a new vertical level to the isometric map and returns its index.
 LIsoMap:fillLevel(z: integer, part: integer, gid: integer) -- Fills all tiles on a level for a given part with a single GID.
-LIsoMap:getHeight() -> number -- Returns the map height in tiles. This method is available to Lua scripts.
-LIsoMap:getLevelCount() -> number -- Returns the number of vertical levels in the isometric map.
-LIsoMap:getLevelHeight() -> number -- Returns the vertical pixel offset between levels.
-LIsoMap:getPartCount() -> number -- Returns the number of tile parts per cell.
-LIsoMap:getPartOrder() -> table -- Returns the rendering order of tile parts as an array of part indices.
-LIsoMap:getTileHeight() -> number -- Returns the height of an isometric tile in pixels.
-LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> number -- Returns the GID for a specific part of a tile at a given position and level.
-LIsoMap:getTileWidth() -> number -- Returns the width of an isometric tile in pixels.
-LIsoMap:getWidth() -> number -- Returns the map width in tiles. This method is available to Lua scripts.
+LIsoMap:getHeight() -> integer -- Returns the map height in tiles. This method is available to Lua scripts.
+LIsoMap:getLevelCount() -> integer -- Returns the number of vertical levels in the isometric map.
+LIsoMap:getLevelHeight() -> integer -- Returns the vertical pixel offset between levels.
+LIsoMap:getPartCount() -> integer -- Returns the number of tile parts per cell.
+LIsoMap:getPartOrder() -> integer[] -- Returns the rendering order of tile parts as an array of part indices.
+LIsoMap:getTileHeight() -> integer -- Returns the height of an isometric tile in pixels.
+LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> integer -- Returns the GID for a specific part of a tile at a given position and level.
+LIsoMap:getTileWidth() -> integer -- Returns the width of an isometric tile in pixels.
+LIsoMap:getWidth() -> integer -- Returns the map width in tiles. This method is available to Lua scripts.
 LIsoMap:isLevelVisible(z: integer) -> boolean -- Returns whether a vertical level is currently visible.
 LIsoMap:screenToTile(sx: number, sy: number) -> number -- Converts screen-space pixel coordinates to tile-grid coordinates (ignoring Z).
 LIsoMap:setLevelVisible(z: integer, visible: boolean) -- Sets whether a vertical level is drawn during rendering.
 LIsoMap:setOrigin(x: number, y: number) -- Sets the screen-space origin (top-left anchor) for isometric rendering.
-LIsoMap:setPartOrder(order: table) -> LuaValue -- Overrides the rendering order of tile parts.
+LIsoMap:setPartOrder(order: table) -- Overrides the rendering order of tile parts.
 LIsoMap:setTilePart(z: integer, x: integer, y: integer, part: integer, gid: integer) -- Sets the GID for a specific part of a tile at a given position and level.
 LIsoMap:tileToScreen(tx: number, ty: number, tz: number) -> number -- Converts tile-grid coordinates to screen-space pixel position.
 LIsoMap:type() -> string -- Returns the type name of this userdata.
@@ -5688,12 +5688,12 @@ LIsoMap:typeOf(name: string) -> boolean -- Checks whether this object matches th
 ### LLargeMapRenderer
 
 ```lua
-LLargeMapRenderer:getChunkSize() -> number -- Returns the current chunk size. This method is available to Lua scripts.
-LLargeMapRenderer:getMapSize() -> number -- Returns the map dimensions in tiles.
-LLargeMapRenderer:getTile(x: integer, y: integer) -> number -- Returns the tile GID at a given position.
-LLargeMapRenderer:getTilesetColumns() -> number -- Returns the tileset column count used for UV calculation.
-LLargeMapRenderer:getTotalChunks() -> number -- Returns the total number of chunks in the map.
-LLargeMapRenderer:getVisibleChunks() -> number -- Returns the number of chunks currently visible in the viewport.
+LLargeMapRenderer:getChunkSize() -> integer -- Returns the current chunk size. This method is available to Lua scripts.
+LLargeMapRenderer:getMapSize() -> integer -- Returns the map dimensions in tiles.
+LLargeMapRenderer:getTile(x: integer, y: integer) -> integer -- Returns the tile GID at a given position.
+LLargeMapRenderer:getTilesetColumns() -> integer -- Returns the tileset column count used for UV calculation.
+LLargeMapRenderer:getTotalChunks() -> integer -- Returns the total number of chunks in the map.
+LLargeMapRenderer:getVisibleChunks() -> integer -- Returns the number of chunks currently visible in the viewport.
 LLargeMapRenderer:invalidateAll() -- Marks all chunks as dirty, forcing a full rebuild on the next render.
 LLargeMapRenderer:invalidateChunk(cx: integer, cy: integer) -- Marks a specific chunk as dirty so it will be rebuilt on the next render.
 LLargeMapRenderer:isLodEnabled() -> boolean -- Returns whether LOD rendering is currently enabled.
@@ -5712,17 +5712,17 @@ LLargeMapRenderer:typeOf(name: string) -> boolean -- Checks whether this object 
 ### LMapBlock
 
 ```lua
-LMapBlock:getDimensions() -> number -- Returns both width and height of the block in tiles.
-LMapBlock:getHeight() -> number -- Returns the block height in tiles. This method is available to Lua scripts.
-LMapBlock:getHeightInSegments() -> number -- Returns the block height measured in segments.
-LMapBlock:getLayerCount() -> number -- Returns the number of tile layers in this block.
+LMapBlock:getDimensions() -> integer -- Returns both width and height of the block in tiles.
+LMapBlock:getHeight() -> integer -- Returns the block height in tiles. This method is available to Lua scripts.
+LMapBlock:getHeightInSegments() -> integer -- Returns the block height measured in segments.
+LMapBlock:getLayerCount() -> integer -- Returns the number of tile layers in this block.
 LMapBlock:getName() -> string -- Returns the block's name. This method is available to Lua scripts.
-LMapBlock:getSegmentSize() -> number -- Returns the segment size used for edge matching.
-LMapBlock:getSide(edge: string, segment: integer) -> number -- Returns the side ID for an edge segment.
-LMapBlock:getTile(layer: integer, x: integer, y: integer) -> number -- Returns the tile GID at a position within the block.
+LMapBlock:getSegmentSize() -> integer -- Returns the segment size used for edge matching.
+LMapBlock:getSide(edge: string, segment: integer) -> integer -- Returns the side ID for an edge segment.
+LMapBlock:getTile(layer: integer, x: integer, y: integer) -> integer -- Returns the tile GID at a position within the block.
 LMapBlock:getWeight() -> number -- Returns the current selection weight.
-LMapBlock:getWidth() -> number -- Returns the block width in tiles. This method is available to Lua scripts.
-LMapBlock:getWidthInSegments() -> number -- Returns the block width measured in segments.
+LMapBlock:getWidth() -> integer -- Returns the block width in tiles. This method is available to Lua scripts.
+LMapBlock:getWidthInSegments() -> integer -- Returns the block width measured in segments.
 LMapBlock:setName(name: string) -- Sets the block's name for identification during map generation.
 LMapBlock:setSide(edge: string, segment: integer, sideId: integer) -- Sets the side ID for an edge segment, used for edge matching in map generation.
 LMapBlock:setTile(layer: integer, x: integer, y: integer, gid: integer) -- Sets a tile GID at a position within the block.
@@ -5744,9 +5744,9 @@ LMapGen:typeOf(name: string) -> boolean -- Checks whether this object matches th
 ```lua
 LMapGroup:addBlock(block: LMapBlock) -- Adds a map block to this group for use in generation.
 LMapGroup:addScript(script: LMapScript) -- Attaches a map-generation script to this group.
-LMapGroup:getBlockCount() -> number -- Returns how many blocks are in this group.
+LMapGroup:getBlockCount() -> integer -- Returns how many blocks are in this group.
 LMapGroup:getName() -> string -- Returns the group name. This method is available to Lua scripts.
-LMapGroup:getScriptCount() -> number -- Returns how many scripts are attached to this group.
+LMapGroup:getScriptCount() -> integer -- Returns how many scripts are attached to this group.
 LMapGroup:removeBlock(idx: integer) -- Removes a block from the group by index.
 LMapGroup:type() -> string -- Returns the type name of this userdata.
 LMapGroup:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
@@ -5756,7 +5756,7 @@ LMapGroup:typeOf(name: string) -> boolean -- Checks whether this object matches 
 
 ```lua
 LMapScript:addStep(stepDef: table) -- Appends a generation step. The step table must have a `type` field and optional parameters.
-LMapScript:getStepCount() -> number -- Returns the number of generation steps in this script.
+LMapScript:getStepCount() -> integer -- Returns the number of generation steps in this script.
 LMapScript:type() -> string -- Returns the type name of this userdata.
 LMapScript:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 ```
@@ -5764,7 +5764,7 @@ LMapScript:typeOf(name: string) -> boolean -- Checks whether this object matches
 ### LTileMap
 
 ```lua
-LTileMap:addLayer(name: string, w: integer, h: integer) -> number -- Creates a new tile layer with the given name and dimensions.
+LTileMap:addLayer(name: string, w: integer, h: integer) -> integer -- Creates a new tile layer with the given name and dimensions.
 LTileMap:addTileSet(tileSet: LTileSet) -- Attaches a tileset to this map for tile rendering.
 LTileMap:applyAutoTile(layer: integer, typeName: string) -- Runs 4-bit auto-tiling on an entire layer, replacing tiles according to registered rules.
 LTileMap:applyAutoTile8(layer: integer, typeName: string) -- Runs 8-bit auto-tiling on an entire layer, considering diagonal neighbors.
@@ -5777,20 +5777,20 @@ LTileMap:fill(layer: integer, gid: integer) -- Fills every cell of a layer with 
 LTileMap:findTilesByGid(layer: integer, gid: integer) -> table -- Returns all positions on a layer that contain a specific GID.
 LTileMap:fireTileExit(gid: integer, entity: table, tx: integer, ty: integer) -- Manually fires the tile-exit callback for a specific GID and entity at a tile position.
 LTileMap:fireTileStep(gid: integer, entity: table, tx: integer, ty: integer) -- Manually fires the tile-step callback for a specific GID and entity at a tile position.
-LTileMap:getChunkSize() -> number -- Returns the chunk size used for internal tile storage.
+LTileMap:getChunkSize() -> integer -- Returns the chunk size used for internal tile storage.
 LTileMap:getLayerColor(idx: integer) -> number -- Returns the tint color of a layer as four RGBA components.
-LTileMap:getLayerCount() -> number -- Returns the total number of layers in this map.
+LTileMap:getLayerCount() -> integer -- Returns the total number of layers in this map.
 LTileMap:getLayerName(idx: integer) -> string -- Returns the name of a layer by index.
 LTileMap:getLayerOffset(idx: integer) -> number -- Returns the pixel offset of a layer.
 LTileMap:getLayerParallax(idx: integer) -> number -- Returns the parallax scroll factor of a layer.
 LTileMap:getLayerVisible(idx: integer) -> boolean -- Returns whether a layer is currently visible.
 LTileMap:getOrientation() -> string -- Returns the current map orientation as a string.
-LTileMap:getTile(layer: integer, x: integer, y: integer) -> number -- Returns the tile GID at a specific grid position on a layer.
-LTileMap:getTileDimensions() -> number -- Returns both tile width and height in pixels.
-LTileMap:getTileHeight() -> number -- Returns the height of a single tile in pixels for this map.
+LTileMap:getTile(layer: integer, x: integer, y: integer) -> integer -- Returns the tile GID at a specific grid position on a layer.
+LTileMap:getTileDimensions() -> integer -- Returns both tile width and height in pixels.
+LTileMap:getTileHeight() -> integer -- Returns the height of a single tile in pixels for this map.
 LTileMap:getTileSet(idx: integer) -> LTileSet -- Returns the tileset at the given index.
-LTileMap:getTileSetCount() -> number -- Returns how many tilesets are attached to this map.
-LTileMap:getTileWidth() -> number -- Returns the width of a single tile in pixels for this map.
+LTileMap:getTileSetCount() -> integer -- Returns how many tilesets are attached to this map.
+LTileMap:getTileWidth() -> integer -- Returns the width of a single tile in pixels for this map.
 LTileMap:getViewport() -> number -- Returns the current viewport rectangle, or nils if none is set.
 LTileMap:isSolid(layer: integer, x: integer, y: integer) -> boolean -- Checks whether the tile at a given position on a layer is solid.
 LTileMap:onTileEnter(gid: integer, func: function) -- Registers a callback invoked when an entity enters a tile with the given GID.
@@ -5809,32 +5809,32 @@ LTileMap:setViewport(x: number, y: number, w: number, h: number) -- Sets the vis
 LTileMap:sweepRect(layer: integer, x: number, y: number, w: number, h: number, dx: number, dy: number) -> number -- Performs a swept AABB collision test against solid tiles on a layer, returning the contact point and normal.
 LTileMap:tileToWorld(tx: integer, ty: integer) -> number -- Converts tile-grid coordinates to world-space pixel coordinates (top-left corner of the tile).
 LTileMap:tileTypeIndex(layer: integer) -> table -- Builds an index mapping each GID present on a layer to an array of `{x, y}` positions.
-LTileMap:toNavGrid(layer: integer, gids: table) -> table -- Converts a layer into a 2D boolean grid for pathfinding. Tiles with GIDs in the given list are marked walka...
+LTileMap:toNavGrid(layer: integer, gids: table) -> boolean[] -- Converts a layer into a 2D boolean grid for pathfinding. Tiles with GIDs in the given list are marked walka...
 LTileMap:type() -> string -- Returns the type name of this userdata.
 LTileMap:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
 LTileMap:update(dt: number) -- Advances tile animations by the given delta time.
-LTileMap:worldToTile(wx: number, wy: number) -> number -- Converts world-space pixel coordinates to tile-grid coordinates.
+LTileMap:worldToTile(wx: number, wy: number) -> integer -- Converts world-space pixel coordinates to tile-grid coordinates.
 ```
 
 ### LTileSet
 
 ```lua
 LTileSet:getAnimation(tileId: integer) -> table -- Returns the animation frames for a tile, or nil if none are set.
-LTileSet:getAutoTileId(typeName: string, bitmask: number) -> number -- Looks up the tile ID for a 4-bit auto-tile bitmask and type name.
-LTileSet:getAutoTileId8(typeName: string, bitmask: number) -> number -- Looks up the tile ID for an 8-bit auto-tile bitmask and type name.
-LTileSet:getColumns() -> number -- Returns the number of columns in the tileset atlas image.
-LTileSet:getFirstGid() -> number -- Returns the first global tile ID (GID) of this tileset.
-LTileSet:getMargin() -> number -- Returns the margin around the edge of the atlas image, in pixels.
+LTileSet:getAutoTileId(typeName: string, bitmask: integer) -> integer -- Looks up the tile ID for a 4-bit auto-tile bitmask and type name.
+LTileSet:getAutoTileId8(typeName: string, bitmask: integer) -> integer -- Looks up the tile ID for an 8-bit auto-tile bitmask and type name.
+LTileSet:getColumns() -> integer -- Returns the number of columns in the tileset atlas image.
+LTileSet:getFirstGid() -> integer -- Returns the first global tile ID (GID) of this tileset.
+LTileSet:getMargin() -> integer -- Returns the margin around the edge of the atlas image, in pixels.
 LTileSet:getQuad(tileId: integer) -> table -- Returns the source rectangle (UV quad) for a tile in the atlas.
-LTileSet:getSpacing() -> number -- Returns the spacing between tiles in the atlas image, in pixels.
-LTileSet:getTileCount() -> number -- Returns the total number of tiles defined in this tileset.
-LTileSet:getTileDimensions() -> number -- Returns both tile width and height in pixels.
-LTileSet:getTileHeight() -> number -- Returns the height of a single tile in pixels.
-LTileSet:getTileWidth() -> number -- Returns the width of a single tile in pixels.
+LTileSet:getSpacing() -> integer -- Returns the spacing between tiles in the atlas image, in pixels.
+LTileSet:getTileCount() -> integer -- Returns the total number of tiles defined in this tileset.
+LTileSet:getTileDimensions() -> integer -- Returns both tile width and height in pixels.
+LTileSet:getTileHeight() -> integer -- Returns the height of a single tile in pixels.
+LTileSet:getTileWidth() -> integer -- Returns the width of a single tile in pixels.
 LTileSet:isSolid(tileId: integer) -> boolean -- Checks whether a tile is marked as solid.
 LTileSet:setAnimation(tileId: integer, frames: table) -- Assigns an animation sequence to a tile. Each frame references another tile ID and a duration.
-LTileSet:setAutoTileRule(typeName: string, bitmask: number, tileId: integer) -- Registers a 4-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
-LTileSet:setAutoTileRule8(typeName: string, bitmask: number, tileId: integer) -- Registers an 8-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
+LTileSet:setAutoTileRule(typeName: string, bitmask: integer, tileId: integer) -- Registers a 4-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
+LTileSet:setAutoTileRule8(typeName: string, bitmask: integer, tileId: integer) -- Registers an 8-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
 LTileSet:setSolid(tileId: integer, solid: boolean) -- Marks a tile as solid or non-solid for collision queries.
 LTileSet:type() -> string -- Returns the type name of this userdata.
 LTileSet:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
@@ -5850,7 +5850,7 @@ lurek.timer.chain(steps: table) -> LScheduler -- Creates a scheduler pre-loaded 
 lurek.timer.getAverageDelta() -> number -- Returns the smoothed average delta time in seconds over a recent window of frames. More stable than getDelt...
 lurek.timer.getDelta() -> number -- Returns the time in seconds elapsed since the last frame. Use this to make movement and animations frame-ra...
 lurek.timer.getFPS() -> number -- Returns the current frames-per-second count. Useful for performance monitoring overlays and debug HUDs.
-lurek.timer.getFrameCount() -> number -- Returns the total number of frames rendered since the engine started.
+lurek.timer.getFrameCount() -> integer -- Returns the total number of frames rendered since the engine started.
 lurek.timer.getMicroTime() -> number -- Returns high-resolution elapsed time in seconds since engine start. Useful for precise benchmarking and pro...
 lurek.timer.getPhysicsDelta() -> number -- Returns the fixed timestep used for physics simulation in seconds. The default is typically 1/60.
 lurek.timer.getPhysicsMaxSteps() -> number -- Returns the maximum number of physics steps allowed per frame. Prevents the spiral of death when the game r...
@@ -5862,8 +5862,8 @@ lurek.timer.setPhysicsMaxSteps(n: integer) -- Sets the maximum number of physics
 lurek.timer.setSmoothingFactor(alpha: number) -- Sets the exponential smoothing factor used by getSmoothedDelta. Lower values produce smoother (more lagged)...
 lurek.timer.sleep(seconds: number) -- Blocks the current thread for the given number of seconds. Use sparingly — this halts the entire game loop....
 lurek.timer.step() -> number -- Advances the internal clock by one tick and returns the delta time for that tick. Typically called by the e...
-lurek.timer.tickRealTimers() -> number -- Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that f...
-lurek.timer.tickWaits() -> number -- Checks all pending waitSeconds and waitFrames coroutines, resumes any whose deadline or frame target has be...
+lurek.timer.tickRealTimers() -> integer -- Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that f...
+lurek.timer.tickWaits() -> integer -- Checks all pending waitSeconds and waitFrames coroutines, resumes any whose deadline or frame target has be...
 lurek.timer.waitFrames(frames: integer) -- Yields the current coroutine for the given number of frames. Must be called from within a coroutine. The co...
 lurek.timer.waitSeconds(seconds: number) -- Yields the current coroutine for the given number of real-time seconds. Must be called from within a corout...
 ```
@@ -5871,16 +5871,16 @@ lurek.timer.waitSeconds(seconds: number) -- Yields the current coroutine for the
 ### LScheduler
 
 ```lua
-LScheduler:after(delay: number, func: function) -> number -- Schedules a one-shot callback to fire after the given delay in seconds. Returns an event ID that can be use...
-LScheduler:afterFrames(n: integer, func: function) -> number -- Schedules a one-shot callback to fire after the given number of frames. Returns an event ID for management.
-LScheduler:afterNamed(name: string, delay: number, func: function) -> number -- Schedules a named one-shot callback after a delay in seconds. If a callback with the same name already exis...
+LScheduler:after(delay: number, func: function) -> integer -- Schedules a one-shot callback to fire after the given delay in seconds. Returns an event ID that can be use...
+LScheduler:afterFrames(n: integer, func: function) -> integer -- Schedules a one-shot callback to fire after the given number of frames. Returns an event ID for management.
+LScheduler:afterNamed(name: string, delay: number, func: function) -> integer -- Schedules a named one-shot callback after a delay in seconds. If a callback with the same name already exis...
 LScheduler:cancel(id: integer) -> boolean -- Cancels a scheduled event by its ID. Returns true if the event was found and removed, false if it did not e...
-LScheduler:cancelAll() -> number -- Cancels all scheduled events in this scheduler and frees their callbacks. Returns the number of events that...
+LScheduler:cancelAll() -> integer -- Cancels all scheduled events in this scheduler and frees their callbacks. Returns the number of events that...
 LScheduler:cancelNamed(name: string) -> boolean -- Cancels a named scheduled event. Returns true if the named event was found and removed.
-LScheduler:every(interval: number, func: function, [count]: integer) -> number -- Schedules a repeating callback that fires at a fixed interval in seconds. Pass a positive count to limit re...
-LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> number -- Schedules a repeating callback that fires every N frames. Pass a positive count to limit repetitions, or om...
-LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> number -- Schedules a named repeating callback at a fixed interval. If a callback with the same name already exists,...
-LScheduler:getCount() -> number -- Returns the total number of active scheduled events in this scheduler.
+LScheduler:every(interval: number, func: function, [count]: integer) -> integer -- Schedules a repeating callback that fires at a fixed interval in seconds. Pass a positive count to limit re...
+LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> integer -- Schedules a repeating callback that fires every N frames. Pass a positive count to limit repetitions, or om...
+LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> integer -- Schedules a named repeating callback at a fixed interval. If a callback with the same name already exists,...
+LScheduler:getCount() -> integer -- Returns the total number of active scheduled events in this scheduler.
 LScheduler:getInterval(id: integer) -> boolean -- Returns the interval duration in seconds for a repeating event. The first return value indicates whether th...
 LScheduler:getRemaining(id: integer) -> boolean -- Returns the remaining time in seconds before the event fires. The first return value indicates whether the...
 LScheduler:getRepeatCount(id: integer) -> boolean -- Returns the remaining repeat count for a repeating event. The first return value indicates whether the even...
@@ -5897,8 +5897,8 @@ LScheduler:setInterval(id: integer, interval: number) -> boolean -- Changes the 
 LScheduler:setTimeScale(scale: number) -- Sets the time scale multiplier for this scheduler. A value of 2.0 makes events fire twice as fast; 0.5 make...
 LScheduler:type() -> string -- Returns the type name of this object as a string.
 LScheduler:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name. Accepts "LScheduler" or "Object".
-LScheduler:update(dt: number) -> number -- Advances all time-based events by dt seconds, fires any callbacks whose delay has elapsed, and cleans up co...
-LScheduler:updateFrames() -> number -- Advances all frame-based events by one frame, fires any callbacks whose frame count has been reached, and c...
+LScheduler:update(dt: number) -> integer -- Advances all time-based events by dt seconds, fires any callbacks whose delay has elapsed, and cleans up co...
+LScheduler:updateFrames() -> integer -- Advances all frame-based events by one frame, fires any callbacks whose frame count has been reached, and c...
 ```
 
 ## lurek.tween
@@ -5909,7 +5909,7 @@ LScheduler:updateFrames() -> number -- Advances all frame-based events by one fr
 lurek.tween.cancelAll() -- Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine.
 lurek.tween.delay(seconds: number, [cb]: function) -> LTweenSequence -- Creates a one-shot delay. After the specified seconds elapse, the optional callback is invoked.
 lurek.tween.getActiveCount() -> number -- Returns the total number of currently active tweens, sequences, and parallels.
-lurek.tween.getEasingNames() -> table -- Returns an array of all available easing function names, including both built-in and custom-registered easi...
+lurek.tween.getEasingNames() -> string[] -- Returns an array of all available easing function names, including both built-in and custom-registered easi...
 lurek.tween.newState(duration: number, [easing]: string) -> LTweenState -- Creates a standalone tween state for manual interpolation. Useful when you need eased progress without auto...
 lurek.tween.parallel() -> LTweenParallel -- Creates a new empty parallel tween group. Add tweens with `:tween()` or `:add()`, then call `:start()` to r...
 lurek.tween.registerEasing(name: string, f: function) -- Registers a custom easing function by name. The function receives a progress value (0..1) and must return a...
@@ -5944,7 +5944,7 @@ LTween:await() -- Yields the current coroutine until this tween completes or is 
 LTween:cancel() -- Cancels this tween immediately, fires the onCancel callback if set, and resumes any coroutines waiting on it.
 LTween:getDuration() -> number -- Returns the total duration of this tween in seconds.
 LTween:getElapsed() -> number -- Returns the number of seconds that have elapsed since the tween started.
-LTween:getFields() -> table -- Returns an array of field names being tweened on the target table.
+LTween:getFields() -> string[] -- Returns an array of field names being tweened on the target table.
 LTween:getProgress() -> number -- Returns the eased progress of this tween as a value from 0.0 to 1.0.
 LTween:getRemaining() -> number -- Returns the number of seconds remaining until this tween completes.
 LTween:isActive() -> boolean -- Returns whether this tween is still running (not cancelled or completed).
@@ -6013,69 +6013,69 @@ lurek.ui.clearFocus() -- Clears keyboard focus from all widgets.
 lurek.ui.draw() -- Invokes custom draw callbacks for all widgets that have one registered.
 lurek.ui.drawToImage(w: integer, h: integer) -> LImageData -- Renders the entire UI to an image buffer.
 lurek.ui.dropOn(target: table|number) -> boolean -- Drops the currently dragged widget onto a target widget.
-lurek.ui.endDrag() -- Ends the current drag operation without dropping.
-lurek.ui.flushCache() -> table -- Flushes internal UI caches. This function is exposed to Lua scripts.
+lurek.ui.endDrag() -> integer -- Ends the current drag operation without dropping.
+lurek.ui.flushCache() -> boolean -- Flushes internal UI layout and render caches.
 lurek.ui.focusNext() -- Moves keyboard focus to the next focusable widget.
 lurek.ui.focusPrev() -- Moves keyboard focus to the previous focusable widget.
-lurek.ui.getActiveDrag() -> number -- Returns the widget index currently being dragged, or nil.
-lurek.ui.getFocus() -> number -- Returns the index of the currently focused widget, or nil.
-lurek.ui.getRoot() -> LPanel -- Returns the root panel widget. This function is exposed to Lua scripts.
+lurek.ui.getActiveDrag() -> integer -- Returns the widget index currently being dragged, or nil.
+lurek.ui.getFocus() -> integer -- Returns the index of the currently focused widget, or nil.
+lurek.ui.getRoot() -> LPanel -- Returns the root panel widget of the UI tree.
 lurek.ui.getTheme() -> boolean -- Returns whether a theme is currently set.
-lurek.ui.getToastCount() -> number -- Returns the number of active toast notifications.
-lurek.ui.getWidgetCount() -> number -- Returns the total number of widgets in the UI context.
+lurek.ui.getToastCount() -> integer -- Returns the number of active toast notifications.
+lurek.ui.getWidgetCount() -> integer -- Returns the total number of widgets in the UI context.
 lurek.ui.keypressed(key: string) -> boolean -- Delivers a key press event to the UI.
-lurek.ui.loadLayout(def: table) -> number -- Loads a UI layout from a Lua table definition.
-lurek.ui.loadLayoutFile(path: string) -> number -- Loads a UI layout from a TOML file. This function is exposed to Lua scripts.
+lurek.ui.loadLayout(def: table) -> integer -- Loads a UI layout from a Lua table definition.
+lurek.ui.loadLayoutFile(path: string) -> integer -- Loads a UI layout from a TOML layout file.
 lurek.ui.mousemoved(x: number, y: number) -> boolean -- Delivers a mouse move event to the UI.
 lurek.ui.mousepressed(x: number, y: number, [btn]: integer) -> boolean -- Delivers a mouse press event to the UI.
 lurek.ui.mousereleased(x: number, y: number, [btn]: integer) -> boolean -- Delivers a mouse release event to the UI.
-lurek.ui.newAccordion() -> LAccordion -- Creates a new accordion widget. This function is exposed to Lua scripts.
+lurek.ui.newAccordion() -> LAccordion -- Creates a new accordion widget with collapsible sections.
 lurek.ui.newAreaChart(opts: table) -> LAreaChart -- Creates a new area chart for data visualization.
 lurek.ui.newBadge([count]: integer) -> LBadge -- Creates a new badge widget for displaying counts.
 lurek.ui.newBarChart(opts: table) -> LBarChart -- Creates a new bar chart for data visualization.
-lurek.ui.newButton([text]: string) -> LButton -- Creates a new button widget. This function is exposed to Lua scripts.
-lurek.ui.newCheckbox([text]: string) -> LCheckbox -- Creates a new checkbox widget. This function is exposed to Lua scripts.
-lurek.ui.newColorPicker() -> LColorPicker -- Creates a new color picker widget. This function is exposed to Lua scripts.
+lurek.ui.newButton([text]: string) -> LButton -- Creates a new button widget with optional label text.
+lurek.ui.newCheckbox([text]: string) -> LCheckbox -- Creates a new checkbox widget with optional label.
+lurek.ui.newColorPicker() -> LColorPicker -- Creates a new color picker widget for color selection.
 lurek.ui.newComboBox() -> LComboBox -- Creates a new combo box (drop-down) widget.
 lurek.ui.newCustomWidget([config]: table) -> LUiWidget -- Creates a new custom widget with optional initial configuration.
-lurek.ui.newDialog([title]: string) -> LDialog -- Creates a new dialog widget. This function is exposed to Lua scripts.
+lurek.ui.newDialog([title]: string) -> LDialog -- Creates a new dialog widget with an optional title.
 lurek.ui.newDockPanel() -> LDockPanel -- Creates a new dock panel widget for docking child widgets to sides.
 lurek.ui.newImageWidget() -> LImageWidget -- Creates a new image display widget.
-lurek.ui.newLabel([text]: string) -> LLabel -- Creates a new label widget. This function is exposed to Lua scripts.
+lurek.ui.newLabel([text]: string) -> LLabel -- Creates a new label widget for displaying text.
 lurek.ui.newLayout([direction]: string) -> LLayout -- Creates a new layout container widget.
 lurek.ui.newLineChart(opts: table) -> LLineChart -- Creates a new line chart for data visualization.
-lurek.ui.newList() -> LListBox -- Creates a new list box widget. This function is exposed to Lua scripts.
-lurek.ui.newMenuBar() -> LMenuBar -- Creates a new menu bar widget. This function is exposed to Lua scripts.
-lurek.ui.newMenuItem([text]: string) -> LMenuItem -- Creates a new menu item widget. This function is exposed to Lua scripts.
+lurek.ui.newList() -> LListBox -- Creates a new list box widget for item selection.
+lurek.ui.newMenuBar() -> LMenuBar -- Creates a new menu bar widget for top-level menus.
+lurek.ui.newMenuItem([text]: string) -> LMenuItem -- Creates a new menu item widget with optional text.
 lurek.ui.newNinePatch() -> LNinePatch -- Creates a new nine-patch widget for scalable bordered images.
 lurek.ui.newPanel() -> LPanel -- Creates a new panel widget (container).
 lurek.ui.newPieChart(opts: table) -> LPieChart -- Creates a new pie chart for data visualization.
-lurek.ui.newProgressBar([min]: number, [max]: number) -> LProgressBar -- Creates a new progress bar widget. This function is exposed to Lua scripts.
-lurek.ui.newRadioButton([text]: string, [group]: string) -> LRadioButton -- Creates a new radio button widget. This function is exposed to Lua scripts.
+lurek.ui.newProgressBar([min]: number, [max]: number) -> LProgressBar -- Creates a new progress bar widget with min and max.
+lurek.ui.newRadioButton([text]: string, [group]: string) -> LRadioButton -- Creates a new radio button widget in a named group.
 lurek.ui.newScatterPlot(opts: table) -> LScatterPlot -- Creates a new scatter plot for data visualization.
-lurek.ui.newScrollBar([vertical]: boolean) -> LScrollBar -- Creates a new scroll bar widget. This function is exposed to Lua scripts.
+lurek.ui.newScrollBar([vertical]: boolean) -> LScrollBar -- Creates a new scroll bar widget for content scrolling.
 lurek.ui.newScrollPanel() -> LScrollPanel -- Creates a new scrollable panel widget.
-lurek.ui.newSeparator([vertical]: boolean) -> LSeparator -- Creates a new separator widget. This function is exposed to Lua scripts.
-lurek.ui.newSlider([min]: number, [max]: number) -> LSlider -- Creates a new slider widget. This function is exposed to Lua scripts.
+lurek.ui.newSeparator([vertical]: boolean) -> LSeparator -- Creates a new separator widget for visual division.
+lurek.ui.newSlider([min]: number, [max]: number) -> LSlider -- Creates a new slider widget with adjustable range.
 lurek.ui.newSpacer([w]: number, [h]: number) -> LSpacer -- Creates a new spacer widget for spacing between other widgets.
 lurek.ui.newSpinBox([min]: number, [max]: number) -> LSpinBox -- Creates a new spin box (numeric stepper) widget.
 lurek.ui.newSplitPanel([orientation]: string) -> LSplitPanel -- Creates a new split panel widget with two resizable sub-panels.
-lurek.ui.newStatusBar() -> LStatusBar -- Creates a new status bar widget. This function is exposed to Lua scripts.
+lurek.ui.newStatusBar() -> LStatusBar -- Creates a new status bar widget for app-level info.
 lurek.ui.newSwitch([on]: boolean) -> LSwitch -- Creates a new toggle switch widget.
-lurek.ui.newTabBar() -> LTabBar -- Creates a new tab bar widget. This function is exposed to Lua scripts.
+lurek.ui.newTabBar() -> LTabBar -- Creates a new tab bar widget for tabbed navigation.
 lurek.ui.newTable() -> LGuiTable -- Creates a new table widget for tabular data display.
-lurek.ui.newTextInput() -> LTextInput -- Creates a new text input widget. This function is exposed to Lua scripts.
+lurek.ui.newTextInput() -> LTextInput -- Creates a new text input widget for user entry.
 lurek.ui.newTheme() -> LTheme -- Creates a new UI theme for styling widgets.
 lurek.ui.newToast([message]: string, [duration]: number) -> LToast -- Creates a new toast notification widget.
-lurek.ui.newToolbar([orientation]: string) -> LToolbar -- Creates a new toolbar widget. This function is exposed to Lua scripts.
+lurek.ui.newToolbar([orientation]: string) -> LToolbar -- Creates a new toolbar widget for action buttons.
 lurek.ui.newTooltipPanel([text]: string) -> LTooltipPanel -- Creates a new tooltip panel widget.
-lurek.ui.newTreeView() -> LTreeView -- Creates a new tree view widget. This function is exposed to Lua scripts.
-lurek.ui.newWindow([title]: string) -> LGuiWindow -- Creates a new GUI window widget. This function is exposed to Lua scripts.
+lurek.ui.newTreeView() -> LTreeView -- Creates a new tree view widget for hierarchical data.
+lurek.ui.newWindow([title]: string) -> LGuiWindow -- Creates a new GUI window widget with an optional title.
 lurek.ui.parseWidgetState(state: string) -> string -- Validates and normalizes a widget state string.
-lurek.ui.renderToImage(width: integer, height: integer, path: string) -- Renders the UI to a PNG file. This function is exposed to Lua scripts.
+lurek.ui.renderToImage(width: integer, height: integer, path: string) -- Renders the entire UI to a PNG image file.
 lurek.ui.setDefaultTheme() -- Applies the built-in default theme to the UI context.
 lurek.ui.setFocus([widget]: table) -- Sets keyboard focus to a widget, or clears focus if nil.
-lurek.ui.setTheme(theme_ud: LTheme) -- Applies a theme to the UI context. This function is exposed to Lua scripts.
+lurek.ui.setTheme(theme_ud: LTheme) -- Applies a theme to the entire UI context.
 lurek.ui.setViewport(w: number, h: number) -- Sets the viewport size for the UI context.
 lurek.ui.textinput(text: string) -> boolean -- Delivers a text input event to the UI.
 lurek.ui.update(dt: number) -- Updates the UI context and dispatches pending events to callbacks.
@@ -6087,7 +6087,7 @@ lurek.ui.wheelmoved(x: number, y: number) -> boolean -- Delivers a mouse wheel e
 
 ```lua
 LAccordion:addSection(self: LAccordion, title: string, [content_idx]: integer) -- Adds a collapsible section to this accordion.
-LAccordion:getSectionCount(self: LAccordion) -> number -- Returns the number of sections in this accordion.
+LAccordion:getSectionCount(self: LAccordion) -> integer -- Returns the number of sections in this accordion.
 LAccordion:getSectionTitle(self: LAccordion, section_idx: integer) -> string -- Returns the title of an accordion section by its 1-based index.
 LAccordion:isExclusive(self: LAccordion) -> boolean -- Returns whether this accordion is in exclusive mode (only one section open at a time).
 LAccordion:isSectionExpanded(self: LAccordion, section_idx: integer) -> boolean -- Returns whether an accordion section is expanded.
@@ -6108,7 +6108,7 @@ LAreaChart:typeOf(name: string) -> boolean -- Checks whether this object matches
 ### LBadge
 
 ```lua
-LBadge:getCount(self: LBadge) -> number -- Returns the current notification count of this badge.
+LBadge:getCount(self: LBadge) -> integer -- Returns the current notification count of this badge.
 LBadge:getDisplayText(self: LBadge) -> string -- Returns the formatted display text of this badge (e.g. "99+" when count exceeds the maximum).
 LBadge:setCount(self: LBadge, count: integer) -- Sets the notification count displayed by this badge.
 ```
@@ -6157,8 +6157,8 @@ LColorPicker:setShowAlpha(self: LColorPicker, v: boolean) -- Sets whether the al
 LComboBox:addItem(self: LComboBox, text: string) -- Appends a new text item to this combo box's dropdown list.
 LComboBox:clearItems(self: LComboBox) -- Removes all items from this combo box.
 LComboBox:getItem(self: LComboBox, index: integer) -> string -- Returns the text of the item at the given 1-based index.
-LComboBox:getItemCount(self: LComboBox) -> number -- Returns the number of items in this combo box.
-LComboBox:getSelectedIndex(self: LComboBox) -> number -- Returns the 1-based index of the currently selected item, or 0 if none is selected.
+LComboBox:getItemCount(self: LComboBox) -> integer -- Returns the number of items in this combo box.
+LComboBox:getSelectedIndex(self: LComboBox) -> integer -- Returns the 1-based index of the currently selected item, or 0 if none is selected.
 LComboBox:getSelectedItem(self: LComboBox) -> string -- Returns the text of the currently selected item, or nil if none is selected.
 LComboBox:removeItem(self: LComboBox, index: integer) -> boolean -- Removes the item at the given 1-based index from this combo box.
 LComboBox:setSelectedIndex(self: LComboBox, index: integer) -- Sets the selected item by 1-based index.
@@ -6167,24 +6167,24 @@ LComboBox:setSelectedIndex(self: LComboBox, index: integer) -- Sets the selected
 ### LDialog
 
 ```lua
-LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number -- Adds a footer button to this dialog and returns its 1-based index.
+LDialog:addButton(self: LDialog, text: string, [cb]: function) -> integer -- Adds a footer button to this dialog and returns its 1-based index.
 LDialog:close(self: LDialog) -- Closes this dialog and fires the onClose callback if it was open.
-LDialog:getContent(self: LDialog) -> number -- Returns the widget index of this dialog's content, or nil if not set.
+LDialog:getContent(self: LDialog) -> integer -- Returns the widget index of this dialog's content, or nil if not set.
 LDialog:getTitle(self: LDialog) -> string -- Returns the title text of this dialog.
 LDialog:isModal(self: LDialog) -> boolean -- Returns whether this dialog is modal (blocks interaction with other widgets).
 LDialog:isOpen(self: LDialog) -> boolean -- Returns whether this dialog is currently open and visible.
 LDialog:open(self: LDialog) -- Opens this dialog, making it visible.
 LDialog:setContent(self: LDialog, [content_idx]: integer) -- Sets the content widget for this dialog.
-LDialog:setModal(self: LDialog, v: boolean) -- Sets whether this dialog is modal. This method is available to Lua scripts.
+LDialog:setModal(self: LDialog, v: boolean) -- Sets whether this dialog widget is modal.
 LDialog:setOnClose(self: LDialog, f: function) -- Registers a callback invoked when this dialog is closed.
-LDialog:setTitle(self: LDialog, title: string) -- Sets the title text of this dialog. This method is available to Lua scripts.
+LDialog:setTitle(self: LDialog, title: string) -- Sets the title text of this dialog widget.
 ```
 
 ### LDockPanel
 
 ```lua
 LDockPanel:dock(self: LDockPanel, child_idx: integer, side: string) -- Docks a child widget to the specified side of this dock panel.
-LDockPanel:getDockedCount(self: LDockPanel) -> number -- Returns the number of widgets docked in this dock panel.
+LDockPanel:getDockedCount(self: LDockPanel) -> integer -- Returns the number of widgets docked in this dock panel.
 LDockPanel:getSplitSize(self: LDockPanel, side: string) -> number -- Returns the size configured for a dock panel side region.
 LDockPanel:setSplitSize(self: LDockPanel, side: string, size: number) -- Sets the size of a dock panel side region.
 LDockPanel:undock(self: LDockPanel, child_idx: integer) -- Removes a child widget from this dock panel.
@@ -6194,11 +6194,11 @@ LDockPanel:undock(self: LDockPanel, child_idx: integer) -- Removes a child widge
 
 ```lua
 LGuiTable:addColumn(self: LGuiTable, header: string, [width]: number) -- Adds a new column to this table widget.
-LGuiTable:addRow(self: LGuiTable, cells: table) -- Adds a row to this table widget. This method is available to Lua scripts.
+LGuiTable:addRow(self: LGuiTable, cells: table) -- Adds a row of data to this table widget.
 LGuiTable:getCell(self: LGuiTable, row: integer, col: integer) -> string -- Returns the text of a cell at the given 1-based row and column.
-LGuiTable:getColumnCount(self: LGuiTable) -> number -- Returns the number of columns in this table widget.
-LGuiTable:getRowCount(self: LGuiTable) -> number -- Returns the number of rows in this table widget.
-LGuiTable:getSelectedRow(self: LGuiTable) -> number -- Returns the 1-based index of the currently selected row, or nil.
+LGuiTable:getColumnCount(self: LGuiTable) -> integer -- Returns the number of columns in this table widget.
+LGuiTable:getRowCount(self: LGuiTable) -> integer -- Returns the number of rows in this table widget.
+LGuiTable:getSelectedRow(self: LGuiTable) -> integer -- Returns the 1-based index of the currently selected row, or nil.
 LGuiTable:isSortable(self: LGuiTable) -> boolean -- Returns whether columns in this table can be sorted by clicking headers.
 LGuiTable:setCell(self: LGuiTable, row: integer, col: integer, text: string) -- Sets the text of a cell at the given 1-based row and column.
 LGuiTable:setOnSelect(self: LGuiTable, f: function) -- Registers a callback invoked when a table row is selected.
@@ -6269,8 +6269,8 @@ LLineChart:typeOf(name: string) -> boolean -- Checks whether this object matches
 LListBox:addItem(self: LListBox, text: string) -- Appends a new text item to this list box.
 LListBox:clearItems(self: LListBox) -- Removes all items from this list box.
 LListBox:getItem(self: LListBox, index: integer) -> string -- Returns the text of the item at the given 1-based index.
-LListBox:getItemCount(self: LListBox) -> number -- Returns the number of items in this list box.
-LListBox:getSelectedIndex(self: LListBox) -> number -- Returns the 1-based index of the currently selected item, or 0 if none.
+LListBox:getItemCount(self: LListBox) -> integer -- Returns the number of items in this list box.
+LListBox:getSelectedIndex(self: LListBox) -> integer -- Returns the 1-based index of the currently selected item, or 0 if none.
 LListBox:removeItem(self: LListBox, index: integer) -- Removes the item at the given 1-based index from this list box.
 LListBox:setItemHeight(self: LListBox, h: number) -- Sets the pixel height of each item row in this list box.
 LListBox:setSelectedIndex(self: LListBox, index: integer) -- Sets the selected item by 1-based index.
@@ -6280,8 +6280,8 @@ LListBox:setSelectedIndex(self: LListBox, index: integer) -- Sets the selected i
 
 ```lua
 LMenuBar:addMenu(self: LMenuBar, menu_idx: integer) -- Adds a menu (by its widget index) to this menu bar.
-LMenuBar:getMenuCount(self: LMenuBar) -> number -- Returns the number of menus in this menu bar.
-LMenuBar:getMenus(self: LMenuBar) -> table -- Returns a table of widget indices for all menus in this menu bar.
+LMenuBar:getMenuCount(self: LMenuBar) -> integer -- Returns the number of menus in this menu bar.
+LMenuBar:getMenus(self: LMenuBar) -> integer[] -- Returns a table of widget indices for all menus in this menu bar.
 LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean -- Removes a menu from this menu bar by its widget index.
 ```
 
@@ -6290,7 +6290,7 @@ LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean -- Removes a m
 ```lua
 LMenuItem:addSubItem(self: LMenuItem, child_idx: integer) -- Adds a sub-item to this menu item for building nested menus.
 LMenuItem:getShortcut(self: LMenuItem) -> string -- Returns the keyboard shortcut string associated with this menu item.
-LMenuItem:getSubItems(self: LMenuItem) -> table -- Returns a table of widget indices for all sub-items of this menu item.
+LMenuItem:getSubItems(self: LMenuItem) -> integer[] -- Returns a table of widget indices for all sub-items of this menu item.
 LMenuItem:getText(self: LMenuItem) -> string -- Returns the display text of this menu item.
 LMenuItem:isChecked(self: LMenuItem) -> boolean -- Returns whether this menu item is checked (for checkable menu items).
 LMenuItem:setChecked(self: LMenuItem, v: boolean) -- Sets the checked state of this menu item.
@@ -6302,8 +6302,8 @@ LMenuItem:setText(self: LMenuItem, text: string) -- Sets the display text of thi
 ### LNinePatch
 
 ```lua
-LNinePatch:getImageDimensions(self: LNinePatch) -> number, number -- Returns the original image dimensions of this nine-patch.
-LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number -- Returns the border insets of this nine-patch.
+LNinePatch:getImageDimensions(self: LNinePatch) -> integer, integer -- Returns the original image dimensions of this nine-patch.
+LNinePatch:getInsets(self: LNinePatch) -> integer, integer, integer, integer -- Returns the border insets of this nine-patch.
 LNinePatch:getSlices(self: LNinePatch) -> table -- Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
 LNinePatch:setImageDimensions(self: LNinePatch, w: integer, h: integer) -- Sets the original image dimensions used for nine-patch slice calculations.
 LNinePatch:setInsets(self: LNinePatch, left: integer, top: integer, right: integer, bottom: integer) -- Sets the border insets defining the stretchable center region of the nine-patch image.
@@ -6320,7 +6320,7 @@ LPanel:setTitle(self: LPanel, title: string) -- Sets the title text displayed on
 ### LPieChart
 
 ```lua
-LPieChart:addSegment(label: string, value: number, r: number, g: number, b: number) -- Adds a segment to this pie chart. This method is available to Lua scripts.
+LPieChart:addSegment(label: string, value: number, r: number, g: number, b: number) -- Adds a labeled segment to this pie chart widget.
 LPieChart:drawToImage(target: LImageData) -- Renders this pie chart to an image buffer.
 LPieChart:type() -> string -- Returns the type name of this object.
 LPieChart:typeOf(name: string) -> boolean -- Checks whether this object matches the given type name.
@@ -6419,10 +6419,10 @@ LSpinBox:setValue(self: LSpinBox, v: number) -- Sets the numeric value of this s
 ### LSplitPanel
 
 ```lua
-LSplitPanel:getFirstChild(self: LSplitPanel) -> number -- Returns the widget index of the first (left/top) child panel.
+LSplitPanel:getFirstChild(self: LSplitPanel) -> integer -- Returns the widget index of the first (left/top) child panel.
 LSplitPanel:getMinPanelSize(self: LSplitPanel) -> number -- Returns the minimum pixel size of each split sub-panel.
 LSplitPanel:getOrientation(self: LSplitPanel) -> string -- Returns the orientation of this split panel ("horizontal" or "vertical").
-LSplitPanel:getSecondChild(self: LSplitPanel) -> number -- Returns the widget index of the second (right/bottom) child panel.
+LSplitPanel:getSecondChild(self: LSplitPanel) -> integer -- Returns the widget index of the second (right/bottom) child panel.
 LSplitPanel:getSplitPosition(self: LSplitPanel) -> number -- Returns the split position as a fraction (0.0 to 1.0) of the panel's total size.
 LSplitPanel:setFirstChild(self: LSplitPanel, child_idx: integer) -- Sets the widget index for the first (left/top) panel.
 LSplitPanel:setMinPanelSize(self: LSplitPanel, v: number) -- Sets the minimum pixel size of each split sub-panel.
@@ -6434,12 +6434,12 @@ LSplitPanel:setSplitPosition(self: LSplitPanel, v: number) -- Sets the split pos
 ### LStatusBar
 
 ```lua
-LStatusBar:addSection(self: LStatusBar, text: string, [width]: number) -- Adds a section to this status bar. This method is available to Lua scripts.
-LStatusBar:getSectionCount(self: LStatusBar) -> number -- Returns the number of sections in this status bar.
+LStatusBar:addSection(self: LStatusBar, text: string, [width]: number) -- Adds a labeled section to this status bar.
+LStatusBar:getSectionCount(self: LStatusBar) -> integer -- Returns the number of sections in this status bar.
 LStatusBar:getSectionText(self: LStatusBar, section_idx: integer) -> string -- Returns the text of a status bar section by its 1-based index.
 LStatusBar:setSectionCount(self: LStatusBar, count: integer) -- Sets the number of sections, truncating or adding empty sections as needed.
 LStatusBar:setSectionText(self: LStatusBar, section_idx: integer, text: string) -- Sets the text of a status bar section by its 1-based index.
-LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any) -- Associates a widget with a status bar section (reserved for future use).
+LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, [widget]: table) -- Associates a widget with a status bar section (reserved for future use).
 ```
 
 ### LSwitch
@@ -6454,9 +6454,9 @@ LSwitch:toggle(self: LSwitch) -- Toggles this switch between on and off states.
 
 ```lua
 LTabBar:addTab(self: LTabBar, label: string) -- Adds a new tab with the given label to this tab bar.
-LTabBar:getActiveTab(self: LTabBar) -> number -- Returns the 1-based index of the currently active tab.
+LTabBar:getActiveTab(self: LTabBar) -> integer -- Returns the 1-based index of the currently active tab.
 LTabBar:getTab(self: LTabBar, index: integer) -> string -- Returns the label of the tab at the given 1-based index.
-LTabBar:getTabCount(self: LTabBar) -> number -- Returns the total number of tabs. This method is available to Lua scripts.
+LTabBar:getTabCount(self: LTabBar) -> integer -- Returns the total number of tabs in this tab bar.
 LTabBar:removeTab(self: LTabBar, index: integer) -> boolean -- Removes the tab at the given 1-based index.
 LTabBar:setActiveTab(self: LTabBar, index: integer) -- Sets the active (selected) tab by 1-based index.
 ```
@@ -6464,7 +6464,7 @@ LTabBar:setActiveTab(self: LTabBar, index: integer) -- Sets the active (selected
 ### LTextInput
 
 ```lua
-LTextInput:getCursorPosition(self: LTextInput) -> number -- Returns the current cursor position (character index) within the text input.
+LTextInput:getCursorPosition(self: LTextInput) -> integer -- Returns the current cursor position (character index) within the text input.
 LTextInput:getPlaceholder(self: LTextInput) -> string -- Returns the placeholder text of this text input.
 LTextInput:getText(self: LTextInput) -> string -- Returns the current text content of this text input field.
 LTextInput:isFocused(self: LTextInput) -> boolean -- Returns whether this text input currently has keyboard focus.
@@ -6495,7 +6495,7 @@ LToast:setMessage(self: LToast, msg: string) -- Sets the message text displayed 
 ### LToolbar
 
 ```lua
-LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number -- Adds a new button to this toolbar and returns its 1-based index.
+LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> integer -- Adds a new button to this toolbar and returns its 1-based index.
 LToolbar:addSeparator(self: LToolbar) -- Adds a visual separator to this toolbar.
 LToolbar:addSpacer(self: LToolbar, [_size]: number) -- Adds a flexible spacer to this toolbar.
 LToolbar:getButton(self: LToolbar, id: string) -> table -- Returns a table describing the toolbar button with the given ID.
@@ -6510,35 +6510,35 @@ LToolbar:setOrientation(self: LToolbar, v: string) -- Sets the toolbar orientati
 
 ```lua
 LTooltipPanel:getDelay(self: LTooltipPanel) -> number -- Returns the delay in seconds before this tooltip appears.
-LTooltipPanel:getTarget(self: LTooltipPanel) -> number -- Returns the widget index that this tooltip is attached to.
-LTooltipPanel:getText(self: LTooltipPanel) -> string -- Returns the tooltip display text. This method is available to Lua scripts.
+LTooltipPanel:getTarget(self: LTooltipPanel) -> integer -- Returns the widget index that this tooltip is attached to.
+LTooltipPanel:getText(self: LTooltipPanel) -> string -- Returns the current tooltip display text.
 LTooltipPanel:setDelay(self: LTooltipPanel, v: number) -- Sets the delay in seconds before this tooltip appears.
 LTooltipPanel:setTarget(self: LTooltipPanel, [target]: integer) -- Sets the widget index that this tooltip is attached to.
-LTooltipPanel:setText(self: LTooltipPanel, text: string) -- Sets the tooltip display text. This method is available to Lua scripts.
+LTooltipPanel:setText(self: LTooltipPanel, text: string) -- Sets the tooltip panel display text content.
 ```
 
 ### LTreeView
 
 ```lua
-LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer -- Adds node on this LTreeView object.
-LTreeView:clearNodes(self: LTreeView) -- Clears nodes on this LTreeView object.
+LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer -- Adds a new node to this tree view, optionally under a parent node.
+LTreeView:clearNodes(self: LTreeView) -- Removes all nodes from this tree view.
 LTreeView:collapseAll(self: LTreeView) -- Collapses all nodes in this tree view.
 LTreeView:collapseNode(self: LTreeView, index: integer) -> boolean -- Collapses the node at the given 1-based index to hide its children.
 LTreeView:expandAll(self: LTreeView) -- Expands all nodes in this tree view.
-LTreeView:expandNode(self: LTreeView, index: integer) -> boolean -- Expand node on this LTreeView object.
-LTreeView:getChildNodes(self: LTreeView, index: integer) -> table -- Returns a table of 1-based child node indices for the node at the given index.
-LTreeView:getNodeCount(self: LTreeView) -> table -- Returns the node count on this LTreeView object.
-LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number -- Returns the nesting depth of the node at the given index (0 for root nodes).
-LTreeView:getNodeText(self: LTreeView, index: integer) -> table -- Returns the node text on this LTreeView object.
-LTreeView:getParentNode(self: LTreeView, index: integer) -> number -- Returns the 1-based index of the parent of the node at the given index.
-LTreeView:getSelectedNode(self: LTreeView) -> number -- Returns the 1-based index of the currently selected node.
-LTreeView:isExpanded(self: LTreeView, index: integer) -> table -- Returns true if expanded on this LTreeView object.
+LTreeView:expandNode(self: LTreeView, index: integer) -> boolean -- Expands the node at the given 1-based index to show its children.
+LTreeView:getChildNodes(self: LTreeView, index: integer) -> integer[] -- Returns a table of 1-based child node indices for the node at the given index.
+LTreeView:getNodeCount(self: LTreeView) -> integer -- Returns the total number of nodes in this tree view.
+LTreeView:getNodeDepth(self: LTreeView, index: integer) -> integer -- Returns the nesting depth of the node at the given index (0 for root nodes).
+LTreeView:getNodeText(self: LTreeView, index: integer) -> string -- Returns the text of the node at the given 1-based index.
+LTreeView:getParentNode(self: LTreeView, index: integer) -> integer -- Returns the 1-based index of the parent of the node at the given index.
+LTreeView:getSelectedNode(self: LTreeView) -> integer -- Returns the 1-based index of the currently selected node.
+LTreeView:isExpanded(self: LTreeView, index: integer) -> boolean -- Returns whether the node at the given 1-based index is currently expanded.
 LTreeView:isNodeExpanded(self: LTreeView, index: integer) -> boolean -- Returns whether the node at the given 1-based index is expanded. Returns nil if the index is invalid.
-LTreeView:removeNode(self: LTreeView, index: integer) -> boolean -- Removes node on this LTreeView object.
-LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean -- Sets the node icon on this LTreeView object.
-LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean -- Sets the node text on this LTreeView object.
+LTreeView:removeNode(self: LTreeView, index: integer) -> boolean -- Removes the node at the given 1-based index from this tree view.
+LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean -- Sets the icon of the node at the given 1-based index.
+LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean -- Sets the text of the node at the given 1-based index.
 LTreeView:setSelectedNode(self: LTreeView, index: integer) -> boolean -- Sets the selected node by 1-based index.
-LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean -- Toggle node on this LTreeView object.
+LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean -- Toggles the expanded/collapsed state of the node at the given 1-based index.
 ```
 
 ### LUiWidget
@@ -6549,7 +6549,7 @@ LUiWidget:animateAlpha(self: LUiWidget, target: number, [duration]: number, [hid
 LUiWidget:animatePosition(self: LUiWidget, x: number, y: number, [duration]: number) -> table -- Smoothly animates this widget's position toward the target coordinates.
 LUiWidget:attachToEntity(self: LUiWidget, entity_id: integer) -- Attaches this widget to a game entity so it follows the entity's position on screen.
 LUiWidget:bind(self: LUiWidget, key: string) -- Binds this widget to a data key for use with update_bindings.
-LUiWidget:cancelAnimations(self: LUiWidget) -- Cancels all active animations on this widget, leaving it at its current state.
+LUiWidget:cancelAnimations(self: LUiWidget) -> boolean -- Cancels all active animations on this widget, leaving it at its current state.
 LUiWidget:clearAnchor(self: LUiWidget) -- Removes all anchor constraints from this widget.
 LUiWidget:containsPoint(self: LUiWidget, x: number, y: number) -> boolean -- Tests whether the given screen-space point is inside this widget's bounds.
 LUiWidget:detachFromEntity(self: LUiWidget) -- Detaches this widget from any previously attached entity.
@@ -6557,7 +6557,7 @@ LUiWidget:fadeIn(self: LUiWidget) -- Instantly makes this widget fully opaque an
 LUiWidget:fadeOut(self: LUiWidget) -- Instantly makes this widget fully transparent and hidden.
 LUiWidget:findById(self: LUiWidget, id: string) -> LWidget -- Searches this widget's subtree for a child with the given ID.
 LUiWidget:getAlpha(self: LUiWidget) -> number -- Returns the current opacity of this widget.
-LUiWidget:getChildCount(self: LUiWidget) -> number -- Returns the number of direct child widgets attached to this widget.
+LUiWidget:getChildCount(self: LUiWidget) -> integer -- Returns the number of direct child widgets attached to this widget.
 LUiWidget:getChildren(self: LUiWidget) -> table -- Returns a table of lightweight child widget references, each containing an _idx field.
 LUiWidget:getFlexGrow(self: LUiWidget) -> number -- Returns the flex-grow factor of this widget.
 LUiWidget:getFlexShrink(self: LUiWidget) -> number -- Returns the flex-shrink factor of this widget.
@@ -6571,13 +6571,13 @@ LUiWidget:getRect(self: LUiWidget) -> number, number, number, number -- Returns 
 LUiWidget:getSize(self: LUiWidget) -> number, number -- Returns the width and height of this widget.
 LUiWidget:getState(self: LUiWidget) -> string -- Returns the current interaction state of this widget (e.g. "normal", "hovered", "pressed", "disabled").
 LUiWidget:getTooltip(self: LUiWidget) -> string -- Returns the tooltip text of this widget.
-LUiWidget:getZOrder(self: LUiWidget) -> number -- Returns the z-order (draw priority) of this widget.
+LUiWidget:getZOrder(self: LUiWidget) -> integer -- Returns the z-order (draw priority) of this widget.
 LUiWidget:isAnimating(self: LUiWidget) -> boolean -- Returns whether this widget currently has an active animation.
 LUiWidget:isEnabled(self: LUiWidget) -> boolean -- Returns whether this widget is currently enabled and can receive input.
 LUiWidget:isVisible(self: LUiWidget) -> boolean -- Returns whether this widget is currently visible.
 LUiWidget:removeChild(self: LUiWidget, child: LUiWidget|integer) -- Removes a child widget from this widget's hierarchy.
 LUiWidget:setAlpha(self: LUiWidget, alpha: number) -- Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
-LUiWidget:setAnchor([left]: number, [top]: number, [right]: number, [bottom]: number) -- Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
+LUiWidget:setAnchor(self: LUiWidget, [left]: number, [top]: number, [right]: number, [bottom]: number) -- Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
 LUiWidget:setAnchorCenter(self: LUiWidget, [cx]: number, [cy]: number) -- Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
 LUiWidget:setEnabled(self: LUiWidget, v: boolean) -- Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
 LUiWidget:setFlexGrow(self: LUiWidget, grow: number) -- Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
@@ -6647,7 +6647,7 @@ lurek.window.isVisible() -> boolean -- Returns whether the window is currently v
 lurek.window.maximize() -- Maximizes the window to fill the screen.
 lurek.window.minimize() -- Minimizes the window to the taskbar.
 lurek.window.onDpiChange(func: function) -- Registers a callback function that is called whenever the DPI scale factor changes (e.g., when the window i...
-lurek.window.openFileDialog([opts]: table) -> table -- Opens a native file picker dialog and returns the selected file paths. Blocks until the user picks file(s)...
+lurek.window.openFileDialog([opts]: table) -> string[] -- Opens a native file picker dialog and returns the selected file paths. Blocks until the user picks file(s)...
 lurek.window.pollDpiChange() -> number -- Checks if the DPI scale has changed since the last poll and fires the onDpiChange callback if so. Call this...
 lurek.window.requestAttention() -- Requests user attention by flashing the taskbar icon. Useful for notifying the player when the window is in...
 lurek.window.restore() -- Restores the window from minimized or maximized state to its previous size and position.

@@ -24,13 +24,10 @@ fn dispatch(
                     if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
                         if let Ok(record_table) = lua.create_table() {
                             /// Performs the 'level' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("level", level.as_str().to_lowercase());
                             /// Performs the 'tag' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("tag", tag);
                             /// Performs the 'message' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("message", message);
                             let _ = func.call::<LuaTable, ()>(record_table);
                         }
@@ -59,13 +56,10 @@ fn dispatch_structured(
                     if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
                         if let Ok(record_table) = lua.create_table() {
                             /// Performs the 'level' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("level", level.as_str().to_lowercase());
                             /// Performs the 'tag' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("tag", tag);
                             /// Performs the 'message' operation.
-                            /// @return | nil | No value is returned.
                             let _ = record_table.set("message", message);
                             if !fields.is_empty() {
                                 if let Ok(fields_table) = lua.create_table() {
@@ -73,7 +67,6 @@ fn dispatch_structured(
                                         let _ = fields_table.set(key.as_str(), value.clone());
                                     }
                                     /// Performs the 'fields' operation.
-                                    /// @return | nil | No value is returned.
                                     let _ = record_table.set("fields", fields_table);
                                 }
                             }
@@ -159,7 +152,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a debug message with an optional tag.
     /// @param | message | string | Message text.
     /// @param | tag | string? | Log tag shown in the sink output (default `"Lua"`).
-    /// @return | nil | No value is returned.
     tbl.set(
         "debug",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -175,7 +167,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs an info message with an optional tag.
     /// @param | message | string | Message text.
     /// @param | tag | string? | Log tag shown in the sink output (default `"Lua"`).
-    /// @return | nil | No value is returned.
     tbl.set(
         "info",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -191,7 +182,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a warning message with an optional tag.
     /// @param | message | string | Message text.
     /// @param | tag | string? | Log tag shown in the sink output (default `"Lua"`).
-    /// @return | nil | No value is returned.
     tbl.set(
         "warn",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -207,7 +197,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs an error message with an optional tag.
     /// @param | message | string | Message text.
     /// @param | tag | string? | Log tag shown in the sink output (default `"Lua"`).
-    /// @return | nil | No value is returned.
     tbl.set(
         "error",
         lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
@@ -223,8 +212,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a message at a runtime-selected level with an optional tag.
     /// @param | level | string | Log level string.
     /// @param | message | string | Message text.
-    /// @param | tag? | string | Optional tag, defaulting to `Lua`.
-    /// @return | nil | No value is returned.
+    /// @param | tag | string? | Optional tag, defaulting to `Lua`.
     tbl.set(
         "print",
         lua.create_function(
@@ -260,7 +248,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setLevel --
     /// Sets the global log level. This function is exposed to Lua scripts.
     /// @param | level | string | Level `error`, `warn`, `info`, `debug`, `trace`, `off`, or `none`.
-    /// @return | nil | No value is returned.
     tbl.set("setLevel", lua.create_function(|_, level: String| {
         match level.to_lowercase().as_str() {
             "error" | "warn" | "warning" | "info" | "debug" | "trace" | "off" | "none" => {
@@ -369,7 +356,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let callback_keys_for_clear = callback_keys.clone();
     // -- clearSinks --
     /// Removes all sinks and releases callback registry keys.
-    /// @return | nil | No value is returned.
     tbl.set(
         "clearSinks",
         lua.create_function(move |lua, ()| {
@@ -383,7 +369,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let s = sinks.clone();
     // -- listSinks --
     /// Returns metadata for all registered sinks.
-    /// @return | table | Array table of sink records with id, type, level, and optional path.
+    /// @return | table | Array of sink records with id, type, level, and optional path.
+    /// @field | id | integer | Sink id.
+    /// @field | type | string | Sink type name.
+    /// @field | level | string | Minimum log level.
+    /// @field | path | string? | File path for file-backed sinks.
     tbl.set(
         "listSinks",
         lua.create_function(move |lua, ()| {
@@ -391,17 +381,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (i, sink) in s.borrow().sinks.iter().enumerate() {
                 let st = lua.create_table()?;
                 /// Performs the 'id' operation.
-                /// @return | nil | No value is returned.
                 st.set("id", sink.id)?;
                 /// Performs the 'type' operation.
-                /// @return | nil | No value is returned.
                 st.set("type", sink.type_name())?;
                 /// Performs the 'level' operation.
-                /// @return | nil | No value is returned.
                 st.set("level", sink.min_level.as_str())?;
                 if let Some(p) = sink.path() {
                     /// Performs the 'path' operation.
-                    /// @return | nil | No value is returned.
                     st.set("path", p)?;
                 }
                 out.set(i + 1, st)?;
@@ -413,8 +399,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- readMemory --
     /// Reads entries from a memory sink and optionally drains them.
     /// @param | id | integer | Memory sink id.
-    /// @param | drain? | boolean | Optional drain flag, defaulting to false.
+    /// @param | drain | boolean? | Optional drain flag, defaulting to false.
     /// @return | table | Array table of memory log entries.
+    /// @field | level | string | Log level.
+    /// @field | tag | string | Log tag.
+    /// @field | message | string | Log message.
+    /// @field | fields | table? | Optional structured fields table.
     tbl.set(
         "readMemory",
         lua.create_function(move |lua, (id, drain): (u64, Option<bool>)| {
@@ -431,13 +421,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     for (i, entry) in entries.iter().enumerate() {
                         let et = lua.create_table()?;
                         /// Performs the 'level' operation.
-                        /// @return | nil | No value is returned.
                         et.set("level", entry.level.as_str())?;
                         /// Performs the 'tag' operation.
-                        /// @return | nil | No value is returned.
                         et.set("tag", entry.tag.as_str())?;
                         /// Performs the 'message' operation.
-                        /// @return | nil | No value is returned.
                         et.set("message", entry.message.as_str())?;
                         if let Some(ref fields) = entry.fields {
                             let ft = lua.create_table()?;
@@ -445,7 +432,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                                 ft.set(k.as_str(), v.as_str())?;
                             }
                             /// Performs the 'fields' operation.
-                            /// @return | nil | No value is returned.
                             et.set("fields", ft)?;
                         }
                         out.set(i + 1, et)?;
@@ -463,7 +449,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- flushFile --
     /// Flushes a file-backed sink by id when it exists.
     /// @param | id | integer | Sink id.
-    /// @return | nil | No value is returned.
     tbl.set(
         "flushFile",
         lua.create_function(move |_lua, id: u64| {
@@ -480,7 +465,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | level_str | string | Log level string.
     /// @param | message | string | Message text.
     /// @param | fields_tbl | table | Scalar field table converted to strings.
-    /// @return | nil | No value is returned.
     tbl.set(
         "struct",
         lua.create_function(
@@ -507,7 +491,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a debug message with structured fields.
     /// @param | message | string | Message text.
     /// @param | fields_tbl | table | Scalar field table converted to strings.
-    /// @return | nil | No value is returned.
     tbl.set(
         "debug_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -532,7 +515,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs an info message with structured fields.
     /// @param | message | string | Message text.
     /// @param | fields_tbl | table | Scalar field table converted to strings.
-    /// @return | nil | No value is returned.
     tbl.set(
         "info_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -557,7 +539,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs a warning message with structured fields.
     /// @param | message | string | Message text.
     /// @param | fields_tbl | table | Scalar field table converted to strings.
-    /// @return | nil | No value is returned.
     tbl.set(
         "warn_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -582,7 +563,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Logs an error message with structured fields.
     /// @param | message | string | Message text.
     /// @param | fields_tbl | table | Scalar field table converted to strings.
-    /// @return | nil | No value is returned.
     tbl.set(
         "error_fields",
         lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
@@ -602,7 +582,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'log' operation.
-    /// @return | nil | No value is returned.
     lurek.set("log", tbl)?;
     Ok(())
 }

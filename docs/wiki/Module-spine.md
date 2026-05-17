@@ -20,16 +20,16 @@
 - [Types and Methods](#types-and-methods)
   - [LSkeleton](#lskeleton)
   - [LSkeleton:addAnimation(anim: LSkeletonAnimation)](#lskeletonaddanimationanim-lskeletonanimation)
-  - [LSkeleton:addBone(name: string, [opts]: table) -> number](#lskeletonaddbonename-string-opts-table-number)
-  - [LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> number](#lskeletonaddchildbonename-string-parentidx-integer-opts-table-number)
-  - [LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> number](#lskeletonaddikconstraintname-string-chain-table-bendpositive-boolean-number)
+  - [LSkeleton:addBone(name: string, [opts]: table) -> integer](#lskeletonaddbonename-string-opts-table-integer)
+  - [LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> integer](#lskeletonaddchildbonename-string-parentidx-integer-opts-table-integer)
+  - [LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> integer](#lskeletonaddikconstraintname-string-chain-table-bendpositive-boolean-integer)
   - [LSkeleton:addSkin(name: string)](#lskeletonaddskinname-string)
-  - [LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> number](#lskeletonaddslotname-string-boneidx-integer-attachment-string-number)
+  - [LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> integer](#lskeletonaddslotname-string-boneidx-integer-attachment-string-integer)
   - [LSkeleton:blendAnimation(anim: LSkeletonAnimation, time: number, [blend_weight]: number)](#lskeletonblendanimationanim-lskeletonanimation-time-number-blendweight-number)
-  - [LSkeleton:boneCount() -> number](#lskeletonbonecount-number)
+  - [LSkeleton:boneCount() -> integer](#lskeletonbonecount-integer)
   - [LSkeleton:drawToImage(w: integer, h: integer) -> LImageData](#lskeletondrawtoimagew-integer-h-integer-limagedata)
-  - [LSkeleton:findBone(name: string) -> number](#lskeletonfindbonename-string-number)
-  - [LSkeleton:findSlot(name: string) -> number](#lskeletonfindslotname-string-number)
+  - [LSkeleton:findBone(name: string) -> integer](#lskeletonfindbonename-string-integer)
+  - [LSkeleton:findSlot(name: string) -> integer](#lskeletonfindslotname-string-integer)
   - [LSkeleton:getAnimationTime() -> number](#lskeletongetanimationtime-number)
   - [LSkeleton:getBoneWorld(idx: integer) -> table](#lskeletongetboneworldidx-integer-table)
   - [LSkeleton:getSkin() -> string](#lskeletongetskin-string)
@@ -38,7 +38,7 @@
   - [LSkeleton:setPosition(x: number, y: number)](#lskeletonsetpositionx-number-y-number)
   - [LSkeleton:setSkin(name: string) -> boolean](#lskeletonsetskinname-string-boolean)
   - [LSkeleton:setSkinMapping(skin: string, slot: string, attachment: string)](#lskeletonsetskinmappingskin-string-slot-string-attachment-string)
-  - [LSkeleton:slotCount() -> number](#lskeletonslotcount-number)
+  - [LSkeleton:slotCount() -> integer](#lskeletonslotcount-integer)
   - [LSkeleton:stopAnimation()](#lskeletonstopanimation)
   - [LSkeleton:type() -> string](#lskeletontype-string)
   - [LSkeleton:typeOf(name: string) -> boolean](#lskeletontypeofname-string-boolean)
@@ -46,10 +46,10 @@
   - [LSkeleton:updateWorldTransforms()](#lskeletonupdateworldtransforms)
   - [LSkeletonAnimation](#lskeletonanimation)
   - [LSkeletonAnimation:addEventKey(time: number, name: string, [value]: number)](#lskeletonanimationaddeventkeytime-number-name-string-value-number)
-  - [LSkeletonAnimation:addKeyframe(bone_idx: number, property: string, time: number, value: number, [easing]: string)](#lskeletonanimationaddkeyframeboneidx-number-property-string-time-number-value-number-easing-string)
+  - [LSkeletonAnimation:addKeyframe(bone_idx: integer, property: string, time: number, value: number, [easing]: string)](#lskeletonanimationaddkeyframeboneidx-integer-property-string-time-number-value-number-easing-string)
   - [LSkeletonAnimation:getDuration() -> number](#lskeletonanimationgetduration-number)
   - [LSkeletonAnimation:getEvents(from: number, to: number) -> table](#lskeletonanimationgeteventsfrom-number-to-number-table)
-  - [LSkeletonAnimation:getTimelineCount() -> number](#lskeletonanimationgettimelinecount-number)
+  - [LSkeletonAnimation:getTimelineCount() -> integer](#lskeletonanimationgettimelinecount-integer)
   - [LSkeletonAnimation:poseAt(time: number) -> table](#lskeletonanimationposeattime-number-table)
   - [LSkeletonAnimation:reverse() -> LSkeletonAnimation](#lskeletonanimationreverse-lskeletonanimation)
   - [LSkeletonAnimation:type() -> string](#lskeletonanimationtype-string)
@@ -326,7 +326,7 @@ do
 end
 ```
 
-### `LSkeleton:addBone(name: string, [opts]: table) -> number`
+### `LSkeleton:addBone(name: string, [opts]: table) -> integer`
 
 Adds a root-level bone to the skeleton with optional transform properties.
 
@@ -335,7 +335,7 @@ Adds a root-level bone to the skeleton with optional transform properties.
 - `name` (`string`, required) - Unique name for this bone.
 - `opts` (`table`, optional) - Optional table with keys: x, y, rotation, scale_x, scale_y.
 
-**Returns**: `number` - Zero-based index of the newly added bone.
+**Returns**: `integer` - Zero-based index of the newly added bone.
 
 #### Example
 
@@ -358,7 +358,7 @@ do
 end
 ```
 
-### `LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> number`
+### `LSkeleton:addChildBone(name: string, parent_idx: integer, [opts]: table) -> integer`
 
 Adds a bone as a child of an existing bone, inheriting its parent's world transform.
 
@@ -368,7 +368,7 @@ Adds a bone as a child of an existing bone, inheriting its parent's world transf
 - `parent_idx` (`integer`, required) - Zero-based index of the parent bone.
 - `opts` (`table`, optional) - Optional table with keys: x, y, rotation, scale_x, scale_y (local offsets from parent).
 
-**Returns**: `number` - Zero-based index of the newly added child bone.
+**Returns**: `integer` - Zero-based index of the newly added child bone.
 
 #### Example
 
@@ -394,7 +394,7 @@ do
 end
 ```
 
-### `LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> number`
+### `LSkeleton:addIKConstraint(name: string, chain: table, [bend_positive]: boolean) -> integer`
 
 Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
 
@@ -404,7 +404,7 @@ Adds an inverse-kinematics constraint that controls a chain of bones to reach a 
 - `chain` (`table`, required) - Array of bone indices forming the IK chain from root to tip.
 - `bend_positive` (`boolean`, optional) - Whether the joint bends in the positive direction. Defaults to true.
 
-**Returns**: `number` - Index of the newly added constraint.
+**Returns**: `integer` - Index of the newly added constraint.
 
 #### Example
 
@@ -456,7 +456,7 @@ do
 end
 ```
 
-### `LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> number`
+### `LSkeleton:addSlot(name: string, bone_idx: integer, [attachment]: string) -> integer`
 
 Adds a slot attached to a specific bone, optionally assigning a default attachment name.
 
@@ -466,7 +466,7 @@ Adds a slot attached to a specific bone, optionally assigning a default attachme
 - `bone_idx` (`integer`, required) - Zero-based index of the bone this slot is attached to.
 - `attachment` (`string`, optional) - Optional default attachment name for this slot.
 
-**Returns**: `number` - Zero-based index of the newly added slot.
+**Returns**: `integer` - Zero-based index of the newly added slot.
 
 #### Example
 
@@ -532,11 +532,11 @@ do
 end
 ```
 
-### `LSkeleton:boneCount() -> number`
+### `LSkeleton:boneCount() -> integer`
 
 Returns the total number of bones in the skeleton.
 
-**Returns**: `number` - Bone count.
+**Returns**: `integer` - Bone count.
 
 #### Example
 
@@ -595,7 +595,7 @@ do
 end
 ```
 
-### `LSkeleton:findBone(name: string) -> number`
+### `LSkeleton:findBone(name: string) -> integer`
 
 Searches for a bone by name and returns its zero-based index, or nil if not found.
 
@@ -603,7 +603,7 @@ Searches for a bone by name and returns its zero-based index, or nil if not foun
 
 - `name` (`string`, required) - Name of the bone to find.
 
-**Returns**: `number` - Zero-based bone index, or nil if no bone with that name exists.
+**Returns**: `integer` - Zero-based bone index, or nil if no bone with that name exists.
 
 #### Example
 
@@ -627,7 +627,7 @@ do
 end
 ```
 
-### `LSkeleton:findSlot(name: string) -> number`
+### `LSkeleton:findSlot(name: string) -> integer`
 
 Searches for a slot by name and returns its zero-based index, or nil if not found.
 
@@ -635,7 +635,7 @@ Searches for a slot by name and returns its zero-based index, or nil if not foun
 
 - `name` (`string`, required) - Name of the slot to find.
 
-**Returns**: `number` - Zero-based slot index, or nil if no slot with that name exists.
+**Returns**: `integer` - Zero-based slot index, or nil if no slot with that name exists.
 
 #### Example
 
@@ -949,11 +949,11 @@ do
 end
 ```
 
-### `LSkeleton:slotCount() -> number`
+### `LSkeleton:slotCount() -> integer`
 
 Returns the total number of slots in the skeleton.
 
-**Returns**: `number` - Slot count.
+**Returns**: `integer` - Slot count.
 
 #### Example
 
@@ -1195,13 +1195,13 @@ do
 end
 ```
 
-### `LSkeletonAnimation:addKeyframe(bone_idx: number, property: string, time: number, value: number, [easing]: string)`
+### `LSkeletonAnimation:addKeyframe(bone_idx: integer, property: string, time: number, value: number, [easing]: string)`
 
 Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
 
 **Parameters**
 
-- `bone_idx` (`number`, required) - Zero-based index of the target bone.
+- `bone_idx` (`integer`, required) - Zero-based index of the target bone.
 - `property` (`string`, required) - Bone property: "x", "y", "rotation", "scale_x", or "scale_y".
 - `time` (`number`, required) - Time position in seconds for this keyframe.
 - `value` (`number`, required) - Value of the property at this keyframe.
@@ -1324,11 +1324,11 @@ do
   for _, entry in ipairs(pose) do
 ```
 
-### `LSkeletonAnimation:getTimelineCount() -> number`
+### `LSkeletonAnimation:getTimelineCount() -> integer`
 
 Returns the number of bone-property timelines in this animation.
 
-**Returns**: `number` - Timeline count.
+**Returns**: `integer` - Timeline count.
 
 #### Example
 
@@ -1365,7 +1365,7 @@ Samples all timelines at a given time and returns the computed pose as an array 
 
 - `time` (`number`, required) - Time position in seconds to sample.
 
-**Returns**: `table` - Array of tables, each with "bone_idx" (number), "property" (string), and "value" (number).
+**Returns**: `table` - Array of tables, each with "bone_idx" (integer), "property" (string), and "value" (number).
 
 #### Example
 

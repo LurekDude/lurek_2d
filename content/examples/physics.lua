@@ -1953,7 +1953,7 @@ do
   local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(150, 200, 20, "static")
   local hit = world:raycastClosest(0, 200, 1, 0, 400)
-  lurek.log.info("closest hit: " .. tostring(hit and hit.id), "physics")
+  lurek.log.info("closest hit: " .. tostring(hit and hit.bodyId), "physics")
 end
 
 --@api-stub: Zone:setAngularDampingOverride

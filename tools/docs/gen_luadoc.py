@@ -145,6 +145,31 @@ def extract_return_entries_from_full_doc(full_doc):
     return entries
 
 
+def extract_field_entries_from_full_doc(full_doc):
+    """Extract @field entries from a full docstring for table return shapes."""
+    if not full_doc:
+        return []
+    entries = []
+    for line in full_doc.splitlines():
+        stripped = line.strip()
+        m = re.match(r"^@field\s*\|\s*(\w+)\s*\|\s*([^|]+?)\s*\|\s*(.+)$", stripped)
+        if m:
+            entries.append({"name": m.group(1), "type": m.group(2).strip(), "description": m.group(3).strip()})
+    return entries
+
+
+def _derive_class_name(fn_name):
+    """Derive a PascalCase class name from a stub function name."""
+    if ":" in fn_name:
+        owner, method = fn_name.split(":", 1)
+        return owner + method[0].upper() + method[1:] + "Result"
+    if "." in fn_name:
+        parts = fn_name.split(".")
+        tail = parts[-2:] if len(parts) >= 2 else parts
+        return "".join(p[0].upper() + p[1:] for p in tail) + "Result"
+    return fn_name[0].upper() + fn_name[1:] + "Result"
+
+
 def get_return_entries(fn):
     full_doc_entries = extract_return_entries_from_full_doc(fn.get("full_doc", ""))
     if full_doc_entries:
@@ -585,6 +610,8 @@ def parse_returns(fn):
     return None
 
 def write_function_doc(out, fn, name):
+    block_start = len(out)
+
     desc = fn.get("description", "").strip()
     if desc:
         for line in desc.splitlines():
@@ -628,8 +655,27 @@ def write_function_doc(out, fn, name):
                 out.append(f"---@param {safe_k} {t}".strip())
             param_names.append(safe_k)
 
+    # --- @field → @class generation for table returns ---
+    field_entries = extract_field_entries_from_full_doc(fn.get("full_doc", ""))
+    generated_class_name = None
+    if field_entries:
+        generated_class_name = _derive_class_name(name)
+        class_block = [f"---@class {generated_class_name}"]
+        for fe in field_entries:
+            ft = normalize_type(fe["type"])
+            fd = fe.get("description", "")
+            if fd:
+                class_block.append(f"---@field {fe['name']} {ft} {fd}")
+            else:
+                class_block.append(f"---@field {fe['name']} {ft}")
+        class_block.append("")  # blank separator
+        for ci, cl in enumerate(class_block):
+            out.insert(block_start + ci, cl)
+
     ret_entries, has_explicit_return_entries = get_return_entries(fn)
     for i, (ret_type, ret_desc) in enumerate(ret_entries):
+        if generated_class_name and normalize_type(ret_type) == "table":
+            ret_type = generated_class_name
         raw_ret_desc = ret_desc.strip()
         if raw_ret_desc:
             if len(ret_entries) > 1:

@@ -26,7 +26,6 @@ impl LuaUserData for LuaUniverse {
         // -- kill --
         /// Deletes an entity and removes its components from this universe.
         /// @param | id | integer | Entity id to delete.
-        /// @return | nil | No value is returned.
         methods.add_method("kill", |lua, this, id: u32| {
             this.inner.borrow_mut().kill(id, lua)
         });
@@ -41,8 +40,7 @@ impl LuaUserData for LuaUniverse {
         /// Stores or replaces a component value on an entity.
         /// @param | id | integer | Entity id that receives the component.
         /// @param | name | string | Component name.
-        /// @param | value | any | Lua value stored as the component payload.
-        /// @return | nil | No value is returned.
+        /// @param | value | table | Lua value stored as the component payload.
         methods.add_method(
             "set",
             |lua, this, (id, name, value): (u32, String, LuaValue)| {
@@ -69,21 +67,20 @@ impl LuaUserData for LuaUniverse {
         /// Removes a named component from an entity.
         /// @param | id | integer | Entity id to mutate.
         /// @param | name | string | Component name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |lua, this, (id, name): (u32, String)| {
             this.inner.borrow_mut().remove_component(lua, id, &name)
         });
         // -- getComponents --
         /// Returns component names currently stored on an entity.
         /// @param | id | integer | Entity id to inspect.
-        /// @return | table | Array table of component name strings.
+        /// @return | string[] | Component name strings.
         methods.add_method("getComponents", |lua, this, id: u32| {
             this.inner.borrow().get_component_names(lua, id)
         });
         // -- query --
         /// Returns entities that have all component names passed as varargs.
         /// @param | ... | string | Component names that every returned entity must have.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("query", |lua, this, args: LuaMultiValue| {
             let names: Vec<String> = args
                 .into_iter()
@@ -98,7 +95,6 @@ impl LuaUserData for LuaUniverse {
         /// Iterates entities with one component and calls a Lua callback for each match.
         /// @param | name | string | Component name used to select entities.
         /// @param | callback | function | Callback invoked by the ECS backend for each matching entity.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "each",
             |lua, this, (name, callback): (String, LuaFunction)| {
@@ -107,7 +103,7 @@ impl LuaUserData for LuaUniverse {
         );
         // -- getEntities --
         /// Returns all live entity ids in this universe.
-        /// @return | table | Array table of live entity ids.
+        /// @return | integer[] | Array table of live entity ids.
         methods.add_method("getEntities", |_, this, ()| {
             Ok(this.inner.borrow().get_entities())
         });
@@ -120,8 +116,7 @@ impl LuaUserData for LuaUniverse {
         // -- addSystem --
         /// Registers a Lua system table with optional phase, priority, name, and dependency metadata.
         /// @param | system | table | System table containing update, render, draw, or event methods.
-        /// @param | opts? | table | Optional table with priority, phase, name, and after fields.
-        /// @return | nil | No value is returned.
+        /// @param | opts | table? | Optional table with priority, phase, name, and after fields.
         methods.add_method(
             "addSystem",
             |lua, this, (system, opts): (LuaTable, Option<LuaTable>)| {
@@ -154,14 +149,12 @@ impl LuaUserData for LuaUniverse {
         // -- removeSystem --
         /// Removes a previously registered Lua system table.
         /// @param | system | table | System table to remove from this universe.
-        /// @return | nil | No value is returned.
         methods.add_method("removeSystem", |lua, this, system: LuaTable| {
             this.inner.borrow_mut().remove_system(lua, system)
         });
         // -- update --
         /// Runs registered update-phase systems with a frame delta.
         /// @param | dt | number | Frame delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("update", |lua, this, dt: f64| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
@@ -183,7 +176,6 @@ impl LuaUserData for LuaUniverse {
         });
         // -- render --
         /// Runs registered render-phase systems using their render or draw callbacks.
-        /// @return | nil | No value is returned.
         methods.add_method("render", |lua, this, ()| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
@@ -209,8 +201,7 @@ impl LuaUserData for LuaUniverse {
         // -- emit --
         /// Calls matching event-named functions on registered systems.
         /// @param | event | string | Function name looked up on each system table.
-        /// @param | ... | any | Extra values forwarded after the system and universe arguments.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Extra values forwarded after the system and universe arguments.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let event: String = match args_iter.next() {
@@ -251,7 +242,6 @@ impl LuaUserData for LuaUniverse {
         /// Runs registered systems assigned to a named phase.
         /// @param | phase | string | System phase name to run.
         /// @param | dt | number | Frame delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("updatePhase", |lua, this, (phase, dt): (String, f64)| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
@@ -273,7 +263,7 @@ impl LuaUserData for LuaUniverse {
         });
         // -- getDirtyEntities --
         /// Returns entities marked dirty by recent ECS mutations.
-        /// @return | table | Array table of dirty entity ids.
+        /// @return | integer[] | Array table of dirty entity ids.
         methods.add_method("getDirtyEntities", |lua, this, ()| {
             let ids = this.inner.borrow().get_dirty_entities();
             let t = lua.create_table()?;
@@ -286,7 +276,6 @@ impl LuaUserData for LuaUniverse {
         /// Iterates entities that have all component names from a table.
         /// @param | names_table | table | Array table of component names.
         /// @param | callback | function | Callback invoked by the ECS backend for each matching entity.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "queryMulti",
             |lua, this, (names_table, callback): (LuaTable, LuaFunction)| {
@@ -300,13 +289,16 @@ impl LuaUserData for LuaUniverse {
         // -- snapshot --
         /// Serializes this universe into a Lua table snapshot.
         /// @return | table | Snapshot table containing entities and component state.
+        /// @field | added_components | table | Added components.
+        /// @field | removed_components | table | Removed components.
+        /// @field | deleted_entities | integer[] | Deleted entity ids.
+        /// @field | dirty_entities | integer[] | Dirty entity ids.
         methods.add_method("snapshot", |lua, this, ()| {
             this.inner.borrow().serialize_to_table(lua)
         });
         // -- applySnapshot --
         /// Replaces this universe state from a Lua table snapshot.
         /// @param | snapshot | table | Snapshot table previously produced by `snapshot` or `serialize`.
-        /// @return | nil | No value is returned.
         methods.add_method("applySnapshot", |lua, this, snapshot: LuaTable| {
             this.inner
                 .borrow_mut()
@@ -315,6 +307,10 @@ impl LuaUserData for LuaUniverse {
         // -- takeSnapshotDiff --
         /// Returns and clears accumulated ECS snapshot diff data.
         /// @return | table | Diff table with added_components, removed_components, deleted_entities, and dirty_entities arrays.
+        /// @field | added_components | table | Array of {entity_id, name} tables.
+        /// @field | removed_components | table | Array of {entity_id, name} tables.
+        /// @field | deleted_entities | integer[] | Deleted entity ids.
+        /// @field | dirty_entities | integer[] | Modified entity ids.
         methods.add_method("takeSnapshotDiff", |lua, this, ()| {
             let diff = this.inner.borrow_mut().take_snapshot_diff();
             let out = lua.create_table()?;
@@ -322,53 +318,43 @@ impl LuaUserData for LuaUniverse {
             for (i, (id, name)) in diff.added_components.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'entity_id' operation.
-                /// @return | nil | No value is returned.
                 entry.set("entity_id", *id)?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 added.set(i + 1, entry)?;
             }
             /// Performs the 'added_components' operation.
-            /// @return | nil | No value is returned.
             out.set("added_components", added)?;
             let removed = lua.create_table()?;
             for (i, (id, name)) in diff.removed_components.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'entity_id' operation.
-                /// @return | nil | No value is returned.
                 entry.set("entity_id", *id)?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 removed.set(i + 1, entry)?;
             }
             /// Performs the 'removed_components' operation.
-            /// @return | nil | No value is returned.
             out.set("removed_components", removed)?;
             let deleted = lua.create_table()?;
             for (i, id) in diff.deleted_entities.iter().enumerate() {
                 deleted.set(i + 1, *id)?;
             }
             /// Performs the 'deleted_entities' operation.
-            /// @return | nil | No value is returned.
             out.set("deleted_entities", deleted)?;
             let dirty = lua.create_table()?;
             for (i, id) in diff.dirty_entities.iter().enumerate() {
                 dirty.set(i + 1, *id)?;
             }
             /// Performs the 'dirty_entities' operation.
-            /// @return | nil | No value is returned.
             out.set("dirty_entities", dirty)?;
             Ok(out)
         });
         // -- clear --
         /// Clears all entities, components, systems, and ECS state from this universe.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |lua, this, ()| this.inner.borrow_mut().clear(lua));
         // -- release --
         /// Releases universe contents by clearing all ECS state.
-        /// @return | nil | No value is returned.
         methods.add_method("release", |lua, this, ()| {
             this.inner.borrow_mut().clear(lua)
         });
@@ -376,7 +362,6 @@ impl LuaUserData for LuaUniverse {
         /// Assigns a string tag name to an entity in this universe.
         /// @param | id | integer | Entity id to tag.
         /// @param | tag | string | Tag name to add.
-        /// @return | nil | No value is returned.
         methods.add_method("addTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().add_tag(id, &tag);
             Ok(())
@@ -385,7 +370,6 @@ impl LuaUserData for LuaUniverse {
         /// Removes a string tag from an entity.
         /// @param | id | integer | Entity id to update.
         /// @param | tag | string | Tag name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("removeTag", |_, this, (id, tag): (u32, String)| {
             this.inner.borrow_mut().remove_tag(id, &tag);
             Ok(())
@@ -401,14 +385,14 @@ impl LuaUserData for LuaUniverse {
         // -- getTags --
         /// Returns string tags assigned to an entity.
         /// @param | id | integer | Entity id to inspect.
-        /// @return | table | Array table of tag names.
+        /// @return | string[] | Tag names.
         methods.add_method("getTags", |_, this, id: u32| {
             Ok(this.inner.borrow().get_tags(id))
         });
         // -- getEntitiesByTag --
         /// Returns entities that have a string tag.
         /// @param | tag | string | Tag name used for lookup.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("getEntitiesByTag", |_, this, tag: String| {
             Ok(this.inner.borrow().get_entities_by_tag(&tag))
         });
@@ -416,7 +400,6 @@ impl LuaUserData for LuaUniverse {
         /// Assigns a numeric layer to an entity.
         /// @param | id | integer | Entity id to update.
         /// @param | layer | integer | Layer value stored on the entity.
-        /// @return | nil | No value is returned.
         methods.add_method("setLayer", |_, this, (id, layer): (u32, i32)| {
             this.inner.borrow_mut().set_layer(id, layer);
             Ok(())
@@ -431,13 +414,13 @@ impl LuaUserData for LuaUniverse {
         // -- getEntitiesByLayer --
         /// Returns entities assigned to a numeric layer.
         /// @param | layer | integer | Layer value used for lookup.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("getEntitiesByLayer", |_, this, layer: i32| {
             Ok(this.inner.borrow().get_entities_by_layer(layer))
         });
         // -- getEntitiesSorted --
         /// Returns live entities sorted by ECS layer and stable entity ordering.
-        /// @return | table | Array table of sorted entity ids.
+        /// @return | integer[] | Array table of sorted entity ids.
         methods.add_method("getEntitiesSorted", |_, this, ()| {
             Ok(this.inner.borrow().get_entities_sorted())
         });
@@ -460,7 +443,6 @@ impl LuaUserData for LuaUniverse {
         /// Removes a bitmap tag from an entity.
         /// @param | id | integer | Entity id to update.
         /// @param | name | string | Bitmap tag name to remove.
-        /// @return | nil | No value is returned.
         methods.add_method("bitmapUntag", |_, this, (id, name): (u32, String)| {
             this.inner.borrow_mut().bitmap_untag(id, &name);
             Ok(())
@@ -476,14 +458,14 @@ impl LuaUserData for LuaUniverse {
         // -- queryBitmapTag --
         /// Returns entities with one bitmap tag.
         /// @param | name | string | Bitmap tag name used for lookup.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("queryBitmapTag", |_, this, name: String| {
             Ok(this.inner.borrow().query_bitmap_tag(&name))
         });
         // -- queryBitmapAny --
         /// Returns entities with at least one bitmap tag from a list.
         /// @param | names | table | Array table of bitmap tag names.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("queryBitmapAny", |_, this, names: LuaTable| {
             let name_vec: Vec<String> = names
                 .sequence_values::<String>()
@@ -493,7 +475,7 @@ impl LuaUserData for LuaUniverse {
         // -- queryBitmapAll --
         /// Returns entities that have every bitmap tag from a list.
         /// @param | names | table | Array table of bitmap tag names.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method("queryBitmapAll", |_, this, names: LuaTable| {
             let name_vec: Vec<String> = names
                 .sequence_values::<String>()
@@ -503,8 +485,7 @@ impl LuaUserData for LuaUniverse {
         // -- getBitmapTagBit --
         /// Returns the bit index assigned to a bitmap tag name.
         /// @param | name | string | Bitmap tag name to inspect.
-        /// @return | integer | Bit index when the tag exists.
-        /// @return | nil | When the tag is undefined.
+        /// @return | integer | Bit index when the tag exists, or nil when the tag is undefined.
         methods.add_method("getBitmapTagBit", |_, this, name: String| {
             Ok(this.inner.borrow().get_bitmap_tag_bit(&name))
         });
@@ -512,7 +493,6 @@ impl LuaUserData for LuaUniverse {
         /// Defines a named entity blueprint from a component table.
         /// @param | name | string | Blueprint name.
         /// @param | components | table | Component table copied when the blueprint is spawned.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "defineBlueprint",
             |lua, this, (name, components): (String, LuaTable)| {
@@ -526,7 +506,6 @@ impl LuaUserData for LuaUniverse {
         /// @param | name | string | Child blueprint name to define.
         /// @param | parent | string | Existing parent blueprint name.
         /// @param | overrides | table | Component overrides applied over the parent definition.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "extendBlueprint",
             |lua, this, (name, parent, overrides): (String, String, LuaTable)| {
@@ -538,7 +517,7 @@ impl LuaUserData for LuaUniverse {
         // -- spawnBlueprint --
         /// Spawns an entity from a named blueprint with optional component overrides.
         /// @param | name | string | Blueprint name to instantiate.
-        /// @param | overrides? | table | Optional component overrides applied to this spawn.
+        /// @param | overrides | table? | Optional component overrides applied to this spawn.
         /// @return | integer | Entity id created from the blueprint.
         methods.add_method(
             "spawnBlueprint",
@@ -564,7 +543,7 @@ impl LuaUserData for LuaUniverse {
         });
         // -- listBlueprints --
         /// Returns names of all registered blueprints.
-        /// @return | table | Array table of blueprint names.
+        /// @return | string[] | Blueprint names.
         methods.add_method("listBlueprints", |lua, this, ()| {
             this.inner.borrow().list_blueprints(lua)
         });
@@ -578,8 +557,7 @@ impl LuaUserData for LuaUniverse {
         // -- setParent --
         /// Sets or clears the parent entity for a child entity.
         /// @param | child_id | integer | Entity id whose parent changes.
-        /// @param | parent_id? | integer | Parent entity id, or nil to clear the parent.
-        /// @return | nil | No value is returned.
+        /// @param | parent_id | integer? | Parent entity id, or nil to clear the parent.
         methods.add_method(
             "setParent",
             |_, this, (child_id, parent_id): (u32, Option<u32>)| {
@@ -590,22 +568,20 @@ impl LuaUserData for LuaUniverse {
         // -- getParent --
         /// Returns the parent entity id for a child entity.
         /// @param | child_id | integer | Entity id whose parent is read.
-        /// @return | integer | Parent entity id.
-        /// @return | nil | When the entity has no parent.
+        /// @return | integer | Parent entity id, or nil when the entity has no parent.
         methods.add_method("getParent", |_, this, child_id: u32| {
             Ok(this.inner.borrow().get_parent(child_id))
         });
         // -- getChildren --
         /// Returns child entity ids for a parent entity.
         /// @param | parent_id | integer | Parent entity id to inspect.
-        /// @return | table | Array table of child entity ids.
+        /// @return | integer[] | Array table of child entity ids.
         methods.add_method("getChildren", |_, this, parent_id: u32| {
             Ok(this.inner.borrow().get_children(parent_id))
         });
         // -- killRecursive --
         /// Deletes an entity and all descendant entities in its hierarchy.
         /// @param | id | integer | Root entity id to delete.
-        /// @return | nil | No value is returned.
         methods.add_method("killRecursive", |lua, this, id: u32| {
             this.inner.borrow_mut().kill_recursive(id, lua)
         });
@@ -613,7 +589,7 @@ impl LuaUserData for LuaUniverse {
         /// Returns entities that include one component set and exclude another component set.
         /// @param | with_tbl | table | Array table of required component names.
         /// @param | without_tbl | table | Array table of forbidden component names.
-        /// @return | table | Array table of matching entity ids.
+        /// @return | integer[] | Array table of matching entity ids.
         methods.add_method(
             "queryNot",
             |lua, this, (with_tbl, without_tbl): (LuaTable, LuaTable)| {
@@ -631,13 +607,14 @@ impl LuaUserData for LuaUniverse {
         // -- serialize --
         /// Serializes this universe into a Lua table snapshot.
         /// @return | table | Snapshot table containing entities and component state.
+        /// @field | entities | integer[] | Array of entity ids.
+        /// @field | components | table | Map of entity id to component data tables.
         methods.add_method("serialize", |lua, this, ()| {
             this.inner.borrow().serialize_to_table(lua)
         });
         // -- deserialize --
         /// Replaces this universe state from a serialized Lua snapshot.
         /// @param | snapshot | table | Snapshot table previously produced by `serialize` or `snapshot`.
-        /// @return | nil | No value is returned.
         methods.add_method("deserialize", |lua, this, snapshot: LuaTable| {
             this.inner
                 .borrow_mut()
@@ -647,7 +624,6 @@ impl LuaUserData for LuaUniverse {
         /// Registers a callback for queued component-add events with a given component name.
         /// @param | name | string | Component name whose add events are observed.
         /// @param | cb | function | Callback receiving entity id and component name.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "onComponentAdded",
             |lua, this, (name, cb): (String, LuaFunction)| {
@@ -664,7 +640,6 @@ impl LuaUserData for LuaUniverse {
         /// Registers a callback for queued component-remove events with a given component name.
         /// @param | name | string | Component name whose remove events are observed.
         /// @param | cb | function | Callback receiving entity id and component name.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "onComponentRemoved",
             |lua, this, (name, cb): (String, LuaFunction)| {
@@ -679,7 +654,6 @@ impl LuaUserData for LuaUniverse {
         );
         // -- flushObservers --
         /// Delivers queued component add and remove events to registered observer callbacks.
-        /// @return | nil | No value is returned.
         methods.add_method("flushObservers", |lua, this, ()| {
             let (add_evs, remove_evs) = this.inner.borrow_mut().take_component_events();
             for (id, name) in &add_evs {
@@ -726,8 +700,8 @@ impl LuaUserData for LuaUniverse {
         /// Spawns multiple entities from a blueprint using shared optional overrides.
         /// @param | name | string | Blueprint name to instantiate.
         /// @param | count | integer | Number of entities to spawn.
-        /// @param | overrides? | table | Optional component overrides applied to each spawned entity.
-        /// @return | table | Array table of spawned entity ids.
+        /// @param | overrides | table? | Optional component overrides applied to each spawned entity.
+        /// @return | integer[] | Array table of spawned entity ids.
         methods.add_method(
             "spawnBulk",
             |lua, this, (name, count, overrides): (String, usize, Option<LuaTable>)| {
@@ -741,7 +715,6 @@ impl LuaUserData for LuaUniverse {
         /// @param | from | integer | Source entity id.
         /// @param | name | string | Relation name.
         /// @param | to | integer | Target entity id.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "addRelation",
             |_, this, (from, name, to): (u32, String, u32)| {
@@ -756,7 +729,7 @@ impl LuaUserData for LuaUniverse {
         /// Returns targets linked from an entity by a named relation.
         /// @param | from | integer | Source entity id.
         /// @param | name | string | Relation name.
-        /// @return | table | Array table of related target entity ids.
+        /// @return | integer[] | Array table of related target entity ids.
         methods.add_method("getRelated", |lua, this, (from, name): (u32, String)| {
             let inner = this.inner.borrow();
             let ids = inner.relationships.get_links(from, &name);
@@ -771,7 +744,6 @@ impl LuaUserData for LuaUniverse {
         /// @param | from | integer | Source entity id.
         /// @param | name | string | Relation name.
         /// @param | to | integer | Target entity id.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "removeRelation",
             |_, this, (from, name, to): (u32, String, u32)| {
@@ -786,7 +758,6 @@ impl LuaUserData for LuaUniverse {
         /// Removes every target for one named relation from an entity.
         /// @param | from | integer | Source entity id.
         /// @param | name | string | Relation name to clear.
-        /// @return | nil | No value is returned.
         methods.add_method("clearRelations", |_, this, (from, name): (u32, String)| {
             this.inner
                 .borrow_mut()
@@ -836,7 +807,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'ecs' operation.
-    /// @return | nil | No value is returned.
     lurek.set("ecs", tbl)?;
     Ok(())
 }

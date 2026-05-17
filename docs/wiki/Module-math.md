@@ -31,7 +31,7 @@
   - [lurek.math.circleIntersectsSegment(cx: number, cy: number, r: number, sx1: number, sy1: number, sx2: number, sy2: number) -> boolean](#lurekmathcircleintersectssegmentcx-number-cy-number-r-number-sx1-number-sy1-number-sx2-number-sy2-number-boolean)
   - [lurek.math.clamp(v: number, min: number, max: number) -> number](#lurekmathclampv-number-min-number-max-number-number)
   - [lurek.math.closestPointOnSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number) -> number](#lurekmathclosestpointonsegmentpx-number-py-number-x1-number-y1-number-x2-number-y2-number-number)
-  - [lurek.math.convexHull(pts: table) -> table](#lurekmathconvexhullpts-table-table)
+  - [lurek.math.convexHull(pts: table) -> number[]](#lurekmathconvexhullpts-table-number)
   - [lurek.math.cos(x: number) -> number](#lurekmathcosx-number-number)
   - [lurek.math.deg(rad: number) -> number](#lurekmathdegrad-number-number)
   - [lurek.math.delaunayTriangulate(pts: table) -> table](#lurekmathdelaunaytriangulatepts-table-table)
@@ -66,7 +66,7 @@
   - [lurek.math.lerp(a: number, b: number, t: number) -> number](#lurekmathlerpa-number-b-number-t-number-number)
   - [lurek.math.linear(t: number) -> number](#lurekmathlineart-number-number)
   - [lurek.math.linearToGamma(c: number) -> number](#lurekmathlineartogammac-number-number)
-  - [lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> LuaValue](#lurekmathlineintersectx1-number-y1-number-x2-number-y2-number-x3-number-y3-number-x4-number-y4-number-luavalue)
+  - [lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> number](#lurekmathlineintersectx1-number-y1-number-x2-number-y2-number-x3-number-y3-number-x4-number-y4-number-number)
   - [lurek.math.log(x: number, [b]: number) -> number](#lurekmathlogx-number-b-number-number)
   - [lurek.math.max(...: number) -> number](#lurekmathmax-number-number)
   - [lurek.math.min(...: number) -> number](#lurekmathmin-number-number)
@@ -91,10 +91,10 @@
   - [lurek.math.pointInPolygon(pts: table, px: number, py: number) -> boolean](#lurekmathpointinpolygonpts-table-px-number-py-number-boolean)
   - [lurek.math.polygonArea(pts: table) -> number](#lurekmathpolygonareapts-table-number)
   - [lurek.math.polygonCentroid(pts: table) -> number](#lurekmathpolygoncentroidpts-table-number)
-  - [lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> table](#lurekmathpolygonclippts-table-nx-number-ny-number-d-number-table)
-  - [lurek.math.polygonDifference(a: table, b: table) -> table](#lurekmathpolygondifferencea-table-b-table-table)
-  - [lurek.math.polygonIntersection(a: table, b: table) -> table](#lurekmathpolygonintersectiona-table-b-table-table)
-  - [lurek.math.polygonUnion(a: table, b: table) -> table](#lurekmathpolygonuniona-table-b-table-table)
+  - [lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> number[]](#lurekmathpolygonclippts-table-nx-number-ny-number-d-number-number)
+  - [lurek.math.polygonDifference(a: table, b: table) -> number[]](#lurekmathpolygondifferencea-table-b-table-number)
+  - [lurek.math.polygonIntersection(a: table, b: table) -> number[]](#lurekmathpolygonintersectiona-table-b-table-number)
+  - [lurek.math.polygonUnion(a: table, b: table) -> number[]](#lurekmathpolygonuniona-table-b-table-number)
   - [lurek.math.pow(x: number, y: number) -> number](#lurekmathpowx-number-y-number-number)
   - [lurek.math.rad(deg: number) -> number](#lurekmathraddeg-number-number)
   - [lurek.math.random([a]: number, [b]: number) -> number](#lurekmathrandoma-number-b-number-number)
@@ -123,8 +123,8 @@
   - [LAabbTree:insert(id: integer, min_x: number, min_y: number, max_x: number, max_y: number)](#laabbtreeinsertid-integer-minx-number-miny-number-maxx-number-maxy-number)
   - [LAabbTree:isEmpty() -> boolean](#laabbtreeisempty-boolean)
   - [LAabbTree:len() -> integer](#laabbtreelen-integer)
-  - [LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> table](#laabbtreequeryminx-number-miny-number-maxx-number-maxy-number-table)
-  - [LAabbTree:queryPoint(x: number, y: number) -> table](#laabbtreequerypointx-number-y-number-table)
+  - [LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> integer[]](#laabbtreequeryminx-number-miny-number-maxx-number-maxy-number-integer)
+  - [LAabbTree:queryPoint(x: number, y: number) -> integer[]](#laabbtreequerypointx-number-y-number-integer)
   - [LAabbTree:remove(id: integer) -> boolean](#laabbtreeremoveid-integer-boolean)
   - [LAabbTree:type() -> string](#laabbtreetype-string)
   - [LAabbTree:typeOf(name: string) -> boolean](#laabbtreetypeofname-string-boolean)
@@ -132,7 +132,7 @@
   - [LBezierCurve](#lbeziercurve)
   - [LBezierCurve:evaluate(t: number) -> number](#lbeziercurveevaluatet-number-number)
   - [LBezierCurve:evaluateAtDistance(distance: number, [samples]: integer) -> number](#lbeziercurveevaluateatdistancedistance-number-samples-integer-number)
-  - [LBezierCurve:getControlPoint(index: integer) -> LuaValue](#lbeziercurvegetcontrolpointindex-integer-luavalue)
+  - [LBezierCurve:getControlPoint(index: integer) -> number](#lbeziercurvegetcontrolpointindex-integer-number)
   - [LBezierCurve:getControlPointCount() -> integer](#lbeziercurvegetcontrolpointcount-integer)
   - [LBezierCurve:getDerivative() -> LBezierCurve](#lbeziercurvegetderivative-lbeziercurve)
   - [LBezierCurve:insertControlPoint(x: number, y: number, [index]: integer)](#lbeziercurveinsertcontrolpointx-number-y-number-index-integer)
@@ -170,8 +170,8 @@
   - [LHermite:typeOf(name: string) -> boolean](#lhermitetypeofname-string-boolean)
   - [LNoiseGenerator](#lnoisegenerator)
   - [LNoiseGenerator:fbm(x: number, y: number, [octaves]: integer, [lac]: number, [pers]: number, [kind]: string) -> number](#lnoisegeneratorfbmx-number-y-number-octaves-integer-lac-number-pers-number-kind-string-number)
-  - [LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> table](#lnoisegeneratorgeneratemapw-integer-h-integer-opts-table-table)
-  - [LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> table](#lnoisegeneratorgeneratemapcomputew-integer-h-integer-opts-table-table)
+  - [LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> number[]](#lnoisegeneratorgeneratemapw-integer-h-integer-opts-table-number)
+  - [LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> number[]](#lnoisegeneratorgeneratemapcomputew-integer-h-integer-opts-table-number)
   - [LNoiseGenerator:getSeed() -> integer](#lnoisegeneratorgetseed-integer)
   - [LNoiseGenerator:perlin1d(x: number) -> number](#lnoisegeneratorperlin1dx-number-number)
   - [LNoiseGenerator:perlin2d(x: number, y: number) -> number](#lnoisegeneratorperlin2dx-number-y-number-number)
@@ -203,23 +203,23 @@
   - [LRectPacker:clear()](#lrectpackerclear)
   - [LRectPacker:getPacked() -> table](#lrectpackergetpacked-table)
   - [LRectPacker:occupancy() -> number](#lrectpackeroccupancy-number)
-  - [LRectPacker:pack(w: integer, h: integer, [id]: string) -> LuaValue](#lrectpackerpackw-integer-h-integer-id-string-luavalue)
+  - [LRectPacker:pack(w: integer, h: integer, [id]: string) -> integer](#lrectpackerpackw-integer-h-integer-id-string-integer)
   - [LSpatialHash](#lspatialhash)
   - [LSpatialHash:clear()](#lspatialhashclear)
   - [LSpatialHash:getCellSize() -> number](#lspatialhashgetcellsize-number)
   - [LSpatialHash:getItemCount() -> integer](#lspatialhashgetitemcount-integer)
   - [LSpatialHash:insert(id: string, x: number, y: number, w: number, h: number)](#lspatialhashinsertid-string-x-number-y-number-w-number-h-number)
-  - [LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> table](#lspatialhashquerycirclecx-number-cy-number-radius-number-table)
-  - [LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> table](#lspatialhashqueryrectx-number-y-number-w-number-h-number-table)
-  - [LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> table](#lspatialhashquerysegmentx1-number-y1-number-x2-number-y2-number-table)
+  - [LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> integer[]](#lspatialhashquerycirclecx-number-cy-number-radius-number-integer)
+  - [LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> integer[]](#lspatialhashqueryrectx-number-y-number-w-number-h-number-integer)
+  - [LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> integer[]](#lspatialhashquerysegmentx1-number-y1-number-x2-number-y2-number-integer)
   - [LSpatialHash:remove(id: string)](#lspatialhashremoveid-string)
   - [LSpatialHash:type() -> string](#lspatialhashtype-string)
   - [LSpatialHash:typeOf(name: string) -> boolean](#lspatialhashtypeofname-string-boolean)
   - [LSpatialHash:update(id: string, x: number, y: number, w: number, h: number)](#lspatialhashupdateid-string-x-number-y-number-w-number-h-number)
   - [LTransform](#ltransform)
   - [LTransform:clone() -> LTransform](#ltransformclone-ltransform)
-  - [LTransform:decompose() -> LuaValue](#ltransformdecompose-luavalue)
-  - [LTransform:getMatrix() -> table](#ltransformgetmatrix-table)
+  - [LTransform:decompose() -> number](#ltransformdecompose-number)
+  - [LTransform:getMatrix() -> number[]](#ltransformgetmatrix-number)
   - [LTransform:inverse() -> LTransform](#ltransforminverse-ltransform)
   - [LTransform:inverseTransformPoint(x: number, y: number) -> number](#ltransforminversetransformpointx-number-y-number-number)
   - [LTransform:reset()](#ltransformreset)
@@ -233,12 +233,12 @@
   - [LTransform:typeOf(name: string) -> boolean](#ltransformtypeofname-string-boolean)
   - [LTween](#ltween)
   - [LTween:addValue(start: number, target: number) -> integer](#ltweenaddvaluestart-number-target-number-integer)
-  - [LTween:getAllValues() -> table](#ltweengetallvalues-table)
+  - [LTween:getAllValues() -> number[]](#ltweengetallvalues-number)
   - [LTween:getClock() -> number](#ltweengetclock-number)
   - [LTween:getDuration() -> number](#ltweengetduration-number)
   - [LTween:getEasingName() -> string](#ltweengeteasingname-string)
   - [LTween:getTime() -> number](#ltweengettime-number)
-  - [LTween:getValue([index]: integer) -> LuaValue](#ltweengetvalueindex-integer-luavalue)
+  - [LTween:getValue([index]: integer) -> number](#ltweengetvalueindex-integer-number)
   - [LTween:getValueCount() -> integer](#ltweengetvaluecount-integer)
   - [LTween:isComplete() -> boolean](#ltweeniscomplete-boolean)
   - [LTween:reset()](#ltweenreset)
@@ -390,7 +390,7 @@ lurek.math.circleIntersectsLine(cx: number, cy: number, r: number, lx1: number, 
 lurek.math.circleIntersectsSegment(cx: number, cy: number, r: number, sx1: number, sy1: number, sx2: number, sy2: number) -> boolean -- Returns circle-segment intersection state and hit points when present.
 lurek.math.clamp(v: number, min: number, max: number) -> number -- Clamps a value to a range. This function is exposed to Lua scripts.
 lurek.math.closestPointOnSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number) -> number -- Returns the closest point on a segment to an input point.
-lurek.math.convexHull(pts: table) -> table -- Computes the convex hull for a flat point table.
+lurek.math.convexHull(pts: table) -> number[] -- Computes the convex hull for a flat point table.
 -- ... 84 more module functions
 ```
 
@@ -542,7 +542,7 @@ Returns arctangent or two-argument arctangent.
 **Parameters**
 
 - `y` (`number`, required) - Input value or y coordinate.
-- `x` (`number`, optional) - Optional x coordinate for atan2 behavior.
+- `x` (`number`, optional) - X coordinate for atan2 behavior.
 
 **Returns**: `number` - Angle in radians.
 
@@ -590,10 +590,10 @@ Returns integer grid points along a Bresenham line.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
+- `x1` (`integer`, required) - Start x coordinate.
+- `y1` (`integer`, required) - Start y coordinate.
+- `x2` (`integer`, required) - End x coordinate.
+- `y2` (`integer`, required) - End y coordinate.
 
 **Returns**: `table` - Array table of `{x, y}` point tables.
 
@@ -691,12 +691,12 @@ Returns whether two circles intersect.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `r1` (`number`, required) - Lua argument for `r1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
-- `r2` (`number`, required) - Lua argument for `r2`.
+- `x1` (`number`, required) - First circle center x coordinate.
+- `y1` (`number`, required) - First circle center y coordinate.
+- `r1` (`number`, required) - First circle radius.
+- `x2` (`number`, required) - Second circle center x coordinate.
+- `y2` (`number`, required) - Second circle center y coordinate.
+- `r2` (`number`, required) - Second circle radius.
 
 **Returns**: `boolean` - True when the circles intersect.
 
@@ -720,13 +720,13 @@ Returns circle-line intersection state and hit points when present.
 
 **Parameters**
 
-- `cx` (`number`, required) - Lua argument for `cx`.
-- `cy` (`number`, required) - Lua argument for `cy`.
-- `r` (`number`, required) - Lua argument for `r`.
-- `lx1` (`number`, required) - Lua argument for `lx1`.
-- `ly1` (`number`, required) - Lua argument for `ly1`.
-- `lx2` (`number`, required) - Lua argument for `lx2`.
-- `ly2` (`number`, required) - Lua argument for `ly2`.
+- `cx` (`number`, required) - Circle center x coordinate.
+- `cy` (`number`, required) - Circle center y coordinate.
+- `r` (`number`, required) - Circle radius.
+- `lx1` (`number`, required) - Line start x coordinate.
+- `ly1` (`number`, required) - Line start y coordinate.
+- `lx2` (`number`, required) - Line end x coordinate.
+- `ly2` (`number`, required) - Line end y coordinate.
 
 **Returns**: `boolean` - True when the line intersects the circle.
 
@@ -751,13 +751,13 @@ Returns circle-segment intersection state and hit points when present.
 
 **Parameters**
 
-- `cx` (`number`, required) - Lua argument for `cx`.
-- `cy` (`number`, required) - Lua argument for `cy`.
-- `r` (`number`, required) - Lua argument for `r`.
-- `sx1` (`number`, required) - Lua argument for `sx1`.
-- `sy1` (`number`, required) - Lua argument for `sy1`.
-- `sx2` (`number`, required) - Lua argument for `sx2`.
-- `sy2` (`number`, required) - Lua argument for `sy2`.
+- `cx` (`number`, required) - Circle center x coordinate.
+- `cy` (`number`, required) - Circle center y coordinate.
+- `r` (`number`, required) - Circle radius.
+- `sx1` (`number`, required) - Segment start x coordinate.
+- `sy1` (`number`, required) - Segment start y coordinate.
+- `sx2` (`number`, required) - Segment end x coordinate.
+- `sy2` (`number`, required) - Segment end y coordinate.
 
 **Returns**: `boolean` - True when the segment intersects the circle.
 
@@ -807,12 +807,12 @@ Returns the closest point on a segment to an input point.
 
 **Parameters**
 
-- `px` (`number`, required) - Lua argument for `px`.
-- `py` (`number`, required) - Lua argument for `py`.
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
+- `px` (`number`, required) - Point x coordinate.
+- `py` (`number`, required) - Point y coordinate.
+- `x1` (`number`, required) - Segment start x coordinate.
+- `y1` (`number`, required) - Segment start y coordinate.
+- `x2` (`number`, required) - Segment end x coordinate.
+- `y2` (`number`, required) - Segment end y coordinate.
 
 **Returns**: `number` - Closest point x coordinate.
 
@@ -829,7 +829,7 @@ do
 end
 ```
 
-### `lurek.math.convexHull(pts: table) -> table`
+### `lurek.math.convexHull(pts: table) -> number[]`
 
 Computes the convex hull for a flat point table.
 
@@ -837,7 +837,7 @@ Computes the convex hull for a flat point table.
 
 - `pts` (`table`, required) - Flat numeric point table.
 
-**Returns**: `table` - Flat numeric hull point table.
+**Returns**: `number[]` - Flat numeric hull point table (x1,y1,x2,y2,...).
 
 #### Example
 
@@ -906,7 +906,7 @@ Computes Delaunay triangles for a flat point table.
 
 - `pts` (`table`, required) - Flat numeric point table.
 
-**Returns**: `table` - Array table of triangle index tables.
+**Returns**: `table` - Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
 
 #### Example
 
@@ -928,10 +928,10 @@ Returns Euclidean distance between two points.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
+- `x1` (`number`, required) - First point x coordinate.
+- `y1` (`number`, required) - First point y coordinate.
+- `x2` (`number`, required) - Second point x coordinate.
+- `y2` (`number`, required) - Second point y coordinate.
 
 **Returns**: `number` - Distance.
 
@@ -955,10 +955,10 @@ Returns squared Euclidean distance between two points.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
+- `x1` (`number`, required) - First point x coordinate.
+- `y1` (`number`, required) - First point y coordinate.
+- `x2` (`number`, required) - Second point x coordinate.
+- `y2` (`number`, required) - Second point y coordinate.
 
 **Returns**: `number` - Squared distance.
 
@@ -1007,10 +1007,10 @@ Samples stateless fractal Brownian motion noise.
 
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
-- `seed` (`integer`, optional) - Optional seed value, defaulting to 0.
-- `octaves` (`integer`, optional) - Optional octave count, defaulting to 4.
-- `lac` (`number`, optional) - Optional lacunarity, defaulting to 2.0.
-- `gain` (`number`, optional) - Optional gain, defaulting to 0.5.
+- `seed` (`integer`, optional) - Seed value (default 0).
+- `octaves` (`integer`, optional) - Octave count (default 4).
+- `lac` (`number`, optional) - Lacunarity (default 2.0).
+- `gain` (`number`, optional) - Gain (default 0.5).
 
 **Returns**: `number` - Noise value.
 
@@ -1126,14 +1126,14 @@ Creates a Hermite spline from endpoints and tangents.
 
 **Parameters**
 
-- `p0x` (`number`, required) - Lua argument for `p0x`.
-- `p0y` (`number`, required) - Lua argument for `p0y`.
-- `p1x` (`number`, required) - Lua argument for `p1x`.
-- `p1y` (`number`, required) - Lua argument for `p1y`.
-- `m0x` (`number`, required) - Lua argument for `m0x`.
-- `m0y` (`number`, required) - Lua argument for `m0y`.
-- `m1x` (`number`, required) - Lua argument for `m1x`.
-- `m1y` (`number`, required) - Lua argument for `m1y`.
+- `p0x` (`number`, required) - Start point x coordinate.
+- `p0y` (`number`, required) - Start point y coordinate.
+- `p1x` (`number`, required) - End point x coordinate.
+- `p1y` (`number`, required) - End point y coordinate.
+- `m0x` (`number`, required) - Start tangent x component.
+- `m0y` (`number`, required) - Start tangent y component.
+- `m1x` (`number`, required) - End tangent x component.
+- `m1y` (`number`, required) - End tangent y component.
 
 **Returns**: `LHermite` - New Hermite spline handle.
 
@@ -1158,9 +1158,9 @@ Converts HSL color values to RGBA channels.
 
 **Parameters**
 
-- `h` (`number`, required) - Lua argument for `h`.
-- `s` (`number`, required) - Lua argument for `s`.
-- `l` (`number`, required) - Lua argument for `l`.
+- `h` (`number`, required) - Hue value.
+- `s` (`number`, required) - Saturation value.
+- `l` (`number`, required) - Lightness value.
 
 **Returns**: `number` - Red channel.
 
@@ -1655,22 +1655,22 @@ do
 end
 ```
 
-### `lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> LuaValue`
+### `lurek.math.lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) -> number`
 
 Returns intersection point for two infinite lines when present.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
-- `x3` (`number`, required) - Lua argument for `x3`.
-- `y3` (`number`, required) - Lua argument for `y3`.
-- `x4` (`number`, required) - Lua argument for `x4`.
-- `y4` (`number`, required) - Lua argument for `y4`.
+- `x1` (`number`, required) - First line start x coordinate.
+- `y1` (`number`, required) - First line start y coordinate.
+- `x2` (`number`, required) - First line end x coordinate.
+- `y2` (`number`, required) - First line end y coordinate.
+- `x3` (`number`, required) - Second line start x coordinate.
+- `y3` (`number`, required) - Second line start y coordinate.
+- `x4` (`number`, required) - Second line end x coordinate.
+- `y4` (`number`, required) - Second line end y coordinate.
 
-**Returns**: `LuaValue` - Intersection x coordinate, or nil.
+**Returns**: `number` - Intersection x coordinate, or nil.
 
 #### Example
 
@@ -1694,7 +1694,7 @@ Returns natural logarithm or logarithm with a supplied base.
 **Parameters**
 
 - `x` (`number`, required) - Input value.
-- `b` (`number`, optional) - Optional logarithm base.
+- `b` (`number`, optional) - Logarithm base.
 
 **Returns**: `number` - Logarithm value.
 
@@ -1817,7 +1817,7 @@ Creates a procedural noise generator with an optional seed.
 
 **Parameters**
 
-- `seed` (`integer`, optional) - Optional seed value, defaulting to 0.
+- `seed` (`integer`, optional) - Seed value (default 0).
 
 **Returns**: `LNoiseGenerator` - New noise generator handle.
 
@@ -1845,7 +1845,7 @@ Creates a deterministic random generator with an optional seed.
 
 **Parameters**
 
-- `seed` (`integer`, optional) - Optional seed value.
+- `seed` (`integer`, optional) - Seed value.
 
 **Returns**: `LRandomGenerator` - New random generator handle.
 
@@ -1876,7 +1876,7 @@ Creates a rectangle packer. This function is exposed to Lua scripts.
 
 - `width` (`integer`, required) - Packer width.
 - `height` (`integer`, required) - Packer height.
-- `padding` (`integer`, optional) - Optional padding between rectangles.
+- `padding` (`integer`, optional) - Padding between rectangles (default 0).
 
 **Returns**: `LRectPacker` - New rectangle packer handle.
 
@@ -1933,7 +1933,7 @@ Creates a 2D transform. All components are optional; omitting all returns an ide
 - `y` (`number`, optional) - Y translation (default 0).
 - `angle` (`number`, optional) - Rotation angle in radians (default 0).
 - `sx` (`number`, optional) - X scale factor (default 1).
-- `sy` (`number`, optional) - Y scale factor; defaults to `sx` when omitted.
+- `sy` (`number`, optional) - Y scale factor (defaults to `sx`).
 - `ox` (`number`, optional) - X origin offset for rotation/scale (default 0).
 - `oy` (`number`, optional) - Y origin offset for rotation/scale (default 0).
 - `kx` (`number`, optional) - X shear factor (default 0).
@@ -1964,7 +1964,7 @@ Creates a tween with a duration and optional easing name.
 **Parameters**
 
 - `duration` (`number`, required) - Tween duration in seconds.
-- `easing_name` (`string`, optional) - Optional easing name, defaulting to `linear`.
+- `easing_name` (`string`, optional) - Easing name (default `linear`).
 
 **Returns**: `LTween` - New tween handle.
 
@@ -2168,7 +2168,7 @@ Samples stateless 2D Perlin noise.
 
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
-- `seed` (`integer`, optional) - Optional seed value, defaulting to 0.
+- `seed` (`integer`, optional) - Seed value (default 0).
 
 **Returns**: `number` - Noise value.
 
@@ -2196,7 +2196,7 @@ Samples stateless 3D Perlin noise.
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
 - `z` (`number`, required) - Z coordinate.
-- `seed` (`integer`, optional) - Optional seed value, defaulting to 0.
+- `seed` (`integer`, optional) - Seed value (default 0).
 
 **Returns**: `number` - Noise value.
 
@@ -2291,18 +2291,18 @@ do
 end
 ```
 
-### `lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> table`
+### `lurek.math.polygonClip(pts: table, nx: number, ny: number, d: number) -> number[]`
 
 Clips a flat polygon point table against a plane.
 
 **Parameters**
 
-- `pts` (`table`, required) - Lua argument for `pts`.
-- `nx` (`number`, required) - Lua argument for `nx`.
-- `ny` (`number`, required) - Lua argument for `ny`.
-- `d` (`number`, required) - Lua argument for `d`.
+- `pts` (`table`, required) - Flat numeric polygon point table.
+- `nx` (`number`, required) - Plane normal x component.
+- `ny` (`number`, required) - Plane normal y component.
+- `d` (`number`, required) - Plane distance from origin.
 
-**Returns**: `table` - Flat numeric clipped polygon point table.
+**Returns**: `number[]` - Flat numeric clipped polygon point table (x1,y1,x2,y2,...).
 
 #### Example
 
@@ -2318,7 +2318,7 @@ do
 end
 ```
 
-### `lurek.math.polygonDifference(a: table, b: table) -> table`
+### `lurek.math.polygonDifference(a: table, b: table) -> number[]`
 
 Returns polygon difference points for two polygon tables.
 
@@ -2327,7 +2327,7 @@ Returns polygon difference points for two polygon tables.
 - `a` (`table`, required) - First polygon table of `{x, y}` points.
 - `b` (`table`, required) - Second polygon table of `{x, y}` points.
 
-**Returns**: `table` - Polygon table of result points.
+**Returns**: `number[]` - Flat array of polygon difference result points (x1,y1,x2,y2,...).
 
 #### Example
 
@@ -2344,7 +2344,7 @@ do
 end
 ```
 
-### `lurek.math.polygonIntersection(a: table, b: table) -> table`
+### `lurek.math.polygonIntersection(a: table, b: table) -> number[]`
 
 Returns polygon intersection points for two polygon tables.
 
@@ -2353,7 +2353,7 @@ Returns polygon intersection points for two polygon tables.
 - `a` (`table`, required) - First polygon table of `{x, y}` points.
 - `b` (`table`, required) - Second polygon table of `{x, y}` points.
 
-**Returns**: `table` - Polygon table of result points.
+**Returns**: `number[]` - Flat array of polygon intersection result points (x1,y1,x2,y2,...).
 
 #### Example
 
@@ -2370,7 +2370,7 @@ do
 end
 ```
 
-### `lurek.math.polygonUnion(a: table, b: table) -> table`
+### `lurek.math.polygonUnion(a: table, b: table) -> number[]`
 
 Returns polygon union points for two polygon tables.
 
@@ -2379,7 +2379,7 @@ Returns polygon union points for two polygon tables.
 - `a` (`table`, required) - First polygon table of `{x, y}` points.
 - `b` (`table`, required) - Second polygon table of `{x, y}` points.
 
-**Returns**: `table` - Polygon table of result points.
+**Returns**: `number[]` - Flat array of polygon union result points (x1,y1,x2,y2,...).
 
 #### Example
 
@@ -2447,8 +2447,8 @@ Returns a Lua math random value, optionally scaled to one or two bounds.
 
 **Parameters**
 
-- `a` (`number`, optional) - Optional upper bound or lower bound.
-- `b` (`number`, optional) - Optional upper bound.
+- `a` (`number`, optional) - Upper bound, or lower bound when `b` is given.
+- `b` (`number`, optional) - Upper bound.
 
 **Returns**: `number` - Random value.
 
@@ -2495,10 +2495,10 @@ Creates a rectangle tuple from center coordinates and size.
 
 **Parameters**
 
-- `cx` (`number`, required) - Lua argument for `cx`.
-- `cy` (`number`, required) - Lua argument for `cy`.
-- `w` (`number`, required) - Lua argument for `w`.
-- `h` (`number`, required) - Lua argument for `h`.
+- `cx` (`number`, required) - Center x coordinate.
+- `cy` (`number`, required) - Center y coordinate.
+- `w` (`number`, required) - Rectangle width.
+- `h` (`number`, required) - Rectangle height.
 
 **Returns**: `number` - Rectangle x coordinate.
 
@@ -2520,14 +2520,14 @@ Returns the union rectangle for two rectangles.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `w1` (`number`, required) - Lua argument for `w1`.
-- `h1` (`number`, required) - Lua argument for `h1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
-- `w2` (`number`, required) - Lua argument for `w2`.
-- `h2` (`number`, required) - Lua argument for `h2`.
+- `x1` (`number`, required) - First rectangle x coordinate.
+- `y1` (`number`, required) - First rectangle y coordinate.
+- `w1` (`number`, required) - First rectangle width.
+- `h1` (`number`, required) - First rectangle height.
+- `x2` (`number`, required) - Second rectangle x coordinate.
+- `y2` (`number`, required) - Second rectangle y coordinate.
+- `w2` (`number`, required) - Second rectangle width.
+- `h2` (`number`, required) - Second rectangle height.
 
 **Returns**: `number` - Union x coordinate.
 
@@ -2550,11 +2550,11 @@ Remaps a value from one range to another.
 
 **Parameters**
 
-- `v` (`number`, required) - Lua argument for `v`.
-- `in_min` (`number`, required) - Lua argument for `in_min`.
-- `in_max` (`number`, required) - Lua argument for `in_max`.
-- `out_min` (`number`, required) - Lua argument for `out_min`.
-- `out_max` (`number`, required) - Lua argument for `out_max`.
+- `v` (`number`, required) - Input value.
+- `in_min` (`number`, required) - Input range minimum.
+- `in_max` (`number`, required) - Input range maximum.
+- `out_min` (`number`, required) - Output range minimum.
+- `out_max` (`number`, required) - Output range maximum.
 
 **Returns**: `number` - Remapped value.
 
@@ -2577,9 +2577,9 @@ Converts RGB channels to HSL values.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
+- `r` (`number`, required) - Red channel value.
+- `g` (`number`, required) - Green channel value.
+- `b` (`number`, required) - Blue channel value.
 
 **Returns**: `number` - Hue.
 
@@ -2623,14 +2623,14 @@ Returns whether two segments intersect and their intersection point when present
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
-- `x3` (`number`, required) - Lua argument for `x3`.
-- `y3` (`number`, required) - Lua argument for `y3`.
-- `x4` (`number`, required) - Lua argument for `x4`.
-- `y4` (`number`, required) - Lua argument for `y4`.
+- `x1` (`number`, required) - First segment start x coordinate.
+- `y1` (`number`, required) - First segment start y coordinate.
+- `x2` (`number`, required) - First segment end x coordinate.
+- `y2` (`number`, required) - First segment end y coordinate.
+- `x3` (`number`, required) - Second segment start x coordinate.
+- `y3` (`number`, required) - Second segment start y coordinate.
+- `x4` (`number`, required) - Second segment end x coordinate.
+- `y4` (`number`, required) - Second segment end y coordinate.
 
 **Returns**: `boolean` - True when the segments intersect.
 
@@ -2680,7 +2680,7 @@ Samples stateless 2D simplex noise.
 
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
-- `seed` (`integer`, optional) - Optional seed value, defaulting to 0.
+- `seed` (`integer`, optional) - Seed value (default 0).
 
 **Returns**: `number` - Noise value.
 
@@ -2706,7 +2706,7 @@ Samples 2D or 3D simplex noise. This function is exposed to Lua scripts.
 
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
-- `z` (`number`, optional) - Optional Z coordinate.
+- `z` (`number`, optional) - Z coordinate for 3D noise.
 
 **Returns**: `number` - Noise value.
 
@@ -2756,9 +2756,9 @@ Applies smoothstep interpolation between two edges.
 
 **Parameters**
 
-- `edge0` (`number`, required) - Lua argument for `edge0`.
-- `edge1` (`number`, required) - Lua argument for `edge1`.
-- `x` (`number`, required) - Numeric `x` argument for this call.
+- `edge0` (`number`, required) - Lower edge.
+- `edge1` (`number`, required) - Upper edge.
+- `x` (`number`, required) - Input value.
 
 **Returns**: `number` - Smoothstep value.
 
@@ -2827,7 +2827,7 @@ Triangulates a flat polygon point table.
 
 - `pts` (`table`, required) - Flat numeric table `{x1, y1, x2, y2, ...}` with at least three points.
 
-**Returns**: `table` - Array table of flat triangle point tables.
+**Returns**: `table` - Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
 
 #### Example
 
@@ -3045,7 +3045,7 @@ do
 end
 ```
 
-### `LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> table`
+### `LAabbTree:query(min_x: number, min_y: number, max_x: number, max_y: number) -> integer[]`
 
 Queries ids intersecting an AABB. This method is available to Lua scripts.
 
@@ -3056,7 +3056,7 @@ Queries ids intersecting an AABB. This method is available to Lua scripts.
 - `max_x` (`number`, required) - Maximum x coordinate.
 - `max_y` (`number`, required) - Maximum y coordinate.
 
-**Returns**: `table` - Array table of item ids.
+**Returns**: `integer[]` - Item ids.
 
 #### Example
 
@@ -3074,7 +3074,7 @@ do
 end
 ```
 
-### `LAabbTree:queryPoint(x: number, y: number) -> table`
+### `LAabbTree:queryPoint(x: number, y: number) -> integer[]`
 
 Queries ids containing a point. This method is available to Lua scripts.
 
@@ -3083,7 +3083,7 @@ Queries ids containing a point. This method is available to Lua scripts.
 - `x` (`number`, required) - Point x coordinate.
 - `y` (`number`, required) - Point y coordinate.
 
-**Returns**: `table` - Array table of item ids.
+**Returns**: `integer[]` - Item ids.
 
 #### Example
 
@@ -3248,7 +3248,7 @@ Evaluates this curve at an approximate distance along the curve.
 **Parameters**
 
 - `distance` (`number`, required) - Distance along the curve.
-- `samples` (`integer`, optional) - Optional sample count, defaulting to 128.
+- `samples` (`integer`, optional) - Sample count (default 128).
 
 **Returns**: `number` - Point x coordinate.
 
@@ -3266,7 +3266,7 @@ do
 end
 ```
 
-### `LBezierCurve:getControlPoint(index: integer) -> LuaValue`
+### `LBezierCurve:getControlPoint(index: integer) -> number`
 
 Returns a control point by one-based index.
 
@@ -3274,7 +3274,7 @@ Returns a control point by one-based index.
 
 - `index` (`integer`, required) - One-based control point index.
 
-**Returns**: `LuaValue` - X coordinate, or nil when out of range.
+**Returns**: `number` - X coordinate, or nil when out of range.
 
 #### Example
 
@@ -3336,7 +3336,7 @@ Inserts a control point, optionally before a one-based index.
 
 - `x` (`number`, required) - Point x coordinate.
 - `y` (`number`, required) - Point y coordinate.
-- `index` (`integer`, optional) - Optional one-based insertion index.
+- `index` (`integer`, optional) - One-based insertion index.
 
 #### Example
 
@@ -4082,7 +4082,7 @@ do
 end
 ```
 
-### `LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> table`
+### `LNoiseGenerator:generateMap(w: integer, h: integer, [opts]: table) -> number[]`
 
 Generates a noise map and returns it as a flat array table.
 
@@ -4090,9 +4090,9 @@ Generates a noise map and returns it as a flat array table.
 
 - `w` (`integer`, required) - Map width.
 - `h` (`integer`, required) - Map height.
-- `opts` (`table`, optional) - Optional generation options including scale, octaves, kind, fractal, offset, and backend.
+- `opts` (`table`, optional) - Generation options including scale, octaves, kind, fractal, offset, and backend.
 
-**Returns**: `table` - Flat array table of noise values.
+**Returns**: `number[]` - Noise values.
 
 #### Example
 
@@ -4108,7 +4108,7 @@ do
 end
 ```
 
-### `LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> table`
+### `LNoiseGenerator:generateMapCompute(w: integer, h: integer, [opts]: table) -> number[]`
 
 Generates a noise map through the compute backend and returns it as a flat array table.
 
@@ -4116,9 +4116,9 @@ Generates a noise map through the compute backend and returns it as a flat array
 
 - `w` (`integer`, required) - Map width.
 - `h` (`integer`, required) - Map height.
-- `opts` (`table`, optional) - Optional generation options including scale, octaves, kind, fractal, and offset.
+- `opts` (`table`, optional) - Generation options including scale, octaves, kind, fractal, and offset.
 
-**Returns**: `table` - Flat array table of noise values.
+**Returns**: `number[]` - Noise values.
 
 #### Example
 
@@ -4479,8 +4479,8 @@ Samples 2D Worley noise. This method is available to Lua scripts.
 
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
-- `dist_name` (`string`, optional) - Optional distance type name.
-- `f2` (`boolean`, optional) - Optional second-feature flag.
+- `dist_name` (`string`, optional) - Distance type name (default `"euclidean"`).
+- `f2` (`boolean`, optional) - Second-feature flag (default false).
 
 **Returns**: `number` - Noise value.
 
@@ -4507,8 +4507,8 @@ Samples 3D Worley noise. This method is available to Lua scripts.
 - `x` (`number`, required) - X coordinate.
 - `y` (`number`, required) - Y coordinate.
 - `z` (`number`, required) - Z coordinate.
-- `dist_name` (`string`, optional) - Optional distance type name.
-- `f2` (`boolean`, optional) - Optional second-feature flag.
+- `dist_name` (`string`, optional) - Distance type name (default `"euclidean"`).
+- `f2` (`boolean`, optional) - Second-feature flag (default false).
 
 **Returns**: `number` - Noise value.
 
@@ -4662,8 +4662,8 @@ Returns a normally distributed random value.
 
 **Parameters**
 
-- `stddev` (`number`, optional) - Optional standard deviation, defaulting to 1.0.
-- `mean` (`number`, optional) - Optional mean, defaulting to 0.0.
+- `stddev` (`number`, optional) - Standard deviation (default 1.0).
+- `mean` (`number`, optional) - Mean value (default 0.0).
 
 **Returns**: `number` - Random normal value.
 
@@ -4846,7 +4846,7 @@ do
 end
 ```
 
-### `LRectPacker:pack(w: integer, h: integer, [id]: string) -> LuaValue`
+### `LRectPacker:pack(w: integer, h: integer, [id]: string) -> integer`
 
 Attempts to pack a rectangle and returns its placement coordinates.
 
@@ -4854,9 +4854,9 @@ Attempts to pack a rectangle and returns its placement coordinates.
 
 - `w` (`integer`, required) - Rectangle width.
 - `h` (`integer`, required) - Rectangle height.
-- `id` (`string`, optional) - Optional rectangle id.
+- `id` (`string`, optional) - Rectangle id.
 
-**Returns**: `LuaValue` - X coordinate, or nil when packing fails.
+**Returns**: `integer` - X coordinate, or nil when packing fails.
 
 #### Example
 
@@ -4978,7 +4978,7 @@ do
 end
 ```
 
-### `LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> table`
+### `LSpatialHash:queryCircle(cx: number, cy: number, radius: number) -> integer[]`
 
 Returns ids intersecting a query circle.
 
@@ -4988,7 +4988,7 @@ Returns ids intersecting a query circle.
 - `cy` (`number`, required) - Circle center y coordinate.
 - `radius` (`number`, required) - Circle radius.
 
-**Returns**: `table` - Array table of item ids.
+**Returns**: `integer[]` - Item ids.
 
 #### Example
 
@@ -5006,7 +5006,7 @@ do
 end
 ```
 
-### `LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> table`
+### `LSpatialHash:queryRect(x: number, y: number, w: number, h: number) -> integer[]`
 
 Returns ids intersecting a query rectangle.
 
@@ -5017,7 +5017,7 @@ Returns ids intersecting a query rectangle.
 - `w` (`number`, required) - Query width.
 - `h` (`number`, required) - Query height.
 
-**Returns**: `table` - Array table of item ids.
+**Returns**: `integer[]` - Item ids.
 
 #### Example
 
@@ -5034,7 +5034,7 @@ do
 end
 ```
 
-### `LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> table`
+### `LSpatialHash:querySegment(x1: number, y1: number, x2: number, y2: number) -> integer[]`
 
 Returns ids intersecting a query line segment.
 
@@ -5045,7 +5045,7 @@ Returns ids intersecting a query line segment.
 - `x2` (`number`, required) - Segment end x coordinate.
 - `y2` (`number`, required) - Segment end y coordinate.
 
-**Returns**: `table` - Array table of item ids.
+**Returns**: `integer[]` - Item ids.
 
 #### Example
 
@@ -5189,11 +5189,11 @@ do
 end
 ```
 
-### `LTransform:decompose() -> LuaValue`
+### `LTransform:decompose() -> number`
 
 Decomposes this transform into component values.
 
-**Returns**: `LuaValue` - Transform decomposition tuple from the math module.
+**Returns**: `number` - X translation.
 
 #### Example
 
@@ -5209,11 +5209,11 @@ do
 end
 ```
 
-### `LTransform:getMatrix() -> table`
+### `LTransform:getMatrix() -> number[]`
 
 Returns this transform matrix as a flat array table.
 
-**Returns**: `table` - Flat matrix values in row order.
+**Returns**: `number[]` - Flat matrix values in row-major order.
 
 #### Example
 
@@ -5319,7 +5319,7 @@ Applies scale to this transform. This method is available to Lua scripts.
 **Parameters**
 
 - `sx` (`number`, required) - X scale.
-- `sy` (`number`, optional) - Optional Y scale, defaulting to `sx`.
+- `sy` (`number`, optional) - Y scale (defaults to `sx`).
 
 #### Example
 
@@ -5342,13 +5342,13 @@ Replaces this transform from position, rotation, scale, origin, and shear compon
 
 - `x` (`number`, required) - X translation.
 - `y` (`number`, required) - Y translation.
-- `angle` (`number`, optional) - Optional rotation angle, defaulting to 0.
-- `sx` (`number`, optional) - Optional X scale, defaulting to 1.
-- `sy` (`number`, optional) - Optional Y scale, defaulting to `sx`.
-- `ox` (`number`, optional) - Optional origin x, defaulting to 0.
-- `oy` (`number`, optional) - Optional origin y, defaulting to 0.
-- `kx` (`number`, optional) - Optional X shear, defaulting to 0.
-- `ky` (`number`, optional) - Optional Y shear, defaulting to 0.
+- `angle` (`number`, optional) - Rotation angle (default 0).
+- `sx` (`number`, optional) - X scale (default 1).
+- `sy` (`number`, optional) - Y scale (defaults to `sx`).
+- `ox` (`number`, optional) - Origin x offset (default 0).
+- `oy` (`number`, optional) - Origin y offset (default 0).
+- `kx` (`number`, optional) - X shear (default 0).
+- `ky` (`number`, optional) - Y shear (default 0).
 
 #### Example
 
@@ -5520,11 +5520,11 @@ do
 end
 ```
 
-### `LTween:getAllValues() -> table`
+### `LTween:getAllValues() -> number[]`
 
 Returns all current tween values. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of numeric tween values.
+**Returns**: `number[]` - Numeric tween values.
 
 #### Example
 
@@ -5615,15 +5615,15 @@ do
 end
 ```
 
-### `LTween:getValue([index]: integer) -> LuaValue`
+### `LTween:getValue([index]: integer) -> number`
 
 Returns one tween value by one-based index or all values when no index is provided.
 
 **Parameters**
 
-- `index` (`integer`, optional) - Optional one-based value index.
+- `index` (`integer`, optional) - One-based value index; omit to return all values as a table.
 
-**Returns**: `LuaValue` - Number value or array table of all values.
+**Returns**: `number` - Tween value at the given index, or a table of all values when index is omitted.
 
 #### Example
 

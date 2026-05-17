@@ -28,9 +28,9 @@
   - [LDatabase](#ldatabase)
   - [LDatabase:addTable(name: string, df_ud: LDataFrame)](#ldatabaseaddtablename-string-dfud-ldataframe)
   - [LDatabase:clear()](#ldatabaseclear)
-  - [LDatabase:getTable(name: string) -> LuaValue](#ldatabasegettablename-string-luavalue)
+  - [LDatabase:getTable(name: string) -> LDataFrame](#ldatabasegettablename-string-ldataframe)
   - [LDatabase:hasTable(name: string) -> boolean](#ldatabasehastablename-string-boolean)
-  - [LDatabase:listTables() -> table](#ldatabaselisttables-table)
+  - [LDatabase:listTables() -> string[]](#ldatabaselisttables-string)
   - [LDatabase:merge(other: LDatabase)](#ldatabasemergeother-ldatabase)
   - [LDatabase:query(sql_str: string) -> LDataFrame](#ldatabasequerysqlstr-string-ldataframe)
   - [LDatabase:removeTable(name: string)](#ldatabaseremovetablename-string)
@@ -39,59 +39,59 @@
   - [LDatabase:type() -> string](#ldatabasetype-string)
   - [LDatabase:typeOf(name: string) -> boolean](#ldatabasetypeofname-string-boolean)
   - [LDataFrame](#ldataframe)
-  - [LDataFrame:addColumn(name: string, [default]: LuaValue)](#ldataframeaddcolumnname-string-default-luavalue)
+  - [LDataFrame:addColumn(name: string, [default]: string)](#ldataframeaddcolumnname-string-default-string)
   - [LDataFrame:addRow([row_tbl]: table) -> integer](#ldataframeaddrowrowtbl-table-integer)
   - [LDataFrame:addRowBatch(rows: table)](#ldataframeaddrowbatchrows-table)
-  - [LDataFrame:apply(col_val: LuaValue, func: function)](#ldataframeapplycolval-luavalue-func-function)
+  - [LDataFrame:apply(col_val: string, func: function)](#ldataframeapplycolval-string-func-function)
   - [LDataFrame:clone() -> LDataFrame](#ldataframeclone-ldataframe)
-  - [LDataFrame:columns() -> table](#ldataframecolumns-table)
-  - [LDataFrame:corr(col_a: LuaValue, col_b: LuaValue) -> number](#ldataframecorrcola-luavalue-colb-luavalue-number)
+  - [LDataFrame:columns() -> string[]](#ldataframecolumns-string)
+  - [LDataFrame:corr(col_a: string, col_b: string) -> number](#ldataframecorrcola-string-colb-string-number)
   - [LDataFrame:correlationMatrix() -> LDataFrame](#ldataframecorrelationmatrix-ldataframe)
   - [LDataFrame:count() -> integer](#ldataframecount-integer)
-  - [LDataFrame:countBy(col: any) -> LDataFrame](#ldataframecountbycol-any-ldataframe)
+  - [LDataFrame:countBy(col: string) -> LDataFrame](#ldataframecountbycol-string-ldataframe)
   - [LDataFrame:describe() -> LDataFrame](#ldataframedescribe-ldataframe)
-  - [LDataFrame:dropNil(col: any) -> LDataFrame](#ldataframedropnilcol-any-ldataframe)
-  - [LDataFrame:entropy(col: any) -> number](#ldataframeentropycol-any-number)
-  - [LDataFrame:fillNil(col: LuaValue, val: LuaValue)](#ldataframefillnilcol-luavalue-val-luavalue)
-  - [LDataFrame:filter(col: LuaValue, op: string, val: LuaValue) -> LDataFrame](#ldataframefiltercol-luavalue-op-string-val-luavalue-ldataframe)
-  - [LDataFrame:getColumn(col: any) -> table](#ldataframegetcolumncol-any-table)
-  - [LDataFrame:getColumnAsF64(col: any) -> table](#ldataframegetcolumnasf64col-any-table)
+  - [LDataFrame:dropNil(col: string) -> LDataFrame](#ldataframedropnilcol-string-ldataframe)
+  - [LDataFrame:entropy(col: string) -> number](#ldataframeentropycol-string-number)
+  - [LDataFrame:fillNil(col: string, val: string)](#ldataframefillnilcol-string-val-string)
+  - [LDataFrame:filter(col: string, op: string, val: string) -> LDataFrame](#ldataframefiltercol-string-op-string-val-string-ldataframe)
+  - [LDataFrame:getColumn(col: string) -> number[]](#ldataframegetcolumncol-string-number)
+  - [LDataFrame:getColumnAsF64(col: string) -> number[]](#ldataframegetcolumnasf64col-string-number)
   - [LDataFrame:getRow(row: integer) -> table](#ldataframegetrowrow-integer-table)
-  - [LDataFrame:getValue(row: integer, col: LuaValue) -> LuaValue](#ldataframegetvaluerow-integer-col-luavalue-luavalue)
-  - [LDataFrame:groupAgg(group_col: LuaValue, agg_col: LuaValue, fn_name: string) -> LDataFrame](#ldataframegroupagggroupcol-luavalue-aggcol-luavalue-fnname-string-ldataframe)
-  - [LDataFrame:groupBy(col: any) -> table](#ldataframegroupbycol-any-table)
-  - [LDataFrame:groupByObj(col: any) -> LGroupedFrame](#ldataframegroupbyobjcol-any-lgroupedframe)
+  - [LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil](#ldataframegetvaluerow-integer-col-string-numberstringbooleannil)
+  - [LDataFrame:groupAgg(group_col: string, agg_col: string, fn_name: string) -> LDataFrame](#ldataframegroupagggroupcol-string-aggcol-string-fnname-string-ldataframe)
+  - [LDataFrame:groupBy(col: string) -> table](#ldataframegroupbycol-string-table)
+  - [LDataFrame:groupByObj(col: string) -> LGroupedFrame](#ldataframegroupbyobjcol-string-lgroupedframe)
   - [LDataFrame:head([n]: integer) -> LDataFrame](#ldataframeheadn-integer-ldataframe)
-  - [LDataFrame:join(other: LDataFrame, this_col: LuaValue, other_col: LuaValue, [jtype]: string) -> LDataFrame](#ldataframejoinother-ldataframe-thiscol-luavalue-othercol-luavalue-jtype-string-ldataframe)
+  - [LDataFrame:join(other: LDataFrame, this_col: string, other_col: string, [jtype]: string) -> LDataFrame](#ldataframejoinother-ldataframe-thiscol-string-othercol-string-jtype-string-ldataframe)
   - [LDataFrame:lazy() -> LLazyQuery](#ldataframelazy-llazyquery)
-  - [LDataFrame:max(col: any) -> LuaValue](#ldataframemaxcol-any-luavalue)
-  - [LDataFrame:mean(col: any) -> number](#ldataframemeancol-any-number)
-  - [LDataFrame:median(col: any) -> number](#ldataframemediancol-any-number)
+  - [LDataFrame:max(col: string) -> number|string|boolean|nil](#ldataframemaxcol-string-numberstringbooleannil)
+  - [LDataFrame:mean(col: string) -> number](#ldataframemeancol-string-number)
+  - [LDataFrame:median(col: string) -> number](#ldataframemediancol-string-number)
   - [LDataFrame:merge(other: LDataFrame)](#ldataframemergeother-ldataframe)
-  - [LDataFrame:min(col: any) -> LuaValue](#ldataframemincol-any-luavalue)
-  - [LDataFrame:modeVal(col: any) -> LuaValue](#ldataframemodevalcol-any-luavalue)
+  - [LDataFrame:min(col: string) -> number|string|boolean|nil](#ldataframemincol-string-numberstringbooleannil)
+  - [LDataFrame:modeVal(col: string) -> number|string|boolean|nil](#ldataframemodevalcol-string-numberstringbooleannil)
   - [LDataFrame:ncols() -> integer](#ldataframencols-integer)
-  - [LDataFrame:normalizeCol(col: LuaValue, out_min: number, out_max: number, name: string)](#ldataframenormalizecolcol-luavalue-outmin-number-outmax-number-name-string)
+  - [LDataFrame:normalizeCol(col: string, out_min: number, out_max: number, name: string)](#ldataframenormalizecolcol-string-outmin-number-outmax-number-name-string)
   - [LDataFrame:nrows() -> integer](#ldataframenrows-integer)
-  - [LDataFrame:outliers(col: LuaValue, [threshold]: number) -> LDataFrame](#ldataframeoutlierscol-luavalue-threshold-number-ldataframe)
-  - [LDataFrame:pivot(row_col: LuaValue, col_col: LuaValue, val_col: LuaValue) -> LDataFrame](#ldataframepivotrowcol-luavalue-colcol-luavalue-valcol-luavalue-ldataframe)
-  - [LDataFrame:pivotTable(row_key: LuaValue, col_key: LuaValue, value_key: LuaValue, [agg]: string) -> LDataFrame](#ldataframepivottablerowkey-luavalue-colkey-luavalue-valuekey-luavalue-agg-string-ldataframe)
+  - [LDataFrame:outliers(col: string, [threshold]: number) -> LDataFrame](#ldataframeoutlierscol-string-threshold-number-ldataframe)
+  - [LDataFrame:pivot(row_col: string, col_col: string, val_col: string) -> LDataFrame](#ldataframepivotrowcol-string-colcol-string-valcol-string-ldataframe)
+  - [LDataFrame:pivotTable(row_key: string, col_key: string, value_key: string, [agg]: string) -> LDataFrame](#ldataframepivottablerowkey-string-colkey-string-valuekey-string-agg-string-ldataframe)
   - [LDataFrame:query(sql_str: string) -> LDataFrame](#ldataframequerysqlstr-string-ldataframe)
-  - [LDataFrame:rank(col: LuaValue, [order]: string, [result_col]: string) -> LDataFrame](#ldataframerankcol-luavalue-order-string-resultcol-string-ldataframe)
-  - [LDataFrame:removeColumn(col: any)](#ldataframeremovecolumncol-any)
+  - [LDataFrame:rank(col: string, [order]: string, [result_col]: string) -> LDataFrame](#ldataframerankcol-string-order-string-resultcol-string-ldataframe)
+  - [LDataFrame:removeColumn(col: string)](#ldataframeremovecolumncol-string)
   - [LDataFrame:removeRow(row: integer)](#ldataframeremoverowrow-integer)
-  - [LDataFrame:rename(col: LuaValue, new_name: string)](#ldataframerenamecol-luavalue-newname-string)
-  - [LDataFrame:rollingMean(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingmeancol-luavalue-window-integer-resultcol-string-ldataframe)
-  - [LDataFrame:rollingSum(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingsumcol-luavalue-window-integer-resultcol-string-ldataframe)
+  - [LDataFrame:rename(col: string, new_name: string)](#ldataframerenamecol-string-newname-string)
+  - [LDataFrame:rollingMean(col: string, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingmeancol-string-window-integer-resultcol-string-ldataframe)
+  - [LDataFrame:rollingSum(col: string, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingsumcol-string-window-integer-resultcol-string-ldataframe)
   - [LDataFrame:rows() -> function](#ldataframerows-function)
   - [LDataFrame:sample(n: integer, [seed]: integer) -> LDataFrame](#ldataframesamplen-integer-seed-integer-ldataframe)
-  - [LDataFrame:select(...: LuaValue) -> LDataFrame](#ldataframeselect-luavalue-ldataframe)
-  - [LDataFrame:setColumnFromF64(col: LuaValue, values: table)](#ldataframesetcolumnfromf64col-luavalue-values-table)
-  - [LDataFrame:setValue(row: integer, col: LuaValue, val: LuaValue)](#ldataframesetvaluerow-integer-col-luavalue-val-luavalue)
+  - [LDataFrame:select(...: string) -> LDataFrame](#ldataframeselect-string-ldataframe)
+  - [LDataFrame:setColumnFromF64(col: string, values: table)](#ldataframesetcolumnfromf64col-string-values-table)
+  - [LDataFrame:setValue(row: integer, col: string, val: string)](#ldataframesetvaluerow-integer-col-string-val-string)
   - [LDataFrame:slice(start: integer, end: integer) -> LDataFrame](#ldataframeslicestart-integer-end-integer-ldataframe)
-  - [LDataFrame:sort(col: LuaValue, [ascending]: boolean) -> LDataFrame](#ldataframesortcol-luavalue-ascending-boolean-ldataframe)
-  - [LDataFrame:stddev(col: any) -> number](#ldataframestddevcol-any-number)
-  - [LDataFrame:sum(col: any) -> number](#ldataframesumcol-any-number)
+  - [LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame](#ldataframesortcol-string-ascending-boolean-ldataframe)
+  - [LDataFrame:stddev(col: string) -> number](#ldataframestddevcol-string-number)
+  - [LDataFrame:sum(col: string) -> number](#ldataframesumcol-string-number)
   - [LDataFrame:tail([n]: integer) -> LDataFrame](#ldataframetailn-integer-ldataframe)
   - [LDataFrame:toBinary() -> string](#ldataframetobinary-string)
   - [LDataFrame:toCSV() -> string](#ldataframetocsv-string)
@@ -100,17 +100,17 @@
   - [LDataFrame:toTable() -> table](#ldataframetotable-table)
   - [LDataFrame:type() -> string](#ldataframetype-string)
   - [LDataFrame:typeOf(name: string) -> boolean](#ldataframetypeofname-string-boolean)
-  - [LDataFrame:unique(col: any) -> table](#ldataframeuniquecol-any-table)
-  - [LDataFrame:variance(col: any) -> number](#ldataframevariancecol-any-number)
-  - [LDataFrame:withCumsum(col: LuaValue, name: string)](#ldataframewithcumsumcol-luavalue-name-string)
+  - [LDataFrame:unique(col: string) -> number[]](#ldataframeuniquecol-string-number)
+  - [LDataFrame:variance(col: string) -> number](#ldataframevariancecol-string-number)
+  - [LDataFrame:withCumsum(col: string, name: string)](#ldataframewithcumsumcol-string-name-string)
   - [LDataFrame:withEval(col_name: string, expr: string) -> LDataFrame](#ldataframewithevalcolname-string-expr-string-ldataframe)
-  - [LDataFrame:withPctChange(col: LuaValue, name: string)](#ldataframewithpctchangecol-luavalue-name-string)
-  - [LDataFrame:withRank(col: LuaValue, [asc]: boolean, name: string)](#ldataframewithrankcol-luavalue-asc-boolean-name-string)
-  - [LDataFrame:withRollingMax(col: LuaValue, window: integer, name: string)](#ldataframewithrollingmaxcol-luavalue-window-integer-name-string)
-  - [LDataFrame:withRollingMean(col: LuaValue, window: integer, name: string)](#ldataframewithrollingmeancol-luavalue-window-integer-name-string)
-  - [LDataFrame:withRollingMin(col: LuaValue, window: integer, name: string)](#ldataframewithrollingmincol-luavalue-window-integer-name-string)
-  - [LDataFrame:withRollingSum(col: LuaValue, window: integer, name: string)](#ldataframewithrollingsumcol-luavalue-window-integer-name-string)
-  - [LDataFrame:zscoreCol(col: LuaValue, name: string)](#ldataframezscorecolcol-luavalue-name-string)
+  - [LDataFrame:withPctChange(col: string, name: string)](#ldataframewithpctchangecol-string-name-string)
+  - [LDataFrame:withRank(col: string, [asc]: boolean, name: string)](#ldataframewithrankcol-string-asc-boolean-name-string)
+  - [LDataFrame:withRollingMax(col: string, window: integer, name: string)](#ldataframewithrollingmaxcol-string-window-integer-name-string)
+  - [LDataFrame:withRollingMean(col: string, window: integer, name: string)](#ldataframewithrollingmeancol-string-window-integer-name-string)
+  - [LDataFrame:withRollingMin(col: string, window: integer, name: string)](#ldataframewithrollingmincol-string-window-integer-name-string)
+  - [LDataFrame:withRollingSum(col: string, window: integer, name: string)](#ldataframewithrollingsumcol-string-window-integer-name-string)
+  - [LDataFrame:zscoreCol(col: string, name: string)](#ldataframezscorecolcol-string-name-string)
   - [LGroupedFrame](#lgroupedframe)
   - [LGroupedFrame:aggregate(col_name: string, func: function) -> LDataFrame](#lgroupedframeaggregatecolname-string-func-function-ldataframe)
   - [LGroupedFrame:type() -> string](#lgroupedframetype-string)
@@ -118,7 +118,7 @@
   - [LLazyQuery](#llazyquery)
   - [LLazyQuery:collect() -> LDataFrame](#llazyquerycollect-ldataframe)
   - [LLazyQuery:dropNil(col: string) -> LLazyQuery](#llazyquerydropnilcol-string-llazyquery)
-  - [LLazyQuery:filter(col: string, op: string, val: LuaValue) -> LLazyQuery](#llazyqueryfiltercol-string-op-string-val-luavalue-llazyquery)
+  - [LLazyQuery:filter(col: string, op: string, val: string) -> LLazyQuery](#llazyqueryfiltercol-string-op-string-val-string-llazyquery)
   - [LLazyQuery:head(n: integer) -> LLazyQuery](#llazyqueryheadn-integer-llazyquery)
   - [LLazyQuery:limit(n: integer) -> LLazyQuery](#llazyquerylimitn-integer-llazyquery)
   - [LLazyQuery:select(cols: table) -> LLazyQuery](#llazyqueryselectcols-table-llazyquery)
@@ -141,9 +141,9 @@
   - [LVecFrame:colOp(out_col: string, left_col: string, op: string, right_col: string)](#lvecframecolopoutcol-string-leftcol-string-op-string-rightcol-string)
   - [LVecFrame:colSqrt(col: string)](#lvecframecolsqrtcol-string)
   - [LVecFrame:colSub(col: string, val: number)](#lvecframecolsubcol-string-val-number)
-  - [LVecFrame:colType(col: string) -> LuaValue](#lvecframecoltypecol-string-luavalue)
-  - [LVecFrame:columns() -> table](#lvecframecolumns-table)
-  - [LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> table](#lvecframefiltermaskcol-string-cmpop-string-val-number-table)
+  - [LVecFrame:colType(col: string) -> string](#lvecframecoltypecol-string-string)
+  - [LVecFrame:columns() -> string[]](#lvecframecolumns-string)
+  - [LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> number[]](#lvecframefiltermaskcol-string-cmpop-string-val-number-number)
   - [LVecFrame:ncols() -> integer](#lvecframencols-integer)
   - [LVecFrame:nrows() -> integer](#lvecframenrows-integer)
   - [LVecFrame:parReduce(cols_tbl: table, op: string) -> table](#lvecframeparreducecolstbl-table-op-string-table)
@@ -621,7 +621,7 @@ do
 end
 ```
 
-### `LDatabase:getTable(name: string) -> LuaValue`
+### `LDatabase:getTable(name: string) -> LDataFrame`
 
 Returns a copy of a named table when it exists.
 
@@ -629,7 +629,7 @@ Returns a copy of a named table when it exists.
 
 - `name` (`string`, required) - Table name to retrieve.
 
-**Returns**: `LuaValue` - Dataframe handle, or nil when no table has that name.
+**Returns**: `LDataFrame` - Dataframe handle, or nil when no table has that name.
 
 #### Example
 
@@ -676,11 +676,11 @@ do
 end
 ```
 
-### `LDatabase:listTables() -> table`
+### `LDatabase:listTables() -> string[]`
 
 Returns all table names in the database.
 
-**Returns**: `table` - Array table of table names.
+**Returns**: `string[]` - Table names.
 
 #### Example
 
@@ -907,14 +907,14 @@ do
 end
 ```
 
-### `LDataFrame:addColumn(name: string, [default]: LuaValue)`
+### `LDataFrame:addColumn(name: string, [default]: string)`
 
 Adds a column with an optional default value.
 
 **Parameters**
 
 - `name` (`string`, required) - Column name to create.
-- `default` (`LuaValue`, optional) - Default cell value for existing rows; nil uses empty cells.
+- `default` (`string`, optional) - Default cell value for existing rows; nil uses empty cells.
 
 #### Example
 
@@ -994,13 +994,13 @@ do
 end
 ```
 
-### `LDataFrame:apply(col_val: LuaValue, func: function)`
+### `LDataFrame:apply(col_val: string, func: function)`
 
 Applies a Lua function to each value in a column in place.
 
 **Parameters**
 
-- `col_val` (`LuaValue`, required) - Column name string or one-based column index.
+- `col_val` (`string`, required) - Column name string or one-based column index.
 - `func` (`function`, required) - Function called with each cell value and returning a replacement value.
 
 #### Example
@@ -1051,11 +1051,11 @@ do
 end
 ```
 
-### `LDataFrame:columns() -> table`
+### `LDataFrame:columns() -> string[]`
 
 Returns all column names in order. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of column names.
+**Returns**: `string[]` - Column names.
 
 #### Example
 
@@ -1075,14 +1075,14 @@ do
 end
 ```
 
-### `LDataFrame:corr(col_a: LuaValue, col_b: LuaValue) -> number`
+### `LDataFrame:corr(col_a: string, col_b: string) -> number`
 
 Returns correlation between two numeric columns.
 
 **Parameters**
 
-- `col_a` (`LuaValue`, required) - First column reference.
-- `col_b` (`LuaValue`, required) - Second column reference.
+- `col_a` (`string`, required) - Column name string or one-based column index.
+- `col_b` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Correlation value.
 
@@ -1151,13 +1151,13 @@ do
 end
 ```
 
-### `LDataFrame:countBy(col: any) -> LDataFrame`
+### `LDataFrame:countBy(col: string) -> LDataFrame`
 
 Counts occurrences of each value in a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `LDataFrame` - New dataframe containing value counts.
 
@@ -1202,13 +1202,13 @@ do
 end
 ```
 
-### `LDataFrame:dropNil(col: any) -> LDataFrame`
+### `LDataFrame:dropNil(col: string) -> LDataFrame`
 
 Returns rows where the chosen column is not nil.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `LDataFrame` - New dataframe without nil rows for the column.
 
@@ -1232,13 +1232,13 @@ do
 end
 ```
 
-### `LDataFrame:entropy(col: any) -> number`
+### `LDataFrame:entropy(col: string) -> number`
 
 Returns entropy for a column. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`any`, required) - Column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Entropy value.
 
@@ -1261,14 +1261,14 @@ do
 end
 ```
 
-### `LDataFrame:fillNil(col: LuaValue, val: LuaValue)`
+### `LDataFrame:fillNil(col: string, val: string)`
 
 Replaces nil cells in a column with a value.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
-- `val` (`LuaValue`, required) - Replacement cell value.
+- `col` (`string`, required) - Column name string or one-based column index.
+- `val` (`string`, required) - Replacement cell value.
 
 #### Example
 
@@ -1290,15 +1290,15 @@ do
 end
 ```
 
-### `LDataFrame:filter(col: LuaValue, op: string, val: LuaValue) -> LDataFrame`
+### `LDataFrame:filter(col: string, op: string, val: string) -> LDataFrame`
 
 Returns rows whose column value matches a comparison.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `op` (`string`, required) - Comparison operator string.
-- `val` (`LuaValue`, required) - Cell value used as the comparison target.
+- `val` (`string`, required) - Cell value used as the comparison target.
 
 **Returns**: `LDataFrame` - New filtered dataframe.
 
@@ -1321,15 +1321,15 @@ do
 end
 ```
 
-### `LDataFrame:getColumn(col: any) -> table`
+### `LDataFrame:getColumn(col: string) -> number[]`
 
 Returns a column as an array table. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `table` - Array table of column values.
+**Returns**: `number[]` - Array table of column values.
 
 #### Example
 
@@ -1351,15 +1351,15 @@ do
 end
 ```
 
-### `LDataFrame:getColumnAsF64(col: any) -> table`
+### `LDataFrame:getColumnAsF64(col: string) -> number[]`
 
 Returns a numeric column as an array of numbers.
 
 **Parameters**
 
-- `col` (`any`, required) - Column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `table` - Array table of numeric values.
+**Returns**: `number[]` - Numeric values.
 
 #### Example
 
@@ -1406,16 +1406,16 @@ do
 end
 ```
 
-### `LDataFrame:getValue(row: integer, col: LuaValue) -> LuaValue`
+### `LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil`
 
 Returns one cell value by one-based row and column reference.
 
 **Parameters**
 
 - `row` (`integer`, required) - One-based row index.
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `LuaValue` - Cell value at the requested row and column.
+**Returns**: `number|string|boolean|nil` - Cell value at the requested row and column.
 
 #### Example
 
@@ -1440,14 +1440,14 @@ do
 end
 ```
 
-### `LDataFrame:groupAgg(group_col: LuaValue, agg_col: LuaValue, fn_name: string) -> LDataFrame`
+### `LDataFrame:groupAgg(group_col: string, agg_col: string, fn_name: string) -> LDataFrame`
 
 Groups by one column and aggregates another column.
 
 **Parameters**
 
-- `group_col` (`LuaValue`, required) - Grouping column reference.
-- `agg_col` (`LuaValue`, required) - Aggregated column reference.
+- `group_col` (`string`, required) - Column name string or one-based column index.
+- `agg_col` (`string`, required) - Column name string or one-based column index.
 - `fn_name` (`string`, required) - Aggregate function name.
 
 **Returns**: `LDataFrame` - New grouped aggregate dataframe.
@@ -1471,13 +1471,13 @@ do
 end
 ```
 
-### `LDataFrame:groupBy(col: any) -> table`
+### `LDataFrame:groupBy(col: string) -> table`
 
 Groups rows by a column and returns a table from group key to dataframe.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `table` - Table keyed by group values with dataframe handles as values.
 
@@ -1503,13 +1503,13 @@ do
 end
 ```
 
-### `LDataFrame:groupByObj(col: any) -> LGroupedFrame`
+### `LDataFrame:groupByObj(col: string) -> LGroupedFrame`
 
 Groups rows by a column and returns a grouped-frame object.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `LGroupedFrame` - Grouped frame handle.
 
@@ -1560,15 +1560,15 @@ do
 end
 ```
 
-### `LDataFrame:join(other: LDataFrame, this_col: LuaValue, other_col: LuaValue, [jtype]: string) -> LDataFrame`
+### `LDataFrame:join(other: LDataFrame, this_col: string, other_col: string, [jtype]: string) -> LDataFrame`
 
 Joins this dataframe with another dataframe by column references.
 
 **Parameters**
 
 - `other` (`LDataFrame`, required) - Other dataframe to join.
-- `this_col` (`LuaValue`, required) - Column reference in this dataframe.
-- `other_col` (`LuaValue`, required) - Column reference in the other dataframe.
+- `this_col` (`string`, required) - Column name string or one-based column index.
+- `other_col` (`string`, required) - Column name string or one-based column index.
 - `jtype` (`string`, optional) - Join type string; defaults to `inner`.
 
 **Returns**: `LDataFrame` - New joined dataframe.
@@ -1621,15 +1621,15 @@ do
 end
 ```
 
-### `LDataFrame:max(col: any) -> LuaValue`
+### `LDataFrame:max(col: string) -> number|string|boolean|nil`
 
 Returns the maximum value of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `LuaValue` - Maximum cell value.
+**Returns**: `number|string|boolean|nil` - Maximum cell value.
 
 #### Example
 
@@ -1649,13 +1649,13 @@ do
 end
 ```
 
-### `LDataFrame:mean(col: any) -> number`
+### `LDataFrame:mean(col: string) -> number`
 
 Returns the numeric mean of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Column mean.
 
@@ -1678,13 +1678,13 @@ do
 end
 ```
 
-### `LDataFrame:median(col: any) -> number`
+### `LDataFrame:median(col: string) -> number`
 
 Returns the numeric median of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Column median.
 
@@ -1731,15 +1731,15 @@ do
 end
 ```
 
-### `LDataFrame:min(col: any) -> LuaValue`
+### `LDataFrame:min(col: string) -> number|string|boolean|nil`
 
 Returns the minimum value of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `LuaValue` - Minimum cell value.
+**Returns**: `number|string|boolean|nil` - Minimum cell value.
 
 #### Example
 
@@ -1759,15 +1759,15 @@ do
 end
 ```
 
-### `LDataFrame:modeVal(col: any) -> LuaValue`
+### `LDataFrame:modeVal(col: string) -> number|string|boolean|nil`
 
 Returns the mode value of a column. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`any`, required) - Column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `LuaValue` - Most common cell value.
+**Returns**: `number|string|boolean|nil` - Most common cell value.
 
 #### Example
 
@@ -1813,13 +1813,13 @@ do
 end
 ```
 
-### `LDataFrame:normalizeCol(col: LuaValue, out_min: number, out_max: number, name: string)`
+### `LDataFrame:normalizeCol(col: string, out_min: number, out_max: number, name: string)`
 
 Adds a range-normalized column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `out_min` (`number`, required) - Output lower bound.
 - `out_max` (`number`, required) - Output upper bound.
 - `name` (`string`, required) - Output column name.
@@ -1865,13 +1865,13 @@ do
 end
 ```
 
-### `LDataFrame:outliers(col: LuaValue, [threshold]: number) -> LDataFrame`
+### `LDataFrame:outliers(col: string, [threshold]: number) -> LDataFrame`
 
 Returns rows considered outliers for a numeric column.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `threshold` (`number`, optional) - Z-score threshold; defaults to 2.0.
 
 **Returns**: `LDataFrame` - New dataframe containing outlier rows.
@@ -1893,15 +1893,15 @@ do
 end
 ```
 
-### `LDataFrame:pivot(row_col: LuaValue, col_col: LuaValue, val_col: LuaValue) -> LDataFrame`
+### `LDataFrame:pivot(row_col: string, col_col: string, val_col: string) -> LDataFrame`
 
 Pivots rows into columns using row, column, and value fields.
 
 **Parameters**
 
-- `row_col` (`LuaValue`, required) - Row key column reference.
-- `col_col` (`LuaValue`, required) - Column key column reference.
-- `val_col` (`LuaValue`, required) - Value column reference.
+- `row_col` (`string`, required) - Column name string or one-based column index.
+- `col_col` (`string`, required) - Column name string or one-based column index.
+- `val_col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `LDataFrame` - New pivoted dataframe.
 
@@ -1925,15 +1925,15 @@ do
 end
 ```
 
-### `LDataFrame:pivotTable(row_key: LuaValue, col_key: LuaValue, value_key: LuaValue, [agg]: string) -> LDataFrame`
+### `LDataFrame:pivotTable(row_key: string, col_key: string, value_key: string, [agg]: string) -> LDataFrame`
 
 Builds a pivot table using row key, column key, value column, and aggregate function.
 
 **Parameters**
 
-- `row_key` (`LuaValue`, required) - Row key column reference.
-- `col_key` (`LuaValue`, required) - Column key column reference.
-- `value_key` (`LuaValue`, required) - Value column reference.
+- `row_key` (`string`, required) - Column name string or one-based column index.
+- `col_key` (`string`, required) - Column name string or one-based column index.
+- `value_key` (`string`, required) - Column name string or one-based column index.
 - `agg` (`string`, optional) - Aggregate function name; defaults to `mean`.
 
 **Returns**: `LDataFrame` - New pivot table dataframe.
@@ -1988,13 +1988,13 @@ do
 end
 ```
 
-### `LDataFrame:rank(col: LuaValue, [order]: string, [result_col]: string) -> LDataFrame`
+### `LDataFrame:rank(col: string, [order]: string, [result_col]: string) -> LDataFrame`
 
 Returns a dataframe with a rank column.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `order` (`string`, optional) - Rank order string; defaults to `asc`.
 - `result_col` (`string`, optional) - Output column name; defaults to `rank`.
 
@@ -2019,13 +2019,13 @@ do
 end
 ```
 
-### `LDataFrame:removeColumn(col: any)`
+### `LDataFrame:removeColumn(col: string)`
 
 Removes a column by name or one-based index.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 #### Example
 
@@ -2074,13 +2074,13 @@ do
 end
 ```
 
-### `LDataFrame:rename(col: LuaValue, new_name: string)`
+### `LDataFrame:rename(col: string, new_name: string)`
 
 Renames a column by name or one-based index.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `new_name` (`string`, required) - New column name.
 
 #### Example
@@ -2100,13 +2100,13 @@ do
 end
 ```
 
-### `LDataFrame:rollingMean(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame`
+### `LDataFrame:rollingMean(col: string, window: integer, [result_col]: string) -> LDataFrame`
 
 Returns a dataframe with a rolling mean column.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `result_col` (`string`, optional) - Output column name; defaults to `rolling_mean`.
 
@@ -2131,13 +2131,13 @@ do
 end
 ```
 
-### `LDataFrame:rollingSum(col: LuaValue, window: integer, [result_col]: string) -> LDataFrame`
+### `LDataFrame:rollingSum(col: string, window: integer, [result_col]: string) -> LDataFrame`
 
 Returns a dataframe with a rolling sum column.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `result_col` (`string`, optional) - Output column name; defaults to `rolling_sum`.
 
@@ -2215,13 +2215,13 @@ do
 end
 ```
 
-### `LDataFrame:select(...: LuaValue) -> LDataFrame`
+### `LDataFrame:select(...: string) -> LDataFrame`
 
 Returns a dataframe with selected columns.
 
 **Parameters**
 
-- `...` (`LuaValue`, required) - Column name strings or one-based column indices to keep.
+- `...` (`string`, required) - Column name strings or one-based column indices to keep.
 
 **Returns**: `LDataFrame` - New dataframe containing selected columns.
 
@@ -2243,13 +2243,13 @@ do
 end
 ```
 
-### `LDataFrame:setColumnFromF64(col: LuaValue, values: table)`
+### `LDataFrame:setColumnFromF64(col: string, values: table)`
 
 Replaces a numeric column from an array table of numbers.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `values` (`table`, required) - Array table of numeric values.
 
 #### Example
@@ -2268,15 +2268,15 @@ do
 end
 ```
 
-### `LDataFrame:setValue(row: integer, col: LuaValue, val: LuaValue)`
+### `LDataFrame:setValue(row: integer, col: string, val: string)`
 
 Sets one cell value by one-based row and column reference.
 
 **Parameters**
 
 - `row` (`integer`, required) - One-based row index.
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
-- `val` (`LuaValue`, required) - Cell value to store.
+- `col` (`string`, required) - Column name string or one-based column index.
+- `val` (`string`, required) - Cell value to store.
 
 #### Example
 
@@ -2321,13 +2321,13 @@ do
 end
 ```
 
-### `LDataFrame:sort(col: LuaValue, [ascending]: boolean) -> LDataFrame`
+### `LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame`
 
 Returns rows sorted by a column. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `ascending` (`boolean`, optional) - True for ascending order; defaults to true.
 
 **Returns**: `LDataFrame` - New sorted dataframe.
@@ -2350,13 +2350,13 @@ do
 end
 ```
 
-### `LDataFrame:stddev(col: any) -> number`
+### `LDataFrame:stddev(col: string) -> number`
 
 Returns the numeric standard deviation of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Column standard deviation.
 
@@ -2374,13 +2374,13 @@ do
 end
 ```
 
-### `LDataFrame:sum(col: any) -> number`
+### `LDataFrame:sum(col: string) -> number`
 
 Returns the numeric sum of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Column sum.
 
@@ -2530,7 +2530,7 @@ end
 
 Converts this dataframe to an array table of row tables.
 
-**Returns**: `table` - Array table of rows keyed by column name.
+**Returns**: `table` - Array of rows keyed by column name.
 
 #### Example
 
@@ -2598,15 +2598,15 @@ do
 end
 ```
 
-### `LDataFrame:unique(col: any) -> table`
+### `LDataFrame:unique(col: string) -> number[]`
 
 Returns unique values from a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
-**Returns**: `table` - Array table of unique values.
+**Returns**: `number[]` - Array table of unique values.
 
 #### Example
 
@@ -2628,13 +2628,13 @@ do
 end
 ```
 
-### `LDataFrame:variance(col: any) -> number`
+### `LDataFrame:variance(col: string) -> number`
 
 Returns the numeric variance of a column.
 
 **Parameters**
 
-- `col` (`any`, required) - Column name string or one-based column index.
+- `col` (`string`, required) - Column name string or one-based column index.
 
 **Returns**: `number` - Column variance.
 
@@ -2653,13 +2653,13 @@ do
 end
 ```
 
-### `LDataFrame:withCumsum(col: LuaValue, name: string)`
+### `LDataFrame:withCumsum(col: string, name: string)`
 
 Adds a cumulative-sum column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `name` (`string`, required) - Output column name.
 
 #### Example
@@ -2712,13 +2712,13 @@ do
 end
 ```
 
-### `LDataFrame:withPctChange(col: LuaValue, name: string)`
+### `LDataFrame:withPctChange(col: string, name: string)`
 
 Adds a percent-change column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `name` (`string`, required) - Output column name.
 
 #### Example
@@ -2740,13 +2740,13 @@ do
 end
 ```
 
-### `LDataFrame:withRank(col: LuaValue, [asc]: boolean, name: string)`
+### `LDataFrame:withRank(col: string, [asc]: boolean, name: string)`
 
 Adds a rank column in place. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `asc` (`boolean`, optional) - True for ascending rank; defaults to true.
 - `name` (`string`, required) - Output column name.
 
@@ -2768,13 +2768,13 @@ do
 end
 ```
 
-### `LDataFrame:withRollingMax(col: LuaValue, window: integer, name: string)`
+### `LDataFrame:withRollingMax(col: string, window: integer, name: string)`
 
 Adds a rolling maximum column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `name` (`string`, required) - Output column name.
 
@@ -2797,13 +2797,13 @@ do
 end
 ```
 
-### `LDataFrame:withRollingMean(col: LuaValue, window: integer, name: string)`
+### `LDataFrame:withRollingMean(col: string, window: integer, name: string)`
 
 Adds a rolling mean column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `name` (`string`, required) - Output column name.
 
@@ -2822,13 +2822,13 @@ do
 end
 ```
 
-### `LDataFrame:withRollingMin(col: LuaValue, window: integer, name: string)`
+### `LDataFrame:withRollingMin(col: string, window: integer, name: string)`
 
 Adds a rolling minimum column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `name` (`string`, required) - Output column name.
 
@@ -2851,13 +2851,13 @@ do
 end
 ```
 
-### `LDataFrame:withRollingSum(col: LuaValue, window: integer, name: string)`
+### `LDataFrame:withRollingSum(col: string, window: integer, name: string)`
 
 Adds a rolling sum column in place. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `window` (`integer`, required) - Rolling window size.
 - `name` (`string`, required) - Output column name.
 
@@ -2877,13 +2877,13 @@ do
 end
 ```
 
-### `LDataFrame:zscoreCol(col: LuaValue, name: string)`
+### `LDataFrame:zscoreCol(col: string, name: string)`
 
 Adds a z-score normalized column in place.
 
 **Parameters**
 
-- `col` (`LuaValue`, required) - Source column reference.
+- `col` (`string`, required) - Column name string or one-based column index.
 - `name` (`string`, required) - Output column name.
 
 #### Example
@@ -3198,7 +3198,7 @@ do
 end
 ```
 
-### `LLazyQuery:filter(col: string, op: string, val: LuaValue) -> LLazyQuery`
+### `LLazyQuery:filter(col: string, op: string, val: string) -> LLazyQuery`
 
 Adds a filter step to the lazy query.
 
@@ -3206,7 +3206,7 @@ Adds a filter step to the lazy query.
 
 - `col` (`string`, required) - Column name to filter.
 - `op` (`string`, required) - Comparison operator string.
-- `val` (`LuaValue`, required) - Filter comparison value.
+- `val` (`string`, required) - Filter comparison value.
 
 **Returns**: `LLazyQuery` - New lazy query handle with the filter step.
 
@@ -3778,7 +3778,7 @@ do
 end
 ```
 
-### `LVecFrame:colType(col: string) -> LuaValue`
+### `LVecFrame:colType(col: string) -> string`
 
 Returns the data type name for a vectorized column.
 
@@ -3786,7 +3786,7 @@ Returns the data type name for a vectorized column.
 
 - `col` (`string`, required) - Column name.
 
-**Returns**: `LuaValue` - Column type name, or nil when the column is missing.
+**Returns**: `string` - Column type name, or nil when the column is missing.
 
 #### Example
 
@@ -3803,11 +3803,11 @@ do
 end
 ```
 
-### `LVecFrame:columns() -> table`
+### `LVecFrame:columns() -> string[]`
 
 Returns all vectorized column names in order.
 
-**Returns**: `table` - Array table of column names.
+**Returns**: `string[]` - Column names.
 
 #### Example
 
@@ -3825,7 +3825,7 @@ do
 end
 ```
 
-### `LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> table`
+### `LVecFrame:filterMask(col: string, cmp_op: string, val: number) -> number[]`
 
 Builds a boolean mask for a numeric column comparison.
 
@@ -3835,7 +3835,7 @@ Builds a boolean mask for a numeric column comparison.
 - `cmp_op` (`string`, required) - Comparison operation name.
 - `val` (`number`, required) - Comparison value.
 
-**Returns**: `table` - Array table of boolean mask values.
+**Returns**: `number[]` - Array table of boolean mask values.
 
 #### Example
 

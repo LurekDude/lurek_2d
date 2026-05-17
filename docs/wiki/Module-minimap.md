@@ -46,7 +46,7 @@
   - [LMinimap:getHoverInfo(sx: number, sy: number, mx: number, my: number) -> string](#lminimapgethoverinfosx-number-sy-number-mx-number-my-number-string)
   - [LMinimap:getLayer() -> integer](#lminimapgetlayer-integer)
   - [LMinimap:getLayerCount() -> integer](#lminimapgetlayercount-integer)
-  - [LMinimap:getLayerData(layer: integer) -> table](#lminimapgetlayerdatalayer-integer-table)
+  - [LMinimap:getLayerData(layer: integer) -> integer[]](#lminimapgetlayerdatalayer-integer-integer)
   - [LMinimap:getMarkerCount() -> integer](#lminimapgetmarkercount-integer)
   - [LMinimap:getMarkerDescription(id: integer) -> string](#lminimapgetmarkerdescriptionid-integer-string)
   - [LMinimap:getObjectCount() -> integer](#lminimapgetobjectcount-integer)
@@ -59,9 +59,9 @@
   - [LMinimap:getTerrainColor(terrain_type: integer) -> number](#lminimapgetterraincolorterraintype-integer-number)
   - [LMinimap:getTileDescription(type_id: integer) -> string](#lminimapgettiledescriptiontypeid-integer-string)
   - [LMinimap:getViewportColor() -> number](#lminimapgetviewportcolor-number)
-  - [LMinimap:getViewportRect() -> LuaValue](#lminimapgetviewportrect-luavalue)
+  - [LMinimap:getViewportRect() -> number](#lminimapgetviewportrect-number)
   - [LMinimap:getZoom() -> number](#lminimapgetzoom-number)
-  - [LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> LuaValue](#lminimapgridtoscreengx-number-gy-number-mx-number-my-number-luavalue)
+  - [LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> number](#lminimapgridtoscreengx-number-gy-number-mx-number-my-number-number)
   - [LMinimap:hasMarker(id: integer) -> boolean](#lminimaphasmarkerid-integer-boolean)
   - [LMinimap:isAntiAlias() -> boolean](#lminimapisantialias-boolean)
   - [LMinimap:isClickable() -> boolean](#lminimapisclickable-boolean)
@@ -72,7 +72,7 @@
   - [LMinimap:removeObject(id: integer) -> boolean](#lminimapremoveobjectid-integer-boolean)
   - [LMinimap:render([x]: number, [y]: number)](#lminimaprenderx-number-y-number)
   - [LMinimap:revealRadius(cx: number, cy: number, radius: number)](#lminimaprevealradiuscx-number-cy-number-radius-number)
-  - [LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> LuaValue](#lminimapscreentogridsx-number-sy-number-mx-number-my-number-luavalue)
+  - [LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> number](#lminimapscreentogridsx-number-sy-number-mx-number-my-number-number)
   - [LMinimap:setAntiAlias(enabled: boolean)](#lminimapsetantialiasenabled-boolean)
   - [LMinimap:setCenter(x: number, y: number)](#lminimapsetcenterx-number-y-number)
   - [LMinimap:setClickable(enabled: boolean)](#lminimapsetclickableenabled-boolean)
@@ -87,7 +87,7 @@
   - [LMinimap:setMarkerAnimation(id: integer, anim_type: string, speed: number)](#lminimapsetmarkeranimationid-integer-animtype-string-speed-number)
   - [LMinimap:setMarkerTexture(id: integer, image_ud: LImage, [width]: number, [height]: number)](#lminimapsetmarkertextureid-integer-imageud-limage-width-number-height-number)
   - [LMinimap:setObject(id: integer, x: number, y: number, type_idx: integer, [owner]: integer)](#lminimapsetobjectid-integer-x-number-y-number-typeidx-integer-owner-integer)
-  - [LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, width: number, height: number)](#lminimapsetobjecttypetexturetypeidx-integer-imageud-limage-width-number-height-number)
+  - [LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, [width]: number, [height]: number)](#lminimapsetobjecttypetexturetypeidx-integer-imageud-limage-width-number-height-number)
   - [LMinimap:setObjectTypeVisible(type_idx: integer, visible: boolean)](#lminimapsetobjecttypevisibletypeidx-integer-visible-boolean)
   - [LMinimap:setOwnerColor(owner: integer, r: number, g: number, b: number, [a]: number)](#lminimapsetownercolorowner-integer-r-number-g-number-b-number-a-number)
   - [LMinimap:setTerrain(x: integer, y: integer, terrain_type: integer)](#lminimapsetterrainx-integer-y-integer-terraintype-integer)
@@ -199,8 +199,8 @@ Creates a minimap with grid dimensions and optional display size.
 
 - `grid_w` (`integer`, required) - Grid width in cells.
 - `grid_h` (`integer`, required) - Grid height in cells.
-- `display_w` (`integer`, optional) - Optional display width in pixels, defaulting to 200.
-- `display_h` (`integer`, optional) - Optional display height in pixels, defaulting to 200.
+- `display_w` (`integer`, optional) - Display width in pixels, defaults to 200.
+- `display_h` (`integer`, optional) - Display height in pixels, defaults to 200.
 
 **Returns**: `LMinimap` - New minimap handle.
 
@@ -257,17 +257,17 @@ end
 
 ### `LMinimap:addMarker(x: number, y: number, [desc]: string, [r]: number, [g]: number, [b]: number, [a]: number) -> integer`
 
-Adds a marker and returns its id. This method is available to Lua scripts.
+Adds a world-space marker and returns its unique id.
 
 **Parameters**
 
 - `x` (`number`, required) - Marker x coordinate.
 - `y` (`number`, required) - Marker y coordinate.
-- `desc` (`string`, optional) - Optional marker description.
-- `r` (`number`, optional) - Optional red channel override (0..1, default 1).
-- `g` (`number`, optional) - Optional green channel override (0..1, default 0).
-- `b` (`number`, optional) - Optional blue channel override (0..1, default 0).
-- `a` (`number`, optional) - Optional alpha channel override (0..1, default 1).
+- `desc` (`string`, optional) - Marker description.
+- `r` (`number`, optional) - Red channel override, defaults to 1.0.
+- `g` (`number`, optional) - Green channel override, defaults to 0.0.
+- `b` (`number`, optional) - Blue channel override, defaults to 0.0.
+- `a` (`number`, optional) - Alpha channel override, defaults to 1.0.
 
 **Returns**: `integer` - Marker id.
 
@@ -298,11 +298,11 @@ Adds an object type and returns its one-based index.
 
 **Parameters**
 
-- `name` (`string`, required) - String value for `name`.
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, optional) - Lua argument for `a`.
+- `name` (`string`, required) - Object type name.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, optional) - Alpha channel, defaults to 1.0.
 
 **Returns**: `integer` - One-based object type index.
 
@@ -326,17 +326,17 @@ end
 
 ### `LMinimap:addPing(x: number, y: number, duration: number, [r]: number, [g]: number, [b]: number, [a]: number)`
 
-Adds a timed ping effect at a minimap world position. The ping fades out over its duration.
+Adds a timed ping effect at a minimap world position.
 
 **Parameters**
 
 - `x` (`number`, required) - World x coordinate of the ping.
 - `y` (`number`, required) - World y coordinate of the ping.
-- `duration` (`number`, required) - How long the ping is visible in seconds.
-- `r` (`number`, optional) - Red channel of the ping color (0..1, default 1).
-- `g` (`number`, optional) - Green channel of the ping color (0..1, default 1).
-- `b` (`number`, optional) - Blue channel of the ping color (0..1, default 0).
-- `a` (`number`, optional) - Alpha channel of the ping color (0..1, default 1).
+- `duration` (`number`, required) - Duration in seconds before the ping fades out.
+- `r` (`number`, optional) - Red channel, defaults to 1.0.
+- `g` (`number`, optional) - Green channel, defaults to 1.0.
+- `b` (`number`, optional) - Blue channel, defaults to 0.0.
+- `a` (`number`, optional) - Alpha channel, defaults to 1.0.
 
 #### Example
 
@@ -359,7 +359,7 @@ end
 
 ### `LMinimap:clearMarkerAnimation(id: integer)`
 
-Clears marker animation by id. This method is available to Lua scripts.
+Clears the animation assigned to a marker by id.
 
 **Parameters**
 
@@ -455,7 +455,7 @@ end
 
 ### `LMinimap:clearOverlay()`
 
-Clears overlay shapes. This method is available to Lua scripts.
+Clears all minimap overlay shapes.
 
 #### Example
 
@@ -479,7 +479,7 @@ Clears one path by id or all paths when no id is provided.
 
 **Parameters**
 
-- `id` (`integer`, optional) - Optional path id.
+- `id` (`integer`, optional) - Path id to clear.
 
 #### Example
 
@@ -498,7 +498,7 @@ end
 
 ### `LMinimap:clearViewportRect()`
 
-Clears the viewport rectangle. This method is available to Lua scripts.
+Clears the minimap viewport rectangle overlay.
 
 #### Example
 
@@ -521,15 +521,15 @@ end
 
 ### `LMinimap:drawLine(x1: number, y1: number, x2: number, y2: number, color_tbl: table)`
 
-Adds an overlay line. This method is available to Lua scripts.
+Adds an overlay line between two world-space points.
 
 **Parameters**
 
-- `x1` (`number`, required) - Lua argument for `x1`.
-- `y1` (`number`, required) - Lua argument for `y1`.
-- `x2` (`number`, required) - Lua argument for `x2`.
-- `y2` (`number`, required) - Lua argument for `y2`.
-- `color_tbl` (`table`, required) - Lua argument for `color_tbl`.
+- `x1` (`number`, required) - Start x coordinate.
+- `y1` (`number`, required) - Start y coordinate.
+- `x2` (`number`, required) - End x coordinate.
+- `y2` (`number`, required) - End y coordinate.
+- `color_tbl` (`table`, required) - RGBA byte color table.
 
 #### Example
 
@@ -554,15 +554,15 @@ end
 
 ### `LMinimap:drawRect(x: number, y: number, w: number, h: number, color_tbl: table)`
 
-Adds an overlay rectangle. This method is available to Lua scripts.
+Adds an overlay rectangle at a world-space position.
 
 **Parameters**
 
-- `x` (`number`, required) - Numeric `x` argument for this call.
-- `y` (`number`, required) - Numeric `y` argument for this call.
-- `w` (`number`, required) - Lua argument for `w`.
-- `h` (`number`, required) - Lua argument for `h`.
-- `color_tbl` (`table`, required) - Lua argument for `color_tbl`.
+- `x` (`number`, required) - Rectangle x coordinate.
+- `y` (`number`, required) - Rectangle y coordinate.
+- `w` (`number`, required) - Rectangle width.
+- `h` (`number`, required) - Rectangle height.
+- `color_tbl` (`table`, required) - RGBA byte color table.
 
 #### Example
 
@@ -630,7 +630,7 @@ end
 
 ### `LMinimap:getCenter() -> number`
 
-Returns minimap world center. This method is available to Lua scripts.
+Returns the current minimap world-space center position.
 
 **Returns**: `number` - Center x coordinate.
 
@@ -742,7 +742,7 @@ end
 
 ### `LMinimap:getDisplaySize() -> integer`
 
-Returns the minimap display size. This method is available to Lua scripts.
+Returns the minimap display width and height in pixels.
 
 **Returns**: `integer` - Display width in pixels.
 
@@ -785,7 +785,7 @@ end
 
 ### `LMinimap:getFogColor() -> number`
 
-Returns the fog overlay color. This method is available to Lua scripts.
+Returns the current RGBA fog overlay color.
 
 **Returns**: `number` - Red channel.
 
@@ -872,7 +872,7 @@ do
 
 ### `LMinimap:getGridHeight() -> integer`
 
-Returns the minimap grid height. This method is available to Lua scripts.
+Returns the height of the minimap grid in cells.
 
 **Returns**: `integer` - Grid height in cells.
 
@@ -894,7 +894,7 @@ end
 
 ### `LMinimap:getGridSize() -> integer`
 
-Returns the minimap grid size. This method is available to Lua scripts.
+Returns the minimap grid width and height in cells.
 
 **Returns**: `integer` - Grid width in cells.
 
@@ -914,7 +914,7 @@ end
 
 ### `LMinimap:getGridWidth() -> integer`
 
-Returns the minimap grid width. This method is available to Lua scripts.
+Returns the width of the minimap grid in cells.
 
 **Returns**: `integer` - Grid width in cells.
 
@@ -941,10 +941,10 @@ Returns hover text for a screen position when available.
 
 **Parameters**
 
-- `sx` (`number`, required) - Lua argument for `sx`.
-- `sy` (`number`, required) - Lua argument for `sy`.
-- `mx` (`number`, required) - Lua argument for `mx`.
-- `my` (`number`, required) - Lua argument for `my`.
+- `sx` (`number`, required) - Screen x coordinate.
+- `sy` (`number`, required) - Screen y coordinate.
+- `mx` (`number`, required) - Minimap x position.
+- `my` (`number`, required) - Minimap y position.
 
 **Returns**: `string` - Hover info text, or nil when unavailable.
 
@@ -969,7 +969,7 @@ end
 
 ### `LMinimap:getLayer() -> integer`
 
-Returns active minimap layer. This method is available to Lua scripts.
+Returns the active minimap display layer index.
 
 **Returns**: `integer` - Layer index.
 
@@ -1010,15 +1010,15 @@ do
 end
 ```
 
-### `LMinimap:getLayerData(layer: integer) -> table`
+### `LMinimap:getLayerData(layer: integer) -> integer[]`
 
-Returns raw cell data for a layer. This method is available to Lua scripts.
+Returns raw cell data for a minimap layer.
 
 **Parameters**
 
 - `layer` (`integer`, required) - Layer index.
 
-**Returns**: `table` - Array table of cell bytes, or nil when missing.
+**Returns**: `integer[]` - Array table of cell bytes, or nil when missing.
 
 #### Example
 
@@ -1039,7 +1039,7 @@ end
 
 ### `LMinimap:getMarkerCount() -> integer`
 
-Returns the number of markers. This method is available to Lua scripts.
+Returns the total number of minimap markers.
 
 **Returns**: `integer` - Marker count.
 
@@ -1155,7 +1155,7 @@ end
 
 ### `LMinimap:getOwnerColor(owner: integer) -> number`
 
-Returns RGBA color for an owner id. This method is available to Lua scripts.
+Returns the current RGBA color for an owner id.
 
 **Parameters**
 
@@ -1180,7 +1180,7 @@ end
 
 ### `LMinimap:getPathCount() -> integer`
 
-Returns the number of paths. This method is available to Lua scripts.
+Returns the number of active path overlays.
 
 **Returns**: `integer` - Path count.
 
@@ -1325,11 +1325,11 @@ do
 end
 ```
 
-### `LMinimap:getViewportRect() -> LuaValue`
+### `LMinimap:getViewportRect() -> number`
 
 Returns the viewport rectangle when one is set.
 
-**Returns**: `LuaValue` - X coordinate, or nil.
+**Returns**: `number` - X coordinate, or nil when unset.
 
 #### Example
 
@@ -1351,7 +1351,7 @@ end
 
 ### `LMinimap:getZoom() -> number`
 
-Returns minimap zoom. This method is available to Lua scripts.
+Returns the current minimap zoom magnification level.
 
 **Returns**: `number` - Zoom value.
 
@@ -1371,18 +1371,18 @@ do
 end
 ```
 
-### `LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> LuaValue`
+### `LMinimap:gridToScreen(gx: number, gy: number, mx: number, my: number) -> number`
 
 Converts grid coordinates to screen coordinates.
 
 **Parameters**
 
-- `gx` (`number`, required) - Lua argument for `gx`.
-- `gy` (`number`, required) - Lua argument for `gy`.
-- `mx` (`number`, required) - Lua argument for `mx`.
-- `my` (`number`, required) - Lua argument for `my`.
+- `gx` (`number`, required) - Grid x coordinate.
+- `gy` (`number`, required) - Grid y coordinate.
+- `mx` (`number`, required) - Minimap x position.
+- `my` (`number`, required) - Minimap y position.
 
-**Returns**: `LuaValue` - Conversion result from the minimap module.
+**Returns**: `number` - Screen x coordinate.
 
 #### Example
 
@@ -1545,7 +1545,7 @@ end
 
 ### `LMinimap:removeMarker(id: integer) -> boolean`
 
-Removes a marker by id. This method is available to Lua scripts.
+Removes a minimap marker by its unique id.
 
 **Parameters**
 
@@ -1572,7 +1572,7 @@ end
 
 ### `LMinimap:removeObject(id: integer) -> boolean`
 
-Removes an object by id. This method is available to Lua scripts.
+Removes a minimap object by its unique id.
 
 **Parameters**
 
@@ -1605,8 +1605,8 @@ Enqueues minimap render commands at an optional screen position.
 
 **Parameters**
 
-- `x` (`number`, optional) - Optional screen x coordinate, defaulting to 0.
-- `y` (`number`, optional) - Optional screen y coordinate, defaulting to 0.
+- `x` (`number`, optional) - Screen x coordinate, defaults to 0.
+- `y` (`number`, optional) - Screen y coordinate, defaults to 0.
 
 #### Example
 
@@ -1659,18 +1659,18 @@ do
 end
 ```
 
-### `LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> LuaValue`
+### `LMinimap:screenToGrid(sx: number, sy: number, mx: number, my: number) -> number`
 
 Converts a screen position to grid coordinates.
 
 **Parameters**
 
-- `sx` (`number`, required) - Lua argument for `sx`.
-- `sy` (`number`, required) - Lua argument for `sy`.
-- `mx` (`number`, required) - Lua argument for `mx`.
-- `my` (`number`, required) - Lua argument for `my`.
+- `sx` (`number`, required) - Screen x coordinate.
+- `sy` (`number`, required) - Screen y coordinate.
+- `mx` (`number`, required) - Minimap x position.
+- `my` (`number`, required) - Minimap y position.
 
-**Returns**: `LuaValue` - Conversion result from the minimap module.
+**Returns**: `number` - Grid x coordinate.
 
 #### Example
 
@@ -1716,7 +1716,7 @@ end
 
 ### `LMinimap:setCenter(x: number, y: number)`
 
-Sets minimap world center. This method is available to Lua scripts.
+Sets the minimap world-space center position.
 
 **Parameters**
 
@@ -1767,7 +1767,7 @@ end
 
 ### `LMinimap:setColorMode(mode: string)`
 
-Sets the minimap color mode. This method is available to Lua scripts.
+Sets the minimap color mode to terrain or political.
 
 **Parameters**
 
@@ -1791,7 +1791,7 @@ end
 
 ### `LMinimap:setDisplaySize(w: integer, h: integer)`
 
-Sets the minimap display size. This method is available to Lua scripts.
+Sets the minimap display width and height in pixels.
 
 **Parameters**
 
@@ -1818,14 +1818,14 @@ end
 
 ### `LMinimap:setFogColor(r: number, g: number, b: number, [a]: number)`
 
-Sets the fog overlay color. This method is available to Lua scripts.
+Sets the RGBA fog overlay color for covered cells.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, optional) - Lua argument for `a`.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, optional) - Alpha channel, defaults to 0.8.
 
 #### Example
 
@@ -1871,7 +1871,7 @@ end
 
 ### `LMinimap:setFogEnabled(enabled: boolean)`
 
-Enables or disables fog display. This method is available to Lua scripts.
+Enables or disables the minimap fog display.
 
 **Parameters**
 
@@ -1928,7 +1928,7 @@ end
 
 ### `LMinimap:setLayer(layer: integer)`
 
-Sets active minimap layer. This method is available to Lua scripts.
+Sets the active minimap display layer index.
 
 **Parameters**
 
@@ -1953,7 +1953,7 @@ end
 
 ### `LMinimap:setLayerData(layer: integer, data_tbl: table)`
 
-Sets raw cell data for a layer. This method is available to Lua scripts.
+Sets raw cell data for a minimap layer.
 
 **Parameters**
 
@@ -2019,8 +2019,8 @@ Assigns an image texture to a marker.
 
 - `id` (`integer`, required) - Marker id.
 - `image_ud` (`LImage`, required) - Image handle from `lurek.render.newImage`.
-- `width` (`number`, optional) - Optional display width.
-- `height` (`number`, optional) - Optional display height.
+- `width` (`number`, optional) - Display width override.
+- `height` (`number`, optional) - Display height override.
 
 #### Example
 
@@ -2048,7 +2048,7 @@ Adds or updates an object on the minimap.
 - `x` (`number`, required) - Object x coordinate.
 - `y` (`number`, required) - Object y coordinate.
 - `type_idx` (`integer`, required) - One-based object type index.
-- `owner` (`integer`, optional) - Optional owner id, defaulting to 0.
+- `owner` (`integer`, optional) - Owner id, defaults to 0.
 
 #### Example
 
@@ -2071,7 +2071,7 @@ do
 end
 ```
 
-### `LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, width: number, height: number)`
+### `LMinimap:setObjectTypeTexture(type_idx: integer, image_ud: LImage, [width]: number, [height]: number)`
 
 Assigns an image texture to an object type.
 
@@ -2079,8 +2079,8 @@ Assigns an image texture to an object type.
 
 - `type_idx` (`integer`, required) - One-based object type index.
 - `image_ud` (`LImage`, required) - Image handle from `lurek.render.newImage`.
-- `width` (`number`, required) - Optional display width.
-- `height` (`number`, required) - Optional display height.
+- `width` (`number`, optional) - Display width override.
+- `height` (`number`, optional) - Display height override.
 
 #### Example
 
@@ -2126,15 +2126,15 @@ end
 
 ### `LMinimap:setOwnerColor(owner: integer, r: number, g: number, b: number, [a]: number)`
 
-Sets RGBA color for an owner id. This method is available to Lua scripts.
+Sets the RGBA display color for an owner id.
 
 **Parameters**
 
-- `owner` (`integer`, required) - Lua argument for `owner`.
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, optional) - Lua argument for `a`.
+- `owner` (`integer`, required) - Owner id.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, optional) - Alpha channel, defaults to 1.0.
 
 #### Example
 
@@ -2187,7 +2187,7 @@ end
 
 ### `LMinimap:setTerrainColor(terrain_type: integer, r: number, g: number, b: number, [a]: number)`
 
-Sets RGBA color for a terrain type. This method is available to Lua scripts.
+Sets the RGBA display color for a terrain type.
 
 **Parameters**
 
@@ -2195,7 +2195,7 @@ Sets RGBA color for a terrain type. This method is available to Lua scripts.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaults to 1.0.
 
 #### Example
 
@@ -2277,10 +2277,10 @@ Sets the viewport rectangle color.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, optional) - Lua argument for `a`.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, optional) - Alpha channel, defaults to 0.8.
 
 #### Example
 
@@ -2302,10 +2302,10 @@ Sets the visible viewport rectangle shown on the minimap.
 
 **Parameters**
 
-- `x` (`number`, required) - Numeric `x` argument for this call.
-- `y` (`number`, required) - Numeric `y` argument for this call.
-- `w` (`number`, required) - Lua argument for `w`.
-- `h` (`number`, required) - Lua argument for `h`.
+- `x` (`number`, required) - Viewport x coordinate.
+- `y` (`number`, required) - Viewport y coordinate.
+- `w` (`number`, required) - Viewport width.
+- `h` (`number`, required) - Viewport height.
 
 #### Example
 
@@ -2350,7 +2350,7 @@ end
 
 ### `LMinimap:setZoom(zoom: number)`
 
-Sets minimap zoom. This method is available to Lua scripts.
+Sets the minimap zoom magnification level.
 
 **Parameters**
 

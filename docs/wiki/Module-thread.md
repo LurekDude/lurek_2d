@@ -14,9 +14,9 @@
 - [Key Types](#key-types)
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
-  - [lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise](#lurekthreadasynccodeorfunc-stringfunction-any-lpromise)
+  - [lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise](#lurekthreadasynccodeorfunc-stringfunction-table-lpromise)
   - [lurek.thread.getChannel(name: string) -> LChannel](#lurekthreadgetchannelname-string-lchannel)
-  - [lurek.thread.getWorkerCapabilities() -> table](#lurekthreadgetworkercapabilities-table)
+  - [lurek.thread.getWorkerCapabilities() -> string[]](#lurekthreadgetworkercapabilities-string)
   - [lurek.thread.newBoundedChannel(capacity: integer) -> LChannel](#lurekthreadnewboundedchannelcapacity-integer-lchannel)
   - [lurek.thread.newChannel() -> LChannel](#lurekthreadnewchannel-lchannel)
   - [lurek.thread.newPool(size: integer, code: string) -> LThreadPool](#lurekthreadnewpoolsize-integer-code-string-lthreadpool)
@@ -24,42 +24,42 @@
 - [Types and Methods](#types-and-methods)
   - [LChannel](#lchannel)
   - [LChannel:clear()](#lchannelclear)
-  - [LChannel:demand([timeout]: number) -> any](#lchanneldemandtimeout-number-any)
-  - [LChannel:getCapacity() -> number](#lchannelgetcapacity-number)
-  - [LChannel:getCount() -> number](#lchannelgetcount-number)
+  - [LChannel:demand([timeout]: number) -> table](#lchanneldemandtimeout-number-table)
+  - [LChannel:getCapacity() -> integer](#lchannelgetcapacity-integer)
+  - [LChannel:getCount() -> integer](#lchannelgetcount-integer)
   - [LChannel:isBounded() -> boolean](#lchannelisbounded-boolean)
-  - [LChannel:peek() -> any](#lchannelpeek-any)
-  - [LChannel:pop() -> any](#lchannelpop-any)
+  - [LChannel:peek() -> table](#lchannelpeek-table)
+  - [LChannel:pop() -> table](#lchannelpop-table)
   - [LChannel:popBytes() -> string](#lchannelpopbytes-string)
   - [LChannel:popTable() -> table](#lchannelpoptable-table)
-  - [LChannel:push(value: any) -> number](#lchannelpushvalue-any-number)
-  - [LChannel:pushBytes(data: string) -> number](#lchannelpushbytesdata-string-number)
-  - [LChannel:pushTable(value: table) -> number](#lchannelpushtablevalue-table-number)
-  - [LChannel:supply(value: any) -> boolean](#lchannelsupplyvalue-any-boolean)
-  - [LChannel:tryPush(value: any) -> boolean](#lchanneltrypushvalue-any-boolean)
+  - [LChannel:push(value: table) -> integer](#lchannelpushvalue-table-integer)
+  - [LChannel:pushBytes(data: string) -> integer](#lchannelpushbytesdata-string-integer)
+  - [LChannel:pushTable(value: table) -> integer](#lchannelpushtablevalue-table-integer)
+  - [LChannel:supply(value: table) -> boolean](#lchannelsupplyvalue-table-boolean)
+  - [LChannel:tryPush(value: table) -> boolean](#lchanneltrypushvalue-table-boolean)
   - [LChannel:type() -> string](#lchanneltype-string)
   - [LChannel:typeOf(name: string) -> boolean](#lchanneltypeofname-string-boolean)
   - [LPromise](#lpromise)
-  - [LPromise:chain(code: string, ...: any) -> LPromise](#lpromisechaincode-string-any-lpromise)
+  - [LPromise:chain(code: string, ...: table) -> LPromise](#lpromisechaincode-string-table-lpromise)
   - [LPromise:getError() -> string](#lpromisegeterror-string)
   - [LPromise:isDone() -> boolean](#lpromiseisdone-boolean)
-  - [LPromise:result() -> any](#lpromiseresult-any)
+  - [LPromise:result() -> table](#lpromiseresult-table)
   - [LPromise:type() -> string](#lpromisetype-string)
   - [LPromise:typeOf(name: string) -> boolean](#lpromisetypeofname-string-boolean)
   - [LThread](#lthread)
   - [LThread:getError() -> string](#lthreadgeterror-string)
   - [LThread:isRunning() -> boolean](#lthreadisrunning-boolean)
-  - [LThread:start(...: any)](#lthreadstart-any)
+  - [LThread:start(...: table)](#lthreadstart-table)
   - [LThread:type() -> string](#lthreadtype-string)
   - [LThread:typeOf(name: string) -> boolean](#lthreadtypeofname-string-boolean)
   - [LThread:wait()](#lthreadwait)
   - [LThreadPool](#lthreadpool)
-  - [LThreadPool:collect() -> any](#lthreadpoolcollect-any)
+  - [LThreadPool:collect() -> table](#lthreadpoolcollect-table)
   - [LThreadPool:getInputChannel() -> LChannel](#lthreadpoolgetinputchannel-lchannel)
   - [LThreadPool:getOutputChannel() -> LChannel](#lthreadpoolgetoutputchannel-lchannel)
   - [LThreadPool:join([timeout]: number) -> boolean](#lthreadpooljointimeout-number-boolean)
-  - [LThreadPool:size() -> number](#lthreadpoolsize-number)
-  - [LThreadPool:submit(value: any)](#lthreadpoolsubmitvalue-any)
+  - [LThreadPool:size() -> integer](#lthreadpoolsize-integer)
+  - [LThreadPool:submit(value: table)](#lthreadpoolsubmitvalue-table)
   - [LThreadPool:type() -> string](#lthreadpooltype-string)
   - [LThreadPool:typeOf(name: string) -> boolean](#lthreadpooltypeofname-string-boolean)
 - [Examples](#examples)
@@ -148,9 +148,9 @@ do
 - Source spec: [docs/specs/thread.md](../blob/main/docs/specs/thread.md)
 
 ```lua
-lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
+lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
 lurek.thread.getChannel(name: string) -> LChannel -- Returns a named shared channel, creating it on first access. Repeated calls with the same name return the s...
-lurek.thread.getWorkerCapabilities() -> table -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
+lurek.thread.getWorkerCapabilities() -> string[] -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
 lurek.thread.newBoundedChannel(capacity: integer) -> LChannel -- Creates a new bounded channel with a fixed capacity, blocking pushes when full.
 lurek.thread.newChannel() -> LChannel -- Creates a new unbounded channel for sending typed values between threads.
 lurek.thread.newPool(size: integer, code: string) -> LThreadPool -- Creates a fixed-size thread pool where each worker runs the same Lua code and consumes items from a shared...
@@ -159,14 +159,14 @@ lurek.thread.newThread(code: string) -> LThread -- Creates a new worker thread t
 
 ## Module Functions
 
-### `lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise`
+### `lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise`
 
 Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
 
 **Parameters**
 
 - `codeOrFunc` (`string|function`, required) - Lua source code or a dumpable Lua function to execute.
-- `...` (`any`, required) - Additional arguments forwarded to the worker.
+- `...` (`table`, required) - Additional arguments forwarded to the worker.
 
 **Returns**: `LPromise` - A promise that resolves to the worker's return value.
 
@@ -217,11 +217,11 @@ do
 end
 ```
 
-### `lurek.thread.getWorkerCapabilities() -> table`
+### `lurek.thread.getWorkerCapabilities() -> string[]`
 
 Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
 
-**Returns**: `table` - An integer-indexed table of capability name strings.
+**Returns**: `string[]` - Integer-indexed list of capability name strings.
 
 #### Example
 
@@ -390,7 +390,7 @@ do
 end
 ```
 
-### `LChannel:demand([timeout]: number) -> any`
+### `LChannel:demand([timeout]: number) -> table`
 
 Blocks until a value is available on the channel or the optional timeout expires.
 
@@ -398,7 +398,7 @@ Blocks until a value is available on the channel or the optional timeout expires
 
 - `timeout` (`number`, optional) - Maximum seconds to wait. If omitted, waits indefinitely.
 
-**Returns**: `any` - The received value, or `nil` if the timeout expired.
+**Returns**: `table` - The received message table.
 
 #### Example
 
@@ -420,11 +420,11 @@ do
 end
 ```
 
-### `LChannel:getCapacity() -> number`
+### `LChannel:getCapacity() -> integer`
 
 Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
 
-**Returns**: `number` - The capacity limit, or `nil` if unbounded.
+**Returns**: `integer` - The capacity limit, or `nil` if unbounded.
 
 #### Example
 
@@ -439,11 +439,11 @@ do
 end
 ```
 
-### `LChannel:getCount() -> number`
+### `LChannel:getCount() -> integer`
 
 Returns the number of values currently queued in the channel.
 
-**Returns**: `number` - The current item count.
+**Returns**: `integer` - The current item count.
 
 #### Example
 
@@ -481,11 +481,11 @@ do
 end
 ```
 
-### `LChannel:peek() -> any`
+### `LChannel:peek() -> table`
 
 Returns the next value from the channel without removing it.
 
-**Returns**: `any` - The front value, or `nil` if the channel is empty.
+**Returns**: `table` - The front message table.
 
 #### Example
 
@@ -504,11 +504,11 @@ do
 end
 ```
 
-### `LChannel:pop() -> any`
+### `LChannel:pop() -> table`
 
 Removes and returns the next value from the channel without blocking.
 
-**Returns**: `any` - The next value, or `nil` if the channel is empty.
+**Returns**: `table` - The next message table.
 
 #### Example
 
@@ -571,15 +571,15 @@ do
 end
 ```
 
-### `LChannel:push(value: any) -> number`
+### `LChannel:push(value: table) -> integer`
 
 Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to send through the channel.
+- `value` (`table`, required) - The message table to send.
 
-**Returns**: `number` - The message sequence ID assigned to this push.
+**Returns**: `integer` - The message sequence ID assigned to this push.
 
 #### Example
 
@@ -596,7 +596,7 @@ do
 end
 ```
 
-### `LChannel:pushBytes(data: string) -> number`
+### `LChannel:pushBytes(data: string) -> integer`
 
 Pushes raw binary data onto the channel as a byte blob.
 
@@ -604,7 +604,7 @@ Pushes raw binary data onto the channel as a byte blob.
 
 - `data` (`string`, required) - The binary data to send (Lua strings can hold arbitrary bytes).
 
-**Returns**: `number` - The message sequence ID assigned to this push.
+**Returns**: `integer` - The message sequence ID assigned to this push.
 
 #### Example
 
@@ -621,7 +621,7 @@ do
 end
 ```
 
-### `LChannel:pushTable(value: table) -> number`
+### `LChannel:pushTable(value: table) -> integer`
 
 Pushes a table value onto the channel, raising an error if the value is not a table.
 
@@ -629,7 +629,7 @@ Pushes a table value onto the channel, raising an error if the value is not a ta
 
 - `value` (`table`, required) - The table to send through the channel.
 
-**Returns**: `number` - The message sequence ID assigned to this push.
+**Returns**: `integer` - The message sequence ID assigned to this push.
 
 #### Example
 
@@ -644,15 +644,15 @@ do
 end
 ```
 
-### `LChannel:supply(value: any) -> boolean`
+### `LChannel:supply(value: table) -> boolean`
 
 Pushes a value and blocks until a consumer pops it (synchronous handoff).
 
 **Parameters**
 
-- `value` (`any`, required) - The value to hand off to a consumer.
+- `value` (`table`, required) - The message table to send.
 
-**Returns**: `boolean` - `true` when the value has been consumed.
+**Returns**: `boolean` - true when the value has been consumed.
 
 #### Example
 
@@ -670,15 +670,15 @@ do
 end
 ```
 
-### `LChannel:tryPush(value: any) -> boolean`
+### `LChannel:tryPush(value: table) -> boolean`
 
 Attempts to push a value onto a bounded channel without blocking.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to send.
+- `value` (`table`, required) - The message table to send.
 
-**Returns**: `boolean` - `true` if the value was enqueued, `false` if the channel is full.
+**Returns**: `boolean` - true if the value was enqueued, false if the channel is full.
 
 #### Example
 
@@ -761,14 +761,14 @@ do
 end
 ```
 
-### `LPromise:chain(code: string, ...: any) -> LPromise`
+### `LPromise:chain(code: string, ...: table) -> LPromise`
 
 Creates a new promise that runs the given code with the parent promise's result as its first argument.
 
 **Parameters**
 
 - `code` (`string`, required) - Lua source code to execute in the chained worker thread.
-- `...` (`any`, required) - Additional arguments forwarded after the parent result.
+- `...` (`table`, required) - Additional arguments forwarded after the parent result.
 
 **Returns**: `LPromise` - A new promise representing the chained computation.
 
@@ -830,11 +830,11 @@ do
 end
 ```
 
-### `LPromise:result() -> any`
+### `LPromise:result() -> table`
 
 Returns the result value of the completed promise.
 
-**Returns**: `any` - The computed result, or `nil` if the promise is not yet done.
+**Returns**: `table` - The computed result table.
 
 #### Example
 
@@ -965,13 +965,13 @@ do
 end
 ```
 
-### `LThread:start(...: any)`
+### `LThread:start(...: table)`
 
 Launches the worker thread, executing the Lua code string supplied at creation time.
 
 **Parameters**
 
-- `...` (`any`, required) - Zero or more arguments forwarded to the worker as the `arg` table.
+- `...` (`table`, required) - Zero or more arguments forwarded to the worker as the `arg` table.
 
 #### Example
 
@@ -1078,11 +1078,11 @@ do
 end
 ```
 
-### `LThreadPool:collect() -> any`
+### `LThreadPool:collect() -> table`
 
 Pops and returns the next result from the pool's output channel.
 
-**Returns**: `any` - The next result value, or `nil` if the output channel is empty.
+**Returns**: `table` - The next result table.
 
 #### Example
 
@@ -1179,11 +1179,11 @@ do
 end
 ```
 
-### `LThreadPool:size() -> number`
+### `LThreadPool:size() -> integer`
 
 Returns the number of worker threads in the pool.
 
-**Returns**: `number` - The pool's worker count.
+**Returns**: `integer` - The pool's worker count.
 
 #### Example
 
@@ -1198,13 +1198,13 @@ do
 end
 ```
 
-### `LThreadPool:submit(value: any)`
+### `LThreadPool:submit(value: table)`
 
 Pushes a value into the pool's input channel for processing by a worker thread.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to enqueue for processing.
+- `value` (`table`, required) - The message table to send.
 
 #### Example
 

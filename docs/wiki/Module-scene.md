@@ -27,11 +27,11 @@
   - [lurek.scene.getData(key: string) -> LuaValue](#lurekscenegetdatakey-string-luavalue)
   - [lurek.scene.getQueuedTransitionCount() -> number](#lurekscenegetqueuedtransitioncount-number)
   - [lurek.scene.getRegistered(name: string) -> table|nil](#lurekscenegetregisteredname-string-tablenil)
-  - [lurek.scene.getRegisteredNames() -> table](#lurekscenegetregisterednames-table)
+  - [lurek.scene.getRegisteredNames() -> string[]](#lurekscenegetregisterednames-string)
   - [lurek.scene.getStackSize() -> number](#lurekscenegetstacksize-number)
   - [lurek.scene.getTransitionProgress() -> number](#lurekscenegettransitionprogress-number)
   - [lurek.scene.getTransitionProgressEased() -> number](#lurekscenegettransitionprogresseased-number)
-  - [lurek.scene.getTransitionTypes() -> table](#lurekscenegettransitiontypes-table)
+  - [lurek.scene.getTransitionTypes() -> string[]](#lurekscenegettransitiontypes-string)
   - [lurek.scene.hasData(key: string) -> boolean](#lurekscenehasdatakey-string-boolean)
   - [lurek.scene.hasRegistered(name: string) -> boolean](#lurekscenehasregisteredname-string-boolean)
   - [lurek.scene.transitions.iris([duration]: number) -> table](#lurekscenetransitionsirisduration-number-table)
@@ -48,9 +48,9 @@
   - [lurek.scene.process(dt: number)](#lureksceneprocessdt-number)
   - [lurek.scene.processLate(dt: number)](#lureksceneprocesslatedt-number)
   - [lurek.scene.processPhysics(dt: number)](#lureksceneprocessphysicsdt-number)
-  - [lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)](#lurekscenepushscene-table-transition-string-duration-number-easing-string-params-any)
-  - [lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)](#lurekscenepushoverlayscene-table-transition-string-duration-number-easing-string-params-any)
-  - [lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: any)](#lurekscenepushpreloadedname-string-transition-string-duration-number-easing-string-params-any)
+  - [lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)](#lurekscenepushscene-table-transition-string-duration-number-easing-string-params-table)
+  - [lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)](#lurekscenepushoverlayscene-table-transition-string-duration-number-easing-string-params-table)
+  - [lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: table)](#lurekscenepushpreloadedname-string-transition-string-duration-number-easing-string-params-table)
   - [lurek.scene.queueTransition(transition: string, duration: number, [easing]: string)](#lurekscenequeuetransitiontransition-string-duration-number-easing-string)
   - [lurek.scene.registerScene(name: string, scene: table)](#lureksceneregisterscenename-string-scene-table)
   - [lurek.scene.removeData(key: string)](#lureksceneremovedatakey-string)
@@ -58,9 +58,9 @@
   - [lurek.scene.renderUi()](#lurekscenerenderui)
   - [lurek.scene.serializeScene() -> table](#lureksceneserializescene-table)
   - [lurek.scene.setCurrentLayer(layer: integer) -> boolean](#lurekscenesetcurrentlayerlayer-integer-boolean)
-  - [lurek.scene.setData(key: string, value: any)](#lurekscenesetdatakey-string-value-any)
+  - [lurek.scene.setData(key: string, value: table)](#lurekscenesetdatakey-string-value-table)
   - [lurek.scene.transitions.slide([direction]: string, [duration]: number) -> table](#lurekscenetransitionsslidedirection-string-duration-number-table)
-  - [lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)](#lureksceneswitchtoscene-table-transition-string-duration-number-easing-string-params-any)
+  - [lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)](#lureksceneswitchtoscene-table-transition-string-duration-number-easing-string-params-table)
   - [lurek.scene.unregisterScene(name: string)](#lureksceneunregisterscenename-string)
   - [lurek.scene.update(dt: number)](#lureksceneupdatedt-number)
   - [lurek.scene.transitions.wipe([duration]: number) -> table](#lurekscenetransitionswipeduration-number-table)
@@ -171,11 +171,11 @@ lurek.scene.getCurrentLayer() -> number -- Get the rendering layer of the curren
 lurek.scene.getData(key: string) -> LuaValue -- Retrieve a value from the shared data map by key, or nil if the key has not been set. Commonly used in a sc...
 lurek.scene.getQueuedTransitionCount() -> number -- Returns the number of transitions waiting in the queue behind the currently-playing transition.
 lurek.scene.getRegistered(name: string) -> table|nil -- Retrieve a previously registered scene table by its name, or nil if no scene is registered under that name....
-lurek.scene.getRegisteredNames() -> table -- Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic s...
+lurek.scene.getRegisteredNames() -> string[] -- Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic s...
 lurek.scene.getStackSize() -> number -- Returns the total number of scenes currently on the stack, including overlays. Useful for asserting expecte...
 lurek.scene.getTransitionProgress() -> number -- Returns the raw linear progress (0.0 to 1.0) of the current transition animation, ignoring easing. Returns...
 lurek.scene.getTransitionProgressEased() -> number -- Returns the eased progress (0.0 to 1.0) of the current transition, with the selected easing curve applied....
-lurek.scene.getTransitionTypes() -> table -- Returns a Lua array of all supported transition type name strings. Use this to discover available transitio...
+lurek.scene.getTransitionTypes() -> string[] -- Returns a Lua array of all supported transition type name strings. Use this to discover available transitio...
 -- ... 32 more module functions
 ```
 
@@ -352,7 +352,7 @@ end
 
 Returns a Lua array of all active scene tables ordered by their layer value (lowest layer first). Includes both regular scenes and overlays. Useful for iterating over all scenes for custom processing or debugging.
 
-**Returns**: `table` - Lua array of scene tables sorted by layer.
+**Returns**: `table` - Lua array of active scene tables sorted by layer.
 
 #### Example
 
@@ -479,11 +479,11 @@ do
 end
 ```
 
-### `lurek.scene.getRegisteredNames() -> table`
+### `lurek.scene.getRegisteredNames() -> string[]`
 
 Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic scene-selection UIs.
 
-**Returns**: `table` - Lua array of registered name strings.
+**Returns**: `string[]` - Lua array of registered name strings.
 
 #### Example
 
@@ -605,11 +605,11 @@ do
 end
 ```
 
-### `lurek.scene.getTransitionTypes() -> table`
+### `lurek.scene.getTransitionTypes() -> string[]`
 
 Returns a Lua array of all supported transition type name strings. Use this to discover available transitions at runtime or build a transition picker UI.
 
-**Returns**: `table` - Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
+**Returns**: `string[]` - Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
 
 #### Example
 
@@ -1028,7 +1028,7 @@ do
 end
 ```
 
-### `lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)`
+### `lurek.scene.push(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)`
 
 Push a new scene onto the stack, making it the active scene. The previously-active scene receives its `pause()` lifecycle callback and the new scene receives `enter(self, params)`. An optional visual transition (fade, slide, iris, etc.) animates between the two scenes over the specified duration.
 
@@ -1038,7 +1038,7 @@ Push a new scene onto the stack, making it the active scene. The previously-acti
 - `transition` (`string`, optional) - Transition type name: `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`. Defaults to `"none"`.
 - `duration` (`number`, optional) - Transition animation duration in seconds. Defaults to 0 (instant).
 - `easing` (`string`, optional) - Easing curve name (e.g. `"linear"`, `"ease_in"`, `"ease_out"`, `"ease_in_out"`). Defaults to `"linear"`.
-- `params` (`any`, optional) - Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
+- `params` (`table`, optional) - Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
 
 #### Example
 
@@ -1058,7 +1058,7 @@ do
 end
 ```
 
-### `lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)`
+### `lurek.scene.pushOverlay(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)`
 
 Push a scene as a transparent overlay on top of the current scene. Unlike `push`, the underlying scene is NOT paused — it continues to receive `process`, `draw`, and `render` callbacks. Use overlays for pause menus, dialog boxes, inventory screens, or debug panels that should draw on top without stopping gameplay.
 
@@ -1068,7 +1068,7 @@ Push a scene as a transparent overlay on top of the current scene. Unlike `push`
 - `transition` (`string`, optional) - Transition type name. Defaults to `"none"`.
 - `duration` (`number`, optional) - Transition animation duration in seconds. Defaults to 0.
 - `easing` (`string`, optional) - Easing curve name. Defaults to `"linear"`.
-- `params` (`any`, optional) - Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
+- `params` (`table`, optional) - Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
 
 #### Example
 
@@ -1094,7 +1094,7 @@ do
 end
 ```
 
-### `lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: any)`
+### `lurek.scene.pushPreloaded(name: string, [transition]: string, [duration]: number, [easing]: string, [params]: table)`
 
 Push a preloaded scene onto the stack by name. If the loader registered via `preload` has not yet run, it executes first to create and register the scene. Then the registered scene is pushed with the specified transition. Combines deferred loading with stack navigation in a single call.
 
@@ -1104,7 +1104,7 @@ Push a preloaded scene onto the stack by name. If the loader registered via `pre
 - `transition` (`string`, optional) - Transition type name. Defaults to `"none"`.
 - `duration` (`number`, optional) - Transition animation duration in seconds. Defaults to 0.
 - `easing` (`string`, optional) - Easing curve name. Defaults to `"linear"`.
-- `params` (`any`, optional) - Arbitrary data forwarded to the scene's `enter(self, params)` callback.
+- `params` (`table`, optional) - Arbitrary data forwarded to the scene's `enter(self, params)` callback.
 
 #### Example
 
@@ -1230,7 +1230,7 @@ end
 
 Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` array of registered scene names (in stack order) and a `data` map of shared data key-value pairs. Use this for save/load systems to persist the player's navigation state.
 
-**Returns**: `table` - A snapshot table with `stack` (array of name strings) and `data` (key-value map) fields.
+**Returns**: `table` - A snapshot table with `stack` (array of scene name strings) and `data` (key-value map) fields.
 
 #### Example
 
@@ -1269,14 +1269,14 @@ do
 end
 ```
 
-### `lurek.scene.setData(key: string, value: any)`
+### `lurek.scene.setData(key: string, value: table)`
 
 Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
 
 **Parameters**
 
 - `key` (`string`, required) - The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
-- `value` (`any`, required) - The value to store (table, number, string, boolean, etc.). Overwrites any previous value for this key.
+- `value` (`table`, required) - Value to store (a table with your game data).
 
 #### Example
 
@@ -1327,7 +1327,7 @@ end
 --@api-stub: lurek.scene.iris
 ```
 
-### `lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: any)`
+### `lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)`
 
 Replace the current top scene with a different one without changing stack depth. The old scene receives `leave()` and the new scene receives `enter(self, params)`. Unlike `push`, no scene is added to the stack — the old scene is removed and the new one takes its slot. Ideal for transitioning between peer-level game states (e.g. level 1 → level 2).
 
@@ -1337,7 +1337,7 @@ Replace the current top scene with a different one without changing stack depth.
 - `transition` (`string`, optional) - Transition type name. Defaults to `"none"`.
 - `duration` (`number`, optional) - Transition animation duration in seconds. Defaults to 0.
 - `easing` (`string`, optional) - Easing curve name. Defaults to `"linear"`.
-- `params` (`any`, optional) - Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
+- `params` (`table`, optional) - Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
 
 #### Example
 

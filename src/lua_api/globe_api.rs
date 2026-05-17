@@ -102,7 +102,7 @@ impl LuaUserData for LuaGlobe {
         // -- getNeighbors --
         /// Returns neighboring province ids for a province.
         /// @param | id | integer | Province id.
-        /// @return | table | Array table of neighboring province ids.
+        /// @return | integer[] | Array table of neighboring province ids.
         methods.add_method("getNeighbors", |lua, this, id: u32| {
             let neighbors = this.with(|g| {
                 g.get_province(id)
@@ -138,7 +138,7 @@ impl LuaUserData for LuaGlobe {
         /// Reads a string attribute from a province.
         /// @param | id | integer | Province id.
         /// @param | key | string | Attribute key.
-        /// @return | string? | Attribute string, or nil when the province or key is missing.
+        /// @return | string | Attribute string, or nil when the province or key is missing.
         methods.add_method("getProvinceAttr", |_, this, (id, key): (u32, String)| {
             this.with(|g| g.get_province(id).and_then(|p| p.attrs.get(&key).cloned()))
         });
@@ -195,14 +195,14 @@ impl LuaUserData for LuaGlobe {
         // -- getProvinceSector --
         /// Returns the sector name assigned to a province.
         /// @param | id | integer | Province id.
-        /// @return | string? | Sector string, or nil when absent.
+        /// @return | string | Sector string, or nil when absent.
         methods.add_method("getProvinceSector", |_, this, id: u32| {
             this.with(|g| g.province_sector(id).map(|s| s.to_string()))
         });
         // -- getSectorProvinces --
         /// Returns province ids assigned to a sector.
         /// @param | sector | string | Sector name.
-        /// @return | table | Array table of province ids.
+        /// @return | integer[] | Array table of province ids.
         methods.add_method("getSectorProvinces", |lua, this, sector: String| {
             let ids = this.with(|g| g.sector_provinces(&sector))?;
             let t = lua.create_table()?;
@@ -247,14 +247,12 @@ impl LuaUserData for LuaGlobe {
         /// Pans the globe camera by latitude and longitude deltas.
         /// @param | dlat | number | Latitude delta in degrees.
         /// @param | dlon | number | Longitude delta in degrees.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("pan", |_, this, (dlat, dlon): (f32, f32)| {
             this.with_mut(|g| g.camera.pan(dlat, dlon))
         });
         // -- zoom --
         /// Multiplies the globe camera zoom by a factor.
         /// @param | factor | number | Zoom factor.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("zoom", |_, this, factor: f32| {
             this.with_mut(|g| g.camera.zoom_by(factor))
         });
@@ -263,7 +261,6 @@ impl LuaUserData for LuaGlobe {
         /// @param | lat | number | Camera latitude in degrees.
         /// @param | lon | number | Camera longitude in degrees.
         /// @param | z | number | Camera zoom, clamped to at least 0.1.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setCamera", |_, this, (lat, lon, z): (f32, f32, f32)| {
             this.with_mut(|g| {
                 g.camera.lat_deg = lat;
@@ -297,7 +294,7 @@ impl LuaUserData for LuaGlobe {
         /// Picks a province at screen coordinates.
         /// @param | sx | number | Screen x coordinate.
         /// @param | sy | number | Screen y coordinate.
-        /// @return | integer? | Province id, or nil when nothing is hit.
+        /// @return | integer | Province id, or nil when nothing is hit.
         methods.add_method("pick", |_, this, (sx, sy): (f32, f32)| {
             this.with(|g| g.pick_screen(sx, sy).map(|r| r.province_id))
         });
@@ -305,8 +302,8 @@ impl LuaUserData for LuaGlobe {
         /// Samples along a screen ray from the camera center and returns the first hit province.
         /// @param | sx | number | Target screen x coordinate.
         /// @param | sy | number | Target screen y coordinate.
-        /// @param | steps? | integer | Number of samples along the ray, defaulting to 24.
-        /// @return | integer? | Province id, or nil when no sample hits.
+        /// @param | steps | integer? | Number of samples along the ray, defaulting to 24.
+        /// @return | integer | Province id, or nil when no sample hits.
         methods.add_method(
             "pickRaycast",
             |_, this, (sx, sy, steps): (f32, f32, Option<u32>)| {
@@ -332,8 +329,8 @@ impl LuaUserData for LuaGlobe {
         /// Picks at screen coordinates and returns the hit province centroid screen coordinates.
         /// @param | sx | number | Screen x coordinate.
         /// @param | sy | number | Screen y coordinate.
-        /// @return | number? | Centroid x coordinate, or nil when nothing is hit.
-        /// @return | number? | Centroid y coordinate, or nil when nothing is hit.
+        /// @return | number | Centroid x coordinate, or nil when nothing is hit.
+        /// @return | number | Centroid y coordinate, or nil when nothing is hit.
         methods.add_method("pickLatLon", |_lua, this, (sx, sy): (f32, f32)| {
             this.with(|g| match g.pick_screen(sx, sy) {
                 Some(r) => (
@@ -345,8 +342,7 @@ impl LuaUserData for LuaGlobe {
         });
         // -- setActiveViewer --
         /// Sets the active fog-of-war viewer name or clears it.
-        /// @param | viewer? | string | Viewer name.
-        /// @return | nil | No value is returned.
+        /// @param | viewer | string? | Viewer name.
         methods.add_method_mut("setActiveViewer", |_, this, viewer: Option<String>| {
             this.with_mut(|g| g.active_viewer = viewer)
         });
@@ -403,7 +399,6 @@ impl LuaUserData for LuaGlobe {
         /// Reveals a province for one fog-of-war viewer.
         /// @param | viewer | string | Viewer name.
         /// @param | id | integer | Province id.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("revealProvince", |_, this, (viewer, id): (String, u32)| {
             this.with_mut(|g| g.fog.reveal(&viewer, id))
         });
@@ -411,7 +406,6 @@ impl LuaUserData for LuaGlobe {
         /// Hides a province for one fog-of-war viewer.
         /// @param | viewer | string | Viewer name.
         /// @param | id | integer | Province id.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("hideProvince", |_, this, (viewer, id): (String, u32)| {
             this.with_mut(|g| g.fog.hide(&viewer, id))
         });
@@ -426,7 +420,6 @@ impl LuaUserData for LuaGlobe {
         // -- revealAll --
         /// Reveals every province for one fog-of-war viewer.
         /// @param | viewer | string | Viewer name.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("revealAll", |_, this, viewer: String| {
             this.with_mut(|g| {
                 let ids: Vec<u32> = g.graph.iter().map(|p| p.id).collect();
@@ -440,7 +433,7 @@ impl LuaUserData for LuaGlobe {
         /// @param | mtype | string | Marker type name.
         /// @param | lat | number | Latitude in degrees.
         /// @param | lon | number | Longitude in degrees.
-        /// @param | label? | string | Marker label.
+        /// @param | label | string? | Marker label.
         /// @return | integer | New marker id.
         methods.add_method_mut(
             "addMarker",
@@ -526,7 +519,7 @@ impl LuaUserData for LuaGlobe {
         /// Reads a string attribute from a marker.
         /// @param | id | integer | Marker id.
         /// @param | key | string | Attribute key.
-        /// @return | string? | Attribute string, or nil when missing.
+        /// @return | string | Attribute string, or nil when missing.
         methods.add_method("getMarkerAttr", |_, this, (id, key): (u32, String)| {
             this.with(|g| g.markers.get_attr(id, &key).map(|s| s.to_owned()))
         });
@@ -572,7 +565,7 @@ impl LuaUserData for LuaGlobe {
         // -- addLayer --
         /// Adds a render layer with optional z-order.
         /// @param | name | string | Layer name.
-        /// @param | z_order? | integer | Layer z-order, defaulting to zero.
+        /// @param | z_order | integer? | Layer z-order, defaulting to zero.
         methods.add_method_mut(
             "addLayer",
             |_, this, (name, z_order): (String, Option<i32>)| {
@@ -629,7 +622,6 @@ impl LuaUserData for LuaGlobe {
         // -- setTimeOfDay --
         /// Sets globe time of day modulo 24 hours.
         /// @param | t | number | Time of day in hours.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setTimeOfDay", |_, this, t: f32| {
             this.with_mut(|g| g.spec.time_of_day = t % 24.0)
         });
@@ -642,26 +634,22 @@ impl LuaUserData for LuaGlobe {
         // -- setRotation --
         /// Sets globe rotation angle. This method is available to Lua scripts.
         /// @param | deg | number | Rotation in degrees.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setRotation", |_, this, deg: f32| {
             this.with_mut(|g| g.spec.rotation_deg = deg)
         });
         // -- setAutoRotationSpeed --
         /// Sets automatic globe rotation speed.
         /// @param | dps | number | Rotation speed in degrees per second.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setAutoRotationSpeed", |_, this, dps: f32| {
             this.with_mut(|g| g.spec.auto_rotation_deg_per_sec = dps)
         });
         // -- update --
         /// Advances globe simulation timers and animated state.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| this.with_mut(|g| g.update(dt)));
         // -- setBorders --
         /// Enables or disables province border rendering.
         /// @param | show | boolean | New border visibility flag.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setBorders", |_, this, show: bool| {
             this.with_mut(|g| g.spec.render_borders = show)
         });
@@ -669,7 +657,7 @@ impl LuaUserData for LuaGlobe {
         /// Finds a default-cost province path between two province ids.
         /// @param | from_id | integer | Start province id.
         /// @param | to_id | integer | Target province id.
-        /// @return | table? | Array table of province ids, or nil when no path exists.
+        /// @return | string[] | Province ids, or nil when no path exists.
         methods.add_method("findPath", |lua, this, (from_id, to_id): (u32, u32)| {
             let path_opt = this.with(|g| g.graph.find_path_default(from_id, to_id))?;
             match path_opt {
@@ -687,7 +675,7 @@ impl LuaUserData for LuaGlobe {
         /// Returns provinces reachable from a start province within a cost budget.
         /// @param | start_id | integer | Start province id.
         /// @param | max_cost | number | Maximum traversal cost.
-        /// @return | table | Map table from province id to accumulated cost.
+        /// @return | table | Map table from province id (integer key) to accumulated traversal cost (number).
         methods.add_method(
             "reachable",
             |lua, this, (start_id, max_cost): (u32, f64)| {
@@ -713,7 +701,7 @@ impl LuaUserData for LuaGlobe {
         // -- getCachedReachability --
         /// Returns cached reachability costs for a faction.
         /// @param | faction | string | Faction cache key.
-        /// @return | table | Map table from province id to accumulated cost, empty when missing.
+        /// @return | table | Map table from province id (integer key) to accumulated traversal cost (number), empty when missing.
         methods.add_method("getCachedReachability", |lua, this, faction: String| {
             let t = lua.create_table()?;
             let map = this.with(|g| g.cached_reachability(&faction).cloned())?;
@@ -736,7 +724,7 @@ impl LuaUserData for LuaGlobe {
         /// @param | lon1 | number | Start longitude in degrees.
         /// @param | lat2 | number | End latitude in degrees.
         /// @param | lon2 | number | End longitude in degrees.
-        /// @param | steps? | integer | Point count for the arc, defaulting to 24.
+        /// @param | steps | integer? | Point count for the arc, defaulting to 24.
         /// @return | integer | New arc id.
         methods.add_method_mut(
             "addArc",
@@ -802,7 +790,7 @@ impl LuaUserData for LuaGlobeRegistry {
         // -- new --
         /// Creates a named globe with optional specification fields.
         /// @param | name | string | Globe registry name.
-        /// @param | spec_tbl? | table | Globe specification table.
+        /// @param | spec_tbl | table? | Globe specification table.
         /// @return | LGlobe | New globe handle.
         methods.add_method_mut(
             "new",
@@ -824,7 +812,7 @@ impl LuaUserData for LuaGlobeRegistry {
         // -- get --
         /// Returns a globe handle by registry name.
         /// @param | name | string | Globe registry name.
-        /// @return | LGlobe? | Globe handle, or nil when no globe exists with that name.
+        /// @return | LGlobe | Globe handle, or nil when no globe exists with that name.
         methods.add_method("get", |_, this, name: String| {
             let exists = {
                 let guard = this.reg.lock().map_err(|e| {
@@ -855,7 +843,7 @@ impl LuaUserData for LuaGlobeRegistry {
         });
         // -- names --
         /// Returns all globe names currently stored in this registry.
-        /// @return | table | Array table of globe names.
+        /// @return | string[] | Globe names.
         methods.add_method("names", |lua, this, ()| {
             let guard = this
                 .reg
@@ -928,7 +916,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         // -- new --
         /// Creates a named globe with optional specification fields in the module registry.
         /// @param | name | string | Globe registry name.
-        /// @param | spec_tbl? | table | Globe specification table.
+        /// @param | spec_tbl | table? | Globe specification table.
         /// @return | LGlobe | New globe handle.
         tbl.set(
             "new",
@@ -954,7 +942,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         // -- get --
         /// Returns a globe from the module registry by name.
         /// @param | name | string | Globe registry name.
-        /// @return | LGlobe? | Globe handle, or nil when no globe exists with that name.
+        /// @return | LGlobe | Globe handle, or nil when no globe exists with that name.
         tbl.set(
             "get",
             lua.create_function(move |_, name: String| {
@@ -983,7 +971,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         /// Creates a globe and populates provinces from TOML source text.
         /// @param | name | string | Globe registry name.
         /// @param | toml_src | string | TOML province document source.
-        /// @param | spec_tbl? | table | Globe specification table.
+        /// @param | spec_tbl | table? | Globe specification table.
         /// @return | LGlobe | New populated globe handle.
         tbl.set(
             "loadFromTOML",
@@ -1017,7 +1005,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         /// Creates a globe and populates provinces from a PNG file.
         /// @param | name | string | Globe registry name.
         /// @param | png_path | string | PNG file path to load.
-        /// @param | spec_tbl? | table | Globe specification table.
+        /// @param | spec_tbl | table? | Globe specification table.
         /// @return | LGlobe | New populated globe handle.
         tbl.set(
             "loadFromPNG",
@@ -1051,7 +1039,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         /// Creates a globe and populates provinces from latitude-longitude seed points.
         /// @param | name | string | Globe registry name.
         /// @param | seeds_tbl | table | Array table of `{lat, lon}` seed pairs.
-        /// @param | spec_tbl? | table | Globe specification table.
+        /// @param | spec_tbl | table? | Globe specification table.
         /// @return | LGlobe | New generated globe handle.
         tbl.set(
             "generateVoronoi",
@@ -1105,6 +1093,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | lo2 | number | End longitude in degrees.
     /// @param | n | integer | Number of samples.
     /// @return | table | Array table of `{lat, lon}` point tables.
+    /// @field | lat | number | Lat.
+    /// @field | lon | number | Lon.
     tbl.set(
         "greatCirclePath",
         lua.create_function(|lua, (la, lo, lb, lo2, n): (f32, f32, f32, f32, u32)| {
@@ -1124,6 +1114,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | lat | number | Latitude in degrees.
     /// @param | lon | number | Longitude in degrees.
     /// @return | table | Array table `{x, y, z}` on the unit sphere.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
+    /// @field | z | number | Z.
     tbl.set(
         "latLonToUnit",
         lua.create_function(|lua, (lat, lon): (f32, f32)| {
@@ -1136,19 +1129,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
     /// Maximum number of provinces that can be registered in the globe.
-    /// @return | nil | No value is returned.
     tbl.set("MAX_PROVINCES", MAX_PROVINCES as u32)?;
     /// LOD string constant for far-distance province rendering.
-    /// @return | nil | No value is returned.
     tbl.set("LOD_FAR", "far")?;
     /// LOD string constant for mid-distance province rendering.
-    /// @return | nil | No value is returned.
     tbl.set("LOD_MID", "mid")?;
     /// LOD string constant for near-distance province rendering.
-    /// @return | nil | No value is returned.
     tbl.set("LOD_NEAR", "near")?;
     /// Performs the 'globe' operation.
-    /// @return | nil | No value is returned.
     luna.set("globe", tbl)?;
     Ok(())
 }

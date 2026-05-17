@@ -19,7 +19,7 @@
   - [lurek.timer.getAverageDelta() -> number](#lurektimergetaveragedelta-number)
   - [lurek.timer.getDelta() -> number](#lurektimergetdelta-number)
   - [lurek.timer.getFPS() -> number](#lurektimergetfps-number)
-  - [lurek.timer.getFrameCount() -> number](#lurektimergetframecount-number)
+  - [lurek.timer.getFrameCount() -> integer](#lurektimergetframecount-integer)
   - [lurek.timer.getMicroTime() -> number](#lurektimergetmicrotime-number)
   - [lurek.timer.getPhysicsDelta() -> number](#lurektimergetphysicsdelta-number)
   - [lurek.timer.getPhysicsMaxSteps() -> number](#lurektimergetphysicsmaxsteps-number)
@@ -31,22 +31,22 @@
   - [lurek.timer.setSmoothingFactor(alpha: number)](#lurektimersetsmoothingfactoralpha-number)
   - [lurek.timer.sleep(seconds: number)](#lurektimersleepseconds-number)
   - [lurek.timer.step() -> number](#lurektimerstep-number)
-  - [lurek.timer.tickRealTimers() -> number](#lurektimertickrealtimers-number)
-  - [lurek.timer.tickWaits() -> number](#lurektimertickwaits-number)
+  - [lurek.timer.tickRealTimers() -> integer](#lurektimertickrealtimers-integer)
+  - [lurek.timer.tickWaits() -> integer](#lurektimertickwaits-integer)
   - [lurek.timer.waitFrames(frames: integer)](#lurektimerwaitframesframes-integer)
   - [lurek.timer.waitSeconds(seconds: number)](#lurektimerwaitsecondsseconds-number)
 - [Types and Methods](#types-and-methods)
   - [LScheduler](#lscheduler)
-  - [LScheduler:after(delay: number, func: function) -> number](#lschedulerafterdelay-number-func-function-number)
-  - [LScheduler:afterFrames(n: integer, func: function) -> number](#lschedulerafterframesn-integer-func-function-number)
-  - [LScheduler:afterNamed(name: string, delay: number, func: function) -> number](#lschedulerafternamedname-string-delay-number-func-function-number)
+  - [LScheduler:after(delay: number, func: function) -> integer](#lschedulerafterdelay-number-func-function-integer)
+  - [LScheduler:afterFrames(n: integer, func: function) -> integer](#lschedulerafterframesn-integer-func-function-integer)
+  - [LScheduler:afterNamed(name: string, delay: number, func: function) -> integer](#lschedulerafternamedname-string-delay-number-func-function-integer)
   - [LScheduler:cancel(id: integer) -> boolean](#lschedulercancelid-integer-boolean)
-  - [LScheduler:cancelAll() -> number](#lschedulercancelall-number)
+  - [LScheduler:cancelAll() -> integer](#lschedulercancelall-integer)
   - [LScheduler:cancelNamed(name: string) -> boolean](#lschedulercancelnamedname-string-boolean)
-  - [LScheduler:every(interval: number, func: function, [count]: integer) -> number](#lschedulereveryinterval-number-func-function-count-integer-number)
-  - [LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> number](#lschedulereveryframesn-integer-func-function-count-integer-number)
-  - [LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> number](#lschedulereverynamedname-string-interval-number-func-function-count-integer-number)
-  - [LScheduler:getCount() -> number](#lschedulergetcount-number)
+  - [LScheduler:every(interval: number, func: function, [count]: integer) -> integer](#lschedulereveryinterval-number-func-function-count-integer-integer)
+  - [LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> integer](#lschedulereveryframesn-integer-func-function-count-integer-integer)
+  - [LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> integer](#lschedulereverynamedname-string-interval-number-func-function-count-integer-integer)
+  - [LScheduler:getCount() -> integer](#lschedulergetcount-integer)
   - [LScheduler:getInterval(id: integer) -> boolean](#lschedulergetintervalid-integer-boolean)
   - [LScheduler:getRemaining(id: integer) -> boolean](#lschedulergetremainingid-integer-boolean)
   - [LScheduler:getRepeatCount(id: integer) -> boolean](#lschedulergetrepeatcountid-integer-boolean)
@@ -63,8 +63,8 @@
   - [LScheduler:setTimeScale(scale: number)](#lschedulersettimescalescale-number)
   - [LScheduler:type() -> string](#lschedulertype-string)
   - [LScheduler:typeOf(name: string) -> boolean](#lschedulertypeofname-string-boolean)
-  - [LScheduler:update(dt: number) -> number](#lschedulerupdatedt-number-number)
-  - [LScheduler:updateFrames() -> number](#lschedulerupdateframes-number)
+  - [LScheduler:update(dt: number) -> integer](#lschedulerupdatedt-number-integer)
+  - [LScheduler:updateFrames() -> integer](#lschedulerupdateframes-integer)
 - [Examples](#examples)
 - [Reference Games](#reference-games)
 - [Related Modules](#related-modules)
@@ -152,7 +152,7 @@ lurek.timer.chain(steps: table) -> LScheduler -- Creates a scheduler pre-loaded 
 lurek.timer.getAverageDelta() -> number -- Returns the smoothed average delta time in seconds over a recent window of frames. More stable than getDelt...
 lurek.timer.getDelta() -> number -- Returns the time in seconds elapsed since the last frame. Use this to make movement and animations frame-ra...
 lurek.timer.getFPS() -> number -- Returns the current frames-per-second count. Useful for performance monitoring overlays and debug HUDs.
-lurek.timer.getFrameCount() -> number -- Returns the total number of frames rendered since the engine started.
+lurek.timer.getFrameCount() -> integer -- Returns the total number of frames rendered since the engine started.
 lurek.timer.getMicroTime() -> number -- Returns high-resolution elapsed time in seconds since engine start. Useful for precise benchmarking and pro...
 lurek.timer.getPhysicsDelta() -> number -- Returns the fixed timestep used for physics simulation in seconds. The default is typically 1/60.
 lurek.timer.getPhysicsMaxSteps() -> number -- Returns the maximum number of physics steps allowed per frame. Prevents the spiral of death when the game r...
@@ -164,7 +164,7 @@ lurek.timer.setPhysicsMaxSteps(n: integer) -- Sets the maximum number of physics
 lurek.timer.setSmoothingFactor(alpha: number) -- Sets the exponential smoothing factor used by getSmoothedDelta. Lower values produce smoother (more lagged)...
 lurek.timer.sleep(seconds: number) -- Blocks the current thread for the given number of seconds. Use sparingly — this halts the entire game loop....
 lurek.timer.step() -> number -- Advances the internal clock by one tick and returns the delta time for that tick. Typically called by the e...
-lurek.timer.tickRealTimers() -> number -- Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that f...
+lurek.timer.tickRealTimers() -> integer -- Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that f...
 -- ... 3 more module functions
 ```
 
@@ -290,11 +290,11 @@ do
 end
 ```
 
-### `lurek.timer.getFrameCount() -> number`
+### `lurek.timer.getFrameCount() -> integer`
 
 Returns the total number of frames rendered since the engine started.
 
-**Returns**: `number` - Total frame count.
+**Returns**: `integer` - Total frame count.
 
 #### Example
 
@@ -542,11 +542,11 @@ do
 end
 ```
 
-### `lurek.timer.tickRealTimers() -> number`
+### `lurek.timer.tickRealTimers() -> integer`
 
 Checks all real-time timers and fires any whose deadline has passed. Returns the number of callbacks that fired. Call this once per frame after afterReal scheduling.
 
-**Returns**: `number` - Count of real-time callbacks that fired.
+**Returns**: `integer` - Count of real-time callbacks that fired.
 
 #### Example
 
@@ -566,11 +566,11 @@ do
 end
 ```
 
-### `lurek.timer.tickWaits() -> number`
+### `lurek.timer.tickWaits() -> integer`
 
 Checks all pending waitSeconds and waitFrames coroutines, resumes any whose deadline or frame target has been reached, and cleans up completed entries. Returns the number of coroutines that were resumed. Call once per frame.
 
-**Returns**: `number` - Count of coroutines resumed.
+**Returns**: `integer` - Count of coroutines resumed.
 
 #### Example
 
@@ -666,7 +666,7 @@ do
 end
 ```
 
-### `LScheduler:after(delay: number, func: function) -> number`
+### `LScheduler:after(delay: number, func: function) -> integer`
 
 Schedules a one-shot callback to fire after the given delay in seconds. Returns an event ID that can be used to cancel, pause, or query the event.
 
@@ -675,7 +675,7 @@ Schedules a one-shot callback to fire after the given delay in seconds. Returns 
 - `delay` (`number`, required) - Time in seconds before the callback fires.
 - `func` (`function`, required) - Callback to invoke when the delay elapses.
 
-**Returns**: `number` - Unique event ID for this scheduled callback.
+**Returns**: `integer` - Unique event ID for this scheduled callback.
 
 #### Example
 
@@ -694,7 +694,7 @@ do
 end
 ```
 
-### `LScheduler:afterFrames(n: integer, func: function) -> number`
+### `LScheduler:afterFrames(n: integer, func: function) -> integer`
 
 Schedules a one-shot callback to fire after the given number of frames. Returns an event ID for management.
 
@@ -703,7 +703,7 @@ Schedules a one-shot callback to fire after the given number of frames. Returns 
 - `n` (`integer`, required) - Number of frames to wait before the callback fires.
 - `func` (`function`, required) - Callback to invoke when the frame count elapses.
 
-**Returns**: `number` - Unique event ID for this scheduled callback.
+**Returns**: `integer` - Unique event ID for this scheduled callback.
 
 #### Example
 
@@ -721,7 +721,7 @@ do
 end
 ```
 
-### `LScheduler:afterNamed(name: string, delay: number, func: function) -> number`
+### `LScheduler:afterNamed(name: string, delay: number, func: function) -> integer`
 
 Schedules a named one-shot callback after a delay in seconds. If a callback with the same name already exists, the old one is cancelled and replaced. Useful for debouncing or resettable delays.
 
@@ -731,7 +731,7 @@ Schedules a named one-shot callback after a delay in seconds. If a callback with
 - `delay` (`number`, required) - Time in seconds before the callback fires.
 - `func` (`function`, required) - Callback to invoke when the delay elapses.
 
-**Returns**: `number` - Unique event ID for this scheduled callback.
+**Returns**: `integer` - Unique event ID for this scheduled callback.
 
 #### Example
 
@@ -779,11 +779,11 @@ do
 end
 ```
 
-### `LScheduler:cancelAll() -> number`
+### `LScheduler:cancelAll() -> integer`
 
 Cancels all scheduled events in this scheduler and frees their callbacks. Returns the number of events that were removed.
 
-**Returns**: `number` - Count of events that were cancelled.
+**Returns**: `integer` - Count of events that were cancelled.
 
 #### Example
 
@@ -827,7 +827,7 @@ do
 end
 ```
 
-### `LScheduler:every(interval: number, func: function, [count]: integer) -> number`
+### `LScheduler:every(interval: number, func: function, [count]: integer) -> integer`
 
 Schedules a repeating callback that fires at a fixed interval in seconds. Pass a positive count to limit repetitions, or omit/pass -1 to repeat indefinitely.
 
@@ -837,7 +837,7 @@ Schedules a repeating callback that fires at a fixed interval in seconds. Pass a
 - `func` (`function`, required) - Callback to invoke on each interval tick.
 - `count` (`integer`, optional) - Maximum number of times to fire. Defaults to -1 (infinite).
 
-**Returns**: `number` - Unique event ID for this repeating callback.
+**Returns**: `integer` - Unique event ID for this repeating callback.
 
 #### Example
 
@@ -856,7 +856,7 @@ do
 end
 ```
 
-### `LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> number`
+### `LScheduler:everyFrames(n: integer, func: function, [count]: integer) -> integer`
 
 Schedules a repeating callback that fires every N frames. Pass a positive count to limit repetitions, or omit/pass -1 to repeat indefinitely.
 
@@ -866,7 +866,7 @@ Schedules a repeating callback that fires every N frames. Pass a positive count 
 - `func` (`function`, required) - Callback to invoke on each frame-interval tick.
 - `count` (`integer`, optional) - Maximum number of times to fire. Defaults to -1 (infinite).
 
-**Returns**: `number` - Unique event ID for this repeating callback.
+**Returns**: `integer` - Unique event ID for this repeating callback.
 
 #### Example
 
@@ -884,7 +884,7 @@ do
 end
 ```
 
-### `LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> number`
+### `LScheduler:everyNamed(name: string, interval: number, func: function, [count]: integer) -> integer`
 
 Schedules a named repeating callback at a fixed interval. If a callback with the same name already exists, the old one is cancelled and replaced. Useful for restartable periodic effects like health regeneration or status ticks.
 
@@ -895,7 +895,7 @@ Schedules a named repeating callback at a fixed interval. If a callback with the
 - `func` (`function`, required) - Callback to invoke on each interval tick.
 - `count` (`integer`, optional) - Maximum number of times to fire. Defaults to -1 (infinite).
 
-**Returns**: `number` - Unique event ID for this repeating callback.
+**Returns**: `integer` - Unique event ID for this repeating callback.
 
 #### Example
 
@@ -917,11 +917,11 @@ do
 end
 ```
 
-### `LScheduler:getCount() -> number`
+### `LScheduler:getCount() -> integer`
 
 Returns the total number of active scheduled events in this scheduler.
 
-**Returns**: `number` - Count of active events.
+**Returns**: `integer` - Count of active events.
 
 #### Example
 
@@ -1338,7 +1338,7 @@ do
 end
 ```
 
-### `LScheduler:update(dt: number) -> number`
+### `LScheduler:update(dt: number) -> integer`
 
 Advances all time-based events by dt seconds, fires any callbacks whose delay has elapsed, and cleans up completed one-shot events. Call this once per frame with delta time. Returns the number of callbacks that fired.
 
@@ -1346,7 +1346,7 @@ Advances all time-based events by dt seconds, fires any callbacks whose delay ha
 
 - `dt` (`number`, required) - Delta time in seconds since the last update.
 
-**Returns**: `number` - Count of callbacks that fired during this update.
+**Returns**: `integer` - Count of callbacks that fired during this update.
 
 #### Example
 
@@ -1368,11 +1368,11 @@ do
 end
 ```
 
-### `LScheduler:updateFrames() -> number`
+### `LScheduler:updateFrames() -> integer`
 
 Advances all frame-based events by one frame, fires any callbacks whose frame count has been reached, and cleans up completed one-shot events. Call this once per frame. Returns the number of callbacks that fired.
 
-**Returns**: `number` - Count of callbacks that fired during this frame update.
+**Returns**: `integer` - Count of callbacks that fired during this frame update.
 
 #### Example
 

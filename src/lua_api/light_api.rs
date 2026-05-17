@@ -252,7 +252,6 @@ impl LuaUserData for LuaLight {
         /// Sets this light position. This method is available to Lua scripts.
         /// @param | x | number | Light x coordinate.
         /// @param | y | number | Light y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -277,7 +276,6 @@ impl LuaUserData for LuaLight {
         // -- setRadius --
         /// Sets this light radius. This method is available to Lua scripts.
         /// @param | r | number | Radius value.
-        /// @return | nil | No value is returned.
         methods.add_method("setRadius", |_, this, r: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -303,7 +301,7 @@ impl LuaUserData for LuaLight {
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
-        /// @param | a? | number | Alpha channel, defaulting to 1.0.
+        /// @param | a | number? | Alpha channel, defaulting to 1.0.
         methods.add_method(
             "setColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -334,7 +332,6 @@ impl LuaUserData for LuaLight {
         // -- setIntensity --
         /// Sets this light intensity. This method is available to Lua scripts.
         /// @param | i | number | Intensity value.
-        /// @return | nil | No value is returned.
         methods.add_method("setIntensity", |_, this, i: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -358,7 +355,6 @@ impl LuaUserData for LuaLight {
         // -- setEnergy --
         /// Sets this light energy value. This method is available to Lua scripts.
         /// @param | e | number | Energy value.
-        /// @return | nil | No value is returned.
         methods.add_method("setEnergy", |_, this, e: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -382,7 +378,6 @@ impl LuaUserData for LuaLight {
         // -- setBlendMode --
         /// Sets this light blend mode. This method is available to Lua scripts.
         /// @param | mode | string | Blend mode `add`, `sub`, or `mix`.
-        /// @return | nil | No value is returned.
         methods.add_method("setBlendMode", |_, this, mode: String| {
             let bm = parse_blend_mode(&mode)?;
             let mut st = this.state.borrow_mut();
@@ -407,7 +402,6 @@ impl LuaUserData for LuaLight {
         // -- setFalloff --
         /// Sets this light falloff mode. This method is available to Lua scripts.
         /// @param | mode | string | Falloff mode `linear`, `smooth`, or `constant`.
-        /// @return | nil | No value is returned.
         methods.add_method("setFalloff", |_, this, mode: String| {
             let fm = parse_falloff(&mode)?;
             let mut st = this.state.borrow_mut();
@@ -432,7 +426,6 @@ impl LuaUserData for LuaLight {
         // -- setShadowEnabled --
         /// Enables or disables shadow casting for this light.
         /// @param | b | boolean | New shadow enabled flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setShadowEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -458,7 +451,7 @@ impl LuaUserData for LuaLight {
         /// @param | r | number | Red channel.
         /// @param | g | number | Green channel.
         /// @param | b | number | Blue channel.
-        /// @param | a? | number | Alpha channel, defaulting to 1.0.
+        /// @param | a | number? | Alpha channel, defaulting to 1.0.
         methods.add_method(
             "setShadowColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -489,7 +482,6 @@ impl LuaUserData for LuaLight {
         // -- setShadowFilter --
         /// Sets this light shadow filter. This method is available to Lua scripts.
         /// @param | filter | string | Shadow filter `none`, `pcf5`, or `pcf13`.
-        /// @return | nil | No value is returned.
         methods.add_method("setShadowFilter", |_, this, filter: String| {
             let sf = parse_shadow_filter(&filter)?;
             let mut st = this.state.borrow_mut();
@@ -514,7 +506,6 @@ impl LuaUserData for LuaLight {
         // -- setShadowSmooth --
         /// Sets this light shadow smoothing value.
         /// @param | s | number | Shadow smoothing value.
-        /// @return | nil | No value is returned.
         methods.add_method("setShadowSmooth", |_, this, s: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -538,7 +529,6 @@ impl LuaUserData for LuaLight {
         // -- setShadowSoftness --
         /// Sets this light shadow softness value.
         /// @param | softness | number | Shadow softness value.
-        /// @return | nil | No value is returned.
         methods.add_method("setShadowSoftness", |_, this, softness: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -562,7 +552,6 @@ impl LuaUserData for LuaLight {
         // -- setLightMask --
         /// Sets this light's inclusion mask. This method is available to Lua scripts.
         /// @param | mask | integer | Light mask bits.
-        /// @return | nil | No value is returned.
         methods.add_method("setLightMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -586,7 +575,6 @@ impl LuaUserData for LuaLight {
         // -- setShadowMask --
         /// Sets this light's shadow receiver mask.
         /// @param | mask | integer | Shadow mask bits.
-        /// @return | nil | No value is returned.
         methods.add_method("setShadowMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -610,7 +598,6 @@ impl LuaUserData for LuaLight {
         // -- setEnabled --
         /// Enables or disables this light. This method is available to Lua scripts.
         /// @param | b | boolean | New enabled flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -634,7 +621,6 @@ impl LuaUserData for LuaLight {
         // -- setLightType --
         /// Sets this light type. This method is available to Lua scripts.
         /// @param | t | string | Light type `point`, `directional`, or `spot`.
-        /// @return | nil | No value is returned.
         methods.add_method("setLightType", |_, this, t: String| {
             let lt = parse_light_type(&t)?;
             let mut st = this.state.borrow_mut();
@@ -659,7 +645,6 @@ impl LuaUserData for LuaLight {
         // -- setDirection --
         /// Sets this light direction angle. This method is available to Lua scripts.
         /// @param | dir | number | Direction angle in radians or engine units.
-        /// @return | nil | No value is returned.
         methods.add_method("setDirection", |_, this, dir: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -683,7 +668,6 @@ impl LuaUserData for LuaLight {
         // -- setInnerAngle --
         /// Sets this spot light inner cone angle.
         /// @param | a | number | Inner angle.
-        /// @return | nil | No value is returned.
         methods.add_method("setInnerAngle", |_, this, a: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -707,7 +691,6 @@ impl LuaUserData for LuaLight {
         // -- setOuterAngle --
         /// Sets this spot light outer cone angle.
         /// @param | a | number | Outer angle.
-        /// @return | nil | No value is returned.
         methods.add_method("setOuterAngle", |_, this, a: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -733,7 +716,6 @@ impl LuaUserData for LuaLight {
         /// @param | c | number | Constant coefficient.
         /// @param | l | number | Linear coefficient.
         /// @param | q | number | Quadratic coefficient.
-        /// @return | nil | No value is returned.
         methods.add_method("setAttenuation", |_, this, (c, l, q): (f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -761,7 +743,6 @@ impl LuaUserData for LuaLight {
         /// Configures flicker speed and strength for this light.
         /// @param | speed | number | Flicker speed.
         /// @param | strength | number | Flicker strength.
-        /// @return | nil | No value is returned.
         methods.add_method("setFlicker", |_, this, (speed, strength): (f32, f32)| {
             let mut st = this.state.borrow_mut();
             {
@@ -790,7 +771,6 @@ impl LuaUserData for LuaLight {
         // -- setFlickerEnabled --
         /// Enables or disables this light flicker state.
         /// @param | b | boolean | New flicker enabled flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setFlickerEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
             {
@@ -817,7 +797,6 @@ impl LuaUserData for LuaLight {
         // -- setGroupId --
         /// Sets this light group id. This method is available to Lua scripts.
         /// @param | id | integer | Group id.
-        /// @return | nil | No value is returned.
         methods.add_method("setGroupId", |_, this, id: u16| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -841,7 +820,6 @@ impl LuaUserData for LuaLight {
         // -- setVolumetric --
         /// Enables or disables volumetric behavior for this light.
         /// @param | b | boolean | New volumetric flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setVolumetric", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -864,7 +842,6 @@ impl LuaUserData for LuaLight {
         });
         // -- remove --
         /// Removes this light from the shared light world.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |_, this, ()| {
             this.state.borrow_mut().light_world.remove_light(this.key);
             Ok(())
@@ -892,7 +869,6 @@ impl LuaUserData for LuaLight {
         /// @param | min | number | Minimum flicker range value.
         /// @param | max | number | Maximum flicker range value.
         /// @param | hz | number | Flicker frequency in hertz.
-        /// @return | nil | No value is returned.
         methods.add_method("addFlicker", |_, this, (min, max, hz): (f32, f32, f32)| {
             let strength = ((max - min) / 2.0).abs();
             let speed = hz * std::f32::consts::TAU;
@@ -974,7 +950,6 @@ impl LuaUserData for LuaLight {
         });
         // -- stopTransition --
         /// Stops and clears this light's active transition.
-        /// @return | nil | No value is returned.
         methods.add_method("stopTransition", |_, this, ()| {
             this.transition.borrow_mut().take();
             Ok(())
@@ -993,7 +968,6 @@ impl LuaUserData for LuaLight {
         // -- setCookie --
         /// Stores a cookie texture path on this Lua light handle.
         /// @param | path | string | Cookie texture path.
-        /// @return | nil | No value is returned.
         methods.add_method("setCookie", |_, this, path: String| {
             *this.cookie_path.borrow_mut() = Some(path);
             Ok(())
@@ -1006,7 +980,6 @@ impl LuaUserData for LuaLight {
         });
         // -- clearCookie --
         /// Clears the cookie texture path stored on this Lua light handle.
-        /// @return | nil | No value is returned.
         methods.add_method("clearCookie", |_, this, ()| {
             this.cookie_path.borrow_mut().take();
             Ok(())
@@ -1014,7 +987,6 @@ impl LuaUserData for LuaLight {
         // -- setNormalMap --
         /// Sets the normal map path used by this light.
         /// @param | path | string | Normal map path.
-        /// @return | nil | No value is returned.
         methods.add_method("setNormalMap", |_, this, path: String| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -1037,7 +1009,6 @@ impl LuaUserData for LuaLight {
         });
         // -- clearNormalMap --
         /// Clears the normal map path used by this light.
-        /// @return | nil | No value is returned.
         methods.add_method("clearNormalMap", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -1050,7 +1021,6 @@ impl LuaUserData for LuaLight {
         // -- setNormalStrength --
         /// Sets this light's normal map strength.
         /// @param | strength | number | Normal map strength.
-        /// @return | nil | No value is returned.
         methods.add_method("setNormalStrength", |_, this, strength: f32| {
             let mut st = this.state.borrow_mut();
             let light = st
@@ -1098,7 +1068,6 @@ impl LuaUserData for LuaOccluder {
         // -- setVertices --
         /// Replaces this occluder's flat vertex coordinate list.
         /// @param | tbl | table | Flat numeric array `[x1, y1, x2, y2, ...]`.
-        /// @return | nil | No value is returned.
         methods.add_method("setVertices", |_, this, tbl: LuaTable| {
             let flat: Vec<f32> = tbl.sequence_values::<f32>().collect::<LuaResult<_>>()?;
             let tmp = Occluder::from_flat_coords(&flat).map_err(LuaError::RuntimeError)?;
@@ -1112,7 +1081,7 @@ impl LuaUserData for LuaOccluder {
         });
         // -- getVertices --
         /// Returns this occluder's flat vertex coordinate list.
-        /// @return | table | Flat numeric array `[x1, y1, x2, y2, ...]`.
+        /// @return | number[] | Flat numeric array `[x1, y1, x2, y2, ...]`.
         methods.add_method("getVertices", |lua, this, ()| {
             let st = this.state.borrow();
             let occ = st
@@ -1130,7 +1099,6 @@ impl LuaUserData for LuaOccluder {
         /// Sets this occluder position offset.
         /// @param | x | number | X coordinate.
         /// @param | y | number | Y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             let mut st = this.state.borrow_mut();
             let occ = st
@@ -1156,7 +1124,6 @@ impl LuaUserData for LuaOccluder {
         // -- setOpacity --
         /// Sets this occluder opacity. This method is available to Lua scripts.
         /// @param | o | number | Opacity value.
-        /// @return | nil | No value is returned.
         methods.add_method("setOpacity", |_, this, o: f32| {
             let mut st = this.state.borrow_mut();
             let occ = st
@@ -1180,7 +1147,6 @@ impl LuaUserData for LuaOccluder {
         // -- setLightMask --
         /// Sets this occluder's light mask. This method is available to Lua scripts.
         /// @param | mask | integer | Light mask bits.
-        /// @return | nil | No value is returned.
         methods.add_method("setLightMask", |_, this, mask: u16| {
             let mut st = this.state.borrow_mut();
             let occ = st
@@ -1204,7 +1170,6 @@ impl LuaUserData for LuaOccluder {
         // -- setEnabled --
         /// Enables or disables this occluder.
         /// @param | b | boolean | New enabled flag.
-        /// @return | nil | No value is returned.
         methods.add_method("setEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
             let occ = st
@@ -1227,7 +1192,6 @@ impl LuaUserData for LuaOccluder {
         });
         // -- remove --
         /// Removes this occluder from the shared light world.
-        /// @return | nil | No value is returned.
         methods.add_method("remove", |_, this, ()| {
             this.state
                 .borrow_mut()
@@ -1275,7 +1239,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | Light x coordinate.
     /// @param | y | number | Light y coordinate.
     /// @param | radius | number | Light radius.
-    /// @param | opts? | table | Table of light settings.
+    /// @param | opts | table? | Table of light settings.
     /// @return | LLight | New light handle.
     tbl.set(
         "newLight",
@@ -1301,7 +1265,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newOccluder --
     /// Creates an occluder from a flat vertex coordinate table and optional settings.
     /// @param | vtbl | table | Flat numeric array `[x1, y1, x2, y2, ...]`.
-    /// @param | opts? | table | Table of occluder settings.
+    /// @param | opts | table? | Table of occluder settings.
     /// @return | LOccluder | New occluder handle.
     tbl.set(
         "newOccluder",
@@ -1324,7 +1288,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | r | number | Red channel.
     /// @param | g | number | Green channel.
     /// @param | b | number | Blue channel.
-    /// @param | a? | number | Alpha channel, defaulting to 1.0.
+    /// @param | a | number? | Alpha channel, defaulting to 1.0.
     tbl.set(
         "setAmbient",
         lua.create_function(move |_, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -1445,7 +1409,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | r | number | Red channel.
     /// @param | g | number | Green channel.
     /// @param | b | number | Blue channel.
-    /// @param | a? | number | Alpha channel, defaulting to 1.0.
+    /// @param | a | number? | Alpha channel, defaulting to 1.0.
     tbl.set(
         "setGroupColor",
         lua.create_function(
@@ -1497,6 +1461,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getGodRayHints --
     /// Returns directional light hints for god-ray style effects.
     /// @return | table | Array table of hint records with `x`, `y`, and `angle` fields.
+    /// @field | x | number | Hint x position.
+    /// @field | y | number | Hint y position.
+    /// @field | angle | number | Hint angle in radians.
     tbl.set(
         "getGodRayHints",
         lua.create_function(move |lua, ()| {
@@ -1505,13 +1472,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for (i, (x, y, angle)) in hints.iter().enumerate() {
                 let t = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 t.set("x", *x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 t.set("y", *y)?;
                 /// Performs the 'angle' operation.
-                /// @return | nil | No value is returned.
                 t.set("angle", *angle)?;
                 tbl.set(i + 1, t)?;
             }
@@ -1522,6 +1486,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getNormalMapHints --
     /// Returns light hints that reference normal maps.
     /// @return | table | Array table of normal-map light hint records.
+    /// @field | x | number | Hint x position.
+    /// @field | y | number | Hint y position.
+    /// @field | radius | number | Hint radius.
+    /// @field | intensity | number | Hint intensity.
+    /// @field | direction | number | Hint direction.
+    /// @field | normalMap | string | Normal map asset path.
+    /// @field | strength | number | Normal map strength.
     tbl.set(
         "getNormalMapHints",
         lua.create_function(move |lua, ()| {
@@ -1530,25 +1501,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for (i, h) in hints.iter().enumerate() {
                 let t = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 t.set("x", h.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 t.set("y", h.y)?;
                 /// Performs the 'radius' operation.
-                /// @return | nil | No value is returned.
                 t.set("radius", h.radius)?;
                 /// Performs the 'intensity' operation.
-                /// @return | nil | No value is returned.
                 t.set("intensity", h.intensity)?;
                 /// Performs the 'direction' operation.
-                /// @return | nil | No value is returned.
                 t.set("direction", h.direction)?;
                 /// Performs the 'normalMap' operation.
-                /// @return | nil | No value is returned.
                 t.set("normalMap", h.path.clone())?;
                 /// Performs the 'strength' operation.
-                /// @return | nil | No value is returned.
                 t.set("strength", h.strength)?;
                 tbl.set(i + 1, t)?;
             }
@@ -1556,7 +1520,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'light' operation.
-    /// @return | nil | No value is returned.
     lurek.set("light", tbl)?;
     Ok(())
 }

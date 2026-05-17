@@ -16,7 +16,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> = Arc::new(Mutex::new(None));
     // -- start --
     /// Starts the localhost debug bridge server on a port.
-    /// @param | port? | integer | TCP port to bind on `127.0.0.1`; defaults to 19740 and must be at least 1024.
+    /// @param | port | integer? | TCP port to bind on `127.0.0.1`; defaults to 19740 and must be at least 1024.
     /// @return | boolean | True when the server was started, false when it was already running.
     let sh = shared.clone();
     let run = running.clone();
@@ -51,7 +51,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- stop --
     /// Stops the debug bridge server and joins its server thread.
-    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set(
@@ -92,7 +91,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- poll --
     /// Polls pending debugger requests, evaluates supported methods, and queues responses.
-    /// @return | nil | No value is returned.
+    /// @return | nil | No return value.
     let sh = shared.clone();
     db.set("poll", lua.create_function(move |lua, ()| {
             if let Ok(lurek_tbl) = lua.globals().get::<_, LuaTable>("lurek") {
@@ -260,9 +259,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- capturePrint --
     /// Captures a print message and broadcasts it to debug bridge clients.
     /// @param | msg | string | Printed message text.
-    /// @param | source? | string | Source label; defaults to `?`.
-    /// @param | line? | integer | Source line; defaults to zero.
-    /// @return | nil | No value is returned.
+    /// @param | source | string? | Source label; defaults to `?`.
+    /// @param | line | integer? | Source line; defaults to zero.
     let sh = shared.clone();
     db.set(
         "capturePrint",
@@ -280,8 +278,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getPrintHistory --
     /// Returns captured print history entries.
-    /// @param | count? | integer | Number of newest entries; nil or zero returns all entries.
+    /// @param | count | integer? | Number of newest entries; nil or zero returns all entries.
     /// @return | table | Array table of entries with `timestamp`, `message`, `source`, and `line` fields.
+    /// @field | timestamp | number | Unix timestamp.
+    /// @field | message | string | Log message.
+    /// @field | source | string | Source file or module.
+    /// @field | line | integer | Line number.
     let sh = shared.clone();
     db.set(
         "getPrintHistory",
@@ -304,16 +306,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             for (i, entry) in entries.iter().enumerate() {
                 let e = lua.create_table()?;
                 /// Performs the 'timestamp' operation.
-                /// @return | nil | No value is returned.
                 e.set("timestamp", entry.timestamp)?;
                 /// Performs the 'message' operation.
-                /// @return | nil | No value is returned.
                 e.set("message", entry.message.clone())?;
                 /// Performs the 'source' operation.
-                /// @return | nil | No value is returned.
                 e.set("source", entry.source.clone())?;
                 /// Performs the 'line' operation.
-                /// @return | nil | No value is returned.
                 e.set("line", entry.line)?;
                 tbl.set(i + 1, e)?;
             }
@@ -322,7 +320,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- clearPrintHistory --
     /// Clears all entries from the captured print history buffer.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "clearPrintHistory",
@@ -337,7 +334,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setMaxPrintHistory --
     /// Sets the maximum retained print history entry count.
     /// @param | max | integer | Maximum retained print entries.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "setMaxPrintHistory",
@@ -373,8 +369,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- requestScreenshot --
     /// Requests a screenshot from the runtime.
-    /// @param | scale? | integer | Screenshot scale clamped from 1 to 8; defaults to 1.
-    /// @return | nil | No value is returned.
+    /// @param | scale | integer? | Screenshot scale clamped from 1 to 8; defaults to 1.
     let sh = shared.clone();
     db.set(
         "requestScreenshot",
@@ -401,7 +396,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Queues a JSON string payload broadcast for debug bridge clients.
     /// @param | event | string | Event name sent to clients.
     /// @param | json_data | string | Payload string wrapped as JSON for clients.
-    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set(
         "broadcast",
@@ -416,6 +410,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- getProtocolInfo --
     /// Returns debug bridge protocol version, capabilities, and handshake nonce.
     /// @return | table | Protocol info table with `version`, `capabilities`, and `nonce` fields.
+    /// @field | version | string | Protocol version.
+    /// @field | capabilities | table | Capabilities table.
+    /// @field | nonce | string | Nonce.
     let sh = shared.clone();
     db.set(
         "getProtocolInfo",
@@ -425,17 +422,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
             let t = lua.create_table()?;
             /// Performs the 'version' operation.
-            /// @return | nil | No value is returned.
             t.set("version", s.protocol_version)?;
             let caps = lua.create_table()?;
             for (i, cap) in s.capabilities.iter().enumerate() {
                 caps.set(i + 1, cap.clone())?;
             }
             /// Performs the 'capabilities' operation.
-            /// @return | nil | No value is returned.
             t.set("capabilities", caps)?;
             /// Performs the 'nonce' operation.
-            /// @return | nil | No value is returned.
             t.set("nonce", s.handshake_nonce.clone())?;
             Ok(t)
         })?,
@@ -456,7 +450,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'debugbridge' operation.
-    /// @return | nil | No value is returned.
     lurek.set("debugbridge", db)?;
     Ok(())
 }

@@ -38,7 +38,7 @@ impl LuaUserData for LuaSkeleton {
         // -- addBone --
         /// Adds a root-level bone to the skeleton with optional transform properties.
         /// @param | name | string | Unique name for this bone.
-        /// @param | opts? | table | Optional table with keys: x, y, rotation, scale_x, scale_y.
+        /// @param | opts | table? | Optional table with keys: x, y, rotation, scale_x, scale_y.
         /// @return | integer | Zero-based index of the newly added bone.
         methods.add_method_mut(
             "addBone",
@@ -59,7 +59,7 @@ impl LuaUserData for LuaSkeleton {
         /// Adds a bone as a child of an existing bone, inheriting its parent's world transform.
         /// @param | name | string | Unique name for this bone.
         /// @param | parent_idx | integer | Zero-based index of the parent bone.
-        /// @param | opts? | table | Optional table with keys: x, y, rotation, scale_x, scale_y (local offsets from parent).
+        /// @param | opts | table? | Optional table with keys: x, y, rotation, scale_x, scale_y (local offsets from parent).
         /// @return | integer | Zero-based index of the newly added child bone.
         methods.add_method_mut(
             "addChildBone",
@@ -80,7 +80,7 @@ impl LuaUserData for LuaSkeleton {
         /// Adds a slot attached to a specific bone, optionally assigning a default attachment name.
         /// @param | name | string | Unique name for this slot.
         /// @param | bone_idx | integer | Zero-based index of the bone this slot is attached to.
-        /// @param | attachment? | string | Optional default attachment name for this slot.
+        /// @param | attachment | string? | Optional default attachment name for this slot.
         /// @return | integer | Zero-based index of the newly added slot.
         methods.add_method_mut(
             "addSlot",
@@ -104,7 +104,6 @@ impl LuaUserData for LuaSkeleton {
         });
         // -- updateWorldTransforms --
         /// Recomputes world transforms for all bones in hierarchy order. Call after modifying bone locals or IK targets.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("updateWorldTransforms", |_, this, ()| {
             this.inner.update_world_transforms();
             Ok(())
@@ -113,25 +112,25 @@ impl LuaUserData for LuaSkeleton {
         /// Returns the final world-space transform of a bone after hierarchy resolution.
         /// @param | idx | integer | Zero-based bone index.
         /// @return | table | Table with keys x, y, rotation, scale_x, scale_y — or nil if the index is invalid.
+        /// @field | x | number | X position.
+        /// @field | y | number | Y position.
+        /// @field | rotation | number | Rotation in degrees.
+        /// @field | scale_x | number | Horizontal scale.
+        /// @field | scale_y | number | Vertical scale.
         methods.add_method("getBoneWorld", |lua, this, idx: usize| {
             match this.inner.bone_world_transform(idx) {
                 None => Ok(LuaValue::Nil),
                 Some((x, y, rotation, sx, sy)) => {
                     let t = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     t.set("x", x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     t.set("y", y)?;
                     /// Performs the 'rotation' operation.
-                    /// @return | nil | No value is returned.
                     t.set("rotation", rotation)?;
                     /// Performs the 'scale_x' operation.
-                    /// @return | nil | No value is returned.
                     t.set("scale_x", sx)?;
                     /// Performs the 'scale_y' operation.
-                    /// @return | nil | No value is returned.
                     t.set("scale_y", sy)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -141,7 +140,6 @@ impl LuaUserData for LuaSkeleton {
         /// Sets the root bone world position, shifting the entire skeleton.
         /// @param | x | number | World X coordinate.
         /// @param | y | number | World Y coordinate.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.set_root_position(x, y);
             Ok(())
@@ -166,7 +164,7 @@ impl LuaUserData for LuaSkeleton {
         // -- playAnimation --
         /// Starts playing a named animation on this skeleton. Optionally loops.
         /// @param | name | string | Name of the animation to play (must have been added via addAnimation).
-        /// @param | looping? | boolean | Whether to loop the animation. Defaults to true.
+        /// @param | looping | boolean? | Whether to loop the animation. Defaults to true.
         /// @return | boolean | True if the animation was found and started, false otherwise.
         methods.add_method_mut(
             "playAnimation",
@@ -176,7 +174,6 @@ impl LuaUserData for LuaSkeleton {
         );
         // -- stopAnimation --
         /// Stops the currently playing animation and resets playback state.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("stopAnimation", |_, this, ()| {
             this.inner.stop_animation();
             Ok(())
@@ -184,7 +181,6 @@ impl LuaUserData for LuaSkeleton {
         // -- updateAnimation --
         /// Advances the current animation by a delta time, applying bone transforms to the skeleton.
         /// @param | dt | number | Time step in seconds (e.g. from lurek.timer.getDelta()).
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("updateAnimation", |_, this, dt: f32| {
             this.inner.update_animation(dt);
             Ok(())
@@ -198,7 +194,6 @@ impl LuaUserData for LuaSkeleton {
         // -- addAnimation --
         /// Registers a SkeletonAnimation object with this skeleton so it can be played by name.
         /// @param | anim | LSkeletonAnimation | The animation userdata to register. Consumed by this call.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("addAnimation", |_, this, anim_ud: LuaAnyUserData| {
             let anim = anim_ud.take::<LuaSkeletonAnimation>()?.inner;
             this.inner.add_animation(anim);
@@ -208,7 +203,7 @@ impl LuaUserData for LuaSkeleton {
         /// Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
         /// @param | name | string | Unique name for this IK constraint (used with setIKTarget).
         /// @param | chain | table | Array of bone indices forming the IK chain from root to tip.
-        /// @param | bend_positive? | boolean | Whether the joint bends in the positive direction. Defaults to true.
+        /// @param | bend_positive | boolean? | Whether the joint bends in the positive direction. Defaults to true.
         /// @return | integer | Index of the newly added constraint.
         methods.add_method_mut(
             "addIKConstraint",
@@ -234,7 +229,6 @@ impl LuaUserData for LuaSkeleton {
         // -- addSkin --
         /// Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
         /// @param | name | string | Unique name for the skin.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut("addSkin", |_, this, name: String| {
             this.inner.add_skin(&name);
             Ok(())
@@ -257,7 +251,6 @@ impl LuaUserData for LuaSkeleton {
         /// @param | skin | string | Name of the skin to add the mapping to.
         /// @param | slot | string | Name of the slot to remap.
         /// @param | attachment | string | Attachment name to display in that slot when the skin is active.
-        /// @return | nil | This method returns no value.
         methods.add_method_mut(
             "setSkinMapping",
             |_, this, (skin, slot, attachment): (String, String, String)| {
@@ -269,8 +262,7 @@ impl LuaUserData for LuaSkeleton {
         /// Blends an animation pose onto the skeleton at a given time with a weight factor for smooth transitions.
         /// @param | anim | LSkeletonAnimation | The animation to sample and blend from.
         /// @param | time | number | The time position to sample within the animation.
-        /// @param | blend_weight? | number | Blend factor from 0.0 (no effect) to 1.0 (full). Defaults to 1.0.
-        /// @return | nil | This method returns no value.
+        /// @param | blend_weight | number? | Blend factor from 0.0 (no effect) to 1.0 (full). Defaults to 1.0.
         methods.add_method_mut(
             "blendAnimation",
             |_, this, (anim_ud, time, blend_weight): (mlua::AnyUserData, f32, Option<f32>)| {
@@ -309,8 +301,7 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @param | property | string | Bone property: "x", "y", "rotation", "scale_x", or "scale_y".
         /// @param | time | number | Time position in seconds for this keyframe.
         /// @param | value | number | Value of the property at this keyframe.
-        /// @param | easing? | string | Easing type: "linear" (default), "ease_in", "ease_out", "ease_in_out", or "step".
-        /// @return | nil | This method returns no value.
+        /// @param | easing | string? | Easing type: "linear" (default), "ease_in", "ease_out", "ease_in_out", or "step".
         methods.add_method_mut(
             "addKeyframe",
             |_,
@@ -378,8 +369,7 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Inserts an event trigger at a specific time within the animation timeline.
         /// @param | time | number | Time position in seconds when the event fires.
         /// @param | name | string | Name of the event (used to identify it when querying).
-        /// @param | value? | number | Optional numeric payload for the event. Defaults to 0.
-        /// @return | nil | This method returns no value.
+        /// @param | value | number? | Optional numeric payload for the event. Defaults to 0.
         methods.add_method_mut(
             "addEventKey",
             |_, this, (time, name, value): (f32, String, Option<f32>)| {
@@ -392,16 +382,16 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @param | from | number | Start time in seconds (inclusive).
         /// @param | to | number | End time in seconds (exclusive).
         /// @return | table | Array of tables, each with "name" (string) and "value" (number) fields.
+    /// @field | name | string | Event name.
+    /// @field | value | number | Event value.
         methods.add_method("getEvents", |lua, this, (from, to): (f32, f32)| {
             let pairs = this.inner.collect_events(from, to);
             let tbl = lua.create_table()?;
             for (i, (name, value)) in pairs.into_iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 entry.set("name", name)?;
                 /// Performs the 'value' operation.
-                /// @return | nil | No value is returned.
                 entry.set("value", value)?;
                 tbl.set(i + 1, entry)?;
             }
@@ -417,13 +407,15 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Samples all timelines at a given time and returns the computed pose as an array of bone-property-value entries.
         /// @param | time | number | Time position in seconds to sample.
         /// @return | table | Array of tables, each with "bone_idx" (integer), "property" (string), and "value" (number).
+    /// @field | bone_idx | integer | Bone index.
+    /// @field | property | string | Property name.
+    /// @field | value | number | Property value.
         methods.add_method("poseAt", |lua, this, time: f32| {
             let snapshot = this.inner.pose_at(time);
             let arr = lua.create_table()?;
             for (i, (bone_idx, prop, value)) in snapshot.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'bone_idx' operation.
-                /// @return | nil | No value is returned.
                 entry.set("bone_idx", *bone_idx)?;
                 let prop_name = match prop {
                     BoneProperty::X => "x",
@@ -433,10 +425,8 @@ impl LuaUserData for LuaSkeletonAnimation {
                     BoneProperty::ScaleY => "scale_y",
                 };
                 /// Performs the 'property' operation.
-                /// @return | nil | No value is returned.
                 entry.set("property", prop_name)?;
                 /// Performs the 'value' operation.
-                /// @return | nil | No value is returned.
                 entry.set("value", *value)?;
                 arr.set(i + 1, entry)?;
             }
@@ -514,7 +504,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'spine' operation.
-    /// @return | nil | No value is returned.
     luna.set("spine", tbl)?;
     Ok(())
 }

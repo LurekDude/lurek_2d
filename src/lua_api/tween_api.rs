@@ -52,7 +52,6 @@ impl LuaUserData for LuaTweenState {
 
         // -- reset --
         /// Resets the tween state to the beginning so it can be replayed.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
             Ok(())
@@ -111,7 +110,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- update --
     /// Advances all active tweens, sequences, parallels, and springs by the given delta time. Call once per frame.
     /// @param | dt | number | Delta time in seconds since the last frame.
-    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "update",
@@ -231,7 +229,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- cancelAll --
     /// Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine.
-    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "cancelAll",
@@ -264,7 +261,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Registers a custom easing function by name. The function receives a progress value (0..1) and must return an eased value.
     /// @param | name | string | Unique name for the custom easing.
     /// @param | f | function | Easing function `f(t) -> number` where t is 0..1.
-    /// @return | nil | No return value.
     let s = engine.clone();
     tbl.set(
         "registerEasing",
@@ -280,7 +276,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getEasingNames --
     /// Returns an array of all available easing function names, including both built-in and custom-registered easings.
-    /// @return | table | Array of easing name strings.
+    /// @return | string[] | Easing name strings.
     let s = engine.clone();
     tbl.set(
         "getEasingNames",
@@ -488,7 +484,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
     /// Performs the 'tween' operation.
-    /// @return | nil | No value is returned.
     lurek.set("tween", tbl)?;
     Ok(())
 }
@@ -497,7 +492,6 @@ impl LuaUserData for LuaTween {
         // -- cancel --
         /// Cancels this tween immediately, fires the onCancel callback if set, and resumes any coroutines waiting on it.
         /// @param | self | LTween | The tween instance.
-        /// @return | nil | No return value.
         methods.add_function("cancel", |lua, ud: LuaAnyUserData| {
             let mut tw = ud.borrow_mut::<LuaTween>()?;
             tw.active = false;
@@ -513,7 +507,6 @@ impl LuaUserData for LuaTween {
 
         // -- pause --
         /// Pauses this tween so it stops advancing until resumed.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("pause", |_, this, ()| {
             this.paused = true;
             Ok(())
@@ -521,7 +514,6 @@ impl LuaUserData for LuaTween {
 
         // -- resume --
         /// Resumes a paused tween so it continues advancing.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("resume", |_, this, ()| {
             this.paused = false;
             Ok(())
@@ -553,7 +545,7 @@ impl LuaUserData for LuaTween {
         methods.add_method("getRemaining", |_, this, ()| Ok(this.remaining()));
         // -- getFields --
         /// Returns an array of field names being tweened on the target table.
-        /// @return | table | Array of field name strings.
+        /// @return | string[] | Field name strings.
         methods.add_method("getFields", |lua, this, ()| {
             let out = lua.create_table()?;
             for (idx, field) in this.fields.iter().enumerate() {
@@ -564,7 +556,6 @@ impl LuaUserData for LuaTween {
         // -- setRelative --
         /// Sets whether the tween end values are relative to the start values instead of absolute.
         /// @param | enabled | boolean | `true` for relative mode, `false` for absolute.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setRelative", |_, this, enabled: bool| {
             this.set_relative(enabled);
             Ok(())
@@ -582,7 +573,6 @@ impl LuaUserData for LuaTween {
         // -- await --
         /// Yields the current coroutine until this tween completes or is cancelled. Must be called from inside a coroutine.
         /// @param | self | LTween | The tween instance.
-        /// @return | nil | No return value.
         methods.add_function("await", |lua, ud: LuaAnyUserData| {
             let co_tbl: LuaTable = lua.globals().get("coroutine")?;
             let running_fn: LuaFunction = co_tbl.get("running")?;
@@ -606,7 +596,6 @@ impl LuaUserData for LuaTween {
         // -- setRepeat --
         /// Sets how many times the tween should repeat after the first play. Use -1 for infinite repeat.
         /// @param | n | integer | Number of additional repeats (0 = play once, -1 = infinite).
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setRepeat", |_, this, n: i32| {
             this.repeat_count = n;
             this.cycles_remaining = n;
@@ -615,7 +604,6 @@ impl LuaUserData for LuaTween {
         // -- setYoyo --
         /// Enables or disables yoyo mode, which reverses the tween direction on each repeat cycle.
         /// @param | enabled | boolean | `true` to enable yoyo, `false` to disable.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setYoyo", |_, this, enabled: bool| {
             this.yoyo = enabled;
             Ok(())
@@ -777,7 +765,6 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- cancel --
         /// Cancels this sequence immediately and resumes any coroutines waiting on it.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
             this.resume_waiters(lua)?;
@@ -797,7 +784,6 @@ impl LuaUserData for LuaTweenSequence {
         // -- await --
         /// Yields the current coroutine until this sequence completes or is cancelled. Must be called from inside a coroutine.
         /// @param | self | LTweenSequence | The sequence instance.
-        /// @return | nil | No return value.
         methods.add_function("await", |lua, ud: LuaAnyUserData| {
             let co_tbl: LuaTable = lua.globals().get("coroutine")?;
             let running_fn: LuaFunction = co_tbl.get("running")?;
@@ -858,7 +844,6 @@ impl LuaUserData for LuaTweenParallel {
         /// Adds an existing tween handle to this parallel group. The tween becomes owned by the group.
         /// @param | self | LTweenParallel | The parallel group instance.
         /// @param | tw_ud | LTween | The tween handle returned by `lurek.tween.tween()` to add to this group.
-        /// @return | nil | No return value.
         methods.add_function(
             "add",
             |lua, (par_ud, tw_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -936,7 +921,6 @@ impl LuaUserData for LuaTweenParallel {
 
         // -- cancel --
         /// Cancels all tweens in this parallel group immediately.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |_, this, ()| {
             this.active = false;
             Ok(())
@@ -1006,7 +990,6 @@ impl LuaUserData for LuaSpring {
         // -- setTarget --
         /// Changes the spring target values for one or more axes. Re-activates the spring if it was settled.
         /// @param | fields | table | Key-value pairs mapping axis names to new target values.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setTarget", |_, this, fields_tbl: LuaTable| {
             for pair in fields_tbl.pairs::<String, f64>() {
                 let (k, v) = pair?;
@@ -1021,7 +1004,6 @@ impl LuaUserData for LuaSpring {
         // -- setStiffness --
         /// Sets the spring stiffness for all axes. Higher values make the spring snap faster.
         /// @param | value | number | Stiffness coefficient (default 100).
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setStiffness", |_, this, value: f32| {
             this.system.stiffness = value;
             for axis in this.system.axes.values_mut() {
@@ -1033,7 +1015,6 @@ impl LuaUserData for LuaSpring {
         // -- setDamping --
         /// Sets the spring damping for all axes. Higher values reduce oscillation and overshoot.
         /// @param | value | number | Damping coefficient (default 10).
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setDamping", |_, this, value: f32| {
             this.system.damping = value;
             for axis in this.system.axes.values_mut() {
@@ -1044,7 +1025,6 @@ impl LuaUserData for LuaSpring {
 
         // -- cancel --
         /// Cancels this spring animation and cleans up the on-settle callback if one was registered.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
             if let Some(k) = this.on_settle_key.take() {

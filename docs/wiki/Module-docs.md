@@ -44,13 +44,13 @@
   - [LApiCatalog](#lapicatalog)
   - [LApiCatalog:entryCount([module]: string) -> integer](#lapicatalogentrycountmodule-string-integer)
   - [LApiCatalog:filter(predicate: function) -> LApiCatalog](#lapicatalogfilterpredicate-function-lapicatalog)
-  - [LApiCatalog:getEntries([module]: string) -> table](#lapicataloggetentriesmodule-string-table)
+  - [LApiCatalog:getEntries([module]: string) -> LDocEntry[]](#lapicataloggetentriesmodule-string-ldocentry)
   - [LApiCatalog:getEntry(qualified_name: string) -> LuaValue](#lapicataloggetentryqualifiedname-string-luavalue)
-  - [LApiCatalog:getModules() -> table](#lapicataloggetmodules-table)
-  - [LApiCatalog:getTypeMethods(qualified_name: string) -> table](#lapicataloggettypemethodsqualifiedname-string-table)
-  - [LApiCatalog:getTypes(module_name: string) -> table](#lapicataloggettypesmodulename-string-table)
+  - [LApiCatalog:getModules() -> string[]](#lapicataloggetmodules-string)
+  - [LApiCatalog:getTypeMethods(qualified_name: string) -> LDocEntry[]](#lapicataloggettypemethodsqualifiedname-string-ldocentry)
+  - [LApiCatalog:getTypes(module_name: string) -> string[]](#lapicataloggettypesmodulename-string-string)
   - [LApiCatalog:merge(other: LApiCatalog) -> LApiCatalog](#lapicatalogmergeother-lapicatalog-lapicatalog)
-  - [LApiCatalog:search(query: string) -> table](#lapicatalogsearchquery-string-table)
+  - [LApiCatalog:search(query: string) -> LDocEntry[]](#lapicatalogsearchquery-string-ldocentry)
   - [LApiCatalog:toJSON() -> string](#lapicatalogtojson-string)
   - [LApiCatalog:toTable() -> table](#lapicatalogtotable-table)
   - [LApiCatalog:type() -> string](#lapicatalogtype-string)
@@ -74,13 +74,13 @@
   - [LDocEntry:type() -> string](#ldocentrytype-string)
   - [LDocEntry:typeOf(name: string) -> boolean](#ldocentrytypeofname-string-boolean)
   - [LQualityReport](#lqualityreport)
-  - [LQualityReport:getBest([count]: integer) -> table](#lqualityreportgetbestcount-integer-table)
-  - [LQualityReport:getByGrade(grade: string) -> table](#lqualityreportgetbygradegrade-string-table)
+  - [LQualityReport:getBest([count]: integer) -> LDocEntry[]](#lqualityreportgetbestcount-integer-ldocentry)
+  - [LQualityReport:getByGrade(grade: string) -> LDocEntry[]](#lqualityreportgetbygradegrade-string-ldocentry)
   - [LQualityReport:getGrade() -> string](#lqualityreportgetgrade-string)
   - [LQualityReport:getModuleScores() -> table](#lqualityreportgetmodulescores-table)
   - [LQualityReport:getOverallScore() -> number](#lqualityreportgetoverallscore-number)
   - [LQualityReport:getSummary() -> string](#lqualityreportgetsummary-string)
-  - [LQualityReport:getWorst([count]: integer) -> table](#lqualityreportgetworstcount-integer-table)
+  - [LQualityReport:getWorst([count]: integer) -> LDocEntry[]](#lqualityreportgetworstcount-integer-ldocentry)
   - [LQualityReport:toJSON() -> string](#lqualityreporttojson-string)
   - [LQualityReport:toTable() -> table](#lqualityreporttotable-table)
   - [LQualityReport:type() -> string](#lqualityreporttype-string)
@@ -88,15 +88,15 @@
   - [LSchema](#lschema)
   - [LSchema:assert(data: table)](#lschemaassertdata-table)
   - [LSchema:check(data: table) -> boolean](#lschemacheckdata-table-boolean)
-  - [LSchema:getFields() -> table](#lschemagetfields-table)
+  - [LSchema:getFields() -> string[]](#lschemagetfields-string)
   - [LSchema:getName() -> string](#lschemagetname-string)
   - [LSchema:type() -> string](#lschematype-string)
   - [LSchema:typeOf(name: string) -> boolean](#lschematypeofname-string-boolean)
   - [LSchema:validate(data: table) -> boolean](#lschemavalidatedata-table-boolean)
   - [LValidationReport](#lvalidationreport)
-  - [LValidationReport:getIncomplete() -> table](#lvalidationreportgetincomplete-table)
-  - [LValidationReport:getMissing() -> table](#lvalidationreportgetmissing-table)
-  - [LValidationReport:getPhantom() -> table](#lvalidationreportgetphantom-table)
+  - [LValidationReport:getIncomplete() -> string[]](#lvalidationreportgetincomplete-string)
+  - [LValidationReport:getMissing() -> string[]](#lvalidationreportgetmissing-string)
+  - [LValidationReport:getPhantom() -> string[]](#lvalidationreportgetphantom-string)
   - [LValidationReport:getSummary() -> string](#lvalidationreportgetsummary-string)
   - [LValidationReport:incompleteCount() -> integer](#lvalidationreportincompletecount-integer)
   - [LValidationReport:isValid() -> boolean](#lvalidationreportisvalid-boolean)
@@ -971,7 +971,7 @@ do
 end
 ```
 
-### `LApiCatalog:getEntries([module]: string) -> table`
+### `LApiCatalog:getEntries([module]: string) -> LDocEntry[]`
 
 Returns catalog entries, optionally limited to one module.
 
@@ -979,7 +979,7 @@ Returns catalog entries, optionally limited to one module.
 
 - `module` (`string`, optional) - Optional module name used to filter entries.
 
-**Returns**: `table` - Array table of `LDocEntry` handles.
+**Returns**: `LDocEntry[]` - `LDocEntry` handles.
 
 #### Example
 
@@ -1022,11 +1022,11 @@ do
 end
 ```
 
-### `LApiCatalog:getModules() -> table`
+### `LApiCatalog:getModules() -> string[]`
 
 Returns every module represented in this catalog.
 
-**Returns**: `table` - Sorted array table of module names.
+**Returns**: `string[]` - Sorted array table of module names.
 
 #### Example
 
@@ -1044,7 +1044,7 @@ do
 end
 ```
 
-### `LApiCatalog:getTypeMethods(qualified_name: string) -> table`
+### `LApiCatalog:getTypeMethods(qualified_name: string) -> LDocEntry[]`
 
 Returns method entries associated with a qualified type name.
 
@@ -1052,7 +1052,7 @@ Returns method entries associated with a qualified type name.
 
 - `qualified_name` (`string`, required) - Qualified type name used as the method prefix.
 
-**Returns**: `table` - Array table of `LDocEntry` method entries.
+**Returns**: `LDocEntry[]` - `LDocEntry` method entries.
 
 #### Example
 
@@ -1071,7 +1071,7 @@ do
 end
 ```
 
-### `LApiCatalog:getTypes(module_name: string) -> table`
+### `LApiCatalog:getTypes(module_name: string) -> string[]`
 
 Returns type names documented for one module.
 
@@ -1079,7 +1079,7 @@ Returns type names documented for one module.
 
 - `module_name` (`string`, required) - Module name to inspect.
 
-**Returns**: `table` - Array table of documented type names.
+**Returns**: `string[]` - Documented type names.
 
 #### Example
 
@@ -1126,7 +1126,7 @@ do
 end
 ```
 
-### `LApiCatalog:search(query: string) -> table`
+### `LApiCatalog:search(query: string) -> LDocEntry[]`
 
 Searches names, qualified names, and descriptions with a case-insensitive substring query.
 
@@ -1134,7 +1134,7 @@ Searches names, qualified names, and descriptions with a case-insensitive substr
 
 - `query` (`string`, required) - Search text matched against catalog metadata.
 
-**Returns**: `table` - Array table of matching `LDocEntry` handles.
+**Returns**: `LDocEntry[]` - Matching `LDocEntry` handles.
 
 #### Example
 
@@ -1177,7 +1177,7 @@ end
 
 Converts this catalog into plain Lua tables for lightweight inspection.
 
-**Returns**: `table` - Array table of rows with name, qualifiedName, module, kind, description, and score fields.
+**Returns**: `table` - Array of rows with name, qualifiedName, module, kind, description, and score fields.
 
 #### Example
 
@@ -1437,7 +1437,7 @@ end
 
 Returns parameter metadata recorded for this entry.
 
-**Returns**: `table` - Array table of parameter rows with name, type, description, optional, and optional default fields.
+**Returns**: `table` - Array of parameter rows with name, type, description, optional, and optional default fields.
 
 #### Example
 
@@ -1790,7 +1790,7 @@ do
 end
 ```
 
-### `LQualityReport:getBest([count]: integer) -> table`
+### `LQualityReport:getBest([count]: integer) -> LDocEntry[]`
 
 Returns the highest-scoring documentation entries.
 
@@ -1798,7 +1798,7 @@ Returns the highest-scoring documentation entries.
 
 - `count` (`integer`, optional) - Optional maximum number of entries to return; defaults to 10.
 
-**Returns**: `table` - Array table of best-scoring `LDocEntry` handles.
+**Returns**: `LDocEntry[]` - Best-scoring `LDocEntry` handles.
 
 #### Example
 
@@ -1817,7 +1817,7 @@ do
 end
 ```
 
-### `LQualityReport:getByGrade(grade: string) -> table`
+### `LQualityReport:getByGrade(grade: string) -> LDocEntry[]`
 
 Returns documentation entries whose calculated grade matches a grade string.
 
@@ -1825,7 +1825,7 @@ Returns documentation entries whose calculated grade matches a grade string.
 
 - `grade` (`string`, required) - Grade string produced by the docs quality backend.
 
-**Returns**: `table` - Array table of matching `LDocEntry` handles.
+**Returns**: `LDocEntry[]` - Matching `LDocEntry` handles.
 
 #### Example
 
@@ -1930,7 +1930,7 @@ do
 end
 ```
 
-### `LQualityReport:getWorst([count]: integer) -> table`
+### `LQualityReport:getWorst([count]: integer) -> LDocEntry[]`
 
 Returns the lowest-scoring documentation entries.
 
@@ -1938,7 +1938,7 @@ Returns the lowest-scoring documentation entries.
 
 - `count` (`integer`, optional) - Optional maximum number of entries to return; defaults to 10.
 
-**Returns**: `table` - Array table of worst-scoring `LDocEntry` handles.
+**Returns**: `LDocEntry[]` - Worst-scoring `LDocEntry` handles.
 
 #### Example
 
@@ -2121,11 +2121,11 @@ do
 end
 ```
 
-### `LSchema:getFields() -> table`
+### `LSchema:getFields() -> string[]`
 
 Returns the field names declared by this schema.
 
-**Returns**: `table` - Sorted array table of field names.
+**Returns**: `string[]` - Sorted array table of field names.
 
 #### Example
 
@@ -2257,11 +2257,11 @@ do
 end
 ```
 
-### `LValidationReport:getIncomplete() -> table`
+### `LValidationReport:getIncomplete() -> string[]`
 
 Returns catalog APIs whose documentation was incomplete.
 
-**Returns**: `table` - Array table of incomplete qualified names.
+**Returns**: `string[]` - Incomplete qualified names.
 
 #### Example
 
@@ -2280,11 +2280,11 @@ do
 end
 ```
 
-### `LValidationReport:getMissing() -> table`
+### `LValidationReport:getMissing() -> string[]`
 
 Returns live APIs that were missing from the checked catalog.
 
-**Returns**: `table` - Array table of missing qualified names.
+**Returns**: `string[]` - Missing qualified names.
 
 #### Example
 
@@ -2303,11 +2303,11 @@ do
 end
 ```
 
-### `LValidationReport:getPhantom() -> table`
+### `LValidationReport:getPhantom() -> string[]`
 
 Returns catalog APIs that were not present in the live Lua table.
 
-**Returns**: `table` - Array table of phantom qualified names.
+**Returns**: `string[]` - Phantom qualified names.
 
 #### Example
 

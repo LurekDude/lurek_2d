@@ -104,7 +104,6 @@ impl LuaUserData for LuaSource {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- play --
         /// Starts playback of this audio source from the current position.
-        /// @return | nil | No return value.
         methods.add_method("play", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:play")?;
@@ -114,7 +113,6 @@ impl LuaUserData for LuaSource {
         });
         // -- stop --
         /// Stops playback and resets the source position to the beginning.
-        /// @return | nil | No return value.
         methods.add_method("stop", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:stop")?;
@@ -123,7 +121,6 @@ impl LuaUserData for LuaSource {
         });
         // -- pause --
         /// Pauses playback at the current position, allowing later resumption.
-        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:pause")?;
@@ -132,7 +129,6 @@ impl LuaUserData for LuaSource {
         });
         // -- resume --
         /// Resumes playback from the position where the source was paused.
-        /// @return | nil | No return value.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:resume")?;
@@ -142,7 +138,6 @@ impl LuaUserData for LuaSource {
         // -- setVolume --
         /// Sets the volume level of this source where 0.0 is silent and 1.0 is full volume.
         /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal, >1.0 = amplified).
-        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setVolume")?;
@@ -160,7 +155,6 @@ impl LuaUserData for LuaSource {
         // -- setPitch --
         /// Sets the playback speed multiplier, affecting both pitch and duration.
         /// @param | pitch | number | Pitch multiplier (1.0 = normal, 2.0 = double speed/octave up).
-        /// @return | nil | No return value.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPitch")?;
@@ -178,7 +172,6 @@ impl LuaUserData for LuaSource {
         // -- setLooping --
         /// Enables or disables looping so the source restarts automatically after finishing.
         /// @param | looping | boolean | True to loop continuously, false to play once.
-        /// @return | nil | No return value.
         methods.add_method("setLooping", |_, this, looping: bool| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLooping")?;
@@ -220,7 +213,6 @@ impl LuaUserData for LuaSource {
         // -- setPan --
         /// Sets the stereo panning position of this source.
         /// @param | pan | number | Pan value from -1.0 (full left) to 1.0 (full right), 0.0 is center.
-        /// @return | nil | No return value.
         methods.add_method("setPan", |_, this, pan: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPan")?;
@@ -278,7 +270,6 @@ impl LuaUserData for LuaSource {
         // -- seek --
         /// Seeks to a specific position in seconds within this audio source.
         /// @param | pos | number | Target position in seconds.
-        /// @return | nil | No return value.
         methods.add_method("seek", |_, this, pos: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:seek")?;
@@ -289,7 +280,6 @@ impl LuaUserData for LuaSource {
         // -- setLowpass --
         /// Applies a lowpass filter that attenuates frequencies above the cutoff.
         /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
-        /// @return | nil | No return value.
         methods.add_method("setLowpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLowpass")?;
@@ -299,7 +289,6 @@ impl LuaUserData for LuaSource {
         // -- setHighpass --
         /// Applies a highpass filter that attenuates frequencies below the cutoff.
         /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
-        /// @return | nil | No return value.
         methods.add_method("setHighpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setHighpass")?;
@@ -324,7 +313,6 @@ impl LuaUserData for LuaSource {
         });
         // -- clearFilter --
         /// Removes all frequency filters (lowpass and highpass) from this source.
-        /// @return | nil | No return value.
         methods.add_method("clearFilter", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:clearFilter")?;
@@ -334,7 +322,6 @@ impl LuaUserData for LuaSource {
         // -- fadeIn --
         /// Sets the fade-in duration so the source ramps from silence to full volume on play.
         /// @param | dur | number | Fade-in duration in seconds.
-        /// @return | nil | No return value.
         methods.add_method("fadeIn", |_, this, dur: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:fadeIn")?;
@@ -385,7 +372,6 @@ impl LuaUserData for LuaBus {
         // -- setVolume --
         /// Sets the volume multiplier for all sources routed through this bus.
         /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
-        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -403,7 +389,6 @@ impl LuaUserData for LuaBus {
         // -- setPitch --
         /// Sets the pitch multiplier applied to all sources routed through this bus.
         /// @param | pitch | number | Pitch multiplier (1.0 = normal speed).
-        /// @return | nil | No return value.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -420,7 +405,6 @@ impl LuaUserData for LuaBus {
         });
         // -- pause --
         /// Pauses all sources routed through this bus.
-        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -430,7 +414,6 @@ impl LuaUserData for LuaBus {
         });
         // -- resume --
         /// Resumes all sources routed through this bus that were paused.
-        /// @return | nil | No return value.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -460,7 +443,6 @@ impl LuaUserData for LuaBus {
         /// Configures ducking so this bus lowers the volume of a target bus when active.
         /// @param | target_name | string | Name of the bus to duck.
         /// @param | duck_vol | number | Volume multiplier applied to the target when ducking (0.0-1.0).
-        /// @return | nil | No return value.
         methods.add_method(
             "setDuckTarget",
             |_, this, (target_name, duck_vol): (String, f32)| {
@@ -473,7 +455,6 @@ impl LuaUserData for LuaBus {
         );
         // -- clearDuck --
         /// Removes the ducking configuration from this bus.
-        /// @return | nil | No return value.
         methods.add_method("clearDuck", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -530,7 +511,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setSoundFont --
         /// Sets a custom SoundFont file for MIDI synthesis (stub, not yet implemented).
         /// @param | path | string | Relative path to the .sf2 file.
-        /// @return | nil | No return value.
         methods.add_method("setSoundFont", |_, _this, _path: String| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setSoundFont");
             Ok(())
@@ -544,14 +524,12 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- useDefaultSoundFont --
         /// Reverts to the built-in default SoundFont (stub, not yet implemented).
-        /// @return | nil | No return value.
         methods.add_method("useDefaultSoundFont", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:useDefaultSoundFont");
             Ok(())
         });
         // -- play --
         /// Starts MIDI playback from the current position using the audio output stream.
-        /// @return | nil | No return value.
         methods.add_method("play", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(handle) = st.mixer.stream_handle() {
@@ -561,14 +539,12 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- pause --
         /// Pauses MIDI playback at the current position.
-        /// @return | nil | No return value.
         methods.add_method("pause", |_, this, ()| {
             this.inner.borrow_mut().pause();
             Ok(())
         });
         // -- stop --
         /// Stops MIDI playback and resets position to the beginning.
-        /// @return | nil | No return value.
         methods.add_method("stop", |_, this, ()| {
             this.inner.borrow_mut().stop();
             Ok(())
@@ -588,7 +564,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- seek --
         /// Seeks to a specific position in the MIDI file.
         /// @param | secs | number | Target position in seconds.
-        /// @return | nil | No return value.
         methods.add_method("seek", |_, this, secs: f64| {
             this.inner.borrow_mut().seek(secs);
             Ok(())
@@ -606,7 +581,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setLooping --
         /// Enables or disables looping for MIDI playback.
         /// @param | looping | boolean | True to loop, false to play once.
-        /// @return | nil | No return value.
         methods.add_method("setLooping", |_, this, looping: bool| {
             this.inner.borrow_mut().set_looping(looping);
             Ok(())
@@ -620,7 +594,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setVolume --
         /// Sets the master volume for MIDI playback.
         /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
-        /// @return | nil | No return value.
         methods.add_method("setVolume", |_, this, vol: f32| {
             this.inner.borrow_mut().set_volume(vol);
             Ok(())
@@ -632,7 +605,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setBus --
         /// Routes this MIDI player's output through the specified audio bus.
         /// @param | bus | LBus? | Bus to route through, or nil for direct output.
-        /// @return | nil | No return value.
         methods.add_method("setBus", |_, this, bus_val: LuaValue| match &bus_val {
             LuaValue::UserData(ud) => {
                 let bus = ud.borrow::<LuaBus>()?;
@@ -662,7 +634,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setTempo --
         /// Sets the playback tempo in beats per minute.
         /// @param | bpm | number | Desired tempo in BPM.
-        /// @return | nil | No return value.
         methods.add_method("setTempo", |_, this, bpm: f64| {
             let original = this.inner.borrow().original_tempo();
             if original > 0.0 {
@@ -688,7 +659,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setTempoScale --
         /// Sets a tempo multiplier relative to the original speed.
         /// @param | scale | number | Tempo scale (1.0 = original, 2.0 = double speed).
-        /// @return | nil | No return value.
         methods.add_method("setTempoScale", |_, this, scale: f32| {
             this.inner.borrow_mut().set_tempo_scale(scale);
             Ok(())
@@ -709,7 +679,6 @@ impl LuaUserData for LuaMidiPlayer {
         /// Sets the volume for a specific MIDI channel (1-16).
         /// @param | ch | integer | Channel number (1-16).
         /// @param | vol | number | Volume multiplier (0.0-1.0).
-        /// @return | nil | No return value.
         methods.add_method("setChannelVolume", |_, this, (ch, vol): (usize, f32)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_volume(ch - 1, vol);
@@ -731,7 +700,6 @@ impl LuaUserData for LuaMidiPlayer {
         /// Mutes or unmutes a specific MIDI channel.
         /// @param | ch | integer | Channel number (1-16).
         /// @param | muted | boolean | True to mute, false to unmute.
-        /// @return | nil | No return value.
         methods.add_method("setChannelMuted", |_, this, (ch, muted): (usize, bool)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_muted(ch - 1, muted);
@@ -753,7 +721,6 @@ impl LuaUserData for LuaMidiPlayer {
         /// Sets the General MIDI instrument program for a channel.
         /// @param | ch | integer | Channel number (1-16).
         /// @param | inst | integer | GM instrument program number (0-127).
-        /// @return | nil | No return value.
         methods.add_method(
             "setChannelInstrument",
             |_, this, (ch, inst): (usize, u8)| {
@@ -783,7 +750,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- soloChannel --
         /// Solos a specific MIDI channel, muting all others.
         /// @param | ch | integer | Channel number (1-16) to solo.
-        /// @return | nil | No return value.
         methods.add_method("soloChannel", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().solo_channel(ch - 1);
@@ -792,7 +758,6 @@ impl LuaUserData for LuaMidiPlayer {
         });
         // -- unsoloAll --
         /// Removes solo from all channels, restoring normal playback.
-        /// @return | nil | No return value.
         methods.add_method("unsoloAll", |_, this, ()| {
             this.inner.borrow_mut().unsolo_all();
             Ok(())
@@ -822,7 +787,6 @@ impl LuaUserData for LuaMidiPlayer {
         /// Mutes or unmutes a specific MIDI track.
         /// @param | idx | integer | Track index (1-based).
         /// @param | muted | boolean | True to mute, false to unmute.
-        /// @return | nil | No return value.
         methods.add_method("setTrackMuted", |_, this, (idx, muted): (usize, bool)| {
             if idx >= 1 {
                 this.inner.borrow_mut().set_track_muted(idx - 1, muted);
@@ -849,7 +813,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setOnNoteOn --
         /// Registers a callback for MIDI note-on events (stub, not yet implemented).
         /// @param | cb | function? | Callback function or nil to clear.
-        /// @return | nil | No return value.
         methods.add_method("setOnNoteOn", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOn");
             Ok(())
@@ -857,7 +820,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setOnNoteOff --
         /// Registers a callback for MIDI note-off events (stub, not yet implemented).
         /// @param | cb | function? | Callback function or nil to clear.
-        /// @return | nil | No return value.
         methods.add_method("setOnNoteOff", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOff");
             Ok(())
@@ -865,7 +827,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setOnEnd --
         /// Registers a callback invoked when MIDI playback finishes (stub, not yet implemented).
         /// @param | cb | function? | Callback function or nil to clear.
-        /// @return | nil | No return value.
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
             Ok(())
@@ -879,7 +840,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setSampleRate --
         /// Sets the output sample rate for MIDI synthesis.
         /// @param | rate | integer | Sample rate in Hz (e.g. 44100, 48000).
-        /// @return | nil | No return value.
         methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
             this.inner.borrow_mut().set_output_sample_rate(rate);
             Ok(())
@@ -893,7 +853,6 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setChannels --
         /// Sets the number of output audio channels for MIDI synthesis.
         /// @param | channels | integer | Channel count (1 = mono, 2 = stereo).
-        /// @return | nil | No return value.
         methods.add_method_mut("setChannels", |_, this, channels: u32| {
             this.inner.borrow_mut().set_output_channels(channels as u16);
             Ok(())
@@ -929,7 +888,6 @@ impl LuaUserData for LuaSoundPool {
         });
         // -- stopAll --
         /// Stops all voices in this sound pool immediately.
-        /// @return | nil | No return value.
         methods.add_method_mut("stopAll", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -941,7 +899,6 @@ impl LuaUserData for LuaSoundPool {
         // -- setVolume --
         /// Sets the volume for all voices in this pool.
         /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
-        /// @return | nil | No return value.
         methods.add_method_mut("setVolume", |_, this, vol: f32| {
             this.pool.set_volume(vol);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -954,7 +911,6 @@ impl LuaUserData for LuaSoundPool {
         // -- setBus --
         /// Routes all voices in this pool through the named audio bus.
         /// @param | name | string | Name of the target bus.
-        /// @return | nil | No return value.
         methods.add_method_mut("setBus", |_, this, name: String| {
             this.pool.set_bus(&name);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -967,7 +923,6 @@ impl LuaUserData for LuaSoundPool {
         });
         // -- release --
         /// Releases all voices and frees audio resources held by this pool.
-        /// @return | nil | No return value.
         methods.add_method_mut("release", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -1032,14 +987,12 @@ impl LuaUserData for LuaDecoder {
         // -- seek --
         /// Seeks to a specific position in the audio stream.
         /// @param | offset | number | Target position in seconds.
-        /// @return | nil | No return value.
         methods.add_method_mut("seek", |_, this, offset: f64| {
             this.inner.seek(offset);
             Ok(())
         });
         // -- rewind --
         /// Rewinds the decoder back to the beginning of the audio stream.
-        /// @return | nil | No return value.
         methods.add_method_mut("rewind", |_, this, ()| {
             this.inner.rewind();
             Ok(())
@@ -1054,7 +1007,6 @@ impl LuaUserData for LuaDecoder {
         methods.add_method("isSeekable", |_, this, ()| Ok(this.inner.is_seekable()));
         // -- release --
         /// Releases decoder resources (no-op, kept for API symmetry).
-        /// @return | nil | No return value.
         methods.add_method("release", |_, _, ()| Ok(()));
         // -- type --
         /// Returns the type name of this object for runtime type-checking.
@@ -1139,7 +1091,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- stop --
     /// Stops playback of a source and resets its position to the beginning.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "stop",
@@ -1154,7 +1105,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the volume of a source by handle.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | vol | number | Volume multiplier (0.0 = silent, 1.0 = normal).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setVolume",
@@ -1181,7 +1131,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pause --
     /// Pauses playback of a source at its current position.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "pause",
@@ -1195,7 +1144,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- resume --
     /// Resumes playback of a paused source.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "resume",
@@ -1210,7 +1158,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the pitch multiplier of a source, affecting playback speed and tone.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | pitch | number | Pitch multiplier (1.0 = normal, 2.0 = octave up).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPitch",
@@ -1277,7 +1224,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Enables or disables looping for a source.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | looping | boolean | True to loop, false to play once.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setLooping",
@@ -1304,7 +1250,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- playLooping --
     /// Starts playback of a source with looping enabled in one call.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "playLooping",
@@ -1320,7 +1265,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the stereo panning of a source.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | pan | number | Pan from -1.0 (left) to 1.0 (right), 0.0 is center.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPan",
@@ -1347,7 +1291,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setMasterVolume --
     /// Sets the global master volume affecting all audio output.
     /// @param | vol | number | Master volume multiplier (0.0 = silent, 1.0 = normal).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setMasterVolume",
@@ -1422,7 +1365,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- pauseAll --
     /// Pauses all currently playing audio sources.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "pauseAll",
@@ -1433,7 +1375,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- stopAll --
     /// Stops all audio sources and resets their positions.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "stopAll",
@@ -1444,7 +1385,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- resumeAll --
     /// Resumes all paused audio sources. This function is exposed to Lua scripts.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "resumeAll",
@@ -1492,7 +1432,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Routes a source through a specific audio bus for grouped mixing.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | bus | LBus | The bus to route through.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setSourceBus",
@@ -1566,7 +1505,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Seeks a source to a specific position in seconds.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | pos | number | Target position in seconds.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "seek",
@@ -1582,7 +1520,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Applies a lowpass filter to a source, attenuating high frequencies.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setLowpass",
@@ -1597,7 +1534,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Applies a highpass filter to a source, attenuating low frequencies.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | cutoff_hz | integer | Cutoff frequency in Hertz.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setHighpass",
@@ -1637,7 +1573,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- clearFilter --
     /// Removes all frequency filters from a source.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "clearFilter",
@@ -1652,7 +1587,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the fade-in duration for a source so it ramps from silence on play.
     /// @param | source | LSource|integer | Audio source or numeric source ID.
     /// @param | dur | number | Fade-in duration in seconds.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "fadeIn",
@@ -1680,7 +1614,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the 2D listener position for spatial audio calculations.
     /// @param | x | number | Listener X position in world units.
     /// @param | y | number | Listener Y position in world units.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setListener2D",
@@ -1705,7 +1638,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | Listener X position.
     /// @param | y | number | Listener Y position.
     /// @param | z | number? | Listener Z position (defaults to 0).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setListener",
@@ -1733,7 +1665,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | X position in world units.
     /// @param | y | number | Y position in world units.
     /// @param | z | number? | Z position (defaults to 0).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setPosition",
@@ -1766,7 +1697,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | x | number | X velocity component.
     /// @param | y | number | Y velocity component.
     /// @param | z | number? | Z velocity component (defaults to 0).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setVelocity",
@@ -1802,7 +1732,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | ux | number | Up vector X.
     /// @param | uy | number | Up vector Y.
     /// @param | uz | number | Up vector Z.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setOrientation",
@@ -1832,7 +1761,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setDopplerScale --
     /// Sets the global Doppler effect intensity multiplier.
     /// @param | scale | number | Doppler scale (0 = disabled, 1.0 = realistic).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setDopplerScale",
@@ -1852,7 +1780,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setDistanceModel --
     /// Sets the distance attenuation model for spatial audio.
     /// @param | model | string | Model name (e.g. "inverse", "linear", "exponent", "none").
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setDistanceModel",
@@ -1872,7 +1799,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setMeter --
     /// Sets the master peak level for metering purposes.
     /// @param | level | number | Peak level clamped to 0.0-1.0.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "setMeter",
@@ -1933,7 +1859,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     /// Sets the SoundFont file used for MIDI synthesis.
     /// @param | path | string | Relative path to the .sf2 SoundFont file.
-    /// @return | nil | No return value.
     tbl.set(
         "setMidiSoundFont",
         lua.create_function(move |_, path: String| {
@@ -1960,7 +1885,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     /// Clears the loaded SoundFont and reverts MIDI synthesis to default.
-    /// @return | nil | No return value.
     tbl.set(
         "clearMidiSoundFont",
         lua.create_function(move |_, ()| {
@@ -2017,7 +1941,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Queues a decoded audio chunk for playback on a queueable source.
     /// @param | qsource_id | integer | Queueable source handle returned by `newQueueableSource`.
     /// @param | sd | LSoundData | Sound data chunk to enqueue for playback.
-    /// @return | nil | No return value.
     tbl.set(
         "queueSource",
         lua.create_function(move |_, (qsource_id, sd): (u64, mlua::AnyUserData)| {
@@ -2043,7 +1966,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     /// Starts playback of a queueable audio source.
     /// @param | qsource_id | integer | Queueable source handle returned by newQueueableSource.
-    /// @return | nil | No return value.
     tbl.set(
         "playQueueable",
         lua.create_function(move |_, qsource_id: u64| {
@@ -2055,7 +1977,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     /// Stops playback of a queueable audio source.
     /// @param | qsource_id | integer | Queueable source handle returned by newQueueableSource.
-    /// @return | nil | No return value.
     tbl.set(
         "stopQueueable",
         lua.create_function(move |_, qsource_id: u64| {
@@ -2065,7 +1986,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Returns a list of available audio playback device names.
-    /// @return | table | Array of device name strings.
+    /// @return | string[] | Device name strings.
     tbl.set(
         "getPlaybackDevices",
         lua.create_function(|lua, ()| {
@@ -2085,7 +2006,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     /// Sets the active audio playback device by name.
     /// @param | name | string | Name of the playback device to activate.
-    /// @return | nil | No return value.
     tbl.set(
         "setPlaybackDevice",
         lua.create_function(|_, name: String| {
@@ -2097,7 +2017,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a named audio bus, optionally parented to another bus.
     /// @param | name | string | Unique name for the new bus.
     /// @param | parent_name | string? | Name of the parent bus, or nil for a root bus.
-    /// @return | nil | No return value.
     tbl.set(
         "create_bus",
         lua.create_function(move |_, (name, parent_name): (String, Option<String>)| {
@@ -2114,7 +2033,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the volume of a named audio bus.
     /// @param | name | string | Name of the audio bus.
     /// @param | volume | number | Volume level (0.0 = silent, 1.0 = full, >1.0 = boost).
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "set_bus_volume",
@@ -2307,7 +2225,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Applies a lowpass filter in-place to the sound data.
     /// @param | sd_ud | LSoundData | The sound data to process.
     /// @param | cutoff_hz | number | Lowpass cutoff frequency in Hz.
-    /// @return | nil | No return value.
     tbl.set(
         "applyLowpass",
         lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
@@ -2321,7 +2238,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Applies a highpass filter in-place to the sound data.
     /// @param | sd_ud | LSoundData | The sound data to process.
     /// @param | cutoff_hz | number | Highpass cutoff frequency in Hz.
-    /// @return | nil | No return value.
     tbl.set(
         "applyHighpass",
         lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
@@ -2336,7 +2252,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | sd_ud | LSoundData | The sound data to process.
     /// @param | low_hz | number | Lower cutoff frequency in Hz.
     /// @param | high_hz | number | Upper cutoff frequency in Hz.
-    /// @return | nil | No return value.
     tbl.set(
         "applyBandpass",
         lua.create_function(|_, (sd_ud, low_hz, high_hz): (LuaAnyUserData, f32, f32)| {
@@ -2350,7 +2265,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Applies a gain multiplier in-place to the sound data.
     /// @param | sd_ud | LSoundData | The sound data to process.
     /// @param | gain | number | Gain multiplier (1.0 = unity, >1.0 = louder, <1.0 = quieter).
-    /// @return | nil | No return value.
     tbl.set(
         "applyGain",
         lua.create_function(|_, (sd_ud, gain): (LuaAnyUserData, f32)| {
@@ -2364,7 +2278,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Mixes the samples of `src` into `dest` in-place (both must have the same format).
     /// @param | dest_ud | LSoundData | Destination sound data to mix into.
     /// @param | src_ud | LSoundData | Source sound data to mix from.
-    /// @return | nil | No return value.
     tbl.set(
         "mixInto",
         lua.create_function(|_, (dest_ud, src_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -2391,7 +2304,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Encodes the sound data as a WAV file and saves it to the given path (relative to game dir).
     /// @param | sd_ud | LSoundData | The sound data to encode and save.
     /// @param | filename | string | Relative output path for the WAV file.
-    /// @return | nil | No return value.
     tbl.set(
         "saveWAV",
         lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
@@ -2410,7 +2322,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Sets the stereo width of an audio source (0.0 = mono, 1.0 = full stereo).
     /// @param | src_ud | LSource | The audio source to adjust.
     /// @param | width | number | Stereo width factor (0.0 = mono, 1.0 = full stereo).
-    /// @return | nil | No return value.
     tbl.set(
         "setStereoWidth",
         lua.create_function(move |_, (src_ud, width): (LuaAnyUserData, f32)| {
@@ -2446,7 +2357,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | src_ud | LSource | The audio source to configure.
     /// @param | min | number | Minimum pitch multiplier.
     /// @param | max | number | Maximum pitch multiplier.
-    /// @return | nil | No return value.
     tbl.set(
         "setRandomPitch",
         lua.create_function(move |_, (src_ud, min, max): (LuaAnyUserData, f32, f32)| {
@@ -2463,7 +2373,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     /// Clears any random pitch range previously set on the source.
     /// @param | src_ud | LSource | The audio source to reset.
-    /// @return | nil | No return value.
     tbl.set(
         "clearRandomPitch",
         lua.create_function(move |_, src_ud: LuaAnyUserData| {
@@ -2480,7 +2389,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | from_ud | LSource | The source to fade out.
     /// @param | to_ud | LSource | The source to fade in.
     /// @param | duration | number | Crossfade duration in seconds.
-    /// @return | nil | No return value.
     tbl.set(
         "crossfade",
         lua.create_function(
@@ -2551,7 +2459,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | input | string | Relative path to the input audio file.
     /// @param | output | string | Relative path for the output WAV file.
     /// @param | effects_tbl | table | Array of effect tables; each has `type` (string) and optional `p1`, `p2`, `p3` (number) fields.
-    /// @return | nil | No return value.
     tbl.set(
         "processOffline",
         lua.create_function(
@@ -2605,7 +2512,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | input | string | Relative path to the input audio file.
     /// @param | output | string | Relative path for the output WAV file.
     /// @param | target | number | Target peak amplitude (e.g. 0.9 for headroom).
-    /// @return | nil | No return value.
     tbl.set(
         "normalizeFile",
         lua.create_function(move |_, (input, output, target): (String, String, f32)| {
@@ -2625,7 +2531,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | output | string | Relative path for the output PNG file.
     /// @param | width | integer | Image width in pixels.
     /// @param | height | integer | Image height in pixels.
-    /// @return | nil | No return value.
     tbl.set(
         "waveformToPng",
         lua.create_function(
@@ -2647,7 +2552,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | output | string | Relative path for the output PNG file.
     /// @param | width | integer | Image width in pixels.
     /// @param | height | integer | Image height in pixels.
-    /// @return | nil | No return value.
     tbl.set(
         "spectrogramToPng",
         lua.create_function(
@@ -2669,7 +2573,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
     /// Performs the 'audio' operation.
-    /// @return | nil | No value is returned.
     lurek.set("audio", tbl)?;
     Ok(())
 }
@@ -2717,7 +2620,6 @@ impl mlua::UserData for SoundData {
         /// @param | g | integer | Green channel from 0 to 255.
         /// @param | b | integer | Blue channel from 0 to 255.
         /// @param | a | integer | Alpha channel from 0 to 255.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "drawWaveform",
             |_,
@@ -2742,7 +2644,6 @@ impl mlua::UserData for SoundData {
         /// Overwrites the sample value at the given zero-based sample index.
         /// @param | index | integer | Zero-based sample index.
         /// @param | value | number | New sample value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setSample", |_, this, (index, value): (usize, f32)| {
             if this.set_sample(index, value) {
                 Ok(())

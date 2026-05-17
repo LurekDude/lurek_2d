@@ -16,7 +16,7 @@
 - [Module Functions](#module-functions)
   - [lurek.runtime.errorSnapshot(msg: string) -> string](#lurekruntimeerrorsnapshotmsg-string-string)
   - [lurek.runtime.getArch() -> string](#lurekruntimegetarch-string)
-  - [lurek.runtime.getArgs() -> table](#lurekruntimegetargs-table)
+  - [lurek.runtime.getArgs() -> string[]](#lurekruntimegetargs-string)
   - [lurek.runtime.getBatchResults(results: table) -> number](#lurekruntimegetbatchresultsresults-table-number)
   - [lurek.runtime.getClipboardText() -> string](#lurekruntimegetclipboardtext-string)
   - [lurek.runtime.getConfig() -> table](#lurekruntimegetconfig-table)
@@ -30,7 +30,7 @@
   - [lurek.runtime.getMessageCount() -> number](#lurekruntimegetmessagecount-number)
   - [lurek.runtime.getOS() -> string](#lurekruntimegetos-string)
   - [lurek.runtime.getPowerInfo() -> string](#lurekruntimegetpowerinfo-string)
-  - [lurek.runtime.getPreferredLocales() -> table](#lurekruntimegetpreferredlocales-table)
+  - [lurek.runtime.getPreferredLocales() -> string[]](#lurekruntimegetpreferredlocales-string)
   - [lurek.runtime.getProcessorCount() -> number](#lurekruntimegetprocessorcount-number)
   - [lurek.runtime.getVersion() -> string](#lurekruntimegetversion-string)
   - [lurek.runtime.hasMessage(id: string) -> boolean](#lurekruntimehasmessageid-string-boolean)
@@ -124,7 +124,7 @@ This module has no separate Lua-visible classes in the generated API data.
 ```lua
 lurek.runtime.errorSnapshot(msg: string) -> string -- Creates a JSON-encoded error snapshot from a message string, useful for diagnostics and error reporting.
 lurek.runtime.getArch() -> string -- Returns the CPU architecture of the host system.
-lurek.runtime.getArgs() -> table -- Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
+lurek.runtime.getArgs() -> string[] -- Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
 lurek.runtime.getBatchResults(results: table) -> number -- Summarizes batch results by counting passed, failed, and skipped tasks.
 lurek.runtime.getClipboardText() -> string -- Reads the current text content from the system clipboard. Returns an empty string if the clipboard is unava...
 lurek.runtime.getConfig() -> table -- Returns a table containing the current engine runtime configuration values.
@@ -138,7 +138,7 @@ lurek.runtime.getMessage(id: string) -> string -- Resolves a message string by i
 lurek.runtime.getMessageCount() -> number -- Returns the total number of messages registered in the engine message catalog.
 lurek.runtime.getOS() -> string -- Returns the name of the host operating system as a string.
 lurek.runtime.getPowerInfo() -> string -- Returns the current power supply state, battery percentage, and estimated time remaining.
-lurek.runtime.getPreferredLocales() -> table -- Returns a list of the user's preferred locale identifiers from the operating system.
+lurek.runtime.getPreferredLocales() -> string[] -- Returns a list of the user's preferred locale identifiers from the operating system.
 lurek.runtime.getProcessorCount() -> number -- Returns the number of logical processors available on the host machine.
 -- ... 10 more module functions
 ```
@@ -187,11 +187,11 @@ do
 end
 ```
 
-### `lurek.runtime.getArgs() -> table`
+### `lurek.runtime.getArgs() -> string[]`
 
 Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
 
-**Returns**: `table` - Array of argument strings.
+**Returns**: `string[]` - Argument strings.
 
 #### Example
 
@@ -487,11 +487,11 @@ do
 end
 ```
 
-### `lurek.runtime.getPreferredLocales() -> table`
+### `lurek.runtime.getPreferredLocales() -> string[]`
 
 Returns a list of the user's preferred locale identifiers from the operating system.
 
-**Returns**: `table` - Array of locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
+**Returns**: `string[]` - Locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
 
 #### Example
 

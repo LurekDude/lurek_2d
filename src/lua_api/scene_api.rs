@@ -42,7 +42,6 @@ impl LuaUserData for LuaDepthSorter {
         /// Register a draw callback at a given depth value. When `flush` is called, all registered callbacks execute in back-to-front order (lowest depth drawn first, highest depth drawn last / on top). Use this for simple draw calls like sprite rendering where each entity has a depth/z-layer.
         /// @param | callback | function | A zero-argument draw function invoked during flush.
         /// @param | depth | number | Numeric z-depth controlling draw order — lower values are drawn behind higher values.
-        /// @return | nil | No value is returned.
         methods.add_method("add", |lua, this, (callback, depth): (LuaFunction, f32)| {
             let key = lua.create_registry_value(callback)?;
             let mut cbs = this.callbacks.borrow_mut();
@@ -54,7 +53,6 @@ impl LuaUserData for LuaDepthSorter {
         // -- addObject --
         /// Register a game object table for depth-sorted rendering. The object must expose a numeric `depth` field and a `drawSorted(self)` method. During `flush`, each object's `drawSorted` is called in depth order, making this ideal for entity-based architectures where objects manage their own drawing.
         /// @param | obj | table | A game object table with a numeric `depth` field and a `drawSorted(self)` method.
-        /// @return | nil | No value is returned.
         methods.add_method("addObject", |lua, this, obj: LuaTable| {
             let depth: f32 = obj.get::<_, f32>("depth").unwrap_or(0.0);
             let key = lua.create_registry_value(obj)?;
@@ -66,14 +64,12 @@ impl LuaUserData for LuaDepthSorter {
         });
         // -- sort --
         /// Sort all registered entries by depth without executing any callbacks. Call this only if you need to inspect the sorted order before drawing; `flush` already sorts automatically.
-        /// @return | nil | No value is returned.
         methods.add_method("sort", |_, this, ()| {
             this.inner.borrow_mut().sort();
             Ok(())
         });
         // -- flush --
         /// Sort all entries by depth, execute every callback or object's `drawSorted` method in back-to-front order, then clear the sorter for the next frame. This is the standard one-call render path — call it once per frame inside your scene's `draw` or `render` callback.
-        /// @return | nil | No value is returned.
         methods.add_method("flush", |lua, this, ()| {
             let entries: Vec<(usize, bool)> = {
                 let mut sorter = this.inner.borrow_mut();
@@ -105,7 +101,6 @@ impl LuaUserData for LuaDepthSorter {
         // -- setStable --
         /// Enable or disable stable sorting. When stable, items sharing the same depth value retain their insertion order, which prevents visual flickering between overlapping sprites at the same layer. Unstable sort is slightly faster but may swap equal-depth items between frames.
         /// @param | stable | boolean | True for stable sort (deterministic order at equal depth), false for unstable (faster but may flicker).
-        /// @return | nil | No value is returned.
         methods.add_method("setStable", |_, this, stable: bool| {
             this.inner.borrow_mut().set_stable(stable);
             Ok(())
@@ -118,7 +113,6 @@ impl LuaUserData for LuaDepthSorter {
         });
         // -- clear --
         /// Discard all pending entries without executing any draw callbacks. Use this when a scene is interrupted, reset, or destroyed before its normal `flush` call.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             this.callbacks.borrow_mut().clear();
@@ -160,8 +154,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string? | Transition type name: `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`. Defaults to `"none"`.
     /// @param | duration | number? | Transition animation duration in seconds. Defaults to 0 (instant).
     /// @param | easing | string? | Easing curve name (e.g. `"linear"`, `"ease_in"`, `"ease_out"`, `"ease_in_out"`). Defaults to `"linear"`.
-    /// @param | params | any? | Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
-    /// @return | nil | No return value.
+    /// @param | params | table? | Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
     let st = state.clone();
     tbl.set(
         "push",
@@ -208,7 +201,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string? | Transition type name. Defaults to `"none"` (instant).
     /// @param | duration | number? | Transition animation duration in seconds. Defaults to 0.
     /// @param | easing | string? | Easing curve name. Defaults to `"linear"`.
-    /// @return | nil | No value is returned.
     tbl.set("pop", lua.create_function(
             move |lua, (transition, duration, easing): (Option<String>, Option<f32>, Option<String>)| {
                 let trans = transition
@@ -241,8 +233,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string? | Transition type name. Defaults to `"none"`.
     /// @param | duration | number? | Transition animation duration in seconds. Defaults to 0.
     /// @param | easing | string? | Easing curve name. Defaults to `"linear"`.
-    /// @param | params | any? | Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
-    /// @return | nil | No return value.
+    /// @param | params | table? | Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
     let st = state.clone();
     tbl.set(
         "switchTo",
@@ -285,7 +276,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- clear --
     /// Remove all scenes from the stack. Each removed scene receives its `leave()` callback in stack order. After this call the stack is empty and `isEmpty()` returns true. Useful for returning to a title screen or tearing down the entire scene graph.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "clear",
@@ -328,7 +318,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- update --
     /// Advance any active transition animation and call `update(self, dt)` on the current top scene. Call this once per frame from your main loop to drive scene logic and transition timing.
     /// @param | dt | number | Delta time in seconds since the last frame (e.g. from `lurek.timer.getDelta()`).
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "update",
@@ -346,7 +335,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- process --
     /// Call `ready(self)` once on newly-pushed scenes, then call `process(self, dt)` on every active scene ordered by layer (lowest first). Use this for deterministic game-logic ticks at a fixed time step. Scenes pushed as overlays and underlying scenes all receive this callback.
     /// @param | dt | number | Fixed time-step delta in seconds (e.g. 1/60 for 60-tick logic).
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "process",
@@ -369,7 +357,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- processPhysics --
     /// Call `process_physics(self, dt)` on every active scene ordered by layer. Run this callback after your physics world step so scenes can react to collision results, apply forces, or synchronize sprite positions with physics bodies.
     /// @param | dt | number | Physics time-step delta in seconds.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "processPhysics",
@@ -387,7 +374,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- processLate --
     /// Call `process_late(self, dt)` on every active scene after all other processing. Ideal for camera follow logic, HUD synchronization, deferred cleanup, or any work that depends on the final positions of game objects.
     /// @param | dt | number | Delta time in seconds (same value passed to `process`).
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "processLate",
@@ -404,7 +390,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- draw --
     /// Call `draw(self)` on every scene in the stack from bottom to top. This is the legacy draw callback — prefer `render` and `renderUi` for world-space and screen-space separation.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "draw",
@@ -421,7 +406,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- render --
     /// Call `render(self)` on every scene in the stack from bottom to top. This is the preferred world-space rendering callback — draw sprites, tilemaps, particles, and other in-world visuals here. Runs before `renderUi`.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "render",
@@ -438,7 +422,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- renderUi --
     /// Call `render_ui(self)` on every scene in the stack from bottom to top. Use this for screen-space HUD elements, health bars, score displays, menus, and overlays that should draw on top of the world after `render`.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "renderUi",
@@ -544,7 +527,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string | Transition type name (e.g. `"fade"`, `"iris"`, `"wipe"`).
     /// @param | duration | number | Duration in seconds.
     /// @param | easing | string? | Easing curve name. Defaults to `"linear"`.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "queueTransition",
@@ -570,7 +552,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- clearQueuedTransitions --
     /// Discard all queued transitions without affecting the currently-playing transition (if any). Use this to cancel a planned transition sequence mid-way.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "clearQueuedTransitions",
@@ -583,7 +564,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Register a scene table under a unique name for later retrieval via `getRegistered`, navigation via `popTo`, or deferred push via `pushPreloaded`. Registering does not push the scene onto the stack.
     /// @param | name | string | Unique name to associate with this scene (e.g. `"mainMenu"`, `"gameplay"`).
     /// @param | scene | table | The scene table to register.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "registerScene",
@@ -626,7 +606,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- unregisterScene --
     /// Remove a scene registration by name. Does not pop the scene if it is currently active on the stack — it only removes the name mapping.
     /// @param | name | string | The registered name to remove.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "unregisterScene",
@@ -637,7 +616,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getRegisteredNames --
     /// Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic scene-selection UIs.
-    /// @return | table | Lua array of registered name strings.
+    /// @return | string[] | Lua array of registered name strings.
     let st = state.clone();
     tbl.set(
         "getRegisteredNames",
@@ -646,8 +625,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setData --
     /// Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
     /// @param | key | string | The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
-    /// @param | value | any | The value to store (table, number, string, boolean, etc.). Overwrites any previous value for this key.
-    /// @return | nil | No return value.
+    /// @param | value | table | Value to store (a table with your game data).
     let st = state.clone();
     tbl.set(
         "setData",
@@ -688,7 +666,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- removeData --
     /// Remove a key and its associated value from the shared scene data map. No-op if the key does not exist.
     /// @param | key | string | The data key to remove.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "removeData",
@@ -715,6 +692,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Create a new scene instance from an optional prototype table. Sets up metatables so the instance inherits methods from the prototype. Use this for one-off scene creation; use `define` when you need a reusable scene constructor.
     /// @param | def | table? | A prototype table containing scene lifecycle methods (`enter`, `leave`, `update`, `draw`, etc.). If omitted, an empty table is used.
     /// @return | table | A new instance table with `def` as its metatable `__index`.
+    /// @field | __index | table | Prototype table (the def parameter).
     tbl.set(
         "new",
         lua.create_function(|lua, def: Option<LuaTable>| {
@@ -723,7 +701,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 None => lua.create_table()?,
             };
             /// Performs the '__index' operation.
-            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let instance: LuaTable = lua.create_table()?;
             instance.set_metatable(Some(def));
@@ -734,6 +711,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Alias for `lurek.scene.new`. Creates a new scene instance from an optional prototype table while preserving the older API name still used by tests, examples, and existing game scripts.
     /// @param | def | table? | A prototype table containing scene lifecycle methods (`enter`, `leave`, `update`, `draw`, etc.). If omitted, an empty table is used.
     /// @return | table | A new instance table with `def` as its metatable `__index`.
+    /// @field | __index | table | Prototype table (the def parameter).
     tbl.set(
         "newScene",
         lua.create_function(|lua, def: Option<LuaTable>| {
@@ -742,7 +720,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 None => lua.create_table()?,
             };
             /// Performs the '__index' operation.
-            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let instance: LuaTable = lua.create_table()?;
             instance.set_metatable(Some(def));
@@ -761,7 +738,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 None => lua.create_table()?,
             };
             /// Performs the '__index' operation.
-            /// @return | nil | No value is returned.
             def.set("__index", def.clone())?;
             let key = lua.create_registry_value(def)?;
             let ctor = lua.create_function(move |inner_lua, ()| {
@@ -787,8 +763,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string? | Transition type name. Defaults to `"none"`.
     /// @param | duration | number? | Transition animation duration in seconds. Defaults to 0.
     /// @param | easing | string? | Easing curve name. Defaults to `"linear"`.
-    /// @param | params | any? | Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
-    /// @return | nil | No return value.
+    /// @param | params | table? | Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
     let st = state.clone();
     tbl.set(
         "pushOverlay",
@@ -842,7 +817,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getActiveScenes --
     /// Returns a Lua array of all active scene tables ordered by their layer value (lowest layer first). Includes both regular scenes and overlays. Useful for iterating over all scenes for custom processing or debugging.
-    /// @return | table | Lua array of scene tables sorted by layer.
+    /// @return | table | Lua array of active scene tables sorted by layer.
+    /// @field | __index | table | Prototype table (the scene definition used to create this instance).
     let st = state.clone();
     tbl.set(
         "getActiveScenes",
@@ -863,7 +839,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Register a deferred-loading function for a scene. The loader function is NOT called immediately — it runs the first time `pushPreloaded` is called with this name. Use this to spread scene initialization (asset loading, table setup) across loading screens or lazy-load heavy scenes on demand.
     /// @param | name | string | Name to associate with the loader (must match the name used in `pushPreloaded`).
     /// @param | loader | function | A zero-argument function that creates and registers the scene via `registerScene` when called.
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "preload",
@@ -891,8 +866,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | transition | string? | Transition type name. Defaults to `"none"`.
     /// @param | duration | number? | Transition animation duration in seconds. Defaults to 0.
     /// @param | easing | string? | Easing curve name. Defaults to `"linear"`.
-    /// @param | params | any? | Arbitrary data forwarded to the scene's `enter(self, params)` callback.
-    /// @return | nil | No return value.
+    /// @param | params | table? | Arbitrary data forwarded to the scene's `enter(self, params)` callback.
     let st = state.clone();
     tbl.set(
         "pushPreloaded",
@@ -952,7 +926,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- getTransitionTypes --
     /// Returns a Lua array of all supported transition type name strings. Use this to discover available transitions at runtime or build a transition picker UI.
-    /// @return | table | Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
+    /// @return | string[] | Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
     tbl.set(
         "getTransitionTypes",
         lua.create_function(|lua, ()| {
@@ -977,7 +951,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
     // -- serializeScene --
     /// Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` array of registered scene names (in stack order) and a `data` map of shared data key-value pairs. Use this for save/load systems to persist the player's navigation state.
-    /// @return | table | A snapshot table with `stack` (array of name strings) and `data` (key-value map) fields.
+    /// @return | table | A snapshot table with `stack` (array of scene name strings) and `data` (key-value map) fields.
+    /// @field | stack | string[] | Scene stack as ordered array of registered name strings.
+    /// @field | data | table | Key-value map of shared scene data.
     let st = state.clone();
     tbl.set(
         "serializeScene",
@@ -998,7 +974,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 }
             }
             /// Performs the 'stack' operation.
-            /// @return | nil | No value is returned.
             snap.set("stack", stack_names)?;
             let data_snap = lua.create_table()?;
             for (key, reg_key) in &s.data_refs {
@@ -1007,7 +982,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 }
             }
             /// Performs the 'data' operation.
-            /// @return | nil | No value is returned.
             snap.set("data", data_snap)?;
             Ok(snap)
         })?,
@@ -1015,7 +989,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- deserializeScene --
     /// Restore shared scene data from a previously-serialized snapshot table. Only the `data` key-value map is restored; the scene stack itself must be rebuilt manually by pushing or registering scenes. Pair with `serializeScene` for save/load workflows.
     /// @param | snapshot | table | A snapshot table as returned by `serializeScene` (must contain a `data` field).
-    /// @return | nil | No return value.
     let st = state.clone();
     tbl.set(
         "deserializeScene",
@@ -1041,15 +1014,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Create a fade-to-black transition descriptor table. The screen fades to black, then fades back in on the new scene.
     /// @param | duration | number? | Total fade duration in seconds. Defaults to 0.5.
     /// @return | table | Transition descriptor `{type="fade", duration=...}` for use with scene functions.
+    /// @field | type | string | Transition type name.
+    /// @field | duration | number | Duration in seconds.
     trans_tbl.set(
         "fade",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
             /// Performs the 'type' operation.
-            /// @return | nil | No value is returned.
             t.set("type", "fade")?;
             /// Performs the 'duration' operation.
-            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.5))?;
             Ok(t)
         })?,
@@ -1059,6 +1032,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | direction | string? | Slide direction: `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
     /// @param | duration | number? | Slide animation duration in seconds. Defaults to 0.4.
     /// @return | table | Transition descriptor `{type="slide...", duration=...}` for use with scene functions.
+    /// @field | type | string | Transition type name.
+    /// @field | duration | number | Duration in seconds.
     trans_tbl.set(
         "slide",
         lua.create_function(
@@ -1072,10 +1047,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     _ => "slideleft",
                 };
                 /// Performs the 'type' operation.
-                /// @return | nil | No value is returned.
                 t.set("type", dir)?;
                 /// Performs the 'duration' operation.
-                /// @return | nil | No value is returned.
                 t.set("duration", duration.unwrap_or(0.4))?;
                 Ok(t)
             },
@@ -1085,15 +1058,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Create a horizontal wipe transition descriptor table. A wipe bar sweeps across the screen to reveal the new scene.
     /// @param | duration | number? | Wipe animation duration in seconds. Defaults to 0.5.
     /// @return | table | Transition descriptor `{type="wipe", duration=...}` for use with scene functions.
+    /// @field | type | string | Transition type name.
+    /// @field | duration | number | Duration in seconds.
     trans_tbl.set(
         "wipe",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
             /// Performs the 'type' operation.
-            /// @return | nil | No value is returned.
             t.set("type", "wipe")?;
             /// Performs the 'duration' operation.
-            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.5))?;
             Ok(t)
         })?,
@@ -1102,25 +1075,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Create an iris (circle) transition descriptor table. A circular aperture opens or closes to reveal the new scene, similar to classic cartoon transitions.
     /// @param | duration | number? | Iris animation duration in seconds. Defaults to 0.6.
     /// @return | table | Transition descriptor `{type="iris", duration=...}` for use with scene functions.
+    /// @field | type | string | Transition type name.
+    /// @field | duration | number | Duration in seconds.
     trans_tbl.set(
         "iris",
         lua.create_function(|lua, duration: Option<f32>| {
             let t = lua.create_table()?;
             /// Performs the 'type' operation.
-            /// @return | nil | No value is returned.
             t.set("type", "iris")?;
             /// Performs the 'duration' operation.
-            /// @return | nil | No value is returned.
             t.set("duration", duration.unwrap_or(0.6))?;
             Ok(t)
         })?,
     )?;
     // transitions: subtable of built-in transition descriptor constructor functions.
     /// Performs the 'transitions' operation.
-    /// @return | nil | No value is returned.
     tbl.set("transitions", trans_tbl)?;
     /// Performs the 'scene' operation.
-    /// @return | nil | No value is returned.
     lurek.set("scene", tbl)?;
     Ok(())
 }

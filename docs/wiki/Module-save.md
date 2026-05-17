@@ -19,11 +19,11 @@
   - [LSaveManager](#lsavemanager)
   - [LSaveManager:addMigration(fromVersion: integer, func: function)](#lsavemanageraddmigrationfromversion-integer-func-function)
   - [LSaveManager:collect() -> table](#lsavemanagercollect-table)
-  - [LSaveManager:delete(slot: string) -> LuaValue](#lsavemanagerdeleteslot-string-luavalue)
+  - [LSaveManager:delete(slot: string)](#lsavemanagerdeleteslot-string)
   - [LSaveManager:disableAutoSave()](#lsavemanagerdisableautosave)
   - [LSaveManager:enableAutoSave(interval: number, slot: string)](#lsavemanagerenableautosaveinterval-number-slot-string)
   - [LSaveManager:exists(slot: string) -> boolean](#lsavemanagerexistsslot-string-boolean)
-  - [LSaveManager:getSchemaVersion() -> number](#lsavemanagergetschemaversion-number)
+  - [LSaveManager:getSchemaVersion() -> integer](#lsavemanagergetschemaversion-integer)
   - [LSaveManager:getSlotInfo(slot: string) -> table](#lsavemanagergetslotinfoslot-string-table)
   - [LSaveManager:getSlots() -> table](#lsavemanagergetslots-table)
   - [LSaveManager:getSummary() -> string](#lsavemanagergetsummary-string)
@@ -35,8 +35,8 @@
   - [LSaveManager:onBeforeSave([func]: function)](#lsavemanageronbeforesavefunc-function)
   - [LSaveManager:register(name: string, collectFn: function, restoreFn: function)](#lsavemanagerregistername-string-collectfn-function-restorefn-function)
   - [LSaveManager:reset()](#lsavemanagerreset)
-  - [LSaveManager:restore(data: table) -> LuaValue](#lsavemanagerrestoredata-table-luavalue)
-  - [LSaveManager:save(slot: string) -> LuaValue](#lsavemanagersaveslot-string-luavalue)
+  - [LSaveManager:restore(data: table)](#lsavemanagerrestoredata-table)
+  - [LSaveManager:save(slot: string)](#lsavemanagersaveslot-string)
   - [LSaveManager:setCompress(enabled: boolean)](#lsavemanagersetcompressenabled-boolean)
   - [LSaveManager:setSchemaVersion(version: integer)](#lsavemanagersetschemaversionversion-integer)
   - [LSaveManager:setSummary(summary: string)](#lsavemanagersetsummarysummary-string)
@@ -255,15 +255,13 @@ do
 end
 ```
 
-### `LSaveManager:delete(slot: string) -> LuaValue`
+### `LSaveManager:delete(slot: string)`
 
 Permanently delete a save slot file from disk. This action cannot be undone.
 
 **Parameters**
 
 - `slot` (`string`, required) - Slot name to delete (e.g. "slot1").
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -363,11 +361,11 @@ do
 end
 ```
 
-### `LSaveManager:getSchemaVersion() -> number`
+### `LSaveManager:getSchemaVersion() -> integer`
 
 Return the current schema version number set for this save manager.
 
-**Returns**: `number` - The active schema version integer.
+**Returns**: `integer` - The active schema version.
 
 #### Example
 
@@ -393,7 +391,7 @@ Read metadata for a single save slot without loading its full game state.
 
 - `slot` (`string`, required) - Slot name to inspect.
 
-**Returns**: `table` - Info table with fields: slot, version, timestamp, summary — or nil.
+**Returns**: `table` - Info table with fields: slot, version, timestamp, summary, or nil if not found.
 
 #### Example
 
@@ -688,15 +686,13 @@ do
 end
 ```
 
-### `LSaveManager:restore(data: table) -> LuaValue`
+### `LSaveManager:restore(data: table)`
 
 Apply a previously collected save-data table back into game state by invoking all registered restorers.
 
 **Parameters**
 
 - `data` (`table`, required) - A save-data table (as produced by collect or loaded from disk).
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -723,15 +719,13 @@ do
 end
 ```
 
-### `LSaveManager:save(slot: string) -> LuaValue`
+### `LSaveManager:save(slot: string)`
 
 Persist all registered data sections to the named slot file on disk.
 
 **Parameters**
 
 - `slot` (`string`, required) - Slot name (e.g. "slot1", "quicksave"). The file is stored as save/slot_<name>.sav.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 

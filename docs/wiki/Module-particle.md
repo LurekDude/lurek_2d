@@ -49,7 +49,7 @@
   - [LParticleSystem:getRadialAcceleration() -> number](#lparticlesystemgetradialacceleration-number)
   - [LParticleSystem:getRotation() -> number](#lparticlesystemgetrotation-number)
   - [LParticleSystem:getShape() -> string](#lparticlesystemgetshape-string)
-  - [LParticleSystem:getSizes() -> table](#lparticlesystemgetsizes-table)
+  - [LParticleSystem:getSizes() -> number[]](#lparticlesystemgetsizes-number)
   - [LParticleSystem:getSizeVariation() -> number](#lparticlesystemgetsizevariation-number)
   - [LParticleSystem:getSpeed() -> number](#lparticlesystemgetspeed-number)
   - [LParticleSystem:getSpin() -> number](#lparticlesystemgetspin-number)
@@ -111,7 +111,7 @@
   - [LTrail:drawToImage(w: integer, h: integer) -> LImageData](#ltraildrawtoimagew-integer-h-integer-limagedata)
   - [LTrail:getLifetime() -> number](#ltrailgetlifetime-number)
   - [LTrail:getPointCount() -> integer](#ltrailgetpointcount-integer)
-  - [LTrail:getWidth() -> LuaValue](#ltrailgetwidth-luavalue)
+  - [LTrail:getWidth() -> number](#ltrailgetwidth-number)
   - [LTrail:pushPoint(x: number, y: number)](#ltrailpushpointx-number-y-number)
   - [LTrail:setHeadColor(r: number, g: number, b: number, a: number)](#ltrailsetheadcolorr-number-g-number-b-number-a-number)
   - [LTrail:setLifetime(lifetime: number)](#ltrailsetlifetimelifetime-number)
@@ -288,7 +288,7 @@ Creates a particle system from an optional config table.
 
 **Parameters**
 
-- `config` (`table`, optional) - Optional particle config table.
+- `config` (`table`, optional) - Particle config table.
 
 **Returns**: `LParticleSystem` - New particle system handle.
 
@@ -398,10 +398,10 @@ Adds an attractor to the particle system.
 
 **Parameters**
 
-- `x` (`number`, required) - Numeric `x` argument for this call.
-- `y` (`number`, required) - Numeric `y` argument for this call.
-- `strength` (`number`, required) - Lua argument for `strength`.
-- `radius` (`number`, required) - Numeric `radius` argument for this call.
+- `x` (`number`, required) - Attractor x position.
+- `y` (`number`, required) - Attractor y position.
+- `strength` (`number`, required) - Attraction strength.
+- `radius` (`number`, required) - Attraction radius.
 
 #### Example
 
@@ -434,7 +434,7 @@ Configures a death sub-emitter from a config table.
 **Parameters**
 
 - `config_tbl` (`table`, required) - Particle config table.
-- `burst_count` (`integer`, optional) - Optional burst count.
+- `burst_count` (`integer`, optional) - Burst count per death.
 
 #### Example
 
@@ -511,7 +511,7 @@ end
 
 ### `LParticleSystem:clearAttractors()`
 
-Clears all attractors. This method is available to Lua scripts.
+Clears all attractors on this object.
 
 #### Example
 
@@ -532,7 +532,7 @@ end
 
 ### `LParticleSystem:clearBounds()`
 
-Clears collision bounds. This method is available to Lua scripts.
+Clears collision bounds on this object.
 
 #### Example
 
@@ -1092,11 +1092,11 @@ do
 end
 ```
 
-### `LParticleSystem:getSizes() -> table`
+### `LParticleSystem:getSizes() -> number[]`
 
 Returns particle size keyframes. This method is available to Lua scripts.
 
-**Returns**: `table` - Array table of size values.
+**Returns**: `number[]` - Array table of size values.
 
 #### Example
 
@@ -1499,8 +1499,8 @@ Enqueues particle render commands with an optional offset.
 
 **Parameters**
 
-- `ox` (`number`, optional) - Optional x offset.
-- `oy` (`number`, optional) - Optional y offset.
+- `ox` (`number`, optional) - X offset.
+- `oy` (`number`, optional) - Y offset.
 
 #### Example
 
@@ -1550,7 +1550,7 @@ end
 
 ### `LParticleSystem:resume()`
 
-Resumes a paused particle system. This method is available to Lua scripts.
+Resumes a paused particle system if it was previously paused.
 
 #### Example
 
@@ -1575,11 +1575,11 @@ Sets collision bounds for particles.
 
 **Parameters**
 
-- `xmin` (`number`, required) - Lua argument for `xmin`.
-- `xmax` (`number`, required) - Lua argument for `xmax`.
-- `ymin` (`number`, required) - Lua argument for `ymin`.
-- `ymax` (`number`, required) - Lua argument for `ymax`.
-- `restitution` (`number`, required) - Lua argument for `restitution`.
+- `xmin` (`number`, required) - Minimum x bound.
+- `xmax` (`number`, required) - Maximum x bound.
+- `ymin` (`number`, required) - Minimum y bound.
+- `ymax` (`number`, required) - Maximum y bound.
+- `restitution` (`number`, required) - Bounce restitution factor.
 
 #### Example
 
@@ -1636,8 +1636,8 @@ Enables particle collision against a physics world.
 **Parameters**
 
 - `world_ud` (`LWorld`, required) - Physics world handle.
-- `probe_radius` (`number`, optional) - Optional collision probe radius.
-- `restitution` (`number`, optional) - Optional restitution.
+- `probe_radius` (`number`, optional) - Collision probe radius.
+- `restitution` (`number`, optional) - Bounce restitution.
 
 #### Example
 
@@ -1772,8 +1772,8 @@ Sets emission area distribution and size.
 - `dist` (`string`, required) - Distribution name.
 - `w` (`number`, required) - Area width.
 - `h` (`number`, required) - Area height.
-- `angle` (`number`, optional) - Optional area angle.
-- `dir_rel` (`boolean`, optional) - Optional direction-relative flag.
+- `angle` (`number`, optional) - Area angle.
+- `dir_rel` (`boolean`, optional) - Direction-relative flag.
 
 #### Example
 
@@ -1853,9 +1853,9 @@ Sets flipbook grid and frame rate. This method is available to Lua scripts.
 
 **Parameters**
 
-- `cols` (`integer`, required) - Lua argument for `cols`.
-- `rows` (`integer`, required) - Lua argument for `rows`.
-- `fps` (`number`, required) - Lua argument for `fps`.
+- `cols` (`integer`, required) - Grid column count.
+- `rows` (`integer`, required) - Grid row count.
+- `fps` (`number`, required) - Playback frame rate.
 
 #### Example
 
@@ -1937,10 +1937,10 @@ Sets linear acceleration range. This method is available to Lua scripts.
 
 **Parameters**
 
-- `xmin` (`number`, required) - Lua argument for `xmin`.
-- `ymin` (`number`, required) - Lua argument for `ymin`.
-- `xmax` (`number`, required) - Lua argument for `xmax`.
-- `ymax` (`number`, required) - Lua argument for `ymax`.
+- `xmin` (`number`, required) - Minimum x acceleration.
+- `ymin` (`number`, required) - Minimum y acceleration.
+- `xmax` (`number`, required) - Maximum x acceleration.
+- `ymax` (`number`, required) - Maximum y acceleration.
 
 #### Example
 
@@ -1968,8 +1968,8 @@ Sets linear damping range. This method is available to Lua scripts.
 
 **Parameters**
 
-- `min` (`number`, required) - Lua argument for `min`.
-- `max` (`number`, required) - Lua argument for `max`.
+- `min` (`number`, required) - Minimum damping.
+- `max` (`number`, required) - Maximum damping.
 
 #### Example
 
@@ -1996,8 +1996,8 @@ Sets particle spawn offset. This method is available to Lua scripts.
 
 **Parameters**
 
-- `ox` (`number`, required) - Lua argument for `ox`.
-- `oy` (`number`, required) - Lua argument for `oy`.
+- `ox` (`number`, required) - Spawn offset x.
+- `oy` (`number`, required) - Spawn offset y.
 
 #### Example
 
@@ -2121,8 +2121,8 @@ Sets radial acceleration range. This method is available to Lua scripts.
 
 **Parameters**
 
-- `min` (`number`, required) - Lua argument for `min`.
-- `max` (`number`, required) - Lua argument for `max`.
+- `min` (`number`, required) - Minimum radial acceleration.
+- `max` (`number`, required) - Maximum radial acceleration.
 
 #### Example
 
@@ -2177,8 +2177,8 @@ Sets particle rotation range. This method is available to Lua scripts.
 
 **Parameters**
 
-- `min` (`number`, required) - Lua argument for `min`.
-- `max` (`number`, required) - Lua argument for `max`.
+- `min` (`number`, required) - Minimum rotation.
+- `max` (`number`, required) - Maximum rotation.
 
 #### Example
 
@@ -2313,8 +2313,8 @@ Sets particle spin range. This method is available to Lua scripts.
 
 **Parameters**
 
-- `min` (`number`, required) - Lua argument for `min`.
-- `max` (`number`, required) - Lua argument for `max`.
+- `min` (`number`, required) - Minimum spin.
+- `max` (`number`, required) - Maximum spin.
 
 #### Example
 
@@ -2342,7 +2342,7 @@ Sets spin variation. This method is available to Lua scripts.
 
 **Parameters**
 
-- `v` (`number`, required) - Lua argument for `v`.
+- `v` (`number`, required) - Spin variation factor.
 
 #### Example
 
@@ -2391,12 +2391,12 @@ end
 
 ### `LParticleSystem:setTangentialAcceleration(min: number, max: number)`
 
-Sets tangential acceleration range.
+Sets tangential acceleration range for emitted particles.
 
 **Parameters**
 
-- `min` (`number`, required) - Lua argument for `min`.
-- `max` (`number`, required) - Lua argument for `max`.
+- `min` (`number`, required) - Minimum tangential acceleration.
+- `max` (`number`, required) - Maximum tangential acceleration.
 
 #### Example
 
@@ -2420,7 +2420,7 @@ end
 
 ### `LParticleSystem:start()`
 
-Starts particle emission. This method is available to Lua scripts.
+Starts particle emission on this object.
 
 #### Example
 
@@ -2449,7 +2449,7 @@ end
 
 ### `LParticleSystem:stop()`
 
-Stops particle emission. This method is available to Lua scripts.
+Stops particle emission on this object.
 
 #### Example
 
@@ -2661,7 +2661,7 @@ end
 
 ### `LTrail:clear()`
 
-Clears all trail points. This method is available to Lua scripts.
+Clears all trail points on this object.
 
 #### Example
 
@@ -2754,11 +2754,11 @@ do
 end
 ```
 
-### `LTrail:getWidth() -> LuaValue`
+### `LTrail:getWidth() -> number`
 
-Returns trail width settings. This method is available to Lua scripts.
+Returns trail width settings from this object.
 
-**Returns**: `LuaValue` - Width tuple from the trail module.
+**Returns**: `number` - Start width.
 
 #### Example
 
@@ -2781,8 +2781,8 @@ Adds a point to the trail. This method is available to Lua scripts.
 
 **Parameters**
 
-- `x` (`number`, required) - Numeric `x` argument for this call.
-- `y` (`number`, required) - Numeric `y` argument for this call.
+- `x` (`number`, required) - Point x coordinate.
+- `y` (`number`, required) - Point y coordinate.
 
 #### Example
 
@@ -2808,14 +2808,14 @@ end
 
 ### `LTrail:setHeadColor(r: number, g: number, b: number, a: number)`
 
-Sets trail head color. This method is available to Lua scripts.
+Sets the color of the leading edge of the trail.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, required) - Lua argument for `a`.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, required) - Alpha channel.
 
 #### Example
 
@@ -2839,7 +2839,7 @@ Sets trail point lifetime. This method is available to Lua scripts.
 
 **Parameters**
 
-- `lifetime` (`number`, required) - Lua argument for `lifetime`.
+- `lifetime` (`number`, required) - Point lifetime in seconds.
 
 #### Example
 
@@ -2864,7 +2864,7 @@ Sets minimum distance between trail points.
 
 **Parameters**
 
-- `distance` (`number`, required) - Lua argument for `distance`.
+- `distance` (`number`, required) - Minimum distance between points.
 
 #### Example
 
@@ -2887,14 +2887,14 @@ end
 
 ### `LTrail:setTailColor(r: number, g: number, b: number, a: number)`
 
-Sets trail tail color. This method is available to Lua scripts.
+Sets the color of the trailing edge of the trail.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, required) - Lua argument for `a`.
+- `r` (`number`, required) - Red channel.
+- `g` (`number`, required) - Green channel.
+- `b` (`number`, required) - Blue channel.
+- `a` (`number`, required) - Alpha channel.
 
 #### Example
 
@@ -2918,8 +2918,8 @@ Sets trail start and optional end width.
 
 **Parameters**
 
-- `start` (`number`, required) - Lua argument for `start`.
-- `end` (`number`, optional) - Lua argument for `end`.
+- `start` (`number`, required) - Start width.
+- `end` (`number`, optional) - End width.
 
 #### Example
 

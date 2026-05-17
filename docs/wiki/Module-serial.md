@@ -276,7 +276,7 @@ Attempts to auto-detect the serialization format of a string by inspecting its c
 
 - `text` (`string`, required) - The raw text content to analyze.
 
-**Returns**: `string` - The detected format name ("json", "toml", "csv", "xml", "ini") or nil if unrecognized.
+**Returns**: `string` - The detected format name ("json", "toml", "csv", "xml", "ini"), or nil if unrecognized.
 
 #### Example
 

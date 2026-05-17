@@ -27,14 +27,14 @@
   - [LPipeline:clear()](#lpipelineclear)
   - [LPipeline:getContext() -> table](#lpipelinegetcontext-table)
   - [LPipeline:getErrorMode() -> string](#lpipelinegeterrormode-string)
-  - [LPipeline:getExecutionOrder() -> table](#lpipelinegetexecutionorder-table)
+  - [LPipeline:getExecutionOrder() -> string[]](#lpipelinegetexecutionorder-string)
   - [LPipeline:getName() -> string](#lpipelinegetname-string)
-  - [LPipeline:getParallelGroups() -> table](#lpipelinegetparallelgroups-table)
+  - [LPipeline:getParallelGroups() -> string[]](#lpipelinegetparallelgroups-string)
   - [LPipeline:getResult() -> table](#lpipelinegetresult-table)
   - [LPipeline:getStep(name: string) -> LPipelineStep](#lpipelinegetstepname-string-lpipelinestep)
-  - [LPipeline:getStepCount() -> number](#lpipelinegetstepcount-number)
-  - [LPipeline:getSteps() -> table](#lpipelinegetsteps-table)
-  - [LPipeline:getStepsByTag(tag: string) -> table](#lpipelinegetstepsbytagtag-string-table)
+  - [LPipeline:getStepCount() -> integer](#lpipelinegetstepcount-integer)
+  - [LPipeline:getSteps() -> LPipelineStep[]](#lpipelinegetsteps-lpipelinestep)
+  - [LPipeline:getStepsByTag(tag: string) -> LPipelineStep[]](#lpipelinegetstepsbytagtag-string-lpipelinestep)
   - [LPipeline:isComplete() -> boolean](#lpipelineiscomplete-boolean)
   - [LPipeline:isRunning() -> boolean](#lpipelineisrunning-boolean)
   - [LPipeline:onEvent(callback: function)](#lpipelineoneventcallback-function)
@@ -56,15 +56,15 @@
   - [LPipeline:validate() -> boolean](#lpipelinevalidate-boolean)
   - [LPipelineStep](#lpipelinestep)
   - [LPipelineStep:dependsOn(dep: string|LPipelineStep) -> LPipelineStep](#lpipelinestepdependsondep-stringlpipelinestep-lpipelinestep)
-  - [LPipelineStep:getAttempt() -> number](#lpipelinestepgetattempt-number)
+  - [LPipelineStep:getAttempt() -> integer](#lpipelinestepgetattempt-integer)
   - [LPipelineStep:getData(key: string) -> string](#lpipelinestepgetdatakey-string-string)
   - [LPipelineStep:getDelay() -> number](#lpipelinestepgetdelay-number)
-  - [LPipelineStep:getDependencies() -> table](#lpipelinestepgetdependencies-table)
-  - [LPipelineStep:getDependencyCount() -> number](#lpipelinestepgetdependencycount-number)
+  - [LPipelineStep:getDependencies() -> string[]](#lpipelinestepgetdependencies-string)
+  - [LPipelineStep:getDependencyCount() -> integer](#lpipelinestepgetdependencycount-integer)
   - [LPipelineStep:getDuration() -> number](#lpipelinestepgetduration-number)
   - [LPipelineStep:getError() -> string](#lpipelinestepgeterror-string)
   - [LPipelineStep:getName() -> string](#lpipelinestepgetname-string)
-  - [LPipelineStep:getRetryCount() -> number](#lpipelinestepgetretrycount-number)
+  - [LPipelineStep:getRetryCount() -> integer](#lpipelinestepgetretrycount-integer)
   - [LPipelineStep:getStatus() -> string](#lpipelinestepgetstatus-string)
   - [LPipelineStep:getTag() -> string](#lpipelinestepgettag-string)
   - [LPipelineStep:getTimeout() -> number](#lpipelinestepgettimeout-number)
@@ -553,11 +553,11 @@ do
 end
 ```
 
-### `LPipeline:getExecutionOrder() -> table`
+### `LPipeline:getExecutionOrder() -> string[]`
 
 Computes the topologically sorted execution order of all steps, respecting dependencies.
 
-**Returns**: `table` - Array of step name strings in execution order, or nil on error.
+**Returns**: `string[]` - Step names in execution order, or nil on error.
 
 #### Example
 
@@ -601,11 +601,11 @@ do
 end
 ```
 
-### `LPipeline:getParallelGroups() -> table`
+### `LPipeline:getParallelGroups() -> string[]`
 
 Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can run concurrently.
 
-**Returns**: `table` - Array of arrays, each inner array is a group of step names. Nil on error.
+**Returns**: `string[]` - Array of arrays, each inner array is a group of step names. Nil on error.
 
 #### Example
 
@@ -632,7 +632,7 @@ end
 
 Returns the current pipeline result summary table, or nil if no steps exist. Useful for inspecting state after run or during async execution.
 
-**Returns**: `table` - Result table with success, completed, failed, skipped, cancelled, totalDuration, errors fields.
+**Returns**: `table` - Result table with success, completed, failed, skipped, cancelled, totalDuration, errors fields, or nil if no steps exist.
 
 #### Example
 
@@ -662,7 +662,7 @@ Retrieves a step object by name, or nil if no step with that name exists in this
 
 - `name` (`string`, required) - Name of the step to find.
 
-**Returns**: `LPipelineStep` - The step object or nil.
+**Returns**: `LPipelineStep` - The step object, or nil if no step with that name exists.
 
 #### Example
 
@@ -685,11 +685,11 @@ do
 end
 ```
 
-### `LPipeline:getStepCount() -> number`
+### `LPipeline:getStepCount() -> integer`
 
 Returns the total number of steps in this pipeline.
 
-**Returns**: `number` - Step count.
+**Returns**: `integer` - Step count.
 
 #### Example
 
@@ -706,11 +706,11 @@ do
 end
 ```
 
-### `LPipeline:getSteps() -> table`
+### `LPipeline:getSteps() -> LPipelineStep[]`
 
 Returns a table containing all step objects currently in this pipeline.
 
-**Returns**: `table` - Array of LPipelineStep objects.
+**Returns**: `LPipelineStep[]` - LPipelineStep objects.
 
 #### Example
 
@@ -730,7 +730,7 @@ do
 end
 ```
 
-### `LPipeline:getStepsByTag(tag: string) -> table`
+### `LPipeline:getStepsByTag(tag: string) -> LPipelineStep[]`
 
 Returns all steps that have the specified tag assigned.
 
@@ -738,7 +738,7 @@ Returns all steps that have the specified tag assigned.
 
 - `tag` (`string`, required) - The tag to filter by.
 
-**Returns**: `table` - Array of matching LPipelineStep objects.
+**Returns**: `LPipelineStep[]` - Matching LPipelineStep objects.
 
 #### Example
 
@@ -1294,11 +1294,11 @@ do
 end
 ```
 
-### `LPipelineStep:getAttempt() -> number`
+### `LPipelineStep:getAttempt() -> integer`
 
 Returns the current attempt number (1-based). Increases with each retry.
 
-**Returns**: `number` - Attempt number.
+**Returns**: `integer` - Attempt number.
 
 #### Example
 
@@ -1320,7 +1320,7 @@ Retrieves a metadata value previously stored with setData.
 
 - `key` (`string`, required) - Metadata key to look up.
 
-**Returns**: `string` - The stored value, or nil if not found.
+**Returns**: `string` - The stored value, or nil if the key does not exist.
 
 #### Example
 
@@ -1353,11 +1353,11 @@ do
 end
 ```
 
-### `LPipelineStep:getDependencies() -> table`
+### `LPipelineStep:getDependencies() -> string[]`
 
 Returns a list of step names that this step depends on.
 
-**Returns**: `table` - Array of dependency step name strings.
+**Returns**: `string[]` - Dependency step name strings.
 
 #### Example
 
@@ -1373,11 +1373,11 @@ do
 end
 ```
 
-### `LPipelineStep:getDependencyCount() -> number`
+### `LPipelineStep:getDependencyCount() -> integer`
 
 Returns the number of dependencies this step has.
 
-**Returns**: `number` - Dependency count.
+**Returns**: `integer` - Dependency count.
 
 #### Example
 
@@ -1415,7 +1415,7 @@ end
 
 Returns the error message if this step failed, or nil if it has not failed.
 
-**Returns**: `string` - Error message or nil.
+**Returns**: `string` - Error message, or nil if the step has not failed.
 
 #### Example
 
@@ -1448,11 +1448,11 @@ do
 end
 ```
 
-### `LPipelineStep:getRetryCount() -> number`
+### `LPipelineStep:getRetryCount() -> integer`
 
 Returns the configured retry count for this step.
 
-**Returns**: `number` - Number of retry attempts.
+**Returns**: `integer` - Number of retry attempts.
 
 #### Example
 
@@ -1488,7 +1488,7 @@ end
 
 Returns the tag assigned to this step, or nil if none is set.
 
-**Returns**: `string` - The step tag.
+**Returns**: `string` - The step tag, or nil if no tag is assigned.
 
 #### Example
 

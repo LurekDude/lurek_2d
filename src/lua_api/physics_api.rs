@@ -65,22 +65,16 @@ fn shape_from_lua(lua: &Lua, shape_type: &str, args: LuaMultiValue) -> LuaResult
 fn raycast_hit_to_table<'lua>(lua: &'lua Lua, hit: &RaycastHit) -> LuaResult<LuaTable<'lua>> {
     let tbl = lua.create_table()?;
     /// Performs the 'bodyId' operation.
-    /// @return | nil | No value is returned.
     tbl.set("bodyId", hit.body_id)?;
     /// Performs the 'x' operation.
-    /// @return | nil | No value is returned.
     tbl.set("x", hit.point.0)?;
     /// Performs the 'y' operation.
-    /// @return | nil | No value is returned.
     tbl.set("y", hit.point.1)?;
     /// Performs the 'normalX' operation.
-    /// @return | nil | No value is returned.
     tbl.set("normalX", hit.normal.0)?;
     /// Performs the 'normalY' operation.
-    /// @return | nil | No value is returned.
     tbl.set("normalY", hit.normal.1)?;
     /// Performs the 'toi' operation.
-    /// @return | nil | No value is returned.
     tbl.set("toi", hit.toi)?;
     Ok(tbl)
 }
@@ -108,7 +102,6 @@ impl LuaUserData for LuaWorld {
         /// @param | g | integer? | Green channel (0-255, default 255).
         /// @param | b | integer? | Blue channel (0-255, default 0).
         /// @param | a | integer? | Alpha channel (0-255, default 255).
-        /// @return | nil | No return value.
         methods.add_method(
             "drawDebug",
             |_,
@@ -135,7 +128,6 @@ impl LuaUserData for LuaWorld {
         // -- step --
         /// Advances the physics simulation by a time delta and fires any registered contact callbacks.
         /// @param | dt | number | Time step in seconds (e.g. 1/60 for 60 FPS).
-        /// @return | nil | No value is returned.
         methods.add_method("step", |lua, this, dt: f32| {
             this.world.borrow_mut().step(dt);
             let begins: Vec<(usize, usize)> =
@@ -157,7 +149,6 @@ impl LuaUserData for LuaWorld {
         });
         // -- clear --
         /// Removes all bodies and joints from the world, resetting it to an empty state.
-        /// @return | nil | No value is returned.
         methods.add_method("clear", |_, this, ()| {
             this.world.borrow_mut().clear();
             Ok(())
@@ -173,7 +164,6 @@ impl LuaUserData for LuaWorld {
         /// Sets the world gravity vector. Affects all dynamic bodies.
         /// @param | gx | number | Horizontal gravity component.
         /// @param | gy | number | Vertical gravity component (positive = down in screen space).
-        /// @return | nil | No value is returned.
         methods.add_method("setGravity", |_, this, (gx, gy): (f32, f32)| {
             this.world.borrow_mut().set_gravity(gx, gy);
             Ok(())
@@ -181,7 +171,6 @@ impl LuaUserData for LuaWorld {
         // -- setMeter --
         /// Sets the pixels-per-meter scale used to convert between pixel coordinates and physics units.
         /// @param | ppm | number | Pixels per meter (e.g. 64 means 64 px = 1 meter in physics).
-        /// @return | nil | No value is returned.
         methods.add_method("setMeter", |_, this, ppm: f32| {
             this.world.borrow_mut().set_meter(ppm);
             Ok(())
@@ -214,14 +203,13 @@ impl LuaUserData for LuaWorld {
         });
         // -- getBodyIds --
         /// Returns a sequential table of all body IDs currently in the world.
-        /// @return | table | Array of body ID numbers.
+        /// @return | integer[] | Body ID numbers.
         methods.add_method("getBodyIds", |_, this, ()| {
             Ok(this.world.borrow().get_body_ids())
         });
         // -- destroyBody --
         /// Removes a body from the world by its ID, along with all attached fixtures and joints.
         /// @param | id | integer | The body ID to destroy.
-        /// @return | nil | No value is returned.
         methods.add_method("destroyBody", |_, this, id: usize| {
             this.world.borrow_mut().destroy_body(id);
             Ok(())
@@ -387,7 +375,6 @@ impl LuaUserData for LuaWorld {
         /// @param | bodyId | integer | The body ID.
         /// @param | fixtureIndex | integer | Zero-based fixture index on the body.
         /// @param | friction | number | New friction value (0–1 typical range).
-        /// @return | nil | No return value.
         methods.add_method(
             "setFixtureFriction",
             |_, this, (body_id, fix_idx, friction): (usize, usize, f32)| {
@@ -402,7 +389,6 @@ impl LuaUserData for LuaWorld {
         /// @param | bodyId | integer | The body ID.
         /// @param | fixtureIndex | integer | Zero-based fixture index on the body.
         /// @param | restitution | number | New restitution value (0 = no bounce, 1 = full bounce).
-        /// @return | nil | No return value.
         methods.add_method(
             "setFixtureRestitution",
             |_, this, (body_id, fix_idx, restitution): (usize, usize, f32)| {
@@ -417,7 +403,6 @@ impl LuaUserData for LuaWorld {
         /// @param | bodyId | integer | The body ID.
         /// @param | fixtureIndex | integer | Zero-based fixture index on the body.
         /// @param | sensor | boolean | True to make it a sensor, false for solid collision.
-        /// @return | nil | No return value.
         methods.add_method(
             "setFixtureSensor",
             |_, this, (body_id, fix_idx, sensor): (usize, usize, bool)| {
@@ -609,7 +594,7 @@ impl LuaUserData for LuaWorld {
         });
         // -- getJointIds --
         /// Returns a sequential table of all joint IDs currently in the world.
-        /// @return | table | Array of joint ID numbers.
+        /// @return | integer[] | Joint ID numbers.
         methods.add_method("getJointIds", |_, this, ()| {
             Ok(this.world.borrow().get_joint_ids())
         });
@@ -627,7 +612,6 @@ impl LuaUserData for LuaWorld {
         // -- destroyJoint --
         /// Removes a joint from the world, disconnecting the two bodies it linked.
         /// @param | jointId | integer | The joint ID to destroy.
-        /// @return | nil | No value is returned.
         methods.add_method("destroyJoint", |_, this, jid: usize| {
             this.world.borrow_mut().destroy_joint(jid);
             Ok(())
@@ -643,7 +627,6 @@ impl LuaUserData for LuaWorld {
         /// Sets the motor speed on a motorized joint (revolute or prismatic).
         /// @param | jointId | integer | The joint ID.
         /// @param | speed | number | Desired motor speed (radians/sec for revolute, meters/sec for prismatic).
-        /// @return | nil | No return value.
         methods.add_method(
             "setJointMotorSpeed",
             |_, this, (jid, speed): (usize, f32)| {
@@ -662,7 +645,6 @@ impl LuaUserData for LuaWorld {
         /// Enables or disables angular/linear limits on a joint.
         /// @param | jointId | integer | The joint ID.
         /// @param | enabled | boolean | True to enforce limits, false to allow free movement.
-        /// @return | nil | No return value.
         methods.add_method(
             "setJointLimitsEnabled",
             |_, this, (jid, enabled): (usize, bool)| {
@@ -677,7 +659,6 @@ impl LuaUserData for LuaWorld {
         /// @param | jointId | integer | The joint ID.
         /// @param | lower | number | Lower limit (radians or meters depending on joint type).
         /// @param | upper | number | Upper limit.
-        /// @return | nil | No return value.
         methods.add_method(
             "setJointLimits",
             |_, this, (jid, lower, upper): (usize, f32, f32)| {
@@ -698,7 +679,6 @@ impl LuaUserData for LuaWorld {
         /// @param | jointId | integer | The mouse joint ID.
         /// @param | x | number | New target X in world coordinates.
         /// @param | y | number | New target Y in world coordinates.
-        /// @return | nil | No return value.
         methods.add_method(
             "setMouseJointTarget",
             |_, this, (jid, x, y): (usize, f32, f32)| {
@@ -713,6 +693,12 @@ impl LuaUserData for LuaWorld {
         /// @param | x2 | number | Ray end X.
         /// @param | y2 | number | Ray end Y.
         /// @return | table | Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
+        /// @field | bodyId | integer | BodyId.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
+        /// @field | normalX | number | NormalX.
+        /// @field | normalY | number | NormalY.
+        /// @field | toi | number | Toi.
         methods.add_method(
             "raycast",
             |lua, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| match this
@@ -732,6 +718,12 @@ impl LuaUserData for LuaWorld {
         /// @param | dy | number | Ray direction Y.
         /// @param | maxDist | number | Maximum ray travel distance.
         /// @return | table | Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
+        /// @field | bodyId | integer | BodyId.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
+        /// @field | normalX | number | NormalX.
+        /// @field | normalY | number | NormalY.
+        /// @field | toi | number | Toi.
         methods.add_method(
             "raycastClosest",
             |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| match this
@@ -751,6 +743,12 @@ impl LuaUserData for LuaWorld {
         /// @param | dy | number | Ray direction Y.
         /// @param | maxDist | number | Maximum ray travel distance.
         /// @return | table | Array of hit tables {bodyId, x, y, normalX, normalY, toi}.
+        /// @field | bodyId | integer | BodyId.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
+        /// @field | normalX | number | NormalX.
+        /// @field | normalY | number | NormalY.
+        /// @field | toi | number | Toi.
         methods.add_method(
             "raycastAll",
             |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| {
@@ -768,7 +766,7 @@ impl LuaUserData for LuaWorld {
         /// @param | y | number | Query rectangle top Y.
         /// @param | w | number | Query rectangle width.
         /// @param | h | number | Query rectangle height.
-        /// @return | table | Array of body ID numbers found in the region.
+        /// @return | integer[] | Body ID numbers found in the region.
         methods.add_method(
             "queryAABB",
             |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -786,6 +784,8 @@ impl LuaUserData for LuaWorld {
         // -- getCollisionEvents --
         /// Returns all collision events from the last step as a table of {bodyA, bodyB} pairs.
         /// @return | table | Array of collision event tables.
+        /// @field | bodyA | integer | Body A id.
+        /// @field | bodyB | integer | Body B id.
         methods.add_method("getCollisionEvents", |lua, this, ()| {
             let w = this.world.borrow();
             let events = w.get_collision_events();
@@ -793,10 +793,8 @@ impl LuaUserData for LuaWorld {
             for (i, evt) in events.iter().enumerate() {
                 let tbl = lua.create_table()?;
                 /// Performs the 'bodyA' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyA", evt.body_a)?;
                 /// Performs the 'bodyB' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyB", evt.body_b)?;
                 result.set(i + 1, tbl)?;
             }
@@ -805,6 +803,8 @@ impl LuaUserData for LuaWorld {
         // -- getBeginContactEvents --
         /// Returns contact-begin events from the last step (pairs of bodies that started touching).
         /// @return | table | Array of {bodyA, bodyB} tables.
+        /// @field | bodyA | integer | BodyA.
+        /// @field | bodyB | integer | BodyB.
         methods.add_method("getBeginContactEvents", |lua, this, ()| {
             let w = this.world.borrow();
             let events = w.get_begin_contact_events();
@@ -812,10 +812,8 @@ impl LuaUserData for LuaWorld {
             for (i, (a, b)) in events.iter().enumerate() {
                 let tbl = lua.create_table()?;
                 /// Performs the 'bodyA' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyA", *a)?;
                 /// Performs the 'bodyB' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyB", *b)?;
                 result.set(i + 1, tbl)?;
             }
@@ -824,6 +822,8 @@ impl LuaUserData for LuaWorld {
         // -- getEndContactEvents --
         /// Returns contact-end events from the last step (pairs of bodies that stopped touching).
         /// @return | table | Array of {bodyA, bodyB} tables.
+        /// @field | bodyA | integer | BodyA.
+        /// @field | bodyB | integer | BodyB.
         methods.add_method("getEndContactEvents", |lua, this, ()| {
             let w = this.world.borrow();
             let events = w.get_end_contact_events();
@@ -831,10 +831,8 @@ impl LuaUserData for LuaWorld {
             for (i, (a, b)) in events.iter().enumerate() {
                 let tbl = lua.create_table()?;
                 /// Performs the 'bodyA' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyA", *a)?;
                 /// Performs the 'bodyB' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyB", *b)?;
                 result.set(i + 1, tbl)?;
             }
@@ -843,25 +841,25 @@ impl LuaUserData for LuaWorld {
         // -- getContacts --
         /// Returns all currently active contact manifolds with normals and touching state.
         /// @return | table | Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
+        /// @field | bodyA | integer | BodyA.
+        /// @field | bodyB | integer | BodyB.
+        /// @field | normalX | number | NormalX.
+        /// @field | normalY | number | NormalY.
+        /// @field | isTouching | boolean | IsTouching.
         methods.add_method("getContacts", |lua, this, ()| {
             let contacts = this.world.borrow().get_contacts();
             let result = lua.create_table()?;
             for (i, c) in contacts.iter().enumerate() {
                 let tbl = lua.create_table()?;
                 /// Performs the 'bodyA' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyA", c.body_a)?;
                 /// Performs the 'bodyB' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyB", c.body_b)?;
                 /// Performs the 'normalX' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("normalX", c.normal_x)?;
                 /// Performs the 'normalY' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("normalY", c.normal_y)?;
                 /// Performs the 'isTouching' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("isTouching", c.is_touching)?;
                 result.set(i + 1, tbl)?;
             }
@@ -871,25 +869,25 @@ impl LuaUserData for LuaWorld {
         /// Returns all contacts involving a specific body.
         /// @param | bodyId | integer | The body to query contacts for.
         /// @return | table | Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
+        /// @field | bodyA | integer | BodyA.
+        /// @field | bodyB | integer | BodyB.
+        /// @field | normalX | number | NormalX.
+        /// @field | normalY | number | NormalY.
+        /// @field | isTouching | boolean | IsTouching.
         methods.add_method("getBodyContacts", |lua, this, body_id: usize| {
             let contacts = this.world.borrow().get_body_contacts(body_id);
             let result = lua.create_table()?;
             for (i, c) in contacts.iter().enumerate() {
                 let tbl = lua.create_table()?;
                 /// Performs the 'bodyA' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyA", c.body_a)?;
                 /// Performs the 'bodyB' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("bodyB", c.body_b)?;
                 /// Performs the 'normalX' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("normalX", c.normal_x)?;
                 /// Performs the 'normalY' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("normalY", c.normal_y)?;
                 /// Performs the 'isTouching' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("isTouching", c.is_touching)?;
                 result.set(i + 1, tbl)?;
             }
@@ -899,7 +897,6 @@ impl LuaUserData for LuaWorld {
         /// Changes the type of an existing body (e.g. from "dynamic" to "static").
         /// @param | id | integer | The body ID.
         /// @param | bodyType | string | New type: "static", "dynamic", "kinematic", or "sensor".
-        /// @return | nil | No value is returned.
         methods.add_method("setBodyType", |_, this, (id, bt): (usize, String)| {
             let body_type = parse_body_type(&bt)?;
             this.world.borrow_mut().set_body_type(id, body_type);
@@ -915,14 +912,12 @@ impl LuaUserData for LuaWorld {
         // -- setBeginContact --
         /// Registers a callback function invoked whenever two bodies begin touching.
         /// @param | callback | function | Called with (bodyIdA, bodyIdB) on each new contact.
-        /// @return | nil | No value is returned.
         methods.add_method("setBeginContact", |lua, this, f: LuaFunction| {
             *this.begin_contact_key.borrow_mut() = Some(lua.create_registry_value(f)?);
             Ok(())
         });
         // -- clearBeginContact --
         /// Removes the begin-contact callback so it is no longer called.
-        /// @return | nil | No value is returned.
         methods.add_method("clearBeginContact", |_, this, ()| {
             *this.begin_contact_key.borrow_mut() = None;
             Ok(())
@@ -930,14 +925,12 @@ impl LuaUserData for LuaWorld {
         // -- setEndContact --
         /// Registers a callback function invoked whenever two bodies stop touching.
         /// @param | callback | function | Called with (bodyIdA, bodyIdB) on each ended contact.
-        /// @return | nil | No value is returned.
         methods.add_method("setEndContact", |lua, this, f: LuaFunction| {
             *this.end_contact_key.borrow_mut() = Some(lua.create_registry_value(f)?);
             Ok(())
         });
         // -- clearEndContact --
         /// Removes the end-contact callback so it is no longer called.
-        /// @return | nil | No value is returned.
         methods.add_method("clearEndContact", |_, this, ()| {
             *this.end_contact_key.borrow_mut() = None;
             Ok(())
@@ -945,8 +938,7 @@ impl LuaUserData for LuaWorld {
         // -- setBodyData --
         /// Attaches arbitrary Lua data to a body ID for later retrieval (e.g. entity reference, tag).
         /// @param | id | integer | The body ID.
-        /// @param | value | any | Any Lua value to associate with this body.
-        /// @return | nil | No return value.
+        /// @param | value | table | Lua value to associate with this body (table, number, string, etc.).
         methods.add_method(
             "setBodyData",
             |lua, this, (id, value): (usize, LuaValue)| {
@@ -969,7 +961,6 @@ impl LuaUserData for LuaWorld {
         // -- clearBodyData --
         /// Removes and releases the Lua data attached to a body.
         /// @param | id | integer | The body ID.
-        /// @return | nil | No value is returned.
         methods.add_method("clearBodyData", |lua, this, id: usize| {
             let removed = this.body_data.borrow_mut().remove(&id);
             if let Some(key) = removed {
@@ -981,7 +972,6 @@ impl LuaUserData for LuaWorld {
         /// Enables or disables continuous collision detection (bullet mode) on a body to prevent tunneling.
         /// @param | id | integer | The body ID.
         /// @param | enabled | boolean | True to enable CCD.
-        /// @return | nil | No value is returned.
         methods.add_method("setBodyCCD", |_, this, (id, enabled): (usize, bool)| {
             this.world.borrow_mut().set_bullet(id, enabled);
             Ok(())
@@ -998,7 +988,6 @@ impl LuaUserData for LuaWorld {
         /// @param | id | integer | The body ID.
         /// @param | nx | number | One-way normal X (points toward the blocking side).
         /// @param | ny | number | One-way normal Y.
-        /// @return | nil | No return value.
         methods.add_method(
             "setBodyOneWay",
             |_, this, (id, nx, ny): (usize, f32, f32)| {
@@ -1009,7 +998,6 @@ impl LuaUserData for LuaWorld {
         // -- clearBodyOneWay --
         /// Removes the one-way platform behavior from a body, making it block from all directions.
         /// @param | id | integer | The body ID.
-        /// @return | nil | No value is returned.
         methods.add_method("clearBodyOneWay", |_, this, id: usize| {
             this.world.borrow_mut().clear_body_one_way(id);
             Ok(())
@@ -1029,7 +1017,6 @@ impl LuaUserData for LuaWorld {
         /// Sets the maximum force a joint can withstand before it breaks and is automatically destroyed.
         /// @param | jointId | integer | The joint ID.
         /// @param | force | number | Break threshold force (use math.huge for unbreakable).
-        /// @return | nil | No value is returned.
         methods.add_method("setJointBreakForce", |_, this, (jid, f): (usize, f32)| {
             this.world.borrow_mut().set_joint_break_force(jid, f);
             Ok(())
@@ -1051,7 +1038,6 @@ impl LuaUserData for LuaWorld {
         // -- wakeUpBody --
         /// Forces a sleeping body to wake up and participate in simulation again.
         /// @param | id | integer | The body ID.
-        /// @return | nil | No value is returned.
         methods.add_method("wakeUpBody", |_, this, id: usize| {
             this.world.borrow_mut().wake_up_body(id);
             Ok(())
@@ -1059,7 +1045,6 @@ impl LuaUserData for LuaWorld {
         // -- sleepBody --
         /// Forces a body into the sleeping state, pausing its simulation until disturbed.
         /// @param | id | integer | The body ID.
-        /// @return | nil | No value is returned.
         methods.add_method("sleepBody", |_, this, id: usize| {
             this.world.borrow_mut().sleep_body(id);
             Ok(())
@@ -1067,7 +1052,6 @@ impl LuaUserData for LuaWorld {
         // -- setSolverIterations --
         /// Sets the number of velocity solver iterations. Higher values improve stability at the cost of performance.
         /// @param | n | integer | Number of iterations (default is typically 4–8).
-        /// @return | nil | No value is returned.
         methods.add_method("setSolverIterations", |_, this, n: usize| {
             this.world.borrow_mut().set_solver_iterations(n);
             Ok(())
@@ -1081,7 +1065,7 @@ impl LuaUserData for LuaWorld {
         // -- newBodies --
         /// Batch-creates multiple bodies at once for better performance. Each entry is {x, y, type}.
         /// @param | specs | table | Array of tables: {{x, y, "dynamic"}, {x, y, "static"}, ...}.
-        /// @return | table | Array of body ID numbers in creation order.
+        /// @return | integer[] | Body ID numbers in creation order.
         methods.add_method("newBodies", |_, this, specs: LuaTable| {
             let mut pairs: Vec<(f32, f32, BodyType)> = Vec::new();
             for entry in specs.sequence_values::<LuaTable>() {
@@ -1128,6 +1112,9 @@ impl LuaUserData for LuaWorld {
         // -- getZoneEvents --
         /// Returns all zone enter/leave events from the last step.
         /// @return | table | Array of {zone_id, body_id, kind} tables where kind is "enter" or "leave".
+        /// @field | zone_id | integer | Zone_id.
+        /// @field | body_id | integer | Body_id.
+        /// @field | kind | string | Kind.
         methods.add_method("getZoneEvents", |lua, this, ()| {
             let w = this.world.borrow();
             let events = w.get_zone_events();
@@ -1135,10 +1122,8 @@ impl LuaUserData for LuaWorld {
             for (i, evt) in events.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'zone_id' operation.
-                /// @return | nil | No value is returned.
                 row.set("zone_id", evt.zone_id)?;
                 /// Performs the 'body_id' operation.
-                /// @return | nil | No value is returned.
                 row.set("body_id", evt.body_id)?;
                 row.set(
                     "kind",
@@ -1179,7 +1164,6 @@ impl LuaUserData for LuaZone {
         // -- setEnabled --
         /// Enables or disables this zone. Disabled zones have no effect on bodies.
         /// @param | enabled | boolean | True to enable, false to disable.
-        /// @return | nil | No value is returned.
         methods.add_method("setEnabled", |_, this, enabled: bool| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1190,7 +1174,6 @@ impl LuaUserData for LuaZone {
         // -- setPriority --
         /// Sets the priority of this zone. Higher-priority zones take precedence when overlapping.
         /// @param | priority | integer | Integer priority value.
-        /// @return | nil | No value is returned.
         methods.add_method("setPriority", |_, this, priority: i32| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1201,7 +1184,6 @@ impl LuaUserData for LuaZone {
         // -- setLayerMask --
         /// Sets a bitmask controlling which body layers this zone affects.
         /// @param | mask | integer | Layer bitmask (bitwise AND with body layer must be nonzero).
-        /// @return | nil | No value is returned.
         methods.add_method("setLayerMask", |_, this, mask: u32| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1214,7 +1196,6 @@ impl LuaUserData for LuaZone {
         /// @param | cx | number | Center X.
         /// @param | cy | number | Center Y.
         /// @param | radius | number | Circle radius.
-        /// @return | nil | No value is returned.
         methods.add_method("setCircle", |_, this, (cx, cy, radius): (f32, f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1226,7 +1207,6 @@ impl LuaUserData for LuaZone {
         /// Sets the zone to apply a constant directional gravity to bodies inside.
         /// @param | gx | number | Gravity X component.
         /// @param | gy | number | Gravity Y component.
-        /// @return | nil | No value is returned.
         methods.add_method("setGravityDirectional", |_, this, (gx, gy): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1239,7 +1219,6 @@ impl LuaUserData for LuaZone {
         /// @param | cx | number | Attractor center X.
         /// @param | cy | number | Attractor center Y.
         /// @param | strength | number | Pull force magnitude.
-        /// @return | nil | No return value.
         methods.add_method(
             "setGravityPoint",
             |_, this, (cx, cy, strength): (f32, f32, f32)| {
@@ -1255,7 +1234,6 @@ impl LuaUserData for LuaZone {
         /// @param | cx | number | Repulsor center X.
         /// @param | cy | number | Repulsor center Y.
         /// @param | strength | number | Push force magnitude.
-        /// @return | nil | No return value.
         methods.add_method(
             "setGravityRepulsor",
             |_, this, (cx, cy, strength): (f32, f32, f32)| {
@@ -1268,7 +1246,6 @@ impl LuaUserData for LuaZone {
         );
         // -- setGravityZero --
         /// Sets the zone to cancel all gravity for bodies inside (zero-G area).
-        /// @return | nil | No value is returned.
         methods.add_method("setGravityZero", |_, this, ()| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1279,7 +1256,6 @@ impl LuaUserData for LuaZone {
         // -- setLinearDampingOverride --
         /// Overrides the linear damping of bodies inside this zone, or nil to use each body's own value.
         /// @param | value | number? | Damping override, or nil to clear.
-        /// @return | nil | No value is returned.
         methods.add_method("setLinearDampingOverride", |_, this, value: Option<f32>| {
             let mut w = this.world.borrow_mut();
             if let Some(z) = w.zone_mut(this.zone_id) {
@@ -1290,7 +1266,6 @@ impl LuaUserData for LuaZone {
         // -- setAngularDampingOverride --
         /// Overrides the angular damping of bodies inside this zone, or nil to use each body's own value.
         /// @param | value | number? | Damping override, or nil to clear.
-        /// @return | nil | No return value.
         methods.add_method(
             "setAngularDampingOverride",
             |_, this, value: Option<f32>| {
@@ -1303,7 +1278,6 @@ impl LuaUserData for LuaZone {
         );
         // -- destroy --
         /// Removes this zone from the world. Bodies will no longer be affected by it.
-        /// @return | nil | No value is returned.
         methods.add_method("destroy", |_, this, ()| {
             this.world.borrow_mut().remove_zone(this.zone_id);
             Ok(())
@@ -1334,7 +1308,6 @@ impl LuaUserData for LuaTerrain {
         /// @param | cx | integer | Cell column (0-based).
         /// @param | cy | integer | Cell row (0-based).
         /// @param | solid | boolean | True for solid, false for empty.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setCell", |_, this, (cx, cy, solid): (u32, u32, bool)| {
             this.terrain.borrow_mut().set_cell(cx, cy, solid);
             Ok(())
@@ -1353,7 +1326,6 @@ impl LuaUserData for LuaTerrain {
         /// @param | wy | number | Circle center Y in world coordinates.
         /// @param | radius | number | Circle radius in world units.
         /// @param | solid | boolean | True to fill solid, false to carve empty.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "fillCircle",
             |_, this, (wx, wy, radius, solid): (f32, f32, f32, bool)| {
@@ -1368,7 +1340,6 @@ impl LuaUserData for LuaTerrain {
         /// @param | w | number | Rectangle width.
         /// @param | h | number | Rectangle height.
         /// @param | solid | boolean | True to fill solid, false to carve empty.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "fillRect",
             |_, this, (wx, wy, w, h, solid): (f32, f32, f32, f32, bool)| {
@@ -1379,14 +1350,12 @@ impl LuaUserData for LuaTerrain {
         // -- fillAll --
         /// Sets all terrain cells to either solid or empty.
         /// @param | solid | boolean | True to fill everything solid, false to clear.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("fillAll", |_, this, solid: bool| {
             this.terrain.borrow_mut().fill_all(solid);
             Ok(())
         });
         // -- flush --
         /// Regenerates physics colliders from the current terrain grid state. Call after modifying cells.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("flush", |_, this, ()| {
             this.terrain
                 .borrow_mut()
@@ -1408,16 +1377,16 @@ impl LuaUserData for LuaTerrain {
         // -- solidPositions --
         /// Returns all solid cell positions as a table of {x, y} entries.
         /// @return | table | Array of tables with x and y fields (cell coordinates).
+        /// @field | x | integer | Cell x coordinate.
+        /// @field | y | integer | Cell y coordinate.
         methods.add_method("solidPositions", |lua, this, ()| {
             let positions = this.terrain.borrow().solid_cell_positions();
             let tbl = lua.create_table()?;
             for (i, (x, y)) in positions.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 row.set("x", *x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 row.set("y", *y)?;
                 tbl.set(i + 1, row)?;
             }
@@ -1428,7 +1397,7 @@ impl LuaUserData for LuaTerrain {
         /// @param | positions | table | Array of {x, y} tables in world coordinates.
         /// @param | mass | number | Mass of each debris body.
         /// @param | restitution | number | Bounciness of debris bodies.
-        /// @return | table | Array of body IDs for the spawned debris.
+        /// @return | integer[] | Array of body IDs for the spawned debris.
         methods.add_method_mut(
             "spawnDebris",
             |lua, this, (positions, mass, restitution): (LuaTable, f32, f32)| {
@@ -1509,7 +1478,6 @@ impl LuaUserData for LuaCellular {
         /// @param | cx | integer | Cell column (0-based).
         /// @param | cy | integer | Cell row (0-based).
         /// @param | cellType | integer | Material type constant (CELL_AIR, CELL_SAND, etc.).
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setCell", |_, this, (cx, cy, t): (u32, u32, u8)| {
             this.sim.borrow_mut().set_cell(cx, cy, CellType::from_u8(t));
             Ok(())
@@ -1529,7 +1497,6 @@ impl LuaUserData for LuaCellular {
         /// @param | cw | integer | Width in cells.
         /// @param | ch | integer | Height in cells.
         /// @param | cellType | integer | Material type constant.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "fillRect",
             |_, this, (cx0, cy0, cw, ch, t): (u32, u32, u32, u32, u8)| {
@@ -1545,7 +1512,6 @@ impl LuaUserData for LuaCellular {
         /// @param | cy | integer | Center cell row.
         /// @param | r | integer | Radius in cells.
         /// @param | cellType | integer | Material type constant.
-        /// @return | nil | No return value.
         methods.add_method_mut(
             "fillCircle",
             |_, this, (cx, cy, r, t): (u32, u32, u32, u8)| {
@@ -1557,7 +1523,6 @@ impl LuaUserData for LuaCellular {
         );
         // -- step --
         /// Advances the cellular simulation by one tick (particles fall, flow, burn, etc.).
-        /// @return | nil | No value is returned.
         methods.add_method_mut("step", |_, this, ()| {
             this.sim.borrow_mut().step();
             Ok(())
@@ -1565,7 +1530,6 @@ impl LuaUserData for LuaCellular {
         // -- stepN --
         /// Advances the cellular simulation by N ticks in a single call.
         /// @param | n | integer | Number of simulation ticks to run.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("stepN", |_, this, n: u32| {
             this.sim.borrow_mut().step_n(n);
             Ok(())
@@ -1611,16 +1575,16 @@ impl LuaUserData for LuaCellular {
         /// Returns positions of all cells matching a material type.
         /// @param | cellType | integer | Material type constant to find.
         /// @return | table | Array of {x, y} tables with cell coordinates.
+        /// @field | x | number | X.
+        /// @field | y | number | Y.
         methods.add_method("findCells", |lua, this, t: u8| {
             let positions = this.sim.borrow().find_cells(CellType::from_u8(t));
             let tbl = lua.create_table()?;
             for (i, (cx, cy)) in positions.iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 row.set("x", *cx)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 row.set("y", *cy)?;
                 tbl.set(i + 1, row)?;
             }
@@ -1685,7 +1649,6 @@ impl LuaUserData for LuaBody {
         /// Teleports the body to a new world-space position (does not apply physics forces).
         /// @param | x | number | New X position.
         /// @param | y | number | New Y position.
-        /// @return | nil | No value is returned.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.world.borrow_mut().set_body_position(this.id, x, y);
             Ok(())
@@ -1719,7 +1682,6 @@ impl LuaUserData for LuaBody {
         /// Directly sets the body's linear velocity.
         /// @param | vx | number | Velocity X component.
         /// @param | vy | number | Velocity Y component.
-        /// @return | nil | No value is returned.
         methods.add_method("setVelocity", |_, this, (vx, vy): (f32, f32)| {
             let mut w = this.world.borrow_mut();
             if let Some(b) = w.get_body_mut(this.id) {
@@ -1737,7 +1699,6 @@ impl LuaUserData for LuaBody {
         // -- setAngle --
         /// Sets the body's rotation angle directly.
         /// @param | angle | number | New angle in radians.
-        /// @return | nil | No value is returned.
         methods.add_method("setAngle", |_, this, angle: f32| {
             this.world.borrow_mut().set_body_angle(this.id, angle);
             Ok(())
@@ -1751,7 +1712,6 @@ impl LuaUserData for LuaBody {
         // -- setAngularVelocity --
         /// Sets the body's angular velocity directly.
         /// @param | omega | number | Angular velocity in radians per second.
-        /// @return | nil | No value is returned.
         methods.add_method("setAngularVelocity", |_, this, omega: f32| {
             this.world.borrow_mut().set_angular_velocity(this.id, omega);
             Ok(())
@@ -1765,7 +1725,6 @@ impl LuaUserData for LuaBody {
         // -- setMass --
         /// Overrides the body's mass directly.
         /// @param | mass | number | New mass value.
-        /// @return | nil | No value is returned.
         methods.add_method("setMass", |_, this, mass: f32| {
             this.world.borrow_mut().set_body_mass(this.id, mass);
             Ok(())
@@ -1779,7 +1738,6 @@ impl LuaUserData for LuaBody {
         // -- setType --
         /// Changes the body's type at runtime.
         /// @param | bodyType | string | New type: "static", "dynamic", "kinematic", or "sensor".
-        /// @return | nil | No value is returned.
         methods.add_method("setType", |_, this, bt: String| {
             let body_type = parse_body_type(&bt)?;
             this.world.borrow_mut().set_body_type(this.id, body_type);
@@ -1809,7 +1767,6 @@ impl LuaUserData for LuaBody {
         // -- setFriction --
         /// Sets the body's friction coefficient.
         /// @param | friction | number | New friction value (0 = ice, 1 = rubber).
-        /// @return | nil | No value is returned.
         methods.add_method("setFriction", |_, this, friction: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(b) = w.get_body_mut(this.id) {
@@ -1827,7 +1784,6 @@ impl LuaUserData for LuaBody {
         // -- setRestitution --
         /// Sets the body's restitution (bounciness) value.
         /// @param | restitution | number | New restitution (0–1).
-        /// @return | nil | No value is returned.
         methods.add_method("setRestitution", |_, this, restitution: f32| {
             let mut w = this.world.borrow_mut();
             if let Some(b) = w.get_body_mut(this.id) {
@@ -1845,7 +1801,6 @@ impl LuaUserData for LuaBody {
         // -- setLayer --
         /// Sets the body's collision layer bitmask (which layers this body belongs to).
         /// @param | layer | integer | Layer bitmask.
-        /// @return | nil | No value is returned.
         methods.add_method("setLayer", |_, this, layer: u32| {
             let mut w = this.world.borrow_mut();
             if let Some(b) = w.get_body_mut(this.id) {
@@ -1863,7 +1818,6 @@ impl LuaUserData for LuaBody {
         // -- setMask --
         /// Sets the body's collision mask (which layers this body can collide with).
         /// @param | mask | integer | Collision mask bitmask.
-        /// @return | nil | No value is returned.
         methods.add_method("setMask", |_, this, mask: u32| {
             let mut w = this.world.borrow_mut();
             if let Some(b) = w.get_body_mut(this.id) {
@@ -1875,7 +1829,6 @@ impl LuaUserData for LuaBody {
         /// Applies an instantaneous linear impulse to the body's center of mass.
         /// @param | ix | number | Impulse X component.
         /// @param | iy | number | Impulse Y component.
-        /// @return | nil | No value is returned.
         methods.add_method("applyImpulse", |_, this, (ix, iy): (f32, f32)| {
             this.world.borrow_mut().apply_impulse(this.id, ix, iy);
             Ok(())
@@ -1884,7 +1837,6 @@ impl LuaUserData for LuaBody {
         /// Applies a continuous force to the body's center of mass (accumulates over the step).
         /// @param | fx | number | Force X component.
         /// @param | fy | number | Force Y component.
-        /// @return | nil | No value is returned.
         methods.add_method("applyForce", |_, this, (fx, fy): (f32, f32)| {
             this.world.borrow_mut().apply_force(this.id, fx, fy);
             Ok(())
@@ -1892,7 +1844,6 @@ impl LuaUserData for LuaBody {
         // -- applyTorque --
         /// Applies a rotational torque to the body.
         /// @param | torque | number | Torque value (positive = counter-clockwise).
-        /// @return | nil | No value is returned.
         methods.add_method("applyTorque", |_, this, torque: f32| {
             this.world.borrow_mut().apply_torque(this.id, torque);
             Ok(())
@@ -1903,7 +1854,6 @@ impl LuaUserData for LuaBody {
         /// @param | fy | number | Force Y component.
         /// @param | px | number | Application point X in world coordinates.
         /// @param | py | number | Application point Y in world coordinates.
-        /// @return | nil | No return value.
         methods.add_method(
             "applyForceAtPoint",
             |_, this, (fx, fy, px, py): (f32, f32, f32, f32)| {
@@ -1916,7 +1866,6 @@ impl LuaUserData for LuaBody {
         // -- applyAngularImpulse --
         /// Applies an instantaneous angular impulse (spin) to the body.
         /// @param | impulse | number | Angular impulse value.
-        /// @return | nil | No value is returned.
         methods.add_method("applyAngularImpulse", |_, this, impulse: f32| {
             this.world
                 .borrow_mut()
@@ -1932,7 +1881,6 @@ impl LuaUserData for LuaBody {
         // -- setGravityScale --
         /// Sets a per-body gravity scale multiplier (0 = no gravity, 2 = double gravity, -1 = inverted).
         /// @param | scale | number | Gravity scale factor.
-        /// @return | nil | No value is returned.
         methods.add_method("setGravityScale", |_, this, scale: f32| {
             this.world.borrow_mut().set_gravity_scale(this.id, scale);
             Ok(())
@@ -1946,7 +1894,6 @@ impl LuaUserData for LuaBody {
         // -- setFixedRotation --
         /// Locks or unlocks the body's rotation. Useful for player characters.
         /// @param | fixed | boolean | True to prevent rotation.
-        /// @return | nil | No value is returned.
         methods.add_method("setFixedRotation", |_, this, fixed: bool| {
             this.world.borrow_mut().set_fixed_rotation(this.id, fixed);
             Ok(())
@@ -1960,7 +1907,6 @@ impl LuaUserData for LuaBody {
         // -- setLinearDamping --
         /// Sets the linear damping factor (higher = more velocity decay per step).
         /// @param | damping | number | Damping value (0 = no damping).
-        /// @return | nil | No value is returned.
         methods.add_method("setLinearDamping", |_, this, damping: f32| {
             this.world.borrow_mut().set_linear_damping(this.id, damping);
             Ok(())
@@ -1974,7 +1920,6 @@ impl LuaUserData for LuaBody {
         // -- setAngularDamping --
         /// Sets the angular damping factor (higher = rotation decays faster).
         /// @param | damping | number | Angular damping value.
-        /// @return | nil | No value is returned.
         methods.add_method("setAngularDamping", |_, this, damping: f32| {
             this.world
                 .borrow_mut()
@@ -1990,7 +1935,6 @@ impl LuaUserData for LuaBody {
         // -- setBullet --
         /// Enables or disables continuous collision detection to prevent fast-moving tunneling.
         /// @param | bullet | boolean | True to enable CCD.
-        /// @return | nil | No value is returned.
         methods.add_method("setBullet", |_, this, bullet: bool| {
             this.world.borrow_mut().set_bullet(this.id, bullet);
             Ok(())
@@ -2004,7 +1948,6 @@ impl LuaUserData for LuaBody {
         // -- setSleepingAllowed --
         /// Controls whether the body can enter sleep state. Disable for bodies that must stay active.
         /// @param | allowed | boolean | True to allow sleeping.
-        /// @return | nil | No value is returned.
         methods.add_method("setSleepingAllowed", |_, this, allowed: bool| {
             this.world
                 .borrow_mut()
@@ -2013,7 +1956,6 @@ impl LuaUserData for LuaBody {
         });
         // -- destroy --
         /// Destroys this body, removing it from the world along with all fixtures and joints.
-        /// @return | nil | No value is returned.
         methods.add_method("destroy", |_, this, ()| {
             this.world.borrow_mut().destroy_body(this.id);
             Ok(())
@@ -2026,14 +1968,12 @@ impl LuaUserData for LuaBody {
         });
         // -- wakeUp --
         /// Wakes the body from sleep, making it active in the simulation again.
-        /// @return | nil | No value is returned.
         methods.add_method("wakeUp", |_, this, ()| {
             this.world.borrow_mut().wake_up_body(this.id);
             Ok(())
         });
         // -- sleep --
         /// Forces the body into sleep state, pausing its simulation until disturbed.
-        /// @return | nil | No value is returned.
         methods.add_method("sleep", |_, this, ()| {
             this.world.borrow_mut().sleep_body(this.id);
             Ok(())
@@ -2145,7 +2085,6 @@ impl LuaUserData for LuaPhysicsShape {
         // -- setDensity --
         /// Sets the density used when this shape is attached to a body (affects mass calculation).
         /// @param | density | number | Mass density.
-        /// @return | nil | No value is returned.
         methods.add_method("setDensity", |_, this, density: f32| {
             this.inner.borrow_mut().density = density;
             Ok(())
@@ -2153,7 +2092,6 @@ impl LuaUserData for LuaPhysicsShape {
         // -- setFriction --
         /// Sets the friction coefficient for this shape.
         /// @param | friction | number | Friction (0 = ice, 1 = rubber).
-        /// @return | nil | No value is returned.
         methods.add_method("setFriction", |_, this, friction: f32| {
             this.inner.borrow_mut().friction = friction;
             Ok(())
@@ -2161,7 +2099,6 @@ impl LuaUserData for LuaPhysicsShape {
         // -- setRestitution --
         /// Sets the restitution (bounciness) for this shape.
         /// @param | restitution | number | Restitution (0\u20131).
-        /// @return | nil | No value is returned.
         methods.add_method("setRestitution", |_, this, restitution: f32| {
             this.inner.borrow_mut().restitution = restitution;
             Ok(())
@@ -2169,14 +2106,12 @@ impl LuaUserData for LuaPhysicsShape {
         // -- setSensor --
         /// Marks this shape as a sensor (overlap detection only, no physical response).
         /// @param | sensor | boolean | True for sensor mode.
-        /// @return | nil | No value is returned.
         methods.add_method("setSensor", |_, this, sensor: bool| {
             this.inner.borrow_mut().sensor = sensor;
             Ok(())
         });
         // -- destroy --
         /// No-op placeholder for API consistency. Shapes are freed when no longer referenced.
-        /// @return | nil | No value is returned.
         methods.add_method("destroy", |_, _this, ()| Ok(()));
         // -- type --
         /// Returns the type name of this object ("LPhysicsShape").
@@ -2230,7 +2165,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Steps a physics world forward by dt seconds (free-function variant).
     /// @param | world | LWorld | The world to step.
     /// @param | dt | number | Time step in seconds.
-    /// @return | nil | No return value.
     tbl.set(
         "step",
         lua.create_function(|_, (world_ud, dt): (LuaAnyUserData, f32)| {
@@ -2242,7 +2176,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- destroyWorld --
     /// No-op placeholder for API parity. Worlds are freed when no longer referenced.
     /// @param | world | LWorld | The world to destroy.
-    /// @return | nil | No return value.
     tbl.set(
         "destroyWorld",
         lua.create_function(|_, _world_ud: LuaAnyUserData| Ok(()))?,
@@ -2299,7 +2232,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | body | LBody | The body.
     /// @param | vx | number | Velocity X.
     /// @param | vy | number | Velocity Y.
-    /// @return | nil | No return value.
     tbl.set(
         "setBodyVelocity",
         lua.create_function(
@@ -2334,7 +2266,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | world | LWorld | The world.
     /// @param | body | LBody | The body.
     /// @param | allowed | boolean | True to allow sleeping.
-    /// @return | nil | No return value.
     tbl.set(
         "setSleepingAllowed",
         lua.create_function(
@@ -2428,7 +2359,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Attaches a previously created shape to a body, using the shape's stored material properties.
     /// @param | body | LBody | The target body.
     /// @param | shape | LPhysicsShape | The shape to attach.
-    /// @return | nil | No return value.
     tbl.set(
         "attachShape",
         lua.create_function(|_, (body_ud, shape_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -2450,6 +2380,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns all collision events from the last world step as {body_a, body_b} pairs.
     /// @param | world | LWorld | The world to query.
     /// @return | table | Array of collision event tables.
+    /// @field | body_a | integer | Body A id.
+    /// @field | body_b | integer | Body B id.
     tbl.set(
         "getCollisions",
         lua.create_function(|lua, world_ud: LuaAnyUserData| {
@@ -2460,10 +2392,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             for (i, contact) in events.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'body_a' operation.
-                /// @return | nil | No value is returned.
                 entry.set("body_a", contact.body_a)?;
                 /// Performs the 'body_b' operation.
-                /// @return | nil | No value is returned.
                 entry.set("body_b", contact.body_b)?;
                 tbl.set(i + 1, entry)?;
             }
@@ -2473,7 +2403,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- debugDraw --
     /// Enables or disables automatic physics debug overlay rendering for the next frame.
     /// @param | enable | boolean | True to show debug shapes.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "debugDraw",
@@ -2486,7 +2415,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Queues a GPU-rendered physics debug visualization using the world's current body state.
     /// @param | world | LWorld | The world to visualize.
     /// @param | config | table? | Optional config: {bodyColor, staticColor, sleepColor, sensorColor, lineWidth}.
-    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set(
         "drawDebugGpu",
@@ -2582,22 +2510,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
     /// Cell type constant: air — passable empty cell for cellular simulation.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_AIR", CellType::Air as u8)?;
     /// Cell type constant: sand — granular solid that falls and piles.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_SAND", CellType::Sand as u8)?;
     /// Cell type constant: water — liquid that flows and spreads.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_WATER", CellType::Water as u8)?;
     /// Cell type constant: rock — immovable solid barrier.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_ROCK", CellType::Rock as u8)?;
     /// Cell type constant: fire — active combustion that spreads and consumes.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_FIRE", CellType::Fire as u8)?;
     /// Cell type constant: gas — diffusing vapor that rises.
-    /// @return | nil | No value is returned.
     tbl.set("CELL_GAS", CellType::Gas as u8)?;
     // -- testAABB --
     /// Tests whether two axis-aligned bounding boxes overlap. Lightweight collision check without physics world.
@@ -2679,7 +2601,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
     /// Performs the 'physics' operation.
-    /// @return | nil | No value is returned.
     luna.set("physics", tbl)?;
     Ok(())
 }

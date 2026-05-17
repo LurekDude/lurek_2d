@@ -64,18 +64,18 @@ impl LuaUserData for LuaProvinceGrid {
         // -- adjacencies --
         /// Returns province adjacency records and shared border pixel counts.
         /// @return | table | Array table with `province_a`, `province_b`, and `border_pixels` fields.
+    /// @field | province_a | integer | First province id.
+    /// @field | province_b | integer | Second province id.
+    /// @field | border_pixels | integer | Number of shared border pixels.
         methods.add_method("adjacencies", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, &(a, b, bp)) in this.inner.adjacencies().iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'province_a' operation.
-                /// @return | nil | No value is returned.
                 entry.set("province_a", a)?;
                 /// Performs the 'province_b' operation.
-                /// @return | nil | No value is returned.
                 entry.set("province_b", b)?;
                 /// Performs the 'border_pixels' operation.
-                /// @return | nil | No value is returned.
                 entry.set("border_pixels", bp)?;
                 t.set(i + 1, entry)?;
             }
@@ -84,21 +84,21 @@ impl LuaUserData for LuaProvinceGrid {
         // -- provinceSpans --
         /// Returns horizontal province spans by row.
         /// @return | table | Array table with `province_id`, `y`, `x0`, and `x1` fields.
+    /// @field | province_id | integer | Province id.
+    /// @field | y | integer | Scanline y coordinate.
+    /// @field | x0 | integer | Start x coordinate.
+    /// @field | x1 | integer | End x coordinate.
         methods.add_method("provinceSpans", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, (id, y, x0, x1)) in this.inner.province_spans().into_iter().enumerate() {
                 let row = lua.create_table()?;
                 /// Performs the 'province_id' operation.
-                /// @return | nil | No value is returned.
                 row.set("province_id", id)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 row.set("y", y)?;
                 /// Performs the 'x0' operation.
-                /// @return | nil | No value is returned.
                 row.set("x0", x0)?;
                 /// Performs the 'x1' operation.
-                /// @return | nil | No value is returned.
                 row.set("x1", x1)?;
                 t.set(i + 1, row)?;
             }
@@ -107,28 +107,28 @@ impl LuaUserData for LuaProvinceGrid {
         // -- borderSegments --
         /// Returns border line segments between neighboring provinces.
         /// @return | table | Array table with province ids and segment coordinates.
+    /// @field | province_a | integer | First province id.
+    /// @field | province_b | integer | Second province id.
+    /// @field | x0 | number | Segment start x.
+    /// @field | y0 | number | Segment start y.
+    /// @field | x1 | number | Segment end x.
+    /// @field | y1 | number | Segment end y.
         methods.add_method("borderSegments", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, (a, b, x0, y0, x1, y1)) in this.inner.border_segments().into_iter().enumerate()
             {
                 let seg = lua.create_table()?;
                 /// Performs the 'province_a' operation.
-                /// @return | nil | No value is returned.
                 seg.set("province_a", a)?;
                 /// Performs the 'province_b' operation.
-                /// @return | nil | No value is returned.
                 seg.set("province_b", b)?;
                 /// Performs the 'x0' operation.
-                /// @return | nil | No value is returned.
                 seg.set("x0", x0)?;
                 /// Performs the 'y0' operation.
-                /// @return | nil | No value is returned.
                 seg.set("y0", y0)?;
                 /// Performs the 'x1' operation.
-                /// @return | nil | No value is returned.
                 seg.set("x1", x1)?;
                 /// Performs the 'y1' operation.
-                /// @return | nil | No value is returned.
                 seg.set("y1", y1)?;
                 t.set(i + 1, seg)?;
             }
@@ -137,6 +137,8 @@ impl LuaUserData for LuaProvinceGrid {
         // -- getPolygons --
         /// Returns polygon rings for every province.
         /// @return | table | Array table of province polygon records with `province_id` and `rings` fields.
+    /// @field | province_id | integer | Province id.
+    /// @field | rings | table | Array of rings; each ring is an array of [x, y] pairs.
         methods.add_method("getPolygons", |lua, this, ()| {
             let map = this.inner.province_polygons();
             let out = lua.create_table()?;
@@ -144,7 +146,6 @@ impl LuaUserData for LuaProvinceGrid {
             for (id, rings) in &map {
                 let entry = lua.create_table()?;
                 /// Performs the 'province_id' operation.
-                /// @return | nil | No value is returned.
                 entry.set("province_id", *id)?;
                 let rings_tbl = lua.create_table()?;
                 for (ri, ring) in rings.iter().enumerate() {
@@ -158,7 +159,6 @@ impl LuaUserData for LuaProvinceGrid {
                     rings_tbl.set(ri + 1, pts)?;
                 }
                 /// Performs the 'rings' operation.
-                /// @return | nil | No value is returned.
                 entry.set("rings", rings_tbl)?;
                 out.set(idx, entry)?;
                 idx += 1;
@@ -168,6 +168,8 @@ impl LuaUserData for LuaProvinceGrid {
         // -- getPolygonsSimplified --
         /// Returns simplified polygon rings for every province.
         /// @return | table | Array table of simplified province polygon records with `province_id` and `rings` fields.
+    /// @field | province_id | integer | Province id.
+    /// @field | rings | table | Array of simplified rings; each ring is an array of [x, y] pairs.
         methods.add_method("getPolygonsSimplified", |lua, this, ()| {
             let map = this.inner.province_polygons_simplified();
             let out = lua.create_table()?;
@@ -175,7 +177,6 @@ impl LuaUserData for LuaProvinceGrid {
             for (id, rings) in &map {
                 let entry = lua.create_table()?;
                 /// Performs the 'province_id' operation.
-                /// @return | nil | No value is returned.
                 entry.set("province_id", *id)?;
                 let rings_tbl = lua.create_table()?;
                 for (ri, ring) in rings.iter().enumerate() {
@@ -189,7 +190,6 @@ impl LuaUserData for LuaProvinceGrid {
                     rings_tbl.set(ri + 1, pts)?;
                 }
                 /// Performs the 'rings' operation.
-                /// @return | nil | No value is returned.
                 entry.set("rings", rings_tbl)?;
                 out.set(idx, entry)?;
                 idx += 1;
@@ -353,47 +353,35 @@ impl LuaUserData for LuaProvinceGrid {
                 for (i, (id, y, x0, x1)) in spans.into_iter().enumerate() {
                     let row = lua.create_table()?;
                     /// Performs the 'province_id' operation.
-                    /// @return | nil | No value is returned.
                     row.set("province_id", id)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     row.set("y", y)?;
                     /// Performs the 'x0' operation.
-                    /// @return | nil | No value is returned.
                     row.set("x0", x0)?;
                     /// Performs the 'x1' operation.
-                    /// @return | nil | No value is returned.
                     row.set("x1", x1)?;
                     spans_tbl.set(i + 1, row)?;
                 }
                 /// Performs the 'spans' operation.
-                /// @return | nil | No value is returned.
                 result.set("spans", spans_tbl)?;
                 let segs_tbl = lua.create_table()?;
                 for (i, (a, b, x0, y0, x1, y1)) in segs.into_iter().enumerate() {
                     let seg = lua.create_table()?;
                     /// Performs the 'province_a' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("province_a", a)?;
                     /// Performs the 'province_b' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("province_b", b)?;
                     /// Performs the 'x0' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("x0", x0)?;
                     /// Performs the 'y0' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("y0", y0)?;
                     /// Performs the 'x1' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("x1", x1)?;
                     /// Performs the 'y1' operation.
-                    /// @return | nil | No value is returned.
                     seg.set("y1", y1)?;
                     segs_tbl.set(i + 1, seg)?;
                 }
                 /// Performs the 'segments' operation.
-                /// @return | nil | No value is returned.
                 result.set("segments", segs_tbl)?;
                 Ok(LuaValue::Table(result))
             } else {
@@ -577,7 +565,6 @@ impl LuaUserData for LuaLayeredImage {
         // -- save --
         /// Saves the layered image stack to a file.
         /// @param | path | string | Output path.
-        /// @return | nil | No value is returned.
         methods.add_method("save", |_, this, path: String| {
             serial::save_layered(&this.inner, &path).map_err(LuaError::external)
         });
@@ -748,7 +735,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Saves an image data object to a path under the current game directory.
     /// @param | img_ud | LImageData | Image data handle to save.
     /// @param | filename | string | Output filename relative to game directory.
-    /// @return | nil | No value is returned.
     tbl.set(
         "saveImage",
         lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
@@ -767,7 +753,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Encodes image data as PNG and writes it under the current game directory.
     /// @param | img_ud | LImageData | Image data handle to encode.
     /// @param | filename | string | Output filename relative to game directory.
-    /// @return | nil | No value is returned.
     tbl.set(
         "savePNG",
         lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
@@ -866,7 +851,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'image' operation.
-    /// @return | nil | No value is returned.
     lurek.set("image", tbl)?;
     Ok(())
 }
@@ -916,7 +900,6 @@ impl mlua::UserData for ImageData {
         /// @param | g | integer | Green channel.
         /// @param | b | integer | Blue channel.
         /// @param | a | integer | Alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setPixel",
             |_, this, (x, y, r, g, b, a): (u32, u32, u8, u8, u8, u8)| {
@@ -951,7 +934,6 @@ impl mlua::UserData for ImageData {
         // -- mapPixel --
         /// Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
         /// @param | func | function | Callback receiving `(x, y, r, g, b, a)` and returning replacement channels.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("mapPixel", |_, this, func: LuaFunction| {
             let w = this.width();
             let h = this.height();
@@ -971,7 +953,6 @@ impl mlua::UserData for ImageData {
         // -- brightness --
         /// Applies a brightness factor to this image in place.
         /// @param | factor | number | Brightness multiplier or adjustment factor.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("brightness", |_, this, factor: f32| {
             this.brightness(factor);
             Ok(())
@@ -979,7 +960,6 @@ impl mlua::UserData for ImageData {
         // -- contrast --
         /// Applies a contrast factor to this image in place.
         /// @param | factor | number | Contrast factor.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("contrast", |_, this, factor: f32| {
             this.contrast(factor);
             Ok(())
@@ -987,7 +967,6 @@ impl mlua::UserData for ImageData {
         // -- saturation --
         /// Applies a saturation factor to this image in place.
         /// @param | factor | number | Saturation factor.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("saturation", |_, this, factor: f32| {
             this.saturation(factor);
             Ok(())
@@ -995,7 +974,6 @@ impl mlua::UserData for ImageData {
         // -- gamma --
         /// Applies gamma correction to this image in place.
         /// @param | gamma | number | Gamma value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("gamma", |_, this, gamma: f32| {
             this.gamma(gamma);
             Ok(())
@@ -1006,7 +984,6 @@ impl mlua::UserData for ImageData {
         /// @param | tg | integer | Tint green channel.
         /// @param | tb | integer | Tint blue channel.
         /// @param | factor | number | Tint blend factor.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "tint",
             |_, this, (tr, tg, tb, factor): (u8, u8, u8, f32)| {
@@ -1016,21 +993,18 @@ impl mlua::UserData for ImageData {
         );
         // -- grayscale --
         /// Converts this image to grayscale in place.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("grayscale", |_, this, ()| {
             this.grayscale();
             Ok(())
         });
         // -- sepia --
         /// Applies a sepia filter to this image in place.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("sepia", |_, this, ()| {
             this.sepia();
             Ok(())
         });
         // -- invert --
         /// Inverts image color channels in place.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("invert", |_, this, ()| {
             this.invert();
             Ok(())
@@ -1038,7 +1012,6 @@ impl mlua::UserData for ImageData {
         // -- threshold --
         /// Applies a threshold filter to this image in place.
         /// @param | value | integer | Threshold channel value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("threshold", |_, this, value: u8| {
             this.threshold(value);
             Ok(())
@@ -1046,7 +1019,6 @@ impl mlua::UserData for ImageData {
         // -- posterize --
         /// Reduces image colors to a fixed number of levels in place.
         /// @param | levels | integer | Number of posterization levels.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("posterize", |_, this, levels: u8| {
             this.posterize(levels);
             Ok(())
@@ -1057,7 +1029,6 @@ impl mlua::UserData for ImageData {
         /// @param | g | integer | Green channel.
         /// @param | b | integer | Blue channel.
         /// @param | a | integer | Alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("fill", |_, this, (r, g, b, a): (u8, u8, u8, u8)| {
             this.fill(r, g, b, a);
             Ok(())
@@ -1065,7 +1036,6 @@ impl mlua::UserData for ImageData {
         // -- noise --
         /// Adds noise to this image in place. This method is available to Lua scripts.
         /// @param | amount | integer | Noise amount.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("noise", |_, this, amount: u8| {
             this.noise(amount);
             Ok(())
@@ -1073,21 +1043,18 @@ impl mlua::UserData for ImageData {
         // -- alphaMask --
         /// Multiplies this image alpha channel by a factor in place.
         /// @param | factor | number | Alpha multiplier.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("alphaMask", |_, this, factor: f32| {
             this.alpha_mask(factor);
             Ok(())
         });
         // -- flipHorizontal --
         /// Flips this image horizontally in place.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("flipHorizontal", |_, this, ()| {
             this.flip_horizontal();
             Ok(())
         });
         // -- flipVertical --
         /// Flips this image vertically in place.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("flipVertical", |_, this, ()| {
             this.flip_vertical();
             Ok(())
@@ -1151,7 +1118,6 @@ impl mlua::UserData for ImageData {
         /// @param | g | integer | Green channel.
         /// @param | b | integer | Blue channel.
         /// @param | a | integer | Alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawRect",
             |_, this, (x, y, w, h, r, g, b, a): (i32, i32, u32, u32, u8, u8, u8, u8)| {
@@ -1168,7 +1134,6 @@ impl mlua::UserData for ImageData {
         /// @param | g | integer | Green channel.
         /// @param | b | integer | Blue channel.
         /// @param | a | integer | Alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawCircle",
             |_, this, (cx, cy, radius, r, g, b, a): (i32, i32, u32, u8, u8, u8, u8)| {
@@ -1186,7 +1151,6 @@ impl mlua::UserData for ImageData {
         /// @param | g | integer | Green channel.
         /// @param | b | integer | Blue channel.
         /// @param | a | integer | Alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawLine",
             |_, this, (x0, y0, x1, y1, r, g, b, a): (i32, i32, i32, i32, u8, u8, u8, u8)| {
@@ -1249,7 +1213,6 @@ impl mlua::UserData for ImageData {
         /// @param | src_ud | LImageData | Source image data handle.
         /// @param | dst_x | integer | Destination x coordinate.
         /// @param | dst_y | integer | Destination y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "blit",
             |_, this, (src_ud, dst_x, dst_y): (LuaAnyUserData, i32, i32)| {
@@ -1274,7 +1237,6 @@ impl mlua::UserData for ImageData {
         /// @param | inset_right | integer | Right inset width.
         /// @param | inset_top | integer | Top inset height.
         /// @param | inset_bottom | integer | Bottom inset height.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "drawNineSlice",
             |_,
@@ -1361,7 +1323,6 @@ impl mlua::UserData for ImageData {
         // -- mapPixels --
         /// Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
         /// @param | func | function | Callback receiving `(x, y, r, g, b, a)` and returning replacement channels.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("mapPixels", |_, this, func: LuaFunction| {
             let w = this.width();
             let h = this.height();
@@ -1395,7 +1356,6 @@ impl mlua::UserData for ImageData {
         // -- applyPaletteLut --
         /// Applies a palette lookup table to this image in place.
         /// @param | lut_ud | LPaletteLUT | Palette lookup table handle.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("applyPaletteLut", |_, this, lut_ud: LuaAnyUserData| {
             let lut = lut_ud.borrow::<LuaPaletteLUT>()?;
             lut.inner.apply(this);
@@ -1404,7 +1364,6 @@ impl mlua::UserData for ImageData {
         // -- setRawData --
         /// Replaces the image byte buffer with raw bytes.
         /// @param | bytes | string | Raw byte string matching the image storage size.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setRawData", |_, this, bytes: LuaString| {
             this.set_raw_data(bytes.as_bytes())
                 .map_err(LuaError::RuntimeError)
@@ -1414,7 +1373,6 @@ impl mlua::UserData for ImageData {
         /// @param | src_ud | LImageData | Source image data handle.
         /// @param | dx | integer | Destination x coordinate.
         /// @param | dy | integer | Destination y coordinate.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "paste",
             |_, this, (src_ud, dx, dy): (LuaAnyUserData, u32, u32)| {
@@ -1454,7 +1412,6 @@ impl LuaUserData for LuaPaletteLUT {
         /// @param | tg | integer | Destination green channel.
         /// @param | tb | integer | Destination blue channel.
         /// @param | ta | integer | Destination alpha channel.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "setColor",
             |_, this, (fr, fg, fb, fa, tr, tg, tb, ta): (u8, u8, u8, u8, u8, u8, u8, u8)| {
@@ -1484,7 +1441,6 @@ impl LuaUserData for LuaPaletteLUT {
         });
         // -- clear --
         /// Removes every color mapping from this palette lookup table.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -1492,7 +1448,6 @@ impl LuaUserData for LuaPaletteLUT {
         // -- cycle --
         /// Cycles palette mappings by an offset.
         /// @param | offset | integer | Mapping offset.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("cycle", |_, this, offset: i32| {
             this.inner.cycle_to_colors(offset);
             Ok(())

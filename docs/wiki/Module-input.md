@@ -15,28 +15,28 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.input.advancePlayback() -> table](#lurekinputadvanceplayback-table)
-  - [lurek.input.bind(action: string, keys: LuaValue)](#lurekinputbindaction-string-keys-luavalue)
+  - [lurek.input.bind(action: string, keys: string)](#lurekinputbindaction-string-keys-string)
   - [lurek.input.clearBindings()](#lurekinputclearbindings)
   - [lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number](#lurekinputgamepadgetaxisid-integer-axis-integer-number)
   - [lurek.input.gamepad.getAxisCount(id: integer) -> integer](#lurekinputgamepadgetaxiscountid-integer-integer)
   - [lurek.input.gamepad.getBackgroundEvents() -> boolean](#lurekinputgamepadgetbackgroundevents-boolean)
-  - [lurek.input.getBindings() -> table](#lurekinputgetbindings-table)
+  - [lurek.input.getBindings() -> string[]](#lurekinputgetbindings-string)
   - [lurek.input.gamepad.getButtonCount(id: integer) -> integer](#lurekinputgamepadgetbuttoncountid-integer-integer)
   - [lurek.input.gamepad.getCount() -> integer](#lurekinputgamepadgetcount-integer)
   - [lurek.input.mouse.getCursor() -> string](#lurekinputmousegetcursor-string)
-  - [lurek.input.gamepad.getGamepadMappingString(guid: string) -> LuaValue](#lurekinputgamepadgetgamepadmappingstringguid-string-luavalue)
+  - [lurek.input.gamepad.getGamepadMappingString(guid: string) -> string](#lurekinputgamepadgetgamepadmappingstringguid-string-string)
   - [lurek.input.gamepad.getGUID(id: integer) -> string](#lurekinputgamepadgetguidid-integer-string)
   - [lurek.input.gamepad.getHat(id: integer, hat: integer) -> string](#lurekinputgamepadgethatid-integer-hat-integer-string)
   - [lurek.input.gamepad.getJoystickCount() -> integer](#lurekinputgamepadgetjoystickcount-integer)
-  - [lurek.input.gamepad.getJoysticks() -> table](#lurekinputgamepadgetjoysticks-table)
-  - [lurek.input.keyboard.getKeyFromScancode(scancode: string) -> LuaValue](#lurekinputkeyboardgetkeyfromscancodescancode-string-luavalue)
+  - [lurek.input.gamepad.getJoysticks() -> integer[]](#lurekinputgamepadgetjoysticks-integer)
+  - [lurek.input.keyboard.getKeyFromScancode(scancode: string) -> string](#lurekinputkeyboardgetkeyfromscancodescancode-string-string)
   - [lurek.input.gamepad.getName(id: integer) -> string](#lurekinputgamepadgetnameid-integer-string)
   - [lurek.input.getPlaybackFrame() -> integer](#lurekinputgetplaybackframe-integer)
   - [lurek.input.mouse.getPosition() -> number](#lurekinputmousegetposition-number)
   - [lurek.input.touch.getPosition(id: integer) -> number](#lurekinputtouchgetpositionid-integer-number)
   - [lurek.input.touch.getPressure(id: integer) -> number](#lurekinputtouchgetpressureid-integer-number)
   - [lurek.input.mouse.getRelativeMode() -> boolean](#lurekinputmousegetrelativemode-boolean)
-  - [lurek.input.keyboard.getScancodeFromKey(key: string) -> LuaValue](#lurekinputkeyboardgetscancodefromkeykey-string-luavalue)
+  - [lurek.input.keyboard.getScancodeFromKey(key: string) -> string](#lurekinputkeyboardgetscancodefromkeykey-string-string)
   - [lurek.input.mouse.getSystemCursor(name: string) -> LCursor](#lurekinputmousegetsystemcursorname-string-lcursor)
   - [lurek.input.touch.getTouchCount() -> integer](#lurekinputtouchgettouchcount-integer)
   - [lurek.input.touch.getTouches() -> table](#lurekinputtouchgettouches-table)
@@ -62,12 +62,12 @@
   - [lurek.input.mouse.isVisible() -> boolean](#lurekinputmouseisvisible-boolean)
   - [lurek.input.gamepad.loadGamepadMappings(path: string)](#lurekinputgamepadloadgamepadmappingspath-string)
   - [lurek.input.loadRecording(json: string)](#lurekinputloadrecordingjson-string)
-  - [lurek.input.newCombo(steps_val: table, [opts]: table) -> LCombo](#lurekinputnewcombostepsval-table-opts-table-lcombo)
+  - [lurek.input.newCombo(steps: table, [opts]: table) -> LCombo](#lurekinputnewcombosteps-table-opts-table-lcombo)
   - [lurek.input.mouse.newCursor(pixels: table, width: integer, height: integer, [hotx]: integer, [hoty]: integer) -> LCursor](#lurekinputmousenewcursorpixels-table-width-integer-height-integer-hotx-integer-hoty-integer-lcursor)
-  - [lurek.input.newMapping(name: string, keys: LuaValue) -> table](#lurekinputnewmappingname-string-keys-luavalue-table)
+  - [lurek.input.newMapping(name: string, keys: string) -> table](#lurekinputnewmappingname-string-keys-string-table)
   - [lurek.input.gamepad.saveGamepadMappings(path: string)](#lurekinputgamepadsavegamepadmappingspath-string)
   - [lurek.input.gamepad.setBackgroundEvents(enable: boolean)](#lurekinputgamepadsetbackgroundeventsenable-boolean)
-  - [lurek.input.mouse.setCursor(cursor_val: any)](#lurekinputmousesetcursorcursorval-any)
+  - [lurek.input.mouse.setCursor(cursor: LCursor)](#lurekinputmousesetcursorcursor-lcursor)
   - [lurek.input.gamepad.setGamepadMapping(guid: string, mapping: string)](#lurekinputgamepadsetgamepadmappingguid-string-mapping-string)
   - [lurek.input.mouse.setGrabbed(grabbed: boolean)](#lurekinputmousesetgrabbedgrabbed-boolean)
   - [lurek.input.keyboard.setKeyRepeat(enabled: boolean)](#lurekinputkeyboardsetkeyrepeatenabled-boolean)
@@ -79,7 +79,7 @@
   - [lurek.input.startPlayback()](#lurekinputstartplayback)
   - [lurek.input.startRecording()](#lurekinputstartrecording)
   - [lurek.input.stopPlayback()](#lurekinputstopplayback)
-  - [lurek.input.stopRecording() -> LuaValue](#lurekinputstoprecording-luavalue)
+  - [lurek.input.stopRecording() -> LInputRecording](#lurekinputstoprecording-linputrecording)
   - [lurek.input.unbind(action: string) -> boolean](#lurekinputunbindaction-string-boolean)
   - [lurek.input.gamepad.vibrate(id: integer, low_freq: number, high_freq: number, duration_ms: number) -> boolean](#lurekinputgamepadvibrateid-integer-lowfreq-number-highfreq-number-durationms-number-boolean)
   - [lurek.input.gamepad.virtualDpad(x: number, y: number, [deadzone]: number) -> table](#lurekinputgamepadvirtualdpadx-number-y-number-deadzone-number-table)
@@ -97,7 +97,7 @@
 - [Types and Methods](#types-and-methods)
   - [LCombo](#lcombo)
   - [LCombo:feed(key: string) -> string](#lcombofeedkey-string-string)
-  - [LCombo:getStep(index: integer) -> LuaValue](#lcombogetstepindex-integer-luavalue)
+  - [LCombo:getStep(index: integer) -> table](#lcombogetstepindex-integer-table)
   - [LCombo:isInProgress() -> boolean](#lcomboisinprogress-boolean)
   - [LCombo:progress() -> integer](#lcomboprogress-integer)
   - [LCombo:reset()](#lcomboreset)
@@ -201,22 +201,22 @@ end
 
 ```lua
 lurek.input.advancePlayback() -> table -- Advances playback by one frame and returns events for that frame.
-lurek.input.bind(action: string, keys: LuaValue) -- Adds one or more keyboard/gamepad bindings to an action.
-lurek.input.clearBindings() -- Removes all action bindings. This function is exposed to Lua scripts.
-lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number -- Returns a gamepad axis value. This function is exposed to Lua scripts.
+lurek.input.bind(action: string, keys: string) -- Adds one or more keyboard/gamepad bindings to an action.
+lurek.input.clearBindings() -- Removes all action bindings from the map.
+lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number -- Returns a gamepad axis value by index.
 lurek.input.gamepad.getAxisCount(id: integer) -> integer -- Returns the axis count for a gamepad.
 lurek.input.gamepad.getBackgroundEvents() -> boolean -- Returns whether background gamepad event processing is enabled.
-lurek.input.getBindings() -> table -- Returns all action bindings. This function is exposed to Lua scripts.
+lurek.input.getBindings() -> string[] -- Returns all registered action bindings.
 lurek.input.gamepad.getButtonCount(id: integer) -> integer -- Returns the button count for a gamepad.
 lurek.input.gamepad.getCount() -> integer -- Returns the number of gamepad slots tracked by the runtime.
 lurek.input.mouse.getCursor() -> string -- Returns the current system cursor name.
-lurek.input.gamepad.getGamepadMappingString(guid: string) -> LuaValue -- Returns a stored mapping string for a gamepad GUID.
+lurek.input.gamepad.getGamepadMappingString(guid: string) -> string -- Returns a stored mapping string for a gamepad GUID.
 lurek.input.gamepad.getGUID(id: integer) -> string -- Returns the GUID string for a gamepad.
 lurek.input.gamepad.getHat(id: integer, hat: integer) -> string -- Returns hat direction for a gamepad hat index.
 lurek.input.gamepad.getJoystickCount() -> integer -- Returns the number of joystick slots tracked by the runtime.
-lurek.input.gamepad.getJoysticks() -> table -- Returns ids for currently connected gamepads.
-lurek.input.keyboard.getKeyFromScancode(scancode: string) -> LuaValue -- Converts a scancode name to its key name when known.
-lurek.input.gamepad.getName(id: integer) -> string -- Returns a gamepad display name. This function is exposed to Lua scripts.
+lurek.input.gamepad.getJoysticks() -> integer[] -- Returns ids for currently connected gamepads.
+lurek.input.keyboard.getKeyFromScancode(scancode: string) -> string -- Converts a scancode name to its key name when known.
+lurek.input.gamepad.getName(id: integer) -> string -- Returns a gamepad display name by its id.
 lurek.input.getPlaybackFrame() -> integer -- Returns the current playback frame index.
 -- ... 62 more module functions
 ```
@@ -227,7 +227,7 @@ lurek.input.getPlaybackFrame() -> integer -- Returns the current playback frame 
 
 Advances playback by one frame and returns events for that frame.
 
-**Returns**: `table` - Array table of event records with `kind` and `name` fields.
+**Returns**: `table` - Array of event records with `kind` and `name` fields.
 
 #### Example
 
@@ -246,14 +246,14 @@ do
 end
 ```
 
-### `lurek.input.bind(action: string, keys: LuaValue)`
+### `lurek.input.bind(action: string, keys: string)`
 
 Adds one or more keyboard/gamepad bindings to an action.
 
 **Parameters**
 
 - `action` (`string`, required) - Action name.
-- `keys` (`LuaValue`, required) - Binding string or array table of binding strings.
+- `keys` (`string`, required) - Binding string or array table of binding strings.
 
 #### Example
 
@@ -275,7 +275,7 @@ end
 
 ### `lurek.input.clearBindings()`
 
-Removes all action bindings. This function is exposed to Lua scripts.
+Removes all action bindings from the map.
 
 #### Example
 
@@ -293,7 +293,7 @@ end
 
 ### `lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number`
 
-Returns a gamepad axis value. This function is exposed to Lua scripts.
+Returns a gamepad axis value by index.
 
 **Parameters**
 
@@ -389,11 +389,11 @@ do
 end
 ```
 
-### `lurek.input.getBindings() -> table`
+### `lurek.input.getBindings() -> string[]`
 
-Returns all action bindings. This function is exposed to Lua scripts.
+Returns all registered action bindings.
 
-**Returns**: `table` - Map table from action names to arrays of binding strings.
+**Returns**: `string[]` - Map table from action names to arrays of binding strings.
 
 #### Example
 
@@ -506,7 +506,7 @@ do
     -- dx is for horizontal scroll wheels or trackpad gestures
 ```
 
-### `lurek.input.gamepad.getGamepadMappingString(guid: string) -> LuaValue`
+### `lurek.input.gamepad.getGamepadMappingString(guid: string) -> string`
 
 Returns a stored mapping string for a gamepad GUID.
 
@@ -514,7 +514,7 @@ Returns a stored mapping string for a gamepad GUID.
 
 - `guid` (`string`, required) - Gamepad GUID.
 
-**Returns**: `LuaValue` - Mapping string, or nil when no mapping exists.
+**Returns**: `string` - Mapping string, or nil when no mapping exists.
 
 #### Example
 
@@ -639,11 +639,11 @@ do
   end
 ```
 
-### `lurek.input.gamepad.getJoysticks() -> table`
+### `lurek.input.gamepad.getJoysticks() -> integer[]`
 
 Returns ids for currently connected gamepads.
 
-**Returns**: `table` - Array table of connected gamepad ids.
+**Returns**: `integer[]` - Array table of connected gamepad ids.
 
 #### Example
 
@@ -669,7 +669,7 @@ do
     lurek.log.warn("player 1 controller not connected", "input")
 ```
 
-### `lurek.input.keyboard.getKeyFromScancode(scancode: string) -> LuaValue`
+### `lurek.input.keyboard.getKeyFromScancode(scancode: string) -> string`
 
 Converts a scancode name to its key name when known.
 
@@ -677,7 +677,7 @@ Converts a scancode name to its key name when known.
 
 - `scancode` (`string`, required) - Scancode name.
 
-**Returns**: `LuaValue` - Key string, or nil when unknown.
+**Returns**: `string` - Key string, or nil when unknown.
 
 #### Example
 
@@ -704,7 +704,7 @@ do
 
 ### `lurek.input.gamepad.getName(id: integer) -> string`
 
-Returns a gamepad display name. This function is exposed to Lua scripts.
+Returns a gamepad display name by its id.
 
 **Parameters**
 
@@ -791,7 +791,7 @@ end
 
 ### `lurek.input.touch.getPosition(id: integer) -> number`
 
-Returns the position of a touch id. This function is exposed to Lua scripts.
+Returns the position of a touch point by id.
 
 **Parameters**
 
@@ -816,7 +816,7 @@ end
 
 ### `lurek.input.touch.getPressure(id: integer) -> number`
 
-Returns pressure for a touch id. This function is exposed to Lua scripts.
+Returns pressure for a touch point by its id.
 
 **Parameters**
 
@@ -878,7 +878,7 @@ do
   lurek.log.debug("cursor warped to center (" .. cx .. "," .. cy .. ")", "input")
 ```
 
-### `lurek.input.keyboard.getScancodeFromKey(key: string) -> LuaValue`
+### `lurek.input.keyboard.getScancodeFromKey(key: string) -> string`
 
 Converts a key name to its scancode name when known.
 
@@ -886,7 +886,7 @@ Converts a key name to its scancode name when known.
 
 - `key` (`string`, required) - Key name.
 
-**Returns**: `LuaValue` - Scancode string, or nil when unknown.
+**Returns**: `string` - Scancode string, or nil when unknown.
 
 #### Example
 
@@ -1287,9 +1287,9 @@ end
 
 ### `lurek.input.isDown() -> boolean`
 
-Returns true if down for Lua scripts in this module.
+Returns whether any bound key for this mapping is currently down.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True when any bound key is down.
 
 #### Example
 
@@ -1668,14 +1668,14 @@ do
 end
 ```
 
-### `lurek.input.newCombo(steps_val: table, [opts]: table) -> LCombo`
+### `lurek.input.newCombo(steps: table, [opts]: table) -> LCombo`
 
 Creates a combo detector from string steps or step tables with optional timing.
 
 **Parameters**
 
-- `steps_val` (`table`, required) - Array table of key strings or `{key, gap}` step tables.
-- `opts` (`table`, optional) - Optional table with `total_gap` in milliseconds.
+- `steps` (`table`, required) - Array table of key strings or `{key, gap}` step tables.
+- `opts` (`table`, optional) - Options table with `total_gap` in milliseconds.
 
 **Returns**: `LCombo` - New combo detector handle.
 
@@ -1736,14 +1736,14 @@ do
     -- Switch to crosshair when aiming
 ```
 
-### `lurek.input.newMapping(name: string, keys: LuaValue) -> table`
+### `lurek.input.newMapping(name: string, keys: string) -> table`
 
 Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
 
 **Parameters**
 
 - `name` (`string`, required) - Action name.
-- `keys` (`LuaValue`, required) - Binding string or array table of binding strings.
+- `keys` (`string`, required) - Binding string or array table of binding strings.
 
 **Returns**: `table` - Mapping table with action query closures.
 
@@ -1833,13 +1833,13 @@ end
 do
 ```
 
-### `lurek.input.mouse.setCursor(cursor_val: any)`
+### `lurek.input.mouse.setCursor(cursor: LCursor)`
 
 Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
 
 **Parameters**
 
-- `cursor_val` (`any`, required) - `LCursor`, system cursor string, or nil.
+- `cursor` (`LCursor`, required) - `LCursor`, system cursor string, or nil.
 
 #### Example
 
@@ -1997,7 +1997,7 @@ end
 
 ### `lurek.input.mouse.setRelativeMode(relative: boolean)`
 
-Sets relative mouse mode. This function is exposed to Lua scripts.
+Sets the relative mouse input mode state.
 
 **Parameters**
 
@@ -2098,7 +2098,7 @@ do
 
 ### `lurek.input.mouse.setVisible(visible: boolean)`
 
-Sets mouse cursor visibility. This function is exposed to Lua scripts.
+Sets the mouse cursor visibility state.
 
 **Parameters**
 
@@ -2176,11 +2176,11 @@ do
 end
 ```
 
-### `lurek.input.stopRecording() -> LuaValue`
+### `lurek.input.stopRecording() -> LInputRecording`
 
 Stops input recording and returns the captured recording when one is active.
 
-**Returns**: `LuaValue` - `LInputRecording` handle, or nil when recording was not active.
+**Returns**: `LInputRecording` - Recording handle, or nil when recording was not active.
 
 #### Example
 
@@ -2266,7 +2266,7 @@ Converts analog x and y values into virtual d-pad booleans and direction.
 
 - `x` (`number`, required) - Horizontal analog value.
 - `y` (`number`, required) - Vertical analog value.
-- `deadzone` (`number`, optional) - Optional deadzone, defaulting to 0.3.
+- `deadzone` (`number`, optional) - Deadzone threshold, defaults to 0.3.
 
 **Returns**: `table` - Table with `up`, `down`, `left`, `right`, and `direction` fields.
 
@@ -2506,9 +2506,9 @@ end
 
 ### `lurek.input.wasPressed() -> boolean`
 
-Was pressed for Lua scripts in this module.
+Returns whether any bound key for this mapping was pressed this frame.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True when any bound key was pressed.
 
 #### Example
 
@@ -2588,9 +2588,9 @@ end
 
 ### `lurek.input.wasReleased() -> boolean`
 
-Was released for Lua scripts in this module.
+Returns whether any bound key for this mapping was released this frame.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True when any bound key was released.
 
 #### Example
 
@@ -2659,7 +2659,7 @@ do
 end
 ```
 
-### `LCombo:getStep(index: integer) -> LuaValue`
+### `LCombo:getStep(index: integer) -> table`
 
 Returns step data by one-based index.
 
@@ -2667,7 +2667,7 @@ Returns step data by one-based index.
 
 - `index` (`integer`, required) - One-based combo step index.
 
-**Returns**: `LuaValue` - Step table with `key` and `gap_ms`, or nil when out of range.
+**Returns**: `table` - Step table with `key` and `gap_ms`, or nil when out of range.
 
 #### Example
 
@@ -2955,56 +2955,17 @@ Lua-side handle for serialized input recording data.
 
 #### Example
 
-Module-level example from [input.lua](../blob/main/content/examples/input.lua):
+Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
---@api-stub: lurek.input.isDown
--- Check if one or more keyboard keys are currently held down (variadic).
 do
-  function lurek.process(dt)
-    -- Pass multiple key names; returns true if ANY of them is held.
-    -- Useful for movement where WASD and arrows should both work.
-    if lurek.input.keyboard.isDown("space", "w", "up") then
-      -- Player is holding a jump/up key — apply upward velocity
-      lurek.log.debug("jump key held — applying upward force", "input")
-    end
-
-    -- Typical 4-direction movement pattern:
-    local dx, dy = 0, 0
-    if lurek.input.keyboard.isDown("a", "left")  then dx = dx - 1 end
-    if lurek.input.keyboard.isDown("d", "right") then dx = dx + 1 end
-    if lurek.input.keyboard.isDown("w", "up")    then dy = dy - 1 end
-    if lurek.input.keyboard.isDown("s", "down")  then dy = dy + 1 end
-    if dx ~= 0 or dy ~= 0 then
-      lurek.log.debug("moving: dx=" .. dx .. " dy=" .. dy, "input")
-    end
+  lurek.input.startRecording()
+  local rec = lurek.input.stopRecording()
+  if rec then
+    -- rec is an LInputRecording handle — serialize with :toJson()
+    lurek.log.info("captured " .. rec:totalFrames() .. " frames of input", "replay")
   end
 end
-
---@api-stub: lurek.input.isScancodeDown
--- Check if a physical scancode is held, ignoring keyboard layout remapping.
-do
-  function lurek.process(dt)
-    -- Scancodes refer to physical key positions (hardware layout).
-    -- On AZERTY keyboards, "a" is in the QWERTY "q" position.
-    -- Use scancodes when you want consistent physical positions regardless of locale.
-    if lurek.input.keyboard.isScancodeDown("a") then
-      lurek.log.debug("physical 'A' position held (strafe-left)", "input")
-    end
-  end
-end
-
---@api-stub: lurek.input.setKeyRepeat
--- Enable or disable OS key-repeat events reaching lurek.keypressed callback.
-do
-  -- Enable key repeat so that holding a key fires repeated keypressed events.
-  -- Useful for menu navigation: holding "down" scrolls through items.
-  lurek.input.keyboard.setKeyRepeat(true)
-  lurek.log.info("key repeat enabled — menus will auto-scroll on hold", "input")
-end
-
---@api-stub: lurek.input.hasKeyRepeat
--- Query whether key-repeat is currently enabled.
 ```
 
 ### `LInputRecording:frameCount() -> integer`

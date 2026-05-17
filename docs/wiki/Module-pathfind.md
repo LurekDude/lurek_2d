@@ -28,9 +28,9 @@
   - [lurek.pathfind.setThreadCount(count: integer)](#lurekpathfindsetthreadcountcount-integer)
 - [Types and Methods](#types-and-methods)
   - [LAIFlowField](#laiflowfield)
-  - [LAIFlowField:getDirection(x: integer, y: integer) -> LuaValue](#laiflowfieldgetdirectionx-integer-y-integer-luavalue)
-  - [LAIFlowField:getDistance(x: integer, y: integer) -> LuaValue](#laiflowfieldgetdistancex-integer-y-integer-luavalue)
-  - [LAIFlowField:getGoal() -> integer|nil](#laiflowfieldgetgoal-integernil)
+  - [LAIFlowField:getDirection(x: integer, y: integer) -> number](#laiflowfieldgetdirectionx-integer-y-integer-number)
+  - [LAIFlowField:getDistance(x: integer, y: integer) -> number](#laiflowfieldgetdistancex-integer-y-integer-number)
+  - [LAIFlowField:getGoal() -> integer](#laiflowfieldgetgoal-integer)
   - [LAIFlowField:getHeight() -> integer](#laiflowfieldgetheight-integer)
   - [LAIFlowField:getWidth() -> integer](#laiflowfieldgetwidth-integer)
   - [LAIFlowField:hasGoal() -> boolean](#laiflowfieldhasgoal-boolean)
@@ -40,12 +40,12 @@
   - [LFlowField](#lflowfield)
   - [LFlowField:calculate(tx: integer, ty: integer, [unit_size]: integer)](#lflowfieldcalculatetx-integer-ty-integer-unitsize-integer)
   - [LFlowField:calculateMulti(targets: table, [unit_size]: integer)](#lflowfieldcalculatemultitargets-table-unitsize-integer)
-  - [LFlowField:getCostToTarget(x: integer, y: integer) -> LuaValue](#lflowfieldgetcosttotargetx-integer-y-integer-luavalue)
-  - [LFlowField:getDirection(x: integer, y: integer) -> LuaValue](#lflowfieldgetdirectionx-integer-y-integer-luavalue)
+  - [LFlowField:getCostToTarget(x: integer, y: integer) -> number](#lflowfieldgetcosttotargetx-integer-y-integer-number)
+  - [LFlowField:getDirection(x: integer, y: integer) -> number](#lflowfieldgetdirectionx-integer-y-integer-number)
   - [LFlowField:getDirectionAngle(x: integer, y: integer) -> number](#lflowfieldgetdirectionanglex-integer-y-integer-number)
   - [LFlowField:getTargets() -> table](#lflowfieldgettargets-table)
   - [LFlowField:isCalculated() -> boolean](#lflowfieldiscalculated-boolean)
-  - [LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> LuaValue](#lflowfieldsteerwx-number-wy-number-speed-number-tw-number-th-number-luavalue)
+  - [LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> number](#lflowfieldsteerwx-number-wy-number-speed-number-tw-number-th-number-number)
   - [LFlowField:type() -> string](#lflowfieldtype-string)
   - [LFlowField:typeOf(name: string) -> boolean](#lflowfieldtypeofname-string-boolean)
   - [LHexGrid](#lhexgrid)
@@ -68,7 +68,7 @@
   - [LNavGrid](#lnavgrid)
   - [LNavGrid:clearDirty()](#lnavgridcleardirty)
   - [LNavGrid:fill(cost: integer)](#lnavgridfillcost-integer)
-  - [LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: u8)](#lnavgridfillrectx-integer-y-integer-w-integer-h-integer-cost-u8)
+  - [LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: integer)](#lnavgridfillrectx-integer-y-integer-w-integer-h-integer-cost-integer)
   - [LNavGrid:getChunkSize() -> integer](#lnavgridgetchunksize-integer)
   - [LNavGrid:getCost(x: integer, y: integer) -> integer](#lnavgridgetcostx-integer-y-integer-integer)
   - [LNavGrid:getDiagonalMode() -> string](#lnavgridgetdiagonalmode-string)
@@ -82,7 +82,7 @@
   - [LNavGrid:saveToString() -> string](#lnavgridsavetostring-string)
   - [LNavGrid:setBlocked(x: integer, y: integer, blocked: boolean)](#lnavgridsetblockedx-integer-y-integer-blocked-boolean)
   - [LNavGrid:setChunkSize(size: integer)](#lnavgridsetchunksizesize-integer)
-  - [LNavGrid:setCost(x: integer, y: integer, cost: u8)](#lnavgridsetcostx-integer-y-integer-cost-u8)
+  - [LNavGrid:setCost(x: integer, y: integer, cost: integer)](#lnavgridsetcostx-integer-y-integer-cost-integer)
   - [LNavGrid:setDiagonalMode(mode: string)](#lnavgridsetdiagonalmodemode-string)
   - [LNavGrid:setDirty(x: integer, y: integer, w: integer, h: integer)](#lnavgridsetdirtyx-integer-y-integer-w-integer-h-integer)
   - [LNavGrid:type() -> string](#lnavgridtype-string)
@@ -95,8 +95,8 @@
   - [LNavMesh:type() -> string](#lnavmeshtype-string)
   - [LNavMesh:typeOf(name: string) -> boolean](#lnavmeshtypeofname-string-boolean)
   - [LPathGrid](#lpathgrid)
-  - [LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil](#lpathgridfindpathsx-integer-sy-integer-gx-integer-gy-integer-tablenil)
-  - [LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil](#lpathgridfindpathsmoothedsx-integer-sy-integer-gx-integer-gy-integer-tablenil)
+  - [LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table](#lpathgridfindpathsx-integer-sy-integer-gx-integer-gy-integer-table)
+  - [LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table](#lpathgridfindpathsmoothedsx-integer-sy-integer-gx-integer-gy-integer-table)
   - [LPathGrid:getCellSize() -> number](#lpathgridgetcellsize-number)
   - [LPathGrid:getCost(x: integer, y: integer) -> number](#lpathgridgetcostx-integer-y-integer-number)
   - [LPathGrid:getHeight() -> integer](#lpathgridgetheight-integer)
@@ -216,16 +216,16 @@ do
 ```lua
 lurek.pathfind.getThreadCount() -> integer -- Returns the pathfinding thread count.
 lurek.pathfind.newFlowField(grid_ud: LNavGrid) -> LFlowField -- Creates a flow field for a navigation grid.
-lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid. This function is exposed to Lua scripts.
-lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid. This function is exposed to Lua scripts.
-lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid. This function is exposed to Lua scripts.
+lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid -- Creates a hex grid with the given dimensions.
+lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid -- Creates a Jump Point Search grid with given dimensions.
+lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid -- Creates a navigation grid with the given dimensions.
 lurek.pathfind.newNavGridFromTileMap(tm_ud: LTileMap, layer_index: integer, blocked_table: table) -> LNavGrid -- Creates a navigation grid from a tilemap layer and blocked gid table.
-lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh. This function is exposed to Lua scripts.
+lurek.pathfind.newNavMesh() -> LNavMesh -- Creates an empty navigation mesh for polygon-based pathfinding.
 lurek.pathfind.newPathfinder(grid_ud: LNavGrid) -> LUnitPathfinder -- Creates a unit pathfinder for a navigation grid.
 lurek.pathfind.newPathFlowField(grid_ud: LPathGrid) -> LAIFlowField -- Creates an AI flow field from a path grid.
-lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid. This function is exposed to Lua scripts.
+lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid -- Creates a cell-size path grid with given dimensions.
 lurek.pathfind.rangeMap(opts: table) -> table -- Computes reachable cells from range map options.
-lurek.pathfind.setThreadCount(count: integer) -- Records a warning because pathfinding thread count is not implemented.
+lurek.pathfind.setThreadCount(count: integer) -- Sets pathfinding thread count (not yet implemented; logs a warning).
 ```
 
 ## Module Functions
@@ -284,13 +284,13 @@ end
 
 ### `lurek.pathfind.newHexGrid(width: integer, height: integer, [layout_str]: string) -> LHexGrid`
 
-Creates a hex grid. This function is exposed to Lua scripts.
+Creates a hex grid with the given dimensions.
 
 **Parameters**
 
-- `width` (`integer`, required) - Numeric `width` argument for this call.
-- `height` (`integer`, required) - Numeric `height` argument for this call.
-- `layout_str` (`string`, optional) - Lua argument for `layout_str`.
+- `width` (`integer`, required) - Grid width in hex columns.
+- `height` (`integer`, required) - Grid height in hex rows.
+- `layout_str` (`string`, optional) - Hex layout: `flat` (default) or `pointy`.
 
 **Returns**: `LHexGrid` - New hex grid handle.
 
@@ -316,12 +316,12 @@ end
 
 ### `lurek.pathfind.newJpsGrid(width: integer, height: integer) -> LJpsGrid`
 
-Creates a Jump Point Search grid. This function is exposed to Lua scripts.
+Creates a Jump Point Search grid with given dimensions.
 
 **Parameters**
 
-- `width` (`integer`, required) - Numeric `width` argument for this call.
-- `height` (`integer`, required) - Numeric `height` argument for this call.
+- `width` (`integer`, required) - Grid width in cells.
+- `height` (`integer`, required) - Grid height in cells.
 
 **Returns**: `LJpsGrid` - New JPS grid handle.
 
@@ -347,12 +347,12 @@ end
 
 ### `lurek.pathfind.newNavGrid(width: integer, height: integer) -> LNavGrid`
 
-Creates a navigation grid. This function is exposed to Lua scripts.
+Creates a navigation grid with the given dimensions.
 
 **Parameters**
 
-- `width` (`integer`, required) - Numeric `width` argument for this call.
-- `height` (`integer`, required) - Numeric `height` argument for this call.
+- `width` (`integer`, required) - Grid width in cells.
+- `height` (`integer`, required) - Grid height in cells.
 
 **Returns**: `LNavGrid` - New navigation grid handle.
 
@@ -384,8 +384,8 @@ Creates a navigation grid from a tilemap layer and blocked gid table.
 **Parameters**
 
 - `tm_ud` (`LTileMap`, required) - Tilemap to derive navigation grid from.
-- `layer_index` (`integer`, required) - Lua argument for `layer_index`.
-- `blocked_table` (`table`, required) - Lua argument for `blocked_table`.
+- `layer_index` (`integer`, required) - One-based tilemap layer index.
+- `blocked_table` (`table`, required) - Array of tile GIDs that should be blocked.
 
 **Returns**: `LNavGrid` - New navigation grid handle.
 
@@ -410,7 +410,7 @@ end
 
 ### `lurek.pathfind.newNavMesh() -> LNavMesh`
 
-Creates an empty navigation mesh. This function is exposed to Lua scripts.
+Creates an empty navigation mesh for polygon-based pathfinding.
 
 **Returns**: `LNavMesh` - New navmesh handle.
 
@@ -507,13 +507,13 @@ end
 
 ### `lurek.pathfind.newPathGrid(w: integer, h: integer, cell_size: number) -> LPathGrid`
 
-Creates a cell-size path grid. This function is exposed to Lua scripts.
+Creates a cell-size path grid with given dimensions.
 
 **Parameters**
 
-- `w` (`integer`, required) - Lua argument for `w`.
-- `h` (`integer`, required) - Lua argument for `h`.
-- `cell_size` (`number`, required) - Lua argument for `cell_size`.
+- `w` (`integer`, required) - Grid width in cells.
+- `h` (`integer`, required) - Grid height in cells.
+- `cell_size` (`number`, required) - World-space size of each cell.
 
 **Returns**: `LPathGrid` - New path grid handle.
 
@@ -571,11 +571,11 @@ end
 
 ### `lurek.pathfind.setThreadCount(count: integer)`
 
-Records a warning because pathfinding thread count is not implemented.
+Sets pathfinding thread count (not yet implemented; logs a warning).
 
 **Parameters**
 
-- `count` (`integer`, required) - Lua argument for `count`.
+- `count` (`integer`, required) - Desired thread count.
 
 #### Example
 
@@ -617,16 +617,16 @@ do
 end
 ```
 
-### `LAIFlowField:getDirection(x: integer, y: integer) -> LuaValue`
+### `LAIFlowField:getDirection(x: integer, y: integer) -> number`
 
-Returns flow direction for a one-based cell.
+Returns flow direction vector for a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
-**Returns**: `LuaValue` - Direction value.
+**Returns**: `number` - Direction X component.
 
 #### Example
 
@@ -646,16 +646,16 @@ do
 end
 ```
 
-### `LAIFlowField:getDistance(x: integer, y: integer) -> LuaValue`
+### `LAIFlowField:getDistance(x: integer, y: integer) -> number`
 
 Returns distance to goal for a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
-**Returns**: `LuaValue` - Distance value.
+**Returns**: `number` - Distance to the goal.
 
 #### Example
 
@@ -675,11 +675,11 @@ do
 end
 ```
 
-### `LAIFlowField:getGoal() -> integer|nil`
+### `LAIFlowField:getGoal() -> integer`
 
-Returns the one-based flow field goal when set.
+Returns the one-based flow field goal, or nil when no goal is set.
 
-**Returns**: `integer|nil` - Goal x coordinate, or nil.
+**Returns**: `integer` - One-based goal column, or nil.
 
 #### Example
 
@@ -701,7 +701,7 @@ end
 
 ### `LAIFlowField:getHeight() -> integer`
 
-Returns flow field height. This method is available to Lua scripts.
+Returns flow field height from this object.
 
 **Returns**: `integer` - Height.
 
@@ -720,7 +720,7 @@ end
 
 ### `LAIFlowField:getWidth() -> integer`
 
-Returns flow field width. This method is available to Lua scripts.
+Returns flow field width from this object.
 
 **Returns**: `integer` - Width.
 
@@ -739,7 +739,7 @@ end
 
 ### `LAIFlowField:hasGoal() -> boolean`
 
-Returns whether a goal is set. This method is available to Lua scripts.
+Returns whether a flow field goal is currently set.
 
 **Returns**: `boolean` - True when a goal exists.
 
@@ -761,12 +761,12 @@ end
 
 ### `LAIFlowField:setGoal(x: integer, y: integer)`
 
-Sets the one-based flow field goal.
+Sets the one-based flow field goal and recalculates the field.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based goal column.
+- `y` (`integer`, required) - One-based goal row.
 
 #### Example
 
@@ -858,9 +858,9 @@ Calculates a flow field toward one target cell.
 
 **Parameters**
 
-- `tx` (`integer`, required) - Lua argument for `tx`.
-- `ty` (`integer`, required) - Lua argument for `ty`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `tx` (`integer`, required) - One-based target column.
+- `ty` (`integer`, required) - One-based target row.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
 #### Example
 
@@ -883,8 +883,8 @@ Calculates a flow field toward multiple target cells.
 
 **Parameters**
 
-- `targets` (`table`, required) - Lua argument for `targets`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `targets` (`table`, required) - Array of `{x, y}` target tables.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
 #### Example
 
@@ -901,16 +901,16 @@ do
 end
 ```
 
-### `LFlowField:getCostToTarget(x: integer, y: integer) -> LuaValue`
+### `LFlowField:getCostToTarget(x: integer, y: integer) -> number`
 
-Returns flow field cost to target from a one-based grid cell.
+Returns integration cost to the target from a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
-**Returns**: `LuaValue` - Cost value from the pathfinding module.
+**Returns**: `number` - Integration cost to the nearest target.
 
 #### Example
 
@@ -928,16 +928,16 @@ do
 end
 ```
 
-### `LFlowField:getDirection(x: integer, y: integer) -> LuaValue`
+### `LFlowField:getDirection(x: integer, y: integer) -> number`
 
-Returns flow direction at a one-based grid cell.
+Returns flow direction vector at a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
-**Returns**: `LuaValue` - Direction value from the pathfinding module.
+**Returns**: `number` - Direction X component.
 
 #### Example
 
@@ -962,10 +962,10 @@ Returns flow direction angle at a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
-**Returns**: `number` - Direction angle.
+**Returns**: `number` - Direction angle in radians.
 
 #### Example
 
@@ -1026,19 +1026,19 @@ do
 end
 ```
 
-### `LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> LuaValue`
+### `LFlowField:steer(wx: number, wy: number, speed: number, tw: number, th: number) -> number`
 
-Returns steering data for a world position.
+Returns a steering velocity for a world position using the flow field.
 
 **Parameters**
 
-- `wx` (`number`, required) - Lua argument for `wx`.
-- `wy` (`number`, required) - Lua argument for `wy`.
-- `speed` (`number`, required) - Lua argument for `speed`.
-- `tw` (`number`, required) - Lua argument for `tw`.
-- `th` (`number`, required) - Lua argument for `th`.
+- `wx` (`number`, required) - World X position.
+- `wy` (`number`, required) - World Y position.
+- `speed` (`number`, required) - Movement speed scalar.
+- `tw` (`number`, required) - Tile width in world units.
+- `th` (`number`, required) - Tile height in world units.
 
-**Returns**: `LuaValue` - Steering tuple from the pathfinding module.
+**Returns**: `number` - Steered X velocity.
 
 #### Example
 
@@ -1127,14 +1127,14 @@ end
 
 ### `LHexGrid:distance(c1: integer, r1: integer, c2: integer, r2: integer) -> number`
 
-Returns distance between two one-based hex cells.
+Returns hex distance between two one-based hex cells.
 
 **Parameters**
 
-- `c1` (`integer`, required) - Lua argument for `c1`.
-- `r1` (`integer`, required) - Lua argument for `r1`.
-- `c2` (`integer`, required) - Lua argument for `c2`.
-- `r2` (`integer`, required) - Lua argument for `r2`.
+- `c1` (`integer`, required) - One-based column of the first cell.
+- `r1` (`integer`, required) - One-based row of the first cell.
+- `c2` (`integer`, required) - One-based column of the second cell.
+- `r2` (`integer`, required) - One-based row of the second cell.
 
 **Returns**: `number` - Hex distance.
 
@@ -1154,15 +1154,15 @@ end
 
 ### `LHexGrid:fieldOfView(col: integer, row: integer, max_range: integer) -> table`
 
-Returns visible hex cells within range.
+Returns visible hex cells within range from an origin.
 
 **Parameters**
 
-- `col` (`integer`, required) - Lua argument for `col`.
-- `row` (`integer`, required) - Lua argument for `row`.
-- `max_range` (`integer`, required) - Lua argument for `max_range`.
+- `col` (`integer`, required) - One-based origin column.
+- `row` (`integer`, required) - One-based origin row.
+- `max_range` (`integer`, required) - Maximum visibility range in cells.
 
-**Returns**: `table` - Array table of hex cell tables.
+**Returns**: `table` - Array of `{col, row}` hex cell tables.
 
 #### Example
 
@@ -1185,12 +1185,12 @@ Finds a path between one-based hex cells.
 
 **Parameters**
 
-- `fc` (`integer`, required) - Lua argument for `fc`.
-- `fr` (`integer`, required) - Lua argument for `fr`.
-- `tc` (`integer`, required) - Lua argument for `tc`.
-- `tr` (`integer`, required) - Lua argument for `tr`.
+- `fc` (`integer`, required) - One-based start column.
+- `fr` (`integer`, required) - One-based start row.
+- `tc` (`integer`, required) - One-based goal column.
+- `tr` (`integer`, required) - One-based goal row.
 
-**Returns**: `table` - Array table of hex cell tables, or nil when no path exists.
+**Returns**: `table` - Array of `{col, row}` hex cell tables, or nil when no path exists.
 
 #### Example
 
@@ -1208,12 +1208,12 @@ end
 
 ### `LHexGrid:isBlocked(col: integer, row: integer) -> boolean`
 
-Returns blocked state for a one-based hex cell.
+Returns whether a one-based hex cell is blocked.
 
 **Parameters**
 
-- `col` (`integer`, required) - Lua argument for `col`.
-- `row` (`integer`, required) - Lua argument for `row`.
+- `col` (`integer`, required) - One-based hex column.
+- `row` (`integer`, required) - One-based hex row.
 
 **Returns**: `boolean` - True when blocked.
 
@@ -1237,10 +1237,10 @@ Returns whether two one-based hex cells have line of sight.
 
 **Parameters**
 
-- `fc` (`integer`, required) - Lua argument for `fc`.
-- `fr` (`integer`, required) - Lua argument for `fr`.
-- `tc` (`integer`, required) - Lua argument for `tc`.
-- `tr` (`integer`, required) - Lua argument for `tr`.
+- `fc` (`integer`, required) - One-based column of the first cell.
+- `fr` (`integer`, required) - One-based row of the first cell.
+- `tc` (`integer`, required) - One-based column of the second cell.
+- `tr` (`integer`, required) - One-based row of the second cell.
 
 **Returns**: `boolean` - True when line of sight is clear.
 
@@ -1259,15 +1259,15 @@ end
 
 ### `LHexGrid:rangeOfMovement(col: integer, row: integer, budget: number) -> table`
 
-Returns reachable hex cells within movement budget.
+Returns reachable hex cells within a movement budget.
 
 **Parameters**
 
-- `col` (`integer`, required) - Lua argument for `col`.
-- `row` (`integer`, required) - Lua argument for `row`.
-- `budget` (`number`, required) - Lua argument for `budget`.
+- `col` (`integer`, required) - One-based origin column.
+- `row` (`integer`, required) - One-based origin row.
+- `budget` (`number`, required) - Maximum movement cost budget.
 
-**Returns**: `table` - Array table of hex cell tables.
+**Returns**: `table` - Array of `{col, row}` hex cell tables.
 
 #### Example
 
@@ -1290,9 +1290,9 @@ Sets blocked state for a one-based hex cell.
 
 **Parameters**
 
-- `col` (`integer`, required) - Lua argument for `col`.
-- `row` (`integer`, required) - Lua argument for `row`.
-- `blocked` (`boolean`, required) - Lua argument for `blocked`.
+- `col` (`integer`, required) - One-based hex column.
+- `row` (`integer`, required) - One-based hex row.
+- `blocked` (`boolean`, required) - True to block the cell.
 
 #### Example
 
@@ -1312,9 +1312,9 @@ Sets movement cost for a one-based hex cell.
 
 **Parameters**
 
-- `col` (`integer`, required) - Lua argument for `col`.
-- `row` (`integer`, required) - Lua argument for `row`.
-- `cost` (`number`, required) - Lua argument for `cost`.
+- `col` (`integer`, required) - One-based hex column.
+- `row` (`integer`, required) - One-based hex row.
+- `cost` (`number`, required) - Movement cost value.
 
 #### Example
 
@@ -1400,12 +1400,12 @@ Finds a JPS path between one-based grid cells.
 
 **Parameters**
 
-- `fx` (`integer`, required) - Lua argument for `fx`.
-- `fy` (`integer`, required) - Lua argument for `fy`.
-- `tx` (`integer`, required) - Lua argument for `tx`.
-- `ty` (`integer`, required) - Lua argument for `ty`.
+- `fx` (`integer`, required) - One-based start column.
+- `fy` (`integer`, required) - One-based start row.
+- `tx` (`integer`, required) - One-based goal column.
+- `ty` (`integer`, required) - One-based goal row.
 
-**Returns**: `table` - Array table of point tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` point tables, or nil when no path exists.
 
 #### Example
 
@@ -1424,12 +1424,12 @@ end
 
 ### `LJpsGrid:isBlocked(x: integer, y: integer) -> boolean`
 
-Returns blocked state for a one-based grid cell.
+Returns whether a one-based JPS grid cell is blocked.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
 **Returns**: `boolean` - True when blocked.
 
@@ -1449,13 +1449,13 @@ end
 
 ### `LJpsGrid:setBlocked(x: integer, y: integer, blocked: boolean)`
 
-Sets blocked state for a one-based grid cell.
+Sets blocked state for a one-based JPS grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `blocked` (`boolean`, required) - Lua argument for `blocked`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `blocked` (`boolean`, required) - True to block the cell.
 
 #### Example
 
@@ -1538,7 +1538,7 @@ end
 
 ### `LNavGrid:clearDirty()`
 
-Clears dirty regions. This method is available to Lua scripts.
+Clears all dirty region markers from the grid.
 
 #### Example
 
@@ -1556,11 +1556,11 @@ end
 
 ### `LNavGrid:fill(cost: integer)`
 
-Fills the grid with a movement cost.
+Fills the entire grid with a uniform movement cost.
 
 **Parameters**
 
-- `cost` (`integer`, required) - Movement cost.
+- `cost` (`integer`, required) - Movement cost (0–255).
 
 #### Example
 
@@ -1578,17 +1578,17 @@ do
 end
 ```
 
-### `LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: u8)`
+### `LNavGrid:fillRect(x: integer, y: integer, w: integer, h: integer, cost: integer)`
 
 Fills a one-based rectangular area with a movement cost.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `w` (`integer`, required) - Lua argument for `w`.
-- `h` (`integer`, required) - Lua argument for `h`.
-- `cost` (`u8`, required) - Lua argument for `cost`.
+- `x` (`integer`, required) - One-based column of the top-left corner.
+- `y` (`integer`, required) - One-based row of the top-left corner.
+- `w` (`integer`, required) - Rectangle width in cells.
+- `h` (`integer`, required) - Rectangle height in cells.
+- `cost` (`integer`, required) - Movement cost (0–255).
 
 #### Example
 
@@ -1606,7 +1606,7 @@ end
 
 ### `LNavGrid:getChunkSize() -> integer`
 
-Returns hierarchical chunk size. This method is available to Lua scripts.
+Returns the hierarchical chunk size in cells.
 
 **Returns**: `integer` - Chunk size.
 
@@ -1629,8 +1629,8 @@ Returns movement cost at a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
 **Returns**: `integer` - Movement cost.
 
@@ -1652,7 +1652,7 @@ end
 
 ### `LNavGrid:getDiagonalMode() -> string`
 
-Returns diagonal movement mode. This method is available to Lua scripts.
+Returns the current diagonal movement mode name.
 
 **Returns**: `string` - Mode name.
 
@@ -1672,7 +1672,7 @@ end
 
 ### `LNavGrid:getDimensions() -> integer`
 
-Returns grid dimensions. This method is available to Lua scripts.
+Returns grid width and height as two integers.
 
 **Returns**: `integer` - Grid width.
 
@@ -1692,7 +1692,7 @@ end
 
 ### `LNavGrid:getHeight() -> integer`
 
-Returns grid height. This method is available to Lua scripts.
+Returns grid height from this object.
 
 **Returns**: `integer` - Grid height.
 
@@ -1710,7 +1710,7 @@ end
 
 ### `LNavGrid:getWidth() -> integer`
 
-Returns grid width. This method is available to Lua scripts.
+Returns grid width from this object.
 
 **Returns**: `integer` - Grid width.
 
@@ -1728,12 +1728,12 @@ end
 
 ### `LNavGrid:isBlocked(x: integer, y: integer) -> boolean`
 
-Returns blocked state at a one-based grid cell.
+Returns whether a one-based grid cell is blocked.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
 **Returns**: `boolean` - True when blocked.
 
@@ -1758,9 +1758,9 @@ Returns whether a one-based grid cell is walkable for a unit size.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
 **Returns**: `boolean` - True when walkable.
 
@@ -1780,7 +1780,7 @@ end
 
 ### `LNavGrid:loadFromString(data: string)`
 
-Loads grid data from a binary string.
+Loads grid data from a serialized binary string.
 
 **Parameters**
 
@@ -1825,7 +1825,7 @@ end
 
 ### `LNavGrid:saveToString() -> string`
 
-Saves grid data to a binary string. This method is available to Lua scripts.
+Saves grid data to a serialized binary string.
 
 **Returns**: `string` - Serialized grid bytes.
 
@@ -1850,9 +1850,9 @@ Sets blocked state at a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `blocked` (`boolean`, required) - Lua argument for `blocked`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `blocked` (`boolean`, required) - True to block the cell.
 
 #### Example
 
@@ -1869,11 +1869,11 @@ end
 
 ### `LNavGrid:setChunkSize(size: integer)`
 
-Sets hierarchical chunk size. This method is available to Lua scripts.
+Sets hierarchical chunk size for abstract graph partitioning.
 
 **Parameters**
 
-- `size` (`integer`, required) - Lua argument for `size`.
+- `size` (`integer`, required) - Chunk side length in cells.
 
 #### Example
 
@@ -1890,15 +1890,15 @@ do
 end
 ```
 
-### `LNavGrid:setCost(x: integer, y: integer, cost: u8)`
+### `LNavGrid:setCost(x: integer, y: integer, cost: integer)`
 
 Sets movement cost at a one-based grid cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `cost` (`u8`, required) - Lua argument for `cost`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `cost` (`integer`, required) - Movement cost (0–255).
 
 #### Example
 
@@ -1918,7 +1918,7 @@ end
 
 ### `LNavGrid:setDiagonalMode(mode: string)`
 
-Sets diagonal movement mode. This method is available to Lua scripts.
+Sets diagonal movement mode for this object.
 
 **Parameters**
 
@@ -1941,14 +1941,14 @@ end
 
 ### `LNavGrid:setDirty(x: integer, y: integer, w: integer, h: integer)`
 
-Marks a one-based rectangular region dirty.
+Marks a one-based rectangular region dirty for incremental rebuild.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `w` (`integer`, required) - Lua argument for `w`.
-- `h` (`integer`, required) - Lua argument for `h`.
+- `x` (`integer`, required) - One-based column of the top-left corner.
+- `y` (`integer`, required) - One-based row of the top-left corner.
+- `w` (`integer`, required) - Region width in cells.
+- `h` (`integer`, required) - Region height in cells.
 
 #### Example
 
@@ -2051,7 +2051,7 @@ Adds a polygon from vertex tables and returns a one-based id.
 
 **Parameters**
 
-- `vertices` (`table`, required) - Lua argument for `vertices`.
+- `vertices` (`table`, required) - Array of `{x, y}` vertex tables (minimum 3).
 
 **Returns**: `integer` - One-based polygon id.
 
@@ -2081,9 +2081,9 @@ Connects two polygons by one-based id.
 
 **Parameters**
 
-- `a` (`integer`, required) - Lua argument for `a`.
-- `b` (`integer`, required) - Lua argument for `b`.
-- `bidirectional` (`boolean`, optional) - Lua argument for `bidirectional`.
+- `a` (`integer`, required) - One-based id of the first polygon.
+- `b` (`integer`, required) - One-based id of the second polygon.
+- `bidirectional` (`boolean`, optional) - True for two-way link (default true).
 
 **Returns**: `boolean` - True when the connection was added.
 
@@ -2110,12 +2110,12 @@ Finds a path through the navmesh between world points.
 
 **Parameters**
 
-- `sx` (`number`, required) - Lua argument for `sx`.
-- `sy` (`number`, required) - Lua argument for `sy`.
-- `gx` (`number`, required) - Lua argument for `gx`.
-- `gy` (`number`, required) - Lua argument for `gy`.
+- `sx` (`number`, required) - Start X in world coordinates.
+- `sy` (`number`, required) - Start Y in world coordinates.
+- `gx` (`number`, required) - Goal X in world coordinates.
+- `gy` (`number`, required) - Goal Y in world coordinates.
 
-**Returns**: `table` - Array table of point tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` point tables, or nil when no path exists.
 
 #### Example
 
@@ -2138,7 +2138,7 @@ end
 
 ### `LNavMesh:getPolygonCount() -> integer`
 
-Returns navmesh polygon count. This method is available to Lua scripts.
+Returns the total navmesh polygon count.
 
 **Returns**: `integer` - Polygon count.
 
@@ -2217,18 +2217,18 @@ do
 end
 ```
 
-### `LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil`
+### `LPathGrid:findPath(sx: integer, sy: integer, gx: integer, gy: integer) -> table`
 
 Finds a path between one-based path grid cells.
 
 **Parameters**
 
-- `sx` (`integer`, required) - Lua argument for `sx`.
-- `sy` (`integer`, required) - Lua argument for `sy`.
-- `gx` (`integer`, required) - Lua argument for `gx`.
-- `gy` (`integer`, required) - Lua argument for `gy`.
+- `sx` (`integer`, required) - One-based start column.
+- `sy` (`integer`, required) - One-based start row.
+- `gx` (`integer`, required) - One-based goal column.
+- `gy` (`integer`, required) - One-based goal row.
 
-**Returns**: `table|nil` - Array table of point tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` point tables, or nil when no path exists.
 
 #### Example
 
@@ -2244,18 +2244,18 @@ do
 end
 ```
 
-### `LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table|nil`
+### `LPathGrid:findPathSmoothed(sx: integer, sy: integer, gx: integer, gy: integer) -> table`
 
 Finds a smoothed path between one-based path grid cells.
 
 **Parameters**
 
-- `sx` (`integer`, required) - Lua argument for `sx`.
-- `sy` (`integer`, required) - Lua argument for `sy`.
-- `gx` (`integer`, required) - Lua argument for `gx`.
-- `gy` (`integer`, required) - Lua argument for `gy`.
+- `sx` (`integer`, required) - One-based start column.
+- `sy` (`integer`, required) - One-based start row.
+- `gx` (`integer`, required) - One-based goal column.
+- `gy` (`integer`, required) - One-based goal row.
 
-**Returns**: `table|nil` - Array table of point tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` point tables, or nil when no path exists.
 
 #### Example
 
@@ -2271,7 +2271,7 @@ end
 
 ### `LPathGrid:getCellSize() -> number`
 
-Returns path grid cell size. This method is available to Lua scripts.
+Returns path grid cell size from this object.
 
 **Returns**: `number` - Cell size.
 
@@ -2295,8 +2295,8 @@ Returns movement cost at a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
 **Returns**: `number` - Movement cost.
 
@@ -2317,7 +2317,7 @@ end
 
 ### `LPathGrid:getHeight() -> integer`
 
-Returns grid height. This method is available to Lua scripts.
+Returns grid height from this object.
 
 **Returns**: `integer` - Grid height.
 
@@ -2335,7 +2335,7 @@ end
 
 ### `LPathGrid:getWidth() -> integer`
 
-Returns grid width. This method is available to Lua scripts.
+Returns grid width from this object.
 
 **Returns**: `integer` - Grid width.
 
@@ -2357,8 +2357,8 @@ Returns walkability at a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
 
 **Returns**: `boolean` - True when walkable.
 
@@ -2383,9 +2383,9 @@ Sets movement cost at a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `cost` (`number`, required) - Lua argument for `cost`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `cost` (`number`, required) - Movement cost value.
 
 #### Example
 
@@ -2407,9 +2407,9 @@ Sets walkability at a one-based cell.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `w` (`boolean`, required) - Lua argument for `w`.
+- `x` (`integer`, required) - One-based column.
+- `y` (`integer`, required) - One-based row.
+- `w` (`boolean`, required) - True to mark the cell walkable.
 
 #### Example
 
@@ -2489,7 +2489,7 @@ end
 
 ### `LUnitPathfinder:clearCache()`
 
-Clears cached paths. This method is available to Lua scripts.
+Clears all cached paths on this object.
 
 #### Example
 
@@ -2512,12 +2512,12 @@ Finds nearest walkable one-based grid cell within a radius.
 
 **Parameters**
 
-- `x` (`integer`, required) - Numeric `x` argument for this call.
-- `y` (`integer`, required) - Numeric `y` argument for this call.
-- `max_radius` (`integer`, required) - Lua argument for `max_radius`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x` (`integer`, required) - One-based column of the search origin.
+- `y` (`integer`, required) - One-based row of the search origin.
+- `max_radius` (`integer`, required) - Maximum search radius in cells.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
-**Returns**: `integer` - Result x coordinate, or nil.
+**Returns**: `integer` - One-based column of the nearest walkable cell, or nil.
 
 #### Example
 
@@ -2575,13 +2575,13 @@ Finds a path between one-based grid cells.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x1` (`integer`, required) - One-based start column.
+- `y1` (`integer`, required) - One-based start row.
+- `x2` (`integer`, required) - One-based goal column.
+- `y2` (`integer`, required) - One-based goal row.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
-**Returns**: `table` - Array table of waypoint tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` waypoint tables, or nil when no path exists.
 
 #### Example
 
@@ -2612,7 +2612,7 @@ Finds a path using bidirectional A* and returns completion status.
 - `unit_size` (`integer`, optional) - Width or height of the unit in grid cells for clearance checks (default 1).
 - `max_nodes` (`integer`, optional) - Optional node-expansion budget; 0 uses the full search.
 
-**Returns**: `table` - Array table of waypoint tables, or nil when no path exists.
+**Returns**: `table` - Array of waypoint tables, or nil when no path exists.
 
 #### Example
 
@@ -2637,13 +2637,13 @@ Finds a smoothed path between one-based grid cells.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x1` (`integer`, required) - One-based start column.
+- `y1` (`integer`, required) - One-based start row.
+- `x2` (`integer`, required) - One-based goal column.
+- `y2` (`integer`, required) - One-based goal row.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
-**Returns**: `table` - Array table of waypoint tables, or nil when no path exists.
+**Returns**: `table` - Array of `{x, y}` waypoint tables, or nil when no path exists.
 
 #### Example
 
@@ -2663,7 +2663,7 @@ end
 
 ### `LUnitPathfinder:getCacheSize() -> integer`
 
-Returns current path cache size. This method is available to Lua scripts.
+Returns the current path cache entry count.
 
 **Returns**: `integer` - Cache size.
 
@@ -2683,11 +2683,11 @@ end
 
 ### `LUnitPathfinder:getPathCost(path: table) -> number`
 
-Returns path cost for a waypoint table.
+Returns the total movement cost along a waypoint path.
 
 **Parameters**
 
-- `path` (`table`, required) - Path-like input used by this call.
+- `path` (`table`, required) - Array of `{x, y}` waypoint tables.
 
 **Returns**: `number` - Path cost.
 
@@ -2711,11 +2711,11 @@ end
 
 ### `LUnitPathfinder:getPathLength(path: table) -> number`
 
-Returns path length for a waypoint table.
+Returns the total Euclidean length of a waypoint path.
 
 **Parameters**
 
-- `path` (`table`, required) - Path-like input used by this call.
+- `path` (`table`, required) - Array of `{x, y}` waypoint tables.
 
 **Returns**: `number` - Path length.
 
@@ -2742,10 +2742,10 @@ Returns heuristic distance between two one-based cells.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
+- `x1` (`integer`, required) - One-based column of the first cell.
+- `y1` (`integer`, required) - One-based row of the first cell.
+- `x2` (`integer`, required) - One-based column of the second cell.
+- `y2` (`integer`, required) - One-based row of the second cell.
 
 **Returns**: `number` - Heuristic distance.
 
@@ -2786,15 +2786,15 @@ end
 
 ### `LUnitPathfinder:isReachable(x1: integer, y1: integer, x2: integer, y2: integer, [unit_size]: integer) -> boolean`
 
-Returns whether a target cell is reachable.
+Returns whether a target cell is reachable from a start cell.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x1` (`integer`, required) - One-based start column.
+- `y1` (`integer`, required) - One-based start row.
+- `x2` (`integer`, required) - One-based target column.
+- `y2` (`integer`, required) - One-based target row.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
 **Returns**: `boolean` - True when reachable.
 
@@ -2819,11 +2819,11 @@ Returns whether two one-based cells have line of sight.
 
 **Parameters**
 
-- `x1` (`integer`, required) - Lua argument for `x1`.
-- `y1` (`integer`, required) - Lua argument for `y1`.
-- `x2` (`integer`, required) - Lua argument for `x2`.
-- `y2` (`integer`, required) - Lua argument for `y2`.
-- `unit_size` (`integer`, optional) - Lua argument for `unit_size`.
+- `x1` (`integer`, required) - One-based column of the first cell.
+- `y1` (`integer`, required) - One-based row of the first cell.
+- `x2` (`integer`, required) - One-based column of the second cell.
+- `y2` (`integer`, required) - One-based row of the second cell.
+- `unit_size` (`integer`, optional) - Unit footprint in cells (default 1).
 
 **Returns**: `boolean` - True when line of sight is clear.
 
@@ -2844,11 +2844,11 @@ end
 
 ### `LUnitPathfinder:setCacheEnabled(enabled: boolean)`
 
-Enables or disables path cache. This method is available to Lua scripts.
+Enables or disables the path cache on this object.
 
 **Parameters**
 
-- `enabled` (`boolean`, required) - Boolean flag that controls `enabled`.
+- `enabled` (`boolean`, required) - True to enable caching.
 
 #### Example
 
@@ -2867,11 +2867,11 @@ end
 
 ### `LUnitPathfinder:setCacheMaxSize(n: integer)`
 
-Sets maximum path cache size. This method is available to Lua scripts.
+Sets maximum path cache size for this object.
 
 **Parameters**
 
-- `n` (`integer`, required) - Lua argument for `n`.
+- `n` (`integer`, required) - Maximum number of cached paths.
 
 #### Example
 

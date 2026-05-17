@@ -16,20 +16,10 @@ pub mod render;
 pub mod theme;
 /// Base widget trait, state, transitions, and type registry.
 pub mod widget;
-pub use containers::{
-    DockPanel, GUIWindow, Layout, LayoutDirection, NinePatch, NineSlice, Panel, ScrollPanel,
-    SplitPanel,
-};
+pub use containers::{DockPanel, GUIWindow, Layout, LayoutDirection, NinePatch, NineSlice, Panel, ScrollPanel, SplitPanel};
 pub use context::{GuiContext, GuiEvent, UiBindingValue};
-pub use controls::{
-    Button, CheckBox, ComboBox, Label, ListBox, ProgressBar, RadioButton, ScrollBar, Slider,
-    SpinBox, Switch, TabBar, TextInput,
-};
-pub use extras::{
-    Accordion, AccordionSection, Badge, ColorPicker, CustomWidget, Dialog, GUITable, ImageWidget,
-    MenuBar, MenuItem, Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, ToolbarButton,
-    TooltipPanel, TreeNode, TreeView,
-};
+pub use controls::{Button, CheckBox, ComboBox, Label, ListBox, ProgressBar, RadioButton, ScrollBar, Slider, SpinBox, Switch, TabBar, TextInput};
+pub use extras::{Accordion, AccordionSection, Badge, ColorPicker, CustomWidget, Dialog, GUITable, ImageWidget, MenuBar, MenuItem, Separator, Spacer, StatusBar, TableColumn, Toast, Toolbar, ToolbarButton, TooltipPanel, TreeNode, TreeView};
 pub use theme::{Theme, WidgetStyle};
 pub use widget::{WidgetBase, WidgetState, WidgetTransition, WidgetTransitionKind, WidgetType};
 /// TOML-based declarative layout loader and image renderer.
@@ -44,7 +34,4 @@ pub use data_graph_renderer::{GraphRenderer, GraphSeries};
 #[cfg(feature = "ui-charts")]
 pub mod chart;
 #[cfg(feature = "ui-charts")]
-pub use chart::{
-    AreaChart, AreaLayer, BarCategory, BarChart, ChartConfig, ChartMargin, ChartSeries, LineChart,
-    PieChart, PieSegment, ScatterPlot,
-};
+pub use chart::{AreaChart, AreaLayer, BarCategory, BarChart, ChartConfig, ChartMargin, ChartSeries, LineChart, PieChart, PieSegment, ScatterPlot};

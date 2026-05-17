@@ -44,8 +44,8 @@
   - [lurek.audio.getOrientation(source: LSource|integer) -> number, number, number, number, number, number](#lurekaudiogetorientationsource-lsourceinteger-number-number-number-number-number-number)
   - [lurek.audio.getPan(source: LSource|integer) -> number](#lurekaudiogetpansource-lsourceinteger-number)
   - [lurek.audio.getPitch(source: LSource|integer) -> number](#lurekaudiogetpitchsource-lsourceinteger-number)
-  - [lurek.audio.getPlaybackDevice() -> table](#lurekaudiogetplaybackdevice-table)
-  - [lurek.audio.getPlaybackDevices() -> table](#lurekaudiogetplaybackdevices-table)
+  - [lurek.audio.getPlaybackDevice() -> string](#lurekaudiogetplaybackdevice-string)
+  - [lurek.audio.getPlaybackDevices() -> string[]](#lurekaudiogetplaybackdevices-string)
   - [lurek.audio.getPosition(source: LSource|integer) -> number, number, number](#lurekaudiogetpositionsource-lsourceinteger-number-number-number)
   - [lurek.audio.getSourceBus(source: LSource|integer) -> LBus](#lurekaudiogetsourcebussource-lsourceinteger-lbus)
   - [lurek.audio.getSourceCount() -> integer](#lurekaudiogetsourcecount-integer)
@@ -53,7 +53,7 @@
   - [lurek.audio.getStereoWidth(src_ud: LSource) -> number](#lurekaudiogetstereowidthsrcud-lsource-number)
   - [lurek.audio.getVelocity(source: LSource|integer) -> number, number, number](#lurekaudiogetvelocitysource-lsourceinteger-number-number-number)
   - [lurek.audio.getVolume(source: LSource|integer) -> number](#lurekaudiogetvolumesource-lsourceinteger-number)
-  - [lurek.audio.hasMidiSoundFont()](#lurekaudiohasmidisoundfont)
+  - [lurek.audio.hasMidiSoundFont() -> boolean](#lurekaudiohasmidisoundfont-boolean)
   - [lurek.audio.isLooping(source: LSource|integer) -> boolean](#lurekaudioisloopingsource-lsourceinteger-boolean)
   - [lurek.audio.isPaused(source: LSource|integer) -> boolean](#lurekaudioispausedsource-lsourceinteger-boolean)
   - [lurek.audio.isPlaying(source: LSource|integer) -> boolean](#lurekaudioisplayingsource-lsourceinteger-boolean)
@@ -80,13 +80,13 @@
   - [lurek.audio.processOffline(input: string, output: string, effects_tbl: table)](#lurekaudioprocessofflineinput-string-output-string-effectstbl-table)
   - [lurek.audio.queueSource(qsource_id: integer, sd: LSoundData)](#lurekaudioqueuesourceqsourceid-integer-sd-lsounddata)
   - [lurek.audio.release(source: LSource|integer) -> boolean](#lurekaudioreleasesource-lsourceinteger-boolean)
-  - [lurek.audio.remove_effect(bus_name: string, effect_id: integer)](#lurekaudioremoveeffectbusname-string-effectid-integer)
+  - [lurek.audio.remove_effect(bus_name: string, effect_id: integer) -> boolean](#lurekaudioremoveeffectbusname-string-effectid-integer-boolean)
   - [lurek.audio.resume(source: LSource|integer)](#lurekaudioresumesource-lsourceinteger)
   - [lurek.audio.resumeAll()](#lurekaudioresumeall)
   - [lurek.audio.saveWAV(sd_ud: LSoundData, filename: string)](#lurekaudiosavewavsdud-lsounddata-filename-string)
   - [lurek.audio.seek(source: LSource|integer, pos: number)](#lurekaudioseeksource-lsourceinteger-pos-number)
   - [lurek.audio.set_bus_volume(name: string, volume: number)](#lurekaudiosetbusvolumename-string-volume-number)
-  - [lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number)](#lurekaudioseteffectparambusname-string-effectid-integer-paramname-string-value-number)
+  - [lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number) -> boolean](#lurekaudioseteffectparambusname-string-effectid-integer-paramname-string-value-number-boolean)
   - [lurek.audio.setDistanceModel(model: string)](#lurekaudiosetdistancemodelmodel-string)
   - [lurek.audio.setDopplerScale(scale: number)](#lurekaudiosetdopplerscalescale-number)
   - [lurek.audio.setHighpass(source: LSource|integer, cutoff_hz: integer)](#lurekaudiosethighpasssource-lsourceinteger-cutoffhz-integer)
@@ -335,10 +335,10 @@ lurek.audio.applyGain(sd_ud: LSoundData, gain: number) -- Applies a gain multipl
 lurek.audio.applyHighpass(sd_ud: LSoundData, cutoff_hz: number) -- Applies a highpass filter in-place to the sound data.
 lurek.audio.applyLowpass(sd_ud: LSoundData, cutoff_hz: number) -- Applies a lowpass filter in-place to the sound data.
 lurek.audio.clearFilter(source: LSource|integer) -- Removes all frequency filters from a source.
-lurek.audio.clearMidiSoundFont() -- Clears midi sound font for Lua scripts in this module.
+lurek.audio.clearMidiSoundFont() -- Clears the loaded SoundFont and reverts MIDI synthesis to default.
 lurek.audio.clearRandomPitch(src_ud: LSource) -- Clears any random pitch range previously set on the source.
 lurek.audio.clone(source: LSource|integer) -> LSource -- Creates an independent copy of a source sharing the same audio data.
-lurek.audio.create_bus(name: string, [parent_name]: string) -- Create_bus for Lua scripts in this module.
+lurek.audio.create_bus(name: string, [parent_name]: string) -- Creates a named audio bus, optionally parented to another bus.
 lurek.audio.crossfade(from_ud: LSource, to_ud: LSource, duration: number) -- Crossfades from one audio source to another over the given duration.
 lurek.audio.fadeIn(source: LSource|integer, dur: number) -- Sets the fade-in duration for a source so it ramps from silence on play.
 lurek.audio.getActiveSourceCount() -> integer -- Returns the number of sources currently playing audio.
@@ -511,7 +511,7 @@ end
 
 ### `lurek.audio.clearMidiSoundFont()`
 
-Clears midi sound font for Lua scripts in this module.
+Clears the loaded SoundFont and reverts MIDI synthesis to default.
 
 #### Example
 
@@ -585,12 +585,12 @@ end
 
 ### `lurek.audio.create_bus(name: string, [parent_name]: string)`
 
-Create_bus for Lua scripts in this module.
+Creates a named audio bus, optionally parented to another bus.
 
 **Parameters**
 
-- `name` (`string`, required) - String value for `name`.
-- `parent_name` (`string`, optional) - Lua argument for `parent_name`.
+- `name` (`string`, required) - Unique name for the new bus.
+- `parent_name` (`string`, optional) - Name of the parent bus, or nil for a root bus.
 
 #### Example
 
@@ -1096,11 +1096,11 @@ do
 end
 ```
 
-### `lurek.audio.getPlaybackDevice() -> table`
+### `lurek.audio.getPlaybackDevice() -> string`
 
-Returns the playback device for Lua scripts in this module.
+Returns the name of the currently active audio playback device.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `string` - Current playback device name.
 
 #### Example
 
@@ -1115,11 +1115,11 @@ do
 end
 ```
 
-### `lurek.audio.getPlaybackDevices() -> table`
+### `lurek.audio.getPlaybackDevices() -> string[]`
 
-Returns the playback devices for Lua scripts in this module.
+Returns a list of available audio playback device names.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `string[]` - Device name strings.
 
 #### Example
 
@@ -1329,9 +1329,11 @@ do
 end
 ```
 
-### `lurek.audio.hasMidiSoundFont()`
+### `lurek.audio.hasMidiSoundFont() -> boolean`
 
-Returns true if midi sound font for Lua scripts in this module.
+Returns whether a SoundFont file has been loaded for MIDI synthesis.
+
+**Returns**: `boolean` - True if a SoundFont is loaded.
 
 #### Example
 
@@ -1834,13 +1836,13 @@ end
 
 ### `lurek.audio.normalizeFile(input: string, output: string, target: number)`
 
-Normalize file for Lua scripts in this module.
+Normalizes an audio file to a target peak amplitude and saves the result.
 
 **Parameters**
 
-- `input` (`string`, required) - Lua argument for `input`.
-- `output` (`string`, required) - Lua argument for `output`.
-- `target` (`number`, required) - Lua argument for `target`.
+- `input` (`string`, required) - Relative path to the input audio file.
+- `output` (`string`, required) - Relative path for the output WAV file.
+- `target` (`number`, required) - Target peak amplitude (e.g. 0.9 for headroom).
 
 #### Example
 
@@ -1963,11 +1965,11 @@ end
 
 ### `lurek.audio.playQueueable(qsource_id: integer)`
 
-Play queueable for Lua scripts in this module.
+Starts playback of a queueable audio source.
 
 **Parameters**
 
-- `qsource_id` (`integer`, required) - Lua argument for `qsource_id`.
+- `qsource_id` (`integer`, required) - Queueable source handle returned by newQueueableSource.
 
 #### Example
 
@@ -2068,14 +2070,16 @@ do
 end
 ```
 
-### `lurek.audio.remove_effect(bus_name: string, effect_id: integer)`
+### `lurek.audio.remove_effect(bus_name: string, effect_id: integer) -> boolean`
 
-Remove_effect for Lua scripts in this module.
+Removes an effect from a named audio bus by effect ID.
 
 **Parameters**
 
-- `bus_name` (`string`, required) - Lua argument for `bus_name`.
-- `effect_id` (`integer`, required) - Lua argument for `effect_id`.
+- `bus_name` (`string`, required) - Name of the audio bus.
+- `effect_id` (`integer`, required) - Effect ID returned by add_effect.
+
+**Returns**: `boolean` - True if the effect was successfully removed.
 
 #### Example
 
@@ -2219,16 +2223,18 @@ do
 end
 ```
 
-### `lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number)`
+### `lurek.audio.set_effect_param(bus_name: string, effect_id: integer, param_name: string, value: number) -> boolean`
 
-Set_effect_param for Lua scripts in this module.
+Sets a parameter value on an effect attached to a named audio bus.
 
 **Parameters**
 
-- `bus_name` (`string`, required) - Lua argument for `bus_name`.
-- `effect_id` (`integer`, required) - Lua argument for `effect_id`.
-- `param_name` (`string`, required) - Lua argument for `param_name`.
-- `value` (`number`, required) - Lua argument for `value`.
+- `bus_name` (`string`, required) - Name of the audio bus.
+- `effect_id` (`integer`, required) - Effect ID returned by add_effect.
+- `param_name` (`string`, required) - Name of the effect parameter to set.
+- `value` (`number`, required) - New value for the parameter.
+
+**Returns**: `boolean` - True if the parameter was set successfully.
 
 #### Example
 
@@ -2467,11 +2473,11 @@ end
 
 ### `lurek.audio.setMidiSoundFont(path: string)`
 
-Sets the midi sound font for Lua scripts in this module.
+Sets the SoundFont file used for MIDI synthesis.
 
 **Parameters**
 
-- `path` (`string`, required) - Path-like input used by this call.
+- `path` (`string`, required) - Relative path to the .sf2 SoundFont file.
 
 #### Example
 
@@ -2575,11 +2581,11 @@ end
 
 ### `lurek.audio.setPlaybackDevice(name: string)`
 
-Sets the playback device for Lua scripts in this module.
+Sets the active audio playback device by name.
 
 **Parameters**
 
-- `name` (`string`, required) - String value for `name`.
+- `name` (`string`, required) - Name of the playback device to activate.
 
 #### Example
 
@@ -2765,14 +2771,14 @@ end
 
 ### `lurek.audio.spectrogramToPng(input: string, output: string, width: integer, height: integer)`
 
-Spectrogram to png for Lua scripts in this module.
+Renders a spectrogram visualization of an audio file and saves it as a PNG image.
 
 **Parameters**
 
-- `input` (`string`, required) - Lua argument for `input`.
-- `output` (`string`, required) - Lua argument for `output`.
-- `width` (`integer`, required) - Numeric `width` argument for this call.
-- `height` (`integer`, required) - Numeric `height` argument for this call.
+- `input` (`string`, required) - Relative path to the input audio file.
+- `output` (`string`, required) - Relative path for the output PNG file.
+- `width` (`integer`, required) - Image width in pixels.
+- `height` (`integer`, required) - Image height in pixels.
 
 #### Example
 
@@ -2839,11 +2845,11 @@ end
 
 ### `lurek.audio.stopQueueable(qsource_id: integer)`
 
-Stop queueable for Lua scripts in this module.
+Stops playback of a queueable audio source.
 
 **Parameters**
 
-- `qsource_id` (`integer`, required) - Lua argument for `qsource_id`.
+- `qsource_id` (`integer`, required) - Queueable source handle returned by newQueueableSource.
 
 #### Example
 
@@ -2892,14 +2898,14 @@ end
 
 ### `lurek.audio.waveformToPng(input: string, output: string, width: integer, height: integer)`
 
-Waveform to png for Lua scripts in this module.
+Renders a waveform visualization of an audio file and saves it as a PNG image.
 
 **Parameters**
 
-- `input` (`string`, required) - Lua argument for `input`.
-- `output` (`string`, required) - Lua argument for `output`.
-- `width` (`integer`, required) - Numeric `width` argument for this call.
-- `height` (`integer`, required) - Numeric `height` argument for this call.
+- `input` (`string`, required) - Relative path to the input audio file.
+- `output` (`string`, required) - Relative path for the output PNG file.
+- `width` (`integer`, required) - Image width in pixels.
+- `height` (`integer`, required) - Image height in pixels.
 
 #### Example
 

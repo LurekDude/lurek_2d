@@ -24,9 +24,9 @@
   - [lurek.raycaster.projectColumn(distance: number, fov: number, screenHeight: number) -> number](#lurekraycasterprojectcolumndistance-number-fov-number-screenheight-number-number)
 - [Types and Methods](#types-and-methods)
   - [LDoorManager](#ldoormanager)
-  - [LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> number](#ldoormanageradddoorx-integer-y-integer-direction-string-speed-number-number)
+  - [LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> integer](#ldoormanageradddoorx-integer-y-integer-direction-string-speed-number-integer)
   - [LDoorManager:closeDoor(index: integer)](#ldoormanagerclosedoorindex-integer)
-  - [LDoorManager:count() -> number](#ldoormanagercount-number)
+  - [LDoorManager:count() -> integer](#ldoormanagercount-integer)
   - [LDoorManager:getDoor(index: integer) -> table](#ldoormanagergetdoorindex-integer-table)
   - [LDoorManager:openDoor(index: integer)](#ldoormanageropendoorindex-integer)
   - [LDoorManager:type() -> string](#ldoormanagertype-string)
@@ -40,7 +40,7 @@
   - [LHeightMap:type() -> string](#lheightmaptype-string)
   - [LHeightMap:typeOf(name: string) -> boolean](#lheightmaptypeofname-string-boolean)
   - [LPointLight](#lpointlight)
-  - [LPointLight:color() -> number, number, number](#lpointlightcolor-number-number-number)
+  - [LPointLight:color() -> number](#lpointlightcolor-number)
   - [LPointLight:intensity() -> number](#lpointlightintensity-number)
   - [LPointLight:radius() -> number](#lpointlightradius-number)
   - [LPointLight:set(x: number, y: number, r: number, g: number, b: number, radius: number, intensity: number)](#lpointlightsetx-number-y-number-r-number-g-number-b-number-radius-number-intensity-number)
@@ -50,48 +50,48 @@
   - [LPointLight:y() -> number](#lpointlighty-number)
   - [LRaycaster](#lraycaster)
   - [LRaycaster:buildMinimapWindow(centerX: number, centerY: number, radius: integer, ambient: number, [lights]: table) -> table](#lraycasterbuildminimapwindowcenterx-number-centery-number-radius-integer-ambient-number-lights-table-table)
-  - [LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> number](#lraycasterbuildsceneparams-table-lights-table-sprites-table-walltextures-table-number)
-  - [LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> number](#lraycasterbuildscenewithmodelsparams-table-lights-table-sprites-table-walltextures-table-models-table-number)
-  - [LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: number) -> table](#lraycastercastfloorrowcamx-number-camy-number-dirx-number-diry-number-planex-number-planey-number-row-number-table)
+  - [LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> integer](#lraycasterbuildsceneparams-table-lights-table-sprites-table-walltextures-table-integer)
+  - [LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> integer](#lraycasterbuildscenewithmodelsparams-table-lights-table-sprites-table-walltextures-table-models-table-integer)
+  - [LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: integer) -> table](#lraycastercastfloorrowcamx-number-camy-number-dirx-number-diry-number-planex-number-planey-number-row-integer-table)
   - [LRaycaster:castRay(ox: number, oy: number, angle: number, maxDist: number) -> table](#lraycastercastrayox-number-oy-number-angle-number-maxdist-number-table)
   - [LRaycaster:castRayMulti(ox: number, oy: number, angle: number, maxDist: number, [maxHits]: integer) -> table](#lraycastercastraymultiox-number-oy-number-angle-number-maxdist-number-maxhits-integer-table)
   - [LRaycaster:castRays(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> table](#lraycastercastraysox-number-oy-number-angle-number-fov-number-count-integer-maxdist-number-table)
-  - [LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> table](#lraycastercastraysflatox-number-oy-number-angle-number-fov-number-count-integer-maxdist-number-table)
-  - [LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number, number, number, number](#lraycastercomputetilelightx-integer-y-integer-ambient-number-lights-table-number-number-number-number)
-  - [LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> table](#lraycasterdrawcamerasweepx-number-y-number-fov-number-maxdist-number-numframes-integer-fw-integer-fh-integer-table)
-  - [LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: number, w: number, h: number, maxDist: number) -> table](#lraycasterdrawdepthmappx-number-py-number-angle-number-fov-number-numrays-number-w-number-h-number-maxdist-number-table)
-  - [LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> table](#lraycasterdrawlineofsightax-number-ay-number-bx-number-by-number-scale-integer-table)
-  - [LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> table](#lraycasterdrawtopdownpx-number-py-number-angle-number-scale-integer-table)
-  - [LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> table](#lraycasterdrawviewpx-number-py-number-angle-number-fov-number-w-integer-h-integer-maxdist-number-table)
-  - [LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> number](#lraycastergetceilingtexturecellx-integer-y-integer-number)
-  - [LRaycaster:getCell(x: integer, y: integer) -> number](#lraycastergetcellx-integer-y-integer-number)
-  - [LRaycaster:getFloorTextureCell(x: integer, y: integer) -> number](#lraycastergetfloortexturecellx-integer-y-integer-number)
+  - [LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> number[]](#lraycastercastraysflatox-number-oy-number-angle-number-fov-number-count-integer-maxdist-number-number)
+  - [LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number](#lraycastercomputetilelightx-integer-y-integer-ambient-number-lights-table-number)
+  - [LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> LImageData](#lraycasterdrawcamerasweepx-number-y-number-fov-number-maxdist-number-numframes-integer-fw-integer-fh-integer-limagedata)
+  - [LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: integer, w: integer, h: integer, maxDist: number) -> LImageData](#lraycasterdrawdepthmappx-number-py-number-angle-number-fov-number-numrays-integer-w-integer-h-integer-maxdist-number-limagedata)
+  - [LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> LImageData](#lraycasterdrawlineofsightax-number-ay-number-bx-number-by-number-scale-integer-limagedata)
+  - [LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> LImageData](#lraycasterdrawtopdownpx-number-py-number-angle-number-scale-integer-limagedata)
+  - [LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> LImageData](#lraycasterdrawviewpx-number-py-number-angle-number-fov-number-w-integer-h-integer-maxdist-number-limagedata)
+  - [LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> integer](#lraycastergetceilingtexturecellx-integer-y-integer-integer)
+  - [LRaycaster:getCell(x: integer, y: integer) -> integer](#lraycastergetcellx-integer-y-integer-integer)
+  - [LRaycaster:getFloorTextureCell(x: integer, y: integer) -> integer](#lraycastergetfloortexturecellx-integer-y-integer-integer)
   - [LRaycaster:getLoweredFloorCell(x: integer, y: integer) -> table](#lraycastergetloweredfloorcellx-integer-y-integer-table)
   - [LRaycaster:getWallAlpha(tileType: integer) -> number](#lraycastergetwallalphatiletype-integer-number)
-  - [LRaycaster:gridMove(px: number, py: number, dir: number, action: string, step: number) -> number, number, boolean](#lraycastergridmovepx-number-py-number-dir-number-action-string-step-number-number-number-boolean)
-  - [LRaycaster:height() -> number](#lraycasterheight-number)
+  - [LRaycaster:gridMove(px: number, py: number, dir: integer, action: string, step: number) -> number](#lraycastergridmovepx-number-py-number-dir-integer-action-string-step-number-number)
+  - [LRaycaster:height() -> integer](#lraycasterheight-integer)
   - [LRaycaster:isBlocked(x: integer, y: integer) -> boolean](#lraycasterisblockedx-integer-y-integer-boolean)
   - [LRaycaster:isWalkBlocked(x: integer, y: integer) -> boolean](#lraycasteriswalkblockedx-integer-y-integer-boolean)
   - [LRaycaster:lineOfSight(x1: number, y1: number, x2: number, y2: number) -> boolean](#lraycasterlineofsightx1-number-y1-number-x2-number-y2-number-boolean)
   - [LRaycaster:projectSprite(sx: number, sy: number, px: number, py: number, pa: number, fov: number, screenW: number) -> table](#lraycasterprojectspritesx-number-sy-number-px-number-py-number-pa-number-fov-number-screenw-number-table)
-  - [LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: number, maxDist: number, [step]: number) -> table](#lraycasterrevealcellsfromraysox-number-oy-number-angle-number-fov-number-count-number-maxdist-number-step-number-table)
+  - [LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number, [step]: number) -> table](#lraycasterrevealcellsfromraysox-number-oy-number-angle-number-fov-number-count-integer-maxdist-number-step-number-table)
   - [LRaycaster:setCeilingTextureCell(x: integer, y: integer, [texture]: LImage)](#lraycastersetceilingtexturecellx-integer-y-integer-texture-limage)
   - [LRaycaster:setCell(x: integer, y: integer, val: integer)](#lraycastersetcellx-integer-y-integer-val-integer)
   - [LRaycaster:setCells(cells: table)](#lraycastersetcellscells-table)
   - [LRaycaster:setFloorTextureCell(x: integer, y: integer, [texture]: LImage)](#lraycastersetfloortexturecellx-integer-y-integer-texture-limage)
   - [LRaycaster:setLoweredFloorCell(x: integer, y: integer, [opts]: table)](#lraycastersetloweredfloorcellx-integer-y-integer-opts-table)
-  - [LRaycaster:setWallAlpha(tileType: number, alpha: number)](#lraycastersetwallalphatiletype-number-alpha-number)
-  - [LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number, number, boolean](#lraycastertrymovepx-number-py-number-dx-number-dy-number-number-number-boolean)
+  - [LRaycaster:setWallAlpha(tileType: integer, alpha: number)](#lraycastersetwallalphatiletype-integer-alpha-number)
+  - [LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number](#lraycastertrymovepx-number-py-number-dx-number-dy-number-number)
   - [LRaycaster:type() -> string](#lraycastertype-string)
   - [LRaycaster:typeOf(name: string) -> boolean](#lraycastertypeofname-string-boolean)
-  - [LRaycaster:width() -> number](#lraycasterwidth-number)
+  - [LRaycaster:width() -> integer](#lraycasterwidth-integer)
   - [LSpriteManager](#lspritemanager)
-  - [LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> number](#lspritemanageraddx-number-y-number-texture-string-scale-number-number)
+  - [LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> integer](#lspritemanageraddx-number-y-number-texture-string-scale-number-integer)
   - [LSpriteManager:clear()](#lspritemanagerclear)
   - [LSpriteManager:remove(id: integer)](#lspritemanagerremoveid-integer)
   - [LSpriteManager:setPosition(id: integer, x: number, y: number)](#lspritemanagersetpositionid-integer-x-number-y-number)
   - [LSpriteManager:setVisible(id: integer, visible: boolean)](#lspritemanagersetvisibleid-integer-visible-boolean)
-  - [LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> table](#lspritemanagersortandprojectcamx-number-camy-number-camangle-number-table)
+  - [LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> integer[]](#lspritemanagersortandprojectcamx-number-camy-number-camangle-number-integer)
   - [LSpriteManager:type() -> string](#lspritemanagertype-string)
   - [LSpriteManager:typeOf(name: string) -> boolean](#lspritemanagertypeofname-string-boolean)
 - [Examples](#examples)
@@ -454,7 +454,7 @@ do
 end
 ```
 
-### `LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> number`
+### `LDoorManager:addDoor(x: integer, y: integer, direction: string, speed: number) -> integer`
 
 Registers a new sliding door at the given grid cell.
 
@@ -465,7 +465,7 @@ Registers a new sliding door at the given grid cell.
 - `direction` (`string`, required) - Slide axis: "horizontal" or "vertical".
 - `speed` (`number`, required) - How fast the door opens/closes (units per second).
 
-**Returns**: `number` - Zero-based index of the newly added door.
+**Returns**: `integer` - Zero-based index of the newly added door.
 
 #### Example
 
@@ -505,11 +505,11 @@ do
 end
 ```
 
-### `LDoorManager:count() -> number`
+### `LDoorManager:count() -> integer`
 
 Returns the total number of registered doors.
 
-**Returns**: `number` - Door count.
+**Returns**: `integer` - Door count.
 
 #### Example
 
@@ -837,11 +837,11 @@ do
 end
 ```
 
-### `LPointLight:color() -> number, number, number`
+### `LPointLight:color() -> number`
 
 Returns the RGB color components of this light.
 
-**Returns**: `number, number, number` - Red, green, blue channels (0.0..1.0).
+**Returns**: `number` - Red channel (0.0..1.0).
 
 #### Example
 
@@ -1077,7 +1077,7 @@ do
 end
 ```
 
-### `LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> number`
+### `LRaycaster:buildScene(params: table, [lights]: table, [sprites]: table, [wallTextures]: table) -> integer`
 
 Builds a complete textured raycaster scene for GPU rendering. Stores the output internally.
 
@@ -1088,7 +1088,7 @@ Builds a complete textured raycaster scene for GPU rendering. Stores the output 
 - `sprites` (`table`, optional) - Array of sprite tables {x, y, texture, size?}.
 - `wallTextures` (`table`, optional) - Map of cell_value -> texture for wall surfaces.
 
-**Returns**: `number` - Total number of quads in the built scene.
+**Returns**: `integer` - Total number of quads in the built scene.
 
 #### Example
 
@@ -1128,7 +1128,7 @@ do
 end
 ```
 
-### `LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> number`
+### `LRaycaster:buildSceneWithModels(params: table, [lights]: table, [sprites]: table, [wallTextures]: table, [models]: table) -> integer`
 
 Builds a textured raycaster scene with additional 3D .obj model instances projected into the view.
 
@@ -1140,7 +1140,7 @@ Builds a textured raycaster scene with additional 3D .obj model instances projec
 - `wallTextures` (`table`, optional) - Map of cell_value -> texture.
 - `models` (`table`, optional) - Array of model instance tables {model, x, y, rotation?, scale?}.
 
-**Returns**: `number` - Total number of quads in the built scene.
+**Returns**: `integer` - Total number of quads in the built scene.
 
 #### Example
 
@@ -1163,7 +1163,7 @@ do
 end
 ```
 
-### `LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: number) -> table`
+### `LRaycaster:castFloorRow(camX: number, camY: number, dirX: number, dirY: number, planeX: number, planeY: number, row: integer) -> table`
 
 Computes floor/ceiling texture UV coordinates for a single scanline row.
 
@@ -1175,7 +1175,7 @@ Computes floor/ceiling texture UV coordinates for a single scanline row.
 - `dirY` (`number`, required) - Camera forward direction Y.
 - `planeX` (`number`, required) - Camera plane X (half-width of FOV).
 - `planeY` (`number`, required) - Camera plane Y (half-width of FOV).
-- `row` (`number`, required) - Scanline row offset from screen center.
+- `row` (`integer`, required) - Scanline row offset from screen center.
 
 **Returns**: `table` - Array of {u, v} tables for each pixel in the row.
 
@@ -1303,7 +1303,7 @@ do
 end
 ```
 
-### `LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> table`
+### `LRaycaster:castRaysFlat(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number) -> number[]`
 
 Casts multiple rays and returns only the corrected distances as a flat array.
 
@@ -1316,7 +1316,7 @@ Casts multiple rays and returns only the corrected distances as a flat array.
 - `count` (`integer`, required) - Number of rays to cast.
 - `maxDist` (`number`, required) - Maximum cast distance per ray.
 
-**Returns**: `table` - Flat array of corrected distance values.
+**Returns**: `number[]` - Flat array of corrected distance values.
 
 #### Example
 
@@ -1334,7 +1334,7 @@ do
 end
 ```
 
-### `LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number, number, number, number`
+### `LRaycaster:computeTileLight(x: integer, y: integer, ambient: number, [lights]: table) -> number`
 
 Computes the combined lighting color at a tile from ambient and point lights, accounting for walls.
 
@@ -1345,7 +1345,7 @@ Computes the combined lighting color at a tile from ambient and point lights, ac
 - `ambient` (`number`, required) - Base ambient light level (0.0..1.0).
 - `lights` (`table`, optional) - Array of point-light tables {x, y, radius, r?, g?, b?, intensity?}.
 
-**Returns**: `number, number, number, number` - Red, green, blue channels and average luminance.
+**Returns**: `number` - Red light channel.
 
 #### Example
 
@@ -1364,7 +1364,7 @@ do
 end
 ```
 
-### `LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> table`
+### `LRaycaster:drawCameraSweep(x: number, y: number, fov: number, maxDist: number, numFrames: integer, fw: integer, fh: integer) -> LImageData`
 
 Renders multiple frames of a rotating camera sweep as a single combined image.
 
@@ -1378,7 +1378,7 @@ Renders multiple frames of a rotating camera sweep as a single combined image.
 - `fw` (`integer`, required) - Frame width in pixels.
 - `fh` (`integer`, required) - Frame height in pixels.
 
-**Returns**: `table` - Raw image data for all frames.
+**Returns**: `LImageData` - Raw image data for all frames.
 
 #### Example
 
@@ -1403,7 +1403,7 @@ do
 end
 ```
 
-### `LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: number, w: number, h: number, maxDist: number) -> table`
+### `LRaycaster:drawDepthMap(px: number, py: number, angle: number, fov: number, numRays: integer, w: integer, h: integer, maxDist: number) -> LImageData`
 
 Renders a grayscale depth map showing distance-to-wall for each column.
 
@@ -1413,12 +1413,12 @@ Renders a grayscale depth map showing distance-to-wall for each column.
 - `py` (`number`, required) - Player Y position.
 - `angle` (`number`, required) - Player facing angle in radians.
 - `fov` (`number`, required) - Field of view in radians.
-- `numRays` (`number`, required) - Number of rays (columns) to cast.
-- `w` (`number`, required) - Output image width in pixels.
-- `h` (`number`, required) - Output image height in pixels.
+- `numRays` (`integer`, required) - Number of rays (columns) to cast.
+- `w` (`integer`, required) - Output image width in pixels.
+- `h` (`integer`, required) - Output image height in pixels.
 - `maxDist` (`number`, required) - Maximum render distance.
 
-**Returns**: `table` - Raw depth-map image data.
+**Returns**: `LImageData` - Raw depth-map image data.
 
 #### Example
 
@@ -1437,7 +1437,7 @@ do
 end
 ```
 
-### `LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> table`
+### `LRaycaster:drawLineOfSight(ax: number, ay: number, bx: number, by: number, scale: integer) -> LImageData`
 
 Renders a debug image showing the line-of-sight ray between two world points.
 
@@ -1449,7 +1449,7 @@ Renders a debug image showing the line-of-sight ray between two world points.
 - `by` (`number`, required) - End Y.
 - `scale` (`integer`, required) - Pixels per grid cell.
 
-**Returns**: `table` - Raw image data.
+**Returns**: `LImageData` - Raw image data for this view.
 
 #### Example
 
@@ -1467,7 +1467,7 @@ do
 end
 ```
 
-### `LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> table`
+### `LRaycaster:drawTopDown(px: number, py: number, angle: number, scale: integer) -> LImageData`
 
 Renders a top-down debug view of the map with the player's position and direction.
 
@@ -1478,7 +1478,7 @@ Renders a top-down debug view of the map with the player's position and directio
 - `angle` (`number`, required) - Player facing angle in radians.
 - `scale` (`integer`, required) - Pixels per grid cell.
 
-**Returns**: `table` - Raw image data.
+**Returns**: `LImageData` - Raw image data.
 
 #### Example
 
@@ -1496,7 +1496,7 @@ do
 end
 ```
 
-### `LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> table`
+### `LRaycaster:drawView(px: number, py: number, angle: number, fov: number, w: integer, h: integer, maxDist: number) -> LImageData`
 
 Renders a first-person raycaster view to a raw image buffer (no textures, flat-shaded).
 
@@ -1510,7 +1510,7 @@ Renders a first-person raycaster view to a raw image buffer (no textures, flat-s
 - `h` (`integer`, required) - Output image height in pixels.
 - `maxDist` (`number`, required) - Maximum render distance.
 
-**Returns**: `table` - Raw image data.
+**Returns**: `LImageData` - Raw image data.
 
 #### Example
 
@@ -1529,7 +1529,7 @@ do
 end
 ```
 
-### `LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> number`
+### `LRaycaster:getCeilingTextureCell(x: integer, y: integer) -> integer`
 
 Returns the raw texture id assigned to this ceiling cell, or nil if none.
 
@@ -1538,7 +1538,7 @@ Returns the raw texture id assigned to this ceiling cell, or nil if none.
 - `x` (`integer`, required) - Grid column.
 - `y` (`integer`, required) - Grid row.
 
-**Returns**: `number` - Raw texture id or nil.
+**Returns**: `integer` - Raw texture id or nil.
 
 #### Example
 
@@ -1556,7 +1556,7 @@ do
 end
 ```
 
-### `LRaycaster:getCell(x: integer, y: integer) -> number`
+### `LRaycaster:getCell(x: integer, y: integer) -> integer`
 
 Returns the wall type value at a grid cell.
 
@@ -1565,7 +1565,7 @@ Returns the wall type value at a grid cell.
 - `x` (`integer`, required) - Grid column.
 - `y` (`integer`, required) - Grid row.
 
-**Returns**: `number` - Cell value (0 = empty, 1+ = wall type).
+**Returns**: `integer` - Cell value (0 = empty, 1+ = wall type).
 
 #### Example
 
@@ -1583,7 +1583,7 @@ do
 end
 ```
 
-### `LRaycaster:getFloorTextureCell(x: integer, y: integer) -> number`
+### `LRaycaster:getFloorTextureCell(x: integer, y: integer) -> integer`
 
 Returns the raw texture id assigned to this floor cell, or nil if none.
 
@@ -1592,7 +1592,7 @@ Returns the raw texture id assigned to this floor cell, or nil if none.
 - `x` (`integer`, required) - Grid column.
 - `y` (`integer`, required) - Grid row.
 
-**Returns**: `number` - Raw texture id or nil.
+**Returns**: `integer` - Raw texture id or nil.
 
 #### Example
 
@@ -1664,7 +1664,7 @@ do
 end
 ```
 
-### `LRaycaster:gridMove(px: number, py: number, dir: number, action: string, step: number) -> number, number, boolean`
+### `LRaycaster:gridMove(px: number, py: number, dir: integer, action: string, step: number) -> number`
 
 Performs a discrete grid-step movement in one of 4 cardinal directions with collision.
 
@@ -1672,11 +1672,11 @@ Performs a discrete grid-step movement in one of 4 cardinal directions with coll
 
 - `px` (`number`, required) - Current X position.
 - `py` (`number`, required) - Current Y position.
-- `dir` (`number`, required) - Facing direction 1..4 (1=N, 2=E, 3=S, 4=W).
+- `dir` (`integer`, required) - Facing direction 1..4 (1=N, 2=E, 3=S, 4=W).
 - `action` (`string`, required) - Movement action: "forward", "back", "left", or "right".
 - `step` (`number`, required) - Step distance in world units (typically 1.0).
 
-**Returns**: `number, number, boolean` - Final X, final Y, whether move succeeded.
+**Returns**: `number` - Final X position.
 
 #### Example
 
@@ -1695,11 +1695,11 @@ do
 end
 ```
 
-### `LRaycaster:height() -> number`
+### `LRaycaster:height() -> integer`
 
 Returns the map height in grid cells.
 
-**Returns**: `number` - Map height.
+**Returns**: `integer` - Map height.
 
 #### Example
 
@@ -1837,7 +1837,7 @@ do
 end
 ```
 
-### `LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: number, maxDist: number, [step]: number) -> table`
+### `LRaycaster:revealCellsFromRays(ox: number, oy: number, angle: number, fov: number, count: integer, maxDist: number, [step]: number) -> table`
 
 Casts rays across the FOV and returns a list of grid cells that are visible (for fog-of-war).
 
@@ -1847,7 +1847,7 @@ Casts rays across the FOV and returns a list of grid cells that are visible (for
 - `oy` (`number`, required) - Ray origin Y.
 - `angle` (`number`, required) - Center angle in radians.
 - `fov` (`number`, required) - Field of view in radians.
-- `count` (`number`, required) - Number of rays.
+- `count` (`integer`, required) - Number of rays.
 - `maxDist` (`number`, required) - Maximum ray distance.
 - `step` (`number`, optional) - Walk step along each ray (default 0.2).
 
@@ -2021,13 +2021,13 @@ do
 end
 ```
 
-### `LRaycaster:setWallAlpha(tileType: number, alpha: number)`
+### `LRaycaster:setWallAlpha(tileType: integer, alpha: number)`
 
 Sets the transparency for a specific wall tile type, enabling see-through walls.
 
 **Parameters**
 
-- `tileType` (`number`, required) - The cell value (1..255) whose alpha to change.
+- `tileType` (`integer`, required) - The cell value (1..255) whose alpha to change.
 - `alpha` (`number`, required) - Opacity (0.0 = fully transparent, 1.0 = fully opaque).
 
 #### Example
@@ -2046,7 +2046,7 @@ do
 end
 ```
 
-### `LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number, number, boolean`
+### `LRaycaster:tryMove(px: number, py: number, dx: number, dy: number) -> number`
 
 Attempts to move from (px,py) by (dx,dy) with wall-slide collision. Returns the final position.
 
@@ -2057,7 +2057,7 @@ Attempts to move from (px,py) by (dx,dy) with wall-slide collision. Returns the 
 - `dx` (`number`, required) - Desired X movement delta.
 - `dy` (`number`, required) - Desired Y movement delta.
 
-**Returns**: `number, number, boolean` - Final X, final Y, and whether any movement occurred.
+**Returns**: `number` - Final X position.
 
 #### Example
 
@@ -2119,11 +2119,11 @@ do
 end
 ```
 
-### `LRaycaster:width() -> number`
+### `LRaycaster:width() -> integer`
 
 Returns the map width in grid cells.
 
-**Returns**: `number` - Map width.
+**Returns**: `integer` - Map width.
 
 #### Example
 
@@ -2159,7 +2159,7 @@ do
 end
 ```
 
-### `LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> number`
+### `LSpriteManager:add(x: number, y: number, texture: string, [scale]: number) -> integer`
 
 Adds a new sprite to the manager at a world position with a texture name and optional scale.
 
@@ -2170,7 +2170,7 @@ Adds a new sprite to the manager at a world position with a texture name and opt
 - `texture` (`string`, required) - Texture asset name.
 - `scale` (`number`, optional) - Sprite size multiplier (default 1.0).
 
-**Returns**: `number` - Unique sprite id for later manipulation.
+**Returns**: `integer` - Unique sprite id for later manipulation.
 
 #### Example
 
@@ -2278,7 +2278,7 @@ do
 end
 ```
 
-### `LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> table`
+### `LSpriteManager:sortAndProject(camX: number, camY: number, camAngle: number) -> integer[]`
 
 Sorts all visible sprites by distance from the camera and returns projection data.
 
@@ -2288,7 +2288,7 @@ Sorts all visible sprites by distance from the camera and returns projection dat
 - `camY` (`number`, required) - Camera Y position.
 - `camAngle` (`number`, required) - Camera facing angle (unused, reserved).
 
-**Returns**: `table` - Array of {id, x, y, texture, scale, distance} sorted back-to-front.
+**Returns**: `integer[]` - Array of {id, x, y, texture, scale, distance} sorted back-to-front.
 
 #### Example
 

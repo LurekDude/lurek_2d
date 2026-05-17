@@ -14,24 +14,24 @@
 - [Key Types](#key-types)
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
-  - [lurek.i18n.buildIndex() -> table](#lureki18nbuildindex-table)
-  - [lurek.i18n.categories() -> table](#lureki18ncategories-table)
-  - [lurek.i18n.detectLocale() -> LuaValue](#lureki18ndetectlocale-luavalue)
+  - [lurek.i18n.buildIndex() -> string[]](#lureki18nbuildindex-string)
+  - [lurek.i18n.categories() -> string[]](#lureki18ncategories-string)
+  - [lurek.i18n.detectLocale() -> string](#lureki18ndetectlocale-string)
   - [lurek.i18n.formatDate(timestamp: integer, [fmt]: string) -> string](#lureki18nformatdatetimestamp-integer-fmt-string-string)
   - [lurek.i18n.formatNumber(n: number, [opts]: table) -> string](#lureki18nformatnumbern-number-opts-table-string)
-  - [lurek.i18n.getAvailableLanguages() -> table](#lureki18ngetavailablelanguages-table)
+  - [lurek.i18n.getAvailableLanguages() -> string[]](#lureki18ngetavailablelanguages-string)
   - [lurek.i18n.getBase() -> string](#lureki18ngetbase-string)
-  - [lurek.i18n.getFallbacks() -> table](#lureki18ngetfallbacks-table)
-  - [lurek.i18n.getKeys() -> table](#lureki18ngetkeys-table)
-  - [lurek.i18n.getLanguage() -> LuaValue](#lureki18ngetlanguage-luavalue)
-  - [lurek.i18n.getLanguages() -> table](#lureki18ngetlanguages-table)
-  - [lurek.i18n.getLoadedLocales() -> table](#lureki18ngetloadedlocales-table)
+  - [lurek.i18n.getFallbacks() -> string[]](#lureki18ngetfallbacks-string)
+  - [lurek.i18n.getKeys() -> string[]](#lureki18ngetkeys-string)
+  - [lurek.i18n.getLanguage() -> string](#lureki18ngetlanguage-string)
+  - [lurek.i18n.getLanguages() -> string[]](#lureki18ngetlanguages-string)
+  - [lurek.i18n.getLoadedLocales() -> string[]](#lureki18ngetloadedlocales-string)
   - [lurek.i18n.hasKey(key: string) -> boolean](#lureki18nhaskeykey-string-boolean)
   - [lurek.i18n.hasLanguage(locale: string) -> boolean](#lureki18nhaslanguagelocale-string-boolean)
   - [lurek.i18n.interpolate(template: string, vars: table) -> string](#lureki18ninterpolatetemplate-string-vars-table-string)
   - [lurek.i18n.isRTL([locale]: string) -> boolean](#lureki18nisrtllocale-string-boolean)
   - [lurek.i18n.keyCount() -> integer](#lureki18nkeycount-integer)
-  - [lurek.i18n.keysInCategory(category: string) -> table](#lureki18nkeysincategorycategory-string-table)
+  - [lurek.i18n.keysInCategory(category: string) -> string[]](#lureki18nkeysincategorycategory-string-string)
   - [lurek.i18n.loadString(locale: string, content: string, format: string)](#lureki18nloadstringlocale-string-content-string-format-string)
   - [lurek.i18n.loadTable(locale: string, tbl: table)](#lureki18nloadtablelocale-string-tbl-table)
   - [lurek.i18n.localeCoverage(reference: string) -> table](#lureki18nlocalecoveragereference-string-table)
@@ -41,7 +41,7 @@
   - [lurek.i18n.onLanguageChange(cb: function)](#lureki18nonlanguagechangecb-function)
   - [lurek.i18n.pluralFor(n: number) -> string](#lureki18npluralforn-number-string)
   - [lurek.i18n.search(query: string, [limit]: integer) -> table](#lureki18nsearchquery-string-limit-integer-table)
-  - [lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> table](#lureki18nsearchindexedindex-table-query-string-limit-integer-table)
+  - [lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> string[]](#lureki18nsearchindexedindex-table-query-string-limit-integer-string)
   - [lurek.i18n.setBase(locale: string)](#lureki18nsetbaselocale-string)
   - [lurek.i18n.setFallbacks(locales: table)](#lureki18nsetfallbackslocales-table)
   - [lurek.i18n.setKey(locale: string, key: string, value: string)](#lureki18nsetkeylocale-string-key-string-value-string)
@@ -133,34 +133,34 @@ This module has no separate Lua-visible classes in the generated API data.
 - Source spec: [docs/specs/i18n.md](../blob/main/docs/specs/i18n.md)
 
 ```lua
-lurek.i18n.buildIndex() -> table -- Builds a word-to-keys search index from the catalog.
-lurek.i18n.categories() -> table -- Returns top-level translation key categories.
-lurek.i18n.detectLocale() -> LuaValue -- Detects the system locale when available.
+lurek.i18n.buildIndex() -> string[] -- Builds a word-to-keys search index from the catalog.
+lurek.i18n.categories() -> string[] -- Returns top-level translation key categories.
+lurek.i18n.detectLocale() -> string -- Detects the system locale when available.
 lurek.i18n.formatDate(timestamp: integer, [fmt]: string) -> string -- Formats a timestamp with the active locale and a named format.
 lurek.i18n.formatNumber(n: number, [opts]: table) -> string -- Formats a number with locale-aware separators and optional decimal precision.
-lurek.i18n.getAvailableLanguages() -> table -- Returns sorted locale codes currently loaded in the catalog.
+lurek.i18n.getAvailableLanguages() -> string[] -- Returns sorted locale codes currently loaded in the catalog.
 lurek.i18n.getBase() -> string -- Returns the base locale string stored by the localization module.
-lurek.i18n.getFallbacks() -> table -- Returns fallback locale codes in lookup order.
-lurek.i18n.getKeys() -> table -- Returns sorted translation keys known to the catalog.
-lurek.i18n.getLanguage() -> LuaValue -- Returns the active locale code. This function is exposed to Lua scripts.
-lurek.i18n.getLanguages() -> table -- Returns sorted locale codes currently loaded in the catalog.
-lurek.i18n.getLoadedLocales() -> table -- Returns locale codes currently loaded in the catalog.
+lurek.i18n.getFallbacks() -> string[] -- Returns fallback locale codes in lookup order.
+lurek.i18n.getKeys() -> string[] -- Returns sorted translation keys known to the catalog.
+lurek.i18n.getLanguage() -> string -- Returns the active locale code string.
+lurek.i18n.getLanguages() -> string[] -- Returns sorted locale codes currently loaded in the catalog.
+lurek.i18n.getLoadedLocales() -> string[] -- Returns locale codes currently loaded in the catalog.
 lurek.i18n.hasKey(key: string) -> boolean -- Returns whether the catalog contains a translation key in active or fallback locales.
 lurek.i18n.hasLanguage(locale: string) -> boolean -- Returns whether a locale has translations loaded.
 lurek.i18n.interpolate(template: string, vars: table) -> string -- Replaces `{name}` placeholders in a template using string variables.
 lurek.i18n.isRTL([locale]: string) -> boolean -- Returns whether a locale is written right-to-left.
 lurek.i18n.keyCount() -> integer -- Returns the number of translation keys known to the catalog.
-lurek.i18n.keysInCategory(category: string) -> table -- Returns translation keys belonging to one category prefix.
+lurek.i18n.keysInCategory(category: string) -> string[] -- Returns translation keys belonging to one category prefix.
 -- ... 18 more module functions
 ```
 
 ## Module Functions
 
-### `lurek.i18n.buildIndex() -> table`
+### `lurek.i18n.buildIndex() -> string[]`
 
 Builds a word-to-keys search index from the catalog.
 
-**Returns**: `table` - Map table from normalized words to arrays of translation keys.
+**Returns**: `string[]` - Map table from normalized words to arrays of translation keys.
 
 #### Example
 
@@ -179,11 +179,11 @@ do
 end
 ```
 
-### `lurek.i18n.categories() -> table`
+### `lurek.i18n.categories() -> string[]`
 
 Returns top-level translation key categories.
 
-**Returns**: `table` - Array table of category names.
+**Returns**: `string[]` - Category names.
 
 #### Example
 
@@ -206,11 +206,11 @@ do
 end
 ```
 
-### `lurek.i18n.detectLocale() -> LuaValue`
+### `lurek.i18n.detectLocale() -> string`
 
 Detects the system locale when available.
 
-**Returns**: `LuaValue` - Locale string, or nil when detection fails.
+**Returns**: `string` - Locale string, or nil when detection fails.
 
 #### Example
 
@@ -236,7 +236,7 @@ Formats a timestamp with the active locale and a named format.
 **Parameters**
 
 - `timestamp` (`integer`, required) - Unix timestamp value.
-- `fmt` (`string`, optional) - Optional format name, defaulting to `short`.
+- `fmt` (`string`, optional) - Format name, defaulting to `short`.
 
 **Returns**: `string` - Formatted date string.
 
@@ -264,7 +264,7 @@ Formats a number with locale-aware separators and optional decimal precision.
 **Parameters**
 
 - `n` (`number`, required) - Number to format.
-- `opts` (`table`, optional) - Optional table with `decimals` field, defaulting to 2.
+- `opts` (`table`, optional) - Table with `decimals` field, defaulting to 2.
 
 **Returns**: `string` - Formatted number string.
 
@@ -287,11 +287,11 @@ do
 end
 ```
 
-### `lurek.i18n.getAvailableLanguages() -> table`
+### `lurek.i18n.getAvailableLanguages() -> string[]`
 
 Returns sorted locale codes currently loaded in the catalog.
 
-**Returns**: `table` - Array table of locale codes.
+**Returns**: `string[]` - Array table of locale codes.
 
 #### Example
 
@@ -325,11 +325,11 @@ do
 end
 ```
 
-### `lurek.i18n.getFallbacks() -> table`
+### `lurek.i18n.getFallbacks() -> string[]`
 
 Returns fallback locale codes in lookup order.
 
-**Returns**: `table` - Array table of fallback locale codes.
+**Returns**: `string[]` - Array table of fallback locale codes.
 
 #### Example
 
@@ -344,11 +344,11 @@ do
 end
 ```
 
-### `lurek.i18n.getKeys() -> table`
+### `lurek.i18n.getKeys() -> string[]`
 
 Returns sorted translation keys known to the catalog.
 
-**Returns**: `table` - Array table of translation keys.
+**Returns**: `string[]` - Translation keys.
 
 #### Example
 
@@ -370,11 +370,11 @@ do
 end
 ```
 
-### `lurek.i18n.getLanguage() -> LuaValue`
+### `lurek.i18n.getLanguage() -> string`
 
-Returns the active locale code. This function is exposed to Lua scripts.
+Returns the active locale code string.
 
-**Returns**: `LuaValue` - Active locale string, or nil when no locale is active.
+**Returns**: `string` - Active locale string, or nil when no locale is active.
 
 #### Example
 
@@ -392,11 +392,11 @@ do
 end
 ```
 
-### `lurek.i18n.getLanguages() -> table`
+### `lurek.i18n.getLanguages() -> string[]`
 
 Returns sorted locale codes currently loaded in the catalog.
 
-**Returns**: `table` - Array table of locale codes.
+**Returns**: `string[]` - Array table of locale codes.
 
 #### Example
 
@@ -415,11 +415,11 @@ do
 end
 ```
 
-### `lurek.i18n.getLoadedLocales() -> table`
+### `lurek.i18n.getLoadedLocales() -> string[]`
 
 Returns locale codes currently loaded in the catalog.
 
-**Returns**: `table` - Array table of loaded locale codes.
+**Returns**: `string[]` - Array table of loaded locale codes.
 
 #### Example
 
@@ -528,7 +528,7 @@ Returns whether a locale is written right-to-left.
 
 **Parameters**
 
-- `locale` (`string`, optional) - Optional locale code; defaults to the active locale.
+- `locale` (`string`, optional) - Locale code; defaults to the active locale.
 
 **Returns**: `boolean` - True for right-to-left locales.
 
@@ -572,7 +572,7 @@ do
 end
 ```
 
-### `lurek.i18n.keysInCategory(category: string) -> table`
+### `lurek.i18n.keysInCategory(category: string) -> string[]`
 
 Returns translation keys belonging to one category prefix.
 
@@ -580,7 +580,7 @@ Returns translation keys belonging to one category prefix.
 
 - `category` (`string`, required) - Category prefix.
 
-**Returns**: `table` - Array table of translation keys.
+**Returns**: `string[]` - Translation keys.
 
 #### Example
 
@@ -682,7 +682,7 @@ Returns missing translation keys for all locales compared to a reference locale.
 
 - `reference` (`string`, required) - Locale code used as the coverage reference.
 
-**Returns**: `table` - Array table of gap rows with `key` and `missing_in` fields.
+**Returns**: `table` - Array of gap rows with `key` and `missing_in` fields.
 
 #### Example
 
@@ -823,9 +823,9 @@ Searches translation keys and values for a query string.
 **Parameters**
 
 - `query` (`string`, required) - Search query.
-- `limit` (`integer`, optional) - Optional maximum result count; zero or nil means no truncation.
+- `limit` (`integer`, optional) - Maximum result count; zero or nil means no truncation.
 
-**Returns**: `table` - Array table of rows with `key` and `value` fields.
+**Returns**: `table` - Array of rows with `key` and `value` fields.
 
 #### Example
 
@@ -847,7 +847,7 @@ do
 end
 ```
 
-### `lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> table`
+### `lurek.i18n.searchIndexed(index: table, query: string, [limit]: integer) -> string[]`
 
 Searches a prebuilt word index and returns matching keys.
 
@@ -855,9 +855,9 @@ Searches a prebuilt word index and returns matching keys.
 
 - `index` (`table`, required) - Index table returned by `buildIndex`.
 - `query` (`string`, required) - Search query.
-- `limit` (`integer`, optional) - Optional maximum key count; zero or nil means no truncation.
+- `limit` (`integer`, optional) - Maximum key count; zero or nil means no truncation.
 
-**Returns**: `table` - Array table of matching translation keys.
+**Returns**: `string[]` - Matching translation keys.
 
 #### Example
 
@@ -981,8 +981,8 @@ Translates a key using the active locale, optional variables, and optional Engli
 **Parameters**
 
 - `key` (`string`, required) - Translation key.
-- `vars` (`table`, optional) - Optional interpolation variables.
-- `count` (`number`, optional) - Optional plural count, also inserted as `{count}` when variables are used.
+- `vars` (`table`, optional) - Interpolation variables.
+- `count` (`number`, optional) - Plural count, also inserted as `{count}` when variables are used.
 
 **Returns**: `string` - Translated and interpolated text, or the catalog fallback for the key.
 
@@ -1022,7 +1022,7 @@ Translates a gender-specific key variant when present, then falls back to the ba
 
 - `key` (`string`, required) - Base translation key.
 - `gender` (`string`, required) - Gender suffix appended to the key.
-- `vars` (`table`, optional) - Optional interpolation variables.
+- `vars` (`table`, optional) - Interpolation variables.
 
 **Returns**: `string` - Gender-specific or fallback translated text.
 

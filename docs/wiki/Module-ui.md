@@ -20,19 +20,19 @@
   - [lurek.ui.draw()](#lurekuidraw)
   - [lurek.ui.drawToImage(w: integer, h: integer) -> LImageData](#lurekuidrawtoimagew-integer-h-integer-limagedata)
   - [lurek.ui.dropOn(target: table|number) -> boolean](#lurekuidropontarget-tablenumber-boolean)
-  - [lurek.ui.endDrag()](#lurekuienddrag)
-  - [lurek.ui.flushCache() -> table](#lurekuiflushcache-table)
+  - [lurek.ui.endDrag() -> integer](#lurekuienddrag-integer)
+  - [lurek.ui.flushCache() -> boolean](#lurekuiflushcache-boolean)
   - [lurek.ui.focusNext()](#lurekuifocusnext)
   - [lurek.ui.focusPrev()](#lurekuifocusprev)
-  - [lurek.ui.getActiveDrag() -> number](#lurekuigetactivedrag-number)
-  - [lurek.ui.getFocus() -> number](#lurekuigetfocus-number)
+  - [lurek.ui.getActiveDrag() -> integer](#lurekuigetactivedrag-integer)
+  - [lurek.ui.getFocus() -> integer](#lurekuigetfocus-integer)
   - [lurek.ui.getRoot() -> LPanel](#lurekuigetroot-lpanel)
   - [lurek.ui.getTheme() -> boolean](#lurekuigettheme-boolean)
-  - [lurek.ui.getToastCount() -> number](#lurekuigettoastcount-number)
-  - [lurek.ui.getWidgetCount() -> number](#lurekuigetwidgetcount-number)
+  - [lurek.ui.getToastCount() -> integer](#lurekuigettoastcount-integer)
+  - [lurek.ui.getWidgetCount() -> integer](#lurekuigetwidgetcount-integer)
   - [lurek.ui.keypressed(key: string) -> boolean](#lurekuikeypressedkey-string-boolean)
-  - [lurek.ui.loadLayout(def: table) -> number](#lurekuiloadlayoutdef-table-number)
-  - [lurek.ui.loadLayoutFile(path: string) -> number](#lurekuiloadlayoutfilepath-string-number)
+  - [lurek.ui.loadLayout(def: table) -> integer](#lurekuiloadlayoutdef-table-integer)
+  - [lurek.ui.loadLayoutFile(path: string) -> integer](#lurekuiloadlayoutfilepath-string-integer)
   - [lurek.ui.mousemoved(x: number, y: number) -> boolean](#lurekuimousemovedx-number-y-number-boolean)
   - [lurek.ui.mousepressed(x: number, y: number, [btn]: integer) -> boolean](#lurekuimousepressedx-number-y-number-btn-integer-boolean)
   - [lurek.ui.mousereleased(x: number, y: number, [btn]: integer) -> boolean](#lurekuimousereleasedx-number-y-number-btn-integer-boolean)
@@ -91,7 +91,7 @@
 - [Types and Methods](#types-and-methods)
   - [LAccordion](#laccordion)
   - [LAccordion:addSection(self: LAccordion, title: string, [content_idx]: integer)](#laccordionaddsectionself-laccordion-title-string-contentidx-integer)
-  - [LAccordion:getSectionCount(self: LAccordion) -> number](#laccordiongetsectioncountself-laccordion-number)
+  - [LAccordion:getSectionCount(self: LAccordion) -> integer](#laccordiongetsectioncountself-laccordion-integer)
   - [LAccordion:getSectionTitle(self: LAccordion, section_idx: integer) -> string](#laccordiongetsectiontitleself-laccordion-sectionidx-integer-string)
   - [LAccordion:isExclusive(self: LAccordion) -> boolean](#laccordionisexclusiveself-laccordion-boolean)
   - [LAccordion:isSectionExpanded(self: LAccordion, section_idx: integer) -> boolean](#laccordionissectionexpandedself-laccordion-sectionidx-integer-boolean)
@@ -104,7 +104,7 @@
   - [LAreaChart:type() -> string](#lareacharttype-string)
   - [LAreaChart:typeOf(name: string) -> boolean](#lareacharttypeofname-string-boolean)
   - [LBadge](#lbadge)
-  - [LBadge:getCount(self: LBadge) -> number](#lbadgegetcountself-lbadge-number)
+  - [LBadge:getCount(self: LBadge) -> integer](#lbadgegetcountself-lbadge-integer)
   - [LBadge:getDisplayText(self: LBadge) -> string](#lbadgegetdisplaytextself-lbadge-string)
   - [LBadge:setCount(self: LBadge, count: integer)](#lbadgesetcountself-lbadge-count-integer)
   - [LBarChart](#lbarchart)
@@ -133,15 +133,15 @@
   - [LComboBox:addItem(self: LComboBox, text: string)](#lcomboboxadditemself-lcombobox-text-string)
   - [LComboBox:clearItems(self: LComboBox)](#lcomboboxclearitemsself-lcombobox)
   - [LComboBox:getItem(self: LComboBox, index: integer) -> string](#lcomboboxgetitemself-lcombobox-index-integer-string)
-  - [LComboBox:getItemCount(self: LComboBox) -> number](#lcomboboxgetitemcountself-lcombobox-number)
-  - [LComboBox:getSelectedIndex(self: LComboBox) -> number](#lcomboboxgetselectedindexself-lcombobox-number)
+  - [LComboBox:getItemCount(self: LComboBox) -> integer](#lcomboboxgetitemcountself-lcombobox-integer)
+  - [LComboBox:getSelectedIndex(self: LComboBox) -> integer](#lcomboboxgetselectedindexself-lcombobox-integer)
   - [LComboBox:getSelectedItem(self: LComboBox) -> string](#lcomboboxgetselecteditemself-lcombobox-string)
   - [LComboBox:removeItem(self: LComboBox, index: integer) -> boolean](#lcomboboxremoveitemself-lcombobox-index-integer-boolean)
   - [LComboBox:setSelectedIndex(self: LComboBox, index: integer)](#lcomboboxsetselectedindexself-lcombobox-index-integer)
   - [LDialog](#ldialog)
-  - [LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number](#ldialogaddbuttonself-ldialog-text-string-cb-function-number)
+  - [LDialog:addButton(self: LDialog, text: string, [cb]: function) -> integer](#ldialogaddbuttonself-ldialog-text-string-cb-function-integer)
   - [LDialog:close(self: LDialog)](#ldialogcloseself-ldialog)
-  - [LDialog:getContent(self: LDialog) -> number](#ldialoggetcontentself-ldialog-number)
+  - [LDialog:getContent(self: LDialog) -> integer](#ldialoggetcontentself-ldialog-integer)
   - [LDialog:getTitle(self: LDialog) -> string](#ldialoggettitleself-ldialog-string)
   - [LDialog:isModal(self: LDialog) -> boolean](#ldialogismodalself-ldialog-boolean)
   - [LDialog:isOpen(self: LDialog) -> boolean](#ldialogisopenself-ldialog-boolean)
@@ -152,7 +152,7 @@
   - [LDialog:setTitle(self: LDialog, title: string)](#ldialogsettitleself-ldialog-title-string)
   - [LDockPanel](#ldockpanel)
   - [LDockPanel:dock(self: LDockPanel, child_idx: integer, side: string)](#ldockpaneldockself-ldockpanel-childidx-integer-side-string)
-  - [LDockPanel:getDockedCount(self: LDockPanel) -> number](#ldockpanelgetdockedcountself-ldockpanel-number)
+  - [LDockPanel:getDockedCount(self: LDockPanel) -> integer](#ldockpanelgetdockedcountself-ldockpanel-integer)
   - [LDockPanel:getSplitSize(self: LDockPanel, side: string) -> number](#ldockpanelgetsplitsizeself-ldockpanel-side-string-number)
   - [LDockPanel:setSplitSize(self: LDockPanel, side: string, size: number)](#ldockpanelsetsplitsizeself-ldockpanel-side-string-size-number)
   - [LDockPanel:undock(self: LDockPanel, child_idx: integer)](#ldockpanelundockself-ldockpanel-childidx-integer)
@@ -160,9 +160,9 @@
   - [LGuiTable:addColumn(self: LGuiTable, header: string, [width]: number)](#lguitableaddcolumnself-lguitable-header-string-width-number)
   - [LGuiTable:addRow(self: LGuiTable, cells: table)](#lguitableaddrowself-lguitable-cells-table)
   - [LGuiTable:getCell(self: LGuiTable, row: integer, col: integer) -> string](#lguitablegetcellself-lguitable-row-integer-col-integer-string)
-  - [LGuiTable:getColumnCount(self: LGuiTable) -> number](#lguitablegetcolumncountself-lguitable-number)
-  - [LGuiTable:getRowCount(self: LGuiTable) -> number](#lguitablegetrowcountself-lguitable-number)
-  - [LGuiTable:getSelectedRow(self: LGuiTable) -> number](#lguitablegetselectedrowself-lguitable-number)
+  - [LGuiTable:getColumnCount(self: LGuiTable) -> integer](#lguitablegetcolumncountself-lguitable-integer)
+  - [LGuiTable:getRowCount(self: LGuiTable) -> integer](#lguitablegetrowcountself-lguitable-integer)
+  - [LGuiTable:getSelectedRow(self: LGuiTable) -> integer](#lguitablegetselectedrowself-lguitable-integer)
   - [LGuiTable:isSortable(self: LGuiTable) -> boolean](#lguitableissortableself-lguitable-boolean)
   - [LGuiTable:setCell(self: LGuiTable, row: integer, col: integer, text: string)](#lguitablesetcellself-lguitable-row-integer-col-integer-text-string)
   - [LGuiTable:setOnSelect(self: LGuiTable, f: function)](#lguitablesetonselectself-lguitable-f-function)
@@ -209,20 +209,20 @@
   - [LListBox:addItem(self: LListBox, text: string)](#llistboxadditemself-llistbox-text-string)
   - [LListBox:clearItems(self: LListBox)](#llistboxclearitemsself-llistbox)
   - [LListBox:getItem(self: LListBox, index: integer) -> string](#llistboxgetitemself-llistbox-index-integer-string)
-  - [LListBox:getItemCount(self: LListBox) -> number](#llistboxgetitemcountself-llistbox-number)
-  - [LListBox:getSelectedIndex(self: LListBox) -> number](#llistboxgetselectedindexself-llistbox-number)
+  - [LListBox:getItemCount(self: LListBox) -> integer](#llistboxgetitemcountself-llistbox-integer)
+  - [LListBox:getSelectedIndex(self: LListBox) -> integer](#llistboxgetselectedindexself-llistbox-integer)
   - [LListBox:removeItem(self: LListBox, index: integer)](#llistboxremoveitemself-llistbox-index-integer)
   - [LListBox:setItemHeight(self: LListBox, h: number)](#llistboxsetitemheightself-llistbox-h-number)
   - [LListBox:setSelectedIndex(self: LListBox, index: integer)](#llistboxsetselectedindexself-llistbox-index-integer)
   - [LMenuBar](#lmenubar)
   - [LMenuBar:addMenu(self: LMenuBar, menu_idx: integer)](#lmenubaraddmenuself-lmenubar-menuidx-integer)
-  - [LMenuBar:getMenuCount(self: LMenuBar) -> number](#lmenubargetmenucountself-lmenubar-number)
-  - [LMenuBar:getMenus(self: LMenuBar) -> table](#lmenubargetmenusself-lmenubar-table)
+  - [LMenuBar:getMenuCount(self: LMenuBar) -> integer](#lmenubargetmenucountself-lmenubar-integer)
+  - [LMenuBar:getMenus(self: LMenuBar) -> integer[]](#lmenubargetmenusself-lmenubar-integer)
   - [LMenuBar:removeMenu(self: LMenuBar, menu_idx: integer) -> boolean](#lmenubarremovemenuself-lmenubar-menuidx-integer-boolean)
   - [LMenuItem](#lmenuitem)
   - [LMenuItem:addSubItem(self: LMenuItem, child_idx: integer)](#lmenuitemaddsubitemself-lmenuitem-childidx-integer)
   - [LMenuItem:getShortcut(self: LMenuItem) -> string](#lmenuitemgetshortcutself-lmenuitem-string)
-  - [LMenuItem:getSubItems(self: LMenuItem) -> table](#lmenuitemgetsubitemsself-lmenuitem-table)
+  - [LMenuItem:getSubItems(self: LMenuItem) -> integer[]](#lmenuitemgetsubitemsself-lmenuitem-integer)
   - [LMenuItem:getText(self: LMenuItem) -> string](#lmenuitemgettextself-lmenuitem-string)
   - [LMenuItem:isChecked(self: LMenuItem) -> boolean](#lmenuitemischeckedself-lmenuitem-boolean)
   - [LMenuItem:setChecked(self: LMenuItem, v: boolean)](#lmenuitemsetcheckedself-lmenuitem-v-boolean)
@@ -230,8 +230,8 @@
   - [LMenuItem:setShortcut(self: LMenuItem, shortcut: string)](#lmenuitemsetshortcutself-lmenuitem-shortcut-string)
   - [LMenuItem:setText(self: LMenuItem, text: string)](#lmenuitemsettextself-lmenuitem-text-string)
   - [LNinePatch](#lninepatch)
-  - [LNinePatch:getImageDimensions(self: LNinePatch) -> number, number](#lninepatchgetimagedimensionsself-lninepatch-number-number)
-  - [LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number](#lninepatchgetinsetsself-lninepatch-number-number-number-number)
+  - [LNinePatch:getImageDimensions(self: LNinePatch) -> integer, integer](#lninepatchgetimagedimensionsself-lninepatch-integer-integer)
+  - [LNinePatch:getInsets(self: LNinePatch) -> integer, integer, integer, integer](#lninepatchgetinsetsself-lninepatch-integer-integer-integer-integer)
   - [LNinePatch:getSlices(self: LNinePatch) -> table](#lninepatchgetslicesself-lninepatch-table)
   - [LNinePatch:setImageDimensions(self: LNinePatch, w: integer, h: integer)](#lninepatchsetimagedimensionsself-lninepatch-w-integer-h-integer)
   - [LNinePatch:setInsets(self: LNinePatch, left: integer, top: integer, right: integer, bottom: integer)](#lninepatchsetinsetsself-lninepatch-left-integer-top-integer-right-integer-bottom-integer)
@@ -303,10 +303,10 @@
   - [LSpinBox:setStep(self: LSpinBox, step: number)](#lspinboxsetstepself-lspinbox-step-number)
   - [LSpinBox:setValue(self: LSpinBox, v: number)](#lspinboxsetvalueself-lspinbox-v-number)
   - [LSplitPanel](#lsplitpanel)
-  - [LSplitPanel:getFirstChild(self: LSplitPanel) -> number](#lsplitpanelgetfirstchildself-lsplitpanel-number)
+  - [LSplitPanel:getFirstChild(self: LSplitPanel) -> integer](#lsplitpanelgetfirstchildself-lsplitpanel-integer)
   - [LSplitPanel:getMinPanelSize(self: LSplitPanel) -> number](#lsplitpanelgetminpanelsizeself-lsplitpanel-number)
   - [LSplitPanel:getOrientation(self: LSplitPanel) -> string](#lsplitpanelgetorientationself-lsplitpanel-string)
-  - [LSplitPanel:getSecondChild(self: LSplitPanel) -> number](#lsplitpanelgetsecondchildself-lsplitpanel-number)
+  - [LSplitPanel:getSecondChild(self: LSplitPanel) -> integer](#lsplitpanelgetsecondchildself-lsplitpanel-integer)
   - [LSplitPanel:getSplitPosition(self: LSplitPanel) -> number](#lsplitpanelgetsplitpositionself-lsplitpanel-number)
   - [LSplitPanel:setFirstChild(self: LSplitPanel, child_idx: integer)](#lsplitpanelsetfirstchildself-lsplitpanel-childidx-integer)
   - [LSplitPanel:setMinPanelSize(self: LSplitPanel, v: number)](#lsplitpanelsetminpanelsizeself-lsplitpanel-v-number)
@@ -315,24 +315,24 @@
   - [LSplitPanel:setSplitPosition(self: LSplitPanel, v: number)](#lsplitpanelsetsplitpositionself-lsplitpanel-v-number)
   - [LStatusBar](#lstatusbar)
   - [LStatusBar:addSection(self: LStatusBar, text: string, [width]: number)](#lstatusbaraddsectionself-lstatusbar-text-string-width-number)
-  - [LStatusBar:getSectionCount(self: LStatusBar) -> number](#lstatusbargetsectioncountself-lstatusbar-number)
+  - [LStatusBar:getSectionCount(self: LStatusBar) -> integer](#lstatusbargetsectioncountself-lstatusbar-integer)
   - [LStatusBar:getSectionText(self: LStatusBar, section_idx: integer) -> string](#lstatusbargetsectiontextself-lstatusbar-sectionidx-integer-string)
   - [LStatusBar:setSectionCount(self: LStatusBar, count: integer)](#lstatusbarsetsectioncountself-lstatusbar-count-integer)
   - [LStatusBar:setSectionText(self: LStatusBar, section_idx: integer, text: string)](#lstatusbarsetsectiontextself-lstatusbar-sectionidx-integer-text-string)
-  - [LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any)](#lstatusbarsetsectionwidgetself-lstatusbar-sectionidx-integer-widget-any)
+  - [LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, [widget]: table)](#lstatusbarsetsectionwidgetself-lstatusbar-sectionidx-integer-widget-table)
   - [LSwitch](#lswitch)
   - [LSwitch:isOn(self: LSwitch) -> boolean](#lswitchisonself-lswitch-boolean)
   - [LSwitch:setOn(self: LSwitch, on: boolean)](#lswitchsetonself-lswitch-on-boolean)
   - [LSwitch:toggle(self: LSwitch)](#lswitchtoggleself-lswitch)
   - [LTabBar](#ltabbar)
   - [LTabBar:addTab(self: LTabBar, label: string)](#ltabbaraddtabself-ltabbar-label-string)
-  - [LTabBar:getActiveTab(self: LTabBar) -> number](#ltabbargetactivetabself-ltabbar-number)
+  - [LTabBar:getActiveTab(self: LTabBar) -> integer](#ltabbargetactivetabself-ltabbar-integer)
   - [LTabBar:getTab(self: LTabBar, index: integer) -> string](#ltabbargettabself-ltabbar-index-integer-string)
-  - [LTabBar:getTabCount(self: LTabBar) -> number](#ltabbargettabcountself-ltabbar-number)
+  - [LTabBar:getTabCount(self: LTabBar) -> integer](#ltabbargettabcountself-ltabbar-integer)
   - [LTabBar:removeTab(self: LTabBar, index: integer) -> boolean](#ltabbarremovetabself-ltabbar-index-integer-boolean)
   - [LTabBar:setActiveTab(self: LTabBar, index: integer)](#ltabbarsetactivetabself-ltabbar-index-integer)
   - [LTextInput](#ltextinput)
-  - [LTextInput:getCursorPosition(self: LTextInput) -> number](#ltextinputgetcursorpositionself-ltextinput-number)
+  - [LTextInput:getCursorPosition(self: LTextInput) -> integer](#ltextinputgetcursorpositionself-ltextinput-integer)
   - [LTextInput:getPlaceholder(self: LTextInput) -> string](#ltextinputgetplaceholderself-ltextinput-string)
   - [LTextInput:getText(self: LTextInput) -> string](#ltextinputgettextself-ltextinput-string)
   - [LTextInput:isFocused(self: LTextInput) -> boolean](#ltextinputisfocusedself-ltextinput-boolean)
@@ -351,7 +351,7 @@
   - [LToast:setDuration(self: LToast, d: number)](#ltoastsetdurationself-ltoast-d-number)
   - [LToast:setMessage(self: LToast, msg: string)](#ltoastsetmessageself-ltoast-msg-string)
   - [LToolbar](#ltoolbar)
-  - [LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number](#ltoolbaraddbuttonself-ltoolbar-id-string-tooltip-string-number)
+  - [LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> integer](#ltoolbaraddbuttonself-ltoolbar-id-string-tooltip-string-integer)
   - [LToolbar:addSeparator(self: LToolbar)](#ltoolbaraddseparatorself-ltoolbar)
   - [LToolbar:addSpacer(self: LToolbar, [_size]: number)](#ltoolbaraddspacerself-ltoolbar-size-number)
   - [LToolbar:getButton(self: LToolbar, id: string) -> table](#ltoolbargetbuttonself-ltoolbar-id-string-table)
@@ -362,7 +362,7 @@
   - [LToolbar:setOrientation(self: LToolbar, v: string)](#ltoolbarsetorientationself-ltoolbar-v-string)
   - [LTooltipPanel](#ltooltippanel)
   - [LTooltipPanel:getDelay(self: LTooltipPanel) -> number](#ltooltippanelgetdelayself-ltooltippanel-number)
-  - [LTooltipPanel:getTarget(self: LTooltipPanel) -> number](#ltooltippanelgettargetself-ltooltippanel-number)
+  - [LTooltipPanel:getTarget(self: LTooltipPanel) -> integer](#ltooltippanelgettargetself-ltooltippanel-integer)
   - [LTooltipPanel:getText(self: LTooltipPanel) -> string](#ltooltippanelgettextself-ltooltippanel-string)
   - [LTooltipPanel:setDelay(self: LTooltipPanel, v: number)](#ltooltippanelsetdelayself-ltooltippanel-v-number)
   - [LTooltipPanel:setTarget(self: LTooltipPanel, [target]: integer)](#ltooltippanelsettargetself-ltooltippanel-target-integer)
@@ -374,13 +374,13 @@
   - [LTreeView:collapseNode(self: LTreeView, index: integer) -> boolean](#ltreeviewcollapsenodeself-ltreeview-index-integer-boolean)
   - [LTreeView:expandAll(self: LTreeView)](#ltreeviewexpandallself-ltreeview)
   - [LTreeView:expandNode(self: LTreeView, index: integer) -> boolean](#ltreeviewexpandnodeself-ltreeview-index-integer-boolean)
-  - [LTreeView:getChildNodes(self: LTreeView, index: integer) -> table](#ltreeviewgetchildnodesself-ltreeview-index-integer-table)
-  - [LTreeView:getNodeCount(self: LTreeView) -> table](#ltreeviewgetnodecountself-ltreeview-table)
-  - [LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number](#ltreeviewgetnodedepthself-ltreeview-index-integer-number)
-  - [LTreeView:getNodeText(self: LTreeView, index: integer) -> table](#ltreeviewgetnodetextself-ltreeview-index-integer-table)
-  - [LTreeView:getParentNode(self: LTreeView, index: integer) -> number](#ltreeviewgetparentnodeself-ltreeview-index-integer-number)
-  - [LTreeView:getSelectedNode(self: LTreeView) -> number](#ltreeviewgetselectednodeself-ltreeview-number)
-  - [LTreeView:isExpanded(self: LTreeView, index: integer) -> table](#ltreeviewisexpandedself-ltreeview-index-integer-table)
+  - [LTreeView:getChildNodes(self: LTreeView, index: integer) -> integer[]](#ltreeviewgetchildnodesself-ltreeview-index-integer-integer)
+  - [LTreeView:getNodeCount(self: LTreeView) -> integer](#ltreeviewgetnodecountself-ltreeview-integer)
+  - [LTreeView:getNodeDepth(self: LTreeView, index: integer) -> integer](#ltreeviewgetnodedepthself-ltreeview-index-integer-integer)
+  - [LTreeView:getNodeText(self: LTreeView, index: integer) -> string](#ltreeviewgetnodetextself-ltreeview-index-integer-string)
+  - [LTreeView:getParentNode(self: LTreeView, index: integer) -> integer](#ltreeviewgetparentnodeself-ltreeview-index-integer-integer)
+  - [LTreeView:getSelectedNode(self: LTreeView) -> integer](#ltreeviewgetselectednodeself-ltreeview-integer)
+  - [LTreeView:isExpanded(self: LTreeView, index: integer) -> boolean](#ltreeviewisexpandedself-ltreeview-index-integer-boolean)
   - [LTreeView:isNodeExpanded(self: LTreeView, index: integer) -> boolean](#ltreeviewisnodeexpandedself-ltreeview-index-integer-boolean)
   - [LTreeView:removeNode(self: LTreeView, index: integer) -> boolean](#ltreeviewremovenodeself-ltreeview-index-integer-boolean)
   - [LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean](#ltreeviewsetnodeiconself-ltreeview-index-integer-icon-string-boolean)
@@ -393,7 +393,7 @@
   - [LUiWidget:animatePosition(self: LUiWidget, x: number, y: number, [duration]: number) -> table](#luiwidgetanimatepositionself-luiwidget-x-number-y-number-duration-number-table)
   - [LUiWidget:attachToEntity(self: LUiWidget, entity_id: integer)](#luiwidgetattachtoentityself-luiwidget-entityid-integer)
   - [LUiWidget:bind(self: LUiWidget, key: string)](#luiwidgetbindself-luiwidget-key-string)
-  - [LUiWidget:cancelAnimations(self: LUiWidget)](#luiwidgetcancelanimationsself-luiwidget)
+  - [LUiWidget:cancelAnimations(self: LUiWidget) -> boolean](#luiwidgetcancelanimationsself-luiwidget-boolean)
   - [LUiWidget:clearAnchor(self: LUiWidget)](#luiwidgetclearanchorself-luiwidget)
   - [LUiWidget:containsPoint(self: LUiWidget, x: number, y: number) -> boolean](#luiwidgetcontainspointself-luiwidget-x-number-y-number-boolean)
   - [LUiWidget:detachFromEntity(self: LUiWidget)](#luiwidgetdetachfromentityself-luiwidget)
@@ -401,7 +401,7 @@
   - [LUiWidget:fadeOut(self: LUiWidget)](#luiwidgetfadeoutself-luiwidget)
   - [LUiWidget:findById(self: LUiWidget, id: string) -> LWidget](#luiwidgetfindbyidself-luiwidget-id-string-lwidget)
   - [LUiWidget:getAlpha(self: LUiWidget) -> number](#luiwidgetgetalphaself-luiwidget-number)
-  - [LUiWidget:getChildCount(self: LUiWidget) -> number](#luiwidgetgetchildcountself-luiwidget-number)
+  - [LUiWidget:getChildCount(self: LUiWidget) -> integer](#luiwidgetgetchildcountself-luiwidget-integer)
   - [LUiWidget:getChildren(self: LUiWidget) -> table](#luiwidgetgetchildrenself-luiwidget-table)
   - [LUiWidget:getFlexGrow(self: LUiWidget) -> number](#luiwidgetgetflexgrowself-luiwidget-number)
   - [LUiWidget:getFlexShrink(self: LUiWidget) -> number](#luiwidgetgetflexshrinkself-luiwidget-number)
@@ -415,13 +415,13 @@
   - [LUiWidget:getSize(self: LUiWidget) -> number, number](#luiwidgetgetsizeself-luiwidget-number-number)
   - [LUiWidget:getState(self: LUiWidget) -> string](#luiwidgetgetstateself-luiwidget-string)
   - [LUiWidget:getTooltip(self: LUiWidget) -> string](#luiwidgetgettooltipself-luiwidget-string)
-  - [LUiWidget:getZOrder(self: LUiWidget) -> number](#luiwidgetgetzorderself-luiwidget-number)
+  - [LUiWidget:getZOrder(self: LUiWidget) -> integer](#luiwidgetgetzorderself-luiwidget-integer)
   - [LUiWidget:isAnimating(self: LUiWidget) -> boolean](#luiwidgetisanimatingself-luiwidget-boolean)
   - [LUiWidget:isEnabled(self: LUiWidget) -> boolean](#luiwidgetisenabledself-luiwidget-boolean)
   - [LUiWidget:isVisible(self: LUiWidget) -> boolean](#luiwidgetisvisibleself-luiwidget-boolean)
   - [LUiWidget:removeChild(self: LUiWidget, child: LUiWidget|integer)](#luiwidgetremovechildself-luiwidget-child-luiwidgetinteger)
   - [LUiWidget:setAlpha(self: LUiWidget, alpha: number)](#luiwidgetsetalphaself-luiwidget-alpha-number)
-  - [LUiWidget:setAnchor([left]: number, [top]: number, [right]: number, [bottom]: number)](#luiwidgetsetanchorleft-number-top-number-right-number-bottom-number)
+  - [LUiWidget:setAnchor(self: LUiWidget, [left]: number, [top]: number, [right]: number, [bottom]: number)](#luiwidgetsetanchorself-luiwidget-left-number-top-number-right-number-bottom-number)
   - [LUiWidget:setAnchorCenter(self: LUiWidget, [cx]: number, [cy]: number)](#luiwidgetsetanchorcenterself-luiwidget-cx-number-cy-number)
   - [LUiWidget:setEnabled(self: LUiWidget, v: boolean)](#luiwidgetsetenabledself-luiwidget-v-boolean)
   - [LUiWidget:setFlexGrow(self: LUiWidget, grow: number)](#luiwidgetsetflexgrowself-luiwidget-grow-number)
@@ -548,18 +548,18 @@ lurek.ui.clearFocus() -- Clears keyboard focus from all widgets.
 lurek.ui.draw() -- Invokes custom draw callbacks for all widgets that have one registered.
 lurek.ui.drawToImage(w: integer, h: integer) -> LImageData -- Renders the entire UI to an image buffer.
 lurek.ui.dropOn(target: table|number) -> boolean -- Drops the currently dragged widget onto a target widget.
-lurek.ui.endDrag() -- Ends the current drag operation without dropping.
-lurek.ui.flushCache() -> table -- Flushes internal UI caches. This function is exposed to Lua scripts.
+lurek.ui.endDrag() -> integer -- Ends the current drag operation without dropping.
+lurek.ui.flushCache() -> boolean -- Flushes internal UI layout and render caches.
 lurek.ui.focusNext() -- Moves keyboard focus to the next focusable widget.
 lurek.ui.focusPrev() -- Moves keyboard focus to the previous focusable widget.
-lurek.ui.getActiveDrag() -> number -- Returns the widget index currently being dragged, or nil.
-lurek.ui.getFocus() -> number -- Returns the index of the currently focused widget, or nil.
-lurek.ui.getRoot() -> LPanel -- Returns the root panel widget. This function is exposed to Lua scripts.
+lurek.ui.getActiveDrag() -> integer -- Returns the widget index currently being dragged, or nil.
+lurek.ui.getFocus() -> integer -- Returns the index of the currently focused widget, or nil.
+lurek.ui.getRoot() -> LPanel -- Returns the root panel widget of the UI tree.
 lurek.ui.getTheme() -> boolean -- Returns whether a theme is currently set.
-lurek.ui.getToastCount() -> number -- Returns the number of active toast notifications.
-lurek.ui.getWidgetCount() -> number -- Returns the total number of widgets in the UI context.
+lurek.ui.getToastCount() -> integer -- Returns the number of active toast notifications.
+lurek.ui.getWidgetCount() -> integer -- Returns the total number of widgets in the UI context.
 lurek.ui.keypressed(key: string) -> boolean -- Delivers a key press event to the UI.
-lurek.ui.loadLayout(def: table) -> number -- Loads a UI layout from a Lua table definition.
+lurek.ui.loadLayout(def: table) -> integer -- Loads a UI layout from a Lua table definition.
 -- ... 56 more module functions
 ```
 
@@ -684,9 +684,11 @@ do
 end
 ```
 
-### `lurek.ui.endDrag()`
+### `lurek.ui.endDrag() -> integer`
 
 Ends the current drag operation without dropping.
+
+**Returns**: `integer` - The widget index that was being dragged, or nil if no drag was active.
 
 #### Example
 
@@ -701,11 +703,11 @@ do
 end
 ```
 
-### `lurek.ui.flushCache() -> table`
+### `lurek.ui.flushCache() -> boolean`
 
-Flushes internal UI caches. This function is exposed to Lua scripts.
+Flushes internal UI layout and render caches.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `boolean` - True if the cache was flushed.
 
 #### Example
 
@@ -748,11 +750,11 @@ do
 end
 ```
 
-### `lurek.ui.getActiveDrag() -> number`
+### `lurek.ui.getActiveDrag() -> integer`
 
 Returns the widget index currently being dragged, or nil.
 
-**Returns**: `number` - The dragged widget index.
+**Returns**: `integer` - The dragged widget index.
 
 #### Example
 
@@ -769,11 +771,11 @@ do
 end
 ```
 
-### `lurek.ui.getFocus() -> number`
+### `lurek.ui.getFocus() -> integer`
 
 Returns the index of the currently focused widget, or nil.
 
-**Returns**: `number` - The focused widget index.
+**Returns**: `integer` - The focused widget index.
 
 #### Example
 
@@ -788,7 +790,7 @@ end
 
 ### `lurek.ui.getRoot() -> LPanel`
 
-Returns the root panel widget. This function is exposed to Lua scripts.
+Returns the root panel widget of the UI tree.
 
 **Returns**: `LPanel` - The root panel widget table.
 
@@ -820,11 +822,11 @@ do
 end
 ```
 
-### `lurek.ui.getToastCount() -> number`
+### `lurek.ui.getToastCount() -> integer`
 
 Returns the number of active toast notifications.
 
-**Returns**: `number` - The toast count.
+**Returns**: `integer` - The toast count.
 
 #### Example
 
@@ -837,11 +839,11 @@ do
 end
 ```
 
-### `lurek.ui.getWidgetCount() -> number`
+### `lurek.ui.getWidgetCount() -> integer`
 
 Returns the total number of widgets in the UI context.
 
-**Returns**: `number` - The widget count.
+**Returns**: `integer` - The widget count.
 
 #### Example
 
@@ -875,7 +877,7 @@ do
 end
 ```
 
-### `lurek.ui.loadLayout(def: table) -> number`
+### `lurek.ui.loadLayout(def: table) -> integer`
 
 Loads a UI layout from a Lua table definition.
 
@@ -883,7 +885,7 @@ Loads a UI layout from a Lua table definition.
 
 - `def` (`table`, required) - The layout definition table.
 
-**Returns**: `number` - The root widget index.
+**Returns**: `integer` - The root widget index.
 
 #### Example
 
@@ -896,15 +898,15 @@ do
 end
 ```
 
-### `lurek.ui.loadLayoutFile(path: string) -> number`
+### `lurek.ui.loadLayoutFile(path: string) -> integer`
 
-Loads a UI layout from a TOML file. This function is exposed to Lua scripts.
+Loads a UI layout from a TOML layout file.
 
 **Parameters**
 
 - `path` (`string`, required) - Path to the TOML layout file.
 
-**Returns**: `number` - The root widget index.
+**Returns**: `integer` - The root widget index.
 
 #### Example
 
@@ -987,7 +989,7 @@ end
 
 ### `lurek.ui.newAccordion() -> LAccordion`
 
-Creates a new accordion widget. This function is exposed to Lua scripts.
+Creates a new accordion widget with collapsible sections.
 
 **Returns**: `LAccordion` - The new accordion widget table.
 
@@ -1067,7 +1069,7 @@ end
 
 ### `lurek.ui.newButton([text]: string) -> LButton`
 
-Creates a new button widget. This function is exposed to Lua scripts.
+Creates a new button widget with optional label text.
 
 **Parameters**
 
@@ -1088,7 +1090,7 @@ end
 
 ### `lurek.ui.newCheckbox([text]: string) -> LCheckbox`
 
-Creates a new checkbox widget. This function is exposed to Lua scripts.
+Creates a new checkbox widget with optional label.
 
 **Parameters**
 
@@ -1109,7 +1111,7 @@ end
 
 ### `lurek.ui.newColorPicker() -> LColorPicker`
 
-Creates a new color picker widget. This function is exposed to Lua scripts.
+Creates a new color picker widget for color selection.
 
 **Returns**: `LColorPicker` - The new color picker widget table.
 
@@ -1164,7 +1166,7 @@ end
 
 ### `lurek.ui.newDialog([title]: string) -> LDialog`
 
-Creates a new dialog widget. This function is exposed to Lua scripts.
+Creates a new dialog widget with an optional title.
 
 **Parameters**
 
@@ -1219,7 +1221,7 @@ end
 
 ### `lurek.ui.newLabel([text]: string) -> LLabel`
 
-Creates a new label widget. This function is exposed to Lua scripts.
+Creates a new label widget for displaying text.
 
 **Parameters**
 
@@ -1282,7 +1284,7 @@ end
 
 ### `lurek.ui.newList() -> LListBox`
 
-Creates a new list box widget. This function is exposed to Lua scripts.
+Creates a new list box widget for item selection.
 
 **Returns**: `LListBox` - The new list box widget table.
 
@@ -1299,7 +1301,7 @@ end
 
 ### `lurek.ui.newMenuBar() -> LMenuBar`
 
-Creates a new menu bar widget. This function is exposed to Lua scripts.
+Creates a new menu bar widget for top-level menus.
 
 **Returns**: `LMenuBar` - The new menu bar widget table.
 
@@ -1316,7 +1318,7 @@ end
 
 ### `lurek.ui.newMenuItem([text]: string) -> LMenuItem`
 
-Creates a new menu item widget. This function is exposed to Lua scripts.
+Creates a new menu item widget with optional text.
 
 **Parameters**
 
@@ -1392,7 +1394,7 @@ end
 
 ### `lurek.ui.newProgressBar([min]: number, [max]: number) -> LProgressBar`
 
-Creates a new progress bar widget. This function is exposed to Lua scripts.
+Creates a new progress bar widget with min and max.
 
 **Parameters**
 
@@ -1414,7 +1416,7 @@ end
 
 ### `lurek.ui.newRadioButton([text]: string, [group]: string) -> LRadioButton`
 
-Creates a new radio button widget. This function is exposed to Lua scripts.
+Creates a new radio button widget in a named group.
 
 **Parameters**
 
@@ -1457,7 +1459,7 @@ end
 
 ### `lurek.ui.newScrollBar([vertical]: boolean) -> LScrollBar`
 
-Creates a new scroll bar widget. This function is exposed to Lua scripts.
+Creates a new scroll bar widget for content scrolling.
 
 **Parameters**
 
@@ -1495,7 +1497,7 @@ end
 
 ### `lurek.ui.newSeparator([vertical]: boolean) -> LSeparator`
 
-Creates a new separator widget. This function is exposed to Lua scripts.
+Creates a new separator widget for visual division.
 
 **Parameters**
 
@@ -1516,7 +1518,7 @@ end
 
 ### `lurek.ui.newSlider([min]: number, [max]: number) -> LSlider`
 
-Creates a new slider widget. This function is exposed to Lua scripts.
+Creates a new slider widget with adjustable range.
 
 **Parameters**
 
@@ -1603,7 +1605,7 @@ end
 
 ### `lurek.ui.newStatusBar() -> LStatusBar`
 
-Creates a new status bar widget. This function is exposed to Lua scripts.
+Creates a new status bar widget for app-level info.
 
 **Returns**: `LStatusBar` - The new status bar widget table.
 
@@ -1641,7 +1643,7 @@ end
 
 ### `lurek.ui.newTabBar() -> LTabBar`
 
-Creates a new tab bar widget. This function is exposed to Lua scripts.
+Creates a new tab bar widget for tabbed navigation.
 
 **Returns**: `LTabBar` - The new tab bar widget table.
 
@@ -1675,7 +1677,7 @@ end
 
 ### `lurek.ui.newTextInput() -> LTextInput`
 
-Creates a new text input widget. This function is exposed to Lua scripts.
+Creates a new text input widget for user entry.
 
 **Returns**: `LTextInput` - The new text input widget table.
 
@@ -1731,7 +1733,7 @@ end
 
 ### `lurek.ui.newToolbar([orientation]: string) -> LToolbar`
 
-Creates a new toolbar widget. This function is exposed to Lua scripts.
+Creates a new toolbar widget for action buttons.
 
 **Parameters**
 
@@ -1773,7 +1775,7 @@ end
 
 ### `lurek.ui.newTreeView() -> LTreeView`
 
-Creates a new tree view widget. This function is exposed to Lua scripts.
+Creates a new tree view widget for hierarchical data.
 
 **Returns**: `LTreeView` - The new tree view widget table.
 
@@ -1790,7 +1792,7 @@ end
 
 ### `lurek.ui.newWindow([title]: string) -> LGuiWindow`
 
-Creates a new GUI window widget. This function is exposed to Lua scripts.
+Creates a new GUI window widget with an optional title.
 
 **Parameters**
 
@@ -1832,7 +1834,7 @@ end
 
 ### `lurek.ui.renderToImage(width: integer, height: integer, path: string)`
 
-Renders the UI to a PNG file. This function is exposed to Lua scripts.
+Renders the entire UI to a PNG image file.
 
 **Parameters**
 
@@ -1888,7 +1890,7 @@ end
 
 ### `lurek.ui.setTheme(theme_ud: LTheme)`
 
-Applies a theme to the UI context. This function is exposed to Lua scripts.
+Applies a theme to the entire UI context.
 
 **Parameters**
 
@@ -2047,7 +2049,7 @@ do
 end
 ```
 
-### `LAccordion:getSectionCount(self: LAccordion) -> number`
+### `LAccordion:getSectionCount(self: LAccordion) -> integer`
 
 Returns the number of sections in this accordion.
 
@@ -2055,7 +2057,7 @@ Returns the number of sections in this accordion.
 
 - `self` (`LAccordion`, required) - The widget instance.
 
-**Returns**: `number` - The section count.
+**Returns**: `integer` - The section count.
 
 #### Example
 
@@ -2316,7 +2318,7 @@ do
 end
 ```
 
-### `LBadge:getCount(self: LBadge) -> number`
+### `LBadge:getCount(self: LBadge) -> integer`
 
 Returns the current notification count of this badge.
 
@@ -2324,7 +2326,7 @@ Returns the current notification count of this badge.
 
 - `self` (`LBadge`, required) - The widget instance.
 
-**Returns**: `number` - The badge count.
+**Returns**: `integer` - The badge count.
 
 #### Example
 
@@ -2687,7 +2689,7 @@ Returns the current color as RGBA components (0.0 to 1.0).
 
 - `self` (`LColorPicker`, required) - The widget instance.
 
-**Returns**: `number` - Red.
+**Returns**: `number` - Red component.
 
 #### Example
 
@@ -2911,7 +2913,7 @@ do
 end
 ```
 
-### `LComboBox:getItemCount(self: LComboBox) -> number`
+### `LComboBox:getItemCount(self: LComboBox) -> integer`
 
 Returns the number of items in this combo box.
 
@@ -2919,7 +2921,7 @@ Returns the number of items in this combo box.
 
 - `self` (`LComboBox`, required) - The widget instance.
 
-**Returns**: `number` - The item count.
+**Returns**: `integer` - The item count.
 
 #### Example
 
@@ -2933,7 +2935,7 @@ do
 end
 ```
 
-### `LComboBox:getSelectedIndex(self: LComboBox) -> number`
+### `LComboBox:getSelectedIndex(self: LComboBox) -> integer`
 
 Returns the 1-based index of the currently selected item, or 0 if none is selected.
 
@@ -2941,7 +2943,7 @@ Returns the 1-based index of the currently selected item, or 0 if none is select
 
 - `self` (`LComboBox`, required) - The widget instance.
 
-**Returns**: `number` - The selected index.
+**Returns**: `integer` - The selected index.
 
 #### Example
 
@@ -3036,7 +3038,7 @@ do
 end
 ```
 
-### `LDialog:addButton(self: LDialog, text: string, [cb]: function) -> number`
+### `LDialog:addButton(self: LDialog, text: string, [cb]: function) -> integer`
 
 Adds a footer button to this dialog and returns its 1-based index.
 
@@ -3046,7 +3048,7 @@ Adds a footer button to this dialog and returns its 1-based index.
 - `text` (`string`, required) - The button label.
 - `cb` (`function`, optional) - Optional click callback (reserved for future use).
 
-**Returns**: `number` - The 1-based button index.
+**Returns**: `integer` - The 1-based button index.
 
 #### Example
 
@@ -3080,7 +3082,7 @@ do
 end
 ```
 
-### `LDialog:getContent(self: LDialog) -> number`
+### `LDialog:getContent(self: LDialog) -> integer`
 
 Returns the widget index of this dialog's content, or nil if not set.
 
@@ -3088,7 +3090,7 @@ Returns the widget index of this dialog's content, or nil if not set.
 
 - `self` (`LDialog`, required) - The widget instance.
 
-**Returns**: `number` - The content widget index.
+**Returns**: `integer` - The content widget index.
 
 #### Example
 
@@ -3211,7 +3213,7 @@ end
 
 ### `LDialog:setModal(self: LDialog, v: boolean)`
 
-Sets whether this dialog is modal. This method is available to Lua scripts.
+Sets whether this dialog widget is modal.
 
 **Parameters**
 
@@ -3253,7 +3255,7 @@ end
 
 ### `LDialog:setTitle(self: LDialog, title: string)`
 
-Sets the title text of this dialog. This method is available to Lua scripts.
+Sets the title text of this dialog widget.
 
 **Parameters**
 
@@ -3309,7 +3311,7 @@ do
 end
 ```
 
-### `LDockPanel:getDockedCount(self: LDockPanel) -> number`
+### `LDockPanel:getDockedCount(self: LDockPanel) -> integer`
 
 Returns the number of widgets docked in this dock panel.
 
@@ -3317,7 +3319,7 @@ Returns the number of widgets docked in this dock panel.
 
 - `self` (`LDockPanel`, required) - The widget instance.
 
-**Returns**: `number` - The docked widget count.
+**Returns**: `integer` - The docked widget count.
 
 #### Example
 
@@ -3436,7 +3438,7 @@ end
 
 ### `LGuiTable:addRow(self: LGuiTable, cells: table)`
 
-Adds a row to this table widget. This method is available to Lua scripts.
+Adds a row of data to this table widget.
 
 **Parameters**
 
@@ -3479,7 +3481,7 @@ do
 end
 ```
 
-### `LGuiTable:getColumnCount(self: LGuiTable) -> number`
+### `LGuiTable:getColumnCount(self: LGuiTable) -> integer`
 
 Returns the number of columns in this table widget.
 
@@ -3487,7 +3489,7 @@ Returns the number of columns in this table widget.
 
 - `self` (`LGuiTable`, required) - The widget instance.
 
-**Returns**: `number` - The column count.
+**Returns**: `integer` - The column count.
 
 #### Example
 
@@ -3501,7 +3503,7 @@ do
 end
 ```
 
-### `LGuiTable:getRowCount(self: LGuiTable) -> number`
+### `LGuiTable:getRowCount(self: LGuiTable) -> integer`
 
 Returns the number of rows in this table widget.
 
@@ -3509,7 +3511,7 @@ Returns the number of rows in this table widget.
 
 - `self` (`LGuiTable`, required) - The widget instance.
 
-**Returns**: `number` - The row count.
+**Returns**: `integer` - The row count.
 
 #### Example
 
@@ -3523,7 +3525,7 @@ do
 end
 ```
 
-### `LGuiTable:getSelectedRow(self: LGuiTable) -> number`
+### `LGuiTable:getSelectedRow(self: LGuiTable) -> integer`
 
 Returns the 1-based index of the currently selected row, or nil.
 
@@ -3531,7 +3533,7 @@ Returns the 1-based index of the currently selected row, or nil.
 
 - `self` (`LGuiTable`, required) - The widget instance.
 
-**Returns**: `number` - The selected row index.
+**Returns**: `integer` - The selected row index.
 
 #### Example
 
@@ -3906,7 +3908,7 @@ Returns the tint color of this image widget as RGBA components.
 
 - `self` (`LImageWidget`, required) - The widget instance.
 
-**Returns**: `number` - Red.
+**Returns**: `number` - Red component.
 
 #### Example
 
@@ -4495,7 +4497,7 @@ do
 end
 ```
 
-### `LListBox:getItemCount(self: LListBox) -> number`
+### `LListBox:getItemCount(self: LListBox) -> integer`
 
 Returns the number of items in this list box.
 
@@ -4503,7 +4505,7 @@ Returns the number of items in this list box.
 
 - `self` (`LListBox`, required) - The widget instance.
 
-**Returns**: `number` - The item count.
+**Returns**: `integer` - The item count.
 
 #### Example
 
@@ -4517,7 +4519,7 @@ do
 end
 ```
 
-### `LListBox:getSelectedIndex(self: LListBox) -> number`
+### `LListBox:getSelectedIndex(self: LListBox) -> integer`
 
 Returns the 1-based index of the currently selected item, or 0 if none.
 
@@ -4525,7 +4527,7 @@ Returns the 1-based index of the currently selected item, or 0 if none.
 
 - `self` (`LListBox`, required) - The widget instance.
 
-**Returns**: `number` - The selected index.
+**Returns**: `integer` - The selected index.
 
 #### Example
 
@@ -4638,7 +4640,7 @@ do
 end
 ```
 
-### `LMenuBar:getMenuCount(self: LMenuBar) -> number`
+### `LMenuBar:getMenuCount(self: LMenuBar) -> integer`
 
 Returns the number of menus in this menu bar.
 
@@ -4646,7 +4648,7 @@ Returns the number of menus in this menu bar.
 
 - `self` (`LMenuBar`, required) - The widget instance.
 
-**Returns**: `number` - The menu count.
+**Returns**: `integer` - The menu count.
 
 #### Example
 
@@ -4660,7 +4662,7 @@ do
 end
 ```
 
-### `LMenuBar:getMenus(self: LMenuBar) -> table`
+### `LMenuBar:getMenus(self: LMenuBar) -> integer[]`
 
 Returns a table of widget indices for all menus in this menu bar.
 
@@ -4668,7 +4670,7 @@ Returns a table of widget indices for all menus in this menu bar.
 
 - `self` (`LMenuBar`, required) - The widget instance.
 
-**Returns**: `table` - Array of menu widget indices.
+**Returns**: `integer[]` - Menu widget indices.
 
 #### Example
 
@@ -4763,7 +4765,7 @@ do
 end
 ```
 
-### `LMenuItem:getSubItems(self: LMenuItem) -> table`
+### `LMenuItem:getSubItems(self: LMenuItem) -> integer[]`
 
 Returns a table of widget indices for all sub-items of this menu item.
 
@@ -4771,7 +4773,7 @@ Returns a table of widget indices for all sub-items of this menu item.
 
 - `self` (`LMenuItem`, required) - The widget instance.
 
-**Returns**: `table` - Array of sub-item widget indices.
+**Returns**: `integer[]` - Sub-item widget indices.
 
 #### Example
 
@@ -4928,7 +4930,7 @@ do
 end
 ```
 
-### `LNinePatch:getImageDimensions(self: LNinePatch) -> number, number`
+### `LNinePatch:getImageDimensions(self: LNinePatch) -> integer, integer`
 
 Returns the original image dimensions of this nine-patch.
 
@@ -4936,7 +4938,7 @@ Returns the original image dimensions of this nine-patch.
 
 - `self` (`LNinePatch`, required) - The widget instance.
 
-**Returns**: `number, number` - Image width and height.
+**Returns**: `integer, integer` - Image width and height.
 
 #### Example
 
@@ -4950,7 +4952,7 @@ do
 end
 ```
 
-### `LNinePatch:getInsets(self: LNinePatch) -> number, number, number, number`
+### `LNinePatch:getInsets(self: LNinePatch) -> integer, integer, integer, integer`
 
 Returns the border insets of this nine-patch.
 
@@ -4958,7 +4960,7 @@ Returns the border insets of this nine-patch.
 
 - `self` (`LNinePatch`, required) - The widget instance.
 
-**Returns**: `number, number, number, number` - Left, top, right, and bottom insets.
+**Returns**: `integer, integer, integer, integer` - Left, top, right, and bottom insets.
 
 #### Example
 
@@ -5136,7 +5138,7 @@ end
 
 ### `LPieChart:addSegment(label: string, value: number, r: number, g: number, b: number)`
 
-Adds a segment to this pie chart. This method is available to Lua scripts.
+Adds a labeled segment to this pie chart widget.
 
 **Parameters**
 
@@ -6430,7 +6432,7 @@ do
 end
 ```
 
-### `LSplitPanel:getFirstChild(self: LSplitPanel) -> number`
+### `LSplitPanel:getFirstChild(self: LSplitPanel) -> integer`
 
 Returns the widget index of the first (left/top) child panel.
 
@@ -6438,7 +6440,7 @@ Returns the widget index of the first (left/top) child panel.
 
 - `self` (`LSplitPanel`, required) - The widget instance.
 
-**Returns**: `number` - The widget index, or nil if not set.
+**Returns**: `integer` - The widget index, or nil if not set.
 
 #### Example
 
@@ -6496,7 +6498,7 @@ do
 end
 ```
 
-### `LSplitPanel:getSecondChild(self: LSplitPanel) -> number`
+### `LSplitPanel:getSecondChild(self: LSplitPanel) -> integer`
 
 Returns the widget index of the second (right/bottom) child panel.
 
@@ -6504,7 +6506,7 @@ Returns the widget index of the second (right/bottom) child panel.
 
 - `self` (`LSplitPanel`, required) - The widget instance.
 
-**Returns**: `number` - The widget index, or nil if not set.
+**Returns**: `integer` - The widget index, or nil if not set.
 
 #### Example
 
@@ -6662,7 +6664,7 @@ end
 
 ### `LStatusBar:addSection(self: LStatusBar, text: string, [width]: number)`
 
-Adds a section to this status bar. This method is available to Lua scripts.
+Adds a labeled section to this status bar.
 
 **Parameters**
 
@@ -6682,7 +6684,7 @@ do
 end
 ```
 
-### `LStatusBar:getSectionCount(self: LStatusBar) -> number`
+### `LStatusBar:getSectionCount(self: LStatusBar) -> integer`
 
 Returns the number of sections in this status bar.
 
@@ -6690,7 +6692,7 @@ Returns the number of sections in this status bar.
 
 - `self` (`LStatusBar`, required) - The widget instance.
 
-**Returns**: `number` - The section count.
+**Returns**: `integer` - The section count.
 
 #### Example
 
@@ -6770,7 +6772,7 @@ do
 end
 ```
 
-### `LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, widget: any)`
+### `LStatusBar:setSectionWidget(self: LStatusBar, section_idx: integer, [widget]: table)`
 
 Associates a widget with a status bar section (reserved for future use).
 
@@ -6778,7 +6780,7 @@ Associates a widget with a status bar section (reserved for future use).
 
 - `self` (`LStatusBar`, required) - The widget instance.
 - `section_idx` (`integer`, required) - The 1-based section index.
-- `widget` (`any`, required) - The widget value to associate.
+- `widget` (`table`, optional) - The widget table to associate, or nil to clear.
 
 #### Example
 
@@ -6906,7 +6908,7 @@ do
 end
 ```
 
-### `LTabBar:getActiveTab(self: LTabBar) -> number`
+### `LTabBar:getActiveTab(self: LTabBar) -> integer`
 
 Returns the 1-based index of the currently active tab.
 
@@ -6914,7 +6916,7 @@ Returns the 1-based index of the currently active tab.
 
 - `self` (`LTabBar`, required) - The widget instance.
 
-**Returns**: `number` - The active tab index.
+**Returns**: `integer` - The active tab index.
 
 #### Example
 
@@ -6951,15 +6953,15 @@ do
 end
 ```
 
-### `LTabBar:getTabCount(self: LTabBar) -> number`
+### `LTabBar:getTabCount(self: LTabBar) -> integer`
 
-Returns the total number of tabs. This method is available to Lua scripts.
+Returns the total number of tabs in this tab bar.
 
 **Parameters**
 
 - `self` (`LTabBar`, required) - The widget instance.
 
-**Returns**: `number` - The tab count.
+**Returns**: `integer` - The tab count.
 
 #### Example
 
@@ -7032,7 +7034,7 @@ do
 end
 ```
 
-### `LTextInput:getCursorPosition(self: LTextInput) -> number`
+### `LTextInput:getCursorPosition(self: LTextInput) -> integer`
 
 Returns the current cursor position (character index) within the text input.
 
@@ -7040,7 +7042,7 @@ Returns the current cursor position (character index) within the text input.
 
 - `self` (`LTextInput`, required) - The widget instance.
 
-**Returns**: `number` - The zero-based cursor position.
+**Returns**: `integer` - The zero-based cursor position.
 
 #### Example
 
@@ -7425,7 +7427,7 @@ do
 end
 ```
 
-### `LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> number`
+### `LToolbar:addButton(self: LToolbar, id: string, [tooltip]: string) -> integer`
 
 Adds a new button to this toolbar and returns its 1-based index.
 
@@ -7435,7 +7437,7 @@ Adds a new button to this toolbar and returns its 1-based index.
 - `id` (`string`, required) - The button identifier.
 - `tooltip` (`string`, optional) - Optional tooltip text for the button.
 
-**Returns**: `number` - The 1-based index of the added button.
+**Returns**: `integer` - The 1-based index of the added button.
 
 #### Example
 
@@ -7664,7 +7666,7 @@ do
 end
 ```
 
-### `LTooltipPanel:getTarget(self: LTooltipPanel) -> number`
+### `LTooltipPanel:getTarget(self: LTooltipPanel) -> integer`
 
 Returns the widget index that this tooltip is attached to.
 
@@ -7672,7 +7674,7 @@ Returns the widget index that this tooltip is attached to.
 
 - `self` (`LTooltipPanel`, required) - The widget instance.
 
-**Returns**: `number` - The target widget index, or nil if unset.
+**Returns**: `integer` - The target widget index, or nil if unset.
 
 #### Example
 
@@ -7688,7 +7690,7 @@ end
 
 ### `LTooltipPanel:getText(self: LTooltipPanel) -> string`
 
-Returns the tooltip display text. This method is available to Lua scripts.
+Returns the current tooltip display text.
 
 **Parameters**
 
@@ -7752,7 +7754,7 @@ end
 
 ### `LTooltipPanel:setText(self: LTooltipPanel, text: string)`
 
-Sets the tooltip display text. This method is available to Lua scripts.
+Sets the tooltip panel display text content.
 
 **Parameters**
 
@@ -7788,13 +7790,13 @@ end
 
 ### `LTreeView:addNode(self: LTreeView, text: string, [parent_index]: integer) -> integer`
 
-Adds node on this LTreeView object.
+Adds a new node to this tree view, optionally under a parent node.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `text` (`string`, required) - String value for `text`.
-- `parent_index` (`integer`, optional) - Lua argument for `parent_index`.
+- `text` (`string`, required) - The node label text.
+- `parent_index` (`integer`, optional) - The 1-based parent node index, or nil for a root node.
 
 **Returns**: `integer` - The 1-based index of the newly added node.
 
@@ -7812,7 +7814,7 @@ end
 
 ### `LTreeView:clearNodes(self: LTreeView)`
 
-Clears nodes on this LTreeView object.
+Removes all nodes from this tree view.
 
 **Parameters**
 
@@ -7895,14 +7897,14 @@ end
 
 ### `LTreeView:expandNode(self: LTreeView, index: integer) -> boolean`
 
-Expand node on this LTreeView object.
+Expands the node at the given 1-based index to show its children.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
+- `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True if the node was expanded.
 
 #### Example
 
@@ -7916,7 +7918,7 @@ do
 end
 ```
 
-### `LTreeView:getChildNodes(self: LTreeView, index: integer) -> table`
+### `LTreeView:getChildNodes(self: LTreeView, index: integer) -> integer[]`
 
 Returns a table of 1-based child node indices for the node at the given index.
 
@@ -7925,7 +7927,7 @@ Returns a table of 1-based child node indices for the node at the given index.
 - `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based parent node index.
 
-**Returns**: `table` - Array of 1-based child indices.
+**Returns**: `integer[]` - 1-based child indices.
 
 #### Example
 
@@ -7939,15 +7941,15 @@ do
 end
 ```
 
-### `LTreeView:getNodeCount(self: LTreeView) -> table`
+### `LTreeView:getNodeCount(self: LTreeView) -> integer`
 
-Returns the node count on this LTreeView object.
+Returns the total number of nodes in this tree view.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `integer` - The node count.
 
 #### Example
 
@@ -7961,7 +7963,7 @@ do
 end
 ```
 
-### `LTreeView:getNodeDepth(self: LTreeView, index: integer) -> number`
+### `LTreeView:getNodeDepth(self: LTreeView, index: integer) -> integer`
 
 Returns the nesting depth of the node at the given index (0 for root nodes).
 
@@ -7970,7 +7972,7 @@ Returns the nesting depth of the node at the given index (0 for root nodes).
 - `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `number` - The depth, or nil if index is invalid.
+**Returns**: `integer` - The depth, or nil if index is invalid.
 
 #### Example
 
@@ -7984,16 +7986,16 @@ do
 end
 ```
 
-### `LTreeView:getNodeText(self: LTreeView, index: integer) -> table`
+### `LTreeView:getNodeText(self: LTreeView, index: integer) -> string`
 
-Returns the node text on this LTreeView object.
+Returns the text of the node at the given 1-based index.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
+- `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `string` - The node text, or nil if the index is invalid.
 
 #### Example
 
@@ -8007,7 +8009,7 @@ do
 end
 ```
 
-### `LTreeView:getParentNode(self: LTreeView, index: integer) -> number`
+### `LTreeView:getParentNode(self: LTreeView, index: integer) -> integer`
 
 Returns the 1-based index of the parent of the node at the given index.
 
@@ -8016,7 +8018,7 @@ Returns the 1-based index of the parent of the node at the given index.
 - `self` (`LTreeView`, required) - The widget instance.
 - `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `number` - The parent node index, or nil for root nodes.
+**Returns**: `integer` - The parent node index, or nil for root nodes.
 
 #### Example
 
@@ -8030,7 +8032,7 @@ do
 end
 ```
 
-### `LTreeView:getSelectedNode(self: LTreeView) -> number`
+### `LTreeView:getSelectedNode(self: LTreeView) -> integer`
 
 Returns the 1-based index of the currently selected node.
 
@@ -8038,7 +8040,7 @@ Returns the 1-based index of the currently selected node.
 
 - `self` (`LTreeView`, required) - The widget instance.
 
-**Returns**: `number` - The selected node index, or nil if none.
+**Returns**: `integer` - The selected node index, or nil if none.
 
 #### Example
 
@@ -8052,16 +8054,16 @@ do
 end
 ```
 
-### `LTreeView:isExpanded(self: LTreeView, index: integer) -> table`
+### `LTreeView:isExpanded(self: LTreeView, index: integer) -> boolean`
 
-Returns true if expanded on this LTreeView object.
+Returns whether the node at the given 1-based index is currently expanded.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
+- `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `table` - Table result returned by this call.
+**Returns**: `boolean` - True if expanded.
 
 #### Example
 
@@ -8100,14 +8102,14 @@ end
 
 ### `LTreeView:removeNode(self: LTreeView, index: integer) -> boolean`
 
-Removes node on this LTreeView object.
+Removes the node at the given 1-based index from this tree view.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
+- `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True if the node was removed.
 
 #### Example
 
@@ -8123,15 +8125,15 @@ end
 
 ### `LTreeView:setNodeIcon(self: LTreeView, index: integer, icon: string) -> boolean`
 
-Sets the node icon on this LTreeView object.
+Sets the icon of the node at the given 1-based index.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
-- `icon` (`string`, required) - Lua argument for `icon`.
+- `index` (`integer`, required) - The 1-based node index.
+- `icon` (`string`, required) - The icon identifier string.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True if the icon was set.
 
 #### Example
 
@@ -8147,15 +8149,15 @@ end
 
 ### `LTreeView:setNodeText(self: LTreeView, index: integer, text: string) -> boolean`
 
-Sets the node text on this LTreeView object.
+Sets the text of the node at the given 1-based index.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
-- `text` (`string`, required) - String value for `text`.
+- `index` (`integer`, required) - The 1-based node index.
+- `text` (`string`, required) - The new node text.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True if the node text was set.
 
 #### Example
 
@@ -8194,14 +8196,14 @@ end
 
 ### `LTreeView:toggleNode(self: LTreeView, index: integer) -> boolean`
 
-Toggle node on this LTreeView object.
+Toggles the expanded/collapsed state of the node at the given 1-based index.
 
 **Parameters**
 
 - `self` (`LTreeView`, required) - The widget instance.
-- `index` (`integer`, required) - Identifier argument for `index`.
+- `index` (`integer`, required) - The 1-based node index.
 
-**Returns**: `boolean` - Boolean result returned by this call.
+**Returns**: `boolean` - True if the node is now expanded, false if collapsed.
 
 #### Example
 
@@ -8345,13 +8347,15 @@ do
 end
 ```
 
-### `LUiWidget:cancelAnimations(self: LUiWidget)`
+### `LUiWidget:cancelAnimations(self: LUiWidget) -> boolean`
 
 Cancels all active animations on this widget, leaving it at its current state.
 
 **Parameters**
 
 - `self` (`LUiWidget`, required) - The widget instance.
+
+**Returns**: `boolean` - True if any animations were cancelled.
 
 #### Example
 
@@ -8515,7 +8519,7 @@ do
 end
 ```
 
-### `LUiWidget:getChildCount(self: LUiWidget) -> number`
+### `LUiWidget:getChildCount(self: LUiWidget) -> integer`
 
 Returns the number of direct child widgets attached to this widget.
 
@@ -8523,7 +8527,7 @@ Returns the number of direct child widgets attached to this widget.
 
 - `self` (`LUiWidget`, required) - The widget instance.
 
-**Returns**: `number` - The child count.
+**Returns**: `integer` - The child count.
 
 #### Example
 
@@ -8823,7 +8827,7 @@ do
 end
 ```
 
-### `LUiWidget:getZOrder(self: LUiWidget) -> number`
+### `LUiWidget:getZOrder(self: LUiWidget) -> integer`
 
 Returns the z-order (draw priority) of this widget.
 
@@ -8831,7 +8835,7 @@ Returns the z-order (draw priority) of this widget.
 
 - `self` (`LUiWidget`, required) - The widget instance.
 
-**Returns**: `number` - The z-order value.
+**Returns**: `integer` - The z-order value.
 
 #### Example
 
@@ -8955,12 +8959,13 @@ do
 end
 ```
 
-### `LUiWidget:setAnchor([left]: number, [top]: number, [right]: number, [bottom]: number)`
+### `LUiWidget:setAnchor(self: LUiWidget, [left]: number, [top]: number, [right]: number, [bottom]: number)`
 
 Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
 
 **Parameters**
 
+- `self` (`LUiWidget`, required) - The widget instance.
 - `left` (`number`, optional) - Distance from parent's left edge, or nil.
 - `top` (`number`, optional) - Distance from parent's top edge, or nil.
 - `right` (`number`, optional) - Distance from parent's right edge, or nil.

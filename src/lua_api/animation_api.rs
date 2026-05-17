@@ -67,7 +67,6 @@ impl LuaUserData for LuaAnimation {
         /// @param | fps | number | Playback speed in frames per second.
         /// @param | looping | boolean | True when playback should wrap at the end.
         /// @param | mode | string? | Playback mode `forward`, `reverse`, or `pingpong`; defaults to `forward`.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addClip",
             |_,
@@ -124,7 +123,6 @@ impl LuaUserData for LuaAnimation {
         /// @param | count | integer | Number of frames to add.
         /// @param | fps | number | Playback speed in frames per second.
         /// @param | looping | boolean | True when playback should wrap at the end.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addClipFromGrid",
             |_,
@@ -152,21 +150,18 @@ impl LuaUserData for LuaAnimation {
         methods.add_method_mut("play", |_, this, name: String| Ok(this.inner.play(&name)));
         // -- stop --
         /// Stops playback and resets animation playback state.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("stop", |_, this, ()| {
             this.inner.stop();
             Ok(())
         });
         // -- pause --
         /// Pauses animation playback without changing the current clip.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("pause", |_, this, ()| {
             this.inner.pause();
             Ok(())
         });
         // -- resume --
         /// Resumes playback of a paused animation.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("resume", |_, this, ()| {
             this.inner.resume();
             Ok(())
@@ -174,7 +169,6 @@ impl LuaUserData for LuaAnimation {
         // -- update --
         /// Advances animation playback and records any frame or clip events.
         /// @param | dt | number | Elapsed time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.update(dt);
             Ok(())
@@ -186,16 +180,12 @@ impl LuaUserData for LuaAnimation {
             if let Some(q) = this.inner.current_quad() {
                 let t = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 t.set("x", q.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 t.set("y", q.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 t.set("w", q.width)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 t.set("h", q.height)?;
                 Ok(LuaValue::Table(t))
             } else {
@@ -205,17 +195,17 @@ impl LuaUserData for LuaAnimation {
         // -- pollEvents --
         /// Drains animation events produced since the previous poll.
         /// @return | table | Array of event tables with `type` and optional `frame` fields.
+        /// @field | type | string | Event type name.
+        /// @field | frame | integer? | Frame index when available.
         methods.add_method_mut("pollEvents", |lua, this, ()| {
             let events = this.inner.drain_events();
             let tbl = lua.create_table()?;
             for (i, ev) in events.iter().enumerate() {
                 let ev_tbl = lua.create_table()?;
                 /// Performs the 'type' operation.
-                /// @return | nil | No value is returned.
                 ev_tbl.set("type", ev.type_name())?;
                 if let Some(idx) = ev.frame_index() {
                     /// Performs the 'frame' operation.
-                    /// @return | nil | No value is returned.
                     ev_tbl.set("frame", idx)?;
                 }
                 tbl.set(i + 1, ev_tbl)?;
@@ -243,7 +233,6 @@ impl LuaUserData for LuaAnimation {
         // -- setSpeed --
         /// Sets the animation playback speed multiplier.
         /// @param | speed | number | Playback speed multiplier used by future updates.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setSpeed", |_, this, speed: f32| {
             this.inner.set_speed(speed);
             Ok(())
@@ -269,7 +258,6 @@ impl LuaUserData for LuaAnimation {
         // -- setFrame --
         /// Sets the current frame index directly.
         /// @param | index | integer | Frame index to make current.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setFrame", |_, this, index: usize| {
             this.inner.set_frame(index);
             Ok(())
@@ -294,39 +282,28 @@ impl LuaUserData for LuaAnimation {
                 Some((from_q, to_q, blend)) => {
                     let from = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     from.set("x", from_q.x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     from.set("y", from_q.y)?;
                     /// Performs the 'w' operation.
-                    /// @return | nil | No value is returned.
                     from.set("w", from_q.width)?;
                     /// Performs the 'h' operation.
-                    /// @return | nil | No value is returned.
                     from.set("h", from_q.height)?;
                     let to = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     to.set("x", to_q.x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     to.set("y", to_q.y)?;
                     /// Performs the 'w' operation.
-                    /// @return | nil | No value is returned.
                     to.set("w", to_q.width)?;
                     /// Performs the 'h' operation.
-                    /// @return | nil | No value is returned.
                     to.set("h", to_q.height)?;
                     let t = lua.create_table()?;
                     /// Performs the 'from' operation.
-                    /// @return | nil | No value is returned.
                     t.set("from", from)?;
                     /// Performs the 'to' operation.
-                    /// @return | nil | No value is returned.
                     t.set("to", to)?;
                     /// Performs the 'blend' operation.
-                    /// @return | nil | No value is returned.
                     t.set("blend", blend)?;
                     Ok(LuaValue::Table(t))
                 }
@@ -376,7 +353,6 @@ impl LuaUserData for LuaAnimStateMachine {
         // -- update --
         /// Advances the animation state machine and its owned animation playback.
         /// @param | dt | number | Elapsed time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.update(dt);
             Ok(())
@@ -399,7 +375,6 @@ impl LuaUserData for LuaAnimStateMachine {
         /// @param | name | string | State name.
         /// @param | clip | string | Clip name to play while this state is active.
         /// @param | looping | boolean | True when the clip should loop in this state.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addState",
             |_, this, (name, clip, looping): (String, String, bool)| {
@@ -412,7 +387,6 @@ impl LuaUserData for LuaAnimStateMachine {
         /// @param | from_state | string | Source state name.
         /// @param | to_state | string | Destination state name.
         /// @param | condition | string | Parameter condition expression understood by the state machine.
-        /// @return | nil | No value is returned.
         methods.add_method_mut(
             "addTransition",
             |_, this, (from_state, to_state, condition): (String, String, String)| {
@@ -425,7 +399,6 @@ impl LuaUserData for LuaAnimStateMachine {
         /// Sets a boolean, integer, or numeric state machine parameter.
         /// @param | name | string | Parameter name used by transition conditions.
         /// @param | value | LuaValue | Boolean, integer, or number value to store.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setParam", |_, this, (name, value): (String, LuaValue)| {
             let param = match value {
                 LuaValue::Boolean(b) => AnimParamValue::Bool(b),
@@ -452,16 +425,12 @@ impl LuaUserData for LuaAnimStateMachine {
             if let Some(q) = anim.current_quad() {
                 let t = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 t.set("x", q.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 t.set("y", q.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 t.set("w", q.width)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 t.set("h", q.height)?;
                 Ok(LuaValue::Table(t))
             } else {
@@ -562,25 +531,25 @@ impl LuaUserData for LuaBlendLayerSet {
         // -- listLayers --
         /// Returns all blend layers with names, clip names, weights, and bone masks.
         /// @return | table | Array of layer tables with `name`, `clip_name`, `weight`, and `bones` fields.
+        /// @field | name | string | Layer name.
+        /// @field | clip_name | string | Clip name.
+        /// @field | weight | number | Blend weight.
+        /// @field | bones | string[] | Bone mask names.
         methods.add_method("listLayers", |lua, this, ()| {
             let out = lua.create_table()?;
             for (i, layer) in this.inner.layers().iter().enumerate() {
                 let t = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 t.set("name", layer.name.clone())?;
                 /// Performs the 'clip_name' operation.
-                /// @return | nil | No value is returned.
                 t.set("clip_name", layer.clip_name.clone())?;
                 /// Performs the 'weight' operation.
-                /// @return | nil | No value is returned.
                 t.set("weight", layer.weight)?;
                 let bones = lua.create_table()?;
                 for (j, b) in layer.mask.bone_names.iter().enumerate() {
                     bones.set(j + 1, b.clone())?;
                 }
                 /// Performs the 'bones' operation.
-                /// @return | nil | No value is returned.
                 t.set("bones", bones)?;
                 out.set(i + 1, t)?;
             }
@@ -686,6 +655,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Builds a character animation bundle from grid frame and clip configuration.
     /// @param | cfg | table | Configuration table with texture size, frame size, clips, optional states, and optional transitions.
     /// @return | table | Table containing `animation` and, when states are supplied, `stateMachine` handles.
+    /// @field | animation | LAnimation | Animation handle.
+    /// @field | stateMachine | LStateMachine | State machine handle.
     tbl.set(
         "buildCharacter",
         lua.create_function(|lua, cfg: LuaTable| {
@@ -716,7 +687,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let anim_clone_for_sm = anim.clone();
             let anim_ud = lua.create_userdata(LuaAnimation { inner: anim })?;
             /// Performs the 'animation' operation.
-            /// @return | nil | No value is returned.
             out.set("animation", anim_ud)?;
             if let Some(states) = cfg.get::<_, Option<LuaTable>>("states")? {
                 let initial_state = cfg
@@ -742,14 +712,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 }
                 let sm_ud = lua.create_userdata(LuaAnimStateMachine { inner: sm })?;
                 /// Performs the 'stateMachine' operation.
-                /// @return | nil | No value is returned.
                 out.set("stateMachine", sm_ud)?;
             }
             Ok(out)
         })?,
     )?;
     /// Performs the 'animation' operation.
-    /// @return | nil | No value is returned.
     luna.set("animation", tbl)?;
     Ok(())
 }
@@ -785,7 +753,6 @@ impl LuaUserData for LuaAnimCurve {
         /// Adds a keyframe to the curve. This method is available to Lua scripts.
         /// @param | t | number | Keyframe time or normalized position.
         /// @param | v | number | Keyframe value.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("addKeyframe", |_, this, (t, v): (f32, f32)| {
             this.inner.add_keyframe(t, v);
             Ok(())
@@ -805,7 +772,6 @@ impl LuaUserData for LuaAnimCurve {
         // -- setEasing --
         /// Sets the built-in easing mode used between keyframes.
         /// @param | mode | string | Easing mode `step`, `linear`, `ease_in`, `ease_out`, or `ease_in_out`.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("setEasing", |_, this, mode: String| {
             use crate::animation::curve::EasingKind;
             this.inner.easing = match mode.as_str() {
@@ -830,8 +796,7 @@ impl LuaUserData for LuaAnimCurve {
         });
         // -- setCustomEasing --
         /// Sets or clears a Lua callback used to evaluate custom easing.
-        /// @param | func | any | Function used as custom easing callback, or nil to clear custom easing.
-        /// @return | nil | No value is returned.
+        /// @param | func | function | Function used as custom easing callback, or nil to clear custom easing.
         methods.add_method_mut("setCustomEasing", |lua, this, func: LuaValue| {
             use crate::animation::curve::EasingKind;
             if let Some(old_key) = this.custom_easing.take() {
@@ -856,7 +821,6 @@ impl LuaUserData for LuaAnimCurve {
         });
         // -- clear --
         /// Removes all keyframes from this curve.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -883,17 +847,14 @@ impl LuaUserData for LuaAnimSyncGroup {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Adds an animation-like handle to the sync group.
-        /// @param | handle | any | Animation handle accepted by future sync group implementations.
-        /// @return | nil | No value is returned.
+        /// @param | handle | table | Animation handle accepted by future sync group implementations.
         methods.add_method_mut("add", |_, _this, _handle: LuaValue| Ok(()));
         // -- remove --
         /// Removes an animation-like handle from the sync group.
-        /// @param | handle | any | Animation handle accepted by future sync group implementations.
-        /// @return | nil | No value is returned.
+        /// @param | handle | table | Animation handle accepted by future sync group implementations.
         methods.add_method_mut("remove", |_, _this, _handle: LuaValue| Ok(()));
         // -- clear --
         /// Removes all members from the sync group.
-        /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())

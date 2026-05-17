@@ -38,8 +38,7 @@ impl LuaUserData for LuaSignal {
         // -- emit --
         /// Emits a signal event and invokes matching callbacks with the remaining arguments.
         /// @param | name | string | Signal event name to emit.
-        /// @param | ... | any | Additional arguments passed to matching callbacks.
-        /// @return | nil | No value is returned.
+        /// @param | ... | table | Additional arguments passed to matching callbacks.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let name: String = match iter.next() {
@@ -245,9 +244,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- exit --
     /// Requests engine shutdown with an optional process exit code.
-    /// @param | code? | integer | Optional exit code, defaulting to 0.
-    /// @return | nil | No value is returned.
+    /// @param | code | integer? | Optional exit code, defaulting to 0.
     tbl.set(
+        "exit",
         lua.create_function(move |_, code: Option<i32>| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
@@ -272,8 +271,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- clear --
     /// Clears all pending events from the shared event queue.
-    /// @return | nil | No value is returned.
     tbl.set(
+        "clear",
         lua.create_function(move |_, ()| {
             s.borrow_mut().event_queue.clear();
             Ok(())
@@ -296,8 +295,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- pump --
     /// Pumps the shared event queue without removing events for Lua.
-    /// @return | nil | No value is returned.
     tbl.set(
+        "pump",
         lua.create_function(move |_, ()| {
             s.borrow().event_queue.pump();
             Ok(())
@@ -306,10 +305,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- wait --
     /// Waits for the next queued event and returns success, name, and argument table.
-    /// @param | timeout? | number | Optional timeout in seconds.
+    /// @param | timeout | number? | Optional timeout in seconds.
     /// @return | boolean | True when an event was received before timeout.
     /// @return | string | Event name, or an empty string on timeout.
-    /// @return | table | Array table of event arguments.
+    /// @return | table | Array of event arguments; element types depend on the emitted event.
     tbl.set(
         "wait",
         lua.create_function(move |lua, timeout: Option<f64>| {
@@ -341,8 +340,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- restart --
     /// Requests a full engine restart cycle from the runtime.
-    /// @return | nil | No value is returned.
     tbl.set(
+        "restart",
         lua.create_function(move |_, ()| {
             s.borrow_mut().restart_requested = true;
             Ok(())
@@ -351,8 +350,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- quit --
     /// Requests engine shutdown with exit code zero.
-    /// @return | nil | No value is returned.
     tbl.set(
+        "quit",
         lua.create_function(move |_, ()| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
@@ -366,8 +365,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pushDeferred --
     /// Adds a normal-priority event to the deferred buffer instead of the live queue.
     /// @param | name | string | Event name to enqueue later.
-    /// @param | ... | any | Additional event arguments stored with the event.
-    /// @return | nil | No value is returned.
+    /// @param | ... | table | Additional event arguments stored with the event.
     tbl.set(
         "pushDeferred",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -398,8 +396,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Adds an event with explicit priority to the deferred buffer.
     /// @param | name | string | Event name to enqueue later.
     /// @param | priority | string | Priority string `high` or `normal`.
-    /// @param | ... | any | Additional event arguments stored with the event.
-    /// @return | nil | No value is returned.
+    /// @param | ... | table | Additional event arguments stored with the event.
     tbl.set(
         "pushDeferredPriority",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -457,7 +454,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- enableHistory --
     /// Enables event push history with a maximum retained capacity.
     /// @param | capacity | integer | Maximum number of pushed events to keep; zero disables retention.
-    /// @return | nil | No value is returned.
     tbl.set(
         "enableHistory",
         lua.create_function(move |_, capacity: usize| {
@@ -472,7 +468,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let hist = history_buf.clone();
     // -- getHistory --
     /// Returns retained pushed event history entries.
-    /// @return | table | Array table of entries with `name` and `args` fields.
+    /// @return | table | Array of entries with `name` and `args` fields.
+    /// @field | name | string | Event name.
+    /// @field | args | table | Event arguments array.
     tbl.set(
         "getHistory",
         lua.create_function(move |lua, ()| {
@@ -481,7 +479,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for (i, (name, args)) in buf.iter().enumerate() {
                 let entry = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 entry.set("name", name.clone())?;
                 let args_tbl = lua.create_table()?;
                 for (j, arg) in args.iter().enumerate() {
@@ -489,7 +486,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                     args_tbl.set(j + 1, v)?;
                 }
                 /// Performs the 'args' operation.
-                /// @return | nil | No value is returned.
                 entry.set("args", args_tbl)?;
                 out.set(i + 1, entry)?;
             }
@@ -499,8 +495,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let hist_c = history_buf.clone();
     // -- clearHistory --
     /// Clears retained pushed event history.
-    /// @return | nil | No value is returned.
     tbl.set(
+        "clearHistory",
         lua.create_function(move |_, ()| {
             hist_c.borrow_mut().clear();
             Ok(())
@@ -512,8 +508,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- push --
     /// Pushes a normal-priority event into the shared event queue and optional history.
     /// @param | name | string | Event name.
-    /// @param | ... | any | Additional event arguments.
-    /// @return | nil | No value is returned.
+    /// @param | ... | table | Additional event arguments.
     tbl.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -554,8 +549,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Pushes an event with explicit priority into the shared event queue and optional history.
     /// @param | name | string | Event name.
     /// @param | priority | string | Priority string `high` or `normal`.
-    /// @param | ... | any | Additional event arguments.
-    /// @return | nil | No value is returned.
+    /// @param | ... | table | Additional event arguments.
     tbl.set(
         "pushPriority",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -600,7 +594,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'event' operation.
-    /// @return | nil | No value is returned.
     lurek.set("event", tbl)?;
     Ok(())
 }

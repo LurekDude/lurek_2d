@@ -59,7 +59,7 @@
   - [LBlackboard:get(key: string) -> boolean|number|string|nil](#lblackboardgetkey-string-booleannumberstringnil)
   - [LBlackboard:getRevision() -> number](#lblackboardgetrevision-number)
   - [LBlackboard:has(key: string) -> boolean](#lblackboardhaskey-string-boolean)
-  - [LBlackboard:keys() -> table](#lblackboardkeys-table)
+  - [LBlackboard:keys() -> string[]](#lblackboardkeys-string)
   - [LBlackboard:set(key: string, value: boolean|number|string|nil)](#lblackboardsetkey-string-value-booleannumberstringnil)
   - [LBlackboard:snapshot() -> table](#lblackboardsnapshot-table)
   - [LBlackboard:unwatch(id: integer)](#lblackboardunwatchid-integer)
@@ -83,16 +83,16 @@
   - [LEventBus](#leventbus)
   - [LEventBus:clear(event: string)](#leventbusclearevent-string)
   - [LEventBus:clearAll()](#leventbusclearall)
-  - [LEventBus:emit(event: string, ...: boolean|number|string|table|nil)](#leventbusemitevent-string-booleannumberstringtablenil)
-  - [LEventBus:getEvents() -> table](#leventbusgetevents-table)
+  - [LEventBus:emit(event: string, ...: table)](#leventbusemitevent-string-table)
+  - [LEventBus:getEvents() -> string[]](#leventbusgetevents-string)
   - [LEventBus:getListenerCount(event: string) -> number](#leventbusgetlistenercountevent-string-number)
   - [LEventBus:off(id: integer)](#leventbusoffid-integer)
   - [LEventBus:on(event: string, callback: function, [priority]: integer) -> number](#leventbusonevent-string-callback-function-priority-integer-number)
   - [LFactory](#lfactory)
   - [LFactory:alias(alias: string, canonical: string)](#lfactoryaliasalias-string-canonical-string)
   - [LFactory:clearAll()](#lfactoryclearall)
-  - [LFactory:create(typeName: string, ...: any) -> boolean|number|string|table|nil](#lfactorycreatetypename-string-any-booleannumberstringtablenil)
-  - [LFactory:getTypes() -> table](#lfactorygettypes-table)
+  - [LFactory:create(typeName: string, ...: table) -> table](#lfactorycreatetypename-string-table-table)
+  - [LFactory:getTypes() -> string[]](#lfactorygettypes-string)
   - [LFactory:has(typeName: string) -> boolean](#lfactoryhastypename-string-boolean)
   - [LFactory:register(typeName: string, ctor: function)](#lfactoryregistertypename-string-ctor-function)
   - [LFactory:remove(typeName: string)](#lfactoryremovetypename-string)
@@ -105,68 +105,68 @@
   - [LFunnel:push(tag: string, [value]: number)](#lfunnelpushtag-string-value-number)
   - [LFunnel:update(dt: number) -> boolean](#lfunnelupdatedt-number-boolean)
   - [LList](#llist)
-  - [LList:add(value: any)](#llistaddvalue-any)
+  - [LList:add(value: string)](#llistaddvalue-string)
   - [LList:clear()](#llistclear)
-  - [LList:contains(value: any) -> boolean](#llistcontainsvalue-any-boolean)
-  - [LList:get(index: integer) -> boolean|number|string|table|nil](#llistgetindex-integer-booleannumberstringtablenil)
-  - [LList:indexOf(value: any) -> integer](#llistindexofvalue-any-integer)
-  - [LList:insert(index: integer, value: boolean|number|string|table)](#llistinsertindex-integer-value-booleannumberstringtable)
+  - [LList:contains(value: string) -> boolean](#llistcontainsvalue-string-boolean)
+  - [LList:get(index: integer) -> string](#llistgetindex-integer-string)
+  - [LList:indexOf(value: string) -> integer](#llistindexofvalue-string-integer)
+  - [LList:insert(index: integer, value: string)](#llistinsertindex-integer-value-string)
   - [LList:isEmpty() -> boolean](#llistisempty-boolean)
   - [LList:len() -> number](#llistlen-number)
-  - [LList:pop() -> boolean|number|string|table|nil](#llistpop-booleannumberstringtablenil)
-  - [LList:push(value: any)](#llistpushvalue-any)
-  - [LList:remove(index: integer) -> boolean|number|string|table|nil](#llistremoveindex-integer-booleannumberstringtablenil)
+  - [LList:pop() -> string](#llistpop-string)
+  - [LList:push(value: string)](#llistpushvalue-string)
+  - [LList:remove(index: integer) -> string](#llistremoveindex-integer-string)
   - [LList:reverse()](#llistreverse)
-  - [LList:set(index: integer, value: boolean|number|string|table)](#llistsetindex-integer-value-booleannumberstringtable)
-  - [LList:shift() -> boolean|number|string|table|nil](#llistshift-booleannumberstringtablenil)
-  - [LList:toArray() -> table](#llisttoarray-table)
-  - [LList:unshift(value: any)](#llistunshiftvalue-any)
+  - [LList:set(index: integer, value: string)](#llistsetindex-integer-value-string)
+  - [LList:shift() -> string](#llistshift-string)
+  - [LList:toArray() -> number[]](#llisttoarray-number)
+  - [LList:unshift(value: string)](#llistunshiftvalue-string)
   - [LMap](#lmap)
   - [LMap:clear()](#lmapclear)
   - [LMap:entries() -> table](#lmapentries-table)
-  - [LMap:get(key: string) -> boolean|number|string|table|nil](#lmapgetkey-string-booleannumberstringtablenil)
+  - [LMap:get(key: string) -> string](#lmapgetkey-string-string)
   - [LMap:has(key: string) -> boolean](#lmaphaskey-string-boolean)
   - [LMap:isEmpty() -> boolean](#lmapisempty-boolean)
-  - [LMap:keys() -> table](#lmapkeys-table)
+  - [LMap:keys() -> string[]](#lmapkeys-string)
   - [LMap:len() -> number](#lmaplen-number)
   - [LMap:merge(other: LMap)](#lmapmergeother-lmap)
   - [LMap:remove(key: string) -> boolean](#lmapremovekey-string-boolean)
-  - [LMap:set(key: string, value: boolean|number|string|table)](#lmapsetkey-string-value-booleannumberstringtable)
-  - [LMap:values() -> table](#lmapvalues-table)
+  - [LMap:set(key: string, value: string)](#lmapsetkey-string-value-string)
+  - [LMap:values() -> number[]](#lmapvalues-number)
   - [LMediator](#lmediator)
-  - [LMediator:broadcast(...: boolean|number|string|table|nil)](#lmediatorbroadcast-booleannumberstringtablenil)
-  - [LMediator:channels() -> table](#lmediatorchannels-table)
+  - [LMediator:broadcast(...: table)](#lmediatorbroadcast-table)
+  - [LMediator:channels() -> string[]](#lmediatorchannels-string)
   - [LMediator:clear()](#lmediatorclear)
   - [LMediator:handlerCount(channel: string) -> number](#lmediatorhandlercountchannel-string-number)
   - [LMediator:off(channel: string, id: integer)](#lmediatoroffchannel-string-id-integer)
   - [LMediator:on(channel: string, callback: function) -> number](#lmediatoronchannel-string-callback-function-number)
   - [LMediator:removeChannel(channel: string)](#lmediatorremovechannelchannel-string)
-  - [LMediator:send(channel: string, ...: boolean|number|string|table|nil)](#lmediatorsendchannel-string-booleannumberstringtablenil)
+  - [LMediator:send(channel: string, ...: table)](#lmediatorsendchannel-string-table)
   - [LObjectPool](#lobjectpool)
-  - [LObjectPool:acquire() -> boolean|number|string|table|nil](#lobjectpoolacquire-booleannumberstringtablenil)
-  - [LObjectPool:add(value: any)](#lobjectpooladdvalue-any)
+  - [LObjectPool:acquire() -> table](#lobjectpoolacquire-table)
+  - [LObjectPool:add(value: table)](#lobjectpooladdvalue-table)
   - [LObjectPool:clearAll()](#lobjectpoolclearall)
   - [LObjectPool:getActiveCount() -> number](#lobjectpoolgetactivecount-number)
   - [LObjectPool:getAvailableCount() -> number](#lobjectpoolgetavailablecount-number)
   - [LObjectPool:getTotalCount() -> number](#lobjectpoolgettotalcount-number)
-  - [LObjectPool:release(value: any)](#lobjectpoolreleasevalue-any)
+  - [LObjectPool:release(value: table)](#lobjectpoolreleasevalue-table)
   - [LObserver](#lobserver)
-  - [LObserver:get(key: string) -> boolean|number|string|table|nil](#lobservergetkey-string-booleannumberstringtablenil)
+  - [LObserver:get(key: string) -> number](#lobservergetkey-string-number)
   - [LObserver:getCount() -> number](#lobservergetcount-number)
-  - [LObserver:set(key: string, value: boolean|number|string|table)](#lobserversetkey-string-value-booleannumberstringtable)
+  - [LObserver:set(key: string, value: number)](#lobserversetkey-string-value-number)
   - [LObserver:subscribe(key: string, callback: function, [once]: boolean) -> number](#lobserversubscribekey-string-callback-function-once-boolean-number)
   - [LObserver:unsubscribe(id: integer)](#lobserverunsubscribeid-integer)
   - [LPatternGraph](#lpatterngraph)
   - [LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number](#lpatterngraphaddedgefrom-integer-to-integer-weight-number-label-string-number)
-  - [LPatternGraph:addNode([label]: string, [value]: boolean|number|string|table) -> number](#lpatterngraphaddnodelabel-string-value-booleannumberstringtable-number)
-  - [LPatternGraph:bfs(start: integer) -> table](#lpatterngraphbfsstart-integer-table)
+  - [LPatternGraph:addNode([label]: string, [value]: table) -> number](#lpatterngraphaddnodelabel-string-value-table-number)
+  - [LPatternGraph:bfs(start: integer) -> integer[]](#lpatterngraphbfsstart-integer-integer)
   - [LPatternGraph:clearAll()](#lpatterngraphclearall)
-  - [LPatternGraph:dfs(start: integer) -> table](#lpatterngraphdfsstart-integer-table)
+  - [LPatternGraph:dfs(start: integer) -> integer[]](#lpatterngraphdfsstart-integer-integer)
   - [LPatternGraph:edgeCount() -> number](#lpatterngraphedgecount-number)
-  - [LPatternGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil](#lpatterngraphgetnodevalueid-integer-booleannumberstringtablenil)
+  - [LPatternGraph:getNodeValue(id: integer) -> table](#lpatterngraphgetnodevalueid-integer-table)
   - [LPatternGraph:hasNode(id: integer) -> boolean](#lpatterngraphhasnodeid-integer-boolean)
   - [LPatternGraph:isConnected(from: integer, to: integer) -> boolean](#lpatterngraphisconnectedfrom-integer-to-integer-boolean)
-  - [LPatternGraph:neighbors(id: integer) -> table](#lpatterngraphneighborsid-integer-table)
+  - [LPatternGraph:neighbors(id: integer) -> integer[]](#lpatterngraphneighborsid-integer-integer)
   - [LPatternGraph:nodeCount() -> number](#lpatterngraphnodecount-number)
   - [LPatternGraph:removeEdge(id: integer) -> boolean](#lpatterngraphremoveedgeid-integer-boolean)
   - [LPatternGraph:removeNode(id: integer) -> boolean](#lpatterngraphremovenodeid-integer-boolean)
@@ -174,24 +174,24 @@
   - [LPriorityQueue:clearAll()](#lpriorityqueueclearall)
   - [LPriorityQueue:isEmpty() -> boolean](#lpriorityqueueisempty-boolean)
   - [LPriorityQueue:len() -> number](#lpriorityqueuelen-number)
-  - [LPriorityQueue:peek() -> boolean|number|string|table|nil](#lpriorityqueuepeek-booleannumberstringtablenil)
-  - [LPriorityQueue:pop() -> boolean|number|string|table|nil](#lpriorityqueuepop-booleannumberstringtablenil)
-  - [LPriorityQueue:push(priority: integer, value: boolean|number|string|table, [label]: string) -> number](#lpriorityqueuepushpriority-integer-value-booleannumberstringtable-label-string-number)
+  - [LPriorityQueue:peek() -> table](#lpriorityqueuepeek-table)
+  - [LPriorityQueue:pop() -> table](#lpriorityqueuepop-table)
+  - [LPriorityQueue:push(priority: integer, value: table, [label]: string) -> number](#lpriorityqueuepushpriority-integer-value-table-label-string-number)
   - [LQueue](#lqueue)
-  - [LQueue:back() -> boolean|number|string|table|nil](#lqueueback-booleannumberstringtablenil)
+  - [LQueue:back() -> string](#lqueueback-string)
   - [LQueue:clear()](#lqueueclear)
-  - [LQueue:dequeue() -> boolean|number|string|table|nil](#lqueuedequeue-booleannumberstringtablenil)
-  - [LQueue:dequeueBack() -> boolean|number|string|table|nil](#lqueuedequeueback-booleannumberstringtablenil)
-  - [LQueue:enqueue(value: any) -> boolean](#lqueueenqueuevalue-any-boolean)
-  - [LQueue:enqueueFront(value: any) -> boolean](#lqueueenqueuefrontvalue-any-boolean)
-  - [LQueue:front() -> boolean|number|string|table|nil](#lqueuefront-booleannumberstringtablenil)
-  - [LQueue:insertAt(index: integer, value: boolean|number|string|table) -> boolean](#lqueueinsertatindex-integer-value-booleannumberstringtable-boolean)
+  - [LQueue:dequeue() -> string](#lqueuedequeue-string)
+  - [LQueue:dequeueBack() -> string](#lqueuedequeueback-string)
+  - [LQueue:enqueue(value: string) -> boolean](#lqueueenqueuevalue-string-boolean)
+  - [LQueue:enqueueFront(value: string) -> boolean](#lqueueenqueuefrontvalue-string-boolean)
+  - [LQueue:front() -> string](#lqueuefront-string)
+  - [LQueue:insertAt(index: integer, value: string) -> boolean](#lqueueinsertatindex-integer-value-string-boolean)
   - [LQueue:isEmpty() -> boolean](#lqueueisempty-boolean)
   - [LQueue:isFull() -> boolean](#lqueueisfull-boolean)
   - [LQueue:len() -> number](#lqueuelen-number)
-  - [LQueue:peekAt(index: integer) -> boolean|number|string|table|nil](#lqueuepeekatindex-integer-booleannumberstringtablenil)
-  - [LQueue:removeAt(index: integer) -> boolean|number|string|table|nil](#lqueueremoveatindex-integer-booleannumberstringtablenil)
-  - [LQueue:toArray() -> table](#lqueuetoarray-table)
+  - [LQueue:peekAt(index: integer) -> string](#lqueuepeekatindex-integer-string)
+  - [LQueue:removeAt(index: integer) -> string](#lqueueremoveatindex-integer-string)
+  - [LQueue:toArray() -> number[]](#lqueuetoarray-number)
   - [LRelationshipManager](#lrelationshipmanager)
   - [LRelationshipManager:adjustValue(a: integer, b: integer, delta: number)](#lrelationshipmanageradjustvaluea-integer-b-integer-delta-number)
   - [LRelationshipManager:defineType(name: string, levels: table, [defaultLevel]: string)](#lrelationshipmanagerdefinetypename-string-levels-table-defaultlevel-string)
@@ -202,7 +202,7 @@
   - [LRelationshipManager:removeType(name: string)](#lrelationshipmanagerremovetypename-string)
   - [LRelationshipManager:setLevel(a: integer, b: integer, typeName: string, level: string) -> boolean](#lrelationshipmanagersetlevela-integer-b-integer-typename-string-level-string-boolean)
   - [LRelationshipManager:setValue(a: integer, b: integer, value: number)](#lrelationshipmanagersetvaluea-integer-b-integer-value-number)
-  - [LRelationshipManager:typeNames() -> table](#lrelationshipmanagertypenames-table)
+  - [LRelationshipManager:typeNames() -> string[]](#lrelationshipmanagertypenames-string)
   - [LRing](#lring)
   - [LRing:average() -> number](#lringaverage-number)
   - [LRing:clear()](#lringclear)
@@ -214,10 +214,10 @@
   - [LRing:toArray() -> table](#lringtoarray-table)
   - [LServiceLocator](#lservicelocator)
   - [LServiceLocator:clearAll()](#lservicelocatorclearall)
-  - [LServiceLocator:getServices() -> table](#lservicelocatorgetservices-table)
+  - [LServiceLocator:getServices() -> string[]](#lservicelocatorgetservices-string)
   - [LServiceLocator:has(name: string) -> boolean](#lservicelocatorhasname-string-boolean)
-  - [LServiceLocator:locate(name: string) -> boolean|number|string|table|nil](#lservicelocatorlocatename-string-booleannumberstringtablenil)
-  - [LServiceLocator:provide(name: string, value: boolean|number|string|table|function)](#lservicelocatorprovidename-string-value-booleannumberstringtablefunction)
+  - [LServiceLocator:locate(name: string) -> table](#lservicelocatorlocatename-string-table)
+  - [LServiceLocator:provide(name: string, value: table)](#lservicelocatorprovidename-string-value-table)
   - [LServiceLocator:remove(name: string)](#lservicelocatorremovename-string)
   - [LSet](#lset)
   - [LSet:add(key: string) -> boolean](#lsetaddkey-string-boolean)
@@ -227,39 +227,39 @@
   - [LSet:isEmpty() -> boolean](#lsetisempty-boolean)
   - [LSet:len() -> number](#lsetlen-number)
   - [LSet:remove(key: string) -> boolean](#lsetremovekey-string-boolean)
-  - [LSet:toArray() -> table](#lsettoarray-table)
+  - [LSet:toArray() -> string[]](#lsettoarray-string)
   - [LSet:union(other: LSet) -> LSet](#lsetunionother-lset-lset)
   - [LSimpleState](#lsimplestate)
   - [LSimpleState:addState(name: string, [callbacks]: table)](#lsimplestateaddstatename-string-callbacks-table)
   - [LSimpleState:clearAll()](#lsimplestateclearall)
   - [LSimpleState:getCurrent() -> string](#lsimplestategetcurrent-string)
-  - [LSimpleState:getStates() -> table](#lsimplestategetstates-table)
+  - [LSimpleState:getStates() -> string[]](#lsimplestategetstates-string)
   - [LSimpleState:hasState(name: string) -> boolean](#lsimplestatehasstatename-string-boolean)
   - [LSimpleState:transitionTo(name: string) -> boolean](#lsimplestatetransitiontoname-string-boolean)
   - [LSimpleState:update(dt: number)](#lsimplestateupdatedt-number)
   - [LStack](#lstack)
   - [LStack:clear()](#lstackclear)
-  - [LStack:insertAt(index: integer, value: boolean|number|string|table) -> boolean](#lstackinsertatindex-integer-value-booleannumberstringtable-boolean)
+  - [LStack:insertAt(index: integer, value: string) -> boolean](#lstackinsertatindex-integer-value-string-boolean)
   - [LStack:isEmpty() -> boolean](#lstackisempty-boolean)
   - [LStack:isFull() -> boolean](#lstackisfull-boolean)
   - [LStack:len() -> number](#lstacklen-number)
   - [LStack:moveWithin(from: integer, to: integer) -> boolean](#lstackmovewithinfrom-integer-to-integer-boolean)
-  - [LStack:peek() -> boolean|number|string|table|nil](#lstackpeek-booleannumberstringtablenil)
-  - [LStack:peekAt(index: integer) -> boolean|number|string|table|nil](#lstackpeekatindex-integer-booleannumberstringtablenil)
-  - [LStack:peekBottom() -> boolean|number|string|table|nil](#lstackpeekbottom-booleannumberstringtablenil)
-  - [LStack:pop() -> boolean|number|string|table|nil](#lstackpop-booleannumberstringtablenil)
-  - [LStack:popBottom() -> boolean|number|string|table|nil](#lstackpopbottom-booleannumberstringtablenil)
-  - [LStack:popMany(count: integer) -> table](#lstackpopmanycount-integer-table)
-  - [LStack:push(value: any) -> boolean](#lstackpushvalue-any-boolean)
-  - [LStack:pushBottom(value: any) -> boolean](#lstackpushbottomvalue-any-boolean)
-  - [LStack:removeAt(index: integer) -> boolean|number|string|table|nil](#lstackremoveatindex-integer-booleannumberstringtablenil)
-  - [LStack:toArray() -> table](#lstacktoarray-table)
+  - [LStack:peek() -> string](#lstackpeek-string)
+  - [LStack:peekAt(index: integer) -> string](#lstackpeekatindex-integer-string)
+  - [LStack:peekBottom() -> string](#lstackpeekbottom-string)
+  - [LStack:pop() -> string](#lstackpop-string)
+  - [LStack:popBottom() -> string](#lstackpopbottom-string)
+  - [LStack:popMany(count: integer) -> integer[]](#lstackpopmanycount-integer-integer)
+  - [LStack:push(value: string) -> boolean](#lstackpushvalue-string-boolean)
+  - [LStack:pushBottom(value: string) -> boolean](#lstackpushbottomvalue-string-boolean)
+  - [LStack:removeAt(index: integer) -> string](#lstackremoveatindex-integer-string)
+  - [LStack:toArray() -> number[]](#lstacktoarray-number)
   - [LStrategy](#lstrategy)
   - [LStrategy:clear()](#lstrategyclear)
-  - [LStrategy:execute(...: boolean|number|string|table|nil) -> boolean|number|string|table|nil](#lstrategyexecute-booleannumberstringtablenil-booleannumberstringtablenil)
+  - [LStrategy:execute(...: table) -> table](#lstrategyexecute-table-table)
   - [LStrategy:getCurrent() -> string](#lstrategygetcurrent-string)
   - [LStrategy:has(name: string) -> boolean](#lstrategyhasname-string-boolean)
-  - [LStrategy:names() -> table](#lstrategynames-table)
+  - [LStrategy:names() -> string[]](#lstrategynames-string)
   - [LStrategy:register(name: string, callback: function)](#lstrategyregistername-string-callback-function)
   - [LStrategy:remove(name: string) -> boolean](#lstrategyremovename-string-boolean)
   - [LStrategy:set(name: string) -> boolean](#lstrategysetname-string-boolean)
@@ -271,13 +271,13 @@
   - [LThrottle:setEnabled(enabled: boolean)](#lthrottlesetenabledenabled-boolean)
   - [LThrottle:update(dt: number) -> boolean](#lthrottleupdatedt-number-boolean)
   - [LWeightedRandom](#lweightedrandom)
-  - [LWeightedRandom:add(weight: number, value: boolean|number|string|table, [label]: string) -> number](#lweightedrandomaddweight-number-value-booleannumberstringtable-label-string-number)
+  - [LWeightedRandom:add(weight: number, value: string, [label]: string) -> number](#lweightedrandomaddweight-number-value-string-label-string-number)
   - [LWeightedRandom:clearAll()](#lweightedrandomclearall)
   - [LWeightedRandom:getRevision() -> number](#lweightedrandomgetrevision-number)
   - [LWeightedRandom:isEmpty() -> boolean](#lweightedrandomisempty-boolean)
   - [LWeightedRandom:len() -> number](#lweightedrandomlen-number)
-  - [LWeightedRandom:pick(sample: number) -> boolean|number|string|table|nil](#lweightedrandompicksample-number-booleannumberstringtablenil)
-  - [LWeightedRandom:pickN(count: integer, samples: table) -> table](#lweightedrandompickncount-integer-samples-table-table)
+  - [LWeightedRandom:pick(sample: number) -> string](#lweightedrandompicksample-number-string)
+  - [LWeightedRandom:pickN(count: integer, samples: table) -> number[]](#lweightedrandompickncount-integer-samples-table-number)
   - [LWeightedRandom:remove(id: integer) -> boolean](#lweightedrandomremoveid-integer-boolean)
   - [LWeightedRandom:setWeight(id: integer, weight: number) -> boolean](#lweightedrandomsetweightid-integer-weight-number-boolean)
   - [LWeightedRandom:totalWeight() -> number](#lweightedrandomtotalweight-number)
@@ -1738,11 +1738,11 @@ do
 end
 ```
 
-### `LBlackboard:keys() -> table`
+### `LBlackboard:keys() -> string[]`
 
 Return an array of all keys currently stored on the blackboard.
 
-**Returns**: `table` - Array of key name strings.
+**Returns**: `string[]` - Key name strings.
 
 #### Example
 
@@ -2308,14 +2308,14 @@ do
 end
 ```
 
-### `LEventBus:emit(event: string, ...: boolean|number|string|table|nil)`
+### `LEventBus:emit(event: string, ...: table)`
 
 Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
 
 **Parameters**
 
 - `event` (`string`, required) - The event name to emit.
-- `...` (`boolean|number|string|table|nil`, required) - Additional arguments passed to each listener callback.
+- `...` (`table`, required) - Additional arguments passed to each listener callback.
 
 #### Example
 
@@ -2336,11 +2336,11 @@ do
 end
 ```
 
-### `LEventBus:getEvents() -> table`
+### `LEventBus:getEvents() -> string[]`
 
 Return an array of all event names that have at least one listener.
 
-**Returns**: `table` - Array of event name strings.
+**Returns**: `string[]` - Event name strings.
 
 #### Example
 
@@ -2519,16 +2519,16 @@ do
 end
 ```
 
-### `LFactory:create(typeName: string, ...: any) -> boolean|number|string|table|nil`
+### `LFactory:create(typeName: string, ...: table) -> table`
 
 Create a new object by type name, passing additional arguments to the constructor.
 
 **Parameters**
 
 - `typeName` (`string`, required) - The registered type to instantiate.
-- `...` (`any`, required) - Extra arguments forwarded to the constructor.
+- `...` (`table`, required) - Extra arguments forwarded to the constructor.
 
-**Returns**: `boolean|number|string|table|nil` - The value returned by the constructor function.
+**Returns**: `table` - The created object table.
 
 #### Example
 
@@ -2546,11 +2546,11 @@ do
 end
 ```
 
-### `LFactory:getTypes() -> table`
+### `LFactory:getTypes() -> string[]`
 
 Return an array of all registered type names.
 
-**Returns**: `table` - Array of type name strings.
+**Returns**: `string[]` - Type name strings.
 
 #### Example
 
@@ -2856,13 +2856,13 @@ do
 end
 ```
 
-### `LList:add(value: any)`
+### `LList:add(value: string)`
 
 Append a value to the end of the list.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to append.
+- `value` (`string`, required) - The value to append.
 
 #### Example
 
@@ -2897,13 +2897,13 @@ do
 end
 ```
 
-### `LList:contains(value: any) -> boolean`
+### `LList:contains(value: string) -> boolean`
 
 Check whether the list contains a specific value.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to search for.
+- `value` (`string`, required) - The value to search for.
 
 **Returns**: `boolean` - True if found.
 
@@ -2923,7 +2923,7 @@ do
 end
 ```
 
-### `LList:get(index: integer) -> boolean|number|string|table|nil`
+### `LList:get(index: integer) -> string`
 
 Get the value at a 1-based index. Returns nil if out of range.
 
@@ -2931,7 +2931,7 @@ Get the value at a 1-based index. Returns nil if out of range.
 
 - `index` (`integer`, required) - 1-based position.
 
-**Returns**: `boolean|number|string|table|nil` - The value, or nil.
+**Returns**: `string` - The value.
 
 #### Example
 
@@ -2948,13 +2948,13 @@ do
 end
 ```
 
-### `LList:indexOf(value: any) -> integer`
+### `LList:indexOf(value: string) -> integer`
 
 Find the 1-based index of the first occurrence of a value. Returns nil if not found.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to search for.
+- `value` (`string`, required) - The value to search for.
 
 **Returns**: `integer` - The 1-based index, or nil when the value is not found.
 
@@ -2974,14 +2974,14 @@ do
 end
 ```
 
-### `LList:insert(index: integer, value: boolean|number|string|table)`
+### `LList:insert(index: integer, value: string)`
 
 Insert a value at a 1-based index, shifting subsequent items right.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`boolean|number|string|table`, required) - The value to insert.
+- `value` (`string`, required) - The value to insert.
 
 #### Example
 
@@ -3033,11 +3033,11 @@ do
 end
 ```
 
-### `LList:pop() -> boolean|number|string|table|nil`
+### `LList:pop() -> string`
 
 Remove and return the last value. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The popped value, or nil.
+**Returns**: `string` - The popped value.
 
 #### Example
 
@@ -3052,13 +3052,13 @@ do
 end
 ```
 
-### `LList:push(value: any)`
+### `LList:push(value: string)`
 
 Append a value to the end of the list (alias for add).
 
 **Parameters**
 
-- `value` (`any`, required) - The value to append.
+- `value` (`string`, required) - The value to append.
 
 #### Example
 
@@ -3073,7 +3073,7 @@ do
 end
 ```
 
-### `LList:remove(index: integer) -> boolean|number|string|table|nil`
+### `LList:remove(index: integer) -> string`
 
 Remove and return the value at a 1-based index. Returns nil if out of range.
 
@@ -3081,7 +3081,7 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 
 - `index` (`integer`, required) - 1-based position to remove.
 
-**Returns**: `boolean|number|string|table|nil` - The removed value, or nil.
+**Returns**: `string` - The removed value.
 
 #### Example
 
@@ -3119,14 +3119,14 @@ do
 end
 ```
 
-### `LList:set(index: integer, value: boolean|number|string|table)`
+### `LList:set(index: integer, value: string)`
 
 Replace the value at a 1-based index. Errors if index is 0 or out of range.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based position.
-- `value` (`boolean|number|string|table`, required) - The new value.
+- `value` (`string`, required) - The new value.
 
 #### Example
 
@@ -3143,11 +3143,11 @@ do
 end
 ```
 
-### `LList:shift() -> boolean|number|string|table|nil`
+### `LList:shift() -> string`
 
 Remove and return the first value. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The shifted value, or nil.
+**Returns**: `string` - The shifted value.
 
 #### Example
 
@@ -3162,11 +3162,11 @@ do
 end
 ```
 
-### `LList:toArray() -> table`
+### `LList:toArray() -> number[]`
 
 Return all items as an array table. This method is available to Lua scripts.
 
-**Returns**: `table` - Array of all values.
+**Returns**: `number[]` - Array of all values.
 
 #### Example
 
@@ -3184,13 +3184,13 @@ do
 end
 ```
 
-### `LList:unshift(value: any)`
+### `LList:unshift(value: string)`
 
 Insert a value at the beginning of the list.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to prepend.
+- `value` (`string`, required) - The value to prepend.
 
 #### Example
 
@@ -3293,7 +3293,7 @@ do
 end
 ```
 
-### `LMap:get(key: string) -> boolean|number|string|table|nil`
+### `LMap:get(key: string) -> string`
 
 Retrieve the value for a key. Returns nil if the key does not exist.
 
@@ -3301,7 +3301,7 @@ Retrieve the value for a key. Returns nil if the key does not exist.
 
 - `key` (`string`, required) - The key to look up.
 
-**Returns**: `boolean|number|string|table|nil` - The value, or nil.
+**Returns**: `string` - The value.
 
 #### Example
 
@@ -3358,11 +3358,11 @@ do
 end
 ```
 
-### `LMap:keys() -> table`
+### `LMap:keys() -> string[]`
 
 Return an array of all keys in the map.
 
-**Returns**: `table` - Array of key strings.
+**Returns**: `string[]` - Key strings.
 
 #### Example
 
@@ -3444,14 +3444,14 @@ do
 end
 ```
 
-### `LMap:set(key: string, value: boolean|number|string|table)`
+### `LMap:set(key: string, value: string)`
 
 Set a key-value pair in the map. Replaces any existing value for the same key.
 
 **Parameters**
 
 - `key` (`string`, required) - The key.
-- `value` (`boolean|number|string|table`, required) - The value to store.
+- `value` (`string`, required) - The value to store.
 
 #### Example
 
@@ -3467,11 +3467,11 @@ do
 end
 ```
 
-### `LMap:values() -> table`
+### `LMap:values() -> number[]`
 
 Return an array of all values in the map.
 
-**Returns**: `table` - Array of values.
+**Returns**: `number[]` - Array of values.
 
 #### Example
 
@@ -3516,13 +3516,13 @@ do
 end
 ```
 
-### `LMediator:broadcast(...: boolean|number|string|table|nil)`
+### `LMediator:broadcast(...: table)`
 
 Send a message to all handlers on all channels. Every registered handler receives the payload.
 
 **Parameters**
 
-- `...` (`boolean|number|string|table|nil`, required) - Arguments passed to every handler.
+- `...` (`table`, required) - Arguments passed to every handler.
 
 #### Example
 
@@ -3540,11 +3540,11 @@ do
 end
 ```
 
-### `LMediator:channels() -> table`
+### `LMediator:channels() -> string[]`
 
 Return an array of all channel names that have at least one handler.
 
-**Returns**: `table` - Array of channel name strings.
+**Returns**: `string[]` - Channel name strings.
 
 #### Example
 
@@ -3679,14 +3679,14 @@ do
 end
 ```
 
-### `LMediator:send(channel: string, ...: boolean|number|string|table|nil)`
+### `LMediator:send(channel: string, ...: table)`
 
 Send a message to all handlers on a specific channel with optional payload arguments.
 
 **Parameters**
 
 - `channel` (`string`, required) - The target channel name.
-- `...` (`boolean|number|string|table|nil`, required) - Additional arguments passed to each handler.
+- `...` (`table`, required) - Additional arguments passed to each handler.
 
 #### Example
 
@@ -3737,11 +3737,11 @@ do
 end
 ```
 
-### `LObjectPool:acquire() -> boolean|number|string|table|nil`
+### `LObjectPool:acquire() -> table`
 
 Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
 
-**Returns**: `boolean|number|string|table|nil` - The acquired object, or nil if none available.
+**Returns**: `table` - The acquired object table.
 
 #### Example
 
@@ -3764,13 +3764,13 @@ do
 end
 ```
 
-### `LObjectPool:add(value: any)`
+### `LObjectPool:add(value: table)`
 
 Add an object to the pool's idle set, making it available for future acquisition.
 
 **Parameters**
 
-- `value` (`any`, required) - The object to store in the pool.
+- `value` (`table`, required) - The object table to store in the pool.
 
 #### Example
 
@@ -3875,13 +3875,13 @@ do
 end
 ```
 
-### `LObjectPool:release(value: any)`
+### `LObjectPool:release(value: table)`
 
 Return an active object back to the pool's idle set so it can be reused.
 
 **Parameters**
 
-- `value` (`any`, required) - The object to release back into the pool.
+- `value` (`table`, required) - The object table to release back into the pool.
 
 #### Example
 
@@ -3930,7 +3930,7 @@ do
 end
 ```
 
-### `LObserver:get(key: string) -> boolean|number|string|table|nil`
+### `LObserver:get(key: string) -> number`
 
 Retrieve the current value for a key. Returns nil if not set.
 
@@ -3938,7 +3938,7 @@ Retrieve the current value for a key. Returns nil if not set.
 
 - `key` (`string`, required) - The property name to look up.
 
-**Returns**: `boolean|number|string|table|nil` - The stored value, or nil.
+**Returns**: `number` - The stored value.
 
 #### Example
 
@@ -3976,14 +3976,14 @@ do
 end
 ```
 
-### `LObserver:set(key: string, value: boolean|number|string|table)`
+### `LObserver:set(key: string, value: number)`
 
 Set a value by key and notify all subscribers watching that key.
 
 **Parameters**
 
 - `key` (`string`, required) - The property name.
-- `value` (`boolean|number|string|table`, required) - The new value to store.
+- `value` (`number`, required) - The new value to store.
 
 #### Example
 
@@ -4153,14 +4153,14 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:addNode([label]: string, [value]: boolean|number|string|table) -> number`
+### `LPatternGraph:addNode([label]: string, [value]: table) -> number`
 
 Add a node to the graph with an optional label and payload value.
 
 **Parameters**
 
 - `label` (`string`, optional) - Optional node label.
-- `value` (`boolean|number|string|table`, optional) - Optional payload stored with the node.
+- `value` (`table`, optional) - Optional payload stored with the node.
 
 **Returns**: `number` - The new node's ID.
 
@@ -4219,7 +4219,7 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:bfs(start: integer) -> table`
+### `LPatternGraph:bfs(start: integer) -> integer[]`
 
 Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
 
@@ -4227,7 +4227,7 @@ Perform a breadth-first search from a node. Returns visited node IDs in BFS orde
 
 - `start` (`integer`, required) - The starting node ID.
 
-**Returns**: `table` - Array of visited node IDs.
+**Returns**: `integer[]` - Array of visited node IDs.
 
 #### Example
 
@@ -4290,60 +4290,51 @@ Remove all nodes, edges, and payloads from the graph.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
+  -- Create undirected graph (edges go both ways).
+  ---@type LPatternGraph
+  local g = lurek.patterns.newGraph(true)
 
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
+  -- Add nodes with optional labels and payload data.
+  local town_a = g:addNode("Riverdale", { population = 500 })
+  local town_b = g:addNode("Hillcrest", { population = 300 })
+  local town_c = g:addNode("Lakewood", { population = 800 })
 
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
+  -- Connect nodes with weighted edges (distance between towns).
+  local road1 = g:addEdge(town_a, town_b, 15.0, "dirt_road")
+  g:addEdge(town_b, town_c, 22.0, "paved_road")
 
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
+  -- Query node data.
+  local data = g:getNodeValue(town_a)
+  print("Riverdale pop=" .. (data and data.population or 0))
 
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  -- Membership check.
+  local exists = g:hasNode(town_a)
+  print("town_a exists=" .. tostring(exists))
+
+  -- Pathfinding queries.
+  local neighbors = g:neighbors(town_a)
+  local bfs_order = g:bfs(town_a)
+  local dfs_order = g:dfs(town_a)
+  local connected = g:isConnected(town_a, town_c)
+
+  print("neighbors=" .. #neighbors
+    .. " bfs=" .. #bfs_order
+    .. " dfs=" .. #dfs_order
+    .. " a-c connected=" .. tostring(connected))
+
+  -- Modify graph: remove a road and a town.
+  g:removeEdge(road1)
+  g:removeNode(town_c)
+  print("nodes=" .. g:nodeCount() .. " edges=" .. g:edgeCount())
+  g:clearAll()
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:dfs(start: integer) -> table`
+### `LPatternGraph:dfs(start: integer) -> integer[]`
 
 Perform a depth-first search from a node. Returns visited node IDs in DFS order.
 
@@ -4351,7 +4342,7 @@ Perform a depth-first search from a node. Returns visited node IDs in DFS order.
 
 - `start` (`integer`, required) - The starting node ID.
 
-**Returns**: `table` - Array of visited node IDs.
+**Returns**: `integer[]` - Array of visited node IDs.
 
 #### Example
 
@@ -4469,7 +4460,7 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:getNodeValue(id: integer) -> boolean|number|string|table|nil`
+### `LPatternGraph:getNodeValue(id: integer) -> table`
 
 Retrieve the payload value stored on a node. Returns nil if no payload.
 
@@ -4477,7 +4468,7 @@ Retrieve the payload value stored on a node. Returns nil if no payload.
 
 - `id` (`integer`, required) - The node ID.
 
-**Returns**: `boolean|number|string|table|nil` - The payload, or nil.
+**Returns**: `table` - The payload.
 
 #### Example
 
@@ -4665,7 +4656,7 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:neighbors(id: integer) -> table`
+### `LPatternGraph:neighbors(id: integer) -> integer[]`
 
 Return an array of node IDs directly connected to the given node.
 
@@ -4673,7 +4664,7 @@ Return an array of node IDs directly connected to the given node.
 
 - `id` (`integer`, required) - The node ID to query.
 
-**Returns**: `table` - Array of neighbor node IDs.
+**Returns**: `integer[]` - Array of neighbor node IDs.
 
 #### Example
 
@@ -5010,11 +5001,11 @@ do
 end
 ```
 
-### `LPriorityQueue:peek() -> boolean|number|string|table|nil`
+### `LPriorityQueue:peek() -> table`
 
 Return the highest-priority item without removing it. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The item value, or nil.
+**Returns**: `table` - The item table.
 
 #### Example
 
@@ -5031,11 +5022,11 @@ do
 end
 ```
 
-### `LPriorityQueue:pop() -> boolean|number|string|table|nil`
+### `LPriorityQueue:pop() -> table`
 
 Remove and return the highest-priority item. Returns nil if the queue is empty.
 
-**Returns**: `boolean|number|string|table|nil` - The item value, or nil.
+**Returns**: `table` - The item table.
 
 #### Example
 
@@ -5052,14 +5043,14 @@ do
 end
 ```
 
-### `LPriorityQueue:push(priority: integer, value: boolean|number|string|table, [label]: string) -> number`
+### `LPriorityQueue:push(priority: integer, value: table, [label]: string) -> number`
 
 Add an item with a numeric priority. Higher priority items are dequeued first.
 
 **Parameters**
 
 - `priority` (`integer`, required) - The priority value (higher = dequeued sooner).
-- `value` (`boolean|number|string|table`, required) - The payload to store.
+- `value` (`table`, required) - The payload table to store.
 - `label` (`string`, optional) - Optional human-readable label for debugging.
 
 **Returns**: `number` - The internal ID of the enqueued item.
@@ -5117,11 +5108,11 @@ do
 end
 ```
 
-### `LQueue:back() -> boolean|number|string|table|nil`
+### `LQueue:back() -> string`
 
 Return the back value without removing it. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The back value, or nil.
+**Returns**: `string` - The back value.
 
 #### Example
 
@@ -5155,11 +5146,11 @@ do
 end
 ```
 
-### `LQueue:dequeue() -> boolean|number|string|table|nil`
+### `LQueue:dequeue() -> string`
 
 Remove and return the front value. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The dequeued value, or nil.
+**Returns**: `string` - The dequeued value.
 
 #### Example
 
@@ -5176,11 +5167,11 @@ do
 end
 ```
 
-### `LQueue:dequeueBack() -> boolean|number|string|table|nil`
+### `LQueue:dequeueBack() -> string`
 
 Remove and return the back value. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The dequeued value, or nil.
+**Returns**: `string` - The dequeued value.
 
 #### Example
 
@@ -5195,13 +5186,13 @@ do
 end
 ```
 
-### `LQueue:enqueue(value: any) -> boolean`
+### `LQueue:enqueue(value: string) -> boolean`
 
 Add a value to the back of the queue. Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to enqueue.
+- `value` (`string`, required) - The value to enqueue.
 
 **Returns**: `boolean` - True if enqueued, false if full.
 
@@ -5219,13 +5210,13 @@ do
 end
 ```
 
-### `LQueue:enqueueFront(value: any) -> boolean`
+### `LQueue:enqueueFront(value: string) -> boolean`
 
 Add a value to the front of the queue (priority insertion). Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to insert at the front.
+- `value` (`string`, required) - The value to insert at the front.
 
 **Returns**: `boolean` - True if enqueued, false if full.
 
@@ -5242,11 +5233,11 @@ do
 end
 ```
 
-### `LQueue:front() -> boolean|number|string|table|nil`
+### `LQueue:front() -> string`
 
 Return the front value without removing it. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The front value, or nil.
+**Returns**: `string` - The front value.
 
 #### Example
 
@@ -5263,14 +5254,14 @@ do
 end
 ```
 
-### `LQueue:insertAt(index: integer, value: boolean|number|string|table) -> boolean`
+### `LQueue:insertAt(index: integer, value: string) -> boolean`
 
 Insert a value at a 1-based index in the queue. Returns false if at capacity.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`boolean|number|string|table`, required) - The value to insert.
+- `value` (`string`, required) - The value to insert.
 
 **Returns**: `boolean` - True if inserted, false if full.
 
@@ -5347,7 +5338,7 @@ do
 end
 ```
 
-### `LQueue:peekAt(index: integer) -> boolean|number|string|table|nil`
+### `LQueue:peekAt(index: integer) -> string`
 
 Return the value at a 1-based index without removing it. Returns nil if out of range.
 
@@ -5355,7 +5346,7 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 
 - `index` (`integer`, required) - 1-based position.
 
-**Returns**: `boolean|number|string|table|nil` - The value, or nil.
+**Returns**: `string` - The value.
 
 #### Example
 
@@ -5370,7 +5361,7 @@ do
 end
 ```
 
-### `LQueue:removeAt(index: integer) -> boolean|number|string|table|nil`
+### `LQueue:removeAt(index: integer) -> string`
 
 Remove and return the value at a 1-based index. Returns nil if out of range.
 
@@ -5378,7 +5369,7 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 
 - `index` (`integer`, required) - 1-based position to remove.
 
-**Returns**: `boolean|number|string|table|nil` - The removed value, or nil.
+**Returns**: `string` - The removed value.
 
 #### Example
 
@@ -5393,11 +5384,11 @@ do
 end
 ```
 
-### `LQueue:toArray() -> table`
+### `LQueue:toArray() -> number[]`
 
 Return all queue items as an array table (front to back).
 
-**Returns**: `table` - Array of all values.
+**Returns**: `number[]` - Array of all values.
 
 #### Example
 
@@ -5670,11 +5661,11 @@ do
 end
 ```
 
-### `LRelationshipManager:typeNames() -> table`
+### `LRelationshipManager:typeNames() -> string[]`
 
 Return all defined relationship type names.
 
-**Returns**: `table` - Array of type name strings.
+**Returns**: `string[]` - Type name strings.
 
 #### Example
 
@@ -5939,11 +5930,11 @@ do
 end
 ```
 
-### `LServiceLocator:getServices() -> table`
+### `LServiceLocator:getServices() -> string[]`
 
 Return an array of all registered service names.
 
-**Returns**: `table` - Array of service name strings.
+**Returns**: `string[]` - Service name strings.
 
 #### Example
 
@@ -5983,7 +5974,7 @@ do
 end
 ```
 
-### `LServiceLocator:locate(name: string) -> boolean|number|string|table|nil`
+### `LServiceLocator:locate(name: string) -> table`
 
 Retrieve a registered service by name. Returns nil if not found.
 
@@ -5991,7 +5982,7 @@ Retrieve a registered service by name. Returns nil if not found.
 
 - `name` (`string`, required) - The service name to look up.
 
-**Returns**: `boolean|number|string|table|nil` - The service object, or nil if not registered.
+**Returns**: `table` - The service table.
 
 #### Example
 
@@ -6009,14 +6000,14 @@ do
 end
 ```
 
-### `LServiceLocator:provide(name: string, value: boolean|number|string|table|function)`
+### `LServiceLocator:provide(name: string, value: table)`
 
 Register a service instance under a given name. Replaces any previously registered service with the same name.
 
 **Parameters**
 
 - `name` (`string`, required) - Unique identifier for the service.
-- `value` (`boolean|number|string|table|function`, required) - The service object or table to store.
+- `value` (`table`, required) - The service table to register.
 
 #### Example
 
@@ -6240,11 +6231,11 @@ do
 end
 ```
 
-### `LSet:toArray() -> table`
+### `LSet:toArray() -> string[]`
 
 Return all set items as an array table.
 
-**Returns**: `table` - Array of string values.
+**Returns**: `string[]` - String values.
 
 #### Example
 
@@ -6390,11 +6381,11 @@ do
 end
 ```
 
-### `LSimpleState:getStates() -> table`
+### `LSimpleState:getStates() -> string[]`
 
 Return an array of all registered state names.
 
-**Returns**: `table` - Array of state name strings.
+**Returns**: `string[]` - State name strings.
 
 #### Example
 
@@ -6547,14 +6538,14 @@ do
 end
 ```
 
-### `LStack:insertAt(index: integer, value: boolean|number|string|table) -> boolean`
+### `LStack:insertAt(index: integer, value: string) -> boolean`
 
 Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`boolean|number|string|table`, required) - The value to insert.
+- `value` (`string`, required) - The value to insert.
 
 **Returns**: `boolean` - True if inserted, false if full.
 
@@ -6655,11 +6646,11 @@ do
 end
 ```
 
-### `LStack:peek() -> boolean|number|string|table|nil`
+### `LStack:peek() -> string`
 
 Return the top value without removing it. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The top value, or nil.
+**Returns**: `string` - The top value.
 
 #### Example
 
@@ -6676,7 +6667,7 @@ do
 end
 ```
 
-### `LStack:peekAt(index: integer) -> boolean|number|string|table|nil`
+### `LStack:peekAt(index: integer) -> string`
 
 Return the value at a 1-based index without removing it. Returns nil if out of range.
 
@@ -6684,7 +6675,7 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 
 - `index` (`integer`, required) - 1-based position in the stack.
 
-**Returns**: `boolean|number|string|table|nil` - The value at that position, or nil.
+**Returns**: `string` - The value at that position.
 
 #### Example
 
@@ -6699,11 +6690,11 @@ do
 end
 ```
 
-### `LStack:peekBottom() -> boolean|number|string|table|nil`
+### `LStack:peekBottom() -> string`
 
 Return the bottom value without removing it. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The bottom value, or nil.
+**Returns**: `string` - The bottom value.
 
 #### Example
 
@@ -6718,11 +6709,11 @@ do
 end
 ```
 
-### `LStack:pop() -> boolean|number|string|table|nil`
+### `LStack:pop() -> string`
 
 Remove and return the top value. Returns nil if the stack is empty.
 
-**Returns**: `boolean|number|string|table|nil` - The popped value, or nil.
+**Returns**: `string` - The popped value.
 
 #### Example
 
@@ -6739,11 +6730,11 @@ do
 end
 ```
 
-### `LStack:popBottom() -> boolean|number|string|table|nil`
+### `LStack:popBottom() -> string`
 
 Remove and return the bottom value. Returns nil if empty.
 
-**Returns**: `boolean|number|string|table|nil` - The popped value, or nil.
+**Returns**: `string` - The popped value.
 
 #### Example
 
@@ -6758,7 +6749,7 @@ do
 end
 ```
 
-### `LStack:popMany(count: integer) -> table`
+### `LStack:popMany(count: integer) -> integer[]`
 
 Pop up to `count` values from the top and return them as an array table.
 
@@ -6766,7 +6757,7 @@ Pop up to `count` values from the top and return them as an array table.
 
 - `count` (`integer`, required) - Maximum number of items to pop.
 
-**Returns**: `table` - Array of popped values (may be shorter than count).
+**Returns**: `integer[]` - Popped values (may be shorter than count).
 
 #### Example
 
@@ -6783,13 +6774,13 @@ do
 end
 ```
 
-### `LStack:push(value: any) -> boolean`
+### `LStack:push(value: string) -> boolean`
 
 Push a value onto the top of the stack. Returns false if the stack is at capacity.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to push.
+- `value` (`string`, required) - The value to push.
 
 **Returns**: `boolean` - True if pushed, false if full.
 
@@ -6809,13 +6800,13 @@ do
 end
 ```
 
-### `LStack:pushBottom(value: any) -> boolean`
+### `LStack:pushBottom(value: string) -> boolean`
 
 Push a value onto the bottom of the stack. Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`any`, required) - The value to insert at the bottom.
+- `value` (`string`, required) - The value to insert at the bottom.
 
 **Returns**: `boolean` - True if pushed, false if full.
 
@@ -6832,7 +6823,7 @@ do
 end
 ```
 
-### `LStack:removeAt(index: integer) -> boolean|number|string|table|nil`
+### `LStack:removeAt(index: integer) -> string`
 
 Remove and return the value at a 1-based index. Returns nil if out of range.
 
@@ -6840,7 +6831,7 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 
 - `index` (`integer`, required) - 1-based position to remove.
 
-**Returns**: `boolean|number|string|table|nil` - The removed value, or nil.
+**Returns**: `string` - The removed value.
 
 #### Example
 
@@ -6855,11 +6846,11 @@ do
 end
 ```
 
-### `LStack:toArray() -> table`
+### `LStack:toArray() -> number[]`
 
 Return all stack items as an array table (bottom to top).
 
-**Returns**: `table` - Array of all values.
+**Returns**: `number[]` - Array of all values.
 
 #### Example
 
@@ -6927,15 +6918,15 @@ do
 end
 ```
 
-### `LStrategy:execute(...: boolean|number|string|table|nil) -> boolean|number|string|table|nil`
+### `LStrategy:execute(...: table) -> table`
 
 Execute the currently active strategy, passing through all arguments and returning its results.
 
 **Parameters**
 
-- `...` (`boolean|number|string|table|nil`, required) - Arguments forwarded to the active strategy function.
+- `...` (`table`, required) - Arguments forwarded to the active strategy function.
 
-**Returns**: `boolean|number|string|table|nil` - Return values from the strategy function.
+**Returns**: `table` - Return value from the strategy function.
 
 #### Example
 
@@ -6999,11 +6990,11 @@ do
 end
 ```
 
-### `LStrategy:names() -> table`
+### `LStrategy:names() -> string[]`
 
 Return an array of all registered strategy names.
 
-**Returns**: `table` - Array of strategy name strings.
+**Returns**: `string[]` - Strategy name strings.
 
 #### Example
 
@@ -7295,14 +7286,14 @@ do
 end
 ```
 
-### `LWeightedRandom:add(weight: number, value: boolean|number|string|table, [label]: string) -> number`
+### `LWeightedRandom:add(weight: number, value: string, [label]: string) -> number`
 
 Add an item with a relative weight. Higher weight = higher selection probability.
 
 **Parameters**
 
 - `weight` (`number`, required) - The selection weight (must be > 0).
-- `value` (`boolean|number|string|table`, required) - The payload value returned on pick.
+- `value` (`string`, required) - The payload value returned on pick.
 - `label` (`string`, optional) - Optional human-readable label.
 
 **Returns**: `number` - The internal ID of the added entry.
@@ -7563,7 +7554,7 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LWeightedRandom:pick(sample: number) -> boolean|number|string|table|nil`
+### `LWeightedRandom:pick(sample: number) -> string`
 
 Pick one item using a random sample value in [0, 1). Returns its value or nil.
 
@@ -7571,7 +7562,7 @@ Pick one item using a random sample value in [0, 1). Returns its value or nil.
 
 - `sample` (`number`, required) - A random number in [0, 1) range.
 
-**Returns**: `boolean|number|string|table|nil` - The selected item's value, or nil if pool is empty.
+**Returns**: `string` - The selected item's value.
 
 #### Example
 
@@ -7593,7 +7584,7 @@ do
 end
 ```
 
-### `LWeightedRandom:pickN(count: integer, samples: table) -> table`
+### `LWeightedRandom:pickN(count: integer, samples: table) -> number[]`
 
 Pick multiple unique items. Requires an array of random samples.
 
@@ -7602,7 +7593,7 @@ Pick multiple unique items. Requires an array of random samples.
 - `count` (`integer`, required) - Number of items to pick.
 - `samples` (`table`, required) - Array of random numbers in [0, 1).
 
-**Returns**: `table` - Array of picked values.
+**Returns**: `number[]` - Array of picked values.
 
 #### Example
 

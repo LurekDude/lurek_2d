@@ -115,11 +115,11 @@ This module has no separate Lua-visible classes in the generated API data.
 ```lua
 lurek.debugbridge.broadcast(event: string, json_data: string) -- Queues a JSON string payload broadcast for debug bridge clients.
 lurek.debugbridge.capturePrint(msg: string, [source]: string, [line]: integer) -- Captures a print message and broadcasts it to debug bridge clients.
-lurek.debugbridge.clearPrintHistory() -- Clears captured print history. This function is exposed to Lua scripts.
+lurek.debugbridge.clearPrintHistory() -- Clears all entries from the captured print history buffer.
 lurek.debugbridge.consumeHotReloadRequest() -> boolean -- Returns and clears the pending hot reload request flag.
 lurek.debugbridge.getClientCount() -> integer -- Returns the number of connected debug bridge clients.
 lurek.debugbridge.getPerformance() -> table -- Returns debug bridge performance metrics.
-lurek.debugbridge.getPort() -> integer -- Returns the debug bridge TCP port. This function is exposed to Lua scripts.
+lurek.debugbridge.getPort() -> integer -- Returns the configured TCP port for the debug bridge.
 lurek.debugbridge.getPrintHistory([count]: integer) -> table -- Returns captured print history entries.
 lurek.debugbridge.getProtocolInfo() -> table -- Returns debug bridge protocol version, capabilities, and handshake nonce.
 lurek.debugbridge.isRunning() -> boolean -- Returns whether the debug bridge server is currently running.
@@ -167,8 +167,8 @@ Captures a print message and broadcasts it to debug bridge clients.
 **Parameters**
 
 - `msg` (`string`, required) - Printed message text.
-- `source` (`string`, optional) - Optional source label; defaults to `?`.
-- `line` (`integer`, optional) - Optional source line; defaults to zero.
+- `source` (`string`, optional) - Source label; defaults to `?`.
+- `line` (`integer`, optional) - Source line; defaults to zero.
 
 #### Example
 
@@ -195,7 +195,7 @@ end
 
 ### `lurek.debugbridge.clearPrintHistory()`
 
-Clears captured print history. This function is exposed to Lua scripts.
+Clears all entries from the captured print history buffer.
 
 #### Example
 
@@ -290,7 +290,7 @@ end
 
 ### `lurek.debugbridge.getPort() -> integer`
 
-Returns the debug bridge TCP port. This function is exposed to Lua scripts.
+Returns the configured TCP port for the debug bridge.
 
 **Returns**: `integer` - Active or configured port, or zero when unavailable.
 
@@ -317,7 +317,7 @@ Returns captured print history entries.
 
 **Parameters**
 
-- `count` (`integer`, optional) - Optional number of newest entries; nil or zero returns all entries.
+- `count` (`integer`, optional) - Number of newest entries; nil or zero returns all entries.
 
 **Returns**: `table` - Array table of entries with `timestamp`, `message`, `source`, and `line` fields.
 

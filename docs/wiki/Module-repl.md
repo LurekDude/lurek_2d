@@ -18,9 +18,9 @@
 - [Types and Methods](#types-and-methods)
   - [LReplSession](#lreplsession)
   - [LReplSession:clear()](#lreplsessionclear)
-  - [LReplSession:complete(prefix: string) -> table](#lreplsessioncompleteprefix-string-table)
+  - [LReplSession:complete(prefix: string) -> string[]](#lreplsessioncompleteprefix-string-string)
   - [LReplSession:eval(code: string) -> string](#lreplsessionevalcode-string-string)
-  - [LReplSession:history() -> table](#lreplsessionhistory-table)
+  - [LReplSession:history() -> string[]](#lreplsessionhistory-string)
   - [LReplSession:len() -> integer](#lreplsessionlen-integer)
   - [LReplSession:type() -> string](#lreplsessiontype-string)
   - [LReplSession:typeOf(name: string) -> boolean](#lreplsessiontypeofname-string-boolean)
@@ -117,7 +117,7 @@ Creates a release-safe REPL session with bounded command history.
 
 **Parameters**
 
-- `max_history` (`integer`, optional) - Optional maximum number of history entries; defaults to 200.
+- `max_history` (`integer`, optional) - Maximum number of history entries; defaults to 200.
 
 **Returns**: `LReplSession` - REPL session handle for eval, history, and completion.
 
@@ -190,7 +190,7 @@ do
 end
 ```
 
-### `LReplSession:complete(prefix: string) -> table`
+### `LReplSession:complete(prefix: string) -> string[]`
 
 Returns completion candidates that begin with the supplied prefix.
 
@@ -198,7 +198,7 @@ Returns completion candidates that begin with the supplied prefix.
 
 - `prefix` (`string`, required) - Prefix text to complete.
 
-**Returns**: `table` - Array table of matching completion strings.
+**Returns**: `string[]` - Matching completion strings.
 
 #### Example
 
@@ -257,11 +257,11 @@ do
 end
 ```
 
-### `LReplSession:history() -> table`
+### `LReplSession:history() -> string[]`
 
 Returns the recorded REPL input history in oldest-first order.
 
-**Returns**: `table` - Array table of history entry strings.
+**Returns**: `string[]` - History entry strings.
 
 #### Example
 

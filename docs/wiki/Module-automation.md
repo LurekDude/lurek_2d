@@ -15,14 +15,14 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.automation.getCondition(name: string) -> boolean](#lurekautomationgetconditionname-string-boolean)
-  - [lurek.automation.getCurrentScript() -> LuaValue](#lurekautomationgetcurrentscript-luavalue)
+  - [lurek.automation.getCurrentScript() -> string](#lurekautomationgetcurrentscript-string)
   - [lurek.automation.getCurrentStep() -> integer](#lurekautomationgetcurrentstep-integer)
   - [lurek.automation.getElapsedTime() -> number](#lurekautomationgetelapsedtime-number)
-  - [lurek.automation.getLastError() -> LuaValue](#lurekautomationgetlasterror-luavalue)
+  - [lurek.automation.getLastError() -> string](#lurekautomationgetlasterror-string)
   - [lurek.automation.getPlaybackSpeed() -> number](#lurekautomationgetplaybackspeed-number)
-  - [lurek.automation.getScripts() -> table](#lurekautomationgetscripts-table)
+  - [lurek.automation.getScripts() -> string[]](#lurekautomationgetscripts-string)
   - [lurek.automation.getStepCount() -> integer](#lurekautomationgetstepcount-integer)
-  - [lurek.automation.getStepLimit(name: string) -> LuaValue](#lurekautomationgetsteplimitname-string-luavalue)
+  - [lurek.automation.getStepLimit(name: string) -> integer](#lurekautomationgetsteplimitname-string-integer)
   - [lurek.automation.hasMacro(name: string) -> boolean](#lurekautomationhasmacroname-string-boolean)
   - [lurek.automation.hasScript(name: string) -> boolean](#lurekautomationhasscriptname-string-boolean)
   - [lurek.automation.isComplete() -> boolean](#lurekautomationiscomplete-boolean)
@@ -30,7 +30,7 @@
   - [lurek.automation.isHighlightMode() -> boolean](#lurekautomationishighlightmode-boolean)
   - [lurek.automation.isPaused() -> boolean](#lurekautomationispaused-boolean)
   - [lurek.automation.isRunning() -> boolean](#lurekautomationisrunning-boolean)
-  - [lurek.automation.listMacros() -> table](#lurekautomationlistmacros-table)
+  - [lurek.automation.listMacros() -> string[]](#lurekautomationlistmacros-string)
   - [lurek.automation.load(name: string, data: table)](#lurekautomationloadname-string-data-table)
   - [lurek.automation.loadFromToml(name: string, toml_str: string)](#lurekautomationloadfromtomlname-string-tomlstr-string)
   - [lurek.automation.pause()](#lurekautomationpause)
@@ -130,14 +130,14 @@ This module has no separate Lua-visible classes in the generated API data.
 
 ```lua
 lurek.automation.getCondition(name: string) -> boolean -- Returns a named automation condition value.
-lurek.automation.getCurrentScript() -> LuaValue -- Returns the current script name when a script is active.
+lurek.automation.getCurrentScript() -> string -- Returns the current script name when a script is active.
 lurek.automation.getCurrentStep() -> integer -- Returns the current step index of the active script.
 lurek.automation.getElapsedTime() -> number -- Returns elapsed playback time for the current script.
-lurek.automation.getLastError() -> LuaValue -- Returns the last automation error message when one exists.
+lurek.automation.getLastError() -> string -- Returns the last automation error message when one exists.
 lurek.automation.getPlaybackSpeed() -> number -- Returns automation playback speed multiplier.
-lurek.automation.getScripts() -> table -- Returns the names of loaded automation scripts.
+lurek.automation.getScripts() -> string[] -- Returns the names of loaded automation scripts.
 lurek.automation.getStepCount() -> integer -- Returns the number of steps in the active script.
-lurek.automation.getStepLimit(name: string) -> LuaValue -- Returns the configured step limit for a loaded script.
+lurek.automation.getStepLimit(name: string) -> integer -- Returns the configured step limit for a loaded script.
 lurek.automation.hasMacro(name: string) -> boolean -- Returns whether a macro is saved. This function is exposed to Lua scripts.
 lurek.automation.hasScript(name: string) -> boolean -- Returns whether a script is loaded.
 lurek.automation.isComplete() -> boolean -- Returns whether the current automation script completed.
@@ -145,7 +145,7 @@ lurek.automation.isFailed() -> boolean -- Returns whether the current automation
 lurek.automation.isHighlightMode() -> boolean -- Returns whether automation highlight mode is enabled.
 lurek.automation.isPaused() -> boolean -- Returns whether automation playback is paused.
 lurek.automation.isRunning() -> boolean -- Returns whether automation playback is running.
-lurek.automation.listMacros() -> table -- Returns the names of saved macros. This function is exposed to Lua scripts.
+lurek.automation.listMacros() -> string[] -- Returns the names of saved macros. This function is exposed to Lua scripts.
 lurek.automation.load(name: string, data: table) -- Loads an automation script from a Lua table of steps and optional metadata.
 -- ... 14 more module functions
 ```
@@ -178,11 +178,11 @@ do
 end
 ```
 
-### `lurek.automation.getCurrentScript() -> LuaValue`
+### `lurek.automation.getCurrentScript() -> string`
 
 Returns the current script name when a script is active.
 
-**Returns**: `LuaValue` - Current script name, or nil when no script is active.
+**Returns**: `string` - Current script name, or nil when no script is active.
 
 #### Example
 
@@ -248,11 +248,11 @@ do
 end
 ```
 
-### `lurek.automation.getLastError() -> LuaValue`
+### `lurek.automation.getLastError() -> string`
 
 Returns the last automation error message when one exists.
 
-**Returns**: `LuaValue` - Last error string, or nil when no error is stored.
+**Returns**: `string` - Last error string, or nil when no error is stored.
 
 #### Example
 
@@ -294,11 +294,11 @@ do
 end
 ```
 
-### `lurek.automation.getScripts() -> table`
+### `lurek.automation.getScripts() -> string[]`
 
 Returns the names of loaded automation scripts.
 
-**Returns**: `table` - Array table of script names.
+**Returns**: `string[]` - Script names.
 
 #### Example
 
@@ -337,7 +337,7 @@ do
 end
 ```
 
-### `lurek.automation.getStepLimit(name: string) -> LuaValue`
+### `lurek.automation.getStepLimit(name: string) -> integer`
 
 Returns the configured step limit for a loaded script.
 
@@ -345,7 +345,7 @@ Returns the configured step limit for a loaded script.
 
 - `name` (`string`, required) - Script name to query.
 
-**Returns**: `LuaValue` - Step limit as an integer, or nil when no limit is set.
+**Returns**: `integer` - Step limit, or nil when no limit is set.
 
 #### Example
 
@@ -541,11 +541,11 @@ do
 end
 ```
 
-### `lurek.automation.listMacros() -> table`
+### `lurek.automation.listMacros() -> string[]`
 
 Returns the names of saved macros. This function is exposed to Lua scripts.
 
-**Returns**: `table` - Array table of macro names.
+**Returns**: `string[]` - Macro names.
 
 #### Example
 

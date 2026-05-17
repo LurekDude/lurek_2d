@@ -75,7 +75,7 @@
   - [LAIBlackboard](#laiblackboard)
   - [LAIBlackboard:clear()](#laiblackboardclear)
   - [LAIBlackboard:getBool(key: string, [default]: boolean) -> boolean](#laiblackboardgetboolkey-string-default-boolean-boolean)
-  - [LAIBlackboard:getKeys() -> table](#laiblackboardgetkeys-table)
+  - [LAIBlackboard:getKeys() -> string[]](#laiblackboardgetkeys-string)
   - [LAIBlackboard:getNumber(key: string, [default]: number) -> number](#laiblackboardgetnumberkey-string-default-number-number)
   - [LAIBlackboard:getSize() -> integer](#laiblackboardgetsize-integer)
   - [LAIBlackboard:getString(key: string, [default]: string) -> string](#laiblackboardgetstringkey-string-default-string-string)
@@ -187,10 +187,10 @@
   - [LEmotionModel:typeOf(name: string) -> boolean](#lemotionmodeltypeofname-string-boolean)
   - [LEmotionModel:update(dt: number)](#lemotionmodelupdatedt-number)
   - [LGeneticAlgorithm](#lgeneticalgorithm)
-  - [LGeneticAlgorithm:bestGenes() -> table](#lgeneticalgorithmbestgenes-table)
+  - [LGeneticAlgorithm:bestGenes() -> number[]](#lgeneticalgorithmbestgenes-number)
   - [LGeneticAlgorithm:evolve()](#lgeneticalgorithmevolve)
   - [LGeneticAlgorithm:generation() -> integer](#lgeneticalgorithmgeneration-integer)
-  - [LGeneticAlgorithm:getGenes(idx: integer) -> table](#lgeneticalgorithmgetgenesidx-integer-table)
+  - [LGeneticAlgorithm:getGenes(idx: integer) -> integer[]](#lgeneticalgorithmgetgenesidx-integer-integer)
   - [LGeneticAlgorithm:popSize() -> integer](#lgeneticalgorithmpopsize-integer)
   - [LGeneticAlgorithm:setFitness(idx: integer, fitness: number)](#lgeneticalgorithmsetfitnessidx-integer-fitness-number)
   - [LGeneticAlgorithm:type() -> string](#lgeneticalgorithmtype-string)
@@ -201,7 +201,7 @@
   - [LGOAPPlanner:getActionCount() -> integer](#lgoapplannergetactioncount-integer)
   - [LGOAPPlanner:getGoalCount() -> integer](#lgoapplannergetgoalcount-integer)
   - [LGOAPPlanner:getMaxIterations() -> integer](#lgoapplannergetmaxiterations-integer)
-  - [LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> table](#lgoapplannerplanworldstatetbl-table-maxdepth-integer-table)
+  - [LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> string[]](#lgoapplannerplanworldstatetbl-table-maxdepth-integer-string)
   - [LGOAPPlanner:setEffect(action_name: string, key: string, value: boolean)](#lgoapplannerseteffectactionname-string-key-string-value-boolean)
   - [LGOAPPlanner:setGoalState(goal_name: string, key: string, value: boolean)](#lgoapplannersetgoalstategoalname-string-key-string-value-boolean)
   - [LGOAPPlanner:setMaxIterations(n: integer)](#lgoapplannersetmaxiterationsn-integer)
@@ -229,7 +229,7 @@
   - [LInfluenceMap:getWidth() -> integer](#linfluencemapgetwidth-integer)
   - [LInfluenceMap:hasLayer(name: string) -> boolean](#linfluencemaphaslayername-string-boolean)
   - [LInfluenceMap:propagate(layer: string, [momentum]: number)](#linfluencemappropagatelayer-string-momentum-number)
-  - [LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> table](#linfluencemapqueryrectlayer-string-wx-number-wy-number-ww-number-wh-number-table)
+  - [LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> number[]](#linfluencemapqueryrectlayer-string-wx-number-wy-number-ww-number-wh-number-number)
   - [LInfluenceMap:setInfluence(layer: string, x: integer, y: integer, value: number)](#linfluencemapsetinfluencelayer-string-x-integer-y-integer-value-number)
   - [LInfluenceMap:stampInfluence(layer: string, wx: number, wy: number, radius: number, value: number, [falloff]: number)](#linfluencemapstampinfluencelayer-string-wx-number-wy-number-radius-number-value-number-falloff-number)
   - [LInfluenceMap:type() -> string](#linfluencemaptype-string)
@@ -248,8 +248,8 @@
   - [LNeedSystem:valueOf(name: string) -> number](#lneedsystemvalueofname-string-number)
   - [LNeuralNet](#lneuralnet)
   - [LNeuralNet:addLayer(inputs: integer, outputs: integer, activation: string)](#lneuralnetaddlayerinputs-integer-outputs-integer-activation-string)
-  - [LNeuralNet:forward(input: table) -> table](#lneuralnetforwardinput-table-table)
-  - [LNeuralNet:getWeights() -> table](#lneuralnetgetweights-table)
+  - [LNeuralNet:forward(input: table) -> number[]](#lneuralnetforwardinput-table-number)
+  - [LNeuralNet:getWeights() -> number[]](#lneuralnetgetweights-number)
   - [LNeuralNet:layerCount() -> integer](#lneuralnetlayercount-integer)
   - [LNeuralNet:paramCount() -> integer](#lneuralnetparamcount-integer)
   - [LNeuralNet:setWeights(weights: table) -> boolean](#lneuralnetsetweightsweights-table-boolean)
@@ -304,7 +304,7 @@
   - [LSquad:getFormationSpacing() -> number](#lsquadgetformationspacing-number)
   - [LSquad:getLeader() -> LuaValue](#lsquadgetleader-luavalue)
   - [LSquad:getMemberCount() -> integer](#lsquadgetmembercount-integer)
-  - [LSquad:getMembers() -> table](#lsquadgetmembers-table)
+  - [LSquad:getMembers() -> string[]](#lsquadgetmembers-string)
   - [LSquad:getName() -> string](#lsquadgetname-string)
   - [LSquad:removeMember(name: string)](#lsquadremovemembername-string)
   - [LSquad:setFormation(ftype: string, [spacing]: number)](#lsquadsetformationftype-string-spacing-number)
@@ -1850,11 +1850,11 @@ do
 end
 ```
 
-### `LAIBlackboard:getKeys() -> table`
+### `LAIBlackboard:getKeys() -> string[]`
 
 Returns every local blackboard key in an array-style Lua table.
 
-**Returns**: `table` - Array table containing all stored key names as strings.
+**Returns**: `string[]` - Array table containing all stored key names as strings.
 
 #### Example
 
@@ -4154,11 +4154,11 @@ do
 end
 ```
 
-### `LGeneticAlgorithm:bestGenes() -> table`
+### `LGeneticAlgorithm:bestGenes() -> number[]`
 
 Returns the genes for the best chromosome in the population.
 
-**Returns**: `table` - Array of best gene values, or an empty table when the population has no best chromosome.
+**Returns**: `number[]` - Array of best gene values, or an empty array when the population has no best chromosome.
 
 #### Example
 
@@ -4206,7 +4206,7 @@ do
 end
 ```
 
-### `LGeneticAlgorithm:getGenes(idx: integer) -> table`
+### `LGeneticAlgorithm:getGenes(idx: integer) -> integer[]`
 
 Returns the genes for a chromosome by zero-based index.
 
@@ -4214,7 +4214,7 @@ Returns the genes for a chromosome by zero-based index.
 
 - `idx` (`integer`, required) - Zero-based chromosome index.
 
-**Returns**: `table` - Array of gene values, or an empty table for an invalid index.
+**Returns**: `integer[]` - Gene values, or an empty table for an invalid index.
 
 #### Example
 
@@ -4427,7 +4427,7 @@ do
 end
 ```
 
-### `LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> table`
+### `LGOAPPlanner:plan(world_state_tbl: table, [max_depth]: integer) -> string[]`
 
 Builds a plan from the supplied boolean world state and returns action names in execution order.
 
@@ -4436,7 +4436,7 @@ Builds a plan from the supplied boolean world state and returns action names in 
 - `world_state_tbl` (`table`, required) - Map table from string world-state keys to boolean values.
 - `max_depth` (`integer`, optional) - Maximum search depth; defaults to 10.
 
-**Returns**: `table` - Array table of action names selected by the planner.
+**Returns**: `string[]` - Action names selected by the planner.
 
 #### Example
 
@@ -5034,7 +5034,7 @@ do
 end
 ```
 
-### `LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> table`
+### `LInfluenceMap:queryRect(layer: string, wx: number, wy: number, ww: number, wh: number) -> number[]`
 
 Returns influence values inside a world-space rectangle on a named layer.
 
@@ -5046,7 +5046,7 @@ Returns influence values inside a world-space rectangle on a named layer.
 - `ww` (`number`, required) - Rectangle width in world units.
 - `wh` (`number`, required) - Rectangle height in world units.
 
-**Returns**: `table` - Array table of influence samples from cells inside the rectangle.
+**Returns**: `number[]` - Array of influence samples from cells inside the rectangle.
 
 #### Example
 
@@ -5447,7 +5447,7 @@ do
 end
 ```
 
-### `LNeuralNet:forward(input: table) -> table`
+### `LNeuralNet:forward(input: table) -> number[]`
 
 Runs a forward pass and returns output values.
 
@@ -5455,7 +5455,7 @@ Runs a forward pass and returns output values.
 
 - `input` (`table`, required) - Array of numeric input values.
 
-**Returns**: `table` - Array of numeric output values.
+**Returns**: `number[]` - Numeric output values.
 
 #### Example
 
@@ -5471,11 +5471,11 @@ do
 end
 ```
 
-### `LNeuralNet:getWeights() -> table`
+### `LNeuralNet:getWeights() -> number[]`
 
 Returns the network weights as a flat numeric array.
 
-**Returns**: `table` - Flat array of numeric weights in engine layer order.
+**Returns**: `number[]` - Numeric weights in engine layer order.
 
 #### Example
 
@@ -6576,11 +6576,11 @@ do
 end
 ```
 
-### `LSquad:getMembers() -> table`
+### `LSquad:getMembers() -> string[]`
 
 Returns all squad members in an array-style Lua table.
 
-**Returns**: `table` - Array table of member names.
+**Returns**: `string[]` - Member names.
 
 #### Example
 

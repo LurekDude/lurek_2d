@@ -95,7 +95,7 @@
   - [LCameraRig:getViewport(name: string) -> boolean, number, number, number, number](#lcamerariggetviewportname-string-boolean-number-number-number-number)
   - [LCameraRig:has(name: string) -> boolean](#lcamerarighasname-string-boolean)
   - [LCameraRig:minimap(window_w: number, window_h: number, [ratio]: number)](#lcamerarigminimapwindoww-number-windowh-number-ratio-number)
-  - [LCameraRig:names() -> table](#lcamerarignames-table)
+  - [LCameraRig:names() -> string[]](#lcamerarignames-string)
   - [LCameraRig:pictureInPicture(window_w: number, window_h: number, [pip_w]: number, [pip_h]: number)](#lcamerarigpictureinpicturewindoww-number-windowh-number-pipw-number-piph-number)
   - [LCameraRig:remove(name: string) -> boolean](#lcamerarigremovename-string-boolean)
   - [LCameraRig:setPosition(name: string, x: number, y: number)](#lcamerarigsetpositionname-string-x-number-y-number)
@@ -2019,11 +2019,11 @@ do
 end
 ```
 
-### `LCameraRig:names() -> table`
+### `LCameraRig:names() -> string[]`
 
 Returns all camera names in this rig.
 
-**Returns**: `table` - Array table of camera names.
+**Returns**: `string[]` - Camera names.
 
 #### Example
 

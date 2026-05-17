@@ -18,7 +18,7 @@
   - [lurek.physics.debugDraw(enable: boolean)](#lurekphysicsdebugdrawenable-boolean)
   - [lurek.physics.destroyWorld(world: LWorld)](#lurekphysicsdestroyworldworld-lworld)
   - [lurek.physics.drawDebugGpu(world: LWorld, [config]: table)](#lurekphysicsdrawdebuggpuworld-lworld-config-table)
-  - [lurek.physics.getBody(world: LWorld, body: LBody) -> number, number, number, number](#lurekphysicsgetbodyworld-lworld-body-lbody-number-number-number-number)
+  - [lurek.physics.getBody(world: LWorld, body: LBody) -> number](#lurekphysicsgetbodyworld-lworld-body-lbody-number)
   - [lurek.physics.getCollisions(world: LWorld) -> table](#lurekphysicsgetcollisionsworld-lworld-table)
   - [lurek.physics.isSleepingAllowed(world: LWorld, body: LBody) -> boolean](#lurekphysicsissleepingallowedworld-lworld-body-lbody-boolean)
   - [lurek.physics.newBody(world: LWorld, x: number, y: number, bodyType: string) -> LBody](#lurekphysicsnewbodyworld-lworld-x-number-y-number-bodytype-string-lbody)
@@ -51,15 +51,15 @@
   - [LBody:getFriction() -> number](#lbodygetfriction-number)
   - [LBody:getGravityScale() -> number](#lbodygetgravityscale-number)
   - [LBody:getHeight() -> number](#lbodygetheight-number)
-  - [LBody:getId() -> number](#lbodygetid-number)
-  - [LBody:getLayer() -> number](#lbodygetlayer-number)
+  - [LBody:getId() -> integer](#lbodygetid-integer)
+  - [LBody:getLayer() -> integer](#lbodygetlayer-integer)
   - [LBody:getLinearDamping() -> number](#lbodygetlineardamping-number)
-  - [LBody:getMask() -> number](#lbodygetmask-number)
+  - [LBody:getMask() -> integer](#lbodygetmask-integer)
   - [LBody:getMass() -> number](#lbodygetmass-number)
-  - [LBody:getPosition() -> number, number](#lbodygetposition-number-number)
+  - [LBody:getPosition() -> number](#lbodygetposition-number)
   - [LBody:getRestitution() -> number](#lbodygetrestitution-number)
   - [LBody:getType() -> string](#lbodygettype-string)
-  - [LBody:getVelocity() -> number, number](#lbodygetvelocity-number-number)
+  - [LBody:getVelocity() -> number](#lbodygetvelocity-number)
   - [LBody:getWidth() -> number](#lbodygetwidth-number)
   - [LBody:getX() -> number](#lbodygetx-number)
   - [LBody:getY() -> number](#lbodygety-number)
@@ -88,13 +88,13 @@
   - [LBody:typeOf(name: string) -> boolean](#lbodytypeofname-string-boolean)
   - [LBody:wakeUp()](#lbodywakeup)
   - [LCellular](#lcellular)
-  - [LCellular:countCells(cellType: integer) -> number](#lcellularcountcellscelltype-integer-number)
-  - [LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: number)](#lcellularfillcirclecx-integer-cy-integer-r-integer-celltype-number)
-  - [LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: number)](#lcellularfillrectcx0-integer-cy0-integer-cw-integer-ch-integer-celltype-number)
+  - [LCellular:countCells(cellType: integer) -> integer](#lcellularcountcellscelltype-integer-integer)
+  - [LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: integer)](#lcellularfillcirclecx-integer-cy-integer-r-integer-celltype-integer)
+  - [LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: integer)](#lcellularfillrectcx0-integer-cy0-integer-cw-integer-ch-integer-celltype-integer)
   - [LCellular:findCells(cellType: integer) -> table](#lcellularfindcellscelltype-integer-table)
-  - [LCellular:getCell(cx: integer, cy: integer) -> number](#lcellulargetcellcx-integer-cy-integer-number)
+  - [LCellular:getCell(cx: integer, cy: integer) -> integer](#lcellulargetcellcx-integer-cy-integer-integer)
   - [LCellular:loadFromBytes(data: string) -> boolean](#lcellularloadfrombytesdata-string-boolean)
-  - [LCellular:setCell(cx: integer, cy: integer, cellType: number)](#lcellularsetcellcx-integer-cy-integer-celltype-number)
+  - [LCellular:setCell(cx: integer, cy: integer, cellType: integer)](#lcellularsetcellcx-integer-cy-integer-celltype-integer)
   - [LCellular:step()](#lcellularstep)
   - [LCellular:stepN(n: integer)](#lcellularstepnn-integer)
   - [LCellular:toBytes() -> string](#lcellulartobytes-string)
@@ -104,7 +104,7 @@
   - [LCellular:typeOf(name: string) -> boolean](#lcellulartypeofname-string-boolean)
   - [LPhysicsShape](#lphysicsshape)
   - [LPhysicsShape:destroy()](#lphysicsshapedestroy)
-  - [LPhysicsShape:getBoundingBox() -> number, number, number, number](#lphysicsshapegetboundingbox-number-number-number-number)
+  - [LPhysicsShape:getBoundingBox() -> number](#lphysicsshapegetboundingbox-number)
   - [LPhysicsShape:getRadius() -> number](#lphysicsshapegetradius-number)
   - [LPhysicsShape:getType() -> string](#lphysicsshapegettype-string)
   - [LPhysicsShape:setDensity(density: number)](#lphysicsshapesetdensitydensity-number)
@@ -114,7 +114,7 @@
   - [LPhysicsShape:type() -> string](#lphysicsshapetype-string)
   - [LPhysicsShape:typeOf(name: string) -> boolean](#lphysicsshapetypeofname-string-boolean)
   - [LTerrain](#lterrain)
-  - [LTerrain:collapseColumns() -> number](#lterraincollapsecolumns-number)
+  - [LTerrain:collapseColumns() -> integer](#lterraincollapsecolumns-integer)
   - [LTerrain:fillAll(solid: boolean)](#lterrainfillallsolid-boolean)
   - [LTerrain:fillCircle(wx: number, wy: number, radius: number, solid: boolean)](#lterrainfillcirclewx-number-wy-number-radius-number-solid-boolean)
   - [LTerrain:fillRect(wx: number, wy: number, w: number, h: number, solid: boolean)](#lterrainfillrectwx-number-wy-number-w-number-h-number-solid-boolean)
@@ -124,24 +124,24 @@
   - [LTerrain:loadFromBytes(data: string) -> boolean](#lterrainloadfrombytesdata-string-boolean)
   - [LTerrain:setCell(cx: integer, cy: integer, solid: boolean)](#lterrainsetcellcx-integer-cy-integer-solid-boolean)
   - [LTerrain:solidPositions() -> table](#lterrainsolidpositions-table)
-  - [LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> table](#lterrainspawndebrispositions-table-mass-number-restitution-number-table)
+  - [LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> integer[]](#lterrainspawndebrispositions-table-mass-number-restitution-number-integer)
   - [LTerrain:toBytes() -> string](#lterraintobytes-string)
-  - [LTerrain:toImageData(sr: number, sg: number, sb: number, er: number, eg: number, eb: number) -> string](#lterraintoimagedatasr-number-sg-number-sb-number-er-number-eg-number-eb-number-string)
+  - [LTerrain:toImageData(sr: integer, sg: integer, sb: integer, er: integer, eg: integer, eb: integer) -> string](#lterraintoimagedatasr-integer-sg-integer-sb-integer-er-integer-eg-integer-eb-integer-string)
   - [LTerrain:type() -> string](#lterraintype-string)
   - [LTerrain:typeOf(name: string) -> boolean](#lterraintypeofname-string-boolean)
   - [LWorld](#lworld)
-  - [LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> number](#lworldadddistancejointbodya-integer-bodyb-integer-anchorax-number-anchoray-number-anchorbx-number-anchorby-number-length-number-number)
-  - [LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> number](#lworldaddfixturebodyid-number-shapetype-string-density-number-friction-number-restitution-number-sensor-boolean-number-number)
-  - [LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> number](#lworldaddfrictionjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-maxforce-number-maxtorque-number-number)
-  - [LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number](#lworldaddgearjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-number)
-  - [LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> number](#lworldaddmotorjointbodya-integer-bodyb-integer-factor-number-number)
-  - [LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> number](#lworldaddmousejointbodyid-integer-targetx-number-targety-number-maxforce-number-number)
-  - [LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number](#lworldaddprismaticjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-axisx-number-axisy-number-number)
-  - [LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number](#lworldaddpulleyjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-number)
-  - [LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number](#lworldaddrevolutejointbodya-integer-bodyb-integer-anchorx-number-anchory-number-number)
-  - [LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> number](#lworldaddropejointbodya-integer-bodyb-integer-anchorax-number-anchoray-number-anchorbx-number-anchorby-number-maxlength-number-number)
-  - [LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number](#lworldaddweldjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-number)
-  - [LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number](#lworldaddwheeljointbodya-integer-bodyb-integer-anchorx-number-anchory-number-axisx-number-axisy-number-number)
+  - [LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> integer](#lworldadddistancejointbodya-integer-bodyb-integer-anchorax-number-anchoray-number-anchorbx-number-anchorby-number-length-number-integer)
+  - [LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> integer](#lworldaddfixturebodyid-number-shapetype-string-density-number-friction-number-restitution-number-sensor-boolean-number-integer)
+  - [LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> integer](#lworldaddfrictionjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-maxforce-number-maxtorque-number-integer)
+  - [LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer](#lworldaddgearjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-integer)
+  - [LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> integer](#lworldaddmotorjointbodya-integer-bodyb-integer-factor-number-integer)
+  - [LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> integer](#lworldaddmousejointbodyid-integer-targetx-number-targety-number-maxforce-number-integer)
+  - [LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer](#lworldaddprismaticjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-axisx-number-axisy-number-integer)
+  - [LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer](#lworldaddpulleyjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-integer)
+  - [LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer](#lworldaddrevolutejointbodya-integer-bodyb-integer-anchorx-number-anchory-number-integer)
+  - [LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> integer](#lworldaddropejointbodya-integer-bodyb-integer-anchorax-number-anchoray-number-anchorbx-number-anchorby-number-maxlength-number-integer)
+  - [LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer](#lworldaddweldjointbodya-integer-bodyb-integer-anchorx-number-anchory-number-integer)
+  - [LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer](#lworldaddwheeljointbodya-integer-bodyb-integer-anchorx-number-anchory-number-axisx-number-axisy-number-integer)
   - [LWorld:addZone(x: number, y: number, w: number, h: number) -> LZone](#lworldaddzonex-number-y-number-w-number-h-number-lzone)
   - [LWorld:clear()](#lworldclear)
   - [LWorld:clearBeginContact()](#lworldclearbegincontact)
@@ -150,45 +150,45 @@
   - [LWorld:clearEndContact()](#lworldclearendcontact)
   - [LWorld:destroyBody(id: integer)](#lworlddestroybodyid-integer)
   - [LWorld:destroyJoint(jointId: integer)](#lworlddestroyjointjointid-integer)
-  - [LWorld:drawDebug(target: LImageData, [r]: number, [g]: number, [b]: number, [a]: number)](#lworlddrawdebugtarget-limagedata-r-number-g-number-b-number-a-number)
-  - [LWorld:fixtureCount(bodyId: integer) -> number](#lworldfixturecountbodyid-integer-number)
+  - [LWorld:drawDebug(target: LImageData, [r]: integer, [g]: integer, [b]: integer, [a]: integer)](#lworlddrawdebugtarget-limagedata-r-integer-g-integer-b-integer-a-integer)
+  - [LWorld:fixtureCount(bodyId: integer) -> integer](#lworldfixturecountbodyid-integer-integer)
   - [LWorld:getBeginContactEvents() -> table](#lworldgetbegincontactevents-table)
-  - [LWorld:getBodyAtPoint(x: number, y: number) -> number](#lworldgetbodyatpointx-number-y-number-number)
+  - [LWorld:getBodyAtPoint(x: number, y: number) -> integer](#lworldgetbodyatpointx-number-y-number-integer)
   - [LWorld:getBodyCCD(id: integer) -> boolean](#lworldgetbodyccdid-integer-boolean)
   - [LWorld:getBodyContacts(bodyId: integer) -> table](#lworldgetbodycontactsbodyid-integer-table)
-  - [LWorld:getBodyCount() -> number](#lworldgetbodycount-number)
-  - [LWorld:getBodyData(id: integer) -> LuaValue](#lworldgetbodydataid-integer-luavalue)
-  - [LWorld:getBodyIds() -> table](#lworldgetbodyids-table)
-  - [LWorld:getBodyOneWay(id: integer) -> number, number](#lworldgetbodyonewayid-integer-number-number)
+  - [LWorld:getBodyCount() -> integer](#lworldgetbodycount-integer)
+  - [LWorld:getBodyData(id: integer) -> table](#lworldgetbodydataid-integer-table)
+  - [LWorld:getBodyIds() -> integer[]](#lworldgetbodyids-integer)
+  - [LWorld:getBodyOneWay(id: integer) -> number](#lworldgetbodyonewayid-integer-number)
   - [LWorld:getBodyType(id: integer) -> string](#lworldgetbodytypeid-integer-string)
   - [LWorld:getCollisionEvents() -> table](#lworldgetcollisionevents-table)
   - [LWorld:getContacts() -> table](#lworldgetcontacts-table)
   - [LWorld:getEndContactEvents() -> table](#lworldgetendcontactevents-table)
-  - [LWorld:getGravity() -> number, number](#lworldgetgravity-number-number)
-  - [LWorld:getJointBodies(jointId: integer) -> number, number](#lworldgetjointbodiesjointid-integer-number-number)
+  - [LWorld:getGravity() -> number](#lworldgetgravity-number)
+  - [LWorld:getJointBodies(jointId: integer) -> integer](#lworldgetjointbodiesjointid-integer-integer)
   - [LWorld:getJointBreakForce(jointId: integer) -> number](#lworldgetjointbreakforcejointid-integer-number)
-  - [LWorld:getJointIds() -> table](#lworldgetjointids-table)
-  - [LWorld:getJointLimits(jointId: integer) -> number, number](#lworldgetjointlimitsjointid-integer-number-number)
+  - [LWorld:getJointIds() -> integer[]](#lworldgetjointids-integer)
+  - [LWorld:getJointLimits(jointId: integer) -> number](#lworldgetjointlimitsjointid-integer-number)
   - [LWorld:getJointMotorSpeed(jointId: integer) -> number](#lworldgetjointmotorspeedjointid-integer-number)
   - [LWorld:getJointType(jointId: integer) -> string](#lworldgetjointtypejointid-integer-string)
   - [LWorld:getMeter() -> number](#lworldgetmeter-number)
-  - [LWorld:getSolverIterations() -> number](#lworldgetsolveriterations-number)
+  - [LWorld:getSolverIterations() -> integer](#lworldgetsolveriterations-integer)
   - [LWorld:getZoneEvents() -> table](#lworldgetzoneevents-table)
   - [LWorld:isBodySleeping(id: integer) -> boolean](#lworldisbodysleepingid-integer-boolean)
-  - [LWorld:jointCount() -> number](#lworldjointcount-number)
-  - [LWorld:newBodies(specs: table) -> table](#lworldnewbodiesspecs-table-table)
+  - [LWorld:jointCount() -> integer](#lworldjointcount-integer)
+  - [LWorld:newBodies(specs: table) -> integer[]](#lworldnewbodiesspecs-table-integer)
   - [LWorld:newBody(x: number, y: number, bodyType: string) -> LBody](#lworldnewbodyx-number-y-number-bodytype-string-lbody)
   - [LWorld:newChainBody(x: number, y: number, vertices: table, closed: boolean, bodyType: string) -> LBody](#lworldnewchainbodyx-number-y-number-vertices-table-closed-boolean-bodytype-string-lbody)
   - [LWorld:newCircleBody(x: number, y: number, radius: number, bodyType: string) -> LBody](#lworldnewcirclebodyx-number-y-number-radius-number-bodytype-string-lbody)
   - [LWorld:newEdgeBody(x: number, y: number, x1: number, y1: number, x2: number, y2: number, bodyType: string) -> LBody](#lworldnewedgebodyx-number-y-number-x1-number-y1-number-x2-number-y2-number-bodytype-string-lbody)
   - [LWorld:newPolygonBody(x: number, y: number, vertices: table, bodyType: string) -> LBody](#lworldnewpolygonbodyx-number-y-number-vertices-table-bodytype-string-lbody)
-  - [LWorld:queryAABB(x: number, y: number, w: number, h: number) -> table](#lworldqueryaabbx-number-y-number-w-number-h-number-table)
+  - [LWorld:queryAABB(x: number, y: number, w: number, h: number) -> integer[]](#lworldqueryaabbx-number-y-number-w-number-h-number-integer)
   - [LWorld:raycast(x1: number, y1: number, x2: number, y2: number) -> table](#lworldraycastx1-number-y1-number-x2-number-y2-number-table)
   - [LWorld:raycastAll(x: number, y: number, dx: number, dy: number, maxDist: number) -> table](#lworldraycastallx-number-y-number-dx-number-dy-number-maxdist-number-table)
   - [LWorld:raycastClosest(x: number, y: number, dx: number, dy: number, maxDist: number) -> table](#lworldraycastclosestx-number-y-number-dx-number-dy-number-maxdist-number-table)
   - [LWorld:setBeginContact(callback: function)](#lworldsetbegincontactcallback-function)
   - [LWorld:setBodyCCD(id: integer, enabled: boolean)](#lworldsetbodyccdid-integer-enabled-boolean)
-  - [LWorld:setBodyData(id: integer, value: any)](#lworldsetbodydataid-integer-value-any)
+  - [LWorld:setBodyData(id: integer, value: table)](#lworldsetbodydataid-integer-value-table)
   - [LWorld:setBodyOneWay(id: integer, nx: number, ny: number)](#lworldsetbodyonewayid-integer-nx-number-ny-number)
   - [LWorld:setBodyType(id: integer, bodyType: string)](#lworldsetbodytypeid-integer-bodytype-string)
   - [LWorld:setEndContact(callback: function)](#lworldsetendcontactcallback-function)
@@ -213,7 +213,7 @@
   - [LWorld:wakeUpBody(id: integer)](#lworldwakeupbodyid-integer)
   - [LZone](#lzone)
   - [LZone:destroy()](#lzonedestroy)
-  - [LZone:getId() -> number](#lzonegetid-number)
+  - [LZone:getId() -> integer](#lzonegetid-integer)
   - [LZone:setAngularDampingOverride([value]: number)](#lzonesetangulardampingoverridevalue-number)
   - [LZone:setCircle(cx: number, cy: number, radius: number)](#lzonesetcirclecx-number-cy-number-radius-number)
   - [LZone:setEnabled(enabled: boolean)](#lzonesetenabledenabled-boolean)
@@ -317,7 +317,7 @@ lurek.physics.attachShape(body: LBody, shape: LPhysicsShape) -- Attaches a previ
 lurek.physics.debugDraw(enable: boolean) -- Enables or disables automatic physics debug overlay rendering for the next frame.
 lurek.physics.destroyWorld(world: LWorld) -- No-op placeholder for API parity. Worlds are freed when no longer referenced.
 lurek.physics.drawDebugGpu(world: LWorld, [config]: table) -- Queues a GPU-rendered physics debug visualization using the world's current body state.
-lurek.physics.getBody(world: LWorld, body: LBody) -> number, number, number, number -- Returns position and velocity of a body (free-function variant for quick queries).
+lurek.physics.getBody(world: LWorld, body: LBody) -> number -- Returns position and velocity of a body (free-function variant for quick queries).
 lurek.physics.getCollisions(world: LWorld) -> table -- Returns all collision events from the last world step as {body_a, body_b} pairs.
 lurek.physics.isSleepingAllowed(world: LWorld, body: LBody) -> boolean -- Checks if sleeping is allowed on a body (free-function variant).
 lurek.physics.newBody(world: LWorld, x: number, y: number, bodyType: string) -> LBody -- Creates a new body in a world (free-function variant).
@@ -439,7 +439,7 @@ do
 end
 ```
 
-### `lurek.physics.getBody(world: LWorld, body: LBody) -> number, number, number, number`
+### `lurek.physics.getBody(world: LWorld, body: LBody) -> number`
 
 Returns position and velocity of a body (free-function variant for quick queries).
 
@@ -448,7 +448,7 @@ Returns position and velocity of a body (free-function variant for quick queries
 - `world` (`LWorld`, required) - The world.
 - `body` (`LBody`, required) - The body to query.
 
-**Returns**: `number, number, number, number` - x, y, vx, vy.
+**Returns**: `number` - X position.
 
 #### Example
 
@@ -1242,11 +1242,11 @@ do
 end
 ```
 
-### `LBody:getId() -> number`
+### `LBody:getId() -> integer`
 
 Returns the unique numeric ID of this body within the world.
 
-**Returns**: `number` - Body ID.
+**Returns**: `integer` - Body ID.
 
 #### Example
 
@@ -1262,11 +1262,11 @@ do
 end
 ```
 
-### `LBody:getLayer() -> number`
+### `LBody:getLayer() -> integer`
 
 Returns the body's collision layer bitmask.
 
-**Returns**: `number` - Layer bitmask.
+**Returns**: `integer` - Layer bitmask.
 
 #### Example
 
@@ -1302,11 +1302,11 @@ do
 end
 ```
 
-### `LBody:getMask() -> number`
+### `LBody:getMask() -> integer`
 
 Returns the body's collision mask (which layers this body can collide with).
 
-**Returns**: `number` - Mask bitmask.
+**Returns**: `integer` - Mask bitmask.
 
 #### Example
 
@@ -1342,11 +1342,11 @@ do
 end
 ```
 
-### `LBody:getPosition() -> number, number`
+### `LBody:getPosition() -> number`
 
 Returns the current world-space position of this body.
 
-**Returns**: `number, number` - X and Y coordinates.
+**Returns**: `number` - X coordinate.
 
 #### Example
 
@@ -1402,11 +1402,11 @@ do
 end
 ```
 
-### `LBody:getVelocity() -> number, number`
+### `LBody:getVelocity() -> number`
 
 Returns the body's current linear velocity.
 
-**Returns**: `number, number` - Velocity X and Y components.
+**Returns**: `number` - Velocity X component.
 
 #### Example
 
@@ -2006,7 +2006,7 @@ do
 end
 ```
 
-### `LCellular:countCells(cellType: integer) -> number`
+### `LCellular:countCells(cellType: integer) -> integer`
 
 Counts how many cells of a given material type exist in the grid.
 
@@ -2014,7 +2014,7 @@ Counts how many cells of a given material type exist in the grid.
 
 - `cellType` (`integer`, required) - Material type constant to count.
 
-**Returns**: `number` - Cell count.
+**Returns**: `integer` - Cell count.
 
 #### Example
 
@@ -2030,7 +2030,7 @@ do
 end
 ```
 
-### `LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: number)`
+### `LCellular:fillCircle(cx: integer, cy: integer, r: integer, cellType: integer)`
 
 Fills a circular region of cells with a material type.
 
@@ -2039,7 +2039,7 @@ Fills a circular region of cells with a material type.
 - `cx` (`integer`, required) - Center cell column.
 - `cy` (`integer`, required) - Center cell row.
 - `r` (`integer`, required) - Radius in cells.
-- `cellType` (`number`, required) - Material type constant.
+- `cellType` (`integer`, required) - Material type constant.
 
 #### Example
 
@@ -2055,7 +2055,7 @@ do
 end
 ```
 
-### `LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: number)`
+### `LCellular:fillRect(cx0: integer, cy0: integer, cw: integer, ch: integer, cellType: integer)`
 
 Fills a rectangular region of cells with a material type.
 
@@ -2065,7 +2065,7 @@ Fills a rectangular region of cells with a material type.
 - `cy0` (`integer`, required) - Top-left cell row.
 - `cw` (`integer`, required) - Width in cells.
 - `ch` (`integer`, required) - Height in cells.
-- `cellType` (`number`, required) - Material type constant.
+- `cellType` (`integer`, required) - Material type constant.
 
 #### Example
 
@@ -2105,7 +2105,7 @@ do
 end
 ```
 
-### `LCellular:getCell(cx: integer, cy: integer) -> number`
+### `LCellular:getCell(cx: integer, cy: integer) -> integer`
 
 Returns the material type of a cell at the given grid position.
 
@@ -2114,7 +2114,7 @@ Returns the material type of a cell at the given grid position.
 - `cx` (`integer`, required) - Cell column.
 - `cy` (`integer`, required) - Cell row.
 
-**Returns**: `number` - Material type constant.
+**Returns**: `integer` - Material type constant.
 
 #### Example
 
@@ -2156,7 +2156,7 @@ do
 end
 ```
 
-### `LCellular:setCell(cx: integer, cy: integer, cellType: number)`
+### `LCellular:setCell(cx: integer, cy: integer, cellType: integer)`
 
 Sets a single cell in the cellular grid to a specific material type.
 
@@ -2164,7 +2164,7 @@ Sets a single cell in the cellular grid to a specific material type.
 
 - `cx` (`integer`, required) - Cell column (0-based).
 - `cy` (`integer`, required) - Cell row (0-based).
-- `cellType` (`number`, required) - Material type constant (CELL_AIR, CELL_SAND, etc.).
+- `cellType` (`integer`, required) - Material type constant (CELL_AIR, CELL_SAND, etc.).
 
 #### Example
 
@@ -2366,11 +2366,11 @@ do
 end
 ```
 
-### `LPhysicsShape:getBoundingBox() -> number, number, number, number`
+### `LPhysicsShape:getBoundingBox() -> number`
 
 Returns the axis-aligned bounding box of the shape in local coordinates.
 
-**Returns**: `number, number, number, number` - minX, minY, maxX, maxY.
+**Returns**: `number` - Minimum X.
 
 #### Example
 
@@ -2571,11 +2571,11 @@ do
 end
 ```
 
-### `LTerrain:collapseColumns() -> number`
+### `LTerrain:collapseColumns() -> integer`
 
 Optimizes terrain by merging vertically adjacent solid cells into larger colliders.
 
-**Returns**: `number` - Number of columns collapsed.
+**Returns**: `integer` - Number of columns collapsed.
 
 #### Example
 
@@ -2811,7 +2811,7 @@ do
 end
 ```
 
-### `LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> table`
+### `LTerrain:spawnDebris(positions: table, mass: number, restitution: number) -> integer[]`
 
 Spawns small dynamic debris bodies at the given positions (for destruction effects).
 
@@ -2821,7 +2821,7 @@ Spawns small dynamic debris bodies at the given positions (for destruction effec
 - `mass` (`number`, required) - Mass of each debris body.
 - `restitution` (`number`, required) - Bounciness of debris bodies.
 
-**Returns**: `table` - Array of body IDs for the spawned debris.
+**Returns**: `integer[]` - Array of body IDs for the spawned debris.
 
 #### Example
 
@@ -2866,18 +2866,18 @@ do
 end
 ```
 
-### `LTerrain:toImageData(sr: number, sg: number, sb: number, er: number, eg: number, eb: number) -> string`
+### `LTerrain:toImageData(sr: integer, sg: integer, sb: integer, er: integer, eg: integer, eb: integer) -> string`
 
 Renders the terrain grid to raw RGBA pixel data with solid and empty colors.
 
 **Parameters**
 
-- `sr` (`number`, required) - Solid color red (0-255).
-- `sg` (`number`, required) - Solid color green.
-- `sb` (`number`, required) - Solid color blue.
-- `er` (`number`, required) - Empty color red.
-- `eg` (`number`, required) - Empty color green.
-- `eb` (`number`, required) - Empty color blue.
+- `sr` (`integer`, required) - Solid color red (0-255).
+- `sg` (`integer`, required) - Solid color green.
+- `sb` (`integer`, required) - Solid color blue.
+- `er` (`integer`, required) - Empty color red.
+- `eg` (`integer`, required) - Empty color green.
+- `eb` (`integer`, required) - Empty color blue.
 
 **Returns**: `string` - Raw RGBA pixel bytes.
 
@@ -2964,7 +2964,7 @@ do
 end
 ```
 
-### `LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> number`
+### `LWorld:addDistanceJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, length: number) -> integer`
 
 Creates a distance joint that keeps two bodies at a fixed distance apart, like a rigid rod.
 
@@ -2978,7 +2978,7 @@ Creates a distance joint that keeps two bodies at a fixed distance apart, like a
 - `anchorBY` (`number`, required) - Local anchor Y on body B.
 - `length` (`number`, required) - Target distance between anchors.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -2998,7 +2998,7 @@ do
 end
 ```
 
-### `LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> number`
+### `LWorld:addFixture(bodyId: number, shapeType: string, density: number, friction: number, restitution: number, sensor: boolean, ...: number) -> integer`
 
 Attaches a new collider shape to an existing body with material properties.
 
@@ -3012,7 +3012,7 @@ Attaches a new collider shape to an existing body with material properties.
 - `sensor` (`boolean`, required) - If true, detects overlaps without generating collision response.
 - `...` (`number`, required) - Shape-specific size arguments (radius, width/height, or vertex list).
 
-**Returns**: `number` - The fixture index on the body.
+**Returns**: `integer` - The fixture index on the body.
 
 #### Example
 
@@ -3032,7 +3032,7 @@ do
 end
 ```
 
-### `LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> number`
+### `LWorld:addFrictionJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, maxForce: number, maxTorque: number) -> integer`
 
 Creates a friction joint that applies resistance to relative motion between two bodies.
 
@@ -3045,7 +3045,7 @@ Creates a friction joint that applies resistance to relative motion between two 
 - `maxForce` (`number`, required) - Maximum friction force.
 - `maxTorque` (`number`, required) - Maximum friction torque.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3064,7 +3064,7 @@ do
 end
 ```
 
-### `LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number`
+### `LWorld:addGearJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer`
 
 Creates a gear joint that synchronizes rotation between two bodies at an anchor.
 
@@ -3075,7 +3075,7 @@ Creates a gear joint that synchronizes rotation between two bodies at an anchor.
 - `anchorX` (`number`, required) - Gear anchor X.
 - `anchorY` (`number`, required) - Gear anchor Y.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3100,7 +3100,7 @@ do
 end
 ```
 
-### `LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> number`
+### `LWorld:addMotorJoint(bodyA: integer, bodyB: integer, factor: number) -> integer`
 
 Creates a motor joint that drives body B toward a target offset from body A using a correction factor.
 
@@ -3110,7 +3110,7 @@ Creates a motor joint that drives body B toward a target offset from body A usin
 - `bodyB` (`integer`, required) - Second body ID.
 - `factor` (`number`, required) - Correction factor (0–1), higher = faster convergence.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3129,7 +3129,7 @@ do
 end
 ```
 
-### `LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> number`
+### `LWorld:addMouseJoint(bodyId: integer, targetX: number, targetY: number, maxForce: number) -> integer`
 
 Creates a mouse joint that pulls a body toward a world target point with spring-like force.
 
@@ -3140,7 +3140,7 @@ Creates a mouse joint that pulls a body toward a world target point with spring-
 - `targetY` (`number`, required) - Initial target Y in world coordinates.
 - `maxForce` (`number`, required) - Maximum force applied to reach the target.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3158,7 +3158,7 @@ do
 end
 ```
 
-### `LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number`
+### `LWorld:addPrismaticJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer`
 
 Creates a prismatic (slider) joint that constrains body B to move along an axis relative to body A.
 
@@ -3171,7 +3171,7 @@ Creates a prismatic (slider) joint that constrains body B to move along an axis 
 - `axisX` (`number`, required) - Slide axis X direction.
 - `axisY` (`number`, required) - Slide axis Y direction.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3192,7 +3192,7 @@ do
 end
 ```
 
-### `LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number`
+### `LWorld:addPulleyJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer`
 
 Creates a pulley joint connecting two bodies so that movement of one affects the other inversely.
 
@@ -3203,7 +3203,7 @@ Creates a pulley joint connecting two bodies so that movement of one affects the
 - `anchorX` (`number`, required) - Shared anchor X.
 - `anchorY` (`number`, required) - Shared anchor Y.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3221,7 +3221,7 @@ do
 end
 ```
 
-### `LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number`
+### `LWorld:addRevoluteJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer`
 
 Creates a revolute (hinge) joint connecting two bodies at an anchor point. Bodies can rotate freely around the anchor.
 
@@ -3232,7 +3232,7 @@ Creates a revolute (hinge) joint connecting two bodies at an anchor point. Bodie
 - `anchorX` (`number`, required) - Anchor X in world coordinates.
 - `anchorY` (`number`, required) - Anchor Y in world coordinates.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3252,7 +3252,7 @@ do
 end
 ```
 
-### `LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> number`
+### `LWorld:addRopeJoint(bodyA: integer, bodyB: integer, anchorAX: number, anchorAY: number, anchorBX: number, anchorBY: number, maxLength: number) -> integer`
 
 Creates a rope joint limiting the maximum distance between two anchor points on two bodies.
 
@@ -3266,7 +3266,7 @@ Creates a rope joint limiting the maximum distance between two anchor points on 
 - `anchorBY` (`number`, required) - Local anchor Y on body B.
 - `maxLength` (`number`, required) - Maximum allowed distance between anchors.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3285,7 +3285,7 @@ do
 end
 ```
 
-### `LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> number`
+### `LWorld:addWeldJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number) -> integer`
 
 Creates a weld joint that rigidly connects two bodies at an anchor point (no relative movement).
 
@@ -3296,7 +3296,7 @@ Creates a weld joint that rigidly connects two bodies at an anchor point (no rel
 - `anchorX` (`number`, required) - Anchor X in world coordinates.
 - `anchorY` (`number`, required) - Anchor Y in world coordinates.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3314,7 +3314,7 @@ do
 end
 ```
 
-### `LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> number`
+### `LWorld:addWheelJoint(bodyA: integer, bodyB: integer, anchorX: number, anchorY: number, axisX: number, axisY: number) -> integer`
 
 Creates a wheel joint simulating a suspension: allows rotation and linear movement along an axis.
 
@@ -3327,7 +3327,7 @@ Creates a wheel joint simulating a suspension: allows rotation and linear moveme
 - `axisX` (`number`, required) - Suspension axis X direction.
 - `axisY` (`number`, required) - Suspension axis Y direction.
 
-**Returns**: `number` - The joint ID.
+**Returns**: `integer` - The joint ID.
 
 #### Example
 
@@ -3519,17 +3519,17 @@ do
 end
 ```
 
-### `LWorld:drawDebug(target: LImageData, [r]: number, [g]: number, [b]: number, [a]: number)`
+### `LWorld:drawDebug(target: LImageData, [r]: integer, [g]: integer, [b]: integer, [a]: integer)`
 
 Renders a debug visualization of all physics bodies onto a software ImageData target.
 
 **Parameters**
 
 - `target` (`LImageData`, required) - The image to draw debug shapes onto.
-- `r` (`number`, optional) - Red channel (0-255, default 0).
-- `g` (`number`, optional) - Green channel (0-255, default 255).
-- `b` (`number`, optional) - Blue channel (0-255, default 0).
-- `a` (`number`, optional) - Alpha channel (0-255, default 255).
+- `r` (`integer`, optional) - Red channel (0-255, default 0).
+- `g` (`integer`, optional) - Green channel (0-255, default 255).
+- `b` (`integer`, optional) - Blue channel (0-255, default 0).
+- `a` (`integer`, optional) - Alpha channel (0-255, default 255).
 
 #### Example
 
@@ -3550,7 +3550,7 @@ do
 end
 ```
 
-### `LWorld:fixtureCount(bodyId: integer) -> number`
+### `LWorld:fixtureCount(bodyId: integer) -> integer`
 
 Returns how many fixtures (colliders) are attached to a body.
 
@@ -3558,7 +3558,7 @@ Returns how many fixtures (colliders) are attached to a body.
 
 - `bodyId` (`integer`, required) - The body to query.
 
-**Returns**: `number` - Number of attached fixtures.
+**Returns**: `integer` - Number of attached fixtures.
 
 #### Example
 
@@ -3599,7 +3599,7 @@ do
 end
 ```
 
-### `LWorld:getBodyAtPoint(x: number, y: number) -> number`
+### `LWorld:getBodyAtPoint(x: number, y: number) -> integer`
 
 Returns the body ID at a specific world point, or nil if no body is there.
 
@@ -3608,7 +3608,7 @@ Returns the body ID at a specific world point, or nil if no body is there.
 - `x` (`number`, required) - Query point X.
 - `y` (`number`, required) - Query point Y.
 
-**Returns**: `number` - Body ID at the point, or nil.
+**Returns**: `integer` - Body ID at the point, or nil.
 
 #### Example
 
@@ -3672,11 +3672,11 @@ do
 end
 ```
 
-### `LWorld:getBodyCount() -> number`
+### `LWorld:getBodyCount() -> integer`
 
 Returns the total number of active bodies in the world.
 
-**Returns**: `number` - Body count.
+**Returns**: `integer` - Body count.
 
 #### Example
 
@@ -3691,7 +3691,7 @@ do
 end
 ```
 
-### `LWorld:getBodyData(id: integer) -> LuaValue`
+### `LWorld:getBodyData(id: integer) -> table`
 
 Retrieves the Lua data previously attached to a body, or nil if none was set.
 
@@ -3699,7 +3699,7 @@ Retrieves the Lua data previously attached to a body, or nil if none was set.
 
 - `id` (`integer`, required) - The body ID.
 
-**Returns**: `LuaValue` - The stored value, or nil.
+**Returns**: `table` - The stored value, or nil if none was set.
 
 #### Example
 
@@ -3719,11 +3719,11 @@ do
 end
 ```
 
-### `LWorld:getBodyIds() -> table`
+### `LWorld:getBodyIds() -> integer[]`
 
 Returns a sequential table of all body IDs currently in the world.
 
-**Returns**: `table` - Array of body ID numbers.
+**Returns**: `integer[]` - Body ID numbers.
 
 #### Example
 
@@ -3741,7 +3741,7 @@ do
 end
 ```
 
-### `LWorld:getBodyOneWay(id: integer) -> number, number`
+### `LWorld:getBodyOneWay(id: integer) -> number`
 
 Returns the one-way platform normal for a body, or nil,nil if not set.
 
@@ -3749,7 +3749,7 @@ Returns the one-way platform normal for a body, or nil,nil if not set.
 
 - `id` (`integer`, required) - The body ID.
 
-**Returns**: `number, number` - Normal X and Y, or nil if not a one-way body.
+**Returns**: `number` - Normal X, or nil if not a one-way body.
 
 #### Example
 
@@ -3862,11 +3862,11 @@ do
   end
 ```
 
-### `LWorld:getGravity() -> number, number`
+### `LWorld:getGravity() -> number`
 
 Returns the current world gravity vector.
 
-**Returns**: `number, number` - Gravity X and Y components in world units per second squared.
+**Returns**: `number` - Gravity X component in world units per second squared.
 
 #### Example
 
@@ -3881,7 +3881,7 @@ do
 end
 ```
 
-### `LWorld:getJointBodies(jointId: integer) -> number, number`
+### `LWorld:getJointBodies(jointId: integer) -> integer`
 
 Returns the two body IDs connected by a joint.
 
@@ -3889,7 +3889,7 @@ Returns the two body IDs connected by a joint.
 
 - `jointId` (`integer`, required) - The joint ID to query.
 
-**Returns**: `number, number` - Body A ID and Body B ID.
+**Returns**: `integer` - Body A ID.
 
 #### Example
 
@@ -3933,11 +3933,11 @@ do
 end
 ```
 
-### `LWorld:getJointIds() -> table`
+### `LWorld:getJointIds() -> integer[]`
 
 Returns a sequential table of all joint IDs currently in the world.
 
-**Returns**: `table` - Array of joint ID numbers.
+**Returns**: `integer[]` - Joint ID numbers.
 
 #### Example
 
@@ -3953,7 +3953,7 @@ do
 end
 ```
 
-### `LWorld:getJointLimits(jointId: integer) -> number, number`
+### `LWorld:getJointLimits(jointId: integer) -> number`
 
 Returns the lower and upper limit values for a joint.
 
@@ -3961,7 +3961,7 @@ Returns the lower and upper limit values for a joint.
 
 - `jointId` (`integer`, required) - The joint ID.
 
-**Returns**: `number, number` - Lower and upper limits.
+**Returns**: `number` - Lower limit.
 
 #### Example
 
@@ -4052,11 +4052,11 @@ do
 end
 ```
 
-### `LWorld:getSolverIterations() -> number`
+### `LWorld:getSolverIterations() -> integer`
 
 Returns the current number of velocity solver iterations.
 
-**Returns**: `number` - Iteration count.
+**Returns**: `integer` - Iteration count.
 
 #### Example
 
@@ -4120,11 +4120,11 @@ do
 end
 ```
 
-### `LWorld:jointCount() -> number`
+### `LWorld:jointCount() -> integer`
 
 Returns the total number of joints in the world.
 
-**Returns**: `number` - Joint count.
+**Returns**: `integer` - Joint count.
 
 #### Example
 
@@ -4138,7 +4138,7 @@ do
 end
 ```
 
-### `LWorld:newBodies(specs: table) -> table`
+### `LWorld:newBodies(specs: table) -> integer[]`
 
 Batch-creates multiple bodies at once for better performance. Each entry is {x, y, type}.
 
@@ -4146,7 +4146,7 @@ Batch-creates multiple bodies at once for better performance. Each entry is {x, 
 
 - `specs` (`table`, required) - Array of tables: {{x, y, "dynamic"}, {x, y, "static"}, ...}.
 
-**Returns**: `table` - Array of body ID numbers in creation order.
+**Returns**: `integer[]` - Body ID numbers in creation order.
 
 #### Example
 
@@ -4313,7 +4313,7 @@ do
 end
 ```
 
-### `LWorld:queryAABB(x: number, y: number, w: number, h: number) -> table`
+### `LWorld:queryAABB(x: number, y: number, w: number, h: number) -> integer[]`
 
 Returns all body IDs whose axis-aligned bounding boxes overlap the given rectangle.
 
@@ -4324,7 +4324,7 @@ Returns all body IDs whose axis-aligned bounding boxes overlap the given rectang
 - `w` (`number`, required) - Query rectangle width.
 - `h` (`number`, required) - Query rectangle height.
 
-**Returns**: `table` - Array of body ID numbers found in the region.
+**Returns**: `integer[]` - Body ID numbers found in the region.
 
 #### Example
 
@@ -4433,7 +4433,7 @@ do
   local world = lurek.physics.newWorld(0, 9.81)
   world:newCircleBody(150, 200, 20, "static")
   local hit = world:raycastClosest(0, 200, 1, 0, 400)
-  lurek.log.info("closest hit: " .. tostring(hit and hit.id), "physics")
+  lurek.log.info("closest hit: " .. tostring(hit and hit.bodyId), "physics")
 end
 ```
 
@@ -4483,14 +4483,14 @@ do
 end
 ```
 
-### `LWorld:setBodyData(id: integer, value: any)`
+### `LWorld:setBodyData(id: integer, value: table)`
 
 Attaches arbitrary Lua data to a body ID for later retrieval (e.g. entity reference, tag).
 
 **Parameters**
 
 - `id` (`integer`, required) - The body ID.
-- `value` (`any`, required) - Any Lua value to associate with this body.
+- `value` (`table`, required) - Lua value to associate with this body (table, number, string, etc.).
 
 #### Example
 
@@ -5080,11 +5080,11 @@ do
 end
 ```
 
-### `LZone:getId() -> number`
+### `LZone:getId() -> integer`
 
 Returns the unique ID of this zone. This method is available to Lua scripts.
 
-**Returns**: `number` - Zone ID.
+**Returns**: `integer` - Zone ID.
 
 #### Example
 

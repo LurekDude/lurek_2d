@@ -333,7 +333,7 @@ Adds a shader effect pass to this layer.
 **Parameters**
 
 - `effect_name` (`string`, required) - Effect name.
-- `params` (`table`, optional) - Optional numeric parameter table.
+- `params` (`table`, optional) - Numeric parameter table.
 
 #### Example
 
@@ -357,7 +357,7 @@ end
 
 ### `LParallaxLayer:clearClamp()`
 
-Clears layer clamp bounds. This method is available to Lua scripts.
+Clears layer clamp bounds on this object.
 
 #### Example
 
@@ -402,7 +402,7 @@ end
 
 ### `LParallaxLayer:effectCount() -> integer`
 
-Returns shader effect pass count. This method is available to Lua scripts.
+Returns the shader effect pass count for this layer.
 
 **Returns**: `integer` - Effect pass count.
 
@@ -451,7 +451,7 @@ end
 
 ### `LParallaxLayer:getBlendMode() -> string`
 
-Returns layer blend mode name. This method is available to Lua scripts.
+Returns the current layer blend mode name.
 
 **Returns**: `string` - Blend mode name.
 
@@ -477,7 +477,7 @@ end
 
 ### `LParallaxLayer:getDepth() -> number`
 
-Returns parallax depth. This method is available to Lua scripts.
+Returns parallax depth from this object.
 
 **Returns**: `number` - Depth value.
 
@@ -499,7 +499,7 @@ end
 
 ### `LParallaxLayer:getMotionStretch() -> boolean`
 
-Returns motion stretch settings. This method is available to Lua scripts.
+Returns the current motion stretch settings.
 
 **Returns**: `boolean` - Motion stretch flag.
 
@@ -527,7 +527,7 @@ end
 
 ### `LParallaxLayer:getOffset() -> number`
 
-Returns layer offset. This method is available to Lua scripts.
+Returns layer offset for this object.
 
 **Returns**: `number` - X offset.
 
@@ -552,7 +552,7 @@ end
 
 ### `LParallaxLayer:getOpacity() -> number`
 
-Returns layer opacity. This method is available to Lua scripts.
+Returns layer opacity from this object.
 
 **Returns**: `number` - Opacity value.
 
@@ -577,7 +577,7 @@ end
 
 ### `LParallaxLayer:getScrollFactor() -> number`
 
-Returns layer scroll factor. This method is available to Lua scripts.
+Returns layer scroll factor from this object.
 
 **Returns**: `number` - X scroll factor.
 
@@ -627,7 +627,7 @@ end
 
 ### `LParallaxLayer:getTint() -> number`
 
-Returns layer tint color. This method is available to Lua scripts.
+Returns layer tint color from this object.
 
 **Returns**: `number` - Red channel.
 
@@ -650,7 +650,7 @@ end
 
 ### `LParallaxLayer:getZ() -> integer`
 
-Returns layer z order. This method is available to Lua scripts.
+Returns layer z order from this object.
 
 **Returns**: `integer` - Z order.
 
@@ -676,7 +676,7 @@ end
 
 ### `LParallaxLayer:isVisible() -> boolean`
 
-Returns layer visibility. This method is available to Lua scripts.
+Returns layer visibility and returns a boolean.
 
 **Returns**: `boolean` - True when visible.
 
@@ -765,7 +765,7 @@ end
 
 ### `LParallaxLayer:resetAutoscroll()`
 
-Resets layer autoscroll offset. This method is available to Lua scripts.
+Resets the layer autoscroll offset to zero.
 
 #### Example
 
@@ -789,12 +789,12 @@ end
 
 ### `LParallaxLayer:setAutoscroll(vx: number, vy: number)`
 
-Sets layer autoscroll velocity. This method is available to Lua scripts.
+Sets the layer autoscroll velocity values.
 
 **Parameters**
 
-- `vx` (`number`, required) - Lua argument for `vx`.
-- `vy` (`number`, required) - Lua argument for `vy`.
+- `vx` (`number`, required) - X autoscroll velocity.
+- `vy` (`number`, required) - Y autoscroll velocity.
 
 #### Example
 
@@ -818,7 +818,7 @@ end
 
 ### `LParallaxLayer:setBlendMode(mode: string)`
 
-Sets layer blend mode by name. This method is available to Lua scripts.
+Sets the layer blend mode by string name.
 
 **Parameters**
 
@@ -848,10 +848,10 @@ Sets clamp bounds for layer movement.
 
 **Parameters**
 
-- `min_x` (`number`, required) - Lua argument for `min_x`.
-- `min_y` (`number`, required) - Lua argument for `min_y`.
-- `max_x` (`number`, required) - Lua argument for `max_x`.
-- `max_y` (`number`, required) - Lua argument for `max_y`.
+- `min_x` (`number`, required) - Minimum X bound.
+- `min_y` (`number`, required) - Minimum Y bound.
+- `max_x` (`number`, required) - Maximum X bound.
+- `max_y` (`number`, required) - Maximum Y bound.
 
 #### Example
 
@@ -875,7 +875,7 @@ end
 
 ### `LParallaxLayer:setDepth(z: number)`
 
-Sets parallax depth. This method is available to Lua scripts.
+Sets parallax depth for this object.
 
 **Parameters**
 
@@ -901,7 +901,7 @@ end
 
 ### `LParallaxLayer:setMotionStretch(enabled: boolean, strength: number, max_scale: number)`
 
-Sets motion stretch settings. This method is available to Lua scripts.
+Sets the motion stretch settings for this layer.
 
 **Parameters**
 
@@ -933,12 +933,12 @@ end
 
 ### `LParallaxLayer:setOffset(x: number, y: number)`
 
-Sets layer offset. This method is available to Lua scripts.
+Sets the layer pixel offset for this object.
 
 **Parameters**
 
-- `x` (`number`, required) - Numeric `x` argument for this call.
-- `y` (`number`, required) - Numeric `y` argument for this call.
+- `x` (`number`, required) - X offset.
+- `y` (`number`, required) - Y offset.
 
 #### Example
 
@@ -988,8 +988,8 @@ Sets horizontal and vertical repeat flags.
 
 **Parameters**
 
-- `rx` (`boolean`, required) - Lua argument for `rx`.
-- `ry` (`boolean`, required) - Lua argument for `ry`.
+- `rx` (`boolean`, required) - Repeat horizontally.
+- `ry` (`boolean`, required) - Repeat vertically.
 
 #### Example
 
@@ -1010,12 +1010,12 @@ end
 
 ### `LParallaxLayer:setScale(sx: number, sy: number)`
 
-Sets layer scale. This method is available to Lua scripts.
+Sets the layer scale factor for this object.
 
 **Parameters**
 
-- `sx` (`number`, required) - Lua argument for `sx`.
-- `sy` (`number`, required) - Lua argument for `sy`.
+- `sx` (`number`, required) - X scale factor.
+- `sy` (`number`, required) - Y scale factor.
 
 #### Example
 
@@ -1036,7 +1036,7 @@ end
 
 ### `LParallaxLayer:setScrollFactor(x: number, y: number)`
 
-Sets layer scroll factor. This method is available to Lua scripts.
+Sets layer scroll factor for this object.
 
 **Parameters**
 
@@ -1062,12 +1062,12 @@ end
 
 ### `LParallaxLayer:setTileSize(w: number, h: number)`
 
-Sets tile size for tiling. This method is available to Lua scripts.
+Sets tile size for tiling for this object.
 
 **Parameters**
 
-- `w` (`number`, required) - Lua argument for `w`.
-- `h` (`number`, required) - Lua argument for `h`.
+- `w` (`number`, required) - Tile width.
+- `h` (`number`, required) - Tile height.
 
 #### Example
 
@@ -1089,7 +1089,7 @@ end
 
 ### `LParallaxLayer:setTiling(enabled: boolean)`
 
-Enables or disables layer tiling. This method is available to Lua scripts.
+Enables or disables the layer tiling mode.
 
 **Parameters**
 
@@ -1114,14 +1114,14 @@ end
 
 ### `LParallaxLayer:setTint(r: number, g: number, b: number, a: number)`
 
-Sets layer tint color. This method is available to Lua scripts.
+Sets layer tint color for this object.
 
 **Parameters**
 
-- `r` (`number`, required) - Lua argument for `r`.
-- `g` (`number`, required) - Lua argument for `g`.
-- `b` (`number`, required) - Lua argument for `b`.
-- `a` (`number`, required) - Lua argument for `a`.
+- `r` (`number`, required) - Red channel (0–1).
+- `g` (`number`, required) - Green channel (0–1).
+- `b` (`number`, required) - Blue channel (0–1).
+- `a` (`number`, required) - Alpha channel (0–1).
 
 #### Example
 
@@ -1142,7 +1142,7 @@ end
 
 ### `LParallaxLayer:setVisible(v: boolean)`
 
-Sets layer visibility. This method is available to Lua scripts.
+Sets layer visibility for this object.
 
 **Parameters**
 
@@ -1167,7 +1167,7 @@ end
 
 ### `LParallaxLayer:setZ(z: integer)`
 
-Sets layer z order. This method is available to Lua scripts.
+Sets the layer z order for this object.
 
 **Parameters**
 
@@ -1271,7 +1271,7 @@ end
 
 ### `LParallaxSet:addLayer(layer: LParallaxLayer)`
 
-Adds a parallax layer to this set. This method is available to Lua scripts.
+Adds a parallax layer to this set handle.
 
 **Parameters**
 
@@ -1309,13 +1309,13 @@ end
 
 ### `LParallaxSet:getLayerZAt(index: integer) -> integer`
 
-Returns z order for a layer by one-based index.
+Returns z order for a layer by one-based index, or nil when out of range.
 
 **Parameters**
 
 - `index` (`integer`, required) - One-based layer index.
 
-**Returns**: `integer` - Z order, or nil when out of range.
+**Returns**: `integer` - Z order.
 
 #### Example
 
@@ -1339,7 +1339,7 @@ end
 
 ### `LParallaxSet:getName() -> string`
 
-Returns this set name. This method is available to Lua scripts.
+Returns this set name from this object.
 
 **Returns**: `string` - Set name.
 
@@ -1360,7 +1360,7 @@ end
 
 ### `LParallaxSet:isVisible() -> boolean`
 
-Returns set visibility. This method is available to Lua scripts.
+Returns set visibility and returns a boolean.
 
 **Returns**: `boolean` - True when visible.
 
@@ -1446,8 +1446,8 @@ Enqueues render commands for all visible set layers using explicit camera coordi
 
 **Parameters**
 
-- `cam_x` (`number`, required) - Lua argument for `cam_x`.
-- `cam_y` (`number`, required) - Lua argument for `cam_y`.
+- `cam_x` (`number`, required) - Camera x coordinate.
+- `cam_y` (`number`, required) - Camera y coordinate.
 
 #### Example
 
@@ -1510,7 +1510,7 @@ end
 
 ### `LParallaxSet:setName(name: string)`
 
-Sets this set name. This method is available to Lua scripts.
+Sets this parallax set name for this object.
 
 **Parameters**
 
@@ -1533,7 +1533,7 @@ end
 
 ### `LParallaxSet:setVisible(v: boolean)`
 
-Sets set visibility. This method is available to Lua scripts.
+Sets set visibility for this object.
 
 **Parameters**
 
@@ -1558,7 +1558,7 @@ end
 
 ### `LParallaxSet:sortByZ()`
 
-Sorts layers by z order. This method is available to Lua scripts.
+Sorts layers by z order on this object.
 
 #### Example
 
@@ -1603,7 +1603,7 @@ end
 
 ### `LParallaxSet:update(dt: number)`
 
-Updates all layers in this set. This method is available to Lua scripts.
+Updates all layers in this parallax set.
 
 **Parameters**
 

@@ -14,7 +14,7 @@
 - [Key Types](#key-types)
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
-  - [lurek.effect.getEffectTypes() -> table](#lurekeffectgeteffecttypes-table)
+  - [lurek.effect.getEffectTypes() -> string[]](#lurekeffectgeteffecttypes-string)
   - [lurek.effect.getShaderErrorDisplay() -> boolean](#lurekeffectgetshadererrordisplay-boolean)
   - [lurek.effect.newCustomEffect(shader_id: integer) -> LPostFxEffect](#lurekeffectnewcustomeffectshaderid-integer-lpostfxeffect)
   - [lurek.effect.newEffect(type_name: string) -> LPostFxEffect](#lurekeffectneweffecttypename-string-lpostfxeffect)
@@ -32,11 +32,11 @@
   - [LImageEffect:clearEffects()](#limageeffectcleareffects)
   - [LImageEffect:clone() -> LImageEffect](#limageeffectclone-limageeffect)
   - [LImageEffect:effectCount() -> integer](#limageeffecteffectcount-integer)
-  - [LImageEffect:getEffect(key: any) -> LuaValue](#limageeffectgeteffectkey-any-luavalue)
+  - [LImageEffect:getEffect(key: string) -> LuaValue](#limageeffectgeteffectkey-string-luavalue)
   - [LImageEffect:getEffectCount() -> integer](#limageeffectgeteffectcount-integer)
   - [LImageEffect:removeByIndex(idx: integer) -> boolean](#limageeffectremovebyindexidx-integer-boolean)
   - [LImageEffect:removeByName(name: string) -> boolean](#limageeffectremovebynamename-string-boolean)
-  - [LImageEffect:removeEffect(key: any) -> boolean](#limageeffectremoveeffectkey-any-boolean)
+  - [LImageEffect:removeEffect(key: string) -> boolean](#limageeffectremoveeffectkey-string-boolean)
   - [LImageEffect:save() -> boolean](#limageeffectsave-boolean)
   - [LImageEffect:type() -> string](#limageeffecttype-string)
   - [LImageEffect:typeOf(name: string) -> boolean](#limageeffecttypeofname-string-boolean)
@@ -123,7 +123,7 @@
   - [LPostFxEffect:enableAutoUniforms()](#lpostfxeffectenableautouniforms)
   - [LPostFxEffect:getEffectType() -> string](#lpostfxeffectgeteffecttype-string)
   - [LPostFxEffect:getParameter(name: string, [default]: number) -> number](#lpostfxeffectgetparametername-string-default-number-number)
-  - [LPostFxEffect:getParameterNames() -> table](#lpostfxeffectgetparameternames-table)
+  - [LPostFxEffect:getParameterNames() -> string[]](#lpostfxeffectgetparameternames-string)
   - [LPostFxEffect:getType() -> string](#lpostfxeffectgettype-string)
   - [LPostFxEffect:getTypeName() -> string](#lpostfxeffectgettypename-string)
   - [LPostFxEffect:hasParameter(name: string) -> boolean](#lpostfxeffecthasparametername-string-boolean)
@@ -154,7 +154,7 @@
   - [LPostFxStack:getDimensions() -> integer](#lpostfxstackgetdimensions-integer)
   - [LPostFxStack:getEffect(index: integer) -> LuaValue](#lpostfxstackgeteffectindex-integer-luavalue)
   - [LPostFxStack:getEffectCount() -> integer](#lpostfxstackgeteffectcount-integer)
-  - [LPostFxStack:getEnabledEffects() -> table](#lpostfxstackgetenabledeffects-table)
+  - [LPostFxStack:getEnabledEffects() -> LPostFxEffect[]](#lpostfxstackgetenabledeffects-lpostfxeffect)
   - [LPostFxStack:getFeedback() -> number](#lpostfxstackgetfeedback-number)
   - [LPostFxStack:getHeight() -> integer](#lpostfxstackgetheight-integer)
   - [LPostFxStack:getWidth() -> integer](#lpostfxstackgetwidth-integer)
@@ -268,7 +268,7 @@ do
 - Source spec: [docs/specs/effect.md](../blob/main/docs/specs/effect.md)
 
 ```lua
-lurek.effect.getEffectTypes() -> table -- Returns all built-in post-processing effect type names.
+lurek.effect.getEffectTypes() -> string[] -- Returns all built-in post-processing effect type names.
 lurek.effect.getShaderErrorDisplay() -> boolean -- Returns whether renderer shader error display overlays are enabled.
 lurek.effect.newCustomEffect(shader_id: integer) -> LPostFxEffect -- Creates a custom post-processing effect that references an existing shader id.
 lurek.effect.newEffect(type_name: string) -> LPostFxEffect -- Creates a built-in post-processing effect by type name.
@@ -283,11 +283,11 @@ lurek.effect.setShaderErrorDisplay(enabled: boolean) -- Enables or disables rend
 
 ## Module Functions
 
-### `lurek.effect.getEffectTypes() -> table`
+### `lurek.effect.getEffectTypes() -> string[]`
 
 Returns all built-in post-processing effect type names.
 
-**Returns**: `table` - Array table of built-in effect type strings.
+**Returns**: `string[]` - Built-in effect type strings.
 
 #### Example
 
@@ -436,8 +436,8 @@ Creates an overlay controller for screen effects using optional dimensions.
 
 **Parameters**
 
-- `w` (`integer`, optional) - Optional overlay width in pixels, defaulting to 800.
-- `h` (`integer`, optional) - Optional overlay height in pixels, defaulting to 600.
+- `w` (`integer`, optional) - Overlay width in pixels, defaulting to 800.
+- `h` (`integer`, optional) - Overlay height in pixels, defaulting to 600.
 
 **Returns**: `LOverlay` - New overlay handle.
 
@@ -501,8 +501,8 @@ Creates a named preset post-processing stack with optional dimensions.
 **Parameters**
 
 - `name` (`string`, required) - Preset stack name.
-- `w` (`integer`, optional) - Optional stack width in pixels.
-- `h` (`integer`, optional) - Optional stack height in pixels.
+- `w` (`integer`, optional) - Stack width in pixels, defaulting to window width.
+- `h` (`integer`, optional) - Stack height in pixels, defaulting to window height.
 
 **Returns**: `LPostFxStack` - New preset post-processing stack handle.
 
@@ -533,8 +533,8 @@ Creates a post-processing stack using optional dimensions or the current window 
 
 **Parameters**
 
-- `w` (`integer`, optional) - Optional stack width in pixels.
-- `h` (`integer`, optional) - Optional stack height in pixels.
+- `w` (`integer`, optional) - Stack width in pixels, defaulting to window width.
+- `h` (`integer`, optional) - Stack height in pixels, defaulting to window height.
 
 **Returns**: `LPostFxStack` - New post-processing stack handle.
 
@@ -564,9 +564,9 @@ Creates a timed screen transition with optional kind, duration, and color.
 
 **Parameters**
 
-- `kind` (`string`, optional) - Optional transition kind name, defaulting to `fade`.
-- `duration` (`number`, optional) - Optional duration in seconds, defaulting to 1.0.
-- `color_tbl` (`table`, optional) - Optional numeric RGBA table using indices 1 through 4.
+- `kind` (`string`, optional) - Transition kind name, defaulting to `fade`.
+- `duration` (`number`, optional) - Duration in seconds, defaulting to 1.0.
+- `color_tbl` (`table`, optional) - Numeric RGBA table using indices 1 through 4.
 
 **Returns**: `LScreenTransition` - New screen transition handle.
 
@@ -752,13 +752,13 @@ do
 end
 ```
 
-### `LImageEffect:getEffect(key: any) -> LuaValue`
+### `LImageEffect:getEffect(key: string) -> LuaValue`
 
 Looks up an image effect by one-based index or effect type name.
 
 **Parameters**
 
-- `key` (`any`, required) - Integer index, numeric index, or effect type name.
+- `key` (`string`, required) - Effect name string or one-based integer index.
 
 **Returns**: `LuaValue` - `LPostFxEffect` handle, or nil when no matching effect exists.
 
@@ -842,13 +842,13 @@ do
 end
 ```
 
-### `LImageEffect:removeEffect(key: any) -> boolean`
+### `LImageEffect:removeEffect(key: string) -> boolean`
 
 Removes an image effect by one-based index or effect type name.
 
 **Parameters**
 
-- `key` (`any`, required) - Integer index, numeric index, or effect type name.
+- `key` (`string`, required) - Effect name string or one-based integer index.
 
 **Returns**: `boolean` - True when an effect was removed.
 
@@ -1012,8 +1012,8 @@ Starts a fade overlay with optional alpha and duration.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional target alpha, defaulting to 1.0.
-- `dur` (`number`, optional) - Optional duration in seconds, defaulting to 1.0.
+- `a` (`number`, optional) - Target alpha, defaulting to 1.0.
+- `dur` (`number`, optional) - Duration in seconds, defaulting to 1.0.
 
 #### Example
 
@@ -1040,8 +1040,8 @@ Starts a short flash overlay with optional alpha and duration.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
-- `dur` (`number`, optional) - Optional duration in seconds, defaulting to 0.2.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
+- `dur` (`number`, optional) - Duration in seconds, defaulting to 0.2.
 
 #### Example
 
@@ -1803,14 +1803,14 @@ end
 
 ### `LOverlay:setAmbientColor(r: number, g: number, b: number, [a]: number)`
 
-Sets overlay ambient RGBA color. This method is available to Lua scripts.
+Sets the overlay ambient color from RGBA channels.
 
 **Parameters**
 
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -2026,14 +2026,14 @@ end
 
 ### `LOverlay:setFogColor(r: number, g: number, b: number, [a]: number)`
 
-Sets overlay fog RGBA color. This method is available to Lua scripts.
+Sets the overlay fog color from RGBA channels.
 
 **Parameters**
 
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -2149,7 +2149,7 @@ Sets overlay lightning RGBA color.
 - `r` (`number`, required) - Red channel.
 - `g` (`number`, required) - Green channel.
 - `b` (`number`, required) - Blue channel.
-- `a` (`number`, optional) - Optional alpha channel, defaulting to 1.0.
+- `a` (`number`, optional) - Alpha channel, defaulting to 1.0.
 
 #### Example
 
@@ -2404,7 +2404,7 @@ Starts a screen shake with optional duration.
 **Parameters**
 
 - `intensity` (`number`, required) - Shake intensity.
-- `dur` (`number`, optional) - Optional duration in seconds, defaulting to 0.5.
+- `dur` (`number`, optional) - Duration in seconds, defaulting to 0.5.
 
 #### Example
 
@@ -2701,7 +2701,7 @@ Reads a numeric shader parameter and falls back to a default value when missing.
 **Parameters**
 
 - `name` (`string`, required) - Parameter name to read.
-- `default` (`number`, optional) - Optional default value returned when the parameter is absent.
+- `default` (`number`, optional) - Default value returned when the parameter is absent.
 
 **Returns**: `number` - Stored parameter value or the supplied default.
 
@@ -2721,11 +2721,11 @@ do
 end
 ```
 
-### `LPostFxEffect:getParameterNames() -> table`
+### `LPostFxEffect:getParameterNames() -> string[]`
 
 Returns the parameter names stored on this effect.
 
-**Returns**: `table` - Array table of parameter name strings.
+**Returns**: `string[]` - Parameter name strings.
 
 #### Example
 
@@ -3412,11 +3412,11 @@ do
 end
 ```
 
-### `LPostFxStack:getEnabledEffects() -> table`
+### `LPostFxStack:getEnabledEffects() -> LPostFxEffect[]`
 
 Returns effect handles whose stack passes are enabled.
 
-**Returns**: `table` - Array table of enabled `LPostFxEffect` handles.
+**Returns**: `LPostFxEffect[]` - Enabled `LPostFxEffect` handles.
 
 #### Example
 

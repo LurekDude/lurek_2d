@@ -326,7 +326,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
     /// Performs the 'serial' operation.
-    /// @return | nil | No value is returned.
     lurek.set("serial", tbl)?;
     Ok(())
 }

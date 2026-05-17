@@ -22,7 +22,7 @@
   - [lurek.render.clear([r]: number, [g]: number, [b]: number)](#lurekrenderclearr-number-g-number-b-number)
   - [lurek.render.clearStencil()](#lurekrenderclearstencil)
   - [lurek.render.currentLayer() -> string](#lurekrendercurrentlayer-string)
-  - [lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -> table](#lurekrenderdrawdrawable-limagelcanvaslspritebatchlmesh-x-number-y-number-r-number-sx-number-sy-number-ox-number-oy-number-table)
+  - [lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number)](#lurekrenderdrawdrawable-limagelcanvaslspritebatchlmesh-x-number-y-number-r-number-sx-number-sy-number-ox-number-oy-number)
   - [lurek.render.drawBevelRect(x: number, y: number, w: number, h: number, [bevelW]: number, [style]: string, [opts]: table)](#lurekrenderdrawbevelrectx-number-y-number-w-number-h-number-bevelw-number-style-string-opts-table)
   - [lurek.render.drawColoredPolygon(vertices: table, colors: table, [mode]: string)](#lurekrenderdrawcoloredpolygonvertices-table-colors-table-mode-string)
   - [lurek.render.drawCubicBezier(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, [segs]: number)](#lurekrenderdrawcubicbezierx1-number-y1-number-cx1-number-cy1-number-cx2-number-cy2-number-x2-number-y2-number-segs-number)
@@ -53,7 +53,7 @@
   - [lurek.render.getFontDescent(font: LFont) -> number](#lurekrendergetfontdescentfont-lfont-number)
   - [lurek.render.getFontHeight(font: LFont) -> number](#lurekrendergetfontheightfont-lfont-number)
   - [lurek.render.getFontLineHeight(font: LFont) -> number](#lurekrendergetfontlineheightfont-lfont-number)
-  - [lurek.render.getFontSizes() -> table](#lurekrendergetfontsizes-table)
+  - [lurek.render.getFontSizes() -> number[]](#lurekrendergetfontsizes-number)
   - [lurek.render.getFontWidth(font: LFont, text: string) -> number](#lurekrendergetfontwidthfont-lfont-text-string-number)
   - [lurek.render.getFontWrap(text: string, limit: number) -> LuaValue, number](#lurekrendergetfontwraptext-string-limit-number-luavalue-number)
   - [lurek.render.getHeight() -> number](#lurekrendergetheight-number)
@@ -128,7 +128,7 @@
   - [LCanvas:getWidth() -> number](#lcanvasgetwidth-number)
   - [LCanvas:release() -> boolean](#lcanvasrelease-boolean)
   - [LCanvas:type() -> string](#lcanvastype-string)
-  - [LCanvas:typeOf(name: string) -> boolean](#lcanvastypeofname-string-boolean)
+  - [LCanvas:typeOf(name: string) -> string](#lcanvastypeofname-string-string)
   - [LDrawLayer](#ldrawlayer)
   - [LDrawLayer:clear()](#ldrawlayerclear)
   - [LDrawLayer:flush()](#ldrawlayerflush)
@@ -146,7 +146,7 @@
   - [LFont:release() -> boolean](#lfontrelease-boolean)
   - [LFont:setLineHeight(height: number)](#lfontsetlineheightheight-number)
   - [LFont:type() -> string](#lfonttype-string)
-  - [LFont:typeOf(name: string) -> boolean](#lfonttypeofname-string-boolean)
+  - [LFont:typeOf(name: string) -> string](#lfonttypeofname-string-string)
   - [LImage](#limage)
   - [LImage:getDimensions() -> number, number](#limagegetdimensions-number-number)
   - [LImage:getHeight() -> number](#limagegetheight-number)
@@ -154,7 +154,7 @@
   - [LImage:getWidth() -> number](#limagegetwidth-number)
   - [LImage:release() -> boolean](#limagerelease-boolean)
   - [LImage:type() -> string](#limagetype-string)
-  - [LImage:typeOf(name: string) -> boolean](#limagetypeofname-string-boolean)
+  - [LImage:typeOf(name: string) -> string](#limagetypeofname-string-string)
   - [LImageData](#limagedata)
   - [LImageData:blit(source: LImageData, dstX: integer, dstY: integer)](#limagedatablitsource-limagedata-dstx-integer-dsty-integer)
   - [LImageData:diff(other: LImageData) -> number](#limagedatadiffother-limagedata-number)
@@ -172,7 +172,7 @@
   - [LMesh:setTexture([image]: LImage)](#lmeshsettextureimage-limage)
   - [LMesh:setVertex(index: integer, data: table)](#lmeshsetvertexindex-integer-data-table)
   - [LMesh:type() -> string](#lmeshtype-string)
-  - [LMesh:typeOf(name: string) -> boolean](#lmeshtypeofname-string-boolean)
+  - [LMesh:typeOf(name: string) -> string](#lmeshtypeofname-string-string)
   - [LNineSlice](#lnineslice)
   - [LNineSlice:getInsets() -> number, number, number, number](#lnineslicegetinsets-number-number-number-number)
   - [LNineSlice:getTextureSize() -> number, number](#lnineslicegettexturesize-number-number)
@@ -190,13 +190,13 @@
   - [LQuad:getViewport() -> number, number, number, number](#lquadgetviewport-number-number-number-number)
   - [LQuad:setViewport(x: number, y: number, w: number, h: number)](#lquadsetviewportx-number-y-number-w-number-h-number)
   - [LQuad:type() -> string](#lquadtype-string)
-  - [LQuad:typeOf(name: string) -> boolean](#lquadtypeofname-string-boolean)
+  - [LQuad:typeOf(name: string) -> string](#lquadtypeofname-string-string)
   - [LShader](#lshader)
   - [LShader:hasUniform(name: string) -> boolean](#lshaderhasuniformname-string-boolean)
   - [LShader:release() -> boolean](#lshaderrelease-boolean)
   - [LShader:send(name: string, value: number|boolean|table)](#lshadersendname-string-value-numberbooleantable)
   - [LShader:type() -> string](#lshadertype-string)
-  - [LShader:typeOf(name: string) -> boolean](#lshadertypeofname-string-boolean)
+  - [LShader:typeOf(name: string) -> string](#lshadertypeofname-string-string)
   - [LShape](#lshape)
   - [LShape:arc(mode: string, x: number, y: number, r: number, astart: number, aend: number, [segments]: number)](#lshapearcmode-string-x-number-y-number-r-number-astart-number-aend-number-segments-number)
   - [LShape:circle(mode: string, x: number, y: number, r: number)](#lshapecirclemode-string-x-number-y-number-r-number)
@@ -221,7 +221,7 @@
   - [LSpriteBatch:getCount() -> number](#lspritebatchgetcount-number)
   - [LSpriteBatch:release() -> boolean](#lspritebatchrelease-boolean)
   - [LSpriteBatch:type() -> string](#lspritebatchtype-string)
-  - [LSpriteBatch:typeOf(name: string) -> boolean](#lspritebatchtypeofname-string-boolean)
+  - [LSpriteBatch:typeOf(name: string) -> string](#lspritebatchtypeofname-string-string)
 - [Examples](#examples)
 - [Reference Games](#reference-games)
 - [Related Modules](#related-modules)
@@ -317,19 +317,19 @@ do
 
 ```lua
 lurek.render.applyTransform(mat: table) -- Multiplies the current transformation matrix by a 3x3 matrix (9 values in row-major order).
-lurek.render.arc(mode: string, x: number, y: number, radius: number, angle1: number, angle2: number, [segments]: number) -- Draws a circular arc. This function is exposed to Lua scripts.
+lurek.render.arc(mode: string, x: number, y: number, radius: number, angle1: number, angle2: number, [segments]: number) -- Draws a filled or outlined circular arc segment.
 lurek.render.beginSortGroup(id: integer) -- Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
 lurek.render.captureScreenshot(callback: function) -- Captures a screenshot as ImageData and passes it to a callback (stub: returns 1x1 placeholder).
-lurek.render.circle(mode: string, x: number, y: number, radius: number) -- Draws a circle. This function is exposed to Lua scripts.
+lurek.render.circle(mode: string, x: number, y: number, radius: number) -- Draws a filled or outlined circle at the given position.
 lurek.render.clear([r]: number, [g]: number, [b]: number) -- Clears all queued render commands for the current frame.
 lurek.render.clearStencil() -- Resets the stencil state to defaults (no stencil operations).
 lurek.render.currentLayer() -> string -- Returns the name of the currently active rendering layer.
-lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -> table -- Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
+lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -- Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
 lurek.render.drawBevelRect(x: number, y: number, w: number, h: number, [bevelW]: number, [style]: string, [opts]: table) -- Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
 lurek.render.drawColoredPolygon(vertices: table, colors: table, [mode]: string) -- Draws a polygon with per-vertex colors.
 lurek.render.drawCubicBezier(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, [segs]: number) -- Draws a cubic Bezier curve through start, two control points, and end.
 lurek.render.drawGradientRect(x: number, y: number, w: number, h: number, c1: table, c2: table, [dir]: string) -- Draws a rectangle with a two-color gradient fill.
-lurek.render.drawHexTile(cx: number, cy: number, size: number, [orientation]: string, [mode]: string) -- Draws a regular hexagonal tile. This function is exposed to Lua scripts.
+lurek.render.drawHexTile(cx: number, cy: number, size: number, [orientation]: string, [mode]: string) -- Draws a regular hexagonal tile at the given center position.
 lurek.render.drawIsoCubeTile(sx: number, sy: number, halfW: number, halfH: number, [opts]: table) -- Draws an isometric cube tile with configurable face colors and optional textures.
 lurek.render.drawMany(list: table) -- Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
 lurek.render.drawNineSlice(slice: LNineSlice, x: number, y: number, w: number, h: number) -- Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
@@ -368,7 +368,7 @@ end
 
 ### `lurek.render.arc(mode: string, x: number, y: number, radius: number, angle1: number, angle2: number, [segments]: number)`
 
-Draws a circular arc. This function is exposed to Lua scripts.
+Draws a filled or outlined circular arc segment.
 
 **Parameters**
 
@@ -450,7 +450,7 @@ end
 
 ### `lurek.render.circle(mode: string, x: number, y: number, radius: number)`
 
-Draws a circle. This function is exposed to Lua scripts.
+Draws a filled or outlined circle at the given position.
 
 **Parameters**
 
@@ -538,7 +538,7 @@ do
 end
 ```
 
-### `lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number) -> table`
+### `lurek.render.draw(drawable: LImage|LCanvas|LSpriteBatch|LMesh, [x]: number, [y]: number, [r]: number, [sx]: number, [sy]: number, [ox]: number, [oy]: number)`
 
 Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given position with optional transform.
 
@@ -552,8 +552,6 @@ Draws a drawable object (Image, Canvas, SpriteBatch, or Mesh) at the given posit
 - `sy` (`number`, optional) - Scale Y (default 1).
 - `ox` (`number`, optional) - Origin offset X (default 0).
 - `oy` (`number`, optional) - Origin offset Y (default 0).
-
-**Returns**: `table` - Table result returned by this call.
 
 #### Example
 
@@ -711,7 +709,7 @@ end
 
 ### `lurek.render.drawHexTile(cx: number, cy: number, size: number, [orientation]: string, [mode]: string)`
 
-Draws a regular hexagonal tile. This function is exposed to Lua scripts.
+Draws a regular hexagonal tile at the given center position.
 
 **Parameters**
 
@@ -974,7 +972,7 @@ end
 
 ### `lurek.render.ellipse(mode: string, x: number, y: number, rx: number, ry: number)`
 
-Draws an ellipse. This function is exposed to Lua scripts.
+Draws a filled or outlined ellipse at the given position.
 
 **Parameters**
 
@@ -1370,11 +1368,11 @@ do
 end
 ```
 
-### `lurek.render.getFontSizes() -> table`
+### `lurek.render.getFontSizes() -> number[]`
 
 Returns all available built-in font pixel heights.
 
-**Returns**: `table` - Array of available font height values.
+**Returns**: `number[]` - Array of available font height values.
 
 #### Example
 
@@ -1489,7 +1487,7 @@ end
 
 ### `lurek.render.getLineWidth() -> number`
 
-Returns the current line width. This function is exposed to Lua scripts.
+Returns the current line width used for line-mode drawing.
 
 **Returns**: `number` - Line width in pixels.
 
@@ -1509,7 +1507,7 @@ end
 
 ### `lurek.render.getPointSize() -> number`
 
-Returns the current point size. This function is exposed to Lua scripts.
+Returns the current point diameter used for point drawing.
 
 **Returns**: `number` - Point diameter in pixels.
 
@@ -1566,7 +1564,7 @@ end
 
 Returns a table of rendering statistics for the current frame.
 
-**Returns**: `table` - Stats table with fields: drawcalls, textures, fonts, canvases, texture_memory, gpu_draw_calls, batched_draws, texture_switches, canvas_switches, shader_switches, cpu_render_ms.
+**Returns**: `table` - Stats table with rendering counters.
 
 #### Example
 
@@ -3185,7 +3183,7 @@ end
 
 ### `LCanvas:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this canvas object.
 
 **Returns**: `string` - Always "LCanvas".
 
@@ -3203,15 +3201,15 @@ do
 end
 ```
 
-### `LCanvas:typeOf(name: string) -> boolean`
+### `LCanvas:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LCanvas" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Canvas".
 
 #### Example
 
@@ -3342,7 +3340,7 @@ end
 
 ### `LDrawLayer:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this draw layer.
 
 **Returns**: `string` - Always "LDrawLayer".
 
@@ -3366,7 +3364,7 @@ Checks whether this object matches the given type name.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LDrawLayer" or "Object").
+- `name` (`string`, required) - Type name to check ("LDrawLayer", "DrawLayer", or "Object").
 
 **Returns**: `boolean` - True if the name matches.
 
@@ -3585,7 +3583,7 @@ end
 
 ### `LFont:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this font object.
 
 **Returns**: `string` - Always "LFont".
 
@@ -3603,15 +3601,15 @@ do
 end
 ```
 
-### `LFont:typeOf(name: string) -> boolean`
+### `LFont:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LFont" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Font".
 
 #### Example
 
@@ -3752,7 +3750,7 @@ end
 
 ### `LImage:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this image object.
 
 **Returns**: `string` - Always "LImage".
 
@@ -3770,15 +3768,15 @@ do
 end
 ```
 
-### `LImage:typeOf(name: string) -> boolean`
+### `LImage:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LImage" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Image".
 
 #### Example
 
@@ -4010,7 +4008,7 @@ Checks whether this object matches the given type name.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LImageData" or "Object").
+- `name` (`string`, required) - Type name to check ("ImageData" or "Object").
 
 **Returns**: `boolean` - True if the name matches.
 
@@ -4109,7 +4107,7 @@ end
 
 ### `LMesh:release() -> boolean`
 
-Releases the mesh resource. This method is available to Lua scripts.
+Releases the mesh GPU resource and invalidates the handle.
 
 **Returns**: `boolean` - True if the mesh was valid and was released.
 
@@ -4193,7 +4191,7 @@ end
 
 ### `LMesh:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this mesh object.
 
 **Returns**: `string` - Always "LMesh".
 
@@ -4215,15 +4213,15 @@ do
 end
 ```
 
-### `LMesh:typeOf(name: string) -> boolean`
+### `LMesh:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LMesh" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Mesh".
 
 #### Example
 
@@ -4343,7 +4341,7 @@ Checks whether this object matches the given type name.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LNineSlice" or "Object").
+- `name` (`string`, required) - Type name to check ("NineSlice" or "Object").
 
 **Returns**: `boolean` - True if the name matches.
 
@@ -4617,7 +4615,7 @@ end
 
 ### `LQuad:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this quad object.
 
 **Returns**: `string` - Always "LQuad".
 
@@ -4635,15 +4633,15 @@ do
 end
 ```
 
-### `LQuad:typeOf(name: string) -> boolean`
+### `LQuad:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LQuad" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Quad".
 
 #### Example
 
@@ -4753,7 +4751,7 @@ end
 
 ### `LShader:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this shader object.
 
 **Returns**: `string` - Always "LShader".
 
@@ -4771,15 +4769,15 @@ do
 end
 ```
 
-### `LShader:typeOf(name: string) -> boolean`
+### `LShader:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LShader" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "Shader".
 
 #### Example
 
@@ -4824,7 +4822,7 @@ end
 
 ### `LShape:arc(mode: string, x: number, y: number, r: number, astart: number, aend: number, [segments]: number)`
 
-Adds an arc command to the shape. This method is available to Lua scripts.
+Adds a filled or outlined arc command to the shape.
 
 **Parameters**
 
@@ -4855,7 +4853,7 @@ end
 
 ### `LShape:circle(mode: string, x: number, y: number, r: number)`
 
-Adds a circle command to the shape. This method is available to Lua scripts.
+Adds a filled or outlined circle command to the shape.
 
 **Parameters**
 
@@ -5206,7 +5204,7 @@ end
 
 ### `LShape:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this shape object.
 
 **Returns**: `string` - Always "LShape".
 
@@ -5230,7 +5228,7 @@ Checks whether this object matches the given type name.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LShape" or "Object").
+- `name` (`string`, required) - Type name to check ("Shape" or "Object").
 
 **Returns**: `boolean` - True if the name matches.
 
@@ -5392,7 +5390,7 @@ end
 
 ### `LSpriteBatch:type() -> string`
 
-Returns the internal Lua type tag. This method is available to Lua scripts.
+Returns the type name string for this sprite batch.
 
 **Returns**: `string` - Always "LSpriteBatch".
 
@@ -5410,15 +5408,15 @@ do
 end
 ```
 
-### `LSpriteBatch:typeOf(name: string) -> boolean`
+### `LSpriteBatch:typeOf(name: string) -> string`
 
-Checks whether this object matches the given type name.
+Returns the type name of this object.
 
 **Parameters**
 
-- `name` (`string`, required) - Type name to check ("LSpriteBatch" or "Object").
+- `name` (`string`, required) - Type name to check.
 
-**Returns**: `boolean` - True if the name matches.
+**Returns**: `string` - Always "SpriteBatch".
 
 #### Example
 

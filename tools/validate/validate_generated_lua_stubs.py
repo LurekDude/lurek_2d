@@ -246,7 +246,9 @@ def _collect_lua_doc_completeness_issues(fresh_data: dict) -> list[dict[str, obj
                     }
                 )
 
-            if not fn.get("returns_doc") or not fn.get("return_description"):
+            # Void functions (no returns_doc, no inferred_return) are fine without return doc.
+            _fn_is_void = not fn.get("returns_doc") and not fn.get("inferred_return")
+            if not _fn_is_void and (not fn.get("returns_doc") or not fn.get("return_description")):
                 issues.append(
                     {
                         "kind": "missing-function-return-doc",
@@ -301,7 +303,9 @@ def _collect_lua_doc_completeness_issues(fresh_data: dict) -> list[dict[str, obj
                         }
                     )
 
-                if not method.get("returns_doc") or not method.get("return_description"):
+                # Void methods (no returns_doc, no inferred_return) are fine without return doc.
+                _is_void = not method.get("returns_doc") and not method.get("inferred_return")
+                if not _is_void and (not method.get("returns_doc") or not method.get("return_description")):
                     issues.append(
                         {
                             "kind": "missing-method-return-doc",

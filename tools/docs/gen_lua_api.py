@@ -212,7 +212,9 @@ def _parse_tagged_params(docstring: str) -> list:
             name_optional = name.endswith("?") and name != "..."
             if name_optional:
                 name = name[:-1]
-            lua_type = pipe_match.group(2).strip().rstrip(",.")
+            lua_type = pipe_match.group(2).strip()
+            if lua_type != "...":
+                lua_type = lua_type.rstrip(",.")
             lua_type = re.sub(r"\s*\|\s*", "|", lua_type)
             description = pipe_match.group(3).strip()
             is_optional = name_optional or lua_type.endswith("?")

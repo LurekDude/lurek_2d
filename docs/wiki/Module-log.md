@@ -387,7 +387,7 @@ end
 
 Returns metadata for all registered sinks.
 
-**Returns**: `table` - Array table of sink records with id, type, level, and optional path.
+**Returns**: `table` - Array of sink records with id, type, level, and optional path.
 
 #### Example
 

@@ -269,6 +269,54 @@ def _is_api_registration(lines: list[str], idx: int) -> bool:
     return "create_function" in block
 
 
+def _is_void_registration(lines: list[str], start_line: int) -> bool:
+    """Check if the registration starting at start_line (0-based) returns no value.
+
+    A method is void if its body does not contain an explicit non-void Ok(value).
+    Void patterns include: Ok(()), .map_err(...), direct Result<()> returns,
+    and delegation to functions returning LuaResult<()>.
+    """
+    # Collect the body text up to the next registration
+    body_lines = []
+    for j in range(start_line, min(len(lines), start_line + 100)):
+        stripped = lines[j].strip()
+        # Stop if we hit the next registration (not on start line)
+        if j > start_line and (
+            "methods.add_method" in stripped
+            or "methods.add_function" in stripped
+            or (
+                ".set(" in stripped
+                and "create_function" in "\n".join(lines[j: min(len(lines), j + 4)])
+            )
+        ):
+            break
+        body_lines.append(stripped)
+
+    body = "\n".join(body_lines)
+
+    # Explicit void returns
+    if "Ok(())" in body:
+        return True
+    # .map_err pattern — propagating Result<()>
+    if ".map_err(" in body:
+        return True
+
+    # Check if there's any Ok() returning a value (not void)
+    # If there's no Ok(...) with a value, it's either:
+    # - delegating to a fn returning Result<()>
+    # - using ? with early returns
+    # Look for Ok(something_not_empty) patterns
+    import re
+    ok_with_value = re.findall(r'Ok\(([^)]*)\)', body)
+    for val in ok_with_value:
+        val = val.strip()
+        if val and val != "()" and val != "":
+            return False  # Has a non-void Ok return
+
+    # No Ok(value) found → likely a delegation to a void function
+    return True
+
+
 def check_docstring_coverage(lines: list[str]) -> None:
     """Every *.set / methods.add_method* must have @return in the docstring above it."""
     api_call_re = re.compile(
@@ -293,11 +341,13 @@ def check_docstring_coverage(lines: list[str]) -> None:
         # Only the consecutive /// block immediately above this line
         doc_lines = _get_doc_block(lines, i)
 
-        # @return must be present
+        # @return should be present for non-void methods.
+        # Void methods (returning Ok(())) do not need @return.
         has_return = any("@return" in l for l in doc_lines)
         if not has_return:
-            _err(i + 1,
-                 f'`{name}` ({kind}): missing `/// @return | type | description` docstring above this entry')
+            if not _is_void_registration(lines, i):
+                _err(i + 1,
+                     f'`{name}` ({kind}): missing `/// @return | type | description` docstring above this entry')
 
         # @param must come before @return if both exist (within same doc block)
         if doc_lines:
@@ -451,10 +501,14 @@ def check_lua_entry_doc_completeness(path: Path) -> None:
 
         return_type, return_desc = GEN_LUA_API._parse_tagged_return(entry.full_doc)
         if not return_type or not return_desc:
-            _err(
-                entry.line,
-                f'`{entry_name}`: every Lua registration must have `@return | type | description` data',
-            )
+            # Allow void methods (returning Ok(())) to omit @return
+            source_lines = path.read_text(encoding='utf-8').splitlines()
+            body_start = entry.line - 1  # 0-based
+            if not _is_void_registration(source_lines, body_start):
+                _err(
+                    entry.line,
+                    f'`{entry_name}`: every Lua registration must have `@return | type | description` data',
+                )
 
         if entry.kind == "method" and entry.owner_type and entry.owner_type != "Unknown":
             first_method_line_by_owner.setdefault(entry.owner_type, entry.line)

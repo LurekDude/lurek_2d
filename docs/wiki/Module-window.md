@@ -54,7 +54,7 @@
   - [lurek.window.maximize()](#lurekwindowmaximize)
   - [lurek.window.minimize()](#lurekwindowminimize)
   - [lurek.window.onDpiChange(func: function)](#lurekwindowondpichangefunc-function)
-  - [lurek.window.openFileDialog([opts]: table) -> table](#lurekwindowopenfiledialogopts-table-table)
+  - [lurek.window.openFileDialog([opts]: table) -> string[]](#lurekwindowopenfiledialogopts-table-string)
   - [lurek.window.pollDpiChange() -> number](#lurekwindowpolldpichange-number)
   - [lurek.window.requestAttention()](#lurekwindowrequestattention)
   - [lurek.window.restore()](#lurekwindowrestore)
@@ -1032,7 +1032,7 @@ do
 end
 ```
 
-### `lurek.window.openFileDialog([opts]: table) -> table`
+### `lurek.window.openFileDialog([opts]: table) -> string[]`
 
 Opens a native file picker dialog and returns the selected file paths. Blocks until the user picks file(s) or cancels.
 
@@ -1040,7 +1040,7 @@ Opens a native file picker dialog and returns the selected file paths. Blocks un
 
 - `opts` (`table`, optional) - Optional config table with fields: title (string), defaultPath (string), multiple (boolean), filters (table of {name, extensions}).
 
-**Returns**: `table` - Array of selected file path strings. Empty table if cancelled.
+**Returns**: `string[]` - Selected file path strings. Empty table if cancelled.
 
 #### Example
 

@@ -15,86 +15,86 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.tilemap.fromLDtk(jsonStr: string, [levelName]: string) -> LTileMap](#lurektilemapfromldtkjsonstr-string-levelname-string-ltilemap)
-  - [lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> number](#lurektilemapfromscreenhexsx-number-sy-number-size-number-number)
+  - [lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> integer](#lurektilemapfromscreenhexsx-number-sy-number-size-number-integer)
   - [lurek.tilemap.fromScreenIso(sx: number, sy: number, tw: number, th: number) -> number](#lurektilemapfromscreenisosx-number-sy-number-tw-number-th-number-number)
   - [lurek.tilemap.hexArea(q: integer, r: integer, radius: integer) -> table](#lurektilemaphexareaq-integer-r-integer-radius-integer-table)
-  - [lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> number](#lurektilemaphexdistanceq1-integer-r1-integer-q2-integer-r2-integer-number)
+  - [lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> integer](#lurektilemaphexdistanceq1-integer-r1-integer-q2-integer-r2-integer-integer)
   - [lurek.tilemap.hexLine(q1: integer, r1: integer, q2: integer, r2: integer) -> table](#lurektilemaphexlineq1-integer-r1-integer-q2-integer-r2-integer-table)
   - [lurek.tilemap.hexNeighbors(q: integer, r: integer) -> table](#lurektilemaphexneighborsq-integer-r-integer-table)
-  - [lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> number](#lurektilemaphexreflectq-integer-r-integer-centerq-integer-centerr-integer-axis-string-number)
+  - [lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> integer](#lurektilemaphexreflectq-integer-r-integer-centerq-integer-centerr-integer-axis-string-integer)
   - [lurek.tilemap.hexRing(q: integer, r: integer, radius: integer) -> table](#lurektilemaphexringq-integer-r-integer-radius-integer-table)
-  - [lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> number](#lurektilemaphexrotateq-integer-r-integer-centerq-integer-centerr-integer-steps-integer-number)
-  - [lurek.tilemap.hexRound(q: number, r: number) -> number](#lurektilemaphexroundq-number-r-number-number)
+  - [lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> integer](#lurektilemaphexrotateq-integer-r-integer-centerq-integer-centerr-integer-steps-integer-integer)
+  - [lurek.tilemap.hexRound(q: number, r: number) -> integer](#lurektilemaphexroundq-number-r-number-integer)
   - [lurek.tilemap.hexSpiral(q: integer, r: integer, radius: integer) -> table](#lurektilemaphexspiralq-integer-r-integer-radius-integer-table)
-  - [lurek.tilemap.isoDirectionFromAngle(angle: number) -> number](#lurektilemapisodirectionfromangleangle-number-number)
+  - [lurek.tilemap.isoDirectionFromAngle(angle: number) -> integer](#lurektilemapisodirectionfromangleangle-number-integer)
   - [lurek.tilemap.isoDirectionName(direction: integer) -> string](#lurektilemapisodirectionnamedirection-integer-string)
-  - [lurek.tilemap.isoRotate(direction: integer, steps: integer) -> number](#lurektilemapisorotatedirection-integer-steps-integer-number)
+  - [lurek.tilemap.isoRotate(direction: integer, steps: integer) -> integer](#lurektilemapisorotatedirection-integer-steps-integer-integer)
   - [lurek.tilemap.loadTMX(xml: string) -> table](#lurektilemaploadtmxxml-string-table)
   - [lurek.tilemap.newAutoTileSheet(tileW: integer, tileH: integer, layout: string) -> LAutoTileSheet](#lurektilemapnewautotilesheettilew-integer-tileh-integer-layout-string-lautotilesheet)
   - [lurek.tilemap.newChunkMap([chunkSize]: integer) -> LChunkMap](#lurektilemapnewchunkmapchunksize-integer-lchunkmap)
-  - [lurek.tilemap.newIsoMap(width: number, height: number, tileW: number, tileH: number, levelHeight: number, [partCount]: number) -> LIsoMap](#lurektilemapnewisomapwidth-number-height-number-tilew-number-tileh-number-levelheight-number-partcount-number-lisomap)
+  - [lurek.tilemap.newIsoMap(width: integer, height: integer, tileW: integer, tileH: integer, levelHeight: integer, [partCount]: integer) -> LIsoMap](#lurektilemapnewisomapwidth-integer-height-integer-tilew-integer-tileh-integer-levelheight-integer-partcount-integer-lisomap)
   - [lurek.tilemap.newLargeMapRenderer(tileW: integer, tileH: integer) -> LLargeMapRenderer](#lurektilemapnewlargemaprenderertilew-integer-tileh-integer-llargemaprenderer)
   - [lurek.tilemap.newMapBlock(width: integer, height: integer, [layers]: integer, [segmentSize]: integer) -> LMapBlock](#lurektilemapnewmapblockwidth-integer-height-integer-layers-integer-segmentsize-integer-lmapblock)
-  - [lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|number, segmentSizeOrHeight: number, [segmentSize]: number) -> LMapGen](#lurektilemapnewmapgengroup-lmapgroup-presetorwidth-stringnumber-segmentsizeorheight-number-segmentsize-number-lmapgen)
+  - [lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|integer, segmentSizeOrHeight: integer, [segmentSize]: integer) -> LMapGen](#lurektilemapnewmapgengroup-lmapgroup-presetorwidth-stringinteger-segmentsizeorheight-integer-segmentsize-integer-lmapgen)
   - [lurek.tilemap.newMapGroup(name: string) -> LMapGroup](#lurektilemapnewmapgroupname-string-lmapgroup)
   - [lurek.tilemap.newMapScript() -> LMapScript](#lurektilemapnewmapscript-lmapscript)
   - [lurek.tilemap.newTileMap(tileWidth: integer, tileHeight: integer, [chunkSize]: integer) -> LTileMap](#lurektilemapnewtilemaptilewidth-integer-tileheight-integer-chunksize-integer-ltilemap)
-  - [lurek.tilemap.newTileSet(firstGid: number, tileCount: number, columns: number, tileWidth: number, tileHeight: number, [spacing]: number, [margin]: number) -> LTileSet](#lurektilemapnewtilesetfirstgid-number-tilecount-number-columns-number-tilewidth-number-tileheight-number-spacing-number-margin-number-ltileset)
+  - [lurek.tilemap.newTileSet(firstGid: integer, tileCount: integer, columns: integer, tileWidth: integer, tileHeight: integer, [spacing]: integer, [margin]: integer) -> LTileSet](#lurektilemapnewtilesetfirstgid-integer-tilecount-integer-columns-integer-tilewidth-integer-tileheight-integer-spacing-integer-margin-integer-ltileset)
   - [lurek.tilemap.toScreenHex(q: integer, r: integer, size: number) -> number](#lurektilemaptoscreenhexq-integer-r-integer-size-number-number)
   - [lurek.tilemap.toScreenIso(tx: number, ty: number, tw: number, th: number) -> number](#lurektilemaptoscreenisotx-number-ty-number-tw-number-th-number-number)
 - [Types and Methods](#types-and-methods)
   - [LAutoTileSheet](#lautotilesheet)
   - [LAutoTileSheet:applyToTileSet(tileSet: LTileSet, typeName: string, [startGid]: integer)](#lautotilesheetapplytotilesettileset-ltileset-typename-string-startgid-integer)
-  - [LAutoTileSheet:getBitmaskForTile(tileId: integer) -> number](#lautotilesheetgetbitmaskfortiletileid-integer-number)
+  - [LAutoTileSheet:getBitmaskForTile(tileId: integer) -> integer](#lautotilesheetgetbitmaskfortiletileid-integer-integer)
   - [LAutoTileSheet:getLayout() -> string](#lautotilesheetgetlayout-string)
-  - [LAutoTileSheet:getQuad(tileId: integer) -> number](#lautotilesheetgetquadtileid-integer-number)
-  - [LAutoTileSheet:getTileCount() -> number](#lautotilesheetgettilecount-number)
-  - [LAutoTileSheet:getTileForBitmask(bitmask: integer) -> number](#lautotilesheetgettileforbitmaskbitmask-integer-number)
-  - [LAutoTileSheet:getTileHeight() -> number](#lautotilesheetgettileheight-number)
-  - [LAutoTileSheet:getTileWidth() -> number](#lautotilesheetgettilewidth-number)
+  - [LAutoTileSheet:getQuad(tileId: integer) -> integer](#lautotilesheetgetquadtileid-integer-integer)
+  - [LAutoTileSheet:getTileCount() -> integer](#lautotilesheetgettilecount-integer)
+  - [LAutoTileSheet:getTileForBitmask(bitmask: integer) -> integer](#lautotilesheetgettileforbitmaskbitmask-integer-integer)
+  - [LAutoTileSheet:getTileHeight() -> integer](#lautotilesheetgettileheight-integer)
+  - [LAutoTileSheet:getTileWidth() -> integer](#lautotilesheetgettilewidth-integer)
   - [LAutoTileSheet:type() -> string](#lautotilesheettype-string)
   - [LAutoTileSheet:typeOf(name: string) -> boolean](#lautotilesheettypeofname-string-boolean)
   - [LChunkMap](#lchunkmap)
-  - [LChunkMap:chunkTileRange(cx: integer, cy: integer) -> number](#lchunkmapchunktilerangecx-integer-cy-integer-number)
+  - [LChunkMap:chunkTileRange(cx: integer, cy: integer) -> integer](#lchunkmapchunktilerangecx-integer-cy-integer-integer)
   - [LChunkMap:clearTile(x: integer, y: integer)](#lchunkmapcleartilex-integer-y-integer)
   - [LChunkMap:fillRect(x0: integer, y0: integer, x1: integer, y1: integer, gid: integer)](#lchunkmapfillrectx0-integer-y0-integer-x1-integer-y1-integer-gid-integer)
   - [LChunkMap:getChunksInView(vx: number, vy: number, vw: number, vh: number, tw: number, th: number) -> table](#lchunkmapgetchunksinviewvx-number-vy-number-vw-number-vh-number-tw-number-th-number-table)
-  - [LChunkMap:getChunkSize() -> number](#lchunkmapgetchunksize-number)
+  - [LChunkMap:getChunkSize() -> integer](#lchunkmapgetchunksize-integer)
   - [LChunkMap:getLoadedChunks() -> table](#lchunkmapgetloadedchunks-table)
-  - [LChunkMap:getTile(x: integer, y: integer) -> number](#lchunkmapgettilex-integer-y-integer-number)
+  - [LChunkMap:getTile(x: integer, y: integer) -> integer](#lchunkmapgettilex-integer-y-integer-integer)
   - [LChunkMap:loadChunk(cx: integer, cy: integer)](#lchunkmaploadchunkcx-integer-cy-integer)
   - [LChunkMap:setTile(x: integer, y: integer, gid: integer)](#lchunkmapsettilex-integer-y-integer-gid-integer)
   - [LChunkMap:type() -> string](#lchunkmaptype-string)
   - [LChunkMap:typeOf(name: string) -> boolean](#lchunkmaptypeofname-string-boolean)
   - [LChunkMap:unloadChunk(cx: integer, cy: integer)](#lchunkmapunloadchunkcx-integer-cy-integer)
   - [LIsoMap](#lisomap)
-  - [LIsoMap:addLevel() -> number](#lisomapaddlevel-number)
+  - [LIsoMap:addLevel() -> integer](#lisomapaddlevel-integer)
   - [LIsoMap:fillLevel(z: integer, part: integer, gid: integer)](#lisomapfilllevelz-integer-part-integer-gid-integer)
-  - [LIsoMap:getHeight() -> number](#lisomapgetheight-number)
-  - [LIsoMap:getLevelCount() -> number](#lisomapgetlevelcount-number)
-  - [LIsoMap:getLevelHeight() -> number](#lisomapgetlevelheight-number)
-  - [LIsoMap:getPartCount() -> number](#lisomapgetpartcount-number)
-  - [LIsoMap:getPartOrder() -> table](#lisomapgetpartorder-table)
-  - [LIsoMap:getTileHeight() -> number](#lisomapgettileheight-number)
-  - [LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> number](#lisomapgettilepartz-integer-x-integer-y-integer-part-integer-number)
-  - [LIsoMap:getTileWidth() -> number](#lisomapgettilewidth-number)
-  - [LIsoMap:getWidth() -> number](#lisomapgetwidth-number)
+  - [LIsoMap:getHeight() -> integer](#lisomapgetheight-integer)
+  - [LIsoMap:getLevelCount() -> integer](#lisomapgetlevelcount-integer)
+  - [LIsoMap:getLevelHeight() -> integer](#lisomapgetlevelheight-integer)
+  - [LIsoMap:getPartCount() -> integer](#lisomapgetpartcount-integer)
+  - [LIsoMap:getPartOrder() -> integer[]](#lisomapgetpartorder-integer)
+  - [LIsoMap:getTileHeight() -> integer](#lisomapgettileheight-integer)
+  - [LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> integer](#lisomapgettilepartz-integer-x-integer-y-integer-part-integer-integer)
+  - [LIsoMap:getTileWidth() -> integer](#lisomapgettilewidth-integer)
+  - [LIsoMap:getWidth() -> integer](#lisomapgetwidth-integer)
   - [LIsoMap:isLevelVisible(z: integer) -> boolean](#lisomapislevelvisiblez-integer-boolean)
   - [LIsoMap:screenToTile(sx: number, sy: number) -> number](#lisomapscreentotilesx-number-sy-number-number)
   - [LIsoMap:setLevelVisible(z: integer, visible: boolean)](#lisomapsetlevelvisiblez-integer-visible-boolean)
   - [LIsoMap:setOrigin(x: number, y: number)](#lisomapsetoriginx-number-y-number)
-  - [LIsoMap:setPartOrder(order: table) -> LuaValue](#lisomapsetpartorderorder-table-luavalue)
+  - [LIsoMap:setPartOrder(order: table)](#lisomapsetpartorderorder-table)
   - [LIsoMap:setTilePart(z: integer, x: integer, y: integer, part: integer, gid: integer)](#lisomapsettilepartz-integer-x-integer-y-integer-part-integer-gid-integer)
   - [LIsoMap:tileToScreen(tx: number, ty: number, tz: number) -> number](#lisomaptiletoscreentx-number-ty-number-tz-number-number)
   - [LIsoMap:type() -> string](#lisomaptype-string)
   - [LIsoMap:typeOf(name: string) -> boolean](#lisomaptypeofname-string-boolean)
   - [LLargeMapRenderer](#llargemaprenderer)
-  - [LLargeMapRenderer:getChunkSize() -> number](#llargemaprenderergetchunksize-number)
-  - [LLargeMapRenderer:getMapSize() -> number](#llargemaprenderergetmapsize-number)
-  - [LLargeMapRenderer:getTile(x: integer, y: integer) -> number](#llargemaprenderergettilex-integer-y-integer-number)
-  - [LLargeMapRenderer:getTilesetColumns() -> number](#llargemaprenderergettilesetcolumns-number)
-  - [LLargeMapRenderer:getTotalChunks() -> number](#llargemaprenderergettotalchunks-number)
-  - [LLargeMapRenderer:getVisibleChunks() -> number](#llargemaprenderergetvisiblechunks-number)
+  - [LLargeMapRenderer:getChunkSize() -> integer](#llargemaprenderergetchunksize-integer)
+  - [LLargeMapRenderer:getMapSize() -> integer](#llargemaprenderergetmapsize-integer)
+  - [LLargeMapRenderer:getTile(x: integer, y: integer) -> integer](#llargemaprenderergettilex-integer-y-integer-integer)
+  - [LLargeMapRenderer:getTilesetColumns() -> integer](#llargemaprenderergettilesetcolumns-integer)
+  - [LLargeMapRenderer:getTotalChunks() -> integer](#llargemaprenderergettotalchunks-integer)
+  - [LLargeMapRenderer:getVisibleChunks() -> integer](#llargemaprenderergetvisiblechunks-integer)
   - [LLargeMapRenderer:invalidateAll()](#llargemaprendererinvalidateall)
   - [LLargeMapRenderer:invalidateChunk(cx: integer, cy: integer)](#llargemaprendererinvalidatechunkcx-integer-cy-integer)
   - [LLargeMapRenderer:isLodEnabled() -> boolean](#llargemaprendererislodenabled-boolean)
@@ -109,17 +109,17 @@
   - [LLargeMapRenderer:type() -> string](#llargemaprenderertype-string)
   - [LLargeMapRenderer:typeOf(name: string) -> boolean](#llargemaprenderertypeofname-string-boolean)
   - [LMapBlock](#lmapblock)
-  - [LMapBlock:getDimensions() -> number](#lmapblockgetdimensions-number)
-  - [LMapBlock:getHeight() -> number](#lmapblockgetheight-number)
-  - [LMapBlock:getHeightInSegments() -> number](#lmapblockgetheightinsegments-number)
-  - [LMapBlock:getLayerCount() -> number](#lmapblockgetlayercount-number)
+  - [LMapBlock:getDimensions() -> integer](#lmapblockgetdimensions-integer)
+  - [LMapBlock:getHeight() -> integer](#lmapblockgetheight-integer)
+  - [LMapBlock:getHeightInSegments() -> integer](#lmapblockgetheightinsegments-integer)
+  - [LMapBlock:getLayerCount() -> integer](#lmapblockgetlayercount-integer)
   - [LMapBlock:getName() -> string](#lmapblockgetname-string)
-  - [LMapBlock:getSegmentSize() -> number](#lmapblockgetsegmentsize-number)
-  - [LMapBlock:getSide(edge: string, segment: integer) -> number](#lmapblockgetsideedge-string-segment-integer-number)
-  - [LMapBlock:getTile(layer: integer, x: integer, y: integer) -> number](#lmapblockgettilelayer-integer-x-integer-y-integer-number)
+  - [LMapBlock:getSegmentSize() -> integer](#lmapblockgetsegmentsize-integer)
+  - [LMapBlock:getSide(edge: string, segment: integer) -> integer](#lmapblockgetsideedge-string-segment-integer-integer)
+  - [LMapBlock:getTile(layer: integer, x: integer, y: integer) -> integer](#lmapblockgettilelayer-integer-x-integer-y-integer-integer)
   - [LMapBlock:getWeight() -> number](#lmapblockgetweight-number)
-  - [LMapBlock:getWidth() -> number](#lmapblockgetwidth-number)
-  - [LMapBlock:getWidthInSegments() -> number](#lmapblockgetwidthinsegments-number)
+  - [LMapBlock:getWidth() -> integer](#lmapblockgetwidth-integer)
+  - [LMapBlock:getWidthInSegments() -> integer](#lmapblockgetwidthinsegments-integer)
   - [LMapBlock:setName(name: string)](#lmapblocksetnamename-string)
   - [LMapBlock:setSide(edge: string, segment: integer, sideId: integer)](#lmapblocksetsideedge-string-segment-integer-sideid-integer)
   - [LMapBlock:setTile(layer: integer, x: integer, y: integer, gid: integer)](#lmapblocksettilelayer-integer-x-integer-y-integer-gid-integer)
@@ -133,19 +133,19 @@
   - [LMapGroup](#lmapgroup)
   - [LMapGroup:addBlock(block: LMapBlock)](#lmapgroupaddblockblock-lmapblock)
   - [LMapGroup:addScript(script: LMapScript)](#lmapgroupaddscriptscript-lmapscript)
-  - [LMapGroup:getBlockCount() -> number](#lmapgroupgetblockcount-number)
+  - [LMapGroup:getBlockCount() -> integer](#lmapgroupgetblockcount-integer)
   - [LMapGroup:getName() -> string](#lmapgroupgetname-string)
-  - [LMapGroup:getScriptCount() -> number](#lmapgroupgetscriptcount-number)
+  - [LMapGroup:getScriptCount() -> integer](#lmapgroupgetscriptcount-integer)
   - [LMapGroup:removeBlock(idx: integer)](#lmapgroupremoveblockidx-integer)
   - [LMapGroup:type() -> string](#lmapgrouptype-string)
   - [LMapGroup:typeOf(name: string) -> boolean](#lmapgrouptypeofname-string-boolean)
   - [LMapScript](#lmapscript)
   - [LMapScript:addStep(stepDef: table)](#lmapscriptaddstepstepdef-table)
-  - [LMapScript:getStepCount() -> number](#lmapscriptgetstepcount-number)
+  - [LMapScript:getStepCount() -> integer](#lmapscriptgetstepcount-integer)
   - [LMapScript:type() -> string](#lmapscripttype-string)
   - [LMapScript:typeOf(name: string) -> boolean](#lmapscripttypeofname-string-boolean)
   - [LTileMap](#ltilemap)
-  - [LTileMap:addLayer(name: string, w: integer, h: integer) -> number](#ltilemapaddlayername-string-w-integer-h-integer-number)
+  - [LTileMap:addLayer(name: string, w: integer, h: integer) -> integer](#ltilemapaddlayername-string-w-integer-h-integer-integer)
   - [LTileMap:addTileSet(tileSet: LTileSet)](#ltilemapaddtilesettileset-ltileset)
   - [LTileMap:applyAutoTile(layer: integer, typeName: string)](#ltilemapapplyautotilelayer-integer-typename-string)
   - [LTileMap:applyAutoTile8(layer: integer, typeName: string)](#ltilemapapplyautotile8layer-integer-typename-string)
@@ -158,20 +158,20 @@
   - [LTileMap:findTilesByGid(layer: integer, gid: integer) -> table](#ltilemapfindtilesbygidlayer-integer-gid-integer-table)
   - [LTileMap:fireTileExit(gid: integer, entity: table, tx: integer, ty: integer)](#ltilemapfiretileexitgid-integer-entity-table-tx-integer-ty-integer)
   - [LTileMap:fireTileStep(gid: integer, entity: table, tx: integer, ty: integer)](#ltilemapfiretilestepgid-integer-entity-table-tx-integer-ty-integer)
-  - [LTileMap:getChunkSize() -> number](#ltilemapgetchunksize-number)
+  - [LTileMap:getChunkSize() -> integer](#ltilemapgetchunksize-integer)
   - [LTileMap:getLayerColor(idx: integer) -> number](#ltilemapgetlayercoloridx-integer-number)
-  - [LTileMap:getLayerCount() -> number](#ltilemapgetlayercount-number)
+  - [LTileMap:getLayerCount() -> integer](#ltilemapgetlayercount-integer)
   - [LTileMap:getLayerName(idx: integer) -> string](#ltilemapgetlayernameidx-integer-string)
   - [LTileMap:getLayerOffset(idx: integer) -> number](#ltilemapgetlayeroffsetidx-integer-number)
   - [LTileMap:getLayerParallax(idx: integer) -> number](#ltilemapgetlayerparallaxidx-integer-number)
   - [LTileMap:getLayerVisible(idx: integer) -> boolean](#ltilemapgetlayervisibleidx-integer-boolean)
   - [LTileMap:getOrientation() -> string](#ltilemapgetorientation-string)
-  - [LTileMap:getTile(layer: integer, x: integer, y: integer) -> number](#ltilemapgettilelayer-integer-x-integer-y-integer-number)
-  - [LTileMap:getTileDimensions() -> number](#ltilemapgettiledimensions-number)
-  - [LTileMap:getTileHeight() -> number](#ltilemapgettileheight-number)
+  - [LTileMap:getTile(layer: integer, x: integer, y: integer) -> integer](#ltilemapgettilelayer-integer-x-integer-y-integer-integer)
+  - [LTileMap:getTileDimensions() -> integer](#ltilemapgettiledimensions-integer)
+  - [LTileMap:getTileHeight() -> integer](#ltilemapgettileheight-integer)
   - [LTileMap:getTileSet(idx: integer) -> LTileSet](#ltilemapgettilesetidx-integer-ltileset)
-  - [LTileMap:getTileSetCount() -> number](#ltilemapgettilesetcount-number)
-  - [LTileMap:getTileWidth() -> number](#ltilemapgettilewidth-number)
+  - [LTileMap:getTileSetCount() -> integer](#ltilemapgettilesetcount-integer)
+  - [LTileMap:getTileWidth() -> integer](#ltilemapgettilewidth-integer)
   - [LTileMap:getViewport() -> number](#ltilemapgetviewport-number)
   - [LTileMap:isSolid(layer: integer, x: integer, y: integer) -> boolean](#ltilemapissolidlayer-integer-x-integer-y-integer-boolean)
   - [LTileMap:onTileEnter(gid: integer, func: function)](#ltilemapontileentergid-integer-func-function)
@@ -190,28 +190,28 @@
   - [LTileMap:sweepRect(layer: integer, x: number, y: number, w: number, h: number, dx: number, dy: number) -> number](#ltilemapsweeprectlayer-integer-x-number-y-number-w-number-h-number-dx-number-dy-number-number)
   - [LTileMap:tileToWorld(tx: integer, ty: integer) -> number](#ltilemaptiletoworldtx-integer-ty-integer-number)
   - [LTileMap:tileTypeIndex(layer: integer) -> table](#ltilemaptiletypeindexlayer-integer-table)
-  - [LTileMap:toNavGrid(layer: integer, gids: table) -> table](#ltilemaptonavgridlayer-integer-gids-table-table)
+  - [LTileMap:toNavGrid(layer: integer, gids: table) -> boolean[]](#ltilemaptonavgridlayer-integer-gids-table-boolean)
   - [LTileMap:type() -> string](#ltilemaptype-string)
   - [LTileMap:typeOf(name: string) -> boolean](#ltilemaptypeofname-string-boolean)
   - [LTileMap:update(dt: number)](#ltilemapupdatedt-number)
-  - [LTileMap:worldToTile(wx: number, wy: number) -> number](#ltilemapworldtotilewx-number-wy-number-number)
+  - [LTileMap:worldToTile(wx: number, wy: number) -> integer](#ltilemapworldtotilewx-number-wy-number-integer)
   - [LTileSet](#ltileset)
   - [LTileSet:getAnimation(tileId: integer) -> table](#ltilesetgetanimationtileid-integer-table)
-  - [LTileSet:getAutoTileId(typeName: string, bitmask: number) -> number](#ltilesetgetautotileidtypename-string-bitmask-number-number)
-  - [LTileSet:getAutoTileId8(typeName: string, bitmask: number) -> number](#ltilesetgetautotileid8typename-string-bitmask-number-number)
-  - [LTileSet:getColumns() -> number](#ltilesetgetcolumns-number)
-  - [LTileSet:getFirstGid() -> number](#ltilesetgetfirstgid-number)
-  - [LTileSet:getMargin() -> number](#ltilesetgetmargin-number)
+  - [LTileSet:getAutoTileId(typeName: string, bitmask: integer) -> integer](#ltilesetgetautotileidtypename-string-bitmask-integer-integer)
+  - [LTileSet:getAutoTileId8(typeName: string, bitmask: integer) -> integer](#ltilesetgetautotileid8typename-string-bitmask-integer-integer)
+  - [LTileSet:getColumns() -> integer](#ltilesetgetcolumns-integer)
+  - [LTileSet:getFirstGid() -> integer](#ltilesetgetfirstgid-integer)
+  - [LTileSet:getMargin() -> integer](#ltilesetgetmargin-integer)
   - [LTileSet:getQuad(tileId: integer) -> table](#ltilesetgetquadtileid-integer-table)
-  - [LTileSet:getSpacing() -> number](#ltilesetgetspacing-number)
-  - [LTileSet:getTileCount() -> number](#ltilesetgettilecount-number)
-  - [LTileSet:getTileDimensions() -> number](#ltilesetgettiledimensions-number)
-  - [LTileSet:getTileHeight() -> number](#ltilesetgettileheight-number)
-  - [LTileSet:getTileWidth() -> number](#ltilesetgettilewidth-number)
+  - [LTileSet:getSpacing() -> integer](#ltilesetgetspacing-integer)
+  - [LTileSet:getTileCount() -> integer](#ltilesetgettilecount-integer)
+  - [LTileSet:getTileDimensions() -> integer](#ltilesetgettiledimensions-integer)
+  - [LTileSet:getTileHeight() -> integer](#ltilesetgettileheight-integer)
+  - [LTileSet:getTileWidth() -> integer](#ltilesetgettilewidth-integer)
   - [LTileSet:isSolid(tileId: integer) -> boolean](#ltilesetissolidtileid-integer-boolean)
   - [LTileSet:setAnimation(tileId: integer, frames: table)](#ltilesetsetanimationtileid-integer-frames-table)
-  - [LTileSet:setAutoTileRule(typeName: string, bitmask: number, tileId: integer)](#ltilesetsetautotileruletypename-string-bitmask-number-tileid-integer)
-  - [LTileSet:setAutoTileRule8(typeName: string, bitmask: number, tileId: integer)](#ltilesetsetautotilerule8typename-string-bitmask-number-tileid-integer)
+  - [LTileSet:setAutoTileRule(typeName: string, bitmask: integer, tileId: integer)](#ltilesetsetautotileruletypename-string-bitmask-integer-tileid-integer)
+  - [LTileSet:setAutoTileRule8(typeName: string, bitmask: integer, tileId: integer)](#ltilesetsetautotilerule8typename-string-bitmask-integer-tileid-integer)
   - [LTileSet:setSolid(tileId: integer, solid: boolean)](#ltilesetsetsolidtileid-integer-solid-boolean)
   - [LTileSet:type() -> string](#ltilesettype-string)
   - [LTileSet:typeOf(name: string) -> boolean](#ltilesettypeofname-string-boolean)
@@ -308,20 +308,20 @@ end
 
 ```lua
 lurek.tilemap.fromLDtk(jsonStr: string, [levelName]: string) -> LTileMap -- Loads a tilemap from an LDtk JSON string, optionally targeting a specific level.
-lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> number -- Converts screen-space pixel coordinates to axial hex coordinates.
+lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> integer -- Converts screen-space pixel coordinates to axial hex coordinates.
 lurek.tilemap.fromScreenIso(sx: number, sy: number, tw: number, th: number) -> number -- Converts screen-space coordinates back to tile coordinates for isometric projection.
 lurek.tilemap.hexArea(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells within a filled area of a given radius.
-lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> number -- Computes the hex grid distance between two axial coordinates.
+lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> integer -- Computes the hex grid distance between two axial coordinates.
 lurek.tilemap.hexLine(q1: integer, r1: integer, q2: integer, r2: integer) -> table -- Returns all hex cells along a line between two axial coordinates.
 lurek.tilemap.hexNeighbors(q: integer, r: integer) -> table -- Returns the six neighboring hex cells of a given axial coordinate.
-lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> number -- Reflects a hex cell across an axis through a center point.
+lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> integer -- Reflects a hex cell across an axis through a center point.
 lurek.tilemap.hexRing(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells forming a ring at a given radius around a center.
-lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> number -- Rotates a hex cell around a center point by a number of 60-degree steps.
-lurek.tilemap.hexRound(q: number, r: number) -> number -- Rounds fractional axial hex coordinates to the nearest integer hex cell.
+lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> integer -- Rotates a hex cell around a center point by a number of 60-degree steps.
+lurek.tilemap.hexRound(q: number, r: number) -> integer -- Rounds fractional axial hex coordinates to the nearest integer hex cell.
 lurek.tilemap.hexSpiral(q: integer, r: integer, radius: integer) -> table -- Returns all hex cells in a spiral pattern out to a given radius.
-lurek.tilemap.isoDirectionFromAngle(angle: number) -> number -- Converts an angle in degrees to the nearest isometric direction index.
+lurek.tilemap.isoDirectionFromAngle(angle: number) -> integer -- Converts an angle in degrees to the nearest isometric direction index.
 lurek.tilemap.isoDirectionName(direction: integer) -> string -- Returns a human-readable name for an isometric direction index.
-lurek.tilemap.isoRotate(direction: integer, steps: integer) -> number -- Rotates an isometric direction index by a number of 90-degree steps.
+lurek.tilemap.isoRotate(direction: integer, steps: integer) -> integer -- Rotates an isometric direction index by a number of 90-degree steps.
 lurek.tilemap.loadTMX(xml: string) -> table -- Parses a TMX (Tiled XML) string and returns a table describing the map structure.
 lurek.tilemap.newAutoTileSheet(tileW: integer, tileH: integer, layout: string) -> LAutoTileSheet -- Creates an auto-tile sheet with a given tile size and layout.
 lurek.tilemap.newChunkMap([chunkSize]: integer) -> LChunkMap -- Creates a new infinite chunk-based tile map.
@@ -396,7 +396,7 @@ do
 end
 ```
 
-### `lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> number`
+### `lurek.tilemap.fromScreenHex(sx: number, sy: number, size: number) -> integer`
 
 Converts screen-space pixel coordinates to axial hex coordinates.
 
@@ -406,7 +406,7 @@ Converts screen-space pixel coordinates to axial hex coordinates.
 - `sy` (`number`, required) - Screen Y.
 - `size` (`number`, required) - Hex cell size in pixels.
 
-**Returns**: `number` - Axial Q.
+**Returns**: `integer` - Axial Q.
 
 #### Example
 
@@ -476,7 +476,7 @@ do
 end
 ```
 
-### `lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> number`
+### `lurek.tilemap.hexDistance(q1: integer, r1: integer, q2: integer, r2: integer) -> integer`
 
 Computes the hex grid distance between two axial coordinates.
 
@@ -487,7 +487,7 @@ Computes the hex grid distance between two axial coordinates.
 - `q2` (`integer`, required) - Second Q.
 - `r2` (`integer`, required) - Second R.
 
-**Returns**: `number` - Distance in hex steps.
+**Returns**: `integer` - Distance in hex steps.
 
 #### Example
 
@@ -560,7 +560,7 @@ do
 end
 ```
 
-### `lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> number`
+### `lurek.tilemap.hexReflect(q: integer, r: integer, centerQ: integer, centerR: integer, axis: string) -> integer`
 
 Reflects a hex cell across an axis through a center point.
 
@@ -572,7 +572,7 @@ Reflects a hex cell across an axis through a center point.
 - `centerR` (`integer`, required) - Pivot R.
 - `axis` (`string`, required) - Reflection axis name.
 
-**Returns**: `number` - Reflected Q.
+**Returns**: `integer` - Reflected Q.
 
 #### Example
 
@@ -612,7 +612,7 @@ do
 end
 ```
 
-### `lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> number`
+### `lurek.tilemap.hexRotate(q: integer, r: integer, centerQ: integer, centerR: integer, steps: integer) -> integer`
 
 Rotates a hex cell around a center point by a number of 60-degree steps.
 
@@ -624,7 +624,7 @@ Rotates a hex cell around a center point by a number of 60-degree steps.
 - `centerR` (`integer`, required) - Pivot R.
 - `steps` (`integer`, required) - Number of 60-degree rotation steps (positive = clockwise).
 
-**Returns**: `number` - Rotated Q.
+**Returns**: `integer` - Rotated Q.
 
 #### Example
 
@@ -639,7 +639,7 @@ do
 end
 ```
 
-### `lurek.tilemap.hexRound(q: number, r: number) -> number`
+### `lurek.tilemap.hexRound(q: number, r: number) -> integer`
 
 Rounds fractional axial hex coordinates to the nearest integer hex cell.
 
@@ -648,7 +648,7 @@ Rounds fractional axial hex coordinates to the nearest integer hex cell.
 - `q` (`number`, required) - Fractional Q.
 - `r` (`number`, required) - Fractional R.
 
-**Returns**: `number` - Rounded Q.
+**Returns**: `integer` - Rounded Q.
 
 #### Example
 
@@ -689,7 +689,7 @@ do
 end
 ```
 
-### `lurek.tilemap.isoDirectionFromAngle(angle: number) -> number`
+### `lurek.tilemap.isoDirectionFromAngle(angle: number) -> integer`
 
 Converts an angle in degrees to the nearest isometric direction index.
 
@@ -697,7 +697,7 @@ Converts an angle in degrees to the nearest isometric direction index.
 
 - `angle` (`number`, required) - Angle in degrees.
 
-**Returns**: `number` - Direction index.
+**Returns**: `integer` - Direction index.
 
 #### Example
 
@@ -737,7 +737,7 @@ do
 end
 ```
 
-### `lurek.tilemap.isoRotate(direction: integer, steps: integer) -> number`
+### `lurek.tilemap.isoRotate(direction: integer, steps: integer) -> integer`
 
 Rotates an isometric direction index by a number of 90-degree steps.
 
@@ -746,7 +746,7 @@ Rotates an isometric direction index by a number of 90-degree steps.
 - `direction` (`integer`, required) - Current direction (0..3).
 - `steps` (`integer`, required) - Number of 90-degree steps.
 
-**Returns**: `number` - Rotated direction.
+**Returns**: `integer` - Rotated direction.
 
 #### Example
 
@@ -857,18 +857,18 @@ do
 end
 ```
 
-### `lurek.tilemap.newIsoMap(width: number, height: number, tileW: number, tileH: number, levelHeight: number, [partCount]: number) -> LIsoMap`
+### `lurek.tilemap.newIsoMap(width: integer, height: integer, tileW: integer, tileH: integer, levelHeight: integer, [partCount]: integer) -> LIsoMap`
 
 Creates a new isometric map with the given dimensions and tile geometry.
 
 **Parameters**
 
-- `width` (`number`, required) - Map width in tiles.
-- `height` (`number`, required) - Map height in tiles.
-- `tileW` (`number`, required) - Tile width in pixels.
-- `tileH` (`number`, required) - Tile height in pixels.
-- `levelHeight` (`number`, required) - Vertical pixel offset between levels.
-- `partCount` (`number`, optional) - Number of tile parts per cell (default 4).
+- `width` (`integer`, required) - Map width in tiles.
+- `height` (`integer`, required) - Map height in tiles.
+- `tileW` (`integer`, required) - Tile width in pixels.
+- `tileH` (`integer`, required) - Tile height in pixels.
+- `levelHeight` (`integer`, required) - Vertical pixel offset between levels.
+- `partCount` (`integer`, optional) - Number of tile parts per cell (default 4).
 
 **Returns**: `LIsoMap` - New isometric map.
 
@@ -952,16 +952,16 @@ do
 end
 ```
 
-### `lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|number, segmentSizeOrHeight: number, [segmentSize]: number) -> LMapGen`
+### `lurek.tilemap.newMapGen(group: LMapGroup, presetOrWidth: string|integer, segmentSizeOrHeight: integer, [segmentSize]: integer) -> LMapGen`
 
 Creates a procedural map generator from a group and either a size preset or explicit dimensions.
 
 **Parameters**
 
 - `group` (`LMapGroup`, required) - Block group to generate from.
-- `presetOrWidth` (`string|number`, required) - Size preset (`"small"`, `"medium"`, `"large"`) or width in tiles.
-- `segmentSizeOrHeight` (`number`, required) - Segment size (if preset) or height in tiles.
-- `segmentSize` (`number`, optional) - Segment size when using explicit dimensions.
+- `presetOrWidth` (`string|integer`, required) - Size preset (`"small"`, `"medium"`, `"large"`) or width in tiles.
+- `segmentSizeOrHeight` (`integer`, required) - Segment size (if preset) or height in tiles.
+- `segmentSize` (`integer`, optional) - Segment size when using explicit dimensions.
 
 **Returns**: `LMapGen` - New map generator.
 
@@ -1052,19 +1052,19 @@ do
 end
 ```
 
-### `lurek.tilemap.newTileSet(firstGid: number, tileCount: number, columns: number, tileWidth: number, tileHeight: number, [spacing]: number, [margin]: number) -> LTileSet`
+### `lurek.tilemap.newTileSet(firstGid: integer, tileCount: integer, columns: integer, tileWidth: integer, tileHeight: integer, [spacing]: integer, [margin]: integer) -> LTileSet`
 
 Creates a new tileset from atlas parameters.
 
 **Parameters**
 
-- `firstGid` (`number`, required) - First global tile ID.
-- `tileCount` (`number`, required) - Total tiles in the set.
-- `columns` (`number`, required) - Columns in the atlas image.
-- `tileWidth` (`number`, required) - Tile width in pixels.
-- `tileHeight` (`number`, required) - Tile height in pixels.
-- `spacing` (`number`, optional) - Pixel spacing between tiles (default 0).
-- `margin` (`number`, optional) - Pixel margin around the atlas edge (default 0).
+- `firstGid` (`integer`, required) - First global tile ID.
+- `tileCount` (`integer`, required) - Total tiles in the set.
+- `columns` (`integer`, required) - Columns in the atlas image.
+- `tileWidth` (`integer`, required) - Tile width in pixels.
+- `tileHeight` (`integer`, required) - Tile height in pixels.
+- `spacing` (`integer`, optional) - Pixel spacing between tiles (default 0).
+- `margin` (`integer`, optional) - Pixel margin around the atlas edge (default 0).
 
 **Returns**: `LTileSet` - New tileset.
 
@@ -1197,7 +1197,7 @@ do
 end
 ```
 
-### `LAutoTileSheet:getBitmaskForTile(tileId: integer) -> number`
+### `LAutoTileSheet:getBitmaskForTile(tileId: integer) -> integer`
 
 Returns the bitmask associated with a tile in this auto-tile sheet.
 
@@ -1205,7 +1205,7 @@ Returns the bitmask associated with a tile in this auto-tile sheet.
 
 - `tileId` (`integer`, required) - Tile ID (1-based).
 
-**Returns**: `number` - Bitmask value, or nil if not found.
+**Returns**: `integer` - Bitmask value, or nil if not found.
 
 #### Example
 
@@ -1240,7 +1240,7 @@ do
 end
 ```
 
-### `LAutoTileSheet:getQuad(tileId: integer) -> number`
+### `LAutoTileSheet:getQuad(tileId: integer) -> integer`
 
 Returns the source rectangle for a tile in the auto-tile sheet.
 
@@ -1248,7 +1248,7 @@ Returns the source rectangle for a tile in the auto-tile sheet.
 
 - `tileId` (`integer`, required) - Tile ID (1-based).
 
-**Returns**: `number` - X offset in pixels.
+**Returns**: `integer` - X offset in pixels.
 
 #### Example
 
@@ -1266,11 +1266,11 @@ do
 end
 ```
 
-### `LAutoTileSheet:getTileCount() -> number`
+### `LAutoTileSheet:getTileCount() -> integer`
 
 Returns the total number of tiles in this auto-tile sheet.
 
-**Returns**: `number` - Tile count.
+**Returns**: `integer` - Tile count.
 
 #### Example
 
@@ -1283,7 +1283,7 @@ do
 end
 ```
 
-### `LAutoTileSheet:getTileForBitmask(bitmask: integer) -> number`
+### `LAutoTileSheet:getTileForBitmask(bitmask: integer) -> integer`
 
 Looks up which tile corresponds to a given bitmask value.
 
@@ -1291,7 +1291,7 @@ Looks up which tile corresponds to a given bitmask value.
 
 - `bitmask` (`integer`, required) - Bitmask to resolve.
 
-**Returns**: `number` - Tile ID (1-based), or nil if no tile matches.
+**Returns**: `integer` - Tile ID (1-based), or nil if no tile matches.
 
 #### Example
 
@@ -1306,11 +1306,11 @@ do
 end
 ```
 
-### `LAutoTileSheet:getTileHeight() -> number`
+### `LAutoTileSheet:getTileHeight() -> integer`
 
 Returns the height of each tile in the auto-tile sheet, in pixels.
 
-**Returns**: `number` - Tile height.
+**Returns**: `integer` - Tile height.
 
 #### Example
 
@@ -1323,11 +1323,11 @@ do
 end
 ```
 
-### `LAutoTileSheet:getTileWidth() -> number`
+### `LAutoTileSheet:getTileWidth() -> integer`
 
 Returns the width of each tile in the auto-tile sheet, in pixels.
 
-**Returns**: `number` - Tile width.
+**Returns**: `integer` - Tile width.
 
 #### Example
 
@@ -1402,7 +1402,7 @@ do
 end
 ```
 
-### `LChunkMap:chunkTileRange(cx: integer, cy: integer) -> number`
+### `LChunkMap:chunkTileRange(cx: integer, cy: integer) -> integer`
 
 Returns the tile-coordinate range covered by a specific chunk.
 
@@ -1411,7 +1411,7 @@ Returns the tile-coordinate range covered by a specific chunk.
 - `cx` (`integer`, required) - Chunk X coordinate.
 - `cy` (`integer`, required) - Chunk Y coordinate.
 
-**Returns**: `number` - Minimum tile X.
+**Returns**: `integer` - Minimum tile X.
 
 #### Example
 
@@ -1505,11 +1505,11 @@ do
 end
 ```
 
-### `LChunkMap:getChunkSize() -> number`
+### `LChunkMap:getChunkSize() -> integer`
 
 Returns the size of each chunk in tiles per side.
 
-**Returns**: `number` - Chunk size.
+**Returns**: `integer` - Chunk size.
 
 #### Example
 
@@ -1545,7 +1545,7 @@ do
 end
 ```
 
-### `LChunkMap:getTile(x: integer, y: integer) -> number`
+### `LChunkMap:getTile(x: integer, y: integer) -> integer`
 
 Returns the tile GID at the given world-tile coordinate.
 
@@ -1554,7 +1554,7 @@ Returns the tile GID at the given world-tile coordinate.
 - `x` (`integer`, required) - Tile X coordinate.
 - `y` (`integer`, required) - Tile Y coordinate.
 
-**Returns**: `number` - Global tile ID.
+**Returns**: `integer` - Global tile ID.
 
 #### Example
 
@@ -1703,11 +1703,11 @@ do
 end
 ```
 
-### `LIsoMap:addLevel() -> number`
+### `LIsoMap:addLevel() -> integer`
 
 Adds a new vertical level to the isometric map and returns its index.
 
-**Returns**: `number` - Index of the new level (1-based).
+**Returns**: `integer` - Index of the new level (1-based).
 
 #### Example
 
@@ -1747,11 +1747,11 @@ do
 end
 ```
 
-### `LIsoMap:getHeight() -> number`
+### `LIsoMap:getHeight() -> integer`
 
 Returns the map height in tiles. This method is available to Lua scripts.
 
-**Returns**: `number` - Height.
+**Returns**: `integer` - Height.
 
 #### Example
 
@@ -1764,11 +1764,11 @@ do
 end
 ```
 
-### `LIsoMap:getLevelCount() -> number`
+### `LIsoMap:getLevelCount() -> integer`
 
 Returns the number of vertical levels in the isometric map.
 
-**Returns**: `number` - Level count.
+**Returns**: `integer` - Level count.
 
 #### Example
 
@@ -1782,11 +1782,11 @@ do
 end
 ```
 
-### `LIsoMap:getLevelHeight() -> number`
+### `LIsoMap:getLevelHeight() -> integer`
 
 Returns the vertical pixel offset between levels.
 
-**Returns**: `number` - Level height in pixels.
+**Returns**: `integer` - Level height in pixels.
 
 #### Example
 
@@ -1799,11 +1799,11 @@ do
 end
 ```
 
-### `LIsoMap:getPartCount() -> number`
+### `LIsoMap:getPartCount() -> integer`
 
 Returns the number of tile parts per cell.
 
-**Returns**: `number` - Part count.
+**Returns**: `integer` - Part count.
 
 #### Example
 
@@ -1816,11 +1816,11 @@ do
 end
 ```
 
-### `LIsoMap:getPartOrder() -> table`
+### `LIsoMap:getPartOrder() -> integer[]`
 
 Returns the rendering order of tile parts as an array of part indices.
 
-**Returns**: `table` - Array of part index values.
+**Returns**: `integer[]` - Part index values.
 
 #### Example
 
@@ -1835,11 +1835,11 @@ do
 end
 ```
 
-### `LIsoMap:getTileHeight() -> number`
+### `LIsoMap:getTileHeight() -> integer`
 
 Returns the height of an isometric tile in pixels.
 
-**Returns**: `number` - Tile height.
+**Returns**: `integer` - Tile height.
 
 #### Example
 
@@ -1852,7 +1852,7 @@ do
 end
 ```
 
-### `LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> number`
+### `LIsoMap:getTilePart(z: integer, x: integer, y: integer, part: integer) -> integer`
 
 Returns the GID for a specific part of a tile at a given position and level.
 
@@ -1863,7 +1863,7 @@ Returns the GID for a specific part of a tile at a given position and level.
 - `y` (`integer`, required) - Row (1-based).
 - `part` (`integer`, required) - Part index.
 
-**Returns**: `number` - Global tile ID.
+**Returns**: `integer` - Global tile ID.
 
 #### Example
 
@@ -1878,11 +1878,11 @@ do
 end
 ```
 
-### `LIsoMap:getTileWidth() -> number`
+### `LIsoMap:getTileWidth() -> integer`
 
 Returns the width of an isometric tile in pixels.
 
-**Returns**: `number` - Tile width.
+**Returns**: `integer` - Tile width.
 
 #### Example
 
@@ -1895,11 +1895,11 @@ do
 end
 ```
 
-### `LIsoMap:getWidth() -> number`
+### `LIsoMap:getWidth() -> integer`
 
 Returns the map width in tiles. This method is available to Lua scripts.
 
-**Returns**: `number` - Width.
+**Returns**: `integer` - Width.
 
 #### Example
 
@@ -2006,15 +2006,13 @@ do
 end
 ```
 
-### `LIsoMap:setPartOrder(order: table) -> LuaValue`
+### `LIsoMap:setPartOrder(order: table)`
 
 Overrides the rendering order of tile parts.
 
 **Parameters**
 
 - `order` (`table`, required) - Array of part indices in desired draw order.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -2139,11 +2137,11 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getChunkSize() -> number`
+### `LLargeMapRenderer:getChunkSize() -> integer`
 
 Returns the current chunk size. This method is available to Lua scripts.
 
-**Returns**: `number` - Chunk size in tiles per side.
+**Returns**: `integer` - Chunk size in tiles per side.
 
 #### Example
 
@@ -2157,11 +2155,11 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getMapSize() -> number`
+### `LLargeMapRenderer:getMapSize() -> integer`
 
 Returns the map dimensions in tiles.
 
-**Returns**: `number` - Width in tiles.
+**Returns**: `integer` - Width in tiles.
 
 #### Example
 
@@ -2177,7 +2175,7 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getTile(x: integer, y: integer) -> number`
+### `LLargeMapRenderer:getTile(x: integer, y: integer) -> integer`
 
 Returns the tile GID at a given position.
 
@@ -2186,7 +2184,7 @@ Returns the tile GID at a given position.
 - `x` (`integer`, required) - Column.
 - `y` (`integer`, required) - Row.
 
-**Returns**: `number` - Tile GID.
+**Returns**: `integer` - Tile GID.
 
 #### Example
 
@@ -2202,11 +2200,11 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getTilesetColumns() -> number`
+### `LLargeMapRenderer:getTilesetColumns() -> integer`
 
 Returns the tileset column count used for UV calculation.
 
-**Returns**: `number` - Column count.
+**Returns**: `integer` - Column count.
 
 #### Example
 
@@ -2220,11 +2218,11 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getTotalChunks() -> number`
+### `LLargeMapRenderer:getTotalChunks() -> integer`
 
 Returns the total number of chunks in the map.
 
-**Returns**: `number` - Total chunk count.
+**Returns**: `integer` - Total chunk count.
 
 #### Example
 
@@ -2239,11 +2237,11 @@ do
 end
 ```
 
-### `LLargeMapRenderer:getVisibleChunks() -> number`
+### `LLargeMapRenderer:getVisibleChunks() -> integer`
 
 Returns the number of chunks currently visible in the viewport.
 
-**Returns**: `number` - Visible chunk count.
+**Returns**: `integer` - Visible chunk count.
 
 #### Example
 
@@ -2558,11 +2556,11 @@ do
 end
 ```
 
-### `LMapBlock:getDimensions() -> number`
+### `LMapBlock:getDimensions() -> integer`
 
 Returns both width and height of the block in tiles.
 
-**Returns**: `number` - Width.
+**Returns**: `integer` - Width.
 
 #### Example
 
@@ -2576,11 +2574,11 @@ do
 end
 ```
 
-### `LMapBlock:getHeight() -> number`
+### `LMapBlock:getHeight() -> integer`
 
 Returns the block height in tiles. This method is available to Lua scripts.
 
-**Returns**: `number` - Height.
+**Returns**: `integer` - Height.
 
 #### Example
 
@@ -2593,11 +2591,11 @@ do
 end
 ```
 
-### `LMapBlock:getHeightInSegments() -> number`
+### `LMapBlock:getHeightInSegments() -> integer`
 
 Returns the block height measured in segments.
 
-**Returns**: `number` - Height in segments.
+**Returns**: `integer` - Height in segments.
 
 #### Example
 
@@ -2610,11 +2608,11 @@ do
 end
 ```
 
-### `LMapBlock:getLayerCount() -> number`
+### `LMapBlock:getLayerCount() -> integer`
 
 Returns the number of tile layers in this block.
 
-**Returns**: `number` - Layer count.
+**Returns**: `integer` - Layer count.
 
 #### Example
 
@@ -2647,11 +2645,11 @@ do
 end
 ```
 
-### `LMapBlock:getSegmentSize() -> number`
+### `LMapBlock:getSegmentSize() -> integer`
 
 Returns the segment size used for edge matching.
 
-**Returns**: `number` - Segment size in tiles.
+**Returns**: `integer` - Segment size in tiles.
 
 #### Example
 
@@ -2664,7 +2662,7 @@ do
 end
 ```
 
-### `LMapBlock:getSide(edge: string, segment: integer) -> number`
+### `LMapBlock:getSide(edge: string, segment: integer) -> integer`
 
 Returns the side ID for an edge segment.
 
@@ -2673,7 +2671,7 @@ Returns the side ID for an edge segment.
 - `edge` (`string`, required) - Edge direction: `"north"`, `"east"`, `"south"`, or `"west"`.
 - `segment` (`integer`, required) - Segment index along the edge (1-based).
 
-**Returns**: `number` - Side identifier.
+**Returns**: `integer` - Side identifier.
 
 #### Example
 
@@ -2688,7 +2686,7 @@ do
 end
 ```
 
-### `LMapBlock:getTile(layer: integer, x: integer, y: integer) -> number`
+### `LMapBlock:getTile(layer: integer, x: integer, y: integer) -> integer`
 
 Returns the tile GID at a position within the block.
 
@@ -2698,7 +2696,7 @@ Returns the tile GID at a position within the block.
 - `x` (`integer`, required) - Column (1-based).
 - `y` (`integer`, required) - Row (1-based).
 
-**Returns**: `number` - Global tile ID.
+**Returns**: `integer` - Global tile ID.
 
 #### Example
 
@@ -2732,11 +2730,11 @@ do
 end
 ```
 
-### `LMapBlock:getWidth() -> number`
+### `LMapBlock:getWidth() -> integer`
 
 Returns the block width in tiles. This method is available to Lua scripts.
 
-**Returns**: `number` - Width.
+**Returns**: `integer` - Width.
 
 #### Example
 
@@ -2749,11 +2747,11 @@ do
 end
 ```
 
-### `LMapBlock:getWidthInSegments() -> number`
+### `LMapBlock:getWidthInSegments() -> integer`
 
 Returns the block width measured in segments.
 
-**Returns**: `number` - Width in segments.
+**Returns**: `integer` - Width in segments.
 
 #### Example
 
@@ -3051,11 +3049,11 @@ do
 end
 ```
 
-### `LMapGroup:getBlockCount() -> number`
+### `LMapGroup:getBlockCount() -> integer`
 
 Returns how many blocks are in this group.
 
-**Returns**: `number` - Block count.
+**Returns**: `integer` - Block count.
 
 #### Example
 
@@ -3088,11 +3086,11 @@ do
 end
 ```
 
-### `LMapGroup:getScriptCount() -> number`
+### `LMapGroup:getScriptCount() -> integer`
 
 Returns how many scripts are attached to this group.
 
-**Returns**: `number` - Script count.
+**Returns**: `integer` - Script count.
 
 #### Example
 
@@ -3208,11 +3206,11 @@ do
 end
 ```
 
-### `LMapScript:getStepCount() -> number`
+### `LMapScript:getStepCount() -> integer`
 
 Returns the number of generation steps in this script.
 
-**Returns**: `number` - Step count.
+**Returns**: `integer` - Step count.
 
 #### Example
 
@@ -3324,7 +3322,7 @@ do
 end
 ```
 
-### `LTileMap:addLayer(name: string, w: integer, h: integer) -> number`
+### `LTileMap:addLayer(name: string, w: integer, h: integer) -> integer`
 
 Creates a new tile layer with the given name and dimensions.
 
@@ -3334,7 +3332,7 @@ Creates a new tile layer with the given name and dimensions.
 - `w` (`integer`, required) - Width in tiles.
 - `h` (`integer`, required) - Height in tiles.
 
-**Returns**: `number` - Index of the new layer (1-based).
+**Returns**: `integer` - Index of the new layer (1-based).
 
 #### Example
 
@@ -3654,11 +3652,11 @@ do
 end
 ```
 
-### `LTileMap:getChunkSize() -> number`
+### `LTileMap:getChunkSize() -> integer`
 
 Returns the chunk size used for internal tile storage.
 
-**Returns**: `number` - Chunk size in tiles per side.
+**Returns**: `integer` - Chunk size in tiles per side.
 
 #### Example
 
@@ -3695,11 +3693,11 @@ do
 end
 ```
 
-### `LTileMap:getLayerCount() -> number`
+### `LTileMap:getLayerCount() -> integer`
 
 Returns the total number of layers in this map.
 
-**Returns**: `number` - Layer count.
+**Returns**: `integer` - Layer count.
 
 #### Example
 
@@ -3832,7 +3830,7 @@ do
 end
 ```
 
-### `LTileMap:getTile(layer: integer, x: integer, y: integer) -> number`
+### `LTileMap:getTile(layer: integer, x: integer, y: integer) -> integer`
 
 Returns the tile GID at a specific grid position on a layer.
 
@@ -3842,7 +3840,7 @@ Returns the tile GID at a specific grid position on a layer.
 - `x` (`integer`, required) - Column (1-based).
 - `y` (`integer`, required) - Row (1-based).
 
-**Returns**: `number` - Global tile ID at that position.
+**Returns**: `integer` - Global tile ID at that position.
 
 #### Example
 
@@ -3860,11 +3858,11 @@ do
 end
 ```
 
-### `LTileMap:getTileDimensions() -> number`
+### `LTileMap:getTileDimensions() -> integer`
 
 Returns both tile width and height in pixels.
 
-**Returns**: `number` - Tile width.
+**Returns**: `integer` - Tile width.
 
 #### Example
 
@@ -3878,11 +3876,11 @@ do
 end
 ```
 
-### `LTileMap:getTileHeight() -> number`
+### `LTileMap:getTileHeight() -> integer`
 
 Returns the height of a single tile in pixels for this map.
 
-**Returns**: `number` - Tile height in pixels.
+**Returns**: `integer` - Tile height in pixels.
 
 #### Example
 
@@ -3921,11 +3919,11 @@ do
 end
 ```
 
-### `LTileMap:getTileSetCount() -> number`
+### `LTileMap:getTileSetCount() -> integer`
 
 Returns how many tilesets are attached to this map.
 
-**Returns**: `number` - Tileset count.
+**Returns**: `integer` - Tileset count.
 
 #### Example
 
@@ -3940,11 +3938,11 @@ do
 end
 ```
 
-### `LTileMap:getTileWidth() -> number`
+### `LTileMap:getTileWidth() -> integer`
 
 Returns the width of a single tile in pixels for this map.
 
-**Returns**: `number` - Tile width in pixels.
+**Returns**: `integer` - Tile width in pixels.
 
 #### Example
 
@@ -4427,7 +4425,7 @@ do
 end
 ```
 
-### `LTileMap:toNavGrid(layer: integer, gids: table) -> table`
+### `LTileMap:toNavGrid(layer: integer, gids: table) -> boolean[]`
 
 Converts a layer into a 2D boolean grid for pathfinding. Tiles with GIDs in the given list are marked walkable.
 
@@ -4436,7 +4434,7 @@ Converts a layer into a 2D boolean grid for pathfinding. Tiles with GIDs in the 
 - `layer` (`integer`, required) - Layer index (1-based).
 - `gids` (`table`, required) - Array of walkable GIDs.
 
-**Returns**: `table` - 2D array of booleans (true = walkable).
+**Returns**: `boolean[]` - Flat walkable grid (true = walkable), row-major order.
 
 #### Example
 
@@ -4518,7 +4516,7 @@ do
 end
 ```
 
-### `LTileMap:worldToTile(wx: number, wy: number) -> number`
+### `LTileMap:worldToTile(wx: number, wy: number) -> integer`
 
 Converts world-space pixel coordinates to tile-grid coordinates.
 
@@ -4527,7 +4525,7 @@ Converts world-space pixel coordinates to tile-grid coordinates.
 - `wx` (`number`, required) - World X position in pixels.
 - `wy` (`number`, required) - World Y position in pixels.
 
-**Returns**: `number` - Tile column (1-based).
+**Returns**: `integer` - Tile column (1-based).
 
 #### Example
 
@@ -4600,16 +4598,16 @@ do
 end
 ```
 
-### `LTileSet:getAutoTileId(typeName: string, bitmask: number) -> number`
+### `LTileSet:getAutoTileId(typeName: string, bitmask: integer) -> integer`
 
 Looks up the tile ID for a 4-bit auto-tile bitmask and type name.
 
 **Parameters**
 
 - `typeName` (`string`, required) - Logical tile type name.
-- `bitmask` (`number`, required) - 4-bit neighbor bitmask (0..15).
+- `bitmask` (`integer`, required) - 4-bit neighbor bitmask (0..15).
 
-**Returns**: `number` - Resolved tile ID (1-based), or nil if no rule matches.
+**Returns**: `integer` - Resolved tile ID (1-based), or nil if no rule matches.
 
 #### Example
 
@@ -4626,16 +4624,16 @@ do
 end
 ```
 
-### `LTileSet:getAutoTileId8(typeName: string, bitmask: number) -> number`
+### `LTileSet:getAutoTileId8(typeName: string, bitmask: integer) -> integer`
 
 Looks up the tile ID for an 8-bit auto-tile bitmask and type name.
 
 **Parameters**
 
 - `typeName` (`string`, required) - Logical tile type name.
-- `bitmask` (`number`, required) - 8-bit neighbor bitmask (0..255).
+- `bitmask` (`integer`, required) - 8-bit neighbor bitmask (0..255).
 
-**Returns**: `number` - Resolved tile ID (1-based), or nil if no rule matches.
+**Returns**: `integer` - Resolved tile ID (1-based), or nil if no rule matches.
 
 #### Example
 
@@ -4651,11 +4649,11 @@ do
 end
 ```
 
-### `LTileSet:getColumns() -> number`
+### `LTileSet:getColumns() -> integer`
 
 Returns the number of columns in the tileset atlas image.
 
-**Returns**: `number` - Column count.
+**Returns**: `integer` - Column count.
 
 #### Example
 
@@ -4670,11 +4668,11 @@ do
 end
 ```
 
-### `LTileSet:getFirstGid() -> number`
+### `LTileSet:getFirstGid() -> integer`
 
 Returns the first global tile ID (GID) of this tileset.
 
-**Returns**: `number` - First GID assigned to this tileset.
+**Returns**: `integer` - First GID assigned to this tileset.
 
 #### Example
 
@@ -4689,11 +4687,11 @@ do
 end
 ```
 
-### `LTileSet:getMargin() -> number`
+### `LTileSet:getMargin() -> integer`
 
 Returns the margin around the edge of the atlas image, in pixels.
 
-**Returns**: `number` - Margin in pixels.
+**Returns**: `integer` - Margin in pixels.
 
 #### Example
 
@@ -4732,11 +4730,11 @@ do
 end
 ```
 
-### `LTileSet:getSpacing() -> number`
+### `LTileSet:getSpacing() -> integer`
 
 Returns the spacing between tiles in the atlas image, in pixels.
 
-**Returns**: `number` - Spacing in pixels.
+**Returns**: `integer` - Spacing in pixels.
 
 #### Example
 
@@ -4751,11 +4749,11 @@ do
 end
 ```
 
-### `LTileSet:getTileCount() -> number`
+### `LTileSet:getTileCount() -> integer`
 
 Returns the total number of tiles defined in this tileset.
 
-**Returns**: `number` - Total tile count.
+**Returns**: `integer` - Total tile count.
 
 #### Example
 
@@ -4771,11 +4769,11 @@ do
 end
 ```
 
-### `LTileSet:getTileDimensions() -> number`
+### `LTileSet:getTileDimensions() -> integer`
 
 Returns both tile width and height in pixels.
 
-**Returns**: `number` - Tile width in pixels.
+**Returns**: `integer` - Tile width in pixels.
 
 #### Example
 
@@ -4790,11 +4788,11 @@ do
 end
 ```
 
-### `LTileSet:getTileHeight() -> number`
+### `LTileSet:getTileHeight() -> integer`
 
 Returns the height of a single tile in pixels.
 
-**Returns**: `number` - Tile height in pixels.
+**Returns**: `integer` - Tile height in pixels.
 
 #### Example
 
@@ -4808,11 +4806,11 @@ do
 end
 ```
 
-### `LTileSet:getTileWidth() -> number`
+### `LTileSet:getTileWidth() -> integer`
 
 Returns the width of a single tile in pixels.
 
-**Returns**: `number` - Tile width in pixels.
+**Returns**: `integer` - Tile width in pixels.
 
 #### Example
 
@@ -4879,14 +4877,14 @@ do
 end
 ```
 
-### `LTileSet:setAutoTileRule(typeName: string, bitmask: number, tileId: integer)`
+### `LTileSet:setAutoTileRule(typeName: string, bitmask: integer, tileId: integer)`
 
 Registers a 4-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
 
 **Parameters**
 
 - `typeName` (`string`, required) - Logical tile type name (e.g. "grass").
-- `bitmask` (`number`, required) - 4-bit neighbor bitmask (0..15).
+- `bitmask` (`integer`, required) - 4-bit neighbor bitmask (0..15).
 - `tileId` (`integer`, required) - Tile ID to use for this bitmask (1-based).
 
 #### Example
@@ -4904,14 +4902,14 @@ do
 end
 ```
 
-### `LTileSet:setAutoTileRule8(typeName: string, bitmask: number, tileId: integer)`
+### `LTileSet:setAutoTileRule8(typeName: string, bitmask: integer, tileId: integer)`
 
 Registers an 8-bit auto-tile rule mapping a bitmask to a tile ID for a named tile type.
 
 **Parameters**
 
 - `typeName` (`string`, required) - Logical tile type name.
-- `bitmask` (`number`, required) - 8-bit neighbor bitmask (0..255).
+- `bitmask` (`integer`, required) - 8-bit neighbor bitmask (0..255).
 - `tileId` (`integer`, required) - Tile ID to use for this bitmask (1-based).
 
 #### Example

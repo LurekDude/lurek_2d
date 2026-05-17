@@ -17,7 +17,7 @@
   - [lurek.tween.cancelAll()](#lurektweencancelall)
   - [lurek.tween.delay(seconds: number, [cb]: function) -> LTweenSequence](#lurektweendelayseconds-number-cb-function-ltweensequence)
   - [lurek.tween.getActiveCount() -> number](#lurektweengetactivecount-number)
-  - [lurek.tween.getEasingNames() -> table](#lurektweengeteasingnames-table)
+  - [lurek.tween.getEasingNames() -> string[]](#lurektweengeteasingnames-string)
   - [lurek.tween.newState(duration: number, [easing]: string) -> LTweenState](#lurektweennewstateduration-number-easing-string-ltweenstate)
   - [lurek.tween.parallel() -> LTweenParallel](#lurektweenparallel-ltweenparallel)
   - [lurek.tween.registerEasing(name: string, f: function)](#lurektweenregistereasingname-string-f-function)
@@ -45,7 +45,7 @@
   - [LTween:cancel()](#ltweencancel)
   - [LTween:getDuration() -> number](#ltweengetduration-number)
   - [LTween:getElapsed() -> number](#ltweengetelapsed-number)
-  - [LTween:getFields() -> table](#ltweengetfields-table)
+  - [LTween:getFields() -> string[]](#ltweengetfields-string)
   - [LTween:getProgress() -> number](#ltweengetprogress-number)
   - [LTween:getRemaining() -> number](#ltweengetremaining-number)
   - [LTween:isActive() -> boolean](#ltweenisactive-boolean)
@@ -178,7 +178,7 @@ do
 lurek.tween.cancelAll() -- Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine.
 lurek.tween.delay(seconds: number, [cb]: function) -> LTweenSequence -- Creates a one-shot delay. After the specified seconds elapse, the optional callback is invoked.
 lurek.tween.getActiveCount() -> number -- Returns the total number of currently active tweens, sequences, and parallels.
-lurek.tween.getEasingNames() -> table -- Returns an array of all available easing function names, including both built-in and custom-registered easi...
+lurek.tween.getEasingNames() -> string[] -- Returns an array of all available easing function names, including both built-in and custom-registered easi...
 lurek.tween.newState(duration: number, [easing]: string) -> LTweenState -- Creates a standalone tween state for manual interpolation. Useful when you need eased progress without auto...
 lurek.tween.parallel() -> LTweenParallel -- Creates a new empty parallel tween group. Add tweens with `:tween()` or `:add()`, then call `:start()` to r...
 lurek.tween.registerEasing(name: string, f: function) -- Registers a custom easing function by name. The function receives a progress value (0..1) and must return a...
@@ -258,11 +258,11 @@ do
 end
 ```
 
-### `lurek.tween.getEasingNames() -> table`
+### `lurek.tween.getEasingNames() -> string[]`
 
 Returns an array of all available easing function names, including both built-in and custom-registered easings.
 
-**Returns**: `table` - Array of easing name strings.
+**Returns**: `string[]` - Easing name strings.
 
 #### Example
 
@@ -886,11 +886,11 @@ do
 end
 ```
 
-### `LTween:getFields() -> table`
+### `LTween:getFields() -> string[]`
 
 Returns an array of field names being tweened on the target table.
 
-**Returns**: `table` - Array of field name strings.
+**Returns**: `string[]` - Field name strings.
 
 #### Example
 

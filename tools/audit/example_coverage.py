@@ -131,7 +131,7 @@ NAMESPACE_MAP: dict[str, str] = {
     'serial':      'serial',
     'spine':       'spine',
     'sprite':      'sprite',
-    'system':      'system',
+    'system':      'runtime',
     'terminal':    'terminal',
     'thread':      'thread',
     'tilemap':     'tilemap',

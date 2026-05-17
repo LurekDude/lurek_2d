@@ -15,7 +15,7 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.globe.generateVoronoi(name: string, seeds_tbl: table, [spec_tbl]: table) -> LGlobe](#lurekglobegeneratevoronoiname-string-seedstbl-table-spectbl-table-lglobe)
-  - [lurek.globe.get(name: string) -> LuaValue](#lurekglobegetname-string-luavalue)
+  - [lurek.globe.get(name: string) -> LGlobe](#lurekglobegetname-string-lglobe)
   - [lurek.globe.greatCircleDistance(la: number, lo: number, lb: number, lo2: number) -> number](#lurekglobegreatcircledistancela-number-lo-number-lb-number-lo2-number-number)
   - [lurek.globe.greatCirclePath(la: number, lo: number, lb: number, lo2: number, n: integer) -> table](#lurekglobegreatcirclepathla-number-lo-number-lb-number-lo2-number-n-integer-table)
   - [lurek.globe.latLonToUnit(lat: number, lon: number) -> table](#lurekglobelatlontounitlat-number-lon-number-table)
@@ -34,25 +34,25 @@
   - [LGlobe:decodeFogBase64(viewer: string, payload: string) -> boolean](#lglobedecodefogbase64viewer-string-payload-string-boolean)
   - [LGlobe:encodeFogBase64(viewer: string) -> string](#lglobeencodefogbase64viewer-string-string)
   - [LGlobe:exportProvinceMeshOBJ() -> string](#lglobeexportprovincemeshobj-string)
-  - [LGlobe:findPath(from_id: integer, to_id: integer) -> LuaValue](#lglobefindpathfromid-integer-toid-integer-luavalue)
+  - [LGlobe:findPath(from_id: integer, to_id: integer) -> string[]](#lglobefindpathfromid-integer-toid-integer-string)
   - [LGlobe:getCachedReachability(faction: string) -> table](#lglobegetcachedreachabilityfaction-string-table)
   - [LGlobe:getCamera() -> number](#lglobegetcamera-number)
   - [LGlobe:getFogState(viewer: string, id: integer) -> string](#lglobegetfogstateviewer-string-id-integer-string)
   - [LGlobe:getLod() -> string](#lglobegetlod-string)
-  - [LGlobe:getMarkerAttr(id: integer, key: string) -> LuaValue](#lglobegetmarkerattrid-integer-key-string-luavalue)
+  - [LGlobe:getMarkerAttr(id: integer, key: string) -> string](#lglobegetmarkerattrid-integer-key-string-string)
   - [LGlobe:getName() -> string](#lglobegetname-string)
-  - [LGlobe:getNeighbors(id: integer) -> table](#lglobegetneighborsid-integer-table)
-  - [LGlobe:getProvinceAttr(id: integer, key: string) -> LuaValue](#lglobegetprovinceattrid-integer-key-string-luavalue)
-  - [LGlobe:getProvinceSector(id: integer) -> LuaValue](#lglobegetprovincesectorid-integer-luavalue)
-  - [LGlobe:getSectorProvinces(sector: string) -> table](#lglobegetsectorprovincessector-string-table)
+  - [LGlobe:getNeighbors(id: integer) -> integer[]](#lglobegetneighborsid-integer-integer)
+  - [LGlobe:getProvinceAttr(id: integer, key: string) -> string](#lglobegetprovinceattrid-integer-key-string-string)
+  - [LGlobe:getProvinceSector(id: integer) -> string](#lglobegetprovincesectorid-integer-string)
+  - [LGlobe:getSectorProvinces(sector: string) -> integer[]](#lglobegetsectorprovincessector-string-integer)
   - [LGlobe:getTimeOfDay() -> number](#lglobegettimeofday-number)
   - [LGlobe:hideProvince(viewer: string, id: integer)](#lglobehideprovinceviewer-string-id-integer)
   - [LGlobe:isVisible(viewer: string, id: integer) -> boolean](#lglobeisvisibleviewer-string-id-integer-boolean)
   - [LGlobe:moveMarker(id: integer, lat: number, lon: number) -> boolean](#lglobemovemarkerid-integer-lat-number-lon-number-boolean)
   - [LGlobe:pan(dlat: number, dlon: number)](#lglobepandlat-number-dlon-number)
-  - [LGlobe:pick(sx: number, sy: number) -> LuaValue](#lglobepicksx-number-sy-number-luavalue)
-  - [LGlobe:pickLatLon(sx: number, sy: number) -> LuaValue](#lglobepicklatlonsx-number-sy-number-luavalue)
-  - [LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> LuaValue](#lglobepickraycastsx-number-sy-number-steps-integer-luavalue)
+  - [LGlobe:pick(sx: number, sy: number) -> integer](#lglobepicksx-number-sy-number-integer)
+  - [LGlobe:pickLatLon(sx: number, sy: number) -> number](#lglobepicklatlonsx-number-sy-number-number)
+  - [LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> integer](#lglobepickraycastsx-number-sy-number-steps-integer-integer)
   - [LGlobe:provinceCount() -> integer](#lglobeprovincecount-integer)
   - [LGlobe:reachable(start_id: integer, max_cost: number) -> table](#lglobereachablestartid-integer-maxcost-number-table)
   - [LGlobe:removeArc(id: integer) -> boolean](#lgloberemovearcid-integer-boolean)
@@ -88,8 +88,8 @@
   - [LGlobe:update(dt: number)](#lglobeupdatedt-number)
   - [LGlobe:zoom(factor: number)](#lglobezoomfactor-number)
   - [LGlobeRegistry](#lgloberegistry)
-  - [LGlobeRegistry:get(name: string) -> LuaValue](#lgloberegistrygetname-string-luavalue)
-  - [LGlobeRegistry:names() -> table](#lgloberegistrynames-table)
+  - [LGlobeRegistry:get(name: string) -> LGlobe](#lgloberegistrygetname-string-lglobe)
+  - [LGlobeRegistry:names() -> string[]](#lgloberegistrynames-string)
   - [LGlobeRegistry:new(name: string, [spec_tbl]: table) -> LGlobe](#lgloberegistrynewname-string-spectbl-table-lglobe)
   - [LGlobeRegistry:remove(name: string) -> boolean](#lgloberegistryremovename-string-boolean)
   - [LGlobeRegistry:type() -> string](#lgloberegistrytype-string)
@@ -178,7 +178,7 @@ end
 
 ```lua
 lurek.globe.generateVoronoi(name: string, seeds_tbl: table, [spec_tbl]: table) -> LGlobe -- Creates a globe and populates provinces from latitude-longitude seed points.
-lurek.globe.get(name: string) -> LuaValue -- Returns a globe from the module registry by name.
+lurek.globe.get(name: string) -> LGlobe -- Returns a globe from the module registry by name.
 lurek.globe.greatCircleDistance(la: number, lo: number, lb: number, lo2: number) -> number -- Computes great-circle distance between two latitude-longitude points.
 lurek.globe.greatCirclePath(la: number, lo: number, lb: number, lo2: number, n: integer) -> table -- Computes sampled latitude-longitude points along a great-circle path.
 lurek.globe.latLonToUnit(lat: number, lon: number) -> table -- Converts latitude and longitude to a unit-sphere 3D vector table.
@@ -197,7 +197,7 @@ Creates a globe and populates provinces from latitude-longitude seed points.
 
 - `name` (`string`, required) - Globe registry name.
 - `seeds_tbl` (`table`, required) - Array table of `{lat, lon}` seed pairs.
-- `spec_tbl` (`table`, optional) - Optional globe specification table.
+- `spec_tbl` (`table`, optional) - Globe specification table.
 
 **Returns**: `LGlobe` - New generated globe handle.
 
@@ -224,7 +224,7 @@ do
 end
 ```
 
-### `lurek.globe.get(name: string) -> LuaValue`
+### `lurek.globe.get(name: string) -> LGlobe`
 
 Returns a globe from the module registry by name.
 
@@ -232,7 +232,7 @@ Returns a globe from the module registry by name.
 
 - `name` (`string`, required) - Globe registry name.
 
-**Returns**: `LuaValue` - `LGlobe` handle, or nil when no globe exists with that name.
+**Returns**: `LGlobe` - Globe handle, or nil when no globe exists with that name.
 
 #### Example
 
@@ -350,7 +350,7 @@ Creates a globe and populates provinces from a PNG file.
 
 - `name` (`string`, required) - Globe registry name.
 - `png_path` (`string`, required) - PNG file path to load.
-- `spec_tbl` (`table`, optional) - Optional globe specification table.
+- `spec_tbl` (`table`, optional) - Globe specification table.
 
 **Returns**: `LGlobe` - New populated globe handle.
 
@@ -384,7 +384,7 @@ Creates a globe and populates provinces from TOML source text.
 
 - `name` (`string`, required) - Globe registry name.
 - `toml_src` (`string`, required) - TOML province document source.
-- `spec_tbl` (`table`, optional) - Optional globe specification table.
+- `spec_tbl` (`table`, optional) - Globe specification table.
 
 **Returns**: `LGlobe` - New populated globe handle.
 
@@ -423,7 +423,7 @@ Creates a named globe with optional specification fields in the module registry.
 **Parameters**
 
 - `name` (`string`, required) - Globe registry name.
-- `spec_tbl` (`table`, optional) - Optional globe specification table.
+- `spec_tbl` (`table`, optional) - Globe specification table.
 
 **Returns**: `LGlobe` - New globe handle.
 
@@ -487,7 +487,7 @@ Adds a visible route arc between two latitude and longitude points.
 - `lon1` (`number`, required) - Start longitude in degrees.
 - `lat2` (`number`, required) - End latitude in degrees.
 - `lon2` (`number`, required) - End longitude in degrees.
-- `steps` (`integer`, optional) - Optional point count for the arc, defaulting to 24.
+- `steps` (`integer`, optional) - Point count for the arc, defaulting to 24.
 
 **Returns**: `integer` - New arc id.
 
@@ -548,7 +548,7 @@ Adds a render layer with optional z-order.
 **Parameters**
 
 - `name` (`string`, required) - Layer name.
-- `z_order` (`integer`, optional) - Optional layer z-order, defaulting to zero.
+- `z_order` (`integer`, optional) - Layer z-order, defaulting to zero.
 
 #### Example
 
@@ -578,7 +578,7 @@ Adds a marker at latitude and longitude with an optional label.
 - `mtype` (`string`, required) - Marker type name.
 - `lat` (`number`, required) - Latitude in degrees.
 - `lon` (`number`, required) - Longitude in degrees.
-- `label` (`string`, optional) - Optional marker label.
+- `label` (`string`, optional) - Marker label.
 
 **Returns**: `integer` - New marker id.
 
@@ -787,7 +787,7 @@ do
 end
 ```
 
-### `LGlobe:findPath(from_id: integer, to_id: integer) -> LuaValue`
+### `LGlobe:findPath(from_id: integer, to_id: integer) -> string[]`
 
 Finds a default-cost province path between two province ids.
 
@@ -796,7 +796,7 @@ Finds a default-cost province path between two province ids.
 - `from_id` (`integer`, required) - Start province id.
 - `to_id` (`integer`, required) - Target province id.
 
-**Returns**: `LuaValue` - Array table of province ids, or nil when no path exists.
+**Returns**: `string[]` - Province ids, or nil when no path exists.
 
 #### Example
 
@@ -830,7 +830,7 @@ Returns cached reachability costs for a faction.
 
 - `faction` (`string`, required) - Faction cache key.
 
-**Returns**: `table` - Map table from province id to accumulated cost, empty when missing.
+**Returns**: `table` - Map table from province id (integer key) to accumulated traversal cost (number), empty when missing.
 
 #### Example
 
@@ -1002,7 +1002,7 @@ end
 --@api-stub: Globe:pick
 ```
 
-### `LGlobe:getMarkerAttr(id: integer, key: string) -> LuaValue`
+### `LGlobe:getMarkerAttr(id: integer, key: string) -> string`
 
 Reads a string attribute from a marker.
 
@@ -1011,7 +1011,7 @@ Reads a string attribute from a marker.
 - `id` (`integer`, required) - Marker id.
 - `key` (`string`, required) - Attribute key.
 
-**Returns**: `LuaValue` - Attribute string, or nil when missing.
+**Returns**: `string` - Attribute string, or nil when missing.
 
 #### Example
 
@@ -1053,7 +1053,7 @@ do
 end
 ```
 
-### `LGlobe:getNeighbors(id: integer) -> table`
+### `LGlobe:getNeighbors(id: integer) -> integer[]`
 
 Returns neighboring province ids for a province.
 
@@ -1061,7 +1061,7 @@ Returns neighboring province ids for a province.
 
 - `id` (`integer`, required) - Province id.
 
-**Returns**: `table` - Array table of neighboring province ids.
+**Returns**: `integer[]` - Array table of neighboring province ids.
 
 #### Example
 
@@ -1083,7 +1083,7 @@ do
 end
 ```
 
-### `LGlobe:getProvinceAttr(id: integer, key: string) -> LuaValue`
+### `LGlobe:getProvinceAttr(id: integer, key: string) -> string`
 
 Reads a string attribute from a province.
 
@@ -1092,7 +1092,7 @@ Reads a string attribute from a province.
 - `id` (`integer`, required) - Province id.
 - `key` (`string`, required) - Attribute key.
 
-**Returns**: `LuaValue` - Attribute string, or nil when the province or key is missing.
+**Returns**: `string` - Attribute string, or nil when the province or key is missing.
 
 #### Example
 
@@ -1114,7 +1114,7 @@ do
 end
 ```
 
-### `LGlobe:getProvinceSector(id: integer) -> LuaValue`
+### `LGlobe:getProvinceSector(id: integer) -> string`
 
 Returns the sector name assigned to a province.
 
@@ -1122,7 +1122,7 @@ Returns the sector name assigned to a province.
 
 - `id` (`integer`, required) - Province id.
 
-**Returns**: `LuaValue` - Sector string, or nil when absent.
+**Returns**: `string` - Sector string, or nil when absent.
 
 #### Example
 
@@ -1141,7 +1141,7 @@ do
 end
 ```
 
-### `LGlobe:getSectorProvinces(sector: string) -> table`
+### `LGlobe:getSectorProvinces(sector: string) -> integer[]`
 
 Returns province ids assigned to a sector.
 
@@ -1149,7 +1149,7 @@ Returns province ids assigned to a sector.
 
 - `sector` (`string`, required) - Sector name.
 
-**Returns**: `table` - Array table of province ids.
+**Returns**: `integer[]` - Array table of province ids.
 
 #### Example
 
@@ -1317,7 +1317,7 @@ do
 end
 ```
 
-### `LGlobe:pick(sx: number, sy: number) -> LuaValue`
+### `LGlobe:pick(sx: number, sy: number) -> integer`
 
 Picks a province at screen coordinates.
 
@@ -1326,7 +1326,7 @@ Picks a province at screen coordinates.
 - `sx` (`number`, required) - Screen x coordinate.
 - `sy` (`number`, required) - Screen y coordinate.
 
-**Returns**: `LuaValue` - Province id, or nil when nothing is hit.
+**Returns**: `integer` - Province id, or nil when nothing is hit.
 
 #### Example
 
@@ -1354,7 +1354,7 @@ do
 end
 ```
 
-### `LGlobe:pickLatLon(sx: number, sy: number) -> LuaValue`
+### `LGlobe:pickLatLon(sx: number, sy: number) -> number`
 
 Picks at screen coordinates and returns the hit province centroid screen coordinates.
 
@@ -1363,7 +1363,7 @@ Picks at screen coordinates and returns the hit province centroid screen coordin
 - `sx` (`number`, required) - Screen x coordinate.
 - `sy` (`number`, required) - Screen y coordinate.
 
-**Returns**: `LuaValue` - Centroid x coordinate, or nil when nothing is hit.
+**Returns**: `number` - Centroid x coordinate, or nil when nothing is hit.
 
 #### Example
 
@@ -1391,7 +1391,7 @@ do
 end
 ```
 
-### `LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> LuaValue`
+### `LGlobe:pickRaycast(sx: number, sy: number, [steps]: integer) -> integer`
 
 Samples along a screen ray from the camera center and returns the first hit province.
 
@@ -1399,9 +1399,9 @@ Samples along a screen ray from the camera center and returns the first hit prov
 
 - `sx` (`number`, required) - Target screen x coordinate.
 - `sy` (`number`, required) - Target screen y coordinate.
-- `steps` (`integer`, optional) - Optional number of samples along the ray, defaulting to 24.
+- `steps` (`integer`, optional) - Number of samples along the ray, defaulting to 24.
 
-**Returns**: `LuaValue` - Province id, or nil when no sample hits.
+**Returns**: `integer` - Province id, or nil when no sample hits.
 
 #### Example
 
@@ -1455,7 +1455,7 @@ Returns provinces reachable from a start province within a cost budget.
 - `start_id` (`integer`, required) - Start province id.
 - `max_cost` (`number`, required) - Maximum traversal cost.
 
-**Returns**: `table` - Map table from province id to accumulated cost.
+**Returns**: `table` - Map table from province id (integer key) to accumulated traversal cost (number).
 
 #### Example
 
@@ -1700,7 +1700,7 @@ Sets the active fog-of-war viewer name or clears it.
 
 **Parameters**
 
-- `viewer` (`string`, optional) - Optional viewer name.
+- `viewer` (`string`, optional) - Viewer name.
 
 #### Example
 
@@ -2455,7 +2455,7 @@ do
 end
 ```
 
-### `LGlobeRegistry:get(name: string) -> LuaValue`
+### `LGlobeRegistry:get(name: string) -> LGlobe`
 
 Returns a globe handle by registry name.
 
@@ -2463,7 +2463,7 @@ Returns a globe handle by registry name.
 
 - `name` (`string`, required) - Globe registry name.
 
-**Returns**: `LuaValue` - `LGlobe` handle, or nil when no globe exists with that name.
+**Returns**: `LGlobe` - Globe handle, or nil when no globe exists with that name.
 
 #### Example
 
@@ -2481,11 +2481,11 @@ do
 end
 ```
 
-### `LGlobeRegistry:names() -> table`
+### `LGlobeRegistry:names() -> string[]`
 
 Returns all globe names currently stored in this registry.
 
-**Returns**: `table` - Array table of globe names.
+**Returns**: `string[]` - Globe names.
 
 #### Example
 
@@ -2509,7 +2509,7 @@ Creates a named globe with optional specification fields.
 **Parameters**
 
 - `name` (`string`, required) - Globe registry name.
-- `spec_tbl` (`table`, optional) - Optional globe specification table.
+- `spec_tbl` (`table`, optional) - Globe specification table.
 
 **Returns**: `LGlobe` - New globe handle.
 

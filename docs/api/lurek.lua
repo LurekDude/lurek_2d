@@ -182,7 +182,6 @@ lurek.ai = {}
 LAIBlackboard = {}
 
 --- Removes every local entry from this blackboard.
----@return nil No value is returned.
 function LAIBlackboard:clear() end
 
 --- Returns a boolean blackboard fact or the provided fallback when the key is missing or not boolean.
@@ -192,7 +191,7 @@ function LAIBlackboard:clear() end
 function LAIBlackboard:getBool(key, default) end
 
 --- Returns every local blackboard key in an array-style Lua table.
----@return table Array table containing all stored key names as strings.
+---@return string[] Array table containing all stored key names as strings.
 function LAIBlackboard:getKeys() end
 
 --- Returns a numeric blackboard fact or the provided fallback when the key is missing or not numeric.
@@ -218,25 +217,21 @@ function LAIBlackboard:has(key) end
 
 --- Removes the given key from the blackboard if it exists.
 ---@param key string Blackboard key to remove.
----@return nil No value is returned.
 function LAIBlackboard:remove(key) end
 
 --- Stores a boolean fact under the given blackboard key.
 ---@param key string Blackboard key to write.
 ---@param value boolean Boolean value stored for later boolean reads.
----@return nil No value is returned.
 function LAIBlackboard:setBool(key, value) end
 
 --- Stores a numeric fact under the given blackboard key.
 ---@param key string Blackboard key to write.
 ---@param value number Numeric value stored for later numeric reads.
----@return nil No value is returned.
 function LAIBlackboard:setNumber(key, value) end
 
 --- Stores a string fact under the given blackboard key.
 ---@param key string Blackboard key to write.
 ---@param value string String value stored for later string reads.
----@return nil No value is returned.
 function LAIBlackboard:setString(key, value) end
 
 --- Returns the Lua-visible type name for this blackboard handle.
@@ -266,16 +261,13 @@ function LAIDirector:phase() end
 
 --- Adds an event intensity sample to the director tension model.
 ---@param intensity number Event intensity added to current tension.
----@return nil No value is returned.
 function LAIDirector:pushEvent(intensity) end
 
 --- Resets director tension and phase state to defaults.
----@return nil No value is returned.
 function LAIDirector:reset() end
 
 --- Directly sets the director tension value.
 ---@param value number New tension value.
----@return nil No value is returned.
 function LAIDirector:setTension(value) end
 
 --- Returns the spawn-rate multiplier derived from current tension and phase.
@@ -297,7 +289,6 @@ function LAIDirector:typeOf(name) end
 
 --- Advances director tension decay and phase evaluation.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LAIDirector:update(dt) end
 
 --- Lua handle for distance-based AI level-of-detail tier selection.
@@ -360,7 +351,6 @@ function LAIWorld:getGlobalBlackboard() end
 
 --- Removes an agent from this world by using an existing agent handle.
 ---@param agent LAgent Agent handle whose stored name identifies the world entry to remove.
----@return nil No value is returned.
 function LAIWorld:removeAgent(agent) end
 
 --- Returns the Lua-visible type name for this AI world handle.
@@ -374,7 +364,6 @@ function LAIWorld:typeOf(name) end
 
 --- Advances the world simulation and invokes custom decision callbacks for agents that use a custom model.
 ---@param dt number Elapsed simulation time in seconds for this update step.
----@return nil No value is returned.
 function LAIWorld:update(dt) end
 
 --- Lua handle for a named agent stored inside an AI world.
@@ -383,7 +372,6 @@ LAgent = {}
 
 --- Adds a tag string to this agent when the agent still exists in its world.
 ---@param tag string Tag name to insert into the agent tag set.
----@return nil No value is returned.
 function LAgent:addTag(tag) end
 
 --- Returns a blackboard snapshot for this agent or an empty blackboard when the agent has been removed.
@@ -427,44 +415,36 @@ function LAgent:hasTag(tag) end
 
 --- Removes a tag string from this agent when the agent still exists in its world.
 ---@param tag string Tag name to remove from the agent tag set.
----@return nil No value is returned.
 function LAgent:removeTag(tag) end
 
 --- Installs a Lua callback as this agent's decision model and stores it in the callback registry.
 ---@param callback function Function called during world updates with `(agent, blackboard, dt)` for this agent.
----@return nil No value is returned.
 function LAgent:setCustomModel(callback) end
 
 --- Sets this agent's built-in decision model from a string name when the name is recognized.
 ---@param model string Decision model name such as `fsm`, `bt`, `utility`, or another engine-supported model string.
----@return nil No value is returned.
 function LAgent:setDecisionModel(model) end
 
 --- Sets this agent's maximum steering force when the agent still exists in its world.
 ---@param v number Maximum steering force applied during steering calculations.
----@return nil No value is returned.
 function LAgent:setMaxForce(v) end
 
 --- Sets this agent's maximum movement speed when the agent still exists in its world.
 ---@param v number Maximum speed in world units per second.
----@return nil No value is returned.
 function LAgent:setMaxSpeed(v) end
 
 --- Sets this agent's world position when the agent still exists in its world.
 ---@param x number New X position in world units.
 ---@param y number New Y position in world units.
----@return nil No value is returned.
 function LAgent:setPosition(x, y) end
 
 --- Sets this agent's integer priority when the agent still exists in its world.
 ---@param p number Priority value used by game-side AI scheduling or ordering logic.
----@return nil No value is returned.
 function LAgent:setPriority(p) end
 
 --- Sets this agent's velocity vector when the agent still exists in its world.
 ---@param x number New X velocity in world units per second.
 ---@param y number New Y velocity in world units per second.
----@return nil No value is returned.
 function LAgent:setVelocity(x, y) end
 
 --- Returns the Lua-visible type name for this agent handle.
@@ -482,7 +462,6 @@ LBTNode = {}
 
 --- Adds a child node to a composite selector, sequence, or parallel node.
 ---@param child LBTNode Child node handle to move into this composite node.
----@return nil No value is returned.
 function LBTNode:addChild(child) end
 
 --- Returns the number of children owned by this behavior tree node.
@@ -498,27 +477,22 @@ function LBTNode:getCount() end
 function LBTNode:getNodeType() end
 
 --- Resets this behavior tree node's runtime state.
----@return nil No value is returned.
 function LBTNode:reset() end
 
 --- Sets the single child of a decorator node such as inverter, repeater, or succeeder.
 ---@param child LBTNode Child node handle to move into this decorator node.
----@return nil No value is returned.
 function LBTNode:setChild(child) end
 
 --- Sets the repeat count when this node is a repeater.
 ---@param n number Number of successful child executions before the repeater stops; zero means engine-defined repeat behavior.
----@return nil No value is returned.
 function LBTNode:setCount(n) end
 
 --- Sets the failure policy for a parallel node.
 ---@param policy string Parallel failure policy name parsed by the engine.
----@return nil No value is returned.
 function LBTNode:setFailurePolicy(policy) end
 
 --- Sets the success policy for a parallel node.
 ---@param policy string Parallel success policy name parsed by the engine.
----@return nil No value is returned.
 function LBTNode:setSuccessPolicy(policy) end
 
 --- Returns the Lua-visible type name for this behavior tree node handle.
@@ -543,7 +517,6 @@ function LBandit:armCount() end
 function LBandit:bestArm() end
 
 --- Resets all bandit arm statistics. This method is available to Lua scripts.
----@return nil No value is returned.
 function LBandit:reset() end
 
 --- Selects an arm using the configured bandit strategy.
@@ -566,15 +539,18 @@ function LBandit:typeOf(name) end
 --- Updates one arm with a received reward.
 ---@param idx number Zero-based arm index.
 ---@param reward number Reward value assigned to the arm pull.
----@return nil No value is returned.
 function LBandit:update(idx, reward) end
 
 --- Lua handle for a behavior tree root and its most recent execution status.
 ---@class LBehaviorTree
 LBehaviorTree = {}
 
+---@class LBehaviorTreeGetDebugStateResult
+---@field node_count number Node count.
+---@field last_status string Last status.
+
 --- Returns behavior tree debug counters and status in a Lua table.
----@return table Table containing `node_count` and `last_status` fields.
+---@return LBehaviorTreeGetDebugStateResult Table containing `node_count` and `last_status` fields.
 function LBehaviorTree:getDebugState() end
 
 --- Returns the last behavior tree status string recorded by the tree.
@@ -583,7 +559,6 @@ function LBehaviorTree:getLastStatus() end
 
 --- Sets the behavior tree root by moving a node handle into the tree.
 ---@param node LBTNode Node handle to consume as the new tree root.
----@return nil No value is returned.
 function LBehaviorTree:setRoot(node) end
 
 --- Returns the Lua-visible type name for this behavior tree handle.
@@ -604,14 +579,12 @@ LCommandQueue = {}
 function LCommandQueue:cancelCurrent() end
 
 --- Removes every queued command. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCommandQueue:clear() end
 
 --- Adds a command callback to the back of the queue.
 ---@param kind string Command type label stored for inspection.
 ---@param callback function Callback invoked by command execution logic outside this wrapper.
 ---@param opts? table Optional table with `targetX`, `targetY`, `priority`, and `interruptible` fields.
----@return nil No value is returned.
 function LCommandQueue:enqueue(kind, callback, opts) end
 
 --- Returns the number of commands currently queued.
@@ -635,14 +608,12 @@ function LCommandQueue:isEmpty() end
 ---@param kind string Command type label stored for inspection.
 ---@param callback function Callback invoked by command execution logic outside this wrapper.
 ---@param opts? table Optional table with `targetX`, `targetY`, `priority`, and `interruptible` fields.
----@return nil No value is returned.
 function LCommandQueue:pushFront(kind, callback, opts) end
 
 --- Replaces the queue contents with one command callback.
 ---@param kind string Command type label stored for inspection.
 ---@param callback function Callback invoked by command execution logic outside this wrapper.
 ---@param opts? table Optional table with `targetX`, `targetY`, `priority`, and `interruptible` fields.
----@return nil No value is returned.
 function LCommandQueue:replace(kind, callback, opts) end
 
 --- Returns the Lua-visible type name for this command queue handle.
@@ -665,7 +636,6 @@ LContextSteering = {}
 ---@param max_y number Maximum Y bound.
 ---@param margin number Distance from bounds where avoidance begins.
 ---@param weight number Avoidance behavior weight.
----@return nil No value is returned.
 function LContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
 
 --- Adds a point avoidance influence to context steering.
@@ -673,20 +643,17 @@ function LContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, wei
 ---@param y number Avoidance point Y position.
 ---@param radius number Avoidance radius in world units.
 ---@param weight number Avoidance behavior weight.
----@return nil No value is returned.
 function LContextSteering:addAvoidPoint(x, y, radius, weight) end
 
 --- Adds a context steering target attraction.
 ---@param tx number Target X position in world units.
 ---@param ty number Target Y position in world units.
 ---@param weight number Attraction weight.
----@return nil No value is returned.
 function LContextSteering:addSeekTarget(tx, ty, weight) end
 
 --- Adds wander noise to context steering.
 ---@param jitter number Random steering jitter strength.
 ---@param weight number Wander behavior weight.
----@return nil No value is returned.
 function LContextSteering:addWander(jitter, weight) end
 
 --- Returns the magnitude of the last selected context steering slot.
@@ -694,7 +661,6 @@ function LContextSteering:addWander(jitter, weight) end
 function LContextSteering:chosenMagnitude() end
 
 --- Removes all context steering behaviors.
----@return nil No value is returned.
 function LContextSteering:clearBehaviors() end
 
 --- Evaluates context steering and returns the selected movement direction.
@@ -739,11 +705,9 @@ function LDialogueAI:addBranch(topic_id, branch_id, weight, fsm_state, bt_status
 ---@param fsm_state? string Optional FSM state required for this topic.
 ---@param bt_status? string Optional behavior tree status required for this topic.
 ---@param utility_key? string Optional utility score key multiplied into selection.
----@return nil No value is returned.
 function LDialogueAI:addTopic(id, weight, fsm_state, bt_status, utility_key) end
 
 --- Removes every stored utility score from this dialogue selector.
----@return nil No value is returned.
 function LDialogueAI:clearUtilityScores() end
 
 --- Returns the number of topics registered in this dialogue selector.
@@ -761,18 +725,15 @@ function LDialogueAI:selectTopic() end
 
 --- Sets the behavior-tree status used as dialogue selection context.
 ---@param status? string Current behavior tree status, or nil to clear the status context.
----@return nil No value is returned.
 function LDialogueAI:setBTStatus(status) end
 
 --- Sets the finite-state-machine state used as dialogue selection context.
 ---@param state? string Current FSM state name, or nil to clear the FSM context.
----@return nil No value is returned.
 function LDialogueAI:setFSMState(state) end
 
 --- Stores a utility score used by topics and branches that reference the given key.
 ---@param key string Utility score key.
 ---@param score number Utility score value used during weighted selection.
----@return nil No value is returned.
 function LDialogueAI:setUtilityScore(key, score) end
 
 --- Returns the Lua-visible type name for this dialogue AI handle.
@@ -793,7 +754,6 @@ LEmotionModel = {}
 ---@param rest number Resting emotion value.
 ---@param decay number Decay rate back toward rest.
 ---@param min_vis number Minimum value considered visible or active.
----@return nil No value is returned.
 function LEmotionModel:add(name, rest, decay, min_vis) end
 
 --- Returns the strongest active emotion name when one is available.
@@ -811,13 +771,11 @@ function LEmotionModel:get(name) end
 function LEmotionModel:isActive(name) end
 
 --- Resets all emotions toward their default state.
----@return nil No value is returned.
 function LEmotionModel:reset() end
 
 --- Adds an amount to a named emotion. This method is available to Lua scripts.
 ---@param name string Emotion name to trigger.
 ---@param amount number Amount added to the current emotion value.
----@return nil No value is returned.
 function LEmotionModel:trigger(name, amount) end
 
 --- Returns the Lua-visible type name for this emotion model handle.
@@ -831,7 +789,6 @@ function LEmotionModel:typeOf(name) end
 
 --- Advances emotion decay over elapsed time.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LEmotionModel:update(dt) end
 
 --- Lua handle for a GOAP planner with boolean preconditions, effects, and goals.
@@ -842,13 +799,11 @@ LGOAPPlanner = {}
 ---@param name string Action name emitted in generated plans.
 ---@param cost? number Planning cost for the action; defaults to 1.0.
 ---@param callback? function Optional callback stored with the action for game-side execution.
----@return nil No value is returned.
 function LGOAPPlanner:addAction(name, cost, callback) end
 
 --- Adds a GOAP goal with an optional priority weight.
 ---@param name string Goal name used for planning and debugging.
 ---@param priority? number Goal priority; defaults to 1.0.
----@return nil No value is returned.
 function LGOAPPlanner:addGoal(name, priority) end
 
 --- Returns the number of GOAP actions registered in this planner.
@@ -866,33 +821,29 @@ function LGOAPPlanner:getMaxIterations() end
 --- Builds a plan from the supplied boolean world state and returns action names in execution order.
 ---@param world_state_tbl table Map table from string world-state keys to boolean values.
 ---@param max_depth? number Maximum search depth; defaults to 10.
----@return table Array table of action names selected by the planner.
+---@return string[] Action names selected by the planner.
 function LGOAPPlanner:plan(world_state_tbl, max_depth) end
 
 --- Sets one boolean effect produced by an existing GOAP action.
 ---@param action_name string Name of the action to update.
 ---@param key string World-state key changed by the action.
 ---@param value boolean Boolean value written by the effect.
----@return nil No value is returned.
 function LGOAPPlanner:setEffect(action_name, key, value) end
 
 --- Sets one desired world-state key for an existing GOAP goal.
 ---@param goal_name string Name of the goal to update.
 ---@param key string World-state key required by the goal.
 ---@param value boolean Desired boolean value for the key.
----@return nil No value is returned.
 function LGOAPPlanner:setGoalState(goal_name, key, value) end
 
 --- Sets the maximum number of planner iterations allowed during search.
 ---@param n number Maximum iteration count.
----@return nil No value is returned.
 function LGOAPPlanner:setMaxIterations(n) end
 
 --- Sets one boolean precondition for an existing GOAP action.
 ---@param action_name string Name of the action to update.
 ---@param key string World-state key required by the action.
 ---@param value boolean Required boolean value for the key.
----@return nil No value is returned.
 function LGOAPPlanner:setPrecondition(action_name, key, value) end
 
 --- Returns the Lua-visible type name for this GOAP planner handle.
@@ -909,11 +860,10 @@ function LGOAPPlanner:typeOf(name) end
 LGeneticAlgorithm = {}
 
 --- Returns the genes for the best chromosome in the population.
----@return table Array of best gene values, or an empty table when the population has no best chromosome.
+---@return number[] Array of best gene values, or an empty array when the population has no best chromosome.
 function LGeneticAlgorithm:bestGenes() end
 
 --- Advances the genetic algorithm by one generation.
----@return nil No value is returned.
 function LGeneticAlgorithm:evolve() end
 
 --- Returns the current generation index.
@@ -922,7 +872,7 @@ function LGeneticAlgorithm:generation() end
 
 --- Returns the genes for a chromosome by zero-based index.
 ---@param idx number Zero-based chromosome index.
----@return table Array of gene values, or an empty table for an invalid index.
+---@return number[] Gene values, or an empty table for an invalid index.
 function LGeneticAlgorithm:getGenes(idx) end
 
 --- Returns the population size. This method is available to Lua scripts.
@@ -932,7 +882,6 @@ function LGeneticAlgorithm:popSize() end
 --- Sets the fitness value for a chromosome by zero-based index.
 ---@param idx number Zero-based chromosome index.
 ---@param fitness number Fitness value used by the next evolution step.
----@return nil No value is returned.
 function LGeneticAlgorithm:setFitness(idx, fitness) end
 
 --- Returns the Lua-visible type name for this genetic algorithm handle.
@@ -951,7 +900,6 @@ LHTNDomain = {}
 --- Adds a compound HTN task with one or more ordered method definitions.
 ---@param comp_name string Compound task name.
 ---@param methods_table table Array of method tables with `name`, `preconditions`, and `sub_tasks` fields.
----@return nil No value is returned.
 function LHTNDomain:addCompound(comp_name, methods_table) end
 
 --- Adds a primitive HTN task with preconditions, effects, and cleared facts.
@@ -959,7 +907,6 @@ function LHTNDomain:addCompound(comp_name, methods_table) end
 ---@param preconds table Array of fact names required before the task can run.
 ---@param effects table Array of fact names added by the task.
 ---@param clears table Array of fact names removed by the task.
----@return nil No value is returned.
 function LHTNDomain:addPrimitive(name, preconds, effects, clears) end
 
 --- Plans from a root HTN task and numeric world state facts.
@@ -987,7 +934,6 @@ LInfluenceMap = {}
 
 --- Adds an influence layer with the given name if it does not already exist.
 ---@param name string Layer name used by later influence operations.
----@return nil No value is returned.
 function LInfluenceMap:addLayer(name) end
 
 --- Blends two source layers into a destination layer using independent weights.
@@ -996,22 +942,18 @@ function LInfluenceMap:addLayer(name) end
 ---@param layer_b string Second source layer name.
 ---@param weight_b number Weight applied to the second source layer.
 ---@param dest string Destination layer name that receives the blended values.
----@return nil No value is returned.
 function LInfluenceMap:blend(layer_a, weight_a, layer_b, weight_b, dest) end
 
 --- Clears every influence value in every layer.
----@return nil No value is returned.
 function LInfluenceMap:clearAll() end
 
 --- Clears every value in a named influence layer.
 ---@param layer string Layer name to clear.
----@return nil No value is returned.
 function LInfluenceMap:clearLayer(layer) end
 
 --- Multiplies a named layer by a decay factor.
 ---@param layer string Layer name to decay.
 ---@param factor number Decay factor applied to every cell.
----@return nil No value is returned.
 function LInfluenceMap:decay(layer, factor) end
 
 --- Returns the world size represented by each influence map cell.
@@ -1053,7 +995,6 @@ function LInfluenceMap:hasLayer(name) end
 --- Propagates influence values across neighboring cells on a named layer.
 ---@param layer string Layer name to propagate.
 ---@param momentum? number Propagation momentum factor; defaults to 0.5.
----@return nil No value is returned.
 function LInfluenceMap:propagate(layer, momentum) end
 
 --- Returns influence values inside a world-space rectangle on a named layer.
@@ -1062,7 +1003,7 @@ function LInfluenceMap:propagate(layer, momentum) end
 ---@param wy number Rectangle Y coordinate in world units.
 ---@param ww number Rectangle width in world units.
 ---@param wh number Rectangle height in world units.
----@return table Array table of influence samples from cells inside the rectangle.
+---@return number[] Array of influence samples from cells inside the rectangle.
 function LInfluenceMap:queryRect(layer, wx, wy, ww, wh) end
 
 --- Sets one cell value in a named influence layer using one-based cell coordinates.
@@ -1070,7 +1011,6 @@ function LInfluenceMap:queryRect(layer, wx, wy, ww, wh) end
 ---@param x number One-based cell X coordinate.
 ---@param y number One-based cell Y coordinate.
 ---@param value number Influence value to store in the cell.
----@return nil No value is returned.
 function LInfluenceMap:setInfluence(layer, x, y, value) end
 
 --- Applies a radial influence stamp to a named layer in world coordinates.
@@ -1080,7 +1020,6 @@ function LInfluenceMap:setInfluence(layer, x, y, value) end
 ---@param radius number Stamp radius in world units.
 ---@param value number Influence value applied at the center.
 ---@param falloff? number Falloff exponent or multiplier; defaults to 1.0.
----@return nil No value is returned.
 function LInfluenceMap:stampInfluence(layer, wx, wy, radius, value, falloff) end
 
 --- Returns the Lua-visible type name for this influence map handle.
@@ -1122,7 +1061,6 @@ LNeedSystem = {}
 ---@param decay_rate number Value decay rate applied during updates.
 ---@param urgency_threshold number Value threshold where the need becomes urgent.
 ---@param urgency_factor number Weight applied to urgent needs.
----@return nil No value is returned.
 function LNeedSystem:addNeed(name, decay_rate, urgency_threshold, urgency_factor) end
 
 --- Returns the name of the most urgent need when any need is active.
@@ -1132,7 +1070,6 @@ function LNeedSystem:mostUrgent() end
 --- Reduces or satisfies a named need by the supplied amount.
 ---@param name string Need name to satisfy.
 ---@param amount number Amount applied to the need value.
----@return nil No value is returned.
 function LNeedSystem:satisfy(name, amount) end
 
 --- Returns the Lua-visible type name for this need system handle.
@@ -1146,7 +1083,6 @@ function LNeedSystem:typeOf(name) end
 
 --- Advances need decay over elapsed time.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LNeedSystem:update(dt) end
 
 --- Returns the current value of a named need.
@@ -1162,16 +1098,15 @@ LNeuralNet = {}
 ---@param inputs number Input count for the layer.
 ---@param outputs number Output count for the layer.
 ---@param activation string Activation name such as `relu`, `sigmoid`, `tanh`, `linear`, or `softmax`.
----@return nil No value is returned.
 function LNeuralNet:addLayer(inputs, outputs, activation) end
 
 --- Runs a forward pass and returns output values.
 ---@param input table Array of numeric input values.
----@return table Array of numeric output values.
+---@return number[] Numeric output values.
 function LNeuralNet:forward(input) end
 
 --- Returns the network weights as a flat numeric array.
----@return table Flat array of numeric weights in engine layer order.
+---@return number[] Numeric weights in engine layer order.
 function LNeuralNet:getWeights() end
 
 --- Returns the number of layers in the network.
@@ -1214,7 +1149,6 @@ function LNeuroevolution:bestNetwork() end
 function LNeuroevolution:chromosomeToNet(idx) end
 
 --- Advances the neuroevolution population by one generation.
----@return nil No value is returned.
 function LNeuroevolution:evolve() end
 
 --- Returns the current generation index.
@@ -1228,7 +1162,6 @@ function LNeuroevolution:popSize() end
 --- Sets the fitness value for a chromosome by zero-based index.
 ---@param idx number Zero-based chromosome index.
 ---@param fitness number Fitness value used by the next evolution step.
----@return nil No value is returned.
 function LNeuroevolution:setFitness(idx, fitness) end
 
 --- Returns the Lua-visible type name for this neuroevolution handle.
@@ -1258,7 +1191,6 @@ function LORCASolver:agentCount() end
 
 --- Computes safe velocities for all ORCA agents.
 ---@param dt number Elapsed time in seconds for the avoidance step.
----@return nil No value is returned.
 function LORCASolver:compute(dt) end
 
 --- Returns the computed safe velocity for an ORCA agent.
@@ -1271,14 +1203,12 @@ function LORCASolver:getSafeVelocity(idx) end
 ---@param idx number Zero-based ORCA agent index.
 ---@param x number New X position.
 ---@param y number New Y position.
----@return nil No value is returned.
 function LORCASolver:setPosition(idx, x, y) end
 
 --- Sets the preferred velocity for an ORCA agent by zero-based index.
 ---@param idx number Zero-based ORCA agent index.
 ---@param pvx number Preferred X velocity.
 ---@param pvy number Preferred Y velocity.
----@return nil No value is returned.
 function LORCASolver:setPreferredVelocity(idx, pvx, pvy) end
 
 --- Returns the Lua-visible type name for this ORCA solver handle.
@@ -1306,11 +1236,9 @@ function LQLearner:chooseAction(state) end
 
 --- Replaces the Q-learner state from a JSON string.
 ---@param json string JSON data previously produced by `serialize`.
----@return nil No value is returned.
 function LQLearner:deserialize(json) end
 
 --- Ends the current learning episode and applies episode bookkeeping.
----@return nil No value is returned.
 function LQLearner:endEpisode() end
 
 --- Returns the number of actions represented by this learner.
@@ -1352,7 +1280,6 @@ function LQLearner:getStateCount() end
 ---@param action number One-based action index taken in the previous state.
 ---@param reward number Reward received for the transition.
 ---@param next_state number One-based next state index.
----@return nil No value is returned.
 function LQLearner:learn(state, action, reward, next_state) end
 
 --- Serializes the Q-learner state to a JSON string.
@@ -1361,29 +1288,24 @@ function LQLearner:serialize() end
 
 --- Sets the Q-learning gamma discount factor.
 ---@param v number Discount factor used by future updates.
----@return nil No value is returned.
 function LQLearner:setDiscountFactor(v) end
 
 --- Sets the exploration decay multiplier applied across episodes.
 ---@param v number Exploration decay multiplier.
----@return nil No value is returned.
 function LQLearner:setExplorationDecay(v) end
 
 --- Sets the exploration rate used by action selection.
 ---@param v number Exploration probability for future `chooseAction` calls.
----@return nil No value is returned.
 function LQLearner:setExplorationRate(v) end
 
 --- Sets the Q-learning alpha learning rate.
 ---@param v number Learning rate used by future updates.
----@return nil No value is returned.
 function LQLearner:setLearningRate(v) end
 
 --- Sets the stored Q-value for a one-based state and action pair.
 ---@param state number One-based state index.
 ---@param action number One-based action index.
 ---@param value number Q-value to store.
----@return nil No value is returned.
 function LQLearner:setQValue(state, action, value) end
 
 --- Returns the Lua-visible type name for this Q-learner handle.
@@ -1401,7 +1323,6 @@ LSquad = {}
 
 --- Adds a member name to the squad member list.
 ---@param name string Agent or game object name to append as a squad member.
----@return nil No value is returned.
 function LSquad:addMember(name) end
 
 --- Returns a blackboard snapshot for this squad.
@@ -1433,7 +1354,7 @@ function LSquad:getLeader() end
 function LSquad:getMemberCount() end
 
 --- Returns all squad members in an array-style Lua table.
----@return table Array table of member names.
+---@return string[] Member names.
 function LSquad:getMembers() end
 
 --- Returns the squad name. This method is available to Lua scripts.
@@ -1442,18 +1363,15 @@ function LSquad:getName() end
 
 --- Removes every member entry with the given name.
 ---@param name string Member name to remove.
----@return nil No value is returned.
 function LSquad:removeMember(name) end
 
 --- Sets the squad formation type and optionally updates spacing.
 ---@param ftype string Formation type name parsed by the engine.
 ---@param spacing? number Optional spacing between formation slots.
----@return nil No value is returned.
 function LSquad:setFormation(ftype, spacing) end
 
 --- Sets the squad leader name. This method is available to Lua scripts.
 ---@param name string Member or agent name to store as leader.
----@return nil No value is returned.
 function LSquad:setLeader(name) end
 
 --- Returns the Lua-visible type name for this squad handle.
@@ -1472,7 +1390,6 @@ LStateMachine = {}
 --- Adds a state with optional Lua lifecycle callbacks.
 ---@param name string State name used by transitions and direct state changes.
 ---@param opts table Optional table with `onEnter`, `onUpdate`, and `onExit` callback functions.
----@return nil No value is returned.
 function LStateMachine:addState(name, opts) end
 
 --- Adds a transition between two states with an optional guard callback and priority.
@@ -1480,12 +1397,10 @@ function LStateMachine:addState(name, opts) end
 ---@param to string Destination state name.
 ---@param guard? function Optional function that must return true for the transition to run.
 ---@param priority? number Transition priority used when multiple transitions are available; defaults to zero.
----@return nil No value is returned.
 function LStateMachine:addTransition(from, to, guard, priority) end
 
 --- Immediately switches the current state and resets the time spent in state.
 ---@param name string State name to set as current without transition checks.
----@return nil No value is returned.
 function LStateMachine:forceState(name) end
 
 --- Returns the current state name when the state machine has entered a state.
@@ -1498,7 +1413,6 @@ function LStateMachine:getTimeInState() end
 
 --- Sets the initial state and also enters it when the machine has no current state yet.
 ---@param name string State name to use as the initial state.
----@return nil No value is returned.
 function LStateMachine:setInitialState(name) end
 
 --- Returns the Lua-visible type name for this state machine handle.
@@ -1519,19 +1433,16 @@ LSteeringManager = {}
 ---@param ty number Target Y position in world units.
 ---@param slowing? number Radius used to reduce speed near the target; defaults to 50.0.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addArrive(tx, ty, slowing, weight) end
 
 --- Adds a custom steering behavior backed by a Lua callback.
 ---@param func function Function called as `(agent, dt)` that returns an X and Y steering force.
 ---@param weight? number Custom behavior weight applied to returned forces; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addCustomBehavior(func, weight) end
 
 --- Adds an evade behavior that moves away from another named agent when a threat name is supplied.
 ---@param threat_name? string Optional name of the agent to evade.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addEvade(threat_name, weight) end
 
 --- Adds a flee behavior that pushes the agent away from a target point inside a panic distance.
@@ -1539,7 +1450,6 @@ function LSteeringManager:addEvade(threat_name, weight) end
 ---@param ty number Threat Y position in world units.
 ---@param panic_dist? number Distance inside which fleeing is active; defaults to 200.0.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addFlee(tx, ty, panic_dist, weight) end
 
 --- Adds a flocking behavior with separation, alignment, and cohesion weights.
@@ -1548,20 +1458,17 @@ function LSteeringManager:addFlee(tx, ty, panic_dist, weight) end
 ---@param align_w? number Alignment force weight; defaults to 1.0.
 ---@param coh_w? number Cohesion force weight; defaults to 1.0.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addFlock(neighbor_radius, sep_w, align_w, coh_w, weight) end
 
 --- Adds a pursue behavior that chases another named agent when a target name is supplied.
 ---@param target_name? string Optional name of the agent to pursue.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addPursue(target_name, weight) end
 
 --- Adds a seek behavior that pulls the agent toward a target point.
 ---@param tx number Target X position in world units.
 ---@param ty number Target Y position in world units.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addSeek(tx, ty, weight) end
 
 --- Adds a wander behavior that produces jittered exploratory movement.
@@ -1569,7 +1476,6 @@ function LSteeringManager:addSeek(tx, ty, weight) end
 ---@param dist? number Wander circle distance in front of the agent; defaults to 40.0.
 ---@param jitter? number Random displacement applied per update; defaults to 5.0.
 ---@param weight? number Behavior weight applied during steering combination; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:addWander(radius, dist, jitter, weight) end
 
 --- Runs enabled custom steering callbacks for an agent and returns the weighted combined force.
@@ -1592,12 +1498,10 @@ function LSteeringManager:applyCustomSteering(agent, dt) end
 function LSteeringManager:calculate(px, py, vx, vy, max_speed, max_force, dt) end
 
 --- Clears the active waypoint path behavior.
----@return nil No value is returned.
 function LSteeringManager:clearPath() end
 
 --- Enables or disables spatial hash acceleration for neighbor queries.
 ---@param enabled boolean True to use spatial hashing, false to use direct scans.
----@return nil No value is returned.
 function LSteeringManager:enableSpatialHash(enabled) end
 
 --- Returns the number of steering behaviors configured on this manager.
@@ -1624,19 +1528,16 @@ function LSteeringManager:hasPath() end
 
 --- Sets how steering behavior forces are combined.
 ---@param mode string Combine mode string parsed by the steering manager.
----@return nil No value is returned.
 function LSteeringManager:setCombineMode(mode) end
 
 --- Sets a waypoint path behavior from an array of `{x, y}` tables.
 ---@param waypoints table Array of waypoint tables, each containing numeric `x` and `y` fields.
 ---@param reach_radius? number Distance at which a waypoint is considered reached; defaults to 12.0.
 ---@param weight? number Path following behavior weight; defaults to 1.0.
----@return nil No value is returned.
 function LSteeringManager:setPath(waypoints, reach_radius, weight) end
 
 --- Sets the cell size used by the steering manager spatial hash.
 ---@param size number Spatial hash cell size in world units.
----@return nil No value is returned.
 function LSteeringManager:setSpatialHashCellSize(size) end
 
 --- Returns the Lua-visible type name for this steering manager handle.
@@ -1672,7 +1573,6 @@ function LStimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) en
 function LStimulusWorld:addVisual(x, y, intensity, radius, tag) end
 
 --- Removes every active stimulus. This method is available to Lua scripts.
----@return nil No value is returned.
 function LStimulusWorld:clear() end
 
 --- Returns the number of active stimuli.
@@ -1695,7 +1595,6 @@ function LStimulusWorld:typeOf(name) end
 
 --- Advances stimulus decay and lifetime state.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LStimulusWorld:update(dt) end
 
 --- Lua handle for interval-based strategic goal selection.
@@ -1708,22 +1607,18 @@ function LStrategyAI:activeGoal() end
 
 --- Adds a named strategic goal. This method is available to Lua scripts.
 ---@param name string Goal name scored by update callbacks.
----@return nil No value is returned.
 function LStrategyAI:addGoal(name) end
 
 --- Adds a context tag to this strategy AI.
 ---@param tag string Tag name to add.
----@return nil No value is returned.
 function LStrategyAI:addTag(tag) end
 
 --- Immediately scores all goals and updates the active goal.
 ---@param scorer_fn function Function called with a goal name and returning a numeric score.
----@return nil No value is returned.
 function LStrategyAI:forceEvaluate(scorer_fn) end
 
 --- Removes a context tag from this strategy AI.
 ---@param tag string Tag name to remove.
----@return nil No value is returned.
 function LStrategyAI:removeTag(tag) end
 
 --- Returns time remaining until the next scheduled strategy evaluation.
@@ -1742,7 +1637,6 @@ function LStrategyAI:typeOf(name) end
 --- Advances strategy timing and scores goals when the update interval has elapsed.
 ---@param dt number Elapsed time in seconds.
 ---@param scorer_fn function Function called with a goal name and returning a numeric score.
----@return nil No value is returned.
 function LStrategyAI:update(dt, scorer_fn) end
 
 --- Lua handle for trait values with temporary modifiers and archetype lookup.
@@ -1754,7 +1648,6 @@ LTraitProfile = {}
 ---@param delta number Value added to the trait while the modifier is active.
 ---@param duration? number Modifier lifetime in seconds, or nil for engine-defined permanent duration.
 ---@param source string Source label used to remove related modifiers later.
----@return nil No value is returned.
 function LTraitProfile:addModifier(trait_name, delta, duration, source) end
 
 --- Returns the best matching archetype name when the profile can classify one.
@@ -1778,13 +1671,11 @@ function LTraitProfile:has(name) end
 
 --- Removes all trait modifiers that match a source label.
 ---@param source string Source label to remove.
----@return nil No value is returned.
 function LTraitProfile:removeModifiers(source) end
 
 --- Sets the base value for a named trait.
 ---@param name string Trait name to create or update.
 ---@param value number Base trait value.
----@return nil No value is returned.
 function LTraitProfile:set(name, value) end
 
 --- Returns the number of traits stored in the profile.
@@ -1802,7 +1693,6 @@ function LTraitProfile:typeOf(name) end
 
 --- Advances modifier timers and removes expired modifiers.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LTraitProfile:update(dt) end
 
 --- Lua handle for utility AI action scoring and consideration curves.
@@ -1813,7 +1703,6 @@ LUtilityAI = {}
 ---@param name string Action name returned when this action wins evaluation.
 ---@param scorer_fn function Function called by evaluation to score this action.
 ---@param weight? number Momentum bonus or base weighting value; defaults to 1.0.
----@return nil No value is returned.
 function LUtilityAI:addAction(name, scorer_fn, weight) end
 
 --- Adds a consideration scorer and response curve to an existing utility action.
@@ -1825,7 +1714,6 @@ function LUtilityAI:addAction(name, scorer_fn, weight) end
 ---@param p2? number Second curve parameter; defaults to 0.0.
 ---@param p3? number Third curve parameter; defaults to 0.0.
 ---@param weight? number Consideration weight; defaults to 1.0.
----@return nil No value is returned.
 function LUtilityAI:addConsideration(action_name, name, scorer_fn, curve_arg, p1, p2, p3, weight) end
 
 --- Evaluates all actions and returns the winning action name when one is available.
@@ -2033,11 +1921,9 @@ LAnimCurve = {}
 --- Adds a keyframe to the curve. This method is available to Lua scripts.
 ---@param t number Keyframe time or normalized position.
 ---@param v number Keyframe value.
----@return nil No value is returned.
 function LAnimCurve:addKeyframe(t, v) end
 
 --- Removes all keyframes from this curve.
----@return nil No value is returned.
 function LAnimCurve:clear() end
 
 --- Evaluates the curve at a time or normalized position.
@@ -2050,13 +1936,11 @@ function LAnimCurve:eval(t) end
 function LAnimCurve:keyframeCount() end
 
 --- Sets or clears a Lua callback used to evaluate custom easing.
----@param func any Function used as custom easing callback, or nil to clear custom easing.
----@return nil No value is returned.
+---@param func function Function used as custom easing callback, or nil to clear custom easing.
 function LAnimCurve:setCustomEasing(func) end
 
 --- Sets the built-in easing mode used between keyframes.
 ---@param mode string Easing mode `step`, `linear`, `ease_in`, `ease_out`, or `ease_in_out`.
----@return nil No value is returned.
 function LAnimCurve:setEasing(mode) end
 
 --- Returns the Lua-visible type name for this animation curve handle.
@@ -2076,14 +1960,12 @@ LAnimStateMachine = {}
 ---@param name string State name.
 ---@param clip string Clip name to play while this state is active.
 ---@param looping boolean True when the clip should loop in this state.
----@return nil No value is returned.
 function LAnimStateMachine:addState(name, clip, looping) end
 
 --- Adds a named-condition transition between two animation states.
 ---@param from_state string Source state name.
 ---@param to_state string Destination state name.
 ---@param condition string Parameter condition expression understood by the state machine.
----@return nil No value is returned.
 function LAnimStateMachine:addTransition(from_state, to_state, condition) end
 
 --- Forces the state machine into a named state.
@@ -2102,7 +1984,6 @@ function LAnimStateMachine:getState() end
 --- Sets a boolean, integer, or numeric state machine parameter.
 ---@param name string Parameter name used by transition conditions.
 ---@param value LuaValue Boolean, integer, or number value to store.
----@return nil No value is returned.
 function LAnimStateMachine:setParam(name, value) end
 
 --- Returns the Lua-visible type name for this animation state machine handle.
@@ -2116,7 +1997,6 @@ function LAnimStateMachine:typeOf(name) end
 
 --- Advances the animation state machine and its owned animation playback.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LAnimStateMachine:update(dt) end
 
 --- Lua-side animation synchronization group for coordinating multiple animation handles.
@@ -2124,12 +2004,10 @@ function LAnimStateMachine:update(dt) end
 LAnimSyncGroup = {}
 
 --- Adds an animation-like handle to the sync group.
----@param handle any Animation handle accepted by future sync group implementations.
----@return nil No value is returned.
+---@param handle table Animation handle accepted by future sync group implementations.
 function LAnimSyncGroup:add(handle) end
 
 --- Removes all members from the sync group.
----@return nil No value is returned.
 function LAnimSyncGroup:clear() end
 
 --- Returns the number of handles tracked by the sync group.
@@ -2137,8 +2015,7 @@ function LAnimSyncGroup:clear() end
 function LAnimSyncGroup:memberCount() end
 
 --- Removes an animation-like handle from the sync group.
----@param handle any Animation handle accepted by future sync group implementations.
----@return nil No value is returned.
+---@param handle table Animation handle accepted by future sync group implementations.
 function LAnimSyncGroup:remove(handle) end
 
 --- Returns the Lua-visible type name for this animation sync group handle.
@@ -2160,7 +2037,6 @@ LAnimation = {}
 ---@param fps number Playback speed in frames per second.
 ---@param looping boolean True when playback should wrap at the end.
 ---@param mode? string Playback mode `forward`, `reverse`, or `pingpong`; defaults to `forward`.
----@return nil No value is returned.
 function LAnimation:addClip(name, indices_tbl, fps, looping, mode) end
 
 --- Adds frames from a texture grid and creates a clip that references the new frames.
@@ -2173,7 +2049,6 @@ function LAnimation:addClip(name, indices_tbl, fps, looping, mode) end
 ---@param count number Number of frames to add.
 ---@param fps number Playback speed in frames per second.
 ---@param looping boolean True when playback should wrap at the end.
----@return nil No value is returned.
 function LAnimation:addClipFromGrid(name, tw, th, fw, fh, start, count, fps, looping) end
 
 --- Adds one frame rectangle to this animation.
@@ -2259,7 +2134,6 @@ function LAnimation:isLooping() end
 function LAnimation:isPlaying() end
 
 --- Pauses animation playback without changing the current clip.
----@return nil No value is returned.
 function LAnimation:pause() end
 
 --- Starts playback of a named clip. This method is available to Lua scripts.
@@ -2267,12 +2141,15 @@ function LAnimation:pause() end
 ---@return boolean True when the clip exists and playback started.
 function LAnimation:play(name) end
 
+---@class LAnimationPollEventsResult
+---@field type string Event type name.
+---@field frame number? Frame index when available.
+
 --- Drains animation events produced since the previous poll.
----@return table Array of event tables with `type` and optional `frame` fields.
+---@return LAnimationPollEventsResult Array of event tables with `type` and optional `frame` fields.
 function LAnimation:pollEvents() end
 
 --- Resumes playback of a paused animation.
----@return nil No value is returned.
 function LAnimation:resume() end
 
 --- Changes the playback mode for an existing clip.
@@ -2283,16 +2160,13 @@ function LAnimation:setClipMode(name, mode) end
 
 --- Sets the current frame index directly.
 ---@param index number Frame index to make current.
----@return nil No value is returned.
 function LAnimation:setFrame(index) end
 
 --- Sets the animation playback speed multiplier.
 ---@param speed number Playback speed multiplier used by future updates.
----@return nil No value is returned.
 function LAnimation:setSpeed(speed) end
 
 --- Stops playback and resets animation playback state.
----@return nil No value is returned.
 function LAnimation:stop() end
 
 --- Returns the Lua-visible type name for this animation handle.
@@ -2306,7 +2180,6 @@ function LAnimation:typeOf(name) end
 
 --- Advances animation playback and records any frame or clip events.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LAnimation:update(dt) end
 
 --- Lua-side blend layer set used to combine animation clips with weights and bone masks.
@@ -2330,8 +2203,14 @@ function LBlendLayerSet:getWeight(name) end
 ---@return number Blend layer count.
 function LBlendLayerSet:len() end
 
+---@class LBlendLayerSetListLayersResult
+---@field name string Layer name.
+---@field clip_name string Clip name.
+---@field weight number Blend weight.
+---@field bones string[] Bone mask names.
+
 --- Returns all blend layers with names, clip names, weights, and bone masks.
----@return table Array of layer tables with `name`, `clip_name`, `weight`, and `bones` fields.
+---@return LBlendLayerSetListLayersResult Array of layer tables with `name`, `clip_name`, `weight`, and `bones` fields.
 function LBlendLayerSet:listLayers() end
 
 --- Removes a blend layer by name. This method is available to Lua scripts.
@@ -2360,9 +2239,13 @@ function LBlendLayerSet:type() end
 ---@return boolean True when the supplied type name matches this handle.
 function LBlendLayerSet:typeOf(name) end
 
+---@class AnimationBuildCharacterResult
+---@field animation LAnimation Animation handle.
+---@field stateMachine LStateMachine State machine handle.
+
 --- Builds a character animation bundle from grid frame and clip configuration.
 ---@param cfg table Configuration table with texture size, frame size, clips, optional states, and optional transitions.
----@return table Table containing `animation` and, when states are supplied, `stateMachine` handles.
+---@return AnimationBuildCharacterResult Table containing `animation` and, when states are supplied, `stateMachine` handles.
 lurek.animation.buildCharacter = function(cfg) end
 
 --- Loads an animation from an Aseprite JSON export string.
@@ -2400,7 +2283,6 @@ lurek.audio = {}
 LBus = {}
 
 --- Removes the ducking configuration from this bus.
----@return nil No return value.
 function LBus:clearDuck() end
 
 --- Returns the name of this audio bus. This method is available to Lua scripts.
@@ -2424,27 +2306,22 @@ function LBus:getVolume() end
 function LBus:isPaused() end
 
 --- Pauses all sources routed through this bus.
----@return nil No return value.
 function LBus:pause() end
 
 --- Resumes all sources routed through this bus that were paused.
----@return nil No return value.
 function LBus:resume() end
 
 --- Configures ducking so this bus lowers the volume of a target bus when active.
 ---@param target_name string Name of the bus to duck.
 ---@param duck_vol number Volume multiplier applied to the target when ducking (0.0-1.0).
----@return nil No return value.
 function LBus:setDuckTarget(target_name, duck_vol) end
 
 --- Sets the pitch multiplier applied to all sources routed through this bus.
 ---@param pitch number Pitch multiplier (1.0 = normal speed).
----@return nil No return value.
 function LBus:setPitch(pitch) end
 
 --- Sets the volume multiplier for all sources routed through this bus.
 ---@param vol number Volume multiplier (0.0 = silent, 1.0 = normal).
----@return nil No return value.
 function LBus:setVolume(vol) end
 
 --- Returns the type name of this object for runtime type-checking.
@@ -2485,16 +2362,13 @@ function LDecoder:getSampleRate() end
 function LDecoder:isSeekable() end
 
 --- Releases decoder resources (no-op, kept for API symmetry).
----@return nil No return value.
 function LDecoder:release() end
 
 --- Rewinds the decoder back to the beginning of the audio stream.
----@return nil No return value.
 function LDecoder:rewind() end
 
 --- Seeks to a specific position in the audio stream.
 ---@param offset number Target position in seconds.
----@return nil No return value.
 function LDecoder:seek(offset) end
 
 --- Returns the current read position in the audio stream in seconds.
@@ -2622,104 +2496,84 @@ function LMidiPlayer:load(path) end
 function LMidiPlayer:loadData(data) end
 
 --- Pauses MIDI playback at the current position.
----@return nil No return value.
 function LMidiPlayer:pause() end
 
 --- Starts MIDI playback from the current position using the audio output stream.
----@return nil No return value.
 function LMidiPlayer:play() end
 
 --- Seeks to a specific position in the MIDI file.
 ---@param secs number Target position in seconds.
----@return nil No return value.
 function LMidiPlayer:seek(secs) end
 
 --- Routes this MIDI player's output through the specified audio bus.
 ---@param bus? LBus Bus to route through, or nil for direct output.
----@return nil No return value.
 function LMidiPlayer:setBus(bus) end
 
 --- Sets the General MIDI instrument program for a channel.
 ---@param ch number Channel number (1-16).
 ---@param inst number GM instrument program number (0-127).
----@return nil No return value.
 function LMidiPlayer:setChannelInstrument(ch, inst) end
 
 --- Mutes or unmutes a specific MIDI channel.
 ---@param ch number Channel number (1-16).
 ---@param muted boolean True to mute, false to unmute.
----@return nil No return value.
 function LMidiPlayer:setChannelMuted(ch, muted) end
 
 --- Sets the volume for a specific MIDI channel (1-16).
 ---@param ch number Channel number (1-16).
 ---@param vol number Volume multiplier (0.0-1.0).
----@return nil No return value.
 function LMidiPlayer:setChannelVolume(ch, vol) end
 
 --- Sets the number of output audio channels for MIDI synthesis.
 ---@param channels number Channel count (1 = mono, 2 = stereo).
----@return nil No return value.
 function LMidiPlayer:setChannels(channels) end
 
 --- Enables or disables looping for MIDI playback.
 ---@param looping boolean True to loop, false to play once.
----@return nil No return value.
 function LMidiPlayer:setLooping(looping) end
 
 --- Registers a callback invoked when MIDI playback finishes (stub, not yet implemented).
 ---@param cb? function Callback function or nil to clear.
----@return nil No return value.
 function LMidiPlayer:setOnEnd(cb) end
 
 --- Registers a callback for MIDI note-off events (stub, not yet implemented).
 ---@param cb? function Callback function or nil to clear.
----@return nil No return value.
 function LMidiPlayer:setOnNoteOff(cb) end
 
 --- Registers a callback for MIDI note-on events (stub, not yet implemented).
 ---@param cb? function Callback function or nil to clear.
----@return nil No return value.
 function LMidiPlayer:setOnNoteOn(cb) end
 
 --- Sets the output sample rate for MIDI synthesis.
 ---@param rate number Sample rate in Hz (e.g. 44100, 48000).
----@return nil No return value.
 function LMidiPlayer:setSampleRate(rate) end
 
 --- Sets a custom SoundFont file for MIDI synthesis (stub, not yet implemented).
 ---@param path string Relative path to the .sf2 file.
----@return nil No return value.
 function LMidiPlayer:setSoundFont(path) end
 
 --- Sets the playback tempo in beats per minute.
 ---@param bpm number Desired tempo in BPM.
----@return nil No return value.
 function LMidiPlayer:setTempo(bpm) end
 
 --- Sets a tempo multiplier relative to the original speed.
 ---@param scale number Tempo scale (1.0 = original, 2.0 = double speed).
----@return nil No return value.
 function LMidiPlayer:setTempoScale(scale) end
 
 --- Mutes or unmutes a specific MIDI track.
 ---@param idx number Track index (1-based).
 ---@param muted boolean True to mute, false to unmute.
----@return nil No return value.
 function LMidiPlayer:setTrackMuted(idx, muted) end
 
 --- Sets the master volume for MIDI playback.
 ---@param vol number Volume multiplier (0.0 = silent, 1.0 = normal).
----@return nil No return value.
 function LMidiPlayer:setVolume(vol) end
 
 --- Solos a specific MIDI channel, muting all others.
 ---@param ch number Channel number (1-16) to solo.
----@return nil No return value.
 function LMidiPlayer:soloChannel(ch) end
 
 --- Stops MIDI playback and resets position to the beginning.
----@return nil No return value.
 function LMidiPlayer:stop() end
 
 --- Returns the current playback position of the MIDI player in seconds.
@@ -2736,11 +2590,9 @@ function LMidiPlayer:type() end
 function LMidiPlayer:typeOf(name) end
 
 --- Removes solo from all channels, restoring normal playback.
----@return nil No return value.
 function LMidiPlayer:unsoloAll() end
 
 --- Reverts to the built-in default SoundFont (stub, not yet implemented).
----@return nil No return value.
 function LMidiPlayer:useDefaultSoundFont() end
 
 --- Represents the Lua-visible LSoundData object exposed by this module.
@@ -2757,7 +2609,6 @@ LSoundData = {}
 ---@param g number Green channel from 0 to 255.
 ---@param b number Blue channel from 0 to 255.
 ---@param a number Alpha channel from 0 to 255.
----@return nil No value is returned.
 function LSoundData:drawWaveform(target, x, y, w, h, r, g, b, a) end
 
 --- Returns the sample bit depth of this sound buffer.
@@ -2788,7 +2639,6 @@ function LSoundData:getSampleRate() end
 --- Overwrites the sample value at the given zero-based sample index.
 ---@param index number Zero-based sample index.
 ---@param value number New sample value.
----@return nil No value is returned.
 function LSoundData:setSample(index, value) end
 
 --- Returns the type name of this object for runtime type-checking.
@@ -2813,21 +2663,17 @@ function LSoundPool:getVoiceCount() end
 function LSoundPool:play() end
 
 --- Releases all voices and frees audio resources held by this pool.
----@return nil No return value.
 function LSoundPool:release() end
 
 --- Routes all voices in this pool through the named audio bus.
 ---@param name string Name of the target bus.
----@return nil No return value.
 function LSoundPool:setBus(name) end
 
 --- Sets the volume for all voices in this pool.
 ---@param vol number Volume multiplier (0.0 = silent, 1.0 = normal).
----@return nil No return value.
 function LSoundPool:setVolume(vol) end
 
 --- Stops all voices in this sound pool immediately.
----@return nil No return value.
 function LSoundPool:stopAll() end
 
 --- Returns the type name of this object for runtime type-checking.
@@ -2844,7 +2690,6 @@ function LSoundPool:typeOf(name) end
 LSource = {}
 
 --- Removes all frequency filters (lowpass and highpass) from this source.
----@return nil No return value.
 function LSource:clearFilter() end
 
 --- Creates an independent copy of this source sharing the same audio data.
@@ -2853,7 +2698,6 @@ function LSource:clone() end
 
 --- Sets the fade-in duration so the source ramps from silence to full volume on play.
 ---@param dur number Fade-in duration in seconds.
----@return nil No return value.
 function LSource:fadeIn(dur) end
 
 --- Returns the total duration of this audio source in seconds.
@@ -2905,54 +2749,43 @@ function LSource:isPlaying() end
 function LSource:isStopped() end
 
 --- Pauses playback at the current position, allowing later resumption.
----@return nil No return value.
 function LSource:pause() end
 
 --- Starts playback of this audio source from the current position.
----@return nil No return value.
 function LSource:play() end
 
 --- Resumes playback from the position where the source was paused.
----@return nil No return value.
 function LSource:resume() end
 
 --- Seeks to a specific position in seconds within this audio source.
 ---@param pos number Target position in seconds.
----@return nil No return value.
 function LSource:seek(pos) end
 
 --- Applies a highpass filter that attenuates frequencies below the cutoff.
 ---@param cutoff_hz number Cutoff frequency in Hertz.
----@return nil No return value.
 function LSource:setHighpass(cutoff_hz) end
 
 --- Enables or disables looping so the source restarts automatically after finishing.
 ---@param looping boolean True to loop continuously, false to play once.
----@return nil No return value.
 function LSource:setLooping(looping) end
 
 --- Applies a lowpass filter that attenuates frequencies above the cutoff.
 ---@param cutoff_hz number Cutoff frequency in Hertz.
----@return nil No return value.
 function LSource:setLowpass(cutoff_hz) end
 
 --- Sets the stereo panning position of this source.
 ---@param pan number Pan value from -1.0 (full left) to 1.0 (full right), 0.0 is center.
----@return nil No return value.
 function LSource:setPan(pan) end
 
 --- Sets the playback speed multiplier, affecting both pitch and duration.
 ---@param pitch number Pitch multiplier (1.0 = normal, 2.0 = double speed/octave up).
----@return nil No return value.
 function LSource:setPitch(pitch) end
 
 --- Sets the volume level of this source where 0.0 is silent and 1.0 is full volume.
 ---@param vol number Volume multiplier (0.0 = silent, 1.0 = normal, >1.0 = amplified).
----@return nil No return value.
 function LSource:setVolume(vol) end
 
 --- Stops playback and resets the source position to the beginning.
----@return nil No return value.
 function LSource:stop() end
 
 --- Returns the current playback position of this source in seconds.
@@ -2979,39 +2812,32 @@ lurek.audio.add_effect = function(bus_name, effect_type_str, params) end
 ---@param sd_ud LSoundData The sound data to process.
 ---@param low_hz number Lower cutoff frequency in Hz.
 ---@param high_hz number Upper cutoff frequency in Hz.
----@return nil No return value.
 lurek.audio.applyBandpass = function(sd_ud, low_hz, high_hz) end
 
 --- Applies a gain multiplier in-place to the sound data.
 ---@param sd_ud LSoundData The sound data to process.
 ---@param gain number Gain multiplier (1.0 = unity, >1.0 = louder, <1.0 = quieter).
----@return nil No return value.
 lurek.audio.applyGain = function(sd_ud, gain) end
 
 --- Applies a highpass filter in-place to the sound data.
 ---@param sd_ud LSoundData The sound data to process.
 ---@param cutoff_hz number Highpass cutoff frequency in Hz.
----@return nil No return value.
 lurek.audio.applyHighpass = function(sd_ud, cutoff_hz) end
 
 --- Applies a lowpass filter in-place to the sound data.
 ---@param sd_ud LSoundData The sound data to process.
 ---@param cutoff_hz number Lowpass cutoff frequency in Hz.
----@return nil No return value.
 lurek.audio.applyLowpass = function(sd_ud, cutoff_hz) end
 
 --- Removes all frequency filters from a source.
 ---@param source LSource|number Audio source or numeric source ID.
----@return nil No return value.
 lurek.audio.clearFilter = function(source) end
 
 --- Clears the loaded SoundFont and reverts MIDI synthesis to default.
----@return nil No return value.
 lurek.audio.clearMidiSoundFont = function() end
 
 --- Clears any random pitch range previously set on the source.
 ---@param src_ud LSource The audio source to reset.
----@return nil No return value.
 lurek.audio.clearRandomPitch = function(src_ud) end
 
 --- Creates an independent copy of a source sharing the same audio data.
@@ -3022,20 +2848,17 @@ lurek.audio.clone = function(source) end
 --- Creates a named audio bus, optionally parented to another bus.
 ---@param name string Unique name for the new bus.
 ---@param parent_name? string Name of the parent bus, or nil for a root bus.
----@return nil No return value.
 lurek.audio.create_bus = function(name, parent_name) end
 
 --- Crossfades from one audio source to another over the given duration.
 ---@param from_ud LSource The source to fade out.
 ---@param to_ud LSource The source to fade in.
 ---@param duration number Crossfade duration in seconds.
----@return nil No return value.
 lurek.audio.crossfade = function(from_ud, to_ud, duration) end
 
 --- Sets the fade-in duration for a source so it ramps from silence on play.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param dur number Fade-in duration in seconds.
----@return nil No return value.
 lurek.audio.fadeIn = function(source, dur) end
 
 --- Returns the number of sources currently playing audio.
@@ -3133,7 +2956,7 @@ lurek.audio.getPitch = function(source) end
 lurek.audio.getPlaybackDevice = function() end
 
 --- Returns a list of available audio playback device names.
----@return table Array of device name strings.
+---@return string[] Device name strings.
 lurek.audio.getPlaybackDevices = function() end
 
 --- Returns the 3D position of a source.
@@ -3201,7 +3024,6 @@ lurek.audio.isStopped = function(source) end
 --- Mixes the samples of `src` into `dest` in-place (both must have the same format).
 ---@param dest_ud LSoundData Destination sound data to mix into.
 ---@param src_ud LSoundData Source sound data to mix from.
----@return nil No return value.
 lurek.audio.mixInto = function(dest_ud, src_ud) end
 
 --- Creates a new audio mixing bus for grouping and controlling sources.
@@ -3291,16 +3113,13 @@ lurek.audio.newWhiteNoise = function(duration, sample_rate, amplitude, seed) end
 ---@param input string Relative path to the input audio file.
 ---@param output string Relative path for the output WAV file.
 ---@param target number Target peak amplitude (e.g. 0.9 for headroom).
----@return nil No return value.
 lurek.audio.normalizeFile = function(input, output, target) end
 
 --- Pauses playback of a source at its current position.
 ---@param source LSource|number Audio source or numeric source ID.
----@return nil No return value.
 lurek.audio.pause = function(source) end
 
 --- Pauses all currently playing audio sources.
----@return nil No return value.
 lurek.audio.pauseAll = function() end
 
 --- Starts playback of a source by handle, optionally routing through a named bus.
@@ -3311,25 +3130,21 @@ lurek.audio.play = function(source, options) end
 
 --- Starts playback of a source with looping enabled in one call.
 ---@param source LSource|number Audio source or numeric source ID.
----@return nil No return value.
 lurek.audio.playLooping = function(source) end
 
 --- Starts playback of a queueable audio source.
 ---@param qsource_id number Queueable source handle returned by newQueueableSource.
----@return nil No return value.
 lurek.audio.playQueueable = function(qsource_id) end
 
 --- Processes an audio file offline through a chain of effects and writes the result to an output file.
 ---@param input string Relative path to the input audio file.
 ---@param output string Relative path for the output WAV file.
 ---@param effects_tbl table Array of effect tables; each has `type` (string) and optional `p1`, `p2`, `p3` (number) fields.
----@return nil No return value.
 lurek.audio.processOffline = function(input, output, effects_tbl) end
 
 --- Queues a decoded audio chunk for playback on a queueable source.
 ---@param qsource_id number Queueable source handle returned by `newQueueableSource`.
 ---@param sd LSoundData Sound data chunk to enqueue for playback.
----@return nil No return value.
 lurek.audio.queueSource = function(qsource_id, sd) end
 
 --- Releases an audio source, freeing its memory and stopping playback.
@@ -3345,79 +3160,65 @@ lurek.audio.remove_effect = function(bus_name, effect_id) end
 
 --- Resumes playback of a paused source.
 ---@param source LSource|number Audio source or numeric source ID.
----@return nil No return value.
 lurek.audio.resume = function(source) end
 
 --- Resumes all paused audio sources. This function is exposed to Lua scripts.
----@return nil No return value.
 lurek.audio.resumeAll = function() end
 
 --- Encodes the sound data as a WAV file and saves it to the given path (relative to game dir).
 ---@param sd_ud LSoundData The sound data to encode and save.
 ---@param filename string Relative output path for the WAV file.
----@return nil No return value.
 lurek.audio.saveWAV = function(sd_ud, filename) end
 
 --- Seeks a source to a specific position in seconds.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param pos number Target position in seconds.
----@return nil No return value.
 lurek.audio.seek = function(source, pos) end
 
 --- Sets the distance attenuation model for spatial audio.
 ---@param model string Model name (e.g. "inverse", "linear", "exponent", "none").
----@return nil No return value.
 lurek.audio.setDistanceModel = function(model) end
 
 --- Sets the global Doppler effect intensity multiplier.
 ---@param scale number Doppler scale (0 = disabled, 1.0 = realistic).
----@return nil No return value.
 lurek.audio.setDopplerScale = function(scale) end
 
 --- Applies a highpass filter to a source, attenuating low frequencies.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param cutoff_hz number Cutoff frequency in Hertz.
----@return nil No return value.
 lurek.audio.setHighpass = function(source, cutoff_hz) end
 
 --- Sets the 3D listener position for spatial audio (Z defaults to 0 for 2D games).
 ---@param x number Listener X position.
 ---@param y number Listener Y position.
 ---@param z? number Listener Z position (defaults to 0).
----@return nil No return value.
 lurek.audio.setListener = function(x, y, z) end
 
 --- Sets the 2D listener position for spatial audio calculations.
 ---@param x number Listener X position in world units.
 ---@param y number Listener Y position in world units.
----@return nil No return value.
 lurek.audio.setListener2D = function(x, y) end
 
 --- Enables or disables looping for a source.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param looping boolean True to loop, false to play once.
----@return nil No return value.
 lurek.audio.setLooping = function(source, looping) end
 
 --- Applies a lowpass filter to a source, attenuating high frequencies.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param cutoff_hz number Cutoff frequency in Hertz.
----@return nil No return value.
 lurek.audio.setLowpass = function(source, cutoff_hz) end
 
 --- Sets the global master volume affecting all audio output.
 ---@param vol number Master volume multiplier (0.0 = silent, 1.0 = normal).
----@return nil No return value.
 lurek.audio.setMasterVolume = function(vol) end
 
 --- Sets the master peak level for metering purposes.
 ---@param level number Peak level clamped to 0.0-1.0.
----@return nil No return value.
 lurek.audio.setMeter = function(level) end
 
 --- Sets the SoundFont file used for MIDI synthesis.
 ---@param path string Relative path to the .sf2 SoundFont file.
----@return nil No return value.
 lurek.audio.setMidiSoundFont = function(path) end
 
 --- Sets the orientation of a source using forward and up vectors.
@@ -3428,24 +3229,20 @@ lurek.audio.setMidiSoundFont = function(path) end
 ---@param ux number Up vector X.
 ---@param uy number Up vector Y.
 ---@param uz number Up vector Z.
----@return nil No return value.
 lurek.audio.setOrientation = function(source, fx, fy, fz, ux, uy, uz) end
 
 --- Sets the stereo panning of a source.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param pan number Pan from -1.0 (left) to 1.0 (right), 0.0 is center.
----@return nil No return value.
 lurek.audio.setPan = function(source, pan) end
 
 --- Sets the pitch multiplier of a source, affecting playback speed and tone.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param pitch number Pitch multiplier (1.0 = normal, 2.0 = octave up).
----@return nil No return value.
 lurek.audio.setPitch = function(source, pitch) end
 
 --- Sets the active audio playback device by name.
 ---@param name string Name of the playback device to activate.
----@return nil No return value.
 lurek.audio.setPlaybackDevice = function(name) end
 
 --- Sets the 3D position of a source for spatial audio panning and attenuation.
@@ -3453,26 +3250,22 @@ lurek.audio.setPlaybackDevice = function(name) end
 ---@param x number X position in world units.
 ---@param y number Y position in world units.
 ---@param z? number Z position (defaults to 0).
----@return nil No return value.
 lurek.audio.setPosition = function(source, x, y, z) end
 
 --- Sets a random pitch range for a source; each play picks a random pitch between min and max.
 ---@param src_ud LSource The audio source to configure.
 ---@param min number Minimum pitch multiplier.
 ---@param max number Maximum pitch multiplier.
----@return nil No return value.
 lurek.audio.setRandomPitch = function(src_ud, min, max) end
 
 --- Routes a source through a specific audio bus for grouped mixing.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param bus LBus The bus to route through.
----@return nil No return value.
 lurek.audio.setSourceBus = function(source, bus) end
 
 --- Sets the stereo width of an audio source (0.0 = mono, 1.0 = full stereo).
 ---@param src_ud LSource The audio source to adjust.
 ---@param width number Stereo width factor (0.0 = mono, 1.0 = full stereo).
----@return nil No return value.
 lurek.audio.setStereoWidth = function(src_ud, width) end
 
 --- Sets the velocity of a source for Doppler effect calculations.
@@ -3480,19 +3273,16 @@ lurek.audio.setStereoWidth = function(src_ud, width) end
 ---@param x number X velocity component.
 ---@param y number Y velocity component.
 ---@param z? number Z velocity component (defaults to 0).
----@return nil No return value.
 lurek.audio.setVelocity = function(source, x, y, z) end
 
 --- Sets the volume of a source by handle.
 ---@param source LSource|number Audio source or numeric source ID.
 ---@param vol number Volume multiplier (0.0 = silent, 1.0 = normal).
----@return nil No return value.
 lurek.audio.setVolume = function(source, vol) end
 
 --- Sets the volume of a named audio bus.
 ---@param name string Name of the audio bus.
 ---@param volume number Volume level (0.0 = silent, 1.0 = full, >1.0 = boost).
----@return nil No return value.
 lurek.audio.set_bus_volume = function(name, volume) end
 
 --- Sets a parameter value on an effect attached to a named audio bus.
@@ -3508,21 +3298,17 @@ lurek.audio.set_effect_param = function(bus_name, effect_id, param_name, value) 
 ---@param output string Relative path for the output PNG file.
 ---@param width number Image width in pixels.
 ---@param height number Image height in pixels.
----@return nil No return value.
 lurek.audio.spectrogramToPng = function(input, output, width, height) end
 
 --- Stops playback of a source and resets its position to the beginning.
 ---@param source LSource|number Audio source or numeric source ID.
----@return nil No return value.
 lurek.audio.stop = function(source) end
 
 --- Stops all audio sources and resets their positions.
----@return nil No return value.
 lurek.audio.stopAll = function() end
 
 --- Stops playback of a queueable audio source.
 ---@param qsource_id number Queueable source handle returned by newQueueableSource.
----@return nil No return value.
 lurek.audio.stopQueueable = function(qsource_id) end
 
 --- Returns the current playback position of a source in seconds.
@@ -3535,7 +3321,6 @@ lurek.audio.tell = function(source) end
 ---@param output string Relative path for the output PNG file.
 ---@param width number Image width in pixels.
 ---@param height number Image height in pixels.
----@return nil No return value.
 lurek.audio.waveformToPng = function(input, output, width, height) end
 
 ---@class lurek.automation
@@ -3547,8 +3332,7 @@ lurek.automation = {}
 lurek.automation.getCondition = function(name) end
 
 --- Returns the current script name when a script is active.
----@return string a Current script name.
----@return nil b Nil when no script is active.
+---@return string Current script name, or nil when no script is active.
 lurek.automation.getCurrentScript = function() end
 
 --- Returns the current step index of the active script.
@@ -3560,8 +3344,7 @@ lurek.automation.getCurrentStep = function() end
 lurek.automation.getElapsedTime = function() end
 
 --- Returns the last automation error message when one exists.
----@return string a Last error string.
----@return nil b Nil when no error is stored.
+---@return string Last error string, or nil when no error is stored.
 lurek.automation.getLastError = function() end
 
 --- Returns automation playback speed multiplier.
@@ -3569,7 +3352,7 @@ lurek.automation.getLastError = function() end
 lurek.automation.getPlaybackSpeed = function() end
 
 --- Returns the names of loaded automation scripts.
----@return table Array table of script names.
+---@return string[] Script names.
 lurek.automation.getScripts = function() end
 
 --- Returns the number of steps in the active script.
@@ -3578,8 +3361,7 @@ lurek.automation.getStepCount = function() end
 
 --- Returns the configured step limit for a loaded script.
 ---@param name string Script name to query.
----@return number a Step limit.
----@return nil b Nil when no limit is set.
+---@return number Step limit, or nil when no limit is set.
 lurek.automation.getStepLimit = function(name) end
 
 --- Returns whether a macro is saved. This function is exposed to Lua scripts.
@@ -3613,54 +3395,45 @@ lurek.automation.isPaused = function() end
 lurek.automation.isRunning = function() end
 
 --- Returns the names of saved macros. This function is exposed to Lua scripts.
----@return table Array table of macro names.
+---@return string[] Macro names.
 lurek.automation.listMacros = function() end
 
 --- Loads an automation script from a Lua table of steps and optional metadata.
 ---@param name string Script name used by `start`, macros, and lookup calls.
 ---@param data table Script data table with a `steps` array and optional `meta.description` string.
----@return nil No value is returned.
 lurek.automation.load = function(name, data) end
 
 --- Loads an automation script from TOML text.
 ---@param name string Script name used by `start`, macros, and lookup calls.
 ---@param toml_str string TOML automation script contents.
----@return nil No value is returned.
 lurek.automation.loadFromToml = function(name, toml_str) end
 
 --- Pauses automation playback. This function is exposed to Lua scripts.
----@return nil No value is returned.
 lurek.automation.pause = function() end
 
 --- Starts playback of a saved macro. This function is exposed to Lua scripts.
 ---@param name string Macro name to play.
----@return nil No value is returned.
 lurek.automation.playMacro = function(name) end
 
 --- Resumes automation playback. This function is exposed to Lua scripts.
----@return nil No value is returned.
 lurek.automation.resume = function() end
 
 --- Saves a loaded script as a named macro.
 ---@param macro_name string Macro name to save.
 ---@param script_name string Loaded script name to copy into the macro store.
----@return nil No value is returned.
 lurek.automation.saveMacro = function(macro_name, script_name) end
 
 --- Sets a named boolean condition used by automation steps.
 ---@param name string Condition name.
 ---@param value boolean Condition value.
----@return nil No value is returned.
 lurek.automation.setCondition = function(name, value) end
 
 --- Enables or disables automation highlight mode.
 ---@param enable boolean True to enable highlight mode.
----@return nil No value is returned.
 lurek.automation.setHighlightMode = function(enable) end
 
 --- Sets automation playback speed multiplier.
 ---@param factor number Playback speed multiplier.
----@return nil No value is returned.
 lurek.automation.setPlaybackSpeed = function(factor) end
 
 --- Sets the maximum step count for a loaded script.
@@ -3671,11 +3444,9 @@ lurek.automation.setStepLimit = function(name, n) end
 
 --- Starts playback of a loaded automation script.
 ---@param name string Loaded script name to start.
----@return nil No value is returned.
 lurek.automation.start = function(name) end
 
 --- Stops the current automation script.
----@return nil No value is returned.
 lurek.automation.stop = function() end
 
 --- Unloads a named automation script.
@@ -3685,13 +3456,11 @@ lurek.automation.unload = function(name) end
 
 --- Advances automation playback and dispatches generated input events.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 lurek.automation.update = function(dt) end
 
 --- Suspends automation updates until a predicate returns true or a timeout elapses.
 ---@param predicate function Function called each update; true resolves the wait.
 ---@param timeout number Maximum wait duration in seconds.
----@return nil No value is returned.
 lurek.automation.waitUntil = function(predicate, timeout) end
 
 ---@class lurek.camera
@@ -3702,29 +3471,23 @@ lurek.camera = {}
 LCamera = {}
 
 --- Appends render commands that apply this camera transform.
----@return nil No value is returned.
 function LCamera:apply() end
 
 --- Appends render commands that attach this camera transform.
----@return nil No value is returned.
 function LCamera:attach() end
 
 --- Clears all layer parallax factor overrides.
----@return nil No value is returned.
 function LCamera:clearParallaxFactors() end
 
 --- Clears the follow target. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCamera:clearTarget() end
 
 --- Appends a render command that detaches the active camera transform.
----@return nil No value is returned.
 function LCamera:detach() end
 
 --- Starts camera movement along an array of waypoint tables.
 ---@param points table Array of point tables using numeric indices `1` and `2` for X and Y.
 ---@param duration number Total path duration in seconds.
----@return nil No value is returned.
 function LCamera:followPath(points, duration) end
 
 --- Returns camera bounds with a leading availability flag.
@@ -3847,19 +3610,16 @@ function LCamera:isSway() end
 --- Centers the camera on a world position.
 ---@param x number World X position.
 ---@param y number World Y position.
----@return nil No value is returned.
 function LCamera:lookAt(x, y) end
 
 --- Moves the camera by a delta. This method is available to Lua scripts.
 ---@param dx number X delta in world units.
 ---@param dy number Y delta in world units.
----@return nil No value is returned.
 function LCamera:move(dx, dy) end
 
 --- Updates camera viewport state after a window resize.
 ---@param window_w number New window width in pixels.
 ---@param window_h number New window height in pixels.
----@return nil No value is returned.
 function LCamera:onWindowResize(window_w, window_h) end
 
 --- Updates camera viewport state using a virtual game size and scale mode.
@@ -3868,7 +3628,6 @@ function LCamera:onWindowResize(window_w, window_h) end
 ---@param window_w number New window width in pixels.
 ---@param window_h number New window height in pixels.
 ---@param mode string Scale mode `letterbox`, `stretch`, or `pixelperfect`.
----@return nil No value is returned.
 function LCamera:onWindowResizeScaled(game_w, game_h, window_w, window_h, mode) end
 
 --- Returns active path progress. This method is available to Lua scripts.
@@ -3876,27 +3635,21 @@ function LCamera:onWindowResizeScaled(game_w, game_h, window_w, window_h, mode) 
 function LCamera:pathProgress() end
 
 --- Applies the aggressive follow camera preset.
----@return nil No value is returned.
 function LCamera:presetAggressiveFollow() end
 
 --- Applies the balanced follow camera preset.
----@return nil No value is returned.
 function LCamera:presetBalancedFollow() end
 
 --- Applies the cinematic follow camera preset.
----@return nil No value is returned.
 function LCamera:presetCinematicFollow() end
 
 --- Applies the tight follow camera preset.
----@return nil No value is returned.
 function LCamera:presetTightFollow() end
 
 --- Removes active camera bounds. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCamera:removeBounds() end
 
 --- Appends a render command that removes the active camera transform.
----@return nil No value is returned.
 function LCamera:reset() end
 
 --- Sets camera world bounds. This method is available to Lua scripts.
@@ -3904,62 +3657,51 @@ function LCamera:reset() end
 ---@param y number Bounds Y coordinate.
 ---@param w number Bounds width.
 ---@param h number Bounds height.
----@return nil No value is returned.
 function LCamera:setBounds(x, y, w, h) end
 
 --- Sets follow dead-zone dimensions.
 ---@param w number Dead-zone width in world units.
 ---@param h number Dead-zone height in world units.
----@return nil No value is returned.
 function LCamera:setDeadZone(w, h) end
 
 --- Sets target follow easing mode. This method is available to Lua scripts.
 ---@param easing string Easing name such as `linear`, `smoothstep`, or `easeout`.
----@return nil No value is returned.
 function LCamera:setFollowEasing(easing) end
 
 --- Sets follow smoothing speed. This method is available to Lua scripts.
 ---@param speed number Follow smoothing speed.
----@return nil No value is returned.
 function LCamera:setFollowSmooth(speed) end
 
 --- Sets follow look-ahead multiplier.
 ---@param mul number Look-ahead multiplier applied to target motion.
----@return nil No value is returned.
 function LCamera:setLookAhead(mul) end
 
 --- Sets a parallax factor for a named layer.
 ---@param layer string Layer name.
 ---@param factor number Parallax factor, where 1.0 follows the camera fully.
----@return nil No value is returned.
 function LCamera:setParallaxFactor(layer, factor) end
 
 --- Sets the camera world position. This method is available to Lua scripts.
 ---@param x number Camera X position in world units.
 ---@param y number Camera Y position in world units.
----@return nil No value is returned.
 function LCamera:setPosition(x, y) end
 
 --- Sets the camera rotation. This method is available to Lua scripts.
 ---@param r number Rotation in radians.
----@return nil No value is returned.
 function LCamera:setRotation(r) end
 
 --- Sets optional minimum and maximum rotation constraints.
 ---@param min_rot? number Optional minimum rotation in radians.
 ---@param max_rot? number Optional maximum rotation in radians.
----@return nil No value is returned.
 function LCamera:setRotationConstraints(min_rot, max_rot) end
 
 --- Sets rotation damping. This method is available to Lua scripts.
 ---@param damping number Rotation damping value.
----@return nil No value is returned.
 function LCamera:setRotationDamping(damping) end
 
 --- Sets a world-space follow target. This method is available to Lua scripts.
 ---@param x number Target X position.
 ---@param y number Target Y position.
----@return nil No value is returned.
 function LCamera:setTarget(x, y) end
 
 --- Sets the camera viewport rectangle.
@@ -3967,35 +3709,29 @@ function LCamera:setTarget(x, y) end
 ---@param y number Viewport Y coordinate in screen pixels.
 ---@param w number Viewport width in screen pixels.
 ---@param h number Viewport height in screen pixels.
----@return nil No value is returned.
 function LCamera:setViewport(x, y, w, h) end
 
 --- Sets the camera zoom factor. This method is available to Lua scripts.
 ---@param zoom number Zoom factor applied to world rendering.
----@return nil No value is returned.
 function LCamera:setZoom(zoom) end
 
 --- Sets optional minimum and maximum zoom constraints.
 ---@param min_zoom? number Optional minimum zoom.
 ---@param max_zoom? number Optional maximum zoom.
----@return nil No value is returned.
 function LCamera:setZoomConstraints(min_zoom, max_zoom) end
 
 --- Sets zoom damping. This method is available to Lua scripts.
 ---@param damping number Zoom damping value.
----@return nil No value is returned.
 function LCamera:setZoomDamping(damping) end
 
 --- Starts a camera shake effect. This method is available to Lua scripts.
 ---@param intensity number Shake intensity in world units.
 ---@param duration number Shake duration in seconds.
----@return nil No value is returned.
 function LCamera:shake(intensity, duration) end
 
 --- Starts subtle breathing zoom animation.
 ---@param amplitude? number Breathing zoom amplitude; defaults to 0.005.
 ---@param rate? number Breathing rate; defaults to 0.2.
----@return nil No value is returned.
 function LCamera:startBreathing(amplitude, rate) end
 
 --- Starts camera sway offset animation.
@@ -4003,23 +3739,18 @@ function LCamera:startBreathing(amplitude, rate) end
 ---@param amplitude_y number Vertical sway amplitude.
 ---@param frequency number Sway frequency.
 ---@param decay? number Sway decay value; defaults to 1.0.
----@return nil No value is returned.
 function LCamera:startSway(amplitude_x, amplitude_y, frequency, decay) end
 
 --- Stops breathing zoom animation. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCamera:stopBreathing() end
 
 --- Stops the active camera path. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCamera:stopPath() end
 
 --- Stops camera sway offset animation.
----@return nil No value is returned.
 function LCamera:stopSway() end
 
 --- Stops the active zoom tween. This method is available to Lua scripts.
----@return nil No value is returned.
 function LCamera:stopZoom() end
 
 --- Converts world coordinates to screen coordinates.
@@ -4047,7 +3778,6 @@ function LCamera:typeOf(name) end
 
 --- Advances camera follow, shake, and effect state.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LCamera:update(dt) end
 
 --- Advances the active camera path and applies its position.
@@ -4063,14 +3793,12 @@ function LCamera:updateZoom(dt) end
 --- Triggers a temporary zoom pulse effect.
 ---@param amplitude number Zoom pulse amplitude.
 ---@param duration number Pulse duration in seconds.
----@return nil No value is returned.
 function LCamera:zoomPulse(amplitude, duration) end
 
 --- Starts a zoom tween toward a target zoom factor.
 ---@param target_zoom number Destination zoom factor.
 ---@param duration number Tween duration in seconds.
 ---@param easing? string Easing name such as `linear`, `smoothstep`, or `easeout`.
----@return nil No value is returned.
 function LCamera:zoomTo(target_zoom, duration, easing) end
 
 --- Lua-side camera rig that manages named cameras and viewport layouts.
@@ -4100,11 +3828,10 @@ function LCameraRig:has(name) end
 ---@param window_w number Window width in pixels.
 ---@param window_h number Window height in pixels.
 ---@param ratio? number Minimap size ratio; defaults to 0.25.
----@return nil No value is returned.
 function LCameraRig:minimap(window_w, window_h, ratio) end
 
 --- Returns all camera names in this rig.
----@return table Array table of camera names.
+---@return string[] Camera names.
 function LCameraRig:names() end
 
 --- Applies a picture-in-picture layout using optional inset size.
@@ -4112,7 +3839,6 @@ function LCameraRig:names() end
 ---@param window_h number Window height in pixels.
 ---@param pip_w? number Picture-in-picture width; defaults to 320.
 ---@param pip_h? number Picture-in-picture height; defaults to 180.
----@return nil No value is returned.
 function LCameraRig:pictureInPicture(window_w, window_h, pip_w, pip_h) end
 
 --- Removes a named camera from this rig.
@@ -4124,26 +3850,22 @@ function LCameraRig:remove(name) end
 ---@param name string Camera name.
 ---@param x number Camera X position.
 ---@param y number Camera Y position.
----@return nil No value is returned.
 function LCameraRig:setPosition(name, x, y) end
 
 --- Sets the follow target of a named rig camera, creating it if needed.
 ---@param name string Camera name.
 ---@param x number Target X position.
 ---@param y number Target Y position.
----@return nil No value is returned.
 function LCameraRig:setTarget(name, x, y) end
 
 --- Sets the zoom of a named rig camera, creating it if needed.
 ---@param name string Camera name.
 ---@param zoom number Camera zoom factor.
----@return nil No value is returned.
 function LCameraRig:setZoom(name, zoom) end
 
 --- Applies a split-screen layout using the current window size.
 ---@param window_w number Window width in pixels.
 ---@param window_h number Window height in pixels.
----@return nil No value is returned.
 function LCameraRig:splitScreen(window_w, window_h) end
 
 --- Returns the Lua-visible type name for this camera rig handle.
@@ -4157,7 +3879,6 @@ function LCameraRig:typeOf(name) end
 
 --- Advances every camera in this rig. This method is available to Lua scripts.
 ---@param dt number Elapsed time in seconds.
----@return nil No value is returned.
 function LCameraRig:updateAll(dt) end
 
 --- Creates a 2D camera with optional virtual viewport size.
@@ -4188,13 +3909,12 @@ LArray = {}
 function LArray:abs() end
 
 --- Returns element-wise addition with an array or scalar.
----@param value any LArray or number used as the addend.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New array containing the addition result.
 function LArray:add(value) end
 
 --- Adds another array into this array in place.
 ---@param other LArray Array with a compatible shape.
----@return nil No value is returned.
 function LArray:addInplace(other) end
 
 --- Returns whether all elements are non-zero.
@@ -4296,13 +4016,12 @@ function LArray:diff(order) end
 function LArray:dilate(radius) end
 
 --- Returns element-wise division with an array or scalar.
----@param value any LArray or number used as the divisor.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New array containing the division result.
 function LArray:div(value) end
 
 --- Divides this array by another array in place.
 ---@param other LArray Array with a compatible shape.
----@return nil No value is returned.
 function LArray:divInplace(other) end
 
 --- Returns dot product with another array.
@@ -4310,14 +4029,18 @@ function LArray:divInplace(other) end
 ---@return number Dot product result.
 function LArray:dot(other) end
 
+---@class LArrayEigenPowerResult
+---@field value number Dominant eigenvalue.
+---@field vector number[] Eigenvector.
+
 --- Estimates dominant eigenvalue and eigenvector using power iteration.
 ---@param max_iter? number Maximum iteration count; zero uses the engine default.
 ---@param tol? number Convergence tolerance; zero uses the engine default.
----@return table Table containing `value` and `vector` fields.
+---@return LArrayEigenPowerResult Table containing `value` and `vector` fields.
 function LArray:eigenPower(max_iter, tol) end
 
 --- Returns element-wise equality comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:eq(value) end
 
@@ -4333,7 +4056,6 @@ function LArray:eval(expr) end
 
 --- Fills this array in place with one value.
 ---@param val number Value written to every element.
----@return nil No value is returned.
 function LArray:fill(val) end
 
 --- Returns a flood-filled copy starting at a one-based row and column.
@@ -4365,7 +4087,7 @@ function LArray:getDimensions() end
 function LArray:getRegion(row, col, rows, cols) end
 
 --- Returns the array shape as one-based dimension table.
----@return table Array table of dimension sizes.
+---@return number[] Array table of dimension sizes.
 function LArray:getShape() end
 
 --- Returns the total number of array elements.
@@ -4373,20 +4095,25 @@ function LArray:getShape() end
 function LArray:getSize() end
 
 --- Returns element-wise greater-than comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:gt(value) end
 
 --- Returns element-wise greater-or-equal comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:gte(value) end
+
+---@class LArrayHistogramResult
+---@field lo number Bin lower bound.
+---@field hi number Bin upper bound.
+---@field count number Number of values in bin.
 
 --- Returns histogram bins for the array values.
 ---@param bins number Number of histogram bins.
 ---@param lo? number Optional lower bound.
 ---@param hi? number Optional upper bound.
----@return table Array of bin tables with `lo`, `hi`, and `count` fields.
+---@return LArrayHistogramResult Array of bin tables with `lo`, `hi`, and `count` fields.
 function LArray:histogram(bins, lo, hi) end
 
 --- Returns whether this array is currently stored on the GPU.
@@ -4399,17 +4126,23 @@ function LArray:isOnGPU() end
 function LArray:linsolve(b) end
 
 --- Returns element-wise less-than comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:lt(value) end
 
 --- Returns element-wise less-or-equal comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:lte(value) end
 
+---@class LArrayLuDecomposeResult
+---@field n number N.
+---@field det_sign number Det sign.
+---@field perm number[] Permutation array.
+---@field lu_data number[] LU decomposition data.
+
 --- Decomposes this matrix into LU data and permutation metadata.
----@return table Table containing `n`, `det_sign`, `perm`, and `lu_data` fields.
+---@return LArrayLuDecomposeResult Table containing `n`, `det_sign`, `perm`, and `lu_data` fields.
 function LArray:luDecompose() end
 
 --- Maps each element through a Lua function and returns a new array.
@@ -4438,13 +4171,12 @@ function LArray:mean(axis) end
 function LArray:min(axis) end
 
 --- Returns element-wise multiplication with an array or scalar.
----@param value any LArray or number used as the multiplier.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New array containing the multiplication result.
 function LArray:mul(value) end
 
 --- Multiplies this array by another array in place.
 ---@param other LArray Array with a compatible shape.
----@return nil No value is returned.
 function LArray:mulInplace(other) end
 
 --- Returns element-wise negated values.
@@ -4452,7 +4184,7 @@ function LArray:mulInplace(other) end
 function LArray:neg() end
 
 --- Returns element-wise inequality comparison with an array or scalar.
----@param value any LArray or number used for comparison.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:neq(value) end
 
@@ -4504,19 +4236,21 @@ function LArray:reshape(shape) end
 function LArray:scan(func, init) end
 
 --- Writes an array element using one-based indices followed by the value.
----@param ... any One-based indices followed by the numeric value to store.
----@return nil No value is returned.
+---@param ... number One-based indices followed by the numeric value to store.
 function LArray:set(...) end
 
 --- Writes a source array into this array at a one-based row and column.
 ---@param row number One-based destination row.
 ---@param col number One-based destination column.
 ---@param source LArray Source array copied into this array.
----@return nil No value is returned.
 function LArray:setRegion(row, col, source) end
 
+---@class LArraySobelResult
+---@field gx LArray Gradient X array.
+---@field gy LArray Gradient Y array.
+
 --- Computes Sobel gradients for this array.
----@return table Table with `gx` and `gy` gradient arrays.
+---@return LArraySobelResult Table with `gx` and `gy` gradient arrays.
 function LArray:sobel() end
 
 --- Returns element-wise square roots.
@@ -4524,13 +4258,12 @@ function LArray:sobel() end
 function LArray:sqrt() end
 
 --- Returns element-wise subtraction with an array or scalar.
----@param value any LArray or number used as the subtrahend.
+---@param value LArray LArray or scalar number for element-wise operation.
 ---@return LArray New array containing the subtraction result.
 function LArray:sub(value) end
 
 --- Subtracts another array from this array in place.
 ---@param other LArray Array with a compatible shape.
----@return nil No value is returned.
 function LArray:subInplace(other) end
 
 --- Returns total sum or a summed array along a one-based axis.
@@ -4544,7 +4277,7 @@ function LArray:sum(axis) end
 function LArray:threshold(val) end
 
 --- Returns array values flattened into a Lua table.
----@return table Array table of numeric values in storage order.
+---@return number[] Numeric values in storage order.
 function LArray:toTable() end
 
 --- Transforms a point array by this transform matrix.
@@ -4584,14 +4317,18 @@ function LArray:zscore() end
 ---@return LArray New affine transform matrix array.
 lurek.compute.affine2d = function(tx, ty, angle_rad, sx, sy) end
 
+---@class ComputeFftResult
+---@field re number Real part.
+---@field im number Imaginary part.
+
 --- Computes the FFT of real-valued samples.
 ---@param samples table Array table of real-valued samples.
----@return table Array table of complex pairs with `re` and `im` fields.
+---@return ComputeFftResult Array table of complex pairs with `re` and `im` fields.
 lurek.compute.fft = function(samples) end
 
 --- Computes FFT magnitudes for real-valued samples.
 ---@param samples table Array table of real-valued samples.
----@return table Array table of magnitude values.
+---@return number[] Array table of magnitude values.
 lurek.compute.fftMagnitude = function(samples) end
 
 --- Creates an array from a flat Lua table and optional shape.
@@ -4613,7 +4350,7 @@ lurek.compute.getParThreshold = function() end
 
 --- Computes the inverse FFT of complex frequency pairs.
 ---@param freqs table Array table of complex pairs with `re` and `im` fields.
----@return table Array table of reconstructed real-valued samples.
+---@return number[] Array table of reconstructed real-valued samples.
 lurek.compute.ifft = function(freqs) end
 
 --- Creates a zero-filled array with the requested shape and data type.
@@ -4693,13 +4430,11 @@ function LByteData:readBits(byte_offset, bit_offset, count) end
 ---@param byte_offset number Zero-based byte offset.
 ---@param bit_offset number Bit offset from 0 to 7 inside the byte.
 ---@param value boolean True to set the bit, false to clear it.
----@return nil No value is returned.
 function LByteData:setBit(byte_offset, bit_offset, value) end
 
 --- Writes one byte at a zero-based offset inside the buffer.
 ---@param offset number Zero-based byte offset.
 ---@param value number Byte value from 0 to 255.
----@return nil No value is returned.
 function LByteData:setByte(offset, value) end
 
 --- Returns the type name of this object for runtime type-checking.
@@ -4778,7 +4513,6 @@ function LDataWriter:len() end
 
 --- Moves the writer cursor to a specific byte position.
 ---@param pos number New cursor position in bytes.
----@return nil No value is returned.
 function LDataWriter:seek(pos) end
 
 --- Returns the writer cursor position.
@@ -4800,57 +4534,46 @@ function LDataWriter:typeOf(name) end
 
 --- Appends raw bytes from a Lua string to the writer buffer.
 ---@param s string Raw byte string to write.
----@return nil No value is returned.
 function LDataWriter:writeBytes(s) end
 
 --- Appends a 32-bit float value in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeF32LE(v) end
 
 --- Appends a 64-bit float value in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeF64LE(v) end
 
 --- Appends a signed 16-bit integer in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeI16LE(v) end
 
 --- Appends a signed 32-bit integer in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeI32LE(v) end
 
 --- Appends a signed 8-bit integer to the writer buffer.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeI8(v) end
 
 --- Appends a UTF-8 encoded string to the writer buffer.
 ---@param s string String contents to write.
----@return nil No value is returned.
 function LDataWriter:writeString(s) end
 
 --- Appends an unsigned 16-bit integer in big-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeU16BE(v) end
 
 --- Appends an unsigned 16-bit integer in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeU16LE(v) end
 
 --- Appends an unsigned 32-bit integer in little-endian byte order.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeU32LE(v) end
 
 --- Appends an unsigned 8-bit integer to the writer buffer.
 ---@param v number Value to write.
----@return nil No value is returned.
 function LDataWriter:writeU8(v) end
 
 --- Lua-side fixed-capacity FIFO buffer that stores registry-protected Lua values.
@@ -4862,7 +4585,6 @@ LRingBuffer = {}
 function LRingBuffer:capacity() end
 
 --- Removes every stored value and releases their registry keys.
----@return nil No value is returned.
 function LRingBuffer:clear() end
 
 --- Returns whether the ring buffer has no values.
@@ -4890,12 +4612,12 @@ function LRingBuffer:peekNewest() end
 function LRingBuffer:pop() end
 
 --- Pushes a value into the ring buffer and evicts the oldest value when full.
----@param value any Lua value to store in the buffer.
+---@param value table Lua value to store in the buffer.
 ---@return boolean True when the push evicted an older value.
 function LRingBuffer:push(value) end
 
 --- Returns stored values in oldest-to-newest order.
----@return table Array table of stored values.
+---@return number[] Array table of stored values.
 function LRingBuffer:toTable() end
 
 --- Returns the Lua-visible type name for this ring buffer handle.
@@ -4916,7 +4638,7 @@ lurek.data.compress = function(format_str, raw_data, level) end
 
 --- Compresses a string or table of strings as a chunked byte stream.
 ---@param format_str string Compression format name.
----@param chunks any Binary string or array table of binary strings.
+---@param chunks string Binary string or array table of binary strings.
 ---@param level? number Optional compression level; defaults to 6.
 ---@return string Compressed binary byte string.
 lurek.data.compressChunks = function(format_str, chunks, level) end
@@ -4940,7 +4662,7 @@ lurek.data.decompress = function(format_str, compressed) end
 
 --- Decompresses a string or table of strings as a chunked byte stream.
 ---@param format_str string Compression format name.
----@param chunks any Binary string or array table of binary strings.
+---@param chunks string Binary string or array table of binary strings.
 ---@return string Decompressed binary byte string.
 lurek.data.decompressChunks = function(format_str, chunks) end
 
@@ -4962,7 +4684,7 @@ lurek.data.fromMsgPack = function(bytes) end
 
 --- Computes the packed byte size for values and a format string.
 ---@param fmt string Binary pack format string.
----@param ... any Values measured according to the format.
+---@param ... table Values measured according to the format.
 ---@return number Packed byte size.
 lurek.data.getPackedSize = function(fmt, ...) end
 
@@ -4973,7 +4695,7 @@ lurek.data.getPackedSize = function(fmt, ...) end
 lurek.data.hash = function(algo_str, raw_data) end
 
 --- Creates ByteData from a size or string.
----@param value any Integer size for zeroed bytes, or string used as initial bytes.
+---@param value table Integer size for zeroed bytes, or string used as initial bytes.
 ---@return LByteData New LByteData userdata.
 lurek.data.newByteData = function(value) end
 
@@ -4995,7 +4717,7 @@ lurek.data.newWriter = function() end
 
 --- Packs Lua values into a binary string using a format string.
 ---@param fmt string Binary pack format string.
----@param ... any Values to pack according to the format.
+---@param ... table Values to pack according to the format.
 ---@return string Packed binary byte string.
 lurek.data.pack = function(fmt, ...) end
 
@@ -5017,7 +4739,7 @@ lurek.data.read = function(fmt, raw, offset) end
 lurek.data.size = function(fmt) end
 
 --- Encodes a Lua value into the current structured binary interchange payload.
----@param value any Lua value to encode through the serial table converter.
+---@param value table Lua value to encode through the serial table converter.
 ---@return string Encoded binary payload.
 lurek.data.toMsgPack = function(value) end
 
@@ -5030,7 +4752,7 @@ lurek.data.unpack = function(fmt, raw, offset) end
 
 --- Writes binary values into a byte string using a format string.
 ---@param fmt string Binary writer format string.
----@param ... any Values to write according to the format.
+---@param ... table Values to write according to the format.
 ---@return string Binary byte string containing written values.
 lurek.data.write = function(fmt, ...) end
 
@@ -5043,8 +4765,7 @@ LDataFrame = {}
 
 --- Adds a column with an optional default value.
 ---@param name string Column name to create.
----@param default? any Default cell value for existing rows; nil uses empty cells.
----@return nil No value is returned.
+---@param default? string Default cell value for existing rows; nil uses empty cells.
 function LDataFrame:addColumn(name, default) end
 
 --- Adds a row from an optional map table and returns its one-based row index.
@@ -5054,13 +4775,11 @@ function LDataFrame:addRow(row_tbl) end
 
 --- Appends multiple rows from array-style row tables.
 ---@param rows table Array of row arrays matching the dataframe column order.
----@return nil No value is returned.
 function LDataFrame:addRowBatch(rows) end
 
 --- Applies a Lua function to each value in a column in place.
----@param col_val any Column name string or one-based column index.
+---@param col_val string Column name string or one-based column index.
 ---@param func function Function called with each cell value and returning a replacement value.
----@return nil No value is returned.
 function LDataFrame:apply(col_val, func) end
 
 --- Returns a deep copy of this dataframe.
@@ -5068,12 +4787,12 @@ function LDataFrame:apply(col_val, func) end
 function LDataFrame:clone() end
 
 --- Returns all column names in order. This method is available to Lua scripts.
----@return table Array table of column names.
+---@return string[] Column names.
 function LDataFrame:columns() end
 
 --- Returns correlation between two numeric columns.
----@param col_a any First column reference.
----@param col_b any Second column reference.
+---@param col_a string Column name string or one-based column index.
+---@param col_b string Column name string or one-based column index.
 ---@return number Correlation value.
 function LDataFrame:corr(col_a, col_b) end
 
@@ -5086,7 +4805,7 @@ function LDataFrame:correlationMatrix() end
 function LDataFrame:count() end
 
 --- Counts occurrences of each value in a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return LDataFrame New dataframe containing value counts.
 function LDataFrame:countBy(col) end
 
@@ -5095,36 +4814,35 @@ function LDataFrame:countBy(col) end
 function LDataFrame:describe() end
 
 --- Returns rows where the chosen column is not nil.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return LDataFrame New dataframe without nil rows for the column.
 function LDataFrame:dropNil(col) end
 
 --- Returns entropy for a column. This method is available to Lua scripts.
----@param col any Column reference.
+---@param col string Column name string or one-based column index.
 ---@return number Entropy value.
 function LDataFrame:entropy(col) end
 
 --- Replaces nil cells in a column with a value.
----@param col any Column name string or one-based column index.
----@param val any Replacement cell value.
----@return nil No value is returned.
+---@param col string Column name string or one-based column index.
+---@param val string Replacement cell value.
 function LDataFrame:fillNil(col, val) end
 
 --- Returns rows whose column value matches a comparison.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@param op string Comparison operator string.
----@param val any Cell value used as the comparison target.
+---@param val string Cell value used as the comparison target.
 ---@return LDataFrame New filtered dataframe.
 function LDataFrame:filter(col, op, val) end
 
 --- Returns a column as an array table. This method is available to Lua scripts.
----@param col any Column name string or one-based column index.
----@return table Array table of column values.
+---@param col string Column name string or one-based column index.
+---@return number[] Array table of column values.
 function LDataFrame:getColumn(col) end
 
 --- Returns a numeric column as an array of numbers.
----@param col any Column reference.
----@return table Array table of numeric values.
+---@param col string Column name string or one-based column index.
+---@return number[] Numeric values.
 function LDataFrame:getColumnAsF64(col) end
 
 --- Returns a row as a table keyed by column name.
@@ -5134,24 +4852,24 @@ function LDataFrame:getRow(row) end
 
 --- Returns one cell value by one-based row and column reference.
 ---@param row number One-based row index.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number string|boolean|nil | Cell value at the requested row and column.
 function LDataFrame:getValue(row, col) end
 
 --- Groups by one column and aggregates another column.
----@param group_col any Grouping column reference.
----@param agg_col any Aggregated column reference.
+---@param group_col string Column name string or one-based column index.
+---@param agg_col string Column name string or one-based column index.
 ---@param fn_name string Aggregate function name.
 ---@return LDataFrame New grouped aggregate dataframe.
 function LDataFrame:groupAgg(group_col, agg_col, fn_name) end
 
 --- Groups rows by a column and returns a table from group key to dataframe.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return table Table keyed by group values with dataframe handles as values.
 function LDataFrame:groupBy(col) end
 
 --- Groups rows by a column and returns a grouped-frame object.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return LGroupedFrame Grouped frame handle.
 function LDataFrame:groupByObj(col) end
 
@@ -5162,8 +4880,8 @@ function LDataFrame:head(n) end
 
 --- Joins this dataframe with another dataframe by column references.
 ---@param other LDataFrame Other dataframe to join.
----@param this_col any Column reference in this dataframe.
----@param other_col any Column reference in the other dataframe.
+---@param this_col string Column name string or one-based column index.
+---@param other_col string Column name string or one-based column index.
 ---@param jtype? string Join type string; defaults to `inner`.
 ---@return LDataFrame New joined dataframe.
 function LDataFrame:join(other, this_col, other_col, jtype) end
@@ -5173,32 +4891,31 @@ function LDataFrame:join(other, this_col, other_col, jtype) end
 function LDataFrame:lazy() end
 
 --- Returns the maximum value of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number string|boolean|nil | Maximum cell value.
 function LDataFrame:max(col) end
 
 --- Returns the numeric mean of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number Column mean.
 function LDataFrame:mean(col) end
 
 --- Returns the numeric median of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number Column median.
 function LDataFrame:median(col) end
 
 --- Appends another dataframe into this dataframe in place.
 ---@param other LDataFrame Dataframe whose rows are merged into this dataframe.
----@return nil No value is returned.
 function LDataFrame:merge(other) end
 
 --- Returns the minimum value of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number string|boolean|nil | Minimum cell value.
 function LDataFrame:min(col) end
 
 --- Returns the mode value of a column. This method is available to Lua scripts.
----@param col any Column reference.
+---@param col string Column name string or one-based column index.
 ---@return number string|boolean|nil | Most common cell value.
 function LDataFrame:modeVal(col) end
 
@@ -5207,11 +4924,10 @@ function LDataFrame:modeVal(col) end
 function LDataFrame:ncols() end
 
 --- Adds a range-normalized column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param out_min number Output lower bound.
 ---@param out_max number Output upper bound.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:normalizeCol(col, out_min, out_max, name) end
 
 --- Returns the number of rows in this dataframe.
@@ -5219,22 +4935,22 @@ function LDataFrame:normalizeCol(col, out_min, out_max, name) end
 function LDataFrame:nrows() end
 
 --- Returns rows considered outliers for a numeric column.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param threshold? number Z-score threshold; defaults to 2.0.
 ---@return LDataFrame New dataframe containing outlier rows.
 function LDataFrame:outliers(col, threshold) end
 
 --- Pivots rows into columns using row, column, and value fields.
----@param row_col any Row key column reference.
----@param col_col any Column key column reference.
----@param val_col any Value column reference.
+---@param row_col string Column name string or one-based column index.
+---@param col_col string Column name string or one-based column index.
+---@param val_col string Column name string or one-based column index.
 ---@return LDataFrame New pivoted dataframe.
 function LDataFrame:pivot(row_col, col_col, val_col) end
 
 --- Builds a pivot table using row key, column key, value column, and aggregate function.
----@param row_key any Row key column reference.
----@param col_key any Column key column reference.
----@param value_key any Value column reference.
+---@param row_key string Column name string or one-based column index.
+---@param col_key string Column name string or one-based column index.
+---@param value_key string Column name string or one-based column index.
 ---@param agg? string Aggregate function name; defaults to `mean`.
 ---@return LDataFrame New pivot table dataframe.
 function LDataFrame:pivotTable(row_key, col_key, value_key, agg) end
@@ -5245,37 +4961,34 @@ function LDataFrame:pivotTable(row_key, col_key, value_key, agg) end
 function LDataFrame:query(sql_str) end
 
 --- Returns a dataframe with a rank column.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param order? string Rank order string; defaults to `asc`.
 ---@param result_col? string Output column name; defaults to `rank`.
 ---@return LDataFrame New dataframe with the rank column.
 function LDataFrame:rank(col, order, result_col) end
 
 --- Removes a column by name or one-based index.
----@param col any Column name string or one-based column index.
----@return nil No value is returned.
+---@param col string Column name string or one-based column index.
 function LDataFrame:removeColumn(col) end
 
 --- Removes a row by one-based index. This method is available to Lua scripts.
 ---@param row number One-based row index to remove.
----@return nil No value is returned.
 function LDataFrame:removeRow(row) end
 
 --- Renames a column by name or one-based index.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@param new_name string New column name.
----@return nil No value is returned.
 function LDataFrame:rename(col, new_name) end
 
 --- Returns a dataframe with a rolling mean column.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param result_col? string Output column name; defaults to `rolling_mean`.
 ---@return LDataFrame New dataframe with the rolling mean column.
 function LDataFrame:rollingMean(col, window, result_col) end
 
 --- Returns a dataframe with a rolling sum column.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param result_col? string Output column name; defaults to `rolling_sum`.
 ---@return LDataFrame New dataframe with the rolling sum column.
@@ -5292,21 +5005,19 @@ function LDataFrame:rows() end
 function LDataFrame:sample(n, seed) end
 
 --- Returns a dataframe with selected columns.
----@param ... any Column name strings or one-based column indices to keep.
+---@param ... string Column name strings or one-based column indices to keep.
 ---@return LDataFrame New dataframe containing selected columns.
 function LDataFrame:select(...) end
 
 --- Replaces a numeric column from an array table of numbers.
----@param col any Column reference.
+---@param col string Column name string or one-based column index.
 ---@param values table Array table of numeric values.
----@return nil No value is returned.
 function LDataFrame:setColumnFromF64(col, values) end
 
 --- Sets one cell value by one-based row and column reference.
 ---@param row number One-based row index.
----@param col any Column name string or one-based column index.
----@param val any Cell value to store.
----@return nil No value is returned.
+---@param col string Column name string or one-based column index.
+---@param val string Cell value to store.
 function LDataFrame:setValue(row, col, val) end
 
 --- Returns a one-based inclusive row slice.
@@ -5316,18 +5027,18 @@ function LDataFrame:setValue(row, col, val) end
 function LDataFrame:slice(start, end_) end
 
 --- Returns rows sorted by a column. This method is available to Lua scripts.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@param ascending? boolean True for ascending order; defaults to true.
 ---@return LDataFrame New sorted dataframe.
 function LDataFrame:sort(col, ascending) end
 
 --- Returns the numeric standard deviation of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number Column standard deviation.
 function LDataFrame:stddev(col) end
 
 --- Returns the numeric sum of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number Column sum.
 function LDataFrame:sum(col) end
 
@@ -5353,7 +5064,7 @@ function LDataFrame:toJSON() end
 function LDataFrame:toString() end
 
 --- Converts this dataframe to an array table of row tables.
----@return table Array table of rows keyed by column name.
+---@return table Array of rows keyed by column name.
 function LDataFrame:toTable() end
 
 --- Returns the Lua-visible type name for this dataframe handle.
@@ -5366,19 +5077,18 @@ function LDataFrame:type() end
 function LDataFrame:typeOf(name) end
 
 --- Returns unique values from a column.
----@param col any Column name string or one-based column index.
----@return table Array table of unique values.
+---@param col string Column name string or one-based column index.
+---@return number[] Array table of unique values.
 function LDataFrame:unique(col) end
 
 --- Returns the numeric variance of a column.
----@param col any Column name string or one-based column index.
+---@param col string Column name string or one-based column index.
 ---@return number Column variance.
 function LDataFrame:variance(col) end
 
 --- Adds a cumulative-sum column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withCumsum(col, name) end
 
 --- Returns a dataframe with a column computed from an expression.
@@ -5388,50 +5098,43 @@ function LDataFrame:withCumsum(col, name) end
 function LDataFrame:withEval(col_name, expr) end
 
 --- Adds a percent-change column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withPctChange(col, name) end
 
 --- Adds a rank column in place. This method is available to Lua scripts.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param asc? boolean True for ascending rank; defaults to true.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withRank(col, asc, name) end
 
 --- Adds a rolling maximum column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withRollingMax(col, window, name) end
 
 --- Adds a rolling mean column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withRollingMean(col, window, name) end
 
 --- Adds a rolling minimum column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withRollingMin(col, window, name) end
 
 --- Adds a rolling sum column in place. This method is available to Lua scripts.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param window number Rolling window size.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:withRollingSum(col, window, name) end
 
 --- Adds a z-score normalized column in place.
----@param col any Source column reference.
+---@param col string Column name string or one-based column index.
 ---@param name string Output column name.
----@return nil No value is returned.
 function LDataFrame:zscoreCol(col, name) end
 
 --- Lua-side in-memory database containing named dataframes.
@@ -5441,11 +5144,9 @@ LDatabase = {}
 --- Adds or replaces a named dataframe table in the database.
 ---@param name string Table name.
 ---@param df_ud LDataFrame Dataframe handle copied into the database.
----@return nil No value is returned.
 function LDatabase:addTable(name, df_ud) end
 
 --- Removes every table from the database.
----@return nil No value is returned.
 function LDatabase:clear() end
 
 --- Returns a copy of a named table when it exists.
@@ -5459,12 +5160,11 @@ function LDatabase:getTable(name) end
 function LDatabase:hasTable(name) end
 
 --- Returns all table names in the database.
----@return table Array table of table names.
+---@return string[] Table names.
 function LDatabase:listTables() end
 
 --- Merges another database into this database.
 ---@param other LDatabase Database copied into this database.
----@return nil No value is returned.
 function LDatabase:merge(other) end
 
 --- Runs a SQL-style query against the database tables.
@@ -5474,7 +5174,6 @@ function LDatabase:query(sql_str) end
 
 --- Removes a named table from the database.
 ---@param name string Table name to remove.
----@return nil No value is returned.
 function LDatabase:removeTable(name) end
 
 --- Returns the number of tables in the database.
@@ -5529,7 +5228,7 @@ function LLazyQuery:dropNil(col) end
 --- Adds a filter step to the lazy query.
 ---@param col string Column name to filter.
 ---@param op string Comparison operator string.
----@param val any Filter comparison value.
+---@param val string Filter comparison value.
 ---@return LLazyQuery New lazy query handle with the filter step.
 function LLazyQuery:filter(col, op, val) end
 
@@ -5585,53 +5284,44 @@ function LVecFrame:applyMask(mask_tbl) end
 
 --- Applies absolute value to a numeric column in place.
 ---@param col string Column name.
----@return nil No value is returned.
 function LVecFrame:colAbs(col) end
 
 --- Adds a scalar to a numeric column in place.
 ---@param col string Column name.
 ---@param val number Scalar value to add.
----@return nil No value is returned.
 function LVecFrame:colAdd(col, val) end
 
 --- Casts a vectorized column to another data type in place.
 ---@param col string Column name.
 ---@param dtype string Target data type name.
----@return nil No value is returned.
 function LVecFrame:colCast(col, dtype) end
 
 --- Applies ceil to a numeric column in place.
 ---@param col string Column name.
----@return nil No value is returned.
 function LVecFrame:colCeil(col) end
 
 --- Clamps a numeric column in place. This method is available to Lua scripts.
 ---@param col string Column name.
 ---@param min_val number Minimum allowed value.
 ---@param max_val number Maximum allowed value.
----@return nil No value is returned.
 function LVecFrame:colClamp(col, min_val, max_val) end
 
 --- Divides a numeric column by a scalar in place.
 ---@param col string Column name.
 ---@param val number Scalar divisor.
----@return nil No value is returned.
 function LVecFrame:colDiv(col, val) end
 
 --- Applies floor to a numeric column in place.
 ---@param col string Column name.
----@return nil No value is returned.
 function LVecFrame:colFloor(col) end
 
 --- Multiplies a numeric column by a scalar in place.
 ---@param col string Column name.
 ---@param val number Scalar multiplier.
----@return nil No value is returned.
 function LVecFrame:colMul(col, val) end
 
 --- Negates a numeric column in place. This method is available to Lua scripts.
 ---@param col string Column name.
----@return nil No value is returned.
 function LVecFrame:colNeg(col) end
 
 --- Applies a binary column operation into an output column.
@@ -5639,18 +5329,15 @@ function LVecFrame:colNeg(col) end
 ---@param left_col string Left input column name.
 ---@param op string Binary operation name.
 ---@param right_col string Right input column name.
----@return nil No value is returned.
 function LVecFrame:colOp(out_col, left_col, op, right_col) end
 
 --- Applies square root to a numeric column in place.
 ---@param col string Column name.
----@return nil No value is returned.
 function LVecFrame:colSqrt(col) end
 
 --- Subtracts a scalar from a numeric column in place.
 ---@param col string Column name.
 ---@param val number Scalar value to subtract.
----@return nil No value is returned.
 function LVecFrame:colSub(col, val) end
 
 --- Returns the data type name for a vectorized column.
@@ -5659,14 +5346,14 @@ function LVecFrame:colSub(col, val) end
 function LVecFrame:colType(col) end
 
 --- Returns all vectorized column names in order.
----@return table Array table of column names.
+---@return string[] Column names.
 function LVecFrame:columns() end
 
 --- Builds a boolean mask for a numeric column comparison.
 ---@param col string Column name.
 ---@param cmp_op string Comparison operation name.
 ---@param val number Comparison value.
----@return table Array table of boolean mask values.
+---@return number[] Array table of boolean mask values.
 function LVecFrame:filterMask(col, cmp_op, val) end
 
 --- Returns the number of columns in this vectorized frame.
@@ -5687,7 +5374,6 @@ function LVecFrame:parReduce(cols_tbl, op) end
 ---@param cols_tbl table Array table of column names.
 ---@param op string Scalar operation name.
 ---@param val number Scalar value used by the operation.
----@return nil No value is returned.
 function LVecFrame:parScalarOp(cols_tbl, op, val) end
 
 --- Reduces a numeric column with a named operation.
@@ -5774,7 +5460,7 @@ lurek.debugbridge.broadcast = function(event, json_data) end
 ---@param line? number Source line; defaults to zero.
 lurek.debugbridge.capturePrint = function(msg, source, line) end
 
---- Clears captured print history.
+--- Clears all entries from the captured print history buffer.
 lurek.debugbridge.clearPrintHistory = function() end
 
 --- Returns and clears the pending hot reload request flag.
@@ -5789,17 +5475,28 @@ lurek.debugbridge.getClientCount = function() end
 ---@return table Table of numeric performance metrics.
 lurek.debugbridge.getPerformance = function() end
 
---- Returns the debug bridge TCP port.
+--- Returns the configured TCP port for the debug bridge.
 ---@return number Active or configured port, or zero when unavailable.
 lurek.debugbridge.getPort = function() end
 
+---@class DebugbridgeGetPrintHistoryResult
+---@field timestamp number Unix timestamp.
+---@field message string Log message.
+---@field source string Source file or module.
+---@field line number Line number.
+
 --- Returns captured print history entries.
 ---@param count? number Number of newest entries; nil or zero returns all entries.
----@return table Array table of entries with `timestamp`, `message`, `source`, and `line` fields.
+---@return DebugbridgeGetPrintHistoryResult Array table of entries with `timestamp`, `message`, `source`, and `line` fields.
 lurek.debugbridge.getPrintHistory = function(count) end
 
+---@class DebugbridgeGetProtocolInfoResult
+---@field version string Protocol version.
+---@field capabilities table Capabilities table.
+---@field nonce string Nonce.
+
 --- Returns debug bridge protocol version, capabilities, and handshake nonce.
----@return table Protocol info table with `version`, `capabilities`, and `nonce` fields.
+---@return DebugbridgeGetProtocolInfoResult Protocol info table with `version`, `capabilities`, and `nonce` fields.
 lurek.debugbridge.getProtocolInfo = function() end
 
 --- Returns whether the debug bridge server is currently running.
@@ -5811,6 +5508,7 @@ lurek.debugbridge.isRunning = function() end
 lurek.debugbridge.isScreenshotRequested = function() end
 
 --- Polls pending debugger requests, evaluates supported methods, and queues responses.
+---@return nil No return value.
 lurek.debugbridge.poll = function() end
 
 --- Requests a screenshot from the runtime.
@@ -5837,7 +5535,6 @@ lurek.devtools = {}
 LFileWatcher = {}
 
 --- Cancels this watcher and removes its callback.
----@return nil No value is returned.
 function LFileWatcher:cancel() end
 
 --- Polls the watcher and invokes the change callback when a change is found.
@@ -5850,7 +5547,6 @@ function LFileWatcher:getPath() end
 
 --- Sets the callback invoked when this watcher observes a change.
 ---@param func function Callback called with no arguments after a change is detected.
----@return nil No value is returned.
 function LFileWatcher:onChanged(func) end
 
 --- Returns the Lua-visible type name for this file watcher handle.
@@ -5867,7 +5563,6 @@ function LFileWatcher:typeOf(name) end
 LReplConsole = {}
 
 --- Clears this REPL console's command history.
----@return nil No value is returned.
 function LReplConsole:clear() end
 
 --- Evaluates Lua code through this REPL console and records it in history.
@@ -5876,7 +5571,7 @@ function LReplConsole:clear() end
 function LReplConsole:eval(code) end
 
 --- Returns this REPL console's recorded command history.
----@return table Array table of history entry strings.
+---@return string[] History entry strings.
 function LReplConsole:history() end
 
 --- Returns the number of entries stored in this REPL console history.
@@ -5893,21 +5588,17 @@ function LReplConsole:type() end
 function LReplConsole:typeOf(name) end
 
 --- Clears all in-memory devtools log entries.
----@return nil No value is returned.
 lurek.devtools.clearLog = function() end
 
 --- Removes every path from the module-level file watcher.
----@return nil No value is returned.
 lurek.devtools.clearWatches = function() end
 
 --- Adds a debug-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.debug = function(message) end
 
 --- Adds an error-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.error = function(message) end
 
 --- Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
@@ -5924,28 +5615,49 @@ lurek.devtools.exposeWatch = function(name, getter, category) end
 
 --- Adds a fatal-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.fatal = function(message) end
 
 --- Returns Lua call stack frames using the Lua debug library.
 ---@param max_depth? number Optional maximum number of frames to return; defaults to 20 and is capped at 100.
----@return table Array table of frames with source, line, name, and what fields.
+---@return string[] Array of frames with source, line, name, and what fields.
 lurek.devtools.getCallStack = function(max_depth) end
 
 --- Returns retained CPU frame duration samples in insertion order.
----@return table Array table of CPU frame durations in seconds.
+---@return number[] Array table of CPU frame durations in seconds.
 lurek.devtools.getFrameHistory = function() end
 
 --- Returns the current CPU frame history capacity.
 ---@return number Maximum number of retained CPU frame duration samples.
 lurek.devtools.getFrameHistorySize = function() end
 
+---@class DevtoolsGetFrameStatsResult
+---@field fps number Fps.
+---@field dt number Dt.
+---@field avg number Avg.
+---@field min number Min.
+---@field max number Max.
+---@field p50 number P50.
+---@field p95 number P95.
+---@field p99 number P99.
+---@field samples number Samples.
+
 --- Returns aggregate CPU frame timing statistics from recorded samples.
----@return table Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
+---@return DevtoolsGetFrameStatsResult Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
 lurek.devtools.getFrameStats = function() end
 
+---@class DevtoolsGetGpuFrameStatsResult
+---@field fps number Fps.
+---@field dt number Dt.
+---@field avg number Avg.
+---@field min number Min.
+---@field max number Max.
+---@field p50 number P50.
+---@field p95 number P95.
+---@field p99 number P99.
+---@field samples number Samples.
+
 --- Returns aggregate GPU frame timing statistics from recorded samples.
----@return table Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
+---@return DevtoolsGetGpuFrameStatsResult Table containing fps, dt, avg, min, max, p50, p95, p99, and samples fields.
 lurek.devtools.getGpuFrameStats = function() end
 
 --- Returns whether devtools log entries are mirrored to the console.
@@ -5956,18 +5668,33 @@ lurek.devtools.getLogConsole = function() end
 ---@return string Current log file path.
 lurek.devtools.getLogFile = function() end
 
+---@class DevtoolsGetLogHistoryResult
+---@field level string Log level.
+---@field timestamp number Unix timestamp.
+---@field message string Log message.
+---@field source string Source file.
+---@field line number Line number.
+---@field category string? Optional log category.
+
 --- Returns recent devtools log entries as structured tables.
 ---@param count? number Optional number of newest entries to return; omitted returns the logger default.
----@return table Array table containing level, timestamp, message, source, line, and optional category fields.
+---@return DevtoolsGetLogHistoryResult Array table containing level, timestamp, message, source, line, and optional category fields.
 lurek.devtools.getLogHistory = function(count) end
 
 --- Returns the minimum severity currently used by devtools log output.
 ---@return string Current minimum log level name.
 lurek.devtools.getLogLevel = function() end
 
+---@class DevtoolsGetProfileDataResult
+---@field name string Zone name.
+---@field time number Total time in ms.
+---@field selfTime number Self time in ms.
+---@field startTime number Start time in ms.
+---@field children table Nested child zones.
+
 --- Returns the profiler zone tree for a retained frame.
 ---@param frame? number Optional frame index understood by the profiler; omitted reads the newest frame alias used by the backend.
----@return table Array table of profiler zones with name, time, selfTime, startTime, and children fields.
+---@return DevtoolsGetProfileDataResult Array of profiler zones with name, time, selfTime, startTime, and children fields.
 lurek.devtools.getProfileData = function(frame) end
 
 --- Returns how many profiling frames are currently stored.
@@ -5979,16 +5706,20 @@ lurek.devtools.getProfileFrameCount = function() end
 lurek.devtools.getWatchInterval = function() end
 
 --- Returns all paths currently watched by the module-level file watcher.
----@return table Sorted array table of watched path strings.
+---@return string[] Sorted array table of watched path strings.
 lurek.devtools.getWatchedPaths = function() end
 
+---@class DevtoolsGetWatchesResult
+---@field name string Watch name.
+---@field category string Category.
+---@field value string Formatted value.
+
 --- Evaluates exposed watch callbacks and returns their current values.
----@return table Array table of watch rows with name, category, and value fields.
+---@return DevtoolsGetWatchesResult Array of watch rows with name, category, and value fields.
 lurek.devtools.getWatches = function() end
 
 --- Adds an info-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.info = function(message) end
 
 --- Returns whether the devtools console is marked open.
@@ -6006,7 +5737,6 @@ lurek.devtools.isProfilingEnabled = function() end
 --- Adds a message to the devtools log using an explicit severity level.
 ---@param level string Log level name such as `trace`, `debug`, `info`, `warn`, `error`, or `fatal`.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.log = function(level, message) end
 
 --- Creates a dedicated file watcher userdata for one path.
@@ -6028,31 +5758,35 @@ lurek.devtools.openConsole = function() end
 lurek.devtools.openEntityInspector = function() end
 
 --- Closes the current profiling frame and stores its zone tree for later inspection.
----@return nil No value is returned.
 lurek.devtools.profileFrame = function() end
 
 --- Ends the current profiling zone on the profiler stack.
 ---@param name? string Optional zone name accepted for API compatibility and ignored by the profiler.
----@return nil No value is returned.
 lurek.devtools.profilePop = function(name) end
 
 --- Starts a named profiling zone on the current profiler stack.
 ---@param name string Profiling zone name shown in reports and snapshots.
----@return nil No value is returned.
 lurek.devtools.profilePush = function(name) end
 
+---@class DevtoolsProfilerReportResult
+---@field name string Zone name.
+---@field call_count number Call count.
+---@field total_ms number Total time in ms.
+---@field avg_ms number Average time per call in ms.
+---@field min_ms number Minimum time in ms.
+---@field max_ms number Maximum time in ms.
+---@field self_ms number Self time in ms.
+
 --- Aggregates retained profiler frames into per-zone timing rows.
----@return table Array table with zone name, call count, total_ms, avg_ms, min_ms, max_ms, and self_ms fields.
+---@return DevtoolsProfilerReportResult Array table with zone name, call count, total_ms, avg_ms, min_ms, max_ms, and self_ms fields.
 lurek.devtools.profilerReport = function() end
 
 --- Records one CPU frame duration sample for devtools frame statistics.
 ---@param dt_val number Frame duration in seconds.
----@return nil No value is returned.
 lurek.devtools.recordFrameTime = function(dt_val) end
 
 --- Records one GPU frame duration sample for devtools frame statistics.
 ---@param dt_val number GPU frame duration in seconds.
----@return nil No value is returned.
 lurek.devtools.recordGpuFrameTime = function(dt_val) end
 
 --- Removes a previously exposed watch expression by id.
@@ -6061,50 +5795,49 @@ lurek.devtools.recordGpuFrameTime = function(dt_val) end
 lurek.devtools.removeWatch = function(id) end
 
 --- Clears profiler state, active zones, and retained profiling frames.
----@return nil No value is returned.
 lurek.devtools.resetProfile = function() end
 
 --- Polls module-level file watches and returns paths that changed since the previous scan.
----@return table Array table of changed path strings.
+---@return string[] Changed path strings.
 lurek.devtools.scan = function() end
 
 --- Sets the maximum number of CPU frame duration samples retained by devtools.
 ---@param size number Maximum number of frame samples to keep.
----@return nil No value is returned.
 lurek.devtools.setFrameHistorySize = function(size) end
 
 --- Enables or disables mirroring devtools log entries to the console.
 ---@param enabled boolean True to emit future log entries to console output.
----@return nil No value is returned.
 lurek.devtools.setLogConsole = function(enabled) end
 
 --- Sets the file path used by devtools file logging state.
 ---@param path string File path recorded as the active devtools log target.
----@return nil No value is returned.
 lurek.devtools.setLogFile = function(path) end
 
 --- Sets the minimum severity that remains visible in devtools log output.
 ---@param level string Log level name parsed by the devtools logger; unknown names are ignored.
----@return nil No value is returned.
 lurek.devtools.setLogLevel = function(level) end
 
 --- Enables or disables collection of CPU profiling zones.
 ---@param enabled boolean True to record profiling zones into future profiler frames.
----@return nil No value is returned.
 lurek.devtools.setProfilingEnabled = function(enabled) end
 
 --- Sets the polling interval hint used by devtools watch UIs.
 ---@param interval number Watch interval in seconds, clamped to at least 0.01.
----@return nil No value is returned.
 lurek.devtools.setWatchInterval = function(interval) end
 
+---@class DevtoolsSnapshotResult
+---@field frameStats table Frame statistics table.
+---@field watches table Watch values table.
+---@field profile table Profile data table.
+---@field log table Recent log entries table.
+---@field watchCount number WatchCount.
+
 --- Captures a combined devtools snapshot containing frame stats, watch values, profile data, and recent logs.
----@return table Snapshot table with frameStats, watches, profile, log, and watchCount fields.
+---@return DevtoolsSnapshotResult Snapshot table with frameStats, watches, profile, log, and watchCount fields.
 lurek.devtools.snapshot = function() end
 
 --- Adds a trace-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.trace = function(message) end
 
 --- Removes a path from the module-level devtools file watcher.
@@ -6114,7 +5847,6 @@ lurek.devtools.unwatch = function(path) end
 
 --- Adds a warning-level diagnostic message to the devtools log.
 ---@param message string Message text stored in the in-memory log history.
----@return nil No value is returned.
 lurek.devtools.warn = function(message) end
 
 --- Adds a path to the module-level devtools file watcher.
@@ -6141,7 +5873,7 @@ function LApiCatalog:filter(predicate) end
 
 --- Returns catalog entries, optionally limited to one module.
 ---@param module? string Optional module name used to filter entries.
----@return table Array table of `LDocEntry` handles.
+---@return LDocEntry[] `LDocEntry` handles.
 function LApiCatalog:getEntries(module) end
 
 --- Returns one catalog entry by qualified API name.
@@ -6150,17 +5882,17 @@ function LApiCatalog:getEntries(module) end
 function LApiCatalog:getEntry(qualified_name) end
 
 --- Returns every module represented in this catalog.
----@return table Sorted array table of module names.
+---@return string[] Sorted array table of module names.
 function LApiCatalog:getModules() end
 
 --- Returns method entries associated with a qualified type name.
 ---@param qualified_name string Qualified type name used as the method prefix.
----@return table Array table of `LDocEntry` method entries.
+---@return LDocEntry[] `LDocEntry` method entries.
 function LApiCatalog:getTypeMethods(qualified_name) end
 
 --- Returns type names documented for one module.
 ---@param module_name string Module name to inspect.
----@return table Array table of documented type names.
+---@return string[] Documented type names.
 function LApiCatalog:getTypes(module_name) end
 
 --- Merges another catalog into this catalog and returns a new catalog value.
@@ -6170,15 +5902,23 @@ function LApiCatalog:merge(other) end
 
 --- Searches names, qualified names, and descriptions with a case-insensitive substring query.
 ---@param query string Search text matched against catalog metadata.
----@return table Array table of matching `LDocEntry` handles.
+---@return LDocEntry[] Matching `LDocEntry` handles.
 function LApiCatalog:search(query) end
 
 --- Serializes this catalog to formatted JSON.
 ---@return string Pretty-printed JSON array of catalog entries.
 function LApiCatalog:toJSON() end
 
+---@class LApiCatalogToTableResult
+---@field name string Symbol name.
+---@field qualifiedName string Fully qualified name.
+---@field module string Module name.
+---@field kind string Symbol kind.
+---@field description string Symbol description.
+---@field score number Relevance score.
+
 --- Converts this catalog into plain Lua tables for lightweight inspection.
----@return table Array table of rows with name, qualifiedName, module, kind, description, and score fields.
+---@return LApiCatalogToTableResult Array of rows with name, qualifiedName, module, kind, description, and score fields.
 function LApiCatalog:toTable() end
 
 --- Returns the Lua-visible type name for this API catalog handle.
@@ -6218,16 +5958,27 @@ function LDocEntry:getModule() end
 ---@return string Entry name without module prefix.
 function LDocEntry:getName() end
 
+---@class LDocEntryGetParametersResult
+---@field name string Parameter name.
+---@field type string Parameter type.
+---@field description string Parameter description.
+---@field optional boolean Whether the parameter is optional.
+---@field default string? Default value when present.
+
 --- Returns parameter metadata recorded for this entry.
----@return table Array table of parameter rows with name, type, description, optional, and optional default fields.
+---@return LDocEntryGetParametersResult Array of parameter rows with name, type, description, optional, and optional default fields.
 function LDocEntry:getParameters() end
 
 --- Returns the full dotted API name stored by this documentation entry.
 ---@return string Qualified API name.
 function LDocEntry:getQualifiedName() end
 
+---@class LDocEntryGetReturnsResult
+---@field type string Return type.
+---@field description string Return description.
+
 --- Returns return-value metadata recorded for this entry.
----@return table Array table of return rows with type and description fields.
+---@return LDocEntryGetReturnsResult Array table of return rows with type and description fields.
 function LDocEntry:getReturns() end
 
 --- Returns the documentation quality score calculated for this entry.
@@ -6269,12 +6020,12 @@ LQualityReport = {}
 
 --- Returns the highest-scoring documentation entries.
 ---@param count? number Optional maximum number of entries to return; defaults to 10.
----@return table Array table of best-scoring `LDocEntry` handles.
+---@return LDocEntry[] Best-scoring `LDocEntry` handles.
 function LQualityReport:getBest(count) end
 
 --- Returns documentation entries whose calculated grade matches a grade string.
 ---@param grade string Grade string produced by the docs quality backend.
----@return table Array table of matching `LDocEntry` handles.
+---@return LDocEntry[] Matching `LDocEntry` handles.
 function LQualityReport:getByGrade(grade) end
 
 --- Returns the letter grade derived from the aggregate documentation score.
@@ -6295,15 +6046,20 @@ function LQualityReport:getSummary() end
 
 --- Returns the lowest-scoring documentation entries.
 ---@param count? number Optional maximum number of entries to return; defaults to 10.
----@return table Array table of worst-scoring `LDocEntry` handles.
+---@return LDocEntry[] Worst-scoring `LDocEntry` handles.
 function LQualityReport:getWorst(count) end
 
 --- Serializes this quality report to formatted JSON.
 ---@return string Pretty-printed JSON object for the quality report.
 function LQualityReport:toJSON() end
 
+---@class LQualityReportToTableResult
+---@field overallScore number Overall quality score.
+---@field grade string Quality grade letter.
+---@field moduleScores table Per-module score table.
+
 --- Converts this quality report into a plain Lua table.
----@return table Table with overallScore, grade, and moduleScores fields.
+---@return LQualityReportToTableResult Table with overallScore, grade, and moduleScores fields.
 function LQualityReport:toTable() end
 
 --- Returns the Lua-visible type name for this quality report handle.
@@ -6321,7 +6077,6 @@ LSchema = {}
 
 --- Validates a Lua table and raises a Lua error when schema checks fail.
 ---@param data table Table whose fields are checked against this schema.
----@return nil No value is returned when validation succeeds.
 function LSchema:assert(data) end
 
 --- Validates a Lua table and returns only the boolean result.
@@ -6330,7 +6085,7 @@ function LSchema:assert(data) end
 function LSchema:check(data) end
 
 --- Returns the field names declared by this schema.
----@return table Sorted array table of field names.
+---@return string[] Sorted array table of field names.
 function LSchema:getFields() end
 
 --- Returns this schema's display name.
@@ -6346,10 +6101,14 @@ function LSchema:type() end
 ---@return boolean True when the supplied type name matches this handle.
 function LSchema:typeOf(name) end
 
+---@class LSchemaValidateResult
+---@field field string Field name that failed validation.
+---@field message string Validation error message.
+
 --- Validates a Lua table and returns a success flag plus structured error rows.
 ---@param data table Table whose fields are checked against this schema.
 ---@return boolean a True when every provided field satisfies the schema rules.
----@return table b Array table of validation errors with field and message fields.
+---@return LSchemaValidateResult b Array table of validation errors with field and message fields.
 function LSchema:validate(data) end
 
 --- Provides Lua accessors for documentation validation results.
@@ -6357,15 +6116,15 @@ function LSchema:validate(data) end
 LValidationReport = {}
 
 --- Returns catalog APIs whose documentation was incomplete.
----@return table Array table of incomplete qualified names.
+---@return string[] Incomplete qualified names.
 function LValidationReport:getIncomplete() end
 
 --- Returns live APIs that were missing from the checked catalog.
----@return table Array table of missing qualified names.
+---@return string[] Missing qualified names.
 function LValidationReport:getMissing() end
 
 --- Returns catalog APIs that were not present in the live Lua table.
----@return table Array table of phantom qualified names.
+---@return string[] Phantom qualified names.
 function LValidationReport:getPhantom() end
 
 --- Returns a compact text summary of missing, phantom, and incomplete counts.
@@ -6392,8 +6151,13 @@ function LValidationReport:phantomCount() end
 ---@return string Pretty-printed JSON object for the report.
 function LValidationReport:toJSON() end
 
+---@class LValidationReportToTableResult
+---@field missing string[] Missing symbols.
+---@field phantom string[] Phantom symbols.
+---@field incomplete string[] Incomplete symbols.
+
 --- Converts this validation report into a plain Lua table.
----@return table Table with missing, phantom, and incomplete array fields.
+---@return LValidationReportToTableResult Table with missing, phantom, and incomplete array fields.
 function LValidationReport:toTable() end
 
 --- Returns the Lua-visible type name for this validation report handle.
@@ -6405,10 +6169,15 @@ function LValidationReport:type() end
 ---@return boolean True when the supplied type name matches this handle.
 function LValidationReport:typeOf(name) end
 
+---@class DocsCheckStalenessResult
+---@field stale string[] Stale file paths.
+---@field current string[] Current file paths.
+---@field missing string[] Missing file paths.
+
 --- Lists source files in a directory for simple documentation staleness checks.
 ---@param catalog_ud LApiCatalog Catalog argument accepted for API symmetry with validation helpers.
 ---@param source_dir string Directory scanned for `.rs` and `.lua` source files.
----@return table Table with stale, current, and missing arrays.
+---@return DocsCheckStalenessResult Table with stale, current, and missing arrays.
 lurek.docs.checkStaleness = function(catalog_ud, source_dir) end
 
 --- Returns documented and live API counts for the full `lurek` table.
@@ -6427,43 +6196,36 @@ lurek.docs.coverageModule = function(module_name, catalog_ud) end
 --- Adds or updates the description for one editable catalog entry.
 ---@param qualified_name string Full dotted API name to update or create.
 ---@param description string Description text stored on the catalog entry.
----@return nil No value is returned.
 lurek.docs.describe = function(qualified_name, description) end
 
 --- Exports all editor documentation artifacts for a catalog into a directory.
 ---@param catalog_ud LApiCatalog Catalog whose entries are exported.
 ---@param output_dir string Directory that receives all generated artifacts.
----@return nil No value is returned.
 lurek.docs.exportAll = function(catalog_ud, output_dir) end
 
 --- Writes a compact text cheatsheet from catalog entries.
 ---@param catalog_ud LApiCatalog Catalog whose entries are written.
 ---@param path string Output cheatsheet file path.
----@return nil No value is returned.
 lurek.docs.exportCheatsheet = function(catalog_ud, path) end
 
 --- Exports catalog completion metadata to a file.
 ---@param catalog_ud LApiCatalog Catalog whose entries are exported.
 ---@param path string Output file path for completion data.
----@return nil No value is returned.
 lurek.docs.exportCompletions = function(catalog_ud, path) end
 
 --- Exports catalog hover metadata to a file.
 ---@param catalog_ud LApiCatalog Catalog whose entries are exported.
 ---@param path string Output file path for hover data.
----@return nil No value is returned.
 lurek.docs.exportHover = function(catalog_ud, path) end
 
 --- Writes a Markdown API reference from catalog entries.
 ---@param catalog_ud LApiCatalog Catalog whose entries are written.
 ---@param path string Output Markdown file path.
----@return nil No value is returned.
 lurek.docs.exportMarkdown = function(catalog_ud, path) end
 
 --- Exports catalog signature metadata to a file.
 ---@param catalog_ud LApiCatalog Catalog whose entries are exported.
 ---@param path string Output file path for signature data.
----@return nil No value is returned.
 lurek.docs.exportSignatures = function(catalog_ud, path) end
 
 --- Returns the editable in-memory documentation catalog.
@@ -6496,14 +6258,18 @@ lurek.docs.qualityModule = function(module_name, catalog_ud) end
 ---@return table Reflection table keyed by module name or containing the requested module entry.
 lurek.docs.reflectLive = function(ns) end
 
+---@class DocsReflectTableResult
+---@field name string Item name.
+---@field qualifiedName string Fully qualified name.
+---@field type string Item type.
+
 --- Reflects an arbitrary Lua table into name, qualifiedName, and type rows.
 ---@param tbl table Lua table to inspect without recursion.
 ---@param name? string Optional prefix used to build qualifiedName values.
----@return table Array table of reflected item rows.
+---@return DocsReflectTableResult Array table of reflected item rows.
 lurek.docs.reflectTable = function(tbl, name) end
 
 --- Clears the editable in-memory documentation catalog.
----@return nil No value is returned.
 lurek.docs.resetCatalog = function() end
 
 --- Reflects the live `lurek` table and builds a catalog of callable APIs.
@@ -6530,13 +6296,11 @@ lurek.docs.schemaFromToml = function(toml_text) end
 --- Replaces parameter metadata for one editable catalog entry.
 ---@param qualified_name string Full dotted API name whose parameters are updated.
 ---@param params table Array table of parameter rows with name, type, description, optional, and optional default fields.
----@return nil No value is returned.
 lurek.docs.setParamInfo = function(qualified_name, params) end
 
 --- Replaces return-value metadata for one editable catalog entry.
 ---@param qualified_name string Full dotted API name whose return metadata is updated.
 ---@param returns table Array table of return rows with type and description fields.
----@return nil No value is returned.
 lurek.docs.setReturnInfo = function(qualified_name, returns) end
 
 --- Compares a documentation catalog with the live reflected `lurek` API table.
@@ -6568,7 +6332,7 @@ function LUniverse:addRelation(from, name, to) end
 ---@param opts? table Optional table with priority, phase, name, and after fields.
 function LUniverse:addSystem(system, opts) end
 
---- Adds a string tag to an entity.
+--- Assigns a string tag name to an entity in this universe.
 ---@param id number Entity id to tag.
 ---@param tag string Tag name to add.
 function LUniverse:addTag(id, tag) end
@@ -6617,7 +6381,7 @@ function LUniverse:each(name, callback) end
 
 --- Calls matching event-named functions on registered systems.
 ---@param event string Function name looked up on each system table.
----@param ... any Extra values forwarded after the system and universe arguments.
+---@param ... table Extra values forwarded after the system and universe arguments.
 function LUniverse:emit(event, ...) end
 
 --- Defines a blueprint that inherits from a parent blueprint and applies overrides.
@@ -6632,13 +6396,12 @@ function LUniverse:flushObservers() end
 --- Returns a component value from an entity.
 ---@param id number Entity id to read.
 ---@param name string Component name to read.
----@return any Stored component value, or nil when the entity does not have that component.
+---@return table number|string|boolean|nil | Stored component value, or nil when the entity does not have that component.
 function LUniverse:get(id, name) end
 
 --- Returns the bit index assigned to a bitmap tag name.
 ---@param name string Bitmap tag name to inspect.
----@return number a Bit index when the tag exists.
----@return nil b When the tag is undefined.
+---@return number Bit index when the tag exists, or nil when the tag is undefined.
 function LUniverse:getBitmapTagBit(name) end
 
 --- Returns the component table stored for a blueprint.
@@ -6648,34 +6411,34 @@ function LUniverse:getBlueprintComponents(name) end
 
 --- Returns child entity ids for a parent entity.
 ---@param parent_id number Parent entity id to inspect.
----@return table Array table of child entity ids.
+---@return number[] Array table of child entity ids.
 function LUniverse:getChildren(parent_id) end
 
 --- Returns component names currently stored on an entity.
 ---@param id number Entity id to inspect.
----@return table Array table of component name strings.
+---@return string[] Component name strings.
 function LUniverse:getComponents(id) end
 
 --- Returns entities marked dirty by recent ECS mutations.
----@return table Array table of dirty entity ids.
+---@return number[] Array table of dirty entity ids.
 function LUniverse:getDirtyEntities() end
 
 --- Returns all live entity ids in this universe.
----@return table Array table of live entity ids.
+---@return number[] Array table of live entity ids.
 function LUniverse:getEntities() end
 
 --- Returns entities assigned to a numeric layer.
 ---@param layer number Layer value used for lookup.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:getEntitiesByLayer(layer) end
 
 --- Returns entities that have a string tag.
 ---@param tag string Tag name used for lookup.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:getEntitiesByTag(tag) end
 
 --- Returns live entities sorted by ECS layer and stable entity ordering.
----@return table Array table of sorted entity ids.
+---@return number[] Array table of sorted entity ids.
 function LUniverse:getEntitiesSorted() end
 
 --- Returns the number of live entities in this universe.
@@ -6689,14 +6452,13 @@ function LUniverse:getLayer(id) end
 
 --- Returns the parent entity id for a child entity.
 ---@param child_id number Entity id whose parent is read.
----@return number a Parent entity id.
----@return nil b When the entity has no parent.
+---@return number Parent entity id, or nil when the entity has no parent.
 function LUniverse:getParent(child_id) end
 
 --- Returns targets linked from an entity by a named relation.
 ---@param from number Source entity id.
 ---@param name string Relation name.
----@return table Array table of related target entity ids.
+---@return number[] Array table of related target entity ids.
 function LUniverse:getRelated(from, name) end
 
 --- Returns the number of registered systems.
@@ -6705,7 +6467,7 @@ function LUniverse:getSystemCount() end
 
 --- Returns string tags assigned to an entity.
 ---@param id number Entity id to inspect.
----@return table Array table of tag names.
+---@return string[] Tag names.
 function LUniverse:getTags(id) end
 
 --- Returns whether an entity has a named component.
@@ -6752,7 +6514,7 @@ function LUniverse:kill(id) end
 function LUniverse:killRecursive(id) end
 
 --- Returns names of all registered blueprints.
----@return table Array table of blueprint names.
+---@return string[] Blueprint names.
 function LUniverse:listBlueprints() end
 
 --- Registers a callback for queued component-add events with a given component name.
@@ -6767,22 +6529,22 @@ function LUniverse:onComponentRemoved(name, cb) end
 
 --- Returns entities that have all component names passed as varargs.
 ---@param ... string Component names that every returned entity must have.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:query(...) end
 
 --- Returns entities that have every bitmap tag from a list.
 ---@param names table Array table of bitmap tag names.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:queryBitmapAll(names) end
 
 --- Returns entities with at least one bitmap tag from a list.
 ---@param names table Array table of bitmap tag names.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:queryBitmapAny(names) end
 
 --- Returns entities with one bitmap tag.
 ---@param name string Bitmap tag name used for lookup.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:queryBitmapTag(name) end
 
 --- Iterates entities that have all component names from a table.
@@ -6793,7 +6555,7 @@ function LUniverse:queryMulti(names_table, callback) end
 --- Returns entities that include one component set and exclude another component set.
 ---@param with_tbl table Array table of required component names.
 ---@param without_tbl table Array table of forbidden component names.
----@return table Array table of matching entity ids.
+---@return number[] Array table of matching entity ids.
 function LUniverse:queryNot(with_tbl, without_tbl) end
 
 --- Releases universe contents by clearing all ECS state.
@@ -6827,14 +6589,18 @@ function LUniverse:removeTag(id, tag) end
 --- Runs registered render-phase systems using their render or draw callbacks.
 function LUniverse:render() end
 
+---@class LUniverseSerializeResult
+---@field entities number[] Array of entity ids.
+---@field components table Map of entity id to component data tables.
+
 --- Serializes this universe into a Lua table snapshot.
----@return table Snapshot table containing entities and component state.
+---@return LUniverseSerializeResult Snapshot table containing entities and component state.
 function LUniverse:serialize() end
 
 --- Stores or replaces a component value on an entity.
 ---@param id number Entity id that receives the component.
 ---@param name string Component name.
----@param value any Lua value stored as the component payload.
+---@param value table Lua value stored as the component payload.
 function LUniverse:set(id, name, value) end
 
 --- Assigns a numeric layer to an entity.
@@ -6847,8 +6613,14 @@ function LUniverse:setLayer(id, layer) end
 ---@param parent_id? number Parent entity id, or nil to clear the parent.
 function LUniverse:setParent(child_id, parent_id) end
 
+---@class LUniverseSnapshotResult
+---@field added_components table Added components.
+---@field removed_components table Removed components.
+---@field deleted_entities number[] Deleted entity ids.
+---@field dirty_entities number[] Dirty entity ids.
+
 --- Serializes this universe into a Lua table snapshot.
----@return table Snapshot table containing entities and component state.
+---@return LUniverseSnapshotResult Snapshot table containing entities and component state.
 function LUniverse:snapshot() end
 
 --- Creates a new entity in this universe.
@@ -6865,11 +6637,17 @@ function LUniverse:spawnBlueprint(name, overrides) end
 ---@param name string Blueprint name to instantiate.
 ---@param count number Number of entities to spawn.
 ---@param overrides? table Optional component overrides applied to each spawned entity.
----@return table Array table of spawned entity ids.
+---@return number[] Array table of spawned entity ids.
 function LUniverse:spawnBulk(name, count, overrides) end
 
+---@class LUniverseTakeSnapshotDiffResult
+---@field added_components table Array of {entity_id, name} tables.
+---@field removed_components table Array of {entity_id, name} tables.
+---@field deleted_entities number[] Deleted entity ids.
+---@field dirty_entities number[] Modified entity ids.
+
 --- Returns and clears accumulated ECS snapshot diff data.
----@return table Diff table with added_components, removed_components, deleted_entities, and dirty_entities arrays.
+---@return LUniverseTakeSnapshotDiffResult Diff table with added_components, removed_components, deleted_entities, and dirty_entities arrays.
 function LUniverse:takeSnapshotDiff() end
 
 --- Returns the Lua-visible type name for this universe handle.
@@ -6907,11 +6685,9 @@ LImageEffect = {}
 function LImageEffect:addEffect(name) end
 
 --- Removes every effect from this image effect chain.
----@return nil No value is returned.
 function LImageEffect:clear() end
 
 --- Removes every effect from this image effect chain.
----@return nil No value is returned.
 function LImageEffect:clearEffects() end
 
 --- Creates a new image effect chain with cloned effect entries.
@@ -6923,7 +6699,7 @@ function LImageEffect:clone() end
 function LImageEffect:effectCount() end
 
 --- Looks up an image effect by one-based index or effect type name.
----@param key any Integer index, numeric index, or effect type name.
+---@param key string Effect name string or one-based integer index.
 ---@return LuaValue `LPostFxEffect` handle, or nil when no matching effect exists.
 function LImageEffect:getEffect(key) end
 
@@ -6942,7 +6718,7 @@ function LImageEffect:removeByIndex(idx) end
 function LImageEffect:removeByName(name) end
 
 --- Removes an image effect by one-based index or effect type name.
----@param key any Integer index, numeric index, or effect type name.
+---@param key string Effect name string or one-based integer index.
 ---@return boolean True when an effect was removed.
 function LImageEffect:removeEffect(key) end
 
@@ -6964,7 +6740,6 @@ function LImageEffect:typeOf(name) end
 LOverlay = {}
 
 --- Clears active overlay effects and resets transient state.
----@return nil No value is returned.
 function LOverlay:clear() end
 
 --- Renders overlay state into an image object of the requested size.
@@ -6979,7 +6754,6 @@ function LOverlay:drawToImage(w, h) end
 ---@param b number Blue channel.
 ---@param a? number Target alpha, defaulting to 1.0.
 ---@param dur? number Duration in seconds, defaulting to 1.0.
----@return nil No value is returned.
 function LOverlay:fade(r, g, b, a, dur) end
 
 --- Starts a short flash overlay with optional alpha and duration.
@@ -6988,7 +6762,6 @@ function LOverlay:fade(r, g, b, a, dur) end
 ---@param b number Blue channel.
 ---@param a? number Alpha channel, defaulting to 1.0.
 ---@param dur? number Duration in seconds, defaulting to 0.2.
----@return nil No value is returned.
 function LOverlay:flash(r, g, b, a, dur) end
 
 --- Returns overlay ambient RGBA color.
@@ -7070,8 +6843,23 @@ function LOverlay:getTimeOfDay() end
 ---@return number Current vignette strength.
 function LOverlay:getVignetteStrength() end
 
+---@class LOverlayGetWaterResult
+---@field enabled boolean Whether water effect is enabled.
+---@field amplitude number Wave amplitude.
+---@field frequency number Wave frequency.
+---@field speed number Wave speed.
+---@field tint_r number Tint red component.
+---@field tint_g number Tint green component.
+---@field tint_b number Tint blue component.
+---@field tint_strength number Tint strength.
+---@field depth_r number Depth red component.
+---@field depth_g number Depth green component.
+---@field depth_b number Depth blue component.
+---@field depth_strength number Depth strength.
+---@field time number Elapsed time.
+
 --- Returns a table describing the current water effect settings.
----@return table Water state table with enabled, wave, tint, depth, and time fields.
+---@return LOverlayGetWaterResult Water state table with enabled, wave, tint, depth, and time fields.
 function LOverlay:getWater() end
 
 --- Returns the overlay weather type name.
@@ -7139,21 +6927,17 @@ function LOverlay:isVignetteEnabled() end
 function LOverlay:isWeatherEnabled() end
 
 --- Copies ambient color from the shared light world into this overlay.
----@return nil No value is returned.
 function LOverlay:pullAmbientFromLight() end
 
 --- Copies this overlay ambient color into the shared light world.
----@return nil No value is returned.
 function LOverlay:pushAmbientToLight() end
 
 --- Queues renderer commands for the overlay's current visual state.
----@return nil No value is returned.
 function LOverlay:render() end
 
 --- Resizes the overlay target dimensions.
 ---@param w number New width in pixels.
 ---@param h number New height in pixels.
----@return nil No value is returned.
 function LOverlay:resize(w, h) end
 
 --- Sets the overlay ambient color from RGBA channels.
@@ -7161,52 +6945,42 @@ function LOverlay:resize(w, h) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a? number Alpha channel, defaulting to 1.0.
----@return nil No value is returned.
 function LOverlay:setAmbientColor(r, g, b, a) end
 
 --- Enables or disables overlay ambient color rendering.
 ---@param v boolean New ambient enabled flag.
----@return nil No value is returned.
 function LOverlay:setAmbientEnabled(v) end
 
 --- Sets the overlay cloud shadow count.
 ---@param v number Cloud shadow count.
----@return nil No value is returned.
 function LOverlay:setCloudCount(v) end
 
 --- Sets cloud shadow opacity. This method is available to Lua scripts.
 ---@param v number Cloud opacity value.
----@return nil No value is returned.
 function LOverlay:setCloudOpacity(v) end
 
 --- Sets cloud shadow scale. This method is available to Lua scripts.
 ---@param v number Cloud scale value.
----@return nil No value is returned.
 function LOverlay:setCloudScale(v) end
 
 --- Enables or disables overlay cloud shadow rendering.
 ---@param v boolean New cloud shadow enabled flag.
----@return nil No value is returned.
 function LOverlay:setCloudShadows(v) end
 
 --- Sets cloud shadow movement speed. This method is available to Lua scripts.
 ---@param v number Cloud speed value.
----@return nil No value is returned.
 function LOverlay:setCloudSpeed(v) end
 
 --- Sets or clears the custom overlay shader name.
 ---@param name? string Optional shader name; nil clears the custom shader.
----@return nil No value is returned.
 function LOverlay:setCustomShader(name) end
 
 --- Enables or disables overlay film grain rendering.
 ---@param v boolean New film grain enabled flag.
----@return nil No value is returned.
 function LOverlay:setFilmGrainEnabled(v) end
 
 --- Sets overlay film grain intensity.
 ---@param v number Film grain intensity value.
----@return nil No value is returned.
 function LOverlay:setFilmGrainIntensity(v) end
 
 --- Sets the overlay fog color from RGBA channels.
@@ -7214,27 +6988,22 @@ function LOverlay:setFilmGrainIntensity(v) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a? number Alpha channel, defaulting to 1.0.
----@return nil No value is returned.
 function LOverlay:setFogColor(r, g, b, a) end
 
 --- Sets overlay fog density. This method is available to Lua scripts.
 ---@param v number Fog density value.
----@return nil No value is returned.
 function LOverlay:setFogDensity(v) end
 
 --- Enables or disables overlay fog rendering.
 ---@param v boolean New fog enabled flag.
----@return nil No value is returned.
 function LOverlay:setFogEnabled(v) end
 
 --- Enables or disables overlay heat haze rendering.
 ---@param v boolean New heat haze enabled flag.
----@return nil No value is returned.
 function LOverlay:setHeatHazeEnabled(v) end
 
 --- Sets overlay heat haze intensity. This method is available to Lua scripts.
 ---@param v number Heat haze intensity value.
----@return nil No value is returned.
 function LOverlay:setHeatHazeIntensity(v) end
 
 --- Sets overlay lightning RGBA color.
@@ -7242,29 +7011,24 @@ function LOverlay:setHeatHazeIntensity(v) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a? number Alpha channel, defaulting to 1.0.
----@return nil No value is returned.
 function LOverlay:setLightningColor(r, g, b, a) end
 
 --- Sets the overlay time-of-day value used by ambient effects.
 ---@param v number Time-of-day value stored on the overlay ambient state.
----@return nil No value is returned.
 function LOverlay:setTimeOfDay(v) end
 
 --- Enables or disables overlay vignette rendering.
 ---@param v boolean New vignette enabled flag.
----@return nil No value is returned.
 function LOverlay:setVignetteEnabled(v) end
 
 --- Sets overlay vignette strength. This method is available to Lua scripts.
 ---@param v number Vignette strength value.
----@return nil No value is returned.
 function LOverlay:setVignetteStrength(v) end
 
 --- Enables water distortion and sets wave amplitude, frequency, and speed.
 ---@param amplitude number Water wave amplitude.
 ---@param frequency number Water wave frequency.
 ---@param speed number Water animation speed.
----@return nil No value is returned.
 function LOverlay:setWater(amplitude, frequency, speed) end
 
 --- Sets the water tint color and strength.
@@ -7272,43 +7036,35 @@ function LOverlay:setWater(amplitude, frequency, speed) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param strength number Tint strength.
----@return nil No value is returned.
 function LOverlay:setWaterTint(r, g, b, strength) end
 
 --- Sets the overlay weather type by name.
 ---@param name string Weather type name recognized by the engine.
----@return nil No value is returned.
 function LOverlay:setWeather(name) end
 
 --- Enables or disables overlay weather rendering.
 ---@param v boolean New weather enabled flag.
----@return nil No value is returned.
 function LOverlay:setWeatherEnabled(v) end
 
 --- Sets weather intensity for the current weather type.
 ---@param v number Weather intensity value.
----@return nil No value is returned.
 function LOverlay:setWeatherIntensity(v) end
 
 --- Sets the overlay weather wind direction.
 ---@param v number Wind direction value.
----@return nil No value is returned.
 function LOverlay:setWindDirection(v) end
 
 --- Sets the overlay weather wind speed.
 ---@param v number Wind speed value.
----@return nil No value is returned.
 function LOverlay:setWindSpeed(v) end
 
 --- Starts a screen shake with optional duration.
 ---@param intensity number Shake intensity.
 ---@param dur? number Duration in seconds, defaulting to 0.5.
----@return nil No value is returned.
 function LOverlay:shake(intensity, dur) end
 
 --- Resolves overlay and light ambient colors using a named mode and writes both stores.
 ---@param mode string One of `light`, `overlay`, `avg`, `max`, or `min`.
----@return nil No value is returned.
 function LOverlay:syncAmbientWithLight(mode) end
 
 --- Starts a fade overlay toward a target alpha.
@@ -7317,7 +7073,6 @@ function LOverlay:syncAmbientWithLight(mode) end
 ---@param b number Blue channel.
 ---@param target_alpha number Target alpha value.
 ---@param duration number Fade duration in seconds.
----@return nil No value is returned.
 function LOverlay:triggerFade(r, g, b, target_alpha, duration) end
 
 --- Starts a screen flash with explicit RGBA color and duration.
@@ -7326,17 +7081,14 @@ function LOverlay:triggerFade(r, g, b, target_alpha, duration) end
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
 ---@param duration number Flash duration in seconds.
----@return nil No value is returned.
 function LOverlay:triggerFlash(r, g, b, a, duration) end
 
 --- Starts a lightning flash using the overlay lightning state.
----@return nil No value is returned.
 function LOverlay:triggerLightning() end
 
 --- Starts a screen shake effect. This method is available to Lua scripts.
 ---@param intensity number Shake intensity.
 ---@param duration number Shake duration in seconds.
----@return nil No value is returned.
 function LOverlay:triggerShake(intensity, duration) end
 
 --- Returns the Lua-visible type name for this overlay handle.
@@ -7350,7 +7102,6 @@ function LOverlay:typeOf(name) end
 
 --- Advances overlay timers and animated effect state.
 ---@param dt number Delta time in seconds.
----@return nil No value is returned.
 function LOverlay:update(dt) end
 
 --- Lua-side handle for a single post-processing effect instance.
@@ -7358,11 +7109,9 @@ function LOverlay:update(dt) end
 LPostFxEffect = {}
 
 --- Disables automatic time and resolution uniforms for this effect.
----@return nil No value is returned.
 function LPostFxEffect:disableAutoUniforms() end
 
 --- Enables automatic time and resolution uniforms for this effect.
----@return nil No value is returned.
 function LPostFxEffect:enableAutoUniforms() end
 
 --- Returns the renderer effect type name.
@@ -7376,7 +7125,7 @@ function LPostFxEffect:getEffectType() end
 function LPostFxEffect:getParameter(name, default) end
 
 --- Returns the parameter names stored on this effect.
----@return table Array table of parameter name strings.
+---@return string[] Parameter name strings.
 function LPostFxEffect:getParameterNames() end
 
 --- Returns the renderer effect type name.
@@ -7406,58 +7155,47 @@ function LPostFxEffect:isEnabled() end
 
 --- Sets the `brightness` shader parameter.
 ---@param v number Brightness value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setBrightness(v) end
 
 --- Sets the `contrast` shader parameter.
 ---@param v number Contrast value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setContrast(v) end
 
 --- Enables or disables this effect. This method is available to Lua scripts.
 ---@param enabled boolean New enabled flag.
----@return nil No value is returned.
 function LPostFxEffect:setEnabled(enabled) end
 
 --- Sets the `intensity` shader parameter.
 ---@param v number Intensity value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setIntensity(v) end
 
 --- Sets the `offset` shader parameter.
 ---@param v number Offset value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setOffset(v) end
 
 --- Sets a numeric shader parameter by name.
 ---@param name string Parameter name expected by the effect shader.
 ---@param value number Numeric parameter value.
----@return nil No value is returned.
 function LPostFxEffect:setParameter(name, value) end
 
 --- Sets the `radius` shader parameter.
 ---@param v number Radius value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setRadius(v) end
 
 --- Sets the `saturation` shader parameter.
 ---@param v number Saturation value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setSaturation(v) end
 
 --- Sets the `scanline_strength` shader parameter.
 ---@param v number Scanline strength value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setScanlineStrength(v) end
 
 --- Sets the `strength` shader parameter.
 ---@param v number Strength value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setStrength(v) end
 
 --- Sets the `threshold` shader parameter.
 ---@param v number Threshold value passed to the effect shader.
----@return nil No value is returned.
 function LPostFxEffect:setThreshold(v) end
 
 --- Returns the Lua-visible type name for this post-processing effect handle.
@@ -7475,23 +7213,18 @@ LPostFxStack = {}
 
 --- Appends an effect to the end of this stack.
 ---@param effect_ud LPostFxEffect Effect handle to append.
----@return nil No value is returned.
 function LPostFxStack:add(effect_ud) end
 
 --- Queues this stack's enabled post-effect passes for renderer application.
----@return nil No value is returned.
 function LPostFxStack:apply() end
 
 --- Starts post-effect capture and queues a renderer begin-capture command.
----@return nil No value is returned.
 function LPostFxStack:beginCapture() end
 
 --- Removes all effects and pass state from this stack.
----@return nil No value is returned.
 function LPostFxStack:clear() end
 
 --- Resets the stack feedback blend factor to zero.
----@return nil No value is returned.
 function LPostFxStack:clearFeedback() end
 
 --- Removes duplicate effect handles while preserving first occurrences.
@@ -7499,7 +7232,6 @@ function LPostFxStack:clearFeedback() end
 function LPostFxStack:dedup() end
 
 --- Ends post-effect capture and queues a renderer end-capture command.
----@return nil No value is returned.
 function LPostFxStack:endCapture() end
 
 --- Returns the stack render dimensions.
@@ -7517,7 +7249,7 @@ function LPostFxStack:getEffect(index) end
 function LPostFxStack:getEffectCount() end
 
 --- Returns effect handles whose stack passes are enabled.
----@return table Array table of enabled `LPostFxEffect` handles.
+---@return LPostFxEffect[] Enabled `LPostFxEffect` handles.
 function LPostFxStack:getEnabledEffects() end
 
 --- Returns the current stack feedback blend factor.
@@ -7535,7 +7267,6 @@ function LPostFxStack:getWidth() end
 --- Inserts an effect at a one-based stack position.
 ---@param position number One-based insertion position, clamped to the stack length.
 ---@param effect_ud LPostFxEffect Effect handle to insert.
----@return nil No value is returned.
 function LPostFxStack:insert(position, effect_ud) end
 
 --- Returns whether this stack is currently capturing draw commands.
@@ -7563,18 +7294,15 @@ function LPostFxStack:remove(effect_ud) end
 --- Resizes the post-processing stack render target dimensions.
 ---@param w number New width in pixels.
 ---@param h number New height in pixels.
----@return nil No value is returned.
 function LPostFxStack:resize(w, h) end
 
 --- Enables or disables the effect pass at a one-based stack position.
 ---@param position number One-based stack position.
 ---@param enabled boolean New enabled flag for the pass.
----@return nil No value is returned.
 function LPostFxStack:setEnabled(position, enabled) end
 
 --- Sets the stack feedback blend factor and clamps it to 0.0 through 1.0.
 ---@param factor number Feedback blend factor.
----@return nil No value is returned.
 function LPostFxStack:setFeedback(factor) end
 
 --- Returns the Lua-visible type name for this post-processing stack handle.
@@ -7610,7 +7338,6 @@ function LScreenTransition:isDone() end
 function LScreenTransition:kind() end
 
 --- Starts this screen transition forward from its current state.
----@return nil No value is returned.
 function LScreenTransition:play() end
 
 --- Returns normalized transition progress.
@@ -7618,12 +7345,10 @@ function LScreenTransition:play() end
 function LScreenTransition:progress() end
 
 --- Starts this screen transition in reverse from its current state.
----@return nil No value is returned.
 function LScreenTransition:reverse() end
 
 --- Sets the transition RGBA color from a numeric array table.
 ---@param color table Numeric color table using indices 1 through 4.
----@return nil No value is returned.
 function LScreenTransition:setColor(color) end
 
 --- Returns the Lua-visible type name for this transition handle.
@@ -7641,7 +7366,7 @@ function LScreenTransition:typeOf(name) end
 function LScreenTransition:update(dt) end
 
 --- Returns all built-in post-processing effect type names.
----@return table Array table of built-in effect type strings.
+---@return string[] Built-in effect type strings.
 lurek.effect.getEffectTypes = function() end
 
 --- Returns whether renderer shader error display overlays are enabled.
@@ -7697,7 +7422,6 @@ lurek.effect.newTransition = function(kind, duration, color_tbl) end
 
 --- Enables or disables renderer shader error display overlays.
 ---@param enabled boolean New shader error display flag.
----@return nil No value is returned.
 lurek.effect.setShaderErrorDisplay = function(enabled) end
 
 ---@class lurek.engine
@@ -7719,16 +7443,52 @@ lurek.engine.getConfigRevision = function() end
 ---@return number Frame budget in milliseconds.
 lurek.engine.getFrameBudget = function() end
 
+---@class EngineGetFrameProfileResult
+---@field app_tick_ms number App tick ms.
+---@field app_update_ms number App update ms.
+---@field app_render_ms number App render ms.
+---@field app_frame_total_ms number App frame total ms.
+---@field process_physics_ms number Process physics ms.
+---@field fixed_update_ms number Fixed update ms.
+---@field process_ms number Process ms.
+---@field process_late_ms number Process late ms.
+---@field draw_ms number Draw ms.
+---@field draw_ui_ms number Draw ui ms.
+---@field callback_total_ms number Callback total ms.
+
 --- Returns the latest frame timing profile split by engine phase.
----@return table Table of frame phase timings in milliseconds.
+---@return EngineGetFrameProfileResult Table of frame phase timings in milliseconds.
 lurek.engine.getFrameProfile = function() end
 
 --- Returns the latest frame timing profile formatted as one text line.
 ---@return string Human-readable frame profile summary.
 lurek.engine.getFrameProfileText = function() end
 
+---@class EngineGetResourceStatsResult
+---@field texture_bytes number Texture bytes.
+---@field font_bytes number Font bytes.
+---@field canvas_bytes number Canvas bytes.
+---@field shader_bytes number Shader bytes.
+---@field total_bytes number Total bytes.
+---@field budget_bytes number Budget bytes.
+---@field texture_count number Texture count.
+---@field font_count number Font count.
+---@field canvas_count number Canvas count.
+---@field shader_count number Shader count.
+---@field app_tick_ms number App tick ms.
+---@field app_update_ms number App update ms.
+---@field app_render_ms number App render ms.
+---@field app_frame_total_ms number App frame total ms.
+---@field process_physics_ms number Process physics ms.
+---@field fixed_update_ms number Fixed update ms.
+---@field process_ms number Process ms.
+---@field process_late_ms number Process late ms.
+---@field draw_ms number Draw ms.
+---@field draw_ui_ms number Draw ui ms.
+---@field callback_total_ms number Callback total ms.
+
 --- Returns current resource memory usage and object counts by resource kind.
----@return table Table with byte totals, budget, and texture/font/canvas/shader counts.
+---@return EngineGetResourceStatsResult Table with byte totals, budget, and texture/font/canvas/shader counts.
 lurek.engine.getResourceStats = function() end
 
 --- Returns the engine crate version string embedded at build time.
@@ -7739,8 +7499,12 @@ lurek.engine.getVersion = function() end
 ---@return boolean True for debug builds, false for release builds.
 lurek.engine.isDebug = function() end
 
+---@class EngineMemoryUsageResult
+---@field lua_bytes number Lua bytes.
+---@field lua_kb number Lua kb.
+
 --- Returns Lua VM memory usage as bytes and rounded kilobytes.
----@return table Table with `lua_bytes` and `lua_kb` fields.
+---@return EngineMemoryUsageResult Table with `lua_bytes` and `lua_kb` fields.
 lurek.engine.memoryUsage = function() end
 
 --- Returns the current desktop operating system name.
@@ -7779,7 +7543,7 @@ function LSignal:connect(name, func) end
 
 --- Emits a signal event and invokes matching callbacks with the remaining arguments.
 ---@param name string Signal event name to emit.
----@param ... any Additional arguments passed to matching callbacks.
+---@param ... table Additional arguments passed to matching callbacks.
 function LSignal:emit(name, ...) end
 
 --- Returns the callback count for one exact signal event name.
@@ -7842,8 +7606,12 @@ lurek.event.exit = function(code) end
 ---@return number Number of events flushed.
 lurek.event.flushDeferred = function() end
 
+---@class EventGetHistoryResult
+---@field name string Event name.
+---@field args table Event arguments array.
+
 --- Returns retained pushed event history entries.
----@return table Array table of entries with `name` and `args` fields.
+---@return EventGetHistoryResult Array of entries with `name` and `args` fields.
 lurek.event.getHistory = function() end
 
 --- Creates an isolated signal dispatcher for Lua callbacks.
@@ -7859,37 +7627,37 @@ lurek.event.pump = function() end
 
 --- Pushes a normal-priority event into the shared event queue and optional history.
 ---@param name string Event name.
----@param ... any Additional event arguments.
+---@param ... table Additional event arguments.
 lurek.event.push = function(name, ...) end
 
 --- Adds a normal-priority event to the deferred buffer instead of the live queue.
 ---@param name string Event name to enqueue later.
----@param ... any Additional event arguments stored with the event.
+---@param ... table Additional event arguments stored with the event.
 lurek.event.pushDeferred = function(name, ...) end
 
 --- Adds an event with explicit priority to the deferred buffer.
 ---@param name string Event name to enqueue later.
 ---@param priority string Priority string `high` or `normal`.
----@param ... any Additional event arguments stored with the event.
+---@param ... table Additional event arguments stored with the event.
 lurek.event.pushDeferredPriority = function(name, priority, ...) end
 
 --- Pushes an event with explicit priority into the shared event queue and optional history.
 ---@param name string Event name.
 ---@param priority string Priority string `high` or `normal`.
----@param ... any Additional event arguments.
+---@param ... table Additional event arguments.
 lurek.event.pushPriority = function(name, priority, ...) end
 
 --- Requests engine shutdown with exit code zero.
 lurek.event.quit = function() end
 
---- Requests an engine restart.
+--- Requests a full engine restart cycle from the runtime.
 lurek.event.restart = function() end
 
 --- Waits for the next queued event and returns success, name, and argument table.
 ---@param timeout? number Optional timeout in seconds.
 ---@return boolean a True when an event was received before timeout.
 ---@return string b Event name, or an empty string on timeout.
----@return table c Array table of event arguments.
+---@return table c Array of event arguments; element types depend on the emitted event.
 lurek.event.wait = function(timeout) end
 
 ---@class lurek.filesystem
@@ -7924,7 +7692,7 @@ function LFileData:typeOf(name) end
 ---@class LFileHandle
 LFileHandle = {}
 
---- Closes this file handle.
+--- Closes this file handle on this object.
 function LFileHandle:close() end
 
 --- Flushes pending writes on this file handle.
@@ -7934,7 +7702,7 @@ function LFileHandle:flush() end
 ---@return string File mode string.
 function LFileHandle:getMode() end
 
---- Returns the size of the open file.
+--- Returns the size of the open file in bytes.
 ---@return number File size in bytes.
 function LFileHandle:getSize() end
 
@@ -7982,7 +7750,7 @@ LZipMount = {}
 function LZipMount:contains(virtual_path) end
 
 --- Returns every virtual file path in the ZIP mount.
----@return table Array table of mounted file paths.
+---@return string[] Mounted file paths.
 function LZipMount:listFiles() end
 
 --- Returns the virtual prefix used by this ZIP mount.
@@ -8029,16 +7797,22 @@ lurek.filesystem.exists = function(path) end
 
 --- Lists immediate entries in a GameFS directory.
 ---@param path string Directory path to list.
----@return table Array table of entry names.
+---@return string[] Entry names.
 lurek.filesystem.getDirectoryItems = function(path) end
 
 --- Returns the current filesystem identity string.
 ---@return string Filesystem identity used for save namespacing.
 lurek.filesystem.getIdentity = function() end
 
+---@class FilesystemGetInfoResult
+---@field type string File type.
+---@field size number Size in bytes.
+---@field modtime number Modification time.
+---@field readonly boolean Whether the file is read-only.
+
 --- Returns file metadata for a GameFS path when available.
 ---@param path string GameFS path to inspect.
----@return table Metadata table with type, size, modtime, and readonly fields, or nil on error.
+---@return FilesystemGetInfoResult Metadata table with type, size, modtime, and readonly fields, or nil on error.
 lurek.filesystem.getInfo = function(path) end
 
 --- Returns the save directory path used by GameFS.
@@ -8059,7 +7833,7 @@ lurek.filesystem.getWorkingDirectory = function() end
 
 --- Returns GameFS paths matching a glob pattern.
 ---@param pattern string Glob pattern.
----@return table Array table of matching path strings.
+---@return string[] Matching path strings.
 lurek.filesystem.glob = function(pattern) end
 
 --- Returns whether a GameFS path is a directory.
@@ -8079,7 +7853,7 @@ lurek.filesystem.lines = function(path) end
 
 --- Lists all paths under a GameFS directory recursively.
 ---@param path string Root directory path.
----@return table Array table of path strings.
+---@return string[] Path strings.
 lurek.filesystem.listRecursive = function(path) end
 
 --- Loads a Lua chunk from GameFS and returns it as a Lua function.
@@ -8121,16 +7895,16 @@ lurek.filesystem.openFile = function(path, mode) end
 
 --- Polls an asynchronous file load request.
 ---@param handle_id number Async load handle id.
----@return any Completed bytes/result, pending marker, or nil depending on async state.
+---@return string Completed bytes/result, pending marker, or nil depending on async state.
 lurek.filesystem.pollAsync = function(handle_id) end
 
 --- Polls an asynchronous file write request.
 ---@param handle_id number Async write handle id.
----@return any Completed status, pending marker, or nil depending on async state.
+---@return string Completed status, pending marker, or nil depending on async state.
 lurek.filesystem.pollAsyncWrite = function(handle_id) end
 
 --- Polls watched paths and returns paths that changed since the previous poll.
----@return table Array table of changed path strings.
+---@return string[] Changed path strings.
 lurek.filesystem.pollWatchers = function() end
 
 --- Reads a UTF-8 text file from GameFS.
@@ -8163,7 +7937,7 @@ lurek.filesystem.readOrWriteJson = function(path, default_json) end
 ---@param path string Path to remove.
 lurek.filesystem.remove = function(path) end
 
---- Removes a GameFS directory.
+--- Removes a GameFS directory by its path.
 ---@param path string Directory path to remove.
 lurek.filesystem.removeDir = function(path) end
 
@@ -8171,9 +7945,14 @@ lurek.filesystem.removeDir = function(path) end
 ---@param name string New filesystem identity.
 lurek.filesystem.setIdentity = function(name) end
 
+---@class FilesystemStatResult
+---@field size number Size in bytes.
+---@field isFile boolean Whether the path is a file.
+---@field isDir boolean Whether the path is a directory.
+
 --- Returns size and file/directory flags for a GameFS path.
 ---@param path string Path to inspect.
----@return table Table with `size`, `isFile`, and `isDir` fields.
+---@return FilesystemStatResult Table with `size`, `isFile`, and `isDir` fields.
 lurek.filesystem.stat = function(path) end
 
 --- Resolves a GameFS-relative path against the filesystem base directory.
@@ -8181,7 +7960,7 @@ lurek.filesystem.stat = function(path) end
 ---@return string Absolute filesystem path string.
 lurek.filesystem.toAbsolutePath = function(path) end
 
---- Removes a GameFS mount point.
+--- Removes a GameFS mount point by its name.
 ---@param mp string Virtual mount point to remove.
 ---@return boolean True when a mount was removed.
 lurek.filesystem.unmount = function(mp) end
@@ -8210,7 +7989,7 @@ lurek.filesystem.writeAsync = function(path, data) end
 ---@param data string Raw bytes stored in a Lua string.
 lurek.filesystem.writeBytes = function(path, data) end
 
---- Writes JSON text through GameFS.
+--- Writes JSON text through the GameFS layer.
 ---@param path string GameFS path to write.
 ---@param json string JSON text to store.
 lurek.filesystem.writeJson = function(path, json) end
@@ -8290,12 +8069,12 @@ function LGlobe:exportProvinceMeshOBJ() end
 --- Finds a default-cost province path between two province ids.
 ---@param from_id number Start province id.
 ---@param to_id number Target province id.
----@return table? Array table of province ids, or nil when no path exists.
+---@return string[] Province ids, or nil when no path exists.
 function LGlobe:findPath(from_id, to_id) end
 
 --- Returns cached reachability costs for a faction.
 ---@param faction string Faction cache key.
----@return table Map table from province id to accumulated cost, empty when missing.
+---@return table Map table from province id (integer key) to accumulated traversal cost (number), empty when missing.
 function LGlobe:getCachedReachability(faction) end
 
 --- Returns camera latitude, longitude, and zoom.
@@ -8317,7 +8096,7 @@ function LGlobe:getLod() end
 --- Reads a string attribute from a marker.
 ---@param id number Marker id.
 ---@param key string Attribute key.
----@return string? Attribute string, or nil when missing.
+---@return string Attribute string, or nil when missing.
 function LGlobe:getMarkerAttr(id, key) end
 
 --- Returns the registry name of this globe.
@@ -8326,23 +8105,23 @@ function LGlobe:getName() end
 
 --- Returns neighboring province ids for a province.
 ---@param id number Province id.
----@return table Array table of neighboring province ids.
+---@return number[] Array table of neighboring province ids.
 function LGlobe:getNeighbors(id) end
 
 --- Reads a string attribute from a province.
 ---@param id number Province id.
 ---@param key string Attribute key.
----@return string? Attribute string, or nil when the province or key is missing.
+---@return string Attribute string, or nil when the province or key is missing.
 function LGlobe:getProvinceAttr(id, key) end
 
 --- Returns the sector name assigned to a province.
 ---@param id number Province id.
----@return string? Sector string, or nil when absent.
+---@return string Sector string, or nil when absent.
 function LGlobe:getProvinceSector(id) end
 
 --- Returns province ids assigned to a sector.
 ---@param sector string Sector name.
----@return table Array table of province ids.
+---@return number[] Array table of province ids.
 function LGlobe:getSectorProvinces(sector) end
 
 --- Returns globe time of day. This method is available to Lua scripts.
@@ -8375,21 +8154,21 @@ function LGlobe:pan(dlat, dlon) end
 --- Picks a province at screen coordinates.
 ---@param sx number Screen x coordinate.
 ---@param sy number Screen y coordinate.
----@return number? Province id, or nil when nothing is hit.
+---@return number Province id, or nil when nothing is hit.
 function LGlobe:pick(sx, sy) end
 
 --- Picks at screen coordinates and returns the hit province centroid screen coordinates.
 ---@param sx number Screen x coordinate.
 ---@param sy number Screen y coordinate.
----@return number? a Centroid x coordinate, or nil when nothing is hit.
----@return number? b Centroid y coordinate, or nil when nothing is hit.
+---@return number a Centroid x coordinate, or nil when nothing is hit.
+---@return number b Centroid y coordinate, or nil when nothing is hit.
 function LGlobe:pickLatLon(sx, sy) end
 
 --- Samples along a screen ray from the camera center and returns the first hit province.
 ---@param sx number Target screen x coordinate.
 ---@param sy number Target screen y coordinate.
 ---@param steps? number Number of samples along the ray, defaulting to 24.
----@return number? Province id, or nil when no sample hits.
+---@return number Province id, or nil when no sample hits.
 function LGlobe:pickRaycast(sx, sy, steps) end
 
 --- Returns the number of provinces in this globe.
@@ -8399,7 +8178,7 @@ function LGlobe:provinceCount() end
 --- Returns provinces reachable from a start province within a cost budget.
 ---@param start_id number Start province id.
 ---@param max_cost number Maximum traversal cost.
----@return table Map table from province id to accumulated cost.
+---@return table Map table from province id (integer key) to accumulated traversal cost (number).
 function LGlobe:reachable(start_id, max_cost) end
 
 --- Removes an arc by id. This method is available to Lua scripts.
@@ -8587,11 +8366,11 @@ LGlobeRegistry = {}
 
 --- Returns a globe handle by registry name.
 ---@param name string Globe registry name.
----@return LGlobe? Globe handle, or nil when no globe exists with that name.
+---@return LGlobe Globe handle, or nil when no globe exists with that name.
 function LGlobeRegistry:get(name) end
 
 --- Returns all globe names currently stored in this registry.
----@return table Array table of globe names.
+---@return string[] Globe names.
 function LGlobeRegistry:names() end
 
 --- Creates a named globe with optional specification fields.
@@ -8623,7 +8402,7 @@ lurek.globe.generateVoronoi = function(name, seeds_tbl, spec_tbl) end
 
 --- Returns a globe from the module registry by name.
 ---@param name string Globe registry name.
----@return LGlobe? Globe handle, or nil when no globe exists with that name.
+---@return LGlobe Globe handle, or nil when no globe exists with that name.
 lurek.globe.get = function(name) end
 
 --- Computes great-circle distance between two latitude-longitude points.
@@ -8634,19 +8413,28 @@ lurek.globe.get = function(name) end
 ---@return number Great-circle distance on the unit sphere.
 lurek.globe.greatCircleDistance = function(la, lo, lb, lo2) end
 
+---@class GlobeGreatCirclePathResult
+---@field lat number Lat.
+---@field lon number Lon.
+
 --- Computes sampled latitude-longitude points along a great-circle path.
 ---@param la number Start latitude in degrees.
 ---@param lo number Start longitude in degrees.
 ---@param lb number End latitude in degrees.
 ---@param lo2 number End longitude in degrees.
 ---@param n number Number of samples.
----@return table Array table of `{lat, lon}` point tables.
+---@return GlobeGreatCirclePathResult Array table of `{lat, lon}` point tables.
 lurek.globe.greatCirclePath = function(la, lo, lb, lo2, n) end
+
+---@class GlobeLatLonToUnitResult
+---@field x number X.
+---@field y number Y.
+---@field z number Z.
 
 --- Converts latitude and longitude to a unit-sphere 3D vector table.
 ---@param lat number Latitude in degrees.
 ---@param lon number Longitude in degrees.
----@return table Array table `{x, y, z}` on the unit sphere.
+---@return GlobeLatLonToUnitResult Array table `{x, y, z}` on the unit sphere.
 lurek.globe.latLonToUnit = function(lat, lon) end
 
 --- Creates a globe and populates provinces from a PNG file.
@@ -8683,7 +8471,7 @@ LGraph = {}
 ---@return LGraphEdge New edge handle.
 function LGraph:addEdge(from_ud, to_ud, edge_type) end
 
---- Places an item onto a node.
+--- Places an item onto a destination node.
 ---@param item_ud LGraphItem Item handle to place.
 ---@param node_ud LGraphNode Destination node handle.
 function LGraph:addItem(item_ud, node_ud) end
@@ -8697,12 +8485,11 @@ function LGraph:addNode(node_type, capacity) end
 --- Runs A* pathfinding between two nodes.
 ---@param from_node LGraphNode Start node handle.
 ---@param to_node LGraphNode Target node handle.
----@return table a Array table of `LGraphNode` handles along the path.
----@return nil b When no path exists.
+---@return LGraphNode[] `LGraphNode` handles along the path, or nil when no path exists.
 function LGraph:astar(from_node, to_node) end
 
 --- Computes graph coloring and returns color indices by node id.
----@return table Map table from node id to color index.
+---@return table Map table from node id (integer key) to color index (integer).
 function LGraph:colorGraph() end
 
 --- Creates an unplaced graph item with optional type and decay time.
@@ -8711,76 +8498,94 @@ function LGraph:colorGraph() end
 ---@return LGraphItem New graph item handle.
 function LGraph:createItem(item_type, decay_time) end
 
---- Finds a path between two nodes.
+---@class LGraphFindPathResult
+---@field nodes LGraphNode[] Path nodes in order.
+---@field edges LGraphEdge[] Path edges in order.
+---@field cost number Total path cost.
+
+--- Finds a path between two graph nodes.
 ---@param from_ud LGraphNode Start node handle.
 ---@param to_ud LGraphNode Target node handle.
----@return table a Path result table with nodes, edges, and cost.
----@return nil b When no path exists.
+---@return LGraphFindPathResult Path result table with nodes, edges, and cost, or nil when no path exists.
 function LGraph:findPath(from_ud, to_ud) end
+
+---@class LGraphFindPathForItemResult
+---@field nodes LGraphNode[] Path nodes in order.
+---@field edges LGraphEdge[] Path edges in order.
+---@field cost number Total path cost.
 
 --- Finds a path for a specific item between two nodes while respecting item constraints.
 ---@param item_ud LGraphItem Item handle used for routing constraints.
 ---@param from_ud LGraphNode Start node handle.
 ---@param to_ud LGraphNode Target node handle.
----@return table a Path result table with nodes, edges, and cost.
----@return nil b When no path exists.
+---@return LGraphFindPathForItemResult Path result table with nodes, edges, and cost, or nil when no path exists.
 function LGraph:findPathForItem(item_ud, from_ud, to_ud) end
 
 --- Returns connected components as arrays of node handles.
----@return table Array table of component tables containing `LGraphNode` handles.
+---@return LGraphNode[] Component tables containing `LGraphNode` handles.
 function LGraph:getComponents() end
 
 --- Returns graph distance between two nodes when reachable.
 ---@param from_ud LGraphNode Start node handle.
 ---@param to_ud LGraphNode Target node handle.
----@return number a Distance between the two nodes.
----@return nil b When no path connects the nodes.
+---@return number Distance between the two nodes, or nil when no path connects the nodes.
 function LGraph:getDistance(from_ud, to_ud) end
 
 --- Returns the edge connecting two nodes when one exists.
 ---@param from_ud LGraphNode Source node handle.
 ---@param to_ud LGraphNode Destination node handle.
----@return LGraphEdge a Edge handle connecting the two nodes.
----@return nil b When no edge connects the nodes.
+---@return LGraphEdge Edge handle connecting the two nodes, or nil when no edge connects the nodes.
 function LGraph:getEdgeBetween(from_ud, to_ud) end
 
 --- Returns the number of edges in this graph.
 ---@return number Edge count.
 function LGraph:getEdgeCount() end
 
---- Returns all edges in this graph.
----@return table Array table of `LGraphEdge` handles.
+--- Returns all edges in this logistics graph.
+---@return LGraphEdge[] `LGraphEdge` handles.
 function LGraph:getEdges() end
 
 --- Returns the number of items in this graph.
 ---@return number Item count.
 function LGraph:getItemCount() end
 
---- Returns all items in this graph.
----@return table Array table of `LGraphItem` handles.
+--- Returns all items in this logistics graph.
+---@return LGraphItem[] `LGraphItem` handles.
 function LGraph:getItems() end
 
 --- Returns neighbor nodes connected to a node.
 ---@param node_ud LGraphNode Node handle to inspect.
----@return table Array table of neighboring `LGraphNode` handles.
+---@return LGraphNode[] Neighboring `LGraphNode` handles.
 function LGraph:getNeighbors(node_ud) end
 
 --- Returns the number of nodes in this graph.
 ---@return number Node count.
 function LGraph:getNodeCount() end
 
---- Returns all nodes in this graph.
----@return table Array table of `LGraphNode` handles.
+--- Returns all nodes in this logistics graph.
+---@return LGraphNode[] `LGraphNode` handles.
 function LGraph:getNodes() end
 
 --- Returns nodes reachable from a start node within an optional maximum distance.
 ---@param from_ud LGraphNode Start node handle.
 ---@param max_dist? number Maximum distance.
----@return table Array table of reachable `LGraphNode` handles.
+---@return LGraphNode[] Reachable `LGraphNode` handles.
 function LGraph:getReachable(from_ud, max_dist) end
 
+---@class LGraphGetStatsResult
+---@field nodes number Node count.
+---@field edges number Edge count.
+---@field items number Item count.
+---@field activeNodes number Active node count.
+---@field activeEdges number Active edge count.
+---@field itemsInTransit number Items in transit.
+---@field itemsOnNodes number Items on nodes.
+---@field totalDemand number Total demand.
+---@field totalSupply number Total supply.
+---@field queuedItems number Queued item count.
+
 --- Returns graph counts and aggregate supply-demand statistics.
----@return table Table with node, edge, item, activity, transit, demand, supply, and queue counts.
+---@return LGraphGetStatsResult Table with node, edge, item, activity, transit, demand, supply, and queue counts.
 function LGraph:getStats() end
 
 --- Returns whether this graph contains a cycle.
@@ -8807,7 +8612,7 @@ function LGraph:hasNode(node_ud) end
 function LGraph:isBipartite() end
 
 --- Computes a minimum spanning tree using Kruskal and returns edge ids.
----@return table Array table of edge ids included in the tree.
+---@return number[] Array table of edge ids included in the tree.
 function LGraph:mst() end
 
 --- Registers a callback for a named graph event generated during simulation.
@@ -8818,12 +8623,12 @@ function LGraph:on(event_name, func) end
 --- Processes graph supply and demand once and dispatches generated callbacks.
 function LGraph:processDemand() end
 
---- Removes an edge by handle.
+--- Removes an edge by handle on this object.
 ---@param edge_ud LGraphEdge Edge handle to remove.
 ---@return boolean True when the edge was removed.
 function LGraph:removeEdge(edge_ud) end
 
---- Removes an item from this graph.
+--- Removes an item from this logistics graph.
 ---@param item_ud LGraphItem Item handle to remove.
 ---@return boolean True when the item was removed.
 function LGraph:removeItem(item_ud) end
@@ -8851,8 +8656,7 @@ function LGraph:subgraph(nodes) end
 function LGraph:tickParallel(dt) end
 
 --- Returns nodes in topological order when the graph is acyclic.
----@return table a Array table of `LGraphNode` handles in topological order.
----@return nil b When sorting is impossible due to cycles.
+---@return LGraphNode[] `LGraphNode` handles in topological order, or nil when sorting is impossible due to cycles.
 function LGraph:topologicalSort() end
 
 --- Returns the Lua-visible type name for this graph handle.
@@ -8892,7 +8696,7 @@ function LGraphEdge:getCooldown() end
 function LGraphEdge:getFrom() end
 
 --- Returns graph items currently traveling along this edge.
----@return table Array table of `LGraphItem` handles.
+---@return LGraphItem[] `LGraphItem` handles.
 function LGraphEdge:getItemsInTransit() end
 
 --- Returns this edge's speed modifier.
@@ -8957,7 +8761,7 @@ function LGraphEdge:setCapacity(c) end
 ---@param c number Cooldown in seconds.
 function LGraphEdge:setCooldown(c) end
 
---- Sets this edge's speed modifier.
+--- Sets this edge's speed modifier value.
 ---@param m number Speed modifier.
 function LGraphEdge:setSpeedModifier(m) end
 
@@ -8997,8 +8801,7 @@ function LGraphItem:getDecayTime() end
 --- Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
 ---@return LGraphNode a Node handle when the item is at a node.
 ---@return LGraphEdge b Edge handle when the item is in transit.
----@return number c Transit progress when the item is in transit.
----@return nil d No value when the item is unplaced.
+---@return number c Transit progress when the item is in transit, or nil no value when the item is unplaced.
 function LGraphItem:getPosition() end
 
 --- Returns this item's routing or queue priority.
@@ -9056,7 +8859,7 @@ function LGraphNode:addDemand(item_type, quantity, priority) end
 ---@param quantity number Supply quantity to add.
 function LGraphNode:addSupply(item_type, quantity) end
 
---- Adds a tag to this node.
+--- Adds a tag to this node on this object.
 ---@param tag string Tag to add.
 function LGraphNode:addTag(tag) end
 
@@ -9074,12 +8877,11 @@ function LGraphNode:clearDemands() end
 --- Removes every supply entry from this node.
 function LGraphNode:clearSupplies() end
 
---- Removes every tag from this node.
+--- Removes every tag from this graph node.
 function LGraphNode:clearTags() end
 
 --- Removes and returns the next item from this node's explicit queue.
----@return LGraphItem a Item handle from the queue.
----@return nil b When the queue is empty.
+---@return LGraphItem Item handle from the queue, or nil when the queue is empty.
 function LGraphNode:dequeue() end
 
 --- Adds an item handle to this node's explicit queue.
@@ -9093,7 +8895,7 @@ function LGraphNode:getCapacity() end
 
 --- Returns edge handles connected to this node in the requested direction.
 ---@param dir? string Direction string, defaulting to `both`.
----@return table Array table of `LGraphEdge` handles.
+---@return LGraphEdge[] `LGraphEdge` handles.
 function LGraphNode:getEdges(dir) end
 
 --- Returns this node's flow mode name.
@@ -9105,7 +8907,7 @@ function LGraphNode:getFlowMode() end
 function LGraphNode:getItemCount() end
 
 --- Returns item handles currently stored on this node.
----@return table Array table of `LGraphItem` handles.
+---@return LGraphItem[] `LGraphItem` handles.
 function LGraphNode:getItems() end
 
 --- Returns this node's overflow policy name.
@@ -9117,20 +8919,18 @@ function LGraphNode:getOverflowPolicy() end
 function LGraphNode:getProcessTime() end
 
 --- Returns this node's optional pull item-type filter.
----@return string a Filter string when a pull filter is set.
----@return nil b When no pull filter is set.
+---@return string Filter string when a pull filter is set, or nil when no pull filter is set.
 function LGraphNode:getPullFilter() end
 
---- Returns this node's pull rate.
+--- Returns this node's pull rate value.
 ---@return number Pull rate.
 function LGraphNode:getPullRate() end
 
 --- Returns this node's optional push item-type filter.
----@return string a Filter string when a push filter is set.
----@return nil b When no push filter is set.
+---@return string Filter string when a push filter is set, or nil when no push filter is set.
 function LGraphNode:getPushFilter() end
 
---- Returns this node's push rate.
+--- Returns this node's push rate value.
 ---@return number Push rate.
 function LGraphNode:getPushRate() end
 
@@ -9143,10 +8943,10 @@ function LGraphNode:getQueueCapacity() end
 function LGraphNode:getQueueSize() end
 
 --- Returns all tags assigned to this node.
----@return table Array table of tag strings.
+---@return string[] Tag strings.
 function LGraphNode:getTags() end
 
---- Returns this node's type string.
+--- Returns this node's type classification string.
 ---@return string Current node type.
 function LGraphNode:getType() end
 
@@ -9177,7 +8977,7 @@ function LGraphNode:removeDemand(item_type) end
 ---@return boolean True when supply existed.
 function LGraphNode:removeSupply(item_type) end
 
---- Removes a tag from this node.
+--- Removes a tag from this node on this object.
 ---@param tag string Tag to remove.
 ---@return boolean True when the tag was present.
 function LGraphNode:removeTag(tag) end
@@ -9186,7 +8986,7 @@ function LGraphNode:removeTag(tag) end
 ---@param a boolean New active flag.
 function LGraphNode:setActive(a) end
 
---- Sets this node's item capacity.
+--- Sets this node's item capacity value.
 ---@param c number New node capacity.
 function LGraphNode:setCapacity(c) end
 
@@ -9213,7 +9013,7 @@ function LGraphNode:setProcessTime(t) end
 ---@param f? string Item type filter string.
 function LGraphNode:setPullFilter(f) end
 
---- Sets this node's pull rate.
+--- Sets this node's pull rate for this object.
 ---@param r number New pull rate.
 function LGraphNode:setPullRate(r) end
 
@@ -9221,11 +9021,11 @@ function LGraphNode:setPullRate(r) end
 ---@param f? string Item type filter string.
 function LGraphNode:setPushFilter(f) end
 
---- Sets this node's push rate.
+--- Sets this node's push rate for this object.
 ---@param r number New push rate.
 function LGraphNode:setPushRate(r) end
 
---- Sets this node's queue capacity.
+--- Sets this node's queue capacity value.
 ---@param c number Queue capacity.
 function LGraphNode:setQueueCapacity(c) end
 
@@ -9233,7 +9033,7 @@ function LGraphNode:setQueueCapacity(c) end
 ---@param e boolean New queue enabled flag.
 function LGraphNode:setQueueEnabled(e) end
 
---- Sets this node's type string.
+--- Sets this node's type string for this object.
 ---@param t string New node type.
 function LGraphNode:setType(t) end
 
@@ -9259,17 +9059,14 @@ LHtmlDocument = {}
 
 --- Appends CSS source text to the document stylesheet.
 ---@param css string CSS source text to append.
----@return nil Returns nothing.
 function LHtmlDocument:addCss(css) end
 
 --- Clears all CSS source text from the document.
----@return nil Returns nothing.
 function LHtmlDocument:clearCss() end
 
 --- Queues render commands for this document at an optional offset.
 ---@param x? number X offset, defaulting to 0.
 ---@param y? number Y offset, defaulting to 0.
----@return nil Returns nothing.
 function LHtmlDocument:draw(x, y) end
 
 --- Looks up the first element with a matching id attribute.
@@ -9321,7 +9118,6 @@ function LHtmlDocument:mousereleased(x, y, button) end
 
 --- Removes a document-level event listener by handle.
 ---@param handle number Listener handle returned by `on`.
----@return nil Returns nothing.
 function LHtmlDocument:off(handle) end
 
 --- Registers a document-level event listener.
@@ -9337,33 +9133,28 @@ function LHtmlDocument:query(selector) end
 
 --- Returns all elements matching a selector.
 ---@param selector string Selector supported by the HTML engine.
----@return table Array table of `LHtmlElement` handles.
+---@return LHtmlElement[] `LHtmlElement` handles.
 function LHtmlDocument:queryAll(selector) end
 
 --- Rebuilds document layout immediately.
----@return nil Returns nothing.
 function LHtmlDocument:relayout() end
 
 --- Queues render commands for this document at an optional offset.
 ---@param x? number X offset, defaulting to 0.
 ---@param y? number Y offset, defaulting to 0.
----@return nil Returns nothing.
 function LHtmlDocument:render(x, y) end
 
 --- Replaces the document stylesheet text.
 ---@param css string CSS source text.
----@return nil Returns nothing.
 function LHtmlDocument:setCss(css) end
 
 --- Replaces the document markup and invalidates existing element handles.
 ---@param html string New HTML markup.
----@return nil Returns nothing.
 function LHtmlDocument:setHtml(html) end
 
 --- Sets the document layout viewport size.
 ---@param w number Viewport width in pixels.
 ---@param h number Viewport height in pixels.
----@return nil Returns nothing.
 function LHtmlDocument:setViewport(w, h) end
 
 --- Forwards text input to the focused document element and dispatches `input`.
@@ -9382,7 +9173,6 @@ function LHtmlDocument:typeOf(name) end
 
 --- Advances document timers and animated state.
 ---@param dt number Delta time in seconds.
----@return nil Returns nothing.
 function LHtmlDocument:update(dt) end
 
 --- Forwards mouse wheel movement to the document.
@@ -9397,20 +9187,16 @@ LHtmlElement = {}
 
 --- Adds a CSS class to this element's class list.
 ---@param name string Class name to add.
----@return nil Returns nothing.
 function LHtmlElement:addClass(name) end
 
 --- Appends HTML source to this element's inner HTML.
 ---@param html string HTML source to append.
----@return nil Returns nothing.
 function LHtmlElement:appendHtml(html) end
 
 --- Removes keyboard focus from this element when it is focused.
----@return nil Returns nothing.
 function LHtmlElement:blur() end
 
 --- Gives keyboard focus to this element.
----@return nil Returns nothing.
 function LHtmlElement:focus() end
 
 --- Returns an attribute value from this element.
@@ -9457,7 +9243,6 @@ function LHtmlElement:hasClass(name) end
 
 --- Removes an element-level event listener by handle.
 ---@param handle number Listener handle returned by `on`.
----@return nil Returns nothing.
 function LHtmlElement:off(handle) end
 
 --- Registers an element-level event listener.
@@ -9473,48 +9258,40 @@ function LHtmlElement:query(selector) end
 
 --- Returns all descendant elements matching a selector.
 ---@param selector string Selector supported by the HTML engine.
----@return table Array table of `LHtmlElement` handles.
+---@return LHtmlElement[] `LHtmlElement` handles.
 function LHtmlElement:queryAll(selector) end
 
 --- Removes this element from the document.
----@return nil Returns nothing.
 function LHtmlElement:remove() end
 
 --- Removes an attribute from this element.
 ---@param name string Attribute name to remove.
----@return nil Returns nothing.
 function LHtmlElement:removeAttribute(name) end
 
 --- Removes a CSS class from this element.
 ---@param name string Class name to remove.
----@return nil Returns nothing.
 function LHtmlElement:removeClass(name) end
 
 --- Sets or clears an attribute on this element.
 ---@param name string Attribute name.
 ---@param value? string Attribute value, or nil to remove the attribute.
----@return nil Returns nothing.
 function LHtmlElement:setAttribute(name, value) end
 
 --- Replaces this element's inner HTML and may invalidate descendant element handles.
 ---@param html string New inner HTML source.
----@return nil Returns nothing.
 function LHtmlElement:setHtml(html) end
 
 --- Sets or clears this element's id attribute.
 ---@param id? string Id attribute value, or nil to clear.
----@return nil Returns nothing.
 function LHtmlElement:setId(id) end
 
 --- Sets or clears a style property on this element.
 ---@param name string CSS property name.
 ---@param value? string CSS value, or nil to clear the property.
----@return nil Returns nothing.
 function LHtmlElement:setStyle(name, value) end
 
 --- Replaces this element's text content.
 ---@param text string New text content.
----@return nil Returns nothing.
 function LHtmlElement:setText(text) end
 
 --- Toggles a CSS class on this element, optionally forcing the final state.
@@ -9549,11 +9326,9 @@ lurek.html.loadDocument = function(path, opts) end
 lurek.html.newDocument = function(source, opts) end
 
 --- Marks the event as having its default action prevented.
----@return nil Returns nothing.
 lurek.html.preventDefault = function() end
 
 --- Stops event propagation to remaining listeners.
----@return nil Returns nothing.
 lurek.html.stopPropagation = function() end
 
 --- Returns whether the HTML engine supports a named feature.
@@ -9565,11 +9340,11 @@ lurek.html.supports = function(feature) end
 lurek.i18n = {}
 
 --- Builds a word-to-keys search index from the catalog.
----@return table Map table from normalized words to arrays of translation keys.
+---@return string[] Map table from normalized words to arrays of translation keys.
 lurek.i18n.buildIndex = function() end
 
 --- Returns top-level translation key categories.
----@return table Array table of category names.
+---@return string[] Category names.
 lurek.i18n.categories = function() end
 
 --- Detects the system locale when available.
@@ -9589,7 +9364,7 @@ lurek.i18n.formatDate = function(timestamp, fmt) end
 lurek.i18n.formatNumber = function(n, opts) end
 
 --- Returns sorted locale codes currently loaded in the catalog.
----@return table Array table of locale codes.
+---@return string[] Array table of locale codes.
 lurek.i18n.getAvailableLanguages = function() end
 
 --- Returns the base locale string stored by the localization module.
@@ -9597,23 +9372,23 @@ lurek.i18n.getAvailableLanguages = function() end
 lurek.i18n.getBase = function() end
 
 --- Returns fallback locale codes in lookup order.
----@return table Array table of fallback locale codes.
+---@return string[] Array table of fallback locale codes.
 lurek.i18n.getFallbacks = function() end
 
 --- Returns sorted translation keys known to the catalog.
----@return table Array table of translation keys.
+---@return string[] Translation keys.
 lurek.i18n.getKeys = function() end
 
---- Returns the active locale code.
+--- Returns the active locale code string.
 ---@return string Active locale string, or nil when no locale is active.
 lurek.i18n.getLanguage = function() end
 
 --- Returns sorted locale codes currently loaded in the catalog.
----@return table Array table of locale codes.
+---@return string[] Array table of locale codes.
 lurek.i18n.getLanguages = function() end
 
 --- Returns locale codes currently loaded in the catalog.
----@return table Array table of loaded locale codes.
+---@return string[] Array table of loaded locale codes.
 lurek.i18n.getLoadedLocales = function() end
 
 --- Returns whether the catalog contains a translation key in active or fallback locales.
@@ -9643,45 +9418,43 @@ lurek.i18n.keyCount = function() end
 
 --- Returns translation keys belonging to one category prefix.
 ---@param category string Category prefix.
----@return table Array table of translation keys.
+---@return string[] Translation keys.
 lurek.i18n.keysInCategory = function(category) end
 
 --- Loads translations for a locale from TOML or JSON source text.
 ---@param locale string Locale code to load.
 ---@param content string TOML or JSON translation source.
 ---@param format string Source format, either `toml` or `json`.
----@return nil No value is returned.
 lurek.i18n.loadString = function(locale, content, format) end
 
 --- Loads translations for a locale from a nested Lua table flattened with dot-separated keys.
 ---@param locale string Locale code to load.
 ---@param tbl table Translation table containing strings, numbers, booleans, or nested tables.
----@return nil No value is returned.
 lurek.i18n.loadTable = function(locale, tbl) end
+
+---@class I18nLocaleCoverageResult
+---@field key string Translation key.
+---@field missing_in string[] Locales missing this key.
 
 --- Returns missing translation keys for all locales compared to a reference locale.
 ---@param reference string Locale code used as the coverage reference.
----@return table Array table of gap rows with `key` and `missing_in` fields.
+---@return I18nLocaleCoverageResult Array of gap rows with `key` and `missing_in` fields.
 lurek.i18n.localeCoverage = function(reference) end
 
 --- Merges flat translation entries into an existing locale.
 ---@param locale string Locale code to merge into.
 ---@param entries table Map table from translation keys to strings.
----@return nil No value is returned.
 lurek.i18n.mergeLocale = function(locale, entries) end
 
 --- Removes every registered locale-change callback.
----@return nil No value is returned.
 lurek.i18n.offChange = function() end
 
 --- Registers a locale-change callback using the shorter alias name.
 ---@param cb function Callback receiving `(new_locale, old_locale)`.
----@return nil No value is returned.
 lurek.i18n.onChange = function(cb) end
 
 --- Registers a callback invoked when the active locale changes.
 ---@param cb function Callback receiving `(new_locale, old_locale)`.
----@return nil No value is returned.
 lurek.i18n.onLanguageChange = function(cb) end
 
 --- Returns the English plural category key for a number.
@@ -9689,39 +9462,39 @@ lurek.i18n.onLanguageChange = function(cb) end
 ---@return string Plural category, usually `one` or `other`.
 lurek.i18n.pluralFor = function(n) end
 
+---@class I18nSearchResult
+---@field key string Translation key.
+---@field value string Translated value.
+
 --- Searches translation keys and values for a query string.
 ---@param query string Search query.
 ---@param limit? number Maximum result count; zero or nil means no truncation.
----@return table Array table of rows with `key` and `value` fields.
+---@return I18nSearchResult Array of rows with `key` and `value` fields.
 lurek.i18n.search = function(query, limit) end
 
 --- Searches a prebuilt word index and returns matching keys.
 ---@param index table Index table returned by `buildIndex`.
 ---@param query string Search query.
 ---@param limit? number Maximum key count; zero or nil means no truncation.
----@return table Array table of matching translation keys.
+---@return string[] Matching translation keys.
 lurek.i18n.searchIndexed = function(index, query, limit) end
 
 --- Sets the base locale string stored by the localization module.
 ---@param locale string Base locale code.
----@return nil No value is returned.
 lurek.i18n.setBase = function(locale) end
 
 --- Replaces the fallback locale list used for missing translations.
 ---@param locales table Array table of locale codes in fallback order.
----@return nil No value is returned.
 lurek.i18n.setFallbacks = function(locales) end
 
 --- Sets one translation value for one locale and key.
 ---@param locale string Locale code to update.
 ---@param key string Translation key.
 ---@param value string Translation text.
----@return nil No value is returned.
 lurek.i18n.setKey = function(locale, key, value) end
 
 --- Sets the active locale and invokes registered change callbacks with new and old locale values.
 ---@param locale string Locale code to activate.
----@return nil No value is returned.
 lurek.i18n.setLanguage = function(locale) end
 
 --- Translates a key using the active locale, optional variables, and optional English plural selection.
@@ -9791,19 +9564,16 @@ LImageData = {}
 
 --- Multiplies this image alpha channel by a factor in place.
 ---@param factor number Alpha multiplier.
----@return nil No value is returned.
 function LImageData:alphaMask(factor) end
 
 --- Applies a palette lookup table to this image in place.
 ---@param lut_ud LPaletteLUT Palette lookup table handle.
----@return nil No value is returned.
 function LImageData:applyPaletteLut(lut_ud) end
 
 --- Copies a source image into this image at a destination coordinate.
 ---@param src_ud LImageData Source image data handle.
 ---@param dst_x number Destination x coordinate.
 ---@param dst_y number Destination y coordinate.
----@return nil No value is returned.
 function LImageData:blit(src_ud, dst_x, dst_y) end
 
 --- Returns a blurred copy of this image.
@@ -9813,12 +9583,10 @@ function LImageData:blur(radius) end
 
 --- Applies a brightness factor to this image in place.
 ---@param factor number Brightness multiplier or adjustment factor.
----@return nil No value is returned.
 function LImageData:brightness(factor) end
 
 --- Applies a contrast factor to this image in place.
 ---@param factor number Contrast factor.
----@return nil No value is returned.
 function LImageData:contrast(factor) end
 
 --- Applies a convolution kernel and returns the filtered image.
@@ -9848,7 +9616,6 @@ function LImageData:diff(other_ud) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
----@return nil No value is returned.
 function LImageData:drawCircle(cx, cy, radius, r, g, b, a) end
 
 --- Draws a line into this image. This method is available to Lua scripts.
@@ -9860,7 +9627,6 @@ function LImageData:drawCircle(cx, cy, radius, r, g, b, a) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
----@return nil No value is returned.
 function LImageData:drawLine(x0, y0, x1, y1, r, g, b, a) end
 
 --- Draws a nine-slice region from a source image into this image.
@@ -9877,7 +9643,6 @@ function LImageData:drawLine(x0, y0, x1, y1, r, g, b, a) end
 ---@param inset_right number Right inset width.
 ---@param inset_top number Top inset height.
 ---@param inset_bottom number Bottom inset height.
----@return nil No value is returned.
 function LImageData:drawNineSlice(src_ud, src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h, inset_left, inset_right, inset_top, inset_bottom) end
 
 --- Draws a filled rectangle into this image.
@@ -9889,7 +9654,6 @@ function LImageData:drawNineSlice(src_ud, src_x, src_y, src_w, src_h, dst_x, dst
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
----@return nil No value is returned.
 function LImageData:drawRect(x, y, w, h, r, g, b, a) end
 
 --- Encodes image data in a supported format.
@@ -9902,20 +9666,16 @@ function LImageData:encode(format) end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
----@return nil No value is returned.
 function LImageData:fill(r, g, b, a) end
 
 --- Flips this image horizontally in place.
----@return nil No value is returned.
 function LImageData:flipHorizontal() end
 
 --- Flips this image vertically in place.
----@return nil No value is returned.
 function LImageData:flipVertical() end
 
 --- Applies gamma correction to this image in place.
 ---@param gamma number Gamma value.
----@return nil No value is returned.
 function LImageData:gamma(gamma) end
 
 --- Returns image dimensions. This method is available to Lua scripts.
@@ -9957,38 +9717,31 @@ function LImageData:getString() end
 function LImageData:getWidth() end
 
 --- Converts this image to grayscale in place.
----@return nil No value is returned.
 function LImageData:grayscale() end
 
 --- Inverts image color channels in place.
----@return nil No value is returned.
 function LImageData:invert() end
 
 --- Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
 ---@param func function Callback receiving `(x, y, r, g, b, a)` and returning replacement channels.
----@return nil No value is returned.
 function LImageData:mapPixel(func) end
 
 --- Applies a Lua callback to every pixel and replaces each pixel with returned RGBA values.
 ---@param func function Callback receiving `(x, y, r, g, b, a)` and returning replacement channels.
----@return nil No value is returned.
 function LImageData:mapPixels(func) end
 
 --- Adds noise to this image in place. This method is available to Lua scripts.
 ---@param amount number Noise amount.
----@return nil No value is returned.
 function LImageData:noise(amount) end
 
 --- Pastes a source image into this image at unsigned destination coordinates.
 ---@param src_ud LImageData Source image data handle.
 ---@param dx number Destination x coordinate.
 ---@param dy number Destination y coordinate.
----@return nil No value is returned.
 function LImageData:paste(src_ud, dx, dy) end
 
 --- Reduces image colors to a fixed number of levels in place.
 ---@param levels number Number of posterization levels.
----@return nil No value is returned.
 function LImageData:posterize(levels) end
 
 --- Returns a resized image using an optional named filter.
@@ -10010,11 +9763,9 @@ function LImageData:rotate90cw() end
 
 --- Applies a saturation factor to this image in place.
 ---@param factor number Saturation factor.
----@return nil No value is returned.
 function LImageData:saturation(factor) end
 
 --- Applies a sepia filter to this image in place.
----@return nil No value is returned.
 function LImageData:sepia() end
 
 --- Sets RGBA channels at a pixel coordinate.
@@ -10024,12 +9775,10 @@ function LImageData:sepia() end
 ---@param g number Green channel.
 ---@param b number Blue channel.
 ---@param a number Alpha channel.
----@return nil No value is returned.
 function LImageData:setPixel(x, y, r, g, b, a) end
 
 --- Replaces the image byte buffer with raw bytes.
 ---@param bytes string Raw byte string matching the image storage size.
----@return nil No value is returned.
 function LImageData:setRawData(bytes) end
 
 --- Returns a sharpened copy of this image.
@@ -10038,7 +9787,6 @@ function LImageData:sharpen() end
 
 --- Applies a threshold filter to this image in place.
 ---@param value number Threshold channel value.
----@return nil No value is returned.
 function LImageData:threshold(value) end
 
 --- Blends this image toward a tint color in place.
@@ -10046,7 +9794,6 @@ function LImageData:threshold(value) end
 ---@param tg number Tint green channel.
 ---@param tb number Tint blue channel.
 ---@param factor number Tint blend factor.
----@return nil No value is returned.
 function LImageData:tint(tr, tg, tb, factor) end
 
 --- Returns the Lua-visible type name for this image data handle.
@@ -10116,7 +9863,6 @@ function LLayeredImage:removeLayer(index) end
 
 --- Saves the layered image stack to a file.
 ---@param path string Output path.
----@return nil No value is returned.
 function LLayeredImage:save(path) end
 
 --- Replaces a layer's image data by one-based index.
@@ -10163,12 +9909,10 @@ function LLayeredImage:typeOf(name) end
 LPaletteLUT = {}
 
 --- Removes every color mapping from this palette lookup table.
----@return nil No value is returned.
 function LPaletteLUT:clear() end
 
 --- Cycles palette mappings by an offset.
 ---@param offset number Mapping offset.
----@return nil No value is returned.
 function LPaletteLUT:cycle(offset) end
 
 --- Returns the number of color mappings in this palette lookup table.
@@ -10184,7 +9928,6 @@ function LPaletteLUT:getColorCount() end
 ---@param tg number Destination green channel.
 ---@param tb number Destination blue channel.
 ---@param ta number Destination alpha channel.
----@return nil No value is returned.
 function LPaletteLUT:setColor(fr, fg, fb, fa, tr, tg, tb, ta) end
 
 --- Returns the Lua-visible type name for this palette lookup table handle.
@@ -10200,12 +9943,25 @@ function LPaletteLUT:typeOf(name) end
 ---@class LProvinceGrid
 LProvinceGrid = {}
 
+---@class LProvinceGridAdjacenciesResult
+---@field province_a number First province id.
+---@field province_b number Second province id.
+---@field border_pixels number Number of shared border pixels.
+
 --- Returns province adjacency records and shared border pixel counts.
----@return table Array table with `province_a`, `province_b`, and `border_pixels` fields.
+---@return LProvinceGridAdjacenciesResult Array table with `province_a`, `province_b`, and `border_pixels` fields.
 function LProvinceGrid:adjacencies() end
 
+---@class LProvinceGridBorderSegmentsResult
+---@field province_a number First province id.
+---@field province_b number Second province id.
+---@field x0 number Segment start x.
+---@field y0 number Segment start y.
+---@field x1 number Segment end x.
+---@field y1 number Segment end y.
+
 --- Returns border line segments between neighboring provinces.
----@return table Array table with province ids and segment coordinates.
+---@return LProvinceGridBorderSegmentsResult Array table with province ids and segment coordinates.
 function LProvinceGrid:borderSegments() end
 
 --- Decodes serialized province shape data into span and segment tables.
@@ -10231,12 +9987,20 @@ function LProvinceGrid:getAt(x, y) end
 ---@return number Grid height in pixels.
 function LProvinceGrid:getHeight() end
 
+---@class LProvinceGridGetPolygonsResult
+---@field province_id number Province id.
+---@field rings table Array of rings; each ring is an array of [x, y] pairs.
+
 --- Returns polygon rings for every province.
----@return table Array table of province polygon records with `province_id` and `rings` fields.
+---@return LProvinceGridGetPolygonsResult Array table of province polygon records with `province_id` and `rings` fields.
 function LProvinceGrid:getPolygons() end
 
+---@class LProvinceGridGetPolygonsSimplifiedResult
+---@field province_id number Province id.
+---@field rings table Array of simplified rings; each ring is an array of [x, y] pairs.
+
 --- Returns simplified polygon rings for every province.
----@return table Array table of simplified province polygon records with `province_id` and `rings` fields.
+---@return LProvinceGridGetPolygonsSimplifiedResult Array table of simplified province polygon records with `province_id` and `rings` fields.
 function LProvinceGrid:getPolygonsSimplified() end
 
 --- Returns the province grid width. This method is available to Lua scripts.
@@ -10247,8 +10011,14 @@ function LProvinceGrid:getWidth() end
 ---@return number Province count.
 function LProvinceGrid:provinceCount() end
 
+---@class LProvinceGridProvinceSpansResult
+---@field province_id number Province id.
+---@field y number Scanline y coordinate.
+---@field x0 number Start x coordinate.
+---@field x1 number End x coordinate.
+
 --- Returns horizontal province spans by row.
----@return table Array table with `province_id`, `y`, `x0`, and `x1` fields.
+---@return LProvinceGridProvinceSpansResult Array table with `province_id`, `y`, `x0`, and `x1` fields.
 function LProvinceGrid:provinceSpans() end
 
 --- Serializes province span and border shape data into a binary Lua string.
@@ -10319,13 +10089,11 @@ lurek.image.newProvinceGrid = function(filename) end
 --- Saves an image data object to a path under the current game directory.
 ---@param img_ud LImageData Image data handle to save.
 ---@param filename string Output filename relative to game directory.
----@return nil No value is returned.
 lurek.image.saveImage = function(img_ud, filename) end
 
 --- Encodes image data as PNG and writes it under the current game directory.
 ---@param img_ud LImageData Image data handle to encode.
 ---@param filename string Output filename relative to game directory.
----@return nil No value is returned.
 lurek.image.savePNG = function(img_ud, filename) end
 
 ---@class lurek.input
@@ -10352,9 +10120,13 @@ LCombo = {}
 ---@return string `completed`, `advanced`, `broken`, or `idle`.
 function LCombo:feed(key) end
 
+---@class LComboGetStepResult
+---@field key string Key name.
+---@field gap_ms number Gap in milliseconds.
+
 --- Returns step data by one-based index.
 ---@param index number One-based combo step index.
----@return table? Step table with `key` and `gap_ms`, or nil when out of range.
+---@return LComboGetStepResult Step table with `key` and `gap_ms`, or nil when out of range.
 function LCombo:getStep(index) end
 
 --- Returns whether the combo sequence is partially matched.
@@ -10431,19 +10203,23 @@ function LInputRecording:type() end
 ---@return boolean True when the supplied type name matches this handle.
 function LInputRecording:typeOf(name) end
 
+---@class InputAdvancePlaybackResult
+---@field kind string Event kind (press, release, hold).
+---@field name string Event name.
+
 --- Advances playback by one frame and returns events for that frame.
----@return table Array table of event records with `kind` and `name` fields.
+---@return InputAdvancePlaybackResult Array of event records with `kind` and `name` fields.
 lurek.input.advancePlayback = function() end
 
 --- Adds one or more keyboard/gamepad bindings to an action.
 ---@param action string Action name.
----@param keys any Binding string or array table of binding strings.
+---@param keys string Binding string or array table of binding strings.
 lurek.input.bind = function(action, keys) end
 
---- Removes all action bindings.
+--- Removes all action bindings from the map.
 lurek.input.clearBindings = function() end
 
---- Returns a gamepad axis value.
+--- Returns a gamepad axis value by index.
 ---@param id number Gamepad id.
 ---@param axis number Axis index.
 ---@return number Axis value, or zero when missing.
@@ -10458,8 +10234,8 @@ lurek.input.gamepad.getAxisCount = function(id) end
 ---@return boolean True when background events are enabled.
 lurek.input.gamepad.getBackgroundEvents = function() end
 
---- Returns all action bindings.
----@return table Map table from action names to arrays of binding strings.
+--- Returns all registered action bindings.
+---@return string[] Map table from action names to arrays of binding strings.
 lurek.input.getBindings = function() end
 
 --- Returns the button count for a gamepad.
@@ -10482,7 +10258,7 @@ lurek.input.gamepad.getGUID = function(id) end
 
 --- Returns a stored mapping string for a gamepad GUID.
 ---@param guid string Gamepad GUID.
----@return string? Mapping string, or nil when no mapping exists.
+---@return string Mapping string, or nil when no mapping exists.
 lurek.input.gamepad.getGamepadMappingString = function(guid) end
 
 --- Returns hat direction for a gamepad hat index.
@@ -10496,15 +10272,15 @@ lurek.input.gamepad.getHat = function(id, hat) end
 lurek.input.gamepad.getJoystickCount = function() end
 
 --- Returns ids for currently connected gamepads.
----@return table Array table of connected gamepad ids.
+---@return number[] Array table of connected gamepad ids.
 lurek.input.gamepad.getJoysticks = function() end
 
 --- Converts a scancode name to its key name when known.
 ---@param scancode string Scancode name.
----@return string? Key string, or nil when unknown.
+---@return string Key string, or nil when unknown.
 lurek.input.keyboard.getKeyFromScancode = function(scancode) end
 
---- Returns a gamepad display name.
+--- Returns a gamepad display name by its id.
 ---@param id number Gamepad id.
 ---@return string Gamepad name, or `Unknown` when missing.
 lurek.input.gamepad.getName = function(id) end
@@ -10518,13 +10294,13 @@ lurek.input.getPlaybackFrame = function() end
 ---@return number b Mouse y coordinate.
 lurek.input.mouse.getPosition = function() end
 
---- Returns the position of a touch id.
+--- Returns the position of a touch point by id.
 ---@param id number Touch id.
 ---@return number a Touch x coordinate, or 0 when missing.
 ---@return number b Touch y coordinate, or 0 when missing.
 lurek.input.touch.getPosition = function(id) end
 
---- Returns pressure for a touch id.
+--- Returns pressure for a touch point by its id.
 ---@param id number Touch id.
 ---@return number Touch pressure, or 0 when missing.
 lurek.input.touch.getPressure = function(id) end
@@ -10535,7 +10311,7 @@ lurek.input.mouse.getRelativeMode = function() end
 
 --- Converts a key name to its scancode name when known.
 ---@param key string Key name.
----@return string? Scancode string, or nil when unknown.
+---@return string Scancode string, or nil when unknown.
 lurek.input.keyboard.getScancodeFromKey = function(key) end
 
 --- Creates a system cursor handle from a cursor name.
@@ -10547,8 +10323,14 @@ lurek.input.mouse.getSystemCursor = function(name) end
 ---@return number Active touch count.
 lurek.input.touch.getTouchCount = function() end
 
+---@class TouchGetTouchesResult
+---@field id number Touch point id.
+---@field x number Touch x position.
+---@field y number Touch y position.
+---@field pressure number Touch pressure.
+
 --- Returns active touch points with id, position, and pressure.
----@return table Array table of touch records.
+---@return TouchGetTouchesResult Array table of touch records.
 lurek.input.touch.getTouches = function() end
 
 --- Returns the current mouse wheel delta.
@@ -10665,10 +10447,15 @@ lurek.input.newCombo = function(steps, opts) end
 ---@return LCursor New custom cursor handle.
 lurek.input.mouse.newCursor = function(pixels, width, height, hotx, hoty) end
 
+---@class InputNewMappingResult
+---@field isDown function Returns true while the action is held.
+---@field wasPressed function Returns true on the frame the action was pressed.
+---@field wasReleased function Returns true on the frame the action was released.
+
 --- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
 ---@param name string Action name.
----@param keys any Binding string or array table of binding strings.
----@return table Mapping table with action query closures.
+---@param keys string Binding string or array table of binding strings.
+---@return InputNewMappingResult Mapping table with action query closures.
 lurek.input.newMapping = function(name, keys) end
 
 --- Saves gamepad mapping strings to a file.
@@ -10680,7 +10467,7 @@ lurek.input.gamepad.saveGamepadMappings = function(path) end
 lurek.input.gamepad.setBackgroundEvents = function(enable) end
 
 --- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
----@param cursor any `LCursor`, system cursor string, or nil.
+---@param cursor LCursor `LCursor`, system cursor string, or nil.
 lurek.input.mouse.setCursor = function(cursor) end
 
 --- Stores a controller mapping string for a gamepad GUID.
@@ -10701,7 +10488,7 @@ lurek.input.keyboard.setKeyRepeat = function(enabled) end
 ---@param y number Target y coordinate.
 lurek.input.mouse.setPosition = function(x, y) end
 
---- Sets relative mouse mode.
+--- Sets the relative mouse input mode state.
 ---@param relative boolean New relative mode flag.
 lurek.input.mouse.setRelativeMode = function(relative) end
 
@@ -10717,7 +10504,7 @@ lurek.input.keyboard.setTextInput = function(enabled) end
 ---@return boolean True when the gamepad supports vibration and the request was queued.
 lurek.input.gamepad.setVibration = function(id, low_freq, high_freq, duration_ms) end
 
---- Sets mouse cursor visibility.
+--- Sets the mouse cursor visibility state.
 ---@param visible boolean New cursor visibility flag.
 lurek.input.mouse.setVisible = function(visible) end
 
@@ -10731,7 +10518,7 @@ lurek.input.startRecording = function() end
 lurek.input.stopPlayback = function() end
 
 --- Stops input recording and returns the captured recording when one is active.
----@return LInputRecording? Recording handle, or nil when recording was not active.
+---@return LInputRecording Recording handle, or nil when recording was not active.
 lurek.input.stopRecording = function() end
 
 --- Removes all bindings for an action.
@@ -10747,11 +10534,18 @@ lurek.input.unbind = function(action) end
 ---@return boolean True when the gamepad supports vibration and the request was queued.
 lurek.input.gamepad.vibrate = function(id, low_freq, high_freq, duration_ms) end
 
+---@class GamepadVirtualDpadResult
+---@field up boolean Up pressed.
+---@field down boolean Down pressed.
+---@field left boolean Left pressed.
+---@field right boolean Right pressed.
+---@field direction string Direction name.
+
 --- Converts analog x and y values into virtual d-pad booleans and direction.
 ---@param x number Horizontal analog value.
 ---@param y number Vertical analog value.
 ---@param deadzone? number Deadzone threshold, defaults to 0.3.
----@return table Table with `up`, `down`, `left`, `right`, and `direction` fields.
+---@return GamepadVirtualDpadResult Table with `up`, `down`, `left`, `right`, and `direction` fields.
 lurek.input.gamepad.virtualDpad = function(x, y, deadzone) end
 
 --- Returns whether any binding for an action was pressed this frame and records the frame.
@@ -11116,7 +10910,7 @@ function LOccluder:getOpacity() end
 function LOccluder:getPosition() end
 
 --- Returns this occluder's flat vertex coordinate list.
----@return table Flat numeric array `[x1, y1, x2, y2, ...]`.
+---@return number[] Flat numeric array `[x1, y1, x2, y2, ...]`.
 function LOccluder:getVertices() end
 
 --- Returns whether this occluder is enabled.
@@ -11174,8 +10968,13 @@ lurek.light.clear = function() end
 ---@return number d Alpha channel.
 lurek.light.getAmbient = function() end
 
+---@class LightGetGodRayHintsResult
+---@field x number Hint x position.
+---@field y number Hint y position.
+---@field angle number Hint angle in radians.
+
 --- Returns directional light hints for god-ray style effects.
----@return table Array table of hint records with `x`, `y`, and `angle` fields.
+---@return LightGetGodRayHintsResult Array table of hint records with `x`, `y`, and `angle` fields.
 lurek.light.getGodRayHints = function() end
 
 --- Returns the number of lights in a group.
@@ -11191,8 +10990,17 @@ lurek.light.getLightCount = function() end
 ---@return number Maximum light count.
 lurek.light.getMaxLights = function() end
 
+---@class LightGetNormalMapHintsResult
+---@field x number Hint x position.
+---@field y number Hint y position.
+---@field radius number Hint radius.
+---@field intensity number Hint intensity.
+---@field direction number Hint direction.
+---@field normalMap string Normal map asset path.
+---@field strength number Normal map strength.
+
 --- Returns light hints that reference normal maps.
----@return table Array table of normal-map light hint records.
+---@return LightGetNormalMapHintsResult Array table of normal-map light hint records.
 lurek.light.getNormalMapHints = function() end
 
 --- Returns the number of live occluders.
@@ -11266,36 +11074,30 @@ lurek.log = {}
 lurek.log.addSink = function(config) end
 
 --- Removes all sinks and releases callback registry keys.
----@return nil No value is returned.
 lurek.log.clearSinks = function() end
 
 --- Logs a debug message with an optional tag.
 ---@param message string Message text.
 ---@param tag? string Log tag shown in the sink output (default `"Lua"`).
----@return nil No value is returned.
 lurek.log.debug = function(message, tag) end
 
 --- Logs a debug message with structured fields.
 ---@param message string Message text.
 ---@param fields_tbl table Scalar field table converted to strings.
----@return nil No value is returned.
 lurek.log.debug_fields = function(message, fields_tbl) end
 
 --- Logs an error message with an optional tag.
 ---@param message string Message text.
 ---@param tag? string Log tag shown in the sink output (default `"Lua"`).
----@return nil No value is returned.
 lurek.log.error = function(message, tag) end
 
 --- Logs an error message with structured fields.
 ---@param message string Message text.
 ---@param fields_tbl table Scalar field table converted to strings.
----@return nil No value is returned.
 lurek.log.error_fields = function(message, fields_tbl) end
 
 --- Flushes a file-backed sink by id when it exists.
 ---@param id number Sink id.
----@return nil No value is returned.
 lurek.log.flushFile = function(id) end
 
 --- Returns the global log level string.
@@ -11305,30 +11107,39 @@ lurek.log.getLevel = function() end
 --- Logs an info message with an optional tag.
 ---@param message string Message text.
 ---@param tag? string Log tag shown in the sink output (default `"Lua"`).
----@return nil No value is returned.
 lurek.log.info = function(message, tag) end
 
 --- Logs an info message with structured fields.
 ---@param message string Message text.
 ---@param fields_tbl table Scalar field table converted to strings.
----@return nil No value is returned.
 lurek.log.info_fields = function(message, fields_tbl) end
 
+---@class LogListSinksResult
+---@field id number Sink id.
+---@field type string Sink type name.
+---@field level string Minimum log level.
+---@field path string? File path for file-backed sinks.
+
 --- Returns metadata for all registered sinks.
----@return table Array table of sink records with id, type, level, and optional path.
+---@return LogListSinksResult Array of sink records with id, type, level, and optional path.
 lurek.log.listSinks = function() end
 
 --- Logs a message at a runtime-selected level with an optional tag.
 ---@param level string Log level string.
 ---@param message string Message text.
 ---@param tag? string Optional tag, defaulting to `Lua`.
----@return nil No value is returned.
 lurek.log.print = function(level, message, tag) end
+
+---@class LogReadMemoryResult
+---@field level string Log level.
+---@field tag string Log tag.
+---@field message string Log message.
+---@field fields table? Optional structured fields table.
 
 --- Reads entries from a memory sink and optionally drains them.
 ---@param id number Memory sink id.
 ---@param drain? boolean Optional drain flag, defaulting to false.
----@return table Array table of memory log entries.
+---@return LogReadMemoryResult Array table of memory log entries.
 lurek.log.readMemory = function(id, drain) end
 
 --- Removes a sink by id and releases any callback registry key.
@@ -11338,26 +11149,22 @@ lurek.log.removeSink = function(id) end
 
 --- Sets the global log level. This function is exposed to Lua scripts.
 ---@param level string Level `error`, `warn`, `info`, `debug`, `trace`, `off`, or `none`.
----@return nil No value is returned.
 lurek.log.setLevel = function(level) end
 
 --- Logs a structured message at a runtime-selected level.
 ---@param level_str string Log level string.
 ---@param message string Message text.
 ---@param fields_tbl table Scalar field table converted to strings.
----@return nil No value is returned.
 lurek.log.struct = function(level_str, message, fields_tbl) end
 
 --- Logs a warning message with an optional tag.
 ---@param message string Message text.
 ---@param tag? string Log tag shown in the sink output (default `"Lua"`).
----@return nil No value is returned.
 lurek.log.warn = function(message, tag) end
 
 --- Logs a warning message with structured fields.
 ---@param message string Message text.
 ---@param fields_tbl table Scalar field table converted to strings.
----@return nil No value is returned.
 lurek.log.warn_fields = function(message, fields_tbl) end
 
 ---@class lurek.math
@@ -11370,7 +11177,6 @@ lurek.math = {}
 LAabbTree = {}
 
 --- Clears all items from the tree. This method is available to Lua scripts.
----@return nil No value is returned.
 function LAabbTree:clear() end
 
 --- Returns whether the tree contains an id.
@@ -11384,7 +11190,6 @@ function LAabbTree:contains(id) end
 ---@param min_y number Minimum y coordinate.
 ---@param max_x number Maximum x coordinate.
 ---@param max_y number Maximum y coordinate.
----@return nil No value is returned.
 function LAabbTree:insert(id, min_x, min_y, max_x, max_y) end
 
 --- Returns whether the tree has no items.
@@ -11400,13 +11205,13 @@ function LAabbTree:len() end
 ---@param min_y number Minimum y coordinate.
 ---@param max_x number Maximum x coordinate.
 ---@param max_y number Maximum y coordinate.
----@return table Array table of item ids.
+---@return number[] Item ids.
 function LAabbTree:query(min_x, min_y, max_x, max_y) end
 
 --- Queries ids containing a point. This method is available to Lua scripts.
 ---@param x number Point x coordinate.
 ---@param y number Point y coordinate.
----@return table Array table of item ids.
+---@return number[] Item ids.
 function LAabbTree:queryPoint(x, y) end
 
 --- Removes an AABB by id. This method is available to Lua scripts.
@@ -11467,7 +11272,6 @@ function LBezierCurve:getDerivative() end
 ---@param x number Point x coordinate.
 ---@param y number Point y coordinate.
 ---@param index? number One-based insertion index.
----@return nil No value is returned.
 function LBezierCurve:insertControlPoint(x, y, index) end
 
 --- Returns the approximate curve length.
@@ -11479,23 +11283,25 @@ function LBezierCurve:length() end
 ---@return boolean True when a control point was removed.
 function LBezierCurve:removeControlPoint(index) end
 
+---@class LBezierCurveRenderResult
+---@field x number X.
+---@field y number Y.
+
 --- Returns sampled points along this curve.
 ---@param segments number Number of curve segments to sample.
----@return table Array table of `{x, y}` point arrays.
+---@return LBezierCurveRenderResult Array table of `{x, y}` point arrays.
 function LBezierCurve:render(segments) end
 
 --- Rotates all control points around an origin.
 ---@param angle number Rotation angle.
 ---@param ox number Origin x coordinate.
 ---@param oy number Origin y coordinate.
----@return nil No value is returned.
 function LBezierCurve:rotate(angle, ox, oy) end
 
 --- Scales all control points around an origin.
 ---@param s number Scale factor.
 ---@param ox number Origin x coordinate.
 ---@param oy number Origin y coordinate.
----@return nil No value is returned.
 function LBezierCurve:scale(s, ox, oy) end
 
 --- Sets a control point by one-based index.
@@ -11508,7 +11314,6 @@ function LBezierCurve:setControlPoint(index, x, y) end
 --- Translates all control points. This method is available to Lua scripts.
 ---@param dx number X translation.
 ---@param dy number Y translation.
----@return nil No value is returned.
 function LBezierCurve:translate(dx, dy) end
 
 --- Returns the Lua-visible type name for this Bezier curve handle.
@@ -11527,7 +11332,6 @@ LCatmullRom = {}
 --- Adds a point to the spline. This method is available to Lua scripts.
 ---@param x number Point x coordinate.
 ---@param y number Point y coordinate.
----@return nil No value is returned.
 function LCatmullRom:addPoint(x, y) end
 
 --- Returns the number of points in the spline.
@@ -11650,14 +11454,14 @@ function LNoiseGenerator:fbm(x, y, octaves, lac, pers, kind) end
 ---@param w number Map width.
 ---@param h number Map height.
 ---@param opts? table Generation options including scale, octaves, kind, fractal, offset, and backend.
----@return table Flat array table of noise values.
+---@return number[] Noise values.
 function LNoiseGenerator:generateMap(w, h, opts) end
 
 --- Generates a noise map through the compute backend and returns it as a flat array table.
 ---@param w number Map width.
 ---@param h number Map height.
 ---@param opts? table Generation options including scale, octaves, kind, fractal, and offset.
----@return table Flat array table of noise values.
+---@return number[] Noise values.
 function LNoiseGenerator:generateMapCompute(w, h, opts) end
 
 --- Returns this noise generator seed.
@@ -11702,7 +11506,6 @@ function LNoiseGenerator:ridged(x, y, octaves, lac, pers, kind) end
 
 --- Sets this noise generator seed. This method is available to Lua scripts.
 ---@param seed number Seed value.
----@return nil No value is returned.
 function LNoiseGenerator:setSeed(seed) end
 
 --- Samples 1D simplex noise. This method is available to Lua scripts.
@@ -11802,12 +11605,10 @@ function LRandomGenerator:randomNormal(stddev, mean) end
 
 --- Resets this generator to a seed value.
 ---@param seed number Seed value.
----@return nil No value is returned.
 function LRandomGenerator:setSeed(seed) end
 
 --- Restores this generator from a serialized state string.
 ---@param state string Generator state string.
----@return nil No value is returned.
 function LRandomGenerator:setState(state) end
 
 --- Returns the Lua-visible type name for this random generator handle.
@@ -11824,11 +11625,17 @@ function LRandomGenerator:typeOf(name) end
 LRectPacker = {}
 
 --- Clears packed rectangles from this packer.
----@return nil No value is returned.
 function LRectPacker:clear() end
 
+---@class LRectPackerGetPackedResult
+---@field x number X.
+---@field y number Y.
+---@field w number Width.
+---@field h number Height.
+---@field id number? Optional identifier.
+
 --- Returns packed rectangle records.
----@return table Array table with `x`, `y`, `w`, `h`, and optional `id` fields.
+---@return LRectPackerGetPackedResult Array table with `x`, `y`, `w`, `h`, and optional `id` fields.
 function LRectPacker:getPacked() end
 
 --- Returns occupied area ratio. This method is available to Lua scripts.
@@ -11848,7 +11655,6 @@ function LRectPacker:pack(w, h, id) end
 LSpatialHash = {}
 
 --- Clears all items from the spatial hash.
----@return nil No value is returned.
 function LSpatialHash:clear() end
 
 --- Returns the spatial hash cell size.
@@ -11865,14 +11671,13 @@ function LSpatialHash:getItemCount() end
 ---@param y number Rectangle y coordinate.
 ---@param w number Rectangle width.
 ---@param h number Rectangle height.
----@return nil No value is returned.
 function LSpatialHash:insert(id, x, y, w, h) end
 
 --- Returns ids intersecting a query circle.
 ---@param cx number Circle center x coordinate.
 ---@param cy number Circle center y coordinate.
 ---@param radius number Circle radius.
----@return table Array table of item ids.
+---@return number[] Item ids.
 function LSpatialHash:queryCircle(cx, cy, radius) end
 
 --- Returns ids intersecting a query rectangle.
@@ -11880,7 +11685,7 @@ function LSpatialHash:queryCircle(cx, cy, radius) end
 ---@param y number Query y coordinate.
 ---@param w number Query width.
 ---@param h number Query height.
----@return table Array table of item ids.
+---@return number[] Item ids.
 function LSpatialHash:queryRect(x, y, w, h) end
 
 --- Returns ids intersecting a query line segment.
@@ -11888,12 +11693,11 @@ function LSpatialHash:queryRect(x, y, w, h) end
 ---@param y1 number Segment start y coordinate.
 ---@param x2 number Segment end x coordinate.
 ---@param y2 number Segment end y coordinate.
----@return table Array table of item ids.
+---@return number[] Item ids.
 function LSpatialHash:querySegment(x1, y1, x2, y2) end
 
 --- Removes an item from the spatial hash.
 ---@param id string Item id.
----@return nil No value is returned.
 function LSpatialHash:remove(id) end
 
 --- Returns the Lua-visible type name for this spatial hash handle.
@@ -11911,7 +11715,6 @@ function LSpatialHash:typeOf(name) end
 ---@param y number Rectangle y coordinate.
 ---@param w number Rectangle width.
 ---@param h number Rectangle height.
----@return nil No value is returned.
 function LSpatialHash:update(id, x, y, w, h) end
 
 --- Lua-side wrapper for a 2D transform matrix.
@@ -11931,7 +11734,7 @@ function LTransform:clone() end
 function LTransform:decompose() end
 
 --- Returns this transform matrix as a flat array table.
----@return table Flat matrix values in row order.
+---@return number[] Flat matrix values in row-major order.
 function LTransform:getMatrix() end
 
 --- Returns this transform's inverse.
@@ -11946,18 +11749,15 @@ function LTransform:inverse() end
 function LTransform:inverseTransformPoint(x, y) end
 
 --- Resets this transform to identity.
----@return nil No value is returned.
 function LTransform:reset() end
 
 --- Applies a rotation to this transform.
 ---@param angle number Rotation angle.
----@return nil No value is returned.
 function LTransform:rotate(angle) end
 
 --- Applies scale to this transform. This method is available to Lua scripts.
 ---@param sx number X scale.
 ---@param sy? number Y scale (defaults to `sx`).
----@return nil No value is returned.
 function LTransform:scale(sx, sy) end
 
 --- Replaces this transform from position, rotation, scale, origin, and shear components.
@@ -11970,13 +11770,11 @@ function LTransform:scale(sx, sy) end
 ---@param oy? number Origin y offset (default 0).
 ---@param kx? number X shear (default 0).
 ---@param ky? number Y shear (default 0).
----@return nil No value is returned.
 function LTransform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 --- Applies shear to this transform. This method is available to Lua scripts.
 ---@param kx number X shear.
 ---@param ky number Y shear.
----@return nil No value is returned.
 function LTransform:shear(kx, ky) end
 
 --- Transforms a point by this transform.
@@ -11989,7 +11787,6 @@ function LTransform:transformPoint(x, y) end
 --- Applies a translation to this transform.
 ---@param dx number X translation.
 ---@param dy number Y translation.
----@return nil No value is returned.
 function LTransform:translate(dx, dy) end
 
 --- Returns the Lua-visible type name for this transform handle.
@@ -12012,7 +11809,7 @@ LTween = {}
 function LTween:addValue(start, target) end
 
 --- Returns all current tween values. This method is available to Lua scripts.
----@return table Array table of numeric tween values.
+---@return number[] Numeric tween values.
 function LTween:getAllValues() end
 
 --- Returns this tween clock time. This method is available to Lua scripts.
@@ -12045,17 +11842,14 @@ function LTween:getValueCount() end
 function LTween:isComplete() end
 
 --- Resets the tween clock to the beginning.
----@return nil No value is returned.
 function LTween:reset() end
 
 --- Sets this tween clock time. This method is available to Lua scripts.
 ---@param t number New time in seconds.
----@return nil No value is returned.
 function LTween:set(t) end
 
 --- Sets this tween clock time. This method is available to Lua scripts.
 ---@param t number New time in seconds.
----@return nil No value is returned.
 function LTween:setTime(t) end
 
 --- Returns the Lua-visible type name for this tween handle.
@@ -12282,12 +12076,16 @@ lurek.math.atan = function(y, x) end
 ---@return number Angle in radians.
 lurek.math.atan2 = function(y, x) end
 
+---@class MathBresenhamResult
+---@field x number X.
+---@field y number Y.
+
 --- Returns integer grid points along a Bresenham line.
 ---@param x1 number Start x coordinate.
 ---@param y1 number Start y coordinate.
 ---@param x2 number End x coordinate.
 ---@param y2 number End y coordinate.
----@return table Array table of `{x, y}` point tables.
+---@return MathBresenhamResult Array table of `{x, y}` point tables.
 lurek.math.bresenham = function(x1, y1, x2, y2) end
 
 --- Creates a Catmull-Rom spline from point tables.
@@ -12369,7 +12167,7 @@ lurek.math.closestPointOnSegment = function(px, py, x1, y1, x2, y2) end
 
 --- Computes the convex hull for a flat point table.
 ---@param pts table Flat numeric point table.
----@return table Flat numeric hull point table.
+---@return number[] Flat numeric hull point table (x1,y1,x2,y2,...).
 lurek.math.convexHull = function(pts) end
 
 --- Returns cosine of an angle. This function is exposed to Lua scripts.
@@ -12382,9 +12180,14 @@ lurek.math.cos = function(x) end
 ---@return number Angle in degrees.
 lurek.math.deg = function(rad) end
 
+---@class MathDelaunayTriangulateResult
+---@field 1 number First vertex index.
+---@field 2 number Second vertex index.
+---@field 3 number Third vertex index.
+
 --- Computes Delaunay triangles for a flat point table.
 ---@param pts table Flat numeric point table.
----@return table Array table of triangle index tables.
+---@return MathDelaunayTriangulateResult Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
 lurek.math.delaunayTriangulate = function(pts) end
 
 --- Returns Euclidean distance between two points.
@@ -12733,25 +12536,25 @@ lurek.math.polygonCentroid = function(pts) end
 ---@param nx number Plane normal x component.
 ---@param ny number Plane normal y component.
 ---@param d number Plane distance from origin.
----@return table Flat numeric clipped polygon point table.
+---@return number[] Flat numeric clipped polygon point table (x1,y1,x2,y2,...).
 lurek.math.polygonClip = function(pts, nx, ny, d) end
 
 --- Returns polygon difference points for two polygon tables.
 ---@param a table First polygon table of `{x, y}` points.
 ---@param b table Second polygon table of `{x, y}` points.
----@return table Polygon table of result points.
+---@return number[] Flat array of polygon difference result points (x1,y1,x2,y2,...).
 lurek.math.polygonDifference = function(a, b) end
 
 --- Returns polygon intersection points for two polygon tables.
 ---@param a table First polygon table of `{x, y}` points.
 ---@param b table Second polygon table of `{x, y}` points.
----@return table Polygon table of result points.
+---@return number[] Flat array of polygon intersection result points (x1,y1,x2,y2,...).
 lurek.math.polygonIntersection = function(a, b) end
 
 --- Returns polygon union points for two polygon tables.
 ---@param a table First polygon table of `{x, y}` points.
 ---@param b table Second polygon table of `{x, y}` points.
----@return table Polygon table of result points.
+---@return number[] Flat array of polygon union result points (x1,y1,x2,y2,...).
 lurek.math.polygonUnion = function(a, b) end
 
 --- Raises a value to a power. This function is exposed to Lua scripts.
@@ -12881,9 +12684,12 @@ lurek.math.sqrt = function(x) end
 ---@return number Tangent value.
 lurek.math.tan = function(x) end
 
+---@class MathTriangulateResult
+---@field 1 number Point component (interleaved x,y pairs).
+
 --- Triangulates a flat polygon point table.
 ---@param pts table Flat numeric table `{x1, y1, x2, y2, ...}` with at least three points.
----@return table Array table of flat triangle point tables.
+---@return MathTriangulateResult Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
 lurek.math.triangulate = function(pts) end
 
 --- Creates a 2D vector. This function is exposed to Lua scripts.
@@ -12899,9 +12705,13 @@ lurek.math.vec2 = function(x, y) end
 ---@return LVec3 New vector handle.
 lurek.math.vec3 = function(x, y, z) end
 
+---@class MathVoronoiResult
+---@field site table Site position with `x` and `y` fields.
+---@field vertices table Array of vertex positions with `x` and `y` fields.
+
 --- Builds Voronoi cells from a polygon-style point table.
 ---@param points table Point table with `x` and `y` fields.
----@return table Array table of cells with `site` and `vertices` fields.
+---@return MathVoronoiResult Array table of cells with `site` and `vertices` fields.
 lurek.math.voronoi = function(points) end
 
 ---@class lurek.minimap
@@ -13065,7 +12875,7 @@ function LMinimap:getLayerCount() end
 
 --- Returns raw cell data for a minimap layer.
 ---@param layer number Layer index.
----@return table Array table of cell bytes, or nil when missing.
+---@return number[] Array table of cell bytes, or nil when missing.
 function LMinimap:getLayerData(layer) end
 
 --- Returns the total number of minimap markers.
@@ -13386,7 +13196,8 @@ LContentRegistry = {}
 --- Returns one stored value by content type and id.
 ---@param type_name string Content type name.
 ---@param id string Entry id.
----@return any Stored Lua value, or nil when missing.
+---@return table a Stored Lua value.
+---@return nil b If missing.
 function LContentRegistry:get(type_name, id) end
 
 --- Returns all stored values for a content type keyed by id.
@@ -13395,13 +13206,13 @@ function LContentRegistry:get(type_name, id) end
 function LContentRegistry:getAll(type_name) end
 
 --- Returns registered content type names.
----@return table Array table of content type names.
+---@return string[] Content type names.
 function LContentRegistry:getTypes() end
 
 --- Stores a Lua value under a registered content type and id.
 ---@param type_name string Content type name.
 ---@param id string Entry id.
----@param obj any Lua value to store.
+---@param obj table Lua value to store.
 function LContentRegistry:register(type_name, id, obj) end
 
 --- Registers a content type name. This method is available to Lua scripts.
@@ -13430,19 +13241,24 @@ function LMod:getApiVersion() end
 function LMod:getAuthor() end
 
 --- Returns capability names declared by the mod.
----@return table Array table of capability names.
+---@return string[] Capability names.
 function LMod:getCapabilities() end
 
 --- Returns the stored Lua config value.
----@return any Stored config value, or nil when unset.
+---@return table Stored config value, or nil when unset.
 function LMod:getConfig() end
 
+---@class LModGetConfigSchemaResult
+---@field key string Config key.
+---@field type string Type hint.
+---@field default string Default value.
+
 --- Returns config schema entries. This method is available to Lua scripts.
----@return table Array table of schema entries with `key`, `type`, and `default` fields.
+---@return LModGetConfigSchemaResult Array of schema entries with `key`, `type`, and `default` fields.
 function LMod:getConfigSchema() end
 
 --- Returns mod dependency ids. This method is available to Lua scripts.
----@return table Array table of dependency ids.
+---@return number[] Array table of dependency ids.
 function LMod:getDependencies() end
 
 --- Returns the mod description. This method is available to Lua scripts.
@@ -13455,7 +13271,7 @@ function LMod:getDescription() end
 function LMod:getHook(name) end
 
 --- Returns registered hook names. This method is available to Lua scripts.
----@return table Array table of hook names.
+---@return string[] Hook names.
 function LMod:getHookNames() end
 
 --- Returns the mod id. This method is available to Lua scripts.
@@ -13499,7 +13315,7 @@ function LMod:setApiVersion(api_version) end
 function LMod:setCapabilities(caps) end
 
 --- Stores a Lua config value for this mod.
----@param value any Config value to store.
+---@param value table Config value to store (table, number, string, or boolean).
 function LMod:setConfig(value) end
 
 --- Sets config schema entries from a Lua table.
@@ -13534,12 +13350,32 @@ function LModManager:clearLoadOrder() end
 --- Clears the reload queue. This method is available to Lua scripts.
 function LModManager:clearReloadQueue() end
 
+---@class LModManagerGetAllModsResult
+---@field id string Mod id.
+---@field name string Mod display name.
+---@field version string Version string.
+---@field author string Author name.
+---@field description string Mod description.
+---@field priority number Load priority.
+---@field enabled boolean Whether enabled.
+---@field loaded boolean Whether loaded.
+
 --- Returns metadata for all registered mods.
----@return table Array table of mod metadata tables.
+---@return LModManagerGetAllModsResult Array table of mod metadata tables.
 function LModManager:getAllMods() end
 
+---@class LModManagerGetLoadOrderResult
+---@field id string Mod id.
+---@field name string Mod display name.
+---@field version string Version string.
+---@field author string Author name.
+---@field description string Mod description.
+---@field priority number Load priority.
+---@field enabled boolean Whether enabled.
+---@field loaded boolean Whether loaded.
+
 --- Returns the resolved load order. This method is available to Lua scripts.
----@return table Array table of mod metadata tables.
+---@return LModManagerGetLoadOrderResult Array table of mod metadata tables.
 function LModManager:getLoadOrder() end
 
 --- Returns the number of registered mods.
@@ -13551,13 +13387,23 @@ function LModManager:getModCount() end
 ---@return string Mod path, or nil when unknown.
 function LModManager:getModPath(mod_id) end
 
+---@class LModManagerGetModsByCapabilityResult
+---@field id string Mod id.
+---@field name string Mod display name.
+---@field version string Version string.
+---@field author string Author name.
+---@field description string Mod description.
+---@field priority number Load priority.
+---@field enabled boolean Whether enabled.
+---@field loaded boolean Whether loaded.
+
 --- Returns metadata for mods declaring a capability.
 ---@param capability string Capability name.
----@return table Array table of mod metadata tables.
+---@return LModManagerGetModsByCapabilityResult Array table of mod metadata tables.
 function LModManager:getModsByCapability(capability) end
 
 --- Returns mod ids waiting for reload.
----@return table Array table of mod ids.
+---@return number[] Array table of mod ids.
 function LModManager:getReloadQueue() end
 
 --- Returns whether registered mods have circular dependencies.
@@ -13575,16 +13421,26 @@ function LModManager:hasMod(mod_id) end
 function LModManager:markForReload(mod_id) end
 
 --- Processes and clears the reload queue.
----@return table Array table of processed mod ids.
+---@return number[] Array table of processed mod ids.
 function LModManager:processReloadQueue() end
 
 --- Registers a mod with the manager. This method is available to Lua scripts.
 ---@param ud LMod Mod handle.
 function LModManager:registerMod(ud) end
 
+---@class LModManagerScanFolderResult
+---@field id string Mod id.
+---@field name string Mod display name.
+---@field version string Version string.
+---@field author string Author name.
+---@field description string Mod description.
+---@field priority number Load priority.
+---@field enabled boolean Whether enabled.
+---@field loaded boolean Whether loaded.
+
 --- Scans a folder for mod metadata. This method is available to Lua scripts.
 ---@param path string Folder path.
----@return table Array table of discovered mod metadata tables.
+---@return LModManagerScanFolderResult Array table of discovered mod metadata tables.
 function LModManager:scanFolder(path) end
 
 --- Sets explicit load order from an array of mod ids.
@@ -13606,7 +13462,7 @@ function LModManager:typeOf(name) end
 function LModManager:unregisterMod(mod_id) end
 
 --- Returns dependency validation messages.
----@return table Array table of validation message strings.
+---@return string[] Validation message strings.
 function LModManager:validateDependencies() end
 
 --- Checks whether a mod API version is compatible with a host version.
@@ -13674,8 +13530,12 @@ function LNetworkHost:flush() end
 ---@return string Local socket address.
 function LNetworkHost:getAddress() end
 
+---@class LNetworkHostGetBandwidthLimitResult
+---@field incoming number Incoming bandwidth limit.
+---@field outgoing number Outgoing bandwidth limit.
+
 --- Returns incoming and outgoing bandwidth limits.
----@return table Table with `incoming` and `outgoing` fields.
+---@return LNetworkHostGetBandwidthLimitResult Table with `incoming` and `outgoing` fields.
 function LNetworkHost:getBandwidthLimit() end
 
 --- Returns configured channel limit.
@@ -13687,7 +13547,7 @@ function LNetworkHost:getChannelLimit() end
 function LNetworkHost:getConnectedPeerCount() end
 
 --- Returns an array of ids for all connected peers.
----@return table Array table of peer ids.
+---@return number[] Array table of peer ids.
 function LNetworkHost:getConnectedPeerIds() end
 
 --- Returns peer socket address when available.
@@ -13704,9 +13564,16 @@ function LNetworkHost:getPeerLimit() end
 ---@return string Peer state string.
 function LNetworkHost:getPeerState(peer_id) end
 
+---@class LNetworkHostGetPeerStatsResult
+---@field round_trip_time number Round-trip time in ms.
+---@field round_trip_time_variance number RTT variance.
+---@field packets_sent number Packets sent.
+---@field packets_lost number Packets lost.
+---@field packet_loss number Packet loss ratio.
+
 --- Returns statistics for a peer. This method is available to Lua scripts.
 ---@param peer_id number Peer id.
----@return table Peer statistics table.
+---@return LNetworkHostGetPeerStatsResult Peer statistics table.
 function LNetworkHost:getPeerStats(peer_id) end
 
 --- Returns host role string. This method is available to Lua scripts.
@@ -13745,8 +13612,15 @@ function LNetworkHost:resetPeer(peer_id) end
 ---@param reliable? boolean Optional reliable flag, defaulting to true.
 function LNetworkHost:send(peer_id, channel_id, data, reliable) end
 
+---@class LNetworkHostServiceResult
+---@field type string Event type (connect, disconnect, receive).
+---@field peer_id number? Peer id.
+---@field data number? Connection data.
+---@field channel number? Channel index for receive events.
+---@field payload string? Received payload bytes.
+
 --- Polls the host for one network event.
----@return table Event table, or nil when no event is available.
+---@return LNetworkHostServiceResult Event table, or nil when no event is available.
 function LNetworkHost:service() end
 
 --- Sets incoming and outgoing bandwidth limits.
@@ -13789,8 +13663,16 @@ function LNetworkRuntime:httpPost(url, body, headers) end
 ---@return number Request id.
 function LNetworkRuntime:httpRequest(opts) end
 
+---@class LNetworkRuntimePollResult
+---@field type string Response type (http, tcp, ws).
+---@field request_id number? HTTP request id.
+---@field status number? HTTP status code.
+---@field body string? HTTP response body.
+---@field headers table? HTTP response headers.
+---@field id number? TCP/WS connection id.
+
 --- Polls runtime responses for HTTP, TCP, and WebSocket operations.
----@return table Array table of response/event tables.
+---@return LNetworkRuntimePollResult Array table of response/event tables.
 function LNetworkRuntime:poll() end
 
 --- Shuts down the network runtime and cancels pending requests.
@@ -13833,38 +13715,75 @@ function LNetworkRuntime:wsConnect(url) end
 ---@param data string Text payload.
 function LNetworkRuntime:wsSend(id, data) end
 
+---@class NetworkCreateLobbyResult
+---@field name string Lobby name.
+---@field host string Host address.
+---@field port number Port number.
+---@field player_count number Current player count.
+---@field max_players number Maximum players allowed.
+
 --- Broadcasts lobby information and returns it as a table.
 ---@param name string Lobby name.
 ---@param port number Lobby port.
 ---@param player_count? number Optional current player count, defaulting to 1.
 ---@param max_players? number Optional maximum players, defaulting to 8.
----@return table Lobby info table.
+---@return NetworkCreateLobbyResult Lobby info table.
 lurek.network.createLobby = function(name, port, player_count, max_players) end
+
+---@class NetworkCreateRoomResult
+---@field id string Room identifier.
+---@field name string Room name.
+---@field host string Host address.
+---@field player_count number Current player count.
+---@field max_players number Maximum allowed players.
 
 --- Creates a local room record. This function is exposed to Lua scripts.
 ---@param name string Room name.
 ---@param host string Host string.
 ---@param max_players? number Optional maximum players, defaulting to 8.
----@return table Room info table.
+---@return NetworkCreateRoomResult Room info table.
 lurek.network.createRoom = function(name, host, max_players) end
+
+---@class NetworkDiscoverLobbiesResult
+---@field name string Lobby name.
+---@field host string Host address.
+---@field port number Host port.
+---@field player_count number Current player count.
+---@field max_players number Maximum allowed players.
 
 --- Discovers broadcast lobbies. This function is exposed to Lua scripts.
 ---@param timeout_ms? number Optional timeout in milliseconds, defaulting to 500.
----@return table Array table of lobby info tables.
+---@return NetworkDiscoverLobbiesResult Array table of lobby info tables.
 lurek.network.discoverLobbies = function(timeout_ms) end
+
+---@class NetworkJoinRoomResult
+---@field name string Room name.
+---@field host string Host address.
+---@field player_count number Current player count.
+---@field max_players number Maximum allowed players.
 
 --- Joins a room by id when available. This function is exposed to Lua scripts.
 ---@param id string Room id.
----@return table Room info table, or nil when missing.
+---@return NetworkJoinRoomResult Room info table, or nil when missing.
 lurek.network.joinRoom = function(id) end
+
+---@class NetworkLeaveRoomResult
+---@field room_id string Room identifier.
+---@field peer_id string Peer identifier.
 
 --- Leaves a room by id when available. This function is exposed to Lua scripts.
 ---@param id string Room id.
----@return table Room info table, or nil when missing.
+---@return NetworkLeaveRoomResult Room info table, or nil when missing.
 lurek.network.leaveRoom = function(id) end
 
+---@class NetworkListRoomsResult
+---@field name string Room name.
+---@field host string Host address.
+---@field player_count number Current player count.
+---@field max_players number Maximum allowed players.
+
 --- Lists known local room records. This function is exposed to Lua scripts.
----@return table Array table of room info tables.
+---@return NetworkListRoomsResult Array table of room info tables.
 lurek.network.listRooms = function() end
 
 --- Creates a relay punch probe payload for a peer id.
@@ -13898,7 +13817,7 @@ lurek.network.newRuntime = function() end
 lurek.network.newServer = function(opts) end
 
 --- Packs a supported Lua value into a binary network message string.
----@param value any Lua value to pack.
+---@param value table Lua value to pack (table, number, string, or boolean).
 ---@return string Binary packed message.
 lurek.network.pack = function(value) end
 
@@ -13907,22 +13826,48 @@ lurek.network.pack = function(value) end
 ---@return string Parsed peer id, or nil when invalid.
 lurek.network.parsePunchProbe = function(payload) end
 
+---@class NetworkParseRelayTicketResult
+---@field room_id string Room identifier.
+---@field peer_id string Peer identifier.
+---@field id number Id.
+---@field tick number Tick number.
+---@field x number X.
+---@field y number Y.
+---@field vx number Velocity X.
+---@field vy number Velocity Y.
+
 --- Parses an encoded relay ticket. This function is exposed to Lua scripts.
 ---@param token string Encoded relay ticket.
----@return table Ticket table, or nil when invalid.
+---@return NetworkParseRelayTicketResult Ticket table, or nil when invalid.
 lurek.network.parseRelayTicket = function(token) end
+
+---@class NetworkPredictLinearResult
+---@field id number Id.
+---@field tick number Tick number.
+---@field x number X.
+---@field y number Y.
+---@field vx number Velocity X.
+---@field vy number Velocity Y.
 
 --- Predicts an entity snapshot forward by linear velocity.
 ---@param snapshot table Snapshot table with `id`, `tick`, `x`, `y`, `vx`, and `vy`.
 ---@param dt number Prediction delta time.
----@return table Predicted snapshot table.
+---@return NetworkPredictLinearResult Predicted snapshot table.
 lurek.network.predictLinear = function(snapshot, dt) end
+
+---@class NetworkReconcileSnapshotResult
+---@field id number Id.
+---@field tick number Tick number.
+---@field x number X.
+---@field y number Y.
+---@field vx number Velocity X.
+---@field vy number Velocity Y.
 
 --- Reconciles a predicted snapshot toward an authoritative snapshot.
 ---@param pred table Predicted snapshot table.
 ---@param auth table Authoritative snapshot table.
 ---@param alpha number Blend factor.
----@return table Reconciled snapshot table.
+---@return NetworkReconcileSnapshotResult Reconciled snapshot table.
 lurek.network.reconcileSnapshot = function(pred, auth, alpha) end
 
 --- Broadcasts a packed entity sync payload through a network host.
@@ -13933,9 +13878,16 @@ lurek.network.reconcileSnapshot = function(pred, auth, alpha) end
 ---@param reliable? boolean Optional reliable flag, defaulting to false.
 lurek.network.syncEntity = function(host_ud, entity_id, data_tbl, channel, reliable) end
 
+---@class NetworkUnpackResult
+---@field name string Lobby name.
+---@field host string Host address.
+---@field port number Port number.
+---@field player_count number Current player count.
+---@field max_players number Maximum players allowed.
+
 --- Unpacks a binary network message string into a Lua value.
 ---@param data string Binary packed message.
----@return any Unpacked Lua value.
+---@return NetworkUnpackResult Unpacked Lua value.
 lurek.network.unpack = function(data) end
 
 ---@class lurek.parallax
@@ -13950,13 +13902,13 @@ LParallaxLayer = {}
 ---@param params? table Numeric parameter table.
 function LParallaxLayer:addEffectPass(effect_name, params) end
 
---- Clears layer clamp bounds.
+--- Clears layer clamp bounds on this object.
 function LParallaxLayer:clearClamp() end
 
 --- Clears shader effect passes from this layer.
 function LParallaxLayer:clearEffects() end
 
---- Returns shader effect pass count.
+--- Returns the shader effect pass count for this layer.
 ---@return number Effect pass count.
 function LParallaxLayer:effectCount() end
 
@@ -13965,30 +13917,30 @@ function LParallaxLayer:effectCount() end
 ---@return number b Y velocity.
 function LParallaxLayer:getAutoscroll() end
 
---- Returns layer blend mode name.
+--- Returns the current layer blend mode name.
 ---@return string Blend mode name.
 function LParallaxLayer:getBlendMode() end
 
---- Returns parallax depth.
+--- Returns parallax depth from this object.
 ---@return number Depth value.
 function LParallaxLayer:getDepth() end
 
---- Returns motion stretch settings.
+--- Returns the current motion stretch settings.
 ---@return boolean a Motion stretch flag.
 ---@return number b Stretch strength.
 ---@return number c Maximum stretch scale.
 function LParallaxLayer:getMotionStretch() end
 
---- Returns layer offset.
+--- Returns layer offset for this object.
 ---@return number a X offset.
 ---@return number b Y offset.
 function LParallaxLayer:getOffset() end
 
---- Returns layer opacity.
+--- Returns layer opacity from this object.
 ---@return number Opacity value.
 function LParallaxLayer:getOpacity() end
 
---- Returns layer scroll factor.
+--- Returns layer scroll factor from this object.
 ---@return number a X scroll factor.
 ---@return number b Y scroll factor.
 function LParallaxLayer:getScrollFactor() end
@@ -13997,18 +13949,18 @@ function LParallaxLayer:getScrollFactor() end
 ---@return boolean True when tiling is enabled.
 function LParallaxLayer:getTiling() end
 
---- Returns layer tint color.
+--- Returns layer tint color from this object.
 ---@return number a Red channel.
 ---@return number b Green channel.
 ---@return number c Blue channel.
 ---@return number d Alpha channel.
 function LParallaxLayer:getTint() end
 
---- Returns layer z order.
+--- Returns layer z order from this object.
 ---@return number Z order.
 function LParallaxLayer:getZ() end
 
---- Returns layer visibility.
+--- Returns layer visibility and returns a boolean.
 ---@return boolean True when visible.
 function LParallaxLayer:isVisible() end
 
@@ -14020,15 +13972,15 @@ function LParallaxLayer:render(cam_x, cam_y) end
 --- Enqueues render commands using the runtime camera.
 function LParallaxLayer:renderAuto() end
 
---- Resets layer autoscroll offset.
+--- Resets the layer autoscroll offset to zero.
 function LParallaxLayer:resetAutoscroll() end
 
---- Sets layer autoscroll velocity.
+--- Sets the layer autoscroll velocity values.
 ---@param vx number X autoscroll velocity.
 ---@param vy number Y autoscroll velocity.
 function LParallaxLayer:setAutoscroll(vx, vy) end
 
---- Sets layer blend mode by name.
+--- Sets the layer blend mode by string name.
 ---@param mode string Blend mode name.
 function LParallaxLayer:setBlendMode(mode) end
 
@@ -14039,17 +13991,17 @@ function LParallaxLayer:setBlendMode(mode) end
 ---@param max_y number Maximum Y bound.
 function LParallaxLayer:setClamp(min_x, min_y, max_x, max_y) end
 
---- Sets parallax depth.
+--- Sets parallax depth for this object.
 ---@param z number Depth value.
 function LParallaxLayer:setDepth(z) end
 
---- Sets motion stretch settings.
+--- Sets the motion stretch settings for this layer.
 ---@param enabled boolean Motion stretch flag.
 ---@param strength number Stretch strength.
 ---@param max_scale number Maximum stretch scale.
 function LParallaxLayer:setMotionStretch(enabled, strength, max_scale) end
 
---- Sets layer offset.
+--- Sets the layer pixel offset for this object.
 ---@param x number X offset.
 ---@param y number Y offset.
 function LParallaxLayer:setOffset(x, y) end
@@ -14063,37 +14015,37 @@ function LParallaxLayer:setOpacity(a) end
 ---@param ry boolean Repeat vertically.
 function LParallaxLayer:setRepeat(rx, ry) end
 
---- Sets layer scale.
+--- Sets the layer scale factor for this object.
 ---@param sx number X scale factor.
 ---@param sy number Y scale factor.
 function LParallaxLayer:setScale(sx, sy) end
 
---- Sets layer scroll factor.
+--- Sets layer scroll factor for this object.
 ---@param x number X scroll factor.
 ---@param y number Y scroll factor.
 function LParallaxLayer:setScrollFactor(x, y) end
 
---- Sets tile size for tiling.
+--- Sets tile size for tiling for this object.
 ---@param w number Tile width.
 ---@param h number Tile height.
 function LParallaxLayer:setTileSize(w, h) end
 
---- Enables or disables layer tiling.
+--- Enables or disables the layer tiling mode.
 ---@param enabled boolean Tiling flag.
 function LParallaxLayer:setTiling(enabled) end
 
---- Sets layer tint color.
+--- Sets layer tint color for this object.
 ---@param r number Red channel (0–1).
 ---@param g number Green channel (0–1).
 ---@param b number Blue channel (0–1).
 ---@param a number Alpha channel (0–1).
 function LParallaxLayer:setTint(r, g, b, a) end
 
---- Sets layer visibility.
+--- Sets layer visibility for this object.
 ---@param v boolean Visibility flag.
 function LParallaxLayer:setVisible(v) end
 
---- Sets layer z order.
+--- Sets the layer z order for this object.
 ---@param z number Z order.
 function LParallaxLayer:setZ(z) end
 
@@ -14109,7 +14061,7 @@ function LParallaxLayer:update(dt) end
 ---@class LParallaxSet
 LParallaxSet = {}
 
---- Adds a parallax layer to this set.
+--- Adds a parallax layer to this set handle.
 ---@param layer LParallaxLayer Layer handle.
 function LParallaxSet:addLayer(layer) end
 
@@ -14118,11 +14070,11 @@ function LParallaxSet:addLayer(layer) end
 ---@return number Z order.
 function LParallaxSet:getLayerZAt(index) end
 
---- Returns this set name.
+--- Returns this set name from this object.
 ---@return string Set name.
 function LParallaxSet:getName() end
 
---- Returns set visibility.
+--- Returns set visibility and returns a boolean.
 ---@return boolean True when visible.
 function LParallaxSet:isVisible() end
 
@@ -14143,22 +14095,22 @@ function LParallaxSet:render(cam_x, cam_y) end
 --- Enqueues render commands for all visible set layers using the runtime camera.
 function LParallaxSet:renderAuto() end
 
---- Sets this set name.
+--- Sets this parallax set name for this object.
 ---@param name string Set name.
 function LParallaxSet:setName(name) end
 
---- Sets set visibility.
+--- Sets set visibility for this object.
 ---@param v boolean Visibility flag.
 function LParallaxSet:setVisible(v) end
 
---- Sorts layers by z order.
+--- Sorts layers by z order on this object.
 function LParallaxSet:sortByZ() end
 
 --- Returns the Lua-visible type name for this parallax set handle.
 ---@return string The string `LParallaxSet`.
 function LParallaxSet:type() end
 
---- Updates all layers in this set.
+--- Updates all layers in this parallax set.
 ---@param dt number Delta time in seconds.
 function LParallaxSet:update(dt) end
 
@@ -14202,10 +14154,10 @@ function LParticleSystem:addSubEmitter(config_tbl, burst_count) end
 ---@return number One-based sub-system index.
 function LParticleSystem:addSubSystem(config_tbl) end
 
---- Clears all attractors.
+--- Clears all attractors on this object.
 function LParticleSystem:clearAttractors() end
 
---- Clears collision bounds.
+--- Clears collision bounds on this object.
 function LParticleSystem:clearBounds() end
 
 --- Disables particle collision against a physics world.
@@ -14237,8 +14189,14 @@ function LParticleSystem:getAttractorCount() end
 ---@return number Maximum particle count.
 function LParticleSystem:getBufferSize() end
 
+---@class LParticleSystemGetColorsResult
+---@field r number Red component.
+---@field g number Green component.
+---@field b number Blue component.
+---@field a number Alpha component.
+
 --- Returns particle color keyframes.
----@return table Array table of RGBA color tables.
+---@return LParticleSystemGetColorsResult Array table of RGBA color tables.
 function LParticleSystem:getColors() end
 
 --- Returns particle count and errors if the handle was released.
@@ -14324,7 +14282,7 @@ function LParticleSystem:getShape() end
 function LParticleSystem:getSizeVariation() end
 
 --- Returns particle size keyframes. This method is available to Lua scripts.
----@return table Array table of size values.
+---@return number[] Array table of size values.
 function LParticleSystem:getSizes() end
 
 --- Returns particle speed range. This method is available to Lua scripts.
@@ -14398,7 +14356,7 @@ function LParticleSystem:render(ox, oy) end
 --- Resets particles and emitter state.
 function LParticleSystem:reset() end
 
---- Resumes a paused particle system.
+--- Resumes a paused particle system if it was previously paused.
 function LParticleSystem:resume() end
 
 --- Sets collision bounds for particles.
@@ -14537,15 +14495,15 @@ function LParticleSystem:setSpinVariation(v) end
 ---@param spread number Spread angle.
 function LParticleSystem:setSpread(spread) end
 
---- Sets tangential acceleration range.
+--- Sets tangential acceleration range for emitted particles.
 ---@param min number Minimum tangential acceleration.
 ---@param max number Maximum tangential acceleration.
 function LParticleSystem:setTangentialAcceleration(min, max) end
 
---- Starts particle emission.
+--- Starts particle emission on this object.
 function LParticleSystem:start() end
 
---- Stops particle emission.
+--- Stops particle emission on this object.
 function LParticleSystem:stop() end
 
 --- Returns particle sub-system count.
@@ -14579,7 +14537,7 @@ function LParticleSystem:warmUp(seconds) end
 ---@class LTrail
 LTrail = {}
 
---- Clears all trail points.
+--- Clears all trail points on this object.
 function LTrail:clear() end
 
 --- Draws the trail to image data. This method is available to Lua scripts.
@@ -14596,7 +14554,7 @@ function LTrail:getLifetime() end
 ---@return number Point count.
 function LTrail:getPointCount() end
 
---- Returns trail width settings.
+--- Returns trail width settings from this object.
 ---@return number a Start width.
 ---@return number b End width.
 function LTrail:getWidth() end
@@ -14606,7 +14564,7 @@ function LTrail:getWidth() end
 ---@param y number Point y coordinate.
 function LTrail:pushPoint(x, y) end
 
---- Sets trail head color.
+--- Sets the color of the leading edge of the trail.
 ---@param r number Red channel.
 ---@param g number Green channel.
 ---@param b number Blue channel.
@@ -14621,7 +14579,7 @@ function LTrail:setLifetime(lifetime) end
 ---@param distance number Minimum distance between points.
 function LTrail:setMinDistance(distance) end
 
---- Sets trail tail color.
+--- Sets the color of the trailing edge of the trail.
 ---@param r number Red channel.
 ---@param g number Green channel.
 ---@param b number Blue channel.
@@ -14780,15 +14738,15 @@ function LAIFlowField:getDistance(x, y) end
 ---@return number b One-based goal row, or nil.
 function LAIFlowField:getGoal() end
 
---- Returns flow field height.
+--- Returns flow field height from this object.
 ---@return number Height.
 function LAIFlowField:getHeight() end
 
---- Returns flow field width.
+--- Returns flow field width from this object.
 ---@return number Width.
 function LAIFlowField:getWidth() end
 
---- Returns whether a goal is set.
+--- Returns whether a flow field goal is currently set.
 ---@return boolean True when a goal exists.
 function LAIFlowField:hasGoal() end
 
@@ -14840,8 +14798,12 @@ function LFlowField:getDirection(x, y) end
 ---@return number Direction angle in radians.
 function LFlowField:getDirectionAngle(x, y) end
 
+---@class LFlowFieldGetTargetsResult
+---@field x number X.
+---@field y number Y.
+
 --- Returns target cells for this flow field.
----@return table Array table of target point tables.
+---@return LFlowFieldGetTargetsResult Array table of target point tables.
 function LFlowField:getTargets() end
 
 --- Returns whether the flow field has been calculated.
@@ -14879,19 +14841,27 @@ LHexGrid = {}
 ---@return number Hex distance.
 function LHexGrid:distance(c1, r1, c2, r2) end
 
+---@class LHexGridFieldOfViewResult
+---@field col number Col.
+---@field row number Row.
+
 --- Returns visible hex cells within range from an origin.
 ---@param col number One-based origin column.
 ---@param row number One-based origin row.
 ---@param max_range number Maximum visibility range in cells.
----@return table Array of `{col, row}` hex cell tables.
+---@return LHexGridFieldOfViewResult Array of `{col, row}` hex cell tables.
 function LHexGrid:fieldOfView(col, row, max_range) end
+
+---@class LHexGridFindPathResult
+---@field col number Col.
+---@field row number Row.
 
 --- Finds a path between one-based hex cells.
 ---@param fc number One-based start column.
 ---@param fr number One-based start row.
 ---@param tc number One-based goal column.
 ---@param tr number One-based goal row.
----@return table Array of `{col, row}` hex cell tables, or nil when no path exists.
+---@return LHexGridFindPathResult Array of `{col, row}` hex cell tables, or nil when no path exists.
 function LHexGrid:findPath(fc, fr, tc, tr) end
 
 --- Returns whether a one-based hex cell is blocked.
@@ -14908,11 +14878,15 @@ function LHexGrid:isBlocked(col, row) end
 ---@return boolean True when line of sight is clear.
 function LHexGrid:lineOfSight(fc, fr, tc, tr) end
 
+---@class LHexGridRangeOfMovementResult
+---@field col number Col.
+---@field row number Row.
+
 --- Returns reachable hex cells within a movement budget.
 ---@param col number One-based origin column.
 ---@param row number One-based origin row.
 ---@param budget number Maximum movement cost budget.
----@return table Array of `{col, row}` hex cell tables.
+---@return LHexGridRangeOfMovementResult Array of `{col, row}` hex cell tables.
 function LHexGrid:rangeOfMovement(col, row, budget) end
 
 --- Sets blocked state for a one-based hex cell.
@@ -14940,12 +14914,16 @@ function LHexGrid:typeOf(name) end
 ---@class LJpsGrid
 LJpsGrid = {}
 
+---@class LJpsGridFindPathResult
+---@field x number X.
+---@field y number Y.
+
 --- Finds a JPS path between one-based grid cells.
 ---@param fx number One-based start column.
 ---@param fy number One-based start row.
 ---@param tx number One-based goal column.
 ---@param ty number One-based goal row.
----@return table Array of `{x, y}` point tables, or nil when no path exists.
+---@return LJpsGridFindPathResult Array of `{x, y}` point tables, or nil when no path exists.
 function LJpsGrid:findPath(fx, fy, tx, ty) end
 
 --- Returns whether a one-based JPS grid cell is blocked.
@@ -14973,7 +14951,7 @@ function LJpsGrid:typeOf(name) end
 ---@class LNavGrid
 LNavGrid = {}
 
---- Clears all dirty region markers.
+--- Clears all dirty region markers from the grid.
 function LNavGrid:clearDirty() end
 
 --- Fills the entire grid with a uniform movement cost.
@@ -14988,7 +14966,7 @@ function LNavGrid:fill(cost) end
 ---@param cost number Movement cost (0–255).
 function LNavGrid:fillRect(x, y, w, h, cost) end
 
---- Returns hierarchical chunk size.
+--- Returns the hierarchical chunk size in cells.
 ---@return number Chunk size.
 function LNavGrid:getChunkSize() end
 
@@ -14998,20 +14976,20 @@ function LNavGrid:getChunkSize() end
 ---@return number Movement cost.
 function LNavGrid:getCost(x, y) end
 
---- Returns diagonal movement mode.
+--- Returns the current diagonal movement mode name.
 ---@return string Mode name.
 function LNavGrid:getDiagonalMode() end
 
---- Returns grid width and height.
+--- Returns grid width and height as two integers.
 ---@return number a Grid width.
 ---@return number b Grid height.
 function LNavGrid:getDimensions() end
 
---- Returns grid height.
+--- Returns grid height from this object.
 ---@return number Grid height.
 function LNavGrid:getHeight() end
 
---- Returns grid width.
+--- Returns grid width from this object.
 ---@return number Grid width.
 function LNavGrid:getWidth() end
 
@@ -15035,7 +15013,7 @@ function LNavGrid:loadFromString(data) end
 --- Rebuilds the cached abstract graph for this grid.
 function LNavGrid:rebuildAbstract() end
 
---- Saves grid data to a binary string.
+--- Saves grid data to a serialized binary string.
 ---@return string Serialized grid bytes.
 function LNavGrid:saveToString() end
 
@@ -15055,7 +15033,7 @@ function LNavGrid:setChunkSize(size) end
 ---@param cost number Movement cost (0–255).
 function LNavGrid:setCost(x, y, cost) end
 
---- Sets diagonal movement mode.
+--- Sets diagonal movement mode for this object.
 ---@param mode string Mode name: `none`, `always`, or `nocornercut`.
 function LNavGrid:setDiagonalMode(mode) end
 
@@ -15091,15 +15069,19 @@ function LNavMesh:addPolygon(vertices) end
 ---@return boolean True when the connection was added.
 function LNavMesh:connectPolygons(a, b, bidirectional) end
 
+---@class LNavMeshFindPathResult
+---@field x number X.
+---@field y number Y.
+
 --- Finds a path through the navmesh between world points.
 ---@param sx number Start X in world coordinates.
 ---@param sy number Start Y in world coordinates.
 ---@param gx number Goal X in world coordinates.
 ---@param gy number Goal Y in world coordinates.
----@return table Array of `{x, y}` point tables, or nil when no path exists.
+---@return LNavMeshFindPathResult Array of `{x, y}` point tables, or nil when no path exists.
 function LNavMesh:findPath(sx, sy, gx, gy) end
 
---- Returns navmesh polygon count.
+--- Returns the total navmesh polygon count.
 ---@return number Polygon count.
 function LNavMesh:getPolygonCount() end
 
@@ -15116,23 +15098,31 @@ function LNavMesh:typeOf(name) end
 ---@class LPathGrid
 LPathGrid = {}
 
+---@class LPathGridFindPathResult
+---@field x number X.
+---@field y number Y.
+
 --- Finds a path between one-based path grid cells.
 ---@param sx number One-based start column.
 ---@param sy number One-based start row.
 ---@param gx number One-based goal column.
 ---@param gy number One-based goal row.
----@return table Array of `{x, y}` point tables, or nil when no path exists.
+---@return LPathGridFindPathResult Array of `{x, y}` point tables, or nil when no path exists.
 function LPathGrid:findPath(sx, sy, gx, gy) end
+
+---@class LPathGridFindPathSmoothedResult
+---@field x number X.
+---@field y number Y.
 
 --- Finds a smoothed path between one-based path grid cells.
 ---@param sx number One-based start column.
 ---@param sy number One-based start row.
 ---@param gx number One-based goal column.
 ---@param gy number One-based goal row.
----@return table Array of `{x, y}` point tables, or nil when no path exists.
+---@return LPathGridFindPathSmoothedResult Array of `{x, y}` point tables, or nil when no path exists.
 function LPathGrid:findPathSmoothed(sx, sy, gx, gy) end
 
---- Returns path grid cell size.
+--- Returns path grid cell size from this object.
 ---@return number Cell size.
 function LPathGrid:getCellSize() end
 
@@ -15142,11 +15132,11 @@ function LPathGrid:getCellSize() end
 ---@return number Movement cost.
 function LPathGrid:getCost(x, y) end
 
---- Returns grid height.
+--- Returns grid height from this object.
 ---@return number Grid height.
 function LPathGrid:getHeight() end
 
---- Returns grid width.
+--- Returns grid width from this object.
 ---@return number Grid width.
 function LPathGrid:getWidth() end
 
@@ -15181,7 +15171,7 @@ function LPathGrid:typeOf(name) end
 ---@class LUnitPathfinder
 LUnitPathfinder = {}
 
---- Clears all cached paths.
+--- Clears all cached paths on this object.
 function LUnitPathfinder:clearCache() end
 
 --- Finds nearest walkable one-based grid cell within a radius.
@@ -15193,6 +15183,10 @@ function LUnitPathfinder:clearCache() end
 ---@return number b One-based row of the nearest walkable cell, or nil.
 function LUnitPathfinder:findNearestWalkable(x, y, max_radius, unit_size) end
 
+---@class LUnitPathfinderFindPartialPathResult
+---@field x number X.
+---@field y number Y.
+
 --- Finds the best reachable path from a start to a goal within a maximum node budget. Useful for incremental pathfinding across frames.
 ---@param x1 number One-based column of the start cell.
 ---@param y1 number One-based row of the start cell.
@@ -15200,9 +15194,13 @@ function LUnitPathfinder:findNearestWalkable(x, y, max_radius, unit_size) end
 ---@param y2 number One-based row of the goal cell.
 ---@param max_nodes number Maximum number of nodes to expand before stopping.
 ---@param unit_size? number Width/height of the unit in grid cells for clearance checks (default 1).
----@return table a Array of `{x, y}` waypoint tables forming the found partial path.
+---@return LUnitPathfinderFindPartialPathResult a Array of `{x, y}` waypoint tables forming the found partial path.
 ---@return boolean b `true` if the returned path reaches the exact goal cell.
 function LUnitPathfinder:findPartialPath(x1, y1, x2, y2, max_nodes, unit_size) end
+
+---@class LUnitPathfinderFindPathResult
+---@field x number X.
+---@field y number Y.
 
 --- Finds a path between one-based grid cells.
 ---@param x1 number One-based start column.
@@ -15210,8 +15208,12 @@ function LUnitPathfinder:findPartialPath(x1, y1, x2, y2, max_nodes, unit_size) e
 ---@param x2 number One-based goal column.
 ---@param y2 number One-based goal row.
 ---@param unit_size? number Unit footprint in cells (default 1).
----@return table Array of `{x, y}` waypoint tables, or nil when no path exists.
+---@return LUnitPathfinderFindPathResult Array of `{x, y}` waypoint tables, or nil when no path exists.
 function LUnitPathfinder:findPath(x1, y1, x2, y2, unit_size) end
+
+---@class LUnitPathfinderFindPathBidirectionalResult
+---@field x number X.
+---@field y number Y.
 
 --- Finds a path using bidirectional A* and returns completion status.
 ---@param x1 number One-based column of the start cell.
@@ -15220,9 +15222,13 @@ function LUnitPathfinder:findPath(x1, y1, x2, y2, unit_size) end
 ---@param y2 number One-based row of the goal cell.
 ---@param unit_size? number Width or height of the unit in grid cells for clearance checks (default 1).
 ---@param max_nodes? number Optional node-expansion budget; 0 uses the full search.
----@return table a Array table of waypoint tables, or nil when no path exists.
+---@return LUnitPathfinderFindPathBidirectionalResult a Array of waypoint tables, or nil when no path exists.
 ---@return boolean b True when the path is complete.
 function LUnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unit_size, max_nodes) end
+
+---@class LUnitPathfinderFindPathSmoothResult
+---@field x number X.
+---@field y number Y.
 
 --- Finds a smoothed path between one-based grid cells.
 ---@param x1 number One-based start column.
@@ -15230,10 +15236,10 @@ function LUnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unit_size, max_no
 ---@param x2 number One-based goal column.
 ---@param y2 number One-based goal row.
 ---@param unit_size? number Unit footprint in cells (default 1).
----@return table Array of `{x, y}` waypoint tables, or nil when no path exists.
+---@return LUnitPathfinderFindPathSmoothResult Array of `{x, y}` waypoint tables, or nil when no path exists.
 function LUnitPathfinder:findPathSmooth(x1, y1, x2, y2, unit_size) end
 
---- Returns current path cache size.
+--- Returns the current path cache entry count.
 ---@return number Cache size.
 function LUnitPathfinder:getCacheSize() end
 
@@ -15277,11 +15283,11 @@ function LUnitPathfinder:isReachable(x1, y1, x2, y2, unit_size) end
 ---@return boolean True when line of sight is clear.
 function LUnitPathfinder:lineOfSight(x1, y1, x2, y2, unit_size) end
 
---- Enables or disables path cache.
+--- Enables or disables the path cache on this object.
 ---@param enabled boolean True to enable caching.
 function LUnitPathfinder:setCacheEnabled(enabled) end
 
---- Sets maximum path cache size.
+--- Sets maximum path cache size for this object.
 ---@param n number Maximum number of cached paths.
 function LUnitPathfinder:setCacheMaxSize(n) end
 
@@ -15310,7 +15316,7 @@ lurek.pathfind.newFlowField = function(grid_ud) end
 ---@return LHexGrid New hex grid handle.
 lurek.pathfind.newHexGrid = function(width, height, layout_str) end
 
---- Creates a Jump Point Search grid.
+--- Creates a Jump Point Search grid with given dimensions.
 ---@param width number Grid width in cells.
 ---@param height number Grid height in cells.
 ---@return LJpsGrid New JPS grid handle.
@@ -15329,7 +15335,7 @@ lurek.pathfind.newNavGrid = function(width, height) end
 ---@return LNavGrid New navigation grid handle.
 lurek.pathfind.newNavGridFromTileMap = function(tm_ud, layer_index, blocked_table) end
 
---- Creates an empty navigation mesh.
+--- Creates an empty navigation mesh for polygon-based pathfinding.
 ---@return LNavMesh New navmesh handle.
 lurek.pathfind.newNavMesh = function() end
 
@@ -15338,7 +15344,7 @@ lurek.pathfind.newNavMesh = function() end
 ---@return LAIFlowField New AI flow field handle.
 lurek.pathfind.newPathFlowField = function(grid_ud) end
 
---- Creates a cell-size path grid.
+--- Creates a cell-size path grid with given dimensions.
 ---@param w number Grid width in cells.
 ---@param h number Grid height in cells.
 ---@param cell_size number World-space size of each cell.
@@ -15350,9 +15356,14 @@ lurek.pathfind.newPathGrid = function(w, h, cell_size) end
 ---@return LUnitPathfinder New pathfinder handle.
 lurek.pathfind.newPathfinder = function(grid_ud) end
 
+---@class PathfindRangeMapResult
+---@field cells number[] Reachability cost per cell.
+---@field width number Grid width.
+---@field height number Grid height.
+
 --- Computes reachable cells from range map options.
 ---@param opts table Options with dimensions, origin, budget, optional diagonal flag, costs, and blocked cells.
----@return table Range map result with `cells`, `width`, and `height` fields.
+---@return PathfindRangeMapResult Range map result with `cells`, `width`, and `height` fields.
 lurek.pathfind.rangeMap = function(opts) end
 
 --- Sets pathfinding thread count (not yet implemented; logs a warning).
@@ -15406,7 +15417,6 @@ function LBehaviorTree:addSelector(label) end
 function LBehaviorTree:addSequence(label) end
 
 --- Remove all nodes and leaf functions, resetting the tree to empty.
----@return nil No value is returned.
 function LBehaviorTree:clearAll() end
 
 --- Return the total number of nodes in the tree.
@@ -15414,13 +15424,11 @@ function LBehaviorTree:clearAll() end
 function LBehaviorTree:nodeCount() end
 
 --- Reset the tree's running state. Use between encounters or when restarting AI logic.
----@return nil No value is returned.
 function LBehaviorTree:resetState() end
 
 --- Register or replace the callback function for a named leaf. The function must return "success", "failure", or "running".
 ---@param name string The leaf name (matching addLeaf).
 ---@param callback function A function returning a status string.
----@return nil No value is returned.
 function LBehaviorTree:setLeaf(name, callback) end
 
 --- Designate a node as the tree's root. Tick evaluation starts here.
@@ -15438,11 +15446,9 @@ LBlackboard = {}
 
 --- Remove a single key from the blackboard.
 ---@param key string The key to remove.
----@return nil No value is returned.
 function LBlackboard:clear(key) end
 
 --- Remove all keys and values from the blackboard.
----@return nil No value is returned.
 function LBlackboard:clearAll() end
 
 --- Retrieve the value stored under a key. Returns nil if the key does not exist.
@@ -15460,13 +15466,12 @@ function LBlackboard:getRevision() end
 function LBlackboard:has(key) end
 
 --- Return an array of all keys currently stored on the blackboard.
----@return table Array of key name strings.
+---@return string[] Key name strings.
 function LBlackboard:keys() end
 
 --- Set a key to a value (boolean, number, string, or nil to clear). Notifies registered watchers if value changed.
 ---@param key string The key name.
 ---@param value boolean|number|string|nil The value to store. Pass nil to clear the key.
----@return nil No value is returned.
 function LBlackboard:set(key, value) end
 
 --- Return a table containing all current key-value pairs as a snapshot. Useful for serialization or debug display.
@@ -15475,7 +15480,6 @@ function LBlackboard:snapshot() end
 
 --- Remove a previously registered watcher by its ID.
 ---@param id number The watcher ID returned by `watch()`.
----@return nil No value is returned.
 function LBlackboard:unwatch(id) end
 
 --- Register a watcher callback that fires whenever the specified key changes. Use `"*"` to watch all keys.
@@ -15497,14 +15501,12 @@ function LCommandStack:canRedo() end
 function LCommandStack:canUndo() end
 
 --- Discard all command history and free associated callbacks.
----@return nil No value is returned.
 function LCommandStack:clearAll() end
 
 --- Execute a named command immediately, recording it in history. Discards any redo history ahead of the current position.
 ---@param name string A descriptive name for the command (shown in history).
 ---@param execFn function The function that performs the action.
 ---@param undoFn? function An optional function that reverses the action. If omitted, command cannot be undone.
----@return nil No return value.
 function LCommandStack:execute(name, execFn, undoFn) end
 
 --- Return the name of the most recently executed (or undone-to) command, or nil if history is empty.
@@ -15528,7 +15530,6 @@ function LCommandStack:undo() end
 LDebounce = {}
 
 --- Cancel any pending debounce without firing. The callback will not be called until triggered again.
----@return nil No value is returned.
 function LDebounce:cancel() end
 
 --- Return the total number of times this debounce has fired since creation.
@@ -15541,11 +15542,9 @@ function LDebounce:isPending() end
 
 --- Set the callback function to invoke when the debounce fires after the wait period.
 ---@param f function The callback to execute.
----@return nil No value is returned.
 function LDebounce:onFire(f) end
 
 --- Signal input activity. Resets the wait timer so the debounce will fire after the full wait period of inactivity.
----@return nil No value is returned.
 function LDebounce:trigger() end
 
 --- Advance the debounce timer. If the wait period elapsed since last trigger, fires the callback and returns true.
@@ -15559,21 +15558,18 @@ LEventBus = {}
 
 --- Remove all listeners subscribed to a specific event name.
 ---@param event string The event name whose listeners will be removed.
----@return nil No value is returned.
 function LEventBus:clear(event) end
 
 --- Remove all listeners from every event on this bus. Resets the bus to empty.
----@return nil No value is returned.
 function LEventBus:clearAll() end
 
 --- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
 ---@param event string The event name to emit.
----@param ... boolean|number|string|table|nil Additional arguments passed to each listener callback.
----@return nil No value is returned.
+---@param ... table Additional arguments passed to each listener callback.
 function LEventBus:emit(event, ...) end
 
 --- Return an array of all event names that have at least one listener.
----@return table Array of event name strings.
+---@return string[] Event name strings.
 function LEventBus:getEvents() end
 
 --- Return the number of active listeners for a given event name.
@@ -15583,7 +15579,6 @@ function LEventBus:getListenerCount(event) end
 
 --- Unsubscribe a listener by its subscription ID. Removes the callback from the event bus.
 ---@param id number The subscription ID returned by `on()`.
----@return nil No value is returned.
 function LEventBus:off(id) end
 
 --- Subscribe a callback to a named event. Higher priority listeners fire first.
@@ -15600,21 +15595,20 @@ LFactory = {}
 --- Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor.
 ---@param alias string The alternative name.
 ---@param canonical string The existing registered type name.
----@return nil No return value.
 function LFactory:alias(alias, canonical) end
 
 --- Remove all registered types and constructors, resetting the factory.
----@return nil No value is returned.
 function LFactory:clearAll() end
 
 --- Create a new object by type name, passing additional arguments to the constructor.
 ---@param typeName string The registered type to instantiate.
----@param ... any Extra arguments forwarded to the constructor.
----@return boolean number|string|table|nil | The value returned by the constructor function.
+---@param ... table Extra arguments forwarded to the constructor.
+---@return table a The created object table.
+---@return nil b When not available.
 function LFactory:create(typeName, ...) end
 
 --- Return an array of all registered type names.
----@return table Array of type name strings.
+---@return string[] Type name strings.
 function LFactory:getTypes() end
 
 --- Check whether a constructor is registered for the given type name.
@@ -15625,12 +15619,10 @@ function LFactory:has(typeName) end
 --- Register a constructor function for a given type name. Future `create()` calls with this type will invoke it.
 ---@param typeName string The type identifier (e.g. "enemy", "bullet").
 ---@param ctor function A constructor function that returns a new instance.
----@return nil No return value.
 function LFactory:register(typeName, ctor) end
 
 --- Unregister a type and discard its constructor function.
 ---@param typeName string The type name to remove.
----@return nil No value is returned.
 function LFactory:remove(typeName) end
 
 --- Lua-facing batching funnel that collects events over a time window and flushes them together.
@@ -15638,11 +15630,9 @@ function LFactory:remove(typeName) end
 LFunnel = {}
 
 --- Discard all pending entries without flushing or calling the callback.
----@return nil No value is returned.
 function LFunnel:discard() end
 
 --- Force an immediate flush of all pending entries, invoking the callback.
----@return nil No value is returned.
 function LFunnel:flush() end
 
 --- Return the total number of times this funnel has flushed since creation.
@@ -15651,7 +15641,6 @@ function LFunnel:getFlushCount() end
 
 --- Set the callback invoked when the funnel flushes. Receives an array of {tag, value} entries.
 ---@param f function Callback receiving a table array of batched entries.
----@return nil No value is returned.
 function LFunnel:onFlush(f) end
 
 --- Return the number of entries waiting to be flushed.
@@ -15661,7 +15650,6 @@ function LFunnel:pendingCount() end
 --- Push a tagged event into the funnel. May trigger an immediate flush if the max entry count is reached.
 ---@param tag string A category label for the event.
 ---@param value? number Optional numeric value (default 0).
----@return nil No value is returned.
 function LFunnel:push(tag, value) end
 
 --- Advance the funnel's time window. Flushes and invokes the callback if the window elapsed.
@@ -15674,33 +15662,31 @@ function LFunnel:update(dt) end
 LList = {}
 
 --- Append a value to the end of the list.
----@param value any The value to append.
----@return nil No value is returned.
+---@param value string The value to append.
 function LList:add(value) end
 
 --- Remove all items from the list. This method is available to Lua scripts.
----@return nil No value is returned.
 function LList:clear() end
 
 --- Check whether the list contains a specific value.
----@param value any The value to search for.
+---@param value string The value to search for.
 ---@return boolean True if found.
 function LList:contains(value) end
 
 --- Get the value at a 1-based index. Returns nil if out of range.
 ---@param index number 1-based position.
----@return boolean number|string|table|nil | The value, or nil.
+---@return string a The value.
+---@return nil b When not available.
 function LList:get(index) end
 
 --- Find the 1-based index of the first occurrence of a value. Returns nil if not found.
----@param value any The value to search for.
+---@param value string The value to search for.
 ---@return number The 1-based index, or nil when the value is not found.
 function LList:indexOf(value) end
 
 --- Insert a value at a 1-based index, shifting subsequent items right.
 ---@param index number 1-based insertion position.
----@param value boolean|number|string|table The value to insert.
----@return nil No value is returned.
+---@param value string The value to insert.
 function LList:insert(index, value) end
 
 --- Check whether the list is empty. This method is available to Lua scripts.
@@ -15712,40 +15698,39 @@ function LList:isEmpty() end
 function LList:len() end
 
 --- Remove and return the last value. Returns nil if empty.
----@return boolean number|string|table|nil | The popped value, or nil.
+---@return string a The popped value.
+---@return nil b When not available.
 function LList:pop() end
 
 --- Append a value to the end of the list (alias for add).
----@param value any The value to append.
----@return nil No value is returned.
+---@param value string The value to append.
 function LList:push(value) end
 
 --- Remove and return the value at a 1-based index. Returns nil if out of range.
 ---@param index number 1-based position to remove.
----@return boolean number|string|table|nil | The removed value, or nil.
+---@return string a The removed value.
+---@return nil b When not available.
 function LList:remove(index) end
 
 --- Reverse the order of all items in the list in-place.
----@return nil No value is returned.
 function LList:reverse() end
 
 --- Replace the value at a 1-based index. Errors if index is 0 or out of range.
 ---@param index number 1-based position.
----@param value boolean|number|string|table The new value.
----@return nil No value is returned.
+---@param value string The new value.
 function LList:set(index, value) end
 
 --- Remove and return the first value. Returns nil if empty.
----@return boolean number|string|table|nil | The shifted value, or nil.
+---@return string a The shifted value.
+---@return nil b When not available.
 function LList:shift() end
 
 --- Return all items as an array table. This method is available to Lua scripts.
----@return table Array of all values.
+---@return number[] Array of all values.
 function LList:toArray() end
 
 --- Insert a value at the beginning of the list.
----@param value any The value to prepend.
----@return nil No value is returned.
+---@param value string The value to prepend.
 function LList:unshift(value) end
 
 --- Lua-facing string-keyed dictionary (map) with keys(), values(), entries(), and merge operations.
@@ -15753,16 +15738,22 @@ function LList:unshift(value) end
 LMap = {}
 
 --- Remove all entries from the map. This method is available to Lua scripts.
----@return nil No value is returned.
 function LMap:clear() end
 
+---@class LMapEntriesResult
+---@field id number Entry id.
+---@field tag string Tag string.
+---@field value number Numeric value.
+---@field text string Text content.
+
 --- Return an array of {key, value} tables for all entries.
----@return table Array of entry tables.
+---@return LMapEntriesResult Array of entry tables.
 function LMap:entries() end
 
 --- Retrieve the value for a key. Returns nil if the key does not exist.
 ---@param key string The key to look up.
----@return boolean number|string|table|nil | The value, or nil.
+---@return string a The value.
+---@return nil b When not available.
 function LMap:get(key) end
 
 --- Check whether a key exists in the map.
@@ -15775,7 +15766,7 @@ function LMap:has(key) end
 function LMap:isEmpty() end
 
 --- Return an array of all keys in the map.
----@return table Array of key strings.
+---@return string[] Key strings.
 function LMap:keys() end
 
 --- Return the number of key-value pairs.
@@ -15784,7 +15775,6 @@ function LMap:len() end
 
 --- Copy all entries from another LMap into this map. Existing keys are overwritten.
 ---@param other LMap The source map to merge from.
----@return nil No value is returned.
 function LMap:merge(other) end
 
 --- Remove a key from the map. Returns true if it was present.
@@ -15794,12 +15784,11 @@ function LMap:remove(key) end
 
 --- Set a key-value pair in the map. Replaces any existing value for the same key.
 ---@param key string The key.
----@param value boolean|number|string|table The value to store.
----@return nil No value is returned.
+---@param value string The value to store.
 function LMap:set(key, value) end
 
 --- Return an array of all values in the map.
----@return table Array of values.
+---@return number[] Array of values.
 function LMap:values() end
 
 --- Lua-facing mediator for channel-based message passing between decoupled game systems.
@@ -15807,16 +15796,14 @@ function LMap:values() end
 LMediator = {}
 
 --- Send a message to all handlers on all channels. Every registered handler receives the payload.
----@param ... boolean|number|string|table|nil Arguments passed to every handler.
----@return nil No value is returned.
+---@param ... table Arguments passed to every handler.
 function LMediator:broadcast(...) end
 
 --- Return an array of all channel names that have at least one handler.
----@return table Array of channel name strings.
+---@return string[] Channel name strings.
 function LMediator:channels() end
 
 --- Remove all channels and handlers, resetting the mediator.
----@return nil No value is returned.
 function LMediator:clear() end
 
 --- Return the number of handlers registered on a specific channel.
@@ -15827,7 +15814,6 @@ function LMediator:handlerCount(channel) end
 --- Unregister a handler from a channel by its ID.
 ---@param channel string The channel name.
 ---@param id number The handler ID to remove.
----@return nil No value is returned.
 function LMediator:off(channel, id) end
 
 --- Register a handler callback on a named channel. Returns an ID for unregistration.
@@ -15838,13 +15824,11 @@ function LMediator:on(channel, callback) end
 
 --- Remove an entire channel and all its handlers.
 ---@param channel string The channel to remove.
----@return nil No value is returned.
 function LMediator:removeChannel(channel) end
 
 --- Send a message to all handlers on a specific channel with optional payload arguments.
 ---@param channel string The target channel name.
----@param ... boolean|number|string|table|nil Additional arguments passed to each handler.
----@return nil No value is returned.
+---@param ... table Additional arguments passed to each handler.
 function LMediator:send(channel, ...) end
 
 --- Lua-facing object pool for reusing pre-allocated game objects (bullets, particles, enemies) to avoid per-frame allocations.
@@ -15852,16 +15836,15 @@ function LMediator:send(channel, ...) end
 LObjectPool = {}
 
 --- Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
----@return boolean number|string|table|nil | The acquired object, or nil if none available.
+---@return table a The acquired object table.
+---@return nil b If none available.
 function LObjectPool:acquire() end
 
 --- Add an object to the pool's idle set, making it available for future acquisition.
----@param value any The object to store in the pool.
----@return nil No value is returned.
+---@param value table The object table to store in the pool.
 function LObjectPool:add(value) end
 
 --- Destroy all objects (active and idle) and reset the pool to empty.
----@return nil No value is returned.
 function LObjectPool:clearAll() end
 
 --- Return the number of objects currently checked out from the pool.
@@ -15877,8 +15860,7 @@ function LObjectPool:getAvailableCount() end
 function LObjectPool:getTotalCount() end
 
 --- Return an active object back to the pool's idle set so it can be reused.
----@param value any The object to release back into the pool.
----@return nil No value is returned.
+---@param value table The object table to release back into the pool.
 function LObjectPool:release(value) end
 
 --- Lua-facing reactive observer that stores values and notifies subscribers when values change.
@@ -15887,7 +15869,8 @@ LObserver = {}
 
 --- Retrieve the current value for a key. Returns nil if not set.
 ---@param key string The property name to look up.
----@return boolean number|string|table|nil | The stored value, or nil.
+---@return number a The stored value.
+---@return nil b When not available.
 function LObserver:get(key) end
 
 --- Return the total number of active subscriptions across all keys.
@@ -15896,8 +15879,7 @@ function LObserver:getCount() end
 
 --- Set a value by key and notify all subscribers watching that key.
 ---@param key string The property name.
----@param value boolean|number|string|table The new value to store.
----@return nil No value is returned.
+---@param value number The new value to store.
 function LObserver:set(key, value) end
 
 --- Subscribe to changes on a specific key. The callback receives (key, newValue) on each change.
@@ -15909,7 +15891,6 @@ function LObserver:subscribe(key, callback, once) end
 
 --- Remove a subscription by its ID. The callback will no longer fire.
 ---@param id number The subscription ID returned by `subscribe()`.
----@return nil No value is returned.
 function LObserver:unsubscribe(id) end
 
 --- Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and connectivity queries.
@@ -15926,22 +15907,21 @@ function LPatternGraph:addEdge(from, to, weight, label) end
 
 --- Add a node to the graph with an optional label and payload value.
 ---@param label? string Optional node label.
----@param value? boolean|number|string|table Optional payload stored with the node.
+---@param value? table Optional payload stored with the node.
 ---@return number The new node's ID.
 function LPatternGraph:addNode(label, value) end
 
 --- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
 ---@param start number The starting node ID.
----@return table Array of visited node IDs.
+---@return number[] Array of visited node IDs.
 function LPatternGraph:bfs(start) end
 
 --- Remove all nodes, edges, and payloads from the graph.
----@return nil No value is returned.
 function LPatternGraph:clearAll() end
 
 --- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
 ---@param start number The starting node ID.
----@return table Array of visited node IDs.
+---@return number[] Array of visited node IDs.
 function LPatternGraph:dfs(start) end
 
 --- Return the total number of edges in the graph.
@@ -15950,7 +15930,8 @@ function LPatternGraph:edgeCount() end
 
 --- Retrieve the payload value stored on a node. Returns nil if no payload.
 ---@param id number The node ID.
----@return boolean number|string|table|nil | The payload, or nil.
+---@return table a The payload.
+---@return nil b When not available.
 function LPatternGraph:getNodeValue(id) end
 
 --- Check whether a node with the given ID exists in the graph.
@@ -15966,7 +15947,7 @@ function LPatternGraph:isConnected(from, to) end
 
 --- Return an array of node IDs directly connected to the given node.
 ---@param id number The node ID to query.
----@return table Array of neighbor node IDs.
+---@return number[] Array of neighbor node IDs.
 function LPatternGraph:neighbors(id) end
 
 --- Return the total number of nodes in the graph.
@@ -15988,7 +15969,6 @@ function LPatternGraph:removeNode(id) end
 LPriorityQueue = {}
 
 --- Remove all items from the queue. This method is available to Lua scripts.
----@return nil No value is returned.
 function LPriorityQueue:clearAll() end
 
 --- Check whether the queue contains no items.
@@ -16000,16 +15980,18 @@ function LPriorityQueue:isEmpty() end
 function LPriorityQueue:len() end
 
 --- Return the highest-priority item without removing it. Returns nil if empty.
----@return boolean number|string|table|nil | The item value, or nil.
+---@return table a The item table.
+---@return nil b When not available.
 function LPriorityQueue:peek() end
 
 --- Remove and return the highest-priority item. Returns nil if the queue is empty.
----@return boolean number|string|table|nil | The item value, or nil.
+---@return table a The item table.
+---@return nil b When not available.
 function LPriorityQueue:pop() end
 
 --- Add an item with a numeric priority. Higher priority items are dequeued first.
 ---@param priority number The priority value (higher = dequeued sooner).
----@param value boolean|number|string|table The payload to store.
+---@param value table The payload table to store.
 ---@param label? string Optional human-readable label for debugging.
 ---@return number The internal ID of the enqueued item.
 function LPriorityQueue:push(priority, value, label) end
@@ -16019,38 +16001,41 @@ function LPriorityQueue:push(priority, value, label) end
 LQueue = {}
 
 --- Return the back value without removing it. Returns nil if empty.
----@return boolean number|string|table|nil | The back value, or nil.
+---@return string a The back value.
+---@return nil b When not available.
 function LQueue:back() end
 
 --- Remove all items from the queue. This method is available to Lua scripts.
----@return nil No value is returned.
 function LQueue:clear() end
 
 --- Remove and return the front value. Returns nil if empty.
----@return boolean number|string|table|nil | The dequeued value, or nil.
+---@return string a The dequeued value.
+---@return nil b When not available.
 function LQueue:dequeue() end
 
 --- Remove and return the back value. Returns nil if empty.
----@return boolean number|string|table|nil | The dequeued value, or nil.
+---@return string a The dequeued value.
+---@return nil b When not available.
 function LQueue:dequeueBack() end
 
 --- Add a value to the back of the queue. Returns false if at capacity.
----@param value any The value to enqueue.
+---@param value string The value to enqueue.
 ---@return boolean True if enqueued, false if full.
 function LQueue:enqueue(value) end
 
 --- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
----@param value any The value to insert at the front.
+---@param value string The value to insert at the front.
 ---@return boolean True if enqueued, false if full.
 function LQueue:enqueueFront(value) end
 
 --- Return the front value without removing it. Returns nil if empty.
----@return boolean number|string|table|nil | The front value, or nil.
+---@return string a The front value.
+---@return nil b When not available.
 function LQueue:front() end
 
 --- Insert a value at a 1-based index in the queue. Returns false if at capacity.
 ---@param index number 1-based insertion position.
----@param value boolean|number|string|table The value to insert.
+---@param value string The value to insert.
 ---@return boolean True if inserted, false if full.
 function LQueue:insertAt(index, value) end
 
@@ -16068,16 +16053,18 @@ function LQueue:len() end
 
 --- Return the value at a 1-based index without removing it. Returns nil if out of range.
 ---@param index number 1-based position.
----@return boolean number|string|table|nil | The value, or nil.
+---@return string a The value.
+---@return nil b When not available.
 function LQueue:peekAt(index) end
 
 --- Remove and return the value at a 1-based index. Returns nil if out of range.
 ---@param index number 1-based position to remove.
----@return boolean number|string|table|nil | The removed value, or nil.
+---@return string a The removed value.
+---@return nil b When not available.
 function LQueue:removeAt(index) end
 
 --- Return all queue items as an array table (front to back).
----@return table Array of all values.
+---@return number[] Array of all values.
 function LQueue:toArray() end
 
 --- Lua-facing relationship manager for tracking numeric values and named levels between entity pairs.
@@ -16088,14 +16075,12 @@ LRelationshipManager = {}
 ---@param a number First entity ID.
 ---@param b number Second entity ID.
 ---@param delta number Amount to add (can be negative).
----@return nil No value is returned.
 function LRelationshipManager:adjustValue(a, b, delta) end
 
 --- Define a relationship type with named levels (e.g. "friendship" with levels ["hostile", "neutral", "friendly"]).
 ---@param name string The relationship type name.
 ---@param levels table Array of level name strings in order.
 ---@param defaultLevel? string The default level for new pairs.
----@return nil No return value.
 function LRelationshipManager:defineType(name, levels, defaultLevel) end
 
 --- Get the named level for a relationship type between two entities.
@@ -16118,12 +16103,10 @@ function LRelationshipManager:pairCount() end
 --- Remove all relationship data between two entities.
 ---@param a number First entity ID.
 ---@param b number Second entity ID.
----@return nil No value is returned.
 function LRelationshipManager:removePair(a, b) end
 
 --- Remove a relationship type definition.
 ---@param name string The type name to remove.
----@return nil No value is returned.
 function LRelationshipManager:removeType(name) end
 
 --- Set the named level for a relationship type between two entities.
@@ -16138,11 +16121,10 @@ function LRelationshipManager:setLevel(a, b, typeName, level) end
 ---@param a number First entity ID.
 ---@param b number Second entity ID.
 ---@param value number The numeric value to store.
----@return nil No value is returned.
 function LRelationshipManager:setValue(a, b, value) end
 
 --- Return all defined relationship type names.
----@return table Array of type name strings.
+---@return string[] Type name strings.
 function LRelationshipManager:typeNames() end
 
 --- Lua-facing fixed-size ring buffer for numeric or string values. Oldest entries are overwritten when full.
@@ -16154,15 +16136,20 @@ LRing = {}
 function LRing:average() end
 
 --- Remove all entries from the ring. This method is available to Lua scripts.
----@return nil No value is returned.
 function LRing:clear() end
 
 --- Check whether the ring has reached its maximum capacity.
 ---@return boolean True if full.
 function LRing:isFull() end
 
+---@class LRingLatestResult
+---@field id number Id.
+---@field tag string Tag.
+---@field value number Value.
+---@field text string Text.
+
 --- Return the most recently pushed entry as a table with id, tag, value, and text fields. Returns nil if empty.
----@return table nil | Entry table or nil.
+---@return LRingLatestResult nil | Entry table or nil.
 function LRing:latest() end
 
 --- Return the number of entries currently in the ring.
@@ -16179,8 +16166,14 @@ function LRing:push(value, tag) end
 ---@return number Sum of values.
 function LRing:sum() end
 
+---@class LRingToArrayResult
+---@field id number Entry id.
+---@field tag string Tag string.
+---@field value number Numeric value.
+---@field text string Text content.
+
 --- Return all entries in the ring as an ordered array of tables (oldest to newest).
----@return table Array of entry tables with id, tag, value, and text fields.
+---@return LRingToArrayResult Array of entry tables with id, tag, value, and text fields.
 function LRing:toArray() end
 
 --- Lua-facing service locator for registering and retrieving shared services by name at runtime.
@@ -16188,11 +16181,10 @@ function LRing:toArray() end
 LServiceLocator = {}
 
 --- Remove all registered services and reset the locator.
----@return nil No value is returned.
 function LServiceLocator:clearAll() end
 
 --- Return an array of all registered service names.
----@return table Array of service name strings.
+---@return string[] Service name strings.
 function LServiceLocator:getServices() end
 
 --- Check whether a service with the given name is currently registered.
@@ -16202,18 +16194,17 @@ function LServiceLocator:has(name) end
 
 --- Retrieve a registered service by name. Returns nil if not found.
 ---@param name string The service name to look up.
----@return boolean number|string|table|function|nil | The service object, or nil if not registered.
+---@return table a The service table.
+---@return nil b If not registered.
 function LServiceLocator:locate(name) end
 
 --- Register a service instance under a given name. Replaces any previously registered service with the same name.
 ---@param name string Unique identifier for the service.
----@param value boolean|number|string|table|function The service object or table to store.
----@return nil No value is returned.
+---@param value table The service table to register.
 function LServiceLocator:provide(name, value) end
 
 --- Unregister and discard a service by name.
 ---@param name string The service name to remove.
----@return nil No value is returned.
 function LServiceLocator:remove(name) end
 
 --- Lua-facing string set with add/remove/has operations and set algebra (union, intersection).
@@ -16226,7 +16217,6 @@ LSet = {}
 function LSet:add(key) end
 
 --- Remove all items from the set. This method is available to Lua scripts.
----@return nil No value is returned.
 function LSet:clear() end
 
 --- Check whether a string is in the set.
@@ -16253,7 +16243,7 @@ function LSet:len() end
 function LSet:remove(key) end
 
 --- Return all set items as an array table.
----@return table Array of string values.
+---@return string[] String values.
 function LSet:toArray() end
 
 --- Return a new set containing all items from both this set and another.
@@ -16268,11 +16258,9 @@ LSimpleState = {}
 --- Register a named state with optional enter, exit, and update callbacks.
 ---@param name string Unique state identifier.
 ---@param callbacks? table Table with optional fields: `enter` (function), `exit` (function), `update` (function receiving dt).
----@return nil No return value.
 function LSimpleState:addState(name, callbacks) end
 
 --- Remove all states and their callbacks, resetting the state machine.
----@return nil No value is returned.
 function LSimpleState:clearAll() end
 
 --- Return the name of the currently active state, or nil if no state is set.
@@ -16280,7 +16268,7 @@ function LSimpleState:clearAll() end
 function LSimpleState:getCurrent() end
 
 --- Return an array of all registered state names.
----@return table Array of state name strings.
+---@return string[] State name strings.
 function LSimpleState:getStates() end
 
 --- Check whether a state with the given name is registered.
@@ -16295,7 +16283,6 @@ function LSimpleState:transitionTo(name) end
 
 --- Call the current state's update callback with the frame delta time.
 ---@param dt number Delta time in seconds since last frame.
----@return nil No value is returned.
 function LSimpleState:update(dt) end
 
 --- Lua-facing LIFO stack with optional capacity limit. Supports push/pop from both ends.
@@ -16303,12 +16290,11 @@ function LSimpleState:update(dt) end
 LStack = {}
 
 --- Remove all items from the stack. This method is available to Lua scripts.
----@return nil No value is returned.
 function LStack:clear() end
 
 --- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 ---@param index number 1-based insertion position.
----@param value boolean|number|string|table The value to insert.
+---@param value string The value to insert.
 ---@return boolean True if inserted, false if full.
 function LStack:insertAt(index, value) end
 
@@ -16331,48 +16317,54 @@ function LStack:len() end
 function LStack:moveWithin(from, to) end
 
 --- Return the top value without removing it. Returns nil if empty.
----@return boolean number|string|table|nil | The top value, or nil.
+---@return string a The top value.
+---@return nil b When not available.
 function LStack:peek() end
 
 --- Return the value at a 1-based index without removing it. Returns nil if out of range.
 ---@param index number 1-based position in the stack.
----@return boolean number|string|table|nil | The value at that position, or nil.
+---@return string a The value at that position.
+---@return nil b When not available.
 function LStack:peekAt(index) end
 
 --- Return the bottom value without removing it. Returns nil if empty.
----@return boolean number|string|table|nil | The bottom value, or nil.
+---@return string a The bottom value.
+---@return nil b When not available.
 function LStack:peekBottom() end
 
 --- Remove and return the top value. Returns nil if the stack is empty.
----@return boolean number|string|table|nil | The popped value, or nil.
+---@return string a The popped value.
+---@return nil b When not available.
 function LStack:pop() end
 
 --- Remove and return the bottom value. Returns nil if empty.
----@return boolean number|string|table|nil | The popped value, or nil.
+---@return string a The popped value.
+---@return nil b When not available.
 function LStack:popBottom() end
 
 --- Pop up to `count` values from the top and return them as an array table.
 ---@param count number Maximum number of items to pop.
----@return table Array of popped values (may be shorter than count).
+---@return number[] Popped values (may be shorter than count).
 function LStack:popMany(count) end
 
 --- Push a value onto the top of the stack. Returns false if the stack is at capacity.
----@param value any The value to push.
+---@param value string The value to push.
 ---@return boolean True if pushed, false if full.
 function LStack:push(value) end
 
 --- Push a value onto the bottom of the stack. Returns false if at capacity.
----@param value any The value to insert at the bottom.
+---@param value string The value to insert at the bottom.
 ---@return boolean True if pushed, false if full.
 function LStack:pushBottom(value) end
 
 --- Remove and return the value at a 1-based index. Returns nil if out of range.
 ---@param index number 1-based position to remove.
----@return boolean number|string|table|nil | The removed value, or nil.
+---@return string a The removed value.
+---@return nil b When not available.
 function LStack:removeAt(index) end
 
 --- Return all stack items as an array table (bottom to top).
----@return table Array of all values.
+---@return number[] Array of all values.
 function LStack:toArray() end
 
 --- Lua-facing strategy pattern allowing hot-swappable algorithm implementations by name.
@@ -16380,12 +16372,12 @@ function LStack:toArray() end
 LStrategy = {}
 
 --- Remove all strategies and reset the selection.
----@return nil No value is returned.
 function LStrategy:clear() end
 
 --- Execute the currently active strategy, passing through all arguments and returning its results.
----@param ... boolean|number|string|table|nil Arguments forwarded to the active strategy function.
----@return boolean number|string|table|nil | Return values from the strategy function.
+---@param ... table Arguments forwarded to the active strategy function.
+---@return table a Return value from the strategy function.
+---@return nil b When not available.
 function LStrategy:execute(...) end
 
 --- Return the name of the currently active strategy, or nil if none set.
@@ -16398,13 +16390,12 @@ function LStrategy:getCurrent() end
 function LStrategy:has(name) end
 
 --- Return an array of all registered strategy names.
----@return table Array of strategy name strings.
+---@return string[] Strategy name strings.
 function LStrategy:names() end
 
 --- Register a named strategy implementation function.
 ---@param name string Strategy identifier.
 ---@param callback function The implementation function to call when this strategy is active.
----@return nil No return value.
 function LStrategy:register(name, callback) end
 
 --- Remove a named strategy. If it was the active strategy, no strategy will be selected.
@@ -16431,16 +16422,13 @@ function LThrottle:getProgress() end
 
 --- Set the callback function to invoke each time the throttle fires.
 ---@param f function The callback to execute on fire.
----@return nil No value is returned.
 function LThrottle:onFire(f) end
 
 --- Reset the throttle timer back to zero without firing.
----@return nil No value is returned.
 function LThrottle:reset() end
 
 --- Enable or disable the throttle. When disabled, update() will not accumulate time.
 ---@param enabled boolean True to enable, false to disable.
----@return nil No value is returned.
 function LThrottle:setEnabled(enabled) end
 
 --- Advance the throttle timer. If the interval has elapsed, fires the callback and returns true.
@@ -16454,13 +16442,12 @@ LWeightedRandom = {}
 
 --- Add an item with a relative weight. Higher weight = higher selection probability.
 ---@param weight number The selection weight (must be > 0).
----@param value boolean|number|string|table The payload value returned on pick.
+---@param value string The payload value returned on pick.
 ---@param label? string Optional human-readable label.
 ---@return number The internal ID of the added entry.
 function LWeightedRandom:add(weight, value, label) end
 
 --- Remove all entries from the pool. This method is available to Lua scripts.
----@return nil No value is returned.
 function LWeightedRandom:clearAll() end
 
 --- Return the revision counter. Increments on any add/remove/weight change.
@@ -16477,13 +16464,14 @@ function LWeightedRandom:len() end
 
 --- Pick one item using a random sample value in [0, 1). Returns its value or nil.
 ---@param sample number A random number in [0, 1) range.
----@return boolean number|string|table|nil | The selected item's value, or nil if pool is empty.
+---@return string a The selected item's value.
+---@return nil b If pool is empty.
 function LWeightedRandom:pick(sample) end
 
 --- Pick multiple unique items. Requires an array of random samples.
 ---@param count number Number of items to pick.
 ---@param samples table Array of random numbers in [0, 1).
----@return table Array of picked values.
+---@return number[] Array of picked values.
 function LWeightedRandom:pickN(count, samples) end
 
 --- Remove an item by its ID. Returns true if it existed.
@@ -16627,13 +16615,11 @@ LBody = {}
 
 --- Applies an instantaneous angular impulse (spin) to the body.
 ---@param impulse number Angular impulse value.
----@return nil No value is returned.
 function LBody:applyAngularImpulse(impulse) end
 
 --- Applies a continuous force to the body's center of mass (accumulates over the step).
 ---@param fx number Force X component.
 ---@param fy number Force Y component.
----@return nil No value is returned.
 function LBody:applyForce(fx, fy) end
 
 --- Applies a force at a specific world point, generating both linear and angular acceleration.
@@ -16641,22 +16627,18 @@ function LBody:applyForce(fx, fy) end
 ---@param fy number Force Y component.
 ---@param px number Application point X in world coordinates.
 ---@param py number Application point Y in world coordinates.
----@return nil No return value.
 function LBody:applyForceAtPoint(fx, fy, px, py) end
 
 --- Applies an instantaneous linear impulse to the body's center of mass.
 ---@param ix number Impulse X component.
 ---@param iy number Impulse Y component.
----@return nil No value is returned.
 function LBody:applyImpulse(ix, iy) end
 
 --- Applies a rotational torque to the body.
 ---@param torque number Torque value (positive = counter-clockwise).
----@return nil No value is returned.
 function LBody:applyTorque(torque) end
 
 --- Destroys this body, removing it from the world along with all fixtures and joints.
----@return nil No value is returned.
 function LBody:destroy() end
 
 --- Returns the body's rotation angle in radians.
@@ -16751,88 +16733,71 @@ function LBody:isSleepingAllowed() end
 
 --- Sets the body's rotation angle directly.
 ---@param angle number New angle in radians.
----@return nil No value is returned.
 function LBody:setAngle(angle) end
 
 --- Sets the angular damping factor (higher = rotation decays faster).
 ---@param damping number Angular damping value.
----@return nil No value is returned.
 function LBody:setAngularDamping(damping) end
 
 --- Sets the body's angular velocity directly.
 ---@param omega number Angular velocity in radians per second.
----@return nil No value is returned.
 function LBody:setAngularVelocity(omega) end
 
 --- Enables or disables continuous collision detection to prevent fast-moving tunneling.
 ---@param bullet boolean True to enable CCD.
----@return nil No value is returned.
 function LBody:setBullet(bullet) end
 
 --- Locks or unlocks the body's rotation. Useful for player characters.
 ---@param fixed boolean True to prevent rotation.
----@return nil No value is returned.
 function LBody:setFixedRotation(fixed) end
 
 --- Sets the body's friction coefficient.
 ---@param friction number New friction value (0 = ice, 1 = rubber).
----@return nil No value is returned.
 function LBody:setFriction(friction) end
 
 --- Sets a per-body gravity scale multiplier (0 = no gravity, 2 = double gravity, -1 = inverted).
 ---@param scale number Gravity scale factor.
----@return nil No value is returned.
 function LBody:setGravityScale(scale) end
 
 --- Sets the body's collision layer bitmask (which layers this body belongs to).
 ---@param layer number Layer bitmask.
----@return nil No value is returned.
 function LBody:setLayer(layer) end
 
 --- Sets the linear damping factor (higher = more velocity decay per step).
 ---@param damping number Damping value (0 = no damping).
----@return nil No value is returned.
 function LBody:setLinearDamping(damping) end
 
 --- Sets the body's collision mask (which layers this body can collide with).
 ---@param mask number Collision mask bitmask.
----@return nil No value is returned.
 function LBody:setMask(mask) end
 
 --- Overrides the body's mass directly.
 ---@param mass number New mass value.
----@return nil No value is returned.
 function LBody:setMass(mass) end
 
 --- Teleports the body to a new world-space position (does not apply physics forces).
 ---@param x number New X position.
 ---@param y number New Y position.
----@return nil No value is returned.
 function LBody:setPosition(x, y) end
 
 --- Sets the body's restitution (bounciness) value.
 ---@param restitution number New restitution (0–1).
----@return nil No value is returned.
 function LBody:setRestitution(restitution) end
 
 --- Controls whether the body can enter sleep state. Disable for bodies that must stay active.
 ---@param allowed boolean True to allow sleeping.
----@return nil No value is returned.
 function LBody:setSleepingAllowed(allowed) end
 
 --- Changes the body's type at runtime.
 ---@param bodyType string New type: "static", "dynamic", "kinematic", or "sensor".
----@return nil No value is returned.
 function LBody:setType(bodyType) end
 
 --- Directly sets the body's linear velocity.
 ---@param vx number Velocity X component.
 ---@param vy number Velocity Y component.
----@return nil No value is returned.
 function LBody:setVelocity(vx, vy) end
 
 --- Forces the body into sleep state, pausing its simulation until disturbed.
----@return nil No value is returned.
 function LBody:sleep() end
 
 --- Returns the type name of this object ("LBody").
@@ -16845,7 +16810,6 @@ function LBody:type() end
 function LBody:typeOf(name) end
 
 --- Wakes the body from sleep, making it active in the simulation again.
----@return nil No value is returned.
 function LBody:wakeUp() end
 
 --- A cellular automaton simulation grid (sand, water, fire, gas, rock) for particle-like physics effects.
@@ -16862,7 +16826,6 @@ function LCellular:countCells(cellType) end
 ---@param cy number Center cell row.
 ---@param r number Radius in cells.
 ---@param cellType number Material type constant.
----@return nil No return value.
 function LCellular:fillCircle(cx, cy, r, cellType) end
 
 --- Fills a rectangular region of cells with a material type.
@@ -16871,12 +16834,15 @@ function LCellular:fillCircle(cx, cy, r, cellType) end
 ---@param cw number Width in cells.
 ---@param ch number Height in cells.
 ---@param cellType number Material type constant.
----@return nil No return value.
 function LCellular:fillRect(cx0, cy0, cw, ch, cellType) end
+
+---@class LCellularFindCellsResult
+---@field x number X.
+---@field y number Y.
 
 --- Returns positions of all cells matching a material type.
 ---@param cellType number Material type constant to find.
----@return table Array of {x, y} tables with cell coordinates.
+---@return LCellularFindCellsResult Array of {x, y} tables with cell coordinates.
 function LCellular:findCells(cellType) end
 
 --- Returns the material type of a cell at the given grid position.
@@ -16894,16 +16860,13 @@ function LCellular:loadFromBytes(data) end
 ---@param cx number Cell column (0-based).
 ---@param cy number Cell row (0-based).
 ---@param cellType number Material type constant (CELL_AIR, CELL_SAND, etc.).
----@return nil No value is returned.
 function LCellular:setCell(cx, cy, cellType) end
 
 --- Advances the cellular simulation by one tick (particles fall, flow, burn, etc.).
----@return nil No value is returned.
 function LCellular:step() end
 
 --- Advances the cellular simulation by N ticks in a single call.
 ---@param n number Number of simulation ticks to run.
----@return nil No value is returned.
 function LCellular:stepN(n) end
 
 --- Serializes the cellular grid to a compact binary format for saving.
@@ -16936,7 +16899,6 @@ function LCellular:typeOf(name) end
 LPhysicsShape = {}
 
 --- No-op placeholder for API consistency. Shapes are freed when no longer referenced.
----@return nil No value is returned.
 function LPhysicsShape:destroy() end
 
 --- Returns the axis-aligned bounding box of the shape in local coordinates.
@@ -16956,22 +16918,18 @@ function LPhysicsShape:getType() end
 
 --- Sets the density used when this shape is attached to a body (affects mass calculation).
 ---@param density number Mass density.
----@return nil No value is returned.
 function LPhysicsShape:setDensity(density) end
 
 --- Sets the friction coefficient for this shape.
 ---@param friction number Friction (0 = ice, 1 = rubber).
----@return nil No value is returned.
 function LPhysicsShape:setFriction(friction) end
 
 --- Sets the restitution (bounciness) for this shape.
 ---@param restitution number Restitution (0\u20131).
----@return nil No value is returned.
 function LPhysicsShape:setRestitution(restitution) end
 
 --- Marks this shape as a sensor (overlap detection only, no physical response).
 ---@param sensor boolean True for sensor mode.
----@return nil No value is returned.
 function LPhysicsShape:setSensor(sensor) end
 
 --- Returns the type name of this object ("LPhysicsShape").
@@ -16993,7 +16951,6 @@ function LTerrain:collapseColumns() end
 
 --- Sets all terrain cells to either solid or empty.
 ---@param solid boolean True to fill everything solid, false to clear.
----@return nil No value is returned.
 function LTerrain:fillAll(solid) end
 
 --- Fills or clears a circular region of terrain cells.
@@ -17001,7 +16958,6 @@ function LTerrain:fillAll(solid) end
 ---@param wy number Circle center Y in world coordinates.
 ---@param radius number Circle radius in world units.
 ---@param solid boolean True to fill solid, false to carve empty.
----@return nil No return value.
 function LTerrain:fillCircle(wx, wy, radius, solid) end
 
 --- Fills or clears a rectangular region of terrain cells.
@@ -17010,11 +16966,9 @@ function LTerrain:fillCircle(wx, wy, radius, solid) end
 ---@param w number Rectangle width.
 ---@param h number Rectangle height.
 ---@param solid boolean True to fill solid, false to carve empty.
----@return nil No return value.
 function LTerrain:fillRect(wx, wy, w, h, solid) end
 
 --- Regenerates physics colliders from the current terrain grid state. Call after modifying cells.
----@return nil No value is returned.
 function LTerrain:flush() end
 
 --- Returns whether a cell is solid. This method is available to Lua scripts.
@@ -17036,18 +16990,21 @@ function LTerrain:loadFromBytes(data) end
 ---@param cx number Cell column (0-based).
 ---@param cy number Cell row (0-based).
 ---@param solid boolean True for solid, false for empty.
----@return nil No value is returned.
 function LTerrain:setCell(cx, cy, solid) end
 
+---@class LTerrainSolidPositionsResult
+---@field x number Cell x coordinate.
+---@field y number Cell y coordinate.
+
 --- Returns all solid cell positions as a table of {x, y} entries.
----@return table Array of tables with x and y fields (cell coordinates).
+---@return LTerrainSolidPositionsResult Array of tables with x and y fields (cell coordinates).
 function LTerrain:solidPositions() end
 
 --- Spawns small dynamic debris bodies at the given positions (for destruction effects).
 ---@param positions table Array of {x, y} tables in world coordinates.
 ---@param mass number Mass of each debris body.
 ---@param restitution number Bounciness of debris bodies.
----@return table Array of body IDs for the spawned debris.
+---@return number[] Array of body IDs for the spawned debris.
 function LTerrain:spawnDebris(positions, mass, restitution) end
 
 --- Serializes the terrain grid to a compact binary format for saving.
@@ -17196,35 +17153,28 @@ function LWorld:addWheelJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
 function LWorld:addZone(x, y, w, h) end
 
 --- Removes all bodies and joints from the world, resetting it to an empty state.
----@return nil No value is returned.
 function LWorld:clear() end
 
 --- Removes the begin-contact callback so it is no longer called.
----@return nil No value is returned.
 function LWorld:clearBeginContact() end
 
 --- Removes and releases the Lua data attached to a body.
 ---@param id number The body ID.
----@return nil No value is returned.
 function LWorld:clearBodyData(id) end
 
 --- Removes the one-way platform behavior from a body, making it block from all directions.
 ---@param id number The body ID.
----@return nil No value is returned.
 function LWorld:clearBodyOneWay(id) end
 
 --- Removes the end-contact callback so it is no longer called.
----@return nil No value is returned.
 function LWorld:clearEndContact() end
 
 --- Removes a body from the world by its ID, along with all attached fixtures and joints.
 ---@param id number The body ID to destroy.
----@return nil No value is returned.
 function LWorld:destroyBody(id) end
 
 --- Removes a joint from the world, disconnecting the two bodies it linked.
 ---@param jointId number The joint ID to destroy.
----@return nil No value is returned.
 function LWorld:destroyJoint(jointId) end
 
 --- Renders a debug visualization of all physics bodies onto a software ImageData target.
@@ -17233,7 +17183,6 @@ function LWorld:destroyJoint(jointId) end
 ---@param g? number Green channel (0-255, default 255).
 ---@param b? number Blue channel (0-255, default 0).
 ---@param a? number Alpha channel (0-255, default 255).
----@return nil No return value.
 function LWorld:drawDebug(target, r, g, b, a) end
 
 --- Returns how many fixtures (colliders) are attached to a body.
@@ -17241,8 +17190,12 @@ function LWorld:drawDebug(target, r, g, b, a) end
 ---@return number Number of attached fixtures.
 function LWorld:fixtureCount(bodyId) end
 
+---@class LWorldGetBeginContactEventsResult
+---@field bodyA number BodyA.
+---@field bodyB number BodyB.
+
 --- Returns contact-begin events from the last step (pairs of bodies that started touching).
----@return table Array of {bodyA, bodyB} tables.
+---@return LWorldGetBeginContactEventsResult Array of {bodyA, bodyB} tables.
 function LWorld:getBeginContactEvents() end
 
 --- Returns the body ID at a specific world point, or nil if no body is there.
@@ -17256,9 +17209,16 @@ function LWorld:getBodyAtPoint(x, y) end
 ---@return boolean True if CCD is enabled.
 function LWorld:getBodyCCD(id) end
 
+---@class LWorldGetBodyContactsResult
+---@field bodyA number BodyA.
+---@field bodyB number BodyB.
+---@field normalX number NormalX.
+---@field normalY number NormalY.
+---@field isTouching boolean IsTouching.
+
 --- Returns all contacts involving a specific body.
 ---@param bodyId number The body to query contacts for.
----@return table Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
+---@return LWorldGetBodyContactsResult Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
 function LWorld:getBodyContacts(bodyId) end
 
 --- Returns the total number of active bodies in the world.
@@ -17267,11 +17227,11 @@ function LWorld:getBodyCount() end
 
 --- Retrieves the Lua data previously attached to a body, or nil if none was set.
 ---@param id number The body ID.
----@return any The stored value, or nil.
+---@return table The stored value, or nil if none was set.
 function LWorld:getBodyData(id) end
 
 --- Returns a sequential table of all body IDs currently in the world.
----@return table Array of body ID numbers.
+---@return number[] Body ID numbers.
 function LWorld:getBodyIds() end
 
 --- Returns the one-way platform normal for a body, or nil,nil if not set.
@@ -17285,16 +17245,31 @@ function LWorld:getBodyOneWay(id) end
 ---@return string Body type: "static", "dynamic", "kinematic", or "sensor".
 function LWorld:getBodyType(id) end
 
+---@class LWorldGetCollisionEventsResult
+---@field bodyA number Body A id.
+---@field bodyB number Body B id.
+
 --- Returns all collision events from the last step as a table of {bodyA, bodyB} pairs.
----@return table Array of collision event tables.
+---@return LWorldGetCollisionEventsResult Array of collision event tables.
 function LWorld:getCollisionEvents() end
 
+---@class LWorldGetContactsResult
+---@field bodyA number BodyA.
+---@field bodyB number BodyB.
+---@field normalX number NormalX.
+---@field normalY number NormalY.
+---@field isTouching boolean IsTouching.
+
 --- Returns all currently active contact manifolds with normals and touching state.
----@return table Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
+---@return LWorldGetContactsResult Array of {bodyA, bodyB, normalX, normalY, isTouching} tables.
 function LWorld:getContacts() end
 
+---@class LWorldGetEndContactEventsResult
+---@field bodyA number BodyA.
+---@field bodyB number BodyB.
+
 --- Returns contact-end events from the last step (pairs of bodies that stopped touching).
----@return table Array of {bodyA, bodyB} tables.
+---@return LWorldGetEndContactEventsResult Array of {bodyA, bodyB} tables.
 function LWorld:getEndContactEvents() end
 
 --- Returns the current world gravity vector.
@@ -17314,7 +17289,7 @@ function LWorld:getJointBodies(jointId) end
 function LWorld:getJointBreakForce(jointId) end
 
 --- Returns a sequential table of all joint IDs currently in the world.
----@return table Array of joint ID numbers.
+---@return number[] Joint ID numbers.
 function LWorld:getJointIds() end
 
 --- Returns the lower and upper limit values for a joint.
@@ -17341,8 +17316,13 @@ function LWorld:getMeter() end
 ---@return number Iteration count.
 function LWorld:getSolverIterations() end
 
+---@class LWorldGetZoneEventsResult
+---@field zone_id number Zone_id.
+---@field body_id number Body_id.
+---@field kind string Kind.
+
 --- Returns all zone enter/leave events from the last step.
----@return table Array of {zone_id, body_id, kind} tables where kind is "enter" or "leave".
+---@return LWorldGetZoneEventsResult Array of {zone_id, body_id, kind} tables where kind is "enter" or "leave".
 function LWorld:getZoneEvents() end
 
 --- Returns whether a body is currently in the sleeping (inactive) state.
@@ -17356,7 +17336,7 @@ function LWorld:jointCount() end
 
 --- Batch-creates multiple bodies at once for better performance. Each entry is {x, y, type}.
 ---@param specs table Array of tables: {{x, y, "dynamic"}, {x, y, "static"}, ...}.
----@return table Array of body ID numbers in creation order.
+---@return number[] Body ID numbers in creation order.
 function LWorld:newBodies(specs) end
 
 --- Creates a new physics body at the given position with the specified type.
@@ -17407,16 +17387,32 @@ function LWorld:newPolygonBody(x, y, vertices, bodyType) end
 ---@param y number Query rectangle top Y.
 ---@param w number Query rectangle width.
 ---@param h number Query rectangle height.
----@return table Array of body ID numbers found in the region.
+---@return number[] Body ID numbers found in the region.
 function LWorld:queryAABB(x, y, w, h) end
+
+---@class LWorldRaycastResult
+---@field bodyId number BodyId.
+---@field x number X.
+---@field y number Y.
+---@field normalX number NormalX.
+---@field normalY number NormalY.
+---@field toi number Toi.
 
 --- Casts a ray from point (x1,y1) to (x2,y2) and returns the first body hit, or nil.
 ---@param x1 number Ray origin X.
 ---@param y1 number Ray origin Y.
 ---@param x2 number Ray end X.
 ---@param y2 number Ray end Y.
----@return table Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
+---@return LWorldRaycastResult Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
 function LWorld:raycast(x1, y1, x2, y2) end
+
+---@class LWorldRaycastAllResult
+---@field bodyId number BodyId.
+---@field x number X.
+---@field y number Y.
+---@field normalX number NormalX.
+---@field normalY number NormalY.
+---@field toi number Toi.
 
 --- Casts a directional ray and returns all bodies hit within max distance as a table of results.
 ---@param x number Ray origin X.
@@ -17424,8 +17420,16 @@ function LWorld:raycast(x1, y1, x2, y2) end
 ---@param dx number Ray direction X.
 ---@param dy number Ray direction Y.
 ---@param maxDist number Maximum ray travel distance.
----@return table Array of hit tables {bodyId, x, y, normalX, normalY, toi}.
+---@return LWorldRaycastAllResult Array of hit tables {bodyId, x, y, normalX, normalY, toi}.
 function LWorld:raycastAll(x, y, dx, dy, maxDist) end
+
+---@class LWorldRaycastClosestResult
+---@field bodyId number BodyId.
+---@field x number X.
+---@field y number Y.
+---@field normalX number NormalX.
+---@field normalY number NormalY.
+---@field toi number Toi.
 
 --- Casts a directional ray from a point and returns the closest hit within max distance.
 ---@param x number Ray origin X.
@@ -17433,121 +17437,102 @@ function LWorld:raycastAll(x, y, dx, dy, maxDist) end
 ---@param dx number Ray direction X (does not need to be normalized).
 ---@param dy number Ray direction Y.
 ---@param maxDist number Maximum ray travel distance.
----@return table Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
+---@return LWorldRaycastClosestResult Hit info {bodyId, x, y, normalX, normalY, toi} or nil if no hit.
 function LWorld:raycastClosest(x, y, dx, dy, maxDist) end
 
 --- Registers a callback function invoked whenever two bodies begin touching.
 ---@param callback function Called with (bodyIdA, bodyIdB) on each new contact.
----@return nil No value is returned.
 function LWorld:setBeginContact(callback) end
 
 --- Enables or disables continuous collision detection (bullet mode) on a body to prevent tunneling.
 ---@param id number The body ID.
 ---@param enabled boolean True to enable CCD.
----@return nil No value is returned.
 function LWorld:setBodyCCD(id, enabled) end
 
 --- Attaches arbitrary Lua data to a body ID for later retrieval (e.g. entity reference, tag).
 ---@param id number The body ID.
----@param value any Any Lua value to associate with this body.
----@return nil No return value.
+---@param value table Lua value to associate with this body (table, number, string, etc.).
 function LWorld:setBodyData(id, value) end
 
 --- Marks a body as a one-way platform: other bodies can pass through from the opposite side of the normal.
 ---@param id number The body ID.
 ---@param nx number One-way normal X (points toward the blocking side).
 ---@param ny number One-way normal Y.
----@return nil No return value.
 function LWorld:setBodyOneWay(id, nx, ny) end
 
 --- Changes the type of an existing body (e.g. from "dynamic" to "static").
 ---@param id number The body ID.
 ---@param bodyType string New type: "static", "dynamic", "kinematic", or "sensor".
----@return nil No value is returned.
 function LWorld:setBodyType(id, bodyType) end
 
 --- Registers a callback function invoked whenever two bodies stop touching.
 ---@param callback function Called with (bodyIdA, bodyIdB) on each ended contact.
----@return nil No value is returned.
 function LWorld:setEndContact(callback) end
 
 --- Updates the friction coefficient of a specific fixture on a body.
 ---@param bodyId number The body ID.
 ---@param fixtureIndex number Zero-based fixture index on the body.
 ---@param friction number New friction value (0–1 typical range).
----@return nil No return value.
 function LWorld:setFixtureFriction(bodyId, fixtureIndex, friction) end
 
 --- Updates the restitution (bounciness) of a specific fixture on a body.
 ---@param bodyId number The body ID.
 ---@param fixtureIndex number Zero-based fixture index on the body.
 ---@param restitution number New restitution value (0 = no bounce, 1 = full bounce).
----@return nil No return value.
 function LWorld:setFixtureRestitution(bodyId, fixtureIndex, restitution) end
 
 --- Toggles whether a fixture acts as a sensor (overlap detection only, no physical response).
 ---@param bodyId number The body ID.
 ---@param fixtureIndex number Zero-based fixture index on the body.
 ---@param sensor boolean True to make it a sensor, false for solid collision.
----@return nil No return value.
 function LWorld:setFixtureSensor(bodyId, fixtureIndex, sensor) end
 
 --- Sets the world gravity vector. Affects all dynamic bodies.
 ---@param gx number Horizontal gravity component.
 ---@param gy number Vertical gravity component (positive = down in screen space).
----@return nil No value is returned.
 function LWorld:setGravity(gx, gy) end
 
 --- Sets the maximum force a joint can withstand before it breaks and is automatically destroyed.
 ---@param jointId number The joint ID.
 ---@param force number Break threshold force (use math.huge for unbreakable).
----@return nil No value is returned.
 function LWorld:setJointBreakForce(jointId, force) end
 
 --- Sets the lower and upper bounds for a joint's limited range of motion.
 ---@param jointId number The joint ID.
 ---@param lower number Lower limit (radians or meters depending on joint type).
 ---@param upper number Upper limit.
----@return nil No return value.
 function LWorld:setJointLimits(jointId, lower, upper) end
 
 --- Enables or disables angular/linear limits on a joint.
 ---@param jointId number The joint ID.
 ---@param enabled boolean True to enforce limits, false to allow free movement.
----@return nil No return value.
 function LWorld:setJointLimitsEnabled(jointId, enabled) end
 
 --- Sets the motor speed on a motorized joint (revolute or prismatic).
 ---@param jointId number The joint ID.
 ---@param speed number Desired motor speed (radians/sec for revolute, meters/sec for prismatic).
----@return nil No return value.
 function LWorld:setJointMotorSpeed(jointId, speed) end
 
 --- Sets the pixels-per-meter scale used to convert between pixel coordinates and physics units.
 ---@param ppm number Pixels per meter (e.g. 64 means 64 px = 1 meter in physics).
----@return nil No value is returned.
 function LWorld:setMeter(ppm) end
 
 --- Moves the target position of a mouse joint, causing the attached body to follow.
 ---@param jointId number The mouse joint ID.
 ---@param x number New target X in world coordinates.
 ---@param y number New target Y in world coordinates.
----@return nil No return value.
 function LWorld:setMouseJointTarget(jointId, x, y) end
 
 --- Sets the number of velocity solver iterations. Higher values improve stability at the cost of performance.
 ---@param n number Number of iterations (default is typically 4–8).
----@return nil No value is returned.
 function LWorld:setSolverIterations(n) end
 
 --- Forces a body into the sleeping state, pausing its simulation until disturbed.
 ---@param id number The body ID.
----@return nil No value is returned.
 function LWorld:sleepBody(id) end
 
 --- Advances the physics simulation by a time delta and fires any registered contact callbacks.
 ---@param dt number Time step in seconds (e.g. 1/60 for 60 FPS).
----@return nil No value is returned.
 function LWorld:step(dt) end
 
 --- Performs fixed-timestep physics stepping, consuming accumulated time. Returns the leftover time.
@@ -17578,7 +17563,6 @@ function LWorld:typeOf(name) end
 
 --- Forces a sleeping body to wake up and participate in simulation again.
 ---@param id number The body ID.
----@return nil No value is returned.
 function LWorld:wakeUpBody(id) end
 
 --- A physics zone that applies area-based effects (gravity overrides, damping) to bodies within its bounds.
@@ -17586,7 +17570,6 @@ function LWorld:wakeUpBody(id) end
 LZone = {}
 
 --- Removes this zone from the world. Bodies will no longer be affected by it.
----@return nil No value is returned.
 function LZone:destroy() end
 
 --- Returns the unique ID of this zone. This method is available to Lua scripts.
@@ -17595,58 +17578,48 @@ function LZone:getId() end
 
 --- Overrides the angular damping of bodies inside this zone, or nil to use each body's own value.
 ---@param value? number Damping override, or nil to clear.
----@return nil No return value.
 function LZone:setAngularDampingOverride(value) end
 
 --- Changes this zone's shape to a circle (overrides the initial rectangle).
 ---@param cx number Center X.
 ---@param cy number Center Y.
 ---@param radius number Circle radius.
----@return nil No value is returned.
 function LZone:setCircle(cx, cy, radius) end
 
 --- Enables or disables this zone. Disabled zones have no effect on bodies.
 ---@param enabled boolean True to enable, false to disable.
----@return nil No value is returned.
 function LZone:setEnabled(enabled) end
 
 --- Sets the zone to apply a constant directional gravity to bodies inside.
 ---@param gx number Gravity X component.
 ---@param gy number Gravity Y component.
----@return nil No value is returned.
 function LZone:setGravityDirectional(gx, gy) end
 
 --- Sets the zone to attract bodies toward a center point with a given strength.
 ---@param cx number Attractor center X.
 ---@param cy number Attractor center Y.
 ---@param strength number Pull force magnitude.
----@return nil No return value.
 function LZone:setGravityPoint(cx, cy, strength) end
 
 --- Sets the zone to push bodies away from a center point with a given strength.
 ---@param cx number Repulsor center X.
 ---@param cy number Repulsor center Y.
 ---@param strength number Push force magnitude.
----@return nil No return value.
 function LZone:setGravityRepulsor(cx, cy, strength) end
 
 --- Sets the zone to cancel all gravity for bodies inside (zero-G area).
----@return nil No value is returned.
 function LZone:setGravityZero() end
 
 --- Sets a bitmask controlling which body layers this zone affects.
 ---@param mask number Layer bitmask (bitwise AND with body layer must be nonzero).
----@return nil No value is returned.
 function LZone:setLayerMask(mask) end
 
 --- Overrides the linear damping of bodies inside this zone, or nil to use each body's own value.
 ---@param value? number Damping override, or nil to clear.
----@return nil No value is returned.
 function LZone:setLinearDampingOverride(value) end
 
 --- Sets the priority of this zone. Higher-priority zones take precedence when overlapping.
 ---@param priority number Integer priority value.
----@return nil No value is returned.
 function LZone:setPriority(priority) end
 
 --- Returns the type name of this object ("LZone").
@@ -17661,23 +17634,19 @@ function LZone:typeOf(name) end
 --- Attaches a previously created shape to a body, using the shape's stored material properties.
 ---@param body LBody The target body.
 ---@param shape LPhysicsShape The shape to attach.
----@return nil No return value.
 lurek.physics.attachShape = function(body, shape) end
 
 --- Enables or disables automatic physics debug overlay rendering for the next frame.
 ---@param enable boolean True to show debug shapes.
----@return nil No return value.
 lurek.physics.debugDraw = function(enable) end
 
 --- No-op placeholder for API parity. Worlds are freed when no longer referenced.
 ---@param world LWorld The world to destroy.
----@return nil No return value.
 lurek.physics.destroyWorld = function(world) end
 
 --- Queues a GPU-rendered physics debug visualization using the world's current body state.
 ---@param world LWorld The world to visualize.
 ---@param config? table Optional config: {bodyColor, staticColor, sleepColor, sensorColor, lineWidth}.
----@return nil No return value.
 lurek.physics.drawDebugGpu = function(world, config) end
 
 --- Returns position and velocity of a body (free-function variant for quick queries).
@@ -17689,9 +17658,13 @@ lurek.physics.drawDebugGpu = function(world, config) end
 ---@return number d Velocity Y.
 lurek.physics.getBody = function(world, body) end
 
+---@class PhysicsGetCollisionsResult
+---@field body_a number Body A id.
+---@field body_b number Body B id.
+
 --- Returns all collision events from the last world step as {body_a, body_b} pairs.
 ---@param world LWorld The world to query.
----@return table Array of collision event tables.
+---@return PhysicsGetCollisionsResult Array of collision event tables.
 lurek.physics.getCollisions = function(world) end
 
 --- Checks if sleeping is allowed on a body (free-function variant).
@@ -17763,20 +17736,17 @@ lurek.physics.newWorld = function(gx, gy) end
 ---@param body LBody The body.
 ---@param vx number Velocity X.
 ---@param vy number Velocity Y.
----@return nil No return value.
 lurek.physics.setBodyVelocity = function(world, body, vx, vy) end
 
 --- Sets whether a body is allowed to sleep (free-function variant).
 ---@param world LWorld The world.
 ---@param body LBody The body.
 ---@param allowed boolean True to allow sleeping.
----@return nil No return value.
 lurek.physics.setSleepingAllowed = function(world, body, allowed) end
 
 --- Steps a physics world forward by dt seconds (free-function variant).
 ---@param world LWorld The world to step.
 ---@param dt number Time step in seconds.
----@return nil No return value.
 lurek.physics.step = function(world, dt) end
 
 --- Tests whether two axis-aligned bounding boxes overlap. Lightweight collision check without physics world.
@@ -17855,15 +17825,12 @@ function LPipeline:addStep(step) end
 ---@param subPipeline LPipeline The pipeline whose steps will be merged in.
 ---@param alias string A prefix applied to all merged step names to avoid collisions.
 ---@param deps? table Optional array of step names that all merged steps depend on.
----@return nil Returns nothing.
 function LPipeline:addSubPipeline(subPipeline, alias, deps) end
 
 --- Cancels all pending and waiting steps. Steps already running or completed are unaffected.
----@return nil Returns nothing.
 function LPipeline:cancel() end
 
 --- Removes all steps from the pipeline, resetting it to an empty state.
----@return nil Returns nothing.
 function LPipeline:clear() end
 
 --- Returns the shared context table used by the current or most recent pipeline execution, or nil if none exists.
@@ -17876,7 +17843,7 @@ function LPipeline:getContext() end
 function LPipeline:getErrorMode() end
 
 --- Computes the topologically sorted execution order of all steps, respecting dependencies.
----@return table a Array of step name strings in execution order, or nil on error.
+---@return string[] a Step names in execution order, or nil on error.
 ---@return string b Error message if ordering failed (e.g., circular dependency), or nil on success.
 function LPipeline:getExecutionOrder() end
 
@@ -17885,19 +17852,26 @@ function LPipeline:getExecutionOrder() end
 function LPipeline:getName() end
 
 --- Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can run concurrently.
----@return table a Array of arrays, each inner array is a group of step names. Nil on error.
+---@return string[] a Array of arrays, each inner array is a group of step names. Nil on error.
 ---@return string b Error message if grouping failed, or nil on success.
 function LPipeline:getParallelGroups() end
 
+---@class LPipelineGetResultResult
+---@field success boolean Success flag.
+---@field completed string[] Completed step names.
+---@field failed string[] Failed step names.
+---@field skipped string[] Skipped step names.
+---@field cancelled string[] Cancelled step names.
+---@field totalDuration number Total duration in seconds.
+---@field errors table Array of error entries.
+
 --- Returns the current pipeline result summary table, or nil if no steps exist. Useful for inspecting state after run or during async execution.
----@return table a Result table with success, completed, failed, skipped, cancelled, totalDuration, errors fields.
----@return nil b If no steps exist.
+---@return LPipelineGetResultResult Result table with success, completed, failed, skipped, cancelled, totalDuration, errors fields, or nil if no steps exist.
 function LPipeline:getResult() end
 
 --- Retrieves a step object by name, or nil if no step with that name exists in this pipeline.
 ---@param name string Name of the step to find.
----@return LPipelineStep a The step object.
----@return nil b If no step with that name exists.
+---@return LPipelineStep The step object, or nil if no step with that name exists.
 function LPipeline:getStep(name) end
 
 --- Returns the total number of steps in this pipeline.
@@ -17905,12 +17879,12 @@ function LPipeline:getStep(name) end
 function LPipeline:getStepCount() end
 
 --- Returns a table containing all step objects currently in this pipeline.
----@return table Array of LPipelineStep objects.
+---@return LPipelineStep[] LPipelineStep objects.
 function LPipeline:getSteps() end
 
 --- Returns all steps that have the specified tag assigned.
 ---@param tag string The tag to filter by.
----@return table Array of matching LPipelineStep objects.
+---@return LPipelineStep[] Matching LPipelineStep objects.
 function LPipeline:getStepsByTag(tag) end
 
 --- Returns whether all steps have reached a terminal state (completed, failed, skipped, or cancelled).
@@ -17923,64 +17897,68 @@ function LPipeline:isRunning() end
 
 --- Registers a low-level event callback for all pipeline lifecycle events. Receives (eventName, stepName, status, detail).
 ---@param callback function A function receiving (eventName, stepName, status, detail).
----@return nil Returns nothing.
 function LPipeline:onEvent(callback) end
 
 --- Registers a progress callback invoked after each step finishes (regardless of outcome). Receives (stepName, statusString).
 ---@param callback function A function receiving (stepName, status).
----@return nil Returns nothing.
 function LPipeline:onProgress(callback) end
 
 --- Removes a step from the pipeline by name. Any other steps that depend on it may fail or be skipped.
 ---@param name string Name of the step to remove.
----@return nil Returns nothing.
 function LPipeline:removeStep(name) end
 
 --- Resets the pipeline and all steps back to their initial pending state, clearing context and async state.
----@return nil Returns nothing.
 function LPipeline:reset() end
+
+---@class LPipelineRunResult
+---@field success boolean Success flag.
+---@field completed string[] Completed step names.
+---@field failed string[] Failed step names.
+---@field skipped string[] Skipped step names.
+---@field cancelled string[] Cancelled step names.
+---@field totalDuration number Total duration in seconds.
+---@field errors table Array of error entries.
 
 --- Executes all pipeline steps synchronously in dependency order. Blocks until all steps complete, fail, or are cancelled.
 ---@param context? table An optional shared context table passed to every step callback. A fresh table is created if omitted.
----@return table A result table with fields: success (boolean), completed, failed, skipped, cancelled (arrays of names), totalDuration (number), errors (array of {name, msg}).
+---@return LPipelineRunResult A result table with fields: success (boolean), completed, failed, skipped, cancelled (arrays of names), totalDuration (number), errors (array of {name, msg}).
 function LPipeline:run(context) end
 
 --- Starts asynchronous (coroutine-based) execution of the pipeline. Call update(dt) each frame to advance steps.
 ---@param context? table An optional shared context table. A fresh table is created if omitted.
----@return nil Returns nothing.
 function LPipeline:runAsync(context) end
 
 --- Sets how the pipeline handles step failures. "abort" stops on first failure; "continue" runs remaining steps.
 ---@param mode string Either "abort" or "continue".
----@return nil Returns nothing.
 function LPipeline:setErrorMode(mode) end
 
 --- Changes the name of this pipeline. This method is available to Lua scripts.
 ---@param name string New pipeline name.
----@return nil Returns nothing.
 function LPipeline:setName(name) end
 
 --- Registers a callback invoked when the entire pipeline finishes execution. Receives the result table.
 ---@param callback? function A function receiving the result table. Pass nil to remove.
----@return nil Returns nothing.
 function LPipeline:setOnComplete(callback) end
 
 --- Registers a callback invoked each time any step completes successfully. Receives (stepName, context).
 ---@param callback? function A function receiving (stepName, context). Pass nil to remove.
----@return nil Returns nothing.
 function LPipeline:setOnStepComplete(callback) end
 
 --- Registers a callback invoked each time any step fails. Receives (stepName, errorMessage).
 ---@param callback? function A function receiving (stepName, errorMessage). Pass nil to remove.
----@return nil Returns nothing.
 function LPipeline:setOnStepError(callback) end
 
 --- Returns an ASCII art diagram of the pipeline's dependency graph for debugging and visualization.
 ---@return string Multi-line ASCII diagram.
 function LPipeline:toAscii() end
 
+---@class LPipelineToTableResult
+---@field name string Pipeline name.
+---@field errorMode string Error handling mode.
+---@field steps table Array of step tables.
+
 --- Serializes the pipeline configuration into a plain Lua table for inspection or persistence.
----@return table A table with name, errorMode, and steps array fields.
+---@return LPipelineToTableResult A table with name, errorMode, and steps array fields.
 function LPipeline:toTable() end
 
 --- Returns the type name of this object ("LPipeline").
@@ -17999,7 +17977,7 @@ function LPipeline:update(dt) end
 
 --- Validates the pipeline structure, checking for missing dependencies and circular references.
 ---@return boolean a True if the pipeline is valid.
----@return table b Array of error message strings (empty if valid).
+---@return string[] b Error message strings (empty if valid).
 function LPipeline:validate() end
 
 --- A single executable step within a pipeline, wrapping callback, condition, retry, and error hooks.
@@ -18017,8 +17995,7 @@ function LPipelineStep:getAttempt() end
 
 --- Retrieves a metadata value previously stored with setData.
 ---@param key string Metadata key to look up.
----@return string a The stored value.
----@return nil b If the key does not exist.
+---@return string The stored value, or nil if the key does not exist.
 function LPipelineStep:getData(key) end
 
 --- Returns the configured delay for this step.
@@ -18026,7 +18003,7 @@ function LPipelineStep:getData(key) end
 function LPipelineStep:getDelay() end
 
 --- Returns a list of step names that this step depends on.
----@return table Array of dependency step name strings.
+---@return string[] Dependency step name strings.
 function LPipelineStep:getDependencies() end
 
 --- Returns the number of dependencies this step has.
@@ -18038,8 +18015,7 @@ function LPipelineStep:getDependencyCount() end
 function LPipelineStep:getDuration() end
 
 --- Returns the error message if this step failed, or nil if it has not failed.
----@return string a Error message.
----@return nil b If the step has not failed.
+---@return string Error message, or nil if the step has not failed.
 function LPipelineStep:getError() end
 
 --- Returns the unique name of this pipeline step.
@@ -18055,8 +18031,7 @@ function LPipelineStep:getRetryCount() end
 function LPipelineStep:getStatus() end
 
 --- Returns the tag assigned to this step, or nil if none is set.
----@return string a The step tag.
----@return nil b If no tag is assigned.
+---@return string The step tag, or nil if no tag is assigned.
 function LPipelineStep:getTag() end
 
 --- Returns the configured timeout for this step, or 0 if none is set.
@@ -18073,58 +18048,47 @@ function LPipelineStep:isOptional() end
 
 --- Marks this step as asynchronous. Async steps run as coroutines and can yield between frames.
 ---@param enabled boolean True to enable coroutine-based async execution.
----@return nil Returns nothing.
 function LPipelineStep:setAsync(enabled) end
 
 --- Sets the main execution function for this step. Called when the step runs.
 ---@param callback function A function receiving the pipeline context table and optionally returning a result value.
----@return nil Returns nothing.
 function LPipelineStep:setCallback(callback) end
 
 --- Sets a predicate function that determines whether this step should execute. If the predicate returns false, the step is skipped.
 ---@param condition? function A function receiving the context table and returning a boolean. Pass nil to remove the condition.
----@return nil Returns nothing.
 function LPipelineStep:setCondition(condition) end
 
 --- Stores a key-value metadata pair on this step. Useful for passing configuration between steps.
 ---@param key string Metadata key.
 ---@param value string Metadata value.
----@return nil Returns nothing.
 function LPipelineStep:setData(key, value) end
 
 --- Sets a delay in seconds before this step begins execution after its dependencies are satisfied.
 ---@param seconds number Delay duration in seconds.
----@return nil Returns nothing.
 function LPipelineStep:setDelay(seconds) end
 
 --- Sets an error handler callback invoked when this step fails after all retries are exhausted.
 ---@param callback? function A function receiving (stepName, errorMessage). Pass nil to remove.
----@return nil Returns nothing.
 function LPipelineStep:setOnError(callback) end
 
 --- Marks this step as optional. Optional steps do not cause pipeline failure if they fail.
 ---@param optional boolean True to mark the step as optional.
----@return nil Returns nothing.
 function LPipelineStep:setOptional(optional) end
 
 --- Sets how many times this step should be retried after a failure before being marked as failed.
 ---@param count number Number of retry attempts (0 means no retries).
----@return nil Returns nothing.
 function LPipelineStep:setRetryCount(count) end
 
 --- Sets the delay in seconds between retry attempts for this step.
 ---@param seconds number Delay between retries.
----@return nil Returns nothing.
 function LPipelineStep:setRetryDelay(seconds) end
 
 --- Assigns a tag string to this step for grouping and filtering purposes.
 ---@param tag string A category tag for this step.
----@return nil Returns nothing.
 function LPipelineStep:setTag(tag) end
 
 --- Sets a maximum execution time for this step. If exceeded in async mode, the step may be considered failed.
 ---@param seconds number Timeout duration in seconds.
----@return nil Returns nothing.
 function LPipelineStep:setTimeout(seconds) end
 
 --- Returns the type name of this object ("LPipelineStep").
@@ -18172,7 +18136,7 @@ function BiomeClassifier:classify(height, moisture, temperature) end
 ---@param heights table Flat array of height values (length = width*height).
 ---@param moisture table Flat array of moisture values (length = width*height).
 ---@param temperature? table Optional flat array of temperature values. If omitted, temperature is ignored.
----@return table Flat array of biome name strings (length = width*height).
+---@return string[] Biome name strings (length = width*height).
 function BiomeClassifier:classifyMap(width, height, heights, moisture, temperature) end
 
 --- Returns the type name of this object.
@@ -18192,23 +18156,34 @@ function BiomeClassifier:typeOf(name) end
 ---@return number d Alpha component (0–255).
 lurek.procgen.biomeColor = function(name) end
 
+---@class ProcgenBspDungeonResult
+---@field rooms table Array of room tables with x, y, w, h fields.
+---@field corridors table Array of corridor tables with x1, y1, x2, y2 fields.
+
 --- Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapping rooms connected by corridors.
 ---@param opts? table Options: width, height, min_size (minimum leaf size), max_depth (BSP tree depth), seed, padding.
----@return table Table with .rooms (array of {x,y,w,h}) and .corridors (array of {x1,y1,x2,y2}).
+---@return ProcgenBspDungeonResult Table with .rooms (array of {x,y,w,h}) and .corridors (array of {x1,y1,x2,y2}).
 lurek.procgen.bspDungeon = function(opts) end
+
+---@class ProcgenBspDungeonWithPrefabsResult
+---@field name string Name.
+---@field x number X.
+---@field y number Y.
+---@field width number Width.
+---@field height number Height.
 
 --- Generate a BSP dungeon and stamp named prefab rooms into suitable leaves. Returns dungeon layout plus prefab placement info.
 ---@param opts? table BSP options: width, height, min_size, max_depth, seed, padding.
 ---@param prefabs table Array of prefab definitions: {name, width, height}.
----@return table a Dungeon table with .rooms and .corridors.
----@return table b Array of placed prefabs: {name, x, y, width, height}.
+---@return ProcgenBspDungeonWithPrefabsResult a Dungeon table with .rooms and .corridors.
+---@return ProcgenBspDungeonWithPrefabsResult b Array of placed prefabs: {name, x, y, width, height}.
 lurek.procgen.bspDungeonWithPrefabs = function(opts, prefabs) end
 
 --- Generate a cave or organic map using cellular automata rules.
 ---@param width number Grid width in cells.
 ---@param height number Grid height in cells.
 ---@param opts? table Options: fill (0.0–1.0 initial fill ratio), iterations, birth threshold, survive threshold, seed.
----@return table Flat array of u8 values (0=empty, 1=wall) with length width*height.
+---@return number[] Flat array of cell values (0=empty, 1=wall) with length width×height.
 lurek.procgen.cellularAutomata = function(width, height, opts) end
 
 --- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
@@ -18219,7 +18194,7 @@ lurek.procgen.cellularAutomata = function(width, height, opts) end
 ---@param startY number Start row (0-based).
 ---@param threshold? number Value threshold (default 128).
 ---@param above? boolean If true, fill cells >= threshold; if false (default), fill cells < threshold.
----@return table Flat array of u8 (1=filled, 0=not filled) with length width*height.
+---@return number[] Flat array of fill values (1=filled, 0=not filled) with length width×height.
 lurek.procgen.floodFill = function(data, width, height, startX, startY, threshold, above) end
 
 --- Generate a single random name based on a Markov chain trained from sample names. Great for NPC names, place names, or item names.
@@ -18236,20 +18211,30 @@ lurek.procgen.generateName = function(samples, minLen, maxLen, seed) end
 ---@param minLen? number Minimum output length (default 3).
 ---@param maxLen? number Maximum output length (default 10).
 ---@param seed? number RNG seed (default 0).
----@return table Array of generated name strings.
+---@return string[] Generated name strings.
 lurek.procgen.generateNames = function(samples, count, minLen, maxLen, seed) end
+
+---@class ProcgenHeightmapResult
+---@field cells number[] Heightmap values.
+---@field width number Width.
+---@field height number Height.
 
 --- Generate a fractal heightmap using multi-octave noise with optional hydraulic erosion.
 ---@param opts? table Options: width, height, scale, octaves, lacunarity, persistence, seed, erosion_passes.
----@return table Table with .cells (flat f32 array 0.0–1.0), .width, .height.
+---@return ProcgenHeightmapResult Table with .cells (flat f32 array 0.0–1.0), .width, .height.
 lurek.procgen.heightmap = function(opts) end
+
+---@class ProcgenHeightmapFromCellularResult
+---@field cells number[] Distance-transformed heightmap values.
+---@field width number Width.
+---@field height number Height.
 
 --- Convert a cellular automata grid into a heightmap by distance-transforming the floor cells.
 ---@param width number Grid width.
 ---@param height number Grid height.
 ---@param cells table Flat u8 array from cellularAutomata.
 ---@param floorValue? number Cell value treated as open floor (default 0).
----@return table Table with .cells (flat f32 array), .width, .height.
+---@return ProcgenHeightmapFromCellularResult Table with .cells (flat f32 array), .width, .height.
 lurek.procgen.heightmapFromCellular = function(width, height, cells, floorValue) end
 
 --- Expand an L-system grammar and return the resulting string. Useful for generating branching structures like trees, rivers, or cave networks.
@@ -18257,11 +18242,17 @@ lurek.procgen.heightmapFromCellular = function(width, height, cells, floorValue)
 ---@return string The fully expanded L-system string.
 lurek.procgen.lsystem = function(opts) end
 
+---@class ProcgenLsystemSegmentsResult
+---@field x1 number X1.
+---@field y1 number Y1.
+---@field x2 number X2.
+---@field y2 number Y2.
+
 --- Expand an L-system and interpret the result as turtle-graphics commands, returning line segments.
 ---@param opts table L-system options: axiom, iterations, rules.
 ---@param angle? number Turn angle in degrees (default 25).
 ---@param step? number Forward step length (default 1.0).
----@return table Array of segment tables {x1, y1, x2, y2}.
+---@return ProcgenLsystemSegmentsResult Array of segment tables {x1, y1, x2, y2}.
 lurek.procgen.lsystemSegments = function(opts, angle, step) end
 
 --- Create a BiomeClassifier object with custom threshold rules for mapping height/moisture/temperature to biome types.
@@ -18273,21 +18264,21 @@ lurek.procgen.newBiomeClassifier = function(opts) end
 ---@param width number Map width in cells.
 ---@param height number Map height in cells.
 ---@param opts? table Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
----@return table Flat array of f64 noise values (length = width*height).
+---@return number[] F64 noise values (length = width*height).
 lurek.procgen.noiseMap = function(width, height, opts) end
 
 --- Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
 ---@param width number Map width in cells.
 ---@param height number Map height in cells.
 ---@param opts? table Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y.
----@return table Flat array of f64 noise values (length = width*height).
+---@return number[] F64 noise values (length = width*height).
 lurek.procgen.noiseMapParallel = function(width, height, opts) end
 
 --- Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
 ---@param width number Map width in cells.
 ---@param height number Map height in cells.
 ---@param opts? table Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
----@return table Flat array of f64 noise values (length = width*height).
+---@return number[] F64 noise values (length = width*height).
 lurek.procgen.noiseMapParallelSeeded = function(width, height, opts) end
 
 --- Sample periodic 2D Perlin noise at a given coordinate.
@@ -18298,26 +18289,44 @@ lurek.procgen.noiseMapParallelSeeded = function(width, height, opts) end
 ---@return number Noise value in the range [-1, 1].
 lurek.procgen.perlinNoise = function(x, y, periodX, periodY) end
 
+---@class ProcgenPoissonDiskResult
+---@field x number X.
+---@field y number Y.
+
 --- Generate evenly-spaced random points using Poisson disk sampling. Useful for placing trees, NPCs, or loot without clustering.
 ---@param width number Area width.
 ---@param height number Area height.
 ---@param minDist number Minimum distance between any two points.
 ---@param maxAttempts? number Rejection attempts per active point (default 30). Higher = denser fill.
 ---@param seed? number RNG seed (default 0).
----@return table Array of {x, y} tables representing generated points.
+---@return ProcgenPoissonDiskResult Array of {x, y} tables representing generated points.
 lurek.procgen.poissonDisk = function(width, height, minDist, maxAttempts, seed) end
+
+---@class ProcgenRoomsDungeonResult
+---@field rooms table Array of room tables with x, y, w, h fields.
+---@field corridors table Array of corridor tables with x1, y1, x2, y2 fields.
+---@field grid number[] Flat grid array of tile values.
+---@field width number Grid width in tiles.
+---@field height number Grid height in tiles.
 
 --- Generate a dungeon by placing random non-overlapping rooms and connecting them with corridors. Also returns a full tile grid.
 ---@param opts? table Options: width, height, max_rooms, min_room_size, max_room_size, seed.
----@return table Table with .rooms ({x,y,w,h}[]), .corridors ({x1,y1,x2,y2}[]), .grid (flat u8[]), .width, .height.
+---@return ProcgenRoomsDungeonResult Table with .rooms ({x,y,w,h}[]), .corridors ({x1,y1,x2,y2}[]), .grid (flat u8[]), .width, .height.
 lurek.procgen.roomsDungeon = function(opts) end
+
+---@class ProcgenRoomsDungeonWithPrefabsResult
+---@field name string Name.
+---@field x number X.
+---@field y number Y.
+---@field width number Width.
+---@field height number Height.
 
 --- Generate a rooms-based dungeon and place named prefabs into qualifying rooms. Prefabs can have custom shape masks.
 ---@param opts? table Room generation options: width, height, max_rooms, min_room_size, max_room_size, seed.
 ---@param prefabs table Array of prefab definitions: {name, width, height, mask (optional flat u8[])}.
 ---@param stampValue? number Tile value written for prefab cells in the grid (default 3).
----@return table a Dungeon table with .rooms, .corridors, .grid, .width, .height.
----@return table b Array of placed prefabs: {name, x, y, width, height}.
+---@return ProcgenRoomsDungeonWithPrefabsResult a Dungeon table with .rooms, .corridors, .grid, .width, .height.
+---@return ProcgenRoomsDungeonWithPrefabsResult b Array of placed prefabs: {name, x, y, width, height}.
 lurek.procgen.roomsDungeonWithPrefabs = function(opts, prefabs, stampValue) end
 
 --- Sample 2D simplex noise at a point. Returns a value roughly in [-1, 1].
@@ -18338,22 +18347,31 @@ lurek.procgen.simplex3d = function(x, y, z) end
 ---@param height number Grid height.
 ---@param points table Array of {x, y} seed points.
 ---@param opts? table Options: warp_scale, warp_strength, seed for domain warping.
----@return table a Flat array of 1-based region indices (length = width*height).
----@return table b Flat array of distances to nearest seed.
----@return table c Flat array of distances to second-nearest seed.
+---@return number[] a 1-based region indices (length = width*height).
+---@return number[] b Flat array of distances to nearest seed.
+---@return number[] c Flat array of distances to second-nearest seed.
 lurek.procgen.voronoi = function(width, height, points, opts) end
+
+---@class ProcgenWfcGenerateResult
+---@field cells number[] Tile ID per cell.
+---@field width number Width.
+---@field height number Height.
 
 --- Run Wave Function Collapse to generate a grid of tile IDs satisfying adjacency constraints.
 ---@param opts table Options: width, height, seed, max_attempts, tiles (array of {id, weight}), adjacencies (map of tile_id -> allowed neighbor IDs[]).
----@return table Table with .cells (flat array of tile IDs, 0 if unsolved), .width, .height.
+---@return ProcgenWfcGenerateResult Table with .cells (flat array of tile IDs, 0 if unsolved), .width, .height.
 lurek.procgen.wfcGenerate = function(opts) end
+
+---@class ProcgenWorldGraphResult
+---@field regions table Array of region tables, each with id (integer), name (string), x (number), y (number), tags (string[]).
+---@field edges table Array of edge tables, each with from (integer), to (integer), cost (number), bidirectional (boolean).
 
 --- Generate a connected world graph with named regions and weighted edges. Useful for overworld maps, trade routes, or quest connectivity.
 ---@param width number World area width.
 ---@param height number World area height.
 ---@param regionCount number Number of regions to place.
 ---@param seed? number RNG seed (default 0).
----@return table Table with .regions (array of {id, name, x, y, tags[]}) and .edges (array of {from, to, cost, bidirectional}).
+---@return ProcgenWorldGraphResult Table with regions and edges arrays.
 lurek.procgen.worldGraph = function(width, height, regionCount, seed) end
 
 ---@class lurek.province
@@ -18363,12 +18381,24 @@ lurek.province = {}
 ---@class LProvinceRegistry
 LProvinceRegistry = {}
 
+---@class LProvinceRegistryAdjacenciesResult
+---@field province_a number First province id.
+---@field province_b number Second province id.
+
 --- Returns all adjacency pairs in the registry. Each entry has `province_a` and `province_b` fields representing two neighboring provinces.
----@return table Array of tables with fields: province_a (number), province_b (number).
+---@return LProvinceRegistryAdjacenciesResult Array of tables with fields: province_a (number), province_b (number).
 function LProvinceRegistry:adjacencies() end
 
+---@class LProvinceRegistryBorderSegmentsResult
+---@field province_a number First province id.
+---@field province_b number Second province id.
+---@field x0 number Segment start x.
+---@field y0 number Segment start y.
+---@field x1 number Segment end x.
+---@field y1 number Segment end y.
+
 --- Returns all border line segments between adjacent provinces. Each segment is a line from (x0,y0) to (x1,y1) separating province_a from province_b.
----@return table Array of tables with fields: province_a (number), province_b (number), x0 (number), y0 (number), x1 (number), y1 (number).
+---@return LProvinceRegistryBorderSegmentsResult Array of tables with fields: province_a (number), province_b (number), x0 (number), y0 (number), x1 (number), y1 (number).
 function LProvinceRegistry:borderSegments() end
 
 --- Computes camera position and zoom so the entire province map fits within the given screen dimensions.
@@ -18392,9 +18422,14 @@ function LProvinceRegistry:getAt(x, y) end
 ---@return string Border class name, or nil.
 function LProvinceRegistry:getBorderClass(a, b) end
 
+---@class LProvinceRegistryGetChangesSinceResult
+---@field revision number Change revision number.
+---@field kind string Change kind (political_color, terrain_type, etc.).
+---@field province_id number? Province id when applicable.
+
 --- Returns all province changes that occurred after the given revision. Each entry contains the revision number and a change record describing what was modified (political_color, terrain_type, border_style, fog_state, visibility_state, or border_class).
 ---@param revision number The revision to query from (exclusive). Pass the last known revision to get only new changes.
----@return table Array of change tables, each with a `revision` field and change-specific fields (kind, province_id, etc.).
+---@return LProvinceRegistryGetChangesSinceResult Array of change tables, each with a `revision` field and change-specific fields (kind, province_id, etc.).
 function LProvinceRegistry:getChangesSince(revision) end
 
 --- Returns the height of the province grid in cells (pixels of the source PNG).
@@ -18407,12 +18442,19 @@ function LProvinceRegistry:getName() end
 
 --- Returns a table of province IDs that share a border with the given province.
 ---@param id number Province ID to query.
----@return table Array of neighboring province IDs.
+---@return number[] Array of neighboring province IDs.
 function LProvinceRegistry:getNeighbors(id) end
+
+---@class LProvinceRegistryGetProvinceResult
+---@field province_id number Province id.
+---@field revision number Revision number.
+---@field style table Style table with terrain_type, fog_state, etc.
+---@field centroid table Centroid position table.
+---@field attrs table Custom attributes table.
 
 --- Returns a snapshot table describing a single province: its ID, revision, style (political_color, terrain_type, border_style, fog_state, visibility_state), centroid, and custom attributes.
 ---@param id number Province ID to query.
----@return table Province snapshot table, or nil if the ID does not exist.
+---@return LProvinceRegistryGetProvinceResult Province snapshot table, or nil if the ID does not exist.
 function LProvinceRegistry:getProvince(id) end
 
 --- Returns the current change revision counter. Incremented on every mutation (color, terrain, border, fog changes). Use with `getChangesSince` for incremental updates.
@@ -18423,9 +18465,15 @@ function LProvinceRegistry:getRevision() end
 ---@return number Grid width in cells.
 function LProvinceRegistry:getWidth() end
 
+---@class LProvinceRegistryImportMetadataFromFilesResult
+---@field mapped_provinces number Mapped provinces count.
+---@field capitals_set number Capitals set count.
+---@field label_lines_set number Label lines set count.
+---@field labels_set number Labels set count.
+
 --- Bulk-imports province metadata (colors, capitals, labels, terrain) from external files (PNG color map, CSV color table, TOML province definitions, marker PNG). Returns a summary of how many provinces were mapped.
 ---@param opts table Options table with fields: color_map_png (string, required), color_csv (string, required), marker_png (string?), province_toml (string?), water_terrain_tokens (table?), water_terrain_type (number?), land_terrain_type (number?), set_political_colors (boolean?), set_label_text (boolean?), set_capitals (boolean?), set_label_lines (boolean?), marker_options (table?).
----@return table Summary with fields: mapped_provinces (number), capitals_set (number), label_lines_set (number), labels_set (number).
+---@return LProvinceRegistryImportMetadataFromFilesResult Summary with fields: mapped_provinces (number), capitals_set (number), label_lines_set (number), labels_set (number).
 function LProvinceRegistry:importMetadataFromFiles(opts) end
 
 --- Returns the total number of distinct provinces in this registry (excluding ID 0).
@@ -18433,16 +18481,21 @@ function LProvinceRegistry:importMetadataFromFiles(opts) end
 function LProvinceRegistry:provinceCount() end
 
 --- Returns a sequential table of all province IDs in this registry.
----@return table Array of province ID numbers.
+---@return number[] Province ID numbers.
 function LProvinceRegistry:provinceIds() end
 
+---@class LProvinceRegistryProvinceSpansResult
+---@field province_id number Province id.
+---@field y number Scanline y coordinate.
+---@field x0 number Start x coordinate.
+---@field x1 number End x coordinate.
+
 --- Returns the raw span data for all provinces. Each span is a horizontal run of cells belonging to one province, useful for custom rendering or spatial analysis.
----@return table Array of tables with fields: province_id (number), y (number), x0 (number), x1 (number).
+---@return LProvinceRegistryProvinceSpansResult Array of tables with fields: province_id (number), y (number), x0 (number), x1 (number).
 function LProvinceRegistry:provinceSpans() end
 
 --- Renders the province map to the screen using the current camera and style settings. Generates draw commands for fills, borders, labels, and capitals based on the provided options.
 ---@param opts? table Render options: map_mode (string?), x/y/zoom/pixel_size/screen_w/screen_h (number?), draw_fills/draw_borders/draw_labels/draw_capitals (boolean?), border_width (number?), hovered_id/selected_id (integer?).
----@return nil No return value.
 function LProvinceRegistry:render(opts) end
 
 --- Converts screen-space pixel coordinates to map-space floating-point coordinates using the current camera transform.
@@ -18477,7 +18530,6 @@ function LProvinceRegistry:setAttr(id, key, value) end
 ---@param a number First province ID.
 ---@param b number Second province ID.
 ---@param class string Border class name (e.g. "river", "mountain", "sea").
----@return nil No return value.
 function LProvinceRegistry:setBorderClass(a, b, class) end
 
 --- Sets the border rendering style index for a province. Controls line thickness, color, or pattern when borders are drawn.
@@ -18569,11 +18621,15 @@ lurek.province.newFromPng = function(name, png_path) end
 ---@return boolean True if the registry existed and was removed.
 lurek.province.remove = function(name) end
 
+---@class ProvinceSanitizeMarkedPngResult
+---@field replaced_pixels number Replaced pixel count.
+---@field unresolved_pixels number Unresolved pixel count.
+
 --- Pre-processes a marker PNG by replacing capital and label marker pixels with the surrounding province color. Outputs a cleaned PNG suitable for `newFromPng`. Returns a summary of pixel replacements.
 ---@param input_png string Path to the source marker PNG.
 ---@param output_png string Path to write the sanitized output PNG.
 ---@param opts? table Marker detection thresholds: capital_min (number?), label_r_min (number?), label_g_max (number?), label_b_min (number?), search_radius (number?).
----@return table Summary with fields: replaced_pixels (number), unresolved_pixels (number).
+---@return ProvinceSanitizeMarkedPngResult Summary with fields: replaced_pixels (number), unresolved_pixels (number).
 lurek.province.sanitizeMarkedPng = function(input_png, output_png, opts) end
 
 --- Sets the named registry as the active province registry. Returns false if no registry with that name exists.
@@ -18615,9 +18671,15 @@ function LDoorManager:closeDoor(index) end
 ---@return number Door count.
 function LDoorManager:count() end
 
+---@class LDoorManagerGetDoorResult
+---@field x number X.
+---@field y number Y.
+---@field openAmount number Open amount 0.0 to 1.0.
+---@field state string Door state.
+
 --- Returns a table describing the door at the given index, or nil if index is out of range.
 ---@param index number Zero-based index of the door to query.
----@return table Door info table, or nil if not found.
+---@return LDoorManagerGetDoorResult Door info table, or nil if not found.
 function LDoorManager:getDoor(index) end
 
 --- Begins opening the door at the given index. The door animates over time via `update()`.
@@ -18723,13 +18785,23 @@ function LPointLight:y() end
 ---@class LRaycaster
 LRaycaster = {}
 
+---@class LRaycasterBuildMinimapWindowResult
+---@field x number X.
+---@field y number Y.
+---@field blocked boolean Blocked.
+---@field visible boolean Visible.
+---@field r number R.
+---@field g number G.
+---@field b number B.
+---@field luma number Luma.
+
 --- Generates a grid of minimap tile samples around a center point with lighting info.
 ---@param centerX number Center X in world coordinates.
 ---@param centerY number Center Y in world coordinates.
 ---@param radius number Tile radius around the center to sample.
 ---@param ambient number Ambient light level (0.0..1.0).
 ---@param lights? table Array of point-light tables.
----@return table Array of {x, y, blocked, visible, r, g, b, luma} tables.
+---@return LRaycasterBuildMinimapWindowResult Array of {x, y, blocked, visible, r, g, b, luma} tables.
 function LRaycaster:buildMinimapWindow(centerX, centerY, radius, ambient, lights) end
 
 --- Builds a complete textured raycaster scene for GPU rendering. Stores the output internally.
@@ -18749,6 +18821,10 @@ function LRaycaster:buildScene(params, lights, sprites, wallTextures) end
 ---@return number Total number of quads in the built scene.
 function LRaycaster:buildSceneWithModels(params, lights, sprites, wallTextures, models) end
 
+---@class LRaycasterCastFloorRowResult
+---@field u number U.
+---@field v number V.
+
 --- Computes floor/ceiling texture UV coordinates for a single scanline row.
 ---@param camX number Camera X position.
 ---@param camY number Camera Y position.
@@ -18757,16 +18833,38 @@ function LRaycaster:buildSceneWithModels(params, lights, sprites, wallTextures, 
 ---@param planeX number Camera plane X (half-width of FOV).
 ---@param planeY number Camera plane Y (half-width of FOV).
 ---@param row number Scanline row offset from screen center.
----@return table Array of {u, v} tables for each pixel in the row.
+---@return LRaycasterCastFloorRowResult Array of {u, v} tables for each pixel in the row.
 function LRaycaster:castFloorRow(camX, camY, dirX, dirY, planeX, planeY, row) end
+
+---@class LRaycasterCastRayResult
+---@field distance number Distance.
+---@field raw_distance number Raw distance before correction.
+---@field cell_value number Cell value at hit.
+---@field alpha number Alpha.
+---@field side number Side index.
+---@field tex_u number Texture U coordinate.
+---@field hit_x number Hit X position.
+---@field hit_y number Hit Y position.
+---@field hit boolean Hit.
 
 --- Casts a single ray from (ox,oy) at the given angle and returns hit info or nil.
 ---@param ox number Ray origin X.
 ---@param oy number Ray origin Y.
 ---@param angle number Ray direction in radians.
 ---@param maxDist number Maximum cast distance.
----@return table Hit table {distance, raw_distance, cell_value, alpha, side, tex_u, hit_x, hit_y, hit} or nil.
+---@return LRaycasterCastRayResult Hit table {distance, raw_distance, cell_value, alpha, side, tex_u, hit_x, hit_y, hit} or nil.
 function LRaycaster:castRay(ox, oy, angle, maxDist) end
+
+---@class LRaycasterCastRayMultiResult
+---@field distance number Corrected perpendicular distance.
+---@field raw_distance number Uncorrected ray distance.
+---@field cell_value number Cell value hit.
+---@field alpha number Sub-cell hit position.
+---@field side number Wall side (0=x, 1=y).
+---@field tex_u number Texture u coordinate.
+---@field hit_x number World hit x.
+---@field hit_y number World hit y.
+---@field hit boolean True if ray hit a wall.
 
 --- Casts a single ray that passes through transparent walls, returning multiple hits.
 ---@param ox number Ray origin X.
@@ -18774,8 +18872,19 @@ function LRaycaster:castRay(ox, oy, angle, maxDist) end
 ---@param angle number Ray direction in radians.
 ---@param maxDist number Maximum cast distance.
 ---@param maxHits? number Maximum number of hits to collect (default 4, max 8).
----@return table Array of hit tables in distance order.
+---@return LRaycasterCastRayMultiResult Array of hit tables in distance order.
 function LRaycaster:castRayMulti(ox, oy, angle, maxDist, maxHits) end
+
+---@class LRaycasterCastRaysResult
+---@field distance number Corrected perpendicular distance.
+---@field raw_distance number Uncorrected ray distance.
+---@field cell_value number Cell value hit.
+---@field alpha number Sub-cell hit position.
+---@field side number Wall side (0=x, 1=y).
+---@field tex_u number Texture u coordinate.
+---@field hit_x number World hit x.
+---@field hit_y number World hit y.
+---@field hit boolean True if ray hit a wall.
 
 --- Casts multiple rays across a field of view and returns an array of hit tables.
 ---@param ox number Ray origin X.
@@ -18784,7 +18893,7 @@ function LRaycaster:castRayMulti(ox, oy, angle, maxDist, maxHits) end
 ---@param fov number Field of view in radians.
 ---@param count number Number of rays to cast.
 ---@param maxDist number Maximum cast distance per ray.
----@return table Array of hit tables (same fields as castRay).
+---@return LRaycasterCastRaysResult Array of hit tables (same fields as castRay).
 function LRaycaster:castRays(ox, oy, angle, fov, count, maxDist) end
 
 --- Casts multiple rays and returns only the corrected distances as a flat array.
@@ -18794,7 +18903,7 @@ function LRaycaster:castRays(ox, oy, angle, fov, count, maxDist) end
 ---@param fov number Field of view in radians.
 ---@param count number Number of rays to cast.
 ---@param maxDist number Maximum cast distance per ray.
----@return table Flat array of corrected distance values.
+---@return number[] Flat array of corrected distance values.
 function LRaycaster:castRaysFlat(ox, oy, angle, fov, count, maxDist) end
 
 --- Computes the combined lighting color at a tile from ambient and point lights, accounting for walls.
@@ -18816,7 +18925,7 @@ function LRaycaster:computeTileLight(x, y, ambient, lights) end
 ---@param numFrames number Number of rotation steps.
 ---@param fw number Frame width in pixels.
 ---@param fh number Frame height in pixels.
----@return table Raw image data for all frames.
+---@return LImageData Raw image data for all frames.
 function LRaycaster:drawCameraSweep(x, y, fov, maxDist, numFrames, fw, fh) end
 
 --- Renders a grayscale depth map showing distance-to-wall for each column.
@@ -18828,7 +18937,7 @@ function LRaycaster:drawCameraSweep(x, y, fov, maxDist, numFrames, fw, fh) end
 ---@param w number Output image width in pixels.
 ---@param h number Output image height in pixels.
 ---@param maxDist number Maximum render distance.
----@return table Raw depth-map image data.
+---@return LImageData Raw depth-map image data.
 function LRaycaster:drawDepthMap(px, py, angle, fov, numRays, w, h, maxDist) end
 
 --- Renders a debug image showing the line-of-sight ray between two world points.
@@ -18837,7 +18946,7 @@ function LRaycaster:drawDepthMap(px, py, angle, fov, numRays, w, h, maxDist) end
 ---@param bx number End X.
 ---@param by number End Y.
 ---@param scale number Pixels per grid cell.
----@return table Raw image data.
+---@return LImageData Raw image data for this view.
 function LRaycaster:drawLineOfSight(ax, ay, bx, by, scale) end
 
 --- Renders a top-down debug view of the map with the player's position and direction.
@@ -18845,7 +18954,7 @@ function LRaycaster:drawLineOfSight(ax, ay, bx, by, scale) end
 ---@param py number Player Y position.
 ---@param angle number Player facing angle in radians.
 ---@param scale number Pixels per grid cell.
----@return table Raw image data.
+---@return LImageData Raw image data.
 function LRaycaster:drawTopDown(px, py, angle, scale) end
 
 --- Renders a first-person raycaster view to a raw image buffer (no textures, flat-shaded).
@@ -18856,7 +18965,7 @@ function LRaycaster:drawTopDown(px, py, angle, scale) end
 ---@param w number Output image width in pixels.
 ---@param h number Output image height in pixels.
 ---@param maxDist number Maximum render distance.
----@return table Raw image data.
+---@return LImageData Raw image data.
 function LRaycaster:drawView(px, py, angle, fov, w, h, maxDist) end
 
 --- Returns the raw texture id assigned to this ceiling cell, or nil if none.
@@ -18877,10 +18986,18 @@ function LRaycaster:getCell(x, y) end
 ---@return number Raw texture id or nil.
 function LRaycaster:getFloorTextureCell(x, y) end
 
+---@class LRaycasterGetLoweredFloorCellResult
+---@field texture number Texture id.
+---@field depth number Floor depth.
+---@field r number Red component.
+---@field g number Green component.
+---@field b number Blue component.
+---@field blocked boolean Blocked.
+
 --- Returns the lowered floor configuration at a cell, or nil if the cell is normal.
 ---@param x number Grid column.
 ---@param y number Grid row.
----@return table Table {texture, depth, r, g, b, blocked} or nil.
+---@return LRaycasterGetLoweredFloorCellResult Table {texture, depth, r, g, b, blocked} or nil.
 function LRaycaster:getLoweredFloorCell(x, y) end
 
 --- Returns the current transparency value for a wall tile type.
@@ -18923,6 +19040,12 @@ function LRaycaster:isWalkBlocked(x, y) end
 ---@return boolean True if the path is unobstructed.
 function LRaycaster:lineOfSight(x1, y1, x2, y2) end
 
+---@class LRaycasterProjectSpriteResult
+---@field screen_x number Screen x.
+---@field scale number Scale.
+---@field distance number Distance.
+---@field visible boolean Visible.
+
 --- Projects a world-space sprite to screen coordinates for billboard rendering.
 ---@param sx number Sprite world X.
 ---@param sy number Sprite world Y.
@@ -18931,8 +19054,12 @@ function LRaycaster:lineOfSight(x1, y1, x2, y2) end
 ---@param pa number Player angle in radians.
 ---@param fov number Field of view in radians.
 ---@param screenW number Screen width in pixels.
----@return table Projection info {screen_x, scale, distance, visible}.
+---@return LRaycasterProjectSpriteResult Projection info {screen_x, scale, distance, visible}.
 function LRaycaster:projectSprite(sx, sy, px, py, pa, fov, screenW) end
+
+---@class LRaycasterRevealCellsFromRaysResult
+---@field x number X.
+---@field y number Y.
 
 --- Casts rays across the FOV and returns a list of grid cells that are visible (for fog-of-war).
 ---@param ox number Ray origin X.
@@ -18942,7 +19069,7 @@ function LRaycaster:projectSprite(sx, sy, px, py, pa, fov, screenW) end
 ---@param count number Number of rays.
 ---@param maxDist number Maximum ray distance.
 ---@param step? number Walk step along each ray (default 0.2).
----@return table Array of {x, y} tables representing revealed grid cells.
+---@return LRaycasterRevealCellsFromRaysResult Array of {x, y} tables representing revealed grid cells.
 function LRaycaster:revealCellsFromRays(ox, oy, angle, fov, count, maxDist, step) end
 
 --- Assigns a per-cell ceiling texture override. Pass nil to remove the override.
@@ -19035,7 +19162,7 @@ function LSpriteManager:setVisible(id, visible) end
 ---@param camX number Camera X position.
 ---@param camY number Camera Y position.
 ---@param camAngle number Camera facing angle (unused, reserved).
----@return table Array of {id, x, y, texture, scale, distance} sorted back-to-front.
+---@return number[] Array of {id, x, y, texture, scale, distance} sorted back-to-front.
 function LSpriteManager:sortAndProject(camX, camY, camAngle) end
 
 --- Returns the type name of this object ("LSpriteManager").
@@ -19126,19 +19253,18 @@ function LCanvas:release() end
 function LCanvas:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Canvas".
-function LCanvas:typeOf() end
+function LCanvas:typeOf(name) end
 
 --- Z-ordered draw callback layer for sorting draw calls by depth before flushing.
 ---@class LDrawLayer
 LDrawLayer = {}
 
 --- Discards all queued callbacks without executing them.
----@return nil No value is returned.
 function LDrawLayer:clear() end
 
 --- Sorts all queued callbacks by z-depth and executes them in order, then empties the layer.
----@return nil No value is returned.
 function LDrawLayer:flush() end
 
 --- Returns the number of callbacks currently queued.
@@ -19148,7 +19274,6 @@ function LDrawLayer:getCount() end
 --- Enqueues a draw callback at the given z-depth. Callbacks execute when flush() is called.
 ---@param z number Z-depth value used for sorting (lower draws first).
 ---@param f function Callback to invoke during flush.
----@return nil No value is returned.
 function LDrawLayer:queue(z, f) end
 
 --- Returns the type name string for this draw layer.
@@ -19198,7 +19323,6 @@ function LFont:release() end
 
 --- Overrides the line height used for multi-line text rendering.
 ---@param height number New line height in pixels.
----@return nil No value is returned.
 function LFont:setLineHeight(height) end
 
 --- Returns the type name string for this font object.
@@ -19206,8 +19330,9 @@ function LFont:setLineHeight(height) end
 function LFont:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Font".
-function LFont:typeOf() end
+function LFont:typeOf(name) end
 
 --- GPU-backed texture handle used for drawing images to screen.
 ---@class LImage
@@ -19239,8 +19364,9 @@ function LImage:release() end
 function LImage:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Image".
-function LImage:typeOf() end
+function LImage:typeOf(name) end
 
 --- Raw pixel buffer for CPU-side image manipulation before uploading to a GPU texture.
 ---@class LImageData
@@ -19250,7 +19376,6 @@ LImageData = {}
 ---@param source LImageData The source image data to copy from.
 ---@param dstX number Destination X offset in pixels.
 ---@param dstY number Destination Y offset in pixels.
----@return nil No return value.
 function LImageData:blit(source, dstX, dstY) end
 
 --- Computes a numeric difference score between this image and another of the same size.
@@ -19276,7 +19401,6 @@ function LImageData:getWidth() end
 
 --- Iterates over every pixel and replaces its color with the return value of the callback.
 ---@param callback function Called as callback(x, y, r, g, b, a) → (r, g, b, a) for each pixel.
----@return nil No value is returned.
 function LImageData:mapPixels(callback) end
 
 --- Creates a new ImageData resized to the given dimensions using bilinear sampling.
@@ -19320,13 +19444,11 @@ function LMesh:release() end
 
 --- Assigns or removes a texture for this mesh. Pass nil to clear the texture.
 ---@param image? LImage Image to use as the mesh texture, or nil to remove.
----@return nil No value is returned.
 function LMesh:setTexture(image) end
 
 --- Updates a single vertex by 1-based index. Table format: {x, y, u, v, r, g, b, a}.
 ---@param index number 1-based vertex index.
 ---@param data table Vertex data: {x, y, u, v, r, g, b, a}.
----@return nil No value is returned.
 function LMesh:setVertex(index, data) end
 
 --- Returns the type name string for this mesh object.
@@ -19334,8 +19456,9 @@ function LMesh:setVertex(index, data) end
 function LMesh:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Mesh".
-function LMesh:typeOf() end
+function LMesh:typeOf(name) end
 
 --- Texture with defined border insets for scalable 9-slice rendering (e.g., UI panels, buttons).
 ---@class LNineSlice
@@ -19382,11 +19505,21 @@ function LObjModel:getUvCount() end
 ---@return number Vertex count.
 function LObjModel:getVertexCount() end
 
+---@class LObjModelProjectToMeshResult
+---@field x number X.
+---@field y number Y.
+---@field u number U.
+---@field v number V.
+---@field r number R.
+---@field g number G.
+---@field b number B.
+---@field a number A.
+
 --- Projects the OBJ model into 2D vertex data using a virtual camera, returning a table of vertex rows.
 ---@param camera table Camera parameters: {x, y, z, tx, ty, tz, fov}.
 ---@param screenW number Screen width for projection.
 ---@param screenH number Screen height for projection.
----@return table Array of vertex tables: {{x, y, u, v, r, g, b, a}, ...}.
+---@return LObjModelProjectToMeshResult Array of vertex tables: {{x, y, u, v, r, g, b, a}, ...}.
 function LObjModel:projectToMesh(camera, screenW, screenH) end
 
 --- Renders the OBJ model to a GPU texture at the given resolution with optional 90-degree rotation.
@@ -19417,7 +19550,6 @@ function LQuad:getViewport() end
 ---@param y number Top edge in texture pixels.
 ---@param w number Width in texture pixels.
 ---@param h number Height in texture pixels.
----@return nil No return value.
 function LQuad:setViewport(x, y, w, h) end
 
 --- Returns the type name string for this quad object.
@@ -19425,8 +19557,9 @@ function LQuad:setViewport(x, y, w, h) end
 function LQuad:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Quad".
-function LQuad:typeOf() end
+function LQuad:typeOf(name) end
 
 --- GPU shader program for custom rendering effects (post-processing, distortion, etc.).
 ---@class LShader
@@ -19444,7 +19577,6 @@ function LShader:release() end
 --- Sends a uniform value to this shader by name. Supported types: number, boolean, or table (vec2/vec3/vec4).
 ---@param name string Uniform variable name declared in the shader.
 ---@param value number|boolean|table The value to send.
----@return nil No value is returned.
 function LShader:send(name, value) end
 
 --- Returns the type name string for this shader object.
@@ -19452,8 +19584,9 @@ function LShader:send(name, value) end
 function LShader:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "Shader".
-function LShader:typeOf() end
+function LShader:typeOf(name) end
 
 --- Retained compound shape that accumulates drawing commands and can be rendered in one call.
 ---@class LShape
@@ -19467,7 +19600,6 @@ LShape = {}
 ---@param astart number Start angle in radians.
 ---@param aend number End angle in radians.
 ---@param segments? number Number of arc segments (default 32).
----@return nil No return value.
 function LShape:arc(mode, x, y, r, astart, aend, segments) end
 
 --- Adds a filled or outlined circle command to the shape.
@@ -19475,11 +19607,9 @@ function LShape:arc(mode, x, y, r, astart, aend, segments) end
 ---@param x number Center X.
 ---@param y number Center Y.
 ---@param r number Radius.
----@return nil No return value.
 function LShape:circle(mode, x, y, r) end
 
 --- Removes all drawing commands from this shape, making it empty.
----@return nil No value is returned.
 function LShape:clear() end
 
 --- Renders the accumulated shape commands to the screen with optional transform.
@@ -19490,7 +19620,6 @@ function LShape:clear() end
 ---@param sy? number Scale Y (default 1).
 ---@param ox? number Origin offset X (default 0).
 ---@param oy? number Origin offset Y (default 0).
----@return nil No return value.
 function LShape:draw(x, y, rotation, sx, sy, ox, oy) end
 
 --- Adds an ellipse command to the shape.
@@ -19499,7 +19628,6 @@ function LShape:draw(x, y, rotation, sx, sy, ox, oy) end
 ---@param y number Center Y.
 ---@param rx number Horizontal radius.
 ---@param ry number Vertical radius.
----@return nil No return value.
 function LShape:ellipse(mode, x, y, rx, ry) end
 
 --- Returns the number of drawing commands accumulated in this shape.
@@ -19511,18 +19639,15 @@ function LShape:getCommandCount() end
 ---@param y1 number Start Y.
 ---@param x2 number End X.
 ---@param y2 number End Y.
----@return nil No value is returned.
 function LShape:line(x1, y1, x2, y2) end
 
 --- Adds a polygon command to the shape from a flat list of x,y coordinate pairs.
 ---@param mode string "fill" or "line".
 ---@param ... number Flat coordinate values: x1, y1, x2, y2, ... (minimum 3 vertices / 6 values).
----@return nil No return value.
 function LShape:polygon(mode, ...) end
 
 --- Adds a connected polyline command to the shape from a flat list of x,y coordinate pairs.
 ---@param ... number Flat coordinate values: x1, y1, x2, y2, ... (minimum 2 points / 4 values).
----@return nil No value is returned.
 function LShape:polyline(...) end
 
 --- Adds a rectangle command to the shape.
@@ -19531,7 +19656,6 @@ function LShape:polyline(...) end
 ---@param y number Top edge Y.
 ---@param w number Width.
 ---@param h number Height.
----@return nil No return value.
 function LShape:rectangle(mode, x, y, w, h) end
 
 --- Adds a rounded rectangle command to the shape.
@@ -19542,7 +19666,6 @@ function LShape:rectangle(mode, x, y, w, h) end
 ---@param h number Height.
 ---@param rx number Horizontal corner radius.
 ---@param ry? number Vertical corner radius (defaults to rx).
----@return nil No value is returned.
 function LShape:roundedRectangle(mode, x, y, w, h, rx, ry) end
 
 --- Sets the drawing color for subsequent shape commands.
@@ -19550,12 +19673,10 @@ function LShape:roundedRectangle(mode, x, y, w, h, rx, ry) end
 ---@param g number Green channel (0–1).
 ---@param b number Blue channel (0–1).
 ---@param a? number Alpha channel (0–1, default 1).
----@return nil No return value.
 function LShape:setColor(r, g, b, a) end
 
 --- Sets the line width for subsequent line-mode shape commands.
 ---@param w number Line width in pixels.
----@return nil No value is returned.
 function LShape:setLineWidth(w) end
 
 --- Adds a triangle command to the shape.
@@ -19566,7 +19687,6 @@ function LShape:setLineWidth(w) end
 ---@param y2 number Second vertex Y.
 ---@param x3 number Third vertex X.
 ---@param y3 number Third vertex Y.
----@return nil No return value.
 function LShape:triangle(mode, x1, y1, x2, y2, x3, y3) end
 
 --- Returns the type name string for this shape object.
@@ -19594,7 +19714,6 @@ LSpriteBatch = {}
 function LSpriteBatch:add(x, y, r, sx, sy, ox, oy) end
 
 --- Removes all entries from the sprite batch.
----@return nil No value is returned.
 function LSpriteBatch:clear() end
 
 --- Returns the maximum number of entries this batch can hold.
@@ -19614,12 +19733,12 @@ function LSpriteBatch:release() end
 function LSpriteBatch:type() end
 
 --- Returns the type name of this object.
+---@param name string Type name to check.
 ---@return string Always "SpriteBatch".
-function LSpriteBatch:typeOf() end
+function LSpriteBatch:typeOf(name) end
 
 --- Multiplies the current transformation matrix by a 3x3 matrix (9 values in row-major order).
 ---@param mat table Flat table of 9 numbers representing a 3x3 transform matrix.
----@return nil No return value.
 lurek.render.applyTransform = function(mat) end
 
 --- Draws a filled or outlined circular arc segment.
@@ -19630,22 +19749,18 @@ lurek.render.applyTransform = function(mat) end
 ---@param angle1 number Start angle in radians.
 ---@param angle2 number End angle in radians.
 ---@param segments? number Number of arc segments (default 32).
----@return nil No return value.
 lurek.render.arc = function(mode, x, y, radius, angle1, angle2, segments) end
 
 --- Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
 ---@param id number Group identifier.
----@return nil No return value.
 lurek.render.beginSortGroup = function(id) end
 
 --- Begins a depth-sorted rendering group. Draw calls within this group are sorted by pushSortKey values.
 ---@param id number Group identifier.
----@return nil No return value.
 lurek.render.beginSortGroup = function(id) end
 
 --- Captures a screenshot as ImageData and passes it to a callback (stub: returns 1x1 placeholder).
 ---@param callback function Called with an LImageData argument.
----@return nil No return value.
 lurek.render.captureScreenshot = function(callback) end
 
 --- Draws a filled or outlined circle at the given position.
@@ -19653,18 +19768,15 @@ lurek.render.captureScreenshot = function(callback) end
 ---@param x number Center X.
 ---@param y number Center Y.
 ---@param radius number Circle radius in pixels.
----@return nil No return value.
 lurek.render.circle = function(mode, x, y, radius) end
 
 --- Clears all queued render commands for the current frame.
 ---@param r? number Unused (reserved for future clear-color override).
 ---@param g? number Unused.
 ---@param b? number Unused.
----@return nil No return value.
 lurek.render.clear = function(r, g, b) end
 
 --- Resets the stencil state to defaults (no stencil operations).
----@return nil No return value.
 lurek.render.clearStencil = function() end
 
 --- Returns the name of the currently active rendering layer.
@@ -19691,7 +19803,6 @@ lurek.render.draw = function(drawable, x, y, r, sx, sy, ox, oy) end
 ---@param bevelW? number Bevel border width (default 2).
 ---@param style? string Bevel style: "raised" (default), "sunken", "ridge", "groove", "flat".
 ---@param opts? table Options: highlight, shadow, fillColor (each a {r,g,b,a} table).
----@return nil No return value.
 lurek.render.drawBevelRect = function(x, y, w, h, bevelW, style, opts) end
 
 --- Draws a beveled rectangle with highlight, shadow, and fill colors for 3D-style UI elements.
@@ -19702,21 +19813,18 @@ lurek.render.drawBevelRect = function(x, y, w, h, bevelW, style, opts) end
 ---@param bevelW? number Bevel border width (default 2).
 ---@param style? string Bevel style: "raised" (default), "sunken", "ridge", "groove", "flat".
 ---@param opts? table Options: highlight, shadow, fillColor (each a {r,g,b,a} table).
----@return nil No return value.
 lurek.render.drawBevelRect = function(x, y, w, h, bevelW, style, opts) end
 
 --- Draws a polygon with per-vertex colors.
 ---@param vertices table Flat array of x,y coordinates: {x1, y1, x2, y2, ...}.
 ---@param colors table Array of color tables: {{r, g, b, a}, ...}, one per vertex.
 ---@param mode? string "fill" (default) or "line".
----@return nil No value is returned.
 lurek.render.drawColoredPolygon = function(vertices, colors, mode) end
 
 --- Draws a polygon with per-vertex colors.
 ---@param vertices table Flat array of x,y coordinates: {x1, y1, x2, y2, ...}.
 ---@param colors table Array of color tables: {{r, g, b, a}, ...}, one per vertex.
 ---@param mode? string "fill" (default) or "line".
----@return nil No value is returned.
 lurek.render.drawColoredPolygon = function(vertices, colors, mode) end
 
 --- Draws a cubic Bezier curve through start, two control points, and end.
@@ -19729,7 +19837,6 @@ lurek.render.drawColoredPolygon = function(vertices, colors, mode) end
 ---@param x2 number End X.
 ---@param y2 number End Y.
 ---@param segs? number Number of line segments (default 16).
----@return nil No return value.
 lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segs) end
 
 --- Draws a cubic Bezier curve through start, two control points, and end.
@@ -19742,7 +19849,6 @@ lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segs
 ---@param x2 number End X.
 ---@param y2 number End Y.
 ---@param segments? number Number of line segments (default 16).
----@return nil No return value.
 lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments) end
 
 --- Draws a rectangle with a two-color gradient fill.
@@ -19753,7 +19859,6 @@ lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segm
 ---@param c1 table Start color {r, g, b [, a]}.
 ---@param c2 table End color {r, g, b [, a]}.
 ---@param dir? string Direction: "vertical" (default), "horizontal", "diagDown", "diagUp", "radial".
----@return nil No return value.
 lurek.render.drawGradientRect = function(x, y, w, h, c1, c2, dir) end
 
 --- Draws a rectangle with a two-color gradient fill.
@@ -19764,7 +19869,6 @@ lurek.render.drawGradientRect = function(x, y, w, h, c1, c2, dir) end
 ---@param c1 table Start color {r, g, b [, a]}.
 ---@param c2 table End color {r, g, b [, a]}.
 ---@param dir? string Direction: "vertical" (default), "horizontal", "diagDown", "diagUp", "radial".
----@return nil No return value.
 lurek.render.drawGradientRect = function(x, y, w, h, c1, c2, dir) end
 
 --- Draws a regular hexagonal tile at the given center position.
@@ -19773,7 +19877,6 @@ lurek.render.drawGradientRect = function(x, y, w, h, c1, c2, dir) end
 ---@param size number Hex radius (must be positive).
 ---@param orientation? string "pointyTop" (default) or "flatTop".
 ---@param mode? string "line" (default) or "fill".
----@return nil No return value.
 lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
 
 --- Draws a regular hexagonal tile at the given center position.
@@ -19782,7 +19885,6 @@ lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
 ---@param size number Hex radius (must be positive).
 ---@param orientation? string "pointyTop" (default) or "flatTop".
 ---@param mode? string "line" (default) or "fill".
----@return nil No return value.
 lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
 
 --- Draws an isometric cube tile with configurable face colors and optional textures.
@@ -19791,7 +19893,6 @@ lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
 ---@param halfW number Half-width of the tile diamond.
 ---@param halfH number Half-height of the tile diamond.
 ---@param opts? table Options: depth, topColor, leftColor, rightColor, topTexture, leftTexture, rightTexture.
----@return nil No return value.
 lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 
 --- Draws an isometric cube tile with configurable face colors and optional textures.
@@ -19800,12 +19901,10 @@ lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 ---@param halfW number Half-width of the tile diamond.
 ---@param halfH number Half-height of the tile diamond.
 ---@param opts? table Options: depth, topColor, leftColor, rightColor, topTexture, leftTexture, rightTexture.
----@return nil No return value.
 lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 
 --- Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
 ---@param list table Array of draw entry tables.
----@return nil No return value.
 lurek.render.drawMany = function(list) end
 
 --- Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
@@ -19814,21 +19913,18 @@ lurek.render.drawMany = function(list) end
 ---@param y number Top edge Y.
 ---@param w number Target width.
 ---@param h number Target height.
----@return nil No return value.
 lurek.render.drawNineSlice = function(slice, x, y, w, h) end
 
 --- Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
 ---@param path table Array of segment tables, each with a "type" field and coordinates.
 ---@param mode? string "line" (default) or "fill".
 ---@param close? boolean Close the path back to start (default false).
----@return nil No return value.
 lurek.render.drawPath = function(path, mode, close) end
 
 --- Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
 ---@param path table Array of segment tables, each with a "type" field and coordinates.
 ---@param mode? string "line" (default) or "fill".
 ---@param close? boolean Close the path back to start (default false).
----@return nil No return value.
 lurek.render.drawPath = function(path, mode, close) end
 
 --- Draws a quadratic Bezier curve through start, control, and end points.
@@ -19839,7 +19935,6 @@ lurek.render.drawPath = function(path, mode, close) end
 ---@param x2 number End X.
 ---@param y2 number End Y.
 ---@param segs? number Number of line segments (default 16).
----@return nil No value is returned.
 lurek.render.drawQuadBezier = function(x1, y1, cx, cy, x2, y2, segs) end
 
 --- Draws a quadratic Bezier curve through start, control, and end points.
@@ -19850,7 +19945,6 @@ lurek.render.drawQuadBezier = function(x1, y1, cx, cy, x2, y2, segs) end
 ---@param x2 number End X.
 ---@param y2 number End Y.
 ---@param segments? number Number of line segments (default 16).
----@return nil No return value.
 lurek.render.drawQuadBezier = function(x1, y1, cx, cy, x2, y2, segments) end
 
 --- Draws a sub-region of an image defined by a Quad, with optional transform.
@@ -19863,7 +19957,6 @@ lurek.render.drawQuadBezier = function(x1, y1, cx, cy, x2, y2, segments) end
 ---@param sy? number Scale Y (default 1).
 ---@param ox? number Origin offset X (default 0).
 ---@param oy? number Origin offset Y (default 0).
----@return nil No return value.
 lurek.render.drawq = function(image, quad, x, y, r, sx, sy, ox, oy) end
 
 --- Draws a filled or outlined ellipse at the given position.
@@ -19872,17 +19965,14 @@ lurek.render.drawq = function(image, quad, x, y, r, sx, sy, ox, oy) end
 ---@param y number Center Y.
 ---@param rx number Horizontal radius.
 ---@param ry number Vertical radius.
----@return nil No return value.
 lurek.render.ellipse = function(mode, x, y, rx, ry) end
 
 --- Ends a sort group and emits all accumulated draw calls in sorted order.
 ---@param id number Group identifier matching the beginSortGroup call.
----@return nil No return value.
 lurek.render.flushSortGroup = function(id) end
 
 --- Ends a sort group and emits all accumulated draw calls in sorted order.
 ---@param id number Group identifier matching the beginSortGroup call.
----@return nil No return value.
 lurek.render.flushSortGroup = function(id) end
 
 --- Returns the current background clear color.
@@ -19971,7 +20061,7 @@ lurek.render.getFontHeight = function(font) end
 lurek.render.getFontLineHeight = function(font) end
 
 --- Returns all available built-in font pixel heights.
----@return table Array of available font height values.
+---@return number[] Array of available font height values.
 lurek.render.getFontSizes = function() end
 
 --- Measures the pixel width of text using the given font.
@@ -20015,8 +20105,21 @@ lurek.render.getScissor = function() end
 ---@return LShader The active shader handle.
 lurek.render.getShader = function() end
 
+---@class RenderGetStatsResult
+---@field drawcalls number Total draw call count.
+---@field textures number Loaded texture count.
+---@field fonts number Loaded font count.
+---@field canvases number Active canvas count.
+---@field texture_memory number Texture memory in bytes.
+---@field gpu_draw_calls number GPU-side draw call count.
+---@field batched_draws number Batched draw count.
+---@field texture_switches number Texture switch count.
+---@field canvas_switches number Canvas switch count.
+---@field shader_switches number Shader switch count.
+---@field cpu_render_ms number CPU render time in milliseconds.
+
 --- Returns a table of rendering statistics for the current frame.
----@return table Stats table with fields: drawcalls, textures, fonts, canvases, texture_memory, gpu_draw_calls, batched_draws, texture_switches, canvas_switches, shader_switches, cpu_render_ms.
+---@return RenderGetStatsResult Stats table with rendering counters.
 lurek.render.getStats = function() end
 
 --- Returns the current stencil action, compare mode, and reference value.
@@ -20034,7 +20137,6 @@ lurek.render.getWidth = function() end
 ---@param y number Top edge.
 ---@param w number Width.
 ---@param h number Height.
----@return nil No return value.
 lurek.render.intersectScissor = function(x, y, w, h) end
 
 --- Returns whether a named rendering layer is currently visible.
@@ -20048,7 +20150,6 @@ lurek.render.isWireframe = function() end
 
 --- Draws a line between two points, or a polyline through multiple points.
 ---@param ... number Coordinate values: x1, y1, x2, y2 for a line, or more for a polyline.
----@return nil No return value.
 lurek.render.line = function(...) end
 
 --- Loads a 3D model file (OBJ format) and returns a handle for 2D projection and sprite rendering.
@@ -20086,7 +20187,6 @@ lurek.render.newImage = function(pathOrData, colorSpace) end
 --- Creates a named rendering layer with an optional z-order for draw call organization.
 ---@param name string Layer name.
 ---@param zOrder? number Z-order for layer sorting (default 0).
----@return nil No return value.
 lurek.render.newLayer = function(name, zOrder) end
 
 --- Creates a custom vertex mesh from an array of vertex data tables.
@@ -20130,32 +20230,26 @@ lurek.render.newShape = function() end
 lurek.render.newSpriteBatch = function(image, max) end
 
 --- Resets the current transformation matrix to the identity (no transform).
----@return nil No return value.
 lurek.render.origin = function() end
 
 --- Draws one or more points. Accepts either a table of {x,y} pairs or flat x,y coordinate values.
 ---@param ... table|number Point data as a table of {x,y} sub-tables, or flat x1,y1,x2,y2,... values.
----@return nil No return value.
 lurek.render.points = function(...) end
 
 --- Draws a polygon from a flat list of x,y vertex coordinates.
 ---@param mode string "fill" or "line".
 ---@param ... number Flat vertex coordinates: x1, y1, x2, y2, ... (minimum 3 vertices).
----@return nil No return value.
 lurek.render.polygon = function(mode, ...) end
 
 --- Pops the top transformation matrix from the transform stack, restoring the previous one.
----@return nil No return value.
 lurek.render.pop = function() end
 
 --- Ends a compositing layer and composites it with the previous content.
 ---@param id number Layer identifier matching the pushLayer call.
----@return nil No return value.
 lurek.render.popLayer = function(id) end
 
 --- Ends a compositing layer and composites it with the previous content.
 ---@param id number Layer identifier matching the pushLayer call.
----@return nil No return value.
 lurek.render.popLayer = function(id) end
 
 --- Draws text using the active font at the given position.
@@ -20163,14 +20257,12 @@ lurek.render.popLayer = function(id) end
 ---@param x? number X position (default 0).
 ---@param y? number Y position (default 0).
 ---@param scale? number Text scale factor (default 1).
----@return nil No return value.
 lurek.render.print = function(text, x, y, scale) end
 
 --- Draws rich text composed of individually styled spans at the given position.
 ---@param spans table Array of span tables, each with fields: text, r, g, b, a, scale.
 ---@param x number X position.
 ---@param y number Y position.
----@return nil No return value.
 lurek.render.printRich = function(spans, x, y) end
 
 --- Draws text centered and rotated around its midpoint.
@@ -20179,7 +20271,6 @@ lurek.render.printRich = function(spans, x, y) end
 ---@param y number Center Y position.
 ---@param angle number Rotation angle in radians.
 ---@param scale? number Text scale factor (default 1).
----@return nil No return value.
 lurek.render.printRotated = function(text, x, y, angle, scale) end
 
 --- Draws word-wrapped and aligned text within a pixel-width limit.
@@ -20188,35 +20279,29 @@ lurek.render.printRotated = function(text, x, y, angle, scale) end
 ---@param y number Y position.
 ---@param limit number Maximum line width in pixels for wrapping.
 ---@param align? string Alignment: "left" (default), "center", "right", or "justify".
----@return nil No return value.
 lurek.render.printf = function(text, x, y, limit, align) end
 
 --- Pushes the current transformation matrix onto the transform stack.
----@return nil No return value.
 lurek.render.push = function() end
 
 --- Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
 ---@param id number Layer identifier (must match the popLayer call).
 ---@param alpha? number Layer opacity (0–1, default 1).
 ---@param blendMode? string Blend mode: "alpha" (default), "add", "multiply", "replace", "screen".
----@return nil No return value.
 lurek.render.pushLayer = function(id, alpha, blendMode) end
 
 --- Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
 ---@param id number Layer identifier (must match the popLayer call).
 ---@param alpha? number Layer opacity (0–1, default 1).
 ---@param blendMode? string Blend mode: "alpha" (default), "add", "multiply", "replace", "screen".
----@return nil No return value.
 lurek.render.pushLayer = function(id, alpha, blendMode) end
 
 --- Sets the depth sort key for subsequent draw calls within the current sort group.
 ---@param depth number Sort depth value (lower draws first).
----@return nil No return value.
 lurek.render.pushSortKey = function(depth) end
 
 --- Sets the depth sort key for subsequent draw calls within the current sort group.
 ---@param depth number Sort depth value (lower draws first).
----@return nil No return value.
 lurek.render.pushSortKey = function(depth) end
 
 --- Draws a rectangle. If rx is provided, draws a rounded rectangle.
@@ -20227,40 +20312,33 @@ lurek.render.pushSortKey = function(depth) end
 ---@param h number Height.
 ---@param rx? number Horizontal corner radius for rounded rectangle.
 ---@param ry? number Vertical corner radius (defaults to rx).
----@return nil No return value.
 lurek.render.rectangle = function(mode, x, y, w, h, rx, ry) end
 
 --- Applies a rotation to the current transformation matrix.
 ---@param angle number Rotation angle in radians.
----@return nil No return value.
 lurek.render.rotate = function(angle) end
 
 --- Saves a screenshot of the current frame to a file under the save/ directory.
 ---@param path string Output path (must start with "save/").
----@return nil No return value.
 lurek.render.saveScreenshot = function(path) end
 
 --- Applies scaling to the current transformation matrix.
 ---@param sx number Horizontal scale factor.
 ---@param sy? number Vertical scale factor (defaults to sx for uniform scaling).
----@return nil No return value.
 lurek.render.scale = function(sx, sy) end
 
 --- Sets the background clear color used at the start of each frame.
 ---@param r number Red channel (0–1).
 ---@param g number Green channel (0–1).
 ---@param b number Blue channel (0–1).
----@return nil No return value.
 lurek.render.setBackgroundColor = function(r, g, b) end
 
 --- Sets the blend mode for subsequent draw operations.
 ---@param mode string One of: "alpha", "add", "multiply", "replace", "screen".
----@return nil No return value.
 lurek.render.setBlendMode = function(mode) end
 
 --- Redirects all subsequent drawing to the given canvas. Pass nil to draw to the screen again.
 ---@param canvas? LCanvas Canvas to draw to, or nil for the main screen.
----@return nil No return value.
 lurek.render.setCanvas = function(canvas) end
 
 --- Sets the active drawing color for all subsequent draw operations.
@@ -20268,7 +20346,6 @@ lurek.render.setCanvas = function(canvas) end
 ---@param g number Green channel (0–1).
 ---@param b number Blue channel (0–1).
 ---@param a? number Alpha channel (0–1, default 1).
----@return nil No return value.
 lurek.render.setColor = function(r, g, b, a) end
 
 --- Sets which color channels are written during draw calls. Call with no args to enable all.
@@ -20276,58 +20353,48 @@ lurek.render.setColor = function(r, g, b, a) end
 ---@param g? boolean Enable green channel.
 ---@param b? boolean Enable blue channel.
 ---@param a? boolean Enable alpha channel.
----@return nil No return value.
 lurek.render.setColorMask = function(r, g, b, a) end
 
 --- Sets the default texture filtering mode for newly created images.
 ---@param min string Minification filter: "nearest" or "linear".
 ---@param mag string Magnification filter: "nearest" or "linear".
 ---@param anisotropy? number Anisotropy level (default 1).
----@return nil No return value.
 lurek.render.setDefaultFilter = function(min, mag, anisotropy) end
 
 --- Sets the depth comparison mode and whether depth writes are enabled.
 ---@param mode string Compare mode: "always", "never", "less", "lequal", "equal", "notequal", "greater", "gequal".
 ---@param write? boolean Enable depth buffer writes (default false).
----@return nil No return value.
 lurek.render.setDepthMode = function(mode, write) end
 
 --- Sets the active font used by print, printf, and other text rendering calls.
 ---@param font LFont Font handle to make active.
----@return nil No return value.
 lurek.render.setFont = function(font) end
 
 --- Sets the line height override for a font (currently a no-op stub).
 ---@param font LFont Font handle.
 ---@param lh number Line height value.
----@return nil No return value.
 lurek.render.setFontLineHeight = function(font, lh) end
 
 --- Sets the active rendering layer by name. Creates the layer if it does not exist.
 ---@param name string Layer name to activate.
----@return nil No return value.
 lurek.render.setLayer = function(name) end
 
 --- Sets whether a named rendering layer is visible.
 ---@param name string Layer name.
 ---@param visible boolean True to show, false to hide.
----@return nil No return value.
 lurek.render.setLayerVisible = function(name, visible) end
 
 --- Sets the z-order value of a named rendering layer.
 ---@param name string Layer name.
 ---@param z number New z-order value.
----@return nil No return value.
 lurek.render.setLayerZOrder = function(name, z) end
 
 --- Sets the line width for subsequent line-mode draw calls.
 ---@param w number Line width in pixels.
----@return nil No return value.
 lurek.render.setLineWidth = function(w) end
 
 --- Sets the point size for subsequent point draw calls.
 ---@param size number Point diameter in pixels.
----@return nil No return value.
 lurek.render.setPointSize = function(size) end
 
 --- Sets or clears the scissor rectangle. Only pixels inside this region are drawn. Call with no args to clear.
@@ -20335,48 +20402,40 @@ lurek.render.setPointSize = function(size) end
 ---@param y? number Top edge.
 ---@param w? number Width.
 ---@param h? number Height.
----@return nil No return value.
 lurek.render.setScissor = function(x, y, w, h) end
 
 --- Activates a shader for subsequent draw calls. Pass nil to restore the default shader.
 ---@param shader? LShader Shader handle to activate, or nil for default.
----@return nil No return value.
 lurek.render.setShader = function(shader) end
 
 --- Sets the stencil write action, compare function, and reference value at once.
 ---@param action string Stencil action: "keep", "zero", "replace", "increment", "decrement", etc.
 ---@param compare? string Compare function (default "always").
 ---@param value? number Reference value (default 0).
----@return nil No return value.
 lurek.render.setStencilMode = function(action, compare, value) end
 
 --- Configures the stencil comparison test for subsequent draws. Pass nil to disable.
 ---@param compare? string Compare function: "equal", "notequal", "less", "greater", etc. Nil disables.
 ---@param value? number Reference value to compare against (default 1).
----@return nil No return value.
 lurek.render.setStencilTest = function(compare, value) end
 
 --- Enables or disables wireframe rendering mode.
 ---@param enabled boolean True for wireframe, false for solid.
----@return nil No return value.
 lurek.render.setWireframe = function(enabled) end
 
 --- Applies a shear (skew) to the current transformation matrix.
 ---@param kx number Horizontal shear factor.
 ---@param ky number Vertical shear factor.
----@return nil No return value.
 lurek.render.shear = function(kx, ky) end
 
 --- Begins a stencil write pass with the given action and reference value.
 ---@param action? string Stencil action: "replace" (default), "zero", "increment", "decrement", etc.
 ---@param value? number Stencil reference value (default 1).
----@return nil No return value.
 lurek.render.stencil = function(action, value) end
 
 --- Applies a translation to the current transformation matrix.
 ---@param x number Horizontal translation in pixels.
 ---@param y number Vertical translation in pixels.
----@return nil No return value.
 lurek.render.translate = function(x, y) end
 
 --- Draws a triangle from three vertex positions.
@@ -20387,7 +20446,6 @@ lurek.render.translate = function(x, y) end
 ---@param y2 number Second vertex Y.
 ---@param x3 number Third vertex X.
 ---@param y3 number Third vertex Y.
----@return nil No return value.
 lurek.render.triangle = function(mode, x1, y1, x2, y2, x3, y3) end
 
 ---@class lurek.repl
@@ -20402,7 +20460,7 @@ function LReplSession:clear() end
 
 --- Returns completion candidates that begin with the supplied prefix.
 ---@param prefix string Prefix text to complete.
----@return table Array table of matching completion strings.
+---@return string[] Matching completion strings.
 function LReplSession:complete(prefix) end
 
 --- Evaluates Lua code and records the input in this REPL history.
@@ -20411,7 +20469,7 @@ function LReplSession:complete(prefix) end
 function LReplSession:eval(code) end
 
 --- Returns the recorded REPL input history in oldest-first order.
----@return table Array table of history entry strings.
+---@return string[] History entry strings.
 function LReplSession:history() end
 
 --- Returns the number of entries stored in this REPL history.
@@ -20450,6 +20508,7 @@ function LSaveManager:collect() end
 
 --- Permanently delete a save slot file from disk. This action cannot be undone.
 ---@param slot string Slot name to delete (e.g. "slot1").
+---@return nil No return value.
 function LSaveManager:delete(slot) end
 
 --- Disable the periodic auto-save timer. Manual saves via save() still work.
@@ -20469,13 +20528,25 @@ function LSaveManager:exists(slot) end
 ---@return number The active schema version.
 function LSaveManager:getSchemaVersion() end
 
+---@class LSaveManagerGetSlotInfoResult
+---@field slot string Slot name.
+---@field version number Schema version.
+---@field timestamp number Save timestamp.
+---@field summary string Save summary.
+
 --- Read metadata for a single save slot without loading its full game state.
 ---@param slot string Slot name to inspect.
----@return table? Info table with fields: slot, version, timestamp, summary, or nil if not found.
+---@return LSaveManagerGetSlotInfoResult Info table with fields: slot, version, timestamp, summary, or nil if not found.
 function LSaveManager:getSlotInfo(slot) end
 
+---@class LSaveManagerGetSlotsResult
+---@field slot string Slot name.
+---@field version number Schema version.
+---@field timestamp number Save timestamp.
+---@field summary string Save summary.
+
 --- List all save slots found on disk with their metadata (version, timestamp, summary).
----@return table Array of info tables, each with fields: slot, version, timestamp, summary.
+---@return LSaveManagerGetSlotsResult Array of info tables, each with fields: slot, version, timestamp, summary.
 function LSaveManager:getSlots() end
 
 --- Get the current summary string that will be embedded in the next save.
@@ -20493,7 +20564,7 @@ function LSaveManager:isDirty() end
 --- Load game state from a named slot file. Decompresses if needed, applies migrations, calls restorers, then fires onAfterLoad.
 ---@param slot string Slot name to load (e.g. "slot1").
 ---@return boolean a True if the load succeeded, false on error.
----@return string? b Error message if the load failed, nil on success.
+---@return string b Error message if the load failed, nil on success.
 function LSaveManager:load(slot) end
 
 --- Mark the save state as dirty, indicating unsaved changes exist.
@@ -20571,20 +20642,16 @@ LDepthSorter = {}
 --- Register a draw callback at a given depth value. When `flush` is called, all registered callbacks execute in back-to-front order (lowest depth drawn first, highest depth drawn last / on top). Use this for simple draw calls like sprite rendering where each entity has a depth/z-layer.
 ---@param callback function A zero-argument draw function invoked during flush.
 ---@param depth number Numeric z-depth controlling draw order — lower values are drawn behind higher values.
----@return nil No value is returned.
 function LDepthSorter:add(callback, depth) end
 
 --- Register a game object table for depth-sorted rendering. The object must expose a numeric `depth` field and a `drawSorted(self)` method. During `flush`, each object's `drawSorted` is called in depth order, making this ideal for entity-based architectures where objects manage their own drawing.
 ---@param obj table A game object table with a numeric `depth` field and a `drawSorted(self)` method.
----@return nil No value is returned.
 function LDepthSorter:addObject(obj) end
 
 --- Discard all pending entries without executing any draw callbacks. Use this when a scene is interrupted, reset, or destroyed before its normal `flush` call.
----@return nil No value is returned.
 function LDepthSorter:clear() end
 
 --- Sort all entries by depth, execute every callback or object's `drawSorted` method in back-to-front order, then clear the sorter for the next frame. This is the standard one-call render path — call it once per frame inside your scene's `draw` or `render` callback.
----@return nil No value is returned.
 function LDepthSorter:flush() end
 
 --- Returns the number of draw entries currently queued for the next `flush` call. Useful for debugging or deciding whether to skip an empty render pass.
@@ -20597,11 +20664,9 @@ function LDepthSorter:isStable() end
 
 --- Enable or disable stable sorting. When stable, items sharing the same depth value retain their insertion order, which prevents visual flickering between overlapping sprites at the same layer. Unstable sort is slightly faster but may swap equal-depth items between frames.
 ---@param stable boolean True for stable sort (deterministic order at equal depth), false for unstable (faster but may flicker).
----@return nil No value is returned.
 function LDepthSorter:setStable(stable) end
 
 --- Sort all registered entries by depth without executing any callbacks. Call this only if you need to inspect the sorted order before drawing; `flush` already sorts automatically.
----@return nil No value is returned.
 function LDepthSorter:sort() end
 
 --- Returns the type name string `"LDepthSorter"`.
@@ -20614,11 +20679,9 @@ function LDepthSorter:type() end
 function LDepthSorter:typeOf(name) end
 
 --- Remove all scenes from the stack. Each removed scene receives its `leave()` callback in stack order. After this call the stack is empty and `isEmpty()` returns true. Useful for returning to a title screen or tearing down the entire scene graph.
----@return nil No return value.
 lurek.scene.clear = function() end
 
 --- Discard all queued transitions without affecting the currently-playing transition (if any). Use this to cancel a planned transition sequence mid-way.
----@return nil No return value.
 lurek.scene.clearQueuedTransitions = function() end
 
 --- Create a reusable scene constructor function from a prototype table. Each call to the returned factory produces a fresh instance that inherits methods from the prototype via metatables. Ideal for defining scene "classes" that can be instantiated multiple times.
@@ -20632,20 +20695,25 @@ lurek.scene.depth = function() end
 
 --- Restore shared scene data from a previously-serialized snapshot table. Only the `data` key-value map is restored; the scene stack itself must be rebuilt manually by pushing or registering scenes. Pair with `serializeScene` for save/load workflows.
 ---@param snapshot table A snapshot table as returned by `serializeScene` (must contain a `data` field).
----@return nil No return value.
 lurek.scene.deserializeScene = function(snapshot) end
 
 --- Call `draw(self)` on every scene in the stack from bottom to top. This is the legacy draw callback — prefer `render` and `renderUi` for world-space and screen-space separation.
----@return nil No return value.
 lurek.scene.draw = function() end
+
+---@class TransitionsFadeResult
+---@field type string Transition type name.
+---@field duration number Duration in seconds.
 
 --- Helper sub-table `lurek.scene.transitions` with convenience factory functions that build transition descriptor tables for use with transition-aware APIs.
 ---@param duration? number Total fade duration in seconds. Defaults to 0.5.
----@return table Transition descriptor `{type="fade", duration=...}` for use with scene functions.
+---@return TransitionsFadeResult Transition descriptor `{type="fade", duration=...}` for use with scene functions.
 lurek.scene.transitions.fade = function(duration) end
 
+---@class SceneGetActiveScenesResult
+---@field __index table Prototype table (the scene definition used to create this instance).
+
 --- Returns a Lua array of all active scene tables ordered by their layer value (lowest layer first). Includes both regular scenes and overlays. Useful for iterating over all scenes for custom processing or debugging.
----@return table Lua array of scene tables sorted by layer.
+---@return SceneGetActiveScenesResult Lua array of active scene tables sorted by layer.
 lurek.scene.getActiveScenes = function() end
 
 --- Returns the scene table currently on top of the stack, or nil if the stack is empty. Use this to inspect or call methods on the active scene directly.
@@ -20671,7 +20739,7 @@ lurek.scene.getQueuedTransitionCount = function() end
 lurek.scene.getRegistered = function(name) end
 
 --- Returns an array of all currently registered scene name strings. Useful for debugging or building dynamic scene-selection UIs.
----@return table Lua array of registered name strings.
+---@return string[] Lua array of registered name strings.
 lurek.scene.getRegisteredNames = function() end
 
 --- Returns the total number of scenes currently on the stack, including overlays. Useful for asserting expected navigation depth or debugging scene flow.
@@ -20687,7 +20755,7 @@ lurek.scene.getTransitionProgress = function() end
 lurek.scene.getTransitionProgressEased = function() end
 
 --- Returns a Lua array of all supported transition type name strings. Use this to discover available transitions at runtime or build a transition picker UI.
----@return table Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
+---@return string[] Lua array of strings: `"none"`, `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`.
 lurek.scene.getTransitionTypes = function() end
 
 --- Check whether a key exists in the shared scene data map without retrieving its value.
@@ -20700,9 +20768,13 @@ lurek.scene.hasData = function(key) end
 ---@return boolean True if a scene is registered with that name.
 lurek.scene.hasRegistered = function(name) end
 
+---@class TransitionsIrisResult
+---@field type string Transition type name.
+---@field duration number Duration in seconds.
+
 --- Create an iris (circle) transition descriptor table. A circular aperture opens or closes to reveal the new scene, similar to classic cartoon transitions.
 ---@param duration? number Iris animation duration in seconds. Defaults to 0.6.
----@return table Transition descriptor `{type="iris", duration=...}` for use with scene functions.
+---@return TransitionsIrisResult Transition descriptor `{type="iris", duration=...}` for use with scene functions.
 lurek.scene.transitions.iris = function(duration) end
 
 --- Returns true if the scene stack contains no scenes at all. Useful for guarding against calling `pop` on an empty stack or for detecting when the game should quit.
@@ -20722,25 +20794,30 @@ lurek.scene.isPreloaded = function(name) end
 ---@return boolean True while a transition animation is in progress.
 lurek.scene.isTransitioning = function() end
 
+---@class SceneNewResult
+---@field __index table Prototype table (the def parameter).
+
 --- Create a new scene instance from an optional prototype table. Sets up metatables so the instance inherits methods from the prototype. Use this for one-off scene creation; use `define` when you need a reusable scene constructor.
 ---@param def? table A prototype table containing scene lifecycle methods (`enter`, `leave`, `update`, `draw`, etc.). If omitted, an empty table is used.
----@return table A new instance table with `def` as its metatable `__index`.
+---@return SceneNewResult A new instance table with `def` as its metatable `__index`.
 lurek.scene.new = function(def) end
 
 --- Create a new `LDepthSorter` instance for collecting drawable items and flushing them in depth-sorted (painter's algorithm) order. Allocate one per scene or per rendering pass.
 ---@return LDepthSorter A fresh depth sorter with no queued entries.
 lurek.scene.newDepthSorter = function() end
 
+---@class SceneNewSceneResult
+---@field __index table Prototype table (the def parameter).
+
 --- Alias for `lurek.scene.new`. Creates a new scene instance from an optional prototype table while preserving the older API name still used by tests, examples, and existing game scripts.
 ---@param def? table A prototype table containing scene lifecycle methods (`enter`, `leave`, `update`, `draw`, etc.). If omitted, an empty table is used.
----@return table A new instance table with `def` as its metatable `__index`.
+---@return SceneNewSceneResult A new instance table with `def` as its metatable `__index`.
 lurek.scene.newScene = function(def) end
 
 --- Pop the top scene off the stack and return to the previous one. The popped scene receives `leave()` and the revealed scene receives `resume()` (unless the popped scene was an overlay, in which case the underlying scene was never paused). Use this for "back" navigation, closing menus, or exiting sub-screens.
 ---@param transition? string Transition type name. Defaults to `"none"` (instant).
 ---@param duration? number Transition animation duration in seconds. Defaults to 0.
 ---@param easing? string Easing curve name. Defaults to `"linear"`.
----@return nil No value is returned.
 lurek.scene.pop = function(transition, duration, easing) end
 
 --- Pop scenes off the stack until the named registered scene is on top. Every popped scene receives `leave()` and the target scene receives `resume()`. The target scene must have been previously added via `registerScene`. Returns false if no scene with that name exists on the stack.
@@ -20751,22 +20828,18 @@ lurek.scene.popTo = function(name) end
 --- Register a deferred-loading function for a scene. The loader function is NOT called immediately — it runs the first time `pushPreloaded` is called with this name. Use this to spread scene initialization (asset loading, table setup) across loading screens or lazy-load heavy scenes on demand.
 ---@param name string Name to associate with the loader (must match the name used in `pushPreloaded`).
 ---@param loader function A zero-argument function that creates and registers the scene via `registerScene` when called.
----@return nil No return value.
 lurek.scene.preload = function(name, loader) end
 
 --- Call `ready(self)` once on newly-pushed scenes, then call `process(self, dt)` on every active scene ordered by layer (lowest first). Use this for deterministic game-logic ticks at a fixed time step. Scenes pushed as overlays and underlying scenes all receive this callback.
 ---@param dt number Fixed time-step delta in seconds (e.g. 1/60 for 60-tick logic).
----@return nil No return value.
 lurek.scene.process = function(dt) end
 
 --- Call `process_late(self, dt)` on every active scene after all other processing. Ideal for camera follow logic, HUD synchronization, deferred cleanup, or any work that depends on the final positions of game objects.
 ---@param dt number Delta time in seconds (same value passed to `process`).
----@return nil No return value.
 lurek.scene.processLate = function(dt) end
 
 --- Call `process_physics(self, dt)` on every active scene ordered by layer. Run this callback after your physics world step so scenes can react to collision results, apply forces, or synchronize sprite positions with physics bodies.
 ---@param dt number Physics time-step delta in seconds.
----@return nil No return value.
 lurek.scene.processPhysics = function(dt) end
 
 --- Push a new scene onto the stack, making it the active scene. The previously-active scene receives its `pause()` lifecycle callback and the new scene receives `enter(self, params)`. An optional visual transition (fade, slide, iris, etc.) animates between the two scenes over the specified duration.
@@ -20774,8 +20847,7 @@ lurek.scene.processPhysics = function(dt) end
 ---@param transition? string Transition type name: `"fade"`, `"slideleft"`, `"slideright"`, `"slideup"`, `"slidedown"`, `"wipe"`, `"iris"`, `"zoom"`, `"crossfade"`. Defaults to `"none"`.
 ---@param duration? number Transition animation duration in seconds. Defaults to 0 (instant).
 ---@param easing? string Easing curve name (e.g. `"linear"`, `"ease_in"`, `"ease_out"`, `"ease_in_out"`). Defaults to `"linear"`.
----@param params? any Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
----@return nil No return value.
+---@param params? table Arbitrary data forwarded to the new scene's `enter(self, params)` callback for initialization.
 lurek.scene.push = function(scene, transition, duration, easing, params) end
 
 --- Push a scene as a transparent overlay on top of the current scene. Unlike `push`, the underlying scene is NOT paused — it continues to receive `process`, `draw`, and `render` callbacks. Use overlays for pause menus, dialog boxes, inventory screens, or debug panels that should draw on top without stopping gameplay.
@@ -20783,8 +20855,7 @@ lurek.scene.push = function(scene, transition, duration, easing, params) end
 ---@param transition? string Transition type name. Defaults to `"none"`.
 ---@param duration? number Transition animation duration in seconds. Defaults to 0.
 ---@param easing? string Easing curve name. Defaults to `"linear"`.
----@param params? any Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
----@return nil No return value.
+---@param params? table Arbitrary data forwarded to the overlay's `enter(self, params)` callback.
 lurek.scene.pushOverlay = function(scene, transition, duration, easing, params) end
 
 --- Push a preloaded scene onto the stack by name. If the loader registered via `preload` has not yet run, it executes first to create and register the scene. Then the registered scene is pushed with the specified transition. Combines deferred loading with stack navigation in a single call.
@@ -20792,38 +20863,36 @@ lurek.scene.pushOverlay = function(scene, transition, duration, easing, params) 
 ---@param transition? string Transition type name. Defaults to `"none"`.
 ---@param duration? number Transition animation duration in seconds. Defaults to 0.
 ---@param easing? string Easing curve name. Defaults to `"linear"`.
----@param params? any Arbitrary data forwarded to the scene's `enter(self, params)` callback.
----@return nil No return value.
+---@param params? table Arbitrary data forwarded to the scene's `enter(self, params)` callback.
 lurek.scene.pushPreloaded = function(name, transition, duration, easing, params) end
 
 --- Queue a transition to play automatically after the current one finishes. Multiple queued transitions execute in FIFO order, enabling multi-step cinematic sequences (e.g. fade-out then slide-in).
 ---@param transition string Transition type name (e.g. `"fade"`, `"iris"`, `"wipe"`).
 ---@param duration number Duration in seconds.
 ---@param easing? string Easing curve name. Defaults to `"linear"`.
----@return nil No return value.
 lurek.scene.queueTransition = function(transition, duration, easing) end
 
 --- Register a scene table under a unique name for later retrieval via `getRegistered`, navigation via `popTo`, or deferred push via `pushPreloaded`. Registering does not push the scene onto the stack.
 ---@param name string Unique name to associate with this scene (e.g. `"mainMenu"`, `"gameplay"`).
 ---@param scene table The scene table to register.
----@return nil No return value.
 lurek.scene.registerScene = function(name, scene) end
 
 --- Remove a key and its associated value from the shared scene data map. No-op if the key does not exist.
 ---@param key string The data key to remove.
----@return nil No return value.
 lurek.scene.removeData = function(key) end
 
 --- Call `render(self)` on every scene in the stack from bottom to top. This is the preferred world-space rendering callback — draw sprites, tilemaps, particles, and other in-world visuals here. Runs before `renderUi`.
----@return nil No return value.
 lurek.scene.render = function() end
 
 --- Call `render_ui(self)` on every scene in the stack from bottom to top. Use this for screen-space HUD elements, health bars, score displays, menus, and overlays that should draw on top of the world after `render`.
----@return nil No return value.
 lurek.scene.renderUi = function() end
 
+---@class SceneSerializeSceneResult
+---@field stack string[] Scene stack as ordered array of registered name strings.
+---@field data table Key-value map of shared scene data.
+
 --- Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` array of registered scene names (in stack order) and a `data` map of shared data key-value pairs. Use this for save/load systems to persist the player's navigation state.
----@return table A snapshot table with `stack` (array of name strings) and `data` (key-value map) fields.
+---@return SceneSerializeSceneResult A snapshot table with `stack` (array of scene name strings) and `data` (key-value map) fields.
 lurek.scene.serializeScene = function() end
 
 --- Set the rendering layer of the current top scene. Scenes with higher layer values are processed and drawn after lower-layer scenes. Use layers to control draw order when multiple scenes are active (e.g. game world at layer 0, HUD overlay at layer 10).
@@ -20833,14 +20902,17 @@ lurek.scene.setCurrentLayer = function(layer) end
 
 --- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
 ---@param key string The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
----@param value any The value to store (table, number, string, boolean, etc.). Overwrites any previous value for this key.
----@return nil No return value.
+---@param value table Value to store (a table with your game data).
 lurek.scene.setData = function(key, value) end
+
+---@class TransitionsSlideResult
+---@field type string Transition type name.
+---@field duration number Duration in seconds.
 
 --- Create a directional slide transition descriptor table. The new scene slides in from the specified direction, pushing the old scene out.
 ---@param direction? string Slide direction: `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 ---@param duration? number Slide animation duration in seconds. Defaults to 0.4.
----@return table Transition descriptor `{type="slide...", duration=...}` for use with scene functions.
+---@return TransitionsSlideResult Transition descriptor `{type="slide...", duration=...}` for use with scene functions.
 lurek.scene.transitions.slide = function(direction, duration) end
 
 --- Replace the current top scene with a different one without changing stack depth. The old scene receives `leave()` and the new scene receives `enter(self, params)`. Unlike `push`, no scene is added to the stack — the old scene is removed and the new one takes its slot. Ideal for transitioning between peer-level game states (e.g. level 1 → level 2).
@@ -20848,23 +20920,24 @@ lurek.scene.transitions.slide = function(direction, duration) end
 ---@param transition? string Transition type name. Defaults to `"none"`.
 ---@param duration? number Transition animation duration in seconds. Defaults to 0.
 ---@param easing? string Easing curve name. Defaults to `"linear"`.
----@param params? any Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
----@return nil No return value.
+---@param params? table Arbitrary data forwarded to the new scene's `enter(self, params)` callback.
 lurek.scene.switchTo = function(scene, transition, duration, easing, params) end
 
 --- Remove a scene registration by name. Does not pop the scene if it is currently active on the stack — it only removes the name mapping.
 ---@param name string The registered name to remove.
----@return nil No return value.
 lurek.scene.unregisterScene = function(name) end
 
 --- Advance any active transition animation and call `update(self, dt)` on the current top scene. Call this once per frame from your main loop to drive scene logic and transition timing.
 ---@param dt number Delta time in seconds since the last frame (e.g. from `lurek.timer.getDelta()`).
----@return nil No return value.
 lurek.scene.update = function(dt) end
+
+---@class TransitionsWipeResult
+---@field type string Transition type name.
+---@field duration number Duration in seconds.
 
 --- Create a horizontal wipe transition descriptor table. A wipe bar sweeps across the screen to reveal the new scene.
 ---@param duration? number Wipe animation duration in seconds. Defaults to 0.5.
----@return table Transition descriptor `{type="wipe", duration=...}` for use with scene functions.
+---@return TransitionsWipeResult Transition descriptor `{type="wipe", duration=...}` for use with scene functions.
 lurek.scene.transitions.wipe = function(duration) end
 
 ---@class lurek.serial
@@ -20895,7 +20968,7 @@ lurek.serial.decodeXml = function(text) end
 
 --- Attempts to auto-detect the serialization format of a string by inspecting its content (e.g., leading `{` for JSON, `[section]` for INI, XML declaration for XML). Returns the format name or nil if detection fails. Useful for loading user-provided files where the format is unknown.
 ---@param text string The raw text content to analyze.
----@return string? The detected format name ("json", "toml", "csv", "xml", "ini"), or nil if unrecognized.
+---@return string The detected format name ("json", "toml", "csv", "xml", "ini"), or nil if unrecognized.
 lurek.serial.detectFormat = function(text) end
 
 --- Universal encoder that serializes a Lua value into the specified format. Supports JSON, TOML, CSV, and MessagePack. Returns a string (text for JSON/TOML/CSV, binary for MessagePack). Use this as a single entry point for all serialization needs.
@@ -20966,7 +21039,6 @@ LSkeleton = {}
 
 --- Registers a SkeletonAnimation object with this skeleton so it can be played by name.
 ---@param anim LSkeletonAnimation The animation userdata to register. Consumed by this call.
----@return nil This method returns no value.
 function LSkeleton:addAnimation(anim) end
 
 --- Adds a root-level bone to the skeleton with optional transform properties.
@@ -20991,7 +21063,6 @@ function LSkeleton:addIKConstraint(name, chain, bend_positive) end
 
 --- Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
 ---@param name string Unique name for the skin.
----@return nil This method returns no value.
 function LSkeleton:addSkin(name) end
 
 --- Adds a slot attached to a specific bone, optionally assigning a default attachment name.
@@ -21005,7 +21076,6 @@ function LSkeleton:addSlot(name, bone_idx, attachment) end
 ---@param anim LSkeletonAnimation The animation to sample and blend from.
 ---@param time number The time position to sample within the animation.
 ---@param blend_weight? number Blend factor from 0.0 (no effect) to 1.0 (full). Defaults to 1.0.
----@return nil This method returns no value.
 function LSkeleton:blendAnimation(anim, time, blend_weight) end
 
 --- Returns the total number of bones in the skeleton.
@@ -21032,9 +21102,16 @@ function LSkeleton:findSlot(name) end
 ---@return number Current animation time position.
 function LSkeleton:getAnimationTime() end
 
+---@class LSkeletonGetBoneWorldResult
+---@field x number X position.
+---@field y number Y position.
+---@field rotation number Rotation in degrees.
+---@field scale_x number Horizontal scale.
+---@field scale_y number Vertical scale.
+
 --- Returns the final world-space transform of a bone after hierarchy resolution.
 ---@param idx number Zero-based bone index.
----@return table Table with keys x, y, rotation, scale_x, scale_y — or nil if the index is invalid.
+---@return LSkeletonGetBoneWorldResult Table with keys x, y, rotation, scale_x, scale_y — or nil if the index is invalid.
 function LSkeleton:getBoneWorld(idx) end
 
 --- Returns the name of the currently active skin, or nil if no skin is set.
@@ -21057,7 +21134,6 @@ function LSkeleton:setIKTarget(name, x, y) end
 --- Sets the root bone world position, shifting the entire skeleton.
 ---@param x number World X coordinate.
 ---@param y number World Y coordinate.
----@return nil This method returns no value.
 function LSkeleton:setPosition(x, y) end
 
 --- Activates a named skin, applying its slot-attachment mappings to the skeleton.
@@ -21069,7 +21145,6 @@ function LSkeleton:setSkin(name) end
 ---@param skin string Name of the skin to add the mapping to.
 ---@param slot string Name of the slot to remap.
 ---@param attachment string Attachment name to display in that slot when the skin is active.
----@return nil This method returns no value.
 function LSkeleton:setSkinMapping(skin, slot, attachment) end
 
 --- Returns the total number of slots in the skeleton.
@@ -21077,7 +21152,6 @@ function LSkeleton:setSkinMapping(skin, slot, attachment) end
 function LSkeleton:slotCount() end
 
 --- Stops the currently playing animation and resets playback state.
----@return nil This method returns no value.
 function LSkeleton:stopAnimation() end
 
 --- Returns the type name of this userdata object.
@@ -21091,11 +21165,9 @@ function LSkeleton:typeOf(name) end
 
 --- Advances the current animation by a delta time, applying bone transforms to the skeleton.
 ---@param dt number Time step in seconds (e.g. from lurek.timer.getDelta()).
----@return nil This method returns no value.
 function LSkeleton:updateAnimation(dt) end
 
 --- Recomputes world transforms for all bones in hierarchy order. Call after modifying bone locals or IK targets.
----@return nil This method returns no value.
 function LSkeleton:updateWorldTransforms() end
 
 --- Lua-facing animation object containing bone timelines, keyframes, events, and easing curves.
@@ -21106,7 +21178,6 @@ LSkeletonAnimation = {}
 ---@param time number Time position in seconds when the event fires.
 ---@param name string Name of the event (used to identify it when querying).
 ---@param value? number Optional numeric payload for the event. Defaults to 0.
----@return nil This method returns no value.
 function LSkeletonAnimation:addEventKey(time, name, value) end
 
 --- Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
@@ -21115,26 +21186,34 @@ function LSkeletonAnimation:addEventKey(time, name, value) end
 ---@param time number Time position in seconds for this keyframe.
 ---@param value number Value of the property at this keyframe.
 ---@param easing? string Easing type: "linear" (default), "ease_in", "ease_out", "ease_in_out", or "step".
----@return nil This method returns no value.
 function LSkeletonAnimation:addKeyframe(bone_idx, property, time, value, easing) end
 
 --- Returns the total duration of this animation in seconds.
 ---@return number Duration in seconds.
 function LSkeletonAnimation:getDuration() end
 
+---@class LSkeletonAnimationGetEventsResult
+---@field name string Event name.
+---@field value number Event value.
+
 --- Collects all events that fire within a time range. Useful for triggering sound effects or gameplay actions.
 ---@param from number Start time in seconds (inclusive).
 ---@param to number End time in seconds (exclusive).
----@return table Array of tables, each with "name" (string) and "value" (number) fields.
+---@return LSkeletonAnimationGetEventsResult Array of tables, each with "name" (string) and "value" (number) fields.
 function LSkeletonAnimation:getEvents(from, to) end
 
 --- Returns the number of bone-property timelines in this animation.
 ---@return number Timeline count.
 function LSkeletonAnimation:getTimelineCount() end
 
+---@class LSkeletonAnimationPoseAtResult
+---@field bone_idx number Bone index.
+---@field property string Property name.
+---@field value number Property value.
+
 --- Samples all timelines at a given time and returns the computed pose as an array of bone-property-value entries.
 ---@param time number Time position in seconds to sample.
----@return table Array of tables, each with "bone_idx" (integer), "property" (string), and "value" (number).
+---@return LSkeletonAnimationPoseAtResult Array of tables, each with "bone_idx" (integer), "property" (string), and "value" (number).
 function LSkeletonAnimation:poseAt(time) end
 
 --- Creates a new animation that plays this animation's keyframes in reverse order.
@@ -21178,27 +21257,52 @@ LSpriteAtlas = {}
 function LSpriteAtlas:entryCount() end
 
 --- Returns an array of all entry names in the atlas.
----@return table Array of name strings.
+---@return string[] Name strings.
 function LSpriteAtlas:entryNames() end
+
+---@class LSpriteAtlasGetByIndexResult
+---@field name string Entry name.
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
+---@field rotated boolean Whether the entry is rotated.
+---@field flip_x boolean Flip horizontally.
+---@field flip_y boolean Flip vertically.
 
 --- Returns a sprite region by its 1-based index in the atlas.
 ---@param index number 1-based entry index.
----@return table a Entry table `{name, x, y, w, h, rotated}`.
----@return nil b Returned if the index is out of range.
+---@return LSpriteAtlasGetByIndexResult Entry table `{name, x, y, w, h, rotated}`, or nil if the index is out of range.
 function LSpriteAtlas:getByIndex(index) end
+
+---@class LSpriteAtlasGetEntryResult
+---@field name string Entry name.
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
+---@field rotated boolean Whether the entry is rotated.
 
 --- Looks up a named sprite region in the atlas by its original filename or tag.
 ---@param name string Entry name (e.g. `"player_idle_0"`).
----@return table a Entry table `{name, x, y, w, h, rotated}`.
----@return nil b Returned if the entry is not found.
+---@return LSpriteAtlasGetEntryResult Entry table `{name, x, y, w, h, rotated}`, or nil if the entry is not found.
 function LSpriteAtlas:getEntry(name) end
+
+---@class LSpriteAtlasGetFlippedResult
+---@field name string Entry name.
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
+---@field rotated boolean Whether the entry is rotated.
+---@field flip_x boolean Flip horizontally.
+---@field flip_y boolean Flip vertically.
 
 --- Returns a copy of a named atlas entry with the specified flip flags applied.
 ---@param name string Entry name to look up.
 ---@param flip_x boolean Mirror horizontally.
 ---@param flip_y boolean Mirror vertically.
----@return table a Entry table with added `flip_x` and `flip_y` fields.
----@return nil b Returned if the entry is not found.
+---@return LSpriteAtlasGetFlippedResult Entry table with added `flip_x` and `flip_y` fields, or nil if the entry is not found.
 function LSpriteAtlas:getFlipped(name, flip_x, flip_y) end
 
 --- Returns the type name of this object.
@@ -21220,15 +21324,26 @@ LSpriteSheet = {}
 ---@return LImage A new image containing the rendered sprite sheet.
 function LSpriteSheet:drawToImage(w, h) end
 
+---@class LSpriteSheetGetColumnResult
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
+
 --- Returns all frame quads in the given column of the sprite sheet grid.
 ---@param col number 0-based column index.
----@return table Array of quad tables `{x, y, w, h}`.
+---@return LSpriteSheetGetColumnResult Array of quad tables `{x, y, w, h}`.
 function LSpriteSheet:getColumn(col) end
+
+---@class LSpriteSheetGetFrameResult
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
 
 --- Returns the UV quad for a single frame by its 1-based index.
 ---@param index number 1-based frame index in the sprite sheet.
----@return table a Quad table `{x, y, w, h}` with normalized UV coordinates.
----@return nil b Returned if the index is out of range.
+---@return LSpriteSheetGetFrameResult Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if the index is out of range.
 function LSpriteSheet:getFrame(index) end
 
 --- Returns the total number of frames in this sprite sheet.
@@ -21245,19 +21360,30 @@ function LSpriteSheet:getFrameSize() end
 ---@return number b Number of rows.
 function LSpriteSheet:getGridSize() end
 
+---@class LSpriteSheetGetGroupFramesResult
+---@field x number X position in atlas.
+---@field y number Y position in atlas.
+---@field w number Width.
+---@field h number Height.
+
 --- Returns the frame quads for a named animation group.
 ---@param name string Name of the animation group (e.g. "walk", "idle").
----@return table a Array of quad tables for the group.
----@return nil b Returned if the group does not exist.
+---@return LSpriteSheetGetGroupFramesResult Array of quad tables for the group, or nil if the group does not exist.
 function LSpriteSheet:getGroupFrames(name) end
 
 --- Returns an array of all named animation group names defined on this sheet.
----@return table Array of group name strings.
+---@return string[] Group name strings.
 function LSpriteSheet:getGroupNames() end
+
+---@class LSpriteSheetGetRowResult
+---@field x number X.
+---@field y number Y.
+---@field w number W.
+---@field h number H.
 
 --- Returns all frame quads in the given row of the sprite sheet grid.
 ---@param row number 0-based row index.
----@return table Array of quad tables `{x, y, w, h}`.
+---@return LSpriteSheetGetRowResult Array of quad tables `{x, y, w, h}`.
 function LSpriteSheet:getRow(row) end
 
 --- Defines a named animation group as a contiguous range of frames.
@@ -21319,7 +21445,7 @@ lurek.runtime.errorSnapshot = function(msg) end
 lurek.runtime.getArch = function() end
 
 --- Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
----@return table Array of argument strings.
+---@return string[] Argument strings.
 lurek.runtime.getArgs = function() end
 
 --- Summarizes batch results by counting passed, failed, and skipped tasks.
@@ -21333,8 +21459,18 @@ lurek.runtime.getBatchResults = function(results) end
 ---@return string The clipboard text, or `""` on failure.
 lurek.runtime.getClipboardText = function() end
 
+---@class RuntimeGetConfigResult
+---@field runtime_mode string Runtime mode.
+---@field physics_tick_rate number Physics tick rate.
+---@field fixed_update_tick_rate number Fixed update tick rate.
+---@field frame_budget_warn_ms number Frame budget warn ms.
+---@field lua_callback_timeout_ms number Lua callback timeout ms.
+---@field vsync boolean Vsync.
+---@field log_level string Log level.
+---@field config_reload_revision number Config reload revision.
+
 --- Returns a table containing the current engine runtime configuration values.
----@return table Table with fields: `runtime_mode` (string), `physics_tick_rate` (number), `fixed_update_tick_rate` (number?), `frame_budget_warn_ms` (number?), `lua_callback_timeout_ms` (number?), `vsync` (boolean), `log_level` (string), `config_reload_revision` (number).
+---@return RuntimeGetConfigResult Table with fields: `runtime_mode` (string), `physics_tick_rate` (number), `fixed_update_tick_rate` (number?), `frame_budget_warn_ms` (number?), `lua_callback_timeout_ms` (number?), `vsync` (boolean), `log_level` (string), `config_reload_revision` (number).
 lurek.runtime.getConfig = function() end
 
 --- Returns whether the on-screen debug overlay is currently enabled.
@@ -21346,12 +21482,27 @@ lurek.runtime.getDebugOverlay = function() end
 ---@return string The variable value. Returns `nil` when the variable is not set.
 lurek.runtime.getEnv = function(name) end
 
+---@class RuntimeGetInfoResult
+---@field engine string Engine name.
+---@field version string Engine version string.
+---@field lua_version string Lua version string.
+---@field renderer string Renderer backend name.
+---@field os string Host operating system name.
+---@field processors number Number of logical processors.
+---@field memory number Total physical memory in MiB.
+
 --- Returns a table with comprehensive engine and host information.
----@return table Table with fields: `engine` (string), `version` (string), `lua_version` (string), `renderer` (string), `os` (string), `processors` (number), `memory` (number).
+---@return RuntimeGetInfoResult Table with fields: `engine` (string), `version` (string), `lua_version` (string), `renderer` (string), `os` (string), `processors` (number), `memory` (number).
 lurek.runtime.getInfo = function() end
 
+---@class RuntimeGetLastErrorResult
+---@field message string Error message.
+---@field code string Error code.
+---@field category string Error category.
+---@field hint string? Optional hint for resolution.
+
 --- Returns the last error for Lua scripts in this module.
----@return table Table result returned by this call.
+---@return RuntimeGetLastErrorResult Table result returned by this call.
 lurek.runtime.getLastError = function() end
 
 --- Returns the current engine log verbosity level as a string.
@@ -21382,7 +21533,7 @@ lurek.runtime.getOS = function() end
 lurek.runtime.getPowerInfo = function() end
 
 --- Returns a list of the user's preferred locale identifiers from the operating system.
----@return table Array of locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
+---@return string[] Locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
 lurek.runtime.getPreferredLocales = function() end
 
 --- Returns the number of logical processors available on the host machine.
@@ -21401,7 +21552,6 @@ lurek.runtime.hasMessage = function(id) end
 --- Writes a message to the engine log at the specified severity level.
 ---@param level string Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`. Defaults to `"info"` if unrecognized.
 ---@param message string The message text to log.
----@return nil No value is returned.
 lurek.runtime.log = function(level, message) end
 
 --- Opens a URL in the default system browser. Only `http://`, `https://`, and `mailto:` schemes are permitted.
@@ -21409,34 +21559,40 @@ lurek.runtime.log = function(level, message) end
 ---@return boolean `true` if the URL was accepted and the open command launched successfully.
 lurek.runtime.openURL = function(url) end
 
+---@class RuntimeParseArgsResult
+---@field flags table Boolean flags indexed by name.
+---@field options table String options indexed by name.
+---@field positional string[] Positional argument values.
+
 --- Parses command-line arguments into structured flags, options, and positional values. Supports `--key=value`, `--key value`, `-flag`, and `--` end-of-options.
 ---@param args? table Optional table of argument strings. Uses `os.args` if omitted.
----@return table Table with fields: `flags` (table of boolean), `options` (table of string), `positional` (array of string).
+---@return RuntimeParseArgsResult Table with fields: `flags` (table of boolean), `options` (table of string), `positional` (array of string).
 lurek.runtime.parseArgs = function(args) end
 
 --- Requests a reload of the engine configuration from `conf.lua`. The reload is deferred until the next frame.
----@return nil No value is returned.
 lurek.runtime.reloadConfig = function() end
+
+---@class RuntimeRunBatchResult
+---@field status string Task status: passed, failed, or skipped.
+---@field time number Elapsed time in seconds.
+---@field error string? Error message when status is failed.
 
 --- Executes a table of named task functions sequentially, collecting pass/fail results and elapsed time for each.
 ---@param tasks table Table mapping task names (string) to task functions (function).
 ---@param opts? table Options table. Set `stopOnError = true` to skip remaining tasks after the first failure.
----@return table Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
+---@return RuntimeRunBatchResult Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
 lurek.runtime.runBatch = function(tasks, opts) end
 
 --- Copies a string to the system clipboard. Logs a warning if the clipboard is unavailable or the write fails.
 ---@param text string The text to place on the clipboard.
----@return nil No value is returned.
 lurek.runtime.setClipboardText = function(text) end
 
 --- Enables or disables the on-screen debug overlay that shows FPS, draw calls, and other diagnostics.
 ---@param enabled boolean `true` to show the debug overlay, `false` to hide it.
----@return nil No value is returned.
 lurek.runtime.setDebugOverlay = function(enabled) end
 
 --- Sets the engine-wide log verbosity level at runtime.
 ---@param level string Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`.
----@return nil No value is returned.
 lurek.runtime.setLogLevel = function(level) end
 
 ---@class lurek.terminal
@@ -21747,7 +21903,7 @@ lurek.terminal.cmdHistoryLen = function(terminal) end
 
 --- Returns all completion candidates matching the given prefix string.
 ---@param prefix string The prefix to match against.
----@return table Array of matching candidate strings.
+---@return string[] Matching candidate strings.
 lurek.terminal.getCompletions = function(prefix) end
 
 --- Returns the engine-defined maximum number of columns a terminal grid can have.
@@ -21762,7 +21918,7 @@ lurek.terminal.getMaxRows = function() end
 ---@param terminal LTerminal The terminal to read from.
 ---@param offset number 0-based offset from the newest line.
 ---@param count number Number of lines to retrieve.
----@return table Array of scrollback line strings.
+---@return string[] Scrollback line strings.
 lurek.terminal.getScrollback = function(terminal, offset, count) end
 
 --- Creates a new decorative border widget drawn using box-drawing characters.
@@ -21828,9 +21984,16 @@ lurek.terminal.nextCmd = function(terminal) end
 ---@return string The next matching candidate, or nil if none match.
 lurek.terminal.nextCompletion = function(prefix) end
 
+---@class TerminalParseAnsiResult
+---@field text string Text.
+---@field bold boolean Bold.
+---@field fg table? Foreground color table with r, g, b.
+---@field g number G.
+---@field b number B.
+
 --- Parses ANSI escape sequences in a string into an array of span tables with text, bold, fg, and bg fields.
 ---@param text string Input string with ANSI codes.
----@return table Array of span tables: { text=string, bold=boolean, fg?={r,g,b}, bg?={r,g,b} }.
+---@return TerminalParseAnsiResult Array of span tables: { text=string, bold=boolean, fg?={r,g,b}, bg?={r,g,b} }.
 lurek.terminal.parseAnsi = function(text) end
 
 --- Navigates backward in the terminal command history, returning the previous command or nil if at the start.
@@ -21897,7 +22060,8 @@ function LChannel:clear() end
 
 --- Blocks until a value is available on the channel or the optional timeout expires.
 ---@param timeout? number Maximum seconds to wait. If omitted, waits indefinitely.
----@return any The received value, or `nil` if the timeout expired.
+---@return table a The received message table.
+---@return nil b If the timeout expired.
 function LChannel:demand(timeout) end
 
 --- Returns the maximum capacity of a bounded channel, or `nil` for unbounded channels.
@@ -21913,11 +22077,13 @@ function LChannel:getCount() end
 function LChannel:isBounded() end
 
 --- Returns the next value from the channel without removing it.
----@return any The front value, or `nil` if the channel is empty.
+---@return table a The front message table.
+---@return nil b If the channel is empty.
 function LChannel:peek() end
 
 --- Removes and returns the next value from the channel without blocking.
----@return any The next value, or `nil` if the channel is empty.
+---@return table a The next message table.
+---@return nil b If the channel is empty.
 function LChannel:pop() end
 
 --- Pops the next value from the channel only if it is a byte blob, discarding non-bytes values.
@@ -21929,7 +22095,7 @@ function LChannel:popBytes() end
 function LChannel:popTable() end
 
 --- Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
----@param value any The value to send through the channel.
+---@param value table The message table to send.
 ---@return number The message sequence ID assigned to this push.
 function LChannel:push(value) end
 
@@ -21944,13 +22110,13 @@ function LChannel:pushBytes(data) end
 function LChannel:pushTable(value) end
 
 --- Pushes a value and blocks until a consumer pops it (synchronous handoff).
----@param value any The value to hand off to a consumer.
----@return boolean `true` when the value has been consumed.
+---@param value table The message table to send.
+---@return boolean true when the value has been consumed.
 function LChannel:supply(value) end
 
 --- Attempts to push a value onto a bounded channel without blocking.
----@param value any The value to send.
----@return boolean `true` if the value was enqueued, `false` if the channel is full.
+---@param value table The message table to send.
+---@return boolean true if the value was enqueued, false if the channel is full.
 function LChannel:tryPush(value) end
 
 --- Returns the type name of this object.
@@ -21968,7 +22134,7 @@ LPromise = {}
 
 --- Creates a new promise that runs the given code with the parent promise's result as its first argument.
 ---@param code string Lua source code to execute in the chained worker thread.
----@param ... any Additional arguments forwarded after the parent result.
+---@param ... table Additional arguments forwarded after the parent result.
 ---@return LPromise A new promise representing the chained computation.
 function LPromise:chain(code, ...) end
 
@@ -21981,7 +22147,8 @@ function LPromise:getError() end
 function LPromise:isDone() end
 
 --- Returns the result value of the completed promise.
----@return any The computed result, or `nil` if the promise is not yet done.
+---@return table a The computed result table.
+---@return nil b If the promise is not yet done.
 function LPromise:result() end
 
 --- Returns the type name of this object.
@@ -22006,7 +22173,7 @@ function LThread:getError() end
 function LThread:isRunning() end
 
 --- Launches the worker thread, executing the Lua code string supplied at creation time.
----@param ... any Zero or more arguments forwarded to the worker as the `arg` table.
+---@param ... table Zero or more arguments forwarded to the worker as the `arg` table.
 function LThread:start(...) end
 
 --- Returns the type name of this object.
@@ -22026,7 +22193,8 @@ function LThread:wait() end
 LThreadPool = {}
 
 --- Pops and returns the next result from the pool's output channel.
----@return any The next result value, or `nil` if the output channel is empty.
+---@return table a The next result table.
+---@return nil b If the output channel is empty.
 function LThreadPool:collect() end
 
 --- Returns the pool's shared input channel that feeds work items to worker threads.
@@ -22047,7 +22215,7 @@ function LThreadPool:join(timeout) end
 function LThreadPool:size() end
 
 --- Pushes a value into the pool's input channel for processing by a worker thread.
----@param value any The value to enqueue for processing.
+---@param value table The message table to send.
 function LThreadPool:submit(value) end
 
 --- Returns the type name of this object.
@@ -22061,7 +22229,7 @@ function LThreadPool:typeOf(name) end
 
 --- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
 ---@param codeOrFunc string|function Lua source code or a dumpable Lua function to execute.
----@param ... any Additional arguments forwarded to the worker.
+---@param ... table Additional arguments forwarded to the worker.
 ---@return LPromise A promise that resolves to the worker's return value.
 lurek.thread.async = function(codeOrFunc, ...) end
 
@@ -22071,7 +22239,7 @@ lurek.thread.async = function(codeOrFunc, ...) end
 lurek.thread.getChannel = function(name) end
 
 --- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
----@return table An integer-indexed table of capability name strings.
+---@return string[] Integer-indexed list of capability name strings.
 lurek.thread.getWorkerCapabilities = function() end
 
 --- Creates a new bounded channel with a fixed capacity, blocking pushes when full.
@@ -22184,6 +22352,10 @@ function LChunkMap:fillRect(x0, y0, x1, y1, gid) end
 ---@return number Chunk size.
 function LChunkMap:getChunkSize() end
 
+---@class LChunkMapGetChunksInViewResult
+---@field cx number Cx.
+---@field cy number Cy.
+
 --- Returns chunk coordinates that overlap a viewport region, given tile dimensions.
 ---@param vx number Viewport left edge in world pixels.
 ---@param vy number Viewport top edge in world pixels.
@@ -22191,11 +22363,15 @@ function LChunkMap:getChunkSize() end
 ---@param vh number Viewport height in pixels.
 ---@param tw number Tile width in pixels.
 ---@param th number Tile height in pixels.
----@return table Array of `{cx, cy}` pairs.
+---@return LChunkMapGetChunksInViewResult Array of `{cx, cy}` pairs.
 function LChunkMap:getChunksInView(vx, vy, vw, vh, tw, th) end
 
+---@class LChunkMapGetLoadedChunksResult
+---@field cx number Cx.
+---@field cy number Cy.
+
 --- Returns a list of all currently loaded chunk coordinates.
----@return table Array of `{cx, cy}` pairs.
+---@return LChunkMapGetLoadedChunksResult Array of `{cx, cy}` pairs.
 function LChunkMap:getLoadedChunks() end
 
 --- Returns the tile GID at the given world-tile coordinate.
@@ -22260,7 +22436,7 @@ function LIsoMap:getLevelHeight() end
 function LIsoMap:getPartCount() end
 
 --- Returns the rendering order of tile parts as an array of part indices.
----@return table Array of part index values.
+---@return number[] Part index values.
 function LIsoMap:getPartOrder() end
 
 --- Returns the height of an isometric tile in pixels.
@@ -22647,10 +22823,14 @@ function LTileMap:drawToImage(tileSize) end
 ---@param gid number Global tile ID to fill with.
 function LTileMap:fill(layer, gid) end
 
+---@class LTileMapFindTilesByGidResult
+---@field x number X.
+---@field y number Y.
+
 --- Returns all positions on a layer that contain a specific GID.
 ---@param layer number Layer index (1-based).
 ---@param gid number Global tile ID to search for.
----@return table Array of `{x=number, y=number}` positions.
+---@return LTileMapFindTilesByGidResult Array of `{x=number, y=number}` positions.
 function LTileMap:findTilesByGid(layer, gid) end
 
 --- Manually fires the tile-exit callback for a specific GID and entity at a tile position.
@@ -22857,15 +23037,19 @@ function LTileMap:sweepRect(layer, x, y, w, h, dx, dy) end
 ---@return number b World Y position in pixels.
 function LTileMap:tileToWorld(tx, ty) end
 
+---@class LTileMapTileTypeIndexResult
+---@field x number X.
+---@field y number Y.
+
 --- Builds an index mapping each GID present on a layer to an array of `{x, y}` positions.
 ---@param layer number Layer index (1-based).
----@return table Table keyed by GID, each value an array of `{x=number, y=number}`.
+---@return LTileMapTileTypeIndexResult Table keyed by GID, each value an array of `{x=number, y=number}`.
 function LTileMap:tileTypeIndex(layer) end
 
 --- Converts a layer into a 2D boolean grid for pathfinding. Tiles with GIDs in the given list are marked walkable.
 ---@param layer number Layer index (1-based).
 ---@param gids table Array of walkable GIDs.
----@return table 2D array of booleans (true = walkable).
+---@return boolean[] Flat walkable grid (true = walkable), row-major order.
 function LTileMap:toNavGrid(layer, gids) end
 
 --- Returns the type name of this userdata.
@@ -22892,9 +23076,13 @@ function LTileMap:worldToTile(wx, wy) end
 ---@class LTileSet
 LTileSet = {}
 
+---@class LTileSetGetAnimationResult
+---@field tileid number Tileid.
+---@field duration number Duration.
+
 --- Returns the animation frames for a tile, or nil if none are set.
 ---@param tileId number Tile ID to query (1-based).
----@return table Array of `{tileid=number, duration=number}` frames, or nil.
+---@return LTileSetGetAnimationResult Array of `{tileid=number, duration=number}` frames, or nil.
 function LTileSet:getAnimation(tileId) end
 
 --- Looks up the tile ID for a 4-bit auto-tile bitmask and type name.
@@ -22921,9 +23109,15 @@ function LTileSet:getFirstGid() end
 ---@return number Margin in pixels.
 function LTileSet:getMargin() end
 
+---@class LTileSetGetQuadResult
+---@field x number X.
+---@field y number Y.
+---@field width number Width.
+---@field height number Height.
+
 --- Returns the source rectangle (UV quad) for a tile in the atlas.
 ---@param tileId number Tile ID (1-based).
----@return table Table with fields `x`, `y`, `width`, `height` in pixels.
+---@return LTileSetGetQuadResult Table with fields `x`, `y`, `width`, `height` in pixels.
 function LTileSet:getQuad(tileId) end
 
 --- Returns the spacing between tiles in the atlas image, in pixels.
@@ -23006,11 +23200,15 @@ lurek.tilemap.fromScreenHex = function(sx, sy, size) end
 ---@return number b Tile Y.
 lurek.tilemap.fromScreenIso = function(sx, sy, tw, th) end
 
+---@class TilemapHexAreaResult
+---@field q number Q.
+---@field r number R.
+
 --- Returns all hex cells within a filled area of a given radius.
 ---@param q number Center Q.
 ---@param r number Center R.
 ---@param radius number Area radius.
----@return table Array of `{q, r}` pairs inside the area.
+---@return TilemapHexAreaResult Array of `{q, r}` pairs inside the area.
 lurek.tilemap.hexArea = function(q, r, radius) end
 
 --- Computes the hex grid distance between two axial coordinates.
@@ -23021,18 +23219,26 @@ lurek.tilemap.hexArea = function(q, r, radius) end
 ---@return number Distance in hex steps.
 lurek.tilemap.hexDistance = function(q1, r1, q2, r2) end
 
+---@class TilemapHexLineResult
+---@field q number Q.
+---@field r number R.
+
 --- Returns all hex cells along a line between two axial coordinates.
 ---@param q1 number Start Q.
 ---@param r1 number Start R.
 ---@param q2 number End Q.
 ---@param r2 number End R.
----@return table Array of `{q, r}` pairs along the line.
+---@return TilemapHexLineResult Array of `{q, r}` pairs along the line.
 lurek.tilemap.hexLine = function(q1, r1, q2, r2) end
+
+---@class TilemapHexNeighborsResult
+---@field q number Q.
+---@field r number R.
 
 --- Returns the six neighboring hex cells of a given axial coordinate.
 ---@param q number Axial Q.
 ---@param r number Axial R.
----@return table Array of `{q=number, r=number}` neighbor cells.
+---@return TilemapHexNeighborsResult Array of `{q=number, r=number}` neighbor cells.
 lurek.tilemap.hexNeighbors = function(q, r) end
 
 --- Reflects a hex cell across an axis through a center point.
@@ -23045,11 +23251,15 @@ lurek.tilemap.hexNeighbors = function(q, r) end
 ---@return number b Reflected R.
 lurek.tilemap.hexReflect = function(q, r, centerQ, centerR, axis) end
 
+---@class TilemapHexRingResult
+---@field q number Q.
+---@field r number R.
+
 --- Returns all hex cells forming a ring at a given radius around a center.
 ---@param q number Center Q.
 ---@param r number Center R.
 ---@param radius number Ring radius in hex steps.
----@return table Array of `{q, r}` pairs on the ring.
+---@return TilemapHexRingResult Array of `{q, r}` pairs on the ring.
 lurek.tilemap.hexRing = function(q, r, radius) end
 
 --- Rotates a hex cell around a center point by a number of 60-degree steps.
@@ -23069,11 +23279,15 @@ lurek.tilemap.hexRotate = function(q, r, centerQ, centerR, steps) end
 ---@return number b Rounded R.
 lurek.tilemap.hexRound = function(q, r) end
 
+---@class TilemapHexSpiralResult
+---@field q number Q.
+---@field r number R.
+
 --- Returns all hex cells in a spiral pattern out to a given radius.
 ---@param q number Center Q.
 ---@param r number Center R.
 ---@param radius number Maximum radius.
----@return table Array of `{q, r}` pairs in spiral order.
+---@return TilemapHexSpiralResult Array of `{q, r}` pairs in spiral order.
 lurek.tilemap.hexSpiral = function(q, r, radius) end
 
 --- Converts an angle in degrees to the nearest isometric direction index.
@@ -23092,9 +23306,17 @@ lurek.tilemap.isoDirectionName = function(direction) end
 ---@return number Rotated direction.
 lurek.tilemap.isoRotate = function(direction, steps) end
 
+---@class TilemapLoadTMXResult
+---@field width number Width.
+---@field height number Height.
+---@field tileWidth number Tile width in pixels.
+---@field tileHeight number Tile height in pixels.
+---@field orientation string Map orientation.
+---@field layers table Layers array.
+
 --- Parses a TMX (Tiled XML) string and returns a table describing the map structure.
 ---@param xml string Raw TMX XML content.
----@return table Parsed map with `width`, `height`, `tileWidth`, `tileHeight`, `orientation`, and `layers`.
+---@return TilemapLoadTMXResult Parsed map with `width`, `height`, `tileWidth`, `tileHeight`, `orientation`, and `layers`.
 lurek.tilemap.loadTMX = function(xml) end
 
 --- Creates an auto-tile sheet with a given tile size and layout.
@@ -23320,7 +23542,6 @@ function LScheduler:setInterval(id, interval) end
 
 --- Sets the time scale multiplier for this scheduler. A value of 2.0 makes events fire twice as fast; 0.5 makes them fire at half speed. Does not affect frame-based events.
 ---@param scale number Time scale multiplier (1.0 = normal speed).
----@return nil No value is returned.
 function LScheduler:setTimeScale(scale) end
 
 --- Returns the type name of this object as a string.
@@ -23344,7 +23565,6 @@ function LScheduler:updateFrames() end
 --- Schedules a one-shot callback based on real (wall-clock) time, unaffected by game pausing or time scaling. Use for UI fade-outs, notifications, or anything that should run on real time.
 ---@param delay number Real-time delay in seconds before the callback fires.
 ---@param func function Callback to invoke when the real-time deadline is reached.
----@return nil No return value.
 lurek.timer.afterReal = function(delay, func) end
 
 --- Creates a scheduler pre-loaded with a sequence of delayed callbacks. Each step is a table with an optional `delay` (seconds) and optional `func` (callback). Delays accumulate so each step fires after the sum of all preceding delays. Returns the scheduler for manual update calls.
@@ -23394,22 +23614,18 @@ lurek.timer.newScheduler = function() end
 
 --- Sets the fixed timestep for physics simulation. Clamped between 1/240 and 1/10 seconds. Lower values increase accuracy but cost more CPU.
 ---@param dt number Desired fixed delta time in seconds.
----@return nil No return value.
 lurek.timer.setPhysicsDelta = function(dt) end
 
 --- Sets the maximum number of physics steps allowed per frame. Clamped between 1 and 64. Higher values improve accuracy under lag but cost more CPU.
 ---@param n number Maximum physics steps per frame.
----@return nil No return value.
 lurek.timer.setPhysicsMaxSteps = function(n) end
 
 --- Sets the exponential smoothing factor used by getSmoothedDelta. Lower values produce smoother (more lagged) results; higher values track changes faster. Clamped to [0.01, 1.0].
 ---@param alpha number Smoothing factor between 0.01 and 1.0.
----@return nil No return value.
 lurek.timer.setSmoothingFactor = function(alpha) end
 
 --- Blocks the current thread for the given number of seconds. Use sparingly — this halts the entire game loop. Intended for loading screens or synchronization.
 ---@param seconds number Duration to sleep in seconds.
----@return nil No return value.
 lurek.timer.sleep = function(seconds) end
 
 --- Advances the internal clock by one tick and returns the delta time for that tick. Typically called by the engine loop; game scripts rarely need this.
@@ -23426,12 +23642,10 @@ lurek.timer.tickWaits = function() end
 
 --- Yields the current coroutine for the given number of frames. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the target frame count has been reached.
 ---@param frames number Number of frames to wait.
----@return nil No return value.
 lurek.timer.waitFrames = function(frames) end
 
 --- Yields the current coroutine for the given number of real-time seconds. Must be called from within a coroutine. The coroutine is resumed automatically when tickWaits is called and the deadline has passed.
 ---@param seconds number Real-time seconds to wait.
----@return nil No return value.
 lurek.timer.waitSeconds = function(seconds) end
 
 ---@class lurek.tween
@@ -23442,7 +23656,6 @@ lurek.tween = {}
 LSpring = {}
 
 --- Cancels this spring animation and cleans up the on-settle callback if one was registered.
----@return nil No value is returned.
 function LSpring:cancel() end
 
 --- Returns the current position of the given spring axis, or `nil` if the axis does not exist.
@@ -23460,17 +23673,14 @@ function LSpring:isSettled() end
 
 --- Sets the spring damping for all axes. Higher values reduce oscillation and overshoot.
 ---@param value number Damping coefficient (default 10).
----@return nil No value is returned.
 function LSpring:setDamping(value) end
 
 --- Sets the spring stiffness for all axes. Higher values make the spring snap faster.
 ---@param value number Stiffness coefficient (default 100).
----@return nil No value is returned.
 function LSpring:setStiffness(value) end
 
 --- Changes the spring target values for one or more axes. Re-activates the spring if it was settled.
 ---@param fields table Key-value pairs mapping axis names to new target values.
----@return nil No value is returned.
 function LSpring:setTarget(fields) end
 
 --- Returns the type name of this object.
@@ -23492,11 +23702,9 @@ function LSpring:update(dt) end
 LTween = {}
 
 --- Yields the current coroutine until this tween completes or is cancelled. Must be called from inside a coroutine.
----@return nil No return value.
 function LTween:await() end
 
 --- Cancels this tween immediately, fires the onCancel callback if set, and resumes any coroutines waiting on it.
----@return nil No return value.
 function LTween:cancel() end
 
 --- Returns the total duration of this tween in seconds.
@@ -23508,7 +23716,7 @@ function LTween:getDuration() end
 function LTween:getElapsed() end
 
 --- Returns an array of field names being tweened on the target table.
----@return table Array of field name strings.
+---@return string[] Field name strings.
 function LTween:getFields() end
 
 --- Returns the eased progress of this tween as a value from 0.0 to 1.0.
@@ -23539,7 +23747,6 @@ function LTween:onComplete(f) end
 function LTween:onUpdate(f) end
 
 --- Pauses this tween so it stops advancing until resumed.
----@return nil No value is returned.
 function LTween:pause() end
 
 --- Chainable version of `setRelative`. Returns the tween for fluent API usage.
@@ -23548,22 +23755,18 @@ function LTween:pause() end
 function LTween:relative(enabled) end
 
 --- Resumes a paused tween so it continues advancing.
----@return nil No value is returned.
 function LTween:resume() end
 
 --- Sets whether the tween end values are relative to the start values instead of absolute.
 ---@param enabled boolean `true` for relative mode, `false` for absolute.
----@return nil No value is returned.
 function LTween:setRelative(enabled) end
 
 --- Sets how many times the tween should repeat after the first play. Use -1 for infinite repeat.
 ---@param n number Number of additional repeats (0 = play once, -1 = infinite).
----@return nil No value is returned.
 function LTween:setRepeat(n) end
 
 --- Enables or disables yoyo mode, which reverses the tween direction on each repeat cycle.
 ---@param enabled boolean `true` to enable yoyo, `false` to disable.
----@return nil No value is returned.
 function LTween:setYoyo(enabled) end
 
 --- Returns the type name of this object.
@@ -23581,11 +23784,9 @@ LTweenParallel = {}
 
 --- Adds an existing tween handle to this parallel group. The tween becomes owned by the group.
 ---@param tw_ud LTween The tween handle returned by `lurek.tween.tween()` to add to this group.
----@return nil No return value.
 function LTweenParallel:add(tw_ud) end
 
 --- Cancels all tweens in this parallel group immediately.
----@return nil No value is returned.
 function LTweenParallel:cancel() end
 
 --- Returns whether this parallel group is still running.
@@ -23623,7 +23824,6 @@ function LTweenParallel:typeOf(name) end
 LTweenSequence = {}
 
 --- Yields the current coroutine until this sequence completes or is cancelled. Must be called from inside a coroutine.
----@return nil No return value.
 function LTweenSequence:await() end
 
 --- Appends a callback step to this sequence that fires when reached during playback.
@@ -23632,7 +23832,6 @@ function LTweenSequence:await() end
 function LTweenSequence:callback(f) end
 
 --- Cancels this sequence immediately and resumes any coroutines waiting on it.
----@return nil No value is returned.
 function LTweenSequence:cancel() end
 
 --- Appends a delay step to this sequence. Optionally fires a callback when the delay elapses.
@@ -23691,7 +23890,6 @@ function LTweenState:isComplete() end
 function LTweenState:lerp(start, finish) end
 
 --- Resets the tween state to the beginning so it can be replayed.
----@return nil No value is returned.
 function LTweenState:reset() end
 
 --- Returns the raw (un-eased) progress value from 0.0 to 1.0.
@@ -23713,7 +23911,6 @@ function LTweenState:type() end
 function LTweenState:typeOf(name) end
 
 --- Immediately cancels all active tweens, sequences, parallels, and springs managed by the tween engine.
----@return nil No return value.
 lurek.tween.cancelAll = function() end
 
 --- Creates a one-shot delay. After the specified seconds elapse, the optional callback is invoked.
@@ -23727,7 +23924,7 @@ lurek.tween.delay = function(seconds, cb) end
 lurek.tween.getActiveCount = function() end
 
 --- Returns an array of all available easing function names, including both built-in and custom-registered easings.
----@return table Array of easing name strings.
+---@return string[] Easing name strings.
 lurek.tween.getEasingNames = function() end
 
 --- Creates a standalone tween state for manual interpolation. Useful when you need eased progress without automatic property updates.
@@ -23743,7 +23940,6 @@ lurek.tween.parallel = function() end
 --- Registers a custom easing function by name. The function receives a progress value (0..1) and must return an eased value.
 ---@param name string Unique name for the custom easing.
 ---@param f function Easing function `f(t) -> number` where t is 0..1.
----@return nil No return value.
 lurek.tween.registerEasing = function(name, f) end
 
 --- Creates a new empty tween sequence. Chain `.tween()`, `.delay()`, and `.callback()` steps, then call `:start()`.
@@ -23788,7 +23984,6 @@ lurek.tween.tweenColor = function(duration, target, color, easing) end
 
 --- Advances all active tweens, sequences, parallels, and springs by the given delta time. Call once per frame.
 ---@param dt number Delta time in seconds since the last frame.
----@return nil No return value.
 lurek.tween.update = function(dt) end
 
 ---@class lurek.ui
@@ -23801,7 +23996,6 @@ LAccordion = {}
 --- Adds a collapsible section to this accordion.
 ---@param title string The section title.
 ---@param content_idx? number Optional widget index for the section content.
----@return nil No return value.
 function LAccordion:addSection(title, content_idx) end
 
 --- Returns the number of sections in this accordion.
@@ -23824,7 +24018,6 @@ function LAccordion:isSectionExpanded(section_idx) end
 
 --- Sets exclusive mode. When true, expanding one section collapses all others.
 ---@param v boolean True for exclusive mode.
----@return nil No return value.
 function LAccordion:setExclusive(v) end
 
 --- Toggles the expanded state of an accordion section by its 1-based index.
@@ -23842,17 +24035,14 @@ LAreaChart = {}
 ---@param r number Red color component.
 ---@param g number Green color component.
 ---@param b number Blue color component.
----@return nil No value is returned.
 function LAreaChart:addLayer(name, vals_tbl, r, g, b) end
 
 --- Renders this area chart to an image buffer.
 ---@param target LImageData The image to draw into.
----@return nil No value is returned.
 function LAreaChart:drawToImage(target) end
 
 --- Sets the maximum Y-axis value for this area chart.
 ---@param v number The Y-axis maximum.
----@return nil No value is returned.
 function LAreaChart:setYMax(v) end
 
 --- Returns the type name of this object.
@@ -23878,7 +24068,6 @@ function LBadge:getDisplayText() end
 
 --- Sets the notification count displayed by this badge.
 ---@param count number The notification count.
----@return nil No return value.
 function LBadge:setCount(count) end
 
 --- Lua-exposed bar chart for data visualization.
@@ -23888,7 +24077,6 @@ LBarChart = {}
 --- Adds a category with values for each series.
 ---@param label string The category label.
 ---@param vals_tbl table Array of values, one per series.
----@return nil No value is returned.
 function LBarChart:addCategory(label, vals_tbl) end
 
 --- Adds a named series to this bar chart.
@@ -23896,12 +24084,10 @@ function LBarChart:addCategory(label, vals_tbl) end
 ---@param r number Red color component.
 ---@param g number Green color component.
 ---@param b number Blue color component.
----@return nil No value is returned.
 function LBarChart:addSeries(name, r, g, b) end
 
 --- Renders this bar chart to an image buffer.
 ---@param target LImageData The image to draw into.
----@return nil No value is returned.
 function LBarChart:drawToImage(target) end
 
 --- Returns the type name of this object.
@@ -23923,7 +24109,6 @@ function LButton:getText() end
 
 --- Sets the display text on this button.
 ---@param text string The button label text.
----@return nil No return value.
 function LButton:setText(text) end
 
 --- Adds checkbox-specific methods to a checkbox widget table.
@@ -23940,12 +24125,10 @@ function LCheckbox:isChecked() end
 
 --- Sets the checked state of this checkbox.
 ---@param checked boolean True to check, false to uncheck.
----@return nil No return value.
 function LCheckbox:setChecked(checked) end
 
 --- Sets the label text displayed next to this checkbox.
 ---@param text string The checkbox label.
----@return nil No return value.
 function LCheckbox:setText(text) end
 
 --- Adds color-picker-specific methods to a color picker widget table.
@@ -23972,22 +24155,18 @@ function LColorPicker:getShowAlpha() end
 ---@param g number Green (0.0 to 1.0).
 ---@param b number Blue (0.0 to 1.0).
 ---@param a? number Alpha (0.0 to 1.0), keeps current if omitted.
----@return nil No return value.
 function LColorPicker:setColor(r, g, b, a) end
 
 --- Sets the color mode of this picker (e.g. "rgb", "hsv").
 ---@param mode string The color mode.
----@return nil No return value.
 function LColorPicker:setColorMode(mode) end
 
 --- Registers a callback invoked when this color picker's value changes.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LColorPicker:setOnChange(f) end
 
 --- Sets whether the alpha channel slider is visible.
 ---@param v boolean True to show the alpha slider.
----@return nil No return value.
 function LColorPicker:setShowAlpha(v) end
 
 --- Adds combo-box-specific methods to a combo box widget table.
@@ -23996,11 +24175,9 @@ LComboBox = {}
 
 --- Appends a new text item to this combo box's dropdown list.
 ---@param text string The item label to add.
----@return nil No return value.
 function LComboBox:addItem(text) end
 
 --- Removes all items from this combo box.
----@return nil No return value.
 function LComboBox:clearItems() end
 
 --- Returns the text of the item at the given 1-based index.
@@ -24027,7 +24204,6 @@ function LComboBox:removeItem(index) end
 
 --- Sets the selected item by 1-based index.
 ---@param index number The 1-based index of the item to select.
----@return nil No return value.
 function LComboBox:setSelectedIndex(index) end
 
 --- Adds dialog-specific methods to a dialog widget table.
@@ -24041,7 +24217,6 @@ LDialog = {}
 function LDialog:addButton(text, cb) end
 
 --- Closes this dialog and fires the onClose callback if it was open.
----@return nil No return value.
 function LDialog:close() end
 
 --- Returns the widget index of this dialog's content, or nil if not set.
@@ -24061,27 +24236,22 @@ function LDialog:isModal() end
 function LDialog:isOpen() end
 
 --- Opens this dialog, making it visible.
----@return nil No return value.
 function LDialog:open() end
 
 --- Sets the content widget for this dialog.
 ---@param content_idx? number The widget index to show as content, or nil to clear.
----@return nil No return value.
 function LDialog:setContent(content_idx) end
 
 --- Sets whether this dialog widget is modal.
 ---@param v boolean True to make modal.
----@return nil No return value.
 function LDialog:setModal(v) end
 
 --- Registers a callback invoked when this dialog is closed.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LDialog:setOnClose(f) end
 
 --- Sets the title text of this dialog widget.
 ---@param title string The dialog title.
----@return nil No return value.
 function LDialog:setTitle(title) end
 
 --- Adds dock-panel-specific methods to a dock panel widget table.
@@ -24091,7 +24261,6 @@ LDockPanel = {}
 --- Docks a child widget to the specified side of this dock panel.
 ---@param child_idx number The widget index to dock.
 ---@param side string The dock side ("left", "right", "top", "bottom", "center").
----@return nil No return value.
 function LDockPanel:dock(child_idx, side) end
 
 --- Returns the number of widgets docked in this dock panel.
@@ -24106,12 +24275,10 @@ function LDockPanel:getSplitSize(side) end
 --- Sets the size of a dock panel side region.
 ---@param side string The dock side ("left", "right", "top", "bottom").
 ---@param size number The size in pixels.
----@return nil No return value.
 function LDockPanel:setSplitSize(side, size) end
 
 --- Removes a child widget from this dock panel.
 ---@param child_idx number The widget index to undock.
----@return nil No return value.
 function LDockPanel:undock(child_idx) end
 
 --- Adds GUI-table-specific methods to a table widget.
@@ -24121,12 +24288,10 @@ LGuiTable = {}
 --- Adds a new column to this table widget.
 ---@param header string The column header text.
 ---@param width? number The column width in pixels (default 100).
----@return nil No return value.
 function LGuiTable:addColumn(header, width) end
 
 --- Adds a row of data to this table widget.
 ---@param cells table Array of cell text values.
----@return nil No return value.
 function LGuiTable:addRow(cells) end
 
 --- Returns the text of a cell at the given 1-based row and column.
@@ -24155,22 +24320,18 @@ function LGuiTable:isSortable() end
 ---@param row number The 1-based row index.
 ---@param col number The 1-based column index.
 ---@param text string The new cell text.
----@return nil No return value.
 function LGuiTable:setCell(row, col, text) end
 
 --- Registers a callback invoked when a table row is selected.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LGuiTable:setOnSelect(f) end
 
 --- Sets the selected row by its 1-based index, or nil to deselect.
 ---@param row? number The 1-based row index, or nil.
----@return nil No return value.
 function LGuiTable:setSelectedRow(row) end
 
 --- Sets whether columns in this table can be sorted by clicking headers.
 ---@param v boolean True to enable sorting.
----@return nil No return value.
 function LGuiTable:setSortable(v) end
 
 --- Adds GUI-window-specific methods to a window widget table.
@@ -24195,27 +24356,22 @@ function LGuiWindow:isResizable() end
 
 --- Sets whether this window shows a close button.
 ---@param v boolean True to show the close button.
----@return nil No return value.
 function LGuiWindow:setCloseable(v) end
 
 --- Sets whether this window can be dragged by its title bar.
 ---@param v boolean True to allow dragging.
----@return nil No return value.
 function LGuiWindow:setDraggable(v) end
 
 --- Registers a callback invoked when this window is closed.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LGuiWindow:setOnClose(f) end
 
 --- Sets whether this window can be resized.
 ---@param v boolean True to allow resizing.
----@return nil No return value.
 function LGuiWindow:setResizable(v) end
 
 --- Sets the title bar text of this GUI window.
 ---@param title string The window title.
----@return nil No return value.
 function LGuiWindow:setTitle(title) end
 
 --- Adds image-widget-specific methods to an image widget table.
@@ -24235,7 +24391,6 @@ function LImageWidget:getTint() end
 
 --- Sets the image scaling mode (e.g. "fit", "fill", "stretch").
 ---@param mode string The scale mode.
----@return nil No return value.
 function LImageWidget:setScaleMode(mode) end
 
 --- Sets the tint color of this image widget as RGBA components.
@@ -24243,7 +24398,6 @@ function LImageWidget:setScaleMode(mode) end
 ---@param g number Green (0.0 to 1.0).
 ---@param b number Blue (0.0 to 1.0).
 ---@param a? number Alpha (0.0 to 1.0), defaults to 1.0.
----@return nil No return value.
 function LImageWidget:setTint(r, g, b, a) end
 
 --- Adds label-specific methods (setText, getText) to a label widget table.
@@ -24256,7 +24410,6 @@ function LLabel:getText() end
 
 --- Sets the display text on this label.
 ---@param text string The label text.
----@return nil No return value.
 function LLabel:setText(text) end
 
 --- Adds layout-specific methods to a layout container widget table.
@@ -24285,32 +24438,26 @@ function LLayout:getWrap() end
 
 --- Sets the cross-axis alignment for children (e.g. "start", "center", "end", "stretch").
 ---@param align string The alignment mode.
----@return nil No return value.
 function LLayout:setAlign(align) end
 
 --- Sets the number of columns for grid layout mode (minimum 1).
 ---@param n number Column count.
----@return nil No return value.
 function LLayout:setColumns(n) end
 
 --- Sets the layout direction for child arrangement ("horizontal", "vertical", or "grid").
 ---@param dir string The layout direction.
----@return nil No return value.
 function LLayout:setDirection(dir) end
 
 --- Sets the main-axis justification for children (e.g. "start", "center", "end", "space-between").
 ---@param justify string The justification mode.
----@return nil No return value.
 function LLayout:setJustify(justify) end
 
 --- Sets the spacing in pixels between child widgets in this layout.
 ---@param spacing number Gap between children in pixels.
----@return nil No return value.
 function LLayout:setSpacing(spacing) end
 
 --- Enables or disables wrapping of children to the next row/column when they overflow.
 ---@param wrap boolean True to enable wrapping.
----@return nil No return value.
 function LLayout:setWrap(wrap) end
 
 --- Lua-exposed line chart for data visualization.
@@ -24323,22 +24470,18 @@ LLineChart = {}
 ---@param r number Red color component.
 ---@param g number Green color component.
 ---@param b number Blue color component.
----@return nil No value is returned.
 function LLineChart:addSeries(name, pts_tbl, r, g, b) end
 
 --- Renders this line chart to an image buffer.
 ---@param target LImageData The image to draw into.
----@return nil No value is returned.
 function LLineChart:drawToImage(target) end
 
 --- Sets the maximum X-axis value for this line chart.
 ---@param v number The X-axis maximum.
----@return nil No value is returned.
 function LLineChart:setXMax(v) end
 
 --- Sets the maximum Y-axis value for this line chart.
 ---@param v number The Y-axis maximum.
----@return nil No value is returned.
 function LLineChart:setYMax(v) end
 
 --- Returns the type name of this object.
@@ -24356,11 +24499,9 @@ LListBox = {}
 
 --- Appends a new text item to this list box.
 ---@param text string The item text to add.
----@return nil No return value.
 function LListBox:addItem(text) end
 
 --- Removes all items from this list box.
----@return nil No return value.
 function LListBox:clearItems() end
 
 --- Returns the text of the item at the given 1-based index.
@@ -24378,17 +24519,14 @@ function LListBox:getSelectedIndex() end
 
 --- Removes the item at the given 1-based index from this list box.
 ---@param index number The 1-based index to remove.
----@return nil No return value.
 function LListBox:removeItem(index) end
 
 --- Sets the pixel height of each item row in this list box.
 ---@param h number Row height in pixels.
----@return nil No return value.
 function LListBox:setItemHeight(h) end
 
 --- Sets the selected item by 1-based index.
 ---@param index number The 1-based index of the item to select.
----@return nil No return value.
 function LListBox:setSelectedIndex(index) end
 
 --- Adds menu-bar-specific methods to a menu bar widget table.
@@ -24397,7 +24535,6 @@ LMenuBar = {}
 
 --- Adds a menu (by its widget index) to this menu bar.
 ---@param menu_idx number The widget index of the menu to add.
----@return nil No return value.
 function LMenuBar:addMenu(menu_idx) end
 
 --- Returns the number of menus in this menu bar.
@@ -24405,7 +24542,7 @@ function LMenuBar:addMenu(menu_idx) end
 function LMenuBar:getMenuCount() end
 
 --- Returns a table of widget indices for all menus in this menu bar.
----@return table Array of menu widget indices.
+---@return number[] Menu widget indices.
 function LMenuBar:getMenus() end
 
 --- Removes a menu from this menu bar by its widget index.
@@ -24419,7 +24556,6 @@ LMenuItem = {}
 
 --- Adds a sub-item to this menu item for building nested menus.
 ---@param child_idx number The widget index of the sub-item to add.
----@return nil No return value.
 function LMenuItem:addSubItem(child_idx) end
 
 --- Returns the keyboard shortcut string associated with this menu item.
@@ -24427,7 +24563,7 @@ function LMenuItem:addSubItem(child_idx) end
 function LMenuItem:getShortcut() end
 
 --- Returns a table of widget indices for all sub-items of this menu item.
----@return table Array of sub-item widget indices.
+---@return number[] Sub-item widget indices.
 function LMenuItem:getSubItems() end
 
 --- Returns the display text of this menu item.
@@ -24440,22 +24576,18 @@ function LMenuItem:isChecked() end
 
 --- Sets the checked state of this menu item.
 ---@param v boolean True to check.
----@return nil No return value.
 function LMenuItem:setChecked(v) end
 
 --- Registers a callback invoked when this menu item is clicked.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LMenuItem:setOnClick(f) end
 
 --- Sets the keyboard shortcut text displayed next to this menu item.
 ---@param shortcut string The shortcut text (e.g. "Ctrl+S").
----@return nil No return value.
 function LMenuItem:setShortcut(shortcut) end
 
 --- Sets the display text of this menu item.
 ---@param text string The menu item text.
----@return nil No return value.
 function LMenuItem:setText(text) end
 
 --- Adds nine-patch-specific methods to a nine-patch widget table.
@@ -24474,14 +24606,23 @@ function LNinePatch:getImageDimensions() end
 ---@return number d Left, top, right, and bottom insets.
 function LNinePatch:getInsets() end
 
+---@class LNinePatchGetSlicesResult
+---@field sx number Source x.
+---@field sy number Source y.
+---@field sw number Source width.
+---@field sh number Source height.
+---@field dx number Dest x.
+---@field dy number Dest y.
+---@field dw number Dest width.
+---@field dh number Dest height.
+
 --- Returns the computed nine-patch slices as a table of source/dest rectangles for rendering.
----@return table Array of slice tables with sx, sy, sw, sh, dx, dy, dw, dh fields, or nil.
+---@return LNinePatchGetSlicesResult Array of slice tables with sx, sy, sw, sh, dx, dy, dw, dh fields, or nil.
 function LNinePatch:getSlices() end
 
 --- Sets the original image dimensions used for nine-patch slice calculations.
 ---@param w number Image width in pixels.
 ---@param h number Image height in pixels.
----@return nil No return value.
 function LNinePatch:setImageDimensions(w, h) end
 
 --- Sets the border insets defining the stretchable center region of the nine-patch image.
@@ -24489,7 +24630,6 @@ function LNinePatch:setImageDimensions(w, h) end
 ---@param top number Top inset in pixels.
 ---@param right number Right inset in pixels.
 ---@param bottom number Bottom inset in pixels.
----@return nil No return value.
 function LNinePatch:setInsets(left, top, right, bottom) end
 
 --- Adds panel-specific methods (setTitle, getTitle, setScrollable) to a panel widget table.
@@ -24502,12 +24642,10 @@ function LPanel:getTitle() end
 
 --- Enables or disables scrolling within this panel.
 ---@param scrollable boolean True to enable scrolling.
----@return nil No return value.
 function LPanel:setScrollable(scrollable) end
 
 --- Sets the title text displayed on this panel's header.
 ---@param title string The panel title.
----@return nil No return value.
 function LPanel:setTitle(title) end
 
 --- Lua-exposed pie chart for data visualization.
@@ -24520,12 +24658,10 @@ LPieChart = {}
 ---@param r number Red color component.
 ---@param g number Green color component.
 ---@param b number Blue color component.
----@return nil No value is returned.
 function LPieChart:addSegment(label, value, r, g, b) end
 
 --- Renders this pie chart to an image buffer.
 ---@param target LImageData The image to draw into.
----@return nil No value is returned.
 function LPieChart:drawToImage(target) end
 
 --- Returns the type name of this object.
@@ -24560,12 +24696,10 @@ function LProgressBar:getValue() end
 --- Sets the minimum and maximum bounds for this progress bar.
 ---@param min number Minimum value.
 ---@param max number Maximum value.
----@return nil No return value.
 function LProgressBar:setRange(min, max) end
 
 --- Sets the current fill value of this progress bar, clamped to its range.
 ---@param v number The progress value.
----@return nil No return value.
 function LProgressBar:setValue(v) end
 
 --- Adds radio-button-specific methods to a radio button widget table.
@@ -24586,22 +24720,18 @@ function LRadioButton:isSelected() end
 
 --- Sets the radio button group name. Buttons in the same group are mutually exclusive.
 ---@param group string The group name.
----@return nil No return value.
 function LRadioButton:setGroup(group) end
 
 --- Registers a callback invoked when this radio button's selection changes.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LRadioButton:setOnChange(f) end
 
 --- Sets the selected state of this radio button.
 ---@param v boolean True to select.
----@return nil No return value.
 function LRadioButton:setSelected(v) end
 
 --- Sets the label text of this radio button.
 ---@param text string The radio button label.
----@return nil No return value.
 function LRadioButton:setText(text) end
 
 --- Lua-exposed scatter plot for data visualization.
@@ -24614,24 +24744,20 @@ LScatterPlot = {}
 ---@param r number Red color component.
 ---@param g number Green color component.
 ---@param b number Blue color component.
----@return nil No value is returned.
 function LScatterPlot:addSeries(name, pts_tbl, r, g, b) end
 
 --- Renders this scatter plot to an image buffer.
 ---@param target LImageData The image to draw into.
----@return nil No value is returned.
 function LScatterPlot:drawToImage(target) end
 
 --- Sets the X-axis range for this scatter plot.
 ---@param mn number Minimum X value.
 ---@param mx number Maximum X value.
----@return nil No value is returned.
 function LScatterPlot:setXRange(mn, mx) end
 
 --- Sets the Y-axis range for this scatter plot.
 ---@param mn number Minimum Y value.
 ---@param mx number Maximum Y value.
----@return nil No value is returned.
 function LScatterPlot:setYRange(mn, mx) end
 
 --- Returns the type name of this object.
@@ -24665,22 +24791,18 @@ function LScrollBar:isVertical() end
 
 --- Sets the total content size that this scroll bar represents.
 ---@param v number The content size.
----@return nil No return value.
 function LScrollBar:setContentSize(v) end
 
 --- Registers a callback invoked when this scroll bar's position changes.
 ---@param f function Callback receiving the widget index.
----@return nil No return value.
 function LScrollBar:setOnChange(f) end
 
 --- Sets the scroll position of this scroll bar, clamped to the valid range.
 ---@param v number The scroll position.
----@return nil No return value.
 function LScrollBar:setScrollPosition(v) end
 
 --- Sets the visible viewport size for this scroll bar.
 ---@param v number The view size.
----@return nil No return value.
 function LScrollBar:setViewSize(v) end
 
 --- Adds scroll-panel-specific methods to a scroll panel widget table.
@@ -24709,18 +24831,15 @@ function LScrollPanel:getScrollSpeed() end
 --- Sets the virtual content dimensions of this scroll panel.
 ---@param w number Content width in pixels.
 ---@param h number Content height in pixels.
----@return nil No return value.
 function LScrollPanel:setContentSize(w, h) end
 
 --- Sets the scroll offset position of this scroll panel.
 ---@param x number Horizontal scroll offset.
 ---@param y number Vertical scroll offset.
----@return nil No return value.
 function LScrollPanel:setScrollPosition(x, y) end
 
 --- Sets the scroll speed multiplier for mouse wheel scrolling.
 ---@param speed number Scroll speed in pixels per scroll tick.
----@return nil No return value.
 function LScrollPanel:setScrollSpeed(speed) end
 
 --- Adds separator-specific methods to a separator widget table.
@@ -24737,12 +24856,10 @@ function LSeparator:isVertical() end
 
 --- Sets the line thickness of this separator in pixels.
 ---@param thickness number Thickness in pixels.
----@return nil No return value.
 function LSeparator:setThickness(thickness) end
 
 --- Sets whether this separator draws vertically or horizontally.
 ---@param v boolean True for vertical, false for horizontal.
----@return nil No return value.
 function LSeparator:setVertical(v) end
 
 --- Adds slider-specific methods to a slider widget table.
@@ -24764,17 +24881,14 @@ function LSlider:getValue() end
 --- Sets the minimum and maximum bounds for this slider.
 ---@param min number Minimum value.
 ---@param max number Maximum value.
----@return nil No return value.
 function LSlider:setRange(min, max) end
 
 --- Sets the step increment for this slider's value snapping.
 ---@param step number The step size.
----@return nil No return value.
 function LSlider:setStep(step) end
 
 --- Sets the current value of this slider, clamped to its range.
 ---@param v number The value to set.
----@return nil No return value.
 function LSlider:setValue(v) end
 
 --- Adds spin-box-specific methods to a spin box widget table.
@@ -24782,7 +24896,6 @@ function LSlider:setValue(v) end
 LSpinBox = {}
 
 --- Decreases this spin box's value by one step.
----@return nil No return value.
 function LSpinBox:decrement() end
 
 --- Returns the current numeric value of this spin box.
@@ -24790,23 +24903,19 @@ function LSpinBox:decrement() end
 function LSpinBox:getValue() end
 
 --- Increases this spin box's value by one step.
----@return nil No return value.
 function LSpinBox:increment() end
 
 --- Sets the minimum and maximum bounds for this spin box.
 ---@param min number Minimum value.
 ---@param max number Maximum value.
----@return nil No return value.
 function LSpinBox:setRange(min, max) end
 
 --- Sets the step increment for this spin box.
 ---@param step number The step size (minimum 1e-9).
----@return nil No return value.
 function LSpinBox:setStep(step) end
 
 --- Sets the numeric value of this spin box, clamped to its range.
 ---@param v number The value to set.
----@return nil No return value.
 function LSpinBox:setValue(v) end
 
 --- Adds split-panel-specific methods to a split panel widget table.
@@ -24835,27 +24944,22 @@ function LSplitPanel:getSplitPosition() end
 
 --- Sets the widget index for the first (left/top) panel.
 ---@param child_idx number The widget index.
----@return nil No return value.
 function LSplitPanel:setFirstChild(child_idx) end
 
 --- Sets the minimum pixel size of each split sub-panel.
 ---@param v number The minimum size in pixels.
----@return nil No return value.
 function LSplitPanel:setMinPanelSize(v) end
 
 --- Sets the orientation of this split panel ("horizontal" or "vertical").
 ---@param v string The orientation.
----@return nil No return value.
 function LSplitPanel:setOrientation(v) end
 
 --- Sets the widget index for the second (right/bottom) panel.
 ---@param child_idx number The widget index.
----@return nil No return value.
 function LSplitPanel:setSecondChild(child_idx) end
 
 --- Sets the split position as a fraction (0.0 to 1.0).
 ---@param v number The split fraction.
----@return nil No return value.
 function LSplitPanel:setSplitPosition(v) end
 
 --- Adds status-bar-specific methods to a status bar widget table.
@@ -24865,7 +24969,6 @@ LStatusBar = {}
 --- Adds a labeled section to this status bar.
 ---@param text string The section display text.
 ---@param width? number The section width in pixels (default 100).
----@return nil No return value.
 function LStatusBar:addSection(text, width) end
 
 --- Returns the number of sections in this status bar.
@@ -24879,19 +24982,16 @@ function LStatusBar:getSectionText(section_idx) end
 
 --- Sets the number of sections, truncating or adding empty sections as needed.
 ---@param count number The desired section count.
----@return nil No return value.
 function LStatusBar:setSectionCount(count) end
 
 --- Sets the text of a status bar section by its 1-based index.
 ---@param section_idx number The 1-based section index.
 ---@param text string The new section text.
----@return nil No return value.
 function LStatusBar:setSectionText(section_idx, text) end
 
 --- Associates a widget with a status bar section (reserved for future use).
 ---@param section_idx number The 1-based section index.
----@param widget any The widget value to associate.
----@return nil No return value.
+---@param widget? table The widget table to associate, or nil to clear.
 function LStatusBar:setSectionWidget(section_idx, widget) end
 
 --- Adds switch-specific methods (setOn, isOn, toggle) to a switch widget table.
@@ -24904,11 +25004,9 @@ function LSwitch:isOn() end
 
 --- Sets the on/off state of this toggle switch.
 ---@param on boolean True to turn on, false to turn off.
----@return nil No return value.
 function LSwitch:setOn(on) end
 
 --- Toggles this switch between on and off states.
----@return nil No return value.
 function LSwitch:toggle() end
 
 --- Adds tab-bar-specific methods to a tab bar widget table.
@@ -24917,7 +25015,6 @@ LTabBar = {}
 
 --- Adds a new tab with the given label to this tab bar.
 ---@param label string The tab label text.
----@return nil No return value.
 function LTabBar:addTab(label) end
 
 --- Returns the 1-based index of the currently active tab.
@@ -24940,7 +25037,6 @@ function LTabBar:removeTab(index) end
 
 --- Sets the active (selected) tab by 1-based index.
 ---@param index number The 1-based tab index to activate.
----@return nil No return value.
 function LTabBar:setActiveTab(index) end
 
 --- Adds text-input-specific methods to a text input widget table.
@@ -24965,17 +25061,14 @@ function LTextInput:isFocused() end
 
 --- Sets the maximum number of characters allowed in this text input.
 ---@param n number Maximum character count.
----@return nil No return value.
 function LTextInput:setMaxLength(n) end
 
 --- Sets the placeholder text shown when the input is empty.
 ---@param text string The placeholder text.
----@return nil No return value.
 function LTextInput:setPlaceholder(text) end
 
 --- Sets the text content of this text input field and moves the cursor to the end.
 ---@param text string The text to set.
----@return nil No return value.
 function LTextInput:setText(text) end
 
 --- Lua-exposed wrapper around a GUI theme for styling widgets.
@@ -24986,7 +25079,6 @@ LTheme = {}
 ---@param widget_type string The widget type name (e.g. "button").
 ---@param state string The widget state (e.g. "normal", "hovered").
 ---@param style_table table A table of style properties.
----@return nil No value is returned.
 function LTheme:setStyle(widget_type, state, style_table) end
 
 --- Returns the type name of this object.
@@ -25020,12 +25112,10 @@ function LToast:isExpired() end
 
 --- Sets how long this toast is displayed in seconds.
 ---@param d number Duration in seconds.
----@return nil No return value.
 function LToast:setDuration(d) end
 
 --- Sets the message text displayed by this toast notification.
 ---@param msg string The toast message.
----@return nil No return value.
 function LToast:setMessage(msg) end
 
 --- Adds toolbar-specific methods to a toolbar widget table.
@@ -25039,17 +25129,21 @@ LToolbar = {}
 function LToolbar:addButton(id, tooltip) end
 
 --- Adds a visual separator to this toolbar.
----@return nil No return value.
 function LToolbar:addSeparator() end
 
 --- Adds a flexible spacer to this toolbar.
 ---@param _size? number Optional size hint (reserved for future use).
----@return nil No return value.
 function LToolbar:addSpacer(_size) end
+
+---@class LToolbarGetButtonResult
+---@field id number Id.
+---@field tooltip string? Tooltip text.
+---@field enabled boolean Whether the button is enabled.
+---@field toggled boolean Whether the button is toggled.
 
 --- Returns a table describing the toolbar button with the given ID.
 ---@param id string The button identifier.
----@return table Table with id, tooltip, enabled, toggled fields, or nil if not found.
+---@return LToolbarGetButtonResult Table with id, tooltip, enabled, toggled fields, or nil if not found.
 function LToolbar:getButton(id) end
 
 --- Returns the toolbar orientation ("horizontal" or "vertical").
@@ -25075,7 +25169,6 @@ function LToolbar:setButtonToggled(id, toggled) end
 
 --- Sets the toolbar orientation ("horizontal" or "vertical").
 ---@param v string The orientation.
----@return nil No return value.
 function LToolbar:setOrientation(v) end
 
 --- Adds tooltip-panel-specific methods to a tooltip panel widget table.
@@ -25096,17 +25189,14 @@ function LTooltipPanel:getText() end
 
 --- Sets the delay in seconds before this tooltip appears.
 ---@param v number The delay in seconds.
----@return nil No return value.
 function LTooltipPanel:setDelay(v) end
 
 --- Sets the widget index that this tooltip is attached to.
 ---@param target? number The target widget index, or nil to detach.
----@return nil No return value.
 function LTooltipPanel:setTarget(target) end
 
 --- Sets the tooltip panel display text content.
 ---@param text string The tooltip text.
----@return nil No return value.
 function LTooltipPanel:setText(text) end
 
 --- Registers tree-view-specific Lua methods on a widget method table.
@@ -25120,11 +25210,9 @@ LTreeView = {}
 function LTreeView:addNode(text, parent_index) end
 
 --- Removes all nodes from this tree view.
----@return nil No return value.
 function LTreeView:clearNodes() end
 
 --- Collapses all nodes in this tree view.
----@return nil No return value.
 function LTreeView:collapseAll() end
 
 --- Collapses the node at the given 1-based index to hide its children.
@@ -25133,7 +25221,6 @@ function LTreeView:collapseAll() end
 function LTreeView:collapseNode(index) end
 
 --- Expands all nodes in this tree view.
----@return nil No return value.
 function LTreeView:expandAll() end
 
 --- Expands the node at the given 1-based index to show its children.
@@ -25143,7 +25230,7 @@ function LTreeView:expandNode(index) end
 
 --- Returns a table of 1-based child node indices for the node at the given index.
 ---@param index number The 1-based parent node index.
----@return table Array of 1-based child indices.
+---@return number[] 1-based child indices.
 function LTreeView:getChildNodes(index) end
 
 --- Returns the total number of nodes in this tree view.
@@ -25213,7 +25300,6 @@ LUiWidget = {}
 
 --- Adds a child widget to this widget's hierarchy.
 ---@param child LUiWidget|number The child widget table or widget index to add.
----@return nil No return value.
 function LUiWidget:addChild(child) end
 
 --- Smoothly animates this widget's opacity toward a target value over the given duration.
@@ -25232,20 +25318,17 @@ function LUiWidget:animatePosition(x, y, duration) end
 
 --- Attaches this widget to a game entity so it follows the entity's position on screen.
 ---@param entity_id number The entity ID to attach to.
----@return nil No return value.
 function LUiWidget:attachToEntity(entity_id) end
 
 --- Binds this widget to a data key for use with update_bindings.
 ---@param key string The binding key name.
----@return nil No return value.
 function LUiWidget:bind(key) end
 
 --- Cancels all active animations on this widget, leaving it at its current state.
----@return nil No return value.
+---@return boolean True if any animations were cancelled.
 function LUiWidget:cancelAnimations() end
 
 --- Removes all anchor constraints from this widget.
----@return nil No return value.
 function LUiWidget:clearAnchor() end
 
 --- Tests whether the given screen-space point is inside this widget's bounds.
@@ -25255,15 +25338,12 @@ function LUiWidget:clearAnchor() end
 function LUiWidget:containsPoint(x, y) end
 
 --- Detaches this widget from any previously attached entity.
----@return nil No return value.
 function LUiWidget:detachFromEntity() end
 
 --- Instantly makes this widget fully opaque and visible.
----@return nil No return value.
 function LUiWidget:fadeIn() end
 
 --- Instantly makes this widget fully transparent and hidden.
----@return nil No return value.
 function LUiWidget:fadeOut() end
 
 --- Searches this widget's subtree for a child with the given ID.
@@ -25279,8 +25359,11 @@ function LUiWidget:getAlpha() end
 ---@return number The child count.
 function LUiWidget:getChildCount() end
 
+---@class LUiWidgetGetChildrenResult
+---@field _idx number Widget index.
+
 --- Returns a table of lightweight child widget references, each containing an _idx field.
----@return table Array of child widget tables.
+---@return LUiWidgetGetChildrenResult Array of child widget tables.
 function LUiWidget:getChildren() end
 
 --- Returns the flex-grow factor of this widget.
@@ -25362,12 +25445,10 @@ function LUiWidget:isVisible() end
 
 --- Removes a child widget from this widget's hierarchy.
 ---@param child LUiWidget|number The child widget table or widget index to remove.
----@return nil No return value.
 function LUiWidget:removeChild(child) end
 
 --- Sets the opacity of this widget, clamped to 0.0 (fully transparent) through 1.0 (fully opaque).
 ---@param alpha number The opacity value.
----@return nil No return value.
 function LUiWidget:setAlpha(alpha) end
 
 --- Anchors this widget to its parent's edges. Pass nil for any side to leave it unanchored.
@@ -25375,33 +25456,27 @@ function LUiWidget:setAlpha(alpha) end
 ---@param top? number Distance from parent's top edge, or nil.
 ---@param right? number Distance from parent's right edge, or nil.
 ---@param bottom? number Distance from parent's bottom edge, or nil.
----@return nil No return value.
 function LUiWidget:setAnchor(left, top, right, bottom) end
 
 --- Centers this widget within its parent using proportional anchor offsets (0.0 to 1.0).
 ---@param cx? number Horizontal center fraction (0.5 = centered).
 ---@param cy? number Vertical center fraction (0.5 = centered).
----@return nil No return value.
 function LUiWidget:setAnchorCenter(cx, cy) end
 
 --- Enables or disables this widget. Disabled widgets appear grayed out and ignore input.
 ---@param v boolean True to enable, false to disable.
----@return nil No return value.
 function LUiWidget:setEnabled(v) end
 
 --- Sets the flex-grow factor controlling how much extra space this widget receives in a layout.
 ---@param grow number The grow factor (0 = no growth).
----@return nil No return value.
 function LUiWidget:setFlexGrow(grow) end
 
 --- Sets the flex-shrink factor controlling how much this widget shrinks when layout space is insufficient.
 ---@param shrink number The shrink factor (0 = no shrinkage).
----@return nil No return value.
 function LUiWidget:setFlexShrink(shrink) end
 
 --- Assigns a string identifier to this widget for lookup with findById.
 ---@param id string A unique identifier string.
----@return nil No return value.
 function LUiWidget:setId(id) end
 
 --- Sets the outer margin of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
@@ -25409,34 +25484,28 @@ function LUiWidget:setId(id) end
 ---@param right? number Right margin. Defaults to top.
 ---@param bottom? number Bottom margin. Defaults to top.
 ---@param left? number Left margin. Defaults to right.
----@return nil No return value.
 function LUiWidget:setMargin(top, right, bottom, left) end
 
 --- Sets the maximum allowed width and height for this widget during layout.
 ---@param w number Maximum width in pixels.
 ---@param h number Maximum height in pixels.
----@return nil No return value.
 function LUiWidget:setMaxSize(w, h) end
 
 --- Sets the minimum allowed width and height for this widget during layout.
 ---@param w number Minimum width in pixels.
 ---@param h number Minimum height in pixels.
----@return nil No return value.
 function LUiWidget:setMinSize(w, h) end
 
 --- Registers a callback function invoked when this widget's value changes.
 ---@param f function Callback receiving the widget index as argument.
----@return nil No return value.
 function LUiWidget:setOnChange(f) end
 
 --- Registers a callback function invoked when this widget is clicked.
 ---@param f function Callback receiving the widget index as argument.
----@return nil No return value.
 function LUiWidget:setOnClick(f) end
 
 --- Registers a custom draw callback for this widget, invoked each frame during the draw pass.
 ---@param f function Callback receiving a rect table {x, y, w, h} with the computed bounds.
----@return nil No return value.
 function LUiWidget:setOnDraw(f) end
 
 --- Sets the inner padding of this widget. Accepts 1 to 4 values (top, right?, bottom?, left?) following CSS shorthand rules.
@@ -25444,46 +25513,38 @@ function LUiWidget:setOnDraw(f) end
 ---@param right? number Right padding. Defaults to top.
 ---@param bottom? number Bottom padding. Defaults to top.
 ---@param left? number Left padding. Defaults to right.
----@return nil No return value.
 function LUiWidget:setPadding(top, right, bottom, left) end
 
 --- Sets the local position of this widget relative to its parent.
 ---@param x number Horizontal position in pixels.
 ---@param y number Vertical position in pixels.
----@return nil No return value.
 function LUiWidget:setPosition(x, y) end
 
 --- Sets the width and height of this widget in pixels.
 ---@param w number Width in pixels.
 ---@param h number Height in pixels.
----@return nil No return value.
 function LUiWidget:setSize(w, h) end
 
 --- Sets the tooltip text shown when the user hovers over this widget.
 ---@param text string The tooltip message.
----@return nil No return value.
 function LUiWidget:setTooltip(text) end
 
 --- Shows or hides this widget. Hidden widgets are not drawn and do not receive input.
 ---@param v boolean True to show, false to hide.
----@return nil No return value.
 function LUiWidget:setVisible(v) end
 
 --- Sets the z-order (draw priority) of this widget. Higher values draw on top.
 ---@param z number The z-order integer value.
----@return nil No return value.
 function LUiWidget:setZOrder(z) end
 
 --- Moves this widget to the given position and makes it visible.
 ---@param x number Target x position.
 ---@param y number Target y position.
----@return nil No return value.
 function LUiWidget:slideIn(x, y) end
 
 --- Moves this widget to the given position and hides it.
 ---@param x number Target x position.
 ---@param y number Target y position.
----@return nil No return value.
 function LUiWidget:slideOut(x, y) end
 
 --- Returns the type name string of this widget (e.g. "LButton", "LSlider").
@@ -25496,12 +25557,10 @@ function LUiWidget:type() end
 function LUiWidget:typeOf(name) end
 
 --- Removes the data binding from this widget.
----@return nil No return value.
 function LUiWidget:unbind() end
 
 --- Adds a toast notification to the queue.
 ---@param toast_table table Table with message (string) and optional duration (number).
----@return nil No return value.
 lurek.ui.addToast = function(toast_table) end
 
 --- Begins a drag operation on a widget.
@@ -25510,11 +25569,9 @@ lurek.ui.addToast = function(toast_table) end
 lurek.ui.beginDrag = function(widget) end
 
 --- Clears keyboard focus from all widgets.
----@return nil No return value.
 lurek.ui.clearFocus = function() end
 
 --- Invokes custom draw callbacks for all widgets that have one registered.
----@return nil No return value.
 lurek.ui.draw = function() end
 
 --- Renders the entire UI to an image buffer.
@@ -25529,19 +25586,17 @@ lurek.ui.drawToImage = function(w, h) end
 lurek.ui.dropOn = function(target) end
 
 --- Ends the current drag operation without dropping.
----@return nil No return value.
+---@return number The widget index that was being dragged, or nil if no drag was active.
 lurek.ui.endDrag = function() end
 
 --- Flushes internal UI layout and render caches.
----@return nil No value is returned.
+---@return boolean True if the cache was flushed.
 lurek.ui.flushCache = function() end
 
 --- Moves keyboard focus to the next focusable widget.
----@return nil No return value.
 lurek.ui.focusNext = function() end
 
 --- Moves keyboard focus to the previous focusable widget.
----@return nil No return value.
 lurek.ui.focusPrev = function() end
 
 --- Returns the widget index currently being dragged, or nil.
@@ -25812,27 +25867,22 @@ lurek.ui.parseWidgetState = function(state) end
 ---@param width number Image width in pixels.
 ---@param height number Image height in pixels.
 ---@param path string Output file path.
----@return nil No return value.
 lurek.ui.renderToImage = function(width, height, path) end
 
 --- Applies the built-in default theme to the UI context.
----@return nil No return value.
 lurek.ui.setDefaultTheme = function() end
 
 --- Sets keyboard focus to a widget, or clears focus if nil.
 ---@param widget? table The widget table to focus, or nil to clear.
----@return nil No return value.
 lurek.ui.setFocus = function(widget) end
 
 --- Applies a theme to the entire UI context.
 ---@param theme_ud LTheme The theme userdata to apply.
----@return nil No return value.
 lurek.ui.setTheme = function(theme_ud) end
 
 --- Sets the viewport size for the UI context.
 ---@param w number Viewport width.
 ---@param h number Viewport height.
----@return nil No return value.
 lurek.ui.setViewport = function(w, h) end
 
 --- Delivers a text input event to the UI.
@@ -25842,12 +25892,10 @@ lurek.ui.textinput = function(text) end
 
 --- Updates the UI context and dispatches pending events to callbacks.
 ---@param dt number Delta time in seconds.
----@return nil No return value.
 lurek.ui.update = function(dt) end
 
 --- Updates data bindings for widgets that reference binding keys.
 ---@param data table A table mapping binding keys to values.
----@return nil No return value.
 lurek.ui.update_bindings = function(data) end
 
 --- Delivers a mouse wheel event to the UI.
@@ -25860,15 +25908,12 @@ lurek.ui.wheelmoved = function(x, y) end
 lurek.window = {}
 
 --- Closes the window and signals the engine to shut down.
----@return nil No return value.
 lurek.window.close = function() end
 
 --- Flashes the window briefly to attract the user's attention.
----@return nil No return value.
 lurek.window.flash = function() end
 
 --- Requests keyboard focus for the window. No-op if already focused.
----@return nil No value is returned.
 lurek.window.focus = function() end
 
 --- Converts a value from physical pixel units to logical (DPI-independent) units using the current DPI scale.
@@ -25908,16 +25953,32 @@ lurek.window.getDisplayName = function(display) end
 ---@return string "landscape" if width >= height, "portrait" otherwise.
 lurek.window.getDisplayOrientation = function() end
 
+---@class WindowGetDisplaysResult
+---@field index number Display index.
+---@field name string Display name.
+---@field x number X position.
+---@field y number Y position.
+---@field width number Width in pixels.
+---@field height number Height in pixels.
+---@field scale number Scale factor.
+---@field refreshRate number Refresh rate in Hz.
+---@field primary boolean Whether this is the primary display.
+
 --- Returns a list of all connected displays with their properties. Each entry contains index, name, position (x, y), resolution (width, height), scale factor, refresh rate, and whether it is the primary monitor.
----@return table Array of display info tables with fields: index, name, x, y, width, height, scale, refreshRate, primary.
+---@return WindowGetDisplaysResult Array of display info tables with fields: index, name, x, y, width, height, scale, refreshRate, primary.
 lurek.window.getDisplays = function() end
 
 --- Returns the current fullscreen state and type.
 ---@return boolean Whether the window is in fullscreen mode.
 lurek.window.getFullscreen = function() end
 
+---@class WindowGetFullscreenModesResult
+---@field width number Width in pixels.
+---@field height number Height in pixels.
+---@field refreshRate number Refresh rate in Hz.
+
 --- Returns a list of all supported fullscreen video modes across all monitors. Each entry contains width, height, and refresh rate.
----@return table Array of mode tables with fields: width (number), height (number), refreshRate (number).
+---@return WindowGetFullscreenModesResult Array of mode tables with fields: width (number), height (number), refreshRate (number).
 lurek.window.getFullscreenModes = function() end
 
 --- Returns the logical game height as defined by the current scale mode and game configuration.
@@ -25932,10 +25993,15 @@ lurek.window.getGameWidth = function() end
 ---@return number The window height.
 lurek.window.getHeight = function() end
 
+---@class WindowGetModeResult
+---@field fullscreen boolean Whether fullscreen is active.
+---@field fullscreentype string Fullscreen type.
+---@field vsync boolean Whether VSync is enabled.
+
 --- Returns the current window display mode: width, height, and a flags table containing fullscreen state, fullscreen type, and VSync mode.
 ---@return number a The window width.
 ---@return number b The window height.
----@return table c Flags table with fields: fullscreen (boolean), fullscreentype (string), vsync (number).
+---@return WindowGetModeResult c Flags table with fields: fullscreen (boolean), fullscreentype (string), vsync (number).
 lurek.window.getMode = function() end
 
 --- Returns the native DPI scale factor reported by the operating system.
@@ -25959,8 +26025,16 @@ lurek.window.getPosition = function() end
 ---@return number d Safe area height.
 lurek.window.getSafeArea = function() end
 
+---@class WindowGetScaleInfoResult
+---@field scale_x number Scale x.
+---@field scale_y number Scale y.
+---@field offset_x number Offset x.
+---@field offset_y number Offset y.
+---@field game_width number Game width.
+---@field game_height number Game height.
+
 --- Returns detailed scaling information including scale factors, offsets, and logical game dimensions. Useful for coordinate conversion between screen space and game space.
----@return table Table with fields: scale_x (number), scale_y (number), offset_x (number), offset_y (number), game_width (number), game_height (number).
+---@return WindowGetScaleInfoResult Table with fields: scale_x (number), scale_y (number), offset_x (number), offset_y (number), game_width (number), game_height (number).
 lurek.window.getScaleInfo = function() end
 
 --- Returns the current content scale mode name (e.g., "stretch", "letterbox", "pixel-perfect").
@@ -26020,21 +26094,18 @@ lurek.window.isResizable = function() end
 lurek.window.isVisible = function() end
 
 --- Maximizes the window to fill the screen.
----@return nil No return value.
 lurek.window.maximize = function() end
 
 --- Minimizes the window to the taskbar.
----@return nil No return value.
 lurek.window.minimize = function() end
 
 --- Registers a callback function that is called whenever the DPI scale factor changes (e.g., when the window is moved to a different monitor). Only one callback can be active at a time; setting a new one replaces the previous.
 ---@param func function Callback receiving the new DPI scale as a number.
----@return nil No return value.
 lurek.window.onDpiChange = function(func) end
 
 --- Opens a native file picker dialog and returns the selected file paths. Blocks until the user picks file(s) or cancels.
 ---@param opts? table Optional config table with fields: title (string), defaultPath (string), multiple (boolean), filters (table of {name, extensions}).
----@return table Array of selected file path strings. Empty table if cancelled.
+---@return string[] Selected file path strings. Empty table if cancelled.
 lurek.window.openFileDialog = function(opts) end
 
 --- Checks if the DPI scale has changed since the last poll and fires the onDpiChange callback if so. Call this once per frame in your update loop to detect monitor changes.
@@ -26042,55 +26113,45 @@ lurek.window.openFileDialog = function(opts) end
 lurek.window.pollDpiChange = function() end
 
 --- Requests user attention by flashing the taskbar icon. Useful for notifying the player when the window is in the background.
----@return nil No return value.
 lurek.window.requestAttention = function() end
 
 --- Restores the window from minimized or maximized state to its previous size and position.
----@return nil No return value.
 lurek.window.restore = function() end
 
 --- Moves the window to the specified display. Throws an error if the index is negative.
 ---@param display number Zero-based index of the target display.
----@return nil No return value.
 lurek.window.setDisplay = function(display) end
 
 --- Enables or disables fullscreen mode. Supports "desktop" (borderless) and "exclusive" types.
 ---@param enabled boolean Whether to enter fullscreen.
 ---@param fstype? string Fullscreen type: "desktop" (default) or "exclusive".
----@return nil No return value.
 lurek.window.setFullscreen = function(enabled, fstype) end
 
 --- Sets the window icon from an image file. The file must exist in the game's filesystem. Supports PNG and other common image formats.
 ---@param path string Path to the icon image file.
----@return nil No return value.
 lurek.window.setIcon = function(path) end
 
 --- Sets the window display mode with a specific resolution and optional flags. Use this to resize the window and configure fullscreen or VSync at the same time.
 ---@param w number The desired window width in pixels.
 ---@param h number The desired window height in pixels.
 ---@param flags? table Optional table with fields: fullscreen (boolean), fullscreentype (string), vsync (number).
----@return nil No return value.
 lurek.window.setMode = function(w, h, flags) end
 
 --- Moves the window to the specified screen position.
 ---@param x number The x-coordinate for the window's top-left corner.
 ---@param y number The y-coordinate for the window's top-left corner.
----@return nil No return value.
 lurek.window.setPosition = function(x, y) end
 
 --- Sets the content scale mode. Controls how the game's logical resolution maps to the window size.
 ---@param mode string The scale mode name (e.g., "stretch", "letterbox", "pixel-perfect").
----@return nil No return value.
 lurek.window.setScaleMode = function(mode) end
 
 --- Sets the window title bar text. This function is exposed to Lua scripts.
 ---@param title string The new window title to display.
----@return nil No return value.
 lurek.window.setTitle = function(title) end
 
 --- Sets the vertical sync mode. Controls how frame presentation is synchronized with the display.
 ---@param mode number VSync mode: 0 = off, 1 = on, -1 = adaptive.
----@return nil No return value.
 lurek.window.setVSync = function(mode) end
 
 --- Displays a native OS message box dialog. Blocks execution until the user dismisses it.
@@ -26108,5 +26169,4 @@ lurek.window.toPixels = function(value) end
 
 --- Applies multiple window settings at once from a configuration table. Supports title, width, height, fullscreen, fullscreentype, vsync, position (x, y), scaleMode, and display index.
 ---@param opts table Configuration table with optional fields: title (string), width (number), height (number), fullscreen (boolean), fullscreentype (string), vsync (number), x (number), y (number), scaleMode (string), display (number).
----@return nil No return value.
 lurek.window.windowConfig = function(opts) end

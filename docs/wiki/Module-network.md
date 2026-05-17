@@ -26,13 +26,13 @@
   - [lurek.network.newRelayTicket(room_id: string, peer_id: string) -> string](#lureknetworknewrelayticketroomid-string-peerid-string-string)
   - [lurek.network.newRuntime() -> LNetworkRuntime](#lureknetworknewruntime-lnetworkruntime)
   - [lurek.network.newServer(opts: table) -> LNetworkHost](#lureknetworknewserveropts-table-lnetworkhost)
-  - [lurek.network.pack(value: any) -> string](#lureknetworkpackvalue-any-string)
+  - [lurek.network.pack(value: table) -> string](#lureknetworkpackvalue-table-string)
   - [lurek.network.parsePunchProbe(payload: string) -> string](#lureknetworkparsepunchprobepayload-string-string)
   - [lurek.network.parseRelayTicket(token: string) -> table](#lureknetworkparserelaytickettoken-string-table)
   - [lurek.network.predictLinear(snapshot: table, dt: number) -> table](#lureknetworkpredictlinearsnapshot-table-dt-number-table)
   - [lurek.network.reconcileSnapshot(pred: table, auth: table, alpha: number) -> table](#lureknetworkreconcilesnapshotpred-table-auth-table-alpha-number-table)
   - [lurek.network.syncEntity(host_ud: LNetworkHost, entity_id: integer, data_tbl: table, [channel]: integer, [reliable]: boolean)](#lureknetworksyncentityhostud-lnetworkhost-entityid-integer-datatbl-table-channel-integer-reliable-boolean)
-  - [lurek.network.unpack(data: string) -> LuaValue](#lureknetworkunpackdata-string-luavalue)
+  - [lurek.network.unpack(data: string) -> table](#lureknetworkunpackdata-string-table)
 - [Types and Methods](#types-and-methods)
   - [LNetworkHost](#lnetworkhost)
   - [LNetworkHost:broadcast(channel_id: integer, data: string, [reliable]: boolean)](#lnetworkhostbroadcastchannelid-integer-data-string-reliable-boolean)
@@ -46,7 +46,7 @@
   - [LNetworkHost:getBandwidthLimit() -> table](#lnetworkhostgetbandwidthlimit-table)
   - [LNetworkHost:getChannelLimit() -> integer](#lnetworkhostgetchannellimit-integer)
   - [LNetworkHost:getConnectedPeerCount() -> integer](#lnetworkhostgetconnectedpeercount-integer)
-  - [LNetworkHost:getConnectedPeerIds() -> table](#lnetworkhostgetconnectedpeerids-table)
+  - [LNetworkHost:getConnectedPeerIds() -> integer[]](#lnetworkhostgetconnectedpeerids-integer)
   - [LNetworkHost:getPeerAddress(peer_id: integer) -> string](#lnetworkhostgetpeeraddresspeerid-integer-string)
   - [LNetworkHost:getPeerLimit() -> integer](#lnetworkhostgetpeerlimit-integer)
   - [LNetworkHost:getPeerState(peer_id: integer) -> string](#lnetworkhostgetpeerstatepeerid-integer-string)
@@ -174,7 +174,7 @@ lurek.network.newHost(opts: table) -> LNetworkHost -- Creates a network host fro
 lurek.network.newRelayTicket(room_id: string, peer_id: string) -> string -- Creates an encoded relay ticket. This function is exposed to Lua scripts.
 lurek.network.newRuntime() -> LNetworkRuntime -- Creates a background network runtime.
 lurek.network.newServer(opts: table) -> LNetworkHost -- Creates a server host from an options table.
-lurek.network.pack(value: any) -> string -- Packs a supported Lua value into a binary network message string.
+lurek.network.pack(value: table) -> string -- Packs a supported Lua value into a binary network message string.
 lurek.network.parsePunchProbe(payload: string) -> string -- Parses a relay punch probe payload.
 lurek.network.parseRelayTicket(token: string) -> table -- Parses an encoded relay ticket. This function is exposed to Lua scripts.
 lurek.network.predictLinear(snapshot: table, dt: number) -> table -- Predicts an entity snapshot forward by linear velocity.
@@ -530,13 +530,13 @@ do
 end
 ```
 
-### `lurek.network.pack(value: any) -> string`
+### `lurek.network.pack(value: table) -> string`
 
 Packs a supported Lua value into a binary network message string.
 
 **Parameters**
 
-- `value` (`any`, required) - Lua value to pack.
+- `value` (`table`, required) - Lua value to pack (table, number, string, or boolean).
 
 **Returns**: `string` - Binary packed message.
 
@@ -696,15 +696,15 @@ do
 end
 ```
 
-### `lurek.network.unpack(data: string) -> LuaValue`
+### `lurek.network.unpack(data: string) -> table`
 
-Unpacks a binary network message string into Lua values.
+Unpacks a binary network message string into a Lua value.
 
 **Parameters**
 
 - `data` (`string`, required) - Binary packed message.
 
-**Returns**: `LuaValue` - Unpacked Lua value.
+**Returns**: `table` - Unpacked Lua value.
 
 #### Example
 
@@ -815,7 +815,7 @@ end
 
 ### `LNetworkHost:destroy()`
 
-Destroys the network host. This method is available to Lua scripts.
+Destroys the network host and releases resources.
 
 #### Example
 
@@ -989,7 +989,7 @@ end
 
 ### `LNetworkHost:getConnectedPeerCount() -> integer`
 
-Returns connected peer count. This method is available to Lua scripts.
+Returns the number of currently connected peers.
 
 **Returns**: `integer` - Connected peer count.
 
@@ -1007,11 +1007,11 @@ do
 end
 ```
 
-### `LNetworkHost:getConnectedPeerIds() -> table`
+### `LNetworkHost:getConnectedPeerIds() -> integer[]`
 
-Returns ids for connected peers. This method is available to Lua scripts.
+Returns an array of ids for all connected peers.
 
-**Returns**: `table` - Array table of peer ids.
+**Returns**: `integer[]` - Array table of peer ids.
 
 #### Example
 
@@ -1636,7 +1636,7 @@ do
 
 ### `LNetworkRuntime:shutdown()`
 
-Shuts down the network runtime. This method is available to Lua scripts.
+Shuts down the network runtime and cancels pending requests.
 
 #### Example
 

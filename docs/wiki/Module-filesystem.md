@@ -19,18 +19,18 @@
   - [lurek.filesystem.createDirectory(path: string)](#lurekfilesystemcreatedirectorypath-string)
   - [lurek.filesystem.createTempFile([prefix]: string) -> string](#lurekfilesystemcreatetempfileprefix-string-string)
   - [lurek.filesystem.exists(path: string) -> boolean](#lurekfilesystemexistspath-string-boolean)
-  - [lurek.filesystem.getDirectoryItems(path: string) -> table](#lurekfilesystemgetdirectoryitemspath-string-table)
+  - [lurek.filesystem.getDirectoryItems(path: string) -> string[]](#lurekfilesystemgetdirectoryitemspath-string-string)
   - [lurek.filesystem.getIdentity() -> string](#lurekfilesystemgetidentity-string)
-  - [lurek.filesystem.getInfo(path: string) -> LuaValue](#lurekfilesystemgetinfopath-string-luavalue)
+  - [lurek.filesystem.getInfo(path: string) -> table](#lurekfilesystemgetinfopath-string-table)
   - [lurek.filesystem.getSaveDirectory() -> string](#lurekfilesystemgetsavedirectory-string)
   - [lurek.filesystem.getSource() -> string](#lurekfilesystemgetsource-string)
   - [lurek.filesystem.getUserDirectory() -> string](#lurekfilesystemgetuserdirectory-string)
   - [lurek.filesystem.getWorkingDirectory() -> string](#lurekfilesystemgetworkingdirectory-string)
-  - [lurek.filesystem.glob(pattern: string) -> table](#lurekfilesystemglobpattern-string-table)
+  - [lurek.filesystem.glob(pattern: string) -> string[]](#lurekfilesystemglobpattern-string-string)
   - [lurek.filesystem.isDirectory(path: string) -> boolean](#lurekfilesystemisdirectorypath-string-boolean)
   - [lurek.filesystem.isFile(path: string) -> boolean](#lurekfilesystemisfilepath-string-boolean)
   - [lurek.filesystem.lines(path: string) -> function](#lurekfilesystemlinespath-string-function)
-  - [lurek.filesystem.listRecursive(path: string) -> table](#lurekfilesystemlistrecursivepath-string-table)
+  - [lurek.filesystem.listRecursive(path: string) -> string[]](#lurekfilesystemlistrecursivepath-string-string)
   - [lurek.filesystem.load(path: string) -> function](#lurekfilesystemloadpath-string-function)
   - [lurek.filesystem.mkdir(path: string)](#lurekfilesystemmkdirpath-string)
   - [lurek.filesystem.mount(src: string, mp: string) -> boolean](#lurekfilesystemmountsrc-string-mp-string-boolean)
@@ -38,9 +38,9 @@
   - [lurek.filesystem.move(src: string, dst: string)](#lurekfilesystemmovesrc-string-dst-string)
   - [lurek.filesystem.newFileData(path: string) -> LFileData](#lurekfilesystemnewfiledatapath-string-lfiledata)
   - [lurek.filesystem.openFile(path: string, mode: string) -> LFileHandle](#lurekfilesystemopenfilepath-string-mode-string-lfilehandle)
-  - [lurek.filesystem.pollAsync(handle_id: integer) -> LuaValue](#lurekfilesystempollasynchandleid-integer-luavalue)
-  - [lurek.filesystem.pollAsyncWrite(handle_id: integer) -> LuaValue](#lurekfilesystempollasyncwritehandleid-integer-luavalue)
-  - [lurek.filesystem.pollWatchers() -> table](#lurekfilesystempollwatchers-table)
+  - [lurek.filesystem.pollAsync(handle_id: integer) -> string](#lurekfilesystempollasynchandleid-integer-string)
+  - [lurek.filesystem.pollAsyncWrite(handle_id: integer) -> string](#lurekfilesystempollasyncwritehandleid-integer-string)
+  - [lurek.filesystem.pollWatchers() -> string[]](#lurekfilesystempollwatchers-string)
   - [lurek.filesystem.read(path: string) -> string](#lurekfilesystemreadpath-string-string)
   - [lurek.filesystem.readAsync(path: string) -> integer](#lurekfilesystemreadasyncpath-string-integer)
   - [lurek.filesystem.readBytes(path: string) -> string](#lurekfilesystemreadbytespath-string-string)
@@ -72,7 +72,7 @@
   - [LFileHandle:getSize() -> integer](#lfilehandlegetsize-integer)
   - [LFileHandle:isEOF() -> boolean](#lfilehandleiseof-boolean)
   - [LFileHandle:read([count]: integer) -> string](#lfilehandlereadcount-integer-string)
-  - [LFileHandle:readLine() -> LuaValue](#lfilehandlereadline-luavalue)
+  - [LFileHandle:readLine() -> string](#lfilehandlereadline-string)
   - [LFileHandle:seek(pos: integer)](#lfilehandleseekpos-integer)
   - [LFileHandle:tell() -> integer](#lfilehandletell-integer)
   - [LFileHandle:type() -> string](#lfilehandletype-string)
@@ -80,7 +80,7 @@
   - [LFileHandle:write(data: string)](#lfilehandlewritedata-string)
   - [LZipMount](#lzipmount)
   - [LZipMount:contains(virtual_path: string) -> boolean](#lzipmountcontainsvirtualpath-string-boolean)
-  - [LZipMount:listFiles() -> table](#lzipmountlistfiles-table)
+  - [LZipMount:listFiles() -> string[]](#lzipmountlistfiles-string)
   - [LZipMount:prefix() -> string](#lzipmountprefix-string)
   - [LZipMount:readFile(virtual_path: string) -> string](#lzipmountreadfilevirtualpath-string-string)
   - [LZipMount:type() -> string](#lzipmounttype-string)
@@ -175,18 +175,18 @@ lurek.filesystem.copy(src: string, dst: string) -- Copies one GameFS file to ano
 lurek.filesystem.createDirectory(path: string) -- Creates a GameFS directory and any missing parents.
 lurek.filesystem.createTempFile([prefix]: string) -> string -- Creates a temporary file through GameFS.
 lurek.filesystem.exists(path: string) -> boolean -- Returns whether a path exists in GameFS.
-lurek.filesystem.getDirectoryItems(path: string) -> table -- Lists immediate entries in a GameFS directory.
+lurek.filesystem.getDirectoryItems(path: string) -> string[] -- Lists immediate entries in a GameFS directory.
 lurek.filesystem.getIdentity() -> string -- Returns the current filesystem identity string.
-lurek.filesystem.getInfo(path: string) -> LuaValue -- Returns file metadata for a GameFS path when available.
+lurek.filesystem.getInfo(path: string) -> table -- Returns file metadata for a GameFS path when available.
 lurek.filesystem.getSaveDirectory() -> string -- Returns the save directory path used by GameFS.
 lurek.filesystem.getSource() -> string -- Returns the GameFS source root string.
 lurek.filesystem.getUserDirectory() -> string -- Returns the current user's directory path.
 lurek.filesystem.getWorkingDirectory() -> string -- Returns the process working directory.
-lurek.filesystem.glob(pattern: string) -> table -- Returns GameFS paths matching a glob pattern.
+lurek.filesystem.glob(pattern: string) -> string[] -- Returns GameFS paths matching a glob pattern.
 lurek.filesystem.isDirectory(path: string) -> boolean -- Returns whether a GameFS path is a directory.
 lurek.filesystem.isFile(path: string) -> boolean -- Returns whether a GameFS path is a regular file.
 lurek.filesystem.lines(path: string) -> function -- Creates an iterator function over lines in a text file.
-lurek.filesystem.listRecursive(path: string) -> table -- Lists all paths under a GameFS directory recursively.
+lurek.filesystem.listRecursive(path: string) -> string[] -- Lists all paths under a GameFS directory recursively.
 lurek.filesystem.load(path: string) -> function -- Loads a Lua chunk from GameFS and returns it as a Lua function.
 -- ... 26 more module functions
 ```
@@ -313,7 +313,7 @@ do
 end
 ```
 
-### `lurek.filesystem.getDirectoryItems(path: string) -> table`
+### `lurek.filesystem.getDirectoryItems(path: string) -> string[]`
 
 Lists immediate entries in a GameFS directory.
 
@@ -321,7 +321,7 @@ Lists immediate entries in a GameFS directory.
 
 - `path` (`string`, required) - Directory path to list.
 
-**Returns**: `table` - Array table of entry names.
+**Returns**: `string[]` - Entry names.
 
 #### Example
 
@@ -360,7 +360,7 @@ do
 end
 ```
 
-### `lurek.filesystem.getInfo(path: string) -> LuaValue`
+### `lurek.filesystem.getInfo(path: string) -> table`
 
 Returns file metadata for a GameFS path when available.
 
@@ -368,7 +368,7 @@ Returns file metadata for a GameFS path when available.
 
 - `path` (`string`, required) - GameFS path to inspect.
 
-**Returns**: `LuaValue` - Metadata table with type, size, modtime, and readonly fields, or nil on error.
+**Returns**: `table` - Metadata table with type, size, modtime, and readonly fields, or nil on error.
 
 #### Example
 
@@ -467,7 +467,7 @@ do
 end
 ```
 
-### `lurek.filesystem.glob(pattern: string) -> table`
+### `lurek.filesystem.glob(pattern: string) -> string[]`
 
 Returns GameFS paths matching a glob pattern.
 
@@ -475,7 +475,7 @@ Returns GameFS paths matching a glob pattern.
 
 - `pattern` (`string`, required) - Glob pattern.
 
-**Returns**: `table` - Array table of matching path strings.
+**Returns**: `string[]` - Matching path strings.
 
 #### Example
 
@@ -577,7 +577,7 @@ do
 end
 ```
 
-### `lurek.filesystem.listRecursive(path: string) -> table`
+### `lurek.filesystem.listRecursive(path: string) -> string[]`
 
 Lists all paths under a GameFS directory recursively.
 
@@ -585,7 +585,7 @@ Lists all paths under a GameFS directory recursively.
 
 - `path` (`string`, required) - Root directory path.
 
-**Returns**: `table` - Array table of path strings.
+**Returns**: `string[]` - Path strings.
 
 #### Example
 
@@ -791,7 +791,7 @@ do
 end
 ```
 
-### `lurek.filesystem.pollAsync(handle_id: integer) -> LuaValue`
+### `lurek.filesystem.pollAsync(handle_id: integer) -> string`
 
 Polls an asynchronous file load request.
 
@@ -799,7 +799,7 @@ Polls an asynchronous file load request.
 
 - `handle_id` (`integer`, required) - Async load handle id.
 
-**Returns**: `LuaValue` - Completed bytes/result, pending marker, or nil depending on async state.
+**Returns**: `string` - Completed bytes/result, pending marker, or nil depending on async state.
 
 #### Example
 
@@ -826,7 +826,7 @@ do
 end
 ```
 
-### `lurek.filesystem.pollAsyncWrite(handle_id: integer) -> LuaValue`
+### `lurek.filesystem.pollAsyncWrite(handle_id: integer) -> string`
 
 Polls an asynchronous file write request.
 
@@ -834,7 +834,7 @@ Polls an asynchronous file write request.
 
 - `handle_id` (`integer`, required) - Async write handle id.
 
-**Returns**: `LuaValue` - Completed status, pending marker, or nil depending on async state.
+**Returns**: `string` - Completed status, pending marker, or nil depending on async state.
 
 #### Example
 
@@ -891,11 +891,11 @@ end
 --@api-stub: lurek.filesystem.load
 ```
 
-### `lurek.filesystem.pollWatchers() -> table`
+### `lurek.filesystem.pollWatchers() -> string[]`
 
 Polls watched paths and returns paths that changed since the previous poll.
 
-**Returns**: `table` - Array table of changed path strings.
+**Returns**: `string[]` - Changed path strings.
 
 #### Example
 
@@ -1079,7 +1079,7 @@ end
 
 ### `lurek.filesystem.removeDir(path: string)`
 
-Removes a GameFS directory. This function is exposed to Lua scripts.
+Removes a GameFS directory by its path.
 
 **Parameters**
 
@@ -1174,7 +1174,7 @@ end
 
 ### `lurek.filesystem.unmount(mp: string) -> boolean`
 
-Removes a GameFS mount point. This function is exposed to Lua scripts.
+Removes a GameFS mount point by its name.
 
 **Parameters**
 
@@ -1320,7 +1320,7 @@ end
 
 ### `lurek.filesystem.writeJson(path: string, json: string)`
 
-Writes JSON text through GameFS. This function is exposed to Lua scripts.
+Writes JSON text through the GameFS layer.
 
 **Parameters**
 
@@ -1506,7 +1506,7 @@ end
 
 ### `LFileHandle:close()`
 
-Closes this file handle. This method is available to Lua scripts.
+Closes this file handle on this object.
 
 #### Example
 
@@ -1563,7 +1563,7 @@ end
 
 ### `LFileHandle:getSize() -> integer`
 
-Returns the size of the open file. This method is available to Lua scripts.
+Returns the size of the open file in bytes.
 
 **Returns**: `integer` - File size in bytes.
 
@@ -1634,11 +1634,11 @@ do
 end
 ```
 
-### `LFileHandle:readLine() -> LuaValue`
+### `LFileHandle:readLine() -> string`
 
 Reads the next line from this file handle.
 
-**Returns**: `LuaValue` - Line string when available, or nil at EOF.
+**Returns**: `string` - Line string when available, or nil at EOF.
 
 #### Example
 
@@ -1829,11 +1829,11 @@ do
 end
 ```
 
-### `LZipMount:listFiles() -> table`
+### `LZipMount:listFiles() -> string[]`
 
 Returns every virtual file path in the ZIP mount.
 
-**Returns**: `table` - Array table of mounted file paths.
+**Returns**: `string[]` - Mounted file paths.
 
 #### Example
 

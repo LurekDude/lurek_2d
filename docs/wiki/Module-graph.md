@@ -20,29 +20,29 @@
   - [LGraph:addEdge(from_ud: LGraphNode, to_ud: LGraphNode, [edge_type]: string) -> LGraphEdge](#lgraphaddedgefromud-lgraphnode-toud-lgraphnode-edgetype-string-lgraphedge)
   - [LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode)](#lgraphadditemitemud-lgraphitem-nodeud-lgraphnode)
   - [LGraph:addNode([node_type]: string, [capacity]: integer) -> LGraphNode](#lgraphaddnodenodetype-string-capacity-integer-lgraphnode)
-  - [LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil](#lgraphastarfromnode-lgraphnode-tonode-lgraphnode-tablenil)
+  - [LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> LGraphNode[]](#lgraphastarfromnode-lgraphnode-tonode-lgraphnode-lgraphnode)
   - [LGraph:colorGraph() -> table](#lgraphcolorgraph-table)
   - [LGraph:createItem([item_type]: string, [decay_time]: number) -> LGraphItem](#lgraphcreateitemitemtype-string-decaytime-number-lgraphitem)
-  - [LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil](#lgraphfindpathfromud-lgraphnode-toud-lgraphnode-tablenil)
-  - [LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil](#lgraphfindpathforitemitemud-lgraphitem-fromud-lgraphnode-toud-lgraphnode-tablenil)
-  - [LGraph:getComponents() -> table](#lgraphgetcomponents-table)
-  - [LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil](#lgraphgetdistancefromud-lgraphnode-toud-lgraphnode-numbernil)
-  - [LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil](#lgraphgetedgebetweenfromud-lgraphnode-toud-lgraphnode-lgraphedgenil)
+  - [LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table](#lgraphfindpathfromud-lgraphnode-toud-lgraphnode-table)
+  - [LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table](#lgraphfindpathforitemitemud-lgraphitem-fromud-lgraphnode-toud-lgraphnode-table)
+  - [LGraph:getComponents() -> LGraphNode[]](#lgraphgetcomponents-lgraphnode)
+  - [LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number](#lgraphgetdistancefromud-lgraphnode-toud-lgraphnode-number)
+  - [LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge](#lgraphgetedgebetweenfromud-lgraphnode-toud-lgraphnode-lgraphedge)
   - [LGraph:getEdgeCount() -> integer](#lgraphgetedgecount-integer)
-  - [LGraph:getEdges() -> table](#lgraphgetedges-table)
+  - [LGraph:getEdges() -> LGraphEdge[]](#lgraphgetedges-lgraphedge)
   - [LGraph:getItemCount() -> integer](#lgraphgetitemcount-integer)
-  - [LGraph:getItems() -> table](#lgraphgetitems-table)
-  - [LGraph:getNeighbors(node_ud: LGraphNode) -> table](#lgraphgetneighborsnodeud-lgraphnode-table)
+  - [LGraph:getItems() -> LGraphItem[]](#lgraphgetitems-lgraphitem)
+  - [LGraph:getNeighbors(node_ud: LGraphNode) -> LGraphNode[]](#lgraphgetneighborsnodeud-lgraphnode-lgraphnode)
   - [LGraph:getNodeCount() -> integer](#lgraphgetnodecount-integer)
-  - [LGraph:getNodes() -> table](#lgraphgetnodes-table)
-  - [LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> table](#lgraphgetreachablefromud-lgraphnode-maxdist-number-table)
+  - [LGraph:getNodes() -> LGraphNode[]](#lgraphgetnodes-lgraphnode)
+  - [LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> LGraphNode[]](#lgraphgetreachablefromud-lgraphnode-maxdist-number-lgraphnode)
   - [LGraph:getStats() -> table](#lgraphgetstats-table)
   - [LGraph:hasCycle() -> boolean](#lgraphhascycle-boolean)
   - [LGraph:hasEdge(edge_ud: LGraphEdge) -> boolean](#lgraphhasedgeedgeud-lgraphedge-boolean)
   - [LGraph:hasItem(item_ud: LGraphItem) -> boolean](#lgraphhasitemitemud-lgraphitem-boolean)
   - [LGraph:hasNode(node_ud: LGraphNode) -> boolean](#lgraphhasnodenodeud-lgraphnode-boolean)
   - [LGraph:isBipartite() -> boolean](#lgraphisbipartite-boolean)
-  - [LGraph:mst() -> table](#lgraphmst-table)
+  - [LGraph:mst() -> integer[]](#lgraphmst-integer)
   - [LGraph:on(event_name: string, func: function)](#lgraphoneventname-string-func-function)
   - [LGraph:processDemand()](#lgraphprocessdemand)
   - [LGraph:removeEdge(edge_ud: LGraphEdge) -> boolean](#lgraphremoveedgeedgeud-lgraphedge-boolean)
@@ -52,7 +52,7 @@
   - [LGraph:step()](#lgraphstep)
   - [LGraph:subgraph(nodes: table) -> LGraph](#lgraphsubgraphnodes-table-lgraph)
   - [LGraph:tickParallel(dt: number)](#lgraphtickparalleldt-number)
-  - [LGraph:topologicalSort() -> table|nil](#lgraphtopologicalsort-tablenil)
+  - [LGraph:topologicalSort() -> LGraphNode[]](#lgraphtopologicalsort-lgraphnode)
   - [LGraph:type() -> string](#lgraphtype-string)
   - [LGraph:typeOf(name: string) -> boolean](#lgraphtypeofname-string-boolean)
   - [LGraph:update(dt: number)](#lgraphupdatedt-number)
@@ -62,7 +62,7 @@
   - [LGraphEdge:getCapacity() -> integer](#lgraphedgegetcapacity-integer)
   - [LGraphEdge:getCooldown() -> number](#lgraphedgegetcooldown-number)
   - [LGraphEdge:getFrom() -> LGraphNode](#lgraphedgegetfrom-lgraphnode)
-  - [LGraphEdge:getItemsInTransit() -> table](#lgraphedgegetitemsintransit-table)
+  - [LGraphEdge:getItemsInTransit() -> LGraphItem[]](#lgraphedgegetitemsintransit-lgraphitem)
   - [LGraphEdge:getSpeedModifier() -> number](#lgraphedgegetspeedmodifier-number)
   - [LGraphEdge:getThroughput() -> number](#lgraphedgegetthroughput-number)
   - [LGraphEdge:getTo() -> LGraphNode](#lgraphedgegetto-lgraphnode)
@@ -87,7 +87,7 @@
   - [LGraphEdge:typeOf(name: string) -> boolean](#lgraphedgetypeofname-string-boolean)
   - [LGraphItem](#lgraphitem)
   - [LGraphItem:getDecayTime() -> number](#lgraphitemgetdecaytime-number)
-  - [LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil](#lgraphitemgetposition-lgraphnodelgraphedgenil)
+  - [LGraphItem:getPosition() -> LGraphNode](#lgraphitemgetposition-lgraphnode)
   - [LGraphItem:getPriority() -> integer](#lgraphitemgetpriority-integer)
   - [LGraphItem:getRemainingLife() -> number](#lgraphitemgetremaininglife-number)
   - [LGraphItem:getType() -> string](#lgraphitemgettype-string)
@@ -107,22 +107,22 @@
   - [LGraphNode:clearDemands()](#lgraphnodecleardemands)
   - [LGraphNode:clearSupplies()](#lgraphnodeclearsupplies)
   - [LGraphNode:clearTags()](#lgraphnodecleartags)
-  - [LGraphNode:dequeue() -> LGraphItem|nil](#lgraphnodedequeue-lgraphitemnil)
+  - [LGraphNode:dequeue() -> LGraphItem](#lgraphnodedequeue-lgraphitem)
   - [LGraphNode:enqueue(item_ud: LGraphItem) -> boolean](#lgraphnodeenqueueitemud-lgraphitem-boolean)
   - [LGraphNode:getCapacity() -> integer](#lgraphnodegetcapacity-integer)
-  - [LGraphNode:getEdges([dir]: string) -> table](#lgraphnodegetedgesdir-string-table)
+  - [LGraphNode:getEdges([dir]: string) -> LGraphEdge[]](#lgraphnodegetedgesdir-string-lgraphedge)
   - [LGraphNode:getFlowMode() -> string](#lgraphnodegetflowmode-string)
   - [LGraphNode:getItemCount() -> integer](#lgraphnodegetitemcount-integer)
-  - [LGraphNode:getItems() -> table](#lgraphnodegetitems-table)
+  - [LGraphNode:getItems() -> LGraphItem[]](#lgraphnodegetitems-lgraphitem)
   - [LGraphNode:getOverflowPolicy() -> string](#lgraphnodegetoverflowpolicy-string)
   - [LGraphNode:getProcessTime() -> number](#lgraphnodegetprocesstime-number)
-  - [LGraphNode:getPullFilter() -> string|nil](#lgraphnodegetpullfilter-stringnil)
+  - [LGraphNode:getPullFilter() -> string](#lgraphnodegetpullfilter-string)
   - [LGraphNode:getPullRate() -> number](#lgraphnodegetpullrate-number)
-  - [LGraphNode:getPushFilter() -> string|nil](#lgraphnodegetpushfilter-stringnil)
+  - [LGraphNode:getPushFilter() -> string](#lgraphnodegetpushfilter-string)
   - [LGraphNode:getPushRate() -> number](#lgraphnodegetpushrate-number)
   - [LGraphNode:getQueueCapacity() -> integer](#lgraphnodegetqueuecapacity-integer)
   - [LGraphNode:getQueueSize() -> integer](#lgraphnodegetqueuesize-integer)
-  - [LGraphNode:getTags() -> table](#lgraphnodegettags-table)
+  - [LGraphNode:getTags() -> string[]](#lgraphnodegettags-string)
   - [LGraphNode:getType() -> string](#lgraphnodegettype-string)
   - [LGraphNode:hasTag(tag: string) -> boolean](#lgraphnodehastagtag-string-boolean)
   - [LGraphNode:isActive() -> boolean](#lgraphnodeisactive-boolean)
@@ -272,42 +272,21 @@ Lua-side graph handle storing graph state and registered event callbacks.
 
 #### Example
 
-Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
 
 ```lua
 do
-  -- Create undirected graph (edges go both ways).
-  local g = lurek.patterns.newGraph(true)
+  -- newGraph() returns a fresh graph handle. Use it to model any directed network:
+  -- factory belts, quest dependency trees, tech trees, dialog flow, or AI decision graphs.
+  local quest_graph = lurek.graph.newGraph()
 
-  -- Add nodes with optional labels and payload data.
-  local town_a = g:addNode("Riverdale", { population = 500 })
-  local town_b = g:addNode("Hillcrest", { population = 300 })
-  local town_c = g:addNode("Lakewood", { population = 800 })
+  -- Build a simple quest dependency: "find_sword" must complete before "slay_dragon"
+  local find_sword = quest_graph:addNode("find_sword")
+  local slay_dragon = quest_graph:addNode("slay_dragon")
+  quest_graph:addEdge(find_sword, slay_dragon, "requires")
 
-  -- Connect nodes with weighted edges (distance between towns).
-  local road1 = g:addEdge(town_a, town_b, 15.0, "dirt_road")
-  g:addEdge(town_b, town_c, 22.0, "paved_road")
-
-  -- Query node data.
-  local data = g:getNodeValue(town_a)
-  print("Riverdale pop=" .. (data and data.population or 0))
-
-  -- Pathfinding queries.
-  local neighbors = g:neighbors(town_a)
-  local bfs_order = g:bfs(town_a)
-  local dfs_order = g:dfs(town_a)
-  local connected = g:isConnected(town_a, town_c)
-
-  print("neighbors=" .. #neighbors
-    .. " bfs=" .. #bfs_order
-    .. " dfs=" .. #dfs_order
-    .. " a-c connected=" .. tostring(connected))
-
-  -- Modify graph: remove a road and a town.
-  g:removeEdge(road1)
-  g:removeNode(town_c)
-  print("nodes=" .. g:nodeCount() .. " edges=" .. g:edgeCount())
-  g:clearAll()
+  lurek.log.info("quest graph: " .. quest_graph:getNodeCount() .. " quests, "
+    .. quest_graph:getEdgeCount() .. " dependencies", "quest")
 end
 ```
 
@@ -319,7 +298,7 @@ Creates an edge between two nodes with an optional edge type.
 
 - `from_ud` (`LGraphNode`, required) - Source node handle.
 - `to_ud` (`LGraphNode`, required) - Destination node handle.
-- `edge_type` (`string`, optional) - Optional edge type.
+- `edge_type` (`string`, optional) - Edge type.
 
 **Returns**: `LGraphEdge` - New edge handle.
 
@@ -345,7 +324,7 @@ end
 
 ### `LGraph:addItem(item_ud: LGraphItem, node_ud: LGraphNode)`
 
-Places an item onto a node. This method is available to Lua scripts.
+Places an item onto a destination node.
 
 **Parameters**
 
@@ -376,8 +355,8 @@ Creates a node with optional type and capacity.
 
 **Parameters**
 
-- `node_type` (`string`, optional) - Optional node type, defaulting to `default`.
-- `capacity` (`integer`, optional) - Optional capacity, defaulting to -1.
+- `node_type` (`string`, optional) - Node type, defaulting to `default`.
+- `capacity` (`integer`, optional) - Capacity, defaulting to -1.
 
 **Returns**: `LGraphNode` - New node handle.
 
@@ -400,7 +379,7 @@ do
 end
 ```
 
-### `LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> table|nil`
+### `LGraph:astar(from_node: LGraphNode, to_node: LGraphNode) -> LGraphNode[]`
 
 Runs A* pathfinding between two nodes.
 
@@ -409,7 +388,7 @@ Runs A* pathfinding between two nodes.
 - `from_node` (`LGraphNode`, required) - Start node handle.
 - `to_node` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `table|nil` - Array table of `LGraphNode` handles, or nil when no path exists.
+**Returns**: `LGraphNode[]` - `LGraphNode` handles along the path, or nil when no path exists.
 
 #### Example
 
@@ -441,7 +420,7 @@ end
 
 Computes graph coloring and returns color indices by node id.
 
-**Returns**: `table` - Map table from node id to color index.
+**Returns**: `table` - Map table from node id (integer key) to color index (integer).
 
 #### Example
 
@@ -472,8 +451,8 @@ Creates an unplaced graph item with optional type and decay time.
 
 **Parameters**
 
-- `item_type` (`string`, optional) - Optional item type, defaulting to `default`.
-- `decay_time` (`number`, optional) - Optional decay lifetime, defaulting to -1.0.
+- `item_type` (`string`, optional) - Item type, defaulting to `default`.
+- `decay_time` (`number`, optional) - Decay lifetime, defaulting to -1.0.
 
 **Returns**: `LGraphItem` - New graph item handle.
 
@@ -498,16 +477,16 @@ do
 end
 ```
 
-### `LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil`
+### `LGraph:findPath(from_ud: LGraphNode, to_ud: LGraphNode) -> table`
 
-Finds a path between two nodes. This method is available to Lua scripts.
+Finds a path between two graph nodes.
 
 **Parameters**
 
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `table|nil` - Path result table with nodes, edges, and cost, or nil when no path exists.
+**Returns**: `table` - Path result table with nodes, edges, and cost, or nil when no path exists.
 
 #### Example
 
@@ -531,7 +510,7 @@ do
 end
 ```
 
-### `LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table|nil`
+### `LGraph:findPathForItem(item_ud: LGraphItem, from_ud: LGraphNode, to_ud: LGraphNode) -> table`
 
 Finds a path for a specific item between two nodes while respecting item constraints.
 
@@ -541,7 +520,7 @@ Finds a path for a specific item between two nodes while respecting item constra
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `table|nil` - Path result table with nodes, edges, and cost, or nil when no path exists.
+**Returns**: `table` - Path result table with nodes, edges, and cost, or nil when no path exists.
 
 #### Example
 
@@ -565,11 +544,11 @@ do
 end
 ```
 
-### `LGraph:getComponents() -> table`
+### `LGraph:getComponents() -> LGraphNode[]`
 
 Returns connected components as arrays of node handles.
 
-**Returns**: `table` - Array table of component tables containing `LGraphNode` handles.
+**Returns**: `LGraphNode[]` - Component tables containing `LGraphNode` handles.
 
 #### Example
 
@@ -594,7 +573,7 @@ do
 end
 ```
 
-### `LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number|nil`
+### `LGraph:getDistance(from_ud: LGraphNode, to_ud: LGraphNode) -> number`
 
 Returns graph distance between two nodes when reachable.
 
@@ -603,7 +582,7 @@ Returns graph distance between two nodes when reachable.
 - `from_ud` (`LGraphNode`, required) - Start node handle.
 - `to_ud` (`LGraphNode`, required) - Target node handle.
 
-**Returns**: `number|nil` - Distance number, or nil when no distance is available.
+**Returns**: `number` - Distance between the two nodes, or nil when no path connects the nodes.
 
 #### Example
 
@@ -629,7 +608,7 @@ do
 end
 ```
 
-### `LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge|nil`
+### `LGraph:getEdgeBetween(from_ud: LGraphNode, to_ud: LGraphNode) -> LGraphEdge`
 
 Returns the edge connecting two nodes when one exists.
 
@@ -638,7 +617,7 @@ Returns the edge connecting two nodes when one exists.
 - `from_ud` (`LGraphNode`, required) - Source node handle.
 - `to_ud` (`LGraphNode`, required) - Destination node handle.
 
-**Returns**: `LGraphEdge|nil` - `LGraphEdge` handle, or nil when no edge connects the nodes.
+**Returns**: `LGraphEdge` - Edge handle connecting the two nodes, or nil when no edge connects the nodes.
 
 #### Example
 
@@ -680,11 +659,11 @@ do
 end
 ```
 
-### `LGraph:getEdges() -> table`
+### `LGraph:getEdges() -> LGraphEdge[]`
 
-Returns all edges in this graph. This method is available to Lua scripts.
+Returns all edges in this logistics graph.
 
-**Returns**: `table` - Array table of `LGraphEdge` handles.
+**Returns**: `LGraphEdge[]` - `LGraphEdge` handles.
 
 #### Example
 
@@ -725,11 +704,11 @@ do
 end
 ```
 
-### `LGraph:getItems() -> table`
+### `LGraph:getItems() -> LGraphItem[]`
 
-Returns all items in this graph. This method is available to Lua scripts.
+Returns all items in this logistics graph.
 
-**Returns**: `table` - Array table of `LGraphItem` handles.
+**Returns**: `LGraphItem[]` - `LGraphItem` handles.
 
 #### Example
 
@@ -748,7 +727,7 @@ do
 end
 ```
 
-### `LGraph:getNeighbors(node_ud: LGraphNode) -> table`
+### `LGraph:getNeighbors(node_ud: LGraphNode) -> LGraphNode[]`
 
 Returns neighbor nodes connected to a node.
 
@@ -756,7 +735,7 @@ Returns neighbor nodes connected to a node.
 
 - `node_ud` (`LGraphNode`, required) - Node handle to inspect.
 
-**Returns**: `table` - Array table of neighboring `LGraphNode` handles.
+**Returns**: `LGraphNode[]` - Neighboring `LGraphNode` handles.
 
 #### Example
 
@@ -799,11 +778,11 @@ do
 end
 ```
 
-### `LGraph:getNodes() -> table`
+### `LGraph:getNodes() -> LGraphNode[]`
 
-Returns all nodes in this graph. This method is available to Lua scripts.
+Returns all nodes in this logistics graph.
 
-**Returns**: `table` - Array table of `LGraphNode` handles.
+**Returns**: `LGraphNode[]` - `LGraphNode` handles.
 
 #### Example
 
@@ -823,16 +802,16 @@ do
 end
 ```
 
-### `LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> table`
+### `LGraph:getReachable(from_ud: LGraphNode, [max_dist]: number) -> LGraphNode[]`
 
 Returns nodes reachable from a start node within an optional maximum distance.
 
 **Parameters**
 
 - `from_ud` (`LGraphNode`, required) - Start node handle.
-- `max_dist` (`number`, optional) - Optional maximum distance.
+- `max_dist` (`number`, optional) - Maximum distance.
 
-**Returns**: `table` - Array table of reachable `LGraphNode` handles.
+**Returns**: `LGraphNode[]` - Reachable `LGraphNode` handles.
 
 #### Example
 
@@ -1019,11 +998,11 @@ do
 end
 ```
 
-### `LGraph:mst() -> table`
+### `LGraph:mst() -> integer[]`
 
 Computes a minimum spanning tree using Kruskal and returns edge ids.
 
-**Returns**: `table` - Array table of edge ids included in the tree.
+**Returns**: `integer[]` - Array table of edge ids included in the tree.
 
 #### Example
 
@@ -1116,7 +1095,7 @@ end
 
 ### `LGraph:removeEdge(edge_ud: LGraphEdge) -> boolean`
 
-Removes an edge by handle. This method is available to Lua scripts.
+Removes an edge by handle on this object.
 
 **Parameters**
 
@@ -1144,7 +1123,7 @@ end
 
 ### `LGraph:removeItem(item_ud: LGraphItem) -> boolean`
 
-Removes an item from this graph. This method is available to Lua scripts.
+Removes an item from this logistics graph.
 
 **Parameters**
 
@@ -1312,11 +1291,11 @@ do
 end
 ```
 
-### `LGraph:topologicalSort() -> table|nil`
+### `LGraph:topologicalSort() -> LGraphNode[]`
 
 Returns nodes in topological order when the graph is acyclic.
 
-**Returns**: `table|nil` - Array table of `LGraphNode` handles, or nil when sorting is impossible.
+**Returns**: `LGraphNode[]` - `LGraphNode` handles in topological order, or nil when sorting is impossible due to cycles.
 
 #### Example
 
@@ -1552,11 +1531,11 @@ do
 end
 ```
 
-### `LGraphEdge:getItemsInTransit() -> table`
+### `LGraphEdge:getItemsInTransit() -> LGraphItem[]`
 
 Returns graph items currently traveling along this edge.
 
-**Returns**: `table` - Array table of `LGraphItem` handles.
+**Returns**: `LGraphItem[]` - `LGraphItem` handles.
 
 #### Example
 
@@ -1931,7 +1910,7 @@ end
 
 ### `LGraphEdge:setSpeedModifier(m: number)`
 
-Sets this edge's speed modifier. This method is available to Lua scripts.
+Sets this edge's speed modifier value.
 
 **Parameters**
 
@@ -2153,11 +2132,11 @@ do
 end
 ```
 
-### `LGraphItem:getPosition() -> LGraphNode|LGraphEdge|nil`
+### `LGraphItem:getPosition() -> LGraphNode`
 
 Returns where this item is stored: a node, an edge plus progress, or no values when unplaced.
 
-**Returns**: `LGraphNode|LGraphEdge|nil` - `LGraphNode` when at a node, `LGraphEdge` when in transit, or no value when unplaced.
+**Returns**: `LGraphNode` - Node handle when the item is at a node.
 
 #### Example
 
@@ -2504,7 +2483,7 @@ Adds demand quantity and optional priority for an item type on this node.
 
 - `item_type` (`string`, required) - Item type demanded by the node.
 - `quantity` (`integer`, required) - Demand quantity to add.
-- `priority` (`integer`, optional) - Optional demand priority, defaulting to 0.
+- `priority` (`integer`, optional) - Demand priority, defaulting to 0.
 
 #### Example
 
@@ -2548,7 +2527,7 @@ end
 
 ### `LGraphNode:addTag(tag: string)`
 
-Adds a tag to this node. This method is available to Lua scripts.
+Adds a tag to this node on this object.
 
 **Parameters**
 
@@ -2660,7 +2639,7 @@ end
 
 ### `LGraphNode:clearTags()`
 
-Removes every tag from this node. This method is available to Lua scripts.
+Removes every tag from this graph node.
 
 #### Example
 
@@ -2679,11 +2658,11 @@ do
 end
 ```
 
-### `LGraphNode:dequeue() -> LGraphItem|nil`
+### `LGraphNode:dequeue() -> LGraphItem`
 
 Removes and returns the next item from this node's explicit queue.
 
-**Returns**: `LGraphItem|nil` - `LGraphItem` handle, or nil when the queue is empty.
+**Returns**: `LGraphItem` - Item handle from the queue, or nil when the queue is empty.
 
 #### Example
 
@@ -2752,15 +2731,15 @@ do
 end
 ```
 
-### `LGraphNode:getEdges([dir]: string) -> table`
+### `LGraphNode:getEdges([dir]: string) -> LGraphEdge[]`
 
 Returns edge handles connected to this node in the requested direction.
 
 **Parameters**
 
-- `dir` (`string`, optional) - Optional direction string, defaulting to `both`.
+- `dir` (`string`, optional) - Direction string, defaulting to `both`.
 
-**Returns**: `table` - Array table of `LGraphEdge` handles.
+**Returns**: `LGraphEdge[]` - `LGraphEdge` handles.
 
 #### Example
 
@@ -2823,11 +2802,11 @@ do
 end
 ```
 
-### `LGraphNode:getItems() -> table`
+### `LGraphNode:getItems() -> LGraphItem[]`
 
 Returns item handles currently stored on this node.
 
-**Returns**: `table` - Array table of `LGraphItem` handles.
+**Returns**: `LGraphItem[]` - `LGraphItem` handles.
 
 #### Example
 
@@ -2885,11 +2864,11 @@ do
 end
 ```
 
-### `LGraphNode:getPullFilter() -> string|nil`
+### `LGraphNode:getPullFilter() -> string`
 
 Returns this node's optional pull item-type filter.
 
-**Returns**: `string|nil` - Filter string, or nil when no pull filter is set.
+**Returns**: `string` - Filter string when a pull filter is set, or nil when no pull filter is set.
 
 #### Example
 
@@ -2907,7 +2886,7 @@ end
 
 ### `LGraphNode:getPullRate() -> number`
 
-Returns this node's pull rate. This method is available to Lua scripts.
+Returns this node's pull rate value.
 
 **Returns**: `number` - Pull rate.
 
@@ -2926,11 +2905,11 @@ do
 end
 ```
 
-### `LGraphNode:getPushFilter() -> string|nil`
+### `LGraphNode:getPushFilter() -> string`
 
 Returns this node's optional push item-type filter.
 
-**Returns**: `string|nil` - Filter string, or nil when no push filter is set.
+**Returns**: `string` - Filter string when a push filter is set, or nil when no push filter is set.
 
 #### Example
 
@@ -2948,7 +2927,7 @@ end
 
 ### `LGraphNode:getPushRate() -> number`
 
-Returns this node's push rate. This method is available to Lua scripts.
+Returns this node's push rate value.
 
 **Returns**: `number` - Push rate.
 
@@ -3008,11 +2987,11 @@ do
 end
 ```
 
-### `LGraphNode:getTags() -> table`
+### `LGraphNode:getTags() -> string[]`
 
 Returns all tags assigned to this node.
 
-**Returns**: `table` - Array table of tag strings.
+**Returns**: `string[]` - Tag strings.
 
 #### Example
 
@@ -3033,7 +3012,7 @@ end
 
 ### `LGraphNode:getType() -> string`
 
-Returns this node's type string. This method is available to Lua scripts.
+Returns this node's type classification string.
 
 **Returns**: `string` - Current node type.
 
@@ -3190,7 +3169,7 @@ end
 
 ### `LGraphNode:removeTag(tag: string) -> boolean`
 
-Removes a tag from this node. This method is available to Lua scripts.
+Removes a tag from this node on this object.
 
 **Parameters**
 
@@ -3240,7 +3219,7 @@ end
 
 ### `LGraphNode:setCapacity(c: integer)`
 
-Sets this node's item capacity. This method is available to Lua scripts.
+Sets this node's item capacity value.
 
 **Parameters**
 
@@ -3269,8 +3248,8 @@ Configures an item conversion rule on this node.
 
 - `in_type` (`string`, required) - Input item type.
 - `out_type` (`string`, required) - Output item type.
-- `in_count` (`integer`, optional) - Optional input count, defaulting to 1.
-- `out_count` (`integer`, optional) - Optional output count, defaulting to 1.
+- `in_count` (`integer`, optional) - Input count, defaulting to 1.
+- `out_count` (`integer`, optional) - Output count, defaulting to 1.
 
 #### Example
 
@@ -3363,7 +3342,7 @@ Sets or clears this node's pull item-type filter.
 
 **Parameters**
 
-- `f` (`string`, optional) - Optional item type filter string.
+- `f` (`string`, optional) - Item type filter string.
 
 #### Example
 
@@ -3382,7 +3361,7 @@ end
 
 ### `LGraphNode:setPullRate(r: number)`
 
-Sets this node's pull rate. This method is available to Lua scripts.
+Sets this node's pull rate for this object.
 
 **Parameters**
 
@@ -3410,7 +3389,7 @@ Sets or clears this node's push item-type filter.
 
 **Parameters**
 
-- `f` (`string`, optional) - Optional item type filter string.
+- `f` (`string`, optional) - Item type filter string.
 
 #### Example
 
@@ -3429,7 +3408,7 @@ end
 
 ### `LGraphNode:setPushRate(r: number)`
 
-Sets this node's push rate. This method is available to Lua scripts.
+Sets this node's push rate for this object.
 
 **Parameters**
 
@@ -3453,7 +3432,7 @@ end
 
 ### `LGraphNode:setQueueCapacity(c: integer)`
 
-Sets this node's queue capacity. This method is available to Lua scripts.
+Sets this node's queue capacity value.
 
 **Parameters**
 
@@ -3500,7 +3479,7 @@ end
 
 ### `LGraphNode:setType(t: string)`
 
-Sets this node's type string. This method is available to Lua scripts.
+Sets this node's type string for this object.
 
 **Parameters**
 

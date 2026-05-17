@@ -52,7 +52,7 @@ impl LuaUserData for LuaFileHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- read --
         /// Reads up to an optional byte count and returns text using lossless UTF-8 replacement.
-        /// @param | count? | integer | Optional maximum number of bytes to read.
+        /// @param | count | integer? | Optional maximum number of bytes to read.
         /// @return | string | String decoded from the bytes that were read.
         methods.add_method("read", |_, this, count: Option<usize>| {
             let bytes = this
@@ -74,7 +74,6 @@ impl LuaUserData for LuaFileHandle {
         // -- write --
         /// Writes a string to this file handle.
         /// @param | data | string | Text bytes to write.
-        /// @return | nil | No value is returned.
         methods.add_method("write", |_, this, data: String| {
             this.inner
                 .borrow_mut()
@@ -84,7 +83,6 @@ impl LuaUserData for LuaFileHandle {
         // -- seek --
         /// Moves the file cursor to an absolute byte position.
         /// @param | pos | integer | Absolute byte offset.
-        /// @return | nil | No value is returned.
         methods.add_method("seek", |_, this, pos: u64| {
             this.inner
                 .borrow_mut()
@@ -98,7 +96,7 @@ impl LuaUserData for LuaFileHandle {
             this.inner.borrow_mut().tell().map_err(LuaError::external)
         });
         // -- getSize --
-        /// Returns the size of the open file.
+        /// Returns the size of the open file in bytes.
         /// @return | integer | File size in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.borrow().get_size()));
         // -- getMode --
@@ -109,13 +107,11 @@ impl LuaUserData for LuaFileHandle {
         });
         // -- flush --
         /// Flushes pending writes on this file handle.
-        /// @return | nil | No value is returned.
         methods.add_method("flush", |_, this, ()| {
             this.inner.borrow_mut().flush().map_err(LuaError::external)
         });
         // -- close --
         /// Closes this file handle on this object.
-        /// @return | nil | No value is returned.
         methods.add_method("close", |_, this, ()| {
             this.inner.borrow_mut().close().map_err(LuaError::external)
         });
@@ -166,7 +162,7 @@ impl LuaUserData for LuaZipMount {
         });
         // -- listFiles --
         /// Returns every virtual file path in the ZIP mount.
-        /// @return | table | Array table of mounted file paths.
+        /// @return | string[] | Mounted file paths.
         methods.add_method("listFiles", |lua, this, ()| {
             let files = this.inner.list_files();
             let tbl = lua.create_table()?;
@@ -233,7 +229,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let wrc = watcher_rc.clone();
     // -- pollWatchers --
     /// Polls watched paths and returns paths that changed since the previous poll.
-    /// @return | table | Array table of changed path strings.
+    /// @return | string[] | Changed path strings.
     tbl.set(
         "pollWatchers",
         lua.create_function(move |lua, ()| {
@@ -283,7 +279,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- writeJson --
-    /// Writes JSON text through GameFS.
+    /// Writes JSON text through the GameFS layer.
     /// @param | path | string | GameFS path to write.
     /// @param | json | string | JSON text to store.
     tbl.set(
@@ -386,7 +382,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getDirectoryItems --
     /// Lists immediate entries in a GameFS directory.
     /// @param | path | string | Directory path to list.
-    /// @return | table | Array table of entry names.
+    /// @return | string[] | Entry names.
     tbl.set(
         "getDirectoryItems",
         lua.create_function(move |_, path: String| {
@@ -442,6 +438,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns file metadata for a GameFS path when available.
     /// @param | path | string | GameFS path to inspect.
     /// @return | table | Metadata table with type, size, modtime, and readonly fields, or nil on error.
+    /// @field | type | string | File type.
+    /// @field | size | integer | Size in bytes.
+    /// @field | modtime | integer | Modification time.
+    /// @field | readonly | boolean | Whether the file is read-only.
     tbl.set(
         "getInfo",
         lua.create_function(
@@ -449,16 +449,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 Ok(info) => {
                     let t = lua.create_table()?;
                     /// Performs the 'type' operation.
-                    /// @return | nil | No value is returned.
                     t.set("type", info.file_type.as_str())?;
                     /// Performs the 'size' operation.
-                    /// @return | nil | No value is returned.
                     t.set("size", info.size)?;
                     /// Performs the 'modtime' operation.
-                    /// @return | nil | No value is returned.
                     t.set("modtime", info.modified_time)?;
                     /// Performs the 'readonly' operation.
-                    /// @return | nil | No value is returned.
                     t.set("readonly", info.readonly)?;
                     Ok(Some(t))
                 }
@@ -558,7 +554,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pollAsync --
     /// Polls an asynchronous file load request.
     /// @param | handle_id | integer | Async load handle id.
-    /// @return | any | Completed bytes/result, pending marker, or nil depending on async state.
+    /// @return | string | Completed bytes/result, pending marker, or nil depending on async state.
     tbl.set(
         "pollAsync",
         lua.create_function(move |_, handle_id: u64| Ok(s.borrow().poll_async_load(handle_id)))?,
@@ -581,7 +577,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pollAsyncWrite --
     /// Polls an asynchronous file write request.
     /// @param | handle_id | integer | Async write handle id.
-    /// @return | any | Completed status, pending marker, or nil depending on async state.
+    /// @return | string | Completed status, pending marker, or nil depending on async state.
     tbl.set(
         "pollAsyncWrite",
         lua.create_function(move |_, handle_id: u64| Ok(s.borrow().poll_async_write(handle_id)))?,
@@ -604,7 +600,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- unmount --
-    /// Removes a GameFS mount point.
+    /// Removes a GameFS mount point by its name.
     /// @param | mp | string | Virtual mount point to remove.
     /// @return | boolean | True when a mount was removed.
     tbl.set(
@@ -676,7 +672,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
     let s = state.clone();
     // -- removeDir --
-    /// Removes a GameFS directory.
+    /// Removes a GameFS directory by its path.
     /// @param | path | string | Directory path to remove.
     tbl.set(
         "removeDir",
@@ -688,7 +684,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- glob --
     /// Returns GameFS paths matching a glob pattern.
     /// @param | pattern | string | Glob pattern.
-    /// @return | table | Array table of matching path strings.
+    /// @return | string[] | Matching path strings.
     tbl.set(
         "glob",
         lua.create_function(move |lua, pattern: String| {
@@ -704,7 +700,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- listRecursive --
     /// Lists all paths under a GameFS directory recursively.
     /// @param | path | string | Root directory path.
-    /// @return | table | Array table of path strings.
+    /// @return | string[] | Path strings.
     tbl.set(
         "listRecursive",
         lua.create_function(move |lua, path: String| {
@@ -725,19 +721,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns size and file/directory flags for a GameFS path.
     /// @param | path | string | Path to inspect.
     /// @return | table | Table with `size`, `isFile`, and `isDir` fields.
+    /// @field | size | integer | Size in bytes.
+    /// @field | isFile | boolean | Whether the path is a file.
+    /// @field | isDir | boolean | Whether the path is a directory.
     tbl.set(
         "stat",
         lua.create_function(move |lua, path: String| {
             let (size, is_file, is_dir) = s.borrow().fs.stat(&path).map_err(LuaError::external)?;
             let t = lua.create_table()?;
             /// Performs the 'size' operation.
-            /// @return | nil | No value is returned.
             t.set("size", size)?;
             /// Performs the 'isFile' operation.
-            /// @return | nil | No value is returned.
             t.set("isFile", is_file)?;
             /// Performs the 'isDir' operation.
-            /// @return | nil | No value is returned.
             t.set("isDir", is_dir)?;
             Ok(t)
         })?,
@@ -745,7 +741,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- createTempFile --
     /// Creates a temporary file through GameFS.
-    /// @param | prefix? | string | Optional filename prefix, defaulting to `tmp`.
+    /// @param | prefix | string? | Optional filename prefix, defaulting to `tmp`.
     /// @return | string | Created temporary file path.
     tbl.set(
         "createTempFile",
@@ -782,7 +778,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'filesystem' operation.
-    /// @return | nil | No value is returned.
     lurek.set("filesystem", tbl)?;
     Ok(())
 }

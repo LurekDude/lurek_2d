@@ -68,7 +68,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets the camera world position. This method is available to Lua scripts.
         /// @param | x | number | Camera X position in world units.
         /// @param | y | number | Camera Y position in world units.
-        /// @return | nil | No value is returned.
         methods.add_method("setPosition", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_position(x, y);
             Ok(())
@@ -82,7 +81,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setZoom --
         /// Sets the camera zoom factor. This method is available to Lua scripts.
         /// @param | zoom | number | Zoom factor applied to world rendering.
-        /// @return | nil | No value is returned.
         methods.add_method("setZoom", |_, this, zoom: f32| {
             this.inner.borrow_mut().set_zoom(zoom);
             Ok(())
@@ -94,7 +92,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setRotation --
         /// Sets the camera rotation. This method is available to Lua scripts.
         /// @param | r | number | Rotation in radians.
-        /// @return | nil | No value is returned.
         methods.add_method("setRotation", |_, this, r: f32| {
             this.inner.borrow_mut().set_rotation(r);
             Ok(())
@@ -111,7 +108,6 @@ impl LuaUserData for LuaCamera2D {
         /// @param | y | number | Viewport Y coordinate in screen pixels.
         /// @param | w | number | Viewport width in screen pixels.
         /// @param | h | number | Viewport height in screen pixels.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setViewport",
             |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -148,7 +144,6 @@ impl LuaUserData for LuaCamera2D {
         /// @param | y | number | Bounds Y coordinate.
         /// @param | w | number | Bounds width.
         /// @param | h | number | Bounds height.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setBounds",
             |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -158,7 +153,6 @@ impl LuaUserData for LuaCamera2D {
         );
         // -- removeBounds --
         /// Removes active camera bounds. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("removeBounds", |_, this, ()| {
             this.inner.borrow_mut().remove_bounds();
             Ok(())
@@ -167,7 +161,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets a world-space follow target. This method is available to Lua scripts.
         /// @param | x | number | Target X position.
         /// @param | y | number | Target Y position.
-        /// @return | nil | No value is returned.
         methods.add_method("setTarget", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().set_target(x, y);
             Ok(())
@@ -185,7 +178,6 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- clearTarget --
         /// Clears the follow target. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("clearTarget", |_, this, ()| {
             this.inner.borrow_mut().clear_target();
             Ok(())
@@ -193,7 +185,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setFollowSmooth --
         /// Sets follow smoothing speed. This method is available to Lua scripts.
         /// @param | speed | number | Follow smoothing speed.
-        /// @return | nil | No value is returned.
         methods.add_method("setFollowSmooth", |_, this, speed: f32| {
             this.inner.borrow_mut().set_follow_smooth(speed);
             Ok(())
@@ -207,7 +198,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setFollowEasing --
         /// Sets target follow easing mode. This method is available to Lua scripts.
         /// @param | easing | string | Easing name such as `linear`, `smoothstep`, or `easeout`.
-        /// @return | nil | No value is returned.
         methods.add_method("setFollowEasing", |_, this, easing: String| {
             this.inner
                 .borrow_mut()
@@ -229,7 +219,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets follow dead-zone dimensions.
         /// @param | w | number | Dead-zone width in world units.
         /// @param | h | number | Dead-zone height in world units.
-        /// @return | nil | No value is returned.
         methods.add_method("setDeadZone", |_, this, (w, h): (f32, f32)| {
             this.inner.borrow_mut().set_dead_zone(w, h);
             Ok(())
@@ -248,7 +237,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setLookAhead --
         /// Sets follow look-ahead multiplier.
         /// @param | mul | number | Look-ahead multiplier applied to target motion.
-        /// @return | nil | No value is returned.
         methods.add_method("setLookAhead", |_, this, mul: f32| {
             this.inner.borrow_mut().set_look_ahead(mul);
             Ok(())
@@ -263,7 +251,6 @@ impl LuaUserData for LuaCamera2D {
         /// Updates camera viewport state after a window resize.
         /// @param | window_w | number | New window width in pixels.
         /// @param | window_h | number | New window height in pixels.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "onWindowResize",
             |_, this, (window_w, window_h): (f32, f32)| {
@@ -278,7 +265,6 @@ impl LuaUserData for LuaCamera2D {
         /// @param | window_w | number | New window width in pixels.
         /// @param | window_h | number | New window height in pixels.
         /// @param | mode | string | Scale mode `letterbox`, `stretch`, or `pixelperfect`.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "onWindowResizeScaled",
             |_, this, (game_w, game_h, window_w, window_h, mode): (f32, f32, f32, f32, String)| {
@@ -299,7 +285,6 @@ impl LuaUserData for LuaCamera2D {
         /// Starts a camera shake effect. This method is available to Lua scripts.
         /// @param | intensity | number | Shake intensity in world units.
         /// @param | duration | number | Shake duration in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("shake", |_, this, (intensity, duration): (f32, f32)| {
             this.inner.borrow_mut().shake(intensity, duration);
             Ok(())
@@ -307,7 +292,6 @@ impl LuaUserData for LuaCamera2D {
         // -- update --
         /// Advances camera follow, shake, and effect state.
         /// @param | dt | number | Elapsed time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("update", |_, this, dt: f32| {
             this.inner.borrow_mut().update(dt);
             Ok(())
@@ -338,7 +322,6 @@ impl LuaUserData for LuaCamera2D {
         /// Centers the camera on a world position.
         /// @param | x | number | World X position.
         /// @param | y | number | World Y position.
-        /// @return | nil | No value is returned.
         methods.add_method("lookAt", |_, this, (x, y): (f32, f32)| {
             this.inner.borrow_mut().look_at(x, y);
             Ok(())
@@ -347,7 +330,6 @@ impl LuaUserData for LuaCamera2D {
         /// Moves the camera by a delta. This method is available to Lua scripts.
         /// @param | dx | number | X delta in world units.
         /// @param | dy | number | Y delta in world units.
-        /// @return | nil | No value is returned.
         methods.add_method("move", |_, this, (dx, dy): (f32, f32)| {
             this.inner.borrow_mut().move_by(dx, dy);
             Ok(())
@@ -356,7 +338,6 @@ impl LuaUserData for LuaCamera2D {
         /// Starts camera movement along an array of waypoint tables.
         /// @param | points | table | Array of point tables using numeric indices `1` and `2` for X and Y.
         /// @param | duration | number | Total path duration in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "followPath",
             |_, this, (points, duration): (LuaTable, f32)| {
@@ -373,7 +354,6 @@ impl LuaUserData for LuaCamera2D {
         );
         // -- stopPath --
         /// Stops the active camera path. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("stopPath", |_, this, ()| {
             this.path.borrow_mut().take();
             Ok(())
@@ -407,7 +387,6 @@ impl LuaUserData for LuaCamera2D {
         /// @param | target_zoom | number | Destination zoom factor.
         /// @param | duration | number | Tween duration in seconds.
         /// @param | easing | string? | Easing name such as `linear`, `smoothstep`, or `easeout`.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "zoomTo",
             |_, this, (target_zoom, duration, easing): (f32, f32, Option<String>)| {
@@ -423,7 +402,6 @@ impl LuaUserData for LuaCamera2D {
         );
         // -- stopZoom --
         /// Stops the active zoom tween. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("stopZoom", |_, this, ()| {
             this.zoom_tween.borrow_mut().take();
             Ok(())
@@ -449,7 +427,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets a parallax factor for a named layer.
         /// @param | layer | string | Layer name.
         /// @param | factor | number | Parallax factor, where 1.0 follows the camera fully.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setParallaxFactor",
             |_, this, (layer, factor): (String, f32)| {
@@ -466,14 +443,12 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- clearParallaxFactors --
         /// Clears all layer parallax factor overrides.
-        /// @return | nil | No value is returned.
         methods.add_method("clearParallaxFactors", |_, this, ()| {
             this.parallax.borrow_mut().clear();
             Ok(())
         });
         // -- apply --
         /// Appends render commands that apply this camera transform.
-        /// @return | nil | No value is returned.
         methods.add_method("apply", |_, this, ()| {
             let mut state = this.state.borrow_mut();
             this.inner
@@ -483,7 +458,6 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- reset --
         /// Appends a render command that removes the active camera transform.
-        /// @return | nil | No value is returned.
         methods.add_method("reset", |_, this, ()| {
             this.state
                 .borrow_mut()
@@ -493,7 +467,6 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- attach --
         /// Appends render commands that attach this camera transform.
-        /// @return | nil | No value is returned.
         methods.add_method("attach", |_, this, ()| {
             let mut state = this.state.borrow_mut();
             this.inner
@@ -503,7 +476,6 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- detach --
         /// Appends a render command that detaches the active camera transform.
-        /// @return | nil | No value is returned.
         methods.add_method("detach", |_, this, ()| {
             this.state
                 .borrow_mut()
@@ -515,7 +487,6 @@ impl LuaUserData for LuaCamera2D {
         /// Triggers a temporary zoom pulse effect.
         /// @param | amplitude | number | Zoom pulse amplitude.
         /// @param | duration | number | Pulse duration in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("zoomPulse", |_, this, (amplitude, duration): (f32, f32)| {
             this.inner
                 .borrow_mut()
@@ -529,7 +500,6 @@ impl LuaUserData for LuaCamera2D {
         /// @param | amplitude_y | number | Vertical sway amplitude.
         /// @param | frequency | number | Sway frequency.
         /// @param | decay | number? | Sway decay value; defaults to 1.0.
-        /// @return | nil | No value is returned.
         methods.add_method("startSway", |_, this, (amplitude_x, amplitude_y, frequency, decay): (f32, f32, f32, Option<f32>)| {
                 let decay = decay.unwrap_or(1.0);
                 this.inner
@@ -541,7 +511,6 @@ impl LuaUserData for LuaCamera2D {
         );
         // -- stopSway --
         /// Stops camera sway offset animation.
-        /// @return | nil | No value is returned.
         methods.add_method("stopSway", |_, this, ()| {
             this.inner.borrow_mut().sway.stop();
             Ok(())
@@ -556,7 +525,6 @@ impl LuaUserData for LuaCamera2D {
         /// Starts subtle breathing zoom animation.
         /// @param | amplitude | number? | Breathing zoom amplitude; defaults to 0.005.
         /// @param | rate | number? | Breathing rate; defaults to 0.2.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "startBreathing",
             |_, this, (amplitude, rate): (Option<f32>, Option<f32>)| {
@@ -568,7 +536,6 @@ impl LuaUserData for LuaCamera2D {
         );
         // -- stopBreathing --
         /// Stops breathing zoom animation. This method is available to Lua scripts.
-        /// @return | nil | No value is returned.
         methods.add_method("stopBreathing", |_, this, ()| {
             this.inner.borrow_mut().breathing.stop();
             Ok(())
@@ -607,7 +574,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets optional minimum and maximum zoom constraints.
         /// @param | min_zoom | number? | Optional minimum zoom.
         /// @param | max_zoom | number? | Optional maximum zoom.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setZoomConstraints",
             |_, this, (min_zoom, max_zoom): (Option<f32>, Option<f32>)| {
@@ -632,7 +598,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setZoomDamping --
         /// Sets zoom damping. This method is available to Lua scripts.
         /// @param | damping | number | Zoom damping value.
-        /// @return | nil | No value is returned.
         methods.add_method("setZoomDamping", |_, this, damping: f32| {
             this.inner.borrow_mut().set_zoom_damping(damping);
             Ok(())
@@ -647,7 +612,6 @@ impl LuaUserData for LuaCamera2D {
         /// Sets optional minimum and maximum rotation constraints.
         /// @param | min_rot | number? | Optional minimum rotation in radians.
         /// @param | max_rot | number? | Optional maximum rotation in radians.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setRotationConstraints",
             |_, this, (min_rot, max_rot): (Option<f32>, Option<f32>)| {
@@ -672,7 +636,6 @@ impl LuaUserData for LuaCamera2D {
         // -- setRotationDamping --
         /// Sets rotation damping. This method is available to Lua scripts.
         /// @param | damping | number | Rotation damping value.
-        /// @return | nil | No value is returned.
         methods.add_method("setRotationDamping", |_, this, damping: f32| {
             this.inner.borrow_mut().set_rotation_damping(damping);
             Ok(())
@@ -685,28 +648,24 @@ impl LuaUserData for LuaCamera2D {
         });
         // -- presetTightFollow --
         /// Applies the tight follow camera preset.
-        /// @return | nil | No value is returned.
         methods.add_method("presetTightFollow", |_, this, ()| {
             this.inner.borrow_mut().preset_tight_follow();
             Ok(())
         });
         // -- presetCinematicFollow --
         /// Applies the cinematic follow camera preset.
-        /// @return | nil | No value is returned.
         methods.add_method("presetCinematicFollow", |_, this, ()| {
             this.inner.borrow_mut().preset_cinematic_follow();
             Ok(())
         });
         // -- presetBalancedFollow --
         /// Applies the balanced follow camera preset.
-        /// @return | nil | No value is returned.
         methods.add_method("presetBalancedFollow", |_, this, ()| {
             this.inner.borrow_mut().preset_balanced_follow();
             Ok(())
         });
         // -- presetAggressiveFollow --
         /// Applies the aggressive follow camera preset.
-        /// @return | nil | No value is returned.
         methods.add_method("presetAggressiveFollow", |_, this, ()| {
             this.inner.borrow_mut().preset_aggressive_follow();
             Ok(())
@@ -737,7 +696,6 @@ impl LuaUserData for LuaCameraRig {
         /// Applies a split-screen layout using the current window size.
         /// @param | window_w | number | Window width in pixels.
         /// @param | window_h | number | Window height in pixels.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "splitScreen",
             |_, this, (window_w, window_h): (f32, f32)| {
@@ -752,7 +710,6 @@ impl LuaUserData for LuaCameraRig {
         /// @param | window_w | number | Window width in pixels.
         /// @param | window_h | number | Window height in pixels.
         /// @param | ratio | number? | Minimap size ratio; defaults to 0.25.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "minimap",
             |_, this, (window_w, window_h, ratio): (f32, f32, Option<f32>)| {
@@ -770,7 +727,6 @@ impl LuaUserData for LuaCameraRig {
         /// @param | window_h | number | Window height in pixels.
         /// @param | pip_w | number? | Picture-in-picture width; defaults to 320.
         /// @param | pip_h | number? | Picture-in-picture height; defaults to 180.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "pictureInPicture",
             |_, this, (window_w, window_h, pip_w, pip_h): (f32, f32, Option<f32>, Option<f32>)| {
@@ -788,7 +744,6 @@ impl LuaUserData for LuaCameraRig {
         /// @param | name | string | Camera name.
         /// @param | x | number | Camera X position.
         /// @param | y | number | Camera Y position.
-        /// @return | nil | No value is returned.
         methods.add_method(
             "setPosition",
             |_, this, (name, x, y): (String, f32, f32)| {
@@ -803,7 +758,6 @@ impl LuaUserData for LuaCameraRig {
         /// Sets the zoom of a named rig camera, creating it if needed.
         /// @param | name | string | Camera name.
         /// @param | zoom | number | Camera zoom factor.
-        /// @return | nil | No value is returned.
         methods.add_method("setZoom", |_, this, (name, zoom): (String, f32)| {
             this.inner
                 .borrow_mut()
@@ -816,7 +770,6 @@ impl LuaUserData for LuaCameraRig {
         /// @param | name | string | Camera name.
         /// @param | x | number | Target X position.
         /// @param | y | number | Target Y position.
-        /// @return | nil | No value is returned.
         methods.add_method("setTarget", |_, this, (name, x, y): (String, f32, f32)| {
             this.inner
                 .borrow_mut()
@@ -827,7 +780,6 @@ impl LuaUserData for LuaCameraRig {
         // -- updateAll --
         /// Advances every camera in this rig. This method is available to Lua scripts.
         /// @param | dt | number | Elapsed time in seconds.
-        /// @return | nil | No value is returned.
         methods.add_method("updateAll", |_, this, dt: f32| {
             this.inner.borrow_mut().update_all(dt);
             Ok(())
@@ -859,7 +811,7 @@ impl LuaUserData for LuaCameraRig {
         });
         // -- names --
         /// Returns all camera names in this rig.
-        /// @return | table | Array table of camera names.
+        /// @return | string[] | Camera names.
         methods.add_method("names", |lua, this, ()| {
             let names = this.inner.borrow().camera_names();
             let table = lua.create_table()?;
@@ -946,7 +898,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'camera' operation.
-    /// @return | nil | No value is returned.
     lurek.set("camera", tbl)?;
     Ok(())
 }

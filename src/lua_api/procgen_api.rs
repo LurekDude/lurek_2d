@@ -38,7 +38,7 @@ impl LuaUserData for LuaBiomeClassifier {
         /// @param | heights | table | Flat array of height values (length = width*height).
         /// @param | moisture | table | Flat array of moisture values (length = width*height).
         /// @param | temperature | table? | Optional flat array of temperature values. If omitted, temperature is ignored.
-        /// @return | table | Flat array of biome name strings (length = width*height).
+        /// @return | string[] | Biome name strings (length = width*height).
         methods.add_method(
             "classifyMap",
             |lua, this, (width, height, ht, mt, tt): (u32, u32, LuaTable, LuaTable, Option<LuaTable>)| {
@@ -132,7 +132,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | width | integer | Grid width in cells.
     /// @param | height | integer | Grid height in cells.
     /// @param | opts | table? | Options: fill (0.0–1.0 initial fill ratio), iterations, birth threshold, survive threshold, seed.
-    /// @return | table | Flat array of u8 values (0=empty, 1=wall) with length width*height.
+    /// @return | integer[] | Flat array of cell values (0=empty, 1=wall) with length width×height.
     tbl.set(
         "cellularAutomata",
         lua.create_function(|lua, (w, h, opts): (u32, u32, Option<LuaTable>)| {
@@ -157,7 +157,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | startY | number | Start row (0-based).
     /// @param | threshold | number? | Value threshold (default 128).
     /// @param | above | boolean? | If true, fill cells >= threshold; if false (default), fill cells < threshold.
-    /// @return | table | Flat array of u8 (1=filled, 0=not filled) with length width*height.
+    /// @return | integer[] | Flat array of fill values (1=filled, 0=not filled) with length width×height.
     tbl.set(
         "floodFill",
         lua.create_function(
@@ -213,6 +213,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | maxAttempts | integer? | Rejection attempts per active point (default 30). Higher = denser fill.
     /// @param | seed | integer? | RNG seed (default 0).
     /// @return | table | Array of {x, y} tables representing generated points.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
     tbl.set("poissonDisk", lua.create_function(
             |lua, (w, h, min_dist, max_attempts, seed): (f32, f32, f32, Option<u32>, Option<u64>)| {
                 let points = poisson_disk(w, h, min_dist, max_attempts.unwrap_or(30), seed.unwrap_or(0));
@@ -220,10 +222,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, (px, py)) in points.iter().enumerate() {
                     let pt = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     pt.set("x", *px)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     pt.set("y", *py)?;
                     out.set(i + 1, pt)?;
                 }
@@ -237,9 +237,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | height | integer | Grid height.
     /// @param | points | table | Array of {x, y} seed points.
     /// @param | opts | table? | Options: warp_scale, warp_strength, seed for domain warping.
-    /// @return | table | Flat array of 1-based region indices (length = width*height).
-    /// @return | table | Flat array of distances to nearest seed.
-    /// @return | table | Flat array of distances to second-nearest seed.
+    /// @return | integer[] | 1-based region indices (length = width*height).
+    /// @return | number[] | Flat array of distances to nearest seed.
+    /// @return | number[] | Flat array of distances to second-nearest seed.
     tbl.set(
         "voronoi",
         lua.create_function(
@@ -277,6 +277,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapping rooms connected by corridors.
     /// @param | opts | table? | Options: width, height, min_size (minimum leaf size), max_depth (BSP tree depth), seed, padding.
     /// @return | table | Table with .rooms (array of {x,y,w,h}) and .corridors (array of {x1,y1,x2,y2}).
+    /// @field | rooms | table | Array of room tables with x, y, w, h fields.
+    /// @field | corridors | table | Array of corridor tables with x1, y1, x2, y2 fields.
     tbl.set(
         "bspDungeon",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -306,16 +308,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
@@ -323,25 +321,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
                 /// Performs the 'x1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
                 /// Performs the 'y1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
                 /// Performs the 'x2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
                 /// Performs the 'y2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
             let out = lua.create_table()?;
             /// Performs the 'rooms' operation.
-            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
             /// Performs the 'corridors' operation.
-            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
             Ok(out)
         })?,
@@ -352,6 +344,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | prefabs | table | Array of prefab definitions: {name, width, height}.
     /// @return | table | Dungeon table with .rooms and .corridors.
     /// @return | table | Array of placed prefabs: {name, x, y, width, height}.
+    /// @field | name | string | Name.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
+    /// @field | width | number | Width.
+    /// @field | height | number | Height.
     tbl.set(
         "bspDungeonWithPrefabs",
         lua.create_function(|lua, (opts, prefabs_tbl): (Option<LuaTable>, LuaTable)| {
@@ -393,16 +390,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
@@ -410,43 +403,32 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
                 /// Performs the 'x1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
                 /// Performs the 'y1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
                 /// Performs the 'x2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
                 /// Performs the 'y2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
             let out = lua.create_table()?;
             /// Performs the 'rooms' operation.
-            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
             /// Performs the 'corridors' operation.
-            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
             let p_tbl = lua.create_table()?;
             for (i, p) in placements.iter().enumerate() {
                 let t = lua.create_table()?;
                 /// Performs the 'name' operation.
-                /// @return | nil | No value is returned.
                 t.set("name", p.name.as_str())?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 t.set("x", p.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 t.set("y", p.y)?;
                 /// Performs the 'width' operation.
-                /// @return | nil | No value is returned.
                 t.set("width", p.width)?;
                 /// Performs the 'height' operation.
-                /// @return | nil | No value is returned.
                 t.set("height", p.height)?;
                 p_tbl.set(i + 1, t)?;
             }
@@ -457,6 +439,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Generate a dungeon by placing random non-overlapping rooms and connecting them with corridors. Also returns a full tile grid.
     /// @param | opts | table? | Options: width, height, max_rooms, min_room_size, max_room_size, seed.
     /// @return | table | Table with .rooms ({x,y,w,h}[]), .corridors ({x1,y1,x2,y2}[]), .grid (flat u8[]), .width, .height.
+    /// @field | rooms | table | Array of room tables with x, y, w, h fields.
+    /// @field | corridors | table | Array of corridor tables with x1, y1, x2, y2 fields.
+    /// @field | grid | integer[] | Flat grid array of tile values.
+    /// @field | width | integer | Grid width in tiles.
+    /// @field | height | integer | Grid height in tiles.
     tbl.set(
         "roomsDungeon",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -486,16 +473,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, r) in d.rooms.iter().enumerate() {
                 let rt = lua.create_table()?;
                 /// Performs the 'x' operation.
-                /// @return | nil | No value is returned.
                 rt.set("x", r.x)?;
                 /// Performs the 'y' operation.
-                /// @return | nil | No value is returned.
                 rt.set("y", r.y)?;
                 /// Performs the 'w' operation.
-                /// @return | nil | No value is returned.
                 rt.set("w", r.w)?;
                 /// Performs the 'h' operation.
-                /// @return | nil | No value is returned.
                 rt.set("h", r.h)?;
                 rooms_tbl.set(i + 1, rt)?;
             }
@@ -503,16 +486,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                 let ct = lua.create_table()?;
                 /// Performs the 'x1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x1", x1)?;
                 /// Performs the 'y1' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y1", y1)?;
                 /// Performs the 'x2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("x2", x2)?;
                 /// Performs the 'y2' operation.
-                /// @return | nil | No value is returned.
                 ct.set("y2", y2)?;
                 corr_tbl.set(i + 1, ct)?;
             }
@@ -522,19 +501,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             }
             let out = lua.create_table()?;
             /// Performs the 'rooms' operation.
-            /// @return | nil | No value is returned.
             out.set("rooms", rooms_tbl)?;
             /// Performs the 'corridors' operation.
-            /// @return | nil | No value is returned.
             out.set("corridors", corr_tbl)?;
             /// Performs the 'grid' operation.
-            /// @return | nil | No value is returned.
             out.set("grid", grid_tbl)?;
             /// Performs the 'width' operation.
-            /// @return | nil | No value is returned.
             out.set("width", cfg.width)?;
             /// Performs the 'height' operation.
-            /// @return | nil | No value is returned.
             out.set("height", cfg.height)?;
             Ok(out)
         })?,
@@ -546,6 +520,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | stampValue | number? | Tile value written for prefab cells in the grid (default 3).
     /// @return | table | Dungeon table with .rooms, .corridors, .grid, .width, .height.
     /// @return | table | Array of placed prefabs: {name, x, y, width, height}.
+    /// @field | name | string | Name.
+    /// @field | x | number | X.
+    /// @field | y | number | Y.
+    /// @field | width | number | Width.
+    /// @field | height | number | Height.
     tbl.set(
         "roomsDungeonWithPrefabs",
         lua.create_function(
@@ -596,16 +575,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, r) in d.rooms.iter().enumerate() {
                     let rt = lua.create_table()?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("x", r.x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("y", r.y)?;
                     /// Performs the 'w' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("w", r.w)?;
                     /// Performs the 'h' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("h", r.h)?;
                     rooms_tbl.set(i + 1, rt)?;
                 }
@@ -613,16 +588,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, &(x1, y1, x2, y2)) in d.corridors.iter().enumerate() {
                     let ct = lua.create_table()?;
                     /// Performs the 'x1' operation.
-                    /// @return | nil | No value is returned.
                     ct.set("x1", x1)?;
                     /// Performs the 'y1' operation.
-                    /// @return | nil | No value is returned.
                     ct.set("y1", y1)?;
                     /// Performs the 'x2' operation.
-                    /// @return | nil | No value is returned.
                     ct.set("x2", x2)?;
                     /// Performs the 'y2' operation.
-                    /// @return | nil | No value is returned.
                     ct.set("y2", y2)?;
                     corr_tbl.set(i + 1, ct)?;
                 }
@@ -632,37 +603,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 }
                 let out = lua.create_table()?;
                 /// Performs the 'rooms' operation.
-                /// @return | nil | No value is returned.
                 out.set("rooms", rooms_tbl)?;
                 /// Performs the 'corridors' operation.
-                /// @return | nil | No value is returned.
                 out.set("corridors", corr_tbl)?;
                 /// Performs the 'grid' operation.
-                /// @return | nil | No value is returned.
                 out.set("grid", grid_tbl)?;
                 /// Performs the 'width' operation.
-                /// @return | nil | No value is returned.
                 out.set("width", cfg.width)?;
                 /// Performs the 'height' operation.
-                /// @return | nil | No value is returned.
                 out.set("height", cfg.height)?;
                 let p_tbl = lua.create_table()?;
                 for (i, p) in placements.iter().enumerate() {
                     let t = lua.create_table()?;
                     /// Performs the 'name' operation.
-                    /// @return | nil | No value is returned.
                     t.set("name", p.name.as_str())?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     t.set("x", p.x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     t.set("y", p.y)?;
                     /// Performs the 'width' operation.
-                    /// @return | nil | No value is returned.
                     t.set("width", p.width)?;
                     /// Performs the 'height' operation.
-                    /// @return | nil | No value is returned.
                     t.set("height", p.height)?;
                     p_tbl.set(i + 1, t)?;
                 }
@@ -674,6 +635,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Generate a fractal heightmap using multi-octave noise with optional hydraulic erosion.
     /// @param | opts | table? | Options: width, height, scale, octaves, lacunarity, persistence, seed, erosion_passes.
     /// @return | table | Table with .cells (flat f32 array 0.0–1.0), .width, .height.
+    /// @field | cells | number[] | Heightmap values.
+    /// @field | width | integer | Width.
+    /// @field | height | integer | Height.
     tbl.set(
         "heightmap",
         lua.create_function(|lua, opts: Option<LuaTable>| {
@@ -711,13 +675,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             }
             let res = lua.create_table()?;
             /// Performs the 'cells' operation.
-            /// @return | nil | No value is returned.
             res.set("cells", out)?;
             /// Performs the 'width' operation.
-            /// @return | nil | No value is returned.
             res.set("width", hm.width)?;
             /// Performs the 'height' operation.
-            /// @return | nil | No value is returned.
             res.set("height", hm.height)?;
             Ok(res)
         })?,
@@ -729,6 +690,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | cells | table | Flat u8 array from cellularAutomata.
     /// @param | floorValue | number? | Cell value treated as open floor (default 0).
     /// @return | table | Table with .cells (flat f32 array), .width, .height.
+    /// @field | cells | number[] | Distance-transformed heightmap values.
+    /// @field | width | integer | Width.
+    /// @field | height | integer | Height.
     tbl.set(
         "heightmapFromCellular",
         lua.create_function(
@@ -744,13 +708,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 }
                 let res = lua.create_table()?;
                 /// Performs the 'cells' operation.
-                /// @return | nil | No value is returned.
                 res.set("cells", out_cells)?;
                 /// Performs the 'width' operation.
-                /// @return | nil | No value is returned.
                 res.set("width", hm.width)?;
                 /// Performs the 'height' operation.
-                /// @return | nil | No value is returned.
                 res.set("height", hm.height)?;
                 Ok(res)
             },
@@ -760,6 +721,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Run Wave Function Collapse to generate a grid of tile IDs satisfying adjacency constraints.
     /// @param | opts | table | Options: width, height, seed, max_attempts, tiles (array of {id, weight}), adjacencies (map of tile_id -> allowed neighbor IDs[]).
     /// @return | table | Table with .cells (flat array of tile IDs, 0 if unsolved), .width, .height.
+    /// @field | cells | integer[] | Tile ID per cell.
+    /// @field | width | integer | Width.
+    /// @field | height | integer | Height.
     tbl.set(
         "wfcGenerate",
         lua.create_function(|lua, opts: LuaTable| {
@@ -808,13 +772,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             }
             let res = lua.create_table()?;
             /// Performs the 'cells' operation.
-            /// @return | nil | No value is returned.
             res.set("cells", out)?;
             /// Performs the 'width' operation.
-            /// @return | nil | No value is returned.
             res.set("width", grid.width)?;
             /// Performs the 'height' operation.
-            /// @return | nil | No value is returned.
             res.set("height", grid.height)?;
             Ok(res)
         })?,
@@ -855,6 +816,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | angle | number? | Turn angle in degrees (default 25).
     /// @param | step | number? | Forward step length (default 1.0).
     /// @return | table | Array of segment tables {x1, y1, x2, y2}.
+    /// @field | x1 | number | X1.
+    /// @field | y1 | number | Y1.
+    /// @field | x2 | number | X2.
+    /// @field | y2 | number | Y2.
     tbl.set(
         "lsystemSegments",
         lua.create_function(
@@ -882,16 +847,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, (x1, y1, x2, y2)) in segs.iter().enumerate() {
                     let st = lua.create_table()?;
                     /// Performs the 'x1' operation.
-                    /// @return | nil | No value is returned.
                     st.set("x1", *x1)?;
                     /// Performs the 'y1' operation.
-                    /// @return | nil | No value is returned.
                     st.set("y1", *y1)?;
                     /// Performs the 'x2' operation.
-                    /// @return | nil | No value is returned.
                     st.set("x2", *x2)?;
                     /// Performs the 'y2' operation.
-                    /// @return | nil | No value is returned.
                     st.set("y2", *y2)?;
                     out.set(i + 1, st)?;
                 }
@@ -933,7 +894,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | minLen | number? | Minimum output length (default 3).
     /// @param | maxLen | number? | Maximum output length (default 10).
     /// @param | seed | number? | RNG seed (default 0).
-    /// @return | table | Array of generated name strings.
+    /// @return | string[] | Generated name strings.
     tbl.set(
         "generateNames",
         lua.create_function(
@@ -966,7 +927,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | height | number | World area height.
     /// @param | regionCount | integer | Number of regions to place.
     /// @param | seed | integer? | RNG seed (default 0).
-    /// @return | table | Table with .regions (array of {id, name, x, y, tags[]}) and .edges (array of {from, to, cost, bidirectional}).
+    /// @return | table | Table with regions and edges arrays.
+    /// @field | regions | table | Array of region tables, each with id (integer), name (string), x (number), y (number), tags (string[]).
+    /// @field | edges | table | Array of edge tables, each with from (integer), to (integer), cost (number), bidirectional (boolean).
     tbl.set(
         "worldGraph",
         lua.create_function(
@@ -976,23 +939,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, r) in wg.regions.iter().enumerate() {
                     let rt = lua.create_table()?;
                     /// Performs the 'id' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("id", r.id)?;
                     /// Performs the 'name' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("name", r.name.clone())?;
                     /// Performs the 'x' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("x", r.x)?;
                     /// Performs the 'y' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("y", r.y)?;
                     let tags_tbl = lua.create_table()?;
                     for (j, tag) in r.tags.iter().enumerate() {
                         tags_tbl.set(j + 1, tag.clone())?;
                     }
                     /// Performs the 'tags' operation.
-                    /// @return | nil | No value is returned.
                     rt.set("tags", tags_tbl)?;
                     regions_tbl.set(i + 1, rt)?;
                 }
@@ -1000,25 +958,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 for (i, e) in wg.edges.iter().enumerate() {
                     let et = lua.create_table()?;
                     /// Performs the 'from' operation.
-                    /// @return | nil | No value is returned.
                     et.set("from", e.from)?;
                     /// Performs the 'to' operation.
-                    /// @return | nil | No value is returned.
                     et.set("to", e.to)?;
                     /// Performs the 'cost' operation.
-                    /// @return | nil | No value is returned.
                     et.set("cost", e.cost)?;
                     /// Performs the 'bidirectional' operation.
-                    /// @return | nil | No value is returned.
                     et.set("bidirectional", e.bidirectional)?;
                     edges_tbl.set(i + 1, et)?;
                 }
                 let out = lua.create_table()?;
                 /// Performs the 'regions' operation.
-                /// @return | nil | No value is returned.
                 out.set("regions", regions_tbl)?;
                 /// Performs the 'edges' operation.
-                /// @return | nil | No value is returned.
                 out.set("edges", edges_tbl)?;
                 Ok(out)
             },
@@ -1029,7 +981,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | width | integer | Map width in cells.
     /// @param | height | integer | Map height in cells.
     /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
-    /// @return | table | Flat array of f64 noise values (length = width*height).
+    /// @return | number[] | F64 noise values (length = width*height).
     tbl.set(
         "noiseMap",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -1080,7 +1032,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | width | integer | Map width in cells.
     /// @param | height | integer | Map height in cells.
     /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y.
-    /// @return | table | Flat array of f64 noise values (length = width*height).
+    /// @return | number[] | F64 noise values (length = width*height).
     tbl.set(
         "noiseMapParallel",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -1121,7 +1073,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | width | integer | Map width in cells.
     /// @param | height | integer | Map height in cells.
     /// @param | opts | table? | Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
-    /// @return | table | Flat array of f64 noise values (length = width*height).
+    /// @return | number[] | F64 noise values (length = width*height).
     tbl.set(
         "noiseMapParallelSeeded",
         lua.create_function(|lua, (width, height, opts): (u32, u32, Option<LuaTable>)| {
@@ -1211,7 +1163,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'procgen' operation.
-    /// @return | nil | No value is returned.
     luna.set("procgen", tbl)?;
     Ok(())
 }

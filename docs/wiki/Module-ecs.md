@@ -29,25 +29,25 @@
   - [LUniverse:defineTag(name: string) -> integer](#luniversedefinetagname-string-integer)
   - [LUniverse:deserialize(snapshot: table)](#luniversedeserializesnapshot-table)
   - [LUniverse:each(name: string, callback: function)](#luniverseeachname-string-callback-function)
-  - [LUniverse:emit(event: string, ...: LuaValue)](#luniverseemitevent-string-luavalue)
+  - [LUniverse:emit(event: string, ...: table)](#luniverseemitevent-string-table)
   - [LUniverse:extendBlueprint(name: string, parent: string, overrides: table)](#luniverseextendblueprintname-string-parent-string-overrides-table)
   - [LUniverse:flushObservers()](#luniverseflushobservers)
-  - [LUniverse:get(id: integer, name: string) -> LuaValue](#luniversegetid-integer-name-string-luavalue)
-  - [LUniverse:getBitmapTagBit(name: string) -> LuaValue](#luniversegetbitmaptagbitname-string-luavalue)
+  - [LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil](#luniversegetid-integer-name-string-tablenumberstringbooleannil)
+  - [LUniverse:getBitmapTagBit(name: string) -> integer](#luniversegetbitmaptagbitname-string-integer)
   - [LUniverse:getBlueprintComponents(name: string) -> table](#luniversegetblueprintcomponentsname-string-table)
-  - [LUniverse:getChildren(parent_id: integer) -> table](#luniversegetchildrenparentid-integer-table)
-  - [LUniverse:getComponents(id: integer) -> table](#luniversegetcomponentsid-integer-table)
-  - [LUniverse:getDirtyEntities() -> table](#luniversegetdirtyentities-table)
-  - [LUniverse:getEntities() -> table](#luniversegetentities-table)
-  - [LUniverse:getEntitiesByLayer(layer: integer) -> table](#luniversegetentitiesbylayerlayer-integer-table)
-  - [LUniverse:getEntitiesByTag(tag: string) -> table](#luniversegetentitiesbytagtag-string-table)
-  - [LUniverse:getEntitiesSorted() -> table](#luniversegetentitiessorted-table)
+  - [LUniverse:getChildren(parent_id: integer) -> integer[]](#luniversegetchildrenparentid-integer-integer)
+  - [LUniverse:getComponents(id: integer) -> string[]](#luniversegetcomponentsid-integer-string)
+  - [LUniverse:getDirtyEntities() -> integer[]](#luniversegetdirtyentities-integer)
+  - [LUniverse:getEntities() -> integer[]](#luniversegetentities-integer)
+  - [LUniverse:getEntitiesByLayer(layer: integer) -> integer[]](#luniversegetentitiesbylayerlayer-integer-integer)
+  - [LUniverse:getEntitiesByTag(tag: string) -> integer[]](#luniversegetentitiesbytagtag-string-integer)
+  - [LUniverse:getEntitiesSorted() -> integer[]](#luniversegetentitiessorted-integer)
   - [LUniverse:getEntityCount() -> integer](#luniversegetentitycount-integer)
   - [LUniverse:getLayer(id: integer) -> integer](#luniversegetlayerid-integer-integer)
-  - [LUniverse:getParent(child_id: integer) -> LuaValue](#luniversegetparentchildid-integer-luavalue)
-  - [LUniverse:getRelated(from: integer, name: string) -> table](#luniversegetrelatedfrom-integer-name-string-table)
+  - [LUniverse:getParent(child_id: integer) -> integer](#luniversegetparentchildid-integer-integer)
+  - [LUniverse:getRelated(from: integer, name: string) -> integer[]](#luniversegetrelatedfrom-integer-name-string-integer)
   - [LUniverse:getSystemCount() -> integer](#luniversegetsystemcount-integer)
-  - [LUniverse:getTags(id: integer) -> table](#luniversegettagsid-integer-table)
+  - [LUniverse:getTags(id: integer) -> string[]](#luniversegettagsid-integer-string)
   - [LUniverse:has(id: integer, name: string) -> boolean](#luniversehasid-integer-name-string-boolean)
   - [LUniverse:hasBitmapTag(id: integer, name: string) -> boolean](#luniversehasbitmaptagid-integer-name-string-boolean)
   - [LUniverse:hasBlueprint(name: string) -> boolean](#luniversehasblueprintname-string-boolean)
@@ -56,15 +56,15 @@
   - [LUniverse:isAlive(id: integer) -> boolean](#luniverseisaliveid-integer-boolean)
   - [LUniverse:kill(id: integer)](#luniversekillid-integer)
   - [LUniverse:killRecursive(id: integer)](#luniversekillrecursiveid-integer)
-  - [LUniverse:listBlueprints() -> table](#luniverselistblueprints-table)
+  - [LUniverse:listBlueprints() -> string[]](#luniverselistblueprints-string)
   - [LUniverse:onComponentAdded(name: string, cb: function)](#luniverseoncomponentaddedname-string-cb-function)
   - [LUniverse:onComponentRemoved(name: string, cb: function)](#luniverseoncomponentremovedname-string-cb-function)
-  - [LUniverse:query(...: string) -> table](#luniversequery-string-table)
-  - [LUniverse:queryBitmapAll(names: table) -> table](#luniversequerybitmapallnames-table-table)
-  - [LUniverse:queryBitmapAny(names: table) -> table](#luniversequerybitmapanynames-table-table)
-  - [LUniverse:queryBitmapTag(name: string) -> table](#luniversequerybitmaptagname-string-table)
+  - [LUniverse:query(...: string) -> integer[]](#luniversequery-string-integer)
+  - [LUniverse:queryBitmapAll(names: table) -> integer[]](#luniversequerybitmapallnames-table-integer)
+  - [LUniverse:queryBitmapAny(names: table) -> integer[]](#luniversequerybitmapanynames-table-integer)
+  - [LUniverse:queryBitmapTag(name: string) -> integer[]](#luniversequerybitmaptagname-string-integer)
   - [LUniverse:queryMulti(names_table: table, callback: function)](#luniversequerymultinamestable-table-callback-function)
-  - [LUniverse:queryNot(with_tbl: table, without_tbl: table) -> table](#luniversequerynotwithtbl-table-withouttbl-table-table)
+  - [LUniverse:queryNot(with_tbl: table, without_tbl: table) -> integer[]](#luniversequerynotwithtbl-table-withouttbl-table-integer)
   - [LUniverse:release()](#luniverserelease)
   - [LUniverse:remove(id: integer, name: string)](#luniverseremoveid-integer-name-string)
   - [LUniverse:removeBlueprint(name: string) -> boolean](#luniverseremoveblueprintname-string-boolean)
@@ -73,13 +73,13 @@
   - [LUniverse:removeTag(id: integer, tag: string)](#luniverseremovetagid-integer-tag-string)
   - [LUniverse:render()](#luniverserender)
   - [LUniverse:serialize() -> table](#luniverseserialize-table)
-  - [LUniverse:set(id: integer, name: string, value: LuaValue)](#luniversesetid-integer-name-string-value-luavalue)
+  - [LUniverse:set(id: integer, name: string, value: table)](#luniversesetid-integer-name-string-value-table)
   - [LUniverse:setLayer(id: integer, layer: integer)](#luniversesetlayerid-integer-layer-integer)
   - [LUniverse:setParent(child_id: integer, [parent_id]: integer)](#luniversesetparentchildid-integer-parentid-integer)
   - [LUniverse:snapshot() -> table](#luniversesnapshot-table)
   - [LUniverse:spawn() -> integer](#luniversespawn-integer)
   - [LUniverse:spawnBlueprint(name: string, [overrides]: table) -> integer](#luniversespawnblueprintname-string-overrides-table-integer)
-  - [LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> table](#luniversespawnbulkname-string-count-integer-overrides-table-table)
+  - [LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> integer[]](#luniversespawnbulkname-string-count-integer-overrides-table-integer)
   - [LUniverse:takeSnapshotDiff() -> table](#luniversetakesnapshotdiff-table)
   - [LUniverse:type() -> string](#luniversetype-string)
   - [LUniverse:typeOf(name: string) -> boolean](#luniversetypeofname-string-boolean)
@@ -293,7 +293,7 @@ end
 
 ### `LUniverse:addTag(id: integer, tag: string)`
 
-Adds a string tag to an entity. This method is available to Lua scripts.
+Assigns a string tag name to an entity in this universe.
 
 **Parameters**
 
@@ -567,14 +567,14 @@ do
 end
 ```
 
-### `LUniverse:emit(event: string, ...: LuaValue)`
+### `LUniverse:emit(event: string, ...: table)`
 
 Calls matching event-named functions on registered systems.
 
 **Parameters**
 
 - `event` (`string`, required) - Function name looked up on each system table.
-- `...` (`LuaValue`, required) - Extra values forwarded after the system and universe arguments.
+- `...` (`table`, required) - Extra values forwarded after the system and universe arguments.
 
 #### Example
 
@@ -669,7 +669,7 @@ do
 end
 ```
 
-### `LUniverse:get(id: integer, name: string) -> LuaValue`
+### `LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil`
 
 Returns a component value from an entity.
 
@@ -678,7 +678,7 @@ Returns a component value from an entity.
 - `id` (`integer`, required) - Entity id to read.
 - `name` (`string`, required) - Component name to read.
 
-**Returns**: `LuaValue` - Stored component value, or nil when the entity does not have that component.
+**Returns**: `table|number|string|boolean|nil` - Stored component value, or nil when the entity does not have that component.
 
 #### Example
 
@@ -704,7 +704,7 @@ do
 end
 ```
 
-### `LUniverse:getBitmapTagBit(name: string) -> LuaValue`
+### `LUniverse:getBitmapTagBit(name: string) -> integer`
 
 Returns the bit index assigned to a bitmap tag name.
 
@@ -712,7 +712,7 @@ Returns the bit index assigned to a bitmap tag name.
 
 - `name` (`string`, required) - Bitmap tag name to inspect.
 
-**Returns**: `LuaValue` - Bit index when the tag exists, or nil when the tag is undefined.
+**Returns**: `integer` - Bit index when the tag exists, or nil when the tag is undefined.
 
 #### Example
 
@@ -761,7 +761,7 @@ do
 end
 ```
 
-### `LUniverse:getChildren(parent_id: integer) -> table`
+### `LUniverse:getChildren(parent_id: integer) -> integer[]`
 
 Returns child entity ids for a parent entity.
 
@@ -769,7 +769,7 @@ Returns child entity ids for a parent entity.
 
 - `parent_id` (`integer`, required) - Parent entity id to inspect.
 
-**Returns**: `table` - Array table of child entity ids.
+**Returns**: `integer[]` - Array table of child entity ids.
 
 #### Example
 
@@ -793,7 +793,7 @@ do
 end
 ```
 
-### `LUniverse:getComponents(id: integer) -> table`
+### `LUniverse:getComponents(id: integer) -> string[]`
 
 Returns component names currently stored on an entity.
 
@@ -801,7 +801,7 @@ Returns component names currently stored on an entity.
 
 - `id` (`integer`, required) - Entity id to inspect.
 
-**Returns**: `table` - Array table of component name strings.
+**Returns**: `string[]` - Component name strings.
 
 #### Example
 
@@ -823,11 +823,11 @@ do
 end
 ```
 
-### `LUniverse:getDirtyEntities() -> table`
+### `LUniverse:getDirtyEntities() -> integer[]`
 
 Returns entities marked dirty by recent ECS mutations.
 
-**Returns**: `table` - Array table of dirty entity ids.
+**Returns**: `integer[]` - Array table of dirty entity ids.
 
 #### Example
 
@@ -851,11 +851,11 @@ do
 end
 ```
 
-### `LUniverse:getEntities() -> table`
+### `LUniverse:getEntities() -> integer[]`
 
 Returns all live entity ids in this universe.
 
-**Returns**: `table` - Array table of live entity ids.
+**Returns**: `integer[]` - Array table of live entity ids.
 
 #### Example
 
@@ -873,7 +873,7 @@ do
 end
 ```
 
-### `LUniverse:getEntitiesByLayer(layer: integer) -> table`
+### `LUniverse:getEntitiesByLayer(layer: integer) -> integer[]`
 
 Returns entities assigned to a numeric layer.
 
@@ -881,7 +881,7 @@ Returns entities assigned to a numeric layer.
 
 - `layer` (`integer`, required) - Layer value used for lookup.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -903,7 +903,7 @@ do
 end
 ```
 
-### `LUniverse:getEntitiesByTag(tag: string) -> table`
+### `LUniverse:getEntitiesByTag(tag: string) -> integer[]`
 
 Returns entities that have a string tag.
 
@@ -911,7 +911,7 @@ Returns entities that have a string tag.
 
 - `tag` (`string`, required) - Tag name used for lookup.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -932,11 +932,11 @@ do
 end
 ```
 
-### `LUniverse:getEntitiesSorted() -> table`
+### `LUniverse:getEntitiesSorted() -> integer[]`
 
 Returns live entities sorted by ECS layer and stable entity ordering.
 
-**Returns**: `table` - Array table of sorted entity ids.
+**Returns**: `integer[]` - Array table of sorted entity ids.
 
 #### Example
 
@@ -1010,7 +1010,7 @@ do
 end
 ```
 
-### `LUniverse:getParent(child_id: integer) -> LuaValue`
+### `LUniverse:getParent(child_id: integer) -> integer`
 
 Returns the parent entity id for a child entity.
 
@@ -1018,7 +1018,7 @@ Returns the parent entity id for a child entity.
 
 - `child_id` (`integer`, required) - Entity id whose parent is read.
 
-**Returns**: `LuaValue` - Parent entity id, or nil when the entity has no parent.
+**Returns**: `integer` - Parent entity id, or nil when the entity has no parent.
 
 #### Example
 
@@ -1039,7 +1039,7 @@ do
 end
 ```
 
-### `LUniverse:getRelated(from: integer, name: string) -> table`
+### `LUniverse:getRelated(from: integer, name: string) -> integer[]`
 
 Returns targets linked from an entity by a named relation.
 
@@ -1048,7 +1048,7 @@ Returns targets linked from an entity by a named relation.
 - `from` (`integer`, required) - Source entity id.
 - `name` (`string`, required) - Relation name.
 
-**Returns**: `table` - Array table of related target entity ids.
+**Returns**: `integer[]` - Array table of related target entity ids.
 
 #### Example
 
@@ -1093,7 +1093,7 @@ do
 end
 ```
 
-### `LUniverse:getTags(id: integer) -> table`
+### `LUniverse:getTags(id: integer) -> string[]`
 
 Returns string tags assigned to an entity.
 
@@ -1101,7 +1101,7 @@ Returns string tags assigned to an entity.
 
 - `id` (`integer`, required) - Entity id to inspect.
 
-**Returns**: `table` - Array table of tag names.
+**Returns**: `string[]` - Tag names.
 
 #### Example
 
@@ -1354,11 +1354,11 @@ do
 end
 ```
 
-### `LUniverse:listBlueprints() -> table`
+### `LUniverse:listBlueprints() -> string[]`
 
 Returns names of all registered blueprints.
 
-**Returns**: `table` - Array table of blueprint names.
+**Returns**: `string[]` - Blueprint names.
 
 #### Example
 
@@ -1438,7 +1438,7 @@ do
 end
 ```
 
-### `LUniverse:query(...: string) -> table`
+### `LUniverse:query(...: string) -> integer[]`
 
 Returns entities that have all component names passed as varargs.
 
@@ -1446,7 +1446,7 @@ Returns entities that have all component names passed as varargs.
 
 - `...` (`string`, required) - Component names that every returned entity must have.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -1478,7 +1478,7 @@ do
 end
 ```
 
-### `LUniverse:queryBitmapAll(names: table) -> table`
+### `LUniverse:queryBitmapAll(names: table) -> integer[]`
 
 Returns entities that have every bitmap tag from a list.
 
@@ -1486,7 +1486,7 @@ Returns entities that have every bitmap tag from a list.
 
 - `names` (`table`, required) - Array table of bitmap tag names.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -1509,7 +1509,7 @@ do
 end
 ```
 
-### `LUniverse:queryBitmapAny(names: table) -> table`
+### `LUniverse:queryBitmapAny(names: table) -> integer[]`
 
 Returns entities with at least one bitmap tag from a list.
 
@@ -1517,7 +1517,7 @@ Returns entities with at least one bitmap tag from a list.
 
 - `names` (`table`, required) - Array table of bitmap tag names.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -1538,7 +1538,7 @@ do
 end
 ```
 
-### `LUniverse:queryBitmapTag(name: string) -> table`
+### `LUniverse:queryBitmapTag(name: string) -> integer[]`
 
 Returns entities with one bitmap tag.
 
@@ -1546,7 +1546,7 @@ Returns entities with one bitmap tag.
 
 - `name` (`string`, required) - Bitmap tag name used for lookup.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -1603,7 +1603,7 @@ do
 end
 ```
 
-### `LUniverse:queryNot(with_tbl: table, without_tbl: table) -> table`
+### `LUniverse:queryNot(with_tbl: table, without_tbl: table) -> integer[]`
 
 Returns entities that include one component set and exclude another component set.
 
@@ -1612,7 +1612,7 @@ Returns entities that include one component set and exclude another component se
 - `with_tbl` (`table`, required) - Array table of required component names.
 - `without_tbl` (`table`, required) - Array table of forbidden component names.
 
-**Returns**: `table` - Array table of matching entity ids.
+**Returns**: `integer[]` - Array table of matching entity ids.
 
 #### Example
 
@@ -1849,7 +1849,7 @@ do
 end
 ```
 
-### `LUniverse:set(id: integer, name: string, value: LuaValue)`
+### `LUniverse:set(id: integer, name: string, value: table)`
 
 Stores or replaces a component value on an entity.
 
@@ -1857,7 +1857,7 @@ Stores or replaces a component value on an entity.
 
 - `id` (`integer`, required) - Entity id that receives the component.
 - `name` (`string`, required) - Component name.
-- `value` (`LuaValue`, required) - Lua value stored as the component payload.
+- `value` (`table`, required) - Lua value stored as the component payload.
 
 #### Example
 
@@ -1917,7 +1917,7 @@ Sets or clears the parent entity for a child entity.
 **Parameters**
 
 - `child_id` (`integer`, required) - Entity id whose parent changes.
-- `parent_id` (`integer`, optional) - Optional parent entity id; nil clears the parent.
+- `parent_id` (`integer`, optional) - Parent entity id, or nil to clear the parent.
 
 #### Example
 
@@ -2027,7 +2027,7 @@ do
 end
 ```
 
-### `LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> table`
+### `LUniverse:spawnBulk(name: string, count: integer, [overrides]: table) -> integer[]`
 
 Spawns multiple entities from a blueprint using shared optional overrides.
 
@@ -2037,7 +2037,7 @@ Spawns multiple entities from a blueprint using shared optional overrides.
 - `count` (`integer`, required) - Number of entities to spawn.
 - `overrides` (`table`, optional) - Optional component overrides applied to each spawned entity.
 
-**Returns**: `table` - Array table of spawned entity ids.
+**Returns**: `integer[]` - Array table of spawned entity ids.
 
 #### Example
 

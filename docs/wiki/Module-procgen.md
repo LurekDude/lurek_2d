@@ -17,31 +17,31 @@
   - [lurek.procgen.biomeColor(name: string) -> number](#lurekprocgenbiomecolorname-string-number)
   - [lurek.procgen.bspDungeon([opts]: table) -> table](#lurekprocgenbspdungeonopts-table-table)
   - [lurek.procgen.bspDungeonWithPrefabs([opts]: table, prefabs: table) -> table](#lurekprocgenbspdungeonwithprefabsopts-table-prefabs-table-table)
-  - [lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> table](#lurekprocgencellularautomatawidth-integer-height-integer-opts-table-table)
-  - [lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> table](#lurekprocgenfloodfilldata-table-width-number-height-number-startx-number-starty-number-threshold-number-above-boolean-table)
+  - [lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> integer[]](#lurekprocgencellularautomatawidth-integer-height-integer-opts-table-integer)
+  - [lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> integer[]](#lurekprocgenfloodfilldata-table-width-number-height-number-startx-number-starty-number-threshold-number-above-boolean-integer)
   - [lurek.procgen.generateName(samples: table, [minLen]: number, [maxLen]: number, [seed]: number) -> string](#lurekprocgengeneratenamesamples-table-minlen-number-maxlen-number-seed-number-string)
-  - [lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> table](#lurekprocgengeneratenamessamples-table-count-number-minlen-number-maxlen-number-seed-number-table)
+  - [lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> string[]](#lurekprocgengeneratenamessamples-table-count-number-minlen-number-maxlen-number-seed-number-string)
   - [lurek.procgen.heightmap([opts]: table) -> table](#lurekprocgenheightmapopts-table-table)
   - [lurek.procgen.heightmapFromCellular(width: integer, height: integer, cells: table, [floorValue]: number) -> table](#lurekprocgenheightmapfromcellularwidth-integer-height-integer-cells-table-floorvalue-number-table)
   - [lurek.procgen.lsystem(opts: table) -> string](#lurekprocgenlsystemopts-table-string)
   - [lurek.procgen.lsystemSegments(opts: table, [angle]: number, [step]: number) -> table](#lurekprocgenlsystemsegmentsopts-table-angle-number-step-number-table)
   - [lurek.procgen.newBiomeClassifier([opts]: table) -> BiomeClassifier](#lurekprocgennewbiomeclassifieropts-table-biomeclassifier)
-  - [lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> table](#lurekprocgennoisemapwidth-integer-height-integer-opts-table-table)
-  - [lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> table](#lurekprocgennoisemapparallelwidth-integer-height-integer-opts-table-table)
-  - [lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> table](#lurekprocgennoisemapparallelseededwidth-integer-height-integer-opts-table-table)
+  - [lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> number[]](#lurekprocgennoisemapwidth-integer-height-integer-opts-table-number)
+  - [lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> number[]](#lurekprocgennoisemapparallelwidth-integer-height-integer-opts-table-number)
+  - [lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> number[]](#lurekprocgennoisemapparallelseededwidth-integer-height-integer-opts-table-number)
   - [lurek.procgen.perlinNoise(x: number, y: number, periodX: number, periodY: number) -> number](#lurekprocgenperlinnoisex-number-y-number-periodx-number-periody-number-number)
   - [lurek.procgen.poissonDisk(width: number, height: number, minDist: number, [maxAttempts]: integer, [seed]: integer) -> table](#lurekprocgenpoissondiskwidth-number-height-number-mindist-number-maxattempts-integer-seed-integer-table)
   - [lurek.procgen.roomsDungeon([opts]: table) -> table](#lurekprocgenroomsdungeonopts-table-table)
   - [lurek.procgen.roomsDungeonWithPrefabs([opts]: table, prefabs: table, [stampValue]: number) -> table](#lurekprocgenroomsdungeonwithprefabsopts-table-prefabs-table-stampvalue-number-table)
   - [lurek.procgen.simplex2d(x: number, y: number) -> number](#lurekprocgensimplex2dx-number-y-number-number)
   - [lurek.procgen.simplex3d(x: number, y: number, z: number) -> number](#lurekprocgensimplex3dx-number-y-number-z-number-number)
-  - [lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> table](#lurekprocgenvoronoiwidth-integer-height-integer-points-table-opts-table-table)
+  - [lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> integer[]](#lurekprocgenvoronoiwidth-integer-height-integer-points-table-opts-table-integer)
   - [lurek.procgen.wfcGenerate(opts: table) -> table](#lurekprocgenwfcgenerateopts-table-table)
   - [lurek.procgen.worldGraph(width: number, height: number, regionCount: integer, [seed]: integer) -> table](#lurekprocgenworldgraphwidth-number-height-number-regioncount-integer-seed-integer-table)
 - [Types and Methods](#types-and-methods)
   - [BiomeClassifier](#biomeclassifier)
   - [BiomeClassifier:classify(height: number, moisture: number, temperature: number) -> string](#biomeclassifierclassifyheight-number-moisture-number-temperature-number-string)
-  - [BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> table](#biomeclassifierclassifymapwidth-integer-height-integer-heights-table-moisture-table-temperature-table-table)
+  - [BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> string[]](#biomeclassifierclassifymapwidth-integer-height-integer-heights-table-moisture-table-temperature-table-string)
   - [BiomeClassifier:type() -> string](#biomeclassifiertype-string)
   - [BiomeClassifier:typeOf(name: string) -> boolean](#biomeclassifiertypeofname-string-boolean)
 - [Examples](#examples)
@@ -130,18 +130,18 @@ end
 lurek.procgen.biomeColor(name: string) -> number -- Get the default RGBA display color for a biome type name. Useful for minimap or debug visualization.
 lurek.procgen.bspDungeon([opts]: table) -> table -- Generate a dungeon layout using Binary Space Partitioning. Produces non-overlapping rooms connected by corr...
 lurek.procgen.bspDungeonWithPrefabs([opts]: table, prefabs: table) -> table -- Generate a BSP dungeon and stamp named prefab rooms into suitable leaves. Returns dungeon layout plus prefa...
-lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> table -- Generate a cave or organic map using cellular automata rules.
-lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> table -- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
+lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> integer[] -- Generate a cave or organic map using cellular automata rules.
+lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> integer[] -- Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
 lurek.procgen.generateName(samples: table, [minLen]: number, [maxLen]: number, [seed]: number) -> string -- Generate a single random name based on a Markov chain trained from sample names. Great for NPC names, place...
-lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> table -- Generate multiple random names in one call using Markov chains trained from sample data.
+lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> string[] -- Generate multiple random names in one call using Markov chains trained from sample data.
 lurek.procgen.heightmap([opts]: table) -> table -- Generate a fractal heightmap using multi-octave noise with optional hydraulic erosion.
 lurek.procgen.heightmapFromCellular(width: integer, height: integer, cells: table, [floorValue]: number) -> table -- Convert a cellular automata grid into a heightmap by distance-transforming the floor cells.
 lurek.procgen.lsystem(opts: table) -> string -- Expand an L-system grammar and return the resulting string. Useful for generating branching structures like...
 lurek.procgen.lsystemSegments(opts: table, [angle]: number, [step]: number) -> table -- Expand an L-system and interpret the result as turtle-graphics commands, returning line segments.
 lurek.procgen.newBiomeClassifier([opts]: table) -> BiomeClassifier -- Create a BiomeClassifier object with custom threshold rules for mapping height/moisture/temperature to biom...
-lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
-lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
-lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> table -- Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
+lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
+lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
+lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> number[] -- Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
 lurek.procgen.perlinNoise(x: number, y: number, periodX: number, periodY: number) -> number -- Sample periodic 2D Perlin noise at a given coordinate.
 lurek.procgen.poissonDisk(width: number, height: number, minDist: number, [maxAttempts]: integer, [seed]: integer) -> table -- Generate evenly-spaced random points using Poisson disk sampling. Useful for placing trees, NPCs, or loot w...
 lurek.procgen.roomsDungeon([opts]: table) -> table -- Generate a dungeon by placing random non-overlapping rooms and connecting them with corridors. Also returns...
@@ -245,7 +245,7 @@ do
 end
 ```
 
-### `lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> table`
+### `lurek.procgen.cellularAutomata(width: integer, height: integer, [opts]: table) -> integer[]`
 
 Generate a cave or organic map using cellular automata rules.
 
@@ -255,7 +255,7 @@ Generate a cave or organic map using cellular automata rules.
 - `height` (`integer`, required) - Grid height in cells.
 - `opts` (`table`, optional) - Options: fill (0.0–1.0 initial fill ratio), iterations, birth threshold, survive threshold, seed.
 
-**Returns**: `table` - Flat array of u8 values (0=empty, 1=wall) with length width*height.
+**Returns**: `integer[]` - Flat array of cell values (0=empty, 1=wall) with length width×height.
 
 #### Example
 
@@ -281,7 +281,7 @@ do
 end
 ```
 
-### `lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> table`
+### `lurek.procgen.floodFill(data: table, width: number, height: number, startX: number, startY: number, [threshold]: number, [above]: boolean) -> integer[]`
 
 Flood-fill a grid from a starting cell, marking all connected cells that pass a threshold test.
 
@@ -295,7 +295,7 @@ Flood-fill a grid from a starting cell, marking all connected cells that pass a 
 - `threshold` (`number`, optional) - Value threshold (default 128).
 - `above` (`boolean`, optional) - If true, fill cells >= threshold; if false (default), fill cells < threshold.
 
-**Returns**: `table` - Flat array of u8 (1=filled, 0=not filled) with length width*height.
+**Returns**: `integer[]` - Flat array of fill values (1=filled, 0=not filled) with length width×height.
 
 #### Example
 
@@ -353,7 +353,7 @@ do
 end
 ```
 
-### `lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> table`
+### `lurek.procgen.generateNames(samples: table, count: number, [minLen]: number, [maxLen]: number, [seed]: number) -> string[]`
 
 Generate multiple random names in one call using Markov chains trained from sample data.
 
@@ -365,7 +365,7 @@ Generate multiple random names in one call using Markov chains trained from samp
 - `maxLen` (`number`, optional) - Maximum output length (default 10).
 - `seed` (`number`, optional) - RNG seed (default 0).
 
-**Returns**: `table` - Array of generated name strings.
+**Returns**: `string[]` - Generated name strings.
 
 #### Example
 
@@ -546,7 +546,7 @@ do
 end
 ```
 
-### `lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> table`
+### `lurek.procgen.noiseMap(width: integer, height: integer, [opts]: table) -> number[]`
 
 Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a single thread.
 
@@ -556,7 +556,7 @@ Generate a 2D noise map with configurable scale, octaves, and offsets. Runs on a
 - `height` (`integer`, required) - Map height in cells.
 - `opts` (`table`, optional) - Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
 
-**Returns**: `table` - Flat array of f64 noise values (length = width*height).
+**Returns**: `number[]` - F64 noise values (length = width*height).
 
 #### Example
 
@@ -583,7 +583,7 @@ do
 end
 ```
 
-### `lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> table`
+### `lurek.procgen.noiseMapParallel(width: integer, height: integer, [opts]: table) -> number[]`
 
 Generate a 2D noise map using multiple threads for faster computation on large maps. Uses seed 0.
 
@@ -593,7 +593,7 @@ Generate a 2D noise map using multiple threads for faster computation on large m
 - `height` (`integer`, required) - Map height in cells.
 - `opts` (`table`, optional) - Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y.
 
-**Returns**: `table` - Flat array of f64 noise values (length = width*height).
+**Returns**: `number[]` - F64 noise values (length = width*height).
 
 #### Example
 
@@ -616,7 +616,7 @@ do
 end
 ```
 
-### `lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> table`
+### `lurek.procgen.noiseMapParallelSeeded(width: integer, height: integer, [opts]: table) -> number[]`
 
 Generate a 2D noise map using multiple threads with a specific seed for reproducible results.
 
@@ -626,7 +626,7 @@ Generate a 2D noise map using multiple threads with a specific seed for reproduc
 - `height` (`integer`, required) - Map height in cells.
 - `opts` (`table`, optional) - Options: scale_x, scale_y, octaves, lacunarity, persistence, offset_x, offset_y, seed.
 
-**Returns**: `table` - Flat array of f64 noise values (length = width*height).
+**Returns**: `number[]` - F64 noise values (length = width*height).
 
 #### Example
 
@@ -891,7 +891,7 @@ do
 end
 ```
 
-### `lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> table`
+### `lurek.procgen.voronoi(width: integer, height: integer, points: table, [opts]: table) -> integer[]`
 
 Compute a Voronoi diagram from a set of seed points. Returns region ownership, distance-to-nearest, and distance-to-second-nearest for each cell.
 
@@ -902,7 +902,7 @@ Compute a Voronoi diagram from a set of seed points. Returns region ownership, d
 - `points` (`table`, required) - Array of {x, y} seed points.
 - `opts` (`table`, optional) - Options: warp_scale, warp_strength, seed for domain warping.
 
-**Returns**: `table` - Flat array of 1-based region indices (length = width*height).
+**Returns**: `integer[]` - 1-based region indices (length = width*height).
 
 #### Example
 
@@ -992,7 +992,7 @@ Generate a connected world graph with named regions and weighted edges. Useful f
 - `regionCount` (`integer`, required) - Number of regions to place.
 - `seed` (`integer`, optional) - RNG seed (default 0).
 
-**Returns**: `table` - Table with .regions (array of {id, name, x, y, tags[]}) and .edges (array of {from, to, cost, bidirectional}).
+**Returns**: `table` - Table with regions and edges arrays.
 
 #### Example
 
@@ -1076,7 +1076,7 @@ do
 end
 ```
 
-### `BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> table`
+### `BiomeClassifier:classifyMap(width: integer, height: integer, heights: table, moisture: table, [temperature]: table) -> string[]`
 
 Classify an entire grid of points into biome types in bulk.
 
@@ -1088,7 +1088,7 @@ Classify an entire grid of points into biome types in bulk.
 - `moisture` (`table`, required) - Flat array of moisture values (length = width*height).
 - `temperature` (`table`, optional) - Optional flat array of temperature values. If omitted, temperature is ignored.
 
-**Returns**: `table` - Flat array of biome name strings (length = width*height).
+**Returns**: `string[]` - Biome name strings (length = width*height).
 
 #### Example
 

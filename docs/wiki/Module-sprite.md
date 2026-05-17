@@ -21,8 +21,8 @@
   - [lurek.sprite.parseAtlas(json_str: string) -> LSpriteAtlas](#lurekspriteparseatlasjsonstr-string-lspriteatlas)
 - [Types and Methods](#types-and-methods)
   - [LSpriteAtlas](#lspriteatlas)
-  - [LSpriteAtlas:entryCount() -> number](#lspriteatlasentrycount-number)
-  - [LSpriteAtlas:entryNames() -> table](#lspriteatlasentrynames-table)
+  - [LSpriteAtlas:entryCount() -> integer](#lspriteatlasentrycount-integer)
+  - [LSpriteAtlas:entryNames() -> string[]](#lspriteatlasentrynames-string)
   - [LSpriteAtlas:getByIndex(index: integer) -> table](#lspriteatlasgetbyindexindex-integer-table)
   - [LSpriteAtlas:getEntry(name: string) -> table](#lspriteatlasgetentryname-string-table)
   - [LSpriteAtlas:getFlipped(name: string, flip_x: boolean, flip_y: boolean) -> table](#lspriteatlasgetflippedname-string-flipx-boolean-flipy-boolean-table)
@@ -32,11 +32,11 @@
   - [LSpriteSheet:drawToImage(w: integer, h: integer) -> LImage](#lspritesheetdrawtoimagew-integer-h-integer-limage)
   - [LSpriteSheet:getColumn(col: integer) -> table](#lspritesheetgetcolumncol-integer-table)
   - [LSpriteSheet:getFrame(index: integer) -> table](#lspritesheetgetframeindex-integer-table)
-  - [LSpriteSheet:getFrameCount() -> number](#lspritesheetgetframecount-number)
-  - [LSpriteSheet:getFrameSize() -> number](#lspritesheetgetframesize-number)
-  - [LSpriteSheet:getGridSize() -> number](#lspritesheetgetgridsize-number)
+  - [LSpriteSheet:getFrameCount() -> integer](#lspritesheetgetframecount-integer)
+  - [LSpriteSheet:getFrameSize() -> integer](#lspritesheetgetframesize-integer)
+  - [LSpriteSheet:getGridSize() -> integer](#lspritesheetgetgridsize-integer)
   - [LSpriteSheet:getGroupFrames(name: string) -> table](#lspritesheetgetgroupframesname-string-table)
-  - [LSpriteSheet:getGroupNames() -> table](#lspritesheetgetgroupnames-table)
+  - [LSpriteSheet:getGroupNames() -> string[]](#lspritesheetgetgroupnames-string)
   - [LSpriteSheet:getRow(row: integer) -> table](#lspritesheetgetrowrow-integer-table)
   - [LSpriteSheet:nameGroup(name: string, start: integer, count: integer)](#lspritesheetnamegroupname-string-start-integer-count-integer)
   - [LSpriteSheet:type() -> string](#lspritesheettype-string)
@@ -288,11 +288,11 @@ do
 end
 ```
 
-### `LSpriteAtlas:entryCount() -> number`
+### `LSpriteAtlas:entryCount() -> integer`
 
 Returns the total number of entries (sprite regions) in the atlas.
 
-**Returns**: `number` - Entry count.
+**Returns**: `integer` - Entry count.
 
 #### Example
 
@@ -313,11 +313,11 @@ do
 end
 ```
 
-### `LSpriteAtlas:entryNames() -> table`
+### `LSpriteAtlas:entryNames() -> string[]`
 
 Returns an array of all entry names in the atlas.
 
-**Returns**: `table` - Array of name strings.
+**Returns**: `string[]` - Name strings.
 
 #### Example
 
@@ -347,7 +347,7 @@ Returns a sprite region by its 1-based index in the atlas.
 
 - `index` (`integer`, required) - 1-based entry index.
 
-**Returns**: `table` - Entry table `{name, x, y, w, h, rotated}`, or nil if out of range.
+**Returns**: `table` - Entry table `{name, x, y, w, h, rotated}`, or nil if the index is out of range.
 
 #### Example
 
@@ -374,7 +374,7 @@ Looks up a named sprite region in the atlas by its original filename or tag.
 
 - `name` (`string`, required) - Entry name (e.g. `"player_idle_0"`).
 
-**Returns**: `table` - Entry table `{name, x, y, w, h, rotated}`, or nil if not found.
+**Returns**: `table` - Entry table `{name, x, y, w, h, rotated}`, or nil if the entry is not found.
 
 #### Example
 
@@ -405,7 +405,7 @@ Returns a copy of a named atlas entry with the specified flip flags applied.
 - `flip_x` (`boolean`, required) - Mirror horizontally.
 - `flip_y` (`boolean`, required) - Mirror vertically.
 
-**Returns**: `table` - Entry table with added `flip_x` and `flip_y` fields, or nil if not found.
+**Returns**: `table` - Entry table with added `flip_x` and `flip_y` fields, or nil if the entry is not found.
 
 #### Example
 
@@ -543,7 +543,7 @@ Returns the UV quad for a single frame by its 1-based index.
 
 - `index` (`integer`, required) - 1-based frame index in the sprite sheet.
 
-**Returns**: `table` - Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if out of range.
+**Returns**: `table` - Quad table `{x, y, w, h}` with normalized UV coordinates, or nil if the index is out of range.
 
 #### Example
 
@@ -561,11 +561,11 @@ do
 end
 ```
 
-### `LSpriteSheet:getFrameCount() -> number`
+### `LSpriteSheet:getFrameCount() -> integer`
 
 Returns the total number of frames in this sprite sheet.
 
-**Returns**: `number` - Total frame count (columns × rows).
+**Returns**: `integer` - Total frame count (columns × rows).
 
 #### Example
 
@@ -584,11 +584,11 @@ do
 end
 ```
 
-### `LSpriteSheet:getFrameSize() -> number`
+### `LSpriteSheet:getFrameSize() -> integer`
 
 Returns the pixel dimensions of a single frame cell.
 
-**Returns**: `number` - Frame width in pixels.
+**Returns**: `integer` - Frame width in pixels.
 
 #### Example
 
@@ -606,11 +606,11 @@ do
 end
 ```
 
-### `LSpriteSheet:getGridSize() -> number`
+### `LSpriteSheet:getGridSize() -> integer`
 
 Returns the number of columns and rows in the sprite sheet grid.
 
-**Returns**: `number` - Number of columns.
+**Returns**: `integer` - Number of columns.
 
 #### Example
 
@@ -654,11 +654,11 @@ do
 end
 ```
 
-### `LSpriteSheet:getGroupNames() -> table`
+### `LSpriteSheet:getGroupNames() -> string[]`
 
 Returns an array of all named animation group names defined on this sheet.
 
-**Returns**: `table` - Array of group name strings.
+**Returns**: `string[]` - Group name strings.
 
 #### Example
 

@@ -18,13 +18,13 @@
   - [lurek.terminal.applyTheme(terminal: LTerminal, theme: string)](#lurekterminalapplythemeterminal-lterminal-theme-string)
   - [lurek.terminal.clearCmdHistory(terminal: LTerminal)](#lurekterminalclearcmdhistoryterminal-lterminal)
   - [lurek.terminal.clearCompletions()](#lurekterminalclearcompletions)
-  - [lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> number](#lurekterminalcmdhistorylenterminal-lterminal-number)
-  - [lurek.terminal.getCompletions(prefix: string) -> table](#lurekterminalgetcompletionsprefix-string-table)
-  - [lurek.terminal.getMaxCols() -> number](#lurekterminalgetmaxcols-number)
-  - [lurek.terminal.getMaxRows() -> number](#lurekterminalgetmaxrows-number)
-  - [lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> table](#lurekterminalgetscrollbackterminal-lterminal-offset-integer-count-integer-table)
+  - [lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> integer](#lurekterminalcmdhistorylenterminal-lterminal-integer)
+  - [lurek.terminal.getCompletions(prefix: string) -> string[]](#lurekterminalgetcompletionsprefix-string-string)
+  - [lurek.terminal.getMaxCols() -> integer](#lurekterminalgetmaxcols-integer)
+  - [lurek.terminal.getMaxRows() -> integer](#lurekterminalgetmaxrows-integer)
+  - [lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> string[]](#lurekterminalgetscrollbackterminal-lterminal-offset-integer-count-integer-string)
   - [lurek.terminal.newBorder(col: integer, row: integer, width: integer, height: integer) -> LWidget](#lurekterminalnewbordercol-integer-row-integer-width-integer-height-integer-lwidget)
-  - [lurek.terminal.newButton(col: number, row: number, width: number, [height]: number, [text]: string) -> LWidget](#lurekterminalnewbuttoncol-number-row-number-width-number-height-number-text-string-lwidget)
+  - [lurek.terminal.newButton(col: integer, row: integer, width: integer, [height]: integer, [text]: string) -> LWidget](#lurekterminalnewbuttoncol-integer-row-integer-width-integer-height-integer-text-string-lwidget)
   - [lurek.terminal.newLabel(col: integer, row: integer, [text]: string) -> LWidget](#lurekterminalnewlabelcol-integer-row-integer-text-string-lwidget)
   - [lurek.terminal.newList(col: integer, row: integer, width: integer, height: integer) -> LWidget](#lurekterminalnewlistcol-integer-row-integer-width-integer-height-integer-lwidget)
   - [lurek.terminal.newPanel(col: integer, row: integer, [width]: integer, [height]: integer) -> LWidget](#lurekterminalnewpanelcol-integer-row-integer-width-integer-height-integer-lwidget)
@@ -35,12 +35,12 @@
   - [lurek.terminal.parseAnsi(text: string) -> table](#lurekterminalparseansitext-string-table)
   - [lurek.terminal.prevCmd(terminal: LTerminal) -> string](#lurekterminalprevcmdterminal-lterminal-string)
   - [lurek.terminal.printAnsi(terminal: LTerminal, col: integer, row: integer, text: string)](#lurekterminalprintansiterminal-lterminal-col-integer-row-integer-text-string)
-  - [lurek.terminal.printHighlighted(terminal: LTerminal, col: number, row: number, text: string, rules: table)](#lurekterminalprinthighlightedterminal-lterminal-col-number-row-number-text-string-rules-table)
+  - [lurek.terminal.printHighlighted(terminal: LTerminal, col: integer, row: integer, text: string, rules: table)](#lurekterminalprinthighlightedterminal-lterminal-col-integer-row-integer-text-string-rules-table)
   - [lurek.terminal.pushCmdHistory(terminal: LTerminal, cmd: string)](#lurekterminalpushcmdhistoryterminal-lterminal-cmd-string)
   - [lurek.terminal.pushScrollback(terminal: LTerminal, line: string)](#lurekterminalpushscrollbackterminal-lterminal-line-string)
   - [lurek.terminal.removeCompletion(candidate: string)](#lurekterminalremovecompletioncandidate-string)
   - [lurek.terminal.resetCompletion()](#lurekterminalresetcompletion)
-  - [lurek.terminal.scrollbackLen(terminal: LTerminal) -> number](#lurekterminalscrollbacklenterminal-lterminal-number)
+  - [lurek.terminal.scrollbackLen(terminal: LTerminal) -> integer](#lurekterminalscrollbacklenterminal-lterminal-integer)
   - [lurek.terminal.setScrollbackCap(terminal: LTerminal, cap: integer)](#lurekterminalsetscrollbackcapterminal-lterminal-cap-integer)
   - [lurek.terminal.stripAnsi(text: string) -> string](#lurekterminalstripansitext-string-string)
 - [Types and Methods](#types-and-methods)
@@ -49,18 +49,18 @@
   - [LTerminal:autoResize()](#lterminalautoresize)
   - [LTerminal:clear()](#lterminalclear)
   - [LTerminal:clearWidgets()](#lterminalclearwidgets)
-  - [LTerminal:get(col: integer, row: integer) -> number, number, number, number, number, number, number, number, number](#lterminalgetcol-integer-row-integer-number-number-number-number-number-number-number-number-number)
+  - [LTerminal:get(col: integer, row: integer) -> integer, number, number, number, number, number, number, number, number](#lterminalgetcol-integer-row-integer-integer-number-number-number-number-number-number-number-number)
   - [LTerminal:getCellSize() -> number, number](#lterminalgetcellsize-number-number)
-  - [LTerminal:getDimensions() -> number, number](#lterminalgetdimensions-number-number)
+  - [LTerminal:getDimensions() -> integer, integer](#lterminalgetdimensions-integer-integer)
   - [LTerminal:getFocused() -> LWidget](#lterminalgetfocused-lwidget)
-  - [LTerminal:getWidgetCount() -> number](#lterminalgetwidgetcount-number)
+  - [LTerminal:getWidgetCount() -> integer](#lterminalgetwidgetcount-integer)
   - [LTerminal:keypressed(key: string) -> boolean](#lterminalkeypressedkey-string-boolean)
   - [LTerminal:mousepressed(px: number, py: number, [button]: integer)](#lterminalmousepressedpx-number-py-number-button-integer)
   - [LTerminal:print(col: integer, row: integer, text: string)](#lterminalprintcol-integer-row-integer-text-string)
   - [LTerminal:removeWidget(widget: LWidget)](#lterminalremovewidgetwidget-lwidget)
   - [LTerminal:render([x]: number, [y]: number)](#lterminalrenderx-number-y-number)
   - [LTerminal:resetCellSize()](#lterminalresetcellsize)
-  - [LTerminal:set(col: number, row: number, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number)](#lterminalsetcol-number-row-number-ch-stringnumber-fr-number-fg-number-fb-number-fa-number-br-number-bg-number-bb-number-ba-number)
+  - [LTerminal:set(col: integer, row: integer, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number)](#lterminalsetcol-integer-row-integer-ch-stringnumber-fr-number-fg-number-fb-number-fa-number-br-number-bg-number-bb-number-ba-number)
   - [LTerminal:setCellSize(w: number, h: number)](#lterminalsetcellsizew-number-h-number)
   - [LTerminal:setFocus([widget]: LWidget)](#lterminalsetfocuswidget-lwidget)
   - [LTerminal:setFont(height: integer)](#lterminalsetfontheight-integer)
@@ -69,18 +69,18 @@
   - [LTerminal:typeOf(name: string) -> boolean](#lterminaltypeofname-string-boolean)
   - [LWidget](#lwidget)
   - [LWidget:addChild(child: LWidget)](#lwidgetaddchildchild-lwidget)
-  - [LWidget:addItem(item: string) -> LuaValue](#lwidgetadditemitem-string-luavalue)
+  - [LWidget:addItem(item: string)](#lwidgetadditemitem-string)
   - [LWidget:clearChildren()](#lwidgetclearchildren)
-  - [LWidget:clearItems() -> LuaValue](#lwidgetclearitems-luavalue)
+  - [LWidget:clearItems()](#lwidgetclearitems)
   - [LWidget:getChild(index: integer) -> LWidget](#lwidgetgetchildindex-integer-lwidget)
-  - [LWidget:getChildCount() -> number](#lwidgetgetchildcount-number)
+  - [LWidget:getChildCount() -> integer](#lwidgetgetchildcount-integer)
   - [LWidget:getColor() -> number, number, number, number](#lwidgetgetcolor-number-number-number-number)
   - [LWidget:getItem(index: integer) -> string](#lwidgetgetitemindex-integer-string)
-  - [LWidget:getItemCount() -> number](#lwidgetgetitemcount-number)
-  - [LWidget:getMaxLength() -> number](#lwidgetgetmaxlength-number)
-  - [LWidget:getPosition() -> number, number](#lwidgetgetposition-number-number)
-  - [LWidget:getSelected() -> number](#lwidgetgetselected-number)
-  - [LWidget:getSize() -> number, number](#lwidgetgetsize-number-number)
+  - [LWidget:getItemCount() -> integer](#lwidgetgetitemcount-integer)
+  - [LWidget:getMaxLength() -> integer](#lwidgetgetmaxlength-integer)
+  - [LWidget:getPosition() -> integer, integer](#lwidgetgetposition-integer-integer)
+  - [LWidget:getSelected() -> integer](#lwidgetgetselected-integer)
+  - [LWidget:getSize() -> integer, integer](#lwidgetgetsize-integer-integer)
   - [LWidget:getStyle() -> string](#lwidgetgetstyle-string)
   - [LWidget:getTag() -> string](#lwidgetgettag-string)
   - [LWidget:getText() -> string](#lwidgetgettext-string)
@@ -88,20 +88,20 @@
   - [LWidget:isEnabled() -> boolean](#lwidgetisenabled-boolean)
   - [LWidget:isVisible() -> boolean](#lwidgetisvisible-boolean)
   - [LWidget:removeChild(child: LWidget)](#lwidgetremovechildchild-lwidget)
-  - [LWidget:removeItem(index: integer) -> LuaValue](#lwidgetremoveitemindex-integer-luavalue)
+  - [LWidget:removeItem(index: integer)](#lwidgetremoveitemindex-integer)
   - [LWidget:setColor(r: number, g: number, b: number, [a]: number)](#lwidgetsetcolorr-number-g-number-b-number-a-number)
   - [LWidget:setEnabled(enabled: boolean)](#lwidgetsetenabledenabled-boolean)
-  - [LWidget:setMaxLength(maxLength: integer) -> LuaValue](#lwidgetsetmaxlengthmaxlength-integer-luavalue)
+  - [LWidget:setMaxLength(maxLength: integer)](#lwidgetsetmaxlengthmaxlength-integer)
   - [LWidget:setOnChange([callback]: function)](#lwidgetsetonchangecallback-function)
   - [LWidget:setOnClick([callback]: function)](#lwidgetsetonclickcallback-function)
   - [LWidget:setOnSelect([callback]: function)](#lwidgetsetonselectcallback-function)
   - [LWidget:setPosition(col: integer, row: integer)](#lwidgetsetpositioncol-integer-row-integer)
   - [LWidget:setSelected([index]: integer)](#lwidgetsetselectedindex-integer)
   - [LWidget:setSize(width: integer, height: integer)](#lwidgetsetsizewidth-integer-height-integer)
-  - [LWidget:setStyle(styleName: string) -> LuaValue](#lwidgetsetstylestylename-string-luavalue)
+  - [LWidget:setStyle(styleName: string)](#lwidgetsetstylestylename-string)
   - [LWidget:setTag(tag: string)](#lwidgetsettagtag-string)
   - [LWidget:setText(text: string)](#lwidgetsettexttext-string)
-  - [LWidget:setTitle(title: string) -> LuaValue](#lwidgetsettitletitle-string-luavalue)
+  - [LWidget:setTitle(title: string)](#lwidgetsettitletitle-string)
   - [LWidget:setVisible(visible: boolean)](#lwidgetsetvisiblevisible-boolean)
   - [LWidget:type() -> string](#lwidgettype-string)
   - [LWidget:typeOf(name: string) -> boolean](#lwidgettypeofname-string-boolean)
@@ -192,13 +192,13 @@ lurek.terminal.addCompletion(candidate: string) -- Registers a candidate string 
 lurek.terminal.applyTheme(terminal: LTerminal, theme: string) -- Applies a named color theme to the terminal, setting default foreground and background colors.
 lurek.terminal.clearCmdHistory(terminal: LTerminal) -- Removes all entries from the terminal command history.
 lurek.terminal.clearCompletions() -- Removes all registered completion candidates from the shared completion engine.
-lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> number -- Returns the number of commands currently stored in the terminal command history.
-lurek.terminal.getCompletions(prefix: string) -> table -- Returns all completion candidates matching the given prefix string.
-lurek.terminal.getMaxCols() -> number -- Returns the engine-defined maximum number of columns a terminal grid can have.
-lurek.terminal.getMaxRows() -> number -- Returns the engine-defined maximum number of rows a terminal grid can have.
-lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> table -- Retrieves a range of lines from the terminal scrollback buffer.
+lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> integer -- Returns the number of commands currently stored in the terminal command history.
+lurek.terminal.getCompletions(prefix: string) -> string[] -- Returns all completion candidates matching the given prefix string.
+lurek.terminal.getMaxCols() -> integer -- Returns the engine-defined maximum number of columns a terminal grid can have.
+lurek.terminal.getMaxRows() -> integer -- Returns the engine-defined maximum number of rows a terminal grid can have.
+lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> string[] -- Retrieves a range of lines from the terminal scrollback buffer.
 lurek.terminal.newBorder(col: integer, row: integer, width: integer, height: integer) -> LWidget -- Creates a new decorative border widget drawn using box-drawing characters.
-lurek.terminal.newButton(col: number, row: number, width: number, [height]: number, [text]: string) -> LWidget -- Creates a new clickable button widget with the given position, size, and label text.
+lurek.terminal.newButton(col: integer, row: integer, width: integer, [height]: integer, [text]: string) -> LWidget -- Creates a new clickable button widget with the given position, size, and label text.
 lurek.terminal.newLabel(col: integer, row: integer, [text]: string) -> LWidget -- Creates a new label widget that displays static text at the given cell position.
 lurek.terminal.newList(col: integer, row: integer, width: integer, height: integer) -> LWidget -- Creates a new scrollable list widget for displaying and selecting items.
 lurek.terminal.newPanel(col: integer, row: integer, [width]: integer, [height]: integer) -> LWidget -- Creates a new panel widget that can contain child widgets for grouped layout.
@@ -306,7 +306,7 @@ do
 end
 ```
 
-### `lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> number`
+### `lurek.terminal.cmdHistoryLen(terminal: LTerminal) -> integer`
 
 Returns the number of commands currently stored in the terminal command history.
 
@@ -314,7 +314,7 @@ Returns the number of commands currently stored in the terminal command history.
 
 - `terminal` (`LTerminal`, required) - The terminal to query.
 
-**Returns**: `number` - History entry count.
+**Returns**: `integer` - History entry count.
 
 #### Example
 
@@ -332,7 +332,7 @@ do
 end
 ```
 
-### `lurek.terminal.getCompletions(prefix: string) -> table`
+### `lurek.terminal.getCompletions(prefix: string) -> string[]`
 
 Returns all completion candidates matching the given prefix string.
 
@@ -340,7 +340,7 @@ Returns all completion candidates matching the given prefix string.
 
 - `prefix` (`string`, required) - The prefix to match against.
 
-**Returns**: `table` - Array of matching candidate strings.
+**Returns**: `string[]` - Matching candidate strings.
 
 #### Example
 
@@ -359,11 +359,11 @@ do
 end
 ```
 
-### `lurek.terminal.getMaxCols() -> number`
+### `lurek.terminal.getMaxCols() -> integer`
 
 Returns the engine-defined maximum number of columns a terminal grid can have.
 
-**Returns**: `number` - Maximum column count.
+**Returns**: `integer` - Maximum column count.
 
 #### Example
 
@@ -378,11 +378,11 @@ do
 end
 ```
 
-### `lurek.terminal.getMaxRows() -> number`
+### `lurek.terminal.getMaxRows() -> integer`
 
 Returns the engine-defined maximum number of rows a terminal grid can have.
 
-**Returns**: `number` - Maximum row count.
+**Returns**: `integer` - Maximum row count.
 
 #### Example
 
@@ -396,7 +396,7 @@ do
 end
 ```
 
-### `lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> table`
+### `lurek.terminal.getScrollback(terminal: LTerminal, offset: integer, count: integer) -> string[]`
 
 Retrieves a range of lines from the terminal scrollback buffer.
 
@@ -406,7 +406,7 @@ Retrieves a range of lines from the terminal scrollback buffer.
 - `offset` (`integer`, required) - 0-based offset from the newest line.
 - `count` (`integer`, required) - Number of lines to retrieve.
 
-**Returns**: `table` - Array of scrollback line strings.
+**Returns**: `string[]` - Scrollback line strings.
 
 #### Example
 
@@ -469,16 +469,16 @@ do
 end
 ```
 
-### `lurek.terminal.newButton(col: number, row: number, width: number, [height]: number, [text]: string) -> LWidget`
+### `lurek.terminal.newButton(col: integer, row: integer, width: integer, [height]: integer, [text]: string) -> LWidget`
 
 Creates a new clickable button widget with the given position, size, and label text.
 
 **Parameters**
 
-- `col` (`number`, required) - Column position (1-based).
-- `row` (`number`, required) - Row position (1-based).
-- `width` (`number`, required) - Button width in cells.
-- `height` (`number`, optional) - Button height in cells (default 1).
+- `col` (`integer`, required) - Column position (1-based).
+- `row` (`integer`, required) - Row position (1-based).
+- `width` (`integer`, required) - Button width in cells.
+- `height` (`integer`, optional) - Button height in cells (default 1).
 - `text` (`string`, optional) - Button label text (default empty).
 
 **Returns**: `LWidget` - The new button widget.
@@ -833,15 +833,15 @@ do
 end
 ```
 
-### `lurek.terminal.printHighlighted(terminal: LTerminal, col: number, row: number, text: string, rules: table)`
+### `lurek.terminal.printHighlighted(terminal: LTerminal, col: integer, row: integer, text: string, rules: table)`
 
 Renders syntax-highlighted text onto the terminal grid using a table of highlight rules with regex patterns and colors.
 
 **Parameters**
 
 - `terminal` (`LTerminal`, required) - The terminal to print to.
-- `col` (`number`, required) - Starting column (1-based).
-- `row` (`number`, required) - Row to print on (1-based).
+- `col` (`integer`, required) - Starting column (1-based).
+- `row` (`integer`, required) - Row to print on (1-based).
 - `text` (`string`, required) - The text to highlight.
 - `rules` (`table`, required) - Array of rule tables, each with `pattern` (string), `fg` (table {r,g,b} 0-255), and optional `bg` (table {r,g,b} 0-255).
 
@@ -964,7 +964,7 @@ do
 end
 ```
 
-### `lurek.terminal.scrollbackLen(terminal: LTerminal) -> number`
+### `lurek.terminal.scrollbackLen(terminal: LTerminal) -> integer`
 
 Returns the number of lines currently stored in the terminal scrollback buffer.
 
@@ -972,7 +972,7 @@ Returns the number of lines currently stored in the terminal scrollback buffer.
 
 - `terminal` (`LTerminal`, required) - The terminal to query.
 
-**Returns**: `number` - Line count.
+**Returns**: `integer` - Line count.
 
 #### Example
 
@@ -1160,7 +1160,7 @@ do
 end
 ```
 
-### `LTerminal:get(col: integer, row: integer) -> number, number, number, number, number, number, number, number, number`
+### `LTerminal:get(col: integer, row: integer) -> integer, number, number, number, number, number, number, number, number`
 
 Reads the character and colors at a specific cell in the terminal grid.
 
@@ -1169,7 +1169,7 @@ Reads the character and colors at a specific cell in the terminal grid.
 - `col` (`integer`, required) - Column index (1-based).
 - `row` (`integer`, required) - Row index (1-based).
 
-**Returns**: `number, number, number, number, number, number, number, number, number` - Character codepoint, fg RGBA, bg RGBA.
+**Returns**: `integer, number, number, number, number, number, number, number, number` - Character codepoint, fg RGBA, bg RGBA.
 
 #### Example
 
@@ -1209,11 +1209,11 @@ do
 end
 ```
 
-### `LTerminal:getDimensions() -> number, number`
+### `LTerminal:getDimensions() -> integer, integer`
 
 Returns the number of columns and rows in the terminal grid.
 
-**Returns**: `number, number` - Column count, row count.
+**Returns**: `integer, integer` - Column count, row count.
 
 #### Example
 
@@ -1258,11 +1258,11 @@ do
 end
 ```
 
-### `LTerminal:getWidgetCount() -> number`
+### `LTerminal:getWidgetCount() -> integer`
 
 Returns the number of widgets currently attached to this terminal.
 
-**Returns**: `number` - Widget count.
+**Returns**: `integer` - Widget count.
 
 #### Example
 
@@ -1443,14 +1443,14 @@ do
 end
 ```
 
-### `LTerminal:set(col: number, row: number, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number)`
+### `LTerminal:set(col: integer, row: integer, ch: string|number, [fr]: number, [fg]: number, [fb]: number, [fa]: number, [br]: number, [bg]: number, [bb]: number, [ba]: number)`
 
 Writes a character with foreground and background color to a specific cell in the terminal grid.
 
 **Parameters**
 
-- `col` (`number`, required) - Column index (1-based).
-- `row` (`number`, required) - Row index (1-based).
+- `col` (`integer`, required) - Column index (1-based).
+- `row` (`integer`, required) - Row index (1-based).
 - `ch` (`string|number`, required) - Character as a string or Unicode codepoint.
 - `fr` (`number`, optional) - Foreground red (0-1, default 1).
 - `fg` (`number`, optional) - Foreground green (0-1, default 1).
@@ -1684,15 +1684,13 @@ do
 end
 ```
 
-### `LWidget:addItem(item: string) -> LuaValue`
+### `LWidget:addItem(item: string)`
 
 Appends a text item to a list widget.
 
 **Parameters**
 
 - `item` (`string`, required) - The item text to add.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -1729,11 +1727,9 @@ do
 end
 ```
 
-### `LWidget:clearItems() -> LuaValue`
+### `LWidget:clearItems()`
 
 Removes all items from a list widget.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -1780,11 +1776,11 @@ do
 end
 ```
 
-### `LWidget:getChildCount() -> number`
+### `LWidget:getChildCount() -> integer`
 
 Returns the number of child widgets in a panel widget.
 
-**Returns**: `number` - Child count.
+**Returns**: `integer` - Child count.
 
 #### Example
 
@@ -1803,9 +1799,9 @@ end
 
 ### `LWidget:getColor() -> number, number, number, number`
 
-Returns the current RGBA color assigned to this widget.
+Returns the foreground color of the widget as RGBA components.
 
-**Returns**: `number, number, number, number` - Red, green, blue, and alpha components in the 0..1 range.
+**Returns**: `number, number, number, number` - Red, green, blue, and alpha channels.
 
 #### Example
 
@@ -1846,11 +1842,11 @@ do
 end
 ```
 
-### `LWidget:getItemCount() -> number`
+### `LWidget:getItemCount() -> integer`
 
 Returns the number of items in a list widget.
 
-**Returns**: `number` - Item count.
+**Returns**: `integer` - Item count.
 
 #### Example
 
@@ -1867,11 +1863,11 @@ do
 end
 ```
 
-### `LWidget:getMaxLength() -> number`
+### `LWidget:getMaxLength() -> integer`
 
 Returns the maximum character limit of a text box widget.
 
-**Returns**: `number` - Maximum character count.
+**Returns**: `integer` - Maximum character count.
 
 #### Example
 
@@ -1887,11 +1883,11 @@ do
 end
 ```
 
-### `LWidget:getPosition() -> number, number`
+### `LWidget:getPosition() -> integer, integer`
 
 Returns the widget position as 1-based column and row.
 
-**Returns**: `number, number` - Column, row.
+**Returns**: `integer, integer` - Column, row.
 
 #### Example
 
@@ -1909,11 +1905,11 @@ do
 end
 ```
 
-### `LWidget:getSelected() -> number`
+### `LWidget:getSelected() -> integer`
 
 Returns the 1-based index of the currently selected list item, or nil if nothing is selected.
 
-**Returns**: `number` - Selected item index, or nil.
+**Returns**: `integer` - Selected item index, or nil.
 
 #### Example
 
@@ -1933,11 +1929,11 @@ do
 end
 ```
 
-### `LWidget:getSize() -> number, number`
+### `LWidget:getSize() -> integer, integer`
 
 Returns the widget dimensions as width and height in cell units.
 
-**Returns**: `number, number` - Width, height.
+**Returns**: `integer, integer` - Width, height.
 
 #### Example
 
@@ -2099,15 +2095,13 @@ do
 end
 ```
 
-### `LWidget:removeItem(index: integer) -> LuaValue`
+### `LWidget:removeItem(index: integer)`
 
 Removes a list item by its 1-based index.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based item index to remove.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -2180,15 +2174,13 @@ do
 end
 ```
 
-### `LWidget:setMaxLength(maxLength: integer) -> LuaValue`
+### `LWidget:setMaxLength(maxLength: integer)`
 
 Sets the maximum number of characters allowed in a text box widget.
 
 **Parameters**
 
 - `maxLength` (`integer`, required) - Maximum character count.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -2351,15 +2343,13 @@ do
 end
 ```
 
-### `LWidget:setStyle(styleName: string) -> LuaValue`
+### `LWidget:setStyle(styleName: string)`
 
 Sets the border drawing style for a border or panel widget.
 
 **Parameters**
 
 - `styleName` (`string`, required) - Border style name (e.g. "single", "double", "rounded", "heavy", "none").
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 
@@ -2416,15 +2406,13 @@ do
 end
 ```
 
-### `LWidget:setTitle(title: string) -> LuaValue`
+### `LWidget:setTitle(title: string)`
 
 Sets the title text displayed in the border of a border or panel widget.
 
 **Parameters**
 
 - `title` (`string`, required) - The title text.
-
-**Returns**: `LuaValue` - Returned Lua value.
 
 #### Example
 

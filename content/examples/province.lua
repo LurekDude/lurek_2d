@@ -176,8 +176,8 @@ do
     -- Retrieve full province data for a tooltip or info panel.
     local snap = reg:getProvince(1)
     if snap then
-      lurek.log.info("province #1: terrain=" .. tostring(snap.terrain_type)
-        .. " fog=" .. tostring(snap.fog_state), "province")
+      lurek.log.info("province #1: terrain=" .. tostring(snap.style.terrain_type)
+        .. " fog=" .. tostring(snap.style.fog_state), "province")
     end
   end
 end

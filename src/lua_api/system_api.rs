@@ -164,7 +164,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getPreferredLocales --
     /// Returns a list of the user's preferred locale identifiers from the operating system.
-    /// @return | table | Array of locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
+    /// @return | string[] | Locale strings (e.g. `{"en_US", "pl_PL"}`). Falls back to `{"en_US"}` if detection fails.
     system.set(
         "getPreferredLocales",
         lua.create_function(|_, ()| Ok(get_preferred_locales()))?,
@@ -186,21 +186,24 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getInfo --
     /// Returns a table with comprehensive engine and host information.
     /// @return | table | Table with fields: `engine` (string), `version` (string), `lua_version` (string), `renderer` (string), `os` (string), `processors` (number), `memory` (number).
+    /// @field | engine | string | Engine name.
+    /// @field | version | string | Engine version string.
+    /// @field | lua_version | string | Lua version string.
+    /// @field | renderer | string | Renderer backend name.
+    /// @field | os | string | Host operating system name.
+    /// @field | processors | integer | Number of logical processors.
+    /// @field | memory | number | Total physical memory in MiB.
     system.set(
         "getInfo",
         lua.create_function(|lua, ()| {
             let info = lua.create_table()?;
             /// Performs the 'engine' operation.
-            /// @return | nil | No value is returned.
             info.set("engine", "Lurek2D")?;
             /// Performs the 'version' operation.
-            /// @return | nil | No value is returned.
             info.set("version", env!("CARGO_PKG_VERSION"))?;
             /// Performs the 'lua_version' operation.
-            /// @return | nil | No value is returned.
             info.set("lua_version", "Lua 5.4")?;
             /// Performs the 'renderer' operation.
-            /// @return | nil | No value is returned.
             info.set("renderer", "wgpu")?;
             info.set(
                 "os",
@@ -215,10 +218,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 },
             )?;
             /// Performs the 'processors' operation.
-            /// @return | nil | No value is returned.
             info.set("processors", get_processor_count())?;
             /// Performs the 'memory' operation.
-            /// @return | nil | No value is returned.
             info.set("memory", get_memory_size())?;
             Ok(info)
         })?,
@@ -253,7 +254,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setClipboardText --
     /// Copies a string to the system clipboard. Logs a warning if the clipboard is unavailable or the write fails.
     /// @param | text | string | The text to place on the clipboard.
-    /// @return | nil | No value is returned.
     system.set(
         "setClipboardText",
         lua.create_function(|_, text: String| {
@@ -295,7 +295,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- reloadConfig --
     /// Requests a reload of the engine configuration from `conf.lua`. The reload is deferred until the next frame.
-    /// @return | nil | No value is returned.
     system.set(
         "reloadConfig",
         lua.create_function(move |_, ()| {
@@ -309,62 +308,59 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getConfig --
     /// Returns a table containing the current engine runtime configuration values.
     /// @return | table | Table with fields: `runtime_mode` (string), `physics_tick_rate` (number), `fixed_update_tick_rate` (number?), `frame_budget_warn_ms` (number?), `lua_callback_timeout_ms` (number?), `vsync` (boolean), `log_level` (string), `config_reload_revision` (number).
+    /// @field | runtime_mode | string | Runtime mode.
+    /// @field | physics_tick_rate | number | Physics tick rate.
+    /// @field | fixed_update_tick_rate | number | Fixed update tick rate.
+    /// @field | frame_budget_warn_ms | number | Frame budget warn ms.
+    /// @field | lua_callback_timeout_ms | number | Lua callback timeout ms.
+    /// @field | vsync | boolean | Vsync.
+    /// @field | log_level | string | Log level.
+    /// @field | config_reload_revision | integer | Config reload revision.
     system.set(
         "getConfig",
         lua.create_function(move |lua, ()| {
             let st = s.borrow();
             let tbl = lua.create_table()?;
             /// Performs the 'runtime_mode' operation.
-            /// @return | nil | No value is returned.
             tbl.set("runtime_mode", st.runtime_mode.as_str())?;
             let fixed_dt = st.physics_run.fixed_dt;
             let physics_tick_rate = if fixed_dt > 0.0 { 1.0 / fixed_dt } else { 0.0 };
             /// Performs the 'physics_tick_rate' operation.
-            /// @return | nil | No value is returned.
             tbl.set("physics_tick_rate", physics_tick_rate)?;
             let fixed_update_dt = st.physics_run.fixed_update_dt;
             if fixed_update_dt > 0.0 {
                 /// Performs the 'fixed_update_tick_rate' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("fixed_update_tick_rate", 1.0 / fixed_update_dt)?;
             } else {
                 /// Performs the 'fixed_update_tick_rate' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("fixed_update_tick_rate", mlua::Value::Nil)?;
             }
             if let Some(ms) = st.frame_budget_warn_ms {
                 // frame_budget_warn_ms: per-frame time budget threshold in milliseconds
                 /// Performs the 'frame_budget_warn_ms' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("frame_budget_warn_ms", ms)?;
             } else {
                 // frame_budget_warn_ms: not configured
                 /// Performs the 'frame_budget_warn_ms' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("frame_budget_warn_ms", mlua::Value::Nil)?;
             }
             if let Some(ms) = st.lua_callback_timeout_ms {
                 // lua_callback_timeout_ms: per-callback Lua execution time limit in milliseconds
                 /// Performs the 'lua_callback_timeout_ms' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("lua_callback_timeout_ms", ms)?;
             } else {
                 // lua_callback_timeout_ms: not configured
                 /// Performs the 'lua_callback_timeout_ms' operation.
-                /// @return | nil | No value is returned.
                 tbl.set("lua_callback_timeout_ms", mlua::Value::Nil)?;
             }
             // vsync: whether vertical sync is currently enabled
             /// Performs the 'vsync' operation.
-            /// @return | nil | No value is returned.
             tbl.set("vsync", st.window_state.vsync_mode != 0)?;
             // log_level: current logging verbosity level string
             /// Performs the 'log_level' operation.
-            /// @return | nil | No value is returned.
             tbl.set("log_level", log_messages::get_log_level().to_string())?;
             // config_reload_revision: number of times the engine config has been reloaded
             /// Performs the 'config_reload_revision' operation.
-            /// @return | nil | No value is returned.
             tbl.set("config_reload_revision", st.config_reload_revision)?;
             Ok(tbl)
         })?,
@@ -375,7 +371,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setDebugOverlay --
     /// Enables or disables the on-screen debug overlay that shows FPS, draw calls, and other diagnostics.
     /// @param | enabled | boolean | `true` to show the debug overlay, `false` to hide it.
-    /// @return | nil | No value is returned.
     system.set(
         "setDebugOverlay",
         lua.create_function(move |_, enabled: bool| {
@@ -397,7 +392,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setLogLevel --
     /// Sets the engine-wide log verbosity level at runtime.
     /// @param | level | string | Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`.
-    /// @return | nil | No value is returned.
     #[allow(unused_doc_comments)]
     system.set(
         "setLogLevel",
@@ -420,7 +414,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Writes a message to the engine log at the specified severity level.
     /// @param | level | string | Log level: `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`. Defaults to `"info"` if unrecognized.
     /// @param | message | string | The message text to log.
-    /// @return | nil | No value is returned.
     #[allow(unused_doc_comments)]
     system.set(
         "log",
@@ -439,11 +432,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getLastError --
     /// Returns the most recent engine error as a table, or `nil` if no error has occurred.
     /// @return | table | Table with fields: `message` (string), `code` (string), `category` (string), and optional `hint` (string). Returns `nil` when no error is recorded.
+    /// @field | message | string | Error message.
+    /// @field | code | string | Error code.
+    /// @field | category | string | Error category.
+    /// @field | hint | string? | Optional hint for resolution.
     #[allow(unused_doc_comments)]
     {
         let s = state_for_error.clone();
         /// Returns the last error for Lua scripts in this module.
         /// @return | table | Table result returned by this call.
+        /// @field | message | string | Error message.
+        /// @field | code | string | Error code.
+        /// @field | category | string | Error category.
+        /// @field | hint | string? | Optional hint for resolution.
         system.set(
             "getLastError",
             lua.create_function(move |lua, ()| {
@@ -451,17 +452,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 if let Some(ref err_info) = state.last_error {
                     let tbl = lua.create_table()?;
                     /// Performs the 'message' operation.
-                    /// @return | nil | No value is returned.
                     tbl.set("message", err_info.message.as_str())?;
                     /// Performs the 'code' operation.
-                    /// @return | nil | No value is returned.
                     tbl.set("code", err_info.code.as_str())?;
                     /// Performs the 'category' operation.
-                    /// @return | nil | No value is returned.
                     tbl.set("category", err_info.category.as_str())?;
                     if let Some(ref hint) = err_info.hint {
                         /// Performs the 'hint' operation.
-                        /// @return | nil | No value is returned.
                         tbl.set("hint", hint.as_str())?;
                     }
                     Ok(mlua::Value::Table(tbl))
@@ -507,7 +504,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getArgs --
     /// Returns the command-line arguments passed to the engine as a 1-indexed table of strings.
-    /// @return | table | Array of argument strings.
+    /// @return | string[] | Argument strings.
     system.set(
         "getArgs",
         lua.create_function(|lua, ()| {
@@ -524,6 +521,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Parses command-line arguments into structured flags, options, and positional values. Supports `--key=value`, `--key value`, `-flag`, and `--` end-of-options.
     /// @param | args | table? | Optional table of argument strings. Uses `os.args` if omitted.
     /// @return | table | Table with fields: `flags` (table of boolean), `options` (table of string), `positional` (array of string).
+    /// @field | flags | table | Boolean flags indexed by name.
+    /// @field | options | table | String options indexed by name.
+    /// @field | positional | string[] | Positional argument values.
     system.set(
         "parseArgs",
         lua.create_function(|lua, args: Option<LuaTable>| {
@@ -574,13 +574,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             }
             let result = lua.create_table()?;
             /// Performs the 'flags' operation.
-            /// @return | nil | No value is returned.
             result.set("flags", flags)?;
             /// Performs the 'options' operation.
-            /// @return | nil | No value is returned.
             result.set("options", options)?;
             /// Performs the 'positional' operation.
-            /// @return | nil | No value is returned.
             result.set("positional", positional)?;
             Ok(result)
         })?,
@@ -591,6 +588,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | tasks | table | Table mapping task names (string) to task functions (function).
     /// @param | opts | table? | Options table. Set `stopOnError = true` to skip remaining tasks after the first failure.
     /// @return | table | Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
+    /// @field | status | string | Task status: passed, failed, or skipped.
+    /// @field | time | number | Elapsed time in seconds.
+    /// @field | error | string? | Error message when status is failed.
     system.set(
         "runBatch",
         lua.create_function(|lua, (tasks, opts): (LuaTable, Option<LuaTable>)| {
@@ -605,10 +605,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 if had_error && stop_on_error {
                     let entry = lua.create_table()?;
                     /// Performs the 'status' operation.
-                    /// @return | nil | No value is returned.
                     entry.set("status", "skipped")?;
                     /// Performs the 'time' operation.
-                    /// @return | nil | No value is returned.
                     entry.set("time", 0.0)?;
                     results.set(name, entry)?;
                     continue;
@@ -618,21 +616,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 match func.call::<_, LuaMultiValue>(()) {
                     Ok(_) => {
                         /// Performs the 'status' operation.
-                        /// @return | nil | No value is returned.
                         entry.set("status", "passed")?;
                     }
                     Err(e) => {
                         /// Performs the 'status' operation.
-                        /// @return | nil | No value is returned.
                         entry.set("status", "failed")?;
                         /// Performs the 'error' operation.
-                        /// @return | nil | No value is returned.
                         entry.set("error", e.to_string())?;
                         had_error = true;
                     }
                 }
                 /// Performs the 'time' operation.
-                /// @return | nil | No value is returned.
                 entry.set("time", start.elapsed().as_secs_f64())?;
                 results.set(name, entry)?;
             }
@@ -667,7 +661,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     /// Performs the 'runtime' operation.
-    /// @return | nil | No value is returned.
     lurek.set("runtime", system)?;
     Ok(())
 }
